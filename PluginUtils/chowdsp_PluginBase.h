@@ -1,6 +1,7 @@
 # pragma once
 
-namespace chowdsp {
+namespace chowdsp
+{
 
 /**
  * Base class for plugin processors.
