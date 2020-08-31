@@ -73,6 +73,8 @@ protected:
     T t60 = 1;
     std::complex<T> amplitude;
     T fs = 44100;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ModalFilter)
 };
 
 } // chowdsp

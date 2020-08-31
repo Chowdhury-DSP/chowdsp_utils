@@ -1,0 +1,44 @@
+#pragma once
+
+namespace chowdsp
+{
+
+/** A first order shelving filter, with a set gain at DC,
+ * a set gain at high frequencies, and a transition frequency.
+ */
+template<typename T = float>
+class ShelfFilter : public IIRFilter<1, T>
+{
+public:
+    ShelfFilter() = default;
+
+    /** Calculates the coefficients for the filter.
+     * @param lowGain: the gain of the filter at low frequencies
+     * @param highGain: the gain of the filter at high frequencies
+     * @param fc: the transition frequency of the filter
+     * @param fs: the sample rate for the filter
+     */
+    void calcCoefs (float lowGain, float highGain, float fc, float fs)
+    {
+        // reduce to simple gain element
+        if (lowGain == highGain)
+        {
+            b[0] = lowGain; b[1] = 0.0f;
+            a[0] = 1.0f; a[1] = 0.0f;
+            return;
+        }
+
+        auto wc = juce::MathConstants<T>::twoPi * fc;
+        auto p = std::sqrt (wc*wc * (highGain*highGain - lowGain*highGain) / (lowGain*highGain - lowGain*lowGain));
+        auto K = p / std::tan (p / (2.0f * fs));
+
+        float bs[2] { highGain / p, lowGain };
+        float as[2] { 1.0f / p, 1.0f };
+        Bilinear::BilinearTransform<T, 2>::call (b, a, bs, as, K);
+    }
+
+private:
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ShelfFilter)
+};
+
+} // chowdsp

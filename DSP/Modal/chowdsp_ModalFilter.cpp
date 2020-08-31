@@ -1,5 +1,3 @@
-#include "chowdsp_ModalFilter.h"
-
 namespace chowdsp
 {
 
