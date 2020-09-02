@@ -23,8 +23,8 @@ public:
         // reduce to simple gain element
         if (lowGain == highGain)
         {
-            b[0] = lowGain; b[1] = 0.0f;
-            a[0] = 1.0f; a[1] = 0.0f;
+            this->b[0] = lowGain; this->b[1] = 0.0f;
+            this->a[0] = 1.0f; this->a[1] = 0.0f;
             return;
         }
 
@@ -34,7 +34,7 @@ public:
 
         float bs[2] { highGain / p, lowGain };
         float as[2] { 1.0f / p, 1.0f };
-        Bilinear::BilinearTransform<T, 2>::call (b, a, bs, as, K);
+        Bilinear::BilinearTransform<T, 2>::call (this->b, this->a, bs, as, K);
     }
 
 private:

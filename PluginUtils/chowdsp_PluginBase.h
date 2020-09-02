@@ -70,9 +70,9 @@ public:
 template<class Processor>
 PluginBase<Processor>::PluginBase() :
     AudioProcessor (BusesProperties()
-        .withInput ("Input", AudioChannelSet::stereo(), true)
-        .withOutput ("Output", AudioChannelSet::stereo(), true)),
-    vts (*this, nullptr, Identifier ("Parameters"), createParameterLayout())
+        .withInput ("Input", juce::AudioChannelSet::stereo(), true)
+        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)),
+    vts (*this, nullptr, juce::Identifier ("Parameters"), createParameterLayout())
 {
 }
 
