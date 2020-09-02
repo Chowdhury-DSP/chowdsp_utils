@@ -5,6 +5,8 @@
 
 This repository contains a JUCE module with utilities for building Chowdhury DSP plugins.
 
+More documentation coming soon!
+
 ## License
 
 `chowdsp_utils` is open source, and is licensed under the BSD 3-clause license.

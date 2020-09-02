@@ -50,6 +50,7 @@ install:
     fi
 
 script:
+  - cd ${TRAVIS_BUILD_DIR}
   - cmake -Bbuild
   - cd build/
   - cmake --build .

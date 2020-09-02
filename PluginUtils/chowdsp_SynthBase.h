@@ -19,7 +19,7 @@ public:
 
         buffer.clear();
 
-        magicState.processMidiBuffer (midi, buffer.getNumSamples(), true);
+        this->magicState.processMidiBuffer (midi, buffer.getNumSamples(), true);
 
         processSynth (buffer, midi);
     }
