@@ -23,5 +23,9 @@
 
 #include <foleys_gui_magic/foleys_gui_magic.h>
 
+// Plugin utils
 #include "PluginUtils/chowdsp_PluginBase.h"
+#include "PluginUtils/chowdsp_SynthBase.h"
+#include "PluginUtils/chowdsp_DummySynthSound.h"
+
 #include "DSP/chowdsp_DSP.h"

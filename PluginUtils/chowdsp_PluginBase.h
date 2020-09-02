@@ -116,6 +116,8 @@ void PluginBase<Processor>::prepareToPlay (double sampleRate, int samplesPerBloc
 template<class Processor>
 void PluginBase<Processor>::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer&)
 {
+    juce::ScopedNoDenormals noDenormals;
+
     processBlock (buffer);
 }
 
