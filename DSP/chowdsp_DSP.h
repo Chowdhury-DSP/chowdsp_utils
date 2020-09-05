@@ -7,3 +7,6 @@
 
 // modal tools
 #include "Modal/chowdsp_ModalFilter.h"
+
+// WDF tools
+#include "WDF/wdf.h"
