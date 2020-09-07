@@ -34,6 +34,8 @@ before_install:
   # install Foley's GUI Magic
   - cd ${TRAVIS_BUILD_DIR}/../
   - git clone https://github.com/ffAudio/foleys_gui_magic.git
+  - cd foleys_gui_magic
+  - git reset --hard 9b7b982
 
 install:
   # upgrade cmake to 3.18

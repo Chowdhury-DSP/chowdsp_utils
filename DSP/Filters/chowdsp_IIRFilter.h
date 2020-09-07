@@ -40,7 +40,7 @@ public:
         return y;
     }
 
-    /** Optimized processing call for Nth-order filter */
+    /** Generalized processing call for Nth-order filter */
     template <int N = order>
     inline typename std::enable_if <(N > 2), FloatType>::type
     processSample (FloatType x) noexcept

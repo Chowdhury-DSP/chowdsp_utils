@@ -26,6 +26,11 @@
 namespace chowdsp
 {
 
+/** Functions to approximate the Lambert W functions,
+ * borrowed from Stephano D'Angelo. For more information, see:
+ * http://dafx2019.bcu.ac.uk/papers/DAFx2019_paper_5.pdf
+ */
+
 inline float log2f_approx(float x) {
 	union {
 		int	i;
