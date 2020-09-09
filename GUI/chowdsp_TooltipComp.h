@@ -3,6 +3,7 @@
 namespace chowdsp
 {
 
+/** Component to display the name and tooltip of whatever component is under the mouse. */
 class TooltipComponent : public juce::Component,
                          private juce::Timer
 {
@@ -27,6 +28,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TooltipComponent)
 };
 
+/** Foley's GUI wrapper for TooltipComponent */
 class TooltipItem : public foleys::GuiItem
 {
 public:

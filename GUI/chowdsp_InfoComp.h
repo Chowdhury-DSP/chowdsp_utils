@@ -3,6 +3,7 @@
 namespace chowdsp
 {
 
+/** A simple component to display the type, version, and manufacturer of a plugin */
 class InfoComp : public juce::Component
 {
 public:
@@ -26,6 +27,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(InfoComp)
 };
 
+/** Foley's GUI wrapper for InfoComp */
 class InfoItem : public foleys::GuiItem
 {
 public:

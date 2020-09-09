@@ -5,3 +5,4 @@
 #include "chowdsp_TitleComp.h"
 #include "chowdsp_InfoComp.h"
 #include "chowdsp_TooltipComp.h"
+#include "chowdsp_MagicGUI.h"
