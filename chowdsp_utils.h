@@ -29,3 +29,4 @@
 #include "PluginUtils/chowdsp_DummySynthSound.h"
 
 #include "DSP/chowdsp_DSP.h"
+#include "GUI/chowdsp_GUI.h"

@@ -1,3 +1,3 @@
 cd build
 cmake --build .
-ctest -C Debug -V
+ctest -j2 -C Debug -V

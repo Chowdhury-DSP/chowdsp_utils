@@ -521,7 +521,7 @@ public:
      * --- = --- + ---
      * Z_p   Z_1   Z_2
      */
-    inline void calcImpedance()
+    inline void calcImpedance() override
     {
         G = port1->G + port2->G;
         R = 1.0 / G;
@@ -564,7 +564,7 @@ public:
     /** Computes the impedance for a WDF parallel adaptor.
      * Z_s = Z_1 + Z_2
      */
-    inline void calcImpedance()
+    inline void calcImpedance() override
     {
         R = port1->R + port2->R;
         G = 1.0 / R;
@@ -621,7 +621,7 @@ public:
     /** Computes the impedance for a WDF resistive voltage souce
      * Z_Vr = Z_R
      */
-    inline void calcImpedance()
+    inline void calcImpedance() override
     {
         R = R_value;
         G = 1.0 / R;
@@ -658,7 +658,7 @@ public:
     }
     virtual ~IdealVoltageSource() {}
 
-    inline void calcImpedance() {}
+    inline void calcImpedance() override{}
 
     /** Sets the voltage of the voltage source, in Volts */
     void setVoltage (double newV) { Vs = newV; }
@@ -708,7 +708,7 @@ public:
     /** Computes the impedance for a WDF resistive current souce
      * Z_Ir = Z_R
      */
-    inline void calcImpedance()
+    inline void calcImpedance() override
     {
         R = R_value;
         G = 1.0 / R;
@@ -745,7 +745,7 @@ public:
     }
     virtual ~IdealCurrentSource() {}
 
-    inline void calcImpedance() {}
+    inline void calcImpedance() override{}
 
     /** Sets the current of the current source, in Amps */
     void setCurrent (double newI) { Is = newI; }
@@ -792,7 +792,7 @@ public:
 
     virtual ~DiodePair() {}
 
-    inline void calcImpedance() {}
+    inline void calcImpedance() override{}
 
     /** Accepts an incident wave into a WDF diode pair. */
     inline void incident (double x) noexcept override
@@ -833,7 +833,7 @@ public:
 
     virtual ~Diode() {}
 
-    inline void calcImpedance() {}
+    inline void calcImpedance() override{}
 
     /** Accepts an incident wave into a WDF diode. */
     inline void incident (double x) noexcept override

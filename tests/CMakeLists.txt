@@ -5,3 +5,7 @@ target_sources(chowdsp_utils_tests PRIVATE
     PluginBaseTest.cpp
     WDFTest.cpp
 )
+
+target_sources(chowdsp_gui_test PRIVATE
+    GUITest.cpp
+)
