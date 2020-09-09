@@ -35,8 +35,12 @@ public:
 
         addAndMakeVisible (toggle);
 
-        tabs.addTab ("Tab1", Colours::red, new PlainComponent (Colours::yellow), true);
-        tabs.addTab ("Tab2", Colours::blue, new PlainComponent (Colours::green), true);
+        auto titleComp = std::make_unique<chowdsp::TitleComp>();
+        titleComp->setStrings ("Title", "subtitle", 18.0f);
+        tabs.addTab ("Tab1", Colours::darkkhaki, titleComp.release(), true);
+
+        auto infoComp = std::make_unique<chowdsp::InfoComp> (AudioProcessor::WrapperType::wrapperType_AAX);
+        tabs.addTab ("Tab2", Colours::darksalmon, infoComp.release(), true);
         addAndMakeVisible (tabs);
 
         menu.addItemList ({ "Item1", "Item2", "Item3" }, 1);
