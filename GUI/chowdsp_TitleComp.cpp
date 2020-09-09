@@ -10,12 +10,12 @@ TitleComp::TitleComp()
 void TitleComp::paint (juce::Graphics& g)
 {
     g.setFont (juce::Font (font).boldened());
-    auto font = g.getCurrentFont();
+    auto curFont = g.getCurrentFont();
     auto b = getLocalBounds();
 
     auto drawText = [=, &g, &b] (const juce::String& text)
     {
-        auto width = font.getStringWidth (text);
+        auto width = curFont.getStringWidth (text);
         g.drawFittedText (text, b.removeFromLeft (width), juce::Justification::left, 1);  
     };
 
@@ -58,11 +58,11 @@ void TitleItem::update()
 
 std::vector<foleys::SettableProperty> TitleItem::getSettableProperties() const
 {
-    std::vector<foleys::SettableProperty> properties;
-    properties.push_back ({ configNode, title,    foleys::SettableProperty::Text, {}, {} });
-    properties.push_back ({ configNode, subtitle, foleys::SettableProperty::Text, {}, {} });
-    properties.push_back ({ configNode, font,     foleys::SettableProperty::Number, 0.0f, {} });
-    return properties;
+    std::vector<foleys::SettableProperty> props;
+    props.push_back ({ configNode, title,    foleys::SettableProperty::Text, {}, {} });
+    props.push_back ({ configNode, subtitle, foleys::SettableProperty::Text, {}, {} });
+    props.push_back ({ configNode, font,     foleys::SettableProperty::Number, 0.0f, {} });
+    return props;
 }
 
 const juce::Identifier TitleItem::title    { "title" };

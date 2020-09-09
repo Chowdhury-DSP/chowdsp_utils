@@ -27,10 +27,14 @@ public:
 
         slider.setSliderStyle (Slider::RotaryHorizontalVerticalDrag);
         slider.setTextBoxStyle (Slider::TextBoxBelow, true, 80, 15);
+        slider.setName ("Rotary Slider");
+        slider.setTooltip ("Testing a rotary slider...");
         addAndMakeVisible (slider);
 
         linSlider.setSliderStyle (Slider::LinearHorizontal);
         linSlider.setTextBoxStyle (Slider::TextBoxBelow, true, 80, 15);
+        linSlider.setName ("Linear Slider");
+        linSlider.setTooltip ("Testing a linear slider...");
         addAndMakeVisible (linSlider);
 
         addAndMakeVisible (toggle);
@@ -46,6 +50,8 @@ public:
         menu.addItemList ({ "Item1", "Item2", "Item3" }, 1);
         menu.setSelectedItemIndex (0, sendNotification);
         addAndMakeVisible (menu);
+
+        addAndMakeVisible (tooltips);
 
         setSize (500, 500);
     }
@@ -63,6 +69,7 @@ public:
         menu.setBounds      (300, 40, 100, 30);
 
         tabs.setBounds (0, 110, getWidth(), 150);
+        tooltips.setBounds (0, 275, getWidth(), 25);
     }
 
 private:
@@ -72,7 +79,9 @@ private:
     Slider linSlider;
     ToggleButton toggle { "Toggle" };
     ComboBox menu;
+
     TabbedComponent tabs;
+    chowdsp::TooltipComponent tooltips;
 };
 
 class GUIWindow : public DocumentWindow

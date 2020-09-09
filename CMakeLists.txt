@@ -17,6 +17,8 @@ add_subdirectory(tests)
 target_compile_definitions(chowdsp_utils_tests PRIVATE
     CHOWDSP_UNIT_TESTS=1
     JucePlugin_Name="DummyPlugin"
+    JucePlugin_Manufacturer="chowdsp"
+    JucePlugin_VersionString="9.9.9"
     JUCE_UNIT_TESTS=0
     JUCE_USE_CURL=0
     JUCE_WEB_BROWSER=0)
