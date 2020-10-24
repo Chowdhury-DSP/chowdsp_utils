@@ -32,13 +32,14 @@ public:
     juce::Slider::SliderLayout getSliderLayout (juce::Slider& slider) override;
     juce::Label* createSliderTextBox (juce::Slider& slider) override;
 
-private:
+protected:
     std::unique_ptr<juce::Drawable> knob = juce::Drawable::createFromImageData (chowdsp_BinaryData::knob_svg, chowdsp_BinaryData::knob_svgSize);
     std::unique_ptr<juce::Drawable> pointer = juce::Drawable::createFromImageData (chowdsp_BinaryData::pointer_svg, chowdsp_BinaryData::pointer_svgSize);
 
     juce::Typeface::Ptr roboto;
     juce::Typeface::Ptr robotoBold;
 
+private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ChowLNF)
 };
 
