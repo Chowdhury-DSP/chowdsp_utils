@@ -43,19 +43,19 @@ public:
     /** Sub-classes override this function to recompute
      * the impedance of this element.
      */
-    virtual inline void calcImpedance() = 0;
+    virtual void calcImpedance() = 0;
 
     /** Sub-classes override this function to propogate
      * an impedance change to the upstream elements in
      * the WDF tree.
      */
-    virtual inline void propagateImpedance() = 0;
+    virtual void propagateImpedance() = 0;
 
     /** Sub-classes override this function to accept an incident wave. */
-    virtual inline void incident (double x) noexcept = 0;
+    virtual void incident (double x) noexcept = 0;
 
     /** Sub-classes override this function to propogate a reflected wave. */
-    virtual inline double reflected() noexcept = 0;
+    virtual double reflected() noexcept = 0;
 
     /** Probe the voltage across this circuit element. */
     inline double voltage() const noexcept
