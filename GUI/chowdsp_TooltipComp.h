@@ -19,7 +19,7 @@ public:
 
     void paint (juce::Graphics& g) override;
     void timerCallback() override;
-    juce::String getTipFor (juce::Component& c);
+    void getTipFor (juce::Component& c, juce::String& newTip, juce::String& newName);
 
 private:
     juce::String name, tip;

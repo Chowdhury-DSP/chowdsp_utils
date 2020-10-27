@@ -37,17 +37,20 @@ void TooltipComponent::paint (juce::Graphics& g)
     }
 }
 
-juce::String TooltipComponent::getTipFor (juce::Component& c)
+void TooltipComponent::getTipFor (juce::Component& c, juce::String& newTip, juce::String& newName)
 {
     if (juce::Process::isForegroundProcess()
          && ! juce::ModifierKeys::currentModifiers.isAnyMouseButtonDown())
     {
         if (auto* ttc = dynamic_cast<juce::TooltipClient*> (&c))
+        {
             if (! c.isCurrentlyBlockedByAnotherModalComponent())
-                return ttc->getTooltip();
+            {
+                newTip = ttc->getTooltip();
+                newName = c.getName();
+            }
+        }
     }
-
-    return {};
 }
 
 void TooltipComponent::timerCallback()
@@ -60,11 +63,18 @@ void TooltipComponent::timerCallback()
     bool needsRepaint = false;
     if (newComp != nullptr)
     {
-        auto newTip = getTipFor (*newComp);
+        juce::String newTip, newName;
+        getTipFor (*newComp, newTip, newName);
         needsRepaint = newTip != tip;
 
+        if (newTip.isNotEmpty() && newName.isEmpty())
+        {
+            if (auto parent = newComp->getParentComponent())
+                newName = parent->getName();
+        }
+
         tip = newTip;
-        name = newComp->getName();   
+        name = newName;
 
         if (! showTip.load())
         {
