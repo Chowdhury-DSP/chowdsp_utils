@@ -29,7 +29,7 @@ matrix:
 before_install:
   # install JUCE
   - cd ${TRAVIS_BUILD_DIR}/../../
-  - git clone https://github.com/juce-framework/JUCE.git
+  - git clone --depth 1 --branch 6.0.1 https://github.com/juce-framework/JUCE.git
   
   # install Foley's GUI Magic
   - cd ${TRAVIS_BUILD_DIR}/../
