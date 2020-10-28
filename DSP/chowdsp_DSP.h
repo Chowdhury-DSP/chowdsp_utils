@@ -2,6 +2,9 @@
 
 #include "chowdsp_GainProcessor.h"
 
+// delay
+#include "Delay/chowdsp_DelayLine.h"
+
 // filter tools
 #include "Filters/chowdsp_IIRFilter.h"
 #include "Filters/chowdsp_BilinearUtils.h"
