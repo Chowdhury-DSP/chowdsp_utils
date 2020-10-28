@@ -198,7 +198,7 @@ public:
         const auto numSamples  = outputBlock.getNumSamples();
 
         jassert (inputBlock.getNumChannels() == numChannels);
-        jassert (inputBlock.getNumChannels() == writePos.size());
+        jassert (inputBlock.getNumChannels() == this->writePos.size());
         jassert (inputBlock.getNumSamples()  == numSamples);
 
         if (context.isBypassed)
@@ -226,15 +226,15 @@ private:
     typename std::enable_if <std::is_same <T, DelayLineInterpolationTypes::None>::value, SampleType>::type
     interpolateSample (int channel) const
     {
-        auto index = (readPos[(size_t) channel] + delayInt) % totalSize;
-        return bufferData.getSample (channel, index);
+        auto index = (this->readPos[(size_t) channel] + delayInt) % totalSize;
+        return this->bufferData.getSample (channel, index);
     }
 
     template <typename T = InterpolationType>
     typename std::enable_if <std::is_same <T, DelayLineInterpolationTypes::Linear>::value, SampleType>::type
     interpolateSample (int channel) const
     {
-        auto index1 = readPos[(size_t) channel] + delayInt;
+        auto index1 = this->readPos[(size_t) channel] + delayInt;
         auto index2 = index1 + 1;
 
         if (index2 >= totalSize)
@@ -243,8 +243,8 @@ private:
             index2 %= totalSize;
         }
 
-        auto value1 = bufferData.getSample (channel, index1);
-        auto value2 = bufferData.getSample (channel, index2);
+        auto value1 = this->bufferData.getSample (channel, index1);
+        auto value2 = this->bufferData.getSample (channel, index2);
 
         return value1 + delayFrac * (value2 - value1);
     }
@@ -253,7 +253,7 @@ private:
     typename std::enable_if <std::is_same <T, DelayLineInterpolationTypes::Lagrange3rd>::value, SampleType>::type
     interpolateSample (int channel) const
     {
-        auto index1 = readPos[(size_t) channel] + delayInt;
+        auto index1 = this->readPos[(size_t) channel] + delayInt;
         auto index2 = index1 + 1;
         auto index3 = index2 + 1;
         auto index4 = index3 + 1;
@@ -266,7 +266,7 @@ private:
             index4 %= totalSize;
         }
 
-        auto* samples = bufferData.getReadPointer (channel);
+        auto* samples = this->bufferData.getReadPointer (channel);
 
         auto value1 = samples[index1];
         auto value2 = samples[index2];
@@ -289,7 +289,7 @@ private:
     typename std::enable_if <std::is_same <T, DelayLineInterpolationTypes::Lagrange5th>::value, SampleType>::type
     interpolateSample (int channel) const
     {
-        auto index1 = readPos[(size_t) channel] + delayInt;
+        auto index1 = this->readPos[(size_t) channel] + delayInt;
         auto index2 = index1 + 1;
         auto index3 = index2 + 1;
         auto index4 = index3 + 1;
@@ -306,7 +306,7 @@ private:
             index6 %= totalSize;
         }
 
-        auto* samples = bufferData.getReadPointer (channel);
+        auto* samples = this->bufferData.getReadPointer (channel);
 
         auto value1 = samples[index1];
         auto value2 = samples[index2];
@@ -336,7 +336,7 @@ private:
     typename std::enable_if <std::is_same <T, DelayLineInterpolationTypes::Thiran>::value, SampleType>::type
     interpolateSample (int channel)
     {
-        auto index1 = readPos[(size_t) channel] + delayInt;
+        auto index1 = this->readPos[(size_t) channel] + delayInt;
         auto index2 = index1 + 1;
 
         if (index2 >= totalSize)
@@ -345,11 +345,11 @@ private:
             index2 %= totalSize;
         }
 
-        auto value1 = bufferData.getSample (channel, index1);
-        auto value2 = bufferData.getSample (channel, index2);
+        auto value1 = this->bufferData.getSample (channel, index1);
+        auto value2 = this->bufferData.getSample (channel, index2);
 
-        auto output = delayFrac == 0 ? value1 : value2 + alpha * (value1 - v[(size_t) channel]);
-        v[(size_t) channel] = output;
+        auto output = delayFrac == 0 ? value1 : value2 + alpha * (value1 - this->v[(size_t) channel]);
+        this->v[(size_t) channel] = output;
 
         return output;
     }

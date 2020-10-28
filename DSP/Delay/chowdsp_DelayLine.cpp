@@ -68,12 +68,12 @@ void DelayLine<SampleType, InterpolationType>::prepare (const juce::dsp::Process
 {
     jassert (spec.numChannels > 0);
 
-    bufferData.setSize ((int) spec.numChannels, totalSize, false, false, true);
+    this->bufferData.setSize ((int) spec.numChannels, totalSize, false, false, true);
 
-    writePos.resize (spec.numChannels);
-    readPos.resize  (spec.numChannels);
+    this->writePos.resize (spec.numChannels);
+    this->readPos.resize  (spec.numChannels);
 
-    v.resize (spec.numChannels);
+    this->v.resize (spec.numChannels);
     sampleRate = spec.sampleRate;
 
     reset();
@@ -82,20 +82,20 @@ void DelayLine<SampleType, InterpolationType>::prepare (const juce::dsp::Process
 template <typename SampleType, typename InterpolationType>
 void DelayLine<SampleType, InterpolationType>::reset()
 {
-    for (auto vec : { &writePos, &readPos })
+    for (auto vec : { &this->writePos, &this->readPos })
         std::fill (vec->begin(), vec->end(), 0);
 
-    std::fill (v.begin(), v.end(), static_cast<SampleType> (0));
+    std::fill (this->v.begin(), this->v.end(), static_cast<SampleType> (0));
 
-    bufferData.clear();
+    this->bufferData.clear();
 }
 
 //==============================================================================
 template <typename SampleType, typename InterpolationType>
 void DelayLine<SampleType, InterpolationType>::pushSample (int channel, SampleType sample)
 {
-    bufferData.setSample (channel, writePos[(size_t) channel], sample);
-    writePos[(size_t) channel] = (writePos[(size_t) channel] + totalSize - 1) % totalSize;
+    this->bufferData.setSample (channel, this->writePos[(size_t) channel], sample);
+    this->writePos[(size_t) channel] = (this->writePos[(size_t) channel] + totalSize - 1) % totalSize;
 }
 
 template <typename SampleType, typename InterpolationType>
@@ -107,7 +107,7 @@ SampleType DelayLine<SampleType, InterpolationType>::popSample (int channel, Sam
     auto result = interpolateSample (channel);
 
     if (updateReadPointer)
-        readPos[(size_t) channel] = (readPos[(size_t) channel] + totalSize - 1) % totalSize;
+        this->readPos[(size_t) channel] = (this->readPos[(size_t) channel] + totalSize - 1) % totalSize;
 
     return result;
 }
