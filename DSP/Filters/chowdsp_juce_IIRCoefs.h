@@ -44,6 +44,11 @@ struct Coefficients  : public juce::dsp::ProcessorState
         std::fill (coefficients.begin(), coefficients.end(), NumericType());
     }
 
+    // flags for std::enable_if
+    static constexpr bool IsFirstOrder  = std::is_same<Coefficients<NumericType, order>, Coefficients<NumericType, 1>>::value;
+    static constexpr bool IsSecondOrder = std::is_same<Coefficients<NumericType, order>, Coefficients<NumericType, 2>>::value;
+    static constexpr bool IsThirdOrder  = std::is_same<Coefficients<NumericType, order>, Coefficients<NumericType, 3>>::value;
+
     /** Directly constructs an object from the raw coefficients.
         Most people will want to use the static methods instead of this, but the
         constructor is public to allow tinkerers to create their own custom filters!
@@ -111,7 +116,7 @@ struct Coefficients  : public juce::dsp::ProcessorState
         jassert (sampleRate > 0.0);
         jassert (frequency > 0 && frequency <= static_cast<float> (sampleRate * 0.5));
 
-        auto n = std::tan (MathConstants<NumericType>::pi * frequency / static_cast<NumericType> (sampleRate));
+        auto n = std::tan (juce::MathConstants<NumericType>::pi * frequency / static_cast<NumericType> (sampleRate));
 
         return *new Coefficients (n, n, n + 1, n - 1);
     }
@@ -123,7 +128,7 @@ struct Coefficients  : public juce::dsp::ProcessorState
         jassert (sampleRate > 0.0);
         jassert (frequency > 0 && frequency <= static_cast<float> (sampleRate * 0.5));
 
-        auto n = std::tan (MathConstants<NumericType>::pi * frequency / static_cast<NumericType> (sampleRate));
+        auto n = std::tan (juce::MathConstants<NumericType>::pi * frequency / static_cast<NumericType> (sampleRate));
 
         return *new Coefficients (1, -1, n + 1, n - 1);
     }
@@ -135,7 +140,7 @@ struct Coefficients  : public juce::dsp::ProcessorState
         jassert (sampleRate > 0.0);
         jassert (frequency > 0 && frequency <= static_cast<float> (sampleRate * 0.5));
 
-        auto n = std::tan (MathConstants<NumericType>::pi * frequency / static_cast<NumericType> (sampleRate));
+        auto n = std::tan (juce::MathConstants<NumericType>::pi * frequency / static_cast<NumericType> (sampleRate));
 
         return *new Coefficients (n - 1, n + 1, n + 1, n - 1);
     }
@@ -156,7 +161,7 @@ struct Coefficients  : public juce::dsp::ProcessorState
         jassert (frequency > 0 && frequency <= static_cast<float> (sampleRate * 0.5));
         jassert (Q > 0.0);
 
-        auto n = 1 / std::tan (MathConstants<NumericType>::pi * frequency / static_cast<NumericType> (sampleRate));
+        auto n = 1 / std::tan (juce::MathConstants<NumericType>::pi * frequency / static_cast<NumericType> (sampleRate));
         auto nSquared = n * n;
         auto invQ = 1 / Q;
         auto c1 = 1 / (1 + invQ * n + nSquared);
@@ -182,7 +187,7 @@ struct Coefficients  : public juce::dsp::ProcessorState
         jassert (frequency > 0 && frequency <= static_cast<float> (sampleRate * 0.5));
         jassert (Q > 0.0);
 
-        auto n = std::tan (MathConstants<NumericType>::pi * frequency / static_cast<NumericType> (sampleRate));
+        auto n = std::tan (juce::MathConstants<NumericType>::pi * frequency / static_cast<NumericType> (sampleRate));
         auto nSquared = n * n;
         auto invQ = 1 / Q;
         auto c1 = 1 / (1 + invQ * n + nSquared);
@@ -208,7 +213,7 @@ struct Coefficients  : public juce::dsp::ProcessorState
         jassert (frequency > 0 && frequency <= static_cast<float> (sampleRate * 0.5));
         jassert (Q > 0.0);
 
-        auto n = 1 / std::tan (MathConstants<NumericType>::pi * frequency / static_cast<NumericType> (sampleRate));
+        auto n = 1 / std::tan (juce::MathConstants<NumericType>::pi * frequency / static_cast<NumericType> (sampleRate));
         auto nSquared = n * n;
         auto invQ = 1 / Q;
         auto c1 = 1 / (1 + invQ * n + nSquared);
@@ -235,7 +240,7 @@ struct Coefficients  : public juce::dsp::ProcessorState
         jassert (frequency > 0 && frequency <= static_cast<float> (sampleRate * 0.5));
         jassert (Q > 0.0);
 
-        auto n = 1 / std::tan (MathConstants<NumericType>::pi * frequency / static_cast<NumericType> (sampleRate));
+        auto n = 1 / std::tan (juce::MathConstants<NumericType>::pi * frequency / static_cast<NumericType> (sampleRate));
         auto nSquared = n * n;
         auto invQ = 1 / Q;
         auto c1 = 1 / (1 + n * invQ + nSquared);
@@ -261,7 +266,7 @@ struct Coefficients  : public juce::dsp::ProcessorState
         jassert (frequency > 0 && frequency <= sampleRate * 0.5);
         jassert (Q > 0);
 
-        auto n = 1 / std::tan (MathConstants<NumericType>::pi * frequency / static_cast<NumericType> (sampleRate));
+        auto n = 1 / std::tan (juce::MathConstants<NumericType>::pi * frequency / static_cast<NumericType> (sampleRate));
         auto nSquared = n * n;
         auto invQ = 1 / Q;
         auto c1 = 1 / (1 + invQ * n + nSquared);
@@ -286,10 +291,10 @@ struct Coefficients  : public juce::dsp::ProcessorState
         jassert (cutOffFrequency > 0.0 && cutOffFrequency <= sampleRate * 0.5);
         jassert (Q > 0.0);
 
-        auto A = jmax (static_cast<NumericType> (0.0), std::sqrt (gainFactor));
+        auto A = juce::jmax (static_cast<NumericType> (0.0), std::sqrt (gainFactor));
         auto aminus1 = A - 1;
         auto aplus1 = A + 1;
-        auto omega = (2 * MathConstants<NumericType>::pi * jmax (cutOffFrequency, static_cast<NumericType> (2.0))) / static_cast<NumericType> (sampleRate);
+        auto omega = (2 * juce::MathConstants<NumericType>::pi * juce::jmax (cutOffFrequency, static_cast<NumericType> (2.0))) / static_cast<NumericType> (sampleRate);
         auto coso = std::cos (omega);
         auto beta = std::sin (omega) * std::sqrt (A) / Q;
         auto aminus1TimesCoso = aminus1 * coso;
@@ -316,10 +321,10 @@ struct Coefficients  : public juce::dsp::ProcessorState
         jassert (cutOffFrequency > 0 && cutOffFrequency <= static_cast<NumericType> (sampleRate * 0.5));
         jassert (Q > 0);
 
-        auto A = jmax (static_cast<NumericType> (0.0), std::sqrt (gainFactor));
+        auto A = juce::jmax (static_cast<NumericType> (0.0), std::sqrt (gainFactor));
         auto aminus1 = A - 1;
         auto aplus1 = A + 1;
-        auto omega = (2 * MathConstants<NumericType>::pi * jmax (cutOffFrequency, static_cast<NumericType> (2.0))) / static_cast<NumericType> (sampleRate);
+        auto omega = (2 * juce::MathConstants<NumericType>::pi * juce::jmax (cutOffFrequency, static_cast<NumericType> (2.0))) / static_cast<NumericType> (sampleRate);
         auto coso = std::cos (omega);
         auto beta = std::sin (omega) * std::sqrt (A) / Q;
         auto aminus1TimesCoso = aminus1 * coso;
@@ -340,7 +345,7 @@ struct Coefficients  : public juce::dsp::ProcessorState
         1.0 will attenuate them.
     */
     static juce::ReferenceCountedObjectPtr<Coefficients<NumericType, 2>>
-    makePeakFilter (double sampleRate, NumericType centreFrequency,
+    makePeakFilter (double sampleRate, NumericType frequency,
                     NumericType Q, NumericType gainFactor)
     {
         jassert (sampleRate > 0);
@@ -348,8 +353,8 @@ struct Coefficients  : public juce::dsp::ProcessorState
         jassert (Q > 0);
         jassert (gainFactor > 0);
 
-        auto A = jmax (static_cast<NumericType> (0.0), std::sqrt (gainFactor));
-        auto omega = (2 * MathConstants<NumericType>::pi * jmax (frequency, static_cast<NumericType> (2.0))) / static_cast<NumericType> (sampleRate);
+        auto A = juce::jmax (static_cast<NumericType> (0.0), std::sqrt (gainFactor));
+        auto omega = (2 * juce::MathConstants<NumericType>::pi * juce::jmax (frequency, static_cast<NumericType> (2.0))) / static_cast<NumericType> (sampleRate);
         auto alpha = std::sin (omega) / (Q * 2);
         auto c2 = -2 * std::cos (omega);
         auto alphaTimesA = alpha * A;
@@ -370,13 +375,13 @@ struct Coefficients  : public juce::dsp::ProcessorState
     */
     double getMagnitudeForFrequency (double frequency, double sampleRate) const noexcept
     {
-        constexpr Complex<double> j (0, 1);
+        constexpr juce::dsp::Complex<double> j (0, 1);
         const auto* coefs = coefficients.begin();
 
         jassert (frequency >= 0 && frequency <= sampleRate * 0.5);
 
-        Complex<double> numerator = 0.0, denominator = 0.0, factor = 1.0;
-        Complex<double> jw = std::exp (-MathConstants<double>::twoPi * frequency * j / sampleRate);
+        juce::dsp::Complex<double> numerator = 0.0, denominator = 0.0, factor = 1.0;
+        juce::dsp::Complex<double> jw = std::exp (-juce::MathConstants<double>::twoPi * frequency * j / sampleRate);
 
         for (size_t n = 0; n <= order; ++n)
         {
@@ -402,7 +407,7 @@ struct Coefficients  : public juce::dsp::ProcessorState
     void getMagnitudeForFrequencyArray (const double* frequencies, double* magnitudes,
                                         size_t numSamples, double sampleRate) const noexcept
     {
-        constexpr Complex<double> j (0, 1);
+        constexpr juce::dsp::Complex<double> j (0, 1);
         const auto* coefs = coefficients.begin();
 
         jassert (order >= 0);
@@ -411,8 +416,8 @@ struct Coefficients  : public juce::dsp::ProcessorState
         {
             jassert (frequencies[i] >= 0 && frequencies[i] <= sampleRate * 0.5);
 
-            Complex<double> numerator = 0.0, denominator = 0.0, factor = 1.0;
-            Complex<double> jw = std::exp (-MathConstants<double>::twoPi * frequencies[i] * j / sampleRate);
+            juce::dsp::Complex<double> numerator = 0.0, denominator = 0.0, factor = 1.0;
+            juce::dsp::Complex<double> jw = std::exp (-juce::MathConstants<double>::twoPi * frequencies[i] * j / sampleRate);
 
             for (size_t n = 0; n <= order; ++n)
             {
@@ -438,13 +443,13 @@ struct Coefficients  : public juce::dsp::ProcessorState
     */
     double getPhaseForFrequency (double frequency, double sampleRate) const noexcept
     {
-        constexpr Complex<double> j (0, 1);
+        constexpr juce::dsp::Complex<double> j (0, 1);
         const auto* coefs = coefficients.begin();
 
         jassert (frequency >= 0 && frequency <= sampleRate * 0.5);
 
-        Complex<double> numerator = 0.0, denominator = 0.0, factor = 1.0;
-        Complex<double> jw = std::exp (-MathConstants<double>::twoPi * frequency * j / sampleRate);
+        juce::dsp::Complex<double> numerator = 0.0, denominator = 0.0, factor = 1.0;
+        juce::dsp::Complex<double> jw = std::exp (-juce::MathConstants<double>::twoPi * frequency * j / sampleRate);
 
         for (size_t n = 0; n <= order; ++n)
         {
@@ -472,7 +477,7 @@ struct Coefficients  : public juce::dsp::ProcessorState
     {
         jassert (sampleRate > 0);
 
-        constexpr Complex<double> j (0, 1);
+        constexpr juce::dsp::Complex<double> j (0, 1);
         const auto* coefs = coefficients.begin();
         auto invSampleRate = 1 / sampleRate;
 
@@ -482,8 +487,8 @@ struct Coefficients  : public juce::dsp::ProcessorState
         {
             jassert (frequencies[i] >= 0 && frequencies[i] <= sampleRate * 0.5);
 
-            Complex<double> numerator = 0.0, denominator = 0.0, factor = 1.0;
-            Complex<double> jw = std::exp (-MathConstants<double>::twoPi * frequencies[i] * j * invSampleRate);
+            juce::dsp::Complex<double> numerator = 0.0, denominator = 0.0, factor = 1.0;
+            juce::dsp::Complex<double> jw = std::exp (-juce::MathConstants<double>::twoPi * frequencies[i] * j * invSampleRate);
 
             for (size_t n = 0; n <= order; ++n)
             {
@@ -519,11 +524,6 @@ struct Coefficients  : public juce::dsp::ProcessorState
 private:
     // Unfortunately, std::sqrt is not marked as constexpr just yet in all compilers
     static constexpr NumericType inverseRootTwo = static_cast<NumericType> (0.70710678118654752440L);
-
-    // flags for std::enable_if
-    static constexpr bool IsFirstOrder  = std::is_same<Coefficients<NumericType, order>, Coefficients<NumericType, 1>>::value;
-    static constexpr bool IsSecondOrder = std::is_same<Coefficients<NumericType, order>, Coefficients<NumericType, 2>>::value;
-    static constexpr bool IsThirdOrder  = std::is_same<Coefficients<NumericType, order>, Coefficients<NumericType, 3>>::value;
 };
 
 } // namespace IIR

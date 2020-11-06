@@ -154,11 +154,11 @@ namespace IIR
         inline typename std::enable_if <(N > 2), SampleType>::type
         JUCE_VECTOR_CALLTYPE processSample (SampleType x, NumericType* c) noexcept
         {
-            auto y = (c[0] * sample) + state[0];
+            auto y = (c[0] * x) + state[0];
             for (size_t j = 0; j < order - 1; ++j)
-                state[j] = (c[j + 1] * sample) - (c[order + j + 1] * output) + state[j + 1];
+                state[j] = (c[j + 1] * x) - (c[order + j + 1] * y) + state[j + 1];
 
-            state[order - 1] = (c[order] * sample) - (c[order * 2] * output);
+            state[order - 1] = (c[order] * x) - (c[order * 2] * y);
             return y;
         }
 
