@@ -34,7 +34,7 @@ public:
     bool isBusesLayoutSupported (const juce::AudioProcessor::BusesLayout& layouts) const override;
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void processBlock (juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
-    virtual void processBlock (juce::AudioBuffer<float>&) = 0;
+    virtual void processAudioBlock (juce::AudioBuffer<float>&) = 0;
 
     bool hasEditor() const override { return true; }
     juce::AudioProcessorEditor* createEditor() override { return new foleys::MagicPluginEditor (magicState); }
@@ -118,7 +118,7 @@ void PluginBase<Processor>::processBlock (juce::AudioBuffer<float>& buffer, juce
 {
     juce::ScopedNoDenormals noDenormals;
 
-    processBlock (buffer);
+    processAudioBlock (buffer);
 }
 
 } // chowdsp
