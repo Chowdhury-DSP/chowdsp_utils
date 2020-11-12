@@ -14,7 +14,7 @@ public:
 
     void prepareToPlay (double, int) override {}
     void releaseResources() override {}
-    void processBlock (AudioBuffer<float>&) override {}
+    void processAudioBlock (AudioBuffer<float>&) override {}
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DummyPlugin)

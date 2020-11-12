@@ -8,7 +8,7 @@ public:
     static void addParameters (Parameters& params) {}
     void prepareToPlay (double, int) override {}
     void releaseResources() override {}
-    void processBlock (AudioBuffer<float>&) override {}
+    void processAudioBlock (AudioBuffer<float>&) override {}
 
     AudioProcessorEditor* createEditor() override
     {
