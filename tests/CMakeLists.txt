@@ -4,6 +4,7 @@ target_sources(chowdsp_utils_tests PRIVATE
     GainTest.cpp
     ModalFilterTest.cpp
     ShelfFilterTest.cpp
+    SineTest.cpp
     PluginBaseTest.cpp
     WDFTest.cpp
 )
