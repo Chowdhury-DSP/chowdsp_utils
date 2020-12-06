@@ -74,7 +74,7 @@ public:
 
             if (context.usesSeparateInputAndOutputBlocks())
             {
-                for (ch = 0; ch < jmin (numChannels, inputChannels); ++ch)
+                for (ch = 0; ch < juce::jmin (numChannels, inputChannels); ++ch)
                 {
                     x1_temp = x1;
                     x2_temp = x2;
@@ -91,7 +91,7 @@ public:
             }
             else
             {
-                for (ch = 0; ch < jmin (numChannels, inputChannels); ++ch)
+                for (ch = 0; ch < juce::jmin (numChannels, inputChannels); ++ch)
                 {
                     x1_temp = x1;
                     x2_temp = x2;

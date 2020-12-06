@@ -5,7 +5,7 @@ class GuiPlugin : public chowdsp::PluginBase<GuiPlugin>
 public:
     GuiPlugin() {}
 
-    static void addParameters (Parameters& params) {}
+    static void addParameters (Parameters& /*params*/) {}
     void prepareToPlay (double, int) override {}
     void releaseResources() override {}
     void processAudioBlock (AudioBuffer<float>&) override {}

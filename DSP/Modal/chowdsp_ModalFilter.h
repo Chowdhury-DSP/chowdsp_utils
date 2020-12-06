@@ -60,8 +60,16 @@ public:
 protected:
     inline void updateParams() noexcept { filtCoef = decayFactor * oscCoef; }
 
-    inline T calcDecayFactor() noexcept;
-    inline std::complex<T> calcOscCoef() noexcept;
+    inline T calcDecayFactor() noexcept
+    {
+        return std::pow ((T) 0.001, (T) 1 / (t60 * fs));
+    }
+
+    inline std::complex<T> calcOscCoef() noexcept
+    {
+        constexpr std::complex<T> jImag { 0, 1 };
+        return std::exp (jImag * juce::MathConstants<T>::twoPi * (freq / fs));
+    }
 
     std::complex<T> filtCoef = 0;
     T decayFactor = 0;

@@ -52,7 +52,8 @@ public:
         // process with chowdsp::SineWave
         for (int i = 0; i < 2; ++i)
         {
-            dsp::AudioBlock<double> block (chowBuffer.getArrayOfWritePointers(), numChannels, i * blockSize, blockSize);
+            dsp::AudioBlock<double> block (chowBuffer.getArrayOfWritePointers(), numChannels,
+                                           (size_t) i * blockSize, (size_t) blockSize);
             dsp::ProcessContextReplacing<double> context (block);
             chowSine.process (context);
         }
