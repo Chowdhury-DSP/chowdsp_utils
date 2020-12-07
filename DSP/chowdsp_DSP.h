@@ -19,4 +19,8 @@
 #include "Sources/chowdsp_Noise.h"
 
 // WDF tools
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wshadow-field", // Ignore Clang warnings for WDFs
+                                     "-Wshadow-field-in-constructor",
+                                     "-Winconsistent-missing-destructor-override")
 #include "WDF/wdf.h"
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE

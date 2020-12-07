@@ -35,6 +35,7 @@ public:
         linSlider.setTextBoxStyle (Slider::TextBoxBelow, true, 80, 15);
         linSlider.setName ("Linear Slider");
         linSlider.setTooltip ("Testing a linear slider...");
+        linSlider.setColour (Slider::trackColourId, Colours::red);
         addAndMakeVisible (linSlider);
 
         addAndMakeVisible (toggle);
@@ -61,7 +62,7 @@ public:
         g.fillAll (Colours::darkgrey);
     }
 
-    void resized()
+    void resized() override
     {
         slider.setBounds    (  0, 0, 100, 100);
         linSlider.setBounds (100, 0, 100, 100);

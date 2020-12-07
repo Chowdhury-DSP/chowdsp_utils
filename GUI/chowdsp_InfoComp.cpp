@@ -1,8 +1,8 @@
 namespace chowdsp
 {
 
-InfoComp::InfoComp (const juce::AudioProcessor::WrapperType wrapperType) :
-    wrapperType (wrapperType)
+InfoComp::InfoComp (const juce::AudioProcessor::WrapperType pluginWrapperType) :
+    wrapperType (pluginWrapperType)
 {
     setColour (text1ColourID, juce::Colours::grey);
     setColour (text2ColourID, juce::Colours::white);
@@ -40,7 +40,6 @@ void InfoComp::paint (juce::Graphics& g)
 
 void InfoComp::resized()
 {
-    auto b = getLocalBounds();
     linkButton.setBounds (linkX, 0, 100, getHeight());
 }
 

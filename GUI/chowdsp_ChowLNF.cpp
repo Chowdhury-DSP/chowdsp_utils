@@ -31,7 +31,6 @@ void ChowLNF::drawRotarySlider (juce::Graphics& g, int x, int y, int width, int 
     const auto bounds = juce::Rectangle<int> (x, y, diameter, diameter).toFloat();   
 
     auto b = pointer->getBounds().toFloat();
-    auto b2 = knob->getBounds().toFloat();
     pointer->setTransform (juce::AffineTransform::rotation (juce::MathConstants<float>::twoPi * ((sliderPos - 0.5f) * 300.0f / 360.0f),
         b.getCentreX(), b.getCentreY()));
 
@@ -40,7 +39,6 @@ void ChowLNF::drawRotarySlider (juce::Graphics& g, int x, int y, int width, int 
     pointer->drawWithin (g, knobBounds, juce::RectanglePlacement::stretchToFit, 1.0f);
 
     const auto toAngle = rotaryStartAngle + sliderPos * (rotaryEndAngle - rotaryStartAngle);
-    const juce::Colour fill = slider.findColour (juce::Slider::rotarySliderFillColourId);
     constexpr float arcFactor = 0.9f;
 
     juce::Path valueArc;
@@ -186,7 +184,7 @@ void ChowLNF::drawLinearSlider (juce::Graphics& g, int x, int y, int width, int 
     g.strokePath (backgroundTrack, { trackWidth, juce::PathStrokeType::curved, juce::PathStrokeType::rounded });
 
     juce::Path valueTrack;
-    juce::Point<float> minPoint, maxPoint, thumbPoint;
+    juce::Point<float> minPoint, maxPoint;
 
     {
         auto kx = slider.isHorizontal() ? sliderPos : ((float) x + (float) width * 0.5f);

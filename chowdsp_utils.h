@@ -28,7 +28,11 @@ JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wunused-function") // GCC doesn't like Fo
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
 // Plugin utils
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wzero-as-null-pointer-constant", // Clang doesn't like HasAddParameters checker
+                                     "-Winconsistent-missing-destructor-override")
 #include "PluginUtils/chowdsp_PluginBase.h"
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+
 #include "PluginUtils/chowdsp_SynthBase.h"
 #include "PluginUtils/chowdsp_DummySynthSound.h"
 
