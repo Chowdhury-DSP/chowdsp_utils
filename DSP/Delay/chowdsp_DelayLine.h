@@ -37,8 +37,6 @@ namespace DelayLineInterpolationTypes
         No interpolation between successive samples in the delay line will be
         performed. This is useful when the delay is a constant integer or to
         create lo-fi audio effects.
-
-        @tags{DSP}
     */
     struct None {};
 
@@ -47,8 +45,6 @@ namespace DelayLineInterpolationTypes
         type of interpolation has a low compuational cost where the delay can be
         modulated in real time, but it also introduces a low-pass filtering effect
         into your audio signal.
-
-        @tags{DSP}
     */
     struct Linear {};
 
@@ -57,8 +53,6 @@ namespace DelayLineInterpolationTypes
         Lagrange interpolator. This method incurs more computational overhead than
         linear interpolation but reduces the low-pass filtering effect whilst
         remaining amenable to real time delay modulation.
-
-        @tags{DSP}
     */
     struct Lagrange3rd {};
 
@@ -66,8 +60,6 @@ namespace DelayLineInterpolationTypes
         Successive samples in the delay line will be interpolated using a 5th order
         Lagrange interpolator. This method incurs more computational overhead than
         linear interpolation.
-
-        @tags{DSP}
     */
     struct Lagrange5th {};
 
@@ -77,12 +69,11 @@ namespace DelayLineInterpolationTypes
         amplitude frequency response in exchange for less accuracy in the phase
         response. This interpolation method is stateful so is unsuitable for
         applications requiring fast delay modulation.
-
-        @tags{DSP}
     */
     struct Thiran {};
 }
 
+/** Base class for delay lines with any interpolation type */
 template <typename SampleType>
 class DelayLineBase
 {
@@ -119,12 +110,13 @@ protected:
     modulating the delay in real time or creating a standard delay effect with
     feedback.
 
+    This implementation has been modified from the original JUCE implementation
+    to include 5th-order Lagrange Interpolation.
+
     Note: If you intend to change the delay in real time, you may want to smooth
     changes to the delay systematically using either a ramp or a low-pass filter.
 
     @see SmoothedValue, FirstOrderTPTFilter
-
-    @tags{DSP}
 */
 template <typename SampleType, typename InterpolationType = DelayLineInterpolationTypes::Linear>
 class DelayLine : public DelayLineBase<SampleType>

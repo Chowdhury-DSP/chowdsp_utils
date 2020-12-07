@@ -22,12 +22,15 @@ void Noise<T>::reset() noexcept
 namespace NoiseHelpers
 {
 
+/** Returns a uniform random number in [0, 1) */
 template<typename T>
 T uniform01 (juce::Random&) noexcept;
 
+/** Returns a uniform random number in [0, 1) */
 template<>
 inline double uniform01 (juce::Random& r) noexcept { return r.nextDouble(); }
 
+/** Returns a uniform random number in [0, 1) */
 template<>
 inline float uniform01 (juce::Random& r) noexcept { return r.nextFloat(); }
 

@@ -41,14 +41,15 @@ namespace IIR
         A processing class that can perform IIR filtering on an audio signal, using
         the Transposed Direct Form II digital structure.
 
+        This has been modified from the original JUCE implementation to use template
+        arguments to determine filter order at compile-time.
+
         If you need a lowpass, bandpass or highpass filter with fast modulation of
         its cutoff frequency, you might use the class StateVariableFilter instead,
         which is designed to prevent artefacts at parameter changes, instead of the
         class Filter.
 
         @see Filter::Coefficients, FilterAudioSource, StateVariableFilter
-
-        @tags{DSP}
     */
     template <typename SampleType, size_t order=2>
     class Filter
@@ -131,6 +132,9 @@ namespace IIR
             return processSample (x, coefficients->getRawCoefficients());
         }
 
+        /** Processes a single sample, sqecialized for
+         *  first-order filter.
+        */
         template <int N = order>
         inline typename std::enable_if <N == 1, SampleType>::type
         JUCE_VECTOR_CALLTYPE processSample (SampleType x, NumericType* c) noexcept
@@ -140,6 +144,9 @@ namespace IIR
             return y;
         }
 
+        /** Processes a single sample, sqecialized for
+         *  second-order filter.
+        */
         template <int N = order>
         inline typename std::enable_if <N == 2, SampleType>::type
         JUCE_VECTOR_CALLTYPE processSample (SampleType x, NumericType* c) noexcept
@@ -150,6 +157,9 @@ namespace IIR
             return y;
         }
 
+        /** Processes a single sample, sqecialized for
+         *  filter orders greater than 2.
+        */
         template <int N = order>
         inline typename std::enable_if <(N > 2), SampleType>::type
         JUCE_VECTOR_CALLTYPE processSample (SampleType x, NumericType* c) noexcept

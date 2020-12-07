@@ -3,6 +3,9 @@
 namespace chowdsp
 {
 
+/** Helper functions for generating noise signals.
+ *  NOT desgined to be used directly.
+ */
 namespace NoiseHelpers
 {
 // forward declare uniform01
@@ -10,15 +13,19 @@ template<typename T>
 T uniform01 (juce::Random&) noexcept;
 }
 
+/** Audio processor that adds noise to an audio buffer.
+ *  Currently support white noise with a uniform or normal
+ *  distribution, or pink noise (-3dB / Oct).
+*/ 
 template<typename T>
 class Noise : public juce::dsp::Gain<T>
 {
 public:
     enum NoiseType
     {
-        Uniform,
-        Normal,
-        Pink,
+        Uniform, /**< Uniform white noise [-1, 1] */
+        Normal,  /**< White noise with a normal/Gaussian distribution, generated using the Box-Muller Transform */
+        Pink,    /**< Pink noise (-3dB / Oct), generated using the Voss algorithm */
     };
 
     Noise() = default;
@@ -35,7 +42,7 @@ public:
     /** Resets the internal state of the gain */
     void reset() noexcept;
 
-    /** Ses the seed for the random number generator */
+    /** Sets the seed for the random number generator */
     void setSeed (juce::int64 newSeed) { rand.setSeed (newSeed); }
 
     /** Processes the input and output buffers supplied in the processing context. */

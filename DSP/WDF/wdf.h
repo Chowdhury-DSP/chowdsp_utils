@@ -845,7 +845,7 @@ public:
     inline double reflected() noexcept override
     {
         // See eqn (10) from reference paper
-        b = a + 2 * next->R * Is - 2 * Vt * omega4 (float (log (next->R * Is / Vt) + (a + next->R * Is) / Vt));
+        b = a + 2 * next->R * Is - 2 * Vt * Omega::omega4 (float (log (next->R * Is / Vt) + (a + next->R * Is) / Vt));
         return b;
     }
 

@@ -12,9 +12,9 @@ public:
 
     enum ColourIDs
     {
-        backgroundColourID,
-        textColourID,
-        nameColourID,
+        backgroundColourID, /**< Background colour for the component */
+        textColourID,       /**< Colour to use for the tooltip text */
+        nameColourID,       /**< Colour to use for the tooltip name */
     };
 
     void paint (juce::Graphics& g) override;

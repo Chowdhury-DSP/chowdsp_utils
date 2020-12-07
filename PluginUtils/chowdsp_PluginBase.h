@@ -6,10 +6,10 @@ namespace chowdsp
 /**
  * Base class for plugin processors.
  * 
- * Children must override prepareToPlay
- * and releaseResources (from AudioProcessor),
- * as well as processBlock, and addParameters.
- * */
+ * Derived classes must override `prepareToPlay` and `releaseResources`
+ * (from `juce::AudioProcessor`), as well as `processAudioBlock`, and
+ * `addParameters`.
+*/
 template<class Processor>
 class PluginBase : public juce::AudioProcessor
 {
@@ -54,7 +54,9 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginBase)
 };
 
-// check is template class has addParameters
+/** Class that uses SFINAE to ensure that the
+ *  processor class has an `addParameters` function
+*/
 template<typename T>
 class HasAddParameters
 {

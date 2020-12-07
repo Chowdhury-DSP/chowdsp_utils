@@ -12,11 +12,18 @@ public:
 
     enum ColourIDs
     {
-        text1ColourID,
-        text2ColourID,
+        text1ColourID, /**< Colour to use for plugin title */
+        text2ColourID, /**< Colour to use for plugin subtitle */
     };
 
     void paint (juce::Graphics& g) override;
+
+    /** Sets the strings to use for the plugin title
+     * 
+     * @param newTitle      Main plugin title
+     * @param newSubtitle   Secondary plugin title
+     * @param font          Font size to use for drawing the title
+    */
     void setStrings (juce::String newTitle, juce::String newSubtitle, float font);
 
 private:

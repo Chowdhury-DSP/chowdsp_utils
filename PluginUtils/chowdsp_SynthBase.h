@@ -3,6 +3,13 @@
 namespace chowdsp
 {
     
+/**
+ * Base class for synth plugin processors.
+ * 
+ * Derived classes must override `prepareToPlay` and `releaseResources`
+ * (from `juce::AudioProcessor`), as well as `processSynth`, and
+ * `addParameters`.
+*/
 template<class Processor>
 class SynthBase : public PluginBase<Processor>
 {

@@ -7,12 +7,13 @@ namespace chowdsp
 class InfoComp : public juce::Component
 {
 public:
+    /** Creates an Info component for the given plugin wrapper type */
     InfoComp (const juce::AudioProcessor::WrapperType wrapperType);
 
     enum ColourIDs
     {
-        text1ColourID,
-        text2ColourID,
+        text1ColourID, /**< Colour used for plugin type text */
+        text2ColourID, /**< Colour used for web link */
     };
 
     void paint (juce::Graphics& g) override;

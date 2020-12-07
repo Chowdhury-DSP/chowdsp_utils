@@ -32,8 +32,6 @@ namespace IIR
 //==============================================================================
 /** A set of coefficients for use in an Filter object.
     @see IIR::Filter
-
-    @tags{DSP}
 */
 template <typename NumericType, size_t order>
 struct Coefficients  : public juce::dsp::ProcessorState

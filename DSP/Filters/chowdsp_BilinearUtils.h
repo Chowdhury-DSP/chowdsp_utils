@@ -47,13 +47,15 @@ struct BilinearTransform<T, 3>
     }
 };
 
-inline float calcPoleFreq (float a, float b, float c)
+/** Calculates a pole frequency from a set of filter coefficients */
+template<typename T>
+inline T calcPoleFreq (T a, T b, T c)
 {
-    auto radicand = b*b - 4.0f*a*c;
-    if (radicand >= 0.0f)
-        return 0.0f;
+    auto radicand = b*b - 4*a*c;
+    if (radicand >= (T) 0)
+        return (T) 0;
 
-    return std::sqrt (-radicand) / (2.0f * a);
+    return std::sqrt (-radicand) / (2 * a);
 }
 
 } // Bilinear

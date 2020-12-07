@@ -4,6 +4,8 @@ namespace chowdsp
 /**
  * A simple gain processor that fades smoothly
  * across buffers.
+ * 
+ * @deprecated prefer juce::dsp::Gain<T>
  */
 class GainProcessor
 {
