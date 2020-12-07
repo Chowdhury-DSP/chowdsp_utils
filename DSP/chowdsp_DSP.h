@@ -14,8 +14,9 @@
 // modal tools
 #include "Modal/chowdsp_ModalFilter.h"
 
-// oscillators
-#include "Oscillators/chowdsp_SineWave.h"
+// sound sources
+#include "Sources/chowdsp_SineWave.h"
+#include "Sources/chowdsp_Noise.h"
 
 // WDF tools
 #include "WDF/wdf.h"

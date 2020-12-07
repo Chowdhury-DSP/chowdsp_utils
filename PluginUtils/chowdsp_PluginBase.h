@@ -34,6 +34,7 @@ public:
     bool isBusesLayoutSupported (const juce::AudioProcessor::BusesLayout& layouts) const override;
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void processBlock (juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
+    void processBlock (juce::AudioBuffer<double>&, juce::MidiBuffer&) override {}
     virtual void processAudioBlock (juce::AudioBuffer<float>&) = 0;
 
     bool hasEditor() const override { return true; }

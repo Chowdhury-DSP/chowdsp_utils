@@ -168,13 +168,13 @@ namespace IIR
         */
         void snapToZero() noexcept;
 
+    protected:
+        SampleType state[order];
+
     private:
         /** Processes a block of samples */
         template <typename ProcessContext, bool isBypassed>
         void processInternal (const ProcessContext& context) noexcept;
-
-        //==============================================================================
-        SampleType state[order];
 
         JUCE_LEAK_DETECTOR (Filter)
     };

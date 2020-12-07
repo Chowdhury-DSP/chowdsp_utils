@@ -3,6 +3,7 @@ target_sources(chowdsp_utils_tests PRIVATE
     FoleysTest.cpp
     GainTest.cpp
     ModalFilterTest.cpp
+    NoiseTest.cpp
     ShelfFilterTest.cpp
     SineTest.cpp
     PluginBaseTest.cpp

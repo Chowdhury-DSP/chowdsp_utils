@@ -31,7 +31,7 @@ namespace IIR
 //==============================================================================
 template <typename SampleType, size_t order>
 Filter<SampleType, order>::Filter()
-    : coefficients (new Coefficients<typename Filter<SampleType>::NumericType, order> (1, 0, 1, 0))
+    : coefficients (new Coefficients<typename Filter<SampleType>::NumericType, order>)
 {
     reset();
 }

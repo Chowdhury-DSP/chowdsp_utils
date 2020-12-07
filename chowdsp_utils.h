@@ -21,7 +21,11 @@
 
 #pragma once
 
+#include <juce_core/juce_core.h>
+
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wunused-function") // GCC doesn't like Foley's static functions
 #include <foleys_gui_magic/foleys_gui_magic.h>
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
 // Plugin utils
 #include "PluginUtils/chowdsp_PluginBase.h"
