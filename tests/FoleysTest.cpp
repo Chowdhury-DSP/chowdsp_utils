@@ -1,5 +1,6 @@
 #include <JuceHeader.h>
 
+/** Empty plugin with Foley's Magic Editor */
 class GuiPlugin : public chowdsp::PluginBase<GuiPlugin>
 {
 public:
@@ -20,6 +21,9 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GuiPlugin)
 };
 
+/** Unit test to make sure that Foley's Magic Editor can be compiled
+ * and created with chowdsp extensions
+ */
 class FoleysTest : public UnitTest
 {
 public:

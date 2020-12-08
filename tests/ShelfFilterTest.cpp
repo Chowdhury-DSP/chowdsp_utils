@@ -10,6 +10,12 @@ namespace Constants
     constexpr float maxError = 0.1f;
 }
 
+/** Unit tests for chowdsp::ShelfFilter. Checks for correct gain at:
+ *   - All frequencies when high gain == low gain
+ *   - Low frequencies cut by -6 dB
+ *   - High frequencies boosted by +6 dB
+ *   - Transition frequency, stable at +0 dB
+ */
 class ShelfFilterTest : public UnitTest
 {
 public:

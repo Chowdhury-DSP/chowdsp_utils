@@ -6,6 +6,7 @@ namespace
     constexpr float fs = 44100.0f;
 }
 
+/** Unit tests for chowdsp::Gain */
 class GainTest : public UnitTest
 {
 public:

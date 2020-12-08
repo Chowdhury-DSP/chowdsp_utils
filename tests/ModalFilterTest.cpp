@@ -8,6 +8,11 @@ namespace
     constexpr float modeAmp = 0.1f;
 }
 
+/** Unit tests for chowdsp::ModalFilter. Tests include:
+ *   - Check that filter resonates at center frequency
+ *   - Check that filter damps frequencies other than center frequency
+ *   - Check that filter has correct decay time
+ */
 class ModalFilterTest : public UnitTest
 {
 public:

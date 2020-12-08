@@ -16,6 +16,11 @@ namespace
     constexpr size_t posDiff = negDiff + 1;
 }
 
+/** Unit tests for chowdsp::Noise. Testing frequency domain accuracy for:
+ *   - Uniform white noise (flat frequency spectrum)
+ *   - Gaussian (Normal) white noise (flat frequency spectrum)
+ *   - Pink noise (-3dB / Oct)
+ */
 class NoiseTest : public UnitTest
 {
 public:

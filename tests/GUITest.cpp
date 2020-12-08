@@ -1,5 +1,6 @@
 #include <JuceHeader.h>
 
+/** Empty component filled with a single colour */
 class PlainComponent : public Component
 {
 public:
@@ -16,6 +17,17 @@ private:
     const Colour colour;
 };
 
+/** Test GUI component that includes subcomponents defined
+ *  in chowdsp_utils, or modified by chowdsp::ChowLNF:
+ *   - Tabbed Component
+ *   - Rotary Slider
+ *   - Linear Slider
+ *   - Toggle Button
+ *   - ComboBox
+ *   - chowdsp::TitleComp
+ *   - chowdsp::InfoComp
+ *   - chowdsp::TooltipComp
+ */
 class GUIComponent : public Component
 {
 public:
@@ -85,6 +97,9 @@ private:
     chowdsp::TooltipComponent tooltips;
 };
 
+/** Document window to hold the test GUIComponent.
+ *  Closes automatically after 10 seconds.
+ */
 class GUIWindow : public DocumentWindow
 {
 public:
@@ -108,6 +123,11 @@ public:
 private:
 };
 
+/** Unit test to test components defined in chowdsp_utils
+ *  and modified by chowdsp::ChowLNF. This test opens a window
+ *  displaying these components, and closes automatically after
+ *  10 seconds.
+ */
 class GUITest : public JUCEApplication
 {
 public:

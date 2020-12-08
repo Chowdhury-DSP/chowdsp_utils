@@ -805,7 +805,7 @@ public:
     {
         // See eqn (18) from reference paper
         double lambda = (double) signum (a);
-        b = a + 2 * lambda * (next->R * Is - Vt * omega4 (float (log (next->R * Is / Vt) + (lambda * a + next->R * Is) / Vt)));
+        b = a + 2 * lambda * (next->R * Is - Vt * Omega::omega4 (std::log (next->R * Is / Vt) + (lambda * a + next->R * Is) / Vt));
         return b;
     }
 
@@ -845,7 +845,7 @@ public:
     inline double reflected() noexcept override
     {
         // See eqn (10) from reference paper
-        b = a + 2 * next->R * Is - 2 * Vt * Omega::omega4 (float (log (next->R * Is / Vt) + (a + next->R * Is) / Vt));
+        b = a + 2 * next->R * Is - 2 * Vt * Omega::omega4 (std::log (next->R * Is / Vt) + (a + next->R * Is) / Vt);
         return b;
     }
 

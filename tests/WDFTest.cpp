@@ -8,6 +8,10 @@ namespace
     constexpr float error = 0.1f;
 }
 
+/** Unit tests for chowdsp WDF classes. Includes test for:
+ *   - Voltage divider circuit
+ *   - RC Lowpass filter circuit
+ */
 class WDFTest : public UnitTest
 {
 public:

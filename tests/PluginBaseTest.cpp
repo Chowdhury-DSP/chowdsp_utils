@@ -1,6 +1,10 @@
 #include <JuceHeader.h>
 #include "DummyPlugin.h"
 
+/** Unit tests for chowdsp::PluginBase. Tests functionality:
+ *   - saving/loading parameter state
+ *   - channel layouts supported
+ */
 class PluginBaseTest : public UnitTest
 {
 public:

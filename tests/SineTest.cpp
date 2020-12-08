@@ -8,6 +8,10 @@ namespace
     constexpr double err = 1.0e-3;
 }
 
+/** Unit tests for chowdsp::SineWave. Testing accuracy compared to std::sin for:
+ *  - single samples
+ *  - buffers
+*/
 class SineTest : public UnitTest
 {
 public:
@@ -20,6 +24,7 @@ public:
         chowSine.prepare (spec);
         chowSine.setFrequency (freq1);
 
+        // process samples one at a time, and compare to std::sin
         for (int i = 0; i < 2000; i++)
         {
             auto actual = chowSine.processSample();

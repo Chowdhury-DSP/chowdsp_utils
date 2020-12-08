@@ -2,6 +2,7 @@
 
 #include <JuceHeader.h>
 
+/** Dummy plugin used for unit tests */
 class DummyPlugin : public chowdsp::PluginBase<DummyPlugin>
 {
 public:
