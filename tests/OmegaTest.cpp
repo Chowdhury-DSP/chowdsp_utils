@@ -84,14 +84,14 @@ public:
         }
     }
 
-    void checkWrightOmega (FuncType omega, const String& name, T tol)
+    void checkWrightOmega (FuncType omega, const String& funcName, T tol)
     {
         for (auto vals : WO_vals)
         {
             auto expected = (T) vals.second;
             auto actual = omega ((T) vals.first);
 
-            String errorMsg = name + " incorrect at value " + String (vals.first);
+            String errorMsg = funcName + " incorrect at value " + String (vals.first);
             expectWithinAbsoluteError (actual, expected, tol, errorMsg);
         }
     }
@@ -122,7 +122,7 @@ public:
         FunctionTest pow2Test {
             { (T) 0, (T) 1 },
             [] (T x) { return chowdsp::Omega::pow2_approx<T> (x); },
-            [] (T x) { return std::pow (2, x); },
+            [] (T x) { return std::pow ((T) 2, x); },
             "Pow2",
             (T) 0.001
         };

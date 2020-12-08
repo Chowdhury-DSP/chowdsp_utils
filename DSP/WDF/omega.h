@@ -58,12 +58,12 @@ T log_approx(T x);
 template<>
 inline float log_approx(float x) {
 	union {
-		int i;
+		int32_t i;
 		float f;
 	} v;
 	v.f = x;
-	int ex = v.i & 0x7f800000;
-	int e = (ex >> 23) - 127;
+	int32_t ex = v.i & 0x7f800000;
+	int32_t e = (ex >> 23) - 127;
 	v.i = (v.i - ex) | 0x3f800000;
 
 	return 0.693147180559945f * ((float) e + log2_approx<float>(v.f));
@@ -73,12 +73,12 @@ inline float log_approx(float x) {
 template<>
 inline double log_approx(double x) {
 	union {
-		long int i;
+		int64_t i;
 		double d;
 	} v;
 	v.d = x;
-	long int ex = v.i & 0x7ff0000000000000;
-	long int e = (ex >> 53) - 510;
+	int64_t ex = v.i & 0x7ff0000000000000;
+	int64_t e = (ex >> 53) - 510;
 	v.i = (v.i - ex) | 0x3ff0000000000000;
 	
 	return 0.693147180559945 * ((double) e + log2_approx<double>(v.d));;
@@ -105,12 +105,12 @@ inline float exp_approx(float x) {
 	x = std::max (-126.0f, 1.442695040888963f * x);
 
 	union {
-		int i;
+		int32_t i;
 		float f;
 	} v;
 
-	int xi = (int) x;
-	int l = x < 0.0f ? xi - 1 : xi;
+	int32_t xi = (int32_t) x;
+	int32_t l = x < 0.0f ? xi - 1 : xi;
 	float f = x - (float) l;
 	v.i = (l + 127) << 23;
 
@@ -123,12 +123,12 @@ inline double exp_approx(double x) {
 	x = std::max (-126.0, 1.442695040888963 * x);
 
 	union {
-		long int i;
+		int64_t i;
 		double d;
 	} v;
 
-	long int xi = (long int) x;
-	long int l = x < 0.0 ? xi - 1 : xi;
+	int64_t xi = (int64_t) x;
+	int64_t l = x < 0.0 ? xi - 1 : xi;
 	double d = x - (double) l;
 	v.i = (l + 1023) << 52;
 

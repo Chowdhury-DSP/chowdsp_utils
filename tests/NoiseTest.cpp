@@ -6,7 +6,7 @@ namespace
     // processing constants
     constexpr size_t fftOrder = 20;
     constexpr size_t blockSize = 1 << fftOrder;
-    constexpr size_t numChannels = 1;
+    constexpr size_t nCh = 1;
     constexpr double fs = 48000.0;
 
     // measuring constants
@@ -79,13 +79,13 @@ public:
     {
         chowdsp::Noise<float> noise;
 
-        dsp::ProcessSpec spec { fs, blockSize, numChannels };
+        dsp::ProcessSpec spec { fs, blockSize, nCh };
         noise.prepare (spec);
 
         noise.setGainLinear (1.0f);
         noise.setNoiseType (type);
 
-        AudioBuffer<float> noiseBuff (numChannels, blockSize);
+        AudioBuffer<float> noiseBuff (nCh, blockSize);
         dsp::AudioBlock<float> block (noiseBuff);
         block.clear();
         dsp::ProcessContextReplacing<float> ctx (block);
