@@ -112,7 +112,7 @@ public:
 
         setVisible (true);
 
-        Timer::callAfterDelay (10000, [=] { closeButtonPressed(); });
+        Timer::callAfterDelay (1000, [=] { closeButtonPressed(); });
     }
 
     void closeButtonPressed() override
