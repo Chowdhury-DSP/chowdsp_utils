@@ -28,7 +28,7 @@ matrix:
 
 cache:
   directories:
-  - $TRAVIS_BUILD_DIR../../JUCE/build/modules/JUCE/tools
+  - $TRAVIS_BUILD_DIR/../../JUCE/build/modules/JUCE/tools
 
 before_install:
   # install JUCE
