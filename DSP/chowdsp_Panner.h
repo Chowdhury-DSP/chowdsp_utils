@@ -83,7 +83,7 @@ public:
         const auto numSamples        = outputBlock.getNumSamples();
 
         jassert (inputBlock.getNumSamples() == numSamples);
-        ignoreUnused (numSamples);
+        juce::ignoreUnused (numSamples);
 
         if (numOutputChannels != 2 || numInputChannels == 0 || numInputChannels > 2)
             return;
@@ -105,6 +105,27 @@ public:
         outputBlock.getSingleChannelBlock (1).multiplyBy (rightVolume);
     }
 
+    /** 
+     * A function for panning single samples. This is useful if you have
+     * some sort of "modulating" pan effect.
+     * 
+     * An example of how this can be used:
+     * ```
+     * chowdsp::Panner<float> panner;
+     * juce::AudioBuffer<float> monoBuffer;
+     * juce::AudioBuffer<float> stereoBuffer;
+     * 
+     * auto* input = monoBuffer.getReadPointer (0);
+     * auto* left  = stereoBuffer.getWritePointer (0);
+     * auto* right = stereoBuffer.getWritePointer (1);
+     * 
+     * for (int i = 0; i < monoBuffer.getNumSamples(); ++i)
+     * {
+     *     panner.setPan (newPanValue);
+     *     std::tie (left[i], right[i]) = panner.processSample (input[i]);
+     * }
+     * ```
+    */ 
     inline std::pair<SampleType, SampleType> processSample (SampleType x) noexcept
     {
         return { x * leftVolume.getNextValue(), x * rightVolume.getNextValue() };
