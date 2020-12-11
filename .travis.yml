@@ -26,6 +26,10 @@ matrix:
     - os: windows
       env: run=sh
 
+cache:
+  directories:
+  - $TRAVIS_BUILD_DIR../../JUCE/build/modules/JUCE/tools
+
 before_install:
   # install JUCE
   - cd ${TRAVIS_BUILD_DIR}/../../
@@ -53,5 +57,5 @@ script:
   - cd ${TRAVIS_BUILD_DIR}
   - cmake -Bbuild
   - cd build/
-  - cmake --build .
+  - cmake --build . --parallel
   - ctest -C Debug -V
