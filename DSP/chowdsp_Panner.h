@@ -42,6 +42,8 @@ enum class PannerRule
 
 /**
     A processor to perform panning operations on stereo buffers.
+
+    Modified from the juce::dsp::Panner to include single-sample processing.
 */
 template <typename SampleType>
 class Panner
