@@ -43,6 +43,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         path: ${{github.workspace}}/JUCE_modules
+        clean: false
 
     - name: Cache juceaide
       uses: actions/cache@v2
