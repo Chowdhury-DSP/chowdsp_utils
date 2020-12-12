@@ -11,6 +11,9 @@ on:
 
   workflow_dispatch:
 
+env:
+  WORK_DIR_PATH: ${{github.workspace}}/JUCE_modules/chowdsp_utils
+
 jobs:
   build_and_test:
     name: Test module on ${{ matrix.os }}
@@ -44,16 +47,22 @@ jobs:
       with:
         path: $GITHUB_WORKSPACE/JUCE_modules
 
+    - name: Cache juceaide
+      uses: actions/cache@v2
+      with:
+        path: ${WORK_DIR_PATH}/build/JUCE/tools
+        key: ${{ runner.os }}-juceaide
+
     - name: Configure
-      working-directory: $GITHUB_WORKSPACE/JUCE_modules
+      working-directory: ${WORK_DIR_PATH}
       shell: bash
       run: cmake -Bbuild
 
     - name: Build
-      working-directory: $GITHUB_WORKSPACE/JUCE_modules/build
+      working-directory: ${WORK_DIR_PATH}/build
       shell: bash
       run: cmake --build . --parallel
 
     - name: Test
-      working-directory: $GITHUB_WORKSPACE/JUCE_modules/build
-      run: ctest -C Debug -V
+      working-directory: ${WORK_DIR_PATH}/build
+      run: ctest -C Debug -V     
