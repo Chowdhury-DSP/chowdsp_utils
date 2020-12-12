@@ -55,6 +55,8 @@ jobs:
       shell: bash
       run: |
         ls
+        cd JUCE_modules
+        ls
         cmake -Bbuild
 
     - name: Build
