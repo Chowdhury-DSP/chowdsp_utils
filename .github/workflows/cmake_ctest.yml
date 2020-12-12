@@ -32,7 +32,7 @@ jobs:
       uses: lukka/get-cmake@latest 
 
     - name: Set up environment
-      working-directory: ${{runner.workspace}}
+      working-directory: $GITHUB_WORKSPACE
       run: |
         git clone --depth 1 --branch 6.0.1 https://github.com/juce-framework/JUCE.git
         mkdir JUCE_modules && cd JUCE_modules
@@ -40,18 +40,18 @@ jobs:
 
     - name: Checkout code
       uses: actions/checkout@v2
-      working-directory: ${{runner.workspace}}/JUCE_modules
+      path: $GITHUB_WORKSPACE/JUCE_modules
 
     - name: Configure
-      working-directory: ${{runner.workspace}}/JUCE_modules
+      working-directory: $GITHUB_WORKSPACE/JUCE_modules
       shell: bash
       run: cmake -Bbuild
 
     - name: Build
-      working-directory: ${{runner.workspace}}/JUCE_modules/build
+      working-directory: $GITHUB_WORKSPACE/JUCE_modules/build
       shell: bash
       run: cmake --build . --parallel
 
     - name: Test
-      working-directory: ${{runner.workspace}}/JUCE_modules/build
+      working-directory: $GITHUB_WORKSPACE/JUCE_modules/build
       run: ctest -C Debug -V
