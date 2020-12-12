@@ -40,7 +40,8 @@ jobs:
 
     - name: Checkout code
       uses: actions/checkout@v2
-      path: $GITHUB_WORKSPACE/JUCE_modules
+      with:
+        path: $GITHUB_WORKSPACE/JUCE_modules
 
     - name: Configure
       working-directory: $GITHUB_WORKSPACE/JUCE_modules
