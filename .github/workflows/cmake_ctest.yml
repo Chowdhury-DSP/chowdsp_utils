@@ -24,6 +24,7 @@ jobs:
     - name: Install Linux Deps
       if: runner.os == 'Linux'
       run: |
+        sudo apt-get update
         sudo apt install libasound2-dev libcurl4-openssl-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 9
         sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
@@ -32,7 +33,7 @@ jobs:
       uses: lukka/get-cmake@latest 
 
     - name: Set up environment
-      working-directory: $GITHUB_WORKSPACE
+      working-directory: ${{github.workspace}}
       run: |
         git clone --depth 1 --branch 6.0.1 https://github.com/juce-framework/JUCE.git
         mkdir JUCE_modules && cd JUCE_modules
