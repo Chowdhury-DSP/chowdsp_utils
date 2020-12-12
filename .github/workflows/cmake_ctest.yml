@@ -44,11 +44,6 @@ jobs:
       with:
         path: ${{github.workspace}}/JUCE_modules
 
-    - name: LSSSS
-      run: |
-        pwd
-        ls
-
     - name: Cache juceaide
       uses: actions/cache@v2
       with:
@@ -56,9 +51,11 @@ jobs:
         key: ${{ runner.os }}-juceaide
 
     - name: Configure
-      working-directory: ${{github.workspace}}/JUCE_modules/chowdsp_utils
+      working-directory: ${{github.workspace}}
       shell: bash
       run: |
+        cd JUCE_modules/chowdsp_utils
+        ls
         cmake -Bbuild
 
     - name: Build
