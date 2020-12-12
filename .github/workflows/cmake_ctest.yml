@@ -39,8 +39,8 @@ jobs:
         git clone --single-branch --branch chowdsp https://github.com/Chowdhury-DSP/foleys_gui_magic.git
 
     - name: Checkout code
-      working-directory: ${{runner.workspace}}/JUCE_modules
       uses: actions/checkout@v2
+      working-directory: ${{runner.workspace}}/JUCE_modules
 
     - name: Configure
       working-directory: ${{runner.workspace}}/JUCE_modules
