@@ -35,7 +35,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
       with:
-        path: ${{github.workspace}}/JUCE_modules
+        path: ${{github.workspace}}/JUCE_modules/chowdsp_utils
 
     - name: Set up environment
       working-directory: ${{github.workspace}}
@@ -57,6 +57,7 @@ jobs:
         ls
         cd JUCE_modules
         ls
+        cd chowdsp_utils
         cmake -Bbuild
 
     - name: Build
