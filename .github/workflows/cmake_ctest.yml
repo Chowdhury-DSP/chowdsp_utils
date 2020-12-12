@@ -33,33 +33,32 @@ jobs:
       uses: lukka/get-cmake@latest 
 
     - name: Set up environment
-      working-directory: ${{github.workspace}}
+      # working-directory: ${{github.workspace}}
       run: |
-        pwd
         git clone --depth 1 --branch 6.0.1 https://github.com/juce-framework/JUCE.git
-        ls
         mkdir JUCE_modules && cd JUCE_modules
-        pwd
         git clone --single-branch --branch chowdsp https://github.com/Chowdhury-DSP/foleys_gui_magic.git
-        ls
 
     - name: Checkout code
       uses: actions/checkout@v2
       with:
-        path: $GITHUB_WORKSPACE/JUCE_modules
+        path: ${{github.workspace}}/JUCE_modules
+
+    - name: LSSSS
+      run: |
+        pwd
+        ls
 
     - name: Cache juceaide
       uses: actions/cache@v2
       with:
-        path: ${WORK_DIR_PATH}/build/JUCE/tools
+        path: ${{github.workspace}}/JUCE_modules/chowdsp_utils/build/JUCE/tools
         key: ${{ runner.os }}-juceaide
 
     - name: Configure
       working-directory: ${{github.workspace}}/JUCE_modules/chowdsp_utils
       shell: bash
       run: |
-        pwd
-        ls
         cmake -Bbuild
 
     - name: Build
