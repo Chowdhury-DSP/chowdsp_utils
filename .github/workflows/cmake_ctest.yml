@@ -1,4 +1,4 @@
-name: CMake
+name: CI
 
 on:
   push:
@@ -11,8 +11,12 @@ on:
 
   workflow_dispatch:
 
+env:
+  WORK_DIR: ${{github.workspace}}/JUCE_modules/chowdsp_utils
+
 jobs:
   build_and_test:
+    if: github.event_name == 'push' && contains(toJson(github.event.commits), '***NO_CI***') == false && contains(toJson(github.event.commits), '[ci skip]') == false && contains(toJson(github.event.commits), '[skip ci]') == false
     name: Test module on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -35,7 +39,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
       with:
-        path: ${{github.workspace}}/JUCE_modules/chowdsp_utils
+        path: ${{env.WORK_DIR}}
 
     - name: Set up environment
       working-directory: ${{github.workspace}}
@@ -47,19 +51,19 @@ jobs:
     - name: Cache juceaide
       uses: actions/cache@v2
       with:
-        path: ${{github.workspace}}/JUCE_modules/chowdsp_utils/build/JUCE/tools
+        path: ${{env.WORK_DIR}}/build/JUCE/tools
         key: ${{ runner.os }}-juceaide
 
     - name: Configure
-      working-directory: ${{github.workspace}}/JUCE_modules/chowdsp_utils
+      working-directory: ${{env.WORK_DIR}}
       shell: bash
       run: cmake -Bbuild
 
     - name: Build
-      working-directory: ${{github.workspace}}/JUCE_modules/chowdsp_utils/build
+      working-directory: ${{env.WORK_DIR}}/build
       shell: bash
-      run: cmake --build . --parallel
+      run: cmake --build . --parallel 4
 
     - name: Test
-      working-directory: ${{github.workspace}}/JUCE_modules/chowdsp_utils/build
+      working-directory: ${{env.WORK_DIR}}/build
       run: ctest -C Debug -V     

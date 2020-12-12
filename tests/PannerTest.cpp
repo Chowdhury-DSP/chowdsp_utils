@@ -96,9 +96,6 @@ public:
 
         beginTest ("Center Test");
         centerTest();
-
-        beginTest ("Should Fail!");
-        expect (false);
     }
 };
 
