@@ -51,14 +51,9 @@ jobs:
         key: ${{ runner.os }}-juceaide
 
     - name: Configure
-      working-directory: ${{github.workspace}}
+      working-directory: ${{github.workspace}}/JUCE_modules/chowdsp_utils
       shell: bash
-      run: |
-        ls
-        cd JUCE_modules
-        ls
-        cd chowdsp_utils
-        cmake -Bbuild
+      run: cmake -Bbuild
 
     - name: Build
       working-directory: ${{github.workspace}}/JUCE_modules/chowdsp_utils/build

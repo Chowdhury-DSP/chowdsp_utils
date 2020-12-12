@@ -97,7 +97,7 @@ public:
         beginTest ("Center Test");
         centerTest();
 
-        beginTest ("Should Fail!")
+        beginTest ("Should Fail!");
         expect (false);
     }
 };
