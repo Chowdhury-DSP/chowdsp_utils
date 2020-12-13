@@ -48,12 +48,6 @@ jobs:
         cd JUCE_modules
         git clone --single-branch --branch chowdsp https://github.com/Chowdhury-DSP/foleys_gui_magic.git
 
-    - name: Cache juceaide
-      uses: actions/cache@v2
-      with:
-        path: ${{env.WORK_DIR}}/build/JUCE/tools
-        key: ${{ runner.os }}-juceaide
-
     - name: Configure
       working-directory: ${{env.WORK_DIR}}
       shell: bash
@@ -69,9 +63,6 @@ jobs:
       run: ctest -C Debug -V
 
     - name: Docs
-      # if: ${{ github.event_name == 'push' && runner.os == 'Linux' }}
       if: ${{ runner.os == 'Linux' }}
       working-directory: ${{env.WORK_DIR}}/doxygen
-      run: |
-        doxygen Doxyfile
-        scp -r ../docs jatin:${{secrets.CCRMA_PASS}}@ccrma-gate.stanford.edu:~/Library/Web/chowdsp/chowdsp_utils      
+      run: make
