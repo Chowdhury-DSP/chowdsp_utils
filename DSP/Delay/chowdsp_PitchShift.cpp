@@ -3,7 +3,7 @@ namespace chowdsp
 
 template <typename SampleType, typename InterpolationType>
 PitchShifter<SampleType, InterpolationType>::PitchShifter()
-    : PitchShifter (1 << 16)
+    : PitchShifter (4096)
 {
 }
 
@@ -17,7 +17,7 @@ PitchShifter<SampleType, InterpolationType>::PitchShifter (int maximumBufferSize
     jassert (crossfadeOverlap > 0 && crossfadeOverlap < maximumBufferSize / 4);
 
     overlap = crossfadeOverlap;
-    totalSize = juce::jmax (32, maximumBufferSize + 1);
+    totalSize = juce::jmax (32, maximumBufferSize);
     halfSize = (SampleType) totalSize / 2;
 }
 
@@ -32,6 +32,7 @@ void PitchShifter<SampleType, InterpolationType>::prepare (const juce::dsp::Proc
 
     writePos.resize (spec.numChannels);
     readPos.resize  (spec.numChannels);
+    crossfade.resize (spec.numChannels);
 
     v.resize (spec.numChannels);
     interpolator.reset (totalSize);
@@ -44,6 +45,7 @@ void PitchShifter<SampleType, InterpolationType>::reset()
 {
     std::fill (writePos.begin(), writePos.end(), 0);
     std::fill (readPos.begin(), readPos.end(), (SampleType) 0);
+    std::fill (crossfade.begin(), crossfade.end(), (SampleType) 0);
     std::fill (v.begin(), v.end(), (SampleType) 0);
 
     bufferData.clear();

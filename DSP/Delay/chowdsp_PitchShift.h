@@ -9,7 +9,7 @@ public:
     PitchShifter();
 
     /** Constructor. */
-    explicit PitchShifter (int maximumBufferSize, int crossfadeOverlap = 64);
+    explicit PitchShifter (int maximumBufferSize, int crossfadeOverlap = 256);
 
     /** Initialises the processor. */
     void prepare (const juce::dsp::ProcessSpec& spec);
@@ -34,6 +34,7 @@ public:
     {
         auto& writePtr = writePos[ch];
         auto& readPtr = readPos[ch];
+        auto& chCross = crossfade[ch];
 
         // write to double ring buffer
         bufferPtrs[ch][writePtr] = x;
@@ -44,16 +45,16 @@ public:
         
         // crossfade
         if (overlap >= (writePtr - (int) readPtr) && (writePtr - readPtr) >= 0)
-            crossfade = ((SampleType) writePtr - readPtr) / (SampleType) overlap;
+            chCross = ((SampleType) writePtr - readPtr) / (SampleType) overlap;
         else if (writePtr - (int) readPtr == 0)
-            crossfade = (SampleType) 0;
+            chCross = (SampleType) 0;
 
         if (overlap >= (writePtr - (int) readPtr2) && (writePtr - readPtr2) >= 0)
-            crossfade = ((SampleType) writePtr - readPtr2) / (SampleType) overlap;
+            chCross = (SampleType) 1.0 - ((SampleType) writePtr - readPtr2) / (SampleType) overlap;
         else if (writePtr - (int) readPtr2 == 0)
-            crossfade = (SampleType) 1;
+            chCross = (SampleType) 1;
             
-        auto y = rd0 * crossfade + rd1 * ((SampleType) 1.0 - crossfade);
+        auto y = rd0 * chCross + rd1 * ((SampleType) 1.0 - chCross);
 
         // iterate pointers
         writePtr = writePtr + 1 >= totalSize ? 0 : writePtr + 1;
@@ -109,8 +110,8 @@ private:
     std::vector<int> writePos;
     std::vector<SampleType> readPos;
 
-    SampleType shift;     // Shift factor to increment read ptr
-    SampleType crossfade; // crossfade gain
+    SampleType shift;                   // Shift factor to increment read ptr
+    std::vector<SampleType> crossfade;  // crossfade gain
 
     int overlap;   // crossfade overlap
     int totalSize; // max buffer size
