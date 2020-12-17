@@ -1,6 +1,16 @@
 namespace chowdsp
 {
 
+/** A processor for pitch shifting in real-time, using a ring-buffer and interpolation.
+ *  Interpolation can use any of the interpolation modes defined in the DelayInterpolation
+ *  namespace. Processing can be done sample-by-sample or with block processing.
+ * 
+ *  Pitch shift amount may be specified in semitones, or scale factor, e.g. to shift up
+ *  by one octave, either use 12 semitones, or a scale factor of 2.0. Note that as the
+ *  amount of pitch shifting increases, the quality of the output decreases.
+ * 
+ *  Reference: https://github.com/YetAnotherElectronicsChannel/STM32_DSP_PitchShift
+ */ 
 template <typename SampleType, typename InterpolationType = DelayLineInterpolationTypes::Linear>
 class PitchShifter
 {
@@ -8,7 +18,15 @@ public:
     /** Default constructor. */
     PitchShifter();
 
-    /** Constructor. */
+    /** Constructor.
+     * 
+     * @param maximumBufferSize     The size of the ring buffer used for pitch shifting.
+     *                              Note that longer buffers mean better quality, and better extension
+     *                              to low frequencies, but also sometimes more latency.
+     * 
+     * @param crossfadeOverlap      The length (samples) of the crossfade used when crossfading
+     *                              between read pointers on the ring buffer.
+     */
     explicit PitchShifter (int maximumBufferSize, int crossfadeOverlap = 256);
 
     /** Initialises the processor. */
@@ -17,16 +35,16 @@ public:
     /** Resets the internal state variables of the processor. */
     void reset();
 
-    /** Sets the pitch shift in semitones. */
+    /** Sets the pitch shift amount in semitones. */
     void setShiftSemitones (SampleType shiftSemitones);
 
-    /** Returns the current delay in samples. */
+    /** Returns the current pitch shift amount in semitones. */
     SampleType getShiftSemitones() const noexcept;
 
-    /** Sets the pitch shift factor as multiplier. */
+    /** Sets the pitch shift amount as a scale factor. */
     void setShiftFactor (SampleType shiftFactor);
 
-    /** Returns the current delay in samples. */
+    /** Returns the current pitch shift amount as a scale factor. */
     SampleType getShiftFactor() const noexcept;
 
     /** Processes a single sample */
