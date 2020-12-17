@@ -63,15 +63,15 @@ public:
         float signalAccum = 0.0f;
         float freqInc = (float) fs / (float) blockSize;
 
-        for (float freq = 0.0f; freq < 0.66667f * freqExpected; freq += freqInc)
+        for (float freq = 20.0f; freq < 0.66667f * freqExpected; freq += freqInc)
             noiseAccum += getMagForFreq (freq);
 
         signalAccum = getMagForFreq (freqExpected);
 
-        for (float freq = 1.5f * freqExpected; freq < (float) fs; freq += freqInc)
+        for (float freq = 1.5f * freqExpected; freq < (float) fs * 0.48f; freq += freqInc)
             noiseAccum += getMagForFreq (freq);
 
-        noiseAccum /= (float) blockSize / 2.0f;
+        // noiseAccum /= (float) blockSize / 2.0f;
         return Decibels::gainToDecibels (signalAccum / noiseAccum);
     }
 
@@ -137,22 +137,23 @@ public:
         
 
         auto snr = calcSNR (buffer, freqExpected);
+        Logger::writeToLog ("SNR: " + String (snr));
         expectGreaterOrEqual (snr, minSNR, "SNR too low!");
     }
 
     void runTest()
     {
         beginTest ("Single-sample Processing");
-        runPitchShiftTest (false, true, true, 50.0f);
+        runPitchShiftTest (false, true, true, 35.0f);
 
         beginTest ("Buffer Processing");
-        runPitchShiftTest (true, true, true, 50.0f);
+        runPitchShiftTest (true, true, true, 35.0f);
 
         beginTest ("No Shift");
-        runPitchShiftTest (true, false, true, 70.0f);
+        runPitchShiftTest (true, false, true, 35.0f);
 
         beginTest ("Scale Shift");
-        runPitchShiftTest (true, true, false, 50.0f);
+        runPitchShiftTest (true, true, false, 35.0f);
     }
 };
 
