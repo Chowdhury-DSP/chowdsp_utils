@@ -39,7 +39,6 @@ DelayLine<SampleType, InterpolationType>::DelayLine (int maximumDelayInSamples)
     jassert (maximumDelayInSamples >= 0);
 
     totalSize = juce::jmax (4, maximumDelayInSamples + 1);
-    sampleRate = 44100.0;
 }
 
 //==============================================================================
@@ -53,7 +52,7 @@ void DelayLine<SampleType, InterpolationType>::setDelay (SampleType newDelayInSa
     delayInt  = static_cast<int> (std::floor (delay));
     delayFrac = delay - (SampleType) delayInt;
 
-    updateInternalVariables();
+    interpolator.updateInternalVariables (delayInt, delayFrac);
 }
 
 template <typename SampleType, typename InterpolationType>
@@ -74,7 +73,7 @@ void DelayLine<SampleType, InterpolationType>::prepare (const juce::dsp::Process
     this->readPos.resize  (spec.numChannels);
 
     this->v.resize (spec.numChannels);
-    sampleRate = spec.sampleRate;
+    interpolator.reset (totalSize);
 
     reset();
 }

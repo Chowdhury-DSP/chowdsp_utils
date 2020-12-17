@@ -8,6 +8,7 @@ target_sources(chowdsp_utils_tests PRIVATE
     ShelfFilterTest.cpp
     SineTest.cpp
     PannerTest.cpp
+    PitchShiftTest.cpp
     PluginBaseTest.cpp
     WDFTest.cpp
 )

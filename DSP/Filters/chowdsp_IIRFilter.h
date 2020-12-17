@@ -7,7 +7,7 @@ namespace chowdsp
  * Uses Transposed Direct Form II:
  * https://ccrma.stanford.edu/~jos/fp/Transposed_Direct_Forms.html
  */
-template<int order, typename FloatType=float>
+template<size_t order, typename FloatType=float>
 class IIRFilter
 {
 public:

@@ -4,7 +4,9 @@
 #include "chowdsp_Panner.h"
 
 // delay
+#include "Delay/chowdsp_DelayInterpolation.h"
 #include "Delay/chowdsp_DelayLine.h"
+#include "Delay/chowdsp_PitchShift.h"
 
 // filter tools
 #include "Filters/chowdsp_IIRFilter.h"
