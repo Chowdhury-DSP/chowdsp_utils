@@ -3,7 +3,7 @@ project(chowdsp_utils VERSION 1.0.0)
 set(CMAKE_CXX_STANDARD 17)
 include(CTest)
 
-add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../../JUCE build/JUCE)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../../JUCE JUCE)
 juce_add_modules(../foleys_gui_magic)
 juce_add_modules(.)
 
