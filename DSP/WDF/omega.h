@@ -25,6 +25,8 @@
 #ifndef OMEGA_H_INCLUDED
 #define OMEGA_H_INCLUDED
 
+#include <algorithm>
+
 namespace chowdsp
 {
 
