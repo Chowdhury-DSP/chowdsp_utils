@@ -72,9 +72,16 @@ public:
 
 template<class Processor>
 PluginBase<Processor>::PluginBase() :
-    AudioProcessor (BusesProperties()
-        .withInput ("Input", juce::AudioChannelSet::stereo(), true)
-        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)),
+#if JUCE_IOS || JUCE_MAC
+    AudioProcessor (juce::JUCEApplicationBase::isStandaloneApp() ?
+        BusesProperties().withInput ("Input", juce::AudioChannelSet::mono(), true)
+                         .withOutput ("Output", juce::AudioChannelSet::stereo(), true) :
+        BusesProperties().withInput ("Input", juce::AudioChannelSet::stereo(), true)
+                         .withOutput ("Output", juce::AudioChannelSet::stereo(), true)),
+#else
+    AudioProcessor (BusesProperties().withInput ("Input", juce::AudioChannelSet::stereo(), true)
+                                     .withOutput ("Output", juce::AudioChannelSet::stereo(), true)),
+#endif
     vts (*this, nullptr, juce::Identifier ("Parameters"), createParameterLayout())
 {
 }
