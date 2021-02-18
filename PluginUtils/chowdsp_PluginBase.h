@@ -15,6 +15,7 @@ class PluginBase : public juce::AudioProcessor
 {
 public:
     PluginBase();
+    PluginBase (const juce::AudioProcessor::BusesProperties& layout);
     ~PluginBase();
 
     const juce::String getName() const override { return JucePlugin_Name; }
@@ -82,6 +83,13 @@ PluginBase<Processor>::PluginBase() :
     AudioProcessor (BusesProperties().withInput ("Input", juce::AudioChannelSet::stereo(), true)
                                      .withOutput ("Output", juce::AudioChannelSet::stereo(), true)),
 #endif
+    vts (*this, nullptr, juce::Identifier ("Parameters"), createParameterLayout())
+{
+}
+
+template<class Processor>
+PluginBase<Processor>::PluginBase (const juce::AudioProcessor::BusesProperties& layout) :
+    AudioProcessor (layout),
     vts (*this, nullptr, juce::Identifier ("Parameters"), createParameterLayout())
 {
 }
