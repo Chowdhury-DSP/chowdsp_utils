@@ -73,16 +73,8 @@ public:
 
 template<class Processor>
 PluginBase<Processor>::PluginBase() :
-#if JUCE_IOS || JUCE_MAC
-    AudioProcessor (juce::JUCEApplicationBase::isStandaloneApp() ?
-        BusesProperties().withInput ("Input", juce::AudioChannelSet::mono(), true)
-                         .withOutput ("Output", juce::AudioChannelSet::stereo(), true) :
-        BusesProperties().withInput ("Input", juce::AudioChannelSet::stereo(), true)
-                         .withOutput ("Output", juce::AudioChannelSet::stereo(), true)),
-#else
     AudioProcessor (BusesProperties().withInput ("Input", juce::AudioChannelSet::stereo(), true)
                                      .withOutput ("Output", juce::AudioChannelSet::stereo(), true)),
-#endif
     vts (*this, nullptr, juce::Identifier ("Parameters"), createParameterLayout())
 {
 }
@@ -127,8 +119,8 @@ bool PluginBase<Processor>::isBusesLayoutSupported (const juce::AudioProcessor::
 template<class Processor>
 void PluginBase<Processor>::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    setRateAndBufferSizeDetails (sampleRate, samplesPerBlock);
-    magicState.prepareToPlay (sampleRate, samplesPerBlock);
+     setRateAndBufferSizeDetails (sampleRate, samplesPerBlock);
+     magicState.prepareToPlay (sampleRate, samplesPerBlock);
 }
 
 template<class Processor>
@@ -136,7 +128,7 @@ void PluginBase<Processor>::processBlock (juce::AudioBuffer<float>& buffer, juce
 {
     juce::ScopedNoDenormals noDenormals;
 
-    processAudioBlock (buffer);
+     processAudioBlock (buffer);
 }
 
 } // chowdsp
