@@ -62,6 +62,13 @@ public:
             block[n] = processSample (block[n]);
     }
 
+    /** Set coefficients to new values */
+    virtual void setCoefs (const FloatType (&newB)[order + 1], const FloatType (&newA)[order + 1])
+    {
+        std::copy (newB, &newB[order + 1], b);
+        std::copy (newA, &newA[order + 1], a);
+    }
+
 protected:
     FloatType a[order+1];
     FloatType b[order+1];
