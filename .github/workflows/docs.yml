@@ -36,6 +36,11 @@ jobs:
       working-directory: ${{env.WORK_DIR}}/doxygen
       run: make
 
-    - name: Deploy Docs
-      working-directory: ${{env.WORK_DIR}}/doxygen
-      run: scp -r ../docs jatin:${{ secrets.CCRMA_PASS }}@ccrma-gate.stanford.edu:~/Library/Web/chowdsp/chowdsp_utils
+    - name: Deploy docs
+        uses: garygrossgarten/github-action-scp@release
+        with:
+          local: ../docs
+          remote: ~/Library/Web/chowdsp/chowdsp_utils
+          host: ccrma-gate.stanford.edu
+          username: jatin
+          password: ${{ secrets.CCRMA_PASS }}
