@@ -4,7 +4,6 @@ on:
   push:
     branches:
     - master
-    - develop
   pull_request:
     branches:
     - master
@@ -37,6 +36,7 @@ jobs:
       run: make
 
     - name: Deploy docs
+      if: ${{ github.event_name != 'pull_request' }}
       uses: garygrossgarten/github-action-scp@release
       with:
         local: ${{env.WORK_DIR}}/docs
