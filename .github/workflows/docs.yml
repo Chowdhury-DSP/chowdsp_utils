@@ -37,10 +37,10 @@ jobs:
       run: make
 
     - name: Deploy docs
-        uses: garygrossgarten/github-action-scp@release
-        with:
-          local: ../docs
-          remote: ~/Library/Web/chowdsp/chowdsp_utils
-          host: ccrma-gate.stanford.edu
-          username: jatin
-          password: ${{ secrets.CCRMA_PASS }}
+      uses: garygrossgarten/github-action-scp@release
+      with:
+        local: ../docs
+        remote: ~/Library/Web/chowdsp/chowdsp_utils
+        host: ccrma-gate.stanford.edu
+        username: jatin
+        password: ${{ secrets.CCRMA_PASS }}
