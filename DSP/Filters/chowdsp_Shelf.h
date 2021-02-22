@@ -17,23 +17,25 @@ public:
      * @param highGain: the gain of the filter at high frequencies
      * @param fc: the transition frequency of the filter
      * @param fs: the sample rate for the filter
+     * 
+     * For information on the filter coefficient derivation,
+     * see Abel and Berners dsp4dae, pg. 249
      */
-    void calcCoefs (float lowGain, float highGain, float fc, float fs)
+    void calcCoefs (T lowGain, T highGain, T fc, T fs)
     {
         // reduce to simple gain element
         if (lowGain == highGain)
         {
-            this->b[0] = lowGain; this->b[1] = 0.0f;
-            this->a[0] = 1.0f; this->a[1] = 0.0f;
+            this->b[0] = lowGain; this->b[1] = (T) 0;
+            this->a[0] = (T) 1; this->a[1] = (T) 0;
             return;
         }
 
-        auto wc = juce::MathConstants<T>::twoPi * fc;
-        auto p = std::sqrt (wc*wc * (highGain*highGain - lowGain*highGain) / (lowGain*highGain - lowGain*lowGain));
-        auto K = p / std::tan (p / (2.0f * fs));
+        auto rho = std::sqrt (highGain / lowGain);
+        auto K = (T) 1 / std::tan (juce::MathConstants<T>::pi * fc / fs);
 
-        float bs[2] { highGain / p, lowGain };
-        float as[2] { 1.0f / p, 1.0f };
+        T bs[2] { highGain / rho, lowGain };
+        T as[2] { 1.0f / rho, 1.0f };
         Bilinear::BilinearTransform<T, 2>::call (this->b, this->a, bs, as, K);
     }
 
