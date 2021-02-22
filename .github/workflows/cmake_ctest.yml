@@ -61,8 +61,3 @@ jobs:
     - name: Test
       working-directory: ${{env.WORK_DIR}}/build
       run: ctest -C Debug -V
-
-    - name: Docs
-      if: ${{ runner.os == 'Linux' }}
-      working-directory: ${{env.WORK_DIR}}/doxygen
-      run: make

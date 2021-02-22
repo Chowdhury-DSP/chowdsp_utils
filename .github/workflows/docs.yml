@@ -1,0 +1,41 @@
+name: Docs
+
+on:
+  push:
+    branches:
+    - master
+    - develop
+  pull_request:
+    branches:
+    - master
+
+  workflow_dispatch:
+
+env:
+  WORK_DIR: ${{github.workspace}}/JUCE_modules/chowdsp_utils
+
+jobs:
+  build_and_test:
+    if: contains(toJson(github.event.commits), '***NO_CI***') == false && contains(toJson(github.event.commits), '[ci skip]') == false && contains(toJson(github.event.commits), '[skip ci]') == false
+    name: Make and deploy docs
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Install Linux Deps
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt install libasound2-dev libcurl4-openssl-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev doxygen graphviz
+
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        path: ${{env.WORK_DIR}}
+
+    - name: Make Docs
+      working-directory: ${{env.WORK_DIR}}/doxygen
+      run: make
+
+    - name: Deploy Docs
+      working-directory: ${{env.WORK_DIR}}/doxygen
+      run: scp -r ../docs jatin:${{ secrets.CCRMA_PASS }}@ccrma-gate.stanford.edu:~/Library/Web/chowdsp/chowdsp_utils
