@@ -21,7 +21,7 @@ The module currently contains the following utility classes:
   - Base class for audio effect plugin.
   - Base class for synth plugin.
 
-For complete documentation, see the [API docs](https://ccrma.stanford.edu/~jatin/chowdsp/chowdsp_utils/docs/).
+For complete documentation, see the [API docs](https://ccrma.stanford.edu/~jatin/chowdsp/chowdsp_utils).
 
 ## License
 
