@@ -21,7 +21,7 @@ public:
 
 private:
     const juce::AudioProcessor::WrapperType wrapperType;
-    juce::HyperlinkButton linkButton { JucePlugin_Manufacturer, juce::URL ("https://ccrma.stanford.edu/~jatin/chowdsp") };
+    juce::HyperlinkButton linkButton;
     
     int linkX = 0;
 

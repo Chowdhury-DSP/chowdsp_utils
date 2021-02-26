@@ -2,7 +2,12 @@ namespace chowdsp
 {
 
 InfoComp::InfoComp (const juce::AudioProcessor::WrapperType pluginWrapperType) :
-    wrapperType (pluginWrapperType)
+    wrapperType (pluginWrapperType),
+#if defined JucePlugin_ManufacturerWebsite
+    linkButton (JucePlugin_Manufacturer, juce::URL (JucePlugin_ManufacturerWebsite))
+#else
+    linkButton (JucePlugin_Manufacturer, juce::URL ("https://chowdsp.com"))
+#endif
 {
     setColour (text1ColourID, juce::Colours::grey);
     setColour (text2ColourID, juce::Colours::white);
