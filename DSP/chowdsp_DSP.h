@@ -1,6 +1,7 @@
 #pragma once
 
 #include "chowdsp_GainProcessor.h"
+#include "chowdsp_BypassProcessor.h"
 #include "chowdsp_Panner.h"
 
 // delay
