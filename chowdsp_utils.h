@@ -35,6 +35,7 @@ JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wzero-as-null-pointer-constant", // Clang
 #include "PluginUtils/chowdsp_PluginBase.h"
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
+#include "PluginUtils/chowdsp_ParamUtils.h"
 #include "PluginUtils/chowdsp_SynthBase.h"
 #include "PluginUtils/chowdsp_DummySynthSound.h"
 
