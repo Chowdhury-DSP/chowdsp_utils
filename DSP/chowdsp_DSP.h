@@ -14,6 +14,9 @@
 #include "Filters/chowdsp_juce_IIRFilter.h"
 #include "Filters/chowdsp_BilinearUtils.h"
 #include "Filters/chowdsp_Shelf.h"
+#include "Filters/chowdsp_QValCalcs.h"
+#include "Filters/chowdsp_StateVariableFilter.h"
+#include "Filters/chowdsp_NthOrderFilter.h"
 
 // modal tools
 #include "Modal/chowdsp_ModalFilter.h"
