@@ -1,5 +1,5 @@
 #include <JuceHeader.h>
-#include "test_utils.h"
+#include "../test_utils.h"
 
 namespace Constants
 {
@@ -43,7 +43,7 @@ public:
         chowdsp::ShelfFilter shelfFilter;
         shelfFilter.calcCoefs (Constants::lowGain, Constants::highGain, Constants::fc, Constants::fs);
 
-        auto testFrequency = [=, &shelfFilter] (float freq, float expGain, String message)
+        auto testFrequency = [=, &shelfFilter] (float freq, float expGain, const String& message)
         {
             auto buffer = test_utils::makeSineWave (freq, Constants::fs, 1.0f);
 
