@@ -1,5 +1,5 @@
 #include <JuceHeader.h>
-#include "test_utils.h"
+#include "../test_utils.h"
 
 namespace
 {
@@ -23,7 +23,7 @@ public:
         auto refMag = buffer.getMagnitude(0, numSamples);
 
         gainProc.processBlock (buffer);
-        auto mag = buffer.getMagnitude(0, numSamples);
+        auto mag = buffer.getMagnitude (0, numSamples);
 
         expectWithinAbsoluteError (mag / refMag, gain, (float) 1.0e-6,
             "Incorrect gain!");

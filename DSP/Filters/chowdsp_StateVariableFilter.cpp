@@ -11,7 +11,7 @@ StateVariableFilter<SampleType>::StateVariableFilter()
 template <typename SampleType>
 void StateVariableFilter<SampleType>::setCutoffFrequency (SampleType newCutoffFrequencyHz)
 {
-    jassert (isPositiveAndBelow (newCutoffFrequencyHz, static_cast<SampleType> (sampleRate * 0.5)));
+    jassert (juce::isPositiveAndBelow (newCutoffFrequencyHz, static_cast<SampleType> (sampleRate * 0.5)));
 
     cutoffFrequency = newCutoffFrequencyHz;
     update();

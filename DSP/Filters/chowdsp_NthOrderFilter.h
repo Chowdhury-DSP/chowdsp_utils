@@ -52,7 +52,7 @@ public:
     void process (const juce::dsp::ProcessContextReplacing<T>& context) override
     {
         for (auto& filt : filters)
-            filt.process<juce::dsp::ProcessContextReplacing<T>, type> (context);
+            filt.template process<juce::dsp::ProcessContextReplacing<T>, type> (context);
     }
 
     /** Processes a single sample */
