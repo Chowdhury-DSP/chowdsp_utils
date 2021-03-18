@@ -56,6 +56,7 @@ public:
 
         // write to double ring buffer
         bufferPtrs[ch][writePtr] = x;
+        bufferPtrs[ch][writePtr + totalSize] = x;
 
         const auto readPtr2 = readPtr >= halfSize ? readPtr - halfSize : readPtr + halfSize;
         SampleType rd0 = readSample (ch, readPtr);
@@ -140,4 +141,6 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PitchShifter)
 };
 
-} // chowdsp
+} // namespace chowdsp
+
+#include "chowdsp_PitchShift.cpp"

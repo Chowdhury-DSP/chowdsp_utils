@@ -47,12 +47,6 @@ namespace DelayLineInterpolationTypes
             auto index1 = delayInt;
             auto index2 = index1 + 1;
 
-            if (index2 >= totalSize)
-            {
-                index1 %= totalSize;
-                index2 %= totalSize;
-            }
-
             auto value1 = buffer[index1];
             auto value2 = buffer[index2];
 
@@ -89,14 +83,6 @@ namespace DelayLineInterpolationTypes
             auto index2 = index1 + 1;
             auto index3 = index2 + 1;
             auto index4 = index3 + 1;
-
-            if (index4 >= totalSize)
-            {
-                index1 %= totalSize;
-                index2 %= totalSize;
-                index3 %= totalSize;
-                index4 %= totalSize;
-            }
 
             auto value1 = buffer[index1];
             auto value2 = buffer[index2];
@@ -146,16 +132,6 @@ namespace DelayLineInterpolationTypes
             auto index4 = index3 + 1;
             auto index5 = index4 + 1;
             auto index6 = index5 + 1;
-
-            if (index6 >= totalSize)
-            {
-                index1 %= totalSize;
-                index2 %= totalSize;
-                index3 %= totalSize;
-                index4 %= totalSize;
-                index5 %= totalSize;
-                index6 %= totalSize;
-            }
 
             auto value1 = buffer[index1];
             auto value2 = buffer[index2];
@@ -213,12 +189,6 @@ namespace DelayLineInterpolationTypes
             auto index1 = delayInt;
             auto index2 = index1 + 1;
 
-            if (index2 >= totalSize)
-            {
-                index1 %= totalSize;
-                index2 %= totalSize;
-            }
-
             auto value1 = buffer[index1];
             auto value2 = buffer[index2];
 
@@ -231,6 +201,81 @@ namespace DelayLineInterpolationTypes
         int totalSize;
         double alpha = 0.0;
     };
+
+    /**
+        Successive samples in the delay line will be interpolated using Sinc
+        interpolation. This method is somewhat less efficient than the others,
+        but gives a very smooth and flat frequency response.
+    */
+    JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324) // MSVC doesn't like Foley's hiding class members
+    template<typename T, size_t N, size_t M = 256>
+    struct Sinc
+    {
+        Sinc()
+        {
+            T cutoff = 0.455f;
+            size_t j;
+            for (j = 0; j < M + 1; j++)
+            {
+                for (size_t i = 0; i < N; i++)
+                {
+                    T t = -T (i) + T (N / (T) 2.0) + T (j) / T (M) - (T) 1.0;
+                    sinctable[j * N * 2 + i] = symmetric_blackman (t, (int) N) * cutoff * sincf (cutoff * t);
+                }
+            }
+            for (j = 0; j < M; j++)
+            {
+                for (size_t i = 0; i < N; i++)
+                    sinctable[j * N * 2 + N + i] = (sinctable[(j + 1) * N * 2 + i] - sinctable[j * N * 2 + i]) / (T) 65536.0;
+            }
+        }
+
+        inline T sincf (T x) const noexcept
+        {
+            if (x == (T) 0)
+                return (T) 1;
+            return (std::sin (juce::MathConstants<float>::pi * x)) / (juce::MathConstants<float>::pi * x);
+        }
+
+        inline T symmetric_blackman (T i, int n) const noexcept
+        {
+            i -= (n / 2);
+            return ((T) 0.42 - (T) 0.5 * std::cos (juce::MathConstants<T>::twoPi * i / (n))
+                + (T) 0.08 * std::cos (4 * juce::MathConstants<float>::pi * i / (n)));
+        }
+
+        void reset (int newTotalSize) { totalSize = newTotalSize; }
+
+        void updateInternalVariables (int& /*delayIntOffset*/, T& /*delayFrac*/) {}
+
+        inline T call (const T* buffer, int delayInt, T delayFrac, const T& /*state*/)
+        {
+            auto sincTableOffset = (size_t) (((T) 1 - delayFrac) * (T) M) * N * 2;
+
+            auto out = juce::dsp::SIMDRegister<T> ((T) 0);
+            auto buff_reg = juce::dsp::SIMDRegister<T> ((T) 0);
+            for (size_t i = 0; i < N; i += juce::dsp::SIMDRegister<T>::size())
+            {
+              #ifdef __SSE2__
+                if constexpr (std::is_same<T, float>::value)
+                    buff_reg = juce::dsp::SIMDRegister<T> (_mm_loadu_ps (&buffer[delayInt + i]));
+                else
+                    buff_reg = juce::dsp::SIMDRegister<T> (_mm_loadu_pd (&buffer[delayInt + i]));
+              #else
+                auto* regPtr = reinterpret_cast<T*> (&buff_reg.value);
+                std::copy (&buffer[delayInt + i], &buffer[delayInt + i + juce::dsp::SIMDRegister<T>::size()], regPtr);
+              #endif
+                auto sinc_reg = juce::dsp::SIMDRegister<T>::fromRawArray (&sinctable[sincTableOffset + i]);
+                out += buff_reg * sinc_reg;
+            }
+
+            return out.sum();
+        }
+
+        int totalSize;
+        T sinctable alignas(16)[(M + 1) * N * 2];
+    };
+    JUCE_END_IGNORE_WARNINGS_MSVC
 }
 
 } // chowdsp

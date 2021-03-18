@@ -67,7 +67,8 @@ void DelayLine<SampleType, InterpolationType>::prepare (const juce::dsp::Process
 {
     jassert (spec.numChannels > 0);
 
-    this->bufferData.setSize ((int) spec.numChannels, totalSize, false, false, true);
+    this->bufferData.setSize ((int) spec.numChannels, 2 * totalSize, false, false, true);
+    bufferPtr = this->bufferData.getArrayOfWritePointers();
 
     this->writePos.resize (spec.numChannels);
     this->readPos.resize  (spec.numChannels);
@@ -88,39 +89,5 @@ void DelayLine<SampleType, InterpolationType>::reset()
 
     this->bufferData.clear();
 }
-
-//==============================================================================
-template <typename SampleType, typename InterpolationType>
-void DelayLine<SampleType, InterpolationType>::pushSample (int channel, SampleType sample)
-{
-    this->bufferData.setSample (channel, this->writePos[(size_t) channel], sample);
-    this->writePos[(size_t) channel] = (this->writePos[(size_t) channel] + totalSize - 1) % totalSize;
-}
-
-template <typename SampleType, typename InterpolationType>
-SampleType DelayLine<SampleType, InterpolationType>::popSample (int channel, SampleType delayInSamples, bool updateReadPointer)
-{
-    if (delayInSamples >= 0)
-        setDelay(delayInSamples);
-
-    auto result = interpolateSample (channel);
-
-    if (updateReadPointer)
-        this->readPos[(size_t) channel] = (this->readPos[(size_t) channel] + totalSize - 1) % totalSize;
-
-    return result;
-}
-
-//==============================================================================
-template class DelayLine<float,  DelayLineInterpolationTypes::None>;
-template class DelayLine<double, DelayLineInterpolationTypes::None>;
-template class DelayLine<float,  DelayLineInterpolationTypes::Linear>;
-template class DelayLine<double, DelayLineInterpolationTypes::Linear>;
-template class DelayLine<float,  DelayLineInterpolationTypes::Lagrange3rd>;
-template class DelayLine<double, DelayLineInterpolationTypes::Lagrange3rd>;
-template class DelayLine<float,  DelayLineInterpolationTypes::Lagrange5th>;
-template class DelayLine<double, DelayLineInterpolationTypes::Lagrange5th>;
-template class DelayLine<float,  DelayLineInterpolationTypes::Thiran>;
-template class DelayLine<double, DelayLineInterpolationTypes::Thiran>;
 
 } // namespace chowdsp

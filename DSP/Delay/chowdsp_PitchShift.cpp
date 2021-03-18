@@ -26,7 +26,7 @@ void PitchShifter<SampleType, InterpolationType>::prepare (const juce::dsp::Proc
 {
     jassert (spec.numChannels > 0);
 
-    bufferData.setSize ((int) spec.numChannels, totalSize, false, false, true);
+    bufferData.setSize ((int) spec.numChannels, 2 * totalSize, false, false, true);
     bufferPtrs = bufferData.getArrayOfWritePointers();
     jassert (bufferPtrs != nullptr);
 
@@ -74,15 +74,5 @@ SampleType PitchShifter<SampleType, InterpolationType>::getShiftFactor() const n
 {
     return shift;
 }
-
-//=======================================================================
-template class PitchShifter<float,  DelayLineInterpolationTypes::None>;
-template class PitchShifter<double, DelayLineInterpolationTypes::None>;
-template class PitchShifter<float,  DelayLineInterpolationTypes::Linear>;
-template class PitchShifter<double, DelayLineInterpolationTypes::Linear>;
-template class PitchShifter<float,  DelayLineInterpolationTypes::Lagrange3rd>;
-template class PitchShifter<double, DelayLineInterpolationTypes::Lagrange3rd>;
-template class PitchShifter<float,  DelayLineInterpolationTypes::Lagrange5th>;
-template class PitchShifter<double, DelayLineInterpolationTypes::Lagrange5th>;
 
 } // chowdsp
