@@ -206,3 +206,5 @@ private:
 };
 
 } // namespace chowdsp
+
+#include "chowdsp_DelayLine.cpp"
