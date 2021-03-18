@@ -57,7 +57,16 @@ juce::String timeMsValToString (float timeMsVal)
 
 float stringToTimeMsVal (const juce::String& s) { return s.getFloatValue(); }
 
-juce::String floatValToString (float floatVal) { return juce::String (floatVal, 2, false); }
+juce::String floatValToString (float floatVal)
+{ 
+    return floatValToStringDecimal (floatVal, 2);
+}
+
+juce::String floatValToStringDecimal (float floatVal, int numDecimalPlaces)
+{ 
+    return juce::String (floatVal, numDecimalPlaces, false);
+}
+
 float stringToFloatVal (const juce::String& s) { return s.getFloatValue(); }
 
 } // namespace ParamUtils

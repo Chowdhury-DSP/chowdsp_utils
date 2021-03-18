@@ -24,6 +24,7 @@ juce::String timeMsValToString (float timeMsVal);
 float stringToTimeMsVal (const juce::String& s);
 
 juce::String floatValToString (float floatVal);
+juce::String floatValToStringDecimal (float floatVal, int numDecimalPlaces);
 float stringToFloatVal (const juce::String& s);
 
 } // namespace ParamUtils
