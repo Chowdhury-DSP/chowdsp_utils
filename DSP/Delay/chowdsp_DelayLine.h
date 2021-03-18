@@ -39,8 +39,9 @@ public:
     virtual void prepare (const juce::dsp::ProcessSpec& /* spec */) = 0;
     virtual void reset() = 0;
 
-    virtual void pushSample (int /* channel */, SampleType /* sample */) = 0;
-    virtual SampleType popSample (int /* channel */, SampleType /* delayInSamples */, bool /* updateReadPointer */) = 0;
+    virtual void pushSample (int /* channel */, SampleType /* sample */) noexcept = 0;
+    virtual SampleType popSample (int /* channel */) noexcept = 0;
+    virtual SampleType popSample (int /* channel */, SampleType /* delayInSamples */, bool /* updateReadPointer */) noexcept = 0;
 
     void copyState (const DelayLineBase<SampleType>& other)
     {
@@ -105,7 +106,13 @@ public:
 
         @see setDelay, popSample, process
     */
-    void pushSample (int channel, SampleType sample) override;
+    inline void pushSample (int channel, SampleType sample) noexcept override
+    {
+        const auto writePtr = this->writePos[(size_t) channel];
+        bufferPtr[channel][writePtr] = sample;
+        bufferPtr[channel][writePtr + totalSize] = sample;
+        this->writePos[(size_t) channel] = (this->writePos[(size_t) channel] + totalSize - 1) % totalSize;
+    }
 
     /** Pops a single sample from one channel of the delay line.
 
@@ -124,7 +131,25 @@ public:
 
         @see setDelay, pushSample, process
     */
-    SampleType popSample (int channel, SampleType delayInSamples = -1, bool updateReadPointer = true) override;
+    inline SampleType popSample (int channel) noexcept override
+    {
+        auto result = interpolateSample (channel);
+        this->readPos[(size_t) channel] = (this->readPos[(size_t) channel] + totalSize - 1) % totalSize;
+
+        return result;
+    }
+
+    inline SampleType popSample (int channel, SampleType delayInSamples, bool updateReadPointer) noexcept override
+    {
+        setDelay(delayInSamples);
+
+        auto result = interpolateSample (channel);
+
+        if (updateReadPointer)
+            this->readPos[(size_t) channel] = (this->readPos[(size_t) channel] + totalSize - 1) % totalSize;
+
+        return result;
+    }
 
     //==============================================================================
     /** Processes the input and output samples supplied in the processing context.
@@ -169,12 +194,13 @@ private:
     inline SampleType interpolateSample (int channel) noexcept
     {
         auto index = (this->readPos[(size_t) channel] + delayInt);
-        return interpolator.call (this->bufferData.getReadPointer (channel),
+        return interpolator.call (bufferPtr[channel],
             index, delayFrac, this->v[(size_t) channel]);
     }
 
     //==============================================================================
     InterpolationType interpolator;
+    SampleType** bufferPtr = nullptr;
     SampleType delay = 0.0, delayFrac = 0.0;
     int delayInt = 0, totalSize = 4;
 };

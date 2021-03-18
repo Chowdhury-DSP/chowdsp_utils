@@ -47,12 +47,6 @@ namespace DelayLineInterpolationTypes
             auto index1 = delayInt;
             auto index2 = index1 + 1;
 
-            if (index2 >= totalSize)
-            {
-                index1 %= totalSize;
-                index2 %= totalSize;
-            }
-
             auto value1 = buffer[index1];
             auto value2 = buffer[index2];
 
@@ -89,14 +83,6 @@ namespace DelayLineInterpolationTypes
             auto index2 = index1 + 1;
             auto index3 = index2 + 1;
             auto index4 = index3 + 1;
-
-            if (index4 >= totalSize)
-            {
-                index1 %= totalSize;
-                index2 %= totalSize;
-                index3 %= totalSize;
-                index4 %= totalSize;
-            }
 
             auto value1 = buffer[index1];
             auto value2 = buffer[index2];
@@ -146,16 +132,6 @@ namespace DelayLineInterpolationTypes
             auto index4 = index3 + 1;
             auto index5 = index4 + 1;
             auto index6 = index5 + 1;
-
-            if (index6 >= totalSize)
-            {
-                index1 %= totalSize;
-                index2 %= totalSize;
-                index3 %= totalSize;
-                index4 %= totalSize;
-                index5 %= totalSize;
-                index6 %= totalSize;
-            }
 
             auto value1 = buffer[index1];
             auto value2 = buffer[index2];
@@ -212,12 +188,6 @@ namespace DelayLineInterpolationTypes
         {
             auto index1 = delayInt;
             auto index2 = index1 + 1;
-
-            if (index2 >= totalSize)
-            {
-                index1 %= totalSize;
-                index2 %= totalSize;
-            }
 
             auto value1 = buffer[index1];
             auto value2 = buffer[index2];

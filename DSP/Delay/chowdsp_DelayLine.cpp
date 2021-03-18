@@ -67,7 +67,8 @@ void DelayLine<SampleType, InterpolationType>::prepare (const juce::dsp::Process
 {
     jassert (spec.numChannels > 0);
 
-    this->bufferData.setSize ((int) spec.numChannels, totalSize, false, false, true);
+    this->bufferData.setSize ((int) spec.numChannels, 2 * totalSize, false, false, true);
+    bufferPtr = this->bufferData.getArrayOfWritePointers();
 
     this->writePos.resize (spec.numChannels);
     this->readPos.resize  (spec.numChannels);
@@ -87,28 +88,6 @@ void DelayLine<SampleType, InterpolationType>::reset()
     std::fill (this->v.begin(), this->v.end(), static_cast<SampleType> (0));
 
     this->bufferData.clear();
-}
-
-//==============================================================================
-template <typename SampleType, typename InterpolationType>
-void DelayLine<SampleType, InterpolationType>::pushSample (int channel, SampleType sample)
-{
-    this->bufferData.setSample (channel, this->writePos[(size_t) channel], sample);
-    this->writePos[(size_t) channel] = (this->writePos[(size_t) channel] + totalSize - 1) % totalSize;
-}
-
-template <typename SampleType, typename InterpolationType>
-SampleType DelayLine<SampleType, InterpolationType>::popSample (int channel, SampleType delayInSamples, bool updateReadPointer)
-{
-    if (delayInSamples >= 0)
-        setDelay(delayInSamples);
-
-    auto result = interpolateSample (channel);
-
-    if (updateReadPointer)
-        this->readPos[(size_t) channel] = (this->readPos[(size_t) channel] + totalSize - 1) % totalSize;
-
-    return result;
 }
 
 //==============================================================================
