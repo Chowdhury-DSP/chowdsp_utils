@@ -3,6 +3,10 @@
 namespace chowdsp
 {
 
+/**
+ * Implementation of complex numbers using juce::dsp::SIMDRegister,
+ * along with a few helpful operators.
+ */ 
 template <typename Type>
 struct SIMDComplex
 {
@@ -20,7 +24,7 @@ struct SIMDComplex
     {
     }
 
-    constexpr SIMDComplex(Type r[4], Type i[4])
+    constexpr SIMDComplex(Type r[size], Type i[size])
     {
         _r = T::fromRawArray (r);
         _i = T::fromRawArray (i);
@@ -33,14 +37,14 @@ struct SIMDComplex
             throw std::invalid_argument("Initialize lists must be of size 4");
         }
         Type rfl alignas(16)[size], ifl alignas(16)[size];
-        for (int q = 0; q < size; ++q)
+        for (size_t q = 0; q < size; ++q)
         {
             rfl[q] = *(r.begin() + q);
             ifl[q] = *(i.begin() + q);
         }
 
-        _r = _mm_load_ps(rfl);
-        _i = _mm_load_ps(ifl);
+        _r = T::fromRawArray (rfl);
+        _i = T::fromRawArray (ifl);
     }
 
     inline T real() const noexcept { return _r; }
@@ -60,6 +64,7 @@ struct SIMDComplex
 
     inline static SIMDComplex fastExp (T angle)
     {
+        using namespace SIMDUtils;
         angle = clampToPiRangeSIMD<Type> (angle);
         return {fastcosSIMD<Type> (angle), fastsinSIMD<Type> (angle)};
     }

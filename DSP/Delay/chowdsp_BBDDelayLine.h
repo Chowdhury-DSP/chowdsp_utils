@@ -3,12 +3,20 @@
 namespace chowdsp
 {
 
+namespace BBD
+{
+
+/**
+ * A class to emulate an analog delay line
+ * made using a bucket-brigade device
+ */ 
 template <size_t STAGES>
 class BBDDelayLine
 {
   public:
     BBDDelayLine() = default;
 
+    /** Prepares the delay line for processing */
     void prepare (double sampleRate)
     {
         evenOn = true;
@@ -25,12 +33,17 @@ class BBDDelayLine
         reset();
     }
 
+    /** Resets the state of the delay */
     void reset()
     {
         bufferPtr = 0;
         std::fill (buffer.begin(), buffer.end(), 0.0f);
     }
 
+    /**
+     * Sets the cutoff frequency of the anti-alisaing
+     * filter used by the bucket-brigade device
+     */
     void setFilterFreq (float freqHz)
     {
         inputFilter->set_freq(freqHz);
@@ -40,6 +53,11 @@ class BBDDelayLine
         outputFilter->set_time(tn);
     }
 
+    /**
+     * Sets the delay time of the delay line.
+     * Internally this changed the "clock rate"
+     * of the bucket-brigade device
+     */
     inline void setDelayTime (float delaySec) noexcept
     {
         const auto clock_rate_hz = (2.0f * (float) STAGES) / delaySec;
@@ -50,6 +68,7 @@ class BBDDelayLine
         outputFilter->set_delta(doubleTs);
     }
 
+    /** Processes a sample with the delay line */
     inline float process (float u) noexcept
     {
         SIMDComplex<float> xOutAccum;
@@ -101,5 +120,7 @@ class BBDDelayLine
     float tn = 0.0f;
     bool evenOn = true;
 };
+
+} // namespace BBD
 
 } // namespace chowdsp

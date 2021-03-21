@@ -3,12 +3,20 @@
 namespace chowdsp
 {
 
+namespace BBD
+{
+
+/**
+ * A class that wraps the BBDDelayLine class
+ * as a chowdsp::DelayLineBase<float>
+ */
 template <size_t STAGES>
 class BBDDelayWrapper : public DelayLineBase<float>
 {
 public:
     BBDDelayWrapper() = default;
 
+    /** Sets the delay length in samples */
     void setDelay (float newDelayInSamples) override
     {
         delaySamp = newDelayInSamples;
@@ -16,8 +24,10 @@ public:
             line.setDelay (delaySamp / sampleRate);
     }
 
+    /** Returns the delay length in samples */
     float getDelay() const override { return delaySamp; }
 
+    /** Prepares the delay line for processing */
     void prepare (const juce::dsp::ProcessSpec& spec) override
     {
         sampleRate = (float) spec.sampleRate;
@@ -31,22 +41,26 @@ public:
         }
     }
 
+    /** Resets the state of the delay line */
     void reset() override
     {
         for (auto& line : lines)
             line.reset();
     }
 
+    /** Pushes a sample into the delay line */
     inline void pushSample (int channel, float sample) noexcept override
     {
         inputs[channel] = sample;
     }
 
+    /** Returns a sample from the delay line */
     inline float popSample (int channel) noexcept override
     {
         return lines[channel].process (inputs[channel]);
     }
 
+    /** Returns a sample from the delay line. Note that the read pointer is always updated. */
     inline float popSample (int channel, float delayInSamples, bool /*updateReadPointer*/) noexcept override
     {
         setDelay (delayInSamples);
@@ -60,5 +74,7 @@ private:
     std::vector<BBDDelayLine<STAGES>> lines;
     std::vector<float> inputs;
 };
+
+} // namespace BBD
 
 } // namespace chowdsp

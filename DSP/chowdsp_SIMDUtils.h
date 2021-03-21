@@ -3,6 +3,9 @@
 namespace chowdsp
 {
 
+namespace SIMDUtils
+{
+
 /**
 JUCE doesn't implement the divide operator for
 SIMDRegister, so here's a simple implementation.
@@ -56,6 +59,11 @@ inline vec2 operator / (const vec2 &l, const vec2 &r)
 }
 #endif
 
+/**
+ * Fast implementation of the JUCE
+ * FastMathapproximations::sin function
+ * with SIMD optomisation.
+ */ 
 template <typename T>
 inline juce::dsp::SIMDRegister<T> fastsinSIMD (juce::dsp::SIMDRegister<T> x) noexcept
 {
@@ -75,6 +83,11 @@ inline juce::dsp::SIMDRegister<T> fastsinSIMD (juce::dsp::SIMDRegister<T> x) noe
     return num / den;
 }
 
+/**
+ * Fast implementation of the JUCE
+ * FastMathapproximations::cos function
+ * with SIMD optomisation.
+ */ 
 template <typename T>
 inline juce::dsp::SIMDRegister<T> fastcosSIMD (juce::dsp::SIMDRegister<T> x) noexcept
 {
@@ -93,6 +106,7 @@ inline juce::dsp::SIMDRegister<T> fastcosSIMD (juce::dsp::SIMDRegister<T> x) noe
     return num / den;
 }
 
+/** Clamps the input value to the range (-pi, pi) */
 template <typename T>
 inline juce::dsp::SIMDRegister<T> clampToPiRangeSIMD (juce::dsp::SIMDRegister<T> x)
 {
@@ -106,8 +120,9 @@ inline juce::dsp::SIMDRegister<T> clampToPiRangeSIMD (juce::dsp::SIMDRegister<T>
     auto p = y - (m2pi * yip);
     auto off = m2pi & juce::dsp::SIMDRegister<T>::lessThan (p, mz);
     p = p + off;
-
     return p - mpi;
 }
+
+} // namespace SIMDUtils
 
 } // namespace chowdsp

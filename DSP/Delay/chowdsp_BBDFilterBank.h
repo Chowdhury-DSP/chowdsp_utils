@@ -8,6 +8,8 @@ namespace chowdsp
  * Martin Holters and Julian Parker:
  * http://dafx2018.web.ua.pt/papers/DAFx2018_paper_12.pdf
  */
+namespace BBD
+{
 
 /**
  * Anti-aliasing/reconstruction filters used by JUNO-60 chorus.
@@ -177,5 +179,7 @@ private:
     const float Ts;
     SIMDComplex Amult;
 };
+
+} // namespace BBD
 
 } // namespace chowdsp

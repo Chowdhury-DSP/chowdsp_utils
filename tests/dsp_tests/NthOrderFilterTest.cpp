@@ -5,7 +5,6 @@ namespace Constants
 {
     constexpr float fs = 48000.0f;
     constexpr float fc = 1000.0f;
-    constexpr float bandWidth = 400.0f;
 }
 
 /** Unit tests for chowdsp::BypassProcessor */
