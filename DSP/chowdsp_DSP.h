@@ -4,11 +4,16 @@
 #include "chowdsp_BypassProcessor.h"
 #include "chowdsp_LevelDetector.h"
 #include "chowdsp_Panner.h"
+#include "chowdsp_SIMDUtils.h"
+#include "chowdsp_SIMDComplex.h"
 
 // delay
 #include "Delay/chowdsp_DelayInterpolation.h"
 #include "Delay/chowdsp_DelayLine.h"
 #include "Delay/chowdsp_PitchShift.h"
+#include "Delay/chowdsp_BBDFilterBank.h"
+#include "Delay/chowdsp_BBDDelayLine.h"
+#include "Delay/chowdsp_BBDDelayWrapper.h"
 
 // filter tools
 #include "Filters/chowdsp_IIRFilter.h"
