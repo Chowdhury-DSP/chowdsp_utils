@@ -16,12 +16,19 @@ class BBDDelayWrapper : public DelayLineBase<float>
 public:
     BBDDelayWrapper() = default;
 
+    /** Sets the anti-aliasing filter frequency */
+    void setFilterFreq (float freqHz)
+    {
+        for (auto& line : lines)
+            line.setFilterFreq (freqHz);
+    }
+
     /** Sets the delay length in samples */
     void setDelay (float newDelayInSamples) override
     {
         delaySamp = newDelayInSamples;
         for (auto& line : lines)
-            line.setDelay (delaySamp / sampleRate);
+            line.setDelayTime (delaySamp / sampleRate);
     }
 
     /** Returns the delay length in samples */
