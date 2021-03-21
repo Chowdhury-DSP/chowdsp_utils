@@ -41,7 +41,7 @@ inline SIMDComplex<float> fast_complex_pow(juce::dsp::SIMDRegister<float> angle,
 class InputFilterBank
 {
     using T = float; // We need SIMD size 4 (for now)
-    using SIMDComplex = SIMDComplex<T>;
+    using Complex4 = SIMDComplex<T>;
 
 public:
     InputFilterBank (T sampleTime) : Ts (sampleTime)
@@ -58,8 +58,8 @@ public:
             pole_real[i] = BBDFilterSpec::iFiltPole[i].real();
             pole_imag[i] = BBDFilterSpec::iFiltPole[i].imag();
         }
-        roots = SIMDComplex (root_real, root_imag);
-        poles = SIMDComplex (pole_real, pole_imag);
+        roots = Complex4 (root_real, root_imag);
+        poles = Complex4 (pole_real, pole_imag);
     }
 
     inline void set_freq (float freq)
@@ -92,29 +92,29 @@ public:
 
     inline void process (float u) noexcept
     {
-        x = pole_corr * x + SIMDComplex(u, 0.0f);
+        x = pole_corr * x + Complex4(u, 0.0f);
     }
 
-    SIMDComplex x;
-    SIMDComplex Gcalc {(T) 1, (T) 0};
+    Complex4 x;
+    Complex4 Gcalc {(T) 1, (T) 0};
 
 private:
-    SIMDComplex roots;
-    SIMDComplex poles;
-    SIMDComplex root_corr;
-    SIMDComplex pole_corr;
+    Complex4 roots;
+    Complex4 poles;
+    Complex4 root_corr;
+    Complex4 pole_corr;
     juce::dsp::SIMDRegister<T> pole_corr_angle;
 
-    SIMDComplex Aplus;
+    Complex4 Aplus;
 
     const T Ts;
-    SIMDComplex gCoef;
+    Complex4 gCoef;
 };
 
 class OutputFilterBank
 {
     using T = float; // We need SIMD size 4 (for now)
-    using SIMDComplex = SIMDComplex<T>;
+    using Complex4 = SIMDComplex<T>;
 
 public:
     OutputFilterBank (float sampleTime) : Ts (sampleTime)
@@ -132,8 +132,8 @@ public:
             pole_real[i] = BBDFilterSpec::oFiltPole[i].real();
             pole_imag[i] = BBDFilterSpec::oFiltPole[i].imag();
         }
-        gCoef = SIMDComplex(gcoefs_real, gcoefs_imag);
-        poles = SIMDComplex(pole_real, pole_imag);
+        gCoef = Complex4(gcoefs_real, gcoefs_imag);
+        poles = Complex4(pole_real, pole_imag);
     }
 
     inline float calcH0() const noexcept { return -1.0f * gCoef.real().sum(); }
@@ -162,22 +162,22 @@ public:
 
     inline void calcG() noexcept { Gcalc = Aplus * Gcalc; }
 
-    inline void process (SIMDComplex u) noexcept { x = pole_corr * x + u; }
+    inline void process (Complex4 u) noexcept { x = pole_corr * x + u; }
 
-    SIMDComplex x;
-    SIMDComplex Gcalc{1.0f, 0.0f};
+    Complex4 x;
+    Complex4 Gcalc{1.0f, 0.0f};
 
 private:
-    SIMDComplex gCoef;
-    SIMDComplex poles;
-    SIMDComplex root_corr;
-    SIMDComplex pole_corr;
+    Complex4 gCoef;
+    Complex4 poles;
+    Complex4 root_corr;
+    Complex4 pole_corr;
     juce::dsp::SIMDRegister<float> pole_corr_angle;
 
-    SIMDComplex Aplus;
+    Complex4 Aplus;
 
     const float Ts;
-    SIMDComplex Amult;
+    Complex4 Amult;
 };
 
 } // namespace BBD
