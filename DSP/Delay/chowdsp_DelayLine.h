@@ -46,6 +46,10 @@ public:
     void copyState (const DelayLineBase<SampleType>& other)
     {
         bufferData.makeCopyOf (other.bufferData);
+
+        if (v.empty() || other.v.empty()) // nothing to copy!
+            return;
+
         std::copy (other.v.begin(), other.v.end(), v.begin());
         std::copy (other.writePos.begin(), other.writePos.end(), writePos.begin());
         std::copy (other.readPos.begin(), other.readPos.end(), readPos.begin());

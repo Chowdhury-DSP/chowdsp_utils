@@ -8,6 +8,8 @@ target_sources(chowdsp_utils_tests PRIVATE
     dsp_tests/NthOrderFilterTest.cpp
     dsp_tests/OmegaTest.cpp
     dsp_tests/ShelfFilterTest.cpp
+    dsp_tests/SIMDComplexTest.cpp
+    dsp_tests/SIMDUtilsTest.cpp
     dsp_tests/SineTest.cpp
     dsp_tests/PannerTest.cpp
     dsp_tests/PitchShiftTest.cpp
