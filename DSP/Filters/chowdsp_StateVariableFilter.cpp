@@ -1,6 +1,5 @@
 namespace chowdsp
 {
-
 //==============================================================================
 template <typename SampleType>
 StateVariableFilter<SampleType>::StateVariableFilter()
@@ -67,9 +66,9 @@ void StateVariableFilter<SampleType>::snapToZero() noexcept
 template <typename SampleType>
 void StateVariableFilter<SampleType>::update()
 {
-    g  = static_cast<SampleType> (std::tan (juce::MathConstants<double>::pi * cutoffFrequency / sampleRate));
+    g = static_cast<SampleType> (std::tan (juce::MathConstants<double>::pi * cutoffFrequency / sampleRate));
     R2 = static_cast<SampleType> (1.0 / resonance);
-    h  = static_cast<SampleType> (1.0 / (1.0 + R2 * g + g * g));
+    h = static_cast<SampleType> (1.0 / (1.0 + R2 * g + g * g));
 
     gh = g * h;
     g2 = static_cast<SampleType> (2) * g;

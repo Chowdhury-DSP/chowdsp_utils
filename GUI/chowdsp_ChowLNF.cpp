@@ -1,6 +1,5 @@
 namespace chowdsp
 {
-
 ChowLNF::ChowLNF()
 {
     roboto = juce::Typeface::createSystemTypefaceFor (chowdsp_BinaryData::RobotoCondensedRegular_ttf,
@@ -15,24 +14,24 @@ juce::Typeface::Ptr ChowLNF::getTypefaceForFont (const juce::Font& font)
     return font.isBold() ? robotoBold : roboto;
 }
 
-void ChowLNF::drawRotarySlider (juce::Graphics& g, int x, int y, int width, int height,
-                              float sliderPos, float rotaryStartAngle,
-                              float rotaryEndAngle, juce::Slider& slider)
+void ChowLNF::drawRotarySlider (juce::Graphics& g, int x, int y, int width, int height, float sliderPos, float rotaryStartAngle, float rotaryEndAngle, juce::Slider& slider)
 {
-    int diameter = (width > height)? height : width;
-    if (diameter < 16) return;
+    int diameter = (width > height) ? height : width;
+    if (diameter < 16)
+        return;
 
     juce::Point<float> centre (x + std::floor (width * 0.5f + 0.5f), y + std::floor (height * 0.5f + 0.5f));
-    diameter -= (diameter % 2)? 9 : 8;
+    diameter -= (diameter % 2) ? 9 : 8;
     float radius = diameter * 0.5f;
     x = int (centre.x - radius);
     y = int (centre.y - radius);
 
-    const auto bounds = juce::Rectangle<int> (x, y, diameter, diameter).toFloat();   
+    const auto bounds = juce::Rectangle<int> (x, y, diameter, diameter).toFloat();
 
     auto b = pointer->getBounds().toFloat();
     pointer->setTransform (juce::AffineTransform::rotation (juce::MathConstants<float>::twoPi * ((sliderPos - 0.5f) * 300.0f / 360.0f),
-        b.getCentreX(), b.getCentreY()));
+                                                            b.getCentreX(),
+                                                            b.getCentreY()));
 
     auto knobBounds = (bounds * 0.75f).withCentre (centre);
     knob->drawWithin (g, knobBounds, juce::RectanglePlacement::stretchToFit, 1.0f);
@@ -52,18 +51,12 @@ void ChowLNF::drawRotarySlider (juce::Graphics& g, int x, int y, int width, int 
     g.fillPath (valueArc);
 }
 
-void ChowLNF::drawToggleButton (juce::Graphics& g, juce::ToggleButton& button,
-                              bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
+void ChowLNF::drawToggleButton (juce::Graphics& g, juce::ToggleButton& button, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
 {
     auto fontSize = juce::jmin (15.0f, (float) button.getHeight() * 0.75f);
     auto tickWidth = fontSize * 1.1f;
 
-    drawTickBox (g, button, 4.0f, ((float) button.getHeight() - tickWidth) * 0.5f,
-                 tickWidth, tickWidth,
-                 button.getToggleState(),
-                 button.isEnabled(),
-                 shouldDrawButtonAsHighlighted,
-                 shouldDrawButtonAsDown);
+    drawTickBox (g, button, 4.0f, ((float) button.getHeight() - tickWidth) * 0.5f, tickWidth, tickWidth, button.getToggleState(), button.isEnabled(), shouldDrawButtonAsHighlighted, shouldDrawButtonAsDown);
 
     g.setColour (button.findColour (juce::ToggleButton::textColourId));
     g.setFont (juce::Font (fontSize).boldened());
@@ -72,9 +65,9 @@ void ChowLNF::drawToggleButton (juce::Graphics& g, juce::ToggleButton& button,
         g.setOpacity (0.5f);
 
     g.drawFittedText (button.getButtonText(),
-                      button.getLocalBounds().withTrimmedLeft (juce::roundToInt (tickWidth) + 10)
-                                             .withTrimmedRight (2),
-                      juce::Justification::centredLeft, 10);
+                      button.getLocalBounds().withTrimmedLeft (juce::roundToInt (tickWidth) + 10).withTrimmedRight (2),
+                      juce::Justification::centredLeft,
+                      10);
 }
 
 void ChowLNF::positionComboBoxText (juce::ComboBox& box, juce::Label& label)
@@ -84,8 +77,7 @@ void ChowLNF::positionComboBoxText (juce::ComboBox& box, juce::Label& label)
     label.setJustificationType (juce::Justification::centred);
 }
 
-void ChowLNF::createTabTextLayout (const juce::TabBarButton& button, float length, float depth,
-                                 juce::Colour colour, juce::TextLayout& textLayout)
+void ChowLNF::createTabTextLayout (const juce::TabBarButton& button, float length, float depth, juce::Colour colour, juce::TextLayout& textLayout)
 {
     juce::Font font (depth * 0.45f, juce::Font::bold);
     font.setUnderline (button.hasKeyboardFocus (false));
@@ -115,15 +107,28 @@ void ChowLNF::drawTabButton (juce::TabBarButton& button, juce::Graphics& g, bool
 
         switch (o)
         {
-        case juce::TabbedButtonBar::TabsAtBottom:   p1 = activeArea.getBottomLeft(); p2 = activeArea.getTopLeft();    break;
-        case juce::TabbedButtonBar::TabsAtTop:      p1 = activeArea.getTopLeft();    p2 = activeArea.getBottomLeft(); break;
-        case juce::TabbedButtonBar::TabsAtRight:    p1 = activeArea.getTopRight();   p2 = activeArea.getTopLeft();    break;
-        case juce::TabbedButtonBar::TabsAtLeft:     p1 = activeArea.getTopLeft();    p2 = activeArea.getTopRight();   break;
-        default:                                    jassertfalse; break;
+            case juce::TabbedButtonBar::TabsAtBottom:
+                p1 = activeArea.getBottomLeft();
+                p2 = activeArea.getTopLeft();
+                break;
+            case juce::TabbedButtonBar::TabsAtTop:
+                p1 = activeArea.getTopLeft();
+                p2 = activeArea.getBottomLeft();
+                break;
+            case juce::TabbedButtonBar::TabsAtRight:
+                p1 = activeArea.getTopRight();
+                p2 = activeArea.getTopLeft();
+                break;
+            case juce::TabbedButtonBar::TabsAtLeft:
+                p1 = activeArea.getTopLeft();
+                p2 = activeArea.getTopRight();
+                break;
+            default:
+                jassertfalse;
+                break;
         }
 
-        g.setGradientFill (juce::ColourGradient (bkg.brighter (0.2f), p1.toFloat(),
-                           bkg.darker (0.1f),   p2.toFloat(), false));
+        g.setGradientFill (juce::ColourGradient (bkg.brighter (0.2f), p1.toFloat(), bkg.darker (0.1f), p2.toFloat(), false));
     }
 
     g.fillRect (activeArea);
@@ -142,7 +147,7 @@ void ChowLNF::drawTabButton (juce::TabBarButton& button, juce::Graphics& g, bool
     const juce::Rectangle<float> area (button.getTextArea().toFloat());
 
     float length = area.getWidth();
-    float depth  = area.getHeight();
+    float depth = area.getHeight();
 
     if (button.getTabbedButtonBar().isVertical())
         std::swap (length, depth);
@@ -154,28 +159,34 @@ void ChowLNF::drawTabButton (juce::TabBarButton& button, juce::Graphics& g, bool
 
     switch (o)
     {
-    case juce::TabbedButtonBar::TabsAtLeft:   t = t.rotated (juce::MathConstants<float>::pi * -0.5f).translated (area.getX(), area.getBottom()); break;
-    case juce::TabbedButtonBar::TabsAtRight:  t = t.rotated (juce::MathConstants<float>::pi *  0.5f).translated (area.getRight(), area.getY()); break;
-    case juce::TabbedButtonBar::TabsAtTop:
-    case juce::TabbedButtonBar::TabsAtBottom: t = t.translated (area.getX(), area.getY()); break;
-    default:                                  jassertfalse; break;
+        case juce::TabbedButtonBar::TabsAtLeft:
+            t = t.rotated (juce::MathConstants<float>::pi * -0.5f).translated (area.getX(), area.getBottom());
+            break;
+        case juce::TabbedButtonBar::TabsAtRight:
+            t = t.rotated (juce::MathConstants<float>::pi * 0.5f).translated (area.getRight(), area.getY());
+            break;
+        case juce::TabbedButtonBar::TabsAtTop:
+        case juce::TabbedButtonBar::TabsAtBottom:
+            t = t.translated (area.getX(), area.getY());
+            break;
+        default:
+            jassertfalse;
+            break;
     }
 
     g.addTransform (t);
     textLayout.draw (g, juce::Rectangle<float> (length, depth));
 }
 
-void ChowLNF::drawLinearSlider (juce::Graphics& g, int x, int y, int width, int height,
-                              float sliderPos, float /*minSliderPos*/, float /*maxSliderPos*/,
-                              const juce::Slider::SliderStyle, juce::Slider& slider)
+void ChowLNF::drawLinearSlider (juce::Graphics& g, int x, int y, int width, int height, float sliderPos, float /*minSliderPos*/, float /*maxSliderPos*/, const juce::Slider::SliderStyle, juce::Slider& slider)
 {
     auto trackWidth = juce::jmin (6.0f, slider.isHorizontal() ? (float) height * 0.25f : (float) width * 0.25f);
 
     juce::Point<float> startPoint (slider.isHorizontal() ? (float) x : (float) x + (float) width * 0.5f,
-                       slider.isHorizontal() ? (float) y + (float) height * 0.5f : (float) (height + y));
+                                   slider.isHorizontal() ? (float) y + (float) height * 0.5f : (float) (height + y));
 
     juce::Point<float> endPoint (slider.isHorizontal() ? (float) (width + x) : startPoint.x,
-                       slider.isHorizontal() ? startPoint.y : (float) y);
+                                 slider.isHorizontal() ? startPoint.y : (float) y);
 
     juce::Path backgroundTrack;
     backgroundTrack.startNewSubPath (startPoint);
@@ -202,7 +213,8 @@ void ChowLNF::drawLinearSlider (juce::Graphics& g, int x, int y, int width, int 
     g.strokePath (valueTrack, { trackWidth, juce::PathStrokeType::curved, juce::PathStrokeType::rounded });
 
     auto thumbRect = juce::Rectangle<float> (static_cast<float> (thumbWidth),
-                                             static_cast<float> (thumbWidth)).withCentre (maxPoint);
+                                             static_cast<float> (thumbWidth))
+                         .withCentre (maxPoint);
     knob->drawWithin (g, thumbRect, juce::RectanglePlacement::stretchToFit, 1.0f);
 }
 
@@ -230,4 +242,4 @@ juce::Label* ChowLNF::createSliderTextBox (juce::Slider& slider)
     return l;
 }
 
-} // chowdsp
+} // namespace chowdsp

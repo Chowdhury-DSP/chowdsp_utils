@@ -1,12 +1,12 @@
-#include <JuceHeader.h>
 #include "../test_utils.h"
+#include <JuceHeader.h>
 
 namespace
 {
-    constexpr double fs = 44100.0;
-    constexpr double fc = 500.0;
-    constexpr float error = 0.1f;
-}
+constexpr double fs = 44100.0;
+constexpr double fc = 500.0;
+constexpr float error = 0.1f;
+} // namespace
 
 /** Unit tests for chowdsp WDF classes. Includes test for:
  *   - Voltage divider circuit
@@ -50,8 +50,7 @@ public:
         chowdsp::WDF::IdealVoltageSource vs;
         vs.connectToNode (&p1);
 
-        auto processBuffer = [&] (float* buffer, const int numSamples)
-        {
+        auto processBuffer = [&] (float* buffer, const int numSamples) {
             for (int n = 0; n < numSamples; ++n)
             {
                 vs.setVoltage ((double) buffer[n]);
@@ -63,10 +62,9 @@ public:
             }
         };
 
-        auto getMagDB = [=] (const AudioBuffer<float>& buffer) -> float
-        {
+        auto getMagDB = [=] (const AudioBuffer<float>& buffer) -> float {
             return Decibels::gainToDecibels (buffer
-                .getMagnitude (1000, buffer.getNumSamples() - 1000));
+                                                 .getMagnitude (1000, buffer.getNumSamples() - 1000));
         };
 
         auto sineDouble = test_utils::makeSineWave ((float) fc * 2.0f, (float) fs, 1.0f);
@@ -91,7 +89,7 @@ public:
         voltageDiviverTest();
 
         beginTest ("RC Lowpass Test");
-        rcLowpassTest();        
+        rcLowpassTest();
     }
 };
 

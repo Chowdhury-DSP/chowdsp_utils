@@ -1,13 +1,13 @@
-#include <JuceHeader.h>
 #include "../test_utils.h"
+#include <JuceHeader.h>
 
 namespace
 {
-    constexpr float fs = 48000.0f;
-    constexpr float freq = 100.0f;
-    constexpr int nSamples = 512;
-    constexpr float lenSeconds = (float) nSamples / fs;
-}
+constexpr float fs = 48000.0f;
+constexpr float freq = 100.0f;
+constexpr int nSamples = 512;
+constexpr float lenSeconds = (float) nSamples / fs;
+} // namespace
 
 class PannerTest : public UnitTest
 {
@@ -33,8 +33,8 @@ public:
         auto leftMag = outBuffer.getMagnitude (0, 0, nSamples);
         auto rightMag = outBuffer.getMagnitude (1, 0, nSamples);
 
-        expectEquals (leftMag, 2.0f);   // expect both channels summed into left channel
-        expectEquals (rightMag, 0.0f);  // expect silenSecondsce on right channel
+        expectEquals (leftMag, 2.0f); // expect both channels summed into left channel
+        expectEquals (rightMag, 0.0f); // expect silenSecondsce on right channel
     }
 
     void singleSampleTest()
@@ -53,14 +53,14 @@ public:
         auto* input = inBuffer.getReadPointer (0);
         auto* left = outBuffer.getWritePointer (0);
         auto* right = outBuffer.getWritePointer (1);
-        
+
         for (int i = 0; i < nSamples; ++i)
             std::tie (left[i], right[i]) = panner.processSample (input[i]);
         auto leftMag = outBuffer.getMagnitude (0, 0, nSamples);
         auto rightMag = outBuffer.getMagnitude (1, 0, nSamples);
 
-        expectEquals (leftMag, 0.0f);   // expect silenSecondsce on left channel
-        expectEquals (rightMag, 2.0f);  // expect both channels summed to right channel
+        expectEquals (leftMag, 0.0f); // expect silenSecondsce on left channel
+        expectEquals (rightMag, 2.0f); // expect both channels summed to right channel
     }
 
     void centerTest()
@@ -82,7 +82,7 @@ public:
         auto leftMag = outBuffer.getMagnitude (0, 0, nSamples);
         auto rightMag = outBuffer.getMagnitude (1, 0, nSamples);
 
-        expectWithinAbsoluteError (leftMag,  1.0f, 1.0e-3f);
+        expectWithinAbsoluteError (leftMag, 1.0f, 1.0e-3f);
         expectWithinAbsoluteError (rightMag, 1.0f, 1.0e-3f);
     }
 

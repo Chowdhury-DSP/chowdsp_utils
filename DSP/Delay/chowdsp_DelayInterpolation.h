@@ -1,6 +1,5 @@
 namespace chowdsp
 {
-
 /**
     A collection of structs to pass as the template argument when setting the
     interpolation type for the DelayLine class.
@@ -16,10 +15,12 @@ namespace DelayLineInterpolationTypes
     {
         void reset (int newTotalSize) { totalSize = newTotalSize; }
 
-        template<typename T>
-        void updateInternalVariables (int& /*delayIntOffset*/, T& /*delayFrac*/) {}
+        template <typename T>
+        void updateInternalVariables (int& /*delayIntOffset*/, T& /*delayFrac*/)
+        {
+        }
 
-        template<typename T>
+        template <typename T>
         inline T call (const T* buffer, int delayInt, T /*delayFrac*/, const T& /*state*/)
         {
             return buffer[delayInt % totalSize];
@@ -38,10 +39,12 @@ namespace DelayLineInterpolationTypes
     {
         void reset (int newTotalSize) { totalSize = newTotalSize; }
 
-        template<typename T>
-        void updateInternalVariables (int& /*delayIntOffset*/, T& /*delayFrac*/) {}
+        template <typename T>
+        void updateInternalVariables (int& /*delayIntOffset*/, T& /*delayFrac*/)
+        {
+        }
 
-        template<typename T>
+        template <typename T>
         inline T call (const T* buffer, int delayInt, T delayFrac, const T& /*state*/)
         {
             auto index1 = delayInt;
@@ -66,7 +69,7 @@ namespace DelayLineInterpolationTypes
     {
         void reset (int newTotalSize) { totalSize = newTotalSize; }
 
-        template<typename T>
+        template <typename T>
         void updateInternalVariables (int& delayIntOffset, T& delayFrac)
         {
             if (delayIntOffset >= 1)
@@ -76,7 +79,7 @@ namespace DelayLineInterpolationTypes
             }
         }
 
-        template<typename T>
+        template <typename T>
         inline T call (const T* buffer, int delayInt, T delayFrac, const T& /*state*/)
         {
             auto index1 = delayInt;
@@ -94,9 +97,9 @@ namespace DelayLineInterpolationTypes
             auto d3 = delayFrac - (T) 3.0;
 
             auto c1 = -d1 * d2 * d3 / (T) 6.0;
-            auto c2 =       d2 * d3 * (T) 0.5;
-            auto c3 = -d1 *      d3 * (T) 0.5;
-            auto c4 =  d1 * d2      / (T) 6.0;
+            auto c2 = d2 * d3 * (T) 0.5;
+            auto c3 = -d1 * d3 * (T) 0.5;
+            auto c4 = d1 * d2 / (T) 6.0;
 
             return value1 * c1 + delayFrac * (value2 * c2 + value3 * c3 + value4 * c4);
         }
@@ -111,9 +114,9 @@ namespace DelayLineInterpolationTypes
     */
     struct Lagrange5th
     {
-                void reset (int newTotalSize) { totalSize = newTotalSize; }
+        void reset (int newTotalSize) { totalSize = newTotalSize; }
 
-        template<typename T>
+        template <typename T>
         void updateInternalVariables (int& delayIntOffset, T& delayFrac)
         {
             if (delayIntOffset >= 2)
@@ -123,7 +126,7 @@ namespace DelayLineInterpolationTypes
             }
         }
 
-        template<typename T>
+        template <typename T>
         inline T call (const T* buffer, int delayInt, T delayFrac, const T& /*state*/)
         {
             auto index1 = delayInt;
@@ -147,14 +150,13 @@ namespace DelayLineInterpolationTypes
             auto d5 = delayFrac - (T) 5.0;
 
             auto c1 = -d1 * d2 * d3 * d4 * d5 / (T) 120.0;
-            auto c2 =       d2 * d3 * d4 * d5 / (T) 24.0;
-            auto c3 = -d1 *      d3 * d4 * d5 / (T) 12.0;
-            auto c4 =  d1 * d2 *      d4 * d5 / (T) 12.0;
-            auto c5 = -d1 * d2 * d3 *      d5 / (T) 24.0;
-            auto c6 =  d1 * d2 * d3 * d4      / (T) 120.0;
+            auto c2 = d2 * d3 * d4 * d5 / (T) 24.0;
+            auto c3 = -d1 * d3 * d4 * d5 / (T) 12.0;
+            auto c4 = d1 * d2 * d4 * d5 / (T) 12.0;
+            auto c5 = -d1 * d2 * d3 * d5 / (T) 24.0;
+            auto c6 = d1 * d2 * d3 * d4 / (T) 120.0;
 
-            return value1 * c1 + delayFrac * (value2 * c2
-                + value3 * c3 + value4 * c4 + value5 * c5 + value6 * c6);
+            return value1 * c1 + delayFrac * (value2 * c2 + value3 * c3 + value4 * c4 + value5 * c5 + value6 * c6);
         }
 
         int totalSize;
@@ -171,7 +173,7 @@ namespace DelayLineInterpolationTypes
     {
         void reset (int newTotalSize) { totalSize = newTotalSize; }
 
-        template<typename T>
+        template <typename T>
         void updateInternalVariables (int& delayIntOffset, T& delayFrac)
         {
             if (delayFrac < (T) 0.618 && delayIntOffset >= 1)
@@ -183,7 +185,7 @@ namespace DelayLineInterpolationTypes
             alpha = double ((1 - delayFrac) / (1 + delayFrac));
         }
 
-        template<typename T>
+        template <typename T>
         inline T call (const T* buffer, int delayInt, T delayFrac, T& state)
         {
             auto index1 = delayInt;
@@ -208,7 +210,7 @@ namespace DelayLineInterpolationTypes
         but gives a very smooth and flat frequency response.
     */
     JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324) // MSVC doesn't like Foley's hiding class members
-    template<typename T, size_t N, size_t M = 256>
+    template <typename T, size_t N, size_t M = 256>
     struct Sinc
     {
         Sinc()
@@ -241,7 +243,7 @@ namespace DelayLineInterpolationTypes
         {
             i -= (n / 2);
             return ((T) 0.42 - (T) 0.5 * std::cos (juce::MathConstants<T>::twoPi * i / (n))
-                + (T) 0.08 * std::cos (4 * juce::MathConstants<float>::pi * i / (n)));
+                    + (T) 0.08 * std::cos (4 * juce::MathConstants<float>::pi * i / (n)));
         }
 
         void reset (int newTotalSize) { totalSize = newTotalSize; }
@@ -256,15 +258,15 @@ namespace DelayLineInterpolationTypes
             auto buff_reg = juce::dsp::SIMDRegister<T> ((T) 0);
             for (size_t i = 0; i < N; i += juce::dsp::SIMDRegister<T>::size())
             {
-              #ifdef __SSE2__
+#ifdef __SSE2__
                 if constexpr (std::is_same<T, float>::value)
                     buff_reg = juce::dsp::SIMDRegister<T> (_mm_loadu_ps (&buffer[delayInt + i]));
                 else
                     buff_reg = juce::dsp::SIMDRegister<T> (_mm_loadu_pd (&buffer[delayInt + i]));
-              #else
+#else
                 auto* regPtr = reinterpret_cast<T*> (&buff_reg.value);
                 std::copy (&buffer[delayInt + i], &buffer[delayInt + i + juce::dsp::SIMDRegister<T>::size()], regPtr);
-              #endif
+#endif
                 auto sinc_reg = juce::dsp::SIMDRegister<T>::fromRawArray (&sinctable[sincTableOffset + i]);
                 out += buff_reg * sinc_reg;
             }
@@ -273,9 +275,9 @@ namespace DelayLineInterpolationTypes
         }
 
         int totalSize;
-        T sinctable alignas(16)[(M + 1) * N * 2];
+        T sinctable alignas (16)[(M + 1) * N * 2];
     };
     JUCE_END_IGNORE_WARNINGS_MSVC
-}
+} // namespace DelayLineInterpolationTypes
 
-} // chowdsp
+} // namespace chowdsp

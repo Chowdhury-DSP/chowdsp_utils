@@ -1,12 +1,10 @@
 namespace chowdsp
 {
-
-InfoComp::InfoComp (const juce::AudioProcessor::WrapperType pluginWrapperType) :
-    wrapperType (pluginWrapperType),
+InfoComp::InfoComp (const juce::AudioProcessor::WrapperType pluginWrapperType) : wrapperType (pluginWrapperType),
 #if defined JucePlugin_ManufacturerWebsite
-    linkButton (JucePlugin_Manufacturer, juce::URL (JucePlugin_ManufacturerWebsite))
+                                                                                 linkButton (JucePlugin_Manufacturer, juce::URL (JucePlugin_ManufacturerWebsite))
 #else
-    linkButton (JucePlugin_Manufacturer, juce::URL ("https://chowdsp.com"))
+                                                                                 linkButton (JucePlugin_Manufacturer, juce::URL ("https://chowdsp.com"))
 #endif
 {
     setColour (text1ColourID, juce::Colours::grey);
@@ -22,10 +20,9 @@ void InfoComp::paint (juce::Graphics& g)
     auto font = g.getCurrentFont();
     auto b = getLocalBounds();
 
-    auto drawText = [=, &g, &b] (const juce::String& text)
-    {
+    auto drawText = [=, &g, &b] (const juce::String& text) {
         auto width = font.getStringWidth (text);
-        g.drawFittedText (text, b.removeFromLeft (width), juce::Justification::left, 1);  
+        g.drawFittedText (text, b.removeFromLeft (width), juce::Justification::left, 1);
     };
 
     auto typeStr = juce::String (juce::AudioProcessor::getWrapperTypeDescription (wrapperType));
@@ -38,7 +35,7 @@ void InfoComp::paint (juce::Graphics& g)
     g.setColour (findColour (text1ColourID));
     drawText (juce::String ("~ DSP by "));
 
-    linkX =  b.getX() - 2;
+    linkX = b.getX() - 2;
     linkButton.setColour (juce::HyperlinkButton::ColourIds::textColourId, findColour (text2ColourID));
     resized();
 }
@@ -48,4 +45,4 @@ void InfoComp::resized()
     linkButton.setBounds (linkX, 0, 100, getHeight());
 }
 
-} // chowdsp
+} // namespace chowdsp

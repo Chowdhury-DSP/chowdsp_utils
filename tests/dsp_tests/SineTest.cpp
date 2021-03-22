@@ -2,11 +2,11 @@
 
 namespace
 {
-    constexpr double fs = 44100.0;
-    constexpr double freq1 = 100.0;
-    constexpr double freq2 = 200.0;
-    constexpr double err = 1.0e-3;
-}
+constexpr double fs = 44100.0;
+constexpr double freq1 = 100.0;
+constexpr double freq2 = 200.0;
+constexpr double err = 1.0e-3;
+} // namespace
 
 /** Unit tests for chowdsp::SineWave. Testing accuracy compared to std::sin for:
  *  - single samples
@@ -44,7 +44,7 @@ public:
         chowSine.setFrequency (freq2);
 
         AudioBuffer<double> chowBuffer (numChannels, 2 * blockSize);
-        AudioBuffer<double> refBuffer  (numChannels, 2 * blockSize);
+        AudioBuffer<double> refBuffer (numChannels, 2 * blockSize);
 
         chowBuffer.clear();
         refBuffer.clear();
@@ -57,8 +57,7 @@ public:
         // process with chowdsp::SineWave
         for (int i = 0; i < 2; ++i)
         {
-            dsp::AudioBlock<double> block (chowBuffer.getArrayOfWritePointers(), numChannels,
-                                           (size_t) i * blockSize, (size_t) blockSize);
+            dsp::AudioBlock<double> block (chowBuffer.getArrayOfWritePointers(), numChannels, (size_t) i * blockSize, (size_t) blockSize);
             dsp::ProcessContextReplacing<double> context (block);
             chowSine.process (context);
         }
@@ -70,7 +69,8 @@ public:
             {
                 expectWithinAbsoluteError (chowBuffer.getSample (ch, i),
                                            refBuffer.getSample (ch, i),
-                                           err, "Sine Wave is inaccurate");
+                                           err,
+                                           "Sine Wave is inaccurate");
             }
         }
     }

@@ -2,7 +2,6 @@
 
 namespace chowdsp
 {
-
 /** Filter type options for State Variable Filters */
 enum class StateVariableFilterType
 {
@@ -59,10 +58,10 @@ public:
 
     //==============================================================================
     /** Returns the cutoff frequency of the filter. */
-    SampleType getCutoffFrequency() const noexcept     { return cutoffFrequency; }
+    SampleType getCutoffFrequency() const noexcept { return cutoffFrequency; }
 
     /** Returns the resonance of the filter. */
-    SampleType getResonance() const noexcept           { return resonance; }
+    SampleType getResonance() const noexcept { return resonance; }
 
     //==============================================================================
     /** Initialises the filter. */
@@ -86,13 +85,13 @@ public:
     void process (const ProcessContext& context) noexcept
     {
         const auto& inputBlock = context.getInputBlock();
-        auto& outputBlock      = context.getOutputBlock();
+        auto& outputBlock = context.getOutputBlock();
         const auto numChannels = outputBlock.getNumChannels();
-        const auto numSamples  = outputBlock.getNumSamples();
+        const auto numSamples = outputBlock.getNumSamples();
 
         jassert (inputBlock.getNumChannels() <= s1.size());
         jassert (inputBlock.getNumChannels() == numChannels);
-        jassert (inputBlock.getNumSamples()  == numSamples);
+        jassert (inputBlock.getNumSamples() == numSamples);
 
         if (context.isBypassed)
         {
@@ -102,16 +101,16 @@ public:
 
         for (size_t channel = 0; channel < numChannels; ++channel)
         {
-            auto* inputSamples  = inputBlock .getChannelPointer (channel);
+            auto* inputSamples = inputBlock.getChannelPointer (channel);
             auto* outputSamples = outputBlock.getChannelPointer (channel);
 
             for (size_t i = 0; i < numSamples; ++i)
                 outputSamples[i] = processSample<type> ((int) channel, inputSamples[i]);
         }
 
-       #if JUCE_SNAP_TO_ZERO
+#if JUCE_SNAP_TO_ZERO
         snapToZero();
-       #endif
+#endif
     }
 
     //==============================================================================
@@ -130,10 +129,14 @@ public:
 
         switch (type)
         {
-            case Type::Lowpass:   return ls2 - gA;
-            case Type::Bandpass:  return ls1 - yT;
-            case Type::Highpass:  return yT / g;
-            default:              return ls2 - gA; // lowpass
+            case Type::Lowpass:
+                return ls2 - gA;
+            case Type::Bandpass:
+                return ls1 - yT;
+            case Type::Highpass:
+                return yT / g;
+            default:
+                return ls2 - gA; // lowpass
         }
     }
 
@@ -147,7 +150,7 @@ private:
 
     double sampleRate = 44100.0;
     SampleType cutoffFrequency = static_cast<SampleType> (1000.0),
-               resonance       = static_cast<SampleType> (1.0 / std::sqrt (2.0));
+               resonance = static_cast<SampleType> (1.0 / std::sqrt (2.0));
 };
 
 } //namespace chowdsp

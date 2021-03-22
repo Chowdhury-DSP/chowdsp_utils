@@ -1,8 +1,7 @@
 namespace chowdsp
 {
-
 /** Utility class for *smoothly* bypassing a processor */
-template<typename SampleType>
+template <typename SampleType>
 class BypassProcessor
 {
 public:
@@ -99,7 +98,7 @@ public:
         {
             auto* blockPtr = block.getChannelPointer (ch);
             auto* fadePtr = fadeBlock.getChannelPointer (ch);
-            
+
             SampleType gain = startGain;
             SampleType increment = (endGain - startGain) / (SampleType) numSamples;
 

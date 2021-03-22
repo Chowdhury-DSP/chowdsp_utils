@@ -25,7 +25,6 @@
 
 namespace chowdsp
 {
-
 /**
     Classes for IIR filter processing.
 
@@ -34,7 +33,7 @@ namespace chowdsp
 */
 namespace IIR
 {
-    template <typename NumericType, size_t order=2>
+    template <typename NumericType, size_t order = 2>
     struct Coefficients;
 
     /**
@@ -51,7 +50,7 @@ namespace IIR
 
         @see Filter::Coefficients, FilterAudioSource, StateVariableFilter
     */
-    template <typename SampleType, size_t order=2>
+    template <typename SampleType, size_t order = 2>
     class Filter
     {
     public:
@@ -95,7 +94,7 @@ namespace IIR
             Note that this clears the processing state, but the type of filter and
             its coefficients aren't changed.
         */
-        void reset()    { reset (SampleType {0}); }
+        void reset() { reset (SampleType { 0 }); }
 
         /** Resets the filter's processing pipeline to a specific value.
             @see reset
@@ -115,9 +114,9 @@ namespace IIR
             else
                 processInternal<ProcessContext, false> (context);
 
-           #if JUCE_SNAP_TO_ZERO
+#if JUCE_SNAP_TO_ZERO
             snapToZero();
-           #endif
+#endif
         }
 
         /** Processes a single sample, without any locking.
@@ -136,8 +135,9 @@ namespace IIR
          *  first-order filter.
         */
         template <int N = order>
-        inline typename std::enable_if <N == 1, SampleType>::type
-        JUCE_VECTOR_CALLTYPE processSample (SampleType x, NumericType* c) noexcept
+        inline typename std::enable_if<N == 1, SampleType>::type
+            JUCE_VECTOR_CALLTYPE
+            processSample (SampleType x, NumericType* c) noexcept
         {
             auto y = state[0] + x * c[0];
             state[0] = x * c[1] - y * c[2];
@@ -148,8 +148,9 @@ namespace IIR
          *  second-order filter.
         */
         template <int N = order>
-        inline typename std::enable_if <N == 2, SampleType>::type
-        JUCE_VECTOR_CALLTYPE processSample (SampleType x, NumericType* c) noexcept
+        inline typename std::enable_if<N == 2, SampleType>::type
+            JUCE_VECTOR_CALLTYPE
+            processSample (SampleType x, NumericType* c) noexcept
         {
             auto y = x * c[0] + state[0];
             state[0] = x * c[1] - y * c[3] + state[1];
@@ -161,8 +162,9 @@ namespace IIR
          *  filter orders greater than 2.
         */
         template <int N = order>
-        inline typename std::enable_if <(N > 2), SampleType>::type
-        JUCE_VECTOR_CALLTYPE processSample (SampleType x, NumericType* c) noexcept
+        inline typename std::enable_if<(N > 2), SampleType>::type
+            JUCE_VECTOR_CALLTYPE
+            processSample (SampleType x, NumericType* c) noexcept
         {
             auto y = (c[0] * x) + state[0];
             for (size_t j = 0; j < order - 1; ++j)
@@ -192,5 +194,5 @@ namespace IIR
 } // namespace IIR
 } // namespace chowdsp
 
-#include "chowdsp_juce_IIRFilter_Impl.h"
 #include "chowdsp_juce_IIRCoefs.h"
+#include "chowdsp_juce_IIRFilter_Impl.h"

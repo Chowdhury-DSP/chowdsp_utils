@@ -1,6 +1,5 @@
 namespace chowdsp
 {
-
 TitleComp::TitleComp()
 {
     setColour (text1ColourID, juce::Colours::white);
@@ -13,10 +12,9 @@ void TitleComp::paint (juce::Graphics& g)
     auto curFont = g.getCurrentFont();
     auto b = getLocalBounds();
 
-    auto drawText = [=, &g, &b] (const juce::String& text)
-    {
+    auto drawText = [=, &g, &b] (const juce::String& text) {
         auto width = curFont.getStringWidth (text);
-        g.drawFittedText (text, b.removeFromLeft (width), juce::Justification::left, 1);  
+        g.drawFittedText (text, b.removeFromLeft (width), juce::Justification::left, 1);
     };
 
     g.setColour (findColour (text1ColourID));
@@ -36,12 +34,11 @@ void TitleComp::setStrings (juce::String newTitle, juce::String newSubtitle, flo
 }
 
 //======================================================================
-TitleItem::TitleItem (foleys::MagicGUIBuilder& builder, const juce::ValueTree& node) :
-    foleys::GuiItem (builder, node)
+TitleItem::TitleItem (foleys::MagicGUIBuilder& builder, const juce::ValueTree& node) : foleys::GuiItem (builder, node)
 {
     setColourTranslation ({
-        {"text1", TitleComp::text1ColourID},
-        {"text2", TitleComp::text2ColourID},
+        { "text1", TitleComp::text1ColourID },
+        { "text2", TitleComp::text2ColourID },
     });
 
     addAndMakeVisible (comp);
@@ -49,7 +46,7 @@ TitleItem::TitleItem (foleys::MagicGUIBuilder& builder, const juce::ValueTree& n
 
 void TitleItem::update()
 {
-    auto titleString    = magicBuilder.getStyleProperty (title,    configNode).toString();
+    auto titleString = magicBuilder.getStyleProperty (title, configNode).toString();
     auto subtitleString = magicBuilder.getStyleProperty (subtitle, configNode).toString();
     auto fontVal = (float) magicBuilder.getStyleProperty (font, configNode);
 
@@ -59,14 +56,14 @@ void TitleItem::update()
 std::vector<foleys::SettableProperty> TitleItem::getSettableProperties() const
 {
     std::vector<foleys::SettableProperty> props;
-    props.push_back ({ configNode, title,    foleys::SettableProperty::Text, {}, {} });
+    props.push_back ({ configNode, title, foleys::SettableProperty::Text, {}, {} });
     props.push_back ({ configNode, subtitle, foleys::SettableProperty::Text, {}, {} });
-    props.push_back ({ configNode, font,     foleys::SettableProperty::Number, 0.0f, {} });
+    props.push_back ({ configNode, font, foleys::SettableProperty::Number, 0.0f, {} });
     return props;
 }
 
-const juce::Identifier TitleItem::title    { "title" };
+const juce::Identifier TitleItem::title { "title" };
 const juce::Identifier TitleItem::subtitle { "subtitle" };
-const juce::Identifier TitleItem::font     { "font" };
+const juce::Identifier TitleItem::font { "font" };
 
-} // chowdsp
+} // namespace chowdsp

@@ -6,7 +6,8 @@ class PlainComponent : public Component
 public:
     PlainComponent (Colour colour)
         : colour (colour)
-    {}
+    {
+    }
 
     void paint (Graphics& g) override
     {
@@ -31,8 +32,7 @@ private:
 class GUIComponent : public Component
 {
 public:
-    GUIComponent() :
-        tabs (TabbedButtonBar::TabsAtTop)
+    GUIComponent() : tabs (TabbedButtonBar::TabsAtTop)
     {
         lnf = std::make_unique<chowdsp::ChowLNF>();
         LookAndFeel::setDefaultLookAndFeel (lnf.get());
@@ -76,10 +76,10 @@ public:
 
     void resized() override
     {
-        slider.setBounds    (  0, 0, 100, 100);
+        slider.setBounds (0, 0, 100, 100);
         linSlider.setBounds (100, 0, 100, 100);
-        toggle.setBounds    (200, 0, 100, 100);
-        menu.setBounds      (300, 40, 100, 30);
+        toggle.setBounds (200, 0, 100, 100);
+        menu.setBounds (300, 40, 100, 30);
 
         tabs.setBounds (0, 110, getWidth(), 150);
         tooltips.setBounds (0, 275, getWidth(), 25);
@@ -87,7 +87,7 @@ public:
 
 private:
     std::unique_ptr<chowdsp::ChowLNF> lnf;
-    
+
     Slider slider;
     Slider linSlider;
     ToggleButton toggle { "Toggle" };
@@ -133,9 +133,9 @@ class GUITest : public JUCEApplication
 public:
     GUITest() {}
 
-    const String getApplicationName() override       { return "GUITest"; }
-    const String getApplicationVersion() override    { return "1.0.0"; }
-    bool moreThanOneInstanceAllowed() override       { return false; }
+    const String getApplicationName() override { return "GUITest"; }
+    const String getApplicationVersion() override { return "1.0.0"; }
+    bool moreThanOneInstanceAllowed() override { return false; }
 
     //==============================================================================
     void initialise (const String& commandLine) override

@@ -2,7 +2,6 @@
 
 namespace chowdsp
 {
-
 /** 
  * Registers ChowDSP custom GUI elements for use within Foley's GUI magic.
  * @param builder: the foleys::MagicGUIBuilder for which to register the GUI elements
@@ -18,7 +17,7 @@ inline void registerGUIClasses (std::unique_ptr<foleys::MagicGUIBuilder>& builde
 /**
  * Creates a foleys::MagicGUIBuilder with ChowDSP and JUCE GUI elements registered.
  * @param magicState: the foleys::MagicProcessorState to create the builder with
- */ 
+ */
 inline std::unique_ptr<foleys::MagicGUIBuilder> createGUIBuilder (foleys::MagicProcessorState& magicState)
 {
     auto builder = std::make_unique<foleys::MagicGUIBuilder> (magicState);
@@ -31,4 +30,4 @@ inline std::unique_ptr<foleys::MagicGUIBuilder> createGUIBuilder (foleys::MagicP
     JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 }
 
-} // chowdsp
+} // namespace chowdsp

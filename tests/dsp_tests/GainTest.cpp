@@ -1,9 +1,9 @@
-#include <JuceHeader.h>
 #include "../test_utils.h"
+#include <JuceHeader.h>
 
 namespace
 {
-    constexpr float fs = 44100.0f;
+constexpr float fs = 44100.0f;
 }
 
 /** Unit tests for chowdsp::Gain */
@@ -20,13 +20,12 @@ public:
 
         auto buffer = test_utils::makeNoise (fs, 0.25f);
         const int numSamples = buffer.getNumSamples();
-        auto refMag = buffer.getMagnitude(0, numSamples);
+        auto refMag = buffer.getMagnitude (0, numSamples);
 
         gainProc.processBlock (buffer);
         auto mag = buffer.getMagnitude (0, numSamples);
 
-        expectWithinAbsoluteError (mag / refMag, gain, (float) 1.0e-6,
-            "Incorrect gain!");
+        expectWithinAbsoluteError (mag / refMag, gain, (float) 1.0e-6, "Incorrect gain!");
     }
 
     void runTest() override

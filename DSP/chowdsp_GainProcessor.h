@@ -1,6 +1,5 @@
 namespace chowdsp
 {
-
 /**
  * A simple gain processor that fades smoothly
  * across buffers.
@@ -14,7 +13,7 @@ public:
 
     /** Resets the state of the processor */
     void reset()
-    { 
+    {
         oldGain = curGain;
     }
 
@@ -27,7 +26,7 @@ public:
             oldGain = curGain;
             return;
         }
-        
+
         buffer.applyGain (curGain);
     }
 
@@ -50,4 +49,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GainProcessor)
 };
 
-} // chowdsp
+} // namespace chowdsp

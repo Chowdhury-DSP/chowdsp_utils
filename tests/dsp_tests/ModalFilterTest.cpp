@@ -1,12 +1,12 @@
-#include <JuceHeader.h>
 #include "../test_utils.h"
+#include <JuceHeader.h>
 
 namespace
 {
-    constexpr float fs = 44100.0f;
-    constexpr float modeDecay = 0.01f;
-    constexpr float modeAmp = 0.1f;
-}
+constexpr float fs = 44100.0f;
+constexpr float modeDecay = 0.01f;
+constexpr float modeAmp = 0.1f;
+} // namespace
 
 /** Unit tests for chowdsp::ModalFilter. Tests include:
  *   - Check that filter resonates at center frequency

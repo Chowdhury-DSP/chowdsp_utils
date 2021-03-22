@@ -1,11 +1,11 @@
-#include <JuceHeader.h>
 #include "../test_utils.h"
+#include <JuceHeader.h>
 
 namespace Constants
 {
-    constexpr float fs = 48000.0f;
-    constexpr float fc = 1000.0f;
-}
+constexpr float fs = 48000.0f;
+constexpr float fc = 1000.0f;
+} // namespace Constants
 
 /** Unit tests for chowdsp::BypassProcessor */
 class NthOrderFilterTest : public UnitTest
@@ -15,13 +15,10 @@ public:
 
     using FilterType = chowdsp::StateVariableFilterType;
 
-    template<typename Filter>
-    void testFilter (Filter& filt, std::vector<float> freqs,
-                     std::vector<float> mags, std::vector<float> errs,
-                     const StringArray& messages)
+    template <typename Filter>
+    void testFilter (Filter& filt, std::vector<float> freqs, std::vector<float> mags, std::vector<float> errs, const StringArray& messages)
     {
-        auto testFrequency = [=, &filt] (float freq, float expGain, float err, const String& message)
-        {
+        auto testFrequency = [=, &filt] (float freq, float expGain, float err, const String& message) {
             auto buffer = test_utils::makeSineWave (freq, Constants::fs, 1.0f);
 
             filt.reset();
@@ -35,8 +32,7 @@ public:
         };
 
         for (size_t i = 0; i < freqs.size(); ++i)
-            testFrequency (freqs[i], mags[i], errs[i],
-                           "Incorrect gain at " + messages[(int) i] + " frequency.");
+            testFrequency (freqs[i], mags[i], errs[i], "Incorrect gain at " + messages[(int) i] + " frequency.");
     }
 
     void lowpassTest()
@@ -83,13 +79,13 @@ public:
 
     void runTest() override
     {
-        beginTest("Lowpass");
+        beginTest ("Lowpass");
         lowpassTest();
 
-        beginTest("Highpass");
+        beginTest ("Highpass");
         highpassTest();
 
-        beginTest("Bandpass");
+        beginTest ("Bandpass");
         bandpassTest();
     }
 };

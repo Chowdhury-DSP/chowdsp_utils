@@ -1,7 +1,6 @@
 namespace chowdsp
 {
-
-template<typename T>
+template <typename T>
 void Noise<T>::prepare (const juce::dsp::ProcessSpec& spec) noexcept
 {
     juce::dsp::Gain<T>::prepare (spec);
@@ -13,7 +12,7 @@ void Noise<T>::prepare (const juce::dsp::ProcessSpec& spec) noexcept
     pink.reset (spec.numChannels);
 }
 
-template<typename T>
+template <typename T>
 void Noise<T>::reset() noexcept
 {
     juce::dsp::Gain<T>::reset();
@@ -21,62 +20,69 @@ void Noise<T>::reset() noexcept
 
 namespace NoiseHelpers
 {
+    /** Returns a uniform random number in [0, 1) */
+    template <typename T>
+    T uniform01 (juce::Random&) noexcept;
 
-/** Returns a uniform random number in [0, 1) */
-template<typename T>
-T uniform01 (juce::Random&) noexcept;
-
-/** Returns a uniform random number in [0, 1) */
-template<>
-inline double uniform01 (juce::Random& r) noexcept { return r.nextDouble(); }
-
-/** Returns a uniform random number in [0, 1) */
-template<>
-inline float uniform01 (juce::Random& r) noexcept { return r.nextFloat(); }
-
-/** Generates white noise with a uniform distribution */
-template<typename T>
-struct uniformCentered {
-    T operator() (size_t /*ch*/, juce::Random& r)
-    { 
-        return (T) 2 * uniform01<T> (r) - (T) 1;
-    }
-};
-
-/** Generates white noise with a normal (Gaussian) distribution */
-template<typename T>
-struct normal {
-    T operator() (size_t /*ch*/, juce::Random& r)
+    /** Returns a uniform random number in [0, 1) */
+    template <>
+    inline double uniform01 (juce::Random& r) noexcept
     {
-        // Box-Muller transform
-	    T radius = std::sqrt((T) -2 * std::log ((T) 1 - uniform01<T> (r)));
-	    T theta = juce::MathConstants<T>::twoPi * uniform01<T> (r);
-        T value = radius * std::sin (theta) / juce::MathConstants<T>::sqrt2;
-	    return value;
+        return r.nextDouble();
     }
-};
 
-/** Process audio context with some random functor */
-template <typename T, typename ProcessContext, typename F>
-void processRandom (const ProcessContext& context, juce::Random& r, F randFunc) noexcept
-{
-    auto&& outBlock = context.getOutputBlock();
-
-    auto len           = outBlock.getNumSamples();
-    auto numChannels   = outBlock.getNumChannels();
-
-    for (size_t ch = 0; ch < numChannels; ++ch)
+    /** Returns a uniform random number in [0, 1) */
+    template <>
+    inline float uniform01 (juce::Random& r) noexcept
     {
-        auto* dst = outBlock.getChannelPointer (ch);
-
-        for (size_t i = 0; i < len; ++i)
-            dst[i] = randFunc (ch, r);
+        return r.nextFloat();
     }
-}
 
-}
+    /** Generates white noise with a uniform distribution */
+    template <typename T>
+    struct uniformCentered
+    {
+        T operator() (size_t /*ch*/, juce::Random& r)
+        {
+            return (T) 2 * uniform01<T> (r) - (T) 1;
+        }
+    };
 
-template<typename T>
+    /** Generates white noise with a normal (Gaussian) distribution */
+    template <typename T>
+    struct normal
+    {
+        T operator() (size_t /*ch*/, juce::Random& r)
+        {
+            // Box-Muller transform
+            T radius = std::sqrt ((T) -2 * std::log ((T) 1 - uniform01<T> (r)));
+            T theta = juce::MathConstants<T>::twoPi * uniform01<T> (r);
+            T value = radius * std::sin (theta) / juce::MathConstants<T>::sqrt2;
+            return value;
+        }
+    };
+
+    /** Process audio context with some random functor */
+    template <typename T, typename ProcessContext, typename F>
+    void processRandom (const ProcessContext& context, juce::Random& r, F randFunc) noexcept
+    {
+        auto&& outBlock = context.getOutputBlock();
+
+        auto len = outBlock.getNumSamples();
+        auto numChannels = outBlock.getNumChannels();
+
+        for (size_t ch = 0; ch < numChannels; ++ch)
+        {
+            auto* dst = outBlock.getChannelPointer (ch);
+
+            for (size_t i = 0; i < len; ++i)
+                dst[i] = randFunc (ch, r);
+        }
+    }
+
+} // namespace NoiseHelpers
+
+template <typename T>
 template <typename ProcessContext>
 void Noise<T>::process (const ProcessContext& context) noexcept
 {
@@ -85,7 +91,7 @@ void Noise<T>::process (const ProcessContext& context) noexcept
         return;
 
     auto&& outBlock = context.getOutputBlock();
-    auto&& inBlock  = context.getInputBlock();
+    auto&& inBlock = context.getInputBlock();
     auto len = outBlock.getNumSamples();
 
     auto randSubBlock = randBlock.getSubBlock (0, len);
@@ -110,4 +116,4 @@ void Noise<T>::process (const ProcessContext& context) noexcept
     outBlock += randBlock;
 }
 
-} // chowdsp
+} // namespace chowdsp

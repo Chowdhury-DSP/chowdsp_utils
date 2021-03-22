@@ -2,11 +2,10 @@
 
 namespace chowdsp
 {
-
 /** Sinusoidal oscillator using the "magic circle" algorithm.
  * See: https://ccrma.stanford.edu/~jos/pasp/Digital_Sinusoid_Generators.html, eq. 2
  */
-template<typename T>
+template <typename T>
 class SineWave
 {
 public:
@@ -36,18 +35,18 @@ public:
     /** Processes the input and output buffers supplied in the processing context. */
     template <typename ProcessContext>
     void process (const ProcessContext& context) noexcept;
-    
+
 private:
-    T x1  = static_cast<T> (0.0);
-    T x2  = static_cast<T> (0.0);
+    T x1 = static_cast<T> (0.0);
+    T x2 = static_cast<T> (0.0);
     T eps = static_cast<T> (0.0);
 
     T freq = static_cast<T> (0.0);
-    T fs   = static_cast<T> (44100.0);
+    T fs = static_cast<T> (44100.0);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SineWave)
 };
 
-} // chowdsp
+} // namespace chowdsp
 
 #include "chowdsp_SineWave.cpp"

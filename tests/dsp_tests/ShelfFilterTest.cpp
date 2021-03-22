@@ -1,14 +1,14 @@
-#include <JuceHeader.h>
 #include "../test_utils.h"
+#include <JuceHeader.h>
 
 namespace Constants
 {
-    constexpr float fs = 48000.0f;
-    constexpr float lowGain = 0.5f;
-    constexpr float highGain = 2.0f;
-    constexpr float fc = 1000.0f;
-    constexpr float maxError = 0.1f;
-}
+constexpr float fs = 48000.0f;
+constexpr float lowGain = 0.5f;
+constexpr float highGain = 2.0f;
+constexpr float fc = 1000.0f;
+constexpr float maxError = 0.1f;
+} // namespace Constants
 
 /** Unit tests for chowdsp::ShelfFilter. Checks for correct gain at:
  *   - All frequencies when high gain == low gain
@@ -34,8 +34,7 @@ public:
         shelfFilter.processBlock (buffer.getWritePointer (0), numSamples);
         auto mag = buffer.getRMSLevel (0, 0, numSamples);
 
-        expectWithinAbsoluteError (mag / refMag, 2.0f, (float) 1.0e-6,
-            "Incorrect behavior when filter reduces to a simple gain.");
+        expectWithinAbsoluteError (mag / refMag, 2.0f, (float) 1.0e-6, "Incorrect behavior when filter reduces to a simple gain.");
     }
 
     void boostCutTest()
@@ -43,8 +42,7 @@ public:
         chowdsp::ShelfFilter shelfFilter;
         shelfFilter.calcCoefs (Constants::lowGain, Constants::highGain, Constants::fc, Constants::fs);
 
-        auto testFrequency = [=, &shelfFilter] (float freq, float expGain, const String& message)
-        {
+        auto testFrequency = [=, &shelfFilter] (float freq, float expGain, const String& message) {
             auto buffer = test_utils::makeSineWave (freq, Constants::fs, 1.0f);
 
             shelfFilter.reset();

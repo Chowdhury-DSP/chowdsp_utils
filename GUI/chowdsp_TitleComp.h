@@ -2,7 +2,6 @@
 
 namespace chowdsp
 {
-
 /** A simple component to dislay the title and subtitle of a plugin */
 class TitleComp : public juce::Component,
                   public juce::SettableTooltipClient
@@ -31,7 +30,7 @@ private:
     juce::String subtitle;
     float font = 0.0f;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TitleComp)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TitleComp)
 };
 
 /** Foley's GUI wrapper for TitleComp */
@@ -54,7 +53,7 @@ public:
 private:
     TitleComp comp;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TitleItem)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TitleItem)
 };
 
-} // chowdsp
+} // namespace chowdsp

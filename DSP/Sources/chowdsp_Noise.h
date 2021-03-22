@@ -2,30 +2,29 @@
 
 namespace chowdsp
 {
-
 /** Helper functions for generating noise signals.
  *  NOT desgined to be used directly.
  */
 namespace NoiseHelpers
 {
-// forward declare uniform01
-template<typename T>
-T uniform01 (juce::Random&) noexcept;
-}
+    // forward declare uniform01
+    template <typename T>
+    T uniform01 (juce::Random&) noexcept;
+} // namespace NoiseHelpers
 
 /** Audio processor that adds noise to an audio buffer.
  *  Currently support white noise with a uniform or normal
  *  distribution, or pink noise (-3dB / Oct).
-*/ 
-template<typename T>
+*/
+template <typename T>
 class Noise : public juce::dsp::Gain<T>
 {
 public:
     enum NoiseType
     {
         Uniform, /**< Uniform white noise [-1, 1] */
-        Normal,  /**< White noise with a normal/Gaussian distribution, generated using the Box-Muller Transform */
-        Pink,    /**< Pink noise (-3dB / Oct), generated using the Voss algorithm */
+        Normal, /**< White noise with a normal/Gaussian distribution, generated using the Box-Muller Transform */
+        Pink, /**< Pink noise (-3dB / Oct), generated using the Voss algorithm */
     };
 
     Noise() = default;
@@ -60,11 +59,13 @@ private:
         http://www.firstpr.com.au/dsp/pink-noise/
     */
     template <size_t QUALITY = 8>
-    struct PinkNoiseGenerator {
-    	std::vector<int> frame;
+    struct PinkNoiseGenerator
+    {
+        std::vector<int> frame;
         std::vector<std::array<T, QUALITY>> values;
 
-        void reset (size_t nChannels) {
+        void reset (size_t nChannels)
+        {
             frame.resize (nChannels, -1);
 
             values.clear();
@@ -77,22 +78,25 @@ private:
         }
 
         /** Generates pink noise (-3dB / octave) */
-    	T operator() (size_t ch, juce::Random& r) {
-    		int lastFrame = frame[ch];
-    		frame[ch]++;
-    		if (frame[ch] >= (1 << QUALITY))
-    			frame[ch] = 0;
-    		int diff = lastFrame ^ frame[ch];
+        T operator() (size_t ch, juce::Random& r)
+        {
+            int lastFrame = frame[ch];
+            frame[ch]++;
+            if (frame[ch] >= (1 << QUALITY))
+                frame[ch] = 0;
+            int diff = lastFrame ^ frame[ch];
 
-    		T sum = (T) 0;
-    		for (size_t i = 0; i < QUALITY; i++) {
-    			if (diff & (1 << i)) {
-    				values[ch][i] = NoiseHelpers::uniform01<T> (r) - (T) 0.5;
-    			}
-    			sum += values[ch][i];
-    		}
-    		return sum / static_cast<T> (8);
-    	}
+            T sum = (T) 0;
+            for (size_t i = 0; i < QUALITY; i++)
+            {
+                if (diff & (1 << i))
+                {
+                    values[ch][i] = NoiseHelpers::uniform01<T> (r) - (T) 0.5;
+                }
+                sum += values[ch][i];
+            }
+            return sum / static_cast<T> (8);
+        }
     };
 
     PinkNoiseGenerator<> pink;
@@ -103,6 +107,6 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Noise)
 };
 
-} // chowdsp
+} // namespace chowdsp
 
 #include "chowdsp_Noise.cpp"

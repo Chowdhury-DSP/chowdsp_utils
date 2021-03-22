@@ -25,7 +25,6 @@
 
 namespace chowdsp
 {
-
 /** Base class for delay lines with any interpolation type */
 template <typename SampleType>
 class DelayLineBase
@@ -145,7 +144,7 @@ public:
 
     inline SampleType popSample (int channel, SampleType delayInSamples, bool updateReadPointer) noexcept override
     {
-        setDelay(delayInSamples);
+        setDelay (delayInSamples);
 
         auto result = interpolateSample (channel);
 
@@ -167,13 +166,13 @@ public:
     void process (const ProcessContext& context) noexcept
     {
         const auto& inputBlock = context.getInputBlock();
-        auto& outputBlock      = context.getOutputBlock();
+        auto& outputBlock = context.getOutputBlock();
         const auto numChannels = outputBlock.getNumChannels();
-        const auto numSamples  = outputBlock.getNumSamples();
+        const auto numSamples = outputBlock.getNumSamples();
 
         jassert (inputBlock.getNumChannels() == numChannels);
         jassert (inputBlock.getNumChannels() == this->writePos.size());
-        jassert (inputBlock.getNumSamples()  == numSamples);
+        jassert (inputBlock.getNumSamples() == numSamples);
 
         if (context.isBypassed)
         {
@@ -199,7 +198,9 @@ private:
     {
         auto index = (this->readPos[(size_t) channel] + delayInt);
         return interpolator.call (bufferPtr[channel],
-            index, delayFrac, this->v[(size_t) channel]);
+                                  index,
+                                  delayFrac,
+                                  this->v[(size_t) channel]);
     }
 
     //==============================================================================
