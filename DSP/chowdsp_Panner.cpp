@@ -25,7 +25,6 @@
 
 namespace chowdsp
 {
-
 //==============================================================================
 template <typename SampleType>
 Panner<SampleType>::Panner()
@@ -66,7 +65,7 @@ void Panner<SampleType>::prepare (const juce::dsp::ProcessSpec& spec)
 template <typename SampleType>
 void Panner<SampleType>::reset()
 {
-    leftVolume .reset (sampleRate, 0.05);
+    leftVolume.reset (sampleRate, 0.05);
     rightVolume.reset (sampleRate, 0.05);
 }
 
@@ -81,55 +80,55 @@ void Panner<SampleType>::update()
     switch (currentRule)
     {
         case Rule::balanced:
-            leftValue  = juce::jmin (static_cast<SampleType> (0.5), static_cast<SampleType> (1.0) - normalisedPan);
+            leftValue = juce::jmin (static_cast<SampleType> (0.5), static_cast<SampleType> (1.0) - normalisedPan);
             rightValue = juce::jmin (static_cast<SampleType> (0.5), normalisedPan);
             boostValue = static_cast<SampleType> (2.0);
             break;
 
         case Rule::linear:
-            leftValue  = static_cast<SampleType> (1.0) - normalisedPan;
+            leftValue = static_cast<SampleType> (1.0) - normalisedPan;
             rightValue = normalisedPan;
             boostValue = static_cast<SampleType> (2.0);
             break;
 
         case Rule::sin3dB:
-            leftValue  = static_cast<SampleType> (std::sin (0.5 * juce::MathConstants<double>::pi * (1.0 - normalisedPan)));
+            leftValue = static_cast<SampleType> (std::sin (0.5 * juce::MathConstants<double>::pi * (1.0 - normalisedPan)));
             rightValue = static_cast<SampleType> (std::sin (0.5 * juce::MathConstants<double>::pi * normalisedPan));
             boostValue = std::sqrt (static_cast<SampleType> (2.0));
             break;
 
         case Rule::sin4p5dB:
-            leftValue  = static_cast<SampleType> (std::pow (std::sin (0.5 * juce::MathConstants<double>::pi * (1.0 - normalisedPan)), 1.5));
+            leftValue = static_cast<SampleType> (std::pow (std::sin (0.5 * juce::MathConstants<double>::pi * (1.0 - normalisedPan)), 1.5));
             rightValue = static_cast<SampleType> (std::pow (std::sin (0.5 * juce::MathConstants<double>::pi * normalisedPan), 1.5));
             boostValue = static_cast<SampleType> (std::pow (2.0, 3.0 / 4.0));
             break;
 
         case Rule::sin6dB:
-            leftValue  = static_cast<SampleType> (std::pow (std::sin (0.5 * juce::MathConstants<double>::pi * (1.0 - normalisedPan)), 2.0));
+            leftValue = static_cast<SampleType> (std::pow (std::sin (0.5 * juce::MathConstants<double>::pi * (1.0 - normalisedPan)), 2.0));
             rightValue = static_cast<SampleType> (std::pow (std::sin (0.5 * juce::MathConstants<double>::pi * normalisedPan), 2.0));
             boostValue = static_cast<SampleType> (2.0);
             break;
 
         case Rule::squareRoot3dB:
-            leftValue  = std::sqrt (static_cast<SampleType> (1.0) - normalisedPan);
+            leftValue = std::sqrt (static_cast<SampleType> (1.0) - normalisedPan);
             rightValue = std::sqrt (normalisedPan);
             boostValue = std::sqrt (static_cast<SampleType> (2.0));
             break;
 
         case Rule::squareRoot4p5dB:
-            leftValue  = static_cast<SampleType> (std::pow (std::sqrt (1.0 - normalisedPan), 1.5));
+            leftValue = static_cast<SampleType> (std::pow (std::sqrt (1.0 - normalisedPan), 1.5));
             rightValue = static_cast<SampleType> (std::pow (std::sqrt (normalisedPan), 1.5));
             boostValue = static_cast<SampleType> (std::pow (2.0, 3.0 / 4.0));
             break;
 
         default:
-            leftValue  = juce::jmin (static_cast<SampleType> (0.5), static_cast<SampleType> (1.0) - normalisedPan);
+            leftValue = juce::jmin (static_cast<SampleType> (0.5), static_cast<SampleType> (1.0) - normalisedPan);
             rightValue = juce::jmin (static_cast<SampleType> (0.5), normalisedPan);
             boostValue = static_cast<SampleType> (2.0);
             break;
     }
 
-    leftVolume .setTargetValue (leftValue  * boostValue);
+    leftVolume.setTargetValue (leftValue * boostValue);
     rightVolume.setTargetValue (rightValue * boostValue);
 }
 

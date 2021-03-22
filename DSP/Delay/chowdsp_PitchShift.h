@@ -1,6 +1,5 @@
 namespace chowdsp
 {
-
 /** A processor for pitch shifting in real-time, using a ring-buffer and interpolation.
  *  Interpolation can use any of the interpolation modes defined in the DelayInterpolation
  *  namespace. Processing can be done sample-by-sample or with block processing.
@@ -10,7 +9,7 @@ namespace chowdsp
  *  amount of pitch shifting increases, the quality of the output decreases.
  * 
  *  Reference: https://github.com/YetAnotherElectronicsChannel/STM32_DSP_PitchShift
- */ 
+ */
 template <typename SampleType, typename InterpolationType = DelayLineInterpolationTypes::Linear>
 class PitchShifter
 {
@@ -61,7 +60,7 @@ public:
         const auto readPtr2 = readPtr >= halfSize ? readPtr - halfSize : readPtr + halfSize;
         SampleType rd0 = readSample (ch, readPtr);
         SampleType rd1 = readSample (ch, readPtr2);
-        
+
         // crossfade
         if (overlap >= (writePtr - (int) readPtr) && (writePtr - readPtr) >= 0)
             chCross = ((SampleType) writePtr - readPtr) / (SampleType) overlap;
@@ -72,7 +71,7 @@ public:
             chCross = (SampleType) 1.0 - ((SampleType) writePtr - readPtr2) / (SampleType) overlap;
         else if (writePtr - (int) readPtr2 == 0)
             chCross = (SampleType) 1;
-            
+
         auto y = rd0 * chCross + rd1 * ((SampleType) 1.0 - chCross);
 
         // iterate pointers
@@ -87,13 +86,13 @@ public:
     void process (const ProcessContext& context) noexcept
     {
         const auto& inputBlock = context.getInputBlock();
-        auto& outputBlock      = context.getOutputBlock();
+        auto& outputBlock = context.getOutputBlock();
         const auto numChannels = outputBlock.getNumChannels();
-        const auto numSamples  = outputBlock.getNumSamples();
+        const auto numSamples = outputBlock.getNumSamples();
 
         jassert (inputBlock.getNumChannels() == numChannels);
         jassert (inputBlock.getNumChannels() == this->writePos.size());
-        jassert (inputBlock.getNumSamples()  == numSamples);
+        jassert (inputBlock.getNumSamples() == numSamples);
 
         if (context.isBypassed)
         {
@@ -121,7 +120,7 @@ private:
     }
 
     juce::AudioBuffer<SampleType> bufferData; // Ring buffer for storing data
-    SampleType** bufferPtrs = nullptr;        // pointers to data buffer
+    SampleType** bufferPtrs = nullptr; // pointers to data buffer
     std::vector<SampleType> v; // State needed for Thiran interpolator
     InterpolationType interpolator;
 
@@ -129,10 +128,10 @@ private:
     std::vector<int> writePos;
     std::vector<SampleType> readPos;
 
-    SampleType shift;                   // Shift factor to increment read ptr
-    std::vector<SampleType> crossfade;  // crossfade gain
+    SampleType shift; // Shift factor to increment read ptr
+    std::vector<SampleType> crossfade; // crossfade gain
 
-    int overlap;   // crossfade overlap
+    int overlap; // crossfade overlap
     int totalSize; // max buffer size
     SampleType halfSize; // half buffer size
 

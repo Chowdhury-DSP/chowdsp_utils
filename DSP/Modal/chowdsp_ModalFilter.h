@@ -4,7 +4,6 @@
 
 namespace chowdsp
 {
-
 /** Max Mathews phasor filter, a recursive filter
  * that filters a single frequency, with a given
  * damping factor and complex amplitude. This filter
@@ -13,8 +12,9 @@ namespace chowdsp
  * https://ccrma.stanford.edu/~jos/smac03maxjos/,
  * and http://dafx2019.bcu.ac.uk/papers/DAFx2019_paper_48.pdf.
  */
-template<typename T>
-class ModalFilter {
+template <typename T>
+class ModalFilter
+{
 public:
     ModalFilter() = default;
 
@@ -85,4 +85,4 @@ protected:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ModalFilter)
 };
 
-} // chowdsp
+} // namespace chowdsp

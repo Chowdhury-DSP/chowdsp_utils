@@ -2,7 +2,6 @@
 
 namespace chowdsp
 {
-    
 /**
  * Base class for synth plugin processors.
  * 
@@ -10,7 +9,7 @@ namespace chowdsp
  * (from `juce::AudioProcessor`), as well as `processSynth`, and
  * `addParameters`.
 */
-template<class Processor>
+template <class Processor>
 class SynthBase : public PluginBase<Processor>
 {
 public:
@@ -34,6 +33,5 @@ public:
 private:
     void processBlock (juce::AudioBuffer<float>&) override {}
 };
-    
-} // namespace chowdsp
 
+} // namespace chowdsp

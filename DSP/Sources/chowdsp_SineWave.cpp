@@ -1,21 +1,20 @@
 namespace chowdsp
 {
-
-template<typename T>
+template <typename T>
 void SineWave<T>::setFrequency (T newFrequency) noexcept
 {
     freq = newFrequency;
     eps = 2 * std::sin (juce::MathConstants<T>::pi * newFrequency / fs);
 }
 
-template<typename T>
+template <typename T>
 void SineWave<T>::prepare (const juce::dsp::ProcessSpec& spec) noexcept
 {
     fs = static_cast<T> (spec.sampleRate);
     reset();
 }
 
-template<typename T>
+template <typename T>
 void SineWave<T>::reset() noexcept
 {
     // reset state to be "in phase"
@@ -23,15 +22,15 @@ void SineWave<T>::reset() noexcept
     x2 = 0.0f;
 }
 
-template<typename T>
+template <typename T>
 template <typename ProcessContext>
 void SineWave<T>::process (const ProcessContext& context) noexcept
 {
     auto&& outBlock = context.getOutputBlock();
-    auto&& inBlock  = context.getInputBlock();
+    auto&& inBlock = context.getInputBlock();
 
-    auto len           = outBlock.getNumSamples();
-    auto numChannels   = outBlock.getNumChannels();
+    auto len = outBlock.getNumSamples();
+    auto numChannels = outBlock.getNumChannels();
     auto inputChannels = inBlock.getNumChannels();
 
     if (context.isBypassed)
@@ -83,7 +82,7 @@ void SineWave<T>::process (const ProcessContext& context) noexcept
                 }
             }
         }
-            
+
         for (; ch < numChannels; ++ch)
         {
             x1_temp = x1;
@@ -97,10 +96,10 @@ void SineWave<T>::process (const ProcessContext& context) noexcept
                 x2_temp -= eps * x1_temp;
             }
         }
-            
+
         x1 = x1_temp;
         x2 = x2_temp;
     }
 }
 
-} // chowdsp
+} // namespace chowdsp

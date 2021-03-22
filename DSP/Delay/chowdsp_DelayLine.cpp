@@ -25,7 +25,6 @@
 
 namespace chowdsp
 {
-
 //==============================================================================
 template <typename SampleType, typename InterpolationType>
 DelayLine<SampleType, InterpolationType>::DelayLine()
@@ -48,8 +47,8 @@ void DelayLine<SampleType, InterpolationType>::setDelay (SampleType newDelayInSa
     auto upperLimit = (SampleType) (totalSize - 1);
     jassert (juce::isPositiveAndNotGreaterThan (newDelayInSamples, upperLimit));
 
-    delay     = juce::jlimit ((SampleType) 0, upperLimit, newDelayInSamples);
-    delayInt  = static_cast<int> (std::floor (delay));
+    delay = juce::jlimit ((SampleType) 0, upperLimit, newDelayInSamples);
+    delayInt = static_cast<int> (std::floor (delay));
     delayFrac = delay - (SampleType) delayInt;
 
     interpolator.updateInternalVariables (delayInt, delayFrac);
@@ -71,7 +70,7 @@ void DelayLine<SampleType, InterpolationType>::prepare (const juce::dsp::Process
     bufferPtr = this->bufferData.getArrayOfWritePointers();
 
     this->writePos.resize (spec.numChannels);
-    this->readPos.resize  (spec.numChannels);
+    this->readPos.resize (spec.numChannels);
 
     this->v.resize (spec.numChannels);
     interpolator.reset (totalSize);

@@ -1,20 +1,20 @@
-#include <algorithm>
 #include <JuceHeader.h>
+#include <algorithm>
 
 namespace
 {
-    // processing constants
-    constexpr size_t fftOrder = 20;
-    constexpr size_t blockSize = 1 << fftOrder;
-    constexpr size_t nCh = 1;
-    constexpr double fs = 48000.0;
+// processing constants
+constexpr size_t fftOrder = 20;
+constexpr size_t blockSize = 1 << fftOrder;
+constexpr size_t nCh = 1;
+constexpr double fs = 48000.0;
 
-    // measuring constants
-    constexpr float startFreq = 100.0f;
-    constexpr size_t avgNum = 101;
-    constexpr size_t negDiff = avgNum / 2;
-    constexpr size_t posDiff = negDiff + 1;
-}
+// measuring constants
+constexpr float startFreq = 100.0f;
+constexpr size_t avgNum = 101;
+constexpr size_t negDiff = avgNum / 2;
+constexpr size_t posDiff = negDiff + 1;
+} // namespace
 
 /** Unit tests for chowdsp::Noise. Testing frequency domain accuracy for:
  *   - Uniform white noise (flat frequency spectrum)
@@ -40,11 +40,10 @@ public:
         for (size_t i = 0; i < blockSize; ++i)
             magnitudes[i] = Decibels::gainToDecibels<float> (std::abs (fftData[i])) - dBNorm;
 
-        auto getMagForFreq = [=] (float freq) -> float
-        {
+        auto getMagForFreq = [=] (float freq) -> float {
             auto idx = size_t ((blockSize / 2) * freq / (fs / 2.0f));
             // average over many bins to smooth
-            return std::accumulate (&magnitudes[idx-negDiff], &magnitudes[idx + posDiff], 0.0f) / (float) avgNum;
+            return std::accumulate (&magnitudes[idx - negDiff], &magnitudes[idx + posDiff], 0.0f) / (float) avgNum;
         };
 
         auto freq = startFreq;
@@ -54,7 +53,7 @@ public:
             auto mag = getMagForFreq (freq);
             String errorMsg = noiseType + " error at frequency " + String (freq, 2) + " Hz";
             expectWithinAbsoluteError (mag, expMag, 3.0f, errorMsg);
-            
+
             expMag += noiseSlope;
             freq *= 2;
         }

@@ -1,6 +1,5 @@
 namespace chowdsp
 {
-
 TooltipComponent::TooltipComponent()
 {
     setColour (backgroundColourID, juce::Colours::transparentBlack);
@@ -28,19 +27,18 @@ void TooltipComponent::paint (juce::Graphics& g)
 
         auto whitespace = juce::String();
         auto font = g.getCurrentFont();
-        while (font.getStringWidth(whitespace) < font.getStringWidth (name + ": "))
+        while (font.getStringWidth (whitespace) < font.getStringWidth (name + ": "))
             whitespace += " ";
 
         g.setColour (findColour (textColourID));
-        g.drawMultiLineText (whitespace + tip, b.getX(),
-            b.getY() + (int) font.getHeight() - 3, b.getWidth(), juce::Justification::topLeft);
+        g.drawMultiLineText (whitespace + tip, b.getX(), b.getY() + (int) font.getHeight() - 3, b.getWidth(), juce::Justification::topLeft);
     }
 }
 
 void TooltipComponent::getTipFor (juce::Component& c, juce::String& newTip, juce::String& newName)
 {
     if (juce::Process::isForegroundProcess()
-         && ! juce::ModifierKeys::currentModifiers.isAnyMouseButtonDown())
+        && ! juce::ModifierKeys::currentModifiers.isAnyMouseButtonDown())
     {
         if (auto* ttc = dynamic_cast<juce::TooltipClient*> (&c))
         {
@@ -95,4 +93,4 @@ void TooltipComponent::timerCallback()
         repaint();
 }
 
-} // chowdsp
+} // namespace chowdsp

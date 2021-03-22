@@ -2,11 +2,10 @@
 
 namespace chowdsp
 {
-
 /** A first order shelving filter, with a set gain at DC,
  * a set gain at high frequencies, and a transition frequency.
  */
-template<typename T = float>
+template <typename T = float>
 class ShelfFilter : public IIRFilter<1, T>
 {
 public:
@@ -26,8 +25,10 @@ public:
         // reduce to simple gain element
         if (lowGain == highGain)
         {
-            this->b[0] = lowGain; this->b[1] = (T) 0;
-            this->a[0] = (T) 1; this->a[1] = (T) 0;
+            this->b[0] = lowGain;
+            this->b[1] = (T) 0;
+            this->a[0] = (T) 1;
+            this->a[1] = (T) 0;
             return;
         }
 
@@ -43,4 +44,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ShelfFilter)
 };
 
-} // chowdsp
+} // namespace chowdsp

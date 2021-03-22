@@ -1,6 +1,5 @@
 namespace chowdsp
 {
-
 template <typename SampleType, typename InterpolationType>
 PitchShifter<SampleType, InterpolationType>::PitchShifter()
     : PitchShifter (4096)
@@ -31,7 +30,7 @@ void PitchShifter<SampleType, InterpolationType>::prepare (const juce::dsp::Proc
     jassert (bufferPtrs != nullptr);
 
     writePos.resize (spec.numChannels);
-    readPos.resize  (spec.numChannels);
+    readPos.resize (spec.numChannels);
     crossfade.resize (spec.numChannels);
 
     v.resize (spec.numChannels);
@@ -75,4 +74,4 @@ SampleType PitchShifter<SampleType, InterpolationType>::getShiftFactor() const n
     return shift;
 }
 
-} // chowdsp
+} // namespace chowdsp

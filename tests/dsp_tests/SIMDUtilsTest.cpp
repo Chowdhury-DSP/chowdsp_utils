@@ -5,7 +5,7 @@ class SIMDUtilsTest : public UnitTest
 public:
     SIMDUtilsTest() : UnitTest ("SIMD Utils Test") {}
 
-    template<typename T>
+    template <typename T>
     void testDivide()
     {
         dsp::SIMDRegister<T> six (6.0f);
@@ -27,7 +27,7 @@ public:
         }
     }
 
-    template<typename T>
+    template <typename T>
     void testSinCosSIMD (bool clamp, float rangeMultiplier = 1.0f)
     {
         T squareDev = (T) 0, maxDev = (T) 0;
@@ -47,8 +47,8 @@ public:
             }
             p = clamp ? chowdsp::SIMDUtils::clampToPiRangeSIMD (p) : p;
 
-            auto fcp = chowdsp::SIMDUtils::fastcosSIMD(p);
-            auto fsp = chowdsp::SIMDUtils::fastsinSIMD(p);
+            auto fcp = chowdsp::SIMDUtils::fastcosSIMD (p);
+            auto fsp = chowdsp::SIMDUtils::fastsinSIMD (p);
 
             for (size_t j = 0; j < dsp::SIMDRegister<T>::size(); ++j)
             {
@@ -94,7 +94,6 @@ public:
 
         beginTest ("Double SIMD sin/cos Test (way out of range)");
         testSinCosSIMD<double> (true, 100.0f);
-
     }
 };
 

@@ -4,7 +4,6 @@
 
 namespace test_utils
 {
-
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wpessimizing-move") // Clang doesn't like std::move
 
 inline AudioBuffer<float> makeSineWave (float frequency, float sampleRate, float lengthSeconds)
@@ -43,4 +42,4 @@ inline AudioBuffer<float> makeNoise (float sampleRate, float lengthSeconds)
 
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
-} // test_utils
+} // namespace test_utils

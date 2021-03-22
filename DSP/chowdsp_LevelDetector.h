@@ -2,7 +2,6 @@
 
 namespace chowdsp
 {
-
 /** A simple level detector, that I like better than the JUCE one */
 template <typename SampleType>
 class LevelDetector

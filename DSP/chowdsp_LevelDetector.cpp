@@ -1,6 +1,5 @@
 namespace chowdsp
 {
-
 inline float calcTimeConstant (float timeMs, float expFactor)
 {
     return timeMs < 1.0e-3f ? 0.0f : 1.0f - std::exp (expFactor / timeMs);
@@ -9,8 +8,8 @@ inline float calcTimeConstant (float timeMs, float expFactor)
 template <typename SampleType>
 void LevelDetector<SampleType>::setParameters (float attackTimeMs, float releaseTimeMs)
 {
-    tauAtt = (SampleType) calcTimeConstant(attackTimeMs, expFactor);
-    tauRel = (SampleType) calcTimeConstant(releaseTimeMs, expFactor);
+    tauAtt = (SampleType) calcTimeConstant (attackTimeMs, expFactor);
+    tauRel = (SampleType) calcTimeConstant (releaseTimeMs, expFactor);
 }
 
 template <typename SampleType>
@@ -36,10 +35,10 @@ template <typename ProcessContext>
 void LevelDetector<SampleType>::process (const ProcessContext& context) noexcept
 {
     const auto& inputBlock = context.getInputBlock();
-    auto& outputBlock      = context.getOutputBlock();
+    auto& outputBlock = context.getOutputBlock();
 
-    const auto numSamples   = inputBlock.getNumSamples();
-    const auto numInputChannels  = inputBlock.getNumChannels();
+    const auto numSamples = inputBlock.getNumSamples();
+    const auto numInputChannels = inputBlock.getNumChannels();
     jassert (outputBlock.getNumChannels() == 1);
 
     // take absolute value and sum to mono

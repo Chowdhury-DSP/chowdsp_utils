@@ -24,7 +24,7 @@
 #include <juce_core/juce_core.h>
 
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wunused-function") // GCC doesn't like Foley's static functions
-JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4458)                    // MSVC doesn't like Foley's hiding class members
+JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4458) // MSVC doesn't like Foley's hiding class members
 #include <foleys_gui_magic/foleys_gui_magic.h>
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 JUCE_END_IGNORE_WARNINGS_MSVC
@@ -35,9 +35,9 @@ JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wzero-as-null-pointer-constant", // Clang
 #include "PluginUtils/chowdsp_PluginBase.h"
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
+#include "PluginUtils/chowdsp_DummySynthSound.h"
 #include "PluginUtils/chowdsp_ParamUtils.h"
 #include "PluginUtils/chowdsp_SynthBase.h"
-#include "PluginUtils/chowdsp_DummySynthSound.h"
 
 #include "DSP/chowdsp_DSP.h"
 #include "GUI/chowdsp_GUI.h"

@@ -32,9 +32,9 @@ class ConsoleLogger : public Logger
     {
         std::cout << message << std::endl;
 
-       #if JUCE_WINDOWS
+#if JUCE_WINDOWS
         Logger::outputDebugString (message);
-       #endif
+#endif
     }
 };
 
@@ -47,9 +47,8 @@ class ConsoleUnitTestRunner : public UnitTestRunner
     }
 };
 
-
 //==============================================================================
-int main (int argc, char **argv)
+int main (int argc, char** argv)
 {
     ArgumentList args (argc, argv);
 
@@ -64,7 +63,7 @@ int main (int argc, char **argv)
         for (auto& category : UnitTest::getAllCategories())
             std::cout << category << std::endl;
 
-        return  0;
+        return 0;
     }
 
     ScopedJuceInitialiser_GUI scopedJuce;
@@ -74,8 +73,7 @@ int main (int argc, char **argv)
 
     ConsoleUnitTestRunner runner;
 
-    auto seed = [&args]
-    {
+    auto seed = [&args] {
         if (args.containsOption ("--seed"))
         {
             auto seedValueString = args.getValueForOption ("--seed");
@@ -97,7 +95,7 @@ int main (int argc, char **argv)
     Logger::setCurrentLogger (nullptr);
 
     for (int i = 0; i < runner.getNumResults(); ++i)
-        if (runner.getResult(i)->failures > 0)
+        if (runner.getResult (i)->failures > 0)
             return 1;
 
     return 0;

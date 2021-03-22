@@ -2,7 +2,6 @@
 
 namespace chowdsp
 {
-
 /** Component to display the name and tooltip of whatever component is under the mouse. */
 class TooltipComponent : public juce::Component,
                          private juce::Timer
@@ -13,8 +12,8 @@ public:
     enum ColourIDs
     {
         backgroundColourID, /**< Background colour for the component */
-        textColourID,       /**< Colour to use for the tooltip text */
-        nameColourID,       /**< Colour to use for the tooltip name */
+        textColourID, /**< Colour to use for the tooltip text */
+        nameColourID, /**< Colour to use for the tooltip name */
     };
 
     void paint (juce::Graphics& g) override;
@@ -34,13 +33,12 @@ class TooltipItem : public foleys::GuiItem
 public:
     FOLEYS_DECLARE_GUI_FACTORY (TooltipItem)
 
-    TooltipItem (foleys::MagicGUIBuilder& builder, const juce::ValueTree& node) :
-        foleys::GuiItem (builder, node)
+    TooltipItem (foleys::MagicGUIBuilder& builder, const juce::ValueTree& node) : foleys::GuiItem (builder, node)
     {
         setColourTranslation ({
-            {"tooltip-background", TooltipComponent::backgroundColourID},
-            {"tooltip-text",       TooltipComponent::textColourID},
-            {"tooltip-name",       TooltipComponent::nameColourID},
+            { "tooltip-background", TooltipComponent::backgroundColourID },
+            { "tooltip-text", TooltipComponent::textColourID },
+            { "tooltip-name", TooltipComponent::nameColourID },
         });
 
         addAndMakeVisible (tooltipComp);
@@ -61,4 +59,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TooltipItem)
 };
 
-} // chowdsp
+} // namespace chowdsp

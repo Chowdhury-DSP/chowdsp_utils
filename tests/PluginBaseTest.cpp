@@ -1,5 +1,5 @@
-#include <JuceHeader.h>
 #include "DummyPlugin.h"
+#include <JuceHeader.h>
 
 /** Unit tests for chowdsp::PluginBase. Tests functionality:
  *   - saving/loading parameter state
@@ -22,7 +22,7 @@ public:
 
         DummyPlugin dummy2;
         dummy2.setStateInformation (stateBlock.getData(), (int) stateBlock.getSize());
-        
+
         MemoryBlock stateBlock2;
         dummy2.getStateInformation (stateBlock2);
 
@@ -34,19 +34,19 @@ public:
         DummyPlugin dummy;
 
         AudioProcessor::BusesLayout stLayout { { AudioChannelSet::stereo() }, { AudioChannelSet::stereo() } };
-        expect (dummy.isBusesLayoutSupported(stLayout), "Stereo I/O should be supported!");
+        expect (dummy.isBusesLayoutSupported (stLayout), "Stereo I/O should be supported!");
 
         AudioProcessor::BusesLayout monoLayout { { AudioChannelSet::mono() }, { AudioChannelSet::mono() } };
-        expect (dummy.isBusesLayoutSupported(monoLayout), "Mono I/O should be supported!");
+        expect (dummy.isBusesLayoutSupported (monoLayout), "Mono I/O should be supported!");
 
         AudioProcessor::BusesLayout smLayout { { AudioChannelSet::stereo() }, { AudioChannelSet::mono() } };
-        expect (! dummy.isBusesLayoutSupported(smLayout), "Stereo in, mono out should NOT be supported!");
+        expect (! dummy.isBusesLayoutSupported (smLayout), "Stereo in, mono out should NOT be supported!");
 
         AudioProcessor::BusesLayout msLayout { { AudioChannelSet::mono() }, { AudioChannelSet::stereo() } };
-        expect (! dummy.isBusesLayoutSupported(msLayout), "Mono in, stereo out should NOT be supported!");
+        expect (! dummy.isBusesLayoutSupported (msLayout), "Mono in, stereo out should NOT be supported!");
 
         AudioProcessor::BusesLayout quadLayout { { AudioChannelSet::quadraphonic() }, { AudioChannelSet::quadraphonic() } };
-        expect (! dummy.isBusesLayoutSupported(quadLayout), "More than two channels should NOT be supported!");
+        expect (! dummy.isBusesLayoutSupported (quadLayout), "More than two channels should NOT be supported!");
     }
 
     void runTest() override

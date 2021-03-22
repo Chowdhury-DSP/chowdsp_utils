@@ -2,18 +2,16 @@
 
 namespace chowdsp
 {
-
 /**
  * A Nth-order filter, either Lowpass, Highpass, or Bandpass,
  * composed of State Variable Filters with Butterworth Q, so
  * the filter can be modulated pretty fast.
- */ 
-template<typename T, size_t order = 4, StateVariableFilterType type = StateVariableFilterType::Lowpass>
+ */
+template <typename T, size_t order = 4, StateVariableFilterType type = StateVariableFilterType::Lowpass>
 class NthOrderFilter : public juce::dsp::ProcessorBase
 {
 public:
-    NthOrderFilter() :
-        butterQVals (QValCalcs::butterworth_Qs<T, order>())
+    NthOrderFilter() : butterQVals (QValCalcs::butterworth_Qs<T, order>())
     {
         for (size_t i = 0; i < nFilters; ++i)
         {

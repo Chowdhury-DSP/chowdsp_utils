@@ -7,12 +7,13 @@ This repository contains a JUCE module with utilities for building Chowdhury DSP
 
 The module currently contains the following utility classes:
 - DSP
-  - Delay Line: similar to `juce::dsp::DelayLine` but with 5th-order Lagrange interpolation.
+  - Delay Line: similar to `juce::dsp::DelayLine` but with 5th-order Lagrange interpolation and Sinc interpolation.
   - Pitch Shifter: using a ring buffer with two read pointers.
-  - Filters: functions for bilinear transform, IIR filters with static order.
+  - Filters: functions for bilinear transform, IIR filters with static order, and an optimized State Variable Filter.
   - Modal: modal filter/oscillator using Max Mathews Phasor Filter.
   - Sources: sine wave generator, noise generator
   - Wave Digital Filters: all linear circuit elements, series/parallel junctions, and diodes.
+  - Some extra functions and classes for SIMD operations.
 - GUI
   - Custom `LookAndFeel`.
   - Custom tooltip viewer.
@@ -20,6 +21,7 @@ The module currently contains the following utility classes:
 - Plugin Utilities
   - Base class for audio effect plugin.
   - Base class for synth plugin.
+  - Utility functions for creating parameter layouts.
 
 For complete documentation, see the [API docs](https://ccrma.stanford.edu/~jatin/chowdsp/chowdsp_utils).
 

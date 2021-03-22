@@ -1,8 +1,8 @@
 namespace chowdsp
 {
-
-template<typename T>
-void ModalFilter<T>::prepare (T sampleRate) {
+template <typename T>
+void ModalFilter<T>::prepare (T sampleRate)
+{
     fs = sampleRate;
 
     decayFactor = calcDecayFactor();
@@ -12,7 +12,7 @@ void ModalFilter<T>::prepare (T sampleRate) {
     reset();
 }
 
-template<typename T>
+template <typename T>
 void ModalFilter<T>::processBlock (T* buffer, const int numSamples)
 {
     for (int n = 0; n < numSamples; ++n)
@@ -22,4 +22,4 @@ void ModalFilter<T>::processBlock (T* buffer, const int numSamples)
 template class ModalFilter<float>;
 template class ModalFilter<double>;
 
-} // chowdsp
+} // namespace chowdsp
