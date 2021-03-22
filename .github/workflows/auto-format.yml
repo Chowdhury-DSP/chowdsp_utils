@@ -3,8 +3,7 @@ name: Auto-formatter
 on:
   pull_request:
     branches:
-    - main
-    - develop
+    - master
     paths:
     - '**.cpp'
     - '**.h'
