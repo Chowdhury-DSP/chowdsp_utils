@@ -263,7 +263,7 @@ namespace DelayLineInterpolationTypes
                     buff_reg = juce::dsp::SIMDRegister<T> (_mm_loadu_ps (&buffer[(size_t) delayInt + i]));
                 else
                     buff_reg = juce::dsp::SIMDRegister<T> (_mm_loadu_pd (&buffer[(size_t) delayInt + i]));
-              #else
+#else
                 auto* regPtr = reinterpret_cast<T*> (&buff_reg.value);
                 std::copy (&buffer[delayInt + i], &buffer[delayInt + i + juce::dsp::SIMDRegister<T>::size()], regPtr);
 #endif
