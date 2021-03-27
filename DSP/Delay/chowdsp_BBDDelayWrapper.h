@@ -53,26 +53,6 @@ namespace BBD
                 line.reset();
         }
 
-<<<<<<< Updated upstream
-        /** Pushes a sample into the delay line */
-        inline void pushSample (int channel, float sample) noexcept override
-        {
-            inputs[channel] = sample;
-        }
-
-        /** Returns a sample from the delay line */
-        inline float popSample (int channel) noexcept override
-        {
-            return lines[channel].process (inputs[channel]);
-        }
-
-        /** Returns a sample from the delay line. Note that the read pointer is always updated. */
-        inline float popSample (int channel, float delayInSamples, bool /*updateReadPointer*/) noexcept override
-        {
-            setDelay (delayInSamples);
-            return lines[channel].process (inputs[channel]);
-        }
-=======
     /** Pushes a sample into the delay line */
     inline void pushSample (int channel, float sample) noexcept override
     {
@@ -91,7 +71,6 @@ namespace BBD
         setDelay (delayInSamples);
         return lines[(size_t) channel].process (inputs[(size_t) channel]);
     }
->>>>>>> Stashed changes
 
     private:
         float delaySamp;

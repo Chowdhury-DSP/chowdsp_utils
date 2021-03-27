@@ -4,24 +4,24 @@
 #include "chowdsp_GainProcessor.h"
 #include "chowdsp_LevelDetector.h"
 #include "chowdsp_Panner.h"
-#include "chowdsp_SIMDComplex.h"
 #include "chowdsp_SIMDUtils.h"
+#include "chowdsp_SIMDComplex.h"
 
 // delay
-#include "Delay/chowdsp_BBDDelayLine.h"
-#include "Delay/chowdsp_BBDDelayWrapper.h"
-#include "Delay/chowdsp_BBDFilterBank.h"
 #include "Delay/chowdsp_DelayInterpolation.h"
 #include "Delay/chowdsp_DelayLine.h"
+#include "Delay/chowdsp_BBDFilterBank.h"
+#include "Delay/chowdsp_BBDDelayLine.h"
+#include "Delay/chowdsp_BBDDelayWrapper.h"
 #include "Delay/chowdsp_PitchShift.h"
 
 // filter tools
 #include "Filters/chowdsp_BilinearUtils.h"
 #include "Filters/chowdsp_IIRFilter.h"
-#include "Filters/chowdsp_NthOrderFilter.h"
 #include "Filters/chowdsp_QValCalcs.h"
 #include "Filters/chowdsp_Shelf.h"
 #include "Filters/chowdsp_StateVariableFilter.h"
+#include "Filters/chowdsp_NthOrderFilter.h"
 #include "Filters/chowdsp_juce_IIRFilter.h"
 
 // modal tools
