@@ -260,10 +260,15 @@ namespace DelayLineInterpolationTypes
             {
 #ifdef __SSE2__
                 if constexpr (std::is_same<T, float>::value)
-                    buff_reg = juce::dsp::SIMDRegister<T> (_mm_loadu_ps (&buffer[delayInt + i]));
+                    buff_reg = juce::dsp::SIMDRegister<T> (_mm_loadu_ps (&buffer[(size_t) delayInt + i]));
                 else
+<<<<<<< Updated upstream
                     buff_reg = juce::dsp::SIMDRegister<T> (_mm_loadu_pd (&buffer[delayInt + i]));
 #else
+=======
+                    buff_reg = juce::dsp::SIMDRegister<T> (_mm_loadu_pd (&buffer[(size_t) delayInt + i]));
+              #else
+>>>>>>> Stashed changes
                 auto* regPtr = reinterpret_cast<T*> (&buff_reg.value);
                 std::copy (&buffer[delayInt + i], &buffer[delayInt + i + juce::dsp::SIMDRegister<T>::size()], regPtr);
 #endif
