@@ -67,7 +67,6 @@ void DelayLine<SampleType, InterpolationType>::prepare (const juce::dsp::Process
     jassert (spec.numChannels > 0);
 
     this->bufferData.setSize ((int) spec.numChannels, 2 * totalSize, false, false, true);
-    bufferPtr = this->bufferData.getArrayOfWritePointers();
 
     this->writePos.resize (spec.numChannels);
     this->readPos.resize (spec.numChannels);
@@ -76,6 +75,7 @@ void DelayLine<SampleType, InterpolationType>::prepare (const juce::dsp::Process
     interpolator.reset (totalSize);
 
     reset();
+    bufferPtr = this->bufferData.getArrayOfWritePointers();
 }
 
 template <typename SampleType, typename InterpolationType>
