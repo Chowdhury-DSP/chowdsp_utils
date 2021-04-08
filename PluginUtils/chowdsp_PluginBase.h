@@ -38,15 +38,20 @@ public:
     virtual void processAudioBlock (juce::AudioBuffer<float>&) = 0;
 
     bool hasEditor() const override { return true; }
+#if CHOWDSP_USE_FOLEYS_CLASSES
     juce::AudioProcessorEditor* createEditor() override { return new foleys::MagicPluginEditor (magicState); }
+#endif
 
-    void getStateInformation (juce::MemoryBlock& data) override { magicState.getStateInformation (data); }
-    void setStateInformation (const void* data, int sizeInBytes) override { magicState.setStateInformation (data, sizeInBytes, getActiveEditor()); }
+    void getStateInformation (juce::MemoryBlock& data) override;
+    void setStateInformation (const void* data, int sizeInBytes) override;
 
 protected:
     using Parameters = std::vector<std::unique_ptr<juce::RangedAudioParameter>>;
     juce::AudioProcessorValueTreeState vts;
+
+#if CHOWDSP_USE_FOLEYS_CLASSES
     foleys::MagicProcessorState magicState { *this, vts };
+#endif
 
 private:
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
@@ -123,7 +128,9 @@ template <class Processor>
 void PluginBase<Processor>::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     setRateAndBufferSizeDetails (sampleRate, samplesPerBlock);
+#if CHOWDSP_USE_FOLEYS_CLASSES
     magicState.prepareToPlay (sampleRate, samplesPerBlock);
+#endif
 }
 
 template <class Processor>
@@ -134,4 +141,30 @@ void PluginBase<Processor>::processBlock (juce::AudioBuffer<float>& buffer, juce
     processAudioBlock (buffer);
 }
 
-} // namespace chowdsp
+template<class Processor>
+void PluginBase<Processor>::getStateInformation (juce::MemoryBlock& data)
+{
+#if CHOWDSP_USE_FOLEYS_CLASSES
+    magicState.getStateInformation (data);
+#else
+    auto state = vts.copyState();
+    std::unique_ptr<XmlElement> xml (state.createXml());
+    copyXmlToBinary (*xml, data);
+#endif
+}
+
+template<class Processor>
+void PluginBase<Processor>::setStateInformation (const void* data, int sizeInBytes)
+{
+#if CHOWDSP_USE_FOLEYS_CLASSES
+    magicState.setStateInformation (data, sizeInBytes, getActiveEditor());
+#else
+    std::unique_ptr<XmlElement> xmlState (getXmlFromBinary (data, sizeInBytes));
+ 
+    if (xmlState.get() != nullptr)
+        if (xmlState->hasTagName (vts.state.getType()))
+            vts.replaceState (ValueTree::fromXml (*xmlState));
+#endif
+}
+
+} // chowdsp

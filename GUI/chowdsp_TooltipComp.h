@@ -27,6 +27,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TooltipComponent)
 };
 
+#if CHOWDSP_USE_FOLEYS_CLASSES
 /** Foley's GUI wrapper for TooltipComponent */
 class TooltipItem : public foleys::GuiItem
 {
@@ -58,5 +59,6 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TooltipItem)
 };
+#endif
 
 } // namespace chowdsp
