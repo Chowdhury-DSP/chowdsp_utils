@@ -25,6 +25,7 @@ target_compile_definitions(chowdsp_utils_tests PRIVATE
 
 target_link_libraries(chowdsp_utils_tests PRIVATE
     chowdsp_utils
+    foleys_gui_magic
     juce::juce_recommended_config_flags
     juce::juce_recommended_lto_flags
     juce::juce_recommended_warning_flags)
@@ -41,6 +42,6 @@ target_compile_definitions(chowdsp_gui_test PRIVATE
     JUCE_WEB_BROWSER=0
 )
 
-target_link_libraries(chowdsp_gui_test PRIVATE chowdsp_utils)
+target_link_libraries(chowdsp_gui_test PRIVATE chowdsp_utils foleys_gui_magic)
 
 add_test(NAME chowdsp_gui_test COMMAND chowdsp_gui_test)

@@ -2,6 +2,7 @@
 
 namespace chowdsp
 {
+#if CHOWDSP_USE_FOLEYS_CLASSES
 /** 
  * Registers ChowDSP custom GUI elements for use within Foley's GUI magic.
  * @param builder: the foleys::MagicGUIBuilder for which to register the GUI elements
@@ -29,5 +30,6 @@ inline std::unique_ptr<foleys::MagicGUIBuilder> createGUIBuilder (foleys::MagicP
     return std::move (builder);
     JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 }
+#endif
 
 } // namespace chowdsp

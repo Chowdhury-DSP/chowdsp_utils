@@ -33,6 +33,7 @@ void TitleComp::setStrings (juce::String newTitle, juce::String newSubtitle, flo
     repaint();
 }
 
+#if CHOWDSP_USE_FOLEYS_CLASSES
 //======================================================================
 TitleItem::TitleItem (foleys::MagicGUIBuilder& builder, const juce::ValueTree& node) : foleys::GuiItem (builder, node)
 {
@@ -65,5 +66,7 @@ std::vector<foleys::SettableProperty> TitleItem::getSettableProperties() const
 const juce::Identifier TitleItem::title { "title" };
 const juce::Identifier TitleItem::subtitle { "subtitle" };
 const juce::Identifier TitleItem::font { "font" };
+
+#endif
 
 } // namespace chowdsp
