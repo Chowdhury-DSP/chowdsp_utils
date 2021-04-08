@@ -4,8 +4,10 @@
 #include "chowdsp_GainProcessor.h"
 #include "chowdsp_LevelDetector.h"
 #include "chowdsp_Panner.h"
-#include "chowdsp_SIMDUtils.h"
-#include "chowdsp_SIMDComplex.h"
+
+// SIMD
+#include "SIMD/chowdsp_SIMDUtils.h"
+#include "SIMD/chowdsp_SIMDComplex.h"
 
 // delay
 #include "Delay/chowdsp_DelayInterpolation.h"
