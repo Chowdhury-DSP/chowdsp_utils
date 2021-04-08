@@ -39,7 +39,10 @@ public:
 
     bool hasEditor() const override { return true; }
 #if CHOWDSP_USE_FOLEYS_CLASSES
-    juce::AudioProcessorEditor* createEditor() override { return new foleys::MagicPluginEditor (magicState); }
+    juce::AudioProcessorEditor* createEditor() override
+    {
+        return new foleys::MagicPluginEditor (magicState);
+    }
 #endif
 
     void getStateInformation (juce::MemoryBlock& data) override;
@@ -141,7 +144,7 @@ void PluginBase<Processor>::processBlock (juce::AudioBuffer<float>& buffer, juce
     processAudioBlock (buffer);
 }
 
-template<class Processor>
+template <class Processor>
 void PluginBase<Processor>::getStateInformation (juce::MemoryBlock& data)
 {
 #if CHOWDSP_USE_FOLEYS_CLASSES
@@ -153,18 +156,18 @@ void PluginBase<Processor>::getStateInformation (juce::MemoryBlock& data)
 #endif
 }
 
-template<class Processor>
+template <class Processor>
 void PluginBase<Processor>::setStateInformation (const void* data, int sizeInBytes)
 {
 #if CHOWDSP_USE_FOLEYS_CLASSES
     magicState.setStateInformation (data, sizeInBytes, getActiveEditor());
 #else
     std::unique_ptr<XmlElement> xmlState (getXmlFromBinary (data, sizeInBytes));
- 
+
     if (xmlState.get() != nullptr)
         if (xmlState->hasTagName (vts.state.getType()))
             vts.replaceState (ValueTree::fromXml (*xmlState));
 #endif
 }
 
-} // chowdsp
+} // namespace chowdsp

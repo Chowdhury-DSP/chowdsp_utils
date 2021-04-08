@@ -2,7 +2,6 @@
 
 namespace chowdsp
 {
-
 #if CHOWDSP_USE_FOLEYS_CLASSES
 /** 
  * Registers ChowDSP custom GUI elements for use within Foley's GUI magic.

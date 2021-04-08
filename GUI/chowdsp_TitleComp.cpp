@@ -69,4 +69,4 @@ const juce::Identifier TitleItem::font { "font" };
 
 #endif
 
-} // chowdsp
+} // namespace chowdsp
