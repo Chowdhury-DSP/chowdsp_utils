@@ -32,7 +32,7 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
 
     inline vec2 operator/ (const vec2& l, const vec2& r)
     {
-        return vdivq_f64 (l.value, r.value);
+        return {{l.value.v[0] / r.value.v[0], l.value.v[1] / r.value.v[1]}};
     }
 
 #else
