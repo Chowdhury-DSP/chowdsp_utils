@@ -151,7 +151,7 @@ void PluginBase<Processor>::getStateInformation (juce::MemoryBlock& data)
     magicState.getStateInformation (data);
 #else
     auto state = vts.copyState();
-    std::unique_ptr<XmlElement> xml (state.createXml());
+    std::unique_ptr<juce::XmlElement> xml (state.createXml());
     copyXmlToBinary (*xml, data);
 #endif
 }
@@ -162,11 +162,11 @@ void PluginBase<Processor>::setStateInformation (const void* data, int sizeInByt
 #if CHOWDSP_USE_FOLEYS_CLASSES
     magicState.setStateInformation (data, sizeInBytes, getActiveEditor());
 #else
-    std::unique_ptr<XmlElement> xmlState (getXmlFromBinary (data, sizeInBytes));
+    std::unique_ptr<juce::XmlElement> xmlState (getXmlFromBinary (data, sizeInBytes));
 
     if (xmlState.get() != nullptr)
         if (xmlState->hasTagName (vts.state.getType()))
-            vts.replaceState (ValueTree::fromXml (*xmlState));
+            vts.replaceState (juce::ValueTree::fromXml (*xmlState));
 #endif
 }
 
