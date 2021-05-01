@@ -38,4 +38,5 @@ JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wshadow-field", // Ignore Clang warnings 
                                      "-Wshadow-field-in-constructor",
                                      "-Winconsistent-missing-destructor-override")
 #include "WDF/wdf.h"
+#include "WDF/wdf_t.h"
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE

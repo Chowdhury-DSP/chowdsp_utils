@@ -73,8 +73,14 @@ namespace WDF
         friend class WDFParallel;
         friend class WDFSeries;
 
-        double R = 1.0e-9; // impedance
-        double G = 1.0 / R; // admittance
+    template <typename Port1Type, typename Port2Type>
+    friend class WDFParallelT;
+
+    template <typename Port1Type, typename Port2Type>
+    friend class WDFSeriesT;
+
+    double R = 1.0e-9; // impedance
+    double G = 1.0 / R; // admittance
 
     protected:
         double a = 0.0; // incident wave
