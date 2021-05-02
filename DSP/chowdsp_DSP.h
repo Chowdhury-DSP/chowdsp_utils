@@ -30,6 +30,7 @@
 #include "Modal/chowdsp_ModalFilter.h"
 
 // resamplers
+#include "Resampling/chowdsp_LanczosResampler.h"
 #include "Resampling/chowdsp_ResamplingProcessor.h"
 #include "Resampling/chowdsp_SRCResampler.h"
 

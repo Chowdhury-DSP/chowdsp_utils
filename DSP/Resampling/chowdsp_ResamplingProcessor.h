@@ -33,7 +33,7 @@ public:
     {
         auto ratioClamped = juce::jlimit (0.1f, 10.0f, ratio);
         for (auto& r : resamplers)
-            r.setResampleRatio (ratio);
+            r.setResampleRatio (ratioClamped);
     }
 
     /** Processes an input block of samples
