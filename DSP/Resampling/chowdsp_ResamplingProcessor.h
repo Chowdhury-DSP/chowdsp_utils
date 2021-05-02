@@ -1,14 +1,13 @@
 namespace chowdsp
 {
-
 /** A resampler using an internal resampling type
  *  as defined in the ResamplingTypes namespace.
  * 
  *  Note that the number of samples returned from the resampler
  *  may not be enough to fill the required output buffer, so it
  *  might be necessary to buffer some extra samples.
- */ 
-template<typename ResamplerType>
+ */
+template <typename ResamplerType>
 class ResamplingProcessor
 {
 public:
@@ -53,7 +52,7 @@ public:
                                                     outputBuffer.getWritePointer ((int) ch),
                                                     numSamples);
         }
-        
+
         return juce::dsp::AudioBlock<float> (outputBuffer).getSubBlock (0, outNumSamples);
     }
 
