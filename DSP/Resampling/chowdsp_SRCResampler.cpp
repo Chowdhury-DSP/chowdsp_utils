@@ -1,0 +1,48 @@
+#if CHOWDSP_USE_LIBSAMPLERATE
+
+namespace chowdsp
+{
+
+namespace ResamplingTypes
+{
+
+template<size_t QUALITY>
+void SRCResampler<QUALITY>::prepare (double sampleRate)
+{
+    fs = sampleRate;
+
+    int error;
+    src_state.reset (src_new (QUALITY, 1, &error));
+    src_set_ratio (src_state.get(), 1.0);
+}
+
+template<size_t QUALITY>
+size_t SRCResampler<QUALITY>::process (const float* input, float* output, size_t numSamples) noexcept
+{
+    SRC_DATA src_data {
+        input,                          // data_in
+        output,                         // data_out
+        (int) numSamples,               // input_frames
+        int (numSamples * ratio) + 1,   // output_frames
+        0,                              // input_frames_used
+        0,                              // output_frames_gen
+        0,                              // end_of_input
+        ratio                           // src_ratio
+    };
+
+    src_process (src_state.get(), &src_data);
+
+    return (size_t) src_data.output_frames_gen;
+}
+
+template class SRCResampler<SRC_SINC_BEST_QUALITY>;
+template class SRCResampler<SRC_SINC_MEDIUM_QUALITY>;
+template class SRCResampler<SRC_SINC_FASTEST>;
+template class SRCResampler<SRC_ZERO_ORDER_HOLD>;
+template class SRCResampler<SRC_LINEAR>;
+
+} // ResamplingTypes
+
+} // namespace chowdsp
+
+#endif // CHOWDSP_USE_LIBSAMPLERATE
