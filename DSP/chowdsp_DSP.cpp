@@ -7,3 +7,6 @@
 
 // modal tools
 #include "Modal/chowdsp_ModalFilter.cpp"
+
+// resamplers
+#include "Resampling/chowdsp_SRCResampler.cpp"
