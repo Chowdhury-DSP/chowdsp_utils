@@ -8,7 +8,7 @@ namespace BBD
  * A class that wraps the BBDDelayLine class
  * as a chowdsp::DelayLineBase<float>
  */
-    template <size_t STAGES>
+    template <size_t STAGES, bool ALIEN = false>
     class BBDDelayWrapper : public DelayLineBase<float>
     {
     public:
@@ -76,7 +76,7 @@ namespace BBD
         float delaySamp;
         float sampleRate;
 
-        std::vector<BBDDelayLine<STAGES>> lines;
+        std::vector<BBDDelayLine<STAGES, ALIEN>> lines;
         std::vector<float> inputs;
     };
 

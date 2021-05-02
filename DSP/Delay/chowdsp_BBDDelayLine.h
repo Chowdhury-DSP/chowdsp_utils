@@ -8,7 +8,7 @@ namespace BBD
  * A class to emulate an analog delay line
  * made using a bucket-brigade device
  */
-    template <size_t STAGES>
+    template <size_t STAGES, bool ALIEN = false>
     class BBDDelayLine
     {
     public:
@@ -17,12 +17,11 @@ namespace BBD
         /** Prepares the delay line for processing */
         void prepare (double sampleRate)
         {
-            evenOn = true;
             FS = (float) sampleRate;
             Ts = 1.0f / FS;
 
             tn = 0.0f;
-            evenOn = true;
+            evenOn = 1;
 
             inputFilter = std::make_unique<InputFilterBank> (Ts);
             outputFilter = std::make_unique<OutputFilterBank> (Ts);
@@ -44,10 +43,10 @@ namespace BBD
      */
         void setFilterFreq (float freqHz)
         {
-            inputFilter->set_freq (freqHz);
+            inputFilter->set_freq (ALIEN ? freqHz * 0.2f : freqHz);
             inputFilter->set_time (tn);
 
-            outputFilter->set_freq (freqHz);
+            outputFilter->set_freq (ALIEN ? freqHz * 0.2f : freqHz);
             outputFilter->set_time (tn);
         }
 
@@ -56,7 +55,21 @@ namespace BBD
      * Internally this changed the "clock rate"
      * of the bucket-brigade device
      */
-        inline void setDelayTime (float delaySec) noexcept
+        template <bool A = ALIEN>
+        inline typename std::enable_if<A == true, void>::type
+            setDelayTime (float delaySec) noexcept
+        {
+            const auto clock_rate_hz = (2.0f * (float) STAGES) / delaySec;
+            Ts_bbd = 1.0f / clock_rate_hz;
+
+            const auto doubleTs = 2 * Ts_bbd / Ts;
+            inputFilter->set_delta (doubleTs);
+            outputFilter->set_delta (doubleTs);
+        }
+
+        template <bool A = ALIEN>
+        inline typename std::enable_if<A == false, void>::type
+            setDelayTime (float delaySec) noexcept
         {
             const auto clock_rate_hz = (2.0f * (float) STAGES) / delaySec;
             Ts_bbd = 1.0f / clock_rate_hz;
@@ -67,36 +80,80 @@ namespace BBD
         }
 
         /** Processes a sample with the delay line */
-        inline float process (float u) noexcept
+        template <bool A = ALIEN>
+        inline typename std::enable_if<A == true, float>::type
+            process (float u) noexcept
         {
             SIMDComplex<float> xOutAccum;
-            while (tn < Ts)
+            float sum = 0.0f;
+            float yBBD = 0.0f;
+            float delta = 0.0f;
+            while (tn < 1.0f)
             {
-                if (evenOn)
+                switch (evenOn)
                 {
+                case 1:
                     inputFilter->calcG();
-                    auto sum = SIMDComplexMulReal (inputFilter->Gcalc, inputFilter->x).sum();
+                    sum = SIMDComplexMulReal (inputFilter->Gcalc, inputFilter->x).sum();
                     buffer[bufferPtr++] = sum;
                     bufferPtr = (bufferPtr < STAGES) ? bufferPtr : 0;
+                    break;
+
+                case 0:
+                    yBBD = buffer[bufferPtr];
+                    delta = yBBD - yBBD_old;
+                    yBBD_old = yBBD;
+                    outputFilter->calcG();
+                    xOutAccum += outputFilter->Gcalc * delta;
+                    break;
                 }
-                else
+
+                evenOn = 1 - evenOn;
+                tn += Ts_bbd / Ts;
+            }
+            tn -= 1.0f;
+
+            inputFilter->process (u);
+            outputFilter->process (xOutAccum);
+            float sumOut = xOutAccum._r.sum();
+            return H0 * yBBD_old + sumOut;
+        }
+
+        template <bool A = ALIEN>
+        inline typename std::enable_if<A == false, float>::type
+            process (float u) noexcept
+        {
+            SIMDComplex<float> xOutAccum;
+            float sum = 0.0f;
+            float yBBD = 0.0f;
+            float delta = 0.0f;
+            while (tn < Ts)
+            {
+                switch (evenOn)
                 {
-                    auto yBBD = buffer[bufferPtr];
-                    auto delta = yBBD - yBBD_old;
+                case 1:
+                    inputFilter->calcG();
+                    sum = SIMDComplexMulReal (inputFilter->Gcalc, inputFilter->x).sum();
+                    buffer[bufferPtr++] = sum;
+                    bufferPtr = (bufferPtr < STAGES) ? bufferPtr : 0;
+                
+                case 0:
+                    yBBD = buffer[bufferPtr];
+                    delta = yBBD - yBBD_old;
                     yBBD_old = yBBD;
                     outputFilter->calcG();
                     xOutAccum += outputFilter->Gcalc * delta;
                 }
 
-                evenOn = ! evenOn;
+                evenOn = 1 - evenOn;
                 tn += Ts_bbd;
             }
             tn -= Ts;
 
             inputFilter->process (u);
             outputFilter->process (xOutAccum);
-            float sum = xOutAccum._r.sum();
-            return H0 * yBBD_old + sum;
+            float sumOut = xOutAccum._r.sum();
+            return H0 * yBBD_old + sumOut;
         }
 
     private:
@@ -116,7 +173,7 @@ namespace BBD
 
         float yBBD_old = 0.0f;
         float tn = 0.0f;
-        bool evenOn = true;
+        int evenOn = 1;
     };
 
 } // namespace BBD
