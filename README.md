@@ -27,5 +27,5 @@ For complete documentation, see the [API docs](https://ccrma.stanford.edu/~jatin
 
 ## License
 
-`chowdsp_utils` is open source, and is licensed under the BSD 3-clause license.
+`chowdsp_utils` is open source, and is licensed under the GPLv3.
 Enjoy!
