@@ -45,3 +45,18 @@ target_compile_definitions(chowdsp_gui_test PRIVATE
 target_link_libraries(chowdsp_gui_test PRIVATE chowdsp_utils foleys_gui_magic)
 
 add_test(NAME chowdsp_gui_test COMMAND chowdsp_gui_test)
+
+# Test with libsamplerate (if available)
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+find_package(samplerate)
+if(SAMPLERATE_FOUND)
+    message(STATUS "libsamplerate found")
+
+    target_compile_definitions(chowdsp_utils_tests PRIVATE
+        CHOWDSP_USE_LIBSAMPLERATE=1
+    )
+
+    target_link_libraries(chowdsp_utils_tests PRIVATE
+        samplerate::samplerate
+    )
+endif()

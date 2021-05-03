@@ -29,6 +29,12 @@
 // modal tools
 #include "Modal/chowdsp_ModalFilter.h"
 
+// resamplers
+#include "Resampling/chowdsp_BaseResampler.h"
+#include "Resampling/chowdsp_LanczosResampler.h"
+#include "Resampling/chowdsp_ResamplingProcessor.h"
+#include "Resampling/chowdsp_SRCResampler.h"
+
 // sound sources
 #include "Sources/chowdsp_Noise.h"
 #include "Sources/chowdsp_SineWave.h"
