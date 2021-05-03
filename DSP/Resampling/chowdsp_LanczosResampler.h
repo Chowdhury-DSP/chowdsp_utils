@@ -2,7 +2,7 @@ namespace chowdsp
 {
 namespace ResamplingTypes
 {
-/** A resampling algorithm using Lanczos interpolation.
+    /** A resampling algorithm using Lanczos interpolation.
  *  This implementation is inspired by the one done by
  *  @baconpaul for the Surge Synthesizer.
  * 
