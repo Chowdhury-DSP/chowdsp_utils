@@ -72,12 +72,12 @@ public:
             RType resampler;
             resampler.prepare (origSampleRate, ratio);
 
-            constexpr int block_size = 256;
+            constexpr size_t block_size = 256;
             std::vector<float> out (size_t (origNumSamples * ratio) + 1, 0.0f);
 
-            int out_ptr = 0;
-            for (int i = 0; i + block_size < (int) inData.size(); i += block_size)
-                out_ptr += resampler.process (&inData[(size_t) i], &out[(size_t) out_ptr], block_size);
+            size_t out_ptr = 0;
+            for (size_t i = 0; i + block_size < inData.size(); i += block_size)
+                out_ptr += resampler.process (&inData[i], &out[out_ptr], block_size);
 
             auto [avgError, maxError] = calc_error (freq, outSampleRate, out, (int) out_ptr);
             expectLessThan (avgError, avgErrLimit, "Avg. Error is too large! Sample rate: " + String (outSampleRate));

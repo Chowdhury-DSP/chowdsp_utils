@@ -34,9 +34,9 @@ public:
         constexpr int N = 100000;
         for (int i = 0; i < N; ++i)
         {
-            dsp::SIMDRegister<T> p;
-            dsp::SIMDRegister<T> cp;
-            dsp::SIMDRegister<T> sp;
+            dsp::SIMDRegister<T> p ((T) 0);
+            dsp::SIMDRegister<T> cp ((T) 0);
+            dsp::SIMDRegister<T> sp ((T) 0);
             for (size_t j = 0; j < dsp::SIMDRegister<T>::size(); ++j)
             {
                 auto val = MathConstants<T>::twoPi * (T) getRandom().nextFloat() - MathConstants<T>::pi;

@@ -146,7 +146,7 @@ namespace ResamplingTypes
             double off0 = 1.0 - (p0 - idx0);
 
             idx0 = (idx0 + (int) BUFFER_SIZE) & ((int) BUFFER_SIZE - 1);
-            idx0 += (idx0 <= (int) A) * BUFFER_SIZE;
+            idx0 += (idx0 <= (int) A) * (int) BUFFER_SIZE;
 
             double off0byto = off0 * tableObs;
             int tidx = (int) off0byto;
