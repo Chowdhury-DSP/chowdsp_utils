@@ -2,9 +2,9 @@
 
 namespace
 {
-    constexpr float origSampleRate = 48000.0;
-    constexpr int origNumSamples = 4800;
-}
+constexpr float origSampleRate = 48000.0;
+constexpr int origNumSamples = 4800;
+} // namespace
 
 class ResamplerTest : public UnitTest
 {
@@ -14,7 +14,7 @@ public:
     void gen_sine (std::vector<float>& audio, float freq, float fs, int num_samples)
     {
         audio.resize ((size_t) num_samples, 0.0f);
-        std::generate (audio.begin(), audio.end(), [=, n = 0.0f] () mutable { 
+        std::generate (audio.begin(), audio.end(), [=, n = 0.0f]() mutable {
             return std::sin (MathConstants<float>::twoPi * (float) n++ * freq / fs);
         });
     }
@@ -66,8 +66,7 @@ public:
     {
         std::vector<float> inData;
         gen_sine (inData, freq, origSampleRate, origNumSamples);
-        auto testSampleRate = [=] (float outSampleRate)
-        {
+        auto testSampleRate = [=] (float outSampleRate) {
             const auto ratio = outSampleRate / origSampleRate;
 
             RType resampler;

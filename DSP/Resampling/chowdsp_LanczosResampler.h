@@ -91,7 +91,7 @@ namespace ResamplingTypes
         static constexpr size_t tableObs = BUFFER_SIZE * 2;
         static constexpr double dx = 1.0 / (tableObs);
 
-        static float lanczosTable alignas (16)[tableObs+1][filterWidth], lanczosTableDX alignas (16)[tableObs+1][filterWidth];
+        static float lanczosTable alignas (16)[tableObs + 1][filterWidth], lanczosTableDX alignas (16)[tableObs + 1][filterWidth];
         static bool tablesInitialized;
 
         float state[BUFFER_SIZE * 2];
@@ -165,7 +165,7 @@ namespace ResamplingTypes
                 rv += fn * dn;
             }
 
-            return rv.sum();   
+            return rv.sum();
         }
 
         size_t populateNext (float* f, size_t max)
@@ -195,10 +195,10 @@ namespace ResamplingTypes
     };
 
     template <size_t BUFFER_SIZE, size_t A>
-    float LanczosResampler<BUFFER_SIZE, A>::lanczosTable alignas (16)[LanczosResampler::tableObs+1][LanczosResampler::filterWidth];
+    float LanczosResampler<BUFFER_SIZE, A>::lanczosTable alignas (16)[LanczosResampler::tableObs + 1][LanczosResampler::filterWidth];
 
     template <size_t BUFFER_SIZE, size_t A>
-    float LanczosResampler<BUFFER_SIZE, A>::lanczosTableDX alignas (16)[LanczosResampler::tableObs+1][LanczosResampler::filterWidth];
+    float LanczosResampler<BUFFER_SIZE, A>::lanczosTableDX alignas (16)[LanczosResampler::tableObs + 1][LanczosResampler::filterWidth];
 
     template <size_t BUFFER_SIZE, size_t A>
     bool LanczosResampler<BUFFER_SIZE, A>::tablesInitialized = false;
