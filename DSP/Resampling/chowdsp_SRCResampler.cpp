@@ -5,13 +5,14 @@ namespace chowdsp
 namespace ResamplingTypes
 {
     template <size_t QUALITY>
-    void SRCResampler<QUALITY>::prepare (double sampleRate)
+    void SRCResampler<QUALITY>::prepare (double sampleRate, double startRatio)
     {
         fs = sampleRate;
 
         int error;
         src_state.reset (src_new (QUALITY, 1, &error));
-        src_set_ratio (src_state.get(), 1.0);
+        src_set_ratio (src_state.get(), startRatio);
+        ratio = startRatio;
     }
 
     template <size_t QUALITY>

@@ -18,7 +18,7 @@ namespace ResamplingTypes
         SRCResampler() = default;
 
         /** Prepares the resampler for a given input sample rate */
-        void prepare (double sampleRate);
+        void prepare (double sampleRate, double startRatio = 1.0);
 
         /** Sets the ratio of the output sample rate to input sample rate */
         void setResampleRatio (float newRatio) { ratio = static_cast<double> (newRatio); }

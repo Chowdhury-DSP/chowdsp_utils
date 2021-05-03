@@ -24,34 +24,40 @@ namespace ResamplingTypes
             if (tablesInitialized)
                 return;
 
-            for (int t = 0; t < tableObs; ++t)
+            for (size_t t = 0; t < tableObs; ++t)
             {
                 double x0 = dx * t;
-                for (int i = 0; i < filterWidth; ++i)
+                for (size_t i = 0; i < filterWidth; ++i)
                 {
                     double x = x0 + i - A;
-                    lanczosTable[t][i] = kernel (x);
+                    lanczosTable[t][i] = (float) kernel (x);
                 }
             }
-            for (int t = 0; t < tableObs; ++t)
+            for (size_t t = 0; t < tableObs; ++t)
             {
-                for (int i = 0; i < filterWidth; ++i)
+                for (size_t i = 0; i < filterWidth; ++i)
                 {
                     lanczosTableDX[t][i] =
                         lanczosTable[(t + 1) & (tableObs - 1)][i] - lanczosTable[t][i];
                 }
             }
+
+            // wrap case
+            std::copy (lanczosTable[0], &lanczosTable[0][filterWidth], lanczosTable[tableObs]);
+            std::copy (lanczosTableDX[0], &lanczosTableDX[0][filterWidth], lanczosTableDX[tableObs]);
+
             tablesInitialized = true;
         }
 
         /** Prepares the resampler for a given state sample rate */
-        void prepare (double /*sampleRate*/)
+        void prepare (double /*sampleRate*/, double startRatio = 1.0)
         {
             phaseI = 0;
             phaseO = 0;
 
+            ratio = startRatio;
             dPhaseI = 1.0;
-            dPhaseO = 1.0;
+            dPhaseO = 1.0 / ratio;
 
             std::fill (state, &state[BUFFER_SIZE * 2], 0.0f);
         }
@@ -69,19 +75,15 @@ namespace ResamplingTypes
      */
         size_t process (const float* input, float* output, size_t numSamples) noexcept
         {
+            // unless this condition is true, unexpected behaviour will ensue!! (buffer overflow...)
+            jassert (numSamples < BUFFER_SIZE);
+
             renormalizePhases();
 
-            for (int i = 0; i < numSamples; ++i)
+            for (size_t i = 0; i < numSamples; ++i)
                 push (input[i]);
 
-            if (ratio == 1.0)
-            {
-                juce::FloatVectorOperations::copy (output, input, numSamples);
-                snapOutToIn();
-                return numSamples;
-            }
-
-            return populateNext (output, int (numSamples * ratio) + 1);
+            return populateNext (output, size_t (numSamples * ratio) + 1);
         }
 
     private:
@@ -89,7 +91,7 @@ namespace ResamplingTypes
         static constexpr size_t tableObs = BUFFER_SIZE * 2;
         static constexpr double dx = 1.0 / (tableObs);
 
-        static float lanczosTable alignas (16)[tableObs][filterWidth], lanczosTableDX alignas (16)[tableObs][filterWidth];
+        static float lanczosTable alignas (16)[tableObs+1][filterWidth], lanczosTableDX alignas (16)[tableObs+1][filterWidth];
         static bool tablesInitialized;
 
         float state[BUFFER_SIZE * 2];
@@ -109,8 +111,8 @@ namespace ResamplingTypes
         inline void push (float f)
         {
             state[wp] = f;
-            state[wp + BUFFER_SIZE] = f; // this way we can always wrap
-            wp = (wp + 1) & (BUFFER_SIZE - 1);
+            state[wp + (int) BUFFER_SIZE] = f; // this way we can always wrap
+            wp = (wp + 1) & ((int) BUFFER_SIZE - 1);
             phaseI += dPhaseI;
         }
 
@@ -118,8 +120,8 @@ namespace ResamplingTypes
         {
             double p0 = wp - xBack;
             int idx0 = (int) p0;
-            idx0 = (idx0 + BUFFER_SIZE) & (BUFFER_SIZE - 1);
-            if (idx0 <= A)
+            idx0 = (idx0 + (int) BUFFER_SIZE) & ((int) BUFFER_SIZE - 1);
+            if (idx0 <= (int) A)
                 idx0 += BUFFER_SIZE;
 
             return state[idx0];
@@ -130,11 +132,11 @@ namespace ResamplingTypes
             double p0 = wp - xBack;
             int idx0 = (int) p0;
             float frac = float (p0 - idx0);
-            idx0 = (idx0 + BUFFER_SIZE) & (BUFFER_SIZE - 1);
-            if (idx0 <= A)
+            idx0 = (idx0 + (int) BUFFER_SIZE) & ((int) BUFFER_SIZE - 1);
+            if (idx0 <= (int) A)
                 idx0 += BUFFER_SIZE;
 
-            return (1.0 - frac) * state[idx0] + frac * state[idx0 + 1];
+            return (1.0f - frac) * state[idx0] + frac * state[idx0 + 1];
         }
 
         inline float read (double xBack) const
@@ -143,26 +145,27 @@ namespace ResamplingTypes
             int idx0 = (int) floor (p0);
             double off0 = 1.0 - (p0 - idx0);
 
-            idx0 = (idx0 + BUFFER_SIZE) & (BUFFER_SIZE - 1);
-            idx0 += (idx0 <= A) * BUFFER_SIZE;
+            idx0 = (idx0 + (int) BUFFER_SIZE) & ((int) BUFFER_SIZE - 1);
+            idx0 += (idx0 <= (int) A) * BUFFER_SIZE;
 
             double off0byto = off0 * tableObs;
-            int tidx = (int) (off0byto);
+            int tidx = (int) off0byto;
             double fidx = (off0byto - tidx);
 
             using SR = juce::dsp::SIMDRegister<float>;
             auto rv = SR (0.0f);
-
+            const auto fl = SR ((float) fidx);
             for (size_t i = 0; i < filterWidth; i += SR::size())
             {
-                auto fl = SR ((float) fidx);
                 auto fn = SR::fromRawArray (&lanczosTable[tidx][i]);
                 auto dfn = SR::fromRawArray (&lanczosTableDX[tidx][i]);
                 fn = fn + (dfn * fl);
-                auto dn = SIMDUtils::loadUnaligned (&state[idx0 - A + i]);
+
+                auto dn = SIMDUtils::loadUnaligned (&state[idx0 - (int) A + (int) i]);
                 rv += fn * dn;
             }
-            return rv.sum();
+
+            return rv.sum();   
         }
 
         size_t populateNext (float* f, size_t max)
@@ -192,10 +195,10 @@ namespace ResamplingTypes
     };
 
     template <size_t BUFFER_SIZE, size_t A>
-    float LanczosResampler<BUFFER_SIZE, A>::lanczosTable alignas (16)[LanczosResampler::tableObs][LanczosResampler::filterWidth];
+    float LanczosResampler<BUFFER_SIZE, A>::lanczosTable alignas (16)[LanczosResampler::tableObs+1][LanczosResampler::filterWidth];
 
     template <size_t BUFFER_SIZE, size_t A>
-    float LanczosResampler<BUFFER_SIZE, A>::lanczosTableDX alignas (16)[LanczosResampler::tableObs][LanczosResampler::filterWidth];
+    float LanczosResampler<BUFFER_SIZE, A>::lanczosTableDX alignas (16)[LanczosResampler::tableObs+1][LanczosResampler::filterWidth];
 
     template <size_t BUFFER_SIZE, size_t A>
     bool LanczosResampler<BUFFER_SIZE, A>::tablesInitialized = false;
