@@ -32,7 +32,9 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
 
     inline vec2 operator/ (const vec2& l, const vec2& r)
     {
-        return vdivq_f64 (l.value, r.value);
+        // @TODO: figure out how to override JUCE ARM NEON code
+        // return vdivq_f64 (l.value, r.value);
+        return { { l.value.v[0] / r.value.v[0], l.value.v[1] / r.value.v[1] } };
     }
 
 #else
@@ -72,8 +74,8 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
         // fallback implementation
         auto reg = vec4 (0.0f);
         auto* regPtr = reinterpret_cast<float*> (&reg.value);
-    std::copy (ptr, ptr + vec4::size()], regPtr);
-    return reg;
+        std::copy (ptr, ptr + vec4::size(), regPtr);
+        return reg;
 #endif
     }
 
@@ -82,13 +84,18 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
 #if defined(__i386__) || defined(__amd64__) || defined(_M_X64) || defined(_X86_) || defined(_M_IX86)
         return vec2 (_mm_loadu_pd (ptr));
 #elif defined(_M_ARM64) || defined(__arm64__) || defined(__aarch64__)
-        return vec2 (vld1q_f64 (ptr));
+        // @TODO: figure out how to override JUCE ARM NEON code
+        // return vec2 (vld1q_f64 (ptr));
+        auto reg = vec2 (0.0);
+        auto* regPtr = reinterpret_cast<double*> (&reg.value);
+        std::copy (ptr, ptr + vec2::size(), regPtr);
+        return reg;
 #else
         // fallback implementation
         auto reg = vec2 (0.0);
         auto* regPtr = reinterpret_cast<double*> (&reg.value);
-    std::copy (ptr, ptr + vec2::size()], regPtr);
-    return reg;
+        std::copy (ptr, ptr + vec2::size(), regPtr);
+        return reg;
 #endif
     }
 
