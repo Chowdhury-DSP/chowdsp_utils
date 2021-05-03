@@ -52,13 +52,17 @@ namespace ResamplingTypes
         /** Prepares the resampler for a given state sample rate */
         void prepare (double /*sampleRate*/, double startRatio = 1.0)
         {
-            phaseI = 0;
-            phaseO = 0;
-
             ratio = startRatio;
             dPhaseI = 1.0;
             dPhaseO = 1.0 / ratio;
 
+            reset();
+        }
+
+        /** Resets the state of the resampler */
+        void reset()
+        {
+            snapOutToIn();
             std::fill (state, &state[BUFFER_SIZE * 2], 0.0f);
         }
 

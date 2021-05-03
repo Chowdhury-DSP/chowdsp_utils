@@ -16,6 +16,13 @@ namespace ResamplingTypes
     }
 
     template <size_t QUALITY>
+    void SRCResampler<QUALITY>::reset()
+    {
+        src_reset (src_state.get());
+        src_set_ratio (src_state.get(), ratio);
+    }
+
+    template <size_t QUALITY>
     size_t SRCResampler<QUALITY>::process (const float* input, float* output, size_t numSamples) noexcept
     {
         SRC_DATA src_data {

@@ -25,6 +25,13 @@ public:
                               (int) spec.maximumBlockSize * 10);
     }
 
+    /** Resets the state of the resampler */
+    void reset()
+    {
+        for (auto& r : resamplers)
+            r.reset();
+    }
+
     /** Sets the ratio of input and output sample rates
      * 
      *  @param ratio    The resampling ratio. Must be in [0.1, 10.0]
