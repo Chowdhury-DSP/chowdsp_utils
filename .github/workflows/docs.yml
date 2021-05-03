@@ -4,6 +4,9 @@ on:
   push:
     branches:
     - master
+  pull_request:
+    branches:
+    - master
 
   workflow_dispatch:
 
@@ -21,7 +24,7 @@ jobs:
       if: runner.os == 'Linux'
       run: |
         sudo apt-get update
-        sudo apt install libasound2-dev libcurl4-openssl-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev doxygen graphviz
+        sudo apt install doxygen graphviz
 
     - name: Checkout code
       uses: actions/checkout@v2
