@@ -15,7 +15,7 @@ class SynthBase : public PluginBase<Processor>
 public:
     SynthBase() = default;
 
-    bool acceptsMidi() const override { return false; }
+    bool acceptsMidi() const override { return true; }
 
     virtual void processSynth (juce::AudioBuffer<float>&, juce::MidiBuffer&) = 0;
 
@@ -31,7 +31,7 @@ public:
     }
 
 private:
-    void processBlock (juce::AudioBuffer<float>&) override {}
+    void processAudioBlock (juce::AudioBuffer<float>&) override {}
 };
 
 } // namespace chowdsp
