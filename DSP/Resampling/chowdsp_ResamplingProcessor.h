@@ -22,7 +22,7 @@ public:
             r.prepare (spec.sampleRate);
 
         outputBuffer.setSize ((int) spec.numChannels,
-                              (int) spec.maximumBlockSize * 10);
+                              (int) spec.maximumBlockSize * 20);
     }
 
     /** Resets the state of the resampler */
@@ -38,7 +38,7 @@ public:
      */
     void setResampleRatio (float ratio)
     {
-        auto ratioClamped = juce::jlimit (0.1f, 10.0f, ratio);
+        auto ratioClamped = juce::jlimit (0.01f, 100.0f, ratio);
         for (auto& r : resamplers)
             r.setResampleRatio (ratioClamped);
     }
