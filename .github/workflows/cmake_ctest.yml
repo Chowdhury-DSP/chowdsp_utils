@@ -24,7 +24,7 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            cmake_args: ""
+            cmake_args: "-DXSIMD_PATH=../xsimd"
           - os: windows-latest
             cmake_args: ""
           - os: macos-latest
@@ -53,6 +53,11 @@ jobs:
         git clone --depth 1 --branch 6.0.1 https://github.com/juce-framework/JUCE.git
         cd JUCE_modules
         git clone --single-branch --branch chowdsp https://github.com/Chowdhury-DSP/foleys_gui_magic.git
+
+    - name: Install xsimd
+      if: runner.os == 'Linux'
+      working-directory: ${{github.workspace}}/JUCE_modules
+      run: git clone https://github.com/xtensor-stack/xsimd
 
     - name: Configure
       working-directory: ${{env.WORK_DIR}}

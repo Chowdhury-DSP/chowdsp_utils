@@ -28,11 +28,24 @@
 #define CHOWDSP_USE_FOLEYS_CLASSES 1
 #endif
 
-/** Config: FOLEYS_SHOW_GUI_EDITOR_PALLETTE
-            Enables the GUI editor palette allowing to edit the GUI. Ideally set this to 0 in a release build.
+/** Config: CHOWDSP_USE_LIBSAMPLERATE
+            Enable libsamplerate wrappers for resampling processors.
+
+            You must link against libsamplerate, and make sure that libsamplerate headers
+            are in the include paths. You must respect the libsamplerate license when enabling this option.
   */
 #ifndef CHOWDSP_USE_LIBSAMPLERATE
 #define CHOWDSP_USE_LIBSAMPLERATE 0
+#endif
+
+/** Config: CHOWDSP_USE_XSIMD
+            Enable XSIMD library for accelerated SIMD functions.
+
+            You must ensure that xsimd headers are in the include paths.
+            You must respect the xsimd license when enabling this option.
+  */
+#ifndef CHOWDSP_USE_XSIMD
+#define CHOWDSP_USE_XSIMD 0
 #endif
 
 #if CHOWDSP_USE_FOLEYS_CLASSES
@@ -55,6 +68,18 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 
 #if CHOWDSP_USE_LIBSAMPLERATE
 #include <samplerate.h>
+#endif
+
+#if CHOWDSP_USE_XSIMD
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wcast-align",
+                                     "-Wimplicit-int-conversion",
+                                     "-Wshadow",
+                                     "-Wsign-conversion",
+                                     "-Wzero-as-null-pointer-constant")
+JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4244)
+#include <xsimd/xsimd.hpp>
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+JUCE_END_IGNORE_WARNINGS_MSVC
 #endif
 
 // Plugin utils

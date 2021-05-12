@@ -170,7 +170,80 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
      *  let's implement a fallback.
     */
 
-#if CHOWDSP_USE_XSIMD
+
+#if CHOWDSP_USE_XSIMD // XSIMD implementations
+    template <typename T>
+    using x_type = xsimd::batch<T, juce::dsp::SIMDRegister<T>::size()>;
+
+    /** SIMD implementation of std::exp */
+    template <typename T>
+    inline juce::dsp::SIMDRegister<T> expSIMD (juce::dsp::SIMDRegister<T> x)
+    {
+        return (juce::dsp::SIMDRegister<T>) xsimd::exp ((x_type<T>) x.value);
+    }
+
+    /** SIMD implementation of std::log */
+    template <typename T>
+    inline juce::dsp::SIMDRegister<T> logSIMD (juce::dsp::SIMDRegister<T> x)
+    {
+        return (juce::dsp::SIMDRegister<T>) xsimd::log ((x_type<T>) x.value);
+    }
+
+    /** SIMD implementation of std::pow */
+    template <typename T>
+    inline juce::dsp::SIMDRegister<T> powSIMD (juce::dsp::SIMDRegister<T> a, juce::dsp::SIMDRegister<T> b)
+    {
+        return (juce::dsp::SIMDRegister<T>) xsimd::pow ((x_type<T>) a.value, (x_type<T>) b.value);
+    }
+
+    /** SIMD implementation of std::sqrt */
+    template <typename T>
+    inline juce::dsp::SIMDRegister<T> sqrtSIMD (juce::dsp::SIMDRegister<T> x)
+    {
+        return (juce::dsp::SIMDRegister<T>) xsimd::sqrt ((x_type<T>) x.value);
+    }
+
+    /** SIMD implementation of std::sin */
+    template <typename T>
+    inline juce::dsp::SIMDRegister<T> sinSIMD (juce::dsp::SIMDRegister<T> x)
+    {
+        return (juce::dsp::SIMDRegister<T>) xsimd::sin ((x_type<T>) x.value);
+    }
+
+    /** SIMD implementation of std::cos */
+    template <typename T>
+    inline juce::dsp::SIMDRegister<T> cosSIMD (juce::dsp::SIMDRegister<T> x)
+    {
+        return (juce::dsp::SIMDRegister<T>) xsimd::cos ((x_type<T>) x.value);
+    }
+
+    /** SIMD implementation of std::tan */
+    template <typename T>
+    inline juce::dsp::SIMDRegister<T> tanSIMD (juce::dsp::SIMDRegister<T> x)
+    {
+        return (juce::dsp::SIMDRegister<T>) xsimd::tan ((x_type<T>) x.value);
+    }
+
+    /** SIMD implementation of std::sinh */
+    template <typename T>
+    inline juce::dsp::SIMDRegister<T> sinhSIMD (juce::dsp::SIMDRegister<T> x)
+    {
+        return (juce::dsp::SIMDRegister<T>) xsimd::sinh ((x_type<T>) x.value);
+    }
+
+    /** SIMD implementation of std::cosh */
+    template <typename T>
+    inline juce::dsp::SIMDRegister<T> coshSIMD (juce::dsp::SIMDRegister<T> x)
+    {
+        return (juce::dsp::SIMDRegister<T>) xsimd::cosh ((x_type<T>) x.value);
+    }
+
+    /** SIMD implementation of std::tanh */
+    template <typename T>
+    inline juce::dsp::SIMDRegister<T> tanhSIMD (juce::dsp::SIMDRegister<T> x)
+    {
+        return (juce::dsp::SIMDRegister<T>) xsimd::tanh ((x_type<T>) x.value);
+    }
 #else // fallback implemetations
     /** SIMD implementation of std::exp */
     template <typename T>

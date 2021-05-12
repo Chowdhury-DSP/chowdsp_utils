@@ -89,35 +89,37 @@ public:
     }
 
     template <typename FloatType>
-    void baseMathTest (int nIter, std::function<FloatType (FloatType)> floatFunc, std::function<dsp::SIMDRegister<FloatType> (dsp::SIMDRegister<FloatType>)> simdFunc, String functionName)
+    void baseMathTest (int nIter, std::function<FloatType(FloatType)> floatFunc,
+        std::function<dsp::SIMDRegister<FloatType>(dsp::SIMDRegister<FloatType>)> simdFunc,
+        FloatType maxErr, String functionName)
     {
         for (int i = 0; i < nIter; ++i)
         {
-            auto input = (FloatType) getRandom().nextDouble();
+            auto input = (FloatType) Random::getSystemRandom().nextDouble();
             auto expected = floatFunc (input);
             auto actual = simdFunc (dsp::SIMDRegister<FloatType> (input));
 
             for (size_t j = 0; j < dsp::SIMDRegister<FloatType>::size(); ++j)
-                expectEquals (actual.get (j), expected, "SIMD function is incorrect: " + functionName);
+                expectWithinAbsoluteError (actual.get (j), expected, maxErr, "SIMD function is incorrect: " + functionName);
         }
     }
 
     template <typename FloatType>
-    void mathTest (int nIter)
+    void mathTest (int nIter, FloatType maxErr)
     {
         using namespace chowdsp::SIMDUtils;
 #define FLOATFUNC(func) [] (FloatType x) { return func (x); }
 #define SIMDFUNC(func) [] (dsp::SIMDRegister<FloatType> x) { return func (x); }
 
-        baseMathTest<FloatType> (nIter, FLOATFUNC (std::exp), SIMDFUNC (expSIMD), "exp");
-        baseMathTest<FloatType> (nIter, FLOATFUNC (std::log), SIMDFUNC (logSIMD), "log");
-        baseMathTest<FloatType> (nIter, FLOATFUNC (std::sqrt), SIMDFUNC (sqrtSIMD), "sqrt");
-        baseMathTest<FloatType> (nIter, FLOATFUNC (std::sin), SIMDFUNC (sinSIMD), "sin");
-        baseMathTest<FloatType> (nIter, FLOATFUNC (std::cos), SIMDFUNC (cosSIMD), "cos");
-        baseMathTest<FloatType> (nIter, FLOATFUNC (std::tan), SIMDFUNC (tanSIMD), "tan");
-        baseMathTest<FloatType> (nIter, FLOATFUNC (std::sinh), SIMDFUNC (sinhSIMD), "sinh");
-        baseMathTest<FloatType> (nIter, FLOATFUNC (std::cosh), SIMDFUNC (coshSIMD), "cosh");
-        baseMathTest<FloatType> (nIter, FLOATFUNC (std::tanh), SIMDFUNC (tanhSIMD), "tanh");
+        baseMathTest<FloatType> (nIter, FLOATFUNC (std::exp), SIMDFUNC (expSIMD), maxErr, "exp");
+        baseMathTest<FloatType> (nIter, FLOATFUNC (std::log), SIMDFUNC (logSIMD), maxErr, "log");
+        baseMathTest<FloatType> (nIter, FLOATFUNC (std::sqrt), SIMDFUNC (sqrtSIMD), maxErr, "sqrt");
+        baseMathTest<FloatType> (nIter, FLOATFUNC (std::sin), SIMDFUNC (sinSIMD), maxErr, "sin");
+        baseMathTest<FloatType> (nIter, FLOATFUNC (std::cos), SIMDFUNC (cosSIMD), maxErr, "cos");
+        baseMathTest<FloatType> (nIter, FLOATFUNC (std::tan), SIMDFUNC (tanSIMD), maxErr, "tan");
+        baseMathTest<FloatType> (nIter, FLOATFUNC (std::sinh), SIMDFUNC (sinhSIMD), maxErr, "sinh");
+        baseMathTest<FloatType> (nIter, FLOATFUNC (std::cosh), SIMDFUNC (coshSIMD), maxErr, "cosh");
+        baseMathTest<FloatType> (nIter, FLOATFUNC (std::tanh), SIMDFUNC (tanhSIMD), maxErr, "tanh");
 
 #undef FLOATFUNC
 #undef SIMDFUNC
@@ -125,13 +127,13 @@ public:
         // test std::pow (needs 2 inputs)
         for (int i = 0; i < nIter; ++i)
         {
-            auto a = (FloatType) getRandom().nextDouble();
-            auto b = (FloatType) getRandom().nextDouble();
+            auto a = (FloatType) Random::getSystemRandom().nextDouble();
+            auto b = (FloatType) Random::getSystemRandom().nextDouble();
             auto expected = std::pow (a, b);
             auto actual = chowdsp::SIMDUtils::powSIMD (dsp::SIMDRegister<FloatType> (a), dsp::SIMDRegister<FloatType> (b));
 
             for (size_t j = 0; j < dsp::SIMDRegister<FloatType>::size(); ++j)
-                expectEquals (actual.get (j), expected, "SIMD function is incorrect: pow");
+                expectWithinAbsoluteError (actual.get (j), expected, maxErr, "SIMD function is incorrect: pow");
         }
     }
 
@@ -171,10 +173,10 @@ public:
         testLoadUnaligned<double>();
 
         beginTest ("Float SIMD Math test");
-        mathTest<float> (10);
+        mathTest<float> (10, 1.0e-6f);
 
         beginTest ("Double SIMD Math test");
-        mathTest<double> (10);
+        mathTest<double> (10, 1.0e-12);
     }
 };
 
