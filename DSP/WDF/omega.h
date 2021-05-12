@@ -201,7 +201,7 @@ namespace Omega
     {
         auto y = juce::dsp::SIMDRegister<T> ((T) 0);
         for (size_t i = 0; i < x.size(); ++i)
-            y.value[i] = omega2 (x.value[i]);
+            y.set (i, omega2 (x.get (i)));
         return y;
     }
 
@@ -211,7 +211,7 @@ namespace Omega
     {
         auto y = juce::dsp::SIMDRegister<T> ((T) 0);
         for (size_t i = 0; i < x.size(); ++i)
-            y.value[i] = omega3 (x.value[i]);
+            y.set (i, omega3 (x.get (i)));
         return y;
     }
 
@@ -221,7 +221,7 @@ namespace Omega
     {
         auto y = juce::dsp::SIMDRegister<T> ((T) 0);
         for (size_t i = 0; i < x.size(); ++i)
-            y.value[i] = omega4 (x.value[i]);
+            y.set (i, omega4 (x.get (i)));
         return y;
     }
 #endif // USING_JUCE

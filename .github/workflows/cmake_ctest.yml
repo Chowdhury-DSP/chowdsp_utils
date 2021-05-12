@@ -28,7 +28,7 @@ jobs:
           - os: windows-latest
             cmake_args: ""
           - os: macos-latest
-            cmake_args: "-GXcode -DCMAKE_OSX_ARCHITECTURES=\"arm64;x86_64\" -DXSIMD_PATH=../xsimd"
+            cmake_args: "-GXcode \"-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64\" -DXSIMD_PATH=../xsimd"
     
     steps:
     - name: Install Linux Deps

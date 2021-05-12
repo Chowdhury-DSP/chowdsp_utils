@@ -218,7 +218,7 @@ public:
         }
 
         for (int i = 0; i < num; ++i)
-            expectWithinAbsoluteError (data2[i].value[0], data1[i], (FloatType) 1.0e-6, "SIMD WDF is not equivalent to float WDF!");
+            expectWithinAbsoluteError (data2[i].get (0), data1[i], (FloatType) 1.0e-6, "SIMD WDF is not equivalent to float WDF!");
     }
 
     void runTest() override

@@ -250,7 +250,7 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
     {
         auto y = juce::dsp::SIMDRegister<T> ((T) 0);
         for (size_t i = 0; i < x.size(); ++i)
-            y.value[i] = std::exp (x.value[i]);
+            y.set (i, std::exp (x.get (i)));
 
         return y;
     }
@@ -261,7 +261,7 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
     {
         auto y = juce::dsp::SIMDRegister<T> ((T) 0);
         for (size_t i = 0; i < x.size(); ++i)
-            y.value[i] = std::log (x.value[i]);
+            y.set (i, std::log (x.get (i)));
 
         return y;
     }
@@ -272,7 +272,7 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
     {
         auto y = juce::dsp::SIMDRegister<T> ((T) 0);
         for (size_t i = 0; i < a.size(); ++i)
-            y.value[i] = std::pow (a.value[i], b.value[i]);
+            y.set (i, std::pow (a.get (i), b.get (i)));
 
         return y;
     }
@@ -283,7 +283,7 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
     {
         auto y = juce::dsp::SIMDRegister<T> ((T) 0);
         for (size_t i = 0; i < x.size(); ++i)
-            y.value[i] = std::sqrt (x.value[i]);
+            y.set (i, std::sqrt (x.get (i)));
 
         return y;
     }
@@ -294,7 +294,7 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
     {
         auto y = juce::dsp::SIMDRegister<T> ((T) 0);
         for (size_t i = 0; i < x.size(); ++i)
-            y.value[i] = std::sin (x.value[i]);
+            y.set (i, std::sin (x.get (i)));
 
         return y;
     }
@@ -305,7 +305,7 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
     {
         auto y = juce::dsp::SIMDRegister<T> ((T) 0);
         for (size_t i = 0; i < x.size(); ++i)
-            y.value[i] = std::cos (x.value[i]);
+            y.set (i, std::cos (x.get (i)));
 
         return y;
     }
@@ -316,7 +316,7 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
     {
         auto y = juce::dsp::SIMDRegister<T> ((T) 0);
         for (size_t i = 0; i < x.size(); ++i)
-            y.value[i] = std::tan (x.value[i]);
+            y.set (i, std::tan (x.get (i)));
 
         return y;
     }
@@ -327,7 +327,7 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
     {
         auto y = juce::dsp::SIMDRegister<T> ((T) 0);
         for (size_t i = 0; i < x.size(); ++i)
-            y.value[i] = std::sinh (x.value[i]);
+            y.set (i, std::sinh (x.get (i)));
 
         return y;
     }
@@ -338,7 +338,7 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
     {
         auto y = juce::dsp::SIMDRegister<T> ((T) 0);
         for (size_t i = 0; i < x.size(); ++i)
-            y.value[i] = std::cosh (x.value[i]);
+            y.set (i, std::cosh (x.get (i)));
 
         return y;
     }
@@ -349,7 +349,7 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
     {
         auto y = juce::dsp::SIMDRegister<T> ((T) 0);
         for (size_t i = 0; i < x.size(); ++i)
-            y.value[i] = (T) std::tanh (x.value[i]);
+            y.set (i, std::tanh (x.get (i)));
 
         return y;
     }
