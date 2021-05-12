@@ -33,7 +33,7 @@ namespace chowdsp
 namespace WDF
 {
     /** Wave digital filter base class */
-    template<typename T>
+    template <typename T>
     class WDF
     {
     public:
