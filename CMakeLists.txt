@@ -60,3 +60,10 @@ if(SAMPLERATE_FOUND)
         samplerate::samplerate
     )
 endif()
+
+# Test with xsimd (if path is defined)
+if(XSIMD_PATH)
+    message(STATUS "Using XSIMD")
+    target_include_directories(chowdsp_utils_tests PRIVATE ${XSIMD_PATH}/include)
+    target_compile_definitions(chowdsp_utils_tests PRIVATE CHOWDSP_USE_XSIMD=1)
+endif()
