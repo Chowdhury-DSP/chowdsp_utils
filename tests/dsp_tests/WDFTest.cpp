@@ -150,7 +150,6 @@ public:
 
     void simpleSIMDTest()
     {
-
     }
 
     void runTest() override

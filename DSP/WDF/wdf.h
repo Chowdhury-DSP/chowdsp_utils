@@ -87,10 +87,10 @@ namespace WDF
         template <typename, typename Port1Type, typename Port2Type>
         friend class WDFSeriesT;
 
-JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wimplicit-float-conversion")
+        JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wimplicit-float-conversion")
         T R = (T) 1.0e-9; // impedance
         T G = (T) 1.0 / R; // admittance
-JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+        JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
     protected:
         using FloatType = T;
