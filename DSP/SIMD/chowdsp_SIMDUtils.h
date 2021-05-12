@@ -170,7 +170,6 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
      *  let's implement a fallback.
     */
 
-
 #if CHOWDSP_USE_XSIMD // XSIMD implementations
     template <typename T>
     using x_type = xsimd::batch<T, juce::dsp::SIMDRegister<T>::size()>;
