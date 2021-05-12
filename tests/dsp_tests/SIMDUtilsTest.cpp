@@ -89,8 +89,7 @@ public:
     }
 
     template <typename FloatType>
-    void baseMathTest (int nIter, std::function<FloatType(FloatType)> floatFunc,
-        std::function<dsp::SIMDRegister<FloatType>(dsp::SIMDRegister<FloatType>)> simdFunc, String functionName)
+    void baseMathTest (int nIter, std::function<FloatType (FloatType)> floatFunc, std::function<dsp::SIMDRegister<FloatType> (dsp::SIMDRegister<FloatType>)> simdFunc, String functionName)
     {
         for (int i = 0; i < nIter; ++i)
         {
@@ -107,8 +106,8 @@ public:
     void mathTest (int nIter)
     {
         using namespace chowdsp::SIMDUtils;
-        #define FLOATFUNC(func) [] (FloatType x) { return func (x); }
-        #define SIMDFUNC(func) [] (dsp::SIMDRegister<FloatType> x) { return func (x); }
+#define FLOATFUNC(func) [] (FloatType x) { return func (x); }
+#define SIMDFUNC(func) [] (dsp::SIMDRegister<FloatType> x) { return func (x); }
 
         baseMathTest<FloatType> (nIter, FLOATFUNC (std::exp), SIMDFUNC (expSIMD), "exp");
         baseMathTest<FloatType> (nIter, FLOATFUNC (std::log), SIMDFUNC (logSIMD), "log");
@@ -120,8 +119,8 @@ public:
         baseMathTest<FloatType> (nIter, FLOATFUNC (std::cosh), SIMDFUNC (coshSIMD), "cosh");
         baseMathTest<FloatType> (nIter, FLOATFUNC (std::tanh), SIMDFUNC (tanhSIMD), "tanh");
 
-        #undef FLOATFUNC
-        #undef SIMDFUNC
+#undef FLOATFUNC
+#undef SIMDFUNC
 
         // test std::pow (needs 2 inputs)
         for (int i = 0; i < nIter; ++i)

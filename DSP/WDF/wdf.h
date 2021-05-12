@@ -557,7 +557,7 @@ namespace WDF
         inline void incident (T x) noexcept override
         {
             this->port1->incident (x + (this->port2->b - this->port1->b) * port2Reflect);
-            this->port2->incident (x + (this->port2->b - this->port1->b) * ((T) 0 -port1Reflect));
+            this->port2->incident (x + (this->port2->b - this->port1->b) * ((T) 0 - port1Reflect));
             this->a = x;
         }
 
@@ -848,7 +848,7 @@ namespace WDF
         /** Implementation for float/double. */
         template <typename C = T>
         inline typename std::enable_if<std::is_same<float, C>::value || std::is_same<double, C>::value, C>::type
-        reflectedInternal() noexcept
+            reflectedInternal() noexcept
         {
             // See eqn (18) from reference paper
             T lambda = (T) signum (this->a);
@@ -860,8 +860,9 @@ namespace WDF
         /** Implementation for SIMD float/double. */
         template <typename C = T>
         inline typename std::enable_if<std::is_same<juce::dsp::SIMDRegister<float>, C>::value
-                                    || std::is_same<juce::dsp::SIMDRegister<double>, C>::value, C>::type
-        reflectedInternal() noexcept
+                                           || std::is_same<juce::dsp::SIMDRegister<double>, C>::value,
+                                       C>::type
+            reflectedInternal() noexcept
         {
             // See eqn (18) from reference paper
             T lambda = signumSIMD (this->a);
@@ -912,7 +913,7 @@ namespace WDF
         /** Implementation for float/double. */
         template <typename C = T>
         inline typename std::enable_if<std::is_same<float, C>::value || std::is_same<double, C>::value, C>::type
-        reflectedInternal() noexcept
+            reflectedInternal() noexcept
         {
             // See eqn (10) from reference paper
             this->b = this->a + (T) 2 * this->next->R * Is - (T) 2 * Vt * Omega::omega4 (std::log (this->next->R * Is / Vt) + (this->a + this->next->R * Is) / Vt);
@@ -923,8 +924,9 @@ namespace WDF
         /** Implementation for SIMD float/double. */
         template <typename C = T>
         inline typename std::enable_if<std::is_same<juce::dsp::SIMDRegister<float>, C>::value
-                                    || std::is_same<juce::dsp::SIMDRegister<double>, C>::value, C>::type
-        reflectedInternal() noexcept
+                                           || std::is_same<juce::dsp::SIMDRegister<double>, C>::value,
+                                       C>::type
+            reflectedInternal() noexcept
         {
             // See eqn (10) from reference paper
             this->b = this->a + (T) 2 * this->next->R * Is - (T) 2 * Vt * Omega::omega4 (logSIMD (this->next->R * Is / Vt) + (this->a + this->next->R * Is) / Vt);
