@@ -148,8 +148,77 @@ public:
             expectWithinAbsoluteError (data2[i], data1[i], (FloatType) 1.0e-6, "Static WDF is not equivalent to dynamic!");
     }
 
-    void simpleSIMDTest()
+    void simdSignumTest()
     {
+        dsp::SIMDRegister<float> testReg;
+        testReg.set (0, -1.0f);
+        testReg.set (1, 0.0f);
+        testReg.set (2, 0.5f);
+        testReg.set (3, 1.0f);
+
+        auto signumReg = signumSIMD (testReg);
+
+        for (size_t i = 0; i < testReg.size(); ++i)
+            expectEquals (signumReg.get (i), (float) signum (testReg.get (i)), "SIMD Signum is incorrect!");
+    }
+
+    void diodeClipperSIMDTest()
+    {
+        using FloatType = double;
+        using VType = dsp::SIMDRegister<FloatType>;
+        constexpr auto Cap = (FloatType) 47.0e-9;
+        constexpr auto Res = (FloatType) 4700.0;
+
+        constexpr int num = 5;
+        FloatType data1[num] = { 1.0, 0.5, 0.0, -0.5, -1.0 };
+        VType data2[num] = { 1.0, 0.5, 0.0, -0.5, -1.0 };
+
+        // Normal
+        {
+            ResistiveVoltageSource<FloatType> Vs {};
+            Resistor<FloatType> R1 { Res };
+            auto C1 = std::make_unique<Capacitor<FloatType>> (Cap, (FloatType) fs);
+
+            auto S1 = std::make_unique<WDFSeries<FloatType>> (&Vs, &R1);
+            auto P1 = std::make_unique<WDFParallel<FloatType>> (S1.get(), C1.get());
+            auto I1 = std::make_unique<PolarityInverter<FloatType>> (P1.get());
+
+            DiodePair dp { (FloatType) 2.52e-9, (FloatType) 0.02585 };
+            dp.connectToNode (I1.get());
+
+            for (int i = 0; i < num; ++i)
+            {
+                Vs.setVoltage (data1[i]);
+                dp.incident (P1->reflected());
+                data1[i] = C1->voltage();
+                P1->incident (dp.reflected());
+            }
+        }
+
+        // SIMD
+        {
+            ResistiveVoltageSource<VType> Vs {};
+            Resistor<VType> R1 { Res };
+            auto C1 = std::make_unique<Capacitor<VType>> (Cap, (VType) fs);
+
+            auto S1 = std::make_unique<WDFSeries<VType>> (&Vs, &R1);
+            auto P1 = std::make_unique<WDFParallel<VType>> (S1.get(), C1.get());
+            auto I1 = std::make_unique<PolarityInverter<VType>> (P1.get());
+
+            DiodePair dp { (VType) 2.52e-9, (VType) 0.02585 };
+            dp.connectToNode (I1.get());
+
+            for (int i = 0; i < num; ++i)
+            {
+                Vs.setVoltage (data2[i]);
+                dp.incident (P1->reflected());
+                data2[i] = C1->voltage();
+                P1->incident (dp.reflected());
+            }
+        }
+
+        for (int i = 0; i < num; ++i)
+            expectWithinAbsoluteError (data2[i].value[0], data1[i], (FloatType) 1.0e-6, "SIMD WDF is not equivalent to float WDF!");
     }
 
     void runTest() override
@@ -164,10 +233,14 @@ public:
         beginTest ("Static WDF Test");
         staticWDFTest();
 
+        beginTest ("SIMD Signum Test");
+        simdSignumTest();
+
         beginTest ("SIMD WDF Test");
         voltageDividerTest<dsp::SIMDRegister<float>>();
         voltageDividerTest<dsp::SIMDRegister<double>>();
+        diodeClipperSIMDTest();
     }
 };
 
-static WDFTest mfTest;
+static WDFTest wdfTest;

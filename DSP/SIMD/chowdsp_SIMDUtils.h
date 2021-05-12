@@ -164,6 +164,126 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
         return p - mpi;
     }
 
+    //============================================================
+    /** JUCE SIMD registers don't directly support complex math functions
+     *  We can use xsimd to enable this if xsimd is available, otherwise,
+     *  let's implement a fallback.
+    */
+
+
+#if CHOWDSP_USE_XSIMD
+#else // fallback implemetations
+    /** SIMD implementation of std::exp */
+    template <typename T>
+    inline juce::dsp::SIMDRegister<T> expSIMD (juce::dsp::SIMDRegister<T> x)
+    {
+        auto y = juce::dsp::SIMDRegister<T> ((T) 0);
+        for (size_t i = 0; i < x.size(); ++i)
+            y.value[i] = std::exp (x.value[i]);
+        
+        return y;
+    }
+
+    /** SIMD implementation of std::log */
+    template <typename T>
+    inline juce::dsp::SIMDRegister<T> logSIMD (juce::dsp::SIMDRegister<T> x)
+    {
+        auto y = juce::dsp::SIMDRegister<T> ((T) 0);
+        for (size_t i = 0; i < x.size(); ++i)
+            y.value[i] = std::log (x.value[i]);
+        
+        return y;
+    }
+
+    /** SIMD implementation of std::pow */
+    template <typename T>
+    inline juce::dsp::SIMDRegister<T> powSIMD (juce::dsp::SIMDRegister<T> a, juce::dsp::SIMDRegister<T> b)
+    {
+        auto y = juce::dsp::SIMDRegister<T> ((T) 0);
+        for (size_t i = 0; i < a.size(); ++i)
+            y.value[i] = std::pow (a.value[i], b.value[i]);
+        
+        return y;
+    }
+
+    /** SIMD implementation of std::sqrt */
+    template <typename T>
+    inline juce::dsp::SIMDRegister<T> sqrtSIMD (juce::dsp::SIMDRegister<T> x)
+    {
+        auto y = juce::dsp::SIMDRegister<T> ((T) 0);
+        for (size_t i = 0; i < x.size(); ++i)
+            y.value[i] = std::sqrt (x.value[i]);
+        
+        return y;
+    }
+
+    /** SIMD implementation of std::sin */
+    template <typename T>
+    inline juce::dsp::SIMDRegister<T> sinSIMD (juce::dsp::SIMDRegister<T> x)
+    {
+        auto y = juce::dsp::SIMDRegister<T> ((T) 0);
+        for (size_t i = 0; i < x.size(); ++i)
+            y.value[i] = std::sin (x.value[i]);
+        
+        return y;
+    }
+
+    /** SIMD implementation of std::cos */
+    template <typename T>
+    inline juce::dsp::SIMDRegister<T> cosSIMD (juce::dsp::SIMDRegister<T> x)
+    {
+        auto y = juce::dsp::SIMDRegister<T> ((T) 0);
+        for (size_t i = 0; i < x.size(); ++i)
+            y.value[i] = std::cos (x.value[i]);
+        
+        return y;
+    }
+
+    /** SIMD implementation of std::tan */
+    template <typename T>
+    inline juce::dsp::SIMDRegister<T> tanSIMD (juce::dsp::SIMDRegister<T> x)
+    {
+        auto y = juce::dsp::SIMDRegister<T> ((T) 0);
+        for (size_t i = 0; i < x.size(); ++i)
+            y.value[i] = std::tan (x.value[i]);
+        
+        return y;
+    }
+
+    /** SIMD implementation of std::sinh */
+    template <typename T>
+    inline juce::dsp::SIMDRegister<T> sinhSIMD (juce::dsp::SIMDRegister<T> x)
+    {
+        auto y = juce::dsp::SIMDRegister<T> ((T) 0);
+        for (size_t i = 0; i < x.size(); ++i)
+            y.value[i] = std::sinh (x.value[i]);
+        
+        return y;
+    }
+
+    /** SIMD implementation of std::cosh */
+    template <typename T>
+    inline juce::dsp::SIMDRegister<T> coshSIMD (juce::dsp::SIMDRegister<T> x)
+    {
+        auto y = juce::dsp::SIMDRegister<T> ((T) 0);
+        for (size_t i = 0; i < x.size(); ++i)
+            y.value[i] = std::cosh (x.value[i]);
+        
+        return y;
+    }
+
+    /** SIMD implementation of std::tanh */
+    template <typename T>
+    inline juce::dsp::SIMDRegister<T> tanhSIMD (juce::dsp::SIMDRegister<T> x)
+    {
+        auto y = juce::dsp::SIMDRegister<T> ((T) 0);
+        for (size_t i = 0; i < x.size(); ++i)
+            y.value[i] = (T) std::tanh (x.value[i]);
+        
+        return y;
+    }
+#endif
+
 } // namespace SIMDUtils
 
 } // namespace chowdsp

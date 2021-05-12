@@ -1,9 +1,12 @@
 #ifndef WDF_H_INCLUDED
 #define WDF_H_INCLUDED
 
-#include "omega.h"
 #include <cmath>
 #include <string>
+
+// we want to be able to use this header without JUCE, so let's #if out JUCE-specific implementations
+#define USING_JUCE JUCE_WINDOWS || JUCE_ANDROID || JUCE_BSD || JUCE_LINUX || JUCE_MAC || JUCE_IOS || JUCE_WASM
+#include "omega.h"
 
 namespace chowdsp
 {
@@ -554,7 +557,7 @@ namespace WDF
         inline void incident (T x) noexcept override
         {
             this->port1->incident (x + (this->port2->b - this->port1->b) * port2Reflect);
-            this->port2->incident (x + (this->port2->b - this->port1->b) * -port1Reflect);
+            this->port2->incident (x + (this->port2->b - this->port1->b) * ((T) 0 -port1Reflect));
             this->a = x;
         }
 
@@ -796,6 +799,17 @@ namespace WDF
         return (T (0) < val) - (val < T (0));
     }
 
+#if USING_JUCE
+    /** Signum function to determine the sign of the input. */
+    template <typename T>
+    inline juce::dsp::SIMDRegister<T> signumSIMD (juce::dsp::SIMDRegister<T> val)
+    {
+        auto positive = juce::dsp::SIMDRegister<T> ((T) 1) & juce::dsp::SIMDRegister<T>::lessThan (juce::dsp::SIMDRegister<T> ((T) 0), val);
+        auto negative = juce::dsp::SIMDRegister<T> ((T) 1) & juce::dsp::SIMDRegister<T>::lessThan (val, juce::dsp::SIMDRegister<T> ((T) 0));
+        return positive - negative;
+    }
+#endif
+
     /** WDF diode pair (non-adaptable)
  * See Werner et al., "An Improved and Generalized Diode Clipper Model for Wave Digital Filters"
  * https://www.researchgate.net/publication/299514713_An_Improved_and_Generalized_Diode_Clipper_Model_for_Wave_Digital_Filters
@@ -827,13 +841,35 @@ namespace WDF
         /** Propogates a reflected wave from a WDF diode pair. */
         inline T reflected() noexcept override
         {
+            return reflectedInternal();
+        }
+
+    private:
+        /** Implementation for float/double. */
+        template <typename C = T>
+        inline typename std::enable_if<std::is_same<float, C>::value || std::is_same<double, C>::value, C>::type
+        reflectedInternal() noexcept
+        {
             // See eqn (18) from reference paper
             T lambda = (T) signum (this->a);
             this->b = this->a + (T) 2 * lambda * (this->next->R * Is - Vt * Omega::omega4 (std::log (this->next->R * Is / Vt) + (lambda * this->a + this->next->R * Is) / Vt));
             return this->a;
         }
 
-    private:
+#if USING_JUCE
+        /** Implementation for SIMD float/double. */
+        template <typename C = T>
+        inline typename std::enable_if<std::is_same<juce::dsp::SIMDRegister<float>, C>::value
+                                    || std::is_same<juce::dsp::SIMDRegister<double>, C>::value, C>::type
+        reflectedInternal() noexcept
+        {
+            // See eqn (18) from reference paper
+            T lambda = signumSIMD (this->a);
+            this->b = this->a + (T) 2 * lambda * (this->next->R * Is - Vt * Omega::omega4 (SIMDUtils::logSIMD (this->next->R * Is / Vt) + (lambda * this->a + this->next->R * Is) / Vt));
+            return this->a;
+        }
+#endif
+
         const T Is; // reverse saturation current
         const T Vt; // thermal voltage
     };
@@ -869,12 +905,33 @@ namespace WDF
         /** Propogates a reflected wave from a WDF diode. */
         inline T reflected() noexcept override
         {
-            // See eqn (10) from reference paper
-            this->b = this->a + (T) 2 * this->next->R * Is - 2 * Vt * Omega::omega4 (std::log (this->next->R * Is / Vt) + (this->a + this->next->R * Is) / Vt);
-            return this->b;
+            return reflectedInternal();
         }
 
     private:
+        /** Implementation for float/double. */
+        template <typename C = T>
+        inline typename std::enable_if<std::is_same<float, C>::value || std::is_same<double, C>::value, C>::type
+        reflectedInternal() noexcept
+        {
+            // See eqn (10) from reference paper
+            this->b = this->a + (T) 2 * this->next->R * Is - (T) 2 * Vt * Omega::omega4 (std::log (this->next->R * Is / Vt) + (this->a + this->next->R * Is) / Vt);
+            return this->b;
+        }
+
+#if USING_JUCE
+        /** Implementation for SIMD float/double. */
+        template <typename C = T>
+        inline typename std::enable_if<std::is_same<juce::dsp::SIMDRegister<float>, C>::value
+                                    || std::is_same<juce::dsp::SIMDRegister<double>, C>::value, C>::type
+        reflectedInternal() noexcept
+        {
+            // See eqn (10) from reference paper
+            this->b = this->a + (T) 2 * this->next->R * Is - (T) 2 * Vt * Omega::omega4 (logSIMD (this->next->R * Is / Vt) + (this->a + this->next->R * Is) / Vt);
+            return this->b;
+        }
+#endif
+
         const T Is; // reverse saturation current
         const T Vt; // thermal voltage
     };
@@ -882,5 +939,7 @@ namespace WDF
 } // namespace WDF
 
 } // namespace chowdsp
+
+#undef USING_JUCE
 
 #endif // WDF_H_INCLUDED
