@@ -8,9 +8,13 @@ constexpr double fc = 500.0;
 constexpr float error = 0.1f;
 } // namespace
 
+using namespace chowdsp::WDF;
+
 /** Unit tests for chowdsp WDF classes. Includes test for:
  *   - Voltage divider circuit
  *   - RC Lowpass filter circuit
+ * 
+ *  @TODO: SIMD test, test w/ templated adaptors
  */
 class WDFTest : public UnitTest
 {
@@ -19,35 +23,38 @@ public:
 
     void voltageDiviverTest()
     {
-        chowdsp::WDF::Resistor r1 (10000.0);
-        chowdsp::WDF::Resistor r2 (10000.0);
-        chowdsp::WDF::IdealVoltageSource vs;
+        using FloatType = float;
 
-        chowdsp::WDF::WDFSeries s1 (&r1, &r2);
-        chowdsp::WDF::PolarityInverter p1 (&s1);
+        Resistor<FloatType> r1 ((FloatType) 10000.0);
+        Resistor<FloatType> r2 ((FloatType) 10000.0);
+        IdealVoltageSource<FloatType> vs;
+
+        WDFSeries<FloatType> s1 (&r1, &r2);
+        PolarityInverter<FloatType> p1 (&s1);
         vs.connectToNode (&p1);
 
-        vs.setVoltage (10.0f);
+        vs.setVoltage ((FloatType) 10.0f);
         vs.incident (p1.reflected());
         p1.incident (vs.reflected());
 
         auto vOut = r2.voltage();
 
-        expectEquals (vOut, 5.0, "Voltage divider: incorrect voltage!");
+        expectEquals (vOut, (FloatType) 5.0, "Voltage divider: incorrect voltage!");
     }
 
     void rcLowpassTest()
     {
-        constexpr double capValue = 1.0e-6;
-        constexpr double resValue = 1.0 / (MathConstants<double>::twoPi * fc * capValue);
+        using FloatType = double;
+        constexpr auto capValue = (FloatType) 1.0e-6;
+        constexpr auto resValue = (FloatType) 1.0 / (MathConstants<FloatType>::twoPi * (FloatType) fc * capValue);
 
-        chowdsp::WDF::Capacitor c1 (capValue, fs);
-        chowdsp::WDF::Resistor r1 (resValue);
+        Capacitor<FloatType> c1 (capValue, (FloatType) fs);
+        Resistor<FloatType> r1 (resValue);
 
-        chowdsp::WDF::WDFSeries s1 (&r1, &c1);
-        chowdsp::WDF::PolarityInverter p1 (&s1);
+        WDFSeries<FloatType> s1 (&r1, &c1);
+        PolarityInverter<FloatType> p1 (&s1);
 
-        chowdsp::WDF::IdealVoltageSource vs;
+        IdealVoltageSource<FloatType> vs;
         vs.connectToNode (&p1);
 
         auto processBuffer = [&] (float* buffer, const int numSamples) {

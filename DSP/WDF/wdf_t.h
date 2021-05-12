@@ -10,12 +10,12 @@ namespace chowdsp
 namespace WDF
 {
     /** WDF 3-port parallel adaptor */
-    template <typename Port1Type, typename Port2Type>
-    class WDFParallelT : public WDFNode
+    template <typename T, typename Port1Type, typename Port2Type>
+    class WDFParallelT : public WDFNode<T>
     {
     public:
         /** Creates a new WDF parallel adaptor from two connected ports. */
-        WDFParallelT (Port1Type& p1, Port2Type& p2) : chowdsp::WDF::WDFNode ("Parallel"),
+        WDFParallelT (Port1Type& p1, Port2Type& p2) : chowdsp::WDF::WDFNode<T> ("Parallel"),
                                                       port1 (p1),
                                                       port2 (p2)
         {
@@ -32,42 +32,42 @@ namespace WDF
      */
         inline void calcImpedance() override
         {
-            G = port1.G + port2.G;
-            R = 1.0 / G;
-            port1Reflect = port1.G / G;
-            port2Reflect = port2.G / G;
+            this->G = port1.G + port2.G;
+            this->R = 1.0 / this->G;
+            port1Reflect = port1.G / this->G;
+            port2Reflect = port2.G / this->G;
         }
 
         /** Accepts an incident wave into a WDF parallel adaptor. */
-        inline void incident (double x) noexcept override
+        inline void incident (T x) noexcept override
         {
             port1.incident (x + (port2.b - port1.b) * port2Reflect);
             port2.incident (x + (port2.b - port1.b) * -port1Reflect);
-            a = x;
+            this->a = x;
         }
 
         /** Propogates a reflected wave from a WDF parallel adaptor. */
-        inline double reflected() noexcept override
+        inline T reflected() noexcept override
         {
-            b = port1Reflect * port1.reflected() + port2Reflect * port2.reflected();
-            return b;
+            this->b = port1Reflect * port1.reflected() + port2Reflect * port2.reflected();
+            return this->b;
         }
 
         Port1Type& port1;
         Port2Type& port2;
 
     private:
-        double port1Reflect = 1.0;
-        double port2Reflect = 1.0;
+        T port1Reflect = (T) 1.0;
+        T port2Reflect = (T) 1.0;
     };
 
     /** WDF 3-port series adaptor */
-    template <typename Port1Type, typename Port2Type>
-    class WDFSeriesT : public WDFNode
+    template <typename T, typename Port1Type, typename Port2Type>
+    class WDFSeriesT : public WDFNode<T>
     {
     public:
         /** Creates a new WDF series adaptor from two connected ports. */
-        WDFSeriesT (Port1Type& p1, Port2Type& p2) : WDFNode ("Series"),
+        WDFSeriesT (Port1Type& p1, Port2Type& p2) : WDFNode<T> ("Series"),
                                                     port1 (p1),
                                                     port2 (p2)
         {
@@ -82,43 +82,43 @@ namespace WDF
      */
         inline void calcImpedance() override
         {
-            R = port1.R + port2.R;
-            G = 1.0 / R;
-            port1Reflect = port1.R / R;
-            port2Reflect = port2.R / R;
+            this->R = port1.R + port2.R;
+            this->G = 1.0 / this->R;
+            port1Reflect = port1.R / this->R;
+            port2Reflect = port2.R / this->R;
         }
 
         /** Accepts an incident wave into a WDF series adaptor. */
-        inline void incident (double x) noexcept override
+        inline void incident (T x) noexcept override
         {
             port1.incident (port1.b - port1Reflect * (x + port1.b + port2.b));
             port2.incident (port2.b - port2Reflect * (x + port1.b + port2.b));
 
-            a = x;
+            this->a = x;
         }
 
         /** Propogates a reflected wave from a WDF series adaptor. */
-        inline double reflected() noexcept override
+        inline T reflected() noexcept override
         {
-            b = -(port1.reflected() + port2.reflected());
-            return b;
+            this->b = -(port1.reflected() + port2.reflected());
+            return this->b;
         }
 
         Port1Type& port1;
         Port2Type& port2;
 
     private:
-        double port1Reflect = 1.0;
-        double port2Reflect = 1.0;
+        T port1Reflect = (T) 1.0;
+        T port2Reflect = (T) 1.0;
     };
 
     /** WDF Voltage Polarity Inverter */
-    template <typename PortType>
-    class PolarityInverterT : public WDFNode
+    template <typename T, typename PortType>
+    class PolarityInverterT : public WDFNode<T>
     {
     public:
         /** Creates a new WDF polarity inverter */
-        PolarityInverterT (PortType& p) : WDFNode ("Polarity Inverter"),
+        PolarityInverterT (PortType& p) : WDFNode<T> ("Polarity Inverter"),
                                           port1 (p)
         {
             port1.connectToNode (this);
@@ -131,22 +131,22 @@ namespace WDF
      */
         inline void calcImpedance() override
         {
-            R = port1.R;
-            G = 1.0 / R;
+            this->R = port1.R;
+            this->G = 1.0 / this->R;
         }
 
         /** Accepts an incident wave into a WDF inverter. */
-        inline void incident (double x) noexcept override
+        inline void incident (T x) noexcept override
         {
-            a = x;
+            this->a = x;
             port1.incident (-x);
         }
 
         /** Propogates a reflected wave from a WDF inverter. */
-        inline double reflected() noexcept override
+        inline T reflected() noexcept override
         {
-            b = -port1.reflected();
-            return b;
+            this->b = -port1.reflected();
+            return this->b;
         }
 
     private:
