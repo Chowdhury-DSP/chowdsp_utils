@@ -34,9 +34,9 @@ public:
         constexpr int N = 100000;
         for (int i = 0; i < N; ++i)
         {
-            dsp::SIMDRegister<T> p;
-            dsp::SIMDRegister<T> cp;
-            dsp::SIMDRegister<T> sp;
+            dsp::SIMDRegister<T> p ((T) 0);
+            dsp::SIMDRegister<T> cp ((T) 0);
+            dsp::SIMDRegister<T> sp ((T) 0);
             for (size_t j = 0; j < dsp::SIMDRegister<T>::size(); ++j)
             {
                 auto val = MathConstants<T>::twoPi * (T) getRandom().nextFloat() - MathConstants<T>::pi;
@@ -64,6 +64,28 @@ public:
         squareDev = std::sqrt (squareDev) / (T) N;
         expect (maxDev < (T) 1e-4, "Max error is too large!");
         expect (squareDev < (T) 1e-6, "Mean squared error is too large!");
+    }
+
+    template <typename T>
+    void testLoadUnaligned()
+    {
+        constexpr auto size = dsp::SIMDRegister<T>::size() + 1;
+        T testData[size];
+
+        for (size_t i = 0; i < size; ++i)
+            testData[i] = (T) i + 1;
+
+        auto reg1 = chowdsp::SIMDUtils::loadUnaligned (testData);
+        T sum1 = (T) 0;
+        for (size_t i = 0; i < size - 1; ++i)
+            sum1 += testData[i];
+        expectEquals (sum1, reg1.sum(), "Aligned data is incorrect!");
+
+        auto reg2 = chowdsp::SIMDUtils::loadUnaligned (&testData[1]);
+        T sum2 = (T) 0;
+        for (size_t i = 1; i < size; ++i)
+            sum2 += testData[i];
+        expectEquals (sum2, reg2.sum(), "Aligned data is incorrect!");
     }
 
     void runTest() override
@@ -94,6 +116,12 @@ public:
 
         beginTest ("Double SIMD sin/cos Test (way out of range)");
         testSinCosSIMD<double> (true, 100.0f);
+
+        beginTest ("Float SIMD load unaligned test");
+        testLoadUnaligned<float>();
+
+        beginTest ("Double SIMD load unaligned test");
+        testLoadUnaligned<double>();
     }
 };
 

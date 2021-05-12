@@ -13,6 +13,7 @@ target_sources(chowdsp_utils_tests PRIVATE
     dsp_tests/SineTest.cpp
     dsp_tests/PannerTest.cpp
     dsp_tests/PitchShiftTest.cpp
+    dsp_tests/ResamplerTest.cpp
     dsp_tests/WDFTest.cpp
 )
 

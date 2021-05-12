@@ -255,26 +255,9 @@ namespace DelayLineInterpolationTypes
             auto sincTableOffset = (size_t) (((T) 1 - delayFrac) * (T) M) * N * 2;
 
             auto out = juce::dsp::SIMDRegister<T> ((T) 0);
-            auto buff_reg = juce::dsp::SIMDRegister<T> ((T) 0);
             for (size_t i = 0; i < N; i += juce::dsp::SIMDRegister<T>::size())
             {
-#if defined(__SSE2__)
-                if constexpr (std::is_same<T, float>::value)
-                    buff_reg = juce::dsp::SIMDRegister<T> (_mm_loadu_ps (&buffer[(size_t) delayInt + i]));
-                else
-                    buff_reg = juce::dsp::SIMDRegister<T> (_mm_loadu_pd (&buffer[(size_t) delayInt + i]));
-#elif defined(__ARM_NEON__)
-                if constexpr (std::is_same<T, float>::value)
-                    buff_reg = juce::dsp::SIMDRegister<T> (vld1q_f32 (&buffer[(size_t) delayInt + i]));
-                else
-                {
-                    auto* regPtr = reinterpret_cast<T*> (&buff_reg.value);
-                    std::copy (&buffer[(size_t) delayInt + i], &buffer[(size_t) delayInt + i + juce::dsp::SIMDRegister<T>::size()], regPtr);
-                }
-#else
-                auto* regPtr = reinterpret_cast<T*> (&buff_reg.value);
-                std::copy (&buffer[(size_t) delayInt + i], &buffer[(size_t) delayInt + i + juce::dsp::SIMDRegister<T>::size()], regPtr);
-#endif
+                auto buff_reg = SIMDUtils::loadUnaligned (&buffer[(size_t) delayInt + i]);
                 auto sinc_reg = juce::dsp::SIMDRegister<T>::fromRawArray (&sinctable[sincTableOffset + i]);
                 out += buff_reg * sinc_reg;
             }

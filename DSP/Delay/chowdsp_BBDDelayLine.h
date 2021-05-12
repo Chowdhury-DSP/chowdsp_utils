@@ -92,20 +92,20 @@ namespace BBD
             {
                 switch (evenOn)
                 {
-                case 1:
-                    inputFilter->calcG();
-                    sum = SIMDComplexMulReal (inputFilter->Gcalc, inputFilter->x).sum();
-                    buffer[bufferPtr++] = sum;
-                    bufferPtr = (bufferPtr < STAGES) ? bufferPtr : 0;
-                    break;
+                    case 1:
+                        inputFilter->calcG();
+                        sum = SIMDComplexMulReal (inputFilter->Gcalc, inputFilter->x).sum();
+                        buffer[bufferPtr++] = sum;
+                        bufferPtr = (bufferPtr < STAGES) ? bufferPtr : 0;
+                        break;
 
-                case 0:
-                    yBBD = buffer[bufferPtr];
-                    delta = yBBD - yBBD_old;
-                    yBBD_old = yBBD;
-                    outputFilter->calcG();
-                    xOutAccum += outputFilter->Gcalc * delta;
-                    break;
+                    case 0:
+                        yBBD = buffer[bufferPtr];
+                        delta = yBBD - yBBD_old;
+                        yBBD_old = yBBD;
+                        outputFilter->calcG();
+                        xOutAccum += outputFilter->Gcalc * delta;
+                        break;
                 }
 
                 evenOn = 1 - evenOn;
@@ -131,18 +131,18 @@ namespace BBD
             {
                 switch (evenOn)
                 {
-                case 1:
-                    inputFilter->calcG();
-                    sum = SIMDComplexMulReal (inputFilter->Gcalc, inputFilter->x).sum();
-                    buffer[bufferPtr++] = sum;
-                    bufferPtr = (bufferPtr < STAGES) ? bufferPtr : 0;
-                
-                case 0:
-                    yBBD = buffer[bufferPtr];
-                    delta = yBBD - yBBD_old;
-                    yBBD_old = yBBD;
-                    outputFilter->calcG();
-                    xOutAccum += outputFilter->Gcalc * delta;
+                    case 1:
+                        inputFilter->calcG();
+                        sum = SIMDComplexMulReal (inputFilter->Gcalc, inputFilter->x).sum();
+                        buffer[bufferPtr++] = sum;
+                        bufferPtr = (bufferPtr < STAGES) ? bufferPtr : 0;
+
+                    case 0:
+                        yBBD = buffer[bufferPtr];
+                        delta = yBBD - yBBD_old;
+                        yBBD_old = yBBD;
+                        outputFilter->calcG();
+                        xOutAccum += outputFilter->Gcalc * delta;
                 }
 
                 evenOn = 1 - evenOn;

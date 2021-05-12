@@ -28,6 +28,13 @@
 #define CHOWDSP_USE_FOLEYS_CLASSES 1
 #endif
 
+/** Config: FOLEYS_SHOW_GUI_EDITOR_PALLETTE
+            Enables the GUI editor palette allowing to edit the GUI. Ideally set this to 0 in a release build.
+  */
+#ifndef CHOWDSP_USE_LIBSAMPLERATE
+#define CHOWDSP_USE_LIBSAMPLERATE 0
+#endif
+
 #if CHOWDSP_USE_FOLEYS_CLASSES
 #include <juce_core/juce_core.h>
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wunused-function") // GCC doesn't like Foley's static functions
@@ -44,6 +51,10 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 #include <juce_audio_formats/juce_audio_formats.h>
 #include <juce_audio_utils/juce_audio_utils.h>
 #include <juce_dsp/juce_dsp.h>
+#endif
+
+#if CHOWDSP_USE_LIBSAMPLERATE
+#include <samplerate.h>
 #endif
 
 // Plugin utils
