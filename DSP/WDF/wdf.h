@@ -1,9 +1,12 @@
 #ifndef WDF_H_INCLUDED
 #define WDF_H_INCLUDED
 
-#include "omega.h"
 #include <cmath>
 #include <string>
+
+// we want to be able to use this header without JUCE, so let's #if out JUCE-specific implementations
+#define USING_JUCE JUCE_WINDOWS || JUCE_ANDROID || JUCE_BSD || JUCE_LINUX || JUCE_MAC || JUCE_IOS || JUCE_WASM
+#include "omega.h"
 
 namespace chowdsp
 {
@@ -32,7 +35,10 @@ namespace chowdsp
  */
 namespace WDF
 {
+    using namespace SIMDUtils;
+
     /** Wave digital filter base class */
+    template <typename T>
     class WDF
     {
     public:
@@ -42,7 +48,7 @@ namespace WDF
         /** Sub-classes override this function to recompute
      * the impedance of this element.
      */
-        virtual void calcImpedance() = 0;
+        virtual void calcImpedance() {}
 
         /** Sub-classes override this function to propogate
      * an impedance change to the upstream elements in
@@ -51,54 +57,63 @@ namespace WDF
         virtual void propagateImpedance() = 0;
 
         /** Sub-classes override this function to accept an incident wave. */
-        virtual void incident (double x) noexcept = 0;
+        virtual void incident (T x) noexcept = 0;
 
         /** Sub-classes override this function to propogate a reflected wave. */
-        virtual double reflected() noexcept = 0;
+        virtual T reflected() noexcept = 0;
 
         /** Probe the voltage across this circuit element. */
-        inline double voltage() const noexcept
+        inline T voltage() const noexcept
         {
-            return (a + b) / 2.0;
+            return (a + b) / (T) 2.0;
         }
 
         /**Probe the current through this circuit element. */
-        inline double current() const noexcept
+        inline T current() const noexcept
         {
-            return (a - b) / (2.0 * R);
+            return (a - b) / ((T) 2.0 * R);
         }
 
         // These classes need access to a,b
+        template <typename>
         friend class YParameter;
+
+        template <typename>
         friend class WDFParallel;
+
+        template <typename>
         friend class WDFSeries;
 
-        template <typename Port1Type, typename Port2Type>
+        template <typename, typename Port1Type, typename Port2Type>
         friend class WDFParallelT;
 
-        template <typename Port1Type, typename Port2Type>
+        template <typename, typename Port1Type, typename Port2Type>
         friend class WDFSeriesT;
 
-        double R = 1.0e-9; // impedance
-        double G = 1.0 / R; // admittance
+        JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wimplicit-float-conversion")
+        T R = (T) 1.0e-9; // impedance
+        T G = (T) 1.0 / R; // admittance
+        JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
     protected:
-        double a = 0.0; // incident wave
-        double b = 0.0; // reflected wave
+        using FloatType = T;
+        T a = (T) 0.0; // incident wave
+        T b = (T) 0.0; // reflected wave
 
     private:
         const std::string type;
     };
 
     /** WDF node base class */
-    class WDFNode : public WDF
+    template <typename T>
+    class WDFNode : public WDF<T>
     {
     public:
-        WDFNode (std::string type) : WDF (type) {}
+        WDFNode (std::string type) : WDF<T> (type) {}
         virtual ~WDFNode() {}
 
         /** Connects this WDF node to an upstream node in the WDF tree. */
-        void connectToNode (WDF* node)
+        void connectToNode (WDF<T>* node)
         {
             next = node;
         }
@@ -110,66 +125,68 @@ namespace WDF
      */
         inline void propagateImpedance() override
         {
-            calcImpedance();
+            WDF<T>::calcImpedance();
 
             if (next != nullptr)
                 next->propagateImpedance();
         }
 
     protected:
-        WDF* next = nullptr;
+        WDF<T>* next = nullptr;
     };
 
     /** WDF Resistor Node */
-    class Resistor : public WDFNode
+    template <typename T>
+    class Resistor : public WDFNode<T>
     {
     public:
         /** Creates a new WDF Resistor with a given resistance.
      * @param value: resistance in Ohms
      */
-        Resistor (double value) : WDFNode ("Resistor"),
-                                  R_value (value)
+        Resistor (T value) : WDFNode<T> ("Resistor"),
+                             R_value (value)
         {
             calcImpedance();
         }
         virtual ~Resistor() {}
 
         /** Sets the resistance value of the WDF resistor, in Ohms. */
-        void setResistanceValue (double newR)
+        void setResistanceValue (T newR)
         {
             if (newR == R_value)
                 return;
 
             R_value = newR;
-            propagateImpedance();
+            WDFNode<T>::propagateImpedance();
         }
 
         /** Computes the impedance of the WDF resistor, Z_R = R. */
         inline void calcImpedance() override
         {
-            R = R_value;
-            G = 1.0 / R;
+            this->R = R_value;
+            this->G = (T) 1.0 / this->R;
         }
 
         /** Accepts an incident wave into a WDF resistor. */
-        inline void incident (double x) noexcept override
+        inline void incident (T x) noexcept override
         {
-            a = x;
+            this->a = x;
         }
 
         /** Propogates a reflected wave from a WDF resistor. */
-        inline double reflected() noexcept override
+        inline T reflected() noexcept override
         {
-            b = 0.0;
-            return b;
+            this->b = 0.0;
+            return this->b;
         }
 
     private:
-        double R_value = 1.0e-9;
+        T R_value = (T) 1.0e-9;
     };
 
     /** WDF Capacitor Node */
-    class Capacitor : public WDFNode
+    template <typename T>
+    class Capacitor : public WDFNode<T>
     {
     public:
         /** Creates a new WDF Capacitor.
@@ -178,25 +195,25 @@ namespace WDF
      * @param alpha: alpha value to be used for the alpha transform,
      *               use 0 for Backwards Euler, use 1 for Bilinear Transform.
      */
-        Capacitor (double value, double fs, double alpha = 1.0) : WDFNode ("Capacitor"),
-                                                                  C_value (value),
-                                                                  fs (fs),
-                                                                  alpha (alpha),
-                                                                  b_coef ((1.0 - alpha) / 2.0),
-                                                                  a_coef ((1.0 + alpha) / 2.0)
+        Capacitor (T value, T fs, T alpha = 1.0) : WDFNode<T> ("Capacitor"),
+                                                   C_value (value),
+                                                   fs (fs),
+                                                   alpha (alpha),
+                                                   b_coef (((T) 1.0 - alpha) / (T) 2.0),
+                                                   a_coef (((T) 1.0 + alpha) / (T) 2.0)
         {
             calcImpedance();
         }
         virtual ~Capacitor() {}
 
         /** Sets the capacitance value of the WDF capacitor, in Farads. */
-        void setCapacitanceValue (double newC)
+        void setCapacitanceValue (T newC)
         {
             if (newC == C_value)
                 return;
 
             C_value = newC;
-            propagateImpedance();
+            WDFNode<T>::propagateImpedance();
         }
 
         /** Computes the impedance of the WDF capacitor,
@@ -206,37 +223,38 @@ namespace WDF
      */
         inline void calcImpedance() override
         {
-            R = 1.0 / ((1.0 + alpha) * C_value * fs);
-            G = 1.0 / R;
+            this->R = (T) 1.0 / (((T) 1.0 + alpha) * C_value * fs);
+            this->G = (T) 1.0 / this->R;
         }
 
         /** Accepts an incident wave into a WDF capacitor. */
-        inline void incident (double x) noexcept override
+        inline void incident (T x) noexcept override
         {
-            a = x;
-            z = a;
+            this->a = x;
+            z = this->a;
         }
 
         /** Propogates a reflected wave from a WDF capacitor. */
-        inline double reflected() noexcept override
+        inline T reflected() noexcept override
         {
-            b = b_coef * b + a_coef * z;
-            return b;
+            this->b = b_coef * this->b + a_coef * z;
+            return this->b;
         }
 
     private:
-        double C_value = 1.0e-6;
-        double z = 0.0;
+        T C_value = (T) 1.0e-6;
+        T z = (T) 0.0;
 
-        const double fs;
-        const double alpha;
+        const T fs;
+        const T alpha;
 
-        const double b_coef;
-        const double a_coef;
+        const T b_coef;
+        const T a_coef;
     };
 
     /** WDF Inductor Node */
-    class Inductor : public WDFNode
+    template <typename T>
+    class Inductor : public WDFNode<T>
     {
     public:
         /** Creates a new WDF Inductor.
@@ -245,25 +263,25 @@ namespace WDF
      * @param alpha: alpha value to be used for the alpha transform,
      *               use 0 for Backwards Euler, use 1 for Bilinear Transform.
      */
-        Inductor (double value, double fs, double alpha = 1.0) : WDFNode ("Inductor"),
-                                                                 L_value (value),
-                                                                 fs (fs),
-                                                                 alpha (alpha),
-                                                                 b_coef ((1.0 - alpha) / 2.0),
-                                                                 a_coef ((1.0 + alpha) / 2.0)
+        Inductor (T value, T fs, T alpha = 1.0) : WDFNode<T> ("Inductor"),
+                                                  L_value (value),
+                                                  fs (fs),
+                                                  alpha (alpha),
+                                                  b_coef (((T) 1.0 - alpha) / (T) 2.0),
+                                                  a_coef (((T) 1.0 + alpha) / (T) 2.0)
         {
             calcImpedance();
         }
         virtual ~Inductor() {}
 
         /** Sets the inductance value of the WDF capacitor, in Henries. */
-        void setInductanceValue (double newL)
+        void setInductanceValue (T newL)
         {
             if (newL == L_value)
                 return;
 
             L_value = newL;
-            propagateImpedance();
+            WDFNode<T>::propagateImpedance();
         }
 
         /** Computes the impedance of the WDF capacitor,
@@ -271,40 +289,41 @@ namespace WDF
      */
         inline void calcImpedance() override
         {
-            R = (1.0 + alpha) * L_value * fs;
-            G = 1.0 / R;
+            this->R = ((T) 1.0 + alpha) * L_value * fs;
+            this->G = (T) 1.0 / this->R;
         }
 
         /** Accepts an incident wave into a WDF inductor. */
-        inline void incident (double x) noexcept override
+        inline void incident (T x) noexcept override
         {
-            a = x;
-            z = a;
+            this->a = x;
+            z = this->a;
         }
 
         /** Propogates a reflected wave from a WDF inductor. */
-        inline double reflected() noexcept override
+        inline T reflected() noexcept override
         {
-            b = b_coef * b - a_coef * z;
-            return b;
+            this->b = b_coef * this->b - a_coef * z;
+            return this->b;
         }
 
     private:
-        double L_value = 1.0e-6;
-        double z = 0.0;
+        T L_value = (T) 1.0e-6;
+        T z = (T) 0.0;
 
-        const double fs;
-        const double alpha;
+        const T fs;
+        const T alpha;
 
-        const double b_coef;
-        const double a_coef;
+        const T b_coef;
+        const T a_coef;
     };
 
     /** WDF Switch (non-adaptable) */
-    class Switch : public WDFNode
+    template <typename T>
+    class Switch : public WDFNode<T>
     {
     public:
-        Switch() : WDFNode ("Switch")
+        Switch() : WDFNode<T> ("Switch")
         {
         }
         virtual ~Switch() {}
@@ -315,16 +334,16 @@ namespace WDF
         void setClosed (bool shouldClose) { closed = shouldClose; }
 
         /** Accepts an incident wave into a WDF switch. */
-        inline void incident (double x) noexcept override
+        inline void incident (T x) noexcept override
         {
-            a = x;
+            this->a = x;
         }
 
         /** Propogates a reflected wave from a WDF switch. */
-        inline double reflected() noexcept override
+        inline T reflected() noexcept override
         {
-            b = closed ? -a : a;
-            return b;
+            this->b = closed ? -this->a : this->a;
+            return this->b;
         }
 
     private:
@@ -332,72 +351,75 @@ namespace WDF
     };
 
     /** WDF Open circuit (non-adaptable) */
-    class Open : public WDFNode
+    template <typename T>
+    class Open : public WDFNode<T>
     {
     public:
-        Open() : WDFNode ("Open")
+        Open() : WDFNode<T> ("Open")
         {
         }
         virtual ~Open()
         {
-            R = 1.0e15;
-            G = 1.0 / R;
+            this->R = (T) 1.0e15;
+            this->G = (T) 1.0 / this->R;
         }
 
         inline void calcImpedance() override {}
 
         /** Accepts an incident wave into a WDF open. */
-        inline void incident (double x) noexcept override
+        inline void incident (T x) noexcept override
         {
-            a = x;
+            this->a = x;
         }
 
         /** Propogates a reflected wave from a WDF open. */
-        inline double reflected() noexcept override
+        inline T reflected() noexcept override
         {
-            b = a;
-            return b;
+            this->b = this->a;
+            return this->b;
         }
     };
 
     /** WDF Short circuit (non-adaptable) */
-    class Short : public WDFNode
+    template <typename T>
+    class Short : public WDFNode<T>
     {
     public:
-        Short() : WDFNode ("Short")
+        Short() : WDFNode<T> ("Short")
         {
         }
         virtual ~Short()
         {
-            R = 1.0e-15;
-            G = 1.0 / R;
+            this->R = (T) 1.0e-15;
+            this->G = (T) 1.0 / this->R;
         }
 
         inline void calcImpedance() override {}
 
         /** Accepts an incident wave into a WDF short. */
-        inline void incident (double x) noexcept override
+        inline void incident (T x) noexcept override
         {
-            a = x;
+            this->a = x;
         }
 
         /** Propogates a reflected wave from a WDF short. */
-        inline double reflected() noexcept override
+        inline T reflected() noexcept override
         {
-            b = -a;
-            return b;
+            this->b = -this->a;
+            return this->b;
         }
     };
 
     /** WDF Voltage Polarity Inverter */
-    class PolarityInverter : public WDFNode
+    template <typename T>
+    class PolarityInverter : public WDFNode<T>
     {
     public:
         /** Creates a new WDF polarity inverter
      * @param port1: the port to connect to the inverter
      */
-        PolarityInverter (WDFNode* port1) : WDFNode ("Polarity Inverter"),
-                                            port1 (port1)
+        PolarityInverter (WDFNode<T>* port1) : WDFNode<T> ("Polarity Inverter"),
+                                               port1 (port1)
         {
             port1->connectToNode (this);
             calcImpedance();
@@ -409,34 +431,35 @@ namespace WDF
      */
         inline void calcImpedance() override
         {
-            R = port1->R;
-            G = 1.0 / R;
+            this->R = port1->R;
+            this->G = (T) 1.0 / this->R;
         }
 
         /** Accepts an incident wave into a WDF inverter. */
-        inline void incident (double x) noexcept override
+        inline void incident (T x) noexcept override
         {
-            a = x;
-            port1->incident (-x);
+            this->a = x;
+            port1->incident ((T) 0 - x);
         }
 
         /** Propogates a reflected wave from a WDF inverter. */
-        inline double reflected() noexcept override
+        inline T reflected() noexcept override
         {
-            b = -port1->reflected();
-            return b;
+            this->b = (T) 0 - port1->reflected();
+            return this->b;
         }
 
     private:
-        WDFNode* port1 = nullptr;
+        WDFNode<T>* port1 = nullptr;
     };
 
     /** WDF y-parameter 2-port (short circuit admittance) */
-    class YParameter : public WDFNode
+    template <typename T>
+    class YParameter : public WDFNode<T>
     {
     public:
-        YParameter (WDFNode* port1, double y11, double y12, double y21, double y22) : WDFNode ("YParameter"),
-                                                                                      port1 (port1)
+        YParameter (WDFNode<T>* port1, T y11, T y12, T y21, T y22) : WDFNode<T> ("YParameter"),
+                                                                     port1 (port1)
         {
             y[0][0] = y11;
             y[0][1] = y12;
@@ -452,47 +475,48 @@ namespace WDF
         inline void calcImpedance() override
         {
             denominator = y[1][1] + port1->R * y[0][0] * y[1][1] - port1->R * y[0][1] * y[1][0];
-            R = (port1->R * y[0][0] + 1.0) / denominator;
-            G = 1.0 / R;
+            this->R = (port1->R * y[0][0] + (T) 1.0) / denominator;
+            this->G = (T) 1.0 / this->R;
 
-            double rSq = port1->R * port1->R;
-            double num1A = -y[1][1] * rSq * y[0][0] * y[0][0];
-            double num2A = y[0][1] * y[1][0] * rSq * y[0][0];
+            T rSq = port1->R * port1->R;
+            T num1A = -y[1][1] * rSq * y[0][0] * y[0][0];
+            T num2A = y[0][1] * y[1][0] * rSq * y[0][0];
 
-            A = (num1A + num2A + y[1][1]) / (denominator * (port1->R * y[0][0] + 1.0));
-            B = -port1->R * y[0][1] / (port1->R * y[0][0] + 1.0);
+            A = (num1A + num2A + y[1][1]) / (denominator * (port1->R * y[0][0] + (T) 1.0));
+            B = -port1->R * y[0][1] / (port1->R * y[0][0] + (T) 1.0);
             C = -y[1][0] / denominator;
         }
 
-        inline void incident (double x) noexcept override
+        inline void incident (T x) noexcept override
         {
-            a = x;
+            this->a = x;
             port1->incident (A * port1->b + B * x);
         }
 
-        inline double reflected() noexcept override
+        inline T reflected() noexcept override
         {
-            b = C * port1->reflected();
-            return b;
+            this->b = C * port1->reflected();
+            return this->b;
         }
 
     private:
-        WDFNode* port1;
-        double y[2][2] = { { 0.0, 0.0 }, { 0.0, 0.0 } };
+        WDFNode<T>* port1;
+        T y[2][2] = { { (T) 0.0, (T) 0.0 }, { (T) 0.0, (T) 0.0 } };
 
-        double denominator = 1.0;
-        double A = 1.0f;
-        double B = 1.0f;
-        double C = 1.0f;
+        T denominator = (T) 1.0;
+        T A = (T) 1.0;
+        T B = (T) 1.0;
+        T C = (T) 1.0;
     };
 
     /** WDF 3-port adapter base class */
-    class WDFAdaptor : public WDFNode
+    template <typename T>
+    class WDFAdaptor : public WDFNode<T>
     {
     public:
-        WDFAdaptor (WDFNode* port1, WDFNode* port2, std::string type) : WDFNode (type),
-                                                                        port1 (port1),
-                                                                        port2 (port2)
+        WDFAdaptor (WDFNode<T>* port1, WDFNode<T>* port2, std::string type) : WDFNode<T> (type),
+                                                                              port1 (port1),
+                                                                              port2 (port2)
         {
             port1->connectToNode (this);
             port2->connectToNode (this);
@@ -500,16 +524,17 @@ namespace WDF
         virtual ~WDFAdaptor() {}
 
     protected:
-        WDFNode* port1 = nullptr;
-        WDFNode* port2 = nullptr;
+        WDFNode<T>* port1 = nullptr;
+        WDFNode<T>* port2 = nullptr;
     };
 
     /** WDF 3-port parallel adaptor */
-    class WDFParallel : public WDFAdaptor
+    template <typename T>
+    class WDFParallel : public WDFAdaptor<T>
     {
     public:
         /** Creates a new WDF parallel adaptor from two connected ports. */
-        WDFParallel (WDFNode* port1, WDFNode* port2) : WDFAdaptor (port1, port2, "Parallel")
+        WDFParallel (WDFNode<T>* port1, WDFNode<T>* port2) : WDFAdaptor<T> (port1, port2, "Parallel")
         {
             calcImpedance();
         }
@@ -522,38 +547,39 @@ namespace WDF
      */
         inline void calcImpedance() override
         {
-            G = port1->G + port2->G;
-            R = 1.0 / G;
-            port1Reflect = port1->G / G;
-            port2Reflect = port2->G / G;
+            this->G = this->port1->G + this->port2->G;
+            this->R = (T) 1.0 / this->G;
+            port1Reflect = this->port1->G / this->G;
+            port2Reflect = this->port2->G / this->G;
         }
 
         /** Accepts an incident wave into a WDF parallel adaptor. */
-        inline void incident (double x) noexcept override
+        inline void incident (T x) noexcept override
         {
-            port1->incident (x + (port2->b - port1->b) * port2Reflect);
-            port2->incident (x + (port2->b - port1->b) * -port1Reflect);
-            a = x;
+            this->port1->incident (x + (this->port2->b - this->port1->b) * port2Reflect);
+            this->port2->incident (x + (this->port2->b - this->port1->b) * ((T) 0 -port1Reflect));
+            this->a = x;
         }
 
         /** Propogates a reflected wave from a WDF parallel adaptor. */
-        inline double reflected() noexcept override
+        inline T reflected() noexcept override
         {
-            b = port1Reflect * port1->reflected() + port2Reflect * port2->reflected();
-            return b;
+            this->b = port1Reflect * this->port1->reflected() + port2Reflect * this->port2->reflected();
+            return this->b;
         }
 
     private:
-        double port1Reflect = 1.0;
-        double port2Reflect = 1.0;
+        T port1Reflect = (T) 1.0;
+        T port2Reflect = (T) 1.0;
     };
 
     /** WDF 3-port series adaptor */
-    class WDFSeries : public WDFAdaptor
+    template <typename T>
+    class WDFSeries : public WDFAdaptor<T>
     {
     public:
         /** Creates a new WDF series adaptor from two connected ports. */
-        WDFSeries (WDFNode* port1, WDFNode* port2) : WDFAdaptor (port1, port2, "Series")
+        WDFSeries (WDFNode<T>* port1, WDFNode<T>* port2) : WDFAdaptor<T> (port1, port2, "Series")
         {
             calcImpedance();
         }
@@ -564,55 +590,55 @@ namespace WDF
      */
         inline void calcImpedance() override
         {
-            R = port1->R + port2->R;
-            G = 1.0 / R;
-            port1Reflect = port1->R / R;
-            port2Reflect = port2->R / R;
+            this->R = this->port1->R + this->port2->R;
+            this->G = (T) 1.0 / this->R;
+            port1Reflect = this->port1->R / this->R;
+            port2Reflect = this->port2->R / this->R;
         }
 
         /** Accepts an incident wave into a WDF series adaptor. */
-        inline void incident (double x) noexcept override
+        inline void incident (T x) noexcept override
         {
-            port1->incident (port1->b - port1Reflect * (x + port1->b + port2->b));
-            port2->incident (port2->b - port2Reflect * (x + port1->b + port2->b));
-
-            a = x;
+            this->port1->incident (this->port1->b - port1Reflect * (x + this->port1->b + this->port2->b));
+            this->port2->incident (this->port2->b - port2Reflect * (x + this->port1->b + this->port2->b));
+            this->a = x;
         }
 
         /** Propogates a reflected wave from a WDF series adaptor. */
-        inline double reflected() noexcept override
+        inline T reflected() noexcept override
         {
-            b = -(port1->reflected() + port2->reflected());
-            return b;
+            this->b = (T) 0 - (this->port1->reflected() + this->port2->reflected());
+            return this->b;
         }
 
     private:
-        double port1Reflect = 1.0;
-        double port2Reflect = 1.0;
+        T port1Reflect = (T) 1.0;
+        T port2Reflect = (T) 1.0;
     };
 
     /** WDF Voltage source with series resistance */
-    class ResistiveVoltageSource : public WDFNode
+    template <typename T>
+    class ResistiveVoltageSource : public WDFNode<T>
     {
     public:
         /** Creates a new resistive voltage source.
      * @param value: initial resistance value, in Ohms
      */
-        ResistiveVoltageSource (double value = 1.0e-9) : WDFNode ("Resistive Voltage"),
-                                                         R_value (value)
+        ResistiveVoltageSource (T value = 1.0e-9) : WDFNode<T> ("Resistive Voltage"),
+                                                    R_value (value)
         {
             calcImpedance();
         }
         virtual ~ResistiveVoltageSource() {}
 
         /** Sets the resistance value of the series resistor, in Ohms. */
-        void setResistanceValue (double newR)
+        void setResistanceValue (T newR)
         {
             if (newR == R_value)
                 return;
 
             R_value = newR;
-            propagateImpedance();
+            WDFNode<T>::propagateImpedance();
         }
 
         /** Computes the impedance for a WDF resistive voltage souce
@@ -620,36 +646,37 @@ namespace WDF
      */
         inline void calcImpedance() override
         {
-            R = R_value;
-            G = 1.0 / R;
+            this->R = R_value;
+            this->G = (T) 1.0 / this->R;
         }
 
         /** Sets the voltage of the voltage source, in Volts */
-        void setVoltage (double newV) { Vs = newV; }
+        void setVoltage (T newV) { Vs = newV; }
 
         /** Accepts an incident wave into a WDF resistive voltage source. */
-        inline void incident (double x) noexcept override
+        inline void incident (T x) noexcept override
         {
-            a = x;
+            this->a = x;
         }
 
         /** Propogates a reflected wave from a WDF resistive voltage source. */
-        inline double reflected() noexcept override
+        inline T reflected() noexcept override
         {
-            b = Vs;
-            return b;
+            this->b = Vs;
+            return this->b;
         }
 
     private:
-        double Vs = 0.0;
-        double R_value = 1.0e-9;
+        T Vs = (T) 0.0;
+        T R_value = (T) 1.0e-9;
     };
 
     /** WDF Ideal Voltage source (non-adaptable) */
-    class IdealVoltageSource : public WDFNode
+    template <typename T>
+    class IdealVoltageSource : public WDFNode<T>
     {
     public:
-        IdealVoltageSource() : WDFNode ("IdealVoltage")
+        IdealVoltageSource() : WDFNode<T> ("IdealVoltage")
         {
             calcImpedance();
         }
@@ -658,47 +685,48 @@ namespace WDF
         inline void calcImpedance() override {}
 
         /** Sets the voltage of the voltage source, in Volts */
-        void setVoltage (double newV) { Vs = newV; }
+        void setVoltage (T newV) { Vs = newV; }
 
         /** Accepts an incident wave into a WDF ideal voltage source. */
-        inline void incident (double x) noexcept override
+        inline void incident (T x) noexcept override
         {
-            a = x;
+            this->a = x;
         }
 
         /** Propogates a reflected wave from a WDF ideal voltage source. */
-        inline double reflected() noexcept override
+        inline T reflected() noexcept override
         {
-            b = -a + 2.0 * Vs;
-            return b;
+            this->b = (T) 0 - this->a + (T) 2.0 * Vs;
+            return this->b;
         }
 
     private:
-        double Vs = 0.0;
+        T Vs = (T) 0.0;
     };
 
     /** WDF Current source with parallel resistance */
-    class ResistiveCurrentSource : public WDFNode
+    template <typename T>
+    class ResistiveCurrentSource : public WDFNode<T>
     {
     public:
         /** Creates a new resistive current source.
      * @param value: initial resistance value, in Ohms
      */
-        ResistiveCurrentSource (double value = 1.0e9) : WDFNode ("Resistive Current"),
-                                                        R_value (value)
+        ResistiveCurrentSource (T value = 1.0e9) : WDFNode<T> ("Resistive Current"),
+                                                   R_value (value)
         {
             calcImpedance();
         }
         virtual ~ResistiveCurrentSource() {}
 
         /** Sets the resistance value of the parallel resistor, in Ohms. */
-        void setResistanceValue (double newR)
+        void setResistanceValue (T newR)
         {
             if (newR == R_value)
                 return;
 
             R_value = newR;
-            propagateImpedance();
+            WDFNode<T>::propagateImpedance();
         }
 
         /** Computes the impedance for a WDF resistive current souce
@@ -706,36 +734,37 @@ namespace WDF
      */
         inline void calcImpedance() override
         {
-            R = R_value;
-            G = 1.0 / R;
+            this->R = R_value;
+            this->G = (T) 1.0 / this->R;
         }
 
         /** Sets the current of the current source, in Amps */
-        void setCurrent (double newI) { Is = newI; }
+        void setCurrent (T newI) { Is = newI; }
 
         /** Accepts an incident wave into a WDF resistive current source. */
-        inline void incident (double x) noexcept override
+        inline void incident (T x) noexcept override
         {
-            a = x;
+            this->a = x;
         }
 
         /** Propogates a reflected wave from a WDF resistive current source. */
-        inline double reflected() noexcept override
+        inline T reflected() noexcept override
         {
-            b = 2 * R * Is;
-            return b;
+            this->b = (T) 2.0 * this->R * Is;
+            return this->b;
         }
 
     private:
-        double Is = 0.0;
-        double R_value = 1.0e9;
+        T Is = (T) 0.0;
+        T R_value = (T) 1.0e9;
     };
 
     /** WDF Current source (non-adpatable) */
-    class IdealCurrentSource : public WDFNode
+    template <typename T>
+    class IdealCurrentSource : public WDFNode<T>
     {
     public:
-        IdealCurrentSource() : WDFNode ("Ideal Current")
+        IdealCurrentSource() : WDFNode<T> ("Ideal Current")
         {
             calcImpedance();
         }
@@ -744,23 +773,23 @@ namespace WDF
         inline void calcImpedance() override {}
 
         /** Sets the current of the current source, in Amps */
-        void setCurrent (double newI) { Is = newI; }
+        void setCurrent (T newI) { Is = newI; }
 
         /** Accepts an incident wave into a WDF ideal current source. */
-        inline void incident (double x) noexcept override
+        inline void incident (T x) noexcept override
         {
-            a = x;
+            this->a = x;
         }
 
         /** Propogates a reflected wave from a WDF ideal current source. */
-        inline double reflected() noexcept override
+        inline T reflected() noexcept override
         {
-            b = 2 * next->R * Is + a;
-            return b;
+            this->b = (T) 2.0 * this->next->R * Is + this->a;
+            return this->b;
         }
 
     private:
-        double Is = 0.0;
+        T Is = (T) 0.0;
     };
 
     /** Signum function to determine the sign of the input. */
@@ -770,20 +799,32 @@ namespace WDF
         return (T (0) < val) - (val < T (0));
     }
 
+#if USING_JUCE
+    /** Signum function to determine the sign of the input. */
+    template <typename T>
+    inline juce::dsp::SIMDRegister<T> signumSIMD (juce::dsp::SIMDRegister<T> val)
+    {
+        auto positive = juce::dsp::SIMDRegister<T> ((T) 1) & juce::dsp::SIMDRegister<T>::lessThan (juce::dsp::SIMDRegister<T> ((T) 0), val);
+        auto negative = juce::dsp::SIMDRegister<T> ((T) 1) & juce::dsp::SIMDRegister<T>::lessThan (val, juce::dsp::SIMDRegister<T> ((T) 0));
+        return positive - negative;
+    }
+#endif
+
     /** WDF diode pair (non-adaptable)
  * See Werner et al., "An Improved and Generalized Diode Clipper Model for Wave Digital Filters"
  * https://www.researchgate.net/publication/299514713_An_Improved_and_Generalized_Diode_Clipper_Model_for_Wave_Digital_Filters
  */
-    class DiodePair : public WDFNode
+    template <typename T>
+    class DiodePair : public WDFNode<T>
     {
     public:
         /** Creates a new WDF diode pair, with the given diode specifications.
      * @param Is: reverse saturation current
      * @param Vt: thermal voltage
      */
-        DiodePair (double Is, double Vt) : WDFNode ("DiodePair"),
-                                           Is (Is),
-                                           Vt (Vt)
+        DiodePair (T Is, T Vt) : WDFNode<T> ("DiodePair"),
+                                 Is (Is),
+                                 Vt (Vt)
         {
         }
 
@@ -792,39 +833,62 @@ namespace WDF
         inline void calcImpedance() override {}
 
         /** Accepts an incident wave into a WDF diode pair. */
-        inline void incident (double x) noexcept override
+        inline void incident (T x) noexcept override
         {
-            a = x;
+            this->a = x;
         }
 
         /** Propogates a reflected wave from a WDF diode pair. */
-        inline double reflected() noexcept override
+        inline T reflected() noexcept override
         {
-            // See eqn (18) from reference paper
-            double lambda = (double) signum (a);
-            b = a + 2 * lambda * (next->R * Is - Vt * Omega::omega4 (std::log (next->R * Is / Vt) + (lambda * a + next->R * Is) / Vt));
-            return b;
+            return reflectedInternal();
         }
 
     private:
-        const double Is; // reverse saturation current
-        const double Vt; // thermal voltage
+        /** Implementation for float/double. */
+        template <typename C = T>
+        inline typename std::enable_if<std::is_same<float, C>::value || std::is_same<double, C>::value, C>::type
+        reflectedInternal() noexcept
+        {
+            // See eqn (18) from reference paper
+            T lambda = (T) signum (this->a);
+            this->b = this->a + (T) 2 * lambda * (this->next->R * Is - Vt * Omega::omega4 (std::log (this->next->R * Is / Vt) + (lambda * this->a + this->next->R * Is) / Vt));
+            return this->a;
+        }
+
+#if USING_JUCE
+        /** Implementation for SIMD float/double. */
+        template <typename C = T>
+        inline typename std::enable_if<std::is_same<juce::dsp::SIMDRegister<float>, C>::value
+                                    || std::is_same<juce::dsp::SIMDRegister<double>, C>::value, C>::type
+        reflectedInternal() noexcept
+        {
+            // See eqn (18) from reference paper
+            T lambda = signumSIMD (this->a);
+            this->b = this->a + (T) 2 * lambda * (this->next->R * Is - Vt * Omega::omega4 (SIMDUtils::logSIMD (this->next->R * Is / Vt) + (lambda * this->a + this->next->R * Is) / Vt));
+            return this->a;
+        }
+#endif
+
+        const T Is; // reverse saturation current
+        const T Vt; // thermal voltage
     };
 
     /** WDF diode (non-adaptable)
  * See Werner et al., "An Improved and Generalized Diode Clipper Model for Wave Digital Filters"
  * https://www.researchgate.net/publication/299514713_An_Improved_and_Generalized_Diode_Clipper_Model_for_Wave_Digital_Filters
  */
-    class Diode : public WDFNode
+    template <typename T>
+    class Diode : public WDFNode<T>
     {
     public:
         /** Creates a new WDF diode, with the given diode specifications.
      * @param Is: reverse saturation current
      * @param Vt: thermal voltage
      */
-        Diode (double Is, double Vt) : WDFNode ("Diode"),
-                                       Is (Is),
-                                       Vt (Vt)
+        Diode (T Is, T Vt) : WDFNode<T> ("Diode"),
+                             Is (Is),
+                             Vt (Vt)
         {
         }
 
@@ -833,26 +897,49 @@ namespace WDF
         inline void calcImpedance() override {}
 
         /** Accepts an incident wave into a WDF diode. */
-        inline void incident (double x) noexcept override
+        inline void incident (T x) noexcept override
         {
-            a = x;
+            this->a = x;
         }
 
         /** Propogates a reflected wave from a WDF diode. */
-        inline double reflected() noexcept override
+        inline T reflected() noexcept override
         {
-            // See eqn (10) from reference paper
-            b = a + 2 * next->R * Is - 2 * Vt * Omega::omega4 (std::log (next->R * Is / Vt) + (a + next->R * Is) / Vt);
-            return b;
+            return reflectedInternal();
         }
 
     private:
-        const double Is; // reverse saturation current
-        const double Vt; // thermal voltage
+        /** Implementation for float/double. */
+        template <typename C = T>
+        inline typename std::enable_if<std::is_same<float, C>::value || std::is_same<double, C>::value, C>::type
+        reflectedInternal() noexcept
+        {
+            // See eqn (10) from reference paper
+            this->b = this->a + (T) 2 * this->next->R * Is - (T) 2 * Vt * Omega::omega4 (std::log (this->next->R * Is / Vt) + (this->a + this->next->R * Is) / Vt);
+            return this->b;
+        }
+
+#if USING_JUCE
+        /** Implementation for SIMD float/double. */
+        template <typename C = T>
+        inline typename std::enable_if<std::is_same<juce::dsp::SIMDRegister<float>, C>::value
+                                    || std::is_same<juce::dsp::SIMDRegister<double>, C>::value, C>::type
+        reflectedInternal() noexcept
+        {
+            // See eqn (10) from reference paper
+            this->b = this->a + (T) 2 * this->next->R * Is - (T) 2 * Vt * Omega::omega4 (logSIMD (this->next->R * Is / Vt) + (this->a + this->next->R * Is) / Vt);
+            return this->b;
+        }
+#endif
+
+        const T Is; // reverse saturation current
+        const T Vt; // thermal voltage
     };
 
 } // namespace WDF
 
 } // namespace chowdsp
+
+#undef USING_JUCE
 
 #endif // WDF_H_INCLUDED

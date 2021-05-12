@@ -187,6 +187,45 @@ namespace Omega
         return y - (y - exp_approx<T> (x - y)) / (y + (T) 1);
     }
 
+#if USING_JUCE
+    /** First-order approximation of the Wright Omega functions */
+    template <typename T>
+    inline juce::dsp::SIMDRegister<T> omega1 (juce::dsp::SIMDRegister<T> x)
+    {
+        return juce::dsp::SIMDRegister<T>::max (x, juce::dsp::SIMDRegister<T> (0));
+    }
+
+    /** Second-order approximation of the Wright Omega functions */
+    template <typename T>
+    inline juce::dsp::SIMDRegister<T> omega2 (juce::dsp::SIMDRegister<T> x)
+    {
+        auto y = juce::dsp::SIMDRegister<T> ((T) 0);
+        for (size_t i = 0; i < x.size(); ++i)
+            y.value[i] = omega2 (x.value[i]);
+        return y;
+    }
+
+    /** Third-order approximation of the Wright Omega functions */
+    template <typename T>
+    inline juce::dsp::SIMDRegister<T> omega3 (juce::dsp::SIMDRegister<T> x)
+    {
+        auto y = juce::dsp::SIMDRegister<T> ((T) 0);
+        for (size_t i = 0; i < x.size(); ++i)
+            y.value[i] = omega3 (x.value[i]);
+        return y;
+    }
+
+    /** Fourth-order approximation of the Wright Omega functions */
+    template <typename T>
+    inline juce::dsp::SIMDRegister<T> omega4 (juce::dsp::SIMDRegister<T> x)
+    {
+        auto y = juce::dsp::SIMDRegister<T> ((T) 0);
+        for (size_t i = 0; i < x.size(); ++i)
+            y.value[i] = omega4 (x.value[i]);
+        return y;
+    }
+#endif // USING_JUCE
+
 } // namespace Omega
 } // namespace chowdsp
 

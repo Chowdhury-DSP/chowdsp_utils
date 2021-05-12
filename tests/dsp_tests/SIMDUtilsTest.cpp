@@ -88,6 +88,54 @@ public:
         expectEquals (sum2, reg2.sum(), "Aligned data is incorrect!");
     }
 
+    template <typename FloatType>
+    void baseMathTest (int nIter, std::function<FloatType(FloatType)> floatFunc,
+        std::function<dsp::SIMDRegister<FloatType>(dsp::SIMDRegister<FloatType>)> simdFunc, String functionName)
+    {
+        for (int i = 0; i < nIter; ++i)
+        {
+            auto input = (FloatType) getRandom().nextDouble();
+            auto expected = floatFunc (input);
+            auto actual = simdFunc (dsp::SIMDRegister<FloatType> (input));
+
+            for (size_t j = 0; j < dsp::SIMDRegister<FloatType>::size(); ++j)
+                expectEquals (actual.get (j), expected, "SIMD function is incorrect: " + functionName);
+        }
+    }
+
+    template <typename FloatType>
+    void mathTest (int nIter)
+    {
+        using namespace chowdsp::SIMDUtils;
+        #define FLOATFUNC(func) [] (FloatType x) { return func (x); }
+        #define SIMDFUNC(func) [] (dsp::SIMDRegister<FloatType> x) { return func (x); }
+
+        baseMathTest<FloatType> (nIter, FLOATFUNC (std::exp), SIMDFUNC (expSIMD), "exp");
+        baseMathTest<FloatType> (nIter, FLOATFUNC (std::log), SIMDFUNC (logSIMD), "log");
+        baseMathTest<FloatType> (nIter, FLOATFUNC (std::sqrt), SIMDFUNC (sqrtSIMD), "sqrt");
+        baseMathTest<FloatType> (nIter, FLOATFUNC (std::sin), SIMDFUNC (sinSIMD), "sin");
+        baseMathTest<FloatType> (nIter, FLOATFUNC (std::cos), SIMDFUNC (cosSIMD), "cos");
+        baseMathTest<FloatType> (nIter, FLOATFUNC (std::tan), SIMDFUNC (tanSIMD), "tan");
+        baseMathTest<FloatType> (nIter, FLOATFUNC (std::sinh), SIMDFUNC (sinhSIMD), "sinh");
+        baseMathTest<FloatType> (nIter, FLOATFUNC (std::cosh), SIMDFUNC (coshSIMD), "cosh");
+        baseMathTest<FloatType> (nIter, FLOATFUNC (std::tanh), SIMDFUNC (tanhSIMD), "tanh");
+
+        #undef FLOATFUNC
+        #undef SIMDFUNC
+
+        // test std::pow (needs 2 inputs)
+        for (int i = 0; i < nIter; ++i)
+        {
+            auto a = (FloatType) getRandom().nextDouble();
+            auto b = (FloatType) getRandom().nextDouble();
+            auto expected = std::pow (a, b);
+            auto actual = chowdsp::SIMDUtils::powSIMD (dsp::SIMDRegister<FloatType> (a), dsp::SIMDRegister<FloatType> (b));
+
+            for (size_t j = 0; j < dsp::SIMDRegister<FloatType>::size(); ++j)
+                expectEquals (actual.get (j), expected, "SIMD function is incorrect: pow");
+        }
+    }
+
     void runTest() override
     {
         beginTest ("Float Divide Test");
@@ -122,6 +170,12 @@ public:
 
         beginTest ("Double SIMD load unaligned test");
         testLoadUnaligned<double>();
+
+        beginTest ("Float SIMD Math test");
+        mathTest<float> (10);
+
+        beginTest ("Double SIMD Math test");
+        mathTest<double> (10);
     }
 };
 
