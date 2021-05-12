@@ -109,7 +109,7 @@ public:
             auto S1 = std::make_unique<WDFSeries<FloatType>> (&Vs, &R1);
             auto P1 = std::make_unique<WDFParallel<FloatType>> (S1.get(), C1.get());
             auto I1 = std::make_unique<PolarityInverter<FloatType>> (P1.get());
-            
+
             DiodePair dp { (FloatType) 2.52e-9, (FloatType) 0.02585 };
             dp.connectToNode (I1.get());
 
@@ -131,7 +131,7 @@ public:
             auto S1 = makeSeries<FloatType> (Vs, R1);
             auto P1 = makeParallel<FloatType> (S1, C1);
             auto I1 = makeInverter<FloatType> (P1);
-            
+
             DiodePair dp { (FloatType) 2.52e-9, (FloatType) 0.02585 };
             dp.connectToNode (&I1);
 

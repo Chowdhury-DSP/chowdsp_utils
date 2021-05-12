@@ -153,25 +153,25 @@ namespace WDF
         PortType& port1;
     };
 
-// useful "factory" functions to you don't have to declare all the template parameters
+    // useful "factory" functions to you don't have to declare all the template parameters
 
-template <typename T, typename P1Type, typename P2Type>
-WDFParallelT<T, P1Type, P2Type> makeParallel (P1Type& p1, P2Type& p2)
-{
-    return WDFParallelT<T, P1Type, P2Type> (p1, p2);
-}
+    template <typename T, typename P1Type, typename P2Type>
+    WDFParallelT<T, P1Type, P2Type> makeParallel (P1Type& p1, P2Type& p2)
+    {
+        return WDFParallelT<T, P1Type, P2Type> (p1, p2);
+    }
 
-template <typename T, typename P1Type, typename P2Type>
-WDFSeriesT<T, P1Type, P2Type> makeSeries (P1Type& p1, P2Type& p2)
-{
-    return WDFSeriesT<T, P1Type, P2Type> (p1, p2);
-}
+    template <typename T, typename P1Type, typename P2Type>
+    WDFSeriesT<T, P1Type, P2Type> makeSeries (P1Type& p1, P2Type& p2)
+    {
+        return WDFSeriesT<T, P1Type, P2Type> (p1, p2);
+    }
 
-template <typename T, typename PType>
-PolarityInverterT<T, PType> makeInverter (PType& p1)
-{
-    return PolarityInverterT<T, PType> (p1);
-}
+    template <typename T, typename PType>
+    PolarityInverterT<T, PType> makeInverter (PType& p1)
+    {
+        return PolarityInverterT<T, PType> (p1);
+    }
 
 } // namespace WDF
 } // namespace chowdsp
