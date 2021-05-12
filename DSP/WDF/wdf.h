@@ -32,6 +32,8 @@ namespace chowdsp
  */
 namespace WDF
 {
+    using namespace SIMDUtils;
+
     /** Wave digital filter base class */
     template <typename T>
     class WDF
@@ -85,8 +87,10 @@ namespace WDF
         template <typename, typename Port1Type, typename Port2Type>
         friend class WDFSeriesT;
 
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wimplicit-float-conversion")
         T R = (T) 1.0e-9; // impedance
         T G = (T) 1.0 / R; // admittance
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
     protected:
         using FloatType = T;
@@ -432,13 +436,13 @@ namespace WDF
         inline void incident (T x) noexcept override
         {
             this->a = x;
-            port1->incident (-x);
+            port1->incident ((T) 0 - x);
         }
 
         /** Propogates a reflected wave from a WDF inverter. */
         inline T reflected() noexcept override
         {
-            this->b = -port1->reflected();
+            this->b = (T) 0 - port1->reflected();
             return this->b;
         }
 
@@ -600,7 +604,7 @@ namespace WDF
         /** Propogates a reflected wave from a WDF series adaptor. */
         inline T reflected() noexcept override
         {
-            this->b = -(this->port1->reflected() + this->port2->reflected());
+            this->b = (T) 0 - (this->port1->reflected() + this->port2->reflected());
             return this->b;
         }
 
@@ -689,7 +693,7 @@ namespace WDF
         /** Propogates a reflected wave from a WDF ideal voltage source. */
         inline T reflected() noexcept override
         {
-            this->b = -this->a + (T) 2.0 * Vs;
+            this->b = (T) 0 - this->a + (T) 2.0 * Vs;
             return this->b;
         }
 

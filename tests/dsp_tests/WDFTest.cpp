@@ -21,10 +21,9 @@ class WDFTest : public UnitTest
 public:
     WDFTest() : UnitTest ("Wave Digital Filter Test") {}
 
-    void voltageDiviverTest()
+    template <typename FloatType>
+    void voltageDividerTest()
     {
-        using FloatType = float;
-
         Resistor<FloatType> r1 ((FloatType) 10000.0);
         Resistor<FloatType> r2 ((FloatType) 10000.0);
         IdealVoltageSource<FloatType> vs;
@@ -39,7 +38,8 @@ public:
 
         auto vOut = r2.voltage();
 
-        expectEquals (vOut, (FloatType) 5.0, "Voltage divider: incorrect voltage!");
+        if (vOut != (FloatType) 5.0)
+            expect (false, "Voltage divider: incorrect voltage!");
     }
 
     void rcLowpassTest()
@@ -148,10 +148,16 @@ public:
             expectWithinAbsoluteError (data2[i], data1[i], (FloatType) 1.0e-6, "Static WDF is not equivalent to dynamic!");
     }
 
+    void simpleSIMDTest()
+    {
+
+    }
+
     void runTest() override
     {
         beginTest ("Voltage Divider Test");
-        voltageDiviverTest();
+        voltageDividerTest<float>();
+        voltageDividerTest<double>();
 
         beginTest ("RC Lowpass Test");
         rcLowpassTest();
@@ -160,7 +166,8 @@ public:
         staticWDFTest();
 
         beginTest ("SIMD WDF Test");
-        // @TODO
+        voltageDividerTest<dsp::SIMDRegister<float>>();
+        voltageDividerTest<dsp::SIMDRegister<double>>();
     }
 };
 
