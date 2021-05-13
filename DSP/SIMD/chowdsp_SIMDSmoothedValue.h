@@ -163,7 +163,7 @@ namespace SIMDUtils
         template <typename T = SmoothingType>
         MultiplicativeVoid<T> setStepSize()
         {
-            step = expSIMD ((logSIMD (VecType::abs (this->target)) - logSIMD (VecType::abs (this->currentValue))) / (VecType) this->countdown);
+            step = expSIMD ((logSIMD (VecType::abs (this->target)) - logSIMD (VecType::abs (this->currentValue))) / (VecType) (SmFloatType) this->countdown);
         }
 
         //==============================================================================

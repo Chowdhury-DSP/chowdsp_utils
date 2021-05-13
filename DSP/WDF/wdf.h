@@ -626,12 +626,14 @@ namespace WDF
         /** Creates a new resistive voltage source.
      * @param value: initial resistance value, in Ohms
      */
+        JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4305)
         ResistiveVoltageSource (T value = 1.0e-9) : WDFNode<T> ("Resistive Voltage"),
                                                     R_value (value)
         {
             calcImpedance();
         }
         virtual ~ResistiveVoltageSource() {}
+        JUCE_END_IGNORE_WARNINGS_MSVC
 
         /** Sets the resistance value of the series resistor, in Ohms. */
         void setResistanceValue (T newR)
@@ -714,12 +716,14 @@ namespace WDF
         /** Creates a new resistive current source.
      * @param value: initial resistance value, in Ohms
      */
+        JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4305)
         ResistiveCurrentSource (T value = 1.0e9) : WDFNode<T> ("Resistive Current"),
                                                    R_value (value)
         {
             calcImpedance();
         }
         virtual ~ResistiveCurrentSource() {}
+        JUCE_END_IGNORE_WARNINGS_MSVC
 
         /** Sets the resistance value of the parallel resistor, in Ohms. */
         void setResistanceValue (T newR)
