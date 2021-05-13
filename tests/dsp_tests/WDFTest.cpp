@@ -237,7 +237,7 @@ public:
         // dynamic
         {
             ResVs Vs { 1.0e-9f };
-            Resistor r162 {   4700.0f };
+            Resistor r162 { 4700.0f };
             Resistor r163 { 100000.0f };
             Diode<Vec> d53 { 2.52e-9f, 25.85e-3f }; // 1N4148 diode
 
@@ -261,7 +261,7 @@ public:
         // static
         {
             ResVs Vs { 1.0e-9f };
-            Resistor r162 {   4700.0f };
+            Resistor r162 { 4700.0f };
             Resistor r163 { 100000.0f };
             Capacitor c40 { (FloatType) 0.015e-6f, (FloatType) fs, (FloatType) 0.029f };
             Diode<Vec> d53 { 2.52e-9f, 25.85e-3f }; // 1N4148 diode
