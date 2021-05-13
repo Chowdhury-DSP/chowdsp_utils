@@ -125,7 +125,7 @@ namespace WDF
      */
         inline void propagateImpedance() override
         {
-            WDF<T>::calcImpedance();
+            this->calcImpedance();
 
             if (next != nullptr)
                 next->propagateImpedance();

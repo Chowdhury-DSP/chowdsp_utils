@@ -42,7 +42,7 @@ namespace WDF
         inline void incident (T x) noexcept override
         {
             port1.incident (x + (port2.b - port1.b) * port2Reflect);
-            port2.incident (x + (port2.b - port1.b) * -port1Reflect);
+            port2.incident (x + (port2.b - port1.b) * ((T) 0 - port1Reflect));
             this->a = x;
         }
 
@@ -100,7 +100,7 @@ namespace WDF
         /** Propogates a reflected wave from a WDF series adaptor. */
         inline T reflected() noexcept override
         {
-            this->b = -(port1.reflected() + port2.reflected());
+            this->b = (T) 0 - (port1.reflected() + port2.reflected());
             return this->b;
         }
 
@@ -139,13 +139,13 @@ namespace WDF
         inline void incident (T x) noexcept override
         {
             this->a = x;
-            port1.incident (-x);
+            port1.incident ((T) 0 - x);
         }
 
         /** Propogates a reflected wave from a WDF inverter. */
         inline T reflected() noexcept override
         {
-            this->b = -port1.reflected();
+            this->b = (T) 0 - port1.reflected();
             return this->b;
         }
 
