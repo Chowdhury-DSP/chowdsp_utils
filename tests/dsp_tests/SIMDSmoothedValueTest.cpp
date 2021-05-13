@@ -12,7 +12,8 @@ public:
 
     CommonSmoothedValueTests()
         : UnitTest ("Common Smoothed Value Tests: " + String (std::is_same<FloatType, float>::value ? "Float" : "Double"))
-    {}
+    {
+    }
 
     void runTest() override
     {
@@ -51,7 +52,7 @@ public:
             sv.reset (5);
 
             expectEquals (sv.getCurrentValue().get (0), targetValue);
-            expectEquals (sv.getTargetValue().get (0),  targetValue);
+            expectEquals (sv.getTargetValue().get (0), targetValue);
             expect (! sv.isSmoothing());
 
             sv.getNextValue();
@@ -119,7 +120,7 @@ public:
             auto numValues = 12;
             sv.reset (numValues);
 
-            std::vector<std::pair<FloatType, FloatType>> ranges = { { (FloatType) -1.0f,   (FloatType) -2.0f },
+            std::vector<std::pair<FloatType, FloatType>> ranges = { { (FloatType) -1.0f, (FloatType) -2.0f },
                                                                     { (FloatType) -100.0f, (FloatType) -3.0f } };
 
             for (auto range : ranges)
