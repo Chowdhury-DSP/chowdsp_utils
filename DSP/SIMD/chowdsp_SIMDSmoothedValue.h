@@ -35,21 +35,21 @@ namespace SIMDUtils
 
     @tags{Audio}
 */
-    template <typename FloatType, typename SmoothingType>
-    class SIMDSmoothedValue : public juce::SmoothedValueBase<SIMDSmoothedValue<juce::dsp::SIMDRegister<FloatType>, SmoothingType>>
+    template <typename SmFloatType, typename SmoothingType>
+    class SIMDSmoothedValue : public juce::SmoothedValueBase<SIMDSmoothedValue<juce::dsp::SIMDRegister<SmFloatType>, SmoothingType>>
     {
     public:
         //==============================================================================
-        using VecType = juce::dsp::SIMDRegister<FloatType>;
+        using VecType = juce::dsp::SIMDRegister<SmFloatType>;
 
         /** Constructor. */
         SIMDSmoothedValue() noexcept
-            : SIMDSmoothedValue ((FloatType) (std::is_same<SmoothingType, juce::ValueSmoothingTypes::Linear>::value ? 0 : 1))
+            : SIMDSmoothedValue ((SmFloatType) (std::is_same<SmoothingType, juce::ValueSmoothingTypes::Linear>::value ? 0 : 1))
         {
         }
 
         /** Constructor. */
-        SIMDSmoothedValue (FloatType initialValue) noexcept
+        SIMDSmoothedValue (SmFloatType initialValue) noexcept
         {
             // Multiplicative smoothed values cannot ever reach 0!
             jassert (! (std::is_same<SmoothingType, juce::ValueSmoothingTypes::Multiplicative>::value && initialValue == 0));
@@ -144,7 +144,7 @@ namespace SIMDUtils
 
     private:
         /** Hiding this function since applyGain is ill-defined for SIMD types */
-        void applyGain (juce::AudioBuffer<FloatType>& /*buffer*/, int /*numSamples*/) noexcept {}
+        void applyGain (juce::AudioBuffer<SmFloatType>& /*buffer*/, int /*numSamples*/) noexcept {}
 
         //==============================================================================
         template <typename T>
@@ -157,7 +157,7 @@ namespace SIMDUtils
         template <typename T = SmoothingType>
         LinearVoid<T> setStepSize() noexcept
         {
-            step = (this->target - this->currentValue) / (VecType) this->countdown;
+            step = (this->target - this->currentValue) / (VecType) (SmFloatType) this->countdown;
         }
 
         template <typename T = SmoothingType>
@@ -183,7 +183,7 @@ namespace SIMDUtils
         template <typename T = SmoothingType>
         LinearVoid<T> skipCurrentValue (int numSamples) noexcept
         {
-            this->currentValue += step * (FloatType) numSamples;
+            this->currentValue += step * (SmFloatType) numSamples;
         }
 
         template <typename T = SmoothingType>
@@ -193,7 +193,7 @@ namespace SIMDUtils
         }
 
         //==============================================================================
-        VecType step = FloatType();
+        VecType step = SmFloatType();
         int stepsToTarget = 0;
     };
 

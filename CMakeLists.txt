@@ -67,3 +67,9 @@ if(XSIMD_PATH)
     target_include_directories(chowdsp_utils_tests PRIVATE ${XSIMD_PATH}/include)
     target_compile_definitions(chowdsp_utils_tests PRIVATE CHOWDSP_USE_XSIMD=1)
 endif()
+
+# supress warning from Foley's
+if((CMAKE_CXX_COMPILER_ID STREQUAL "MSVC") OR (CMAKE_CXX_SIMULATE_ID STREQUAL "MSVC"))
+    target_compile_options(chowdsp_utils_tests PUBLIC /wd4458)
+    target_compile_options(chowdsp_gui_test PUBLIC /wd4458)
+endif()

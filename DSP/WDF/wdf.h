@@ -91,9 +91,11 @@ namespace WDF
         friend class WDFSeriesT;
 
         JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wimplicit-float-conversion")
+        JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4305)
         T R = (T) 1.0e-9; // impedance
         T G = (T) 1.0 / R; // admittance
         JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+        JUCE_END_IGNORE_WARNINGS_MSVC
 
     protected:
         using FloatType = T;
