@@ -221,6 +221,72 @@ public:
             expectWithinAbsoluteError (data2[i].get (0), data1[i], (FloatType) 1.0e-6, "SIMD WDF is not equivalent to float WDF!");
     }
 
+    void staticSIMDWDFTest()
+    {
+        using FloatType = float;
+        using Vec = dsp::SIMDRegister<FloatType>;
+
+        using Resistor = Resistor<Vec>;
+        using Capacitor = Capacitor<Vec>;
+        using ResVs = ResistiveVoltageSource<Vec>;
+
+        constexpr int num = 5;
+        Vec data1[num] = { 1.0, 0.5, 0.0, -0.5, -1.0 };
+        Vec data2[num] = { 1.0, 0.5, 0.0, -0.5, -1.0 };
+
+        // dynamic
+        {
+            ResVs Vs { 1.0e-9f };
+            Resistor r162 {   4700.0f };
+            Resistor r163 { 100000.0f };
+            Diode<Vec> d53 { 2.52e-9f, 25.85e-3f }; // 1N4148 diode
+
+            auto c40 = std::make_unique<Capacitor> ((FloatType) 0.015e-6f, (FloatType) fs, (FloatType) 0.029f);
+            auto P1 = std::make_unique<WDFParallel<Vec>> (c40.get(), &r163);
+            auto S1 = std::make_unique<WDFSeries<Vec>> (&Vs, P1.get());
+            auto I1 = std::make_unique<PolarityInverter<Vec>> (&r162);
+            auto P2 = std::make_unique<WDFParallel<Vec>> (I1.get(), S1.get());
+
+            d53.connectToNode (P2.get());
+
+            for (int i = 0; i < num; ++i)
+            {
+                Vs.setVoltage (data1[i]);
+                d53.incident (P2->reflected());
+                data1[i] = r162.voltage();
+                P2->incident (d53.reflected());
+            }
+        }
+
+        // static
+        {
+            ResVs Vs { 1.0e-9f };
+            Resistor r162 {   4700.0f };
+            Resistor r163 { 100000.0f };
+            Capacitor c40 { (FloatType) 0.015e-6f, (FloatType) fs, (FloatType) 0.029f };
+            Diode<Vec> d53 { 2.52e-9f, 25.85e-3f }; // 1N4148 diode
+
+            auto P1 = makeParallel<Vec> (c40, r163);
+            auto S1 = makeSeries<Vec> (Vs, P1);
+            auto I1 = makeInverter<Vec> (r162);
+            auto P2 = makeParallel<Vec> (I1, S1);
+
+            d53.connectToNode (&P2);
+
+            for (int i = 0; i < num; ++i)
+            {
+                Vs.setVoltage (data2[i]);
+                d53.incident (P2.reflected());
+                data2[i] = r162.voltage();
+                P2.incident (d53.reflected());
+            }
+        }
+
+        for (int i = 0; i < num; ++i)
+            for (size_t k = 0; k < Vec::size(); ++k)
+                expectWithinAbsoluteError (data2[i].get (k), data1[i].get (k), (FloatType) 1.0e-6, "Static WDF is not equivalent to dynamic!");
+    }
+
     void runTest() override
     {
         beginTest ("Voltage Divider Test");
@@ -240,6 +306,9 @@ public:
         voltageDividerTest<dsp::SIMDRegister<float>>();
         voltageDividerTest<dsp::SIMDRegister<double>>();
         diodeClipperSIMDTest();
+
+        beginTest ("Static SIMD WDF Test");
+        staticSIMDWDFTest();
     }
 };
 
