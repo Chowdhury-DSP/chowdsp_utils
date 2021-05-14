@@ -72,5 +72,7 @@ jobs:
       run: cmake --build . --parallel 4
 
     - name: Test
-      working-directory: ${{env.WORK_DIR}}/build
-      run: ctest -C Debug -V
+      uses: GabrielBB/xvfb-action@v1
+      with:
+        run: ctest -C Debug -V
+        working-directory: ${{env.WORK_DIR}}/build
