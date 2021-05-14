@@ -247,7 +247,7 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
 #if defined(_M_ARM64) || defined(__arm64__) || defined(__aarch64__)
     // We need to specialize the double versions of the functions
     /** SIMD implementation of std::exp */
-    template<>
+    template <>
     inline juce::dsp::SIMDRegister<double> expSIMD (juce::dsp::SIMDRegister<double> x)
     {
         auto y = juce::dsp::SIMDRegister<double> ((double) 0);
@@ -258,7 +258,7 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
     }
 
     /** SIMD implementation of std::log */
-    template<>
+    template <>
     inline juce::dsp::SIMDRegister<double> logSIMD (juce::dsp::SIMDRegister<double> x)
     {
         auto y = juce::dsp::SIMDRegister<double> ((double) 0);
@@ -269,7 +269,7 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
     }
 
     /** SIMD implementation of std::pow */
-    template<>
+    template <>
     inline juce::dsp::SIMDRegister<double> powSIMD (juce::dsp::SIMDRegister<double> a, juce::dsp::SIMDRegister<double> b)
     {
         auto y = juce::dsp::SIMDRegister<double> ((double) 0);
@@ -280,7 +280,7 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
     }
 
     /** SIMD implementation of std::sqrt */
-    template<>
+    template <>
     inline juce::dsp::SIMDRegister<double> sqrtSIMD (juce::dsp::SIMDRegister<double> x)
     {
         auto y = juce::dsp::SIMDRegister<double> ((double) 0);
@@ -291,7 +291,7 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
     }
 
     /** SIMD implementation of std::sin */
-    template<>
+    template <>
     inline juce::dsp::SIMDRegister<double> sinSIMD (juce::dsp::SIMDRegister<double> x)
     {
         auto y = juce::dsp::SIMDRegister<double> ((double) 0);
@@ -302,7 +302,7 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
     }
 
     /** SIMD implementation of std::cos */
-    template<>
+    template <>
     inline juce::dsp::SIMDRegister<double> cosSIMD (juce::dsp::SIMDRegister<double> x)
     {
         auto y = juce::dsp::SIMDRegister<double> ((double) 0);
@@ -313,7 +313,7 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
     }
 
     /** SIMD implementation of std::tan */
-    template<>
+    template <>
     inline juce::dsp::SIMDRegister<double> tanSIMD (juce::dsp::SIMDRegister<double> x)
     {
         auto y = juce::dsp::SIMDRegister<double> ((double) 0);
@@ -324,7 +324,7 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
     }
 
     /** SIMD implementation of std::sinh */
-    template<>
+    template <>
     inline juce::dsp::SIMDRegister<double> sinhSIMD (juce::dsp::SIMDRegister<double> x)
     {
         auto y = juce::dsp::SIMDRegister<double> ((double) 0);
@@ -335,7 +335,7 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
     }
 
     /** SIMD implementation of std::cosh */
-    template<>
+    template <>
     inline juce::dsp::SIMDRegister<double> coshSIMD (juce::dsp::SIMDRegister<double> x)
     {
         auto y = juce::dsp::SIMDRegister<double> ((double) 0);
@@ -346,7 +346,7 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
     }
 
     /** SIMD implementation of std::tanh */
-    template<>
+    template <>
     inline juce::dsp::SIMDRegister<double> tanhSIMD (juce::dsp::SIMDRegister<double> x)
     {
         auto y = juce::dsp::SIMDRegister<double> ((double) 0);
