@@ -243,6 +243,120 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
     {
         return (juce::dsp::SIMDRegister<T>) xsimd::tanh ((x_type<T>) x.value);
     }
+
+#if defined(_M_ARM64) || defined(__arm64__) || defined(__aarch64__)
+    // We need to specialize the double versions of the functions
+    /** SIMD implementation of std::exp */
+    template <>
+    inline juce::dsp::SIMDRegister<double> expSIMD (juce::dsp::SIMDRegister<double> x)
+    {
+        auto y = juce::dsp::SIMDRegister<double> ((double) 0);
+        for (size_t i = 0; i < x.size(); ++i)
+            y.set (i, std::exp (x.get (i)));
+
+        return y;
+    }
+
+    /** SIMD implementation of std::log */
+    template <>
+    inline juce::dsp::SIMDRegister<double> logSIMD (juce::dsp::SIMDRegister<double> x)
+    {
+        auto y = juce::dsp::SIMDRegister<double> ((double) 0);
+        for (size_t i = 0; i < x.size(); ++i)
+            y.set (i, std::log (x.get (i)));
+
+        return y;
+    }
+
+    /** SIMD implementation of std::pow */
+    template <>
+    inline juce::dsp::SIMDRegister<double> powSIMD (juce::dsp::SIMDRegister<double> a, juce::dsp::SIMDRegister<double> b)
+    {
+        auto y = juce::dsp::SIMDRegister<double> ((double) 0);
+        for (size_t i = 0; i < a.size(); ++i)
+            y.set (i, std::pow (a.get (i), b.get (i)));
+
+        return y;
+    }
+
+    /** SIMD implementation of std::sqrt */
+    template <>
+    inline juce::dsp::SIMDRegister<double> sqrtSIMD (juce::dsp::SIMDRegister<double> x)
+    {
+        auto y = juce::dsp::SIMDRegister<double> ((double) 0);
+        for (size_t i = 0; i < x.size(); ++i)
+            y.set (i, std::sqrt (x.get (i)));
+
+        return y;
+    }
+
+    /** SIMD implementation of std::sin */
+    template <>
+    inline juce::dsp::SIMDRegister<double> sinSIMD (juce::dsp::SIMDRegister<double> x)
+    {
+        auto y = juce::dsp::SIMDRegister<double> ((double) 0);
+        for (size_t i = 0; i < x.size(); ++i)
+            y.set (i, std::sin (x.get (i)));
+
+        return y;
+    }
+
+    /** SIMD implementation of std::cos */
+    template <>
+    inline juce::dsp::SIMDRegister<double> cosSIMD (juce::dsp::SIMDRegister<double> x)
+    {
+        auto y = juce::dsp::SIMDRegister<double> ((double) 0);
+        for (size_t i = 0; i < x.size(); ++i)
+            y.set (i, std::cos (x.get (i)));
+
+        return y;
+    }
+
+    /** SIMD implementation of std::tan */
+    template <>
+    inline juce::dsp::SIMDRegister<double> tanSIMD (juce::dsp::SIMDRegister<double> x)
+    {
+        auto y = juce::dsp::SIMDRegister<double> ((double) 0);
+        for (size_t i = 0; i < x.size(); ++i)
+            y.set (i, std::tan (x.get (i)));
+
+        return y;
+    }
+
+    /** SIMD implementation of std::sinh */
+    template <>
+    inline juce::dsp::SIMDRegister<double> sinhSIMD (juce::dsp::SIMDRegister<double> x)
+    {
+        auto y = juce::dsp::SIMDRegister<double> ((double) 0);
+        for (size_t i = 0; i < x.size(); ++i)
+            y.set (i, std::sinh (x.get (i)));
+
+        return y;
+    }
+
+    /** SIMD implementation of std::cosh */
+    template <>
+    inline juce::dsp::SIMDRegister<double> coshSIMD (juce::dsp::SIMDRegister<double> x)
+    {
+        auto y = juce::dsp::SIMDRegister<double> ((double) 0);
+        for (size_t i = 0; i < x.size(); ++i)
+            y.set (i, std::cosh (x.get (i)));
+
+        return y;
+    }
+
+    /** SIMD implementation of std::tanh */
+    template <>
+    inline juce::dsp::SIMDRegister<double> tanhSIMD (juce::dsp::SIMDRegister<double> x)
+    {
+        auto y = juce::dsp::SIMDRegister<double> ((double) 0);
+        for (size_t i = 0; i < x.size(); ++i)
+            y.set (i, std::tanh (x.get (i)));
+
+        return y;
+    }
+#endif // defined(_M_ARM64) || defined(__arm64__) || defined(__aarch64__)
+
 #else // fallback implemetations
     /** SIMD implementation of std::exp */
     template <typename T>
