@@ -50,7 +50,7 @@ jobs:
     - name: Set up environment
       working-directory: ${{github.workspace}}
       run: |
-        git clone --depth 1 --branch 6.0.1 https://github.com/juce-framework/JUCE.git
+        git clone --depth 1 --branch 6.0.8 https://github.com/juce-framework/JUCE.git
         cd JUCE_modules
         git clone --single-branch --branch chowdsp https://github.com/Chowdhury-DSP/foleys_gui_magic.git
 
