@@ -1,4 +1,4 @@
-name: CI
+name: CI-ARM
 
 on:
   push:
@@ -21,6 +21,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
+      os: macos-latest
       matrix:
         include:
           - os: ubuntu-latest
@@ -28,17 +29,9 @@ jobs:
           - os: windows-latest
             cmake_args: ""
           - os: macos-latest
-            cmake_args: "-GXcode -DXSIMD_PATH=../xsimd"
+            cmake_args: "-GXcode -D\"CMAKE_OSX_ARCHITECTURES=arm64;x86_64\" -DXSIMD_PATH=../xsimd"
     
     steps:
-    - name: Install Linux Deps
-      if: runner.os == 'Linux'
-      run: |
-        sudo apt-get update
-        sudo apt install libasound2-dev libcurl4-openssl-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev libsamplerate-dev
-        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 9
-        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
-
     - name: Get latest CMake
       uses: lukka/get-cmake@latest 
 
@@ -55,7 +48,6 @@ jobs:
         git clone --single-branch --branch chowdsp https://github.com/Chowdhury-DSP/foleys_gui_magic.git
 
     - name: Install xsimd
-      if: runner.os == 'Linux' || runner.os == 'MacOS'
       working-directory: ${{github.workspace}}/JUCE_modules
       run: git clone https://github.com/xtensor-stack/xsimd
 
@@ -64,13 +56,9 @@ jobs:
       env:
         CMAKE_ARGS: ${{ matrix.cmake_args }}
       shell: bash
-      run: cmake -Bbuild $CMAKE_ARGS
+      run: cmake -Bbuild -GXcode -D"CMAKE_OSX_ARCHITECTURES=arm64;x86_64" -DXSIMD_PATH=../xsimd
 
     - name: Build
       working-directory: ${{env.WORK_DIR}}/build
       shell: bash
       run: cmake --build . --parallel 4
-
-    - name: Test
-      working-directory: ${{env.WORK_DIR}}/build
-      run: ctest -C Debug -V
