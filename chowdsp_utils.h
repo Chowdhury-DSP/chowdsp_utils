@@ -75,7 +75,8 @@ JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wcast-align",
                                      "-Wimplicit-int-conversion",
                                      "-Wshadow",
                                      "-Wsign-conversion",
-                                     "-Wzero-as-null-pointer-constant")
+                                     "-Wzero-as-null-pointer-constant",
+                                     "-Wc++98-compat-extra-semi")
 JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4244)
 #include <cassert>
 #include <xsimd/xsimd.hpp>
