@@ -43,7 +43,7 @@ namespace WDF
     {
     public:
         WDF (std::string type) : type (type) {}
-        virtual ~WDF() {}
+        virtual ~WDF() = default;
 
         /** Sub-classes override this function to recompute
      * the impedance of this element.
@@ -112,7 +112,6 @@ namespace WDF
     {
     public:
         WDFNode (std::string type) : WDF<T> (type) {}
-        virtual ~WDFNode() {}
 
         /** Connects this WDF node to an upstream node in the WDF tree. */
         void connectToNode (WDF<T>* node)
@@ -150,7 +149,6 @@ namespace WDF
         {
             calcImpedance();
         }
-        virtual ~Resistor() {}
 
         /** Sets the resistance value of the WDF resistor, in Ohms. */
         void setResistanceValue (T newR)
@@ -206,7 +204,6 @@ namespace WDF
         {
             calcImpedance();
         }
-        virtual ~Capacitor() {}
 
         /** Sets the capacitance value of the WDF capacitor, in Farads. */
         void setCapacitanceValue (T newC)
@@ -274,7 +271,6 @@ namespace WDF
         {
             calcImpedance();
         }
-        virtual ~Inductor() {}
 
         /** Sets the inductance value of the WDF capacitor, in Henries. */
         void setInductanceValue (T newL)
@@ -328,7 +324,6 @@ namespace WDF
         Switch() : WDFNode<T> ("Switch")
         {
         }
-        virtual ~Switch() {}
 
         inline void calcImpedance() override {}
 
@@ -359,9 +354,6 @@ namespace WDF
     public:
         Open() : WDFNode<T> ("Open")
         {
-        }
-        virtual ~Open()
-        {
             this->R = (T) 1.0e15;
             this->G = (T) 1.0 / this->R;
         }
@@ -388,9 +380,6 @@ namespace WDF
     {
     public:
         Short() : WDFNode<T> ("Short")
-        {
-        }
-        virtual ~Short()
         {
             this->R = (T) 1.0e-15;
             this->G = (T) 1.0 / this->R;
@@ -426,7 +415,6 @@ namespace WDF
             port1->connectToNode (this);
             calcImpedance();
         }
-        virtual ~PolarityInverter() {}
 
         /** Calculates the impedance of the WDF inverter
      * (same impedance as the connected node).
@@ -471,8 +459,6 @@ namespace WDF
             port1->connectToNode (this);
             calcImpedance();
         }
-
-        virtual ~YParameter() {}
 
         inline void calcImpedance() override
         {
@@ -523,7 +509,6 @@ namespace WDF
             port1->connectToNode (this);
             port2->connectToNode (this);
         }
-        virtual ~WDFAdaptor() {}
 
     protected:
         WDFNode<T>* port1 = nullptr;
@@ -540,7 +525,6 @@ namespace WDF
         {
             calcImpedance();
         }
-        virtual ~WDFParallel() {}
 
         /** Computes the impedance for a WDF parallel adaptor.
      *  1     1     1
@@ -585,7 +569,6 @@ namespace WDF
         {
             calcImpedance();
         }
-        virtual ~WDFSeries() {}
 
         /** Computes the impedance for a WDF parallel adaptor.
      * Z_s = Z_1 + Z_2
@@ -623,16 +606,17 @@ namespace WDF
     class ResistiveVoltageSource : public WDFNode<T>
     {
     public:
+        JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wimplicit-float-conversion")
+        JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4305)
         /** Creates a new resistive voltage source.
      * @param value: initial resistance value, in Ohms
      */
-        JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4305)
         ResistiveVoltageSource (T value = 1.0e-9) : WDFNode<T> ("Resistive Voltage"),
                                                     R_value (value)
         {
             calcImpedance();
         }
-        virtual ~ResistiveVoltageSource() {}
+        JUCE_END_IGNORE_WARNINGS_GCC_LIKE
         JUCE_END_IGNORE_WARNINGS_MSVC
 
         /** Sets the resistance value of the series resistor, in Ohms. */
@@ -684,7 +668,6 @@ namespace WDF
         {
             calcImpedance();
         }
-        virtual ~IdealVoltageSource() {}
 
         inline void calcImpedance() override {}
 
@@ -713,16 +696,17 @@ namespace WDF
     class ResistiveCurrentSource : public WDFNode<T>
     {
     public:
+        JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wimplicit-float-conversion")
+        JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4305)
         /** Creates a new resistive current source.
      * @param value: initial resistance value, in Ohms
      */
-        JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4305)
         ResistiveCurrentSource (T value = 1.0e9) : WDFNode<T> ("Resistive Current"),
                                                    R_value (value)
         {
             calcImpedance();
         }
-        virtual ~ResistiveCurrentSource() {}
+        JUCE_END_IGNORE_WARNINGS_GCC_LIKE
         JUCE_END_IGNORE_WARNINGS_MSVC
 
         /** Sets the resistance value of the parallel resistor, in Ohms. */
@@ -774,7 +758,6 @@ namespace WDF
         {
             calcImpedance();
         }
-        virtual ~IdealCurrentSource() {}
 
         inline void calcImpedance() override {}
 
@@ -833,8 +816,6 @@ namespace WDF
                                  Vt (Vt)
         {
         }
-
-        virtual ~DiodePair() {}
 
         inline void calcImpedance() override {}
 
@@ -898,8 +879,6 @@ namespace WDF
                              Vt (Vt)
         {
         }
-
-        virtual ~Diode() {}
 
         inline void calcImpedance() override {}
 

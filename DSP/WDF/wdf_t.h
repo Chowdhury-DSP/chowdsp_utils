@@ -23,7 +23,6 @@ namespace WDF
             port2.connectToNode (this);
             calcImpedance();
         }
-        virtual ~WDFParallelT() {}
 
         /** Computes the impedance for a WDF parallel adaptor.
      *  1     1     1
@@ -75,7 +74,6 @@ namespace WDF
             port2.connectToNode (this);
             calcImpedance();
         }
-        virtual ~WDFSeriesT() {}
 
         /** Computes the impedance for a WDF parallel adaptor.
      * Z_s = Z_1 + Z_2
@@ -124,7 +122,6 @@ namespace WDF
             port1.connectToNode (this);
             calcImpedance();
         }
-        virtual ~PolarityInverterT() {}
 
         /** Calculates the impedance of the WDF inverter
      * (same impedance as the connected node).
