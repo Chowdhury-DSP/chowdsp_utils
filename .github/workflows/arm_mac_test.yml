@@ -17,19 +17,8 @@ env:
 jobs:
   build_and_test:
     if: contains(toJson(github.event.commits), '***NO_CI***') == false && contains(toJson(github.event.commits), '[ci skip]') == false && contains(toJson(github.event.commits), '[skip ci]') == false
-    name: Test module on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
-      os: macos-latest
-      matrix:
-        include:
-          - os: ubuntu-latest
-            cmake_args: "-DXSIMD_PATH=../xsimd"
-          - os: windows-latest
-            cmake_args: ""
-          - os: macos-latest
-            cmake_args: "-GXcode -D\"CMAKE_OSX_ARCHITECTURES=arm64;x86_64\" -DXSIMD_PATH=../xsimd"
+    name: Test module on ARM Mac
+    runs-on: macos-latest
     
     steps:
     - name: Get latest CMake
