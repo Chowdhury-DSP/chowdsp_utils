@@ -33,21 +33,22 @@ void ChowLNF::drawRotarySlider (juce::Graphics& g, int x, int y, int width, int 
                                                             b.getCentreX(),
                                                             b.getCentreY()));
 
+    const auto alphaMult = slider.isEnabled() ? 1.0f : 0.4f;
     auto knobBounds = (bounds * 0.75f).withCentre (centre);
-    knob->drawWithin (g, knobBounds, juce::RectanglePlacement::stretchToFit, 1.0f);
-    pointer->drawWithin (g, knobBounds, juce::RectanglePlacement::stretchToFit, 1.0f);
+    knob->drawWithin (g, knobBounds, juce::RectanglePlacement::stretchToFit, alphaMult);
+    pointer->drawWithin (g, knobBounds, juce::RectanglePlacement::stretchToFit, alphaMult);
 
     const auto toAngle = rotaryStartAngle + sliderPos * (rotaryEndAngle - rotaryStartAngle);
     constexpr float arcFactor = 0.9f;
 
     juce::Path valueArc;
     valueArc.addPieSegment (bounds, rotaryStartAngle, rotaryEndAngle, arcFactor);
-    g.setColour (slider.findColour (juce::Slider::trackColourId));
+    g.setColour (slider.findColour (juce::Slider::trackColourId).withMultipliedAlpha (alphaMult));
     g.fillPath (valueArc);
     valueArc.clear();
 
     valueArc.addPieSegment (bounds, rotaryStartAngle, toAngle, arcFactor);
-    g.setColour (slider.findColour (juce::Slider::thumbColourId));
+    g.setColour (slider.findColour (juce::Slider::thumbColourId).withMultipliedAlpha (alphaMult));
     g.fillPath (valueArc);
 }
 
