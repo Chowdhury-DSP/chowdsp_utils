@@ -13,7 +13,7 @@ template <class Processor>
 class SynthBase : public PluginBase<Processor>
 {
 public:
-    SynthBase(const juce::AudioProcessor::BusesProperties& layout = juce::AudioProcessor::BusesProperties().withOutput ("Output", juce::AudioChannelSet::stereo(), true)) : PluginBase<Processor> (layout)
+    SynthBase (const juce::AudioProcessor::BusesProperties& layout = juce::AudioProcessor::BusesProperties().withOutput ("Output", juce::AudioChannelSet::stereo(), true)) : PluginBase<Processor> (layout)
     {
     }
 
