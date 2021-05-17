@@ -27,7 +27,7 @@ public:
     NoiseTest() : UnitTest ("Noise Test") {}
 
     /** Check the frequency slope of a noise buffer, slope measured in dB/Oct */
-    void checkNoiseSlope (const AudioBuffer<float>& buffer, String noiseType, float noiseSlope = 0.0f)
+    void checkNoiseSlope (const AudioBuffer<float>& buffer, String noiseType, float noiseSlope = 0.0f, float maxErr = 3.0f)
     {
         dsp::FFT fft (fftOrder);
 
@@ -52,7 +52,7 @@ public:
         {
             auto mag = getMagForFreq (freq);
             String errorMsg = noiseType + " error at frequency " + String (freq, 2) + " Hz";
-            expectWithinAbsoluteError (mag, expMag, 3.0f, errorMsg);
+            expectWithinAbsoluteError (mag, expMag, maxErr, errorMsg);
 
             expMag += noiseSlope;
             freq *= 2;
@@ -74,7 +74,7 @@ public:
         return String();
     }
 
-    void runNoiseTest (chowdsp::Noise<float>::NoiseType type, float noiseSlope = 0.0f)
+    void runNoiseTest (chowdsp::Noise<float>::NoiseType type, float noiseSlope = 0.0f, float maxErr = 3.0f)
     {
         chowdsp::Noise<float> noise;
 
@@ -90,7 +90,7 @@ public:
         dsp::ProcessContextReplacing<float> ctx (block);
         noise.process (ctx);
 
-        checkNoiseSlope (noiseBuff, getNoiseNameForType (type), noiseSlope);
+        checkNoiseSlope (noiseBuff, getNoiseNameForType (type), noiseSlope, maxErr);
     }
 
     void runTest() override
@@ -102,7 +102,7 @@ public:
         runNoiseTest (chowdsp::Noise<float>::NoiseType::Normal);
 
         beginTest ("Pink Noise Test");
-        runNoiseTest (chowdsp::Noise<float>::NoiseType::Pink, -3.0f);
+        runNoiseTest (chowdsp::Noise<float>::NoiseType::Pink, -3.0f, 3.5f);
     }
 };
 
