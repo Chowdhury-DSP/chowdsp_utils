@@ -69,10 +69,10 @@ jobs:
     - name: Build
       working-directory: ${{env.WORK_DIR}}/build
       shell: bash
-      run: cmake --build . --parallel 4
+      run: cmake --build . --config Release --parallel 4
 
     - name: Test
       uses: GabrielBB/xvfb-action@v1
       with:
-        run: ctest -C Debug -V
+        run: ctest -C Release -V
         working-directory: ${{env.WORK_DIR}}/build
