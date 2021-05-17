@@ -54,4 +54,4 @@ jobs:
 
     - name: Test
       working-directory: ${{env.WORK_DIR}}/build
-      run: ctest -C Debug -V
+      run: ctest -C Release -V

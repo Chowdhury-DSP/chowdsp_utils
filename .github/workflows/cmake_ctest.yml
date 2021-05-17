@@ -74,5 +74,5 @@ jobs:
     - name: Test
       uses: GabrielBB/xvfb-action@v1
       with:
-        run: ctest -C Debug -V
+        run: ctest -C Release -V
         working-directory: ${{env.WORK_DIR}}/build
