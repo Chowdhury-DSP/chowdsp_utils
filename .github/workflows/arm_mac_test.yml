@@ -50,7 +50,7 @@ jobs:
     - name: Build
       working-directory: ${{env.WORK_DIR}}/build
       shell: bash
-      run: cmake --build . --parallel 4 | xcpretty
+      run: cmake --build . --config Release --parallel 4 | xcpretty
 
     - name: Test
       working-directory: ${{env.WORK_DIR}}/build

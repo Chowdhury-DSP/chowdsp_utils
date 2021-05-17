@@ -32,7 +32,7 @@ namespace WDF
         inline void calcImpedance() override
         {
             this->G = port1.G + port2.G;
-            this->R = 1.0 / this->G;
+            this->R = (T) 1.0 / this->G;
             port1Reflect = port1.G / this->G;
             port2Reflect = port2.G / this->G;
         }
@@ -81,7 +81,7 @@ namespace WDF
         inline void calcImpedance() override
         {
             this->R = port1.R + port2.R;
-            this->G = 1.0 / this->R;
+            this->G = (T) 1.0 / this->R;
             port1Reflect = port1.R / this->R;
             port2Reflect = port2.R / this->R;
         }
@@ -129,7 +129,7 @@ namespace WDF
         inline void calcImpedance() override
         {
             this->R = port1.R;
-            this->G = 1.0 / this->R;
+            this->G = (T) 1.0 / this->R;
         }
 
         /** Accepts an incident wave into a WDF inverter. */

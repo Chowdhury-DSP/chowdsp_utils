@@ -16,6 +16,7 @@ target_sources(chowdsp_utils_tests PRIVATE
     dsp_tests/PitchShiftTest.cpp
     dsp_tests/ResamplerTest.cpp
     dsp_tests/WDFTest.cpp
+    dsp_tests/WDFPerf.cpp
 )
 
 target_sources(chowdsp_gui_test PRIVATE
