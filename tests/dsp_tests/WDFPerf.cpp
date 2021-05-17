@@ -4,9 +4,9 @@ using namespace chowdsp::WDF;
 
 namespace
 {
-    constexpr float fs = 48000.0f;
-    constexpr float timeSeconds = 1000.0f;
-}
+constexpr float fs = 48000.0f;
+constexpr float timeSeconds = 1000.0f;
+} // namespace
 
 class WDFPerfTest : public UnitTest
 {
@@ -22,8 +22,7 @@ public:
         auto* x = buffer.getReadPointer (0);
 
         Time time;
-        auto timeProcess = [&] (auto& proc)
-        {
+        auto timeProcess = [&] (auto& proc) {
             auto start = time.getMillisecondCounterHiRes();
             for (int i = 0; i < buffer.getNumSamples(); ++i)
                 proc.processSample (x[i]);
