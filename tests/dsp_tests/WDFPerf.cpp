@@ -46,7 +46,7 @@ public:
         std::cout << "WDFT is " << iirDuration / wdfTDuration << "x faster than IIR" << std::endl;
         std::cout << "WDFT is " << wdfDuration / wdfTDuration << "x faster than WDF" << std::endl;
 
-        expectGreaterOrEqual (wdfDuration / wdfTDuration, 1.0, "Templated WDF is slower than polymorphic!");
+        expectGreaterOrEqual (wdfDuration / wdfTDuration, 0.95, "Templated WDF is slower than polymorphic!");
     }
 
     void firstOrderTest()
