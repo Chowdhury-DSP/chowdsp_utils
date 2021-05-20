@@ -5,11 +5,11 @@ namespace chowdsp
 namespace VersionUtils
 {
     /**
- *  Method to compare two versions.
- *  Returns 1 if v2 is smaller, -1 if v1 is smaller, 0 if equal
- *  Adapted from: https://www.geeksforgeeks.org/compare-two-version-numbers/
- */
-    static int compareVersions (juce::String v1, juce::String v2)
+     *  Method to compare two versions.
+     *  Returns 1 if v2 is smaller, -1 if v1 is smaller, 0 if equal
+     *  Adapted from: https://www.geeksforgeeks.org/compare-two-version-numbers/
+     */
+    inline int compareVersions (juce::String v1, juce::String v2)
     {
         v1.removeCharacters ("v");
         v2.removeCharacters ("v");
