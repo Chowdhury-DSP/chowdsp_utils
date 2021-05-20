@@ -11,8 +11,7 @@ public:
 
     void versionCompareTest()
     {
-        auto checkVersions = [=] (const String& v1, const String& v2, int exp)
-        {
+        auto checkVersions = [=] (const String& v1, const String& v2, int exp) {
             auto actual1 = compareVersions (v1, v2);
             expectEquals (actual1, exp, "Incorrect version comparison!");
 
@@ -33,7 +32,7 @@ public:
 
     void runTest() override
     {
-        beginTest("Version Compare Test");
+        beginTest ("Version Compare Test");
         versionCompareTest();
     }
 };
