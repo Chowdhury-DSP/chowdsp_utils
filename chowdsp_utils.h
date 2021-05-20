@@ -93,6 +93,7 @@ JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 #include "PluginUtils/chowdsp_DummySynthSound.h"
 #include "PluginUtils/chowdsp_ParamUtils.h"
 #include "PluginUtils/chowdsp_SynthBase.h"
+#include "PluginUtils/chowdsp_VersionUtils.h"
 
 #include "DSP/chowdsp_DSP.h"
 #include "GUI/chowdsp_GUI.h"
