@@ -2,6 +2,7 @@ target_sources(chowdsp_utils_tests PRIVATE
     test.cpp
     FoleysTest.cpp
     PluginBaseTest.cpp
+    VersionUtilsTest.cpp
     dsp_tests/GainTest.cpp
     dsp_tests/ModalFilterTest.cpp
     dsp_tests/NoiseTest.cpp
