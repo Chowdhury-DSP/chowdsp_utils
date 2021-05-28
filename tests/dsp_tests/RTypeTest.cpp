@@ -14,11 +14,10 @@ using namespace chowdsp::WDF;
 class Tonestack
 {
 public:
-    Tonestack (double sr) :
-        Cap1 (250e-12, sr, alpha),
-        Cap2 (20e-9, sr, alpha),
-        Cap3 (20e-9, sr, alpha),
-        R (std::tie (S1, S3, S2, Cap2, Res4, Cap3))
+    Tonestack (double sr) : Cap1 (250e-12, sr, alpha),
+                            Cap2 (20e-9, sr, alpha),
+                            Cap3 (20e-9, sr, alpha),
+                            R (std::tie (S1, S3, S2, Cap2, Res4, Cap3))
     {
     }
 
@@ -90,12 +89,7 @@ private:
     static constexpr double R2 = 1e6;
     static constexpr double R3 = 25e3;
 
-    RootRtypeAdaptor<double, S1Type,
-                             SeriesRes,
-                             S2Type,
-                             Capacitor<double>,
-                             Resistor<double>,
-                             Capacitor<double>> R;
+    RootRtypeAdaptor<double, S1Type, SeriesRes, S2Type, Capacitor<double>, Resistor<double>, Capacitor<double>> R;
 };
 
 class RTypeTest : public UnitTest
@@ -113,7 +107,7 @@ public:
         for (int n = 0; n < buffer.getNumSamples(); ++n)
             x[n] = (float) tonestack.processSample ((double) x[n]);
 
-        auto actualGainDB =  Decibels::gainToDecibels (buffer.getMagnitude (1000, buffer.getNumSamples() - 1000));
+        auto actualGainDB = Decibels::gainToDecibels (buffer.getMagnitude (1000, buffer.getNumSamples() - 1000));
         expectWithinAbsoluteError (actualGainDB, expGainDB, maxErr);
     }
 
