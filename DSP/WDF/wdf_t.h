@@ -40,15 +40,22 @@ namespace WDF
         /** Accepts an incident wave into a WDF parallel adaptor. */
         inline void incident (T x) noexcept override
         {
-            port1.incident (x + (port2.b - port1.b) * port2Reflect);
-            port2.incident (x + (port2.b - port1.b) * ((T) 0 - port1Reflect));
+            auto b2 = x + bTemp;
+            this->port1.incident (bDiff + b2);
+            this->port2.incident (b2);
             this->a = x;
         }
 
         /** Propogates a reflected wave from a WDF parallel adaptor. */
         inline T reflected() noexcept override
         {
-            this->b = port1Reflect * port1.reflected() + port2Reflect * port2.reflected();
+            this->port1.reflected();
+            this->port2.reflected();
+
+            bDiff = this->port2.b - this->port1.b;
+            bTemp = (T) 0 - port1Reflect * bDiff;
+            this->b = this->port2.b + bTemp;
+
             return this->b;
         }
 
@@ -58,6 +65,9 @@ namespace WDF
     private:
         T port1Reflect = (T) 1.0;
         T port2Reflect = (T) 1.0;
+
+        T bTemp = (T) 0.0;
+        T bDiff = (T) 0.0;
     };
 
     /** WDF 3-port series adaptor */
@@ -89,8 +99,9 @@ namespace WDF
         /** Accepts an incident wave into a WDF series adaptor. */
         inline void incident (T x) noexcept override
         {
-            port1.incident (port1.b - port1Reflect * (x + port1.b + port2.b));
-            port2.incident (port2.b - port2Reflect * (x + port1.b + port2.b));
+            auto b1 = this->port1.b - port1Reflect * (x + this->port1.b + this->port2.b);
+            this->port1.incident (b1);
+            this->port2.incident ((T) 0 - (x + b1));
 
             this->a = x;
         }
