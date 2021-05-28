@@ -51,7 +51,7 @@ namespace WDF
         {
             this->port1.reflected();
             this->port2.reflected();
-            
+
             bDiff = this->port2.b - this->port1.b;
             bTemp = (T) 0 - port1Reflect * bDiff;
             this->b = this->port2.b + bTemp;
