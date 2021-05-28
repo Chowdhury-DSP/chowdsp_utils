@@ -120,8 +120,8 @@ namespace WDF
         /** Implementation for SIMD float/double. */
         template <typename C = T>
         static inline typename std::enable_if<std::is_same<juce::dsp::SIMDRegister<float>, C>::value
-                                           || std::is_same<juce::dsp::SIMDRegister<double>, C>::value,
-                                       void>::type
+                                                  || std::is_same<juce::dsp::SIMDRegister<double>, C>::value,
+                                              void>::type
             RtypeScatter (const T (&S_)[numPorts][numPorts], const T (&a_)[numPorts], T (&b_)[numPorts])
         {
             for (int c = 0; c < numPorts; ++c)
