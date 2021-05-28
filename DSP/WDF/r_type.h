@@ -67,20 +67,71 @@ namespace WDF
         }
 
     protected:
-        static inline void RtypeScatter (const T (&S_)[numPorts][numPorts], const T (&a_)[numPorts], T (&b_)[numPorts])
+        /** Implementation for float/double. */
+        template <typename C = T>
+        static inline typename std::enable_if<std::is_same<float, C>::value || std::is_same<double, C>::value, void>::type
+            RtypeScatter (const T (&S_)[numPorts][numPorts], const T (&a_)[numPorts], T (&b_)[numPorts])
         {
-            // @TODO: SIMD THIS!
             // input matrix (S) of size dim x dim
             // input vector (a) of size 1 x dim
             // output vector (b) of size 1 x dim
 
-            for (int c = 0; c < numPorts; c++)
+#if CHOWDSP_USE_XSIMD
+            using v_type = xsimd::simd_type<T>;
+            constexpr auto simd_size = (int) v_type::size;
+            constexpr auto vec_size = numPorts - numPorts % simd_size;
+
+            for (int c = 0; c < numPorts; ++c)
             {
                 b_[c] = (T) 0;
-                for (int r = 0; r < numPorts; r++)
+                for (int r = 0; r < vec_size; r += simd_size)
+                    b_[c] += xsimd::hadd (xsimd::load_aligned (S_[c] + r) * xsimd::load_aligned (a_ + r));
+
+                // remainder of ops that can't be vectorized
+                for (int r = vec_size; r < numPorts; ++r)
+                    b_[c] += S_[c][r] * a_[r];
+            }
+#elif JUCE_USE_SIMD
+            using v_type = juce::dsp::SIMDRegister<T>;
+            constexpr auto simd_size = v_type::size();
+            constexpr auto vec_size = numPorts - numPorts % simd_size;
+
+            for (int c = 0; c < numPorts; ++c)
+            {
+                b_[c] = (T) 0;
+                for (int r = 0; r < vec_size; r += simd_size)
+                    b_[c] += (v_type::fromRawArray (S_[c] + r) * v_type::fromRawArray (a_ + r)).sum();
+
+                // remainder of ops that can't be vectorized
+                for (int r = vec_size; r < numPorts; ++r)
+                    b_[c] += S_[c][r] * a_[r];
+            }
+#else
+            for (int c = 0; c < numPorts; ++c)
+            {
+                b_[c] = (T) 0;
+                for (int r = 0; r < numPorts; ++r)
+                    b_[c] += S_[c][r] * a_[r];
+            }
+#endif // SIMD options
+        }
+
+#if USING_JUCE
+        /** Implementation for SIMD float/double. */
+        template <typename C = T>
+        static inline typename std::enable_if<std::is_same<juce::dsp::SIMDRegister<float>, C>::value
+                                           || std::is_same<juce::dsp::SIMDRegister<double>, C>::value,
+                                       void>::type
+            RtypeScatter (const T (&S_)[numPorts][numPorts], const T (&a_)[numPorts], T (&b_)[numPorts])
+        {
+            for (int c = 0; c < numPorts; ++c)
+            {
+                b_[c] = (T) 0;
+                for (int r = 0; r < numPorts; ++r)
                     b_[c] += S_[c][r] * a_[r];
             }
         }
+#endif // USING JUCE
 
         std::tuple<PortTypes&...> downPorts; // tuple of ports connected to RtypeAdaptor
 
