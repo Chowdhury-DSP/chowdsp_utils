@@ -83,9 +83,10 @@ namespace WDF
 
             for (int c = 0; c < numPorts; ++c)
             {
-                b_[c] = (T) 0;
+                v_type bc { (T) 0 };
                 for (int r = 0; r < vec_size; r += simd_size)
-                    b_[c] += xsimd::hadd (xsimd::load_aligned (S_[c] + r) * xsimd::load_aligned (a_ + r));
+                    bc = xsimd::fma(xsimd::load_aligned (S_[c] + r), xsimd::load_aligned (a_ + r), bc);
+                b_[c] = xsimd::hadd (bc);
 
                 // remainder of ops that can't be vectorized
                 for (int r = vec_size; r < numPorts; ++r)
@@ -106,7 +107,7 @@ namespace WDF
                 for (int r = vec_size; r < numPorts; ++r)
                     b_[c] += S_[c][r] * a_[r];
             }
-#else
+#else // No SIMD
             for (int c = 0; c < numPorts; ++c)
             {
                 b_[c] = (T) 0;
