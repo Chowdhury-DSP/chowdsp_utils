@@ -104,7 +104,6 @@ namespace WDF
 #endif // USING_JUCE
 
     protected:
-        using FloatType = T;
         T a = (T) 0.0; // incident wave
         T b = (T) 0.0; // reflected wave
 
