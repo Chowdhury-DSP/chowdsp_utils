@@ -85,7 +85,7 @@ namespace WDF
             {
                 v_type bc { (T) 0 };
                 for (int r = 0; r < vec_size; r += simd_size)
-                    bc = xsimd::fma(xsimd::load_aligned (S_[c] + r), xsimd::load_aligned (a_ + r), bc);
+                    bc = xsimd::fma (xsimd::load_aligned (S_[c] + r), xsimd::load_aligned (a_ + r), bc);
                 b_[c] = xsimd::hadd (bc);
 
                 // remainder of ops that can't be vectorized
