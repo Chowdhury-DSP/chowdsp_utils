@@ -37,9 +37,9 @@ public:
 
     static std::vector<T> getTestVector (AudioBuffer<float> buffer)
     {
-        std::vector<T> vector (buffer.getNumSamples(), (T) 0);
+        std::vector<T> vector ((size_t) buffer.getNumSamples(), (T) 0);
         for (int i = 0; i < buffer.getNumSamples(); ++i)
-            vector[i] = (T) (NumericType) buffer.getSample (0, i);
+            vector[(size_t) i] = (T) (NumericType) buffer.getSample (0, i);
 
         return vector;
     }
@@ -52,7 +52,7 @@ public:
 
         auto max = (T) 0;
         for (int i = start; i < start + num; ++i)
-            max = jmax (max, buffer[i]);
+            max = jmax (max, buffer[(size_t) i]);
 
         return max;
     }
@@ -65,7 +65,7 @@ public:
 
         auto max = (T) 0;
         for (int i = start; i < start + num; ++i)
-            max = jmax (max, buffer[i]);
+            max = jmax (max, buffer[(size_t) i]);
 
         return max.get (0);
     }
