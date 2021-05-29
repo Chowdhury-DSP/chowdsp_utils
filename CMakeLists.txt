@@ -73,3 +73,23 @@ if((CMAKE_CXX_COMPILER_ID STREQUAL "MSVC") OR (CMAKE_CXX_SIMULATE_ID STREQUAL "M
     target_compile_options(chowdsp_utils_tests PUBLIC /wd4458)
     target_compile_options(chowdsp_gui_test PUBLIC /wd4458)
 endif()
+
+option(CODE_COVERAGE "Enable coverage reporting" OFF)
+if(CODE_COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    # Add required flags (GCC & LLVM/Clang)
+    message(STATUS "Appending code coverage compiler flags: -O0 -g --coverage")
+    target_compile_options(chowdsp_utils_tests PUBLIC
+        -O0        # no optimization
+        -g         # generate debug info
+        --coverage # sets all required flags
+    )
+
+    target_compile_options(chowdsp_gui_test PUBLIC
+        -O0        # no optimization
+        -g         # generate debug info
+        --coverage # sets all required flags
+    )
+
+    target_link_options(chowdsp_utils_tests PUBLIC --coverage)
+    target_link_options(chowdsp_gui_test PUBLIC --coverage)
+endif(CODE_COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")

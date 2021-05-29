@@ -2,6 +2,7 @@
 
 ![CI](https://github.com/Chowdhury-DSP/chowdsp_utils/workflows/CI/badge.svg)
 [![License](https://img.shields.io/badge/License-BSD-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
+[![codecov](https://codecov.io/gh/Chowdhury-DSP/chowdsp_utils/branch/master/graph/badge.svg?token=84B35MB5QS)](https://codecov.io/gh/Chowdhury-DSP/chowdsp_utils)
 
 This repository contains a JUCE module with utilities for building Chowdhury DSP plugins.
 
