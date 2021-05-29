@@ -44,8 +44,8 @@ namespace WDF
     class WDF
     {
         using NumericType = typename juce::dsp::SampleTypeHelpers::ElementType<T>::Type;
-    public:
 
+    public:
         WDF (std::string type) : type (type) {}
         virtual ~WDF() = default;
 
@@ -616,6 +616,7 @@ namespace WDF
     class ResistiveVoltageSource : public WDFNode<T>
     {
         using NumericType = typename juce::dsp::SampleTypeHelpers::ElementType<T>::Type;
+
     public:
         /** Creates a new resistive voltage source.
      * @param value: initial resistance value, in Ohms
@@ -703,6 +704,7 @@ namespace WDF
     class ResistiveCurrentSource : public WDFNode<T>
     {
         using NumericType = typename juce::dsp::SampleTypeHelpers::ElementType<T>::Type;
+
     public:
         /** Creates a new resistive current source.
      * @param value: initial resistance value, in Ohms
