@@ -32,11 +32,11 @@ namespace WDF
     template <typename T, typename... PortTypes>
     class RootRtypeAdaptor : public WDFNode<T>
     {
-        static constexpr int numPorts = sizeof...(PortTypes); // number of ports connected to RtypeAdaptor
+        static constexpr auto numPorts = sizeof...(PortTypes); // number of ports connected to RtypeAdaptor
     public:
         RootRtypeAdaptor (std::tuple<PortTypes&...> dps) : WDFNode<T> ("Root R-type Adaptor"), downPorts (dps)
         {
-            for (int i = 0; i < numPorts; i++)
+            for (int i = 0; i < (int) numPorts; i++)
             {
                 b_vec[i] = (T) 0;
                 a_vec[i] = (T) 0;
@@ -50,8 +50,8 @@ namespace WDF
         /** Use this function to set the scattering matrix data. */
         void setSMatrixData (const T (&mat)[numPorts][numPorts])
         {
-            for (int i = 0; i < numPorts; ++i)
-                for (int j = 0; j < numPorts; ++j)
+            for (int i = 0; i < (int) numPorts; ++i)
+                for (int j = 0; j < (int) numPorts; ++j)
                     S_matrix[i][j] = mat[i][j];
         }
 
@@ -79,9 +79,9 @@ namespace WDF
 #if CHOWDSP_USE_XSIMD
             using v_type = xsimd::simd_type<T>;
             constexpr auto simd_size = (int) v_type::size;
-            constexpr auto vec_size = numPorts - numPorts % simd_size;
+            constexpr auto vec_size = (int) numPorts - (int) numPorts % simd_size;
 
-            for (int c = 0; c < numPorts; ++c)
+            for (int c = 0; c < (int) numPorts; ++c)
             {
                 v_type bc { (T) 0 };
                 for (int r = 0; r < vec_size; r += simd_size)
@@ -89,29 +89,29 @@ namespace WDF
                 b_[c] = xsimd::hadd (bc);
 
                 // remainder of ops that can't be vectorized
-                for (int r = vec_size; r < numPorts; ++r)
+                for (int r = vec_size; r < (int) numPorts; ++r)
                     b_[c] += S_[c][r] * a_[r];
             }
 #elif JUCE_USE_SIMD
             using v_type = juce::dsp::SIMDRegister<T>;
             constexpr auto simd_size = v_type::size();
-            constexpr auto vec_size = numPorts - numPorts % simd_size;
+            constexpr auto vec_size = (int) numPorts - (int) numPorts % simd_size;
 
-            for (int c = 0; c < numPorts; ++c)
+            for (int c = 0; c < (int) numPorts; ++c)
             {
                 b_[c] = (T) 0;
                 for (int r = 0; r < vec_size; r += simd_size)
                     b_[c] += (v_type::fromRawArray (S_[c] + r) * v_type::fromRawArray (a_ + r)).sum();
 
                 // remainder of ops that can't be vectorized
-                for (int r = vec_size; r < numPorts; ++r)
+                for (int r = vec_size; r < (int) numPorts; ++r)
                     b_[c] += S_[c][r] * a_[r];
             }
 #else // No SIMD
-            for (int c = 0; c < numPorts; ++c)
+            for (int c = 0; c < (int) numPorts; ++c)
             {
                 b_[c] = (T) 0;
-                for (int r = 0; r < numPorts; ++r)
+                for (int r = 0; r < (int) numPorts; ++r)
                     b_[c] += S_[c][r] * a_[r];
             }
 #endif // SIMD options
@@ -125,10 +125,10 @@ namespace WDF
                                               void>::type
             RtypeScatter (const T (&S_)[numPorts][numPorts], const T (&a_)[numPorts], T (&b_)[numPorts])
         {
-            for (int c = 0; c < numPorts; ++c)
+            for (int c = 0; c < (int) numPorts; ++c)
             {
                 b_[c] = (T) 0;
-                for (int r = 0; r < numPorts; ++r)
+                for (int r = 0; r < (int) numPorts; ++r)
                     b_[c] += S_[c][r] * a_[r];
             }
         }
