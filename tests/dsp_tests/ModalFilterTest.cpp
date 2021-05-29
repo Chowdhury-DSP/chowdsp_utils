@@ -46,7 +46,7 @@ public:
 
     template <typename C = T>
     static typename std::enable_if<std::is_same<float, C>::value || std::is_same<double, C>::value, T>::type
-    getMagnitude (const std::vector<T>& buffer, int start = 0, int num = -1)
+        getMagnitude (const std::vector<T>& buffer, int start = 0, int num = -1)
     {
         num = num >= 0 ? num : (int) buffer.size();
 
@@ -59,7 +59,7 @@ public:
 
     template <typename C = T>
     static typename std::enable_if<std::is_same<juce::dsp::SIMDRegister<float>, C>::value || std::is_same<juce::dsp::SIMDRegister<double>, C>::value, NumericType>::type
-    getMagnitude (const std::vector<T>& buffer, int start = 0, int num = -1)
+        getMagnitude (const std::vector<T>& buffer, int start = 0, int num = -1)
     {
         num = num >= 0 ? num : (int) buffer.size();
 

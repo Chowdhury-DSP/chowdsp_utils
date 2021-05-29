@@ -92,6 +92,7 @@ class ModalFilter<juce::dsp::SIMDRegister<FloatType>>
 {
     using VType = juce::dsp::SIMDRegister<FloatType>;
     using CType = SIMDComplex<FloatType>;
+
 public:
     ModalFilter() = default;
 
@@ -149,11 +150,11 @@ protected:
         return CType::exp ((freq / fs) * juce::MathConstants<FloatType>::twoPi);
     }
 
-    CType filtCoef { (FloatType) 0, (FloatType) 0};
+    CType filtCoef { (FloatType) 0, (FloatType) 0 };
     VType decayFactor = 0;
-    CType oscCoef { (FloatType) 0, (FloatType) 0};
+    CType oscCoef { (FloatType) 0, (FloatType) 0 };
 
-    CType y1 = { (FloatType) 0, (FloatType) 0}; // filter state
+    CType y1 = { (FloatType) 0, (FloatType) 0 }; // filter state
 
     VType freq = 1;
     VType t60 = 1;
