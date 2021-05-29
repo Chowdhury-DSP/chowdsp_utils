@@ -44,6 +44,8 @@ namespace WDF
     class WDF
     {
     public:
+        using NumericType = typename juce::dsp::SampleTypeHelpers::ElementType<T>::Type;
+
         WDF (std::string type) : type (type) {}
         virtual ~WDF() = default;
 
@@ -92,16 +94,8 @@ namespace WDF
         template <typename, typename Port1Type, typename Port2Type>
         friend class WDFSeriesT;
 
-#if USING_JUCE
-        JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wimplicit-float-conversion")
-        JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4305)
-#endif // USING_JUCE
-        T R = (T) 1.0e-9; // impedance
+        T R = (NumericType) 1.0e-9; // impedance
         T G = (T) 1.0 / R; // admittance
-#if USING_JUCE
-        JUCE_END_IGNORE_WARNINGS_GCC_LIKE
-        JUCE_END_IGNORE_WARNINGS_MSVC
-#endif // USING_JUCE
 
     protected:
         T a = (T) 0.0; // incident wave
@@ -622,22 +616,14 @@ namespace WDF
     class ResistiveVoltageSource : public WDFNode<T>
     {
     public:
-#if USING_JUCE
-        JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wimplicit-float-conversion")
-        JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4305)
-#endif // USING_JUCE
         /** Creates a new resistive voltage source.
      * @param value: initial resistance value, in Ohms
      */
-        ResistiveVoltageSource (T value = 1.0e-9) : WDFNode<T> ("Resistive Voltage"),
-                                                    R_value (value)
+        ResistiveVoltageSource (T value = (NumericType) 1.0e-9) : WDFNode<T> ("Resistive Voltage"),
+                                                                  R_value (value)
         {
             calcImpedance();
         }
-#if USING_JUCE
-        JUCE_END_IGNORE_WARNINGS_GCC_LIKE
-        JUCE_END_IGNORE_WARNINGS_MSVC
-#endif // USING_JUCE
 
         /** Sets the resistance value of the series resistor, in Ohms. */
         void setResistanceValue (T newR)
@@ -716,22 +702,14 @@ namespace WDF
     class ResistiveCurrentSource : public WDFNode<T>
     {
     public:
-#if USING_JUCE
-        JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wimplicit-float-conversion")
-        JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4305)
-#endif // USING_JUCE
         /** Creates a new resistive current source.
      * @param value: initial resistance value, in Ohms
      */
-        ResistiveCurrentSource (T value = 1.0e9) : WDFNode<T> ("Resistive Current"),
-                                                   R_value (value)
+        ResistiveCurrentSource (T value = (NumericType) 1.0e9) : WDFNode<T> ("Resistive Current"),
+                                                                 R_value (value)
         {
             calcImpedance();
         }
-#if USING_JUCE
-        JUCE_END_IGNORE_WARNINGS_GCC_LIKE
-        JUCE_END_IGNORE_WARNINGS_MSVC
-#endif // USING_JUCE
 
         /** Sets the resistance value of the parallel resistor, in Ohms. */
         void setResistanceValue (T newR)

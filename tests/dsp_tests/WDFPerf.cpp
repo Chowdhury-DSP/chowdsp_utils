@@ -5,7 +5,11 @@ using namespace chowdsp::WDF;
 namespace
 {
 constexpr float fs = 48000.0f;
+#if JUCE_DEBUG
+constexpr float timeSeconds = 10.0f;
+#else
 constexpr float timeSeconds = 1000.0f;
+#endif
 } // namespace
 
 class WDFPerfTest : public UnitTest
