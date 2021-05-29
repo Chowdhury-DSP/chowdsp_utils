@@ -77,11 +77,19 @@ endif()
 option(CODE_COVERAGE "Enable coverage reporting" OFF)
 if(CODE_COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     # Add required flags (GCC & LLVM/Clang)
-    set(COVERAGE_COMPILER_FLAGS "-g -O0 --coverage -fprofile-arcs -ftest-coverage" CACHE INTERNAL "")
-    message(STATUS "Appending code coverage compiler flags: ${COVERAGE_COMPILER_FLAGS}")
-    target_compile_options(chowdsp_utils_tests PUBLIC ${COVERAGE_COMPILER_FLAGS})
-    target_compile_options(chowdsp_gui_test PUBLIC ${COVERAGE_COMPILER_FLAGS})
-    
+    message(STATUS "Appending code coverage compiler flags: -O0 -g --coverage")
+    target_compile_options(chowdsp_utils_tests PUBLIC
+        -O0        # no optimization
+        -g         # generate debug info
+        --coverage # sets all required flags
+    )
+
+    target_compile_options(chowdsp_gui_test PUBLIC
+        -O0        # no optimization
+        -g         # generate debug info
+        --coverage # sets all required flags
+    )
+
     target_link_options(chowdsp_utils_tests PUBLIC --coverage)
     target_link_options(chowdsp_gui_test PUBLIC --coverage)
 endif(CODE_COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
