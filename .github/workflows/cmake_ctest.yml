@@ -24,7 +24,7 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            cmake_args: "-DXSIMD_PATH=../xsimd"
+            cmake_args: "-DCMAKE_BUILD_TYPE=Release -DXSIMD_PATH=../xsimd"
           - os: windows-latest
             cmake_args: ""
           - os: macos-latest

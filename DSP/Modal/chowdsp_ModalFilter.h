@@ -22,7 +22,7 @@ public:
     virtual void prepare (T sampleRate);
 
     /** reset filter state */
-    virtual inline void reset() noexcept { y1 = 0.0f; }
+    virtual inline void reset() noexcept { y1 = std::complex<T> { (T) 0.0 }; }
 
     /** Sets the complex amplitude of the filter */
     virtual inline void setAmp (std::complex<T> amp) noexcept { amplitude = amp; }
@@ -81,6 +81,85 @@ protected:
     T t60 = 1;
     std::complex<T> amplitude;
     T fs = 44100;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ModalFilter)
+};
+
+//=========================================================================
+/** An implementation of the modal filter parallelised with SIMDComplex. */
+template <typename FloatType>
+class ModalFilter<juce::dsp::SIMDRegister<FloatType>>
+{
+    using VType = juce::dsp::SIMDRegister<FloatType>;
+    using CType = SIMDComplex<FloatType>;
+
+public:
+    ModalFilter() = default;
+
+    /** Prepare the filter to process the audio at a given sample rate */
+    virtual void prepare (FloatType sampleRate);
+
+    /** reset filter state */
+    virtual inline void reset() noexcept { y1 = CType { (FloatType) 0, (FloatType) 0 }; }
+
+    /** Sets the complex amplitude of the filter */
+    virtual inline void setAmp (VType amp) noexcept { amplitude = amp; }
+
+    /** Sets the amplitude and phase of the filter */
+    virtual inline void setAmp (VType amp, VType phase) noexcept { amplitude = CType::polar (amp, phase); }
+
+    /** Sets the decay characteristic of the filter, in units of T60 */
+    virtual inline void setDecay (VType newT60) noexcept
+    {
+        t60 = newT60;
+        decayFactor = calcDecayFactor();
+        updateParams();
+    }
+
+    /** Sets the resonant frequency of the filter */
+    virtual inline void setFreq (VType newFreq) noexcept
+    {
+        freq = newFreq;
+        oscCoef = calcOscCoef();
+        updateParams();
+    }
+
+    /** Process a single sample */
+    virtual inline VType processSample (VType x)
+    {
+        auto y = filtCoef * y1 + amplitude * x;
+        y1 = y;
+        return y.imag();
+    }
+
+    /** Process a block of samples */
+    virtual void processBlock (VType* buffer, const int numSamples);
+
+protected:
+    inline void updateParams() noexcept { filtCoef = decayFactor * oscCoef; }
+
+    inline VType calcDecayFactor() noexcept
+    {
+        using namespace SIMDUtils;
+        return powSIMD ((VType) (FloatType) 0.001, (VType) 1 / (t60 * fs));
+    }
+
+    inline CType calcOscCoef() noexcept
+    {
+        using namespace SIMDUtils;
+        return CType::exp ((freq / fs) * juce::MathConstants<FloatType>::twoPi);
+    }
+
+    CType filtCoef { (FloatType) 0, (FloatType) 0 };
+    VType decayFactor = 0;
+    CType oscCoef { (FloatType) 0, (FloatType) 0 };
+
+    CType y1 = { (FloatType) 0, (FloatType) 0 }; // filter state
+
+    VType freq = 1;
+    VType t60 = 1;
+    CType amplitude;
+    FloatType fs = 44100;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ModalFilter)
 };
