@@ -73,3 +73,11 @@ if((CMAKE_CXX_COMPILER_ID STREQUAL "MSVC") OR (CMAKE_CXX_SIMULATE_ID STREQUAL "M
     target_compile_options(chowdsp_utils_tests PUBLIC /wd4458)
     target_compile_options(chowdsp_gui_test PUBLIC /wd4458)
 endif()
+
+option(CHOWDSP_UTILS_TEST_COV "Set options for checking test coverage" OFF)
+if(CHOWDSP_UTILS_TEST_COV)
+    set(COVERAGE_COMPILER_FLAGS "-g -O0 --coverage -fprofile-arcs -ftest-coverage" CACHE INTERNAL "")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COVERAGE_COMPILER_FLAGS}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COVERAGE_COMPILER_FLAGS}")
+    message(STATUS "Appending code coverage compiler flags: ${COVERAGE_COMPILER_FLAGS}")
+endif()
