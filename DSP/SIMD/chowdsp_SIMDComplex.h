@@ -68,6 +68,17 @@ struct SIMDComplex
         return { fastcosSIMD<Type> (angle), fastsinSIMD<Type> (angle) };
     }
 
+    inline static SIMDComplex exp (T angle)
+    {
+        using namespace SIMDUtils;
+        return { cosSIMD (angle), sinSIMD (angle) };
+    }
+
+    inline static SIMDComplex polar (T mag, T angle)
+    {
+        return mag * exp (angle);
+    }
+
     inline SIMDComplex<Type> map (std::function<std::complex<Type> (const std::complex<Type>&)> f)
     {
         Type rfl alignas (16)[size], ifl alignas (16)[size];
@@ -127,6 +138,18 @@ inline SIMDComplex<Type> operator* (const SIMDComplex<Type>& a, const SIMDComple
 
 template <typename Type>
 inline SIMDComplex<Type> operator* (const SIMDComplex<Type>& a, const Type& b)
+{
+    return { a._r * b, a._i * b };
+}
+
+template <typename Type>
+inline SIMDComplex<Type> operator* (const SIMDComplex<Type>& a, const juce::dsp::SIMDRegister<Type>& b)
+{
+    return { a._r * b, a._i * b };
+}
+
+template <typename Type>
+inline SIMDComplex<Type> operator* (const juce::dsp::SIMDRegister<Type>& b, const SIMDComplex<Type>& a)
 {
     return { a._r * b, a._i * b };
 }

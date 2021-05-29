@@ -13,59 +13,111 @@ constexpr float modeAmp = 0.1f;
  *   - Check that filter damps frequencies other than center frequency
  *   - Check that filter has correct decay time
  */
+template <typename T>
 class ModalFilterTest : public UnitTest
 {
 public:
-    ModalFilterTest() : UnitTest ("Modal Filter Test") {}
+    using NumericType = typename dsp::SampleTypeHelpers::ElementType<T>::Type;
+
+    ModalFilterTest() : UnitTest ("Modal Filter Test " + getSampleType()) {}
+
+    static String getSampleType()
+    {
+        if (std::is_same_v<T, float>)
+            return "Float";
+        if (std::is_same_v<T, double>)
+            return "Float";
+        if (std::is_same_v<T, dsp::SIMDRegister<float>>)
+            return "SIMD Float";
+        if (std::is_same_v<T, dsp::SIMDRegister<double>>)
+            return "SIMD Double";
+
+        return "Unknown";
+    }
+
+    static std::vector<T> getTestVector (AudioBuffer<float> buffer)
+    {
+        std::vector<T> vector (buffer.getNumSamples(), (T) 0);
+        for (int i = 0; i < buffer.getNumSamples(); ++i)
+            vector[i] = (T) (NumericType) buffer.getSample (0, i);
+
+        return vector;
+    }
+
+    template <typename C = T>
+    static typename std::enable_if<std::is_same<float, C>::value || std::is_same<double, C>::value, T>::type
+        getMagnitude (const std::vector<T>& buffer, int start = 0, int num = -1)
+    {
+        num = num >= 0 ? num : (int) buffer.size();
+
+        auto max = (T) 0;
+        for (int i = start; i < start + num; ++i)
+            max = jmax (max, buffer[i]);
+
+        return max;
+    }
+
+    template <typename C = T>
+    static typename std::enable_if<std::is_same<juce::dsp::SIMDRegister<float>, C>::value || std::is_same<juce::dsp::SIMDRegister<double>, C>::value, NumericType>::type
+        getMagnitude (const std::vector<T>& buffer, int start = 0, int num = -1)
+    {
+        num = num >= 0 ? num : (int) buffer.size();
+
+        auto max = (T) 0;
+        for (int i = start; i < start + num; ++i)
+            max = jmax (max, buffer[i]);
+
+        return max.get (0);
+    }
 
     void onFreqSineTest()
     {
         constexpr float testFreq = 100.0f;
-        auto buffer = test_utils::makeSineWave (testFreq, fs, 1.0f);
-        auto refMag = Decibels::gainToDecibels (buffer.getMagnitude (0, buffer.getNumSamples()));
+        auto buffer = getTestVector (test_utils::makeSineWave (testFreq, fs, 1.0f));
+        auto refMag = Decibels::gainToDecibels (getMagnitude (buffer));
 
-        chowdsp::ModalFilter<float> filter;
-        filter.prepare (fs);
-        filter.setAmp (modeAmp);
-        filter.setDecay (modeDecay);
-        filter.setFreq (testFreq);
-        filter.processBlock (buffer.getWritePointer (0), buffer.getNumSamples());
+        chowdsp::ModalFilter<T> filter;
+        filter.prepare ((NumericType) fs);
+        filter.setAmp ((T) modeAmp);
+        filter.setDecay ((T) modeDecay);
+        filter.setFreq ((T) testFreq);
+        filter.processBlock (buffer.data(), (int) buffer.size());
 
-        auto mag = Decibels::gainToDecibels (buffer.getMagnitude (0, buffer.getNumSamples()));
-        expectGreaterThan (mag - refMag, 6.0f, "Modal filter is not resonating at correct frequency.");
+        auto mag = Decibels::gainToDecibels (getMagnitude (buffer));
+        expectGreaterThan (mag - refMag, (NumericType) 6.0f, "Modal filter is not resonating at correct frequency.");
     }
 
     void offFreqSineTest()
     {
         constexpr float testFreq1 = 100.0f;
         constexpr float testFreq2 = 10000.0f;
-        auto buffer = test_utils::makeSineWave (testFreq1, fs, 1.0f);
-        auto refMag = Decibels::gainToDecibels (buffer.getMagnitude (0, buffer.getNumSamples()));
+        auto buffer = getTestVector (test_utils::makeSineWave (testFreq1, fs, 1.0f));
+        auto refMag = Decibels::gainToDecibels (getMagnitude (buffer));
 
-        chowdsp::ModalFilter<float> filter;
-        filter.prepare (fs);
-        filter.setAmp (modeAmp);
-        filter.setDecay (modeDecay);
-        filter.setFreq (testFreq2);
-        filter.processBlock (buffer.getWritePointer (0), buffer.getNumSamples());
+        chowdsp::ModalFilter<T> filter;
+        filter.prepare ((NumericType) fs);
+        filter.setAmp ((T) modeAmp);
+        filter.setDecay ((T) modeDecay);
+        filter.setFreq ((T) testFreq2);
+        filter.processBlock (buffer.data(), (int) buffer.size());
 
-        auto mag = Decibels::gainToDecibels (buffer.getMagnitude (0, buffer.getNumSamples()));
-        expectLessThan (mag - refMag, -24.0f, "Modal filter is resonating at an incorrect frequency.");
+        auto mag = Decibels::gainToDecibels (getMagnitude (buffer));
+        expectLessThan (mag - refMag, (NumericType) -24.0f, "Modal filter is resonating at an incorrect frequency.");
     }
 
     void decayTimeTest()
     {
-        auto buffer = test_utils::makeImpulse (1.0f, fs, 1.0f);
+        auto buffer = getTestVector (test_utils::makeImpulse (1.0f, fs, 1.0f));
 
-        chowdsp::ModalFilter<float> filter;
-        filter.prepare (fs);
-        filter.setAmp (1.0f);
-        filter.setDecay (0.5f);
-        filter.setFreq (100.0f);
-        filter.processBlock (buffer.getWritePointer (0), buffer.getNumSamples());
+        chowdsp::ModalFilter<T> filter;
+        filter.prepare ((NumericType) fs);
+        filter.setAmp ((T) 1.0f);
+        filter.setDecay ((T) 0.5f);
+        filter.setFreq ((T) 100.0f);
+        filter.processBlock (buffer.data(), (int) buffer.size());
 
-        auto mag = Decibels::gainToDecibels (buffer.getMagnitude (int (fs * 0.5f), int (fs * 0.1f)));
-        expectWithinAbsoluteError (mag, -60.0f, 1.0f, "Incorrect decay time.");
+        auto mag = Decibels::gainToDecibels (getMagnitude (buffer, int (fs * 0.5f), int (fs * 0.1f)));
+        expectWithinAbsoluteError (mag, (NumericType) -60.0f, (NumericType) 1.0f, "Incorrect decay time.");
     }
 
     void runTest() override
@@ -81,4 +133,7 @@ public:
     }
 };
 
-static ModalFilterTest mfTest;
+static ModalFilterTest<float> mfTestFloat;
+static ModalFilterTest<double> mfTestDouble;
+static ModalFilterTest<dsp::SIMDRegister<float>> mfTestSimdFloat;
+static ModalFilterTest<dsp::SIMDRegister<double>> mfTestSimdDouble;
