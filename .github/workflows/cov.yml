@@ -71,14 +71,14 @@ jobs:
       shell: bash
       run: |
         lcov --directory . --capture --output-file coverage.info
-        lcov --remove coverage.info '/usr/*' "${HOME}"'/.cache/*' --output-file coverage.info
+        lcov --remove coverage.info '/usr/*' "${HOME}"'/.cache/*' '*JUCE/modules*' '*xsimd/include*' '*foleys_*' '*chowdsp_utils/tests*' --output-file coverage.info
 
     - name: Report Coverage Data
       working-directory: ${{env.WORK_DIR}}
       shell: bash
       run: lcov --list coverage.info
 
-    - name: Collect Coverage Data
+    - name: Upload Coverage Data
       working-directory: ${{env.WORK_DIR}}
       shell: bash
       run: bash <(curl -s https://codecov.io/bash) -f coverage.info || echo "Codecov did not collect coverage reports"
