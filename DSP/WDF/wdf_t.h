@@ -11,7 +11,7 @@ namespace WDF
 {
     /** WDF 3-port parallel adaptor */
     template <typename T, typename Port1Type, typename Port2Type>
-    class WDFParallelT : public WDFNode<T>
+    class WDFParallelT final : public WDFNode<T>
     {
     public:
         /** Creates a new WDF parallel adaptor from two connected ports. */
@@ -72,7 +72,7 @@ namespace WDF
 
     /** WDF 3-port series adaptor */
     template <typename T, typename Port1Type, typename Port2Type>
-    class WDFSeriesT : public WDFNode<T>
+    class WDFSeriesT final : public WDFNode<T>
     {
     public:
         /** Creates a new WDF series adaptor from two connected ports. */
@@ -123,7 +123,7 @@ namespace WDF
 
     /** WDF Voltage Polarity Inverter */
     template <typename T, typename PortType>
-    class PolarityInverterT : public WDFNode<T>
+    class PolarityInverterT final : public WDFNode<T>
     {
     public:
         /** Creates a new WDF polarity inverter */
