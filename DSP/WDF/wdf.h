@@ -10,7 +10,6 @@
 
 namespace chowdsp
 {
-
 #ifndef DOXYGEN
 namespace SampleTypeHelpers // Internal classes needed for handling sample type classes
 {
@@ -25,7 +24,7 @@ namespace SampleTypeHelpers // Internal classes needed for handling sample type 
     {
         using Type = typename T::value_type;
     };
-}
+} // namespace SampleTypeHelpers
 #endif
 
 /**
@@ -53,7 +52,6 @@ namespace SampleTypeHelpers // Internal classes needed for handling sample type 
  */
 namespace WDF
 {
-
 #if USING_JUCE
     using namespace SIMDUtils;
 #endif // USING_JUCE
