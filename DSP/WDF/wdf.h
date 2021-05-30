@@ -10,6 +10,24 @@
 
 namespace chowdsp
 {
+
+#ifndef DOXYGEN
+namespace SampleTypeHelpers // Internal classes needed for handling sample type classes
+{
+    template <typename T, bool = std::is_floating_point<T>::value>
+    struct ElementType
+    {
+        using Type = T;
+    };
+
+    template <typename T>
+    struct ElementType<T, false>
+    {
+        using Type = typename T::value_type;
+    };
+}
+#endif
+
 /**
  * A framework for creating circuit emulations with Wave Digital Filters.
  * For more technical information, see:
@@ -35,6 +53,7 @@ namespace chowdsp
  */
 namespace WDF
 {
+
 #if USING_JUCE
     using namespace SIMDUtils;
 #endif // USING_JUCE
@@ -43,7 +62,7 @@ namespace WDF
     template <typename T>
     class WDF
     {
-        using NumericType = typename juce::dsp::SampleTypeHelpers::ElementType<T>::Type;
+        using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
 
     public:
         WDF (std::string type) : type (type) {}
@@ -137,7 +156,7 @@ namespace WDF
 
     /** WDF Resistor Node */
     template <typename T>
-    class Resistor : public WDFNode<T>
+    class Resistor final : public WDFNode<T>
     {
     public:
         /** Creates a new WDF Resistor with a given resistance.
@@ -185,7 +204,7 @@ namespace WDF
 
     /** WDF Capacitor Node */
     template <typename T>
-    class Capacitor : public WDFNode<T>
+    class Capacitor final : public WDFNode<T>
     {
     public:
         /** Creates a new WDF Capacitor.
@@ -252,7 +271,7 @@ namespace WDF
 
     /** WDF Inductor Node */
     template <typename T>
-    class Inductor : public WDFNode<T>
+    class Inductor final : public WDFNode<T>
     {
     public:
         /** Creates a new WDF Inductor.
@@ -317,7 +336,7 @@ namespace WDF
 
     /** WDF Switch (non-adaptable) */
     template <typename T>
-    class Switch : public WDFNode<T>
+    class Switch final : public WDFNode<T>
     {
     public:
         Switch() : WDFNode<T> ("Switch")
@@ -348,7 +367,7 @@ namespace WDF
 
     /** WDF Open circuit (non-adaptable) */
     template <typename T>
-    class Open : public WDFNode<T>
+    class Open final : public WDFNode<T>
     {
     public:
         Open() : WDFNode<T> ("Open")
@@ -375,7 +394,7 @@ namespace WDF
 
     /** WDF Short circuit (non-adaptable) */
     template <typename T>
-    class Short : public WDFNode<T>
+    class Short final : public WDFNode<T>
     {
     public:
         Short() : WDFNode<T> ("Short")
@@ -402,7 +421,7 @@ namespace WDF
 
     /** WDF Voltage Polarity Inverter */
     template <typename T>
-    class PolarityInverter : public WDFNode<T>
+    class PolarityInverter final : public WDFNode<T>
     {
     public:
         /** Creates a new WDF polarity inverter
@@ -444,7 +463,7 @@ namespace WDF
 
     /** WDF y-parameter 2-port (short circuit admittance) */
     template <typename T>
-    class YParameter : public WDFNode<T>
+    class YParameter final : public WDFNode<T>
     {
     public:
         YParameter (WDFNode<T>* port1, T y11, T y12, T y21, T y22) : WDFNode<T> ("YParameter"),
@@ -516,7 +535,7 @@ namespace WDF
 
     /** WDF 3-port parallel adaptor */
     template <typename T>
-    class WDFParallel : public WDFAdaptor<T>
+    class WDFParallel final : public WDFAdaptor<T>
     {
     public:
         /** Creates a new WDF parallel adaptor from two connected ports. */
@@ -570,7 +589,7 @@ namespace WDF
 
     /** WDF 3-port series adaptor */
     template <typename T>
-    class WDFSeries : public WDFAdaptor<T>
+    class WDFSeries final : public WDFAdaptor<T>
     {
     public:
         /** Creates a new WDF series adaptor from two connected ports. */
@@ -613,9 +632,9 @@ namespace WDF
 
     /** WDF Voltage source with series resistance */
     template <typename T>
-    class ResistiveVoltageSource : public WDFNode<T>
+    class ResistiveVoltageSource final : public WDFNode<T>
     {
-        using NumericType = typename juce::dsp::SampleTypeHelpers::ElementType<T>::Type;
+        using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
 
     public:
         /** Creates a new resistive voltage source.
@@ -669,7 +688,7 @@ namespace WDF
 
     /** WDF Ideal Voltage source (non-adaptable) */
     template <typename T>
-    class IdealVoltageSource : public WDFNode<T>
+    class IdealVoltageSource final : public WDFNode<T>
     {
     public:
         IdealVoltageSource() : WDFNode<T> ("IdealVoltage")
@@ -701,9 +720,9 @@ namespace WDF
 
     /** WDF Current source with parallel resistance */
     template <typename T>
-    class ResistiveCurrentSource : public WDFNode<T>
+    class ResistiveCurrentSource final : public WDFNode<T>
     {
-        using NumericType = typename juce::dsp::SampleTypeHelpers::ElementType<T>::Type;
+        using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
 
     public:
         /** Creates a new resistive current source.
@@ -757,7 +776,7 @@ namespace WDF
 
     /** WDF Current source (non-adpatable) */
     template <typename T>
-    class IdealCurrentSource : public WDFNode<T>
+    class IdealCurrentSource final : public WDFNode<T>
     {
     public:
         IdealCurrentSource() : WDFNode<T> ("Ideal Current")
@@ -810,7 +829,7 @@ namespace WDF
  * https://www.researchgate.net/publication/299514713_An_Improved_and_Generalized_Diode_Clipper_Model_for_Wave_Digital_Filters
  */
     template <typename T>
-    class DiodePair : public WDFNode<T>
+    class DiodePair final : public WDFNode<T>
     {
     public:
         /** Creates a new WDF diode pair, with the given diode specifications.
@@ -873,7 +892,7 @@ namespace WDF
  * https://www.researchgate.net/publication/299514713_An_Improved_and_Generalized_Diode_Clipper_Model_for_Wave_Digital_Filters
  */
     template <typename T>
-    class Diode : public WDFNode<T>
+    class Diode final : public WDFNode<T>
     {
     public:
         /** Creates a new WDF diode, with the given diode specifications.
