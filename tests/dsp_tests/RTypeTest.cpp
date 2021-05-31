@@ -57,9 +57,9 @@ public:
     }
 
 private:
-    Capacitor<double> Cap1;
-    Capacitor<double> Cap2; // Port D
-    Capacitor<double> Cap3; // Port F
+    CapacitorAlpha<double> Cap1;
+    CapacitorAlpha<double> Cap2; // Port D
+    CapacitorAlpha<double> Cap3; // Port F
 
     Resistor<double> Res1p { 1.0 };
     Resistor<double> Res1m { 1.0 };
@@ -80,7 +80,7 @@ private:
 
     // Port C
     SeriesRes S4 { Res1p, Res1m };
-    using S2Type = WDFSeriesT<double, Capacitor<double>, SeriesRes>;
+    using S2Type = WDFSeriesT<double, CapacitorAlpha<double>, SeriesRes>;
     S2Type S2 { Cap1, S4 };
 
     static constexpr double alpha = 1.0;
@@ -89,7 +89,7 @@ private:
     static constexpr double R2 = 1e6;
     static constexpr double R3 = 25e3;
 
-    RootRtypeAdaptor<double, S1Type, SeriesRes, S2Type, Capacitor<double>, Resistor<double>, Capacitor<double>> R;
+    RootRtypeAdaptor<double, S1Type, SeriesRes, S2Type, CapacitorAlpha<double>, Resistor<double>, CapacitorAlpha<double>> R;
 };
 
 class RTypeTest : public UnitTest

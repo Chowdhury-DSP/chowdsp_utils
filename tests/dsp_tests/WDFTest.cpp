@@ -90,7 +90,7 @@ public:
         expectWithinAbsoluteError (magHalf, -1.0f, error, "RC Lowpass incorrect voltage at 0.5x fc");
     }
 
-    alphaTransformTest()
+    void alphaTransformTest()
     {
         // 1 kHz cutoff 2nd-order highpass
         constexpr float R = 300.0f;
@@ -115,7 +115,7 @@ public:
         };
 
         // reference filter
-        double magRef
+        float refMag;
         {
             Capacitor<float> c1 (C, (float) fs);
             Resistor<float> r1 (R);
@@ -129,9 +129,9 @@ public:
             vs.connectToNode (&p1);
 
             auto refSine = test_utils::makeSineWave (10.0e3f, (float) fs, 1.0f);
-            processBuffer (refSine.getWritePointer (0), refSine.getNumSamples());
-            magRef = getMagDB (refSine);
-            std::cout << "Ref Mag: " << refMag << std::endl;
+            processBuffer (refSine.getWritePointer (0), refSine.getNumSamples(), vs, p1, l1);
+            refMag = getMagDB (refSine);
+            expectWithinAbsoluteError (refMag, 0.0f, 0.1f, "Reference highpass passband gain is incorrect!");
         }
 
         // alpha = 1.0 filter
@@ -149,9 +149,10 @@ public:
             vs.connectToNode (&p1);
 
             auto a1Sine = test_utils::makeSineWave (10.0e3f, (float) fs, 1.0f);
-            processBuffer (a1Sine.getWritePointer (0), a1Sine.getNumSamples());
-            auto a1Ref = getMagDB (a1Sine);
-            std::cout << "A1 Mag: " << a1Mag << std::endl;
+            processBuffer (a1Sine.getWritePointer (0), a1Sine.getNumSamples(), vs, p1, l1);
+            auto a1Mag = getMagDB (a1Sine);
+            expectWithinAbsoluteError (a1Mag, 0.0f, 0.1f, "Alpha = 1 highpass passband gain is incorrect!");
+            expectWithinAbsoluteError (a1Mag, refMag, 1.0e-6f, "Alpha = 1 passband gain is not equal to reference!");
         }
 
         // alpha = 0.1 filter
@@ -169,9 +170,9 @@ public:
             vs.connectToNode (&p1);
 
             auto a01Sine = test_utils::makeSineWave (10.0e3f, (float) fs, 1.0f);
-            processBuffer (a01Sine.getWritePointer (0), a01Sine.getNumSamples());
-            auto a01Ref = getMagDB (a01Sine);
-            std::cout << "A01 Mag: " << a01Mag << std::endl;
+            processBuffer (a01Sine.getWritePointer (0), a01Sine.getNumSamples(), vs, p1, l1);
+            auto a01Mag = getMagDB (a01Sine);
+            expectWithinAbsoluteError (a01Mag, refMag - 1.1f, 0.1f, "Alpha = 0.1 passband gain is incorrect!");
         }
     }
 
@@ -312,7 +313,7 @@ public:
         using Vec = dsp::SIMDRegister<FloatType>;
 
         using Resistor = Resistor<Vec>;
-        using Capacitor = Capacitor<Vec>;
+        using Capacitor = CapacitorAlpha<Vec>;
         using ResVs = ResistiveVoltageSource<Vec>;
 
         constexpr int num = 5;

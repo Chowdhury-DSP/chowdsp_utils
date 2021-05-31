@@ -94,7 +94,7 @@ namespace WDF
             }
 #elif JUCE_USE_SIMD
             using v_type = juce::dsp::SIMDRegister<T>;
-            constexpr auto simd_size = v_type::size();
+            constexpr auto simd_size = (int) v_type::size();
             constexpr auto vec_size = (int) numPorts - (int) numPorts % simd_size;
 
             for (int c = 0; c < (int) numPorts; ++c)

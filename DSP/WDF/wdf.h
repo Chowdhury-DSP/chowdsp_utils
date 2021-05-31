@@ -247,7 +247,7 @@ namespace WDF
         /** Propogates a reflected wave from a WDF capacitor. */
         inline T reflected() noexcept override
         {
-            this->b = (T) 2 * z;
+            this->b = z;
             return this->b;
         }
 
@@ -370,7 +370,7 @@ namespace WDF
         /** Propogates a reflected wave from a WDF inductor. */
         inline T reflected() noexcept override
         {
-            this->b =  -(T) 2 * z;
+            this->b =  -z;
             return this->b;
         }
 
