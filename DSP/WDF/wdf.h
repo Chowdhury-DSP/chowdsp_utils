@@ -6,6 +6,7 @@
 
 // we want to be able to use this header without JUCE, so let's #if out JUCE-specific implementations
 #define USING_JUCE JUCE_WINDOWS || JUCE_ANDROID || JUCE_BSD || JUCE_LINUX || JUCE_MAC || JUCE_IOS || JUCE_WASM
+#include "signum.h"
 #include "omega.h"
 
 namespace chowdsp
@@ -917,24 +918,6 @@ namespace WDF
     private:
         T Is = (T) 0.0;
     };
-
-    /** Signum function to determine the sign of the input. */
-    template <typename T>
-    inline int signum (T val)
-    {
-        return (T (0) < val) - (val < T (0));
-    }
-
-#if USING_JUCE
-    /** Signum function to determine the sign of the input. */
-    template <typename T>
-    inline juce::dsp::SIMDRegister<T> signumSIMD (juce::dsp::SIMDRegister<T> val)
-    {
-        auto positive = juce::dsp::SIMDRegister<T> ((T) 1) & juce::dsp::SIMDRegister<T>::lessThan (juce::dsp::SIMDRegister<T> ((T) 0), val);
-        auto negative = juce::dsp::SIMDRegister<T> ((T) 1) & juce::dsp::SIMDRegister<T>::lessThan (val, juce::dsp::SIMDRegister<T> ((T) 0));
-        return positive - negative;
-    }
-#endif
 
     /** WDF diode pair (non-adaptable)
  * See Werner et al., "An Improved and Generalized Diode Clipper Model for Wave Digital Filters"

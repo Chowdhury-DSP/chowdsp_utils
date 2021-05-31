@@ -3,7 +3,7 @@
 
 namespace chowdsp
 {
-namespace WDF
+namespace WDFT
 {
     /** Utility functions used internally by the R-Type adaptor */
     namespace rtype_detail
@@ -30,11 +30,11 @@ namespace WDF
  *  For more information see: https://searchworks.stanford.edu/view/11891203, chapter 2
  */
     template <typename T, typename... PortTypes>
-    class RootRtypeAdaptor : public WDFNode<T>
+    class RootRtypeAdaptor
     {
         static constexpr auto numPorts = sizeof...(PortTypes); // number of ports connected to RtypeAdaptor
     public:
-        RootRtypeAdaptor (std::tuple<PortTypes&...> dps) : WDFNode<T> ("Root R-type Adaptor"), downPorts (dps)
+        RootRtypeAdaptor (std::tuple<PortTypes&...> dps) : downPorts (dps)
         {
             for (int i = 0; i < (int) numPorts; i++)
             {
@@ -42,10 +42,9 @@ namespace WDF
                 a_vec[i] = (T) 0;
             }
 
-            rtype_detail::forEachInTuple ([&] (auto& port, size_t) { port.connectToNode (this); }, downPorts);
+            // @TODO: I don't think this is necessary since this is the root?
+            // rtype_detail::forEachInTuple ([&] (auto& port, size_t) { port.connectToParent (this); }, downPorts);
         }
-
-        void calcImpedance() override {}
 
         /** Use this function to set the scattering matrix data. */
         void setSMatrixData (const T (&mat)[numPorts][numPorts])
@@ -56,7 +55,7 @@ namespace WDF
         }
 
         /** Computes the incident wave. Note that the input value is not used. */
-        void incident (T /*downWave*/) noexcept override
+        inline void incident (T /*downWave*/) noexcept
         {
             RtypeScatter (S_matrix, a_vec, b_vec);
             rtype_detail::forEachInTuple ([&] (auto& port, size_t i) {
@@ -139,13 +138,6 @@ namespace WDF
         T S_matrix alignas (16)[numPorts][numPorts]; // square matrix representing S
         T a_vec alignas (16)[numPorts]; // temp matrix of inputs to Rport
         T b_vec alignas (16)[numPorts]; // temp matrix of outputs from Rport
-
-    private:
-        /** Computes the reflected wave (no-op) */
-        T reflected() noexcept override
-        {
-            return 0.0;
-        }
     };
 
 } // namespace WDF
