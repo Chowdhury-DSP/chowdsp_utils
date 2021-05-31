@@ -90,6 +90,91 @@ public:
         expectWithinAbsoluteError (magHalf, -1.0f, error, "RC Lowpass incorrect voltage at 0.5x fc");
     }
 
+    alphaTransformTest()
+    {
+        // 1 kHz cutoff 2nd-order highpass
+        constexpr float R = 300.0f;
+        constexpr float C = 1.0e-6f;
+        constexpr float L = 0.022f;
+
+        auto processBuffer = [] (float* buffer, const int numSamples, auto& vs, auto& p1, auto& l1) {
+            for (int n = 0; n < numSamples; ++n)
+            {
+                vs.setVoltage ((double) buffer[n]);
+
+                vs.incident (p1.reflected());
+                p1.incident (vs.reflected());
+
+                buffer[n] = (float) l1.voltage();
+            }
+        };
+
+        auto getMagDB = [=] (const AudioBuffer<float>& buffer) -> float {
+            return Decibels::gainToDecibels (buffer
+                                                 .getMagnitude (1000, buffer.getNumSamples() - 1000));
+        };
+
+        // reference filter
+        double magRef
+        {
+            Capacitor<float> c1 (C, (float) fs);
+            Resistor<float> r1 (R);
+            Inductor<float> l1 (L, (float) fs);
+
+            WDFSeries<float> s1 (&r1, &c1);
+            WDFSeries<float> s2 (&s1, &l1);
+            PolarityInverter<float> p1 (&s2);
+
+            IdealVoltageSource<float> vs;
+            vs.connectToNode (&p1);
+
+            auto refSine = test_utils::makeSineWave (10.0e3f, (float) fs, 1.0f);
+            processBuffer (refSine.getWritePointer (0), refSine.getNumSamples());
+            magRef = getMagDB (refSine);
+            std::cout << "Ref Mag: " << refMag << std::endl;
+        }
+
+        // alpha = 1.0 filter
+        {
+            constexpr float alpha = 1.0f;
+            CapacitorAlpha<float> c1 (C, (float) fs, alpha);
+            Resistor<float> r1 (R);
+            InductorAlpha<float> l1 (L, (float) fs, alpha);
+
+            WDFSeries<float> s1 (&r1, &c1);
+            WDFSeries<float> s2 (&s1, &l1);
+            PolarityInverter<float> p1 (&s2);
+
+            IdealVoltageSource<float> vs;
+            vs.connectToNode (&p1);
+
+            auto a1Sine = test_utils::makeSineWave (10.0e3f, (float) fs, 1.0f);
+            processBuffer (a1Sine.getWritePointer (0), a1Sine.getNumSamples());
+            auto a1Ref = getMagDB (a1Sine);
+            std::cout << "A1 Mag: " << a1Mag << std::endl;
+        }
+
+        // alpha = 0.1 filter
+        {
+            constexpr float alpha = 0.1f;
+            CapacitorAlpha<float> c1 (C, (float) fs, alpha);
+            Resistor<float> r1 (R);
+            InductorAlpha<float> l1 (L, (float) fs, alpha);
+
+            WDFSeries<float> s1 (&r1, &c1);
+            WDFSeries<float> s2 (&s1, &l1);
+            PolarityInverter<float> p1 (&s2);
+
+            IdealVoltageSource<float> vs;
+            vs.connectToNode (&p1);
+
+            auto a01Sine = test_utils::makeSineWave (10.0e3f, (float) fs, 1.0f);
+            processBuffer (a01Sine.getWritePointer (0), a01Sine.getNumSamples());
+            auto a01Ref = getMagDB (a01Sine);
+            std::cout << "A01 Mag: " << a01Mag << std::endl;
+        }
+    }
+
     void staticWDFTest()
     {
         using FloatType = double;
@@ -295,6 +380,9 @@ public:
 
         beginTest ("RC Lowpass Test");
         rcLowpassTest();
+
+        beginTest ("Alpha Transform Test");
+        alphaTransformTest();
 
         beginTest ("Static WDF Test");
         staticWDFTest();

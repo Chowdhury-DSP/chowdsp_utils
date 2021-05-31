@@ -208,15 +208,73 @@ namespace WDF
         /** Creates a new WDF Capacitor.
      * @param value: Capacitance value in Farads
      * @param fs: WDF sample rate
+     */
+        Capacitor (T value, T fs) : WDFNode<T> ("Capacitor"),
+                                    C_value (value),
+                                    fs (fs)
+        {
+            calcImpedance();
+        }
+
+        /** Sets the capacitance value of the WDF capacitor, in Farads. */
+        void setCapacitanceValue (T newC)
+        {
+            if (newC == C_value)
+                return;
+
+            C_value = newC;
+            WDFNode<T>::propagateImpedance();
+        }
+
+        /** Computes the impedance of the WDF capacitor,
+     *             1
+     * Z_C = --------------
+     *        2 * f_s * C
+     */
+        inline void calcImpedance() override
+        {
+            this->R = (T) 1.0 / ((T) 2.0 * C_value * fs);
+            this->G = (T) 1.0 / this->R;
+        }
+
+        /** Accepts an incident wave into a WDF capacitor. */
+        inline void incident (T x) noexcept override
+        {
+            this->a = x;
+            z = this->a;
+        }
+
+        /** Propogates a reflected wave from a WDF capacitor. */
+        inline T reflected() noexcept override
+        {
+            this->b = (T) 2 * z;
+            return this->b;
+        }
+
+    private:
+        T C_value = (T) 1.0e-6;
+        T z = (T) 0.0;
+
+        const T fs;
+    };
+
+    /** WDF Capacitor Node with alpha transform parameter */
+    template <typename T>
+    class CapacitorAlpha final : public WDFNode<T>
+    {
+    public:
+        /** Creates a new WDF Capacitor.
+     * @param value: Capacitance value in Farads
+     * @param fs: WDF sample rate
      * @param alpha: alpha value to be used for the alpha transform,
      *               use 0 for Backwards Euler, use 1 for Bilinear Transform.
      */
-        Capacitor (T value, T fs, T alpha = 1.0) : WDFNode<T> ("Capacitor"),
-                                                   C_value (value),
-                                                   fs (fs),
-                                                   alpha (alpha),
-                                                   b_coef (((T) 1.0 - alpha) / (T) 2.0),
-                                                   a_coef (((T) 1.0 + alpha) / (T) 2.0)
+        CapacitorAlpha (T value, T fs, T alpha = 1.0) : WDFNode<T> ("Capacitor"),
+                                                        C_value (value),
+                                                        fs (fs),
+                                                        alpha (alpha),
+                                                        b_coef (((T) 1.0 - alpha) / (T) 2.0),
+                                                        a_coef (((T) 1.0 + alpha) / (T) 2.0)
         {
             calcImpedance();
         }
@@ -275,20 +333,15 @@ namespace WDF
         /** Creates a new WDF Inductor.
      * @param value: Inductance value in Farads
      * @param fs: WDF sample rate
-     * @param alpha: alpha value to be used for the alpha transform,
-     *               use 0 for Backwards Euler, use 1 for Bilinear Transform.
      */
-        Inductor (T value, T fs, T alpha = 1.0) : WDFNode<T> ("Inductor"),
-                                                  L_value (value),
-                                                  fs (fs),
-                                                  alpha (alpha),
-                                                  b_coef (((T) 1.0 - alpha) / (T) 2.0),
-                                                  a_coef (((T) 1.0 + alpha) / (T) 2.0)
+        Inductor (T value, T fs) : WDFNode<T> ("Inductor"),
+                                   L_value (value),
+                                   fs (fs)
         {
             calcImpedance();
         }
 
-        /** Sets the inductance value of the WDF capacitor, in Henries. */
+        /** Sets the inductance value of the WDF inductor, in Henries. */
         void setInductanceValue (T newL)
         {
             if (newL == L_value)
@@ -298,7 +351,68 @@ namespace WDF
             WDFNode<T>::propagateImpedance();
         }
 
-        /** Computes the impedance of the WDF capacitor,
+        /** Computes the impedance of the WDF inductor,
+     * Z_L = 2 * f_s * L
+     */
+        inline void calcImpedance() override
+        {
+            this->R = (T) 2.0 * L_value * fs;
+            this->G = (T) 1.0 / this->R;
+        }
+
+        /** Accepts an incident wave into a WDF inductor. */
+        inline void incident (T x) noexcept override
+        {
+            this->a = x;
+            z = this->a;
+        }
+
+        /** Propogates a reflected wave from a WDF inductor. */
+        inline T reflected() noexcept override
+        {
+            this->b =  -(T) 2 * z;
+            return this->b;
+        }
+
+    private:
+        T L_value = (T) 1.0e-6;
+        T z = (T) 0.0;
+
+        const T fs;
+    };
+
+    /** WDF Inductor Node with alpha transform parameter */
+    template <typename T>
+    class InductorAlpha final : public WDFNode<T>
+    {
+    public:
+        /** Creates a new WDF Inductor.
+     * @param value: Inductance value in Farads
+     * @param fs: WDF sample rate
+     * @param alpha: alpha value to be used for the alpha transform,
+     *               use 0 for Backwards Euler, use 1 for Bilinear Transform.
+     */
+        InductorAlpha (T value, T fs, T alpha = 1.0) : WDFNode<T> ("Inductor"),
+                                                       L_value (value),
+                                                       fs (fs),
+                                                       alpha (alpha),
+                                                       b_coef (((T) 1.0 - alpha) / (T) 2.0),
+                                                       a_coef (((T) 1.0 + alpha) / (T) 2.0)
+        {
+            calcImpedance();
+        }
+
+        /** Sets the inductance value of the WDF inductor, in Henries. */
+        void setInductanceValue (T newL)
+        {
+            if (newL == L_value)
+                return;
+
+            L_value = newL;
+            WDFNode<T>::propagateImpedance();
+        }
+
+        /** Computes the impedance of the WDF inductor,
      * Z_L = (1 + alpha) * f_s * L
      */
         inline void calcImpedance() override
