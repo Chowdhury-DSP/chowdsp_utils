@@ -1,4 +1,4 @@
-#include "../test_utils.h"
+#include "test_utils.h"
 #include <JuceHeader.h>
 
 namespace
@@ -100,12 +100,12 @@ public:
         auto processBuffer = [] (float* buffer, const int numSamples, auto& vs, auto& p1, auto& l1) {
             for (int n = 0; n < numSamples; ++n)
             {
-                vs.setVoltage ((double) buffer[n]);
+                vs.setVoltage (buffer[n]);
 
                 vs.incident (p1.reflected());
                 p1.incident (vs.reflected());
 
-                buffer[n] = (float) l1.voltage();
+                buffer[n] = l1.voltage();
             }
         };
 
