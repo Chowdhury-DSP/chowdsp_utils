@@ -19,6 +19,8 @@ target_sources(chowdsp_utils_tests PRIVATE
     
     dsp_tests/wdf_tests/OmegaTest.cpp
     dsp_tests/wdf_tests/RTypeTest.cpp
+    dsp_tests/wdf_tests/SIMDWDFTest.cpp
+    dsp_tests/wdf_tests/StaticWDFTest.cpp
     dsp_tests/wdf_tests/WDFTest.cpp
     dsp_tests/wdf_tests/WDFPerf.cpp
 

@@ -155,7 +155,7 @@ public:
         beginTest ("Float SIMD sin/cos Test (out of range)");
         testSinCosSIMD<float> (true, 10.0f);
 
-        beginTest ("Double SIMD sin/cox Test (out of range)");
+        beginTest ("Double SIMD sin/cos Test (out of range)");
         testSinCosSIMD<double> (true, 10.0f);
 
         beginTest ("Float SIMD sin/cos Test (way out of range)");
