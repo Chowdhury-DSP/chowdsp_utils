@@ -748,10 +748,10 @@ namespace WDFT
             return a;
         }
 #endif
-        Next& next;
-
         const T Is; // reverse saturation current
         const T Vt; // thermal voltage
+
+        Next& next;
     };
 
     /** WDF diode (non-adaptable)
@@ -813,11 +813,10 @@ namespace WDFT
             return b;
         }
 #endif
-
-        Next& next;
-
         const T Is; // reverse saturation current
         const T Vt; // thermal voltage
+
+        Next& next;
     };
 
 #undef CREATE_WDFT_MEMBERS

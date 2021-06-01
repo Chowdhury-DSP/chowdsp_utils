@@ -4,8 +4,6 @@
 namespace
 {
 constexpr double _fs = 44100.0;
-constexpr double fc = 500.0;
-constexpr float error = 0.1f;
 } // namespace
 
 using namespace chowdsp;
