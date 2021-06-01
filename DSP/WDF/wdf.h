@@ -90,12 +90,6 @@ namespace WDF
         template <typename>
         friend class WDFSeries;
 
-        template <typename, typename Port1Type, typename Port2Type>
-        friend class WDFParallelT;
-
-        template <typename, typename Port1Type, typename Port2Type>
-        friend class WDFSeriesT;
-
         T R = (NumericType) 1.0e-9; // impedance
         T G = (T) 1.0 / R; // admittance
 
@@ -599,7 +593,7 @@ namespace WDF
         }
 
         /** Sets the voltage of the voltage source, in Volts */
-        void setVoltage (T newV) { internalWDF.setVoltage (newV); }
+        void setVoltage (T newV) { this->internalWDF.setVoltage (newV); }
     };
 
     /** WDF Ideal Voltage source (non-adaptable) */
@@ -614,7 +608,7 @@ namespace WDF
         inline void calcImpedance() override {}
 
         /** Sets the voltage of the voltage source, in Volts */
-        void setVoltage (T newV) { internalWDF.setVoltage (newV); }
+        void setVoltage (T newV) { this->internalWDF.setVoltage (newV); }
     };
 
     /** WDF Current source with parallel resistance */
