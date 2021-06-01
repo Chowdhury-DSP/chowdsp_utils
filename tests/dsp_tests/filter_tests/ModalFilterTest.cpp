@@ -1,4 +1,4 @@
-#include "../test_utils.h"
+#include "test_utils.h"
 #include <JuceHeader.h>
 
 namespace

@@ -1,14 +1,14 @@
-#include "../test_utils.h"
+#include "test_utils.h"
 #include <JuceHeader.h>
 
 namespace
 {
-constexpr double fs = 44100.0;
+constexpr double _fs = 44100.0;
 constexpr double fc = 500.0;
 constexpr float error = 0.1f;
 } // namespace
 
-using namespace chowdsp::WDF;
+using namespace chowdsp;
 
 /** Fender Bassman tonestack circuit */
 class Tonestack
@@ -40,7 +40,7 @@ public:
         Vres.setVoltage (inSamp);
         R.incident (0.0);
 
-        return Res1m.voltage() + S2.voltage() + Res3m.voltage();
+        return WDFT::voltage<double> (Res1m) + WDFT::voltage<double> (S2) + WDFT::voltage<double> (Res3m);
     }
 
     void setParams (double highPot, double lowPot, double midPot)
@@ -57,30 +57,30 @@ public:
     }
 
 private:
-    Capacitor<double> Cap1;
-    Capacitor<double> Cap2; // Port D
-    Capacitor<double> Cap3; // Port F
+    WDFT::CapacitorAlphaT<double> Cap1;
+    WDFT::CapacitorAlphaT<double> Cap2; // Port D
+    WDFT::CapacitorAlphaT<double> Cap3; // Port F
 
-    Resistor<double> Res1p { 1.0 };
-    Resistor<double> Res1m { 1.0 };
-    Resistor<double> Res2 { 1.0 };
-    Resistor<double> Res3p { 1.0 };
-    Resistor<double> Res3m { 1.0 };
-    Resistor<double> Res4 { 56e3 }; // Port E
+    WDFT::ResistorT<double> Res1p { 1.0 };
+    WDFT::ResistorT<double> Res1m { 1.0 };
+    WDFT::ResistorT<double> Res2 { 1.0 };
+    WDFT::ResistorT<double> Res3p { 1.0 };
+    WDFT::ResistorT<double> Res3m { 1.0 };
+    WDFT::ResistorT<double> Res4 { 56e3 }; // Port E
 
-    ResistiveVoltageSource<double> Vres { 1.0 };
+    WDFT::ResistiveVoltageSourceT<double> Vres { 1.0 };
 
     // Port A
-    using S1Type = WDFSeriesT<double, ResistiveVoltageSource<double>, Resistor<double>>;
+    using S1Type = WDFT::WDFSeriesT<double, WDFT::ResistiveVoltageSourceT<double>, WDFT::ResistorT<double>>;
     S1Type S1 { Vres, Res3m };
 
     // Port B
-    using SeriesRes = WDFSeriesT<double, Resistor<double>, Resistor<double>>;
+    using SeriesRes = WDFT::WDFSeriesT<double, WDFT::ResistorT<double>, WDFT::ResistorT<double>>;
     SeriesRes S3 { Res2, Res3p };
 
     // Port C
     SeriesRes S4 { Res1p, Res1m };
-    using S2Type = WDFSeriesT<double, Capacitor<double>, SeriesRes>;
+    using S2Type = WDFT::WDFSeriesT<double, WDFT::CapacitorAlphaT<double>, SeriesRes>;
     S2Type S2 { Cap1, S4 };
 
     static constexpr double alpha = 1.0;
@@ -89,7 +89,7 @@ private:
     static constexpr double R2 = 1e6;
     static constexpr double R3 = 25e3;
 
-    RootRtypeAdaptor<double, S1Type, SeriesRes, S2Type, Capacitor<double>, Resistor<double>, Capacitor<double>> R;
+    WDFT::RootRtypeAdaptor<double, S1Type, SeriesRes, S2Type, WDFT::CapacitorAlphaT<double>, WDFT::ResistorT<double>, WDFT::CapacitorAlphaT<double>> R;
 };
 
 class RTypeTest : public UnitTest
@@ -99,10 +99,10 @@ public:
 
     void freqTest (float lowPot, float highPot, float sineFreq, float expGainDB, float maxErr)
     {
-        Tonestack tonestack { fs };
+        Tonestack tonestack { _fs };
         tonestack.setParams ((double) highPot, (double) lowPot, 1.0);
 
-        auto buffer = test_utils::makeSineWave (sineFreq, (float) fs, 1.0f);
+        auto buffer = test_utils::makeSineWave (sineFreq, (float) _fs, 1.0f);
         auto* x = buffer.getWritePointer (0);
         for (int n = 0; n < buffer.getNumSamples(); ++n)
             x[n] = (float) tonestack.processSample ((double) x[n]);

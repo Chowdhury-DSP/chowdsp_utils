@@ -30,6 +30,8 @@ target_link_libraries(chowdsp_utils_tests PRIVATE
     juce::juce_recommended_lto_flags
     juce::juce_recommended_warning_flags)
 
+target_include_directories(chowdsp_utils_tests PUBLIC tests)
+
 add_test(NAME chowdsp_utils_tests COMMAND chowdsp_utils_tests)
 
 target_compile_definitions(chowdsp_gui_test PRIVATE
