@@ -166,6 +166,8 @@ public:
         beginTest ("SIMD WDF Test");
         voltageDividerTest<dsp::SIMDRegister<float>> (*this);
         voltageDividerTest<dsp::SIMDRegister<double>> (*this);
+        currentDividerTest<dsp::SIMDRegister<float>> (*this);
+        currentDividerTest<dsp::SIMDRegister<double>> (*this);
         diodeClipperSIMDTest();
 
         beginTest ("Static SIMD WDF Test");

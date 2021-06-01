@@ -19,7 +19,26 @@ inline void voltageDividerTest (UnitTest& test)
     p1.incident (vs.reflected());
 
     auto vOut = r2.voltage();
-
     if (vOut != (FloatType) 5.0)
         test.expect (false, "Voltage divider: incorrect voltage!");
+}
+
+template <typename FloatType>
+inline void currentDividerTest (UnitTest& test)
+{
+    using namespace chowdsp::WDF;
+    Resistor<FloatType> r1 ((FloatType) 10000.0);
+    Resistor<FloatType> r2 ((FloatType) 10000.0);
+    IdealCurrentSource<FloatType> is;
+
+    WDFParallel<FloatType> p1 (&r1, &r2);
+    is.connectToNode (&p1);
+
+    is.setCurrent ((FloatType) 1.0f);
+    is.incident (p1.reflected());
+    p1.incident (is.reflected());
+
+    auto iOut = r2.current();
+    if (iOut != (FloatType) 0.5)
+        test.expect (false, "Current divider: incorrect current!");
 }

@@ -514,7 +514,7 @@ namespace WDFT
     };
 
     /** WDF Ideal Voltage source (non-adaptable) */
-    template <typename T>
+    template <typename T, typename NextType=float>
     class IdealVoltageSourceT
     {
     public:
@@ -599,6 +599,95 @@ namespace WDFT
     private:
         T Vs = (T) 0.0;
         T R_value = (T) 1.0e-9;
+    };
+
+    /** WDF Current source (non-adpatable) */
+    template <typename T, typename Next>
+    class IdealCurrentSourceT
+    {
+    public:
+        IdealCurrentSourceT (Next& n) : next (n)
+        {
+        }
+
+        /** Sets the current of the current source, in Amps */
+        void setCurrent (T newI) { Is = newI; }
+
+        /** Accepts an incident wave into a WDF ideal current source. */
+        inline void incident (T x) noexcept
+        {
+            a = x;
+        }
+
+        /** Propogates a reflected wave from a WDF ideal current source. */
+        inline T reflected() noexcept
+        {
+            b = (T) 2.0 * next.R * Is + a;
+            return b;
+        }
+
+        CREATE_WDFT_MEMBERS
+
+    private:
+        Next& next;
+
+        T Is = (T) 0.0;
+    };
+
+    /** WDF Current source with parallel resistance */
+    template <typename T>
+    class ResistiveCurrentSourceT final : BaseWDF
+    {
+        using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+    public:
+        /** Creates a new resistive current source.
+         * @param value: initial resistance value, in Ohms
+         */
+        ResistiveCurrentSourceT (T value = (NumericType) 1.0e9) : R_value (value)
+        {
+            calcImpedance();
+        }
+
+        /** Sets the resistance value of the parallel resistor, in Ohms. */
+        void setResistanceValue (T newR)
+        {
+            if (newR == R_value)
+                return;
+
+            R_value = newR;
+            propagateImpedance();
+        }
+
+        /** Computes the impedance for a WDF resistive current souce
+         * Z_Ir = Z_R
+         */
+        inline void calcImpedance() override
+        {
+            R = R_value;
+            G = (T) 1.0 / R;
+        }
+
+        /** Sets the current of the current source, in Amps */
+        void setCurrent (T newI) { Is = newI; }
+
+        /** Accepts an incident wave into a WDF resistive current source. */
+        inline void incident (T x) noexcept
+        {
+            a = x;
+        }
+
+        /** Propogates a reflected wave from a WDF resistive current source. */
+        inline T reflected() noexcept
+        {
+            b = (T) 2.0 * R * Is;
+            return b;
+        }
+
+        CREATE_WDFT_MEMBERS
+
+    private:
+        T Is = (T) 0.0;
+        T R_value = (T) 1.0e9;
     };
 
 
