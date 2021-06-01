@@ -638,7 +638,7 @@ namespace WDFT
     {
     public:
         CREATE_WDFT_MEMBERS
-        
+
         /** Creates a new resistive current source.
          * @param value: initial resistance value, in Ohms
          */
