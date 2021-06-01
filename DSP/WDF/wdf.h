@@ -3,30 +3,15 @@
 
 #include <cmath>
 #include <string>
+#include "wdf_t.h"
 
 // we want to be able to use this header without JUCE, so let's #if out JUCE-specific implementations
 #define USING_JUCE JUCE_WINDOWS || JUCE_ANDROID || JUCE_BSD || JUCE_LINUX || JUCE_MAC || JUCE_IOS || JUCE_WASM
+#include "signum.h"
 #include "omega.h"
 
 namespace chowdsp
 {
-#ifndef DOXYGEN
-namespace SampleTypeHelpers // Internal classes needed for handling sample type classes
-{
-    template <typename T, bool = std::is_floating_point<T>::value>
-    struct ElementType
-    {
-        using Type = T;
-    };
-
-    template <typename T>
-    struct ElementType<T, false>
-    {
-        using Type = typename T::value_type;
-    };
-} // namespace SampleTypeHelpers
-#endif
-
 /**
  * A framework for creating circuit emulations with Wave Digital Filters.
  * For more technical information, see:
@@ -105,12 +90,6 @@ namespace WDF
         template <typename>
         friend class WDFSeries;
 
-        template <typename, typename Port1Type, typename Port2Type>
-        friend class WDFParallelT;
-
-        template <typename, typename Port1Type, typename Port2Type>
-        friend class WDFSeriesT;
-
         T R = (NumericType) 1.0e-9; // impedance
         T G = (T) 1.0 / R; // admittance
 
@@ -152,124 +131,131 @@ namespace WDF
         WDF<T>* next = nullptr;
     };
 
-    /** WDF Resistor Node */
-    template <typename T>
-    class Resistor final : public WDFNode<T>
+    template <typename T, typename WDFType>
+    class WDFWrapper : public WDFNode<T>
     {
     public:
-        /** Creates a new WDF Resistor with a given resistance.
-     * @param value: resistance in Ohms
-     */
-        Resistor (T value) : WDFNode<T> ("Resistor"),
-                             R_value (value)
+        template<typename... Args>
+        WDFWrapper(std::string name, Args&&... args) : WDFNode<T> (name),
+                                                       internalWDF (std::forward<Args> (args)...)
         {
             calcImpedance();
         }
 
-        /** Sets the resistance value of the WDF resistor, in Ohms. */
-        void setResistanceValue (T newR)
-        {
-            if (newR == R_value)
-                return;
-
-            R_value = newR;
-            WDFNode<T>::propagateImpedance();
-        }
-
         /** Computes the impedance of the WDF resistor, Z_R = R. */
         inline void calcImpedance() override
-        {
-            this->R = R_value;
-            this->G = (T) 1.0 / this->R;
+        { 
+            internalWDF.calcImpedance();
+            this->R = internalWDF.R;
+            this->G = internalWDF.G;
         }
 
         /** Accepts an incident wave into a WDF resistor. */
         inline void incident (T x) noexcept override
         {
             this->a = x;
+            internalWDF.incident (x);
         }
 
         /** Propogates a reflected wave from a WDF resistor. */
         inline T reflected() noexcept override
         {
-            this->b = 0.0;
+            this->b = internalWDF.reflected();
             return this->b;
         }
 
-    private:
-        T R_value = (T) 1.0e-9;
+    protected:
+        WDFType internalWDF;
+    };
+
+    /** WDF Resistor Node */
+    template <typename T>
+    class Resistor final : public WDFWrapper<T, WDFT::ResistorT<T>>
+    {
+    public:
+        /** Creates a new WDF Resistor with a given resistance.
+         * @param value: resistance in Ohms
+         */
+        Resistor (T value) : WDFWrapper<T, WDFT::ResistorT<T>> ("Resistor", value)
+        {
+        }
+
+        /** Sets the resistance value of the WDF resistor, in Ohms. */
+        void setResistanceValue (T newR)
+        {
+            internalWDF.setResistanceValue (newR);
+            WDFNode<T>::propagateImpedance();
+        }
     };
 
     /** WDF Capacitor Node */
     template <typename T>
-    class Capacitor final : public WDFNode<T>
+    class Capacitor final : public WDFWrapper<T, WDFT::CapacitorT<T>>
     {
     public:
         /** Creates a new WDF Capacitor.
-     * @param value: Capacitance value in Farads
-     * @param fs: WDF sample rate
-     * @param alpha: alpha value to be used for the alpha transform,
-     *               use 0 for Backwards Euler, use 1 for Bilinear Transform.
-     */
-        Capacitor (T value, T fs, T alpha = 1.0) : WDFNode<T> ("Capacitor"),
-                                                   C_value (value),
-                                                   fs (fs),
-                                                   alpha (alpha),
-                                                   b_coef (((T) 1.0 - alpha) / (T) 2.0),
-                                                   a_coef (((T) 1.0 + alpha) / (T) 2.0)
+         * @param value: Capacitance value in Farads
+         * @param fs: WDF sample rate
+         */
+        Capacitor (T value, T fs) : WDFWrapper<T, WDFT::CapacitorT<T>> ("Capacitor", value, fs)
         {
-            calcImpedance();
         }
 
         /** Sets the capacitance value of the WDF capacitor, in Farads. */
         void setCapacitanceValue (T newC)
         {
-            if (newC == C_value)
-                return;
-
-            C_value = newC;
+            internalWDF.setCapacitanceValue (newC);
             WDFNode<T>::propagateImpedance();
         }
+    };
 
-        /** Computes the impedance of the WDF capacitor,
-     *                 1
-     * Z_C = ---------------------
-     *       (1 + alpha) * f_s * C
-     */
-        inline void calcImpedance() override
+    /** WDF Capacitor Node with alpha transform parameter */
+    template <typename T>
+    class CapacitorAlpha final : public WDFWrapper<T, WDFT::CapacitorAlphaT<T>>
+    {
+    public:
+        /** Creates a new WDF Capacitor.
+         * @param value: Capacitance value in Farads
+         * @param fs: WDF sample rate
+         * @param alpha: alpha value to be used for the alpha transform,
+         *               use 0 for Backwards Euler, use 1 for Bilinear Transform.
+         */
+        CapacitorAlpha (T value, T fs, T alpha = 1.0) : WDFWrapper<T, WDFT::CapacitorAlphaT<T>> ("Capacitor", value, fs, alpha)
         {
-            this->R = (T) 1.0 / (((T) 1.0 + alpha) * C_value * fs);
-            this->G = (T) 1.0 / this->R;
         }
 
-        /** Accepts an incident wave into a WDF capacitor. */
-        inline void incident (T x) noexcept override
+        /** Sets the capacitance value of the WDF capacitor, in Farads. */
+        void setCapacitanceValue (T newC)
         {
-            this->a = x;
-            z = this->a;
+            internalWDF.setCapacitanceValue (newC);
+            WDFNode<T>::propagateImpedance();
         }
-
-        /** Propogates a reflected wave from a WDF capacitor. */
-        inline T reflected() noexcept override
-        {
-            this->b = b_coef * this->b + a_coef * z;
-            return this->b;
-        }
-
-    private:
-        T C_value = (T) 1.0e-6;
-        T z = (T) 0.0;
-
-        const T fs;
-        const T alpha;
-
-        const T b_coef;
-        const T a_coef;
     };
 
     /** WDF Inductor Node */
     template <typename T>
-    class Inductor final : public WDFNode<T>
+    class Inductor final : public WDFWrapper<T, WDFT::InductorT<T>>
+    {
+    public:
+        /** Creates a new WDF Inductor.
+     * @param value: Inductance value in Farads
+     * @param fs: WDF sample rate
+     */
+        Inductor (T value, T fs) : WDFWrapper<T, WDFT::InductorT<T>> ("Inductor", value, fs)
+        {
+        }
+
+        /** Sets the inductance value of the WDF inductor, in Henries. */
+        void setInductanceValue (T newL)
+        {
+            internalWDF.setInductanceValue (newL);
+            WDFNode<T>::propagateImpedance();
+        }
+    };
+
+    /** WDF Inductor Node with alpha transform parameter */
+    template <typename T>
+    class InductorAlpha final : public WDFWrapper<T, WDFT::InductorAlphaT<T>>
     {
     public:
         /** Creates a new WDF Inductor.
@@ -278,58 +264,16 @@ namespace WDF
      * @param alpha: alpha value to be used for the alpha transform,
      *               use 0 for Backwards Euler, use 1 for Bilinear Transform.
      */
-        Inductor (T value, T fs, T alpha = 1.0) : WDFNode<T> ("Inductor"),
-                                                  L_value (value),
-                                                  fs (fs),
-                                                  alpha (alpha),
-                                                  b_coef (((T) 1.0 - alpha) / (T) 2.0),
-                                                  a_coef (((T) 1.0 + alpha) / (T) 2.0)
+        InductorAlpha (T value, T fs, T alpha = 1.0) : WDFWrapper<T, WDFT::InductorAlphaT<T>> ("Inductor", value, fs, alpha)
         {
-            calcImpedance();
         }
 
-        /** Sets the inductance value of the WDF capacitor, in Henries. */
+        /** Sets the inductance value of the WDF inductor, in Henries. */
         void setInductanceValue (T newL)
         {
-            if (newL == L_value)
-                return;
-
-            L_value = newL;
+            internalWDF.setInductanceValue (newL);
             WDFNode<T>::propagateImpedance();
         }
-
-        /** Computes the impedance of the WDF capacitor,
-     * Z_L = (1 + alpha) * f_s * L
-     */
-        inline void calcImpedance() override
-        {
-            this->R = ((T) 1.0 + alpha) * L_value * fs;
-            this->G = (T) 1.0 / this->R;
-        }
-
-        /** Accepts an incident wave into a WDF inductor. */
-        inline void incident (T x) noexcept override
-        {
-            this->a = x;
-            z = this->a;
-        }
-
-        /** Propogates a reflected wave from a WDF inductor. */
-        inline T reflected() noexcept override
-        {
-            this->b = b_coef * this->b - a_coef * z;
-            return this->b;
-        }
-
-    private:
-        T L_value = (T) 1.0e-6;
-        T z = (T) 0.0;
-
-        const T fs;
-        const T alpha;
-
-        const T b_coef;
-        const T a_coef;
     };
 
     /** WDF Switch (non-adaptable) */
@@ -423,8 +367,8 @@ namespace WDF
     {
     public:
         /** Creates a new WDF polarity inverter
-     * @param port1: the port to connect to the inverter
-     */
+         * @param port1: the port to connect to the inverter
+         */
         PolarityInverter (WDFNode<T>* port1) : WDFNode<T> ("Polarity Inverter"),
                                                port1 (port1)
         {
@@ -630,90 +574,41 @@ namespace WDF
 
     /** WDF Voltage source with series resistance */
     template <typename T>
-    class ResistiveVoltageSource final : public WDFNode<T>
+    class ResistiveVoltageSource final : public WDFWrapper<T, WDFT::ResistiveVoltageSourceT<T>>
     {
         using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
-
     public:
         /** Creates a new resistive voltage source.
      * @param value: initial resistance value, in Ohms
      */
-        ResistiveVoltageSource (T value = (NumericType) 1.0e-9) : WDFNode<T> ("Resistive Voltage"),
-                                                                  R_value (value)
+        ResistiveVoltageSource (T value = (NumericType) 1.0e-9) : WDFWrapper<T, WDFT::ResistiveVoltageSourceT<T>> ("Resistive Voltage", value)
         {
-            calcImpedance();
         }
 
         /** Sets the resistance value of the series resistor, in Ohms. */
         void setResistanceValue (T newR)
         {
-            if (newR == R_value)
-                return;
-
-            R_value = newR;
+            internalWDF.setResistanceValue (newR);
             WDFNode<T>::propagateImpedance();
         }
 
-        /** Computes the impedance for a WDF resistive voltage souce
-     * Z_Vr = Z_R
-     */
-        inline void calcImpedance() override
-        {
-            this->R = R_value;
-            this->G = (T) 1.0 / this->R;
-        }
-
         /** Sets the voltage of the voltage source, in Volts */
-        void setVoltage (T newV) { Vs = newV; }
-
-        /** Accepts an incident wave into a WDF resistive voltage source. */
-        inline void incident (T x) noexcept override
-        {
-            this->a = x;
-        }
-
-        /** Propogates a reflected wave from a WDF resistive voltage source. */
-        inline T reflected() noexcept override
-        {
-            this->b = Vs;
-            return this->b;
-        }
-
-    private:
-        T Vs = (T) 0.0;
-        T R_value = (T) 1.0e-9;
+        void setVoltage (T newV) { this->internalWDF.setVoltage (newV); }
     };
 
     /** WDF Ideal Voltage source (non-adaptable) */
     template <typename T>
-    class IdealVoltageSource final : public WDFNode<T>
+    class IdealVoltageSource final : public WDFWrapper<T, WDFT::IdealVoltageSourceT<T>>
     {
     public:
-        IdealVoltageSource() : WDFNode<T> ("IdealVoltage")
+        IdealVoltageSource() : WDFWrapper<T, WDFT::IdealVoltageSourceT<T>> ("IdealVoltage")
         {
-            calcImpedance();
         }
 
         inline void calcImpedance() override {}
 
         /** Sets the voltage of the voltage source, in Volts */
-        void setVoltage (T newV) { Vs = newV; }
-
-        /** Accepts an incident wave into a WDF ideal voltage source. */
-        inline void incident (T x) noexcept override
-        {
-            this->a = x;
-        }
-
-        /** Propogates a reflected wave from a WDF ideal voltage source. */
-        inline T reflected() noexcept override
-        {
-            this->b = (T) 0 - this->a + (T) 2.0 * Vs;
-            return this->b;
-        }
-
-    private:
-        T Vs = (T) 0.0;
+        void setVoltage (T newV) { this->internalWDF.setVoltage (newV); }
     };
 
     /** WDF Current source with parallel resistance */
@@ -804,85 +699,23 @@ namespace WDF
         T Is = (T) 0.0;
     };
 
-    /** Signum function to determine the sign of the input. */
-    template <typename T>
-    inline int signum (T val)
-    {
-        return (T (0) < val) - (val < T (0));
-    }
-
-#if USING_JUCE
-    /** Signum function to determine the sign of the input. */
-    template <typename T>
-    inline juce::dsp::SIMDRegister<T> signumSIMD (juce::dsp::SIMDRegister<T> val)
-    {
-        auto positive = juce::dsp::SIMDRegister<T> ((T) 1) & juce::dsp::SIMDRegister<T>::lessThan (juce::dsp::SIMDRegister<T> ((T) 0), val);
-        auto negative = juce::dsp::SIMDRegister<T> ((T) 1) & juce::dsp::SIMDRegister<T>::lessThan (val, juce::dsp::SIMDRegister<T> ((T) 0));
-        return positive - negative;
-    }
-#endif
-
     /** WDF diode pair (non-adaptable)
  * See Werner et al., "An Improved and Generalized Diode Clipper Model for Wave Digital Filters"
  * https://www.researchgate.net/publication/299514713_An_Improved_and_Generalized_Diode_Clipper_Model_for_Wave_Digital_Filters
  */
     template <typename T>
-    class DiodePair final : public WDFNode<T>
+    class DiodePair final : public WDFWrapper<T, WDFT::DiodePairT<T, WDFNode<T>>>
     {
     public:
         /** Creates a new WDF diode pair, with the given diode specifications.
-     * @param Is: reverse saturation current
-     * @param Vt: thermal voltage
-     */
-        DiodePair (T Is, T Vt) : WDFNode<T> ("DiodePair"),
-                                 Is (Is),
-                                 Vt (Vt)
+         * @param Is: reverse saturation current
+         * @param Vt: thermal voltage
+         */
+        DiodePair (T Is, T Vt, WDFNode<T>* next) : WDFWrapper<T, WDFT::DiodePairT<T, WDFNode<T>>> ("DiodePair", Is, Vt, *next)
         {
         }
 
         inline void calcImpedance() override {}
-
-        /** Accepts an incident wave into a WDF diode pair. */
-        inline void incident (T x) noexcept override
-        {
-            this->a = x;
-        }
-
-        /** Propogates a reflected wave from a WDF diode pair. */
-        inline T reflected() noexcept override
-        {
-            return reflectedInternal();
-        }
-
-    private:
-        /** Implementation for float/double. */
-        template <typename C = T>
-        inline typename std::enable_if<std::is_same<float, C>::value || std::is_same<double, C>::value, C>::type
-            reflectedInternal() noexcept
-        {
-            // See eqn (18) from reference paper
-            T lambda = (T) signum (this->a);
-            this->b = this->a + (T) 2 * lambda * (this->next->R * Is - Vt * Omega::omega4 (std::log (this->next->R * Is / Vt) + (lambda * this->a + this->next->R * Is) / Vt));
-            return this->a;
-        }
-
-#if USING_JUCE
-        /** Implementation for SIMD float/double. */
-        template <typename C = T>
-        inline typename std::enable_if<std::is_same<juce::dsp::SIMDRegister<float>, C>::value
-                                           || std::is_same<juce::dsp::SIMDRegister<double>, C>::value,
-                                       C>::type
-            reflectedInternal() noexcept
-        {
-            // See eqn (18) from reference paper
-            T lambda = signumSIMD (this->a);
-            this->b = this->a + (T) 2 * lambda * (this->next->R * Is - Vt * Omega::omega4 (SIMDUtils::logSIMD (this->next->R * Is / Vt) + (lambda * this->a + this->next->R * Is) / Vt));
-            return this->a;
-        }
-#endif
-
-        const T Is; // reverse saturation current
-        const T Vt; // thermal voltage
     };
 
     /** WDF diode (non-adaptable)
@@ -890,60 +723,18 @@ namespace WDF
  * https://www.researchgate.net/publication/299514713_An_Improved_and_Generalized_Diode_Clipper_Model_for_Wave_Digital_Filters
  */
     template <typename T>
-    class Diode final : public WDFNode<T>
+    class Diode final : public WDFWrapper<T, WDFT::DiodeT<T, WDFNode<T>>>
     {
     public:
         /** Creates a new WDF diode, with the given diode specifications.
      * @param Is: reverse saturation current
      * @param Vt: thermal voltage
      */
-        Diode (T Is, T Vt) : WDFNode<T> ("Diode"),
-                             Is (Is),
-                             Vt (Vt)
+        Diode (T Is, T Vt, WDFNode<T>* next) : WDFWrapper<T, WDFT::DiodeT<T, WDFNode<T>>> ("Diode", Is, Vt, *next)
         {
         }
 
         inline void calcImpedance() override {}
-
-        /** Accepts an incident wave into a WDF diode. */
-        inline void incident (T x) noexcept override
-        {
-            this->a = x;
-        }
-
-        /** Propogates a reflected wave from a WDF diode. */
-        inline T reflected() noexcept override
-        {
-            return reflectedInternal();
-        }
-
-    private:
-        /** Implementation for float/double. */
-        template <typename C = T>
-        inline typename std::enable_if<std::is_same<float, C>::value || std::is_same<double, C>::value, C>::type
-            reflectedInternal() noexcept
-        {
-            // See eqn (10) from reference paper
-            this->b = this->a + (T) 2 * this->next->R * Is - (T) 2 * Vt * Omega::omega4 (std::log (this->next->R * Is / Vt) + (this->a + this->next->R * Is) / Vt);
-            return this->b;
-        }
-
-#if USING_JUCE
-        /** Implementation for SIMD float/double. */
-        template <typename C = T>
-        inline typename std::enable_if<std::is_same<juce::dsp::SIMDRegister<float>, C>::value
-                                           || std::is_same<juce::dsp::SIMDRegister<double>, C>::value,
-                                       C>::type
-            reflectedInternal() noexcept
-        {
-            // See eqn (10) from reference paper
-            this->b = this->a + (T) 2 * this->next->R * Is - (T) 2 * Vt * Omega::omega4 (logSIMD (this->next->R * Is / Vt) + (this->a + this->next->R * Is) / Vt);
-            return this->b;
-        }
-#endif
-
-        const T Is; // reverse saturation current
-        const T Vt; // thermal voltage
     };
 
 } // namespace WDF
