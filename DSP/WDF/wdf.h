@@ -183,7 +183,7 @@ namespace WDF
         /** Sets the resistance value of the WDF resistor, in Ohms. */
         void setResistanceValue (T newR)
         {
-            internalWDF.setResistanceValue (newR);
+            this->internalWDF.setResistanceValue (newR);
             WDFNode<T>::propagateImpedance();
         }
     };
@@ -204,7 +204,7 @@ namespace WDF
         /** Sets the capacitance value of the WDF capacitor, in Farads. */
         void setCapacitanceValue (T newC)
         {
-            internalWDF.setCapacitanceValue (newC);
+            this->internalWDF.setCapacitanceValue (newC);
             WDFNode<T>::propagateImpedance();
         }
     };
@@ -227,7 +227,7 @@ namespace WDF
         /** Sets the capacitance value of the WDF capacitor, in Farads. */
         void setCapacitanceValue (T newC)
         {
-            internalWDF.setCapacitanceValue (newC);
+            this->internalWDF.setCapacitanceValue (newC);
             WDFNode<T>::propagateImpedance();
         }
     };
@@ -248,7 +248,7 @@ namespace WDF
         /** Sets the inductance value of the WDF inductor, in Henries. */
         void setInductanceValue (T newL)
         {
-            internalWDF.setInductanceValue (newL);
+            this->internalWDF.setInductanceValue (newL);
             WDFNode<T>::propagateImpedance();
         }
     };
@@ -271,7 +271,7 @@ namespace WDF
         /** Sets the inductance value of the WDF inductor, in Henries. */
         void setInductanceValue (T newL)
         {
-            internalWDF.setInductanceValue (newL);
+            this->internalWDF.setInductanceValue (newL);
             WDFNode<T>::propagateImpedance();
         }
     };
@@ -589,7 +589,7 @@ namespace WDF
         /** Sets the resistance value of the series resistor, in Ohms. */
         void setResistanceValue (T newR)
         {
-            internalWDF.setResistanceValue (newR);
+            this->internalWDF.setResistanceValue (newR);
             WDFNode<T>::propagateImpedance();
         }
 

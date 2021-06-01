@@ -548,9 +548,9 @@ namespace WDFT
     template <typename T>
     class ResistiveVoltageSourceT final : public BaseWDF
     {
-        using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
-
     public:
+        CREATE_WDFT_MEMBERS
+
         /** Creates a new resistive voltage source.
          * @param value: initial resistance value, in Ohms
          */
@@ -594,8 +594,6 @@ namespace WDFT
             return b;
         }
 
-        CREATE_WDFT_MEMBERS
-
     private:
         T Vs = (T) 0.0;
         T R_value = (T) 1.0e-9;
@@ -638,9 +636,9 @@ namespace WDFT
     template <typename T>
     class ResistiveCurrentSourceT final : BaseWDF
     {
-        using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
-
     public:
+        CREATE_WDFT_MEMBERS
+        
         /** Creates a new resistive current source.
          * @param value: initial resistance value, in Ohms
          */
@@ -683,8 +681,6 @@ namespace WDFT
             b = (T) 2.0 * R * Is;
             return b;
         }
-
-        CREATE_WDFT_MEMBERS
 
     private:
         T Is = (T) 0.0;
