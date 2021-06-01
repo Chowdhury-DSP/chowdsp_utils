@@ -140,7 +140,7 @@ namespace WDFT
         T b_vec alignas (16)[numPorts]; // temp matrix of outputs from Rport
     };
 
-} // namespace WDF
+} // namespace WDFT
 } // namespace chowdsp
 
 #endif // RTYPE_H_INCLUDED

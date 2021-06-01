@@ -135,16 +135,16 @@ namespace WDF
     class WDFWrapper : public WDFNode<T>
     {
     public:
-        template<typename... Args>
-        WDFWrapper(std::string name, Args&&... args) : WDFNode<T> (name),
-                                                       internalWDF (std::forward<Args> (args)...)
+        template <typename... Args>
+        WDFWrapper (std::string name, Args&&... args) : WDFNode<T> (name),
+                                                        internalWDF (std::forward<Args> (args)...)
         {
             calcImpedance();
         }
 
         /** Computes the impedance of the WDF resistor, Z_R = R. */
         inline void calcImpedance() override
-        { 
+        {
             internalWDF.calcImpedance();
             this->R = internalWDF.R;
             this->G = internalWDF.G;
@@ -577,6 +577,7 @@ namespace WDF
     class ResistiveVoltageSource final : public WDFWrapper<T, WDFT::ResistiveVoltageSourceT<T>>
     {
         using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+
     public:
         /** Creates a new resistive voltage source.
      * @param value: initial resistance value, in Ohms

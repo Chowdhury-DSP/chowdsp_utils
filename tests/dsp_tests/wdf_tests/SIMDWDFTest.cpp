@@ -142,7 +142,7 @@ public:
             auto S1 = WDFT::makeSeries<Vec> (Vs, P1);
             auto I1 = WDFT::makeInverter<Vec> (r162);
             auto P2 = WDFT::makeParallel<Vec> (I1, S1);
-            WDFT::DiodeT<Vec, decltype(P2)> d53 { 2.52e-9f, 25.85e-3f, P2 }; // 1N4148 diode
+            WDFT::DiodeT<Vec, decltype (P2)> d53 { 2.52e-9f, 25.85e-3f, P2 }; // 1N4148 diode
 
             for (int i = 0; i < num; ++i)
             {

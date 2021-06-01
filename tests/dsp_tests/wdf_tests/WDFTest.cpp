@@ -160,22 +160,18 @@ public:
 
     void impedanceChangeTest()
     {
-        auto checkImpedanceChange = [=] (auto component, const String& name, float value1, float value2,
-                                         auto changeFunc, auto impedanceCalc)
-        {
+        auto checkImpedanceChange = [=] (auto component, const String& name, float value1, float value2, auto changeFunc, auto impedanceCalc) {
             expectEquals (component.R, impedanceCalc (value1), "Initial " + name + " impedance incorrect!");
 
             changeFunc (component, value2);
             expectEquals (component.R, impedanceCalc (value2), "Changed " + name + " impedance incorrect!");
         };
 
-        auto checkImpedanceProp = [=] (auto component, const String& name, float value1, float value2,
-                                         auto changeFunc, auto impedanceCalc)
-        {
+        auto checkImpedanceProp = [=] (auto component, const String& name, float value1, float value2, auto changeFunc, auto impedanceCalc) {
             constexpr float otherR = 5000.0f;
             Resistor<float> r2 { otherR };
             WDFSeries<float> s1 (&component, &r2);
-            
+
             expectEquals (s1.R, impedanceCalc (value1) + otherR, "Initial " + name + " impedance incorrect!");
 
             changeFunc (component, value2);
@@ -188,39 +184,32 @@ public:
         };
 
         // resistor
-        doImpedanceChecks (Resistor<float> { 1000.0f }, "Resistor", 1000.0f, 2000.0f,
-            [=] (Resistor<float>& r, float value) { r.setResistanceValue (value); },
-            [=] (float value) { return value; });
-        
+        doImpedanceChecks (
+            Resistor<float> { 1000.0f }, "Resistor", 1000.0f, 2000.0f, [=] (Resistor<float>& r, float value) { r.setResistanceValue (value); }, [=] (float value) { return value; });
+
         // capacitor
-        doImpedanceChecks (Capacitor<float> { 1.0e-6f, _fs }, "Capacitor", 1.0e-6f, 2.0e-6f,
-            [=] (Capacitor<float>& c, float value) { c.setCapacitanceValue (value); },
-            [=] (float value) { return 1.0f / (2.0f * value * (float) _fs); });
-        
+        doImpedanceChecks (
+            Capacitor<float> { 1.0e-6f, _fs }, "Capacitor", 1.0e-6f, 2.0e-6f, [=] (Capacitor<float>& c, float value) { c.setCapacitanceValue (value); }, [=] (float value) { return 1.0f / (2.0f * value * (float) _fs); });
+
         // capacitor alpha
-        doImpedanceChecks (CapacitorAlpha<float> { 1.0e-6f, _fs, 0.5f }, "CapacitorAlpha", 1.0e-6f, 2.0e-6f,
-            [=] (CapacitorAlpha<float>& c, float value) { c.setCapacitanceValue (value); },
-            [=] (float value) { return 1.0f / (1.5f * value * (float) _fs); });
-        
+        doImpedanceChecks (
+            CapacitorAlpha<float> { 1.0e-6f, _fs, 0.5f }, "CapacitorAlpha", 1.0e-6f, 2.0e-6f, [=] (CapacitorAlpha<float>& c, float value) { c.setCapacitanceValue (value); }, [=] (float value) { return 1.0f / (1.5f * value * (float) _fs); });
+
         // inductor
-        doImpedanceChecks (Inductor<float> { 1.0f, _fs }, "Inductor", 1.0f, 2.0f,
-            [=] (Inductor<float>& i, float value) { i.setInductanceValue (value); },
-            [=] (float value) { return 2.0f * value * (float) _fs; });
-        
+        doImpedanceChecks (
+            Inductor<float> { 1.0f, _fs }, "Inductor", 1.0f, 2.0f, [=] (Inductor<float>& i, float value) { i.setInductanceValue (value); }, [=] (float value) { return 2.0f * value * (float) _fs; });
+
         // inductor alpha
-        doImpedanceChecks (InductorAlpha<float> { 1.0f, _fs, 0.5f }, "InductorAlpha", 1.0f, 2.0f,
-            [=] (InductorAlpha<float>& i, float value) { i.setInductanceValue (value); },
-            [=] (float value) { return 1.5f * value * (float) _fs; });
+        doImpedanceChecks (
+            InductorAlpha<float> { 1.0f, _fs, 0.5f }, "InductorAlpha", 1.0f, 2.0f, [=] (InductorAlpha<float>& i, float value) { i.setInductanceValue (value); }, [=] (float value) { return 1.5f * value * (float) _fs; });
 
         // resistive voltage source
-        doImpedanceChecks (ResistiveVoltageSource<float> { 1000.0f }, "ResistiveVoltageSource", 1000.0f, 2000.0f,
-            [=] (ResistiveVoltageSource<float>& r, float value) { r.setResistanceValue (value); },
-            [=] (float value) { return value; });
-        
+        doImpedanceChecks (
+            ResistiveVoltageSource<float> { 1000.0f }, "ResistiveVoltageSource", 1000.0f, 2000.0f, [=] (ResistiveVoltageSource<float>& r, float value) { r.setResistanceValue (value); }, [=] (float value) { return value; });
+
         // resistive current source
-        doImpedanceChecks (ResistiveCurrentSource<float> { 1000.0f }, "ResistiveCurrentSource", 1000.0f, 2000.0f,
-            [=] (ResistiveCurrentSource<float>& r, float value) { r.setResistanceValue (value); },
-            [=] (float value) { return value; });
+        doImpedanceChecks (
+            ResistiveCurrentSource<float> { 1000.0f }, "ResistiveCurrentSource", 1000.0f, 2000.0f, [=] (ResistiveCurrentSource<float>& r, float value) { r.setResistanceValue (value); }, [=] (float value) { return value; });
     }
 
     void runTest() override

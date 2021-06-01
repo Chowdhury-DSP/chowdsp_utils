@@ -52,11 +52,11 @@ namespace WDFT
         BaseWDF* parent = nullptr;
     };
 
-#define CREATE_WDFT_MEMBERS \
+#define CREATE_WDFT_MEMBERS                                               \
     using NumericType = typename SampleTypeHelpers::ElementType<T>::Type; \
-    T R = (NumericType) 1.0e-9; /* impedance */ \
-    T G = (T) 1.0 / R; /* admittance */ \
-    T a = (T) 0.0; /* incident wave */ \
+    T R = (NumericType) 1.0e-9; /* impedance */                           \
+    T G = (T) 1.0 / R; /* admittance */                                   \
+    T a = (T) 0.0; /* incident wave */                                    \
     T b = (T) 0.0; /* reflected wave */
 
     /** WDF Resistor Node */
@@ -279,7 +279,7 @@ namespace WDFT
         /** Propogates a reflected wave from a WDF inductor. */
         inline T reflected() noexcept
         {
-            b =  -z;
+            b = -z;
             return b;
         }
 
@@ -365,7 +365,7 @@ namespace WDFT
     public:
         /** Creates a new WDF parallel adaptor from two connected ports. */
         WDFParallelT (Port1Type& p1, Port2Type& p2) : port1 (p1),
-                                                       port2 (p2)
+                                                      port2 (p2)
         {
             port1.connectToNode (this);
             port2.connectToNode (this);
@@ -514,7 +514,7 @@ namespace WDFT
     };
 
     /** WDF Ideal Voltage source (non-adaptable) */
-    template <typename T, typename NextType=float>
+    template <typename T, typename NextType = float>
     class IdealVoltageSourceT
     {
     public:
@@ -639,6 +639,7 @@ namespace WDFT
     class ResistiveCurrentSourceT final : BaseWDF
     {
         using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+
     public:
         /** Creates a new resistive current source.
          * @param value: initial resistance value, in Ohms
@@ -690,8 +691,7 @@ namespace WDFT
         T R_value = (T) 1.0e9;
     };
 
-
-/** WDF diode pair (non-adaptable)
+    /** WDF diode pair (non-adaptable)
  * See Werner et al., "An Improved and Generalized Diode Clipper Model for Wave Digital Filters"
  * https://www.researchgate.net/publication/299514713_An_Improved_and_Generalized_Diode_Clipper_Model_for_Wave_Digital_Filters
  */
