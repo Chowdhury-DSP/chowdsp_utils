@@ -614,7 +614,7 @@ namespace WDF
 
     /** WDF Current source with parallel resistance */
     template <typename T>
-    class ResistiveCurrentSource final : public WDFNode<T>
+    class ResistiveCurrentSource final : public WDFWrapper<T, WDFT::ResistiveCurrentSourceT<T>>
     {
         using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
 
@@ -622,58 +622,27 @@ namespace WDF
         /** Creates a new resistive current source.
      * @param value: initial resistance value, in Ohms
      */
-        ResistiveCurrentSource (T value = (NumericType) 1.0e9) : WDFNode<T> ("Resistive Current"),
-                                                                 R_value (value)
+        ResistiveCurrentSource (T value = (NumericType) 1.0e9) : WDFWrapper<T, WDFT::ResistiveCurrentSourceT<T>> ("Resistive Current", value)
         {
-            calcImpedance();
         }
 
         /** Sets the resistance value of the parallel resistor, in Ohms. */
         void setResistanceValue (T newR)
         {
-            if (newR == R_value)
-                return;
-
-            R_value = newR;
+            this->internalWDF.setResistanceValue (newR);
             WDFNode<T>::propagateImpedance();
         }
 
-        /** Computes the impedance for a WDF resistive current souce
-     * Z_Ir = Z_R
-     */
-        inline void calcImpedance() override
-        {
-            this->R = R_value;
-            this->G = (T) 1.0 / this->R;
-        }
-
         /** Sets the current of the current source, in Amps */
-        void setCurrent (T newI) { Is = newI; }
-
-        /** Accepts an incident wave into a WDF resistive current source. */
-        inline void incident (T x) noexcept override
-        {
-            this->a = x;
-        }
-
-        /** Propogates a reflected wave from a WDF resistive current source. */
-        inline T reflected() noexcept override
-        {
-            this->b = (T) 2.0 * this->R * Is;
-            return this->b;
-        }
-
-    private:
-        T Is = (T) 0.0;
-        T R_value = (T) 1.0e9;
+        void setCurrent (T newI) { this->internalWDF.setCurrent (newI); }
     };
 
     /** WDF Current source (non-adpatable) */
     template <typename T>
-    class IdealCurrentSource final : public WDFNode<T>
+    class IdealCurrentSource final : public WDFWrapper<T, WDFT::IdealCurrentSourceT<T, WDFNode<T>>>
     {
     public:
-        IdealCurrentSource() : WDFNode<T> ("Ideal Current")
+        IdealCurrentSource (WDFNode<T>* next) : WDFWrapper<T, WDFT::IdealCurrentSourceT<T, WDFNode<T>>> ("Ideal Current", *next)
         {
             calcImpedance();
         }
@@ -681,23 +650,7 @@ namespace WDF
         inline void calcImpedance() override {}
 
         /** Sets the current of the current source, in Amps */
-        void setCurrent (T newI) { Is = newI; }
-
-        /** Accepts an incident wave into a WDF ideal current source. */
-        inline void incident (T x) noexcept override
-        {
-            this->a = x;
-        }
-
-        /** Propogates a reflected wave from a WDF ideal current source. */
-        inline T reflected() noexcept override
-        {
-            this->b = (T) 2.0 * this->next->R * Is + this->a;
-            return this->b;
-        }
-
-    private:
-        T Is = (T) 0.0;
+        void setCurrent (T newI) { this->internalWDF.setCurrent (newI); }
     };
 
     /** WDF diode pair (non-adaptable)

@@ -29,10 +29,9 @@ inline void currentDividerTest (UnitTest& test)
     using namespace chowdsp::WDF;
     Resistor<FloatType> r1 ((FloatType) 10000.0);
     Resistor<FloatType> r2 ((FloatType) 10000.0);
-    IdealCurrentSource<FloatType> is;
 
     WDFParallel<FloatType> p1 (&r1, &r2);
-    is.connectToNode (&p1);
+    IdealCurrentSource<FloatType> is (&p1);
 
     is.setCurrent ((FloatType) 1.0f);
     is.incident (p1.reflected());
