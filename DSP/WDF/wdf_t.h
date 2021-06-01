@@ -608,6 +608,8 @@ namespace WDFT
         {
         }
 
+        void calcImpedance() {}
+
         /** Sets the current of the current source, in Amps */
         void setCurrent (T newI) { Is = newI; }
 
