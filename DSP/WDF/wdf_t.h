@@ -1,6 +1,8 @@
 #ifndef WDF_T_INCLUDED
 #define WDF_T_INCLUDED
 
+#include <type_traits>
+
 // we want to be able to use this header without JUCE, so let's #if out JUCE-specific implementations
 #define USING_JUCE JUCE_WINDOWS || JUCE_ANDROID || JUCE_BSD || JUCE_LINUX || JUCE_MAC || JUCE_IOS || JUCE_WASM
 #include "signum.h"
@@ -8,6 +10,22 @@
 
 namespace chowdsp
 {
+#ifndef DOXYGEN
+namespace SampleTypeHelpers // Internal classes needed for handling sample type classes
+{
+    template <typename T, bool = std::is_floating_point<T>::value>
+    struct ElementType
+    {
+        using Type = T;
+    };
+
+    template <typename T>
+    struct ElementType<T, false>
+    {
+        using Type = typename T::value_type;
+    };
+} // namespace SampleTypeHelpers
+#endif
 
 namespace WDFT
 {
@@ -18,7 +36,7 @@ namespace WDFT
     class BaseWDF
     {
     public:
-        void connectToParent (BaseWDF* p) { parent = p; }
+        void connectToNode (BaseWDF* p) { parent = p; }
 
         virtual void calcImpedance() = 0;
 
@@ -217,6 +235,129 @@ namespace WDFT
         const T a_coef;
     };
 
+    /** WDF Inductor Node */
+    template <typename T>
+    class InductorT final : public BaseWDF
+    {
+    public:
+        /** Creates a new WDF Inductor.
+         * @param value: Inductance value in Farads
+         * @param fs: WDF sample rate
+         */
+        InductorT (T value, T fs) : L_value (value),
+                                    fs (fs)
+        {
+            calcImpedance();
+        }
+
+        /** Sets the inductance value of the WDF inductor, in Henries. */
+        void setInductanceValue (T newL)
+        {
+            if (newL == L_value)
+                return;
+
+            L_value = newL;
+            propagateImpedance();
+        }
+
+        /** Computes the impedance of the WDF inductor,
+         * Z_L = 2 * f_s * L
+         */
+        inline void calcImpedance() override
+        {
+            R = (T) 2.0 * L_value * fs;
+            G = (T) 1.0 / R;
+        }
+
+        /** Accepts an incident wave into a WDF inductor. */
+        inline void incident (T x) noexcept
+        {
+            a = x;
+            z = a;
+        }
+
+        /** Propogates a reflected wave from a WDF inductor. */
+        inline T reflected() noexcept
+        {
+            b =  -z;
+            return b;
+        }
+
+        CREATE_WDFT_MEMBERS
+
+    private:
+        T L_value = (T) 1.0e-6;
+        T z = (T) 0.0;
+
+        const T fs;
+    };
+
+    /** WDF Inductor Node with alpha transform parameter */
+    template <typename T>
+    class InductorAlphaT final : public BaseWDF
+    {
+    public:
+        /** Creates a new WDF Inductor.
+         * @param value: Inductance value in Farads
+         * @param fs: WDF sample rate
+         * @param alpha: alpha value to be used for the alpha transform,
+         *               use 0 for Backwards Euler, use 1 for Bilinear Transform.
+         */
+        InductorAlphaT (T value, T fs, T alpha = 1.0) : L_value (value),
+                                                        fs (fs),
+                                                        alpha (alpha),
+                                                        b_coef (((T) 1.0 - alpha) / (T) 2.0),
+                                                        a_coef (((T) 1.0 + alpha) / (T) 2.0)
+        {
+            calcImpedance();
+        }
+
+        /** Sets the inductance value of the WDF inductor, in Henries. */
+        void setInductanceValue (T newL)
+        {
+            if (newL == L_value)
+                return;
+
+            L_value = newL;
+            propagateImpedance();
+        }
+
+        /** Computes the impedance of the WDF inductor,
+         * Z_L = (1 + alpha) * f_s * L
+         */
+        inline void calcImpedance() override
+        {
+            R = ((T) 1.0 + alpha) * L_value * fs;
+            G = (T) 1.0 / R;
+        }
+
+        /** Accepts an incident wave into a WDF inductor. */
+        inline void incident (T x) noexcept
+        {
+            a = x;
+            z = a;
+        }
+
+        /** Propogates a reflected wave from a WDF inductor. */
+        inline T reflected() noexcept
+        {
+            b = b_coef * b - a_coef * z;
+            return b;
+        }
+
+        CREATE_WDFT_MEMBERS
+
+    private:
+        T L_value = (T) 1.0e-6;
+        T z = (T) 0.0;
+
+        const T fs;
+
+        const T alpha;
+        const T b_coef;
+        const T a_coef;
+    };
+
     /** WDF 3-port parallel adaptor */
     template <typename T, typename Port1Type, typename Port2Type>
     class WDFParallelT final : public BaseWDF
@@ -226,8 +367,8 @@ namespace WDFT
         WDFParallelT (Port1Type& p1, Port2Type& p2) : port1 (p1),
                                                        port2 (p2)
         {
-            port1.connectToParent (this);
-            port2.connectToParent (this);
+            port1.connectToNode (this);
+            port2.connectToNode (this);
             calcImpedance();
         }
 
@@ -288,8 +429,8 @@ namespace WDFT
         WDFSeriesT (Port1Type& p1, Port2Type& p2) : port1 (p1),
                                                     port2 (p2)
         {
-            port1.connectToParent (this);
-            port2.connectToParent (this);
+            port1.connectToNode (this);
+            port2.connectToNode (this);
             calcImpedance();
         }
 
@@ -339,7 +480,7 @@ namespace WDFT
         /** Creates a new WDF polarity inverter */
         PolarityInverterT (PortType& p) : port1 (p)
         {
-            port1.connectToParent (this);
+            port1.connectToNode (this);
             calcImpedance();
         }
 
@@ -378,6 +519,8 @@ namespace WDFT
     {
     public:
         IdealVoltageSourceT() = default;
+
+        void calcImpedance() {}
 
         /** Sets the voltage of the voltage source, in Volts */
         void setVoltage (T newV) { Vs = newV; }
@@ -478,6 +621,8 @@ namespace WDFT
         {
         }
 
+        void calcImpedance() {}
+
         /** Accepts an incident wave into a WDF diode pair. */
         inline void incident (T x) noexcept
         {
@@ -542,6 +687,8 @@ namespace WDFT
                                        next (n)
         {
         }
+
+        void calcImpedance() {}
 
         /** Accepts an incident wave into a WDF diode. */
         inline void incident (T x) noexcept

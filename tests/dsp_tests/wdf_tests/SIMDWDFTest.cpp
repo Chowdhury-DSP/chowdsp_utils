@@ -3,16 +3,17 @@
 
 namespace
 {
-constexpr double fs = 44100.0;
+constexpr double _fs = 44100.0;
 constexpr double fc = 500.0;
 constexpr float error = 0.1f;
 } // namespace
 
 using namespace chowdsp;
 
-/** Unit tests for chowdsp WDF classes. Includes test for:
- *   - Voltage divider circuit
- *   - RC Lowpass filter circuit
+/** Unit tests for chowdsp WDF classes with SIMD support. Includes test for:
+ *   - Test of the simdSignum function used internally
+ *   - Test accuracy between SIMD and scalar WDF for diode clipper circuit
+ *   - Test accuracy between static and run-time SIMD WDF
  */
 class SIMDWDFTest : public UnitTest
 {
@@ -48,14 +49,13 @@ public:
         {
             WDF::ResistiveVoltageSource<FloatType> Vs {};
             WDF::Resistor<FloatType> R1 { Res };
-            auto C1 = std::make_unique<WDF::Capacitor<FloatType>> (Cap, (FloatType) fs);
+            auto C1 = std::make_unique<WDF::Capacitor<FloatType>> (Cap, (FloatType) _fs);
 
             auto S1 = std::make_unique<WDF::WDFSeries<FloatType>> (&Vs, &R1);
             auto P1 = std::make_unique<WDF::WDFParallel<FloatType>> (S1.get(), C1.get());
             auto I1 = std::make_unique<WDF::PolarityInverter<FloatType>> (P1.get());
 
-            WDF::DiodePair dp { (FloatType) 2.52e-9, (FloatType) 0.02585 };
-            dp.connectToNode (I1.get());
+            WDF::DiodePair dp { (FloatType) 2.52e-9, (FloatType) 0.02585, I1.get() };
 
             for (int i = 0; i < num; ++i)
             {
@@ -70,14 +70,13 @@ public:
         {
             WDF::ResistiveVoltageSource<VType> Vs {};
             WDF::Resistor<VType> R1 { Res };
-            auto C1 = std::make_unique<WDF::Capacitor<VType>> (Cap, (VType) fs);
+            auto C1 = std::make_unique<WDF::Capacitor<VType>> (Cap, (VType) _fs);
 
             auto S1 = std::make_unique<WDF::WDFSeries<VType>> (&Vs, &R1);
             auto P1 = std::make_unique<WDF::WDFParallel<VType>> (S1.get(), C1.get());
             auto I1 = std::make_unique<WDF::PolarityInverter<VType>> (P1.get());
 
-            WDF::DiodePair dp { (VType) 2.52e-9, (VType) 0.02585 };
-            dp.connectToNode (I1.get());
+            WDF::DiodePair dp { (VType) 2.52e-9, (VType) 0.02585, I1.get() };
 
             for (int i = 0; i < num; ++i)
             {
@@ -110,15 +109,14 @@ public:
             ResVs Vs { 1.0e-9f };
             Resistor r162 { 4700.0f };
             Resistor r163 { 100000.0f };
-            WDF::Diode<Vec> d53 { 2.52e-9f, 25.85e-3f }; // 1N4148 diode
 
-            auto c40 = std::make_unique<Capacitor> ((FloatType) 0.015e-6f, (FloatType) fs, (FloatType) 0.029f);
+            auto c40 = std::make_unique<Capacitor> ((FloatType) 0.015e-6f, (FloatType) _fs, (FloatType) 0.029f);
             auto P1 = std::make_unique<WDF::WDFParallel<Vec>> (c40.get(), &r163);
             auto S1 = std::make_unique<WDF::WDFSeries<Vec>> (&Vs, P1.get());
             auto I1 = std::make_unique<WDF::PolarityInverter<Vec>> (&r162);
             auto P2 = std::make_unique<WDF::WDFParallel<Vec>> (I1.get(), S1.get());
 
-            d53.connectToNode (P2.get());
+            WDF::Diode<Vec> d53 { 2.52e-9f, 25.85e-3f, P2.get() }; // 1N4148 diode
 
             for (int i = 0; i < num; ++i)
             {
@@ -138,7 +136,7 @@ public:
             ResVs Vs { 1.0e-9f };
             Resistor r162 { 4700.0f };
             Resistor r163 { 100000.0f };
-            Capacitor c40 { (FloatType) 0.015e-6f, (FloatType) fs, (FloatType) 0.029f };
+            Capacitor c40 { (FloatType) 0.015e-6f, (FloatType) _fs, (FloatType) 0.029f };
 
             auto P1 = WDFT::makeParallel<Vec> (c40, r163);
             auto S1 = WDFT::makeSeries<Vec> (Vs, P1);

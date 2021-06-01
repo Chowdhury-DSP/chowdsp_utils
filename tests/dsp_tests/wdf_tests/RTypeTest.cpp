@@ -3,7 +3,7 @@
 
 namespace
 {
-constexpr double fs = 44100.0;
+constexpr double _fs = 44100.0;
 constexpr double fc = 500.0;
 constexpr float error = 0.1f;
 } // namespace
@@ -99,10 +99,10 @@ public:
 
     void freqTest (float lowPot, float highPot, float sineFreq, float expGainDB, float maxErr)
     {
-        Tonestack tonestack { fs };
+        Tonestack tonestack { _fs };
         tonestack.setParams ((double) highPot, (double) lowPot, 1.0);
 
-        auto buffer = test_utils::makeSineWave (sineFreq, (float) fs, 1.0f);
+        auto buffer = test_utils::makeSineWave (sineFreq, (float) _fs, 1.0f);
         auto* x = buffer.getWritePointer (0);
         for (int n = 0; n < buffer.getNumSamples(); ++n)
             x[n] = (float) tonestack.processSample ((double) x[n]);

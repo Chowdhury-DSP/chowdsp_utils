@@ -4,7 +4,7 @@ using namespace chowdsp;
 
 namespace
 {
-constexpr float fs = 48000.0f;
+constexpr float _fs = 48000.0f;
 #if JUCE_DEBUG
 constexpr float timeSeconds = 10.0f;
 #else
@@ -22,7 +22,7 @@ public:
     template <typename IIRType, typename WDFType, typename WDFTType>
     void runPerf (IIRType& iir, WDFType& wdf, WDFTType& wdfT)
     {
-        auto buffer = test_utils::makeNoise (fs, timeSeconds);
+        auto buffer = test_utils::makeNoise (_fs, timeSeconds);
         auto* x = buffer.getReadPointer (0);
 
         Time time;
@@ -63,7 +63,7 @@ public:
         public:
             WDF1()
             {
-                c1 = std::make_unique<WDF::Capacitor<float>> (1.0e-6f, fs);
+                c1 = std::make_unique<WDF::Capacitor<float>> (1.0e-6f, _fs);
                 s1 = std::make_unique<WDF::WDFSeries<float>> (c1.get(), &r1);
                 p1 = std::make_unique<WDF::PolarityInverter<float>> (s1.get());
                 vs.connectToNode (p1.get());
@@ -105,7 +105,7 @@ public:
             }
 
         private:
-            WDFT::CapacitorT<float> c1 { 1.0e-6f, fs };
+            WDFT::CapacitorT<float> c1 { 1.0e-6f, _fs };
             WDFT::ResistorT<float> r1 { 10.0e3f };
 
             WDFT::WDFSeriesT<float, WDFT::CapacitorT<float>, WDFT::ResistorT<float>> s1 { c1, r1 };
@@ -127,10 +127,10 @@ public:
         public:
             WDF2()
             {
-                c1 = std::make_unique<WDF::Capacitor<float>> (1.0e-6f, fs);
+                c1 = std::make_unique<WDF::Capacitor<float>> (1.0e-6f, _fs);
                 s1 = std::make_unique<WDF::WDFSeries<float>> (c1.get(), &r1);
 
-                c2 = std::make_unique<WDF::Capacitor<float>> (1.0e-6f, fs);
+                c2 = std::make_unique<WDF::Capacitor<float>> (1.0e-6f, _fs);
                 p1 = std::make_unique<WDF::WDFParallel<float>> (c2.get(), s1.get());
                 s2 = std::make_unique<WDF::WDFSeries<float>> (p1.get(), &r2);
 
@@ -178,8 +178,8 @@ public:
             }
 
         private:
-            WDFT::CapacitorT<float> c1 { 1.0e-6f, fs };
-            WDFT::CapacitorT<float> c2 { 1.0e-6f, fs };
+            WDFT::CapacitorT<float> c1 { 1.0e-6f, _fs };
+            WDFT::CapacitorT<float> c2 { 1.0e-6f, _fs };
             WDFT::ResistorT<float> r1 { 10.0e3f };
             WDFT::ResistorT<float> r2 { 10.0e3f };
 
