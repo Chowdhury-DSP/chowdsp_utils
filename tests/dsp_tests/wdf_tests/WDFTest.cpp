@@ -35,9 +35,7 @@ public:
 
         WDFSeries<FloatType> s1 (&r1, &c1);
         PolarityInverter<FloatType> p1 (&s1);
-
-        IdealVoltageSource<FloatType> vs;
-        vs.connectToNode (&p1);
+        IdealVoltageSource<FloatType> vs { &p1 };
 
         auto processBuffer = [&] (float* buffer, const int numSamples) {
             for (int n = 0; n < numSamples; ++n)
@@ -106,9 +104,7 @@ public:
             WDFSeries<float> s1 (&r1, &c1);
             WDFSeries<float> s2 (&s1, &l1);
             PolarityInverter<float> p1 (&s2);
-
-            IdealVoltageSource<float> vs;
-            vs.connectToNode (&p1);
+            IdealVoltageSource<float> vs { &p1 };
 
             auto refSine = test_utils::makeSineWave (10.0e3f, (float) _fs, 1.0f);
             processBuffer (refSine.getWritePointer (0), refSine.getNumSamples(), vs, p1, l1);
@@ -126,9 +122,7 @@ public:
             WDFSeries<float> s1 (&r1, &c1);
             WDFSeries<float> s2 (&s1, &l1);
             PolarityInverter<float> p1 (&s2);
-
-            IdealVoltageSource<float> vs;
-            vs.connectToNode (&p1);
+            IdealVoltageSource<float> vs { &p1 };
 
             auto a1Sine = test_utils::makeSineWave (10.0e3f, (float) _fs, 1.0f);
             processBuffer (a1Sine.getWritePointer (0), a1Sine.getNumSamples(), vs, p1, l1);
@@ -147,9 +141,7 @@ public:
             WDFSeries<float> s1 (&r1, &c1);
             WDFSeries<float> s2 (&s1, &l1);
             PolarityInverter<float> p1 (&s2);
-
-            IdealVoltageSource<float> vs;
-            vs.connectToNode (&p1);
+            IdealVoltageSource<float> vs { &p1 };
 
             auto a01Sine = test_utils::makeSineWave (10.0e3f, (float) _fs, 1.0f);
             processBuffer (a01Sine.getWritePointer (0), a01Sine.getNumSamples(), vs, p1, l1);
@@ -171,11 +163,15 @@ public:
             constexpr float otherR = 5000.0f;
             Resistor<float> r2 { otherR };
             WDFSeries<float> s1 (&component, &r2);
+            IdealCurrentSource<float> is (&s1);
+            is.setCurrent (1.0f);
 
-            expectEquals (s1.R, impedanceCalc (value1) + otherR, "Initial " + name + " impedance incorrect!");
+            expectEquals (s1.R, impedanceCalc (value1) + otherR, "Initial " + name + " propagated impedance incorrect!");
+            expectEquals (is.reflected(), 2.0f * s1.R, "Initial " + name + " propagated root impedance incorrect!");
 
             changeFunc (component, value2);
-            expectEquals (s1.R, impedanceCalc (value2) + otherR, "Changed " + name + " impedance incorrect!");
+            expectEquals (s1.R, impedanceCalc (value2) + otherR, "Changed " + name + " propagated impedance incorrect!");
+            expectEquals (is.reflected(), 2.0f * s1.R, "Changed " + name + " propagated root impedance incorrect!");
         };
 
         auto doImpedanceChecks = [=] (auto... params) {

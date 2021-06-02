@@ -1,6 +1,7 @@
 #ifndef WDF_T_INCLUDED
 #define WDF_T_INCLUDED
 
+#include <cmath>
 #include <type_traits>
 
 // we want to be able to use this header without JUCE, so let's #if out JUCE-specific implementations
@@ -36,20 +37,30 @@ namespace WDFT
     class BaseWDF
     {
     public:
-        void connectToNode (BaseWDF* p) { parent = p; }
+        void connectToParent (BaseWDF* p) { parent = p; }
 
         virtual void calcImpedance() = 0;
 
-        void propagateImpedance()
+        inline virtual void propagateImpedanceChange()
         {
             calcImpedance();
 
             if (parent != nullptr)
-                parent->propagateImpedance();
+                parent->propagateImpedanceChange();
         }
 
     protected:
         BaseWDF* parent = nullptr;
+    };
+
+    class RootWDF : public BaseWDF
+    {
+    public:
+        inline void propagateImpedanceChange() override { calcImpedance(); }
+
+    private:
+        // don't try to connect root nodes!
+        void connectToParent (BaseWDF*) {}
     };
 
 #define CREATE_WDFT_MEMBERS                                               \
@@ -79,7 +90,7 @@ namespace WDFT
                 return;
 
             R_value = newR;
-            propagateImpedance();
+            propagateImpedanceChange();
         }
 
         /** Computes the impedance of the WDF resistor, Z_R = R. */
@@ -130,7 +141,7 @@ namespace WDFT
                 return;
 
             C_value = newC;
-            propagateImpedance();
+            propagateImpedanceChange();
         }
 
         /** Computes the impedance of the WDF capacitor,
@@ -194,7 +205,7 @@ namespace WDFT
                 return;
 
             C_value = newC;
-            propagateImpedance();
+            propagateImpedanceChange();
         }
 
         /** Computes the impedance of the WDF capacitor,
@@ -257,7 +268,7 @@ namespace WDFT
                 return;
 
             L_value = newL;
-            propagateImpedance();
+            propagateImpedanceChange();
         }
 
         /** Computes the impedance of the WDF inductor,
@@ -319,7 +330,7 @@ namespace WDFT
                 return;
 
             L_value = newL;
-            propagateImpedance();
+            propagateImpedanceChange();
         }
 
         /** Computes the impedance of the WDF inductor,
@@ -367,8 +378,8 @@ namespace WDFT
         WDFParallelT (Port1Type& p1, Port2Type& p2) : port1 (p1),
                                                       port2 (p2)
         {
-            port1.connectToNode (this);
-            port2.connectToNode (this);
+            port1.connectToParent (this);
+            port2.connectToParent (this);
             calcImpedance();
         }
 
@@ -429,8 +440,8 @@ namespace WDFT
         WDFSeriesT (Port1Type& p1, Port2Type& p2) : port1 (p1),
                                                     port2 (p2)
         {
-            port1.connectToNode (this);
-            port2.connectToNode (this);
+            port1.connectToParent (this);
+            port2.connectToParent (this);
             calcImpedance();
         }
 
@@ -480,7 +491,7 @@ namespace WDFT
         /** Creates a new WDF polarity inverter */
         PolarityInverterT (PortType& p) : port1 (p)
         {
-            port1.connectToNode (this);
+            port1.connectToParent (this);
             calcImpedance();
         }
 
@@ -514,13 +525,17 @@ namespace WDFT
     };
 
     /** WDF Ideal Voltage source (non-adaptable) */
-    template <typename T, typename NextType = float>
-    class IdealVoltageSourceT
+    template <typename T, typename Next>
+    class IdealVoltageSourceT final : public RootWDF
     {
     public:
-        IdealVoltageSourceT() = default;
+        IdealVoltageSourceT (Next& next)
+        {
+            next.connectToParent (this);
+            calcImpedance();
+        }
 
-        void calcImpedance() {}
+        void calcImpedance() override {}
 
         /** Sets the voltage of the voltage source, in Volts */
         void setVoltage (T newV) { Vs = newV; }
@@ -566,7 +581,7 @@ namespace WDFT
                 return;
 
             R_value = newR;
-            propagateImpedance();
+            propagateImpedanceChange();
         }
 
         /** Computes the impedance for a WDF resistive voltage souce
@@ -601,17 +616,27 @@ namespace WDFT
 
     /** WDF Current source (non-adpatable) */
     template <typename T, typename Next>
-    class IdealCurrentSourceT
+    class IdealCurrentSourceT final : public RootWDF
     {
     public:
         IdealCurrentSourceT (Next& n) : next (n)
         {
+            next.connectToParent (this);
+            calcImpedance();
         }
 
-        void calcImpedance() {}
+        inline void calcImpedance() override
+        {
+            twoR = (T) 2.0 * next.R;
+            twoR_Is = twoR * Is;
+        }
 
         /** Sets the current of the current source, in Amps */
-        void setCurrent (T newI) { Is = newI; }
+        void setCurrent (T newI)
+        {
+            Is = newI;
+            twoR_Is = twoR * Is;
+        }
 
         /** Accepts an incident wave into a WDF ideal current source. */
         inline void incident (T x) noexcept
@@ -622,7 +647,7 @@ namespace WDFT
         /** Propogates a reflected wave from a WDF ideal current source. */
         inline T reflected() noexcept
         {
-            b = (T) 2.0 * next.R * Is + a;
+            b = twoR_Is + a;
             return b;
         }
 
@@ -632,11 +657,13 @@ namespace WDFT
         Next& next;
 
         T Is = (T) 0.0;
+        T twoR;
+        T twoR_Is;
     };
 
     /** WDF Current source with parallel resistance */
     template <typename T>
-    class ResistiveCurrentSourceT final : BaseWDF
+    class ResistiveCurrentSourceT final : public BaseWDF
     {
     public:
         CREATE_WDFT_MEMBERS
@@ -656,7 +683,7 @@ namespace WDFT
                 return;
 
             R_value = newR;
-            propagateImpedance();
+            propagateImpedanceChange();
         }
 
         /** Computes the impedance for a WDF resistive current souce
@@ -694,7 +721,7 @@ namespace WDFT
  * https://www.researchgate.net/publication/299514713_An_Improved_and_Generalized_Diode_Clipper_Model_for_Wave_Digital_Filters
  */
     template <typename T, typename Next>
-    class DiodePairT
+    class DiodePairT final : public RootWDF
     {
     public:
         /** Creates a new WDF diode pair, with the given diode specifications.
@@ -704,11 +731,17 @@ namespace WDFT
          */
         DiodePairT (T Is, T Vt, Next& n) : Is (Is),
                                            Vt (Vt),
+                                           oneOverVt ((T) 1 / Vt),
                                            next (n)
         {
+            next.connectToParent (this);
+            calcImpedance();
         }
 
-        void calcImpedance() {}
+        inline void calcImpedance() override
+        {
+            calcImpedanceInternal();
+        }
 
         /** Accepts an incident wave into a WDF diode pair. */
         inline void incident (T x) noexcept
@@ -727,13 +760,22 @@ namespace WDFT
     private:
         /** Implementation for float/double. */
         template <typename C = T>
-        inline typename std::enable_if<std::is_same<float, C>::value || std::is_same<double, C>::value, C>::type
+        inline typename std::enable_if<std::is_floating_point<C>::value, C>::type
             reflectedInternal() noexcept
         {
             // See eqn (18) from reference paper
             T lambda = (T) signum (a);
-            b = a + (T) 2 * lambda * (next.R * Is - Vt * Omega::omega4 (std::log (next.R * Is / Vt) + (lambda * a + next.R * Is) / Vt));
+            b = a + (T) 2 * lambda * (R_Is - Vt * Omega::omega4 (logR_Is_overVt + lambda * a * oneOverVt + R_Is_overVt));
             return a;
+        }
+
+        template <typename C = T>
+        inline typename std::enable_if<std::is_floating_point<C>::value, void>::type
+            calcImpedanceInternal() noexcept
+        {
+            R_Is = next.R * Is;
+            R_Is_overVt = R_Is * oneOverVt;
+            logR_Is_overVt = std::log (R_Is_overVt);
         }
 
 #if USING_JUCE
@@ -746,12 +788,29 @@ namespace WDFT
         {
             // See eqn (18) from reference paper
             T lambda = signumSIMD (a);
-            b = a + (T) 2 * lambda * (next.R * Is - Vt * Omega::omega4 (SIMDUtils::logSIMD (next.R * Is / Vt) + (lambda * a + next.R * Is) / Vt));
+            b = a + (T) 2 * lambda * (R_Is - Vt * Omega::omega4 (logR_Is_overVt + lambda * a * oneOverVt + R_Is_overVt));
             return a;
+        }
+
+        template <typename C = T>
+        inline typename std::enable_if<std::is_same<juce::dsp::SIMDRegister<float>, C>::value
+                                           || std::is_same<juce::dsp::SIMDRegister<double>, C>::value,
+                                       void>::type
+            calcImpedanceInternal() noexcept
+        {
+            R_Is = next.R * Is;
+            R_Is_overVt = R_Is * oneOverVt;
+            logR_Is_overVt = logSIMD (R_Is_overVt);
         }
 #endif
         const T Is; // reverse saturation current
         const T Vt; // thermal voltage
+
+        // pre-computed vars
+        const T oneOverVt;
+        T R_Is;
+        T R_Is_overVt;
+        T logR_Is_overVt;
 
         Next& next;
     };
@@ -761,7 +820,7 @@ namespace WDFT
      * https://www.researchgate.net/publication/299514713_An_Improved_and_Generalized_Diode_Clipper_Model_for_Wave_Digital_Filters
      */
     template <typename T, typename Next>
-    class DiodeT
+    class DiodeT final : public RootWDF
     {
     public:
         /** Creates a new WDF diode, with the given diode specifications.
@@ -771,11 +830,18 @@ namespace WDFT
          */
         DiodeT (T Is, T Vt, Next& n) : Is (Is),
                                        Vt (Vt),
+                                       twoVt ((T) 2 * Vt),
+                                       oneOverVt ((T) 1 / Vt),
                                        next (n)
         {
+            next.connectToParent (this);
+            calcImpedance();
         }
 
-        void calcImpedance() {}
+        inline void calcImpedance() override
+        {
+            calcImpedanceInternal();
+        }
 
         /** Accepts an incident wave into a WDF diode. */
         inline void incident (T x) noexcept
@@ -786,7 +852,9 @@ namespace WDFT
         /** Propogates a reflected wave from a WDF diode. */
         inline T reflected() noexcept
         {
-            return reflectedInternal();
+            // See eqn (10) from reference paper
+            b = a + twoR_Is - twoVt * Omega::omega4 (logR_Is_overVt + a * oneOverVt + R_Is_overVt);
+            return b;
         }
 
         CREATE_WDFT_MEMBERS
@@ -794,12 +862,12 @@ namespace WDFT
     private:
         /** Implementation for float/double. */
         template <typename C = T>
-        inline typename std::enable_if<std::is_same<float, C>::value || std::is_same<double, C>::value, C>::type
-            reflectedInternal() noexcept
+        inline typename std::enable_if<std::is_floating_point<C>::value, void>::type
+            calcImpedanceInternal() noexcept
         {
-            // See eqn (10) from reference paper
-            b = a + (T) 2 * next.R * Is - (T) 2 * Vt * Omega::omega4 (std::log (next.R * Is / Vt) + (a + next.R * Is) / Vt);
-            return b;
+            twoR_Is = (T) 2 * next.R * Is;
+            R_Is_overVt = next.R * Is * oneOverVt;
+            logR_Is_overVt = std::log (R_Is_overVt);
         }
 
 #if USING_JUCE
@@ -807,16 +875,23 @@ namespace WDFT
         template <typename C = T>
         inline typename std::enable_if<std::is_same<juce::dsp::SIMDRegister<float>, C>::value
                                            || std::is_same<juce::dsp::SIMDRegister<double>, C>::value,
-                                       C>::type
-            reflectedInternal() noexcept
+                                       void>::type
+            calcImpedanceInternal() noexcept
         {
-            // See eqn (10) from reference paper
-            b = a + (T) 2 * next.R * Is - (T) 2 * Vt * Omega::omega4 (logSIMD (next.R * Is / Vt) + (a + next.R * Is) / Vt);
-            return b;
+            twoR_Is = (T) 2 * next.R * Is;
+            R_Is_overVt = next.R * Is * oneOverVt;
+            logR_Is_overVt = logSIMD (R_Is_overVt);
         }
 #endif
         const T Is; // reverse saturation current
         const T Vt; // thermal voltage
+
+        // pre-computed vars
+        const T twoVt;
+        const T oneOverVt;
+        T twoR_Is;
+        T R_Is_overVt;
+        T logR_Is_overVt;
 
         Next& next;
     };

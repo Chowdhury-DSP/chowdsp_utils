@@ -21,10 +21,10 @@ public:
         using namespace chowdsp::WDFT;
         ResistorT<FloatType> r1 ((FloatType) 10000.0);
         ResistorT<FloatType> r2 ((FloatType) 10000.0);
-        IdealVoltageSourceT<FloatType> vs;
 
         auto s1 = makeSeries<FloatType> (r1, r2);
         auto p1 = makeInverter<FloatType> (s1);
+        IdealVoltageSourceT<FloatType, decltype (p1)> vs { p1 };
 
         vs.setVoltage ((FloatType) 10.0f);
         vs.incident (p1.reflected());
@@ -66,7 +66,7 @@ public:
         WDFSeriesT<FloatType, ResistorT<FloatType>, CapacitorT<FloatType>> s1 { r1, c1 };
         PolarityInverterT<FloatType, WDFSeriesT<FloatType, ResistorT<FloatType>, CapacitorT<FloatType>>> p1 { s1 };
 
-        IdealVoltageSourceT<FloatType> vs;
+        IdealVoltageSourceT<FloatType, decltype (p1)> vs { p1 };
 
         auto processBuffer = [&] (float* buffer, const int numSamples) {
             for (int n = 0; n < numSamples; ++n)
@@ -136,7 +136,7 @@ public:
             WDFSeriesT<float, WDFSeriesT<float, ResistorT<float>, CapacitorT<float>>, InductorT<float>> s2 { s1, l1 };
             PolarityInverterT<float, WDFSeriesT<float, WDFSeriesT<float, ResistorT<float>, CapacitorT<float>>, InductorT<float>>> p1 { s2 };
 
-            IdealVoltageSourceT<float> vs;
+            IdealVoltageSourceT<float, decltype (p1)> vs { p1 };
 
             auto refSine = test_utils::makeSineWave (10.0e3f, (float) _fs, 1.0f);
             processBuffer (refSine.getWritePointer (0), refSine.getNumSamples(), vs, p1, l1);
@@ -155,7 +155,7 @@ public:
             WDFSeriesT<float, WDFSeriesT<float, ResistorT<float>, CapacitorAlphaT<float>>, InductorAlphaT<float>> s2 { s1, l1 };
             PolarityInverterT<float, WDFSeriesT<float, WDFSeriesT<float, ResistorT<float>, CapacitorAlphaT<float>>, InductorAlphaT<float>>> p1 { s2 };
 
-            IdealVoltageSourceT<float> vs;
+            IdealVoltageSourceT<float, decltype (p1)> vs { p1 };
 
             auto a1Sine = test_utils::makeSineWave (10.0e3f, (float) _fs, 1.0f);
             processBuffer (a1Sine.getWritePointer (0), a1Sine.getNumSamples(), vs, p1, l1);
@@ -175,7 +175,7 @@ public:
             WDFSeriesT<float, WDFSeriesT<float, ResistorT<float>, CapacitorAlphaT<float>>, InductorAlphaT<float>> s2 { s1, l1 };
             PolarityInverterT<float, WDFSeriesT<float, WDFSeriesT<float, ResistorT<float>, CapacitorAlphaT<float>>, InductorAlphaT<float>>> p1 { s2 };
 
-            IdealVoltageSourceT<float> vs;
+            IdealVoltageSourceT<float, decltype (p1)> vs { p1 };
 
             auto a01Sine = test_utils::makeSineWave (10.0e3f, (float) _fs, 1.0f);
             processBuffer (a01Sine.getWritePointer (0), a01Sine.getNumSamples(), vs, p1, l1);
@@ -253,11 +253,15 @@ public:
             constexpr float otherR = 5000.0f;
             ResistorT<float> r2 { otherR };
             auto s1 = makeSeries<float> (component, r2);
+            IdealCurrentSourceT<float, WDFSeriesT<float, decltype (component), ResistorT<float>>> is { s1 };
+            is.setCurrent (1.0f);
 
-            expectEquals (s1.R, impedanceCalc (value1) + otherR, "Initial " + name + " impedance incorrect!");
+            expectEquals (s1.R, impedanceCalc (value1) + otherR, "Initial " + name + " propagated impedance incorrect!");
+            expectEquals (is.reflected(), 2.0f * s1.R, "Initial " + name + " propagated root impedance incorrect!");
 
             changeFunc (component, value2);
-            expectEquals (s1.R, impedanceCalc (value2) + otherR, "Changed " + name + " impedance incorrect!");
+            expectEquals (s1.R, impedanceCalc (value2) + otherR, "Changed " + name + " propagated impedance incorrect!");
+            expectEquals (is.reflected(), 2.0f * s1.R, "Changed " + name + " propagated root impedance incorrect!");
         };
 
         auto doImpedanceChecks = [=] (auto... params) {
@@ -290,9 +294,9 @@ public:
             ResistiveVoltageSourceT<float> { 1000.0f }, "ResistiveVoltageSource", 1000.0f, 2000.0f, [=] (ResistiveVoltageSourceT<float>& r, float value) { r.setResistanceValue (value); }, [=] (float value) { return value; });
 
         // resistive current source
-        // doImpedanceChecks (ResistiveCurrentSourceT<float> { 1000.0f }, "ResistiveCurrentSource", 1000.0f, 2000.0f,
-        //     [=] (ResistiveCurrentSourceT<float>& r, float value) { r.setResistanceValue (value); },
-        //     [=] (float value) { return value; });
+        doImpedanceChecks (ResistiveCurrentSourceT<float> { 1000.0f }, "ResistiveCurrentSource", 1000.0f, 2000.0f,
+            [=] (ResistiveCurrentSourceT<float>& r, float value) { r.setResistanceValue (value); },
+            [=] (float value) { return value; });
     }
 
     void runTest() override
