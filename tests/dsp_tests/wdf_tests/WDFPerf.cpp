@@ -114,7 +114,7 @@ public:
             WDFT::WDFSeriesT<float, WDFT::CapacitorT<float>, WDFT::ResistorT<float>> s1 { c1, r1 };
             WDFT::PolarityInverterT<float, WDFT::WDFSeriesT<float, WDFT::CapacitorT<float>, WDFT::ResistorT<float>>> p1 { s1 };
 
-            WDFT::IdealVoltageSourceT<float, decltype(p1)> vs { p1 };
+            WDFT::IdealVoltageSourceT<float, decltype (p1)> vs { p1 };
         } wdfT;
 
         runPerf (iir, wdf, wdfT);

@@ -57,7 +57,7 @@ namespace WDFT
     {
     public:
         inline void propagateImpedanceChange() override { calcImpedance(); }
-    
+
     private:
         // don't try to connect root nodes!
         void connectToParent (BaseWDF*) {}
@@ -633,7 +633,7 @@ namespace WDFT
 
         /** Sets the current of the current source, in Amps */
         void setCurrent (T newI)
-        { 
+        {
             Is = newI;
             twoR_Is = twoR * Is;
         }
@@ -805,7 +805,7 @@ namespace WDFT
 #endif
         const T Is; // reverse saturation current
         const T Vt; // thermal voltage
-        
+
         // pre-computed vars
         const T oneOverVt;
         T R_Is;
@@ -885,7 +885,7 @@ namespace WDFT
 #endif
         const T Is; // reverse saturation current
         const T Vt; // thermal voltage
-        
+
         // pre-computed vars
         const T twoVt;
         const T oneOverVt;

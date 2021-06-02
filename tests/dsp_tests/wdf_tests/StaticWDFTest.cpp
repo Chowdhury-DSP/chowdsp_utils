@@ -24,7 +24,7 @@ public:
 
         auto s1 = makeSeries<FloatType> (r1, r2);
         auto p1 = makeInverter<FloatType> (s1);
-        IdealVoltageSourceT<FloatType, decltype(p1)> vs { p1 };
+        IdealVoltageSourceT<FloatType, decltype (p1)> vs { p1 };
 
         vs.setVoltage ((FloatType) 10.0f);
         vs.incident (p1.reflected());
@@ -66,7 +66,7 @@ public:
         WDFSeriesT<FloatType, ResistorT<FloatType>, CapacitorT<FloatType>> s1 { r1, c1 };
         PolarityInverterT<FloatType, WDFSeriesT<FloatType, ResistorT<FloatType>, CapacitorT<FloatType>>> p1 { s1 };
 
-        IdealVoltageSourceT<FloatType, decltype(p1)> vs { p1 };
+        IdealVoltageSourceT<FloatType, decltype (p1)> vs { p1 };
 
         auto processBuffer = [&] (float* buffer, const int numSamples) {
             for (int n = 0; n < numSamples; ++n)
@@ -136,7 +136,7 @@ public:
             WDFSeriesT<float, WDFSeriesT<float, ResistorT<float>, CapacitorT<float>>, InductorT<float>> s2 { s1, l1 };
             PolarityInverterT<float, WDFSeriesT<float, WDFSeriesT<float, ResistorT<float>, CapacitorT<float>>, InductorT<float>>> p1 { s2 };
 
-            IdealVoltageSourceT<float, decltype(p1)> vs { p1 };
+            IdealVoltageSourceT<float, decltype (p1)> vs { p1 };
 
             auto refSine = test_utils::makeSineWave (10.0e3f, (float) _fs, 1.0f);
             processBuffer (refSine.getWritePointer (0), refSine.getNumSamples(), vs, p1, l1);
@@ -155,7 +155,7 @@ public:
             WDFSeriesT<float, WDFSeriesT<float, ResistorT<float>, CapacitorAlphaT<float>>, InductorAlphaT<float>> s2 { s1, l1 };
             PolarityInverterT<float, WDFSeriesT<float, WDFSeriesT<float, ResistorT<float>, CapacitorAlphaT<float>>, InductorAlphaT<float>>> p1 { s2 };
 
-            IdealVoltageSourceT<float, decltype(p1)> vs { p1 };
+            IdealVoltageSourceT<float, decltype (p1)> vs { p1 };
 
             auto a1Sine = test_utils::makeSineWave (10.0e3f, (float) _fs, 1.0f);
             processBuffer (a1Sine.getWritePointer (0), a1Sine.getNumSamples(), vs, p1, l1);
@@ -175,7 +175,7 @@ public:
             WDFSeriesT<float, WDFSeriesT<float, ResistorT<float>, CapacitorAlphaT<float>>, InductorAlphaT<float>> s2 { s1, l1 };
             PolarityInverterT<float, WDFSeriesT<float, WDFSeriesT<float, ResistorT<float>, CapacitorAlphaT<float>>, InductorAlphaT<float>>> p1 { s2 };
 
-            IdealVoltageSourceT<float, decltype(p1)> vs { p1 };
+            IdealVoltageSourceT<float, decltype (p1)> vs { p1 };
 
             auto a01Sine = test_utils::makeSineWave (10.0e3f, (float) _fs, 1.0f);
             processBuffer (a01Sine.getWritePointer (0), a01Sine.getNumSamples(), vs, p1, l1);

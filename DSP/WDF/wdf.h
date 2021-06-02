@@ -480,7 +480,7 @@ namespace WDF
     class IdealVoltageSource final : public WDFWrapper<T, WDFT::IdealVoltageSourceT<T, WDF<T>>>
     {
     public:
-        IdealVoltageSource(WDF<T>* next) : WDFWrapper<T, WDFT::IdealVoltageSourceT<T, WDF<T>>> ("IdealVoltage", *next)
+        IdealVoltageSource (WDF<T>* next) : WDFWrapper<T, WDFT::IdealVoltageSourceT<T, WDF<T>>> ("IdealVoltage", *next)
         {
             next->connectToNode (this);
         }
