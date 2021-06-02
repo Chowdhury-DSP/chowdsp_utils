@@ -70,7 +70,7 @@ public:
     void guiTest()
     {
         DummyPlugin dummy1;
-        
+
         if (dummy1.hasEditor())
         {
             std::unique_ptr<AudioProcessorEditor> editor (dummy1.createEditor());
