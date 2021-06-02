@@ -663,7 +663,7 @@ namespace WDFT
 
     /** WDF Current source with parallel resistance */
     template <typename T>
-    class ResistiveCurrentSourceT final : BaseWDF
+    class ResistiveCurrentSourceT final : public BaseWDF
     {
     public:
         CREATE_WDFT_MEMBERS

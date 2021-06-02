@@ -253,7 +253,7 @@ public:
             constexpr float otherR = 5000.0f;
             ResistorT<float> r2 { otherR };
             auto s1 = makeSeries<float> (component, r2);
-            IdealCurrentSourceT<float, decltype (s1)> is (s1);
+            IdealCurrentSourceT<float, WDFSeriesT<float, decltype (component), ResistorT<float>>> is { s1 };
             is.setCurrent (1.0f);
 
             expectEquals (s1.R, impedanceCalc (value1) + otherR, "Initial " + name + " propagated impedance incorrect!");
@@ -294,9 +294,9 @@ public:
             ResistiveVoltageSourceT<float> { 1000.0f }, "ResistiveVoltageSource", 1000.0f, 2000.0f, [=] (ResistiveVoltageSourceT<float>& r, float value) { r.setResistanceValue (value); }, [=] (float value) { return value; });
 
         // resistive current source
-        // doImpedanceChecks (ResistiveCurrentSourceT<float> { 1000.0f }, "ResistiveCurrentSource", 1000.0f, 2000.0f,
-        //     [=] (ResistiveCurrentSourceT<float>& r, float value) { r.setResistanceValue (value); },
-        //     [=] (float value) { return value; });
+        doImpedanceChecks (ResistiveCurrentSourceT<float> { 1000.0f }, "ResistiveCurrentSource", 1000.0f, 2000.0f,
+            [=] (ResistiveCurrentSourceT<float>& r, float value) { r.setResistanceValue (value); },
+            [=] (float value) { return value; });
     }
 
     void runTest() override
