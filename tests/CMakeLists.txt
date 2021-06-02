@@ -26,6 +26,7 @@ target_sources(chowdsp_utils_tests PRIVATE
 
     gui_tests/FoleysTest.cpp
 
+    utils_tests/ParamStringsTest.cpp
     utils_tests/PluginBaseTest.cpp
     utils_tests/VersionUtilsTest.cpp
 )
