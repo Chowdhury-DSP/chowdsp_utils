@@ -253,11 +253,15 @@ public:
             constexpr float otherR = 5000.0f;
             ResistorT<float> r2 { otherR };
             auto s1 = makeSeries<float> (component, r2);
+            IdealCurrentSourceT<float, decltype (s1)> is (s1);
+            is.setCurrent (1.0f);
 
             expectEquals (s1.R, impedanceCalc (value1) + otherR, "Initial " + name + " propagated impedance incorrect!");
+            expectEquals (is.reflected(), 2.0f * s1.R, "Initial " + name + " propagated root impedance incorrect!");
 
             changeFunc (component, value2);
             expectEquals (s1.R, impedanceCalc (value2) + otherR, "Changed " + name + " propagated impedance incorrect!");
+            expectEquals (is.reflected(), 2.0f * s1.R, "Changed " + name + " propagated root impedance incorrect!");
         };
 
         auto doImpedanceChecks = [=] (auto... params) {
