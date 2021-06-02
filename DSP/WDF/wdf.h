@@ -109,7 +109,7 @@ namespace WDF
     {
     public:
         template <typename... Args>
-        WDFWrapper (std::string name, Args&&... args) : WDF (name),
+        WDFWrapper (std::string name, Args&&... args) : WDF<T> (name),
                                                         internalWDF (std::forward<Args> (args)...)
         {
             calcImpedance();
@@ -159,7 +159,7 @@ namespace WDF
 
         inline void calcImpedance() override
         {
-            internalWDF.calcImpedance();
+            this->internalWDF.calcImpedance();
         }
     };
 
