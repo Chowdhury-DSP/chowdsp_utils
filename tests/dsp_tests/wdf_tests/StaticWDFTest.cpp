@@ -294,9 +294,8 @@ public:
             ResistiveVoltageSourceT<float> { 1000.0f }, "ResistiveVoltageSource", 1000.0f, 2000.0f, [=] (ResistiveVoltageSourceT<float>& r, float value) { r.setResistanceValue (value); }, [=] (float value) { return value; });
 
         // resistive current source
-        doImpedanceChecks (ResistiveCurrentSourceT<float> { 1000.0f }, "ResistiveCurrentSource", 1000.0f, 2000.0f,
-            [=] (ResistiveCurrentSourceT<float>& r, float value) { r.setResistanceValue (value); },
-            [=] (float value) { return value; });
+        doImpedanceChecks (
+            ResistiveCurrentSourceT<float> { 1000.0f }, "ResistiveCurrentSource", 1000.0f, 2000.0f, [=] (ResistiveCurrentSourceT<float>& r, float value) { r.setResistanceValue (value); }, [=] (float value) { return value; });
     }
 
     void runTest() override
