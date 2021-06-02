@@ -49,6 +49,66 @@ public:
         expect (! dummy.isBusesLayoutSupported (quadLayout), "More than two channels should NOT be supported!");
     }
 
+    void propertiesTest()
+    {
+        DummyPlugin dummy1;
+
+        expectEquals (dummy1.getName(), String ("DummyPlugin"), "Plugin name incorrect!");
+
+        bool midiBehaviour = dummy1.acceptsMidi() || dummy1.producesMidi() || dummy1.isMidiEffect();
+        expect (! midiBehaviour, "MIDI behaviour incorrect!");
+
+        expectEquals (dummy1.getTailLengthSeconds(), 0.0, "Tail length incorrect!");
+
+        expect (dummy1.getNumPrograms() > 0, "Num programs is to low!");
+        dummy1.setCurrentProgram (0);
+        expectEquals (dummy1.getCurrentProgram(), 0, "Current program is incorrect!");
+        dummy1.changeProgramName (0, "");
+        expectEquals (dummy1.getProgramName (0), String(), "Program name incorrect");
+    }
+
+    void guiTest()
+    {
+        DummyPlugin dummy1;
+
+        if (dummy1.hasEditor())
+        {
+            std::unique_ptr<AudioProcessorEditor> editor (dummy1.createEditor());
+            editor->setSize (700, 700); // make editor larger
+            dummy1.editorBeingDeleted (editor.get());
+        }
+        else
+        {
+            expect (false, "Dummy plugin has no editor!");
+        }
+    }
+
+    void processTest()
+    {
+        DummyPlugin dummy1;
+        constexpr int blockSize = 1024;
+        dummy1.prepareToPlay (48000.0, blockSize);
+
+        // float test
+        {
+            AudioBuffer<float> buffer (2, blockSize);
+            buffer.clear();
+
+            dummy1.processAudioBlock (buffer);
+            expectLessThan (buffer.getMagnitude (0, blockSize), 1.0e-3f, "Buffer should be empty!");
+        }
+
+        // double test
+        {
+            AudioBuffer<double> buffer (2, blockSize);
+            buffer.clear();
+            MidiBuffer midi;
+
+            dummy1.processBlock (buffer, midi);
+            expectLessThan (buffer.getMagnitude (0, blockSize), 1.0e-6, "Buffer should be empty!");
+        }
+    }
+
     void runTest() override
     {
         beginTest ("Save/Load State Test");
@@ -56,6 +116,15 @@ public:
 
         beginTest ("Buses Layout Test");
         channelSetTest();
+
+        beginTest ("Properties Test");
+        propertiesTest();
+
+        beginTest ("GUI Test");
+        guiTest();
+
+        beginTest ("Process Test");
+        processTest();
     }
 };
 
