@@ -4,6 +4,11 @@
 #include "wdf_t.h"
 #include <array>
 
+#if CHOWDSP_USE_XSIMD
+#include <cassert>
+#include <xsimd/xsimd.hpp>
+#endif
+
 namespace chowdsp
 {
 namespace WDFT
