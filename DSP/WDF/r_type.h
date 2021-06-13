@@ -24,11 +24,11 @@ namespace WDFT
             forEachInTuple (std::forward<Fn> (fn), std::forward<Tuple> (tuple), TupleIndexSequence<Tuple> {});
         }
 
-        template<typename ElementType, int arraySize, int alignment = 16>
+        template <typename ElementType, int arraySize, int alignment = 16>
         struct AlignedArray
         {
-            ElementType& operator[](int index) noexcept { return array[(int) index]; }
-            const ElementType& operator[](int index) const noexcept { return array[(int) index]; }
+            ElementType& operator[] (int index) noexcept { return array[(int) index]; }
+            const ElementType& operator[] (int index) const noexcept { return array[(int) index]; }
 
             auto begin() noexcept { return array.begin(); }
             auto begin() const noexcept { return array.begin(); }
@@ -39,7 +39,7 @@ namespace WDFT
 
             int size() const noexcept { return arraySize; }
 
-            alignas(alignment) std::array<ElementType, arraySize> array;
+            alignas (alignment) std::array<ElementType, arraySize> array;
         };
     } // namespace rtype_detail
 
@@ -83,8 +83,11 @@ namespace WDFT
                                           downPorts);
         }
 
-        template<int port_idx>
-        constexpr auto getPort() { return std::get<port_idx> (downPorts); }
+        template <int port_idx>
+        constexpr auto getPort()
+        {
+            return std::get<port_idx> (downPorts);
+        }
 
     protected:
         /** Implementation for float/double. */
