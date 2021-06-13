@@ -23,6 +23,24 @@ namespace WDFT
         {
             forEachInTuple (std::forward<Fn> (fn), std::forward<Tuple> (tuple), TupleIndexSequence<Tuple> {});
         }
+
+        template<typename ElementType, int arraySize, int alignment = 16>
+        struct AlignedArray
+        {
+            ElementType& operator[](int index) noexcept { return array[(int) index]; }
+            const ElementType& operator[](int index) const noexcept { return array[(int) index]; }
+
+            auto begin() noexcept { return array.begin(); }
+            auto begin() const noexcept { return array.begin(); }
+            auto end() noexcept { return array.end(); }
+            auto end() const noexcept { return array.end(); }
+            auto data() noexcept { return array.data(); }
+            auto data() const noexcept { return array.data(); }
+
+            int size() const noexcept { return arraySize; }
+
+            alignas(alignment) std::array<ElementType, arraySize> array;
+        };
     } // namespace rtype_detail
 
     /**
@@ -65,11 +83,14 @@ namespace WDFT
                                           downPorts);
         }
 
+        template<int port_idx>
+        constexpr auto getPort() { return std::get<port_idx> (downPorts); }
+
     protected:
         /** Implementation for float/double. */
         template <typename C = T>
         static inline typename std::enable_if<std::is_same<float, C>::value || std::is_same<double, C>::value, void>::type
-            RtypeScatter (const T (&S_)[numPorts][numPorts], const T (&a_)[numPorts], T (&b_)[numPorts])
+            RtypeScatter (const rtype_detail::AlignedArray<T, numPorts> (&S_)[numPorts], const T (&a_)[numPorts], T (&b_)[numPorts])
         {
             // input matrix (S) of size dim x dim
             // input vector (a) of size 1 x dim
@@ -84,7 +105,7 @@ namespace WDFT
             {
                 v_type bc { (T) 0 };
                 for (int r = 0; r < vec_size; r += simd_size)
-                    bc = xsimd::fma (xsimd::load_aligned (S_[c] + r), xsimd::load_aligned (a_ + r), bc);
+                    bc = xsimd::fma (xsimd::load_aligned (S_[c].data() + r), xsimd::load_aligned (a_ + r), bc);
                 b_[c] = xsimd::hadd (bc);
 
                 // remainder of ops that can't be vectorized
@@ -100,7 +121,7 @@ namespace WDFT
             {
                 b_[c] = (T) 0;
                 for (int r = 0; r < vec_size; r += simd_size)
-                    b_[c] += (v_type::fromRawArray (S_[c] + r) * v_type::fromRawArray (a_ + r)).sum();
+                    b_[c] += (v_type::fromRawArray (S_[c].data() + r) * v_type::fromRawArray (a_ + r)).sum();
 
                 // remainder of ops that can't be vectorized
                 for (int r = vec_size; r < (int) numPorts; ++r)
@@ -122,7 +143,7 @@ namespace WDFT
         static inline typename std::enable_if<std::is_same<juce::dsp::SIMDRegister<float>, C>::value
                                                   || std::is_same<juce::dsp::SIMDRegister<double>, C>::value,
                                               void>::type
-            RtypeScatter (const T (&S_)[numPorts][numPorts], const T (&a_)[numPorts], T (&b_)[numPorts])
+            RtypeScatter (const rtype_detail::AlignedArray<T, numPorts> (&S_)[numPorts], const T (&a_)[numPorts], T (&b_)[numPorts])
         {
             for (int c = 0; c < (int) numPorts; ++c)
             {
@@ -135,7 +156,7 @@ namespace WDFT
 
         std::tuple<PortTypes&...> downPorts; // tuple of ports connected to RtypeAdaptor
 
-        T S_matrix alignas (16)[numPorts][numPorts]; // square matrix representing S
+        rtype_detail::AlignedArray<T, numPorts> S_matrix[numPorts]; // square matrix representing S
         T a_vec alignas (16)[numPorts]; // temp matrix of inputs to Rport
         T b_vec alignas (16)[numPorts]; // temp matrix of outputs from Rport
     };
