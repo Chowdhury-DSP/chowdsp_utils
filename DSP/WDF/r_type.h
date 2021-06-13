@@ -1,6 +1,9 @@
 #ifndef RTYPE_H_INCLUDED
 #define RTYPE_H_INCLUDED
 
+#include "wdf_t.h"
+#include <array>
+
 namespace chowdsp
 {
 namespace WDFT
