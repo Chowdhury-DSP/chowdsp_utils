@@ -752,7 +752,8 @@ namespace WDFT
         /** Propogates a reflected wave from a WDF diode pair. */
         inline T reflected() noexcept
         {
-            return reflectedInternal();
+            reflectedInternal();
+            return b;
         }
 
         CREATE_WDFT_MEMBERS
@@ -760,13 +761,12 @@ namespace WDFT
     private:
         /** Implementation for float/double. */
         template <typename C = T>
-        inline typename std::enable_if<std::is_floating_point<C>::value, C>::type
+        inline typename std::enable_if<std::is_floating_point<C>::value, void>::type
             reflectedInternal() noexcept
         {
             // See eqn (18) from reference paper
             T lambda = (T) signum (a);
             b = a + (T) 2 * lambda * (R_Is - Vt * Omega::omega4 (logR_Is_overVt + lambda * a * oneOverVt + R_Is_overVt));
-            return a;
         }
 
         template <typename C = T>
@@ -783,13 +783,12 @@ namespace WDFT
         template <typename C = T>
         inline typename std::enable_if<std::is_same<juce::dsp::SIMDRegister<float>, C>::value
                                            || std::is_same<juce::dsp::SIMDRegister<double>, C>::value,
-                                       C>::type
+                                       void>::type
             reflectedInternal() noexcept
         {
             // See eqn (18) from reference paper
             T lambda = signumSIMD (a);
             b = a + (T) 2 * lambda * (R_Is - Vt * Omega::omega4 (logR_Is_overVt + lambda * a * oneOverVt + R_Is_overVt));
-            return a;
         }
 
         template <typename C = T>
