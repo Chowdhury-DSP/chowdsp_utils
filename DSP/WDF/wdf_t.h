@@ -727,7 +727,7 @@ namespace WDFT
  * See Werner et al., "An Improved and Generalized Diode Clipper Model for Wave Digital Filters"
  * https://www.researchgate.net/publication/299514713_An_Improved_and_Generalized_Diode_Clipper_Model_for_Wave_Digital_Filters
  */
-    template <typename T, typename Next, DiodeQuality Quality = DiodeQuality::Best, int NDiodes = 1>
+    template <typename T, typename Next, DiodeQuality Quality = DiodeQuality::Best>
     class DiodePairT final : public RootWDF
     {
     public:
@@ -736,13 +736,19 @@ namespace WDFT
          * @param Vt: thermal voltage
          * @param next: the next element in the WDF connection tree
          */
-        DiodePairT (T Is, T Vt, Next& n) : Is (Is),
-                                           _Vt (NDiodes * Vt),
-                                           twoVt ((T) 2 * _Vt),
-                                           oneOverVt ((T) 1 / _Vt),
+        DiodePairT (T Is, T Vt, T nDiodes, Next& n) : 
                                            next (n)
         {
             next.connectToParent (this);
+            setDiodeParameters (Is, Vt, nDiodes);
+        }
+
+        void setDiodeParameters (T newIs, T newVt, T nDiodes)
+        {
+            Is = newIs;
+            _Vt = nDiodes * newVt;
+            twoVt = (T) 2 * _Vt;
+            oneOverVt = (T) 1 / _Vt;
             calcImpedance();
         }
 
@@ -836,12 +842,12 @@ namespace WDFT
             logR_Is_overVt = logSIMD (R_Is_overVt);
         }
 #endif
-        const T Is; // reverse saturation current
-        const T _Vt; // thermal voltage
+        T Is; // reverse saturation current
+        T _Vt; // thermal voltage
 
         // pre-computed vars
-        const T twoVt;
-        const T oneOverVt;
+        T twoVt;
+        T oneOverVt;
         T R_Is;
         T R_Is_overVt;
         T logR_Is_overVt;

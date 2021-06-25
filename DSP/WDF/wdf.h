@@ -540,7 +540,7 @@ namespace WDF
          * @param Is: reverse saturation current
          * @param Vt: thermal voltage
          */
-        DiodePair (T Is, T Vt, WDF<T>* next) : WDFRootWrapper<T, WDFT::DiodePairT<T, WDF<T>>> ("DiodePair", *next, Is, Vt, *next)
+        DiodePair (T Is, T Vt, T nDiodes, WDF<T>* next) : WDFRootWrapper<T, WDFT::DiodePairT<T, WDF<T>>> ("DiodePair", *next, Is, Vt, nDiodes, *next)
         {
             next->connectToNode (this);
         }
