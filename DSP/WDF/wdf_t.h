@@ -736,8 +736,7 @@ namespace WDFT
          * @param Vt: thermal voltage
          * @param next: the next element in the WDF connection tree
          */
-        DiodePairT (T Is, T Vt, T nDiodes, Next& n) : 
-                                           next (n)
+        DiodePairT (T Is, T Vt, T nDiodes, Next& n) : next (n)
         {
             next.connectToParent (this);
             setDiodeParameters (Is, Vt, nDiodes);
@@ -806,8 +805,8 @@ namespace WDFT
 #if USING_JUCE
         /** Implementation for SIMD float/double (Good). */
         template <typename C = T, DiodeQuality Q = Quality>
-        inline typename std::enable_if<std::is_same<juce::dsp::SIMDRegister<float>, C>::value
-                                           || std::is_same<juce::dsp::SIMDRegister<double>, C>::value
+        inline typename std::enable_if<(std::is_same<juce::dsp::SIMDRegister<float>, C>::value
+                                           || std::is_same<juce::dsp::SIMDRegister<double>, C>::value)
                                            && (Q == Good),
                                        void>::type
             reflectedInternal() noexcept
@@ -819,8 +818,8 @@ namespace WDFT
 
         /** Implementation for SIMD float/double (Best). */
         template <typename C = T, DiodeQuality Q = Quality>
-        inline typename std::enable_if<std::is_same<juce::dsp::SIMDRegister<float>, C>::value
-                                           || std::is_same<juce::dsp::SIMDRegister<double>, C>::value
+        inline typename std::enable_if<(std::is_same<juce::dsp::SIMDRegister<float>, C>::value
+                                           || std::is_same<juce::dsp::SIMDRegister<double>, C>::value)
                                            && (Q == Best),
                                        void>::type
             reflectedInternal() noexcept
@@ -859,7 +858,7 @@ namespace WDFT
      * See Werner et al., "An Improved and Generalized Diode Clipper Model for Wave Digital Filters"
      * https://www.researchgate.net/publication/299514713_An_Improved_and_Generalized_Diode_Clipper_Model_for_Wave_Digital_Filters
      */
-    template <typename T, typename Next>
+    template <typename T, typename Next, DiodeQuality Quality = DiodeQuality::Best>
     class DiodeT final : public RootWDF
     {
     public:
@@ -868,13 +867,18 @@ namespace WDFT
          * @param Vt: thermal voltage
          * @param next: the next element in the WDF connection tree
          */
-        DiodeT (T Is, T Vt, Next& n) : Is (Is),
-                                       Vt (Vt),
-                                       twoVt ((T) 2 * Vt),
-                                       oneOverVt ((T) 1 / Vt),
-                                       next (n)
+        DiodeT (T Is, T Vt, T nDiodes, Next& n) : next (n)
         {
             next.connectToParent (this);
+            setDiodeParameters (Is, Vt, nDiodes);
+        }
+
+        void setDiodeParameters (T newIs, T newVt, T nDiodes)
+        {
+            Is = newIs;
+            Vt = nDiodes * newVt;
+            twoVt = (T) 2 * Vt;
+            oneOverVt = (T) 1 / Vt;
             calcImpedance();
         }
 
@@ -923,12 +927,12 @@ namespace WDFT
             logR_Is_overVt = logSIMD (R_Is_overVt);
         }
 #endif
-        const T Is; // reverse saturation current
-        const T Vt; // thermal voltage
+        T Is; // reverse saturation current
+        T Vt; // thermal voltage
 
         // pre-computed vars
-        const T twoVt;
-        const T oneOverVt;
+        T twoVt;
+        T oneOverVt;
         T twoR_Is;
         T R_Is_overVt;
         T logR_Is_overVt;
