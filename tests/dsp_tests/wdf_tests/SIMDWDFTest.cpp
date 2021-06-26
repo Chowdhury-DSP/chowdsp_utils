@@ -54,7 +54,7 @@ public:
             auto I1 = std::make_unique<WDF::PolarityInverter<FloatType>> (P1.get());
 
             WDF::DiodePair dp { I1.get(), (FloatType) 2.52e-9 };
-            dp.setDiodeParameters ((FloatType) 2.52e-9, (FloatType) 0.002585, 1);
+            dp.setDiodeParameters ((FloatType) 2.52e-9, (FloatType) 0.02585, 1);
 
             for (int i = 0; i < num; ++i)
             {
@@ -116,7 +116,7 @@ public:
             auto P2 = std::make_unique<WDF::WDFParallel<Vec>> (I1.get(), S1.get());
 
             WDF::Diode<Vec> d53 { P2.get(), 2.52e-9f }; // 1N4148 diode
-            d53.setDiodeParameters ((FloatType) 2.52e-9, (FloatType) 0.002585, 1);
+            d53.setDiodeParameters ((FloatType) 2.52e-9, (FloatType) 0.02585, 1);
 
             for (int i = 0; i < num; ++i)
             {
