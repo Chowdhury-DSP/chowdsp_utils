@@ -536,6 +536,7 @@ namespace WDF
     class DiodePair final : public WDFRootWrapper<T, WDFT::DiodePairT<T, WDF<T>, Q>>
     {
         using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+
     public:
         /** Creates a new WDF diode pair, with the given diode specifications.
          * @param Is: reverse saturation current
@@ -561,6 +562,7 @@ namespace WDF
     class Diode final : public WDFRootWrapper<T, WDFT::DiodeT<T, WDF<T>>>
     {
         using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+
     public:
         /** Creates a new WDF diode, with the given diode specifications.
      * @param Is: reverse saturation current

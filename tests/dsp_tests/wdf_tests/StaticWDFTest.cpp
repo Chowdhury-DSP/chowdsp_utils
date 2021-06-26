@@ -184,7 +184,7 @@ public:
         }
     }
 
-    template<chowdsp::WDFT::DiodeQuality Q>
+    template <chowdsp::WDFT::DiodeQuality Q>
     void staticWDFTest()
     {
         using FloatType = double;

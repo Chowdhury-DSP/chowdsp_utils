@@ -719,8 +719,8 @@ namespace WDFT
     /** Enum to determine which diode approximation eqn. to use */
     enum DiodeQuality
     {
-        Good, // see reference eqn (18) 
-        Best, // see reference eqn (39) 
+        Good, // see reference eqn (18)
+        Best, // see reference eqn (39)
     };
 
     /** WDF diode pair (non-adaptable)
@@ -807,7 +807,7 @@ namespace WDFT
         /** Implementation for SIMD float/double (Good). */
         template <typename C = T, DiodeQuality Q = Quality>
         inline typename std::enable_if<(std::is_same<juce::dsp::SIMDRegister<float>, C>::value
-                                           || std::is_same<juce::dsp::SIMDRegister<double>, C>::value)
+                                        || std::is_same<juce::dsp::SIMDRegister<double>, C>::value)
                                            && (Q == Good),
                                        void>::type
             reflectedInternal() noexcept
@@ -820,7 +820,7 @@ namespace WDFT
         /** Implementation for SIMD float/double (Best). */
         template <typename C = T, DiodeQuality Q = Quality>
         inline typename std::enable_if<(std::is_same<juce::dsp::SIMDRegister<float>, C>::value
-                                           || std::is_same<juce::dsp::SIMDRegister<double>, C>::value)
+                                        || std::is_same<juce::dsp::SIMDRegister<double>, C>::value)
                                            && (Q == Best),
                                        void>::type
             reflectedInternal() noexcept
