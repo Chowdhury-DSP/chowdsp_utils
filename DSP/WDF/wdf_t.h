@@ -736,12 +736,13 @@ namespace WDFT
          * @param Vt: thermal voltage
          * @param next: the next element in the WDF connection tree
          */
-        DiodePairT (T Is, T Vt, T nDiodes, Next& n) : next (n)
+        DiodePairT (Next& n, T Is, T Vt = (NumericType) 25.85e-3, T nDiodes = 1) : next (n)
         {
             next.connectToParent (this);
             setDiodeParameters (Is, Vt, nDiodes);
         }
 
+        /** Sets diode specific parameters */
         void setDiodeParameters (T newIs, T newVt, T nDiodes)
         {
             Is = newIs;
@@ -867,12 +868,13 @@ namespace WDFT
          * @param Vt: thermal voltage
          * @param next: the next element in the WDF connection tree
          */
-        DiodeT (T Is, T Vt, T nDiodes, Next& n) : next (n)
+        DiodeT (Next& n, T Is, T Vt = (NumericType) 25.85e-3, T nDiodes = 1) : next (n)
         {
             next.connectToParent (this);
             setDiodeParameters (Is, Vt, nDiodes);
         }
 
+        /** Sets diode specific parameters */
         void setDiodeParameters (T newIs, T newVt, T nDiodes)
         {
             Is = newIs;
