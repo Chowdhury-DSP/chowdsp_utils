@@ -731,6 +731,8 @@ namespace WDFT
     class DiodePairT final : public RootWDF
     {
     public:
+        CREATE_WDFT_MEMBERS
+
         /** Creates a new WDF diode pair, with the given diode specifications.
          * @param Is: reverse saturation current
          * @param Vt: thermal voltage
@@ -769,8 +771,6 @@ namespace WDFT
             reflectedInternal();
             return b;
         }
-
-        CREATE_WDFT_MEMBERS
 
     private:
         /** Implementation for float/double (Good). */
@@ -863,6 +863,8 @@ namespace WDFT
     class DiodeT final : public RootWDF
     {
     public:
+        CREATE_WDFT_MEMBERS
+
         /** Creates a new WDF diode, with the given diode specifications.
          * @param Is: reverse saturation current
          * @param Vt: thermal voltage
@@ -902,8 +904,6 @@ namespace WDFT
             b = a + twoR_Is - twoVt * Omega::omega4 (logR_Is_overVt + a * oneOverVt + R_Is_overVt);
             return b;
         }
-
-        CREATE_WDFT_MEMBERS
 
     private:
         /** Implementation for float/double. */
