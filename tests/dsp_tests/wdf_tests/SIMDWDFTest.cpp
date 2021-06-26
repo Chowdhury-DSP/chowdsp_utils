@@ -53,7 +53,8 @@ public:
             auto P1 = std::make_unique<WDF::WDFParallel<FloatType>> (S1.get(), C1.get());
             auto I1 = std::make_unique<WDF::PolarityInverter<FloatType>> (P1.get());
 
-            WDF::DiodePair dp { (FloatType) 2.52e-9, (FloatType) 0.02585, I1.get() };
+            WDF::DiodePair dp { I1.get(), (FloatType) 2.52e-9 };
+            dp.setDiodeParameters ((FloatType) 2.52e-9, (FloatType) 0.002585, 1);
 
             for (int i = 0; i < num; ++i)
             {
@@ -74,7 +75,7 @@ public:
             auto P1 = std::make_unique<WDF::WDFParallel<VType>> (S1.get(), C1.get());
             auto I1 = std::make_unique<WDF::PolarityInverter<VType>> (P1.get());
 
-            WDF::DiodePair dp { (VType) 2.52e-9, (VType) 0.02585, I1.get() };
+            WDF::DiodePair dp { I1.get(), (VType) 2.52e-9 };
 
             for (int i = 0; i < num; ++i)
             {
@@ -114,7 +115,8 @@ public:
             auto I1 = std::make_unique<WDF::PolarityInverter<Vec>> (&r162);
             auto P2 = std::make_unique<WDF::WDFParallel<Vec>> (I1.get(), S1.get());
 
-            WDF::Diode<Vec> d53 { 2.52e-9f, 25.85e-3f, P2.get() }; // 1N4148 diode
+            WDF::Diode<Vec> d53 { P2.get(), 2.52e-9f }; // 1N4148 diode
+            d53.setDiodeParameters ((FloatType) 2.52e-9, (FloatType) 0.002585, 1);
 
             for (int i = 0; i < num; ++i)
             {
@@ -140,7 +142,7 @@ public:
             auto S1 = WDFT::makeSeries<Vec> (Vs, P1);
             auto I1 = WDFT::makeInverter<Vec> (r162);
             auto P2 = WDFT::makeParallel<Vec> (I1, S1);
-            WDFT::DiodeT<Vec, decltype (P2)> d53 { 2.52e-9f, 25.85e-3f, P2 }; // 1N4148 diode
+            WDFT::DiodeT<Vec, decltype (P2)> d53 { P2, 2.52e-9f }; // 1N4148 diode
 
             for (int i = 0; i < num; ++i)
             {
