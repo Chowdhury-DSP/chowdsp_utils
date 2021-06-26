@@ -532,17 +532,25 @@ namespace WDF
  * See Werner et al., "An Improved and Generalized Diode Clipper Model for Wave Digital Filters"
  * https://www.researchgate.net/publication/299514713_An_Improved_and_Generalized_Diode_Clipper_Model_for_Wave_Digital_Filters
  */
-    template <typename T>
-    class DiodePair final : public WDFRootWrapper<T, WDFT::DiodePairT<T, WDF<T>>>
+    template <typename T, WDFT::DiodeQuality Q = WDFT::DiodeQuality::Best>
+    class DiodePair final : public WDFRootWrapper<T, WDFT::DiodePairT<T, WDF<T>, Q>>
     {
+        using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+
     public:
         /** Creates a new WDF diode pair, with the given diode specifications.
          * @param Is: reverse saturation current
          * @param Vt: thermal voltage
          */
-        DiodePair (T Is, T Vt, WDF<T>* next) : WDFRootWrapper<T, WDFT::DiodePairT<T, WDF<T>>> ("DiodePair", *next, Is, Vt, *next)
+        DiodePair (WDF<T>* next, T Is, T Vt = (NumericType) 25.85e-3, T nDiodes = (T) 1) : WDFRootWrapper<T, WDFT::DiodePairT<T, WDF<T>, Q>> ("DiodePair", *next, *next, Is, Vt, nDiodes)
         {
             next->connectToNode (this);
+        }
+
+        /** Sets diode specific parameters */
+        void setDiodeParameters (T newIs, T newVt, T nDiodes)
+        {
+            this->internalWDF.setDiodeParameters (newIs, newVt, nDiodes);
         }
     };
 
@@ -553,14 +561,22 @@ namespace WDF
     template <typename T>
     class Diode final : public WDFRootWrapper<T, WDFT::DiodeT<T, WDF<T>>>
     {
+        using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+
     public:
         /** Creates a new WDF diode, with the given diode specifications.
      * @param Is: reverse saturation current
      * @param Vt: thermal voltage
      */
-        Diode (T Is, T Vt, WDF<T>* next) : WDFRootWrapper<T, WDFT::DiodeT<T, WDF<T>>> ("Diode", *next, Is, Vt, *next)
+        Diode (WDF<T>* next, T Is, T Vt = (NumericType) 25.85e-3, T nDiodes = 1) : WDFRootWrapper<T, WDFT::DiodeT<T, WDF<T>>> ("Diode", *next, *next, Is, Vt, nDiodes)
         {
             next->connectToNode (this);
+        }
+
+        /** Sets diode specific parameters */
+        void setDiodeParameters (T newIs, T newVt, T nDiodes)
+        {
+            this->internalWDF.setDiodeParameters (newIs, newVt, nDiodes);
         }
     };
 

@@ -184,6 +184,7 @@ public:
         }
     }
 
+    template <chowdsp::WDFT::DiodeQuality Q>
     void staticWDFTest()
     {
         using FloatType = double;
@@ -204,7 +205,7 @@ public:
             auto P1 = std::make_unique<WDF::WDFParallel<FloatType>> (S1.get(), C1.get());
             auto I1 = std::make_unique<WDF::PolarityInverter<FloatType>> (P1.get());
 
-            WDF::DiodePair dp { (FloatType) 2.52e-9, (FloatType) 0.02585, I1.get() };
+            WDF::DiodePair<FloatType, Q> dp { I1.get(), (FloatType) 2.52e-9 };
 
             for (int i = 0; i < num; ++i)
             {
@@ -225,7 +226,7 @@ public:
             auto P1 = makeParallel<FloatType> (S1, C1);
             auto I1 = makeInverter<FloatType> (P1);
 
-            DiodePairT<FloatType, decltype (I1)> dp { (FloatType) 2.52e-9, (FloatType) 0.02585, I1 };
+            DiodePairT<FloatType, decltype (I1), Q> dp { I1, (FloatType) 2.52e-9 };
 
             for (int i = 0; i < num; ++i)
             {
@@ -318,7 +319,8 @@ public:
         impedanceChangeTest();
 
         beginTest ("Static WDF Test");
-        staticWDFTest();
+        staticWDFTest<chowdsp::WDFT::DiodeQuality::Good>();
+        staticWDFTest<chowdsp::WDFT::DiodeQuality::Best>();
     }
 };
 

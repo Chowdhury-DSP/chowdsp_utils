@@ -35,8 +35,8 @@ namespace WDFT
         template <typename ElementType, int arraySize, int alignment = 16>
         struct AlignedArray
         {
-            ElementType& operator[] (int index) noexcept { return array[(int) index]; }
-            const ElementType& operator[] (int index) const noexcept { return array[(int) index]; }
+            ElementType& operator[] (int index) noexcept { return array[(size_t) index]; }
+            const ElementType& operator[] (int index) const noexcept { return array[(size_t) index]; }
 
             auto begin() noexcept { return array.begin(); }
             auto begin() const noexcept { return array.begin(); }

@@ -716,25 +716,41 @@ namespace WDFT
         T R_value = (T) 1.0e9;
     };
 
+    /** Enum to determine which diode approximation eqn. to use */
+    enum DiodeQuality
+    {
+        Good, // see reference eqn (18)
+        Best, // see reference eqn (39)
+    };
+
     /** WDF diode pair (non-adaptable)
  * See Werner et al., "An Improved and Generalized Diode Clipper Model for Wave Digital Filters"
  * https://www.researchgate.net/publication/299514713_An_Improved_and_Generalized_Diode_Clipper_Model_for_Wave_Digital_Filters
  */
-    template <typename T, typename Next>
+    template <typename T, typename Next, DiodeQuality Quality = DiodeQuality::Best>
     class DiodePairT final : public RootWDF
     {
     public:
+        CREATE_WDFT_MEMBERS
+
         /** Creates a new WDF diode pair, with the given diode specifications.
          * @param Is: reverse saturation current
          * @param Vt: thermal voltage
          * @param next: the next element in the WDF connection tree
          */
-        DiodePairT (T Is, T Vt, Next& n) : Is (Is),
-                                           Vt (Vt),
-                                           oneOverVt ((T) 1 / Vt),
-                                           next (n)
+        DiodePairT (Next& n, T Is, T Vt = (NumericType) 25.85e-3, T nDiodes = 1) : next (n)
         {
             next.connectToParent (this);
+            setDiodeParameters (Is, Vt, nDiodes);
+        }
+
+        /** Sets diode specific parameters */
+        void setDiodeParameters (T newIs, T newVt, T nDiodes)
+        {
+            Is = newIs;
+            _Vt = nDiodes * newVt;
+            twoVt = (T) 2 * _Vt;
+            oneOverVt = (T) 1 / _Vt;
             calcImpedance();
         }
 
@@ -756,17 +772,26 @@ namespace WDFT
             return b;
         }
 
-        CREATE_WDFT_MEMBERS
-
     private:
-        /** Implementation for float/double. */
-        template <typename C = T>
-        inline typename std::enable_if<std::is_floating_point<C>::value, void>::type
+        /** Implementation for float/double (Good). */
+        template <typename C = T, DiodeQuality Q = Quality>
+        inline typename std::enable_if<std::is_floating_point<C>::value && (Q == Good), void>::type
             reflectedInternal() noexcept
         {
             // See eqn (18) from reference paper
             T lambda = (T) signum (a);
-            b = a + (T) 2 * lambda * (R_Is - Vt * Omega::omega4 (logR_Is_overVt + lambda * a * oneOverVt + R_Is_overVt));
+            b = a + (T) 2 * lambda * (R_Is - _Vt * Omega::omega4 (logR_Is_overVt + lambda * a * oneOverVt + R_Is_overVt));
+        }
+
+        /** Implementation for float/double (Best). */
+        template <typename C = T, DiodeQuality Q = Quality>
+        inline typename std::enable_if<std::is_floating_point<C>::value && (Q == Best), void>::type
+            reflectedInternal() noexcept
+        {
+            // See eqn (39) from reference paper
+            T lambda = (T) signum (a);
+            T lambda_a_over_vt = lambda * a * oneOverVt;
+            b = a - twoVt * lambda * (Omega::omega4 (logR_Is_overVt + lambda_a_over_vt) - Omega::omega4 (logR_Is_overVt - lambda_a_over_vt));
         }
 
         template <typename C = T>
@@ -779,16 +804,31 @@ namespace WDFT
         }
 
 #if USING_JUCE
-        /** Implementation for SIMD float/double. */
-        template <typename C = T>
-        inline typename std::enable_if<std::is_same<juce::dsp::SIMDRegister<float>, C>::value
-                                           || std::is_same<juce::dsp::SIMDRegister<double>, C>::value,
+        /** Implementation for SIMD float/double (Good). */
+        template <typename C = T, DiodeQuality Q = Quality>
+        inline typename std::enable_if<(std::is_same<juce::dsp::SIMDRegister<float>, C>::value
+                                        || std::is_same<juce::dsp::SIMDRegister<double>, C>::value)
+                                           && (Q == Good),
                                        void>::type
             reflectedInternal() noexcept
         {
             // See eqn (18) from reference paper
             T lambda = signumSIMD (a);
-            b = a + (T) 2 * lambda * (R_Is - Vt * Omega::omega4 (logR_Is_overVt + lambda * a * oneOverVt + R_Is_overVt));
+            b = a + (T) 2 * lambda * (R_Is - _Vt * Omega::omega4 (logR_Is_overVt + lambda * a * oneOverVt + R_Is_overVt));
+        }
+
+        /** Implementation for SIMD float/double (Best). */
+        template <typename C = T, DiodeQuality Q = Quality>
+        inline typename std::enable_if<(std::is_same<juce::dsp::SIMDRegister<float>, C>::value
+                                        || std::is_same<juce::dsp::SIMDRegister<double>, C>::value)
+                                           && (Q == Best),
+                                       void>::type
+            reflectedInternal() noexcept
+        {
+            // See eqn (39) from reference paper
+            T lambda = signumSIMD (a);
+            T lambda_a_over_vt = lambda * a * oneOverVt;
+            b = a - twoVt * lambda * (Omega::omega4 (logR_Is_overVt + lambda_a_over_vt) - Omega::omega4 (logR_Is_overVt - lambda_a_over_vt));
         }
 
         template <typename C = T>
@@ -802,11 +842,12 @@ namespace WDFT
             logR_Is_overVt = logSIMD (R_Is_overVt);
         }
 #endif
-        const T Is; // reverse saturation current
-        const T Vt; // thermal voltage
+        T Is; // reverse saturation current
+        T _Vt; // thermal voltage
 
         // pre-computed vars
-        const T oneOverVt;
+        T twoVt;
+        T oneOverVt;
         T R_Is;
         T R_Is_overVt;
         T logR_Is_overVt;
@@ -818,22 +859,30 @@ namespace WDFT
      * See Werner et al., "An Improved and Generalized Diode Clipper Model for Wave Digital Filters"
      * https://www.researchgate.net/publication/299514713_An_Improved_and_Generalized_Diode_Clipper_Model_for_Wave_Digital_Filters
      */
-    template <typename T, typename Next>
+    template <typename T, typename Next, DiodeQuality Quality = DiodeQuality::Best>
     class DiodeT final : public RootWDF
     {
     public:
+        CREATE_WDFT_MEMBERS
+
         /** Creates a new WDF diode, with the given diode specifications.
          * @param Is: reverse saturation current
          * @param Vt: thermal voltage
          * @param next: the next element in the WDF connection tree
          */
-        DiodeT (T Is, T Vt, Next& n) : Is (Is),
-                                       Vt (Vt),
-                                       twoVt ((T) 2 * Vt),
-                                       oneOverVt ((T) 1 / Vt),
-                                       next (n)
+        DiodeT (Next& n, T Is, T Vt = (NumericType) 25.85e-3, T nDiodes = 1) : next (n)
         {
             next.connectToParent (this);
+            setDiodeParameters (Is, Vt, nDiodes);
+        }
+
+        /** Sets diode specific parameters */
+        void setDiodeParameters (T newIs, T newVt, T nDiodes)
+        {
+            Is = newIs;
+            Vt = nDiodes * newVt;
+            twoVt = (T) 2 * Vt;
+            oneOverVt = (T) 1 / Vt;
             calcImpedance();
         }
 
@@ -856,8 +905,6 @@ namespace WDFT
             return b;
         }
 
-        CREATE_WDFT_MEMBERS
-
     private:
         /** Implementation for float/double. */
         template <typename C = T>
@@ -882,12 +929,12 @@ namespace WDFT
             logR_Is_overVt = logSIMD (R_Is_overVt);
         }
 #endif
-        const T Is; // reverse saturation current
-        const T Vt; // thermal voltage
+        T Is; // reverse saturation current
+        T Vt; // thermal voltage
 
         // pre-computed vars
-        const T twoVt;
-        const T oneOverVt;
+        T twoVt;
+        T oneOverVt;
         T twoR_Is;
         T R_Is_overVt;
         T logR_Is_overVt;
