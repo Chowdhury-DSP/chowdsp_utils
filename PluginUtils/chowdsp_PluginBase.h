@@ -14,6 +14,7 @@ class PluginBase : public juce::AudioProcessor
 {
 public:
     PluginBase();
+    PluginBase (juce::UndoManager* um);
     PluginBase (const juce::AudioProcessor::BusesProperties& layout);
     ~PluginBase();
 
@@ -86,6 +87,12 @@ public:
 template <class Processor>
 PluginBase<Processor>::PluginBase() : AudioProcessor (BusesProperties().withInput ("Input", juce::AudioChannelSet::stereo(), true).withOutput ("Output", juce::AudioChannelSet::stereo(), true)),
                                       vts (*this, nullptr, juce::Identifier ("Parameters"), createParameterLayout())
+{
+}
+
+template <class Processor>
+PluginBase<Processor>::PluginBase (juce::UndoManager* um) : AudioProcessor (BusesProperties().withInput ("Input", juce::AudioChannelSet::stereo(), true).withOutput ("Output", juce::AudioChannelSet::stereo(), true)),
+                                                            vts (*this, um, juce::Identifier ("Parameters"), createParameterLayout())
 {
 }
 
