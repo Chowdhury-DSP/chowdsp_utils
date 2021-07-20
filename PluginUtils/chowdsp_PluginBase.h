@@ -80,7 +80,7 @@ class HasAddParameters
 public:
     enum
     {
-        value = sizeof (test<T> (0)) == sizeof (char)
+        value = sizeof (test<T> (nullptr)) == sizeof (char)
     };
 };
 
