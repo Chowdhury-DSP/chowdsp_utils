@@ -244,6 +244,14 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
         return (juce::dsp::SIMDRegister<T>) xsimd::tanh ((x_type<T>) x.value);
     }
 
+    /** SIMD implementation of std::isnan */
+    template <typename T>
+    inline typename juce::dsp::SIMDRegister<T>::vMaskType isnanSIMD (juce::dsp::SIMDRegister<T> x)
+    {
+        using Vec = juce::dsp::SIMDRegister<T>;
+        return Vec::notEqual ((Vec) xsimd::isnan ((x_type<T>) x.value), (Vec) 0);
+    }
+
 #if defined(_M_ARM64) || defined(__arm64__) || defined(__aarch64__)
     // We need to specialize the double versions of the functions
     /** SIMD implementation of std::exp */
@@ -352,6 +360,17 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
         auto y = juce::dsp::SIMDRegister<double> ((double) 0);
         for (size_t i = 0; i < x.size(); ++i)
             y.set (i, std::tanh (x.get (i)));
+
+        return y;
+    }
+
+    /** SIMD implementation of std::isnan */
+    template <>
+    inline juce::dsp::SIMDRegister<double>::vMaskType isnanSIMD (juce::dsp::SIMDRegister<double> x)
+    {
+        auto y = juce::dsp::SIMDRegister<double>::vMaskType();
+        for (size_t i = 0; i < x.size(); ++i)
+            y.set (i, std::isnan (x.get (i)));
 
         return y;
     }
@@ -464,6 +483,17 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
         auto y = juce::dsp::SIMDRegister<T> ((T) 0);
         for (size_t i = 0; i < x.size(); ++i)
             y.set (i, std::tanh (x.get (i)));
+
+        return y;
+    }
+
+    /** SIMD implementation of std::isnan */
+    template <typename T>
+    inline typename juce::dsp::SIMDRegister<T>::vMaskType isnanSIMD (juce::dsp::SIMDRegister<T> x)
+    {
+        auto y = typename juce::dsp::SIMDRegister<T>::vMaskType();
+        for (size_t i = 0; i < x.size(); ++i)
+            y.set (i, std::isnan (x.get (i)));
 
         return y;
     }

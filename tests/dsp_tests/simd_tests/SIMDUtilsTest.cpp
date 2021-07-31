@@ -135,6 +135,34 @@ public:
         }
     }
 
+    template <typename FloatType>
+    void isnanTest (int nIter)
+    {
+        auto r = Random::getSystemRandom();
+
+        for (int i = 0; i < nIter; ++i)
+        {
+            dsp::SIMDRegister<FloatType> vec;
+            int numNans = 0;
+            for (size_t j = 0; j < vec.size(); ++j)
+            {
+                if (r.nextBool())
+                {
+                    numNans++;
+                    vec.set (j, NAN);
+                }
+                else
+                {
+                    vec.set (j, (FloatType) r.nextFloat());
+                }
+            }
+
+            auto isnan = chowdsp::SIMDUtils::isnanSIMD (vec);
+            auto testNumNans = std::abs ((int) isnan.sum());
+            expectEquals (testNumNans, numNans, "Incorrect number of NANs detected!");
+        }
+    }
+
     void runTest() override
     {
         beginTest ("Float Divide Test");
@@ -175,6 +203,12 @@ public:
 
         beginTest ("Double SIMD Math test");
         mathTest<double> (10, 1.0e-12);
+
+        beginTest ("Float SIMD isnan test");
+        isnanTest<float> (10);
+
+        beginTest ("Double SIMD isnan test");
+        isnanTest<double> (10);
     }
 };
 

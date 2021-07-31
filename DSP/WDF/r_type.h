@@ -47,7 +47,7 @@ namespace WDFT
 
             int size() const noexcept { return arraySize; }
 
-            alignas (alignment) std::array<ElementType, arraySize> array;
+            alignas (alignment) std::array<ElementType, (size_t) arraySize> array;
         };
     } // namespace rtype_detail
 
