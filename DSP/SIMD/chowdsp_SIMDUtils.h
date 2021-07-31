@@ -364,10 +364,10 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
     }
 
     /** SIMD implementation of std::isnan */
-    template <typename T>
-    inline typename juce::dsp::SIMDRegister<T>::vMaskType isnanSIMD (juce::dsp::SIMDRegister<T> x)
+    template <>
+    inline juce::dsp::SIMDRegister<double>::vMaskType isnanSIMD (juce::dsp::SIMDRegister<double> x)
     {
-        auto y = typename juce::dsp::SIMDRegister<T>::vMaskType();
+        auto y = juce::dsp::SIMDRegister<double>::vMaskType();
         for (size_t i = 0; i < x.size(); ++i)
             y.set (i, std::isnan (x.get (i)));
 

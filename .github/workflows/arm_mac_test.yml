@@ -39,7 +39,7 @@ jobs:
     - name: Install xsimd
       working-directory: ${{github.workspace}}/JUCE_modules
       run: |
-        git clone https://github.com/xtensor-stack/xsimd
+        git clone --depth 1 --branch 7.5.0 https://github.com/xtensor-stack/xsimd
         cd xsimd
         git reset --hard e37730f3938a3f58e418ec1c70482fd7ddced7a1
 
