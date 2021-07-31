@@ -158,7 +158,7 @@ public:
             }
 
             auto isnan = chowdsp::SIMDUtils::isnanSIMD (vec);
-            auto testNumNans = (int) isnan.sum();
+            auto testNumNans = std::abs ((int) isnan.sum());
             expectEquals (testNumNans, numNans, "Incorrect number of NANs detected!");
         }
     }
