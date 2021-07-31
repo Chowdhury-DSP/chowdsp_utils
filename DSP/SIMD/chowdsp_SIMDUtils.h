@@ -248,9 +248,8 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
     template <typename T>
     inline typename juce::dsp::SIMDRegister<T>::vMaskType isnanSIMD (juce::dsp::SIMDRegister<T> x)
     {
-        auto y = typename juce::dsp::SIMDRegister<T>::vMaskType();
-        y.value = xsimd::isnan ((x_type<T>) x.value);
-        return y;
+        using Vec = juce::dsp::SIMDRegister<T>;
+        return Vec::notEqual ((Vec) xsimd::isnan ((x_type<T>) x.value), (Vec) 0);
     }
 
 #if defined(_M_ARM64) || defined(__arm64__) || defined(__aarch64__)
