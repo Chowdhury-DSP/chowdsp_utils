@@ -52,15 +52,15 @@
 #include <juce_core/juce_core.h>
 
 // custom behaviour for SIMD on ARM processors
-#if defined(_M_ARM) || defined (__arm64__) || defined (__aarch64__)
+#if defined(_M_ARM) || defined(__arm64__) || defined(__aarch64__)
 #ifndef JUCE_VECTOR_CALLTYPE
- // __vectorcall does not work on 64-bit due to internal compiler error in
- // release mode in both VS2015 and VS2017. Re-enable when Microsoft fixes this
- #if _MSC_VER && JUCE_USE_SIMD && ! (defined(_M_X64) || defined(__amd64__))
-  #define JUCE_VECTOR_CALLTYPE __vectorcall
- #else
-  #define JUCE_VECTOR_CALLTYPE
- #endif
+// __vectorcall does not work on 64-bit due to internal compiler error in
+// release mode in both VS2015 and VS2017. Re-enable when Microsoft fixes this
+#if _MSC_VER && JUCE_USE_SIMD && ! (defined(_M_X64) || defined(__amd64__))
+#define JUCE_VECTOR_CALLTYPE __vectorcall
+#else
+#define JUCE_VECTOR_CALLTYPE
+#endif
 #endif
 
 #define JUCE_SIMD_TMP JUCE_USE_SIMD
