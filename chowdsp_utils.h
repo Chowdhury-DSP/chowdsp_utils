@@ -51,7 +51,11 @@
 // JUCE includes
 #include <juce_core/juce_core.h>
 
-// custom behaviour for SIMD on ARM processors
+// The original implementation of juce::dsp::SIMDRegister
+// did not implement double-precision SIMD intrinsics for
+// ARM NEON. To attempt to add that support here, in a way
+// that is drop-in compatible with the existing implementation,
+// we need this rather ugly hack.
 #if defined(_M_ARM) || defined(__arm64__) || defined(__aarch64__)
 #ifndef JUCE_VECTOR_CALLTYPE
 // __vectorcall does not work on 64-bit due to internal compiler error in

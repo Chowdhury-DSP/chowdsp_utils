@@ -486,9 +486,9 @@ namespace dsp
         }
     };
 
-    //==============================================================================
-    /** Double-precision floating point NEON intrinsics does not exist in NEON
-    so we need to emulate this.
+//==============================================================================
+/** Double-precision floating point NEON intrinsics were not implemented
+    by JUCE maintainers, so we do it ourselves here!
 
     @tags{DSP}
 */
