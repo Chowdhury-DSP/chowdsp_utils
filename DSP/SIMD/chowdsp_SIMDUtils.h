@@ -32,11 +32,11 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
 
     inline vec2 operator/ (const vec2& l, const vec2& r)
     {
-      #if CHOWDSP_USE_CUSTOM_JUCE_DSP
+#if CHOWDSP_USE_CUSTOM_JUCE_DSP
         return vdivq_f64 (l.value, r.value);
-      #else
+#else
         return { { l.value.v[0] / r.value.v[0], l.value.v[1] / r.value.v[1] } };
-      #endif
+#endif
     }
 
 #else
@@ -86,14 +86,14 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
 #if defined(__i386__) || defined(__amd64__) || defined(_M_X64) || defined(_X86_) || defined(_M_IX86)
         return vec2 (_mm_loadu_pd (ptr));
 #elif defined(_M_ARM64) || defined(__arm64__) || defined(__aarch64__)
-      #if CHOWDSP_USE_CUSTOM_JUCE_DSP
+#if CHOWDSP_USE_CUSTOM_JUCE_DSP
         return vec2 (vld1q_f64 (ptr));
-      #else
+#else
         auto reg = vec2 (0.0);
         auto* regPtr = reinterpret_cast<double*> (&reg.value);
         std::copy (ptr, ptr + vec2::size(), regPtr);
         return reg;
-      #endif
+#endif
 #else
         // fallback implementation
         auto reg = vec2 (0.0);
