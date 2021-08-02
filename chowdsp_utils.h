@@ -48,22 +48,52 @@
 #define CHOWDSP_USE_XSIMD 0
 #endif
 
-#if CHOWDSP_USE_FOLEYS_CLASSES
+// JUCE includes
 #include <juce_core/juce_core.h>
+
+// The original implementation of juce::dsp::SIMDRegister
+// did not implement double-precision SIMD intrinsics for
+// ARM NEON. To attempt to add that support here, in a way
+// that is drop-in compatible with the existing implementation,
+// we need this rather ugly hack.
+#if defined(_M_ARM) || defined(__arm64__) || defined(__aarch64__)
+#ifndef JUCE_VECTOR_CALLTYPE
+// __vectorcall does not work on 64-bit due to internal compiler error in
+// release mode in both VS2015 and VS2017. Re-enable when Microsoft fixes this
+#if _MSC_VER && JUCE_USE_SIMD && ! (defined(_M_X64) || defined(__amd64__))
+#define JUCE_VECTOR_CALLTYPE __vectorcall
+#else
+#define JUCE_VECTOR_CALLTYPE
+#endif
+#endif
+
+#define JUCE_SIMD_TMP JUCE_USE_SIMD
+#undef JUCE_USE_SIMD
+
+#include <arm_neon.h>
+#include <complex>
+#include "DSP/SIMD/fallback_SIMD_Native_Ops.h"
+#include "DSP/SIMD/neon_SIMD_Native_Ops.h"
+
+#define JUCE_USE_SIMD JUCE_SIMD_TMP
+#undef JUCE_SIMD_TMP
+
+#define SIMDInternal chowdsp::SIMDInternal
+#include <juce_dsp/containers/juce_SIMDRegister.h>
+#undef SIMDInternal
+
+#include <juce_dsp/juce_dsp.h>
+
+#else
+#include <juce_dsp/juce_dsp.h>
+#endif
+
+#if CHOWDSP_USE_FOLEYS_CLASSES
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wunused-function") // GCC doesn't like Foley's static functions
 JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4458) // MSVC doesn't like Foley's hiding class members
 #include <foleys_gui_magic/foleys_gui_magic.h>
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 JUCE_END_IGNORE_WARNINGS_MSVC
-#else
-#include <juce_core/juce_core.h>
-#include <juce_audio_basics/juce_audio_basics.h>
-#include <juce_audio_processors/juce_audio_processors.h>
-#include <juce_gui_basics/juce_gui_basics.h>
-#include <juce_audio_devices/juce_audio_devices.h>
-#include <juce_audio_formats/juce_audio_formats.h>
-#include <juce_audio_utils/juce_audio_utils.h>
-#include <juce_dsp/juce_dsp.h>
 #endif
 
 #if CHOWDSP_USE_LIBSAMPLERATE
