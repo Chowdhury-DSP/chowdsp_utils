@@ -9,7 +9,7 @@
     name:          ChowDSP Shared Code
     description:   Shared code for ChowDSP plugins and applications
     dependencies:  juce_core, juce_audio_basics, juce_audio_devices, juce_audio_formats,
-                   juce_audio_utils, juce_audio_processors, juce_gui_basics, juce_dsp
+                   juce_audio_utils, juce_audio_processors, juce_gui_basics
 
     website:       https://ccrma.stanford.edu/~jatin/chowdsp
     license:       Dual license: non commercial under BSD V2 3-clause
@@ -48,42 +48,20 @@
 #define CHOWDSP_USE_XSIMD 0
 #endif
 
+/** Config: CHOWDSP_USE_CUSTOM_JUCE_DSP
+            Use chowdsp_juce_dsp instead of juce_dsp.
+
+            You must ensure that chowdsp_juce_dsp headers are in the include paths.
+  */
+#ifndef CHOWDSP_USE_CUSTOM_JUCE_DSP
+#define CHOWDSP_USE_CUSTOM_JUCE_DSP 0
+#endif
+
 // JUCE includes
 #include <juce_core/juce_core.h>
 
-// The original implementation of juce::dsp::SIMDRegister
-// did not implement double-precision SIMD intrinsics for
-// ARM NEON. To attempt to add that support here, in a way
-// that is drop-in compatible with the existing implementation,
-// we need this rather ugly hack.
-#if defined(_M_ARM) || defined(__arm64__) || defined(__aarch64__)
-#ifndef JUCE_VECTOR_CALLTYPE
-// __vectorcall does not work on 64-bit due to internal compiler error in
-// release mode in both VS2015 and VS2017. Re-enable when Microsoft fixes this
-#if _MSC_VER && JUCE_USE_SIMD && ! (defined(_M_X64) || defined(__amd64__))
-#define JUCE_VECTOR_CALLTYPE __vectorcall
-#else
-#define JUCE_VECTOR_CALLTYPE
-#endif
-#endif
-
-#define JUCE_SIMD_TMP JUCE_USE_SIMD
-#undef JUCE_USE_SIMD
-
-#include <arm_neon.h>
-#include <complex>
-#include "DSP/SIMD/fallback_SIMD_Native_Ops.h"
-#include "DSP/SIMD/neon_SIMD_Native_Ops.h"
-
-#define JUCE_USE_SIMD JUCE_SIMD_TMP
-#undef JUCE_SIMD_TMP
-
-#define SIMDInternal chowdsp::SIMDInternal
-#include <juce_dsp/containers/juce_SIMDRegister.h>
-#undef SIMDInternal
-
-#include <juce_dsp/juce_dsp.h>
-
+#if CHOWDSP_USE_CUSTOM_JUCE_DSP
+#include <chowdsp_juce_dsp/chowdsp_juce_dsp.h>
 #else
 #include <juce_dsp/juce_dsp.h>
 #endif

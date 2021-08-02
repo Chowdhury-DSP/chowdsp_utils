@@ -32,7 +32,11 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
 
     inline vec2 operator/ (const vec2& l, const vec2& r)
     {
+#if CHOWDSP_USE_CUSTOM_JUCE_DSP
         return vdivq_f64 (l.value, r.value);
+#else
+        return { { l.value.v[0] / r.value.v[0], l.value.v[1] / r.value.v[1] } };
+#endif
     }
 
 #else
@@ -82,7 +86,14 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
 #if defined(__i386__) || defined(__amd64__) || defined(_M_X64) || defined(_X86_) || defined(_M_IX86)
         return vec2 (_mm_loadu_pd (ptr));
 #elif defined(_M_ARM64) || defined(__arm64__) || defined(__aarch64__)
+#if CHOWDSP_USE_CUSTOM_JUCE_DSP
         return vec2 (vld1q_f64 (ptr));
+#else
+        auto reg = vec2 (0.0);
+        auto* regPtr = reinterpret_cast<double*> (&reg.value);
+        std::copy (ptr, ptr + vec2::size(), regPtr);
+        return reg;
+#endif
 #else
         // fallback implementation
         auto reg = vec2 (0.0);
@@ -244,6 +255,132 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
         using Vec = juce::dsp::SIMDRegister<T>;
         return Vec::notEqual ((Vec) xsimd::isnan ((x_type<T>) x.value), (Vec) 0);
     }
+
+// Template specializations for NEON double precision
+#if (! CHOWDSP_USE_CUSTOM_JUCE_DSP) && (defined(_M_ARM64) || defined(__arm64__) || defined(__aarch64__))
+    // We need to specialize the double versions of the functions
+    /** SIMD implementation of std::exp */
+    template <>
+    inline juce::dsp::SIMDRegister<double> expSIMD (juce::dsp::SIMDRegister<double> x)
+    {
+        auto y = juce::dsp::SIMDRegister<double> ((double) 0);
+        for (size_t i = 0; i < x.size(); ++i)
+            y.set (i, std::exp (x.get (i)));
+
+        return y;
+    }
+
+    /** SIMD implementation of std::log */
+    template <>
+    inline juce::dsp::SIMDRegister<double> logSIMD (juce::dsp::SIMDRegister<double> x)
+    {
+        auto y = juce::dsp::SIMDRegister<double> ((double) 0);
+        for (size_t i = 0; i < x.size(); ++i)
+            y.set (i, std::log (x.get (i)));
+
+        return y;
+    }
+
+    /** SIMD implementation of std::pow */
+    template <>
+    inline juce::dsp::SIMDRegister<double> powSIMD (juce::dsp::SIMDRegister<double> a, juce::dsp::SIMDRegister<double> b)
+    {
+        auto y = juce::dsp::SIMDRegister<double> ((double) 0);
+        for (size_t i = 0; i < a.size(); ++i)
+            y.set (i, std::pow (a.get (i), b.get (i)));
+
+        return y;
+    }
+
+    /** SIMD implementation of std::sqrt */
+    template <>
+    inline juce::dsp::SIMDRegister<double> sqrtSIMD (juce::dsp::SIMDRegister<double> x)
+    {
+        auto y = juce::dsp::SIMDRegister<double> ((double) 0);
+        for (size_t i = 0; i < x.size(); ++i)
+            y.set (i, std::sqrt (x.get (i)));
+
+        return y;
+    }
+
+    /** SIMD implementation of std::sin */
+    template <>
+    inline juce::dsp::SIMDRegister<double> sinSIMD (juce::dsp::SIMDRegister<double> x)
+    {
+        auto y = juce::dsp::SIMDRegister<double> ((double) 0);
+        for (size_t i = 0; i < x.size(); ++i)
+            y.set (i, std::sin (x.get (i)));
+
+        return y;
+    }
+
+    /** SIMD implementation of std::cos */
+    template <>
+    inline juce::dsp::SIMDRegister<double> cosSIMD (juce::dsp::SIMDRegister<double> x)
+    {
+        auto y = juce::dsp::SIMDRegister<double> ((double) 0);
+        for (size_t i = 0; i < x.size(); ++i)
+            y.set (i, std::cos (x.get (i)));
+
+        return y;
+    }
+
+    /** SIMD implementation of std::tan */
+    template <>
+    inline juce::dsp::SIMDRegister<double> tanSIMD (juce::dsp::SIMDRegister<double> x)
+    {
+        auto y = juce::dsp::SIMDRegister<double> ((double) 0);
+        for (size_t i = 0; i < x.size(); ++i)
+            y.set (i, std::tan (x.get (i)));
+
+        return y;
+    }
+
+    /** SIMD implementation of std::sinh */
+    template <>
+    inline juce::dsp::SIMDRegister<double> sinhSIMD (juce::dsp::SIMDRegister<double> x)
+    {
+        auto y = juce::dsp::SIMDRegister<double> ((double) 0);
+        for (size_t i = 0; i < x.size(); ++i)
+            y.set (i, std::sinh (x.get (i)));
+
+        return y;
+    }
+
+    /** SIMD implementation of std::cosh */
+    template <>
+    inline juce::dsp::SIMDRegister<double> coshSIMD (juce::dsp::SIMDRegister<double> x)
+    {
+        auto y = juce::dsp::SIMDRegister<double> ((double) 0);
+        for (size_t i = 0; i < x.size(); ++i)
+            y.set (i, std::cosh (x.get (i)));
+
+        return y;
+    }
+
+    /** SIMD implementation of std::tanh */
+    template <>
+    inline juce::dsp::SIMDRegister<double> tanhSIMD (juce::dsp::SIMDRegister<double> x)
+    {
+        auto y = juce::dsp::SIMDRegister<double> ((double) 0);
+        for (size_t i = 0; i < x.size(); ++i)
+            y.set (i, std::tanh (x.get (i)));
+
+        return y;
+    }
+
+    /** SIMD implementation of std::isnan */
+    template <>
+    inline juce::dsp::SIMDRegister<double>::vMaskType isnanSIMD (juce::dsp::SIMDRegister<double> x)
+    {
+        auto y = juce::dsp::SIMDRegister<double>::vMaskType();
+        for (size_t i = 0; i < x.size(); ++i)
+            y.set (i, std::isnan (x.get (i)));
+
+        return y;
+    }
+#endif // (! CHOWDSP_USE_CUSTOM_JUCE_DSP) && (defined(_M_ARM64) || defined(__arm64__) || defined(__aarch64__))
+
 #else // fallback implemetations
     /** SIMD implementation of std::exp */
     template <typename T>
