@@ -17,15 +17,14 @@ public:
     {
         return buffer.getWritePointer (0);
     }
-    
+
     float* getBufferPtr (dsp::AudioBlock<float>& block)
     {
         return block.getChannelPointer (0);
     }
 
-    template<typename AudioContainerType>
-    void processFunc (AudioContainerType& bufferOrBlock, chowdsp::BypassProcessor<float>& bypass,
-                      std::atomic<float>* onOffParam, std::function<float (float)> sampleFunc)
+    template <typename AudioContainerType>
+    void processFunc (AudioContainerType& bufferOrBlock, chowdsp::BypassProcessor<float>& bypass, std::atomic<float>* onOffParam, std::function<float (float)> sampleFunc)
     {
         auto onOff = bypass.toBool (onOffParam);
         if (! bypass.processBlockIn (bufferOrBlock, onOff))
@@ -144,14 +143,14 @@ public:
                 delay.pushSample (0, x);
                 return delay.popSample (0);
             });
-            
+
             if (i % 2 != 0)
                 onOffParam.store (1.0f - onOffParam.load());
         }
 
         checkPulseSpacing (buffer.getReadPointer (0), nIter * nSamples, pulseSpace);
     }
-    
+
     void blockDelayTest (int nIter)
     {
         chowdsp::BypassProcessor<float> bypass;
@@ -189,7 +188,7 @@ public:
 
         beginTest ("Audio Block Test");
         audioBlockTest (5);
-        
+
         beginTest ("Audio Buffer Delay Test");
         bufferDelayTest (8);
 
