@@ -12,12 +12,13 @@ void BypassProcessor<SampleType, DelayType>::prepare (int samplesPerBlock, bool 
 }
 
 template <typename SampleType, typename DelayType>
-void BypassProcessor<SampleType, DelayType>::setDelaySamples (int delaySamples)
+void BypassProcessor<SampleType, DelayType>::setLatencySamples (int delaySamples)
 {
     if (delaySamples == prevDelay)
         return;
         
     compDelay.setDelay ((SampleType) delaySamples);
+    
     if (delaySamples == 0)
         compDelay.reset();
 
@@ -25,61 +26,10 @@ void BypassProcessor<SampleType, DelayType>::setDelaySamples (int delaySamples)
 }
 
 template <typename SampleType, typename DelayType>
-bool BypassProcessor<SampleType, DelayType>::processBlockIn (juce::AudioBuffer<SampleType>& block, bool onOffParam)
+bool BypassProcessor<SampleType, DelayType>::processBlockIn (juce::AudioBuffer<SampleType>& buffer, bool onOffParam)
 {
-    enum class DelayOp
-    {
-        Pop,
-        Push,
-        Toss,
-    };
-
-    auto doDelayOp = [] (auto& sampleBuffer, auto& delay, DelayOp op)
-    {
-        if (delay.getDelay() == SampleType (0))
-            return;
-
-        for (int ch = 0; ch < sampleBuffer.getNumChannels(); ++ch)
-        {
-            if (op == DelayOp::Push)
-            {
-                auto* x = sampleBuffer.getWritePointer (ch);
-                for (int n = 0; n < sampleBuffer.getNumSamples(); ++n)
-                    delay.pushSample (ch, x[n]);
-            }
-            else if (op == DelayOp::Pop)
-            {
-                auto* x = sampleBuffer.getWritePointer (ch);
-                for (int n = 0; n < sampleBuffer.getNumSamples(); ++n)
-                    x[n] = delay.popSample (ch);
-            }
-            else if (op == DelayOp::Toss)
-            {
-                for (int n = 0; n < sampleBuffer.getNumSamples(); ++n)
-                    delay.incrementReadPointer (ch);
-            }
-        }
-    };
-
-    doDelayOp (block, compDelay, DelayOp::Push);
-
-    if (onOffParam == false && prevOnOffParam == false)
-    {
-        doDelayOp (block, compDelay, DelayOp::Pop);
-        return false;
-    }
-
-    if (onOffParam != prevOnOffParam)
-    {
-        fadeBuffer.makeCopyOf (block, true);
-        doDelayOp (fadeBuffer, compDelay, DelayOp::Pop);
-    }
-    else
-    {
-        doDelayOp (fadeBuffer, compDelay, DelayOp::Toss);
-    }
-
-    return true;
+    juce::dsp::AudioBlock<float> block (buffer);
+    return processBlockIn (block, onOffParam);
 }
 
 template <typename SampleType, typename DelayType>
@@ -131,6 +81,9 @@ bool BypassProcessor<SampleType, DelayType>::processBlockIn (const juce::dsp::Au
     {
         fadeBlock.copyFrom (block);
         doDelayOp (fadeBlock, compDelay, DelayOp::Pop);
+
+        if (onOffParam && latencySampleCount < 0)
+            latencySampleCount = (int) compDelay.getDelay();
     }
     else
     {
@@ -143,52 +96,77 @@ bool BypassProcessor<SampleType, DelayType>::processBlockIn (const juce::dsp::Au
 template <typename SampleType, typename DelayType>
 void BypassProcessor<SampleType, DelayType>::processBlockOut (juce::AudioBuffer<SampleType>& block, bool onOffParam)
 {
-    if (onOffParam == prevOnOffParam)
-        return;
-
-    const auto numChannels = block.getNumChannels();
-    const auto numSamples = block.getNumSamples();
-
-    SampleType startGain = onOffParam == false ? static_cast<SampleType> (1) // fade out
-                                               : static_cast<SampleType> (0); // fade in
-    SampleType endGain = static_cast<SampleType> (1) - startGain;
-
-    block.applyGainRamp (0, numSamples, startGain, endGain);
-    for (int ch = 0; ch < numChannels; ++ch)
-        block.addFromWithRamp (ch, 0, fadeBuffer.getReadPointer (ch), numSamples, 1.0f - startGain, 1.0f - endGain);
-
-    prevOnOffParam = onOffParam;
+    juce::dsp::AudioBlock<float> block (buffer);
+    processBlockOut (block, onOffParam);
 }
 
 template <typename SampleType, typename DelayType>
 void BypassProcessor<SampleType, DelayType>::processBlockOut (juce::dsp::AudioBlock<float>& block, bool onOffParam)
 {
+    auto fadeOutputBuffer = [onOffParam] (auto* blockPtr, const auto* fadePtr, const int startSample, const int numSamples)
+    {
+        SampleType startGain = onOffParam == false ? static_cast<SampleType> (1) // fade out
+                                                   : static_cast<SampleType> (0); // fade in
+        SampleType endGain = static_cast<SampleType> (1) - startGain;
+
+        SampleType gain = startGain;
+        SampleType increment = (endGain - startGain) / (SampleType) (numSamples - startSample);
+
+        FloatVectorOperations::multiply (blockPtr, gain, startSample);
+        FloatVectorOperations::addWithMultiply (blockPtr, fadePtr, static_cast<SampleType> (1) - gain, startSample);
+
+        for (int n = startSample; n < numSamples; ++n)
+        {
+            blockPtr[n] = blockPtr[n] * gain + fadePtr[n] * (static_cast<SampleType> (1) - gain);
+            gain += increment;
+        }
+    };
+
     if (onOffParam == prevOnOffParam)
+    {
+        latencySampleCount = 0;
         return;
+    }
 
     const auto numChannels = block.getNumChannels();
-    const auto numSamples = block.getNumSamples();
-
-    SampleType startGain = onOffParam == false ? static_cast<SampleType> (1) // fade out
-                                               : static_cast<SampleType> (0); // fade in
-    SampleType endGain = static_cast<SampleType> (1) - startGain;
+    const auto numSamples = (int) block.getNumSamples();
+    const auto startSample = getFadeStartSample (numSamples);
 
     for (size_t ch = 0; ch < numChannels; ++ch)
     {
         auto* blockPtr = block.getChannelPointer (ch);
         auto* fadePtr = fadeBlock.getChannelPointer (ch);
 
-        SampleType gain = startGain;
-        SampleType increment = (endGain - startGain) / (SampleType) numSamples;
-
-        for (size_t n = 0; n < numSamples; ++n)
-        {
-            blockPtr[n] = blockPtr[n] * gain + fadePtr[n] * (static_cast<SampleType> (1) - gain);
-            gain += increment;
-        }
+        fadeOutputBuffer (blockPtr, fadePtr, startSample, numSamples);
     }
 
-    prevOnOffParam = onOffParam;
+    auto minMax = block.findMinAndMax();
+    auto fadeMinMax = fadeBlock.findMinAndMax();
+
+    if (startSample < numSamples)
+        prevOnOffParam = onOffParam;
+}
+
+template <typename SampleType, typename DelayType>
+int BypassProcessor<SampleType, DelayType>::getFadeStartSample (const int numSamples)
+{
+    if (latencySampleCount <= 0)
+    {
+        latencySampleCount = -1;
+        return 0;
+    }
+
+    if (latencySampleCount < numSamples / 4) // small offset is okay, just adjust the fade start
+    {
+        int startSample = latencySampleCount;
+        latencySampleCount = -1;
+        return startSample;
+    }
+    else // wait for latency time to catch up
+    {
+        latencySampleCount = juce::jmax (latencySampleCount - numSamples, 0);
+        return numSamples;
+    }
 }
 
 } // namespace chowdsp

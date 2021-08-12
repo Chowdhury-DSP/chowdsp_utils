@@ -41,7 +41,7 @@ public:
      * time here, so that the bypass processing will be
      * correctly time-aligned.
      */
-    void setDelaySamples (int delaySamples);
+    void setLatencySamples (int delaySamples);
 
     /**
       * Call this at the start of your processBlock().
@@ -72,12 +72,15 @@ public:
     void processBlockOut (juce::dsp::AudioBlock<float>& block, bool onOffParam);
 
 private:
+    int getFadeStartSample (const int numSamples);
+
     bool prevOnOffParam = false;
     juce::AudioBuffer<SampleType> fadeBuffer;
     juce::dsp::AudioBlock<SampleType> fadeBlock;
 
     DelayLine<float, DelayType> compDelay { 48000 }; // max latency
     int prevDelay = 0;
+    int latencySampleCount = -1;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BypassProcessor)
 };

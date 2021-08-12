@@ -128,7 +128,7 @@ public:
         chowdsp::BypassProcessor<float> bypass;
         std::atomic<float> onOffParam { 0.0f };
         bypass.prepare (nSamples, bypass.toBool (&onOffParam));
-        bypass.setDelaySamples ((int) delaySamp);
+        bypass.setLatencySamples ((int) delaySamp);
 
         chowdsp::DelayLine<float> delay { 2048 };
         delay.prepare ({ fs, (uint32) nSamples, 1 });
@@ -157,7 +157,7 @@ public:
         chowdsp::BypassProcessor<float> bypass;
         std::atomic<float> onOffParam { 0.0f };
         bypass.prepare (nSamples, bypass.toBool (&onOffParam));
-        bypass.setDelaySamples ((int) delaySamp);
+        bypass.setLatencySamples ((int) delaySamp);
 
         chowdsp::DelayLine<float> delay { 2048 };
         delay.prepare ({ fs, (uint32) nSamples, 1 });
