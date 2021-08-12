@@ -31,6 +31,7 @@ class DelayLineBase
 {
 public:
     DelayLineBase() = default;
+    virtual ~DelayLineBase() = default;
 
     virtual void setDelay (SampleType /* newDelayInSamples */) = 0;
     virtual SampleType getDelay() const = 0;
