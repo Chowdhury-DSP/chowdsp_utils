@@ -92,9 +92,9 @@ bool BypassProcessor<SampleType, DelayType>::processBlockIn (const juce::dsp::Au
 }
 
 template <typename SampleType, typename DelayType>
-void BypassProcessor<SampleType, DelayType>::processBlockOut (juce::AudioBuffer<SampleType>& block, bool onOffParam)
+void BypassProcessor<SampleType, DelayType>::processBlockOut (juce::AudioBuffer<SampleType>& buffer, bool onOffParam)
 {
-    juce::dsp::AudioBlock<float> block (buffer);
+    juce::dsp::AudioBlock<float> block { buffer };
     processBlockOut (block, onOffParam);
 }
 
@@ -109,8 +109,8 @@ void BypassProcessor<SampleType, DelayType>::processBlockOut (juce::dsp::AudioBl
         SampleType gain = startGain;
         SampleType increment = (endGain - startGain) / (SampleType) (numSamples - startSample);
 
-        FloatVectorOperations::multiply (blockPtr, gain, startSample);
-        FloatVectorOperations::addWithMultiply (blockPtr, fadePtr, static_cast<SampleType> (1) - gain, startSample);
+        juce::FloatVectorOperations::multiply (blockPtr, gain, startSample);
+        juce::FloatVectorOperations::addWithMultiply (blockPtr, fadePtr, static_cast<SampleType> (1) - gain, startSample);
 
         for (int n = startSample; n < numSamples; ++n)
         {
@@ -136,9 +136,6 @@ void BypassProcessor<SampleType, DelayType>::processBlockOut (juce::dsp::AudioBl
 
         fadeOutputBuffer (blockPtr, fadePtr, startSample, numSamples);
     }
-
-    auto minMax = block.findMinAndMax();
-    auto fadeMinMax = fadeBlock.findMinAndMax();
 
     if (startSample < numSamples)
         prevOnOffParam = onOffParam;
