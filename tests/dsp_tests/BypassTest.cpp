@@ -5,7 +5,7 @@ namespace
 constexpr double fs = 48000.0;
 constexpr int nSamples = 512;
 constexpr int pulseSpace = 100;
-constexpr float delaySamp = 10.0f;
+constexpr float delaySamp = 5.0f;
 } // namespace
 
 class BypassTest : public UnitTest
@@ -60,9 +60,10 @@ public:
 
     void checkPulseSpacing (const float* buffer, const int numSamples, int spacingSamples)
     {
-        int lastPulseIdx = 0;
+        int lastPulseIdx = (int) delaySamp;
         int numBadPulses = 0;
-        for (int n = 1; n < numSamples; ++n)
+        int numGoodPulses = 0;
+        for (int n = lastPulseIdx + 1; n < numSamples; ++n)
         {
             if (buffer[n] > 0.9f)
             {
@@ -72,11 +73,17 @@ public:
                     std::cout << "Incorrect spacing found! Start: " << lastPulseIdx << ", Length: " << space << std::endl;
                     numBadPulses++;
                 }
+                else
+                {
+                    // std::cout << "Correct spacing found! Start: " << lastPulseIdx << ", Length: " << space << std::endl;
+                    numGoodPulses++;
+                }
                 lastPulseIdx = n;
             }
         }
 
         expect (numBadPulses == 0, "Incorrect pulse spacing detected!");
+        expectEquals (numGoodPulses, numSamples / spacingSamples, "Incorrect number of correct pulses!");
     }
 
     void audioBufferTest (int nIter)
@@ -121,7 +128,7 @@ public:
         chowdsp::BypassProcessor<float> bypass;
         std::atomic<float> onOffParam { 0.0f };
         bypass.prepare (nSamples, bypass.toBool (&onOffParam));
-        bypass.setDelaySamples (delaySamp);
+        bypass.setDelaySamples ((int) delaySamp);
 
         chowdsp::DelayLine<float> delay { 2048 };
         delay.prepare ({ fs, (uint32) nSamples, 1 });
@@ -137,7 +144,9 @@ public:
                 delay.pushSample (0, x);
                 return delay.popSample (0);
             });
-            onOffParam.store (1.0f - onOffParam.load());
+            
+            if (i % 2 != 0)
+                onOffParam.store (1.0f - onOffParam.load());
         }
 
         checkPulseSpacing (buffer.getReadPointer (0), nIter * nSamples, pulseSpace);
@@ -148,7 +157,7 @@ public:
         chowdsp::BypassProcessor<float> bypass;
         std::atomic<float> onOffParam { 0.0f };
         bypass.prepare (nSamples, bypass.toBool (&onOffParam));
-        bypass.setDelaySamples (delaySamp);
+        bypass.setDelaySamples ((int) delaySamp);
 
         chowdsp::DelayLine<float> delay { 2048 };
         delay.prepare ({ fs, (uint32) nSamples, 1 });
@@ -165,7 +174,9 @@ public:
                 delay.pushSample (0, x);
                 return delay.popSample (0);
             });
-            onOffParam.store (1.0f - onOffParam.load());
+
+            if (i % 2 != 0)
+                onOffParam.store (1.0f - onOffParam.load());
         }
 
         checkPulseSpacing (buffer.getReadPointer (0), nIter * nSamples, pulseSpace);
@@ -180,10 +191,10 @@ public:
         audioBlockTest (5);
         
         beginTest ("Audio Buffer Delay Test");
-        bufferDelayTest (5);
+        bufferDelayTest (8);
 
         beginTest ("Audio Block Delay Test");
-        blockDelayTest (5);
+        blockDelayTest (8);
     }
 };
 

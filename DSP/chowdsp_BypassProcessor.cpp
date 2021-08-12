@@ -8,19 +8,18 @@ void BypassProcessor<SampleType, DelayType>::prepare (int samplesPerBlock, bool 
     fadeBuffer.setSize (2, samplesPerBlock);
     fadeBlock = juce::dsp::AudioBlock<SampleType> (fadeBuffer);
 
-    compDelay = std::make_unique<DelayLine<float, DelayType>> (samplesPerBlock);
-    compDelay->prepare ({ 48000.0, (juce::uint32) samplesPerBlock, 2 }); // sample rate does not matter
+    compDelay.prepare ({ 48000.0, (juce::uint32) samplesPerBlock, 2 }); // sample rate does not matter
 }
 
 template <typename SampleType, typename DelayType>
-void BypassProcessor<SampleType, DelayType>::setDelaySamples (SampleType delaySamples)
+void BypassProcessor<SampleType, DelayType>::setDelaySamples (int delaySamples)
 {
     if (delaySamples == prevDelay)
         return;
         
-    compDelay->setDelay (delaySamples);
-    if (delaySamples == SampleType (0))
-        compDelay->reset();
+    compDelay.setDelay ((SampleType) delaySamples);
+    if (delaySamples == 0)
+        compDelay.reset();
 
     prevDelay = delaySamples;
 }
@@ -28,31 +27,57 @@ void BypassProcessor<SampleType, DelayType>::setDelaySamples (SampleType delaySa
 template <typename SampleType, typename DelayType>
 bool BypassProcessor<SampleType, DelayType>::processBlockIn (juce::AudioBuffer<SampleType>& block, bool onOffParam)
 {
-    if (compDelay->getDelay() > SampleType (0))
+    enum class DelayOp
     {
-        for (int ch = 0; ch < block.getNumChannels(); ++ch)
+        Pop,
+        Push,
+        Toss,
+    };
+
+    auto doDelayOp = [] (auto& sampleBuffer, auto& delay, DelayOp op)
+    {
+        if (delay.getDelay() == SampleType (0))
+            return;
+
+        for (int ch = 0; ch < sampleBuffer.getNumChannels(); ++ch)
         {
-            auto* x = block.getReadPointer (ch);
-            for (int n = 0; n < block.getNumSamples(); ++n)
-                compDelay->pushSample (ch, x[n]);
+            if (op == DelayOp::Push)
+            {
+                auto* x = sampleBuffer.getWritePointer (ch);
+                for (int n = 0; n < sampleBuffer.getNumSamples(); ++n)
+                    delay.pushSample (ch, x[n]);
+            }
+            else if (op == DelayOp::Pop)
+            {
+                auto* x = sampleBuffer.getWritePointer (ch);
+                for (int n = 0; n < sampleBuffer.getNumSamples(); ++n)
+                    x[n] = delay.popSample (ch);
+            }
+            else if (op == DelayOp::Toss)
+            {
+                for (int n = 0; n < sampleBuffer.getNumSamples(); ++n)
+                    delay.incrementReadPointer (ch);
+            }
         }
-    }
+    };
+
+    doDelayOp (block, compDelay, DelayOp::Push);
 
     if (onOffParam == false && prevOnOffParam == false)
-        return false;
-
-    if (compDelay->getDelay() > SampleType (0))
     {
-        for (int ch = 0; ch < block.getNumChannels(); ++ch)
-        {
-            auto* x = block.getWritePointer (ch);
-            for (int n = 0; n < block.getNumSamples(); ++n)
-                x[n] = compDelay->popSample (ch);
-        }
+        doDelayOp (block, compDelay, DelayOp::Pop);
+        return false;
     }
 
     if (onOffParam != prevOnOffParam)
+    {
         fadeBuffer.makeCopyOf (block, true);
+        doDelayOp (fadeBuffer, compDelay, DelayOp::Pop);
+    }
+    else
+    {
+        doDelayOp (fadeBuffer, compDelay, DelayOp::Toss);
+    }
 
     return true;
 }
@@ -60,31 +85,57 @@ bool BypassProcessor<SampleType, DelayType>::processBlockIn (juce::AudioBuffer<S
 template <typename SampleType, typename DelayType>
 bool BypassProcessor<SampleType, DelayType>::processBlockIn (const juce::dsp::AudioBlock<SampleType>& block, bool onOffParam)
 {
-    if (compDelay->getDelay() > SampleType (0))
+    enum class DelayOp
     {
-        for (int ch = 0; ch < (int) block.getNumChannels(); ++ch)
+        Pop,
+        Push,
+        Toss,
+    };
+
+    auto doDelayOp = [] (auto& sampleBuffer, auto& delay, DelayOp op)
+    {
+        if (delay.getDelay() == SampleType (0))
+            return;
+
+        for (int ch = 0; ch < (int) sampleBuffer.getNumChannels(); ++ch)
         {
-            auto* x = block.getChannelPointer ((size_t) ch);
-            for (int n = 0; n < (int) block.getNumSamples(); ++n)
-                compDelay->pushSample (ch, x[n]);
+            if (op == DelayOp::Push)
+            {
+                auto* x = sampleBuffer.getChannelPointer ((size_t) ch);
+                for (int n = 0; n < (int) sampleBuffer.getNumSamples(); ++n)
+                    delay.pushSample (ch, x[n]);
+            }
+            else if (op == DelayOp::Pop)
+            {
+                auto* x = sampleBuffer.getChannelPointer ((size_t) ch);
+                for (int n = 0; n < (int) sampleBuffer.getNumSamples(); ++n)
+                    x[n] = delay.popSample (ch);
+            }
+            else if (op == DelayOp::Toss)
+            {
+                for (int n = 0; n < (int) sampleBuffer.getNumSamples(); ++n)
+                    delay.incrementReadPointer (ch);
+            }
         }
-    }
+    };
+
+    doDelayOp (block, compDelay, DelayOp::Push);
 
     if (onOffParam == false && prevOnOffParam == false)
-        return false;
-
-    if (compDelay->getDelay() > SampleType (0))
     {
-        for (int ch = 0; ch < (int) block.getNumChannels(); ++ch)
-        {
-            auto* x = block.getChannelPointer ((size_t) ch);
-            for (int n = 0; n < (int) block.getNumSamples(); ++n)
-                x[n] = compDelay->popSample (ch);
-        }
+        doDelayOp (block, compDelay, DelayOp::Pop);
+        return false;
     }
 
     if (onOffParam != prevOnOffParam)
+    {
         fadeBlock.copyFrom (block);
+        doDelayOp (fadeBlock, compDelay, DelayOp::Pop);
+    }
+    else
+    {
+        doDelayOp (block, compDelay, DelayOp::Toss);
+    }
 
     return true;
 }

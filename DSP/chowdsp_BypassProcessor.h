@@ -20,7 +20,7 @@ namespace chowdsp
  * }
  * ```
  */
-template <typename SampleType, typename DelayType = DelayLineInterpolationTypes::Sinc<SampleType, 16>>
+template <typename SampleType, typename DelayType = DelayLineInterpolationTypes::None>
 class BypassProcessor
 {
 public:
@@ -41,7 +41,7 @@ public:
      * time here, so that the bypass processing will be
      * correctly time-aligned.
      */
-    void setDelaySamples (SampleType delaySamples);
+    void setDelaySamples (int delaySamples);
 
     /**
       * Call this at the start of your processBlock().
@@ -76,8 +76,8 @@ private:
     juce::AudioBuffer<SampleType> fadeBuffer;
     juce::dsp::AudioBlock<SampleType> fadeBlock;
 
-    std::unique_ptr<DelayLine<float, DelayType>> compDelay;
-    SampleType prevDelay = SampleType (0);
+    DelayLine<float, DelayType> compDelay { 48000 }; // max latency
+    int prevDelay = 0;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BypassProcessor)
 };
