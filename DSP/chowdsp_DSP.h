@@ -1,10 +1,5 @@
 #pragma once
 
-#include "chowdsp_BypassProcessor.h"
-#include "chowdsp_GainProcessor.h"
-#include "chowdsp_LevelDetector.h"
-#include "chowdsp_Panner.h"
-
 // SIMD
 #include "SIMD/chowdsp_SIMDUtils.h"
 #include "SIMD/chowdsp_SIMDSmoothedValue.h"
@@ -50,3 +45,9 @@ JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324)
 #include "WDF/r_type.h"
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 JUCE_END_IGNORE_WARNINGS_MSVC
+
+// some other useful processors
+#include "chowdsp_BypassProcessor.h"
+#include "chowdsp_GainProcessor.h"
+#include "chowdsp_LevelDetector.h"
+#include "chowdsp_Panner.h"

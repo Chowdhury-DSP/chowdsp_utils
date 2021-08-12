@@ -1,6 +1,7 @@
 target_sources(chowdsp_utils_tests PRIVATE
     test.cpp
 
+    dsp_tests/BypassTest.cpp
     dsp_tests/GainTest.cpp
     dsp_tests/PannerTest.cpp
     dsp_tests/PitchShiftTest.cpp
