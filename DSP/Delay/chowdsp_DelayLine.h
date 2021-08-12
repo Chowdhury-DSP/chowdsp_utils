@@ -31,6 +31,7 @@ class DelayLineBase
 {
 public:
     DelayLineBase() = default;
+    virtual ~DelayLineBase() = default;
 
     virtual void setDelay (SampleType /* newDelayInSamples */) = 0;
     virtual SampleType getDelay() const = 0;
@@ -41,6 +42,7 @@ public:
     virtual void pushSample (int /* channel */, SampleType /* sample */) noexcept = 0;
     virtual SampleType popSample (int /* channel */) noexcept = 0;
     virtual SampleType popSample (int /* channel */, SampleType /* delayInSamples */, bool /* updateReadPointer */) noexcept = 0;
+    virtual void incrementReadPointer (int channel) noexcept = 0;
 
     void copyState (const DelayLineBase<SampleType>& other)
     {
@@ -124,6 +126,23 @@ public:
 
         @param channel              the target channel for the delay line.
 
+        @see setDelay, pushSample, process
+    */
+    inline SampleType popSample (int channel) noexcept override
+    {
+        auto result = interpolateSample (channel);
+        incrementReadPointer (channel);
+
+        return result;
+    }
+
+    /** Pops a single sample from one channel of the delay line.
+
+        Use this function to modulate the delay in real time or implement standard
+        delay effects with feedback.
+
+        @param channel              the target channel for the delay line.
+
         @param delayInSamples       sets the wanted fractional delay in samples, or -1
                                     to use the value being used before or set with
                                     setDelay function.
@@ -134,14 +153,6 @@ public:
 
         @see setDelay, pushSample, process
     */
-    inline SampleType popSample (int channel) noexcept override
-    {
-        auto result = interpolateSample (channel);
-        this->readPos[(size_t) channel] = (this->readPos[(size_t) channel] + totalSize - 1) % totalSize;
-
-        return result;
-    }
-
     inline SampleType popSample (int channel, SampleType delayInSamples, bool updateReadPointer) noexcept override
     {
         setDelay (delayInSamples);
@@ -149,9 +160,15 @@ public:
         auto result = interpolateSample (channel);
 
         if (updateReadPointer)
-            this->readPos[(size_t) channel] = (this->readPos[(size_t) channel] + totalSize - 1) % totalSize;
+            incrementReadPointer (channel);
 
         return result;
+    }
+
+    /** Increment the read pointer without reading an interpolated sample (be careful...) */
+    inline void incrementReadPointer (int channel) noexcept override
+    {
+        this->readPos[(size_t) channel] = (this->readPos[(size_t) channel] + totalSize - 1) % totalSize;
     }
 
     //==============================================================================
