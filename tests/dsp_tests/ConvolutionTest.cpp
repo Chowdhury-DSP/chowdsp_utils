@@ -65,15 +65,18 @@ public:
         for (; samplePtr < (size_t) fs; samplePtr += irSize)
             engine.processSamples (&bufferPtr[samplePtr], &bufferPtr[samplePtr], irSize);
 
-        std::vector<float> testIR2 (irSize);
+        std::vector<float> testIR2 (irSize, 0.0f);
         testIR2[irSize / 2 + 1] = 1.0f;
 
         chowdsp::IRTransfer irTransfer (engine);
         irTransfer.setNewIR (testIR2.data());
         irTransfer.transferIR (engine);
 
-        for (; samplePtr < (size_t) sineLength; samplePtr += irSize)
+        for (; samplePtr + irSize <= (size_t) sineLength; samplePtr += irSize)
             engine.processSamples (&bufferPtr[samplePtr], &bufferPtr[samplePtr], irSize);
+
+        if (samplePtr < (size_t) sineLength)
+            engine.processSamples (&bufferPtr[samplePtr], &bufferPtr[samplePtr], (size_t) sineLength - samplePtr);
 
         float maxDiff = 0.0f;
         for (int i = (int) irSize; i < sineLength; ++i)
