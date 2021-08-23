@@ -1,6 +1,5 @@
 namespace chowdsp
 {
-
 ConvolutionEngine::ConvolutionEngine (const float* samples,
                                       size_t numSamples,
                                       size_t maxBlockSize)
@@ -10,15 +9,15 @@ ConvolutionEngine::ConvolutionEngine (const float* samples,
       fftObject (std::make_unique<juce::dsp::FFT> (juce::roundToInt (std::log2 (fftSize)))),
       numSegments (numSamples / (fftSize - blockSize) + 1u),
       numInputSegments ((blockSize > 128 ? numSegments : 3 * numSegments)),
-      bufferInput      (1, static_cast<int> (fftSize)),
-      bufferOutput     (1, static_cast<int> (fftSize * 2)),
+      bufferInput (1, static_cast<int> (fftSize)),
+      bufferOutput (1, static_cast<int> (fftSize * 2)),
       bufferTempOutput (1, static_cast<int> (fftSize * 2)),
-      bufferOverlap    (1, static_cast<int> (fftSize))
+      bufferOverlap (1, static_cast<int> (fftSize))
 {
     bufferOutput.clear();
 
-    updateSegmentsIfNecessary (numInputSegments, buffersInputSegments,   fftSize);
-    updateSegmentsIfNecessary (numSegments,      buffersImpulseSegments, fftSize);
+    updateSegmentsIfNecessary (numInputSegments, buffersInputSegments, fftSize);
+    updateSegmentsIfNecessary (numSegments, buffersImpulseSegments, fftSize);
 
     setNewIR (samples);
 
@@ -81,10 +80,10 @@ void ConvolutionEngine::processSamples (const float* input, float* output, size_
 
     auto indexStep = numInputSegments / numSegments;
 
-    auto* inputData      = bufferInput.getWritePointer (0);
+    auto* inputData = bufferInput.getWritePointer (0);
     auto* outputTempData = bufferTempOutput.getWritePointer (0);
-    auto* outputData     = bufferOutput.getWritePointer (0);
-    auto* overlapData    = bufferOverlap.getWritePointer (0);
+    auto* outputData = bufferOutput.getWritePointer (0);
+    auto* overlapData = bufferOverlap.getWritePointer (0);
 
     while (numSamplesProcessed < numSamples)
     {
@@ -161,10 +160,10 @@ void ConvolutionEngine::processSamplesWithAddedLatency (const float* input, floa
 
     auto indexStep = numInputSegments / numSegments;
 
-    auto* inputData      = bufferInput.getWritePointer (0);
+    auto* inputData = bufferInput.getWritePointer (0);
     auto* outputTempData = bufferTempOutput.getWritePointer (0);
-    auto* outputData     = bufferOutput.getWritePointer (0);
-    auto* overlapData    = bufferOverlap.getWritePointer (0);
+    auto* outputData = bufferOutput.getWritePointer (0);
+    auto* overlapData = bufferOverlap.getWritePointer (0);
 
     while (numSamplesProcessed < numSamples)
     {
@@ -232,7 +231,7 @@ void ConvolutionEngine::processSamplesWithAddedLatency (const float* input, floa
     }
 }
 
-void ConvolutionEngine::prepareForConvolution (float *samples, size_t fftSize) noexcept
+void ConvolutionEngine::prepareForConvolution (float* samples, size_t fftSize) noexcept
 {
     auto FFTSizeDiv2 = fftSize / 2;
 
@@ -245,15 +244,15 @@ void ConvolutionEngine::prepareForConvolution (float *samples, size_t fftSize) n
         samples[i + FFTSizeDiv2] = -samples[((fftSize - i) << 1) + 1];
 }
 
-void ConvolutionEngine::convolutionProcessingAndAccumulate (const float *input, const float *impulse, float *output)
+void ConvolutionEngine::convolutionProcessingAndAccumulate (const float* input, const float* impulse, float* output)
 {
     auto FFTSizeDiv2 = fftSize / 2;
 
-    juce::FloatVectorOperations::addWithMultiply      (output, input, impulse, static_cast<int> (FFTSizeDiv2));
+    juce::FloatVectorOperations::addWithMultiply (output, input, impulse, static_cast<int> (FFTSizeDiv2));
     juce::FloatVectorOperations::subtractWithMultiply (output, &(input[FFTSizeDiv2]), &(impulse[FFTSizeDiv2]), static_cast<int> (FFTSizeDiv2));
 
-    juce::FloatVectorOperations::addWithMultiply      (&(output[FFTSizeDiv2]), input, &(impulse[FFTSizeDiv2]), static_cast<int> (FFTSizeDiv2));
-    juce::FloatVectorOperations::addWithMultiply      (&(output[FFTSizeDiv2]), &(input[FFTSizeDiv2]), impulse, static_cast<int> (FFTSizeDiv2));
+    juce::FloatVectorOperations::addWithMultiply (&(output[FFTSizeDiv2]), input, &(impulse[FFTSizeDiv2]), static_cast<int> (FFTSizeDiv2));
+    juce::FloatVectorOperations::addWithMultiply (&(output[FFTSizeDiv2]), &(input[FFTSizeDiv2]), impulse, static_cast<int> (FFTSizeDiv2));
 
     output[fftSize] += input[fftSize] * impulse[fftSize];
 }

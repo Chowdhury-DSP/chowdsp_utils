@@ -2,7 +2,6 @@
 
 namespace chowdsp
 {
-
 /** A stripped-back Convolution engine based on juce::dsp::Convolution
  *  This implementation is specifically meant to be used for linear-phase
  *  filters, where the filter might change, but the IR size remains constant.
@@ -39,14 +38,14 @@ namespace chowdsp
  *                                                  block.getNumSamples());
  *  }
  *  ```
- */ 
+ */
 struct ConvolutionEngine
 {
     /** Creates a new convolution engine for a given IR, note that while future IRs
         may be loaded into this engine, the IR size MUST stay the same.
      */
     ConvolutionEngine (const float* samples, size_t numSamples, size_t maxBlockSize);
-    
+
     // resets the state of this convolution
     void reset();
 
@@ -63,10 +62,10 @@ struct ConvolutionEngine
     static void updateSegmentsIfNecessary (size_t numSegmentsToUpdate, std::vector<juce::AudioBuffer<float>>& segments, size_t fftSize);
 
     // After each FFT, this function is called to allow convolution to be performed with only 4 SIMD functions calls.
-    static void prepareForConvolution (float *samples, size_t fftSize) noexcept;
+    static void prepareForConvolution (float* samples, size_t fftSize) noexcept;
 
     // Does the convolution operation itself only on half of the frequency domain samples.
-    void convolutionProcessingAndAccumulate (const float *input, const float *impulse, float *output);
+    void convolutionProcessingAndAccumulate (const float* input, const float* impulse, float* output);
 
     // Undoes the re-organization of samples from the function prepareForConvolution.
     // Then takes the conjugate of the frequency domain first half of samples to fill the

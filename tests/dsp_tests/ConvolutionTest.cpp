@@ -35,8 +35,7 @@ public:
                 engine.processSamplesWithAddedLatency (testOutput.data() + ptr, testOutput.data() + ptr, irSize);
         }
 
-        auto checkAccuracy = [=] (float* output)
-        {
+        auto checkAccuracy = [=] (float* output) {
             for (size_t i = 0; i < irSize; ++i)
             {
                 auto error = std::abs (output[i] - testIR[i]);
@@ -52,10 +51,10 @@ public:
         constexpr float freq = 25.0f;
         constexpr float fs = 48000.0f;
         constexpr size_t irSize = 1024;
-        
+
         std::vector<float> testIR (irSize, 0.0f);
         testIR[irSize / 2] = 1.0f;
-        
+
         chowdsp::ConvolutionEngine engine (testIR.data(), irSize, irSize);
 
         auto sineBuffer = test_utils::makeSineWave (freq, fs, 2.0f);
@@ -79,7 +78,7 @@ public:
         float maxDiff = 0.0f;
         for (int i = (int) irSize; i < sineLength; ++i)
         {
-            auto curDiff = std::abs (bufferPtr[i] - bufferPtr[i-1]);
+            auto curDiff = std::abs (bufferPtr[i] - bufferPtr[i - 1]);
             maxDiff = jmax (maxDiff, curDiff);
         }
 

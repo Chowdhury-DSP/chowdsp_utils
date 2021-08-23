@@ -2,22 +2,20 @@
 
 namespace chowdsp
 {
-
 /** A utility class to help smoothly transfer a new IR
  *  into a ConvolutionEngine in a thread-safe manner.
  * 
  *  Note that the the size of every IR transferred via
  *  via this class MUST be the same size as the IR in
  *  ConvolutionEngine that was passed to the constructor.
- */ 
+ */
 struct IRTransfer
 {
     // create a new IRTransfer object for a given convolution engine
-    IRTransfer (const ConvolutionEngine& eng) :
-        fftSize (eng.fftSize),
-        blockSize (eng.blockSize),
-        irNumSamples (eng.irNumSamples),
-        irFFT (std::make_unique<juce::dsp::FFT> (juce::roundToInt (std::log2 (fftSize))))
+    IRTransfer (const ConvolutionEngine& eng) : fftSize (eng.fftSize),
+                                                blockSize (eng.blockSize),
+                                                irNumSamples (eng.irNumSamples),
+                                                irFFT (std::make_unique<juce::dsp::FFT> (juce::roundToInt (std::log2 (fftSize))))
     {
         ConvolutionEngine::updateSegmentsIfNecessary (eng.numSegments, buffersImpulseSegments, fftSize);
     }
