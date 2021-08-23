@@ -10,3 +10,6 @@
 
 // resamplers
 #include "Resampling/chowdsp_SRCResampler.cpp"
+
+// convolution
+#include "Convolution/ConvolutionEngine.cpp"
