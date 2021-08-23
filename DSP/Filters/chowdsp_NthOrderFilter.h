@@ -57,7 +57,7 @@ public:
     inline T processSample (int channel, T x) noexcept
     {
         for (auto& filt : filters)
-            x = filt.processSample (channel, x);
+            x = filt.template processSample<type> (channel, x);
         return x;
     }
 
