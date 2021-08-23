@@ -13,6 +13,10 @@
 #include "Delay/chowdsp_BBDDelayWrapper.h"
 #include "Delay/chowdsp_PitchShift.h"
 
+// convolution
+#include "Convolution/ConvolutionEngine.h"
+#include "Convolution/IRTransfer.h"
+
 // filter tools
 #include "Filters/chowdsp_BilinearUtils.h"
 #include "Filters/chowdsp_IIRFilter.h"
