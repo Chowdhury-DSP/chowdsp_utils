@@ -210,7 +210,7 @@ void ChowLNF::drawLinearSlider (juce::Graphics& g, int x, int y, int width, int 
 
     valueTrack.startNewSubPath (minPoint);
     valueTrack.lineTo (maxPoint);
-    g.setColour (slider.findColour (juce::Slider::trackColourId));
+    g.setColour (slider.findColour (juce::Slider::thumbColourId));
     g.strokePath (valueTrack, { trackWidth, juce::PathStrokeType::curved, juce::PathStrokeType::rounded });
 
     auto thumbRect = juce::Rectangle<float> (static_cast<float> (thumbWidth),
