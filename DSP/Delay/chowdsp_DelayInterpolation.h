@@ -20,8 +20,8 @@ namespace DelayLineInterpolationTypes
         {
         }
 
-        template <typename T>
-        inline T call (const T* buffer, int delayInt, T /*delayFrac*/, const T& /*state*/)
+        template <typename SampleType, typename NumericType>
+        inline SampleType call (const SampleType* buffer, int delayInt, NumericType /*delayFrac*/, const SampleType& /*state*/)
         {
             return buffer[delayInt];
         }
@@ -44,8 +44,8 @@ namespace DelayLineInterpolationTypes
         {
         }
 
-        template <typename T>
-        inline T call (const T* buffer, int delayInt, T delayFrac, const T& /*state*/)
+        template <typename SampleType, typename NumericType>
+        inline SampleType call (const SampleType* buffer, int delayInt, NumericType delayFrac, const SampleType& /*state*/)
         {
             auto index1 = delayInt;
             auto index2 = index1 + 1;
@@ -53,7 +53,7 @@ namespace DelayLineInterpolationTypes
             auto value1 = buffer[index1];
             auto value2 = buffer[index2];
 
-            return value1 + delayFrac * (value2 - value1);
+            return value1 + (SampleType) delayFrac * (value2 - value1);
         }
 
         int totalSize;
@@ -79,8 +79,8 @@ namespace DelayLineInterpolationTypes
             }
         }
 
-        template <typename T>
-        inline T call (const T* buffer, int delayInt, T delayFrac, const T& /*state*/)
+        template <typename SampleType, typename NumericType>
+        inline SampleType call (const SampleType* buffer, int delayInt, NumericType delayFrac, const SampleType& /*state*/)
         {
             auto index1 = delayInt;
             auto index2 = index1 + 1;
@@ -92,16 +92,16 @@ namespace DelayLineInterpolationTypes
             auto value3 = buffer[index3];
             auto value4 = buffer[index4];
 
-            auto d1 = delayFrac - (T) 1.0;
-            auto d2 = delayFrac - (T) 2.0;
-            auto d3 = delayFrac - (T) 3.0;
+            auto d1 = delayFrac - (NumericType) 1.0;
+            auto d2 = delayFrac - (NumericType) 2.0;
+            auto d3 = delayFrac - (NumericType) 3.0;
 
-            auto c1 = -d1 * d2 * d3 / (T) 6.0;
-            auto c2 = d2 * d3 * (T) 0.5;
-            auto c3 = -d1 * d3 * (T) 0.5;
-            auto c4 = d1 * d2 / (T) 6.0;
+            auto c1 = -d1 * d2 * d3 / (NumericType) 6.0;
+            auto c2 = d2 * d3 * (NumericType) 0.5;
+            auto c3 = -d1 * d3 * (NumericType) 0.5;
+            auto c4 = d1 * d2 / (NumericType) 6.0;
 
-            return value1 * c1 + delayFrac * (value2 * c2 + value3 * c3 + value4 * c4);
+            return value1 * c1 + (SampleType) delayFrac * (value2 * c2 + value3 * c3 + value4 * c4);
         }
 
         int totalSize;
@@ -126,8 +126,8 @@ namespace DelayLineInterpolationTypes
             }
         }
 
-        template <typename T>
-        inline T call (const T* buffer, int delayInt, T delayFrac, const T& /*state*/)
+        template <typename SampleType, typename NumericType>
+        inline SampleType call (const SampleType* buffer, int delayInt, NumericType delayFrac, const SampleType& /*state*/)
         {
             auto index1 = delayInt;
             auto index2 = index1 + 1;
@@ -143,20 +143,20 @@ namespace DelayLineInterpolationTypes
             auto value5 = buffer[index5];
             auto value6 = buffer[index6];
 
-            auto d1 = delayFrac - (T) 1.0;
-            auto d2 = delayFrac - (T) 2.0;
-            auto d3 = delayFrac - (T) 3.0;
-            auto d4 = delayFrac - (T) 4.0;
-            auto d5 = delayFrac - (T) 5.0;
+            auto d1 = delayFrac - (NumericType) 1.0;
+            auto d2 = delayFrac - (NumericType) 2.0;
+            auto d3 = delayFrac - (NumericType) 3.0;
+            auto d4 = delayFrac - (NumericType) 4.0;
+            auto d5 = delayFrac - (NumericType) 5.0;
 
-            auto c1 = -d1 * d2 * d3 * d4 * d5 / (T) 120.0;
-            auto c2 = d2 * d3 * d4 * d5 / (T) 24.0;
-            auto c3 = -d1 * d3 * d4 * d5 / (T) 12.0;
-            auto c4 = d1 * d2 * d4 * d5 / (T) 12.0;
-            auto c5 = -d1 * d2 * d3 * d5 / (T) 24.0;
-            auto c6 = d1 * d2 * d3 * d4 / (T) 120.0;
+            auto c1 = -d1 * d2 * d3 * d4 * d5 / (NumericType) 120.0;
+            auto c2 = d2 * d3 * d4 * d5 / (NumericType) 24.0;
+            auto c3 = -d1 * d3 * d4 * d5 / (NumericType) 12.0;
+            auto c4 = d1 * d2 * d4 * d5 / (NumericType) 12.0;
+            auto c5 = -d1 * d2 * d3 * d5 / (NumericType) 24.0;
+            auto c6 = d1 * d2 * d3 * d4 / (NumericType) 120.0;
 
-            return value1 * c1 + delayFrac * (value2 * c2 + value3 * c3 + value4 * c4 + value5 * c5 + value6 * c6);
+            return value1 * c1 + (SampleType) delayFrac * (value2 * c2 + value3 * c3 + value4 * c4 + value5 * c5 + value6 * c6);
         }
 
         int totalSize;
@@ -208,6 +208,8 @@ namespace DelayLineInterpolationTypes
         Successive samples in the delay line will be interpolated using Sinc
         interpolation. This method is somewhat less efficient than the others,
         but gives a very smooth and flat frequency response.
+
+        Note that Sinc interpolation cannot currently be used with SIMD data types!
     */
     JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324) // MSVC doesn't like Foley's hiding class members
     template <typename T, size_t N, size_t M = 256>
