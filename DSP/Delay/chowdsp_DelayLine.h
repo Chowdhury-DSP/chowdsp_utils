@@ -29,24 +29,34 @@ namespace chowdsp
 template <typename SampleType>
 class DelayLineBase
 {
+    using NumericType = typename SampleTypeHelpers::ElementType<SampleType>::Type;
+
 public:
     DelayLineBase() = default;
     virtual ~DelayLineBase() = default;
 
-    virtual void setDelay (SampleType /* newDelayInSamples */) = 0;
-    virtual SampleType getDelay() const = 0;
+    virtual void setDelay (NumericType /* newDelayInSamples */) = 0;
+    virtual NumericType getDelay() const = 0;
 
     virtual void prepare (const juce::dsp::ProcessSpec& /* spec */) = 0;
     virtual void reset() = 0;
 
     virtual void pushSample (int /* channel */, SampleType /* sample */) noexcept = 0;
     virtual SampleType popSample (int /* channel */) noexcept = 0;
-    virtual SampleType popSample (int /* channel */, SampleType /* delayInSamples */, bool /* updateReadPointer */) noexcept = 0;
+    virtual SampleType popSample (int /* channel */, NumericType /* delayInSamples */, bool /* updateReadPointer */) noexcept = 0;
     virtual void incrementReadPointer (int channel) noexcept = 0;
 
     void copyState (const DelayLineBase<SampleType>& other)
     {
-        bufferData.makeCopyOf (other.bufferData);
+        const auto numChannels = other.bufferData.getNumChannels();
+        const auto numSamples = other.bufferData.getNumSamples();
+        if (numChannels != bufferData.getNumChannels()
+            || numSamples != bufferData.getNumSamples())
+        {
+            bufferData = juce::dsp::AudioBlock<SampleType> (dataBlock, numChannels, numSamples);
+        }
+
+        bufferData.copyFrom (other.bufferData);
 
         if (v.empty() || other.v.empty()) // nothing to copy!
             return;
@@ -57,7 +67,8 @@ public:
     }
 
 protected:
-    juce::AudioBuffer<SampleType> bufferData;
+    juce::HeapBlock<char> dataBlock;
+    juce::dsp::AudioBlock<SampleType> bufferData;
     std::vector<SampleType> v;
     std::vector<int> writePos, readPos;
 };
@@ -80,6 +91,8 @@ protected:
 template <typename SampleType, typename InterpolationType = DelayLineInterpolationTypes::Linear>
 class DelayLine : public DelayLineBase<SampleType>
 {
+    using NumericType = typename SampleTypeHelpers::ElementType<SampleType>::Type;
+
 public:
     //==============================================================================
     /** Default constructor. */
@@ -90,10 +103,10 @@ public:
 
     //==============================================================================
     /** Sets the delay in samples. */
-    void setDelay (SampleType newDelayInSamples) override;
+    void setDelay (NumericType newDelayInSamples) override;
 
     /** Returns the current delay in samples. */
-    SampleType getDelay() const override;
+    NumericType getDelay() const override;
 
     //==============================================================================
     /** Initialises the processor. */
@@ -114,8 +127,8 @@ public:
     inline void pushSample (int channel, SampleType sample) noexcept override
     {
         const auto writePtr = this->writePos[(size_t) channel];
-        bufferPtr[channel][writePtr] = sample;
-        bufferPtr[channel][writePtr + totalSize] = sample;
+        bufferPtrs[channel][writePtr] = sample;
+        bufferPtrs[channel][writePtr + totalSize] = sample;
         this->writePos[(size_t) channel] = (this->writePos[(size_t) channel] + totalSize - 1) % totalSize;
     }
 
@@ -153,7 +166,7 @@ public:
 
         @see setDelay, pushSample, process
     */
-    inline SampleType popSample (int channel, SampleType delayInSamples, bool updateReadPointer) noexcept override
+    inline SampleType popSample (int channel, NumericType delayInSamples, bool updateReadPointer) noexcept override
     {
         setDelay (delayInSamples);
 
@@ -214,7 +227,7 @@ private:
     inline SampleType interpolateSample (int channel) noexcept
     {
         auto index = (this->readPos[(size_t) channel] + delayInt);
-        return interpolator.call (bufferPtr[channel],
+        return interpolator.call (bufferPtrs[channel],
                                   index,
                                   delayFrac,
                                   this->v[(size_t) channel]);
@@ -222,8 +235,8 @@ private:
 
     //==============================================================================
     InterpolationType interpolator;
-    SampleType** bufferPtr = nullptr;
-    SampleType delay = 0.0, delayFrac = 0.0;
+    std::vector<SampleType*> bufferPtrs;
+    NumericType delay = 0.0, delayFrac = 0.0;
     int delayInt = 0, totalSize = 4;
 };
 

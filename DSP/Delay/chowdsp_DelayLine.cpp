@@ -42,20 +42,20 @@ DelayLine<SampleType, InterpolationType>::DelayLine (int maximumDelayInSamples)
 
 //==============================================================================
 template <typename SampleType, typename InterpolationType>
-void DelayLine<SampleType, InterpolationType>::setDelay (SampleType newDelayInSamples)
+void DelayLine<SampleType, InterpolationType>::setDelay (DelayLine<SampleType, InterpolationType>::NumericType newDelayInSamples)
 {
-    auto upperLimit = (SampleType) (totalSize - 1);
+    auto upperLimit = (NumericType) (totalSize - 1);
     jassert (juce::isPositiveAndNotGreaterThan (newDelayInSamples, upperLimit));
 
-    delay = juce::jlimit ((SampleType) 0, upperLimit, newDelayInSamples);
+    delay = juce::jlimit ((NumericType) 0, upperLimit, newDelayInSamples);
     delayInt = static_cast<int> (std::floor (delay));
-    delayFrac = delay - (SampleType) delayInt;
+    delayFrac = delay - (NumericType) delayInt;
 
     interpolator.updateInternalVariables (delayInt, delayFrac);
 }
 
 template <typename SampleType, typename InterpolationType>
-SampleType DelayLine<SampleType, InterpolationType>::getDelay() const
+typename DelayLine<SampleType, InterpolationType>::NumericType DelayLine<SampleType, InterpolationType>::getDelay() const
 {
     return delay;
 }
@@ -66,7 +66,7 @@ void DelayLine<SampleType, InterpolationType>::prepare (const juce::dsp::Process
 {
     jassert (spec.numChannels > 0);
 
-    this->bufferData.setSize ((int) spec.numChannels, 2 * totalSize, false, false, true);
+    this->bufferData = juce::dsp::AudioBlock<SampleType> (this->dataBlock, spec.numChannels, 2 * (size_t) totalSize);
 
     this->writePos.resize (spec.numChannels);
     this->readPos.resize (spec.numChannels);
@@ -75,7 +75,10 @@ void DelayLine<SampleType, InterpolationType>::prepare (const juce::dsp::Process
     interpolator.reset (totalSize);
 
     reset();
-    bufferPtr = this->bufferData.getArrayOfWritePointers();
+
+    bufferPtrs.resize (spec.numChannels);
+    for (size_t ch = 0; ch < spec.numChannels; ++ch)
+        bufferPtrs[ch] = this->bufferData.getChannelPointer (ch);
 }
 
 template <typename SampleType, typename InterpolationType>

@@ -23,7 +23,7 @@ namespace DelayLineInterpolationTypes
         template <typename T>
         inline T call (const T* buffer, int delayInt, T /*delayFrac*/, const T& /*state*/)
         {
-            return buffer[delayInt % totalSize];
+            return buffer[delayInt];
         }
 
         int totalSize;
@@ -185,8 +185,8 @@ namespace DelayLineInterpolationTypes
             alpha = double ((1 - delayFrac) / (1 + delayFrac));
         }
 
-        template <typename T>
-        inline T call (const T* buffer, int delayInt, T delayFrac, T& state)
+        template <typename T1, typename T2>
+        inline T1 call (const T1* buffer, int delayInt, T2 /*delayFrac*/, T1& state)
         {
             auto index1 = delayInt;
             auto index2 = index1 + 1;
@@ -194,7 +194,7 @@ namespace DelayLineInterpolationTypes
             auto value1 = buffer[index1];
             auto value2 = buffer[index2];
 
-            auto output = delayFrac == 0 ? value1 : value2 + (T) alpha * (value1 - state);
+            auto output = value2 + (T1) (T2) alpha * (value1 - state);
             state = output;
 
             return output;
