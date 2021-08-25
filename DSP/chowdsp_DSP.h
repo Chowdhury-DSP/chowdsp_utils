@@ -5,6 +5,17 @@
 #include "SIMD/chowdsp_SIMDSmoothedValue.h"
 #include "SIMD/chowdsp_SIMDComplex.h"
 
+// WDF tools
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wshadow-field", // Ignore Clang warnings for WDFs
+                                     "-Wshadow-field-in-constructor",
+                                     "-Winconsistent-missing-destructor-override")
+JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324)
+#include "WDF/wdf.h"
+#include "WDF/wdf_t.h"
+#include "WDF/r_type.h"
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+JUCE_END_IGNORE_WARNINGS_MSVC
+
 // delay
 #include "Delay/chowdsp_DelayInterpolation.h"
 #include "Delay/chowdsp_DelayLine.h"
@@ -38,17 +49,6 @@
 // sound sources
 #include "Sources/chowdsp_Noise.h"
 #include "Sources/chowdsp_SineWave.h"
-
-// WDF tools
-JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wshadow-field", // Ignore Clang warnings for WDFs
-                                     "-Wshadow-field-in-constructor",
-                                     "-Winconsistent-missing-destructor-override")
-JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324)
-#include "WDF/wdf.h"
-#include "WDF/wdf_t.h"
-#include "WDF/r_type.h"
-JUCE_END_IGNORE_WARNINGS_GCC_LIKE
-JUCE_END_IGNORE_WARNINGS_MSVC
 
 // some other useful processors
 #include "chowdsp_BypassProcessor.h"
