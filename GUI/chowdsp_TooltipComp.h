@@ -20,10 +20,11 @@ public:
     void timerCallback() override;
     void getTipFor (juce::Component& c, juce::String& newTip, juce::String& newName);
 
-private:
+protected:
     juce::String name, tip;
     std::atomic_bool showTip;
 
+private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TooltipComponent)
 };
 
