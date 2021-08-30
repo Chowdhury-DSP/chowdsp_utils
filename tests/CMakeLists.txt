@@ -36,3 +36,7 @@ target_sources(chowdsp_utils_tests PRIVATE
 target_sources(chowdsp_gui_test PRIVATE
     gui_tests/GUITest.cpp
 )
+
+target_sources(wdf_test PRIVATE
+    wdf_standalone_test.cpp
+)
