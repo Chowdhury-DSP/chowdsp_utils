@@ -8,7 +8,7 @@ using namespace chowdsp::WDF;
  * for non-JUCE things, this standalone test is to
  * make sure that the WDF code builds correctly and
  * can be correctly used without JUCE.
- */ 
+ */
 int main()
 {
     std::cout << "Set up WDF Tests:" << std::endl;
