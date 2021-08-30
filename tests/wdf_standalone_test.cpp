@@ -1,29 +1,35 @@
 #include <iostream>
-#include <wdf_t.h>
+#include <wdf.h>
 
-using namespace chowdsp::WDFT;
+using namespace chowdsp::WDF;
 
+/**
+ * Since the WDF library should be able to be used
+ * for non-JUCE things, this standalone test is to
+ * make sure that the WDF code builds correctly and
+ * can be correctly used without JUCE.
+ */ 
 int main()
 {
     std::cout << "Set up WDF Tests:" << std::endl;
 
-    ResistorT<float> R1 { 1.0e3f };
-    ResistorT<float> R2 { 1.0e3f };
-    auto S1 = makeSeries<float> (R1, R2);
-    auto I1 = makeInverter<float> (S1);
-    IdealVoltageSourceT<float, decltype (I1)> Vin { I1 };
+    Resistor<float> R1 { 1.0e3f };
+    ResistiveVoltageSource<float> Vin { 1.0e3f };
+    PolarityInverter<float> I1 { &Vin };
+    WDFSeries<float> S1 { &R1, &I1 };
+    DiodePair<float> D1 { &S1, 1.0e-10f };
 
     float inVoltage = 10.0f;
     std::cout << "Setting input voltage: " << inVoltage << std::endl;
 
     Vin.setVoltage (inVoltage);
-    Vin.incident (I1.reflected());
-    I1.incident (Vin.reflected());
-    auto outVoltage = voltage<float> (R1);
+    D1.incident (S1.reflected());
+    S1.incident (D1.reflected());
+    auto outVoltage = R1.voltage();
 
     std::cout << "Output voltage: " << outVoltage << std::endl;
 
-    if (outVoltage != 5.0f)
+    if (std::abs (outVoltage - 4.77f) > 0.1f)
     {
         std::cout << "Incorrect output voltage!" << std::endl;
         return 1;

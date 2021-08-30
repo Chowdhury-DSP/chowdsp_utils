@@ -5,7 +5,7 @@
 #include <type_traits>
 
 // we want to be able to use this header without JUCE, so let's #if out JUCE-specific implementations
-#define USING_JUCE 1 // JUCE_WINDOWS || JUCE_ANDROID || JUCE_BSD || JUCE_LINUX || JUCE_MAC || JUCE_IOS || JUCE_WASM
+#define USING_JUCE JUCE_WINDOWS || JUCE_ANDROID || JUCE_BSD || JUCE_LINUX || JUCE_MAC || JUCE_IOS || JUCE_WASM
 #include "signum.h"
 #include "omega.h"
 
