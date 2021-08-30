@@ -11,7 +11,7 @@ int main()
     ResistorT<float> R2 { 1.0e3f };
     auto S1 = makeSeries<float> (R1, R2);
     auto I1 = makeInverter<float> (S1);
-    IdealVoltageSourceT<float, decltype(I1)> Vin { I1 };
+    IdealVoltageSourceT<float, decltype (I1)> Vin { I1 };
 
     float inVoltage = 10.0f;
     std::cout << "Setting input voltage: " << inVoltage << std::endl;
