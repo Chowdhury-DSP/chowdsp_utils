@@ -206,7 +206,7 @@ public:
         testLoadUnaligned<double>();
 
         beginTest ("Float SIMD Math test");
-        mathTest<float> (10, 1.0e-6f);
+        mathTest<float> (10, 2.0e-5f);
 
         beginTest ("Double SIMD Math test");
         mathTest<double> (10, 1.0e-12);
