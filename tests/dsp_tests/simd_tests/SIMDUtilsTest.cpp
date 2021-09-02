@@ -106,6 +106,7 @@ public:
     void mathTest (int nIter, FloatType maxErr)
     {
         const auto minus10To10 = NormalisableRange<FloatType> ((FloatType) -10, (FloatType) 10);
+        const auto sinhRange = NormalisableRange<FloatType> ((FloatType) -3, (FloatType) 3);
         const auto zeroTo10 = NormalisableRange<FloatType> ((FloatType) 0, (FloatType) 10);
         const auto logRange = NormalisableRange<FloatType> ((FloatType) 0.01, (FloatType) 10);
 
@@ -120,8 +121,8 @@ public:
         baseMathTest<FloatType> (nIter, FLOATFUNC (std::sin), SIMDFUNC (sinSIMD), maxErr, "sin", minus10To10);
         baseMathTest<FloatType> (nIter, FLOATFUNC (std::cos), SIMDFUNC (cosSIMD), maxErr, "cos", minus10To10);
         baseMathTest<FloatType> (nIter, FLOATFUNC (std::tan), SIMDFUNC (tanSIMD), maxErr, "tan", minus10To10);
-        baseMathTest<FloatType> (nIter, FLOATFUNC (std::sinh), SIMDFUNC (sinhSIMD), maxErr, "sinh", minus10To10);
-        baseMathTest<FloatType> (nIter, FLOATFUNC (std::cosh), SIMDFUNC (coshSIMD), maxErr, "cosh", minus10To10);
+        baseMathTest<FloatType> (nIter, FLOATFUNC (std::sinh), SIMDFUNC (sinhSIMD), maxErr, "sinh", sinhRange);
+        baseMathTest<FloatType> (nIter, FLOATFUNC (std::cosh), SIMDFUNC (coshSIMD), maxErr, "cosh", sinhRange);
         baseMathTest<FloatType> (nIter, FLOATFUNC (std::tanh), SIMDFUNC (tanhSIMD), maxErr, "tanh", minus10To10);
         baseMathTest<FloatType> (nIter, FLOATFUNC (Decibels::gainToDecibels), SIMDFUNC (gainToDecibels), maxErr, "gainToDecibels", minus10To10);
         baseMathTest<FloatType> (nIter, FLOATFUNC (Decibels::decibelsToGain), SIMDFUNC (decibelsToGain), maxErr, "decibelsToGain", minus10To10);
@@ -206,7 +207,7 @@ public:
         testLoadUnaligned<double>();
 
         beginTest ("Float SIMD Math test");
-        mathTest<float> (10, 2.0e-5f);
+        mathTest<float> (10, 1.0e-5f);
 
         beginTest ("Double SIMD Math test");
         mathTest<double> (10, 1.0e-12);
