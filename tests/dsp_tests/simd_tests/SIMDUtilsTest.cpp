@@ -114,7 +114,7 @@ public:
 #define FLOATFUNC(func) [] (FloatType x) { return func (x); }
 #define SIMDFUNC(func) [] (dsp::SIMDRegister<FloatType> x) { return func (x); }
 
-        baseMathTest<FloatType> (nIter, FLOATFUNC (std::exp), SIMDFUNC (expSIMD), maxErr, "exp", minus10To10);
+        baseMathTest<FloatType> (nIter, FLOATFUNC (std::exp), SIMDFUNC (expSIMD), maxErr, "exp", sinhRange);
         baseMathTest<FloatType> (nIter, FLOATFUNC (std::log), SIMDFUNC (logSIMD), maxErr, "log", logRange);
         baseMathTest<FloatType> (nIter, FLOATFUNC (std::log10), SIMDFUNC (log10SIMD), maxErr, "log10", logRange);
         baseMathTest<FloatType> (nIter, FLOATFUNC (std::sqrt), SIMDFUNC (sqrtSIMD), maxErr, "sqrt", zeroTo10);
