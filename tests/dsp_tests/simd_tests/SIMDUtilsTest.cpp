@@ -206,10 +206,10 @@ public:
         testLoadUnaligned<double>();
 
         beginTest ("Float SIMD Math test");
-        mathTest<float> (10, 1.0e-12f);
+        mathTest<float> (10, 1.0e-6f);
 
         beginTest ("Double SIMD Math test");
-        mathTest<double> (10, 1.0e-24);
+        mathTest<double> (10, 1.0e-12);
 
         beginTest ("Float SIMD isnan test");
         isnanTest<float> (10);
