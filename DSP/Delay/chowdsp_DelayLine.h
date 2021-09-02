@@ -127,8 +127,8 @@ public:
     inline void pushSample (int channel, SampleType sample) noexcept override
     {
         const auto writePtr = this->writePos[(size_t) channel];
-        bufferPtrs[channel][writePtr] = sample;
-        bufferPtrs[channel][writePtr + totalSize] = sample;
+        bufferPtrs[(size_t) channel][writePtr] = sample;
+        bufferPtrs[(size_t) channel][writePtr + totalSize] = sample;
         this->writePos[(size_t) channel] = (this->writePos[(size_t) channel] + totalSize - 1) % totalSize;
     }
 
@@ -227,7 +227,7 @@ private:
     inline SampleType interpolateSample (int channel) noexcept
     {
         auto index = (this->readPos[(size_t) channel] + delayInt);
-        return interpolator.call (bufferPtrs[channel],
+        return interpolator.call (bufferPtrs[(size_t) channel],
                                   index,
                                   delayFrac,
                                   this->v[(size_t) channel]);

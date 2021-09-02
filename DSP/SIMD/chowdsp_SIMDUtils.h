@@ -399,7 +399,7 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
     }
 #endif // (! CHOWDSP_USE_CUSTOM_JUCE_DSP) && (defined(_M_ARM64) || defined(__arm64__) || defined(__aarch64__))
 
-#else // fallback implemetations
+#else // fallback implemetations (! CHOWDSP_USE_XSIMD)
     /** SIMD implementation of std::exp */
     template <typename T>
     inline juce::dsp::SIMDRegister<T> expSIMD (juce::dsp::SIMDRegister<T> x)
@@ -531,13 +531,12 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
 
         return y;
     }
-#endif
+#endif // CHOWDSP_USE_XSIMD
 
 template <typename T>
 inline juce::dsp::SIMDRegister<T> gainToDecibels (const juce::dsp::SIMDRegister<T>& gain, T minusInfinityDB = (T) -100.0)
 {
     using vec = juce::dsp::SIMDRegister<T>;
-
     auto gZero = vec::greaterThan (gain, (T) 0.0);
     return (vec::max (log10SIMD (gain) * (T) 20.0, minusInfinityDB) & gZero) + ((vec) minusInfinityDB & ~gZero);
 }
@@ -546,7 +545,6 @@ template <typename T>
 inline juce::dsp::SIMDRegister<T> decibelsToGain (const juce::dsp::SIMDRegister<T>& decibels, T minusInfinityDB = (T) -100.0)
 {
     using vec = juce::dsp::SIMDRegister<T>;
-
     auto gZero = vec::greaterThan (decibels, minusInfinityDB);
     return (powSIMD ((vec) (T) 10.0, decibels * (T) 0.05) & gZero) + ((vec) (T) 0.0 & ~gZero);
 }
