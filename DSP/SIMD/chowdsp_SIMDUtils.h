@@ -192,6 +192,13 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
         return (juce::dsp::SIMDRegister<T>) xsimd::log ((x_type<T>) x.value);
     }
 
+    /** SIMD implementation of std::log10 */
+    template <typename T>
+    inline juce::dsp::SIMDRegister<T> log10SIMD (juce::dsp::SIMDRegister<T> x)
+    {
+        return (juce::dsp::SIMDRegister<T>) xsimd::log10 ((x_type<T>) x.value);
+    }
+
     /** SIMD implementation of std::pow */
     template <typename T>
     inline juce::dsp::SIMDRegister<T> powSIMD (juce::dsp::SIMDRegister<T> a, juce::dsp::SIMDRegister<T> b)
@@ -277,6 +284,17 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
         auto y = juce::dsp::SIMDRegister<double> ((double) 0);
         for (size_t i = 0; i < x.size(); ++i)
             y.set (i, std::log (x.get (i)));
+
+        return y;
+    }
+
+    /** SIMD implementation of std::log */
+    template <>
+    inline juce::dsp::SIMDRegister<double> log10SIMD (juce::dsp::SIMDRegister<double> x)
+    {
+        auto y = juce::dsp::SIMDRegister<double> ((double) 0);
+        for (size_t i = 0; i < x.size(); ++i)
+            y.set (i, std::log10 (x.get (i)));
 
         return y;
     }
@@ -381,7 +399,7 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
     }
 #endif // (! CHOWDSP_USE_CUSTOM_JUCE_DSP) && (defined(_M_ARM64) || defined(__arm64__) || defined(__aarch64__))
 
-#else // fallback implemetations
+#else // fallback implemetations (! CHOWDSP_USE_XSIMD)
     /** SIMD implementation of std::exp */
     template <typename T>
     inline juce::dsp::SIMDRegister<T> expSIMD (juce::dsp::SIMDRegister<T> x)
@@ -400,6 +418,17 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
         auto y = juce::dsp::SIMDRegister<T> ((T) 0);
         for (size_t i = 0; i < x.size(); ++i)
             y.set (i, std::log (x.get (i)));
+
+        return y;
+    }
+
+    /** SIMD implementation of std::log */
+    template <typename T>
+    inline juce::dsp::SIMDRegister<T> log10SIMD (juce::dsp::SIMDRegister<T> x)
+    {
+        auto y = juce::dsp::SIMDRegister<T> ((T) 0);
+        for (size_t i = 0; i < x.size(); ++i)
+            y.set (i, std::log10 (x.get (i)));
 
         return y;
     }
@@ -502,7 +531,23 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
 
         return y;
     }
-#endif
+#endif // CHOWDSP_USE_XSIMD
+
+    template <typename T>
+    inline juce::dsp::SIMDRegister<T> gainToDecibels (const juce::dsp::SIMDRegister<T>& gain, T minusInfinityDB = (T) -100.0)
+    {
+        using vec = juce::dsp::SIMDRegister<T>;
+        auto gZero = vec::greaterThan (gain, (T) 0.0);
+        return (vec::max (log10SIMD (gain) * (T) 20.0, minusInfinityDB) & gZero) + ((vec) minusInfinityDB & ~gZero);
+    }
+
+    template <typename T>
+    inline juce::dsp::SIMDRegister<T> decibelsToGain (const juce::dsp::SIMDRegister<T>& decibels, T minusInfinityDB = (T) -100.0)
+    {
+        using vec = juce::dsp::SIMDRegister<T>;
+        auto gZero = vec::greaterThan (decibels, minusInfinityDB);
+        return (powSIMD ((vec) (T) 10.0, decibels * (T) 0.05) & gZero) + ((vec) (T) 0.0 & ~gZero);
+    }
 
 } // namespace SIMDUtils
 } // namespace chowdsp
