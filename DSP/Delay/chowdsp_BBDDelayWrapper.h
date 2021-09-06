@@ -72,6 +72,12 @@ namespace BBD
             return lines[(size_t) channel].process (inputs[(size_t) channel]);
         }
 
+        /** Increment the read pointer without reading an interpolated sample (be careful...) */
+        inline void incrementReadPointer (int channel) noexcept override
+        {
+            popSample (channel);
+        }
+
     private:
         float delaySamp;
         float sampleRate;

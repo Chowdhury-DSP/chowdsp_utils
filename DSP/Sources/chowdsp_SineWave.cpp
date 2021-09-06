@@ -23,6 +23,13 @@ void SineWave<T>::reset() noexcept
 }
 
 template <typename T>
+void SineWave<T>::reset (T phase) noexcept
+{
+    x1 = std::sin (phase);
+    x2 = std::cos (phase);
+}
+
+template <typename T>
 template <typename ProcessContext>
 void SineWave<T>::process (const ProcessContext& context) noexcept
 {

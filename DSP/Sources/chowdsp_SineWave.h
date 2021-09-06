@@ -23,6 +23,9 @@ public:
     /** Resets the internal state of the oscillator */
     void reset() noexcept;
 
+    /** Resets the internal state of the oscillator with an initial phase */
+    void reset (T phase) noexcept;
+
     /** Returns the result of processing a single sample. */
     inline T processSample() noexcept
     {
