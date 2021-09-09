@@ -238,6 +238,8 @@ private:
     std::vector<SampleType*> bufferPtrs;
     NumericType delay = 0.0, delayFrac = 0.0;
     int delayInt = 0, totalSize = 4;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DelayLine)
 };
 
 } // namespace chowdsp

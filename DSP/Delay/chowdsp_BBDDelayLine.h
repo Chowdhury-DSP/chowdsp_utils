@@ -13,6 +13,8 @@ namespace BBD
     {
     public:
         BBDDelayLine() = default;
+        BBDDelayLine (BBDDelayLine&&) = default;
+        BBDDelayLine& operator=(BBDDelayLine&&) = default;
 
         /** Prepares the delay line for processing */
         void prepare (double sampleRate)
@@ -55,26 +57,12 @@ namespace BBD
      * Internally this changed the "clock rate"
      * of the bucket-brigade device
      */
-        template <bool A = ALIEN>
-        inline typename std::enable_if<A == true, void>::type
-            setDelayTime (float delaySec) noexcept
+        void setDelayTime (float delaySec) noexcept
         {
             const auto clock_rate_hz = (2.0f * (float) STAGES) / delaySec;
             Ts_bbd = 1.0f / clock_rate_hz;
 
             const auto doubleTs = 2 * Ts_bbd / Ts;
-            inputFilter->set_delta (doubleTs);
-            outputFilter->set_delta (doubleTs);
-        }
-
-        template <bool A = ALIEN>
-        inline typename std::enable_if<A == false, void>::type
-            setDelayTime (float delaySec) noexcept
-        {
-            const auto clock_rate_hz = (2.0f * (float) STAGES) / delaySec;
-            Ts_bbd = 1.0f / clock_rate_hz;
-
-            const auto doubleTs = 2 * Ts_bbd;
             inputFilter->set_delta (doubleTs);
             outputFilter->set_delta (doubleTs);
         }
@@ -136,6 +124,7 @@ namespace BBD
                         sum = SIMDComplexMulReal (inputFilter->Gcalc, inputFilter->x).sum();
                         buffer[bufferPtr++] = sum;
                         bufferPtr = (bufferPtr < STAGES) ? bufferPtr : 0;
+                        break;
 
                     case 0:
                         yBBD = buffer[bufferPtr];
@@ -143,6 +132,7 @@ namespace BBD
                         yBBD_old = yBBD;
                         outputFilter->calcG();
                         xOutAccum += outputFilter->Gcalc * delta;
+                        break;
                 }
 
                 evenOn = 1 - evenOn;
@@ -174,6 +164,8 @@ namespace BBD
         float yBBD_old = 0.0f;
         float tn = 0.0f;
         int evenOn = 1;
+
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BBDDelayLine)
     };
 
 } // namespace BBD
