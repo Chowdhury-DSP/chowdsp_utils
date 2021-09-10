@@ -14,7 +14,7 @@ namespace BBD
     public:
         BBDDelayLine() = default;
         BBDDelayLine (BBDDelayLine&&) = default;
-        BBDDelayLine& operator=(BBDDelayLine&&) = default;
+        BBDDelayLine& operator= (BBDDelayLine&&) = default;
 
         /** Prepares the delay line for processing */
         void prepare (double sampleRate)
@@ -23,7 +23,7 @@ namespace BBD
             Ts = 1.0f / FS;
 
             tn = 0.0f;
-            evenOn = 1;
+            evenOn = true;
 
             inputFilter = std::make_unique<InputFilterBank> (Ts);
             outputFilter = std::make_unique<OutputFilterBank> (Ts);
@@ -62,7 +62,7 @@ namespace BBD
             const auto clock_rate_hz = (2.0f * (float) STAGES) / delaySec;
             Ts_bbd = 1.0f / clock_rate_hz;
 
-            const auto doubleTs = 2 * Ts_bbd / Ts;
+            const auto doubleTs = 2 * Ts_bbd;
             inputFilter->set_delta (doubleTs);
             outputFilter->set_delta (doubleTs);
         }
@@ -78,25 +78,23 @@ namespace BBD
             float delta = 0.0f;
             while (tn < 1.0f)
             {
-                switch (evenOn)
+                if (evenOn)
                 {
-                    case 1:
-                        inputFilter->calcG();
-                        sum = SIMDComplexMulReal (inputFilter->Gcalc, inputFilter->x).sum();
-                        buffer[bufferPtr++] = sum;
-                        bufferPtr = (bufferPtr < STAGES) ? bufferPtr : 0;
-                        break;
-
-                    case 0:
-                        yBBD = buffer[bufferPtr];
-                        delta = yBBD - yBBD_old;
-                        yBBD_old = yBBD;
-                        outputFilter->calcG();
-                        xOutAccum += outputFilter->Gcalc * delta;
-                        break;
+                    inputFilter->calcG();
+                    sum = SIMDComplexMulReal (inputFilter->Gcalc, inputFilter->x).sum();
+                    buffer[bufferPtr++] = sum;
+                    bufferPtr = (bufferPtr < STAGES) ? bufferPtr : 0;
+                }
+                else
+                {
+                    yBBD = buffer[bufferPtr];
+                    delta = yBBD - yBBD_old;
+                    yBBD_old = yBBD;
+                    outputFilter->calcG();
+                    xOutAccum += outputFilter->Gcalc * delta;
                 }
 
-                evenOn = 1 - evenOn;
+                evenOn = ! evenOn;
                 tn += Ts_bbd / Ts;
             }
             tn -= 1.0f;
@@ -117,25 +115,23 @@ namespace BBD
             float delta = 0.0f;
             while (tn < Ts)
             {
-                switch (evenOn)
+                if (evenOn)
                 {
-                    case 1:
-                        inputFilter->calcG();
-                        sum = SIMDComplexMulReal (inputFilter->Gcalc, inputFilter->x).sum();
-                        buffer[bufferPtr++] = sum;
-                        bufferPtr = (bufferPtr < STAGES) ? bufferPtr : 0;
-                        break;
-
-                    case 0:
-                        yBBD = buffer[bufferPtr];
-                        delta = yBBD - yBBD_old;
-                        yBBD_old = yBBD;
-                        outputFilter->calcG();
-                        xOutAccum += outputFilter->Gcalc * delta;
-                        break;
+                    inputFilter->calcG();
+                    sum = SIMDComplexMulReal (inputFilter->Gcalc, inputFilter->x).sum();
+                    buffer[bufferPtr++] = sum;
+                    bufferPtr = (bufferPtr < STAGES) ? bufferPtr : 0;
+                }
+                else
+                {
+                    yBBD = buffer[bufferPtr];
+                    delta = yBBD - yBBD_old;
+                    yBBD_old = yBBD;
+                    outputFilter->calcG();
+                    xOutAccum += outputFilter->Gcalc * delta;
                 }
 
-                evenOn = 1 - evenOn;
+                evenOn = ! evenOn;
                 tn += Ts_bbd;
             }
             tn -= Ts;
@@ -163,7 +159,7 @@ namespace BBD
 
         float yBBD_old = 0.0f;
         float tn = 0.0f;
-        int evenOn = 1;
+        bool evenOn = true;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BBDDelayLine)
     };

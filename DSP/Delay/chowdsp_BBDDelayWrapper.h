@@ -39,6 +39,7 @@ namespace BBD
             sampleRate = (float) spec.sampleRate;
             inputs.resize (spec.numChannels, 0.0f);
 
+            lines.clear();
             for (size_t ch = 0; ch < spec.numChannels; ++ch)
             {
                 lines.emplace_back();

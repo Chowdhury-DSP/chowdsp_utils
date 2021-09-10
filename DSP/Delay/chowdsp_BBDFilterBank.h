@@ -77,12 +77,12 @@ namespace BBD
             constexpr float originalCutoff = 9900.0f;
             const float freqFactor = freq / originalCutoff;
             root_corr = roots * freqFactor;
-            pole_corr = poles.map ([&freqFactor, this] (const std::complex<float>& f) {
-                return std::exp (f * freqFactor * Ts);
-            });
+            pole_corr = poles.map ([&freqFactor, this] (const std::complex<float>& f)
+                                   { return std::exp (f * freqFactor * Ts); });
 
             pole_corr_angle =
-                pole_corr.map_float ([] (const std::complex<float>& f) { return std::arg (f); });
+                pole_corr.map_float ([] (const std::complex<float>& f)
+                                     { return std::arg (f); });
 
             gCoef = root_corr * Ts;
         }
@@ -90,7 +90,8 @@ namespace BBD
         inline void set_time (float tn) noexcept
         {
             Gcalc =
-                gCoef * pole_corr.map ([&tn] (const std::complex<float>& f) { return std::pow (f, tn); });
+                gCoef * pole_corr.map ([&tn] (const std::complex<float>& f)
+                                       { return std::pow (f, tn); });
         }
 
         inline void set_delta (float delta) noexcept
@@ -152,19 +153,20 @@ namespace BBD
         {
             constexpr float originalCutoff = 9500.0f;
             const float freqFactor = freq / originalCutoff;
-            pole_corr = poles.map ([&freqFactor, this] (const std::complex<float>& f) {
-                return std::exp (f * freqFactor * Ts);
-            });
+            pole_corr = poles.map ([&freqFactor, this] (const std::complex<float>& f)
+                                   { return std::exp (f * freqFactor * Ts); });
 
             pole_corr_angle =
-                pole_corr.map_float ([] (const std::complex<float>& f) { return std::arg (f); });
+                pole_corr.map_float ([] (const std::complex<float>& f)
+                                     { return std::arg (f); });
 
             Amult = gCoef * pole_corr;
         }
 
         inline void set_time (float tn) noexcept
         {
-            Gcalc = Amult * pole_corr.map ([&tn] (const std::complex<float>& f) { return std::pow (f, 1.0f - tn); });
+            Gcalc = Amult * pole_corr.map ([&tn] (const std::complex<float>& f)
+                                           { return std::pow (f, 1.0f - tn); });
         }
 
         inline void set_delta (float delta) noexcept { Aplus = BBDFilterSpec::fast_complex_pow (pole_corr_angle, -delta); }
