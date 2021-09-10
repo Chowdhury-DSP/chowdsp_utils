@@ -25,8 +25,9 @@ namespace BBD
         void setDelay (float newDelayInSamples) override
         {
             delaySamp = newDelayInSamples;
+            auto delaySec = delaySamp / sampleRate;
             for (auto& line : lines)
-                line.setDelayTime (delaySamp / sampleRate);
+                line.setDelayTime (delaySec);
         }
 
         /** Returns the delay length in samples */
@@ -36,13 +37,14 @@ namespace BBD
         void prepare (const juce::dsp::ProcessSpec& spec) override
         {
             sampleRate = (float) spec.sampleRate;
-            inputs.resize (spec.numChannels);
-            lines.resize (spec.numChannels);
+            inputs.resize (spec.numChannels, 0.0f);
 
-            for (auto& line : lines)
+            lines.clear();
+            for (size_t ch = 0; ch < spec.numChannels; ++ch)
             {
-                line.prepare (sampleRate);
-                line.setFilterFreq (10000.0f);
+                lines.emplace_back();
+                lines[ch].prepare (sampleRate);
+                lines[ch].setFilterFreq (10000.0f);
             }
         }
 
@@ -65,25 +67,25 @@ namespace BBD
             return lines[(size_t) channel].process (inputs[(size_t) channel]);
         }
 
+    private:
         /** Returns a sample from the delay line. Note that the read pointer is always updated. */
-        inline float popSample (int channel, float delayInSamples, bool /*updateReadPointer*/) noexcept override
+        inline float popSample (int /*channel*/, float /*delayInSamples*/, bool /*updateReadPointer*/) noexcept override
         {
-            setDelay (delayInSamples);
-            return lines[(size_t) channel].process (inputs[(size_t) channel]);
+            return 0.0f;
         }
 
         /** Increment the read pointer without reading an interpolated sample (be careful...) */
-        inline void incrementReadPointer (int channel) noexcept override
+        inline void incrementReadPointer (int /*channel*/) noexcept override
         {
-            popSample (channel);
         }
 
-    private:
         float delaySamp;
         float sampleRate;
 
         std::vector<BBDDelayLine<STAGES, ALIEN>> lines;
         std::vector<float> inputs;
+
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BBDDelayWrapper)
     };
 
 } // namespace BBD

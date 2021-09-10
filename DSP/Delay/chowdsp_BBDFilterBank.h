@@ -77,9 +77,7 @@ namespace BBD
             constexpr float originalCutoff = 9900.0f;
             const float freqFactor = freq / originalCutoff;
             root_corr = roots * freqFactor;
-            pole_corr = poles.map ([&freqFactor, this] (const std::complex<float>& f) {
-                return std::exp (f * freqFactor * Ts);
-            });
+            pole_corr = poles.map ([&freqFactor, this] (const std::complex<float>& f) { return std::exp (f * freqFactor * Ts); });
 
             pole_corr_angle =
                 pole_corr.map_float ([] (const std::complex<float>& f) { return std::arg (f); });
@@ -152,9 +150,7 @@ namespace BBD
         {
             constexpr float originalCutoff = 9500.0f;
             const float freqFactor = freq / originalCutoff;
-            pole_corr = poles.map ([&freqFactor, this] (const std::complex<float>& f) {
-                return std::exp (f * freqFactor * Ts);
-            });
+            pole_corr = poles.map ([&freqFactor, this] (const std::complex<float>& f) { return std::exp (f * freqFactor * Ts); });
 
             pole_corr_angle =
                 pole_corr.map_float ([] (const std::complex<float>& f) { return std::arg (f); });
