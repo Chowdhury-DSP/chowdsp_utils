@@ -16,20 +16,20 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
 #if defined(__i386__) || defined(__amd64__) || defined(_M_X64) || defined(_X86_) || defined(_M_IX86)
     inline vec4 operator/ (const vec4& l, const vec4& r)
     {
-      #ifdef __AVX2__
+#ifdef __AVX2__
         return _mm256_div_ps (l.value, r.value);
-      #else
+#else
         return _mm_div_ps (l.value, r.value);
-      #endif
+#endif
     }
 
     inline vec2 operator/ (const vec2& l, const vec2& r)
     {
-      #ifdef __AVX2__
+#ifdef __AVX2__
         return _mm256_div_pd (l.value, r.value);
-      #else
+#else
         return _mm_div_pd (l.value, r.value);
-      #endif
+#endif
     }
 
 #elif defined(_M_ARM64) || defined(__arm64__) || defined(__aarch64__)
@@ -77,11 +77,11 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
     static inline vec4 loadUnaligned (const float* ptr)
     {
 #if defined(__i386__) || defined(__amd64__) || defined(_M_X64) || defined(_X86_) || defined(_M_IX86)
-      #ifdef __AVX2__
+#ifdef __AVX2__
         return vec4 (_mm256_loadu_ps (ptr));
-      #else
+#else
         return vec4 (_mm_loadu_ps (ptr));
-      #endif
+#endif
 
 #elif defined(_M_ARM64) || defined(__arm64__) || defined(__aarch64__)
         return vec4 (vld1q_f32 (ptr));
@@ -97,11 +97,11 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
     static inline vec2 loadUnaligned (const double* ptr)
     {
 #if defined(__i386__) || defined(__amd64__) || defined(_M_X64) || defined(_X86_) || defined(_M_IX86)
-      #ifdef __AVX2__
+#ifdef __AVX2__
         return vec2 (_mm256_loadu_pd (ptr));
-      #else
+#else
         return vec2 (_mm_loadu_pd (ptr));
-      #endif
+#endif
 
 #elif defined(_M_ARM64) || defined(__arm64__) || defined(__aarch64__)
 #if CHOWDSP_USE_CUSTOM_JUCE_DSP

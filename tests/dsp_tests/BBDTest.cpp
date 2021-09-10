@@ -70,8 +70,7 @@ public:
         constexpr int numSamples = 2048;
         constexpr auto lenSeconds = (float) numSamples / (float) fs;
 
-        auto runBuffer = [=] (float filterFreq, auto& samples)
-        {
+        auto runBuffer = [=] (float filterFreq, auto& samples) {
             chowdsp::BBD::BBDDelayWrapper<8192> delay;
             delay.prepare ({ fs, (uint32) numSamples, 1 });
             delay.setDelay (1.0f);
