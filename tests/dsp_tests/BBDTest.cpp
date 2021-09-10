@@ -13,6 +13,7 @@ public:
 
         for (int i = 0; i < numSamples; ++i)
         {
+            delay.setFilterFreq (10000.0f);
             delay.pushSample (0, samples[i]);
             samples[i] = delay.popSample (0);
         }
@@ -45,27 +46,59 @@ public:
     void postDelayTest()
     {
         constexpr double fs = 48000.0;
-        constexpr int numSamples = 200;
+        constexpr int numSamples = 2048;
 
-        auto refBuffer = test_utils::makeSineWave (100.0f, fs, (float) numSamples / (float) fs);
-        auto buffer = test_utils::makeSineWave (100.0f, fs, (float) numSamples / (float) fs);
+        AudioBuffer<float> buffer (1, numSamples);
         auto bufferPtr = buffer.getWritePointer (0);
+        FloatVectorOperations::fill (bufferPtr, 1.0f, numSamples);
 
         processDelay (fs, (float) numSamples / 2.0f, bufferPtr, numSamples);
 
         auto maxErr = 0.0f;
         for (int i = numSamples / 2 + 10; i < numSamples; ++i)
         {
-            auto err = std::abs (bufferPtr[i] - refBuffer.getSample (0, i - numSamples / 2));
+            auto err = std::abs (bufferPtr[i] - 1.57f);
             maxErr = jmax (err, maxErr);
         }
 
-        for (int i = numSamples / 2; i < numSamples; ++i)
-        {
-            std::cout << bufferPtr[i] << std::endl;
-        }
+        expectLessThan (maxErr, 0.001f, "Maximum error too large!");
+    }
 
-        std::cout << "Max error: " << maxErr << std::endl;
+    void aaFilterTest()
+    {
+        constexpr double fs = 48000.0;
+        constexpr int numSamples = 2048;
+        constexpr auto lenSeconds = (float) numSamples / (float) fs;
+
+        auto runBuffer = [=] (float filterFreq, auto& samples)
+        {
+            chowdsp::BBD::BBDDelayWrapper<8192> delay;
+            delay.prepare ({ fs, (uint32) numSamples, 1 });
+            delay.setDelay (1.0f);
+
+            auto* x = samples.getWritePointer (0);
+            for (int i = 0; i < numSamples; ++i)
+            {
+                delay.setFilterFreq (filterFreq);
+                delay.pushSample (0, x[i]);
+                x[i] = delay.popSample (0);
+            }
+        };
+
+        auto lowBuffer = test_utils::makeSineWave (100.0f, (float) fs, lenSeconds);
+        auto highBuffer = test_utils::makeSineWave (10000.0f, (float) fs, lenSeconds);
+
+        runBuffer (1000.0f, lowBuffer);
+        runBuffer (1000.0f, highBuffer);
+
+        auto lowMag = lowBuffer.getMagnitude (0, numSamples);
+        auto highMag = highBuffer.getMagnitude (0, numSamples);
+
+        auto lowErr = std::abs (Decibels::gainToDecibels (lowMag));
+        auto highErr = std::abs (Decibels::gainToDecibels (highMag) + 17.0f);
+
+        expectLessThan (lowErr, 0.5f, "Low band too much error!");
+        expectLessThan (highErr, 0.5f, "High band too much error!");
     }
 
     void runTest() override
@@ -76,11 +109,8 @@ public:
         beginTest ("Post-Delay Test");
         postDelayTest();
 
-        std::string tt;
-        std::cin >> tt;
-
         beginTest ("AA-Filter Test");
-        std::cout << "TODO..." << std::endl;
+        aaFilterTest();
     }
 };
 
