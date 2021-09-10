@@ -79,7 +79,7 @@ struct SIMDComplex
         return mag * exp (angle);
     }
 
-    inline SIMDComplex<Type> map (std::function<std::complex<Type> (const std::complex<Type>&)> f)
+    inline SIMDComplex<Type> map (std::function<std::complex<Type> (const std::complex<Type>&)> f) const noexcept
     {
         Type rfl alignas (16)[size], ifl alignas (16)[size];
         _r.copyToRawArray (rfl);
@@ -96,7 +96,7 @@ struct SIMDComplex
         return { T::fromRawArray (rflR), T::fromRawArray (iflR) };
     }
 
-    inline juce::dsp::SIMDRegister<Type> map_float (std::function<Type (const std::complex<Type>&)> f)
+    inline juce::dsp::SIMDRegister<Type> map_float (std::function<Type (const std::complex<Type>&)> f) const noexcept
     {
         Type rfl alignas (16)[size], ifl alignas (16)[size];
         _r.copyToRawArray (rfl);
