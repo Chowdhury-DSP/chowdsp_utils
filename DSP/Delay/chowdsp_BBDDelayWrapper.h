@@ -7,6 +7,10 @@ namespace BBD
     /**
  * A class that wraps the BBDDelayLine class
  * as a chowdsp::DelayLineBase<float>
+ * 
+ * @attention make sure to call `setFilterFreq()` every block
+ *            of samples (or every few blocks) to make sure the
+ *            BBD internal clock is correctly aligned.           
  */
     template <size_t STAGES, bool ALIEN = false>
     class BBDDelayWrapper : public DelayLineBase<float>
