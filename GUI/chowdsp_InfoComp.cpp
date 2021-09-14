@@ -2,7 +2,7 @@ namespace chowdsp
 {
 constexpr std::string_view getOSDescription()
 {
-#if JUCE_WIN
+#if JUCE_WINDOWS
 #if JUCE_64BIT
     return "Win64";
 #elif JUCE_32BIT
