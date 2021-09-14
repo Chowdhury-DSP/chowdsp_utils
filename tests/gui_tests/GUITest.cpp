@@ -85,6 +85,8 @@ public:
         tooltips.setBounds (0, 275, getWidth(), 25);
     }
 
+    TabbedComponent tabs;
+
 private:
     std::unique_ptr<chowdsp::ChowLNF> lnf;
 
@@ -93,7 +95,6 @@ private:
     ToggleButton toggle { "Toggle" };
     ComboBox menu;
 
-    TabbedComponent tabs;
     chowdsp::TooltipComponent tooltips;
 };
 
@@ -106,12 +107,15 @@ public:
     GUIWindow() : DocumentWindow ("GUITest", Colours::red, DocumentWindow::allButtons)
     {
         setUsingNativeTitleBar (true);
-        setContentOwned (new GUIComponent, true);
+
+        comp = std::make_unique<GUIComponent>();
+        setContentNonOwned (comp.get(), true);
 
         centreWithSize (getWidth(), getHeight());
 
         setVisible (true);
 
+        Timer::callAfterDelay (500, [=] { comp->tabs.setCurrentTabIndex (1); });
         Timer::callAfterDelay (1000, [=] { closeButtonPressed(); });
     }
 
@@ -121,6 +125,7 @@ public:
     }
 
 private:
+    std::unique_ptr<GUIComponent> comp;
 };
 
 /** Unit test to test components defined in chowdsp_utils

@@ -76,8 +76,8 @@ void InfoComp::paint (juce::Graphics& g)
     auto b = getLocalBounds();
 
     auto drawText = [=, &g, &b] (const juce::String& text) {
-        auto width = font.getStringWidth (text);
-        g.drawFittedText (text, b.removeFromLeft (width), juce::Justification::left, 1);
+        auto w = font.getStringWidth (text);
+        g.drawFittedText (text, b.removeFromLeft (w), juce::Justification::left, 1);
     };
 
     g.setColour (findColour (text1ColourID));
