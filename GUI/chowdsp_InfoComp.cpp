@@ -71,17 +71,15 @@ void InfoComp::paint (juce::Graphics& g)
         float s = width / fw;
         g.setFont (defaultFont * s);
     }
-    
+
     auto font = g.getCurrentFont();
     auto b = getLocalBounds();
 
-    auto drawText = [=, &g, &b] (const juce::String& text)
-    {
+    auto drawText = [=, &g, &b] (const juce::String& text) {
         auto width = font.getStringWidth (text);
         g.drawFittedText (text, b.removeFromLeft (width), juce::Justification::left, 1);
     };
 
-    
     g.setColour (findColour (text1ColourID));
     drawText (platformStr);
     drawText (typeStr);
