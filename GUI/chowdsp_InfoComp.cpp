@@ -47,12 +47,31 @@ InfoComp::InfoComp (const juce::AudioProcessor::WrapperType pluginWrapperType) :
     setColour (text2ColourID, juce::Colours::white);
 
     addAndMakeVisible (linkButton);
-    linkButton.setFont (juce::Font (17.0f).boldened(), false, juce::Justification::left);
 }
 
 void InfoComp::paint (juce::Graphics& g)
 {
-    g.setFont (17.0f);
+    auto width = (float) getWidth();
+
+    auto platformStr = juce::String (getOSDescription().data()) + "-" + juce::String (getProcArch().data()) + ", ";
+    auto typeStr = juce::String (juce::AudioProcessor::getWrapperTypeDescription (wrapperType)) + ", ";
+#if defined JucePlugin_VersionString
+    auto versionStr = "v" + juce::String (JucePlugin_VersionString) + " ";
+#else
+    auto versionStr = "No Version" + " ";
+#endif
+    auto dspStr = juce::String ("~ DSP by ");
+    auto totalStr = platformStr + typeStr + versionStr + dspStr + linkButton.getButtonText();
+
+    const auto defaultFont = juce::jmin (20.0f, (float) getHeight());
+    g.setFont (defaultFont);
+    auto fw = g.getCurrentFont().getStringWidthFloat (totalStr);
+    if (fw > width)
+    {
+        float s = width / fw;
+        g.setFont (defaultFont * s);
+    }
+    
     auto font = g.getCurrentFont();
     auto b = getLocalBounds();
 
@@ -62,23 +81,19 @@ void InfoComp::paint (juce::Graphics& g)
         g.drawFittedText (text, b.removeFromLeft (width), juce::Justification::left, 1);
     };
 
-    auto platformStr = juce::String (getOSDescription().data()) + "-" + juce::String (getProcArch().data());
-    auto typeStr = juce::String (juce::AudioProcessor::getWrapperTypeDescription (wrapperType));
+    
     g.setColour (findColour (text1ColourID));
-    drawText (platformStr + ", ");
-    drawText (typeStr + ", ");
+    drawText (platformStr);
+    drawText (typeStr);
 
     g.setColour (findColour (text2ColourID));
-#if defined JucePlugin_VersionString
-    drawText ("v" + juce::String (JucePlugin_VersionString) + " ");
-#else
-    drawText ("No Version" + " ");
-#endif
+    drawText (versionStr);
 
     g.setColour (findColour (text1ColourID));
     drawText (juce::String ("~ DSP by "));
 
     linkX = b.getX() - 2;
+    linkButton.setFont (font.boldened(), false, juce::Justification::left);
     linkButton.setColour (juce::HyperlinkButton::ColourIds::textColourId, findColour (text2ColourID));
     resized();
 
