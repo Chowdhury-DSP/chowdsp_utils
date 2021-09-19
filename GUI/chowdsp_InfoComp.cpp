@@ -1,37 +1,5 @@
 namespace chowdsp
 {
-constexpr std::string_view getOSDescription()
-{
-#if JUCE_WINDOWS
-#if JUCE_64BIT
-    return "Win64";
-#elif JUCE_32BIT
-    return "Win32";
-#endif
-#elif JUCE_MAC
-    return "Mac";
-#elif JUCE_IOS
-    return "IOS";
-#elif JUCE_LINUX
-#if JUCE_64BIT
-    return "Linux64";
-#elif JUCE_32BIT
-    return "Linux32";
-#endif
-#endif
-}
-
-constexpr std::string_view getProcArch()
-{
-#if JUCE_INTEL
-    return "Intel";
-#elif JUCE_ARM
-    return "ARM";
-#else
-    return "N/A";
-#endif
-}
-
 InfoComp::InfoComp (const juce::AudioProcessor::WrapperType pluginWrapperType) : wrapperType (pluginWrapperType),
 #if defined JucePlugin_Manufacturer
 #if defined JucePlugin_ManufacturerWebsite
@@ -53,6 +21,7 @@ void InfoComp::paint (juce::Graphics& g)
 {
     auto width = (float) getWidth();
 
+    using namespace SystemInfo;
     auto platformStr = juce::String (getOSDescription().data()) + "-" + juce::String (getProcArch().data()) + ", ";
     auto typeStr = juce::String (juce::AudioProcessor::getWrapperTypeDescription (wrapperType)) + ", ";
 #if defined JucePlugin_VersionString
@@ -75,7 +44,8 @@ void InfoComp::paint (juce::Graphics& g)
     auto font = g.getCurrentFont();
     auto b = getLocalBounds();
 
-    auto drawText = [=, &g, &b] (const juce::String& text) {
+    auto drawText = [=, &g, &b] (const juce::String& text)
+    {
         auto w = font.getStringWidth (text);
         g.drawFittedText (text, b.removeFromLeft (w), juce::Justification::left, 1);
     };
