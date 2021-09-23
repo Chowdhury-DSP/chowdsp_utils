@@ -9,3 +9,5 @@ JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 #include "chowdsp_ParamUtils.h"
 #include "chowdsp_SynthBase.h"
 #include "chowdsp_VersionUtils.h"
+#include "Presets/chowdsp_Preset.h"
+#include "Presets/chowdsp_PresetManger.h"

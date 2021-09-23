@@ -8,7 +8,7 @@ namespace VersionUtils
     class Version
     {
     public:
-        Version (const juce::String& versionStr);
+        Version (const juce::String& versionStr = "0.0.0");
 
         juce::String getVersionString() const;
 
