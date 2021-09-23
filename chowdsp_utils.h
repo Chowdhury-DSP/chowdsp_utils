@@ -98,16 +98,6 @@ JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 JUCE_END_IGNORE_WARNINGS_MSVC
 #endif
 
-// Plugin utils
-JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wzero-as-null-pointer-constant", // Clang doesn't like HasAddParameters checker
-                                     "-Winconsistent-missing-destructor-override")
-#include "PluginUtils/chowdsp_PluginBase.h"
-JUCE_END_IGNORE_WARNINGS_GCC_LIKE
-
-#include "PluginUtils/chowdsp_DummySynthSound.h"
-#include "PluginUtils/chowdsp_ParamUtils.h"
-#include "PluginUtils/chowdsp_SynthBase.h"
-#include "PluginUtils/chowdsp_VersionUtils.h"
-
+#include "PluginUtils/chowdsp_PluginUtils.h"
 #include "DSP/chowdsp_DSP.h"
 #include "GUI/chowdsp_GUI.h"
