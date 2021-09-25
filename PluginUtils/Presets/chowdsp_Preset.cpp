@@ -2,14 +2,14 @@ namespace chowdsp
 {
 Preset::Preset (const juce::String& thisName,
                 const juce::String& thisVendor,
-                juce::XmlElement&& stateXml) : name (thisName),
-                                               vendor (thisVendor),
+                const juce::XmlElement& stateXml) : name (thisName),
+                                                    vendor (thisVendor),
 #if defined JucePlugin_VersionString
-                                               version (std::make_unique<VersionUtils::Version> (JucePlugin_VersionString)),
+                                                    version (std::make_unique<VersionUtils::Version> (JucePlugin_VersionString)),
 #else
-                                               version (std::make_unique<VersionUtils::Version> ("0.0.0")),
+                                                    version (std::make_unique<VersionUtils::Version> ("0.0.0")),
 #endif
-                                               state (std::make_unique<juce::XmlElement> (stateXml))
+                                                    state (std::make_unique<juce::XmlElement> (stateXml))
 {
 }
 
@@ -17,6 +17,11 @@ Preset::Preset (const juce::File& presetFile)
 {
     auto xml = juce::XmlDocument::parse (presetFile);
     initialise (xml.get());
+}
+
+Preset::Preset (const juce::XmlElement* presetXml)
+{
+    initialise (presetXml);
 }
 
 Preset::Preset (const void* presetData, size_t presetDataSize)
@@ -64,8 +69,20 @@ void Preset::initialise (const juce::XmlElement* xml)
 
 void Preset::toFile (const juce::File& presetFile) const
 {
-    if (! isValid())
+    auto presetXml = toXml();
+
+    if (presetXml == nullptr)
         return;
+
+    presetFile.deleteRecursively();
+    presetFile.create();
+    presetXml->writeTo (presetFile);
+}
+
+std::unique_ptr<juce::XmlElement> Preset::toXml() const
+{
+    if (! isValid())
+        return {};
 
     auto presetXml = std::make_unique<juce::XmlElement> (presetTag);
 
@@ -80,9 +97,9 @@ void Preset::toFile (const juce::File& presetFile) const
 
     presetXml->addChildElement (new juce::XmlElement (*state));
 
-    presetFile.deleteRecursively();
-    presetFile.create();
-    presetXml->writeTo (presetFile);
+    JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wpessimizing-move")
+    return std::move (presetXml);
+    JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 }
 
 bool Preset::isValid() const

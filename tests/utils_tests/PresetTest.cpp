@@ -17,7 +17,7 @@ public:
         XmlElement presetXml ("Parameters");
         presetXml.setAttribute (testTag, testValue);
 
-        chowdsp::Preset testPreset (presetName, vendorName, std::move (presetXml));
+        chowdsp::Preset testPreset (presetName, vendorName, presetXml);
         expect (testPreset.isValid(), "Test preset is not valid!");
 
         File testFile = File::getSpecialLocation (File::userHomeDirectory).getChildFile ("test.preset");

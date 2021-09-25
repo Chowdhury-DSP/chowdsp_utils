@@ -32,7 +32,8 @@ target_sources(chowdsp_utils_tests PRIVATE
     # utils_tests/ParamStringsTest.cpp
     # utils_tests/PluginBaseTest.cpp
     # utils_tests/VersionUtilsTest.cpp
-    utils_tests/PresetTest.cpp
+    # utils_tests/PresetTest.cpp
+    utils_tests/PresetManagerTest.cpp
 )
 
 target_sources(chowdsp_gui_test PRIVATE

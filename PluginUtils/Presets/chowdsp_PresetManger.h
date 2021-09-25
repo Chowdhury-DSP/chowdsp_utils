@@ -1,21 +1,42 @@
-// #pragma once
+#pragma once
 
-// namespace chowdsp
-// {
-// class PresetManager
-// {
-// public:
-//     PresetManager (juce::AudioProcessor* p, juce::AudioProcessorValueTreeState& vts);
+// - Save user preset
+// - Load factory presets
+// - Load user presets
+// - Mark preset as "dirty"
+// - Save preset name and "dirty" state
 
-//     void createUserPreset (const String& name, juce::XmlElement* state);
-//     virtual std::unique_ptr<juce::XmlElement> savePresetState();
-//     virtual void loadPresetState (juce::XmlElement* xml);
+namespace chowdsp
+{
+class PresetManager
+{
+public:
+    PresetManager (juce::AudioProcessor* p, juce::AudioProcessorValueTreeState& vts);
 
-// private:
-//     juce::AudioProcessor* processor;
-//     juce::AudioProcessorValueTreeState& vts;
+    void loadPresetFromIdx (int index);
 
-//     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetManager)
-// };
+    void saveUserPreset (const juce::File& file);
 
-// } // namespace chowdsp
+protected:
+    virtual std::unique_ptr<juce::XmlElement> savePresetState();
+    virtual void loadPresetState (juce::XmlElement* xml);
+
+    juce::AudioProcessor* processor;
+    juce::AudioProcessorValueTreeState& vts;
+
+private:
+    void loadPreset (const Preset& preset);
+
+    enum
+    {
+        factoryUserNumIDs = 100,
+        userUserIDStart = 10000,
+    };
+
+    std::unordered_map<int, Preset> presetMap;
+    std::unordered_map<juce::String, int> userIDMap;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetManager)
+};
+
+} // namespace chowdsp
