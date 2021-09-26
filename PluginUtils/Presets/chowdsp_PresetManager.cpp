@@ -1,9 +1,30 @@
 namespace chowdsp
 {
-PresetManager::PresetManager (juce::AudioProcessor* p, juce::AudioProcessorValueTreeState& vtState) : processor (p),
-                                                                                                      vts (vtState)
+PresetManager::PresetManager (juce::AudioProcessorValueTreeState& vtState) : vts (vtState),
+                                                                             processor (vts.processor)
 {
+    for (auto* param : processor.getParameters())
+    {
+        if (auto* paramCast = dynamic_cast<juce::RangedAudioParameter*> (param))
+            vts.addParameterListener (paramCast->paramID, this);
+    }
+
     userIDMap.insert ({ "User", userUserIDStart });
+}
+
+PresetManager::~PresetManager()
+{
+    for (auto* param : processor.getParameters())
+    {
+        if (auto* paramCast = dynamic_cast<juce::RangedAudioParameter*> (param))
+            vts.removeParameterListener (paramCast->paramID, this);
+    }
+}
+
+void PresetManager::parameterChanged (const juce::String&, float)
+{
+    if (! isDirty)
+        setIsDirty (true);
 }
 
 void PresetManager::loadPresetFromIdx (int index)
@@ -34,12 +55,21 @@ void PresetManager::saveUserPreset (const juce::File& file)
     auto [iterator, success] = presetMap.insert ({ presetID, std::move (newPreset) });
 
     jassert (success);
-    iterator->second.toFile (file);
+    auto& preset = iterator->second;
+    preset.toFile (file);
+    loadPreset (preset);
+}
+
+void PresetManager::setIsDirty (bool shouldBeDirty)
+{
+    isDirty = shouldBeDirty;
+    listeners.call (&Listener::presetDirtyStatusChanged);
 }
 
 void PresetManager::loadPreset (const Preset& preset)
 {
     loadPresetState (preset.state.get());
+    setIsDirty (false);
 }
 
 std::unique_ptr<juce::XmlElement> PresetManager::savePresetState()
