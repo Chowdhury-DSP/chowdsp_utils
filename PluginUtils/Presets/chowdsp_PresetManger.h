@@ -8,7 +8,7 @@ public:
     PresetManager (juce::AudioProcessorValueTreeState& vts);
     ~PresetManager();
 
-    void loadPresetFromIdx (int index);
+    void loadPresetFromIndex (int index);
     void loadPreset (const Preset& preset);
 
     void addPresets (std::vector<Preset>& presets);
@@ -31,6 +31,8 @@ public:
     std::unique_ptr<juce::XmlElement> saveXmlState() const;
     void loadXmlState (juce::XmlElement* xml);
     static const juce::Identifier presetStateTag;
+
+    const std::unordered_map<int, Preset>& getPresetMap() const { return presetMap; }
 
     struct Listener
     {

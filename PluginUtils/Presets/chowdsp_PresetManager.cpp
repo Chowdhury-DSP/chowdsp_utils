@@ -27,7 +27,7 @@ void PresetManager::parameterChanged (const juce::String&, float)
         setIsDirty (true);
 }
 
-void PresetManager::loadPresetFromIdx (int index)
+void PresetManager::loadPresetFromIndex (int index)
 {
     const Preset* presetToLoad = getPresetForIndex (index);
 
@@ -58,7 +58,10 @@ void PresetManager::addFactoryPreset (Preset&& preset)
 void PresetManager::addPresets (std::vector<Preset>& presets)
 {
     for (auto& preset : presets)
-        addFactoryPreset (std::move (preset));
+    {
+        if (preset.isValid())
+            addFactoryPreset (std::move (preset));
+    }
 
     listeners.call (&Listener::presetListUpdated);
 }
@@ -183,6 +186,9 @@ void PresetManager::loadUserPresetsFromFolder (const juce::File& file)
 
 std::unique_ptr<juce::XmlElement> PresetManager::saveXmlState() const
 {
+    if (currentPreset == nullptr)
+        return {};
+
     auto presetXml = std::make_unique<juce::XmlElement> (presetStateTag);
 
     presetXml->setAttribute (presetDirtyTag, (int) isDirty);
@@ -193,6 +199,9 @@ std::unique_ptr<juce::XmlElement> PresetManager::saveXmlState() const
 
 void PresetManager::loadXmlState (juce::XmlElement* xml)
 {
+    if (xml == nullptr)
+        return;
+
     if (xml->getTagName() != presetStateTag.toString())
         return;
 
