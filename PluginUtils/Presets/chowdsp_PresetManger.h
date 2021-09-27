@@ -1,11 +1,5 @@
 #pragma once
 
-// - Save user preset
-// - Load factory presets
-// - Load user presets
-// - Mark preset as "dirty"
-// - Save preset name and "dirty" state
-
 namespace chowdsp
 {
 class PresetManager : private juce::AudioProcessorValueTreeState::Listener
@@ -15,17 +9,35 @@ public:
     ~PresetManager();
 
     void loadPresetFromIdx (int index);
+    void loadPreset (const Preset& preset);
 
+    void addPresets (std::vector<Preset>& presets);
     void saveUserPreset (const juce::File& file);
+    const Preset* getCurrentPreset() const noexcept { return currentPreset; }
 
     void parameterChanged (const juce::String& parameterID, float newValue) override;
     bool getIsDirty() const noexcept { return isDirty; }
+
+    int getNumPresets() const noexcept { return (int) presetMap.size(); }
+    int getCurrentPresetIndex() const noexcept { return getIndexForPreset (*currentPreset); }
+    juce::String getPresetName (int index) const noexcept { return getPresetForIndex (index)->name; }
+
+    void setUserPresetConfigFile (const juce::String& presetConfigFilePath);
+    juce::File getUserPresetConfigFile() const;
+    juce::File getUserPresetPath() const;
+    void setUserPresetPath (const juce::File& file);
+    void loadUserPresetsFromFolder (const juce::File& file);
+
+    std::unique_ptr<juce::XmlElement> saveXmlState() const;
+    void loadXmlState (juce::XmlElement* xml);
+    static const juce::Identifier presetStateTag;
 
     struct Listener
     {
         virtual ~Listener() = default;
         virtual void presetListUpdated() {}
         virtual void presetDirtyStatusChanged() {}
+        virtual void selectedPresetChanged() {}
     };
 
     void addListener (Listener* l) { listeners.add (l); }
@@ -39,8 +51,11 @@ protected:
     juce::AudioProcessor& processor;
 
 private:
-    void loadPreset (const Preset& preset);
+    void addFactoryPreset (Preset&& preset);
     void setIsDirty (bool shouldBeDirty);
+
+    int getIndexForPreset (const Preset& preset) const;
+    const Preset* getPresetForIndex (int index) const;
 
     enum
     {
@@ -53,6 +68,13 @@ private:
 
     juce::ListenerList<Listener> listeners;
     bool isDirty = false;
+
+    const Preset* currentPreset = nullptr;
+
+    juce::String userPresetConfigPath;
+
+    std::unique_ptr<Preset> statePreset;
+    static const juce::Identifier presetDirtyTag;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetManager)
 };
