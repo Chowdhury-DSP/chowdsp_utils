@@ -37,7 +37,7 @@ void PresetManager::loadPresetFromIndex (int index)
 
 void PresetManager::addFactoryPreset (Preset&& preset)
 {
-    const auto& vendor = preset.vendor;
+    const auto& vendor = preset.getVendor();
     int presetID = 0;
     if (userIDMap.find (vendor) != userIDMap.end())
     {
@@ -93,7 +93,7 @@ void PresetManager::setIsDirty (bool shouldBeDirty)
 void PresetManager::loadPreset (const Preset& preset)
 {
     currentPreset = &preset;
-    loadPresetState (preset.state.get());
+    loadPresetState (preset.getState());
     setIsDirty (false);
     listeners.call (&Listener::selectedPresetChanged);
 }
@@ -103,7 +103,7 @@ std::unique_ptr<juce::XmlElement> PresetManager::savePresetState()
     return vts.state.createXml();
 }
 
-void PresetManager::loadPresetState (juce::XmlElement* xml)
+void PresetManager::loadPresetState (const juce::XmlElement* xml)
 {
     auto newState = juce::ValueTree::fromXml (*xml);
     vts.replaceState (newState);

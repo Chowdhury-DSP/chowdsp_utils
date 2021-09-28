@@ -2,14 +2,16 @@ namespace chowdsp
 {
 Preset::Preset (const juce::String& thisName,
                 const juce::String& thisVendor,
-                const juce::XmlElement& stateXml) : name (thisName),
+                const juce::XmlElement& stateXml,
+                const juce::String& thisCategory) : name (thisName),
                                                     vendor (thisVendor),
 #if defined JucePlugin_VersionString
                                                     version (std::make_unique<VersionUtils::Version> (JucePlugin_VersionString)),
 #else
                                                     version (std::make_unique<VersionUtils::Version> ("0.0.0")),
 #endif
-                                                    state (std::make_unique<juce::XmlElement> (stateXml))
+                                                    state (std::make_unique<juce::XmlElement> (stateXml)),
+                                                    category (thisCategory)
 {
 }
 
@@ -55,6 +57,8 @@ void Preset::initialise (const juce::XmlElement* xml)
     if (vendor.isEmpty())
         return;
 
+    category = xml->getStringAttribute (categoryTag);
+
     auto versionStr = xml->getStringAttribute (versionTag);
     if (versionStr.isEmpty())
         return;
@@ -93,6 +97,7 @@ std::unique_ptr<juce::XmlElement> Preset::toXml() const
     presetXml->setAttribute (pluginTag, {});
 #endif
     presetXml->setAttribute (vendorTag, vendor);
+    presetXml->setAttribute (categoryTag, category);
     presetXml->setAttribute (versionTag, version->getVersionString());
 
     presetXml->addChildElement (new juce::XmlElement (*state));
@@ -111,6 +116,7 @@ const juce::Identifier Preset::presetTag { "Preset" };
 const juce::Identifier Preset::nameTag { "name" };
 const juce::Identifier Preset::pluginTag { "plugin" };
 const juce::Identifier Preset::vendorTag { "vendor" };
+const juce::Identifier Preset::categoryTag { "category" };
 const juce::Identifier Preset::versionTag { "version" };
 const juce::Identifier Preset::stateTag { "Parameters" };
 

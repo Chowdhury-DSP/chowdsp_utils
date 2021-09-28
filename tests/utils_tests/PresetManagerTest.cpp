@@ -47,7 +47,7 @@ public:
         setParameter (param, dummyValue);
         expectEquals (param->getValue(), dummyValue, "Changed value is incorrect!");
 
-        presetMgr.loadPresetFromIdx (0);
+        presetMgr.loadPresetFromIndex (0);
         expectEquals (param->getValue(), testValue, "Preset value is incorrect!");
     }
 
@@ -106,7 +106,7 @@ public:
         chowdsp::PresetManager presetMgr { plugin.getVTS() };
         presetMgr.addPresets (presets);
 
-        presetMgr.loadPresetFromIdx (0);
+        presetMgr.loadPresetFromIndex (0);
         expectWithinAbsoluteError (param->getValue(), testValue, 1.0e-6f, "Preset value is incorrect!");
     }
 
@@ -123,7 +123,7 @@ public:
 
         expectEquals (presetMgr.getNumPresets(), 2, "Num presets incorrect!");
 
-        presetMgr.loadPresetFromIdx (1);
+        presetMgr.loadPresetFromIndex (1);
         expectEquals (presetMgr.getCurrentPresetIndex(), 1, "Current preset index incorrect!");
 
         expectEquals (presetMgr.getPresetName (0), String ("test1"), "Preset 1 name incorrect!");
@@ -191,7 +191,7 @@ public:
         presetMgr = std::make_unique<chowdsp::PresetManager> (plugin.getVTS());
         presetMgr->loadXmlState (xml.get());
 
-        expectEquals (presetMgr->getCurrentPreset()->name, String ("test"), "Preset name is incorrect!");
+        expectEquals (presetMgr->getCurrentPreset()->getName(), String ("test"), "Preset name is incorrect!");
         expect (presetMgr->getIsDirty(), "Dirty state after loading is incorrect!");
     }
 

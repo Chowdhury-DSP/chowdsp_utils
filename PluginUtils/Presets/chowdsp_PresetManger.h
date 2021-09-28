@@ -20,7 +20,7 @@ public:
 
     int getNumPresets() const noexcept { return (int) presetMap.size(); }
     int getCurrentPresetIndex() const noexcept { return getIndexForPreset (*currentPreset); }
-    juce::String getPresetName (int index) const noexcept { return getPresetForIndex (index)->name; }
+    juce::String getPresetName (int index) const noexcept { return getPresetForIndex (index)->getName(); }
 
     void setUserPresetConfigFile (const juce::String& presetConfigFilePath);
     juce::File getUserPresetConfigFile() const;
@@ -47,7 +47,7 @@ public:
 
 protected:
     virtual std::unique_ptr<juce::XmlElement> savePresetState();
-    virtual void loadPresetState (juce::XmlElement* xml);
+    virtual void loadPresetState (const juce::XmlElement* xml);
 
     juce::AudioProcessorValueTreeState& vts;
     juce::AudioProcessor& processor;
@@ -61,8 +61,8 @@ private:
 
     enum
     {
-        factoryUserNumIDs = 100,
-        userUserIDStart = 10000,
+        factoryUserNumIDs = 1000,
+        userUserIDStart = 1000000,
     };
 
     std::unordered_map<int, Preset> presetMap;
