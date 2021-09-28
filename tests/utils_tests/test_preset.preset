@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset name="Test Preset" plugin="DummyPlugin" vendor="Factory" category="" version="1.0.0">
+  <Parameters>
+    <PARAM id="dummy" value="1.0"/>
+  </Parameters>
+</Preset>
