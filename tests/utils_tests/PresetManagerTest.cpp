@@ -126,8 +126,15 @@ public:
         presetMgr.loadPresetFromIndex (1);
         expectEquals (presetMgr.getCurrentPresetIndex(), 1, "Current preset index incorrect!");
 
-        expectEquals (presetMgr.getPresetName (0), String ("test1"), "Preset 1 name incorrect!");
-        expectEquals (presetMgr.getPresetName (1), String ("test2"), "Preset 2 name incorrect!");
+        StringArray presetNames { "test1", "test2" };
+        for (int i = 0; i < 2; ++i)
+        {
+            const auto presetName = presetMgr.getPresetName (i);
+            expect (presetNames.contains (presetName), "Preset " + String (i + 1) + " name incorrect!");
+            presetNames.removeString (presetName);
+        }
+
+        expect (presetNames.isEmpty(), "Some preset names are missing (" + String (presetNames.size()) + ")!");
     }
 
     void userPresetPathTest()
