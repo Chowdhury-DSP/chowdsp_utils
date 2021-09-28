@@ -202,6 +202,26 @@ public:
         expect (presetMgr->getIsDirty(), "Dirty state after loading is incorrect!");
     }
 
+    void defaultPresetTest()
+    {
+        constexpr float initialValue = 0.5f;
+        constexpr float testValue = 0.1f;
+
+        DummyPlugin plugin;
+        auto param = plugin.getParameters()[0];
+
+        chowdsp::PresetManager presetMgr { plugin.getVTS() };
+
+        setParameter (param, testValue);
+        ScopedFile presetFile ("test.preset");
+        presetMgr.saveUserPreset (presetFile.file);
+        presetMgr.setDefaultPreset (chowdsp::Preset { presetFile.file });
+
+        setParameter (param, initialValue);
+        presetMgr.loadDefaultPreset();
+        expectWithinAbsoluteError (param->getValue(), testValue, 1.0e-3f, "Default preset not loaded correctly!");
+    }
+
     void runTest() override
     {
         beginTest ("User Preset Test");
@@ -221,6 +241,9 @@ public:
 
         beginTest ("Preset State Test");
         presetStateTest();
+
+        beginTest ("Default Preset Test");
+        defaultPresetTest();
     }
 };
 
