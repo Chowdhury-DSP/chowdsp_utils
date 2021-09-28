@@ -47,6 +47,8 @@ struct Preset
     /** Returns the preset's state */
     const juce::XmlElement* getState() const noexcept { return state.get(); }
 
+    friend bool operator== (const Preset& p1, const Preset& p2);
+
     static const juce::Identifier presetTag;
     static const juce::Identifier nameTag;
     static const juce::Identifier pluginTag;

@@ -112,9 +112,9 @@ void PresetManager::loadPresetState (const juce::XmlElement* xml)
 int PresetManager::getIndexForPreset (const Preset& preset) const
 {
     int counter = 0;
-    for (auto& [_, presetToCheck] : presetMap)
+    for (const auto& [_, presetToCheck] : presetMap)
     {
-        if (&preset == &presetToCheck)
+        if (preset == presetToCheck)
             return counter;
 
         counter++;

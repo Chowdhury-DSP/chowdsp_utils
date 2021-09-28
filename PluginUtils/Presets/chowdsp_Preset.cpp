@@ -112,6 +112,18 @@ bool Preset::isValid() const
     return state != nullptr;
 }
 
+bool operator== (const Preset& p1, const Preset& p2)
+{
+    if (p1.version == nullptr || p2.version == nullptr)
+        return false;
+
+    if (p1.state == nullptr)
+        return false;
+
+    return p1.name == p2.name && p1.vendor == p2.vendor && p1.category == p2.category && *p1.version == *p2.version
+        && p1.state->isEquivalentTo (p2.state.get(), true);
+}
+
 const juce::Identifier Preset::presetTag { "Preset" };
 const juce::Identifier Preset::nameTag { "name" };
 const juce::Identifier Preset::pluginTag { "plugin" };
