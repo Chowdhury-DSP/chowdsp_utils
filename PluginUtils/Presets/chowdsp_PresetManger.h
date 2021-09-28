@@ -14,7 +14,7 @@ public:
     void addPresets (std::vector<Preset>& presets);
     void saveUserPreset (const juce::File& file);
     const Preset* getCurrentPreset() const noexcept { return currentPreset; }
-    
+
     void setDefaultPreset (Preset&& defaultPreset);
     void loadDefaultPreset();
 
