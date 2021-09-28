@@ -28,7 +28,7 @@ public:
     void setParameter (AudioProcessorParameter* param, float value)
     {
         param->setValueNotifyingHost (value);
-        MessageManager::getInstance()->runDispatchLoopUntil (200);
+        MessageManager::getInstance()->runDispatchLoopUntil (250);
     }
 
     void userPresetTest()
@@ -107,7 +107,7 @@ public:
         presetMgr.addPresets (presets);
 
         presetMgr.loadPresetFromIndex (0);
-        expectWithinAbsoluteError (param->getValue(), testValue, 1.0e-6f, "Preset value is incorrect!");
+        expectWithinAbsoluteError (param->getValue(), testValue, 1.0e-3f, "Preset value is incorrect!");
     }
 
     void processorInterfaceTest()

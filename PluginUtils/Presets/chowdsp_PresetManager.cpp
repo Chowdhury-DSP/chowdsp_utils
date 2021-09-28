@@ -133,7 +133,12 @@ void PresetManager::loadPreset (const Preset& preset)
 
     setIsDirty (false);
     listeners.call (&Listener::selectedPresetChanged);
+
+#if JUCE_VERSION > 0x60007
     processor.updateHostDisplay (juce::AudioProcessorListener::ChangeDetails().withProgramChanged (true));
+#else
+    processor.updateHostDisplay();
+#endif
 }
 
 std::unique_ptr<juce::XmlElement> PresetManager::savePresetState()
