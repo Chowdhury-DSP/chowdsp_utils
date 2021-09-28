@@ -206,6 +206,7 @@ public:
     {
         constexpr float initialValue = 0.5f;
         constexpr float testValue = 0.1f;
+        constexpr float testValue2 = 1.0f;
 
         DummyPlugin plugin;
         auto param = plugin.getParameters()[0];
@@ -220,6 +221,19 @@ public:
         setParameter (param, initialValue);
         presetMgr.loadDefaultPreset();
         expectWithinAbsoluteError (param->getValue(), testValue, 1.0e-3f, "Default preset not loaded correctly!");
+
+        presetMgr.setDefaultPreset (chowdsp::Preset { BinaryData::test_preset_preset, BinaryData::test_preset_presetSize });
+        presetMgr.loadDefaultPreset();
+        expectWithinAbsoluteError (param->getValue(), testValue2, 1.0e-3f, "2nd default preset not loaded correctly!");
+
+        setParameter (param, initialValue);
+        presetMgr.loadXmlState (nullptr);
+        expectWithinAbsoluteError (param->getValue(), testValue2, 1.0e-3f, "Default preset when trying to load null state not loaded correctly!");
+
+        setParameter (param, initialValue);
+        auto badXml = std::make_unique<XmlElement> ("BAD_TAG");
+        presetMgr.loadXmlState (badXml.get());
+        expectWithinAbsoluteError (param->getValue(), testValue2, 1.0e-3f, "Default preset when trying to load bad state not loaded correctly!");
     }
 
     void runTest() override
