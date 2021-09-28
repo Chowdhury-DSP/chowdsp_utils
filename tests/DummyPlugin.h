@@ -6,7 +6,7 @@
 class DummyPlugin : public chowdsp::PluginBase<DummyPlugin>
 {
 public:
-    DummyPlugin() {}
+    DummyPlugin() = default;
 
     static void addParameters (Parameters& params)
     {
@@ -16,6 +16,8 @@ public:
     void prepareToPlay (double, int) override {}
     void releaseResources() override {}
     void processAudioBlock (AudioBuffer<float>&) override {}
+
+    AudioProcessorValueTreeState& getVTS() { return vts; }
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DummyPlugin)

@@ -26,14 +26,17 @@ target_compile_definitions(chowdsp_utils_tests PRIVATE
     JucePlugin_VersionString="9.9.9"
     JUCE_UNIT_TESTS=0
     JUCE_USE_CURL=0
-    JUCE_WEB_BROWSER=0)
+    JUCE_WEB_BROWSER=0
+)
 
 target_link_libraries(chowdsp_utils_tests PRIVATE
     chowdsp_utils
     foleys_gui_magic
+    UnitTestData
     juce::juce_recommended_config_flags
     juce::juce_recommended_lto_flags
-    juce::juce_recommended_warning_flags)
+    juce::juce_recommended_warning_flags
+)
 
 target_include_directories(chowdsp_utils_tests PUBLIC tests)
 
