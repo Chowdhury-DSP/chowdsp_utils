@@ -121,7 +121,7 @@ bool operator== (const Preset& p1, const Preset& p2)
         return false;
 
     return p1.name == p2.name && p1.vendor == p2.vendor && p1.category == p2.category && *p1.version == *p2.version
-        && p1.state->isEquivalentTo (p2.state.get(), true);
+           && p1.state->isEquivalentTo (p2.state.get(), true);
 }
 
 const juce::Identifier Preset::presetTag { "Preset" };
