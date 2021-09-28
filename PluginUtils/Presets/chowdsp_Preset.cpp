@@ -5,13 +5,13 @@ Preset::Preset (const juce::String& thisName,
                 const juce::XmlElement& stateXml,
                 const juce::String& thisCategory) : name (thisName),
                                                     vendor (thisVendor),
+                                                    category (thisCategory),
 #if defined JucePlugin_VersionString
                                                     version (std::make_unique<VersionUtils::Version> (JucePlugin_VersionString)),
 #else
                                                     version (std::make_unique<VersionUtils::Version> ("0.0.0")),
 #endif
-                                                    state (std::make_unique<juce::XmlElement> (stateXml)),
-                                                    category (thisCategory)
+                                                    state (std::make_unique<juce::XmlElement> (stateXml))
 {
 }
 

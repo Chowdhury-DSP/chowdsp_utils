@@ -6,7 +6,7 @@ class PresetManager : private juce::AudioProcessorValueTreeState::Listener
 {
 public:
     PresetManager (juce::AudioProcessorValueTreeState& vts);
-    ~PresetManager();
+    ~PresetManager() override;
 
     void loadPresetFromIndex (int index);
     void loadPreset (const Preset& preset);
@@ -14,6 +14,9 @@ public:
     void addPresets (std::vector<Preset>& presets);
     void saveUserPreset (const juce::File& file);
     const Preset* getCurrentPreset() const noexcept { return currentPreset; }
+    
+    void setDefaultPreset (Preset&& defaultPreset);
+    void loadDefaultPreset();
 
     void parameterChanged (const juce::String& parameterID, float newValue) override;
     bool getIsDirty() const noexcept { return isDirty; }
@@ -53,8 +56,9 @@ protected:
     juce::AudioProcessor& processor;
 
 private:
-    void addFactoryPreset (Preset&& preset);
+    std::pair<const int, Preset>& addFactoryPreset (Preset&& preset);
     void setIsDirty (bool shouldBeDirty);
+    const Preset* findPreset (const Preset& preset) const;
 
     int getIndexForPreset (const Preset& preset) const;
     const Preset* getPresetForIndex (int index) const;
@@ -72,6 +76,7 @@ private:
     bool isDirty = false;
 
     const Preset* currentPreset = nullptr;
+    const Preset* defaultPreset = nullptr;
 
     juce::String userPresetConfigPath;
 

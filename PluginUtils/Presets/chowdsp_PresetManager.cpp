@@ -35,7 +35,7 @@ void PresetManager::loadPresetFromIndex (int index)
         loadPreset (*presetToLoad);
 }
 
-void PresetManager::addFactoryPreset (Preset&& preset)
+std::pair<const int, Preset>& PresetManager::addFactoryPreset (Preset&& preset)
 {
     const auto& vendor = preset.getVendor();
     int presetID = 0;
@@ -52,7 +52,8 @@ void PresetManager::addFactoryPreset (Preset&& preset)
     while (presetMap.find (presetID) != presetMap.end())
         presetID++;
 
-    presetMap.insert ({ presetID, std::move (preset) });
+    auto presetResultPair = presetMap.insert ({ presetID, std::move (preset) });
+    return *presetResultPair.first;
 }
 
 void PresetManager::addPresets (std::vector<Preset>& presets)
@@ -64,6 +65,41 @@ void PresetManager::addPresets (std::vector<Preset>& presets)
     }
 
     listeners.call (&Listener::presetListUpdated);
+}
+
+const Preset* PresetManager::findPreset (const Preset& presetToFind) const
+{
+    for (auto& [_, preset] : presetMap)
+    {
+        if (preset == presetToFind)
+            return &preset;
+    }
+
+    return nullptr;
+}
+
+void PresetManager::setDefaultPreset (Preset&& newDefaultPreset)
+{
+    auto* foundDefaultPreset = findPreset (newDefaultPreset);
+
+    if (foundDefaultPreset != nullptr)
+    {
+        defaultPreset = foundDefaultPreset;
+        return;
+    }
+
+    // default preset is not in factory presets (yet)
+    auto& addedPresetPair = addFactoryPreset (std::move (newDefaultPreset));
+    defaultPreset = &addedPresetPair.second;
+}
+
+void PresetManager::loadDefaultPreset()
+{
+    // tried to load a default preset before assigning one!
+    jassert (defaultPreset != nullptr);
+
+    if (defaultPreset != nullptr)
+        loadPreset (*defaultPreset);
 }
 
 void PresetManager::saveUserPreset (const juce::File& file)
@@ -94,8 +130,10 @@ void PresetManager::loadPreset (const Preset& preset)
 {
     currentPreset = &preset;
     loadPresetState (preset.getState());
+
     setIsDirty (false);
     listeners.call (&Listener::selectedPresetChanged);
+    processor.updateHostDisplay (juce::AudioProcessorListener::ChangeDetails().withProgramChanged (true));
 }
 
 std::unique_ptr<juce::XmlElement> PresetManager::savePresetState()
@@ -194,16 +232,24 @@ std::unique_ptr<juce::XmlElement> PresetManager::saveXmlState() const
     presetXml->setAttribute (presetDirtyTag, (int) isDirty);
     presetXml->addChildElement (currentPreset->toXml().release());
 
+    JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wpessimizing-move")
     return std::move (presetXml);
+    JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 }
 
 void PresetManager::loadXmlState (juce::XmlElement* xml)
 {
     if (xml == nullptr)
+    {
+        loadDefaultPreset();
         return;
+    }
 
     if (xml->getTagName() != presetStateTag.toString())
+    {
+        loadDefaultPreset();
         return;
+    }
 
     statePreset = std::make_unique<Preset> (xml->getChildByName (Preset::presetTag));
     if (statePreset != nullptr)
