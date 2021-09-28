@@ -43,3 +43,7 @@ target_sources(chowdsp_gui_test PRIVATE
 target_sources(wdf_test PRIVATE
     wdf_standalone_test.cpp
 )
+
+juce_add_binary_data(UnitTestData SOURCES
+    utils_tests/test_preset.preset
+)

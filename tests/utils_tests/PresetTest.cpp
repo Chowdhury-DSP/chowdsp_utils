@@ -107,7 +107,8 @@ public:
         auto testFile = File::getSpecialLocation (File::userHomeDirectory).getChildFile ("test.preset");
         auto xml = std::make_unique<XmlElement> ("TEST_XML");
 
-        auto testPreset = [=] (const chowdsp::Preset& p) {
+        auto testPreset = [=] (const chowdsp::Preset& p)
+        {
             expectEquals (p.getName(), String ("test preset"), "Preset name incorrect!");
             expectEquals (p.getVendor(), String ("test vendor"), "Preset vendor incorrect!");
             expectEquals (p.getCategory(), String ("test category"), "Preset category incorrect!");
@@ -125,6 +126,17 @@ public:
         testFile.deleteRecursively();
     }
 
+    void binaryDataPresetTest()
+    {
+        chowdsp::Preset testPreset { BinaryData::test_preset_preset, BinaryData::test_preset_presetSize };
+
+        expectEquals (testPreset.getName(), String ("Test Preset"), "BinaryData preset name is incorrect!");
+        expectEquals (testPreset.getVendor(), String ("Factory"), "BinaryData preset vendor is incorrect!");
+
+        auto testValue = testPreset.getState()->getChildByName ("PARAM")->getDoubleAttribute ("value");
+        expectEquals (testValue, 1.0, "Preset test value is incorrect!");
+    }
+
     void runTest() override
     {
         beginTest ("File Save/Load Test");
@@ -135,6 +147,9 @@ public:
 
         beginTest ("Preset Properties Test");
         presetPropertiesTest();
+
+        beginTest ("Binary Data Preset Test");
+        binaryDataPresetTest();
     }
 };
 
