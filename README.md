@@ -22,6 +22,7 @@ The module currently contains the following utility classes:
 - Plugin Utilities
   - Base class for audio effect plugin.
   - Base class for synth plugin.
+  - Utility class for managing plugin presets.
   - Utility functions for creating parameter layouts.
 
 For complete documentation, see the [API docs](https://ccrma.stanford.edu/~jatin/chowdsp/chowdsp_utils).
