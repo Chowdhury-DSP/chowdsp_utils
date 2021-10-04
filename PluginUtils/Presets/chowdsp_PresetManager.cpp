@@ -200,6 +200,9 @@ juce::File PresetManager::getUserPresetConfigFile() const
 
 void PresetManager::setUserPresetPath (const juce::File& file)
 {
+    if (file == juce::File())
+        return;
+
     auto config = getUserPresetConfigFile();
     config.deleteFile();
     config.create();
