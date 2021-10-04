@@ -80,6 +80,9 @@ const Preset* PresetManager::findPreset (const Preset& presetToFind) const
 
 void PresetManager::setDefaultPreset (Preset&& newDefaultPreset)
 {
+    // default preset must be a valid preset!
+    jassert (newDefaultPreset.isValid());
+
     auto* foundDefaultPreset = findPreset (newDefaultPreset);
 
     if (foundDefaultPreset != nullptr)
