@@ -134,11 +134,13 @@ public:
         beginTest ("Preset Box Text Test");
         presetBoxTextTest();
 
+#if ! JUCE_LINUX
         beginTest ("Choose Preset Folder Test");
         chooserPresetFolderTest();
 
         beginTest ("Go To Preset Folder Test");
         goToPresetFolderTest();
+#endif
 
         beginTest ("Save Preset Test");
         savePresetTest();
