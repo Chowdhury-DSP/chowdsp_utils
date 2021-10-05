@@ -43,14 +43,12 @@ PresetsComp::PresetsComp (PresetManager& presetManager) : manager (presetManager
     presetNameEditor.setMultiLine (false, false);
     presetNameEditor.setJustification (juce::Justification::centred);
 
-    auto setupNextPrevButton = [=] (juce::DrawableButton& button, int presetOffset)
-    {
+    auto setupNextPrevButton = [=] (juce::DrawableButton& button, int presetOffset) {
         addAndMakeVisible (button);
         button.setWantsKeyboardFocus (false);
         button.setColour (juce::ComboBox::outlineColourId, juce::Colours::transparentBlack);
         button.setColour (juce::TextButton::buttonColourId, juce::Colours::transparentBlack);
-        button.onClick = [=]
-        {
+        button.onClick = [=] {
             auto idx = presetBox.getSelectedId() + presetOffset;
             while (idx <= 0)
                 idx += manager.getNumPresets();
@@ -144,8 +142,7 @@ void PresetsComp::presetListUpdated()
 
         juce::PopupMenu::Item presetItem { preset.getName() };
         presetItem.itemID = presetID + 1;
-        presetItem.action = [=, &preset]
-        {
+        presetItem.action = [=, &preset] {
             updatePresetBoxText();
             manager.loadPreset (preset);
         };
@@ -168,8 +165,7 @@ int PresetsComp::addPresetOptions (int optionID)
 
     juce::PopupMenu::Item saveItem { "Save Preset" };
     saveItem.itemID = ++optionID;
-    saveItem.action = [=]
-    {
+    saveItem.action = [=] {
         updatePresetBoxText();
         saveUserPreset();
     };
@@ -178,8 +174,7 @@ int PresetsComp::addPresetOptions (int optionID)
 #if ! JUCE_IOS
     juce::PopupMenu::Item goToFolderItem { "Go to Preset folder..." };
     goToFolderItem.itemID = ++optionID;
-    goToFolderItem.action = [=]
-    {
+    goToFolderItem.action = [=] {
         updatePresetBoxText();
         auto folder = manager.getUserPresetPath();
         if (folder.isDirectory())
@@ -191,8 +186,7 @@ int PresetsComp::addPresetOptions (int optionID)
 
     juce::PopupMenu::Item chooseFolderItem { "Choose Preset folder..." };
     chooseFolderItem.itemID = ++optionID;
-    chooseFolderItem.action = [=]
-    {
+    chooseFolderItem.action = [=] {
         updatePresetBoxText();
         chooseUserPresetFolder();
     };
@@ -207,13 +201,12 @@ void PresetsComp::chooseUserPresetFolder (std::function<void()> onFinish)
     constexpr auto folderChooserFlags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectDirectories;
     fileChooser = std::make_shared<juce::FileChooser> ("Choose User Preset Folder");
     {
-        fileChooser->launchAsync (folderChooserFlags, [=] (const juce::FileChooser& chooser)
-                                  {
-                                      manager.setUserPresetPath (chooser.getResult());
+        fileChooser->launchAsync (folderChooserFlags, [=] (const juce::FileChooser& chooser) {
+            manager.setUserPresetPath (chooser.getResult());
 
-                                      if (onFinish != nullptr)
-                                          onFinish();
-                                  });
+            if (onFinish != nullptr)
+                onFinish();
+        });
     }
 }
 
@@ -224,8 +217,7 @@ void PresetsComp::saveUserPreset()
     presetNameEditor.setText ("MyPreset");
     presetNameEditor.setHighlightedRegion ({ 0, 10 });
 
-    presetNameEditor.onReturnKey = [=]
-    {
+    presetNameEditor.onReturnKey = [=] {
         presetNameEditor.setVisible (false);
 
         auto presetName = presetNameEditor.getText();
@@ -233,8 +225,7 @@ void PresetsComp::saveUserPreset()
         if (presetPath == juce::File() || ! presetPath.isDirectory())
         {
             presetPath.deleteRecursively();
-            chooseUserPresetFolder ([=]
-                                    { savePresetFile (presetName + presetExt); });
+            chooseUserPresetFolder ([=] { savePresetFile (presetName + presetExt); });
         }
         else
         {
@@ -242,8 +233,7 @@ void PresetsComp::saveUserPreset()
         }
     };
 
-    presetNameEditor.onEscapeKey = [=]
-    {
+    presetNameEditor.onEscapeKey = [=] {
         presetNameEditor.setVisible (false);
         updatePresetBoxText();
     };
