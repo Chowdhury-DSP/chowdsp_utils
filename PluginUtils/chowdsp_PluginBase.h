@@ -26,11 +26,12 @@ public:
 
     double getTailLengthSeconds() const override { return 0.0; }
 
-    int getNumPrograms() override { return 1; }
-    int getCurrentProgram() override { return 0; }
-    void setCurrentProgram (int) override {}
-    const juce::String getProgramName (int) override { return {}; }
+    int getNumPrograms() override;
+    int getCurrentProgram() override;
+    void setCurrentProgram (int) override;
+    const juce::String getProgramName (int) override;
     void changeProgramName (int, const juce::String&) override {}
+    virtual PresetManager& getPresetManager() { return *presetManager; }
 
     bool isBusesLayoutSupported (const juce::AudioProcessor::BusesLayout& layouts) const override;
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
@@ -56,6 +57,8 @@ protected:
 #if CHOWDSP_USE_FOLEYS_CLASSES
     foleys::MagicProcessorState magicState { *this, vts };
 #endif
+
+    std::unique_ptr<chowdsp::PresetManager> presetManager;
 
 private:
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
@@ -117,6 +120,42 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginBase<Processor>::creat
     Processor::addParameters (params);
 
     return { params.begin(), params.end() };
+}
+
+template <class Processor>
+int PluginBase<Processor>::getNumPrograms()
+{
+    if (presetManager == nullptr)
+        return 1;
+
+    return presetManager->getNumPresets();
+}
+
+template <class Processor>
+int PluginBase<Processor>::getCurrentProgram()
+{
+    if (presetManager == nullptr)
+        return 0;
+
+    return presetManager->getCurrentPresetIndex();
+}
+
+template <class Processor>
+void PluginBase<Processor>::setCurrentProgram (int index)
+{
+    if (presetManager == nullptr)
+        return;
+
+    presetManager->loadPresetFromIndex (index);
+}
+
+template <class Processor>
+const juce::String PluginBase<Processor>::getProgramName (int index)
+{
+    if (presetManager == nullptr)
+        return {};
+
+    return presetManager->getPresetName (index);
 }
 
 template <class Processor>
