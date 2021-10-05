@@ -10,12 +10,6 @@ public:
     {
     }
 
-    void setParameter (AudioProcessorParameter* param, float value)
-    {
-        param->setValueNotifyingHost (value);
-        MessageManager::getInstance()->runDispatchLoopUntil (250);
-    }
-
     void userPresetTest()
     {
         constexpr float testValue = 0.45f;
