@@ -6,14 +6,17 @@
 class DummyPlugin : public chowdsp::PluginBase<DummyPlugin>
 {
 public:
-    DummyPlugin() = default;
+    DummyPlugin (bool withPresetMgr = false)
+    {
+        if (withPresetMgr)
+            presetManager = std::make_unique<chowdsp::PresetManager> (vts);
+    }
 
     static void addParameters (Parameters& params)
     {
         params.push_back (std::make_unique<AudioParameterFloat> ("dummy", "Dummy", 0.0f, 1.0f, 0.5f));
     }
 
-    void prepareToPlay (double, int) override {}
     void releaseResources() override {}
     void processAudioBlock (AudioBuffer<float>&) override {}
 

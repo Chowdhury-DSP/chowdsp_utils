@@ -1,4 +1,7 @@
 #include "DummyPlugin.h"
+#include "test_utils.h"
+
+using namespace test_utils;
 
 class PresetManagerTest : public UnitTest
 {
@@ -6,24 +9,6 @@ public:
     PresetManagerTest() : UnitTest ("Preset Manager Test")
     {
     }
-
-    struct ScopedFile
-    {
-        ScopedFile (const String& name) : file (File::getSpecialLocation (File::userHomeDirectory).getChildFile (name))
-        {
-        }
-
-        ScopedFile (const File& thisFile) : file (thisFile)
-        {
-        }
-
-        ~ScopedFile()
-        {
-            file.deleteRecursively();
-        }
-
-        const File file;
-    };
 
     void setParameter (AudioProcessorParameter* param, float value)
     {
@@ -169,6 +154,24 @@ public:
 
             auto userPresetConfigFile = presetMgr.getUserPresetConfigFile();
             expect (userPresetConfigFile.existsAsFile(), "Preset config file does not exist!");
+            userPresetConfigFile.deleteRecursively();
+        }
+
+        {
+            chowdsp::PresetManager presetMgr { plugin.getVTS() };
+            presetMgr.setUserPresetConfigFile ("preset_config.txt");
+            presetMgr.setUserPresetPath (presetPath.file);
+            expectEquals (presetMgr.getNumPresets(), 2, "Num presets after loading incorrect!");
+
+            presetMgr.setUserPresetPath (File());
+            expectEquals (presetMgr.getNumPresets(), 2, "Num presets after trying to load empty path incorrect!");
+
+            ScopedFile presetPath2 ("preset_path2");
+            presetPath2.file.createDirectory();
+            presetMgr.setUserPresetPath (presetPath2.file);
+            expectEquals (presetMgr.getNumPresets(), 0, "Num presets after loading empty directory incorrect!");
+
+            auto userPresetConfigFile = presetMgr.getUserPresetConfigFile();
             userPresetConfigFile.deleteRecursively();
         }
 

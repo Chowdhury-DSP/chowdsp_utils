@@ -39,7 +39,24 @@ inline AudioBuffer<float> makeNoise (float sampleRate, float lengthSeconds)
 
     return std::move (noiseBuffer);
 }
-
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+
+struct ScopedFile
+{
+    ScopedFile (const String& name) : file (File::getSpecialLocation (File::userHomeDirectory).getChildFile (name))
+    {
+    }
+
+    ScopedFile (const File& thisFile) : file (thisFile)
+    {
+    }
+
+    ~ScopedFile()
+    {
+        file.deleteRecursively();
+    }
+
+    const File file;
+};
 
 } // namespace test_utils
