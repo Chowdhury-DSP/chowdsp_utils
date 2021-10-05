@@ -67,6 +67,8 @@ public:
 
         addAndMakeVisible (tooltips);
 
+        presetsComp.setNextPrevButton (nullptr, true);
+        presetsComp.setNextPrevButton (nullptr, false);
         addAndMakeVisible (presetsComp);
 
         setSize (500, 500);
@@ -123,8 +125,10 @@ public:
 
         setVisible (true);
 
-        Timer::callAfterDelay (500, [=] { comp->tabs.setCurrentTabIndex (1); });
-        Timer::callAfterDelay (10000, [=] { closeButtonPressed(); });
+        Timer::callAfterDelay (500, [=]
+                               { comp->tabs.setCurrentTabIndex (1); });
+        Timer::callAfterDelay (10000, [=]
+                               { closeButtonPressed(); });
     }
 
     void closeButtonPressed() override
