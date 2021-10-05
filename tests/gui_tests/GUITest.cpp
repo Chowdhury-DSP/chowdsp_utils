@@ -1,4 +1,4 @@
-#include <JuceHeader.h>
+#include "../DummyPlugin.h"
 
 /** Empty component filled with a single colour */
 class PlainComponent : public Component
@@ -28,6 +28,7 @@ private:
  *   - chowdsp::TitleComp
  *   - chowdsp::InfoComp
  *   - chowdsp::TooltipComp
+ *   - chowdsp::PresetsComp
  */
 class GUIComponent : public Component
 {
@@ -66,6 +67,10 @@ public:
 
         addAndMakeVisible (tooltips);
 
+        presetsComp.setNextPrevButton (nullptr, true);
+        presetsComp.setNextPrevButton (nullptr, false);
+        addAndMakeVisible (presetsComp);
+
         setSize (500, 500);
     }
 
@@ -83,6 +88,8 @@ public:
 
         tabs.setBounds (0, 110, getWidth(), 150);
         tooltips.setBounds (0, 275, getWidth(), 25);
+
+        presetsComp.setBounds (300, 85, 200, 35);
     }
 
     TabbedComponent tabs;
@@ -94,6 +101,9 @@ private:
     Slider linSlider;
     ToggleButton toggle { "Toggle" };
     ComboBox menu;
+
+    DummyPlugin dummy { true };
+    chowdsp::PresetsComp presetsComp { dummy.getPresetManager() };
 
     chowdsp::TooltipComponent tooltips;
 };
@@ -115,8 +125,10 @@ public:
 
         setVisible (true);
 
-        Timer::callAfterDelay (500, [=] { comp->tabs.setCurrentTabIndex (1); });
-        Timer::callAfterDelay (1000, [=] { closeButtonPressed(); });
+        Timer::callAfterDelay (500, [=]
+                               { comp->tabs.setCurrentTabIndex (1); });
+        Timer::callAfterDelay (10000, [=]
+                               { closeButtonPressed(); });
     }
 
     void closeButtonPressed() override

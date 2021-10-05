@@ -5,3 +5,4 @@
 #include "chowdsp_InfoComp.cpp"
 #include "chowdsp_TitleComp.cpp"
 #include "chowdsp_TooltipComp.cpp"
+#include "chowdsp_PresetsComp.cpp"
