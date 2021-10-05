@@ -14,6 +14,7 @@ public:
     AudioProcessorEditor* createEditor() override
     {
         auto builder = chowdsp::createGUIBuilder (magicState);
+        builder->registerFactory ("PresetsComp", &chowdsp::PresetsItem<GuiPlugin>::factory);
         return new foleys::MagicPluginEditor (magicState, std::move (builder));
     }
 

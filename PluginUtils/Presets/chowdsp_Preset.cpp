@@ -64,6 +64,7 @@ void Preset::initialise (const juce::XmlElement* xml)
         return;
 
     version = std::make_unique<VersionUtils::Version> (versionStr);
+
     auto* xmlState = xml->getChildElement (0);
     if (xmlState == nullptr)
         return;
