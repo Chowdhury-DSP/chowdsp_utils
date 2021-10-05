@@ -155,6 +155,11 @@ void PresetManager::loadPresetState (const juce::XmlElement* xml)
     vts.replaceState (newState);
 }
 
+Preset PresetManager::loadUserPresetFromFile (const juce::File& file)
+{
+    return { file };
+}
+
 int PresetManager::getIndexForPreset (const Preset& preset) const
 {
     int counter = 0;
@@ -222,8 +227,8 @@ juce::File PresetManager::getUserPresetPath() const
 void PresetManager::loadUserPresetsFromFolder (const juce::File& file)
 {
     std::vector<Preset> presets;
-    for (auto& f : file.findChildFiles (juce::File::findFiles, true))
-        presets.emplace_back (f);
+    for (const auto& f : file.findChildFiles (juce::File::findFiles, true))
+        presets.push_back (loadUserPresetFromFile (f));
 
     // delete old user presets
     int presetID = userIDMap["User"];

@@ -99,8 +99,14 @@ public:
     void removeListener (Listener* l) { listeners.remove (l); }
 
 protected:
+    /** Override this if your presets need custom state-saving behaviour */
     virtual std::unique_ptr<juce::XmlElement> savePresetState();
+
+    /** Override this if your presets need custom state-loading behaviour */
     virtual void loadPresetState (const juce::XmlElement* xml);
+
+    /** Override this to suppor backwards compatibility for user presets */
+    virtual Preset loadUserPresetFromFile (const juce::File& file);
 
     juce::AudioProcessorValueTreeState& vts;
     juce::AudioProcessor& processor;
