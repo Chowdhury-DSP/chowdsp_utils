@@ -34,7 +34,6 @@ PresetsComp::PresetsComp (PresetManager& presetManager) : manager (presetManager
     presetBox.setTextWhenNothingSelected ("No Preset selected...");
     presetListUpdated();
 
-    // @TODO: custom colours here
     addChildComponent (presetNameEditor);
     presetNameEditor.setColour (juce::TextEditor::backgroundColourId, juce::Colours::transparentWhite);
     presetNameEditor.setColour (juce::TextEditor::textColourId, juce::Colours::white);
@@ -217,6 +216,12 @@ void PresetsComp::saveUserPreset()
         {
             savePresetFile (presetName + presetExt);
         }
+    };
+
+    presetNameEditor.onEscapeKey = [=]
+    {
+        presetNameEditor.setVisible (false);
+        updatePresetBoxText();
     };
 }
 
