@@ -59,7 +59,7 @@ struct ScopedFile
     const File file;
 };
 
-void setParameter (AudioProcessorParameter* param, float value)
+inline void setParameter (AudioProcessorParameter* param, float value)
 {
     param->setValueNotifyingHost (value);
     MessageManager::getInstance()->runDispatchLoopUntil (250);
