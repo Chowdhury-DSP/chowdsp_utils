@@ -1,5 +1,9 @@
 #pragma once
 
+#if FOLEYS_ENABLE_BINARY_DATA
+#include "BinaryData.h"
+#endif
+
 #include "chowdsp_BinaryData.h"
 #include "chowdsp_SystemInfo.h"
 #include "chowdsp_ChowLNF.h"

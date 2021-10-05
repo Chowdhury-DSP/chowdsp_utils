@@ -25,7 +25,7 @@ public:
     void presetDirtyStatusChanged() override { updatePresetBoxText(); }
     void selectedPresetChanged() override { updatePresetBoxText(); }
 
-    // @TODO methods to set images for next/prev buttons
+    void setNextPrevButton (const juce::Drawable* image, bool isNext);
 
 protected:
     virtual void chooseUserPresetFolder (std::function<void()> onFinish = {});
@@ -41,9 +41,8 @@ protected:
 private:
     void savePresetFile (const juce::String& fileName);
 
-    juce::DrawableButton presetsLeft, presetsRight;
+    juce::DrawableButton prevPresetButton, nextPresetButton;
 
-    juce::WaitableEvent waiter;
     std::shared_ptr<juce::FileChooser> fileChooser;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetsComp)
@@ -56,6 +55,9 @@ class PresetsItem : public foleys::GuiItem
 {
 public:
     FOLEYS_DECLARE_GUI_FACTORY (PresetsItem)
+
+    static const juce::Identifier pNextButton;
+    static const juce::Identifier pPrevButton;
 
     PresetsItem (foleys::MagicGUIBuilder& builder, const juce::ValueTree& node) : foleys::GuiItem (builder, node)
     {
@@ -74,6 +76,39 @@ public:
 
     void update() override
     {
+        auto getDrawable = [] (const juce::String& name)
+        {
+            int dataSize = 0;
+            const char* data = BinaryData::getNamedResource (name.toRawUTF8(), dataSize);
+            return juce::Drawable::createFromImageData (data, (size_t) dataSize);
+        };
+
+        auto nextButtonName = configNode.getProperty (pNextButton, juce::String()).toString();
+        if (nextButtonName.isNotEmpty())
+            presetsComp->setNextPrevButton (getDrawable (nextButtonName).get(), true);
+        else
+            presetsComp->setNextPrevButton (nullptr, true);
+
+        auto prevButtonName = configNode.getProperty (pPrevButton, juce::String()).toString();
+        if (prevButtonName.isNotEmpty())
+            presetsComp->setNextPrevButton (getDrawable (prevButtonName).get(), false);
+        else
+            presetsComp->setNextPrevButton (nullptr, false);
+    }
+
+    std::vector<foleys::SettableProperty> getSettableProperties() const override
+    {
+        std::function<void (juce::ComboBox&)> createAssetFilesMenuLambda = [=] (juce::ComboBox&)
+        {
+            magicBuilder.getMagicState().createAssetFilesMenu();
+        };
+
+        std::vector<foleys::SettableProperty> props;
+
+        props.push_back ({ configNode, pNextButton, foleys::SettableProperty::Choice, {}, createAssetFilesMenuLambda });
+        props.push_back ({ configNode, pPrevButton, foleys::SettableProperty::Choice, {}, createAssetFilesMenuLambda });
+
+        return props;
     }
 
     juce::Component* getWrappedComponent() override
@@ -86,6 +121,13 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetsItem)
 };
+
+template <typename ProcType>
+const juce::Identifier PresetsItem<ProcType>::pNextButton { "next-button" };
+
+template <typename ProcType>
+const juce::Identifier PresetsItem<ProcType>::pPrevButton { "prev-button" };
+
 #endif
 
 } // namespace chowdsp

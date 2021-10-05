@@ -14,8 +14,8 @@ const juce::String presetExt = ".chowpreset";
 namespace chowdsp
 {
 PresetsComp::PresetsComp (PresetManager& presetManager) : manager (presetManager),
-                                                          presetsLeft ("", juce::DrawableButton::ImageOnButtonBackground),
-                                                          presetsRight ("", juce::DrawableButton::ImageOnButtonBackground)
+                                                          prevPresetButton ("", juce::DrawableButton::ImageOnButtonBackground),
+                                                          nextPresetButton ("", juce::DrawableButton::ImageOnButtonBackground)
 {
     manager.addListener (this);
 
@@ -62,8 +62,8 @@ PresetsComp::PresetsComp (PresetManager& presetManager) : manager (presetManager
         };
     };
 
-    setupNextPrevButton (presetsLeft, -1);
-    setupNextPrevButton (presetsRight, 1);
+    setupNextPrevButton (prevPresetButton, -1);
+    setupNextPrevButton (nextPresetButton, 1);
 
     updatePresetBoxText();
 }
@@ -71,6 +71,30 @@ PresetsComp::PresetsComp (PresetManager& presetManager) : manager (presetManager
 PresetsComp::~PresetsComp()
 {
     manager.removeListener (this);
+}
+
+void PresetsComp::setNextPrevButton (const juce::Drawable* image, bool isNext)
+{
+    if (image == nullptr)
+    {
+        if (isNext)
+        {
+            auto defaultImage = juce::Drawable::createFromImageData (chowdsp_BinaryData::RightArrow_svg, chowdsp_BinaryData::RightArrow_svgSize);
+            nextPresetButton.setImages (defaultImage.get());
+        }
+        else
+        {
+            auto defaultImage = juce::Drawable::createFromImageData (chowdsp_BinaryData::LeftArrow_svg, chowdsp_BinaryData::LeftArrow_svgSize);
+            prevPresetButton.setImages (defaultImage.get());
+        }
+
+        return;
+    }
+
+    if (isNext)
+        nextPresetButton.setImages (image);
+    else
+        prevPresetButton.setImages (image);
 }
 
 void PresetsComp::paint (juce::Graphics& g)
@@ -98,8 +122,8 @@ void PresetsComp::paint (juce::Graphics& g)
 void PresetsComp::resized()
 {
     auto b = getLocalBounds();
-    presetsLeft.setBounds (b.removeFromLeft (arrowWidth));
-    presetsRight.setBounds (b.removeFromRight (arrowWidth));
+    prevPresetButton.setBounds (b.removeFromLeft (arrowWidth));
+    nextPresetButton.setBounds (b.removeFromRight (arrowWidth));
 
     juce::Rectangle<int> presetsBound (b.reduced (arrowPad, 0));
     presetBox.setBounds (presetsBound);
