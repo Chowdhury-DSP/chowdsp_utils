@@ -1,5 +1,5 @@
 #include "DummyPlugin.h"
-#include <JuceHeader.h>
+#include "test_utils.h"
 
 /** Unit tests for chowdsp::PluginBase. Tests functionality:
  *   - saving/loading parameter state
@@ -93,8 +93,9 @@ public:
         {
             AudioBuffer<float> buffer (2, blockSize);
             buffer.clear();
+            MidiBuffer midi;
 
-            dummy1.processAudioBlock (buffer);
+            dummy1.processBlock (buffer, midi);
             expectLessThan (buffer.getMagnitude (0, blockSize), 1.0e-3f, "Buffer should be empty!");
         }
 
@@ -107,6 +108,35 @@ public:
             dummy1.processBlock (buffer, midi);
             expectLessThan (buffer.getMagnitude (0, blockSize), 1.0e-6, "Buffer should be empty!");
         }
+    }
+
+    void programInterfaceTest()
+    {
+        using namespace test_utils;
+
+        DummyPlugin dummy { true };
+        ScopedFile presetPath ("preset_path");
+        presetPath.file.createDirectory();
+
+        auto& presetMgr = dummy.getPresetManager();
+        presetMgr.setUserPresetConfigFile ("preset_config.txt");
+        presetMgr.setUserPresetPath (presetPath.file);
+
+        ScopedFile presetFile1 ("preset_path/test1.preset");
+        presetMgr.saveUserPreset (presetFile1.file);
+
+        ScopedFile presetFile2 ("preset_path/test2.preset");
+        presetMgr.saveUserPreset (presetFile2.file);
+
+        expectEquals (dummy.getNumPrograms(), presetMgr.getNumPresets(), "Num presets incorrect!");
+
+        dummy.setCurrentProgram (0);
+        expectEquals (dummy.getCurrentProgram(), presetMgr.getCurrentPresetIndex(), "Current program index incorrect!");
+
+        expectEquals (dummy.getProgramName (0), presetMgr.getPresetName (0), "Program name incorrect!");
+
+        auto userPresetConfigFile = presetMgr.getUserPresetConfigFile();
+        userPresetConfigFile.deleteRecursively();
     }
 
     void runTest() override
@@ -125,6 +155,9 @@ public:
 
         beginTest ("Process Test");
         processTest();
+
+        beginTest ("Program Interface Test");
+        programInterfaceTest();
     }
 };
 

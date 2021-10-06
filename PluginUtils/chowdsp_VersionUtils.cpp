@@ -17,6 +17,7 @@ namespace VersionUtils
         juce::StringArray tokens;
         int numTokens = tokens.addTokens (trimmedStr, ".", "");
         jassert (numTokens == 3);
+        juce::ignoreUnused (numTokens);
 
         major = tokens[0].getIntValue();
         minor = tokens[1].getIntValue();

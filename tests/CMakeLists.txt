@@ -28,6 +28,7 @@ target_sources(chowdsp_utils_tests PRIVATE
     dsp_tests/wdf_tests/WDFPerf.cpp
 
     gui_tests/FoleysTest.cpp
+    gui_tests/PresetsCompTest.cpp
 
     utils_tests/ParamStringsTest.cpp
     utils_tests/PluginBaseTest.cpp
