@@ -16,11 +16,16 @@ public:
         constexpr float dummyValue = 0.75f;
 
         DummyPlugin plugin;
+        ScopedFile presetPath ("preset_path");
+        presetPath.file.createDirectory();
         auto param = plugin.getParameters()[0];
         setParameter (param, testValue);
 
         chowdsp::PresetManager presetMgr { plugin.getVTS() };
-        ScopedFile presetFile ("test.preset");
+        presetMgr.setUserPresetConfigFile ("preset_config.txt");
+        presetMgr.setUserPresetPath (presetPath.file);
+
+        ScopedFile presetFile ("preset_path/test.preset");
         presetMgr.saveUserPreset (presetFile.file);
 
         setParameter (param, dummyValue);
@@ -28,6 +33,9 @@ public:
 
         presetMgr.loadPresetFromIndex (0);
         expectEquals (param->getValue(), testValue, "Preset value is incorrect!");
+
+        auto userPresetConfigFile = presetMgr.getUserPresetConfigFile();
+        userPresetConfigFile.deleteRecursively();
     }
 
     void presetDirtyTest()
@@ -92,12 +100,17 @@ public:
     void processorInterfaceTest()
     {
         DummyPlugin plugin;
-        chowdsp::PresetManager presetMgr { plugin.getVTS() };
+        ScopedFile presetPath ("preset_path");
+        presetPath.file.createDirectory();
 
-        ScopedFile presetFile1 ("test1.preset");
+        chowdsp::PresetManager presetMgr { plugin.getVTS() };
+        presetMgr.setUserPresetConfigFile ("preset_config.txt");
+        presetMgr.setUserPresetPath (presetPath.file);
+
+        ScopedFile presetFile1 ("preset_path/test1.preset");
         presetMgr.saveUserPreset (presetFile1.file);
 
-        ScopedFile presetFile2 ("test2.preset");
+        ScopedFile presetFile2 ("preset_path/test2.preset");
         presetMgr.saveUserPreset (presetFile2.file);
 
         expectEquals (presetMgr.getNumPresets(), 2, "Num presets incorrect!");
@@ -114,6 +127,9 @@ public:
         }
 
         expect (presetNames.isEmpty(), "Some preset names are missing (" + String (presetNames.size()) + ")!");
+
+        auto userPresetConfigFile = presetMgr.getUserPresetConfigFile();
+        userPresetConfigFile.deleteRecursively();
     }
 
     void userPresetPathTest()
@@ -179,12 +195,16 @@ public:
         constexpr float testValue2 = 0.85f;
 
         DummyPlugin plugin;
+        ScopedFile presetPath ("preset_path");
+        presetPath.file.createDirectory();
         auto param = plugin.getParameters()[0];
 
         auto presetMgr = std::make_unique<chowdsp::PresetManager> (plugin.getVTS());
+        presetMgr->setUserPresetConfigFile ("preset_config.txt");
+        presetMgr->setUserPresetPath (presetPath.file);
 
         setParameter (param, testValue1);
-        ScopedFile presetFile ("test.preset");
+        ScopedFile presetFile ("preset_path/test.preset");
         presetMgr->saveUserPreset (presetFile.file);
 
         setParameter (param, testValue2);
@@ -197,6 +217,9 @@ public:
 
         expectEquals (presetMgr->getCurrentPreset()->getName(), String ("test"), "Preset name is incorrect!");
         expect (presetMgr->getIsDirty(), "Dirty state after loading is incorrect!");
+
+        auto userPresetConfigFile = presetMgr->getUserPresetConfigFile();
+        userPresetConfigFile.deleteRecursively();
     }
 
     void defaultPresetTest()
@@ -206,12 +229,16 @@ public:
         constexpr float testValue2 = 1.0f;
 
         DummyPlugin plugin;
+        ScopedFile presetPath ("preset_path");
+        presetPath.file.createDirectory();
         auto param = plugin.getParameters()[0];
 
         chowdsp::PresetManager presetMgr { plugin.getVTS() };
+        presetMgr.setUserPresetConfigFile ("preset_config.txt");
+        presetMgr.setUserPresetPath (presetPath.file);
 
         setParameter (param, testValue);
-        ScopedFile presetFile ("test.preset");
+        ScopedFile presetFile ("preset_path/test.preset");
         presetMgr.saveUserPreset (presetFile.file);
         presetMgr.setDefaultPreset (chowdsp::Preset { presetFile.file });
 
@@ -231,6 +258,9 @@ public:
         auto badXml = std::make_unique<XmlElement> ("BAD_TAG");
         presetMgr.loadXmlState (badXml.get());
         expectWithinAbsoluteError (param->getValue(), testValue2, 1.0e-3f, "Default preset when trying to load bad state not loaded correctly!");
+
+        auto userPresetConfigFile = presetMgr.getUserPresetConfigFile();
+        userPresetConfigFile.deleteRecursively();
     }
 
     void runTest() override

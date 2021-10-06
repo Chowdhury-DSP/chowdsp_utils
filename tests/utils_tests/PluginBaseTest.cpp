@@ -115,12 +115,17 @@ public:
         using namespace test_utils;
 
         DummyPlugin dummy { true };
-        auto& presetMgr = dummy.getPresetManager();
+        ScopedFile presetPath ("preset_path");
+        presetPath.file.createDirectory();
 
-        ScopedFile presetFile1 ("test1.preset");
+        auto& presetMgr = dummy.getPresetManager();
+        presetMgr.setUserPresetConfigFile ("preset_config.txt");
+        presetMgr.setUserPresetPath (presetPath.file);
+
+        ScopedFile presetFile1 ("preset_path/test1.preset");
         presetMgr.saveUserPreset (presetFile1.file);
 
-        ScopedFile presetFile2 ("test2.preset");
+        ScopedFile presetFile2 ("preset_path/test2.preset");
         presetMgr.saveUserPreset (presetFile2.file);
 
         expectEquals (dummy.getNumPrograms(), presetMgr.getNumPresets(), "Num presets incorrect!");
@@ -129,6 +134,9 @@ public:
         expectEquals (dummy.getCurrentProgram(), presetMgr.getCurrentPresetIndex(), "Current program index incorrect!");
 
         expectEquals (dummy.getProgramName (0), presetMgr.getPresetName (0), "Program name incorrect!");
+
+        auto userPresetConfigFile = presetMgr.getUserPresetConfigFile();
+        userPresetConfigFile.deleteRecursively();
     }
 
     void runTest() override

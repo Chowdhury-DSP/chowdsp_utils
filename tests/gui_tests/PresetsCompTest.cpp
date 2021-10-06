@@ -16,14 +16,20 @@ public:
         auto& presetMgr = plugin.getPresetManager();
         auto param = plugin.getParameters()[0];
 
-        ScopedFile presetFile1 ("Test1.preset");
+        ScopedFile presetPath ("preset_path");
+        presetPath.file.createDirectory();
+
+        ScopedFile presetFile1 ("preset_path/Test1.preset");
         presetMgr.saveUserPreset (presetFile1.file);
 
         setParameter (param, 0.1f);
-        ScopedFile presetFile2 ("Test2.preset");
+        ScopedFile presetFile2 ("preset_path/Test2.preset");
         presetMgr.saveUserPreset (presetFile2.file);
 
         chowdsp::PresetsComp presetsComp { presetMgr };
+        presetMgr.setUserPresetConfigFile ("preset_config.txt");
+        presetMgr.setUserPresetPath (presetPath.file);
+
         expectEquals (presetsComp.getPresetMenuText(), String ("Test2"), "Initial preset text is incorrect!");
 
         setParameter (param, 0.9f);
@@ -34,6 +40,9 @@ public:
 
         setParameter (param, 0.9f);
         expectEquals (presetsComp.getPresetMenuText(), String ("Test1*"), "Dirty preset text is incorrect!");
+
+        auto userPresetConfigFile = presetMgr.getUserPresetConfigFile();
+        userPresetConfigFile.deleteRecursively();
     }
 
     PopupMenu::Item* getMenuItem (const PopupMenu& menu, const String& itemText)
@@ -113,20 +122,29 @@ public:
         auto& presetMgr = plugin.getPresetManager();
         auto param = plugin.getParameters()[0];
 
-        ScopedFile presetFile1 ("Test1.preset");
+        ScopedFile presetPath ("preset_path");
+        presetPath.file.createDirectory();
+
+        ScopedFile presetFile1 ("preset_path/Test1.preset");
         presetMgr.saveUserPreset (presetFile1.file);
 
         setParameter (param, 0.1f);
-        ScopedFile presetFile2 ("Test2.preset");
+        ScopedFile presetFile2 ("preset_path/Test2.preset");
         presetMgr.saveUserPreset (presetFile2.file);
 
         chowdsp::PresetsComp presetsComp { presetMgr };
+        presetMgr.setUserPresetConfigFile ("preset_config.txt");
+        presetMgr.setUserPresetPath (presetPath.file);
+
         expectEquals (presetsComp.getPresetMenuText(), String ("Test2"), "Initial preset text is incorrect!");
 
         const auto* menu = presetsComp.getPresetMenuBox().getRootMenu();
         auto menuItem = getMenuItem (*menu, "Test1");
         menuItem->action();
         expectEquals (presetsComp.getPresetMenuText(), String ("Test1"), "Loaded preset text is incorrect!");
+
+        auto userPresetConfigFile = presetMgr.getUserPresetConfigFile();
+        userPresetConfigFile.deleteRecursively();
     }
 
     void runTest() override
@@ -149,17 +167,5 @@ public:
         loadPresetTest();
     }
 };
-
-// DummyPlugin plugin;
-
-// ScopedFile presetPath ("preset_path");
-// presetPath.file.createDirectory();
-
-// std::vector<File> presetFiles;
-// {
-//     chowdsp::PresetManager presetMgr { plugin.getVTS() };
-//     presetMgr.setUserPresetConfigFile ("preset_config.txt");
-//     presetMgr.setUserPresetPath (presetPath.file);
-// }
 
 static PresetsCompTest presetsCompTest;
