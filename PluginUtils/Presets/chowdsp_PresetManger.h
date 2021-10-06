@@ -78,7 +78,7 @@ public:
     static const juce::Identifier presetStateTag;
 
     /** Returns the map used to store the available presets */
-    const std::unordered_map<int, Preset>& getPresetMap() const { return presetMap; }
+    const auto& getPresetMap() const { return presetMap; }
 
     /** Listener class to hear alerts about preset manager changes */
     struct Listener
@@ -126,7 +126,7 @@ private:
         userUserIDStart = 1000000,
     };
 
-    std::unordered_map<int, Preset> presetMap;
+    std::map<int, Preset> presetMap;
     std::unordered_map<juce::String, int> userIDMap;
 
     juce::ListenerList<Listener> listeners;
