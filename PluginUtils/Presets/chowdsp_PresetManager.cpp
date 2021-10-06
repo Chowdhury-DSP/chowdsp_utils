@@ -110,17 +110,14 @@ void PresetManager::saveUserPreset (const juce::File& file)
     auto stateXml = savePresetState();
     const auto name = file.getFileNameWithoutExtension();
 
-    int presetID = userIDMap["User"];
-    while (presetMap.find (presetID) != presetMap.end())
-        presetID++;
+    keepAlivePreset = std::make_unique<Preset> (name, "User", *stateXml.get());
+    if (keepAlivePreset != nullptr)
+    {
+        keepAlivePreset->toFile (file);
+        loadPreset (*keepAlivePreset);
 
-    auto newPreset = Preset (name, "User", *stateXml.get());
-    auto [iterator, success] = presetMap.insert ({ presetID, std::move (newPreset) });
-
-    jassert (success);
-    auto& preset = iterator->second;
-    preset.toFile (file);
-    loadPreset (preset);
+        loadUserPresetsFromFolder (getUserPresetPath());
+    }
 }
 
 void PresetManager::setIsDirty (bool shouldBeDirty)
@@ -146,7 +143,12 @@ void PresetManager::loadPreset (const Preset& preset)
 
 std::unique_ptr<juce::XmlElement> PresetManager::savePresetState()
 {
-    return vts.state.createXml();
+    auto xml = vts.state.createXml();
+    xml->deleteAllChildElementsWithTagName (presetStateTag);
+
+    JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wpessimizing-move")
+    return std::move (xml);
+    JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 }
 
 void PresetManager::loadPresetState (const juce::XmlElement* xml)
@@ -267,9 +269,9 @@ void PresetManager::loadXmlState (juce::XmlElement* xml)
         return;
     }
 
-    statePreset = std::make_unique<Preset> (xml->getChildByName (Preset::presetTag));
-    if (statePreset != nullptr)
-        loadPreset (*statePreset);
+    keepAlivePreset = std::make_unique<Preset> (xml->getChildByName (Preset::presetTag));
+    if (keepAlivePreset != nullptr)
+        loadPreset (*keepAlivePreset);
 
     setIsDirty ((bool) xml->getIntAttribute (presetDirtyTag));
 }

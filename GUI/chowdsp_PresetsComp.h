@@ -42,11 +42,10 @@ protected:
 
     juce::ComboBox presetBox;
     juce::TextEditor presetNameEditor;
+    juce::DrawableButton prevPresetButton, nextPresetButton;
 
 private:
     void savePresetFile (const juce::String& fileName);
-
-    juce::DrawableButton prevPresetButton, nextPresetButton;
 
     std::shared_ptr<juce::FileChooser> fileChooser;
 

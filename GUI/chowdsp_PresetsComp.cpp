@@ -36,6 +36,8 @@ PresetsComp::PresetsComp (PresetManager& presetManager) : manager (presetManager
 
     addChildComponent (presetNameEditor);
     presetNameEditor.setColour (juce::TextEditor::backgroundColourId, juce::Colours::transparentWhite);
+    presetNameEditor.setColour (juce::TextEditor::outlineColourId, juce::Colours::transparentWhite);
+    presetNameEditor.setColour (juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentWhite);
     presetNameEditor.setColour (juce::TextEditor::textColourId, juce::Colours::white);
     presetNameEditor.setColour (juce::TextEditor::highlightColourId, juce::Colours::cyan);
     presetNameEditor.setColour (juce::CaretComponent::caretColourId, juce::Colours::cyan);
@@ -116,7 +118,6 @@ void PresetsComp::paint (juce::Graphics& g)
     presetNameEditor.setColour (juce::CaretComponent::caretColourId, highlightColour);
 
     g.setColour (findColour (backgroundColourID));
-
     g.fillRoundedRectangle (getLocalBounds().reduced (arrowWidth + arrowPad, 0).toFloat(), cornerSize);
 }
 

@@ -137,7 +137,7 @@ private:
 
     juce::String userPresetConfigPath;
 
-    std::unique_ptr<Preset> statePreset;
+    std::unique_ptr<Preset> keepAlivePreset;
     static const juce::Identifier presetDirtyTag;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetManager)
