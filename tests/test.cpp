@@ -92,8 +92,7 @@ int main (int argc, char** argv)
 
     ConsoleUnitTestRunner runner;
 
-    auto seed = [&args]
-    {
+    auto seed = [&args] {
         if (args.containsOption ("--seed"))
         {
             auto seedValueString = args.getValueForOption ("--seed");
