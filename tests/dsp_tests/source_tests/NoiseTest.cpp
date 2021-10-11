@@ -1,12 +1,13 @@
 #include <JuceHeader.h>
 #include <algorithm>
 
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wpessimizing-move")
+
 namespace
 {
 // processing constants
 constexpr size_t fftOrder = 20;
 constexpr size_t blockSize = 1 << fftOrder;
-constexpr size_t nCh = 1;
 constexpr double fs = 48000.0;
 
 // measuring constants
@@ -80,42 +81,64 @@ public:
 
     std::vector<std::vector<float>> getTestVector (const dsp::AudioBlock<float> data)
     {
-        auto* dataPtr = data.getChannelPointer (0);
-        return { { dataPtr, dataPtr + data.getNumSamples() } };
+        const auto numChannels = data.getNumChannels();
+        const auto numSamples = data.getNumSamples();
+
+        std::vector<std::vector<float>> vecs;
+        for (size_t ch = 0; ch < numChannels; ++ch)
+        {
+            auto* dataPtr = data.getChannelPointer (ch);
+            vecs.emplace_back (dataPtr, dataPtr + numSamples);
+        }
+
+        return std::move (vecs);
     }
 
     std::vector<std::vector<float>> getTestVector (const dsp::AudioBlock<vec4> data)
     {
+        const auto numChannels = data.getNumChannels();
         const auto numSamples = data.getNumSamples();
-        std::vector<std::vector<float>> vecs (4, std::vector<float> (numSamples, 0.0f));
+        std::vector<std::vector<float>> vecs (4 * numChannels, std::vector<float> (numSamples, 0.0f));
 
-        for (size_t n = 0; n < numSamples; ++n)
-            for (size_t ch = 0; ch < 4; ++ch)
-                vecs[ch][n] = data.getSample (0, (int) n).get (ch);
+        for (size_t ch = 0; ch < numChannels; ++ch)
+            for (size_t n = 0; n < numSamples; ++n)
+                for (size_t k = 0; k < 4; ++k)
+                    vecs[4 * ch + k][n] = data.getSample ((int) ch, (int) n).get (k);
 
-        JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wpessimizing-move")
         return std::move (vecs);
-        JUCE_END_IGNORE_WARNINGS_GCC_LIKE
     }
 
     template <typename FloatType>
-    void runNoiseTest (typename chowdsp::Noise<FloatType>::NoiseType type, float noiseSlope = 0.0f, float maxErr = 3.0f)
+    void runNoiseTest (typename chowdsp::Noise<FloatType>::NoiseType type, float noiseSlope = 0.0f, float maxErr = 3.0f, size_t nCh = 1, bool replacing = true)
     {
         chowdsp::Noise<FloatType> noise;
 
-        dsp::ProcessSpec spec { fs, blockSize, nCh };
+        dsp::ProcessSpec spec { fs, blockSize, (uint32) nCh };
         noise.prepare (spec);
 
         noise.setGainLinear (1.0f);
         noise.setNoiseType (type);
 
-        HeapBlock<char> blockData;
-        auto block = dsp::AudioBlock<FloatType> (blockData, (size_t) nCh, (size_t) blockSize);
-        block.clear();
-        dsp::ProcessContextReplacing<FloatType> ctx (block);
-        noise.process (ctx);
+        HeapBlock<char> inBlockData;
+        auto inBlock = dsp::AudioBlock<FloatType> (inBlockData, (size_t) nCh, (size_t) blockSize);
+        inBlock.clear();
 
-        auto testVectors = getTestVector (block);
+        HeapBlock<char> outBlockData;
+        auto outBlock = dsp::AudioBlock<FloatType> (outBlockData, (size_t) nCh, (size_t) blockSize);
+        outBlock.clear();
+
+        if (replacing)
+        {
+            dsp::ProcessContextReplacing<FloatType> ctx (outBlock);
+            noise.process (ctx);
+        }
+        else
+        {
+            dsp::ProcessContextNonReplacing<FloatType> ctx (inBlock, outBlock);
+            noise.process (ctx);
+        }
+
+        auto testVectors = getTestVector (outBlock);
         for (const auto& vec : testVectors)
             checkNoiseSlope (vec.data(), getNoiseNameForType<FloatType> (type), noiseSlope, maxErr);
     }
@@ -135,11 +158,13 @@ public:
         runNoiseTest<vec4> (chowdsp::Noise<vec4>::NoiseType::Normal);
 
         beginTest ("Pink Noise Test");
-        runNoiseTest<float> (chowdsp::Noise<float>::NoiseType::Pink, -3.0f, 3.5f);
+        runNoiseTest<float> (chowdsp::Noise<float>::NoiseType::Pink, -3.0f, 3.5f, 2, false);
 
         beginTest ("Pink Noise Test (SIMD)");
-        runNoiseTest<vec4> (chowdsp::Noise<vec4>::NoiseType::Pink, -3.0f, 3.5f);
+        runNoiseTest<vec4> (chowdsp::Noise<vec4>::NoiseType::Pink, -3.0f, 3.5f, 2, false);
     }
 };
+
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
 static NoiseTest noiseTest;
