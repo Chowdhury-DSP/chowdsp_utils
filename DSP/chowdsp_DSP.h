@@ -46,12 +46,12 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 #include "Resampling/chowdsp_ResamplingProcessor.h"
 #include "Resampling/chowdsp_SRCResampler.h"
 
-// sound sources
-#include "Sources/chowdsp_Noise.h"
-#include "Sources/chowdsp_SineWave.h"
-
 // some other useful processors
 #include "chowdsp_BypassProcessor.h"
 #include "chowdsp_GainProcessor.h"
 #include "chowdsp_LevelDetector.h"
 #include "chowdsp_Panner.h"
+
+// sound sources
+#include "Sources/chowdsp_Noise.h"
+#include "Sources/chowdsp_SineWave.h"

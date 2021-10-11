@@ -14,6 +14,8 @@ constexpr float startFreq = 100.0f;
 constexpr size_t avgNum = 101;
 constexpr size_t negDiff = avgNum / 2;
 constexpr size_t posDiff = negDiff + 1;
+
+using vec4 = dsp::SIMDRegister<float>;
 } // namespace
 
 /** Unit tests for chowdsp::Noise. Testing frequency domain accuracy for:
@@ -27,12 +29,12 @@ public:
     NoiseTest() : UnitTest ("Noise Test") {}
 
     /** Check the frequency slope of a noise buffer, slope measured in dB/Oct */
-    void checkNoiseSlope (const AudioBuffer<float>& buffer, String noiseType, float noiseSlope = 0.0f, float maxErr = 3.0f)
+    void checkNoiseSlope (const float* buffer, String noiseType, float noiseSlope = 0.0f, float maxErr = 3.0f)
     {
         dsp::FFT fft (fftOrder);
 
         std::vector<float> fftData (blockSize * 2, 0.0f);
-        FloatVectorOperations::copy (fftData.data(), buffer.getReadPointer (0), blockSize);
+        FloatVectorOperations::copy (fftData.data(), buffer, blockSize);
         fft.performFrequencyOnlyForwardTransform (fftData.data());
 
         std::vector<float> magnitudes (blockSize);
@@ -40,7 +42,8 @@ public:
         for (size_t i = 0; i < blockSize; ++i)
             magnitudes[i] = Decibels::gainToDecibels<float> (std::abs (fftData[i])) - dBNorm;
 
-        auto getMagForFreq = [=] (float freq) -> float {
+        auto getMagForFreq = [=] (float freq) -> float
+        {
             auto idx = size_t ((blockSize / 2) * freq / (fs / 2.0f));
             // average over many bins to smooth
             return std::accumulate (&magnitudes[idx - negDiff], &magnitudes[idx + posDiff], 0.0f) / (float) avgNum;
@@ -59,24 +62,46 @@ public:
         }
     }
 
-    String getNoiseNameForType (chowdsp::Noise<float>::NoiseType type)
+    template <typename FloatType>
+    String getNoiseNameForType (typename chowdsp::Noise<FloatType>::NoiseType type)
     {
-        if (type == chowdsp::Noise<float>::NoiseType::Uniform)
+        if (type == chowdsp::Noise<FloatType>::NoiseType::Uniform)
             return "Uniform White Noise";
 
-        if (type == chowdsp::Noise<float>::NoiseType::Normal)
+        if (type == chowdsp::Noise<FloatType>::NoiseType::Normal)
             return "Normal White Noise";
 
-        if (type == chowdsp::Noise<float>::NoiseType::Pink)
+        if (type == chowdsp::Noise<FloatType>::NoiseType::Pink)
             return "Pink Noise";
 
         jassertfalse;
         return String();
     }
 
-    void runNoiseTest (chowdsp::Noise<float>::NoiseType type, float noiseSlope = 0.0f, float maxErr = 3.0f)
+    std::vector<std::vector<float>> getTestVector (const dsp::AudioBlock<float> data)
     {
-        chowdsp::Noise<float> noise;
+        auto* dataPtr = data.getChannelPointer (0);
+        return { { dataPtr, dataPtr + data.getNumSamples() } };
+    }
+
+    std::vector<std::vector<float>> getTestVector (const dsp::AudioBlock<vec4> data)
+    {
+        const auto numSamples = data.getNumSamples();
+        std::vector<std::vector<float>> vecs (4, std::vector<float> (numSamples, 0.0f));
+
+        for (size_t n = 0; n < numSamples; ++n)
+            for (size_t ch = 0; ch < 4; ++ch)
+                vecs[ch][n] = data.getSample (0, (int) n).get (ch);
+
+        JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wpessimizing-move")
+        return std::move (vecs);
+        JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+    }
+
+    template <typename FloatType>
+    void runNoiseTest (typename chowdsp::Noise<FloatType>::NoiseType type, float noiseSlope = 0.0f, float maxErr = 3.0f)
+    {
+        chowdsp::Noise<FloatType> noise;
 
         dsp::ProcessSpec spec { fs, blockSize, nCh };
         noise.prepare (spec);
@@ -84,25 +109,36 @@ public:
         noise.setGainLinear (1.0f);
         noise.setNoiseType (type);
 
-        AudioBuffer<float> noiseBuff (nCh, blockSize);
-        dsp::AudioBlock<float> block (noiseBuff);
+        HeapBlock<char> blockData;
+        auto block = dsp::AudioBlock<FloatType> (blockData, (size_t) nCh, (size_t) blockSize);
         block.clear();
-        dsp::ProcessContextReplacing<float> ctx (block);
+        dsp::ProcessContextReplacing<FloatType> ctx (block);
         noise.process (ctx);
 
-        checkNoiseSlope (noiseBuff, getNoiseNameForType (type), noiseSlope, maxErr);
+        auto testVectors = getTestVector (block);
+        for (const auto& vec : testVectors)
+            checkNoiseSlope (vec.data(), getNoiseNameForType<FloatType> (type), noiseSlope, maxErr);
     }
 
     void runTest() override
     {
         beginTest ("Uniform White Noise Test");
-        runNoiseTest (chowdsp::Noise<float>::NoiseType::Uniform);
+        runNoiseTest<float> (chowdsp::Noise<float>::NoiseType::Uniform);
+
+        beginTest ("Uniform White Noise Test (SIMD)");
+        runNoiseTest<vec4> (chowdsp::Noise<vec4>::NoiseType::Uniform);
 
         beginTest ("Normal White Noise Test");
-        runNoiseTest (chowdsp::Noise<float>::NoiseType::Normal);
+        runNoiseTest<float> (chowdsp::Noise<float>::NoiseType::Normal);
+
+        beginTest ("Normal White Noise Test (SIMD)");
+        runNoiseTest<vec4> (chowdsp::Noise<vec4>::NoiseType::Normal);
 
         beginTest ("Pink Noise Test");
-        runNoiseTest (chowdsp::Noise<float>::NoiseType::Pink, -3.0f, 3.5f);
+        runNoiseTest<float> (chowdsp::Noise<float>::NoiseType::Pink, -3.0f, 3.5f);
+
+        beginTest ("Pink Noise Test (SIMD)");
+        runNoiseTest<vec4> (chowdsp::Noise<vec4>::NoiseType::Pink, -3.0f, 3.5f);
     }
 };
 
