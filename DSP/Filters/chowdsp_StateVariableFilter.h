@@ -36,6 +36,7 @@ class StateVariableFilter
 public:
     //==============================================================================
     using Type = StateVariableFilterType;
+    using NumericType = typename SampleTypeHelpers::ElementType<SampleType>::Type;
 
     //==============================================================================
     /** Constructor. */
@@ -46,7 +47,7 @@ public:
 
         @param newFrequencyHz the new cutoff frequency in Hz.
     */
-    void setCutoffFrequency (SampleType newFrequencyHz);
+    void setCutoffFrequency (NumericType newFrequencyHz);
 
     /** Sets the resonance of the filter.
 
@@ -54,14 +55,14 @@ public:
         parameter. To have a standard 12 dB / octave filter, the value must be set
         at 1 / sqrt(2).
     */
-    void setResonance (SampleType newResonance);
+    void setResonance (NumericType newResonance);
 
     //==============================================================================
     /** Returns the cutoff frequency of the filter. */
-    SampleType getCutoffFrequency() const noexcept { return cutoffFrequency; }
+    NumericType getCutoffFrequency() const noexcept { return cutoffFrequency; }
 
     /** Returns the resonance of the filter. */
-    SampleType getResonance() const noexcept { return resonance; }
+    NumericType getResonance() const noexcept { return resonance; }
 
     //==============================================================================
     /** Initialises the filter. */
@@ -95,7 +96,7 @@ public:
 
         if (context.isBypassed)
         {
-            outputBlock.copyFrom (inputBlock);
+            copyBlocks (outputBlock, inputBlock);
             return;
         }
 
@@ -121,12 +122,13 @@ public:
         auto& ls1 = s1[(size_t) channel];
         auto& ls2 = s2[(size_t) channel];
 
-        auto yT = gh * (inputValue - ls1 * gpR2 - ls2);
+        auto yT = (inputValue - ls1 * gpR2 - ls2) * gh;
         ls1 += yT + yT;
 
-        auto gA = g * (ls1 - yT);
+        auto gA = (ls1 - yT) * g;
         ls2 += gA + gA;
 
+        using namespace SIMDUtils;
         switch (type)
         {
             case Type::Lowpass:
@@ -145,12 +147,12 @@ private:
     void update();
 
     //==============================================================================
-    SampleType g, h, R2, gh, gpR2, g2;
+    NumericType g, h, R2, gh, gpR2, g2;
     std::vector<SampleType> s1 { 2 }, s2 { 2 };
 
     double sampleRate = 44100.0;
-    SampleType cutoffFrequency = static_cast<SampleType> (1000.0),
-               resonance = static_cast<SampleType> (1.0 / std::sqrt (2.0));
+    NumericType cutoffFrequency = static_cast<NumericType> (1000.0),
+               resonance = static_cast<NumericType> (1.0 / std::sqrt (2.0));
 };
 
 } //namespace chowdsp

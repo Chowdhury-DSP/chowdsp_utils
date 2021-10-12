@@ -8,18 +8,18 @@ StateVariableFilter<SampleType>::StateVariableFilter()
 }
 
 template <typename SampleType>
-void StateVariableFilter<SampleType>::setCutoffFrequency (SampleType newCutoffFrequencyHz)
+void StateVariableFilter<SampleType>::setCutoffFrequency (NumericType newCutoffFrequencyHz)
 {
-    jassert (juce::isPositiveAndBelow (newCutoffFrequencyHz, static_cast<SampleType> (sampleRate * 0.5)));
+    jassert (juce::isPositiveAndBelow (newCutoffFrequencyHz, static_cast<NumericType> (sampleRate * 0.5)));
 
     cutoffFrequency = newCutoffFrequencyHz;
     update();
 }
 
 template <typename SampleType>
-void StateVariableFilter<SampleType>::setResonance (SampleType newResonance)
+void StateVariableFilter<SampleType>::setResonance (NumericType newResonance)
 {
-    jassert (newResonance > static_cast<SampleType> (0));
+    jassert (newResonance > static_cast<NumericType> (0));
 
     resonance = newResonance;
     update();
@@ -66,17 +66,19 @@ void StateVariableFilter<SampleType>::snapToZero() noexcept
 template <typename SampleType>
 void StateVariableFilter<SampleType>::update()
 {
-    g = static_cast<SampleType> (std::tan (juce::MathConstants<double>::pi * cutoffFrequency / sampleRate));
-    R2 = static_cast<SampleType> (1.0 / resonance);
-    h = static_cast<SampleType> (1.0 / (1.0 + R2 * g + g * g));
+    g = static_cast<NumericType> (std::tan (juce::MathConstants<NumericType>::pi * cutoffFrequency / sampleRate));
+    R2 = static_cast<NumericType> ((NumericType) 1.0 / resonance);
+    h = static_cast<NumericType> ((NumericType) 1.0 / ((NumericType) 1.0 + R2 * g + g * g));
 
     gh = g * h;
-    g2 = static_cast<SampleType> (2) * g;
+    g2 = static_cast<NumericType> (2) * g;
     gpR2 = g + R2;
 }
 
 //==============================================================================
 template class StateVariableFilter<float>;
 template class StateVariableFilter<double>;
+template class StateVariableFilter<juce::dsp::SIMDRegister<float>>;
+template class StateVariableFilter<juce::dsp::SIMDRegister<double>>;
 
 } // namespace chowdsp
