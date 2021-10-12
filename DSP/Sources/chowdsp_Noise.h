@@ -17,8 +17,10 @@ namespace NoiseHelpers
  *  distribution, or pink noise (-3dB / Oct).
 */
 template <typename T>
-class Noise : public juce::dsp::Gain<T>
+class Noise : public juce::dsp::Gain<typename SampleTypeHelpers::ElementType<T>::Type>
 {
+    using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+
 public:
     enum NoiseType
     {
@@ -51,6 +53,59 @@ public:
 private:
     T processSample (T) { return (T) 0; } // hide from dsp::Gain
 
+    template <typename C = T>
+    inline typename std::enable_if<std::is_floating_point<C>::value, void>::type
+        applyGain (juce::dsp::AudioBlock<T>& block)
+    {
+        juce::dsp::ProcessContextReplacing<T> context (block);
+        juce::dsp::Gain<NumericType>::process (context);
+    }
+
+    template <typename C = T>
+    inline typename std::enable_if<! std::is_floating_point<C>::value, void>::type
+        applyGain (juce::dsp::AudioBlock<T>& block)
+    {
+        if (block.getNumChannels() == 1)
+        {
+            auto* data = block.getChannelPointer (0);
+            for (size_t i = 0; i < block.getNumSamples(); ++i)
+                data[i] *= juce::dsp::Gain<NumericType>::processSample ((NumericType) 1);
+        }
+        else
+        {
+            auto* gainData = gainBlock.getChannelPointer (0);
+            for (size_t i = 0; i < block.getNumSamples(); ++i)
+                gainData[i] = (T) juce::dsp::Gain<NumericType>::processSample ((NumericType) 1);
+
+            for (size_t ch = 0; ch < block.getNumChannels(); ++ch)
+            {
+                auto* data = block.getChannelPointer (ch);
+                for (size_t i = 0; i < block.getNumSamples(); ++i)
+                    data[i] *= gainData[i];
+            }
+        }
+    }
+
+    template <typename C = T>
+    inline typename std::enable_if<std::is_floating_point<C>::value, void>::type
+        copyBlocks (juce::dsp::AudioBlock<T>& dest, const juce::dsp::AudioBlock<const T>& src)
+    {
+        dest.copyFrom (src);
+    }
+
+    template <typename C = T>
+    inline typename std::enable_if<! std::is_floating_point<C>::value, void>::type
+        copyBlocks (juce::dsp::AudioBlock<T>& dest, const juce::dsp::AudioBlock<const T>& src)
+    {
+        for (size_t ch = 0; ch < dest.getNumChannels(); ++ch)
+        {
+            auto* srcPtr = src.getChannelPointer (ch);
+            auto* destPtr = dest.getChannelPointer (ch);
+            for (size_t i = 0; i < dest.getNumSamples(); ++i)
+                destPtr[i] = srcPtr[i];
+        }
+    }
+
     NoiseType type;
     juce::Random rand;
     juce::dsp::Gain<T> gain;
@@ -78,8 +133,10 @@ private:
         }
 
         /** Generates pink noise (-3dB / octave) */
-        T operator() (size_t ch, juce::Random& r)
+        inline T operator() (size_t ch, juce::Random& r) noexcept
         {
+            using namespace SIMDUtils;
+
             int lastFrame = frame[ch];
             frame[ch]++;
             if (frame[ch] >= (1 << QUALITY))
@@ -101,8 +158,11 @@ private:
 
     PinkNoiseGenerator<> pink;
 
-    juce::AudioBuffer<T> randBuffer;
+    juce::HeapBlock<char> randBlockData;
     juce::dsp::AudioBlock<T> randBlock;
+
+    juce::HeapBlock<char> gainBlockData;
+    juce::dsp::AudioBlock<T> gainBlock;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Noise)
 };

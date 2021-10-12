@@ -41,6 +41,25 @@ class ConsoleLogger : public Logger
 //==============================================================================
 class ConsoleUnitTestRunner : public UnitTestRunner
 {
+public:
+    void runTestWithName (const String& name, int64 randomSeed)
+    {
+        Array<UnitTest*> unitTests;
+        for (auto* test : UnitTest::getAllTests())
+        {
+            if (test->getName() == name)
+                unitTests.add (test);
+        }
+
+        if (unitTests.isEmpty())
+        {
+            logMessage ("Test with name " + name + " not found!");
+            return;
+        }
+
+        runTests (unitTests, randomSeed);
+    }
+
     void logMessage (const String& message) override
     {
         Logger::writeToLog (message);
@@ -54,7 +73,7 @@ int main (int argc, char** argv)
 
     if (args.containsOption ("--help|-h"))
     {
-        std::cout << argv[0] << " [--help|-h] [--list-categories] [--category category] [--seed seed]" << std::endl;
+        std::cout << argv[0] << " [--help|-h] [--list-categories] [--single-test test] [--category category] [--seed seed]" << std::endl;
         return 0;
     }
 
@@ -87,7 +106,9 @@ int main (int argc, char** argv)
         return Random::getSystemRandom().nextInt64();
     }();
 
-    if (args.containsOption ("--category"))
+    if (args.containsOption ("--single-test"))
+        runner.runTestWithName (args.getValueForOption ("--single-test"), seed);
+    else if (args.containsOption ("--category"))
         runner.runTestsInCategory (args.getValueForOption ("--category"), seed);
     else
         runner.runAllTests (seed);

@@ -107,10 +107,10 @@ public:
             magicBuilder.getMagicState().createAssetFilesMenu();
         };
 
-        std::vector<foleys::SettableProperty> props;
-
-        props.push_back ({ configNode, pNextButton, foleys::SettableProperty::Choice, {}, createAssetFilesMenuLambda });
-        props.push_back ({ configNode, pPrevButton, foleys::SettableProperty::Choice, {}, createAssetFilesMenuLambda });
+        std::vector<foleys::SettableProperty> props {
+            { configNode, pNextButton, foleys::SettableProperty::Choice, {}, createAssetFilesMenuLambda },
+            { configNode, pPrevButton, foleys::SettableProperty::Choice, {}, createAssetFilesMenuLambda },
+        };
 
         return props;
     }

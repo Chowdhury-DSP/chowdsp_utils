@@ -3,11 +3,13 @@ namespace chowdsp
 template <typename T>
 void Noise<T>::prepare (const juce::dsp::ProcessSpec& spec) noexcept
 {
-    juce::dsp::Gain<T>::prepare (spec);
+    juce::dsp::Gain<NumericType>::prepare (spec);
 
-    randBuffer.setSize ((int) spec.numChannels, (int) spec.maximumBlockSize);
-    randBlock = juce::dsp::AudioBlock<T> (randBuffer);
+    randBlock = juce::dsp::AudioBlock<T> (randBlockData, spec.numChannels, spec.maximumBlockSize);
     randBlock.clear();
+
+    gainBlock = juce::dsp::AudioBlock<T> (gainBlockData, spec.numChannels, spec.maximumBlockSize);
+    gainBlock.clear();
 
     pink.reset (spec.numChannels);
 }
@@ -20,6 +22,8 @@ void Noise<T>::reset() noexcept
 
 namespace NoiseHelpers
 {
+    using namespace SIMDUtils;
+
     /** Returns a uniform random number in [0, 1) */
     template <typename T>
     T uniform01 (juce::Random&) noexcept;
@@ -38,11 +42,33 @@ namespace NoiseHelpers
         return r.nextFloat();
     }
 
+    /** Returns a uniform random number in [0, 1) */
+    template <>
+    inline vec2 uniform01 (juce::Random& r) noexcept
+    {
+        double sample alignas (16)[vec2::size()];
+        for (size_t i = 0; i < vec2::size(); ++i)
+            sample[i] = r.nextDouble();
+
+        return vec2::fromRawArray (sample);
+    }
+
+    /** Returns a uniform random number in [0, 1) */
+    template <>
+    inline vec4 uniform01 (juce::Random& r) noexcept
+    {
+        float sample alignas (16)[vec4::size()];
+        for (size_t i = 0; i < vec4::size(); ++i)
+            sample[i] = r.nextFloat();
+
+        return vec4::fromRawArray (sample);
+    }
+
     /** Generates white noise with a uniform distribution */
     template <typename T>
     struct uniformCentered
     {
-        T operator() (size_t /*ch*/, juce::Random& r)
+        inline T operator() (size_t /*ch*/, juce::Random& r) const noexcept
         {
             return (T) 2 * uniform01<T> (r) - (T) 1;
         }
@@ -52,12 +78,27 @@ namespace NoiseHelpers
     template <typename T>
     struct normal
     {
-        T operator() (size_t /*ch*/, juce::Random& r)
+        using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+
+        template <typename C = T>
+        inline typename std::enable_if<std::is_floating_point<C>::value, C>::type
+            operator() (size_t /*ch*/, juce::Random& r) const noexcept
         {
             // Box-Muller transform
             T radius = std::sqrt ((T) -2 * std::log ((T) 1 - uniform01<T> (r)));
-            T theta = juce::MathConstants<T>::twoPi * uniform01<T> (r);
-            T value = radius * std::sin (theta) / juce::MathConstants<T>::sqrt2;
+            T theta = juce::MathConstants<NumericType>::twoPi * uniform01<T> (r);
+            T value = radius * std::sin (theta) / juce::MathConstants<NumericType>::sqrt2;
+            return value;
+        }
+
+        template <typename C = T>
+        inline typename std::enable_if<! std::is_floating_point<C>::value, C>::type
+            operator() (size_t /*ch*/, juce::Random& r) const noexcept
+        {
+            // Box-Muller transform
+            T radius = sqrtSIMD ((T) -2 * logSIMD ((T) 1 - uniform01<T> (r)));
+            T theta = uniform01<T> (r) * juce::MathConstants<NumericType>::twoPi;
+            T value = radius * sinSIMD (theta) / juce::MathConstants<NumericType>::sqrt2;
             return value;
         }
     };
@@ -106,11 +147,11 @@ void Noise<T>::process (const ProcessContext& context) noexcept
         NoiseHelpers::processRandom<T> (randContext, rand, pink);
 
     // apply gain to random block
-    juce::dsp::Gain<T>::process (randContext);
+    applyGain (randSubBlock);
 
     // copy input to output if needed
     if (context.usesSeparateInputAndOutputBlocks())
-        outBlock.copyFrom (inBlock);
+        copyBlocks (outBlock, inBlock);
 
     // add random to output
     outBlock += randBlock;

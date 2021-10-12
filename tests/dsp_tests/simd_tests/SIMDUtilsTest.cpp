@@ -151,7 +151,7 @@ public:
 
         for (int i = 0; i < nIter; ++i)
         {
-            dsp::SIMDRegister<FloatType> vec;
+            dsp::SIMDRegister<FloatType> vec {};
             int numNans = 0;
             for (size_t j = 0; j < vec.size(); ++j)
             {
