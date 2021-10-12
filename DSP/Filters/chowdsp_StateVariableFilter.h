@@ -152,7 +152,7 @@ private:
 
     double sampleRate = 44100.0;
     NumericType cutoffFrequency = static_cast<NumericType> (1000.0),
-               resonance = static_cast<NumericType> (1.0 / std::sqrt (2.0));
+                resonance = static_cast<NumericType> (1.0 / std::sqrt (2.0));
 };
 
 } //namespace chowdsp
