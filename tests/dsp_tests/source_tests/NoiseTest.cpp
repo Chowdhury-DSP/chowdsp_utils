@@ -7,7 +7,8 @@ namespace
 {
 // processing constants
 constexpr size_t fftOrder = 20;
-constexpr size_t blockSize = 1 << fftOrder;
+constexpr size_t nSamples = 1 << fftOrder;
+constexpr size_t blockSize = 256;
 constexpr double fs = 48000.0;
 
 // measuring constants
@@ -34,17 +35,17 @@ public:
     {
         dsp::FFT fft (fftOrder);
 
-        std::vector<float> fftData (blockSize * 2, 0.0f);
-        FloatVectorOperations::copy (fftData.data(), buffer, blockSize);
+        std::vector<float> fftData (nSamples * 2, 0.0f);
+        FloatVectorOperations::copy (fftData.data(), buffer, nSamples);
         fft.performFrequencyOnlyForwardTransform (fftData.data());
 
-        std::vector<float> magnitudes (blockSize);
+        std::vector<float> magnitudes (nSamples);
         auto dBNorm = 3.0f * fftOrder - 6.0f;
-        for (size_t i = 0; i < blockSize; ++i)
+        for (size_t i = 0; i < nSamples; ++i)
             magnitudes[i] = Decibels::gainToDecibels<float> (std::abs (fftData[i])) - dBNorm;
 
         auto getMagForFreq = [=] (float freq) -> float {
-            auto idx = size_t ((blockSize / 2) * freq / (fs / 2.0f));
+            auto idx = size_t ((nSamples / 2) * freq / (fs / 2.0f));
             // average over many bins to smooth
             return std::accumulate (&magnitudes[idx - negDiff], &magnitudes[idx + posDiff], 0.0f) / (float) avgNum;
         };
@@ -119,22 +120,31 @@ public:
         noise.setNoiseType (type);
 
         HeapBlock<char> inBlockData;
-        auto inBlock = dsp::AudioBlock<FloatType> (inBlockData, (size_t) nCh, (size_t) blockSize);
+        auto inBlock = dsp::AudioBlock<FloatType> (inBlockData, (size_t) nCh, (size_t) nSamples);
         inBlock.clear();
 
         HeapBlock<char> outBlockData;
-        auto outBlock = dsp::AudioBlock<FloatType> (outBlockData, (size_t) nCh, (size_t) blockSize);
+        auto outBlock = dsp::AudioBlock<FloatType> (outBlockData, (size_t) nCh, (size_t) nSamples);
         outBlock.clear();
 
         if (replacing)
         {
-            dsp::ProcessContextReplacing<FloatType> ctx (outBlock);
-            noise.process (ctx);
+            for (int n = 0; n < nSamples; n += blockSize)
+            {
+                auto block = outBlock.getSubBlock ((size_t) n, (size_t) blockSize);
+                dsp::ProcessContextReplacing<FloatType> ctx (block);
+                noise.process (ctx);
+            }
         }
         else
         {
-            dsp::ProcessContextNonReplacing<FloatType> ctx (inBlock, outBlock);
-            noise.process (ctx);
+            for (int n = 0; n < nSamples; n += blockSize)
+            {
+                auto inSubBlock = inBlock.getSubBlock ((size_t) n, (size_t) blockSize);
+                auto outSubBlock = outBlock.getSubBlock ((size_t) n, (size_t) blockSize);
+                dsp::ProcessContextNonReplacing<FloatType> ctx (inSubBlock, outSubBlock);
+                noise.process (ctx);
+            }
         }
 
         auto testVectors = getTestVector (outBlock);
