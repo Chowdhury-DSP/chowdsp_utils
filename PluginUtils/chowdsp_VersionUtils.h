@@ -10,6 +10,9 @@ namespace VersionUtils
     public:
         Version (const juce::String& versionStr = "0.0.0");
 
+        Version (const Version&) = default;
+        Version& operator= (const Version&) = default;
+
         juce::String getVersionString() const;
 
         friend bool operator== (const Version& v1, const Version& v2);
@@ -24,7 +27,7 @@ namespace VersionUtils
         int minor = 0;
         int patch = 0;
 
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Version)
+        JUCE_LEAK_DETECTOR (Version)
     };
 
 } // namespace VersionUtils
