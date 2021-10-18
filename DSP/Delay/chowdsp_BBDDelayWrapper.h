@@ -26,7 +26,7 @@ namespace BBD
         }
 
         /** Sets the delay length in samples */
-        void setDelay (float newDelayInSamples) override
+        void setDelay (float newDelayInSamples) final
         {
             delaySamp = newDelayInSamples;
             auto delaySec = delaySamp / sampleRate;
@@ -35,10 +35,10 @@ namespace BBD
         }
 
         /** Returns the delay length in samples */
-        float getDelay() const override { return delaySamp; }
+        float getDelay() const final { return delaySamp; }
 
         /** Prepares the delay line for processing */
-        void prepare (const juce::dsp::ProcessSpec& spec) override
+        void prepare (const juce::dsp::ProcessSpec& spec) final
         {
             sampleRate = (float) spec.sampleRate;
             inputs.resize (spec.numChannels, 0.0f);
@@ -53,33 +53,33 @@ namespace BBD
         }
 
         /** Resets the state of the delay line */
-        void reset() override
+        void reset() final
         {
             for (auto& line : lines)
                 line.reset();
         }
 
         /** Pushes a sample into the delay line */
-        inline void pushSample (int channel, float sample) noexcept override
+        inline void pushSample (int channel, float sample) noexcept final
         {
             inputs[(size_t) channel] = sample;
         }
 
         /** Returns a sample from the delay line */
-        inline float popSample (int channel) noexcept override
+        inline float popSample (int channel) noexcept final
         {
             return lines[(size_t) channel].process (inputs[(size_t) channel]);
         }
 
     private:
         /** Returns a sample from the delay line. Note that the read pointer is always updated. */
-        inline float popSample (int /*channel*/, float /*delayInSamples*/, bool /*updateReadPointer*/) noexcept override
+        inline float popSample (int /*channel*/, float /*delayInSamples*/, bool /*updateReadPointer*/) noexcept final
         {
             return 0.0f;
         }
 
         /** Increment the read pointer without reading an interpolated sample (be careful...) */
-        inline void incrementReadPointer (int /*channel*/) noexcept override
+        inline void incrementReadPointer (int /*channel*/) noexcept final
         {
         }
 
