@@ -103,17 +103,17 @@ public:
 
     //==============================================================================
     /** Sets the delay in samples. */
-    void setDelay (NumericType newDelayInSamples) override;
+    void setDelay (NumericType newDelayInSamples) final;
 
     /** Returns the current delay in samples. */
-    NumericType getDelay() const override;
+    NumericType getDelay() const final;
 
     //==============================================================================
     /** Initialises the processor. */
-    void prepare (const juce::dsp::ProcessSpec& spec) override;
+    void prepare (const juce::dsp::ProcessSpec& spec) final;
 
     /** Resets the internal state variables of the processor. */
-    void reset() override;
+    void reset() final;
 
     //==============================================================================
     /** Pushes a single sample into one channel of the delay line.
@@ -124,7 +124,7 @@ public:
 
         @see setDelay, popSample, process
     */
-    inline void pushSample (int channel, SampleType sample) noexcept override
+    inline void pushSample (int channel, SampleType sample) noexcept final
     {
         const auto writePtr = this->writePos[(size_t) channel];
         bufferPtrs[(size_t) channel][writePtr] = sample;
@@ -141,7 +141,7 @@ public:
 
         @see setDelay, pushSample, process
     */
-    inline SampleType popSample (int channel) noexcept override
+    inline SampleType popSample (int channel) noexcept final
     {
         auto result = interpolateSample (channel);
         incrementReadPointer (channel);
@@ -166,7 +166,7 @@ public:
 
         @see setDelay, pushSample, process
     */
-    inline SampleType popSample (int channel, NumericType delayInSamples, bool updateReadPointer) noexcept override
+    inline SampleType popSample (int channel, NumericType delayInSamples, bool updateReadPointer) noexcept final
     {
         setDelay (delayInSamples);
 
@@ -179,7 +179,7 @@ public:
     }
 
     /** Increment the read pointer without reading an interpolated sample (be careful...) */
-    inline void incrementReadPointer (int channel) noexcept override
+    inline void incrementReadPointer (int channel) noexcept final
     {
         auto newReadPtr = this->readPos[(size_t) channel] + totalSize - 1;
         newReadPtr = newReadPtr > totalSize ? newReadPtr - totalSize : newReadPtr;
