@@ -129,7 +129,7 @@ public:
         const auto writePtr = this->writePos[(size_t) channel];
         bufferPtrs[(size_t) channel][writePtr] = sample;
         bufferPtrs[(size_t) channel][writePtr + totalSize] = sample;
-        this->writePos[(size_t) channel] = (this->writePos[(size_t) channel] + totalSize - 1) % totalSize;
+        incrementWritePointer (channel);
     }
 
     /** Pops a single sample from one channel of the delay line.
@@ -181,7 +181,9 @@ public:
     /** Increment the read pointer without reading an interpolated sample (be careful...) */
     inline void incrementReadPointer (int channel) noexcept override
     {
-        this->readPos[(size_t) channel] = (this->readPos[(size_t) channel] + totalSize - 1) % totalSize;
+        auto newReadPtr = this->readPos[(size_t) channel] + totalSize - 1;
+        newReadPtr = newReadPtr > totalSize ? newReadPtr - totalSize : newReadPtr;
+        this->readPos[(size_t) channel] = newReadPtr;
     }
 
     //==============================================================================
@@ -231,6 +233,14 @@ private:
                                   index,
                                   delayFrac,
                                   this->v[(size_t) channel]);
+    }
+
+    /** Increment the write pointer (be careful...) */
+    inline void incrementWritePointer (int channel) noexcept
+    {
+        auto newWritePtr = this->writePos[(size_t) channel] + totalSize - 1;
+        newWritePtr = newWritePtr > totalSize ? newWritePtr - totalSize : newWritePtr;
+        this->writePos[(size_t) channel] = newWritePtr;
     }
 
     //==============================================================================
