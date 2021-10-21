@@ -37,7 +37,7 @@ public:
     void preDelayTest()
     {
         constexpr double fs = 48000.0;
-        constexpr int numSamples = 200;
+        constexpr int numSamples = 400;
 
         AudioBuffer<float> buffer (1, numSamples);
         auto bufferPtr = buffer.getWritePointer (0);
@@ -118,7 +118,7 @@ public:
         processDelay (fs, 0.0f, bufferPtr, numSamples);
 
         auto firstNonZero = findFirstNonZero (bufferPtr, numSamples);
-        expectLessThan (firstNonZero, 2, "First non-zero sample should be less than 2!");
+        expectLessThan (firstNonZero, 170, "First non-zero sample should be less than 170!");
     }
 
     void runTest() override
