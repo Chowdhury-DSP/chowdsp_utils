@@ -2,7 +2,6 @@
 
 namespace chowdsp
 {
-
 /** 
  * A global allocator to use for look and feels.
  * This class is best used as a Singleton, or SharedResourcePointer.
