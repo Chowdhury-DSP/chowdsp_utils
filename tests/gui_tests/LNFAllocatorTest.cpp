@@ -19,7 +19,7 @@ public:
     void addLookAndFeelTest()
     {
         chowdsp::LNFAllocator allocator;
-        auto* lnf = allocator.addLookAndFeel (new chowdsp::ChowLNF);
+        auto* lnf = allocator.addLookAndFeel<chowdsp::ChowLNF>();
         auto* lnf2 = allocator.getLookAndFeel<chowdsp::ChowLNF>();
 
         expect (lnf == lnf2, "Look and feel pointers should be the same!");
