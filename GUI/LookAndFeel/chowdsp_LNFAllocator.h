@@ -30,15 +30,13 @@ public:
         if (containsLookAndFeelType<LookAndFeelSubclass>())
             return lnfs[getLNFType<LookAndFeelSubclass>()].get();
 
-        return addLookAndFeel (new LookAndFeelSubclass);
+        return addLookAndFeel<LookAndFeelSubclass>();
     }
 
     /** Adds a new look and feel to the allocator */
     template <typename LookAndFeelSubclass>
-    juce::LookAndFeel* addLookAndFeel (LookAndFeelSubclass* laf)
+    juce::LookAndFeel* addLookAndFeel()
     {
-        jassert (laf != nullptr);
-
         auto lnfType = getLNFType<LookAndFeelSubclass>();
         lnfs[lnfType] = std::make_unique<LookAndFeelSubclass>();
 
