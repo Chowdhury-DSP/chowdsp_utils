@@ -19,7 +19,7 @@ InfoComp::InfoComp (const juce::AudioProcessor::WrapperType pluginWrapperType) :
 
 void InfoComp::paint (juce::Graphics& g)
 {
-    auto width = (float) getWidth();
+    auto width = (float) getWidth() - 10.0f;
 
     using namespace SystemInfo;
     auto platformStr = juce::String (getOSDescription().data()) + "-" + juce::String (getProcArch().data()) + ", ";
