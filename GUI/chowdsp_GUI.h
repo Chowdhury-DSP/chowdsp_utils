@@ -5,8 +5,11 @@
 #endif
 
 #include "chowdsp_BinaryData.h"
+
+#include "LookAndFeel/chowdsp_ChowLNF.h"
+#include "LookAndFeel/chowdsp_LNFAllocator.h"
+
 #include "chowdsp_SystemInfo.h"
-#include "chowdsp_ChowLNF.h"
 #include "chowdsp_InfoComp.h"
 #include "chowdsp_TitleComp.h"
 #include "chowdsp_TooltipComp.h"
