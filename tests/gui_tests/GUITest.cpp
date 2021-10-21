@@ -35,8 +35,7 @@ class GUIComponent : public Component
 public:
     GUIComponent() : tabs (TabbedButtonBar::TabsAtTop)
     {
-        lnf = std::make_unique<chowdsp::ChowLNF>();
-        LookAndFeel::setDefaultLookAndFeel (lnf.get());
+        LookAndFeel::setDefaultLookAndFeel (lnfAllocator->getLookAndFeel<chowdsp::ChowLNF>());
 
         slider.setSliderStyle (Slider::RotaryHorizontalVerticalDrag);
         slider.setTextBoxStyle (Slider::TextBoxBelow, true, 80, 15);
@@ -95,7 +94,7 @@ public:
     TabbedComponent tabs;
 
 private:
-    std::unique_ptr<chowdsp::ChowLNF> lnf;
+    SharedResourcePointer<chowdsp::LNFAllocator> lnfAllocator;
 
     Slider slider;
     Slider linSlider;
