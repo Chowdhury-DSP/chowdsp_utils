@@ -59,6 +59,9 @@ namespace BBD
      */
         void setDelayTime (float delaySec) noexcept
         {
+            // if Ts_bbd == 0, then we get an infinite loop, so limit the min. delay to 1 sample
+            delaySec = juce::jmax (Ts, delaySec);
+
             const auto clock_rate_hz = (2.0f * (float) STAGES) / delaySec;
             Ts_bbd = 1.0f / clock_rate_hz;
 

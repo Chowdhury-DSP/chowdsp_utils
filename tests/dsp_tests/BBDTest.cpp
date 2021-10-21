@@ -19,6 +19,21 @@ public:
         }
     }
 
+    int findFirstNonZero (const float* bufferPtr, const int numSamples)
+    {
+        int firstNonZero = -1;
+        for (int i = 0; i < numSamples; ++i)
+        {
+            if (std::abs (bufferPtr[i]) > 1.0e-6f)
+            {
+                firstNonZero = i;
+                break;
+            }
+        }
+
+        return firstNonZero;
+    }
+
     void preDelayTest()
     {
         constexpr double fs = 48000.0;
@@ -30,16 +45,7 @@ public:
 
         processDelay (fs, (float) numSamples / 2.0f, bufferPtr, numSamples);
 
-        int firstNonZero = -1;
-        for (int i = 0; i < numSamples; ++i)
-        {
-            if (std::abs (bufferPtr[i]) > 1.0e-6f)
-            {
-                firstNonZero = i;
-                break;
-            }
-        }
-
+        auto firstNonZero = findFirstNonZero (bufferPtr, numSamples);
         expectEquals (firstNonZero, numSamples / 2, "First non-zero sample is incorrect!");
     }
 
@@ -100,6 +106,21 @@ public:
         expectLessThan (highErr, 0.5f, "High band too much error!");
     }
 
+    void zeroDelayTest()
+    {
+        constexpr double fs = 48000.0;
+        constexpr int numSamples = 200;
+
+        AudioBuffer<float> buffer (1, numSamples);
+        auto bufferPtr = buffer.getWritePointer (0);
+        FloatVectorOperations::fill (bufferPtr, 1.0f, numSamples);
+
+        processDelay (fs, 0.0f, bufferPtr, numSamples);
+
+        auto firstNonZero = findFirstNonZero (bufferPtr, numSamples);
+        expectLessThan (firstNonZero, 2, "First non-zero sample should be less than 2!");
+    }
+
     void runTest() override
     {
         beginTest ("Pre-Delay Test");
@@ -110,6 +131,9 @@ public:
 
         beginTest ("AA-Filter Test");
         aaFilterTest();
+
+        beginTest ("Zero-Delay Test");
+        zeroDelayTest();
     }
 };
 
