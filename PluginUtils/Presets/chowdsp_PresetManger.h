@@ -45,6 +45,9 @@ public:
     /** Returns true if the plugin state has changed since loading the last preset */
     bool getIsDirty() const noexcept { return isDirty; }
 
+    /** Call this function to tell the preset manager if the plugin state is "dirty" */
+    void setIsDirty (bool shouldBeDirty);
+
     /** Returns the number of presets that are currently available */
     int getNumPresets() const noexcept { return (int) presetMap.size(); }
 
@@ -114,7 +117,6 @@ protected:
 private:
     void parameterChanged (const juce::String& parameterID, float newValue) override;
     std::pair<const int, Preset>& addFactoryPreset (Preset&& preset);
-    void setIsDirty (bool shouldBeDirty);
     const Preset* findPreset (const Preset& preset) const;
 
     int getIndexForPreset (const Preset& preset) const;
