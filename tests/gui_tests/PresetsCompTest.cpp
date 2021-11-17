@@ -30,15 +30,19 @@ public:
         presetMgr.setUserPresetConfigFile ("preset_config.txt");
         presetMgr.setUserPresetPath (presetPath.file);
 
+        MessageManager::getInstance()->runDispatchLoopUntil (5);
         expectEquals (presetsComp.getPresetMenuText(), String ("Test2"), "Initial preset text is incorrect!");
 
         setParameter (param, 0.9f);
+        MessageManager::getInstance()->runDispatchLoopUntil (5);
         expectEquals (presetsComp.getPresetMenuText(), String ("Test2*"), "Dirty preset text is incorrect!");
 
         presetsComp.goToNextPreset (true);
+        MessageManager::getInstance()->runDispatchLoopUntil (5);
         expectEquals (presetsComp.getPresetMenuText(), String ("Test1"), "Loaded preset text is incorrect!");
 
         setParameter (param, 0.9f);
+        MessageManager::getInstance()->runDispatchLoopUntil (5);
         expectEquals (presetsComp.getPresetMenuText(), String ("Test1*"), "Dirty preset text is incorrect!");
 
         auto userPresetConfigFile = presetMgr.getUserPresetConfigFile();
@@ -136,12 +140,55 @@ public:
         presetMgr.setUserPresetConfigFile ("preset_config.txt");
         presetMgr.setUserPresetPath (presetPath.file);
 
+        MessageManager::getInstance()->runDispatchLoopUntil (5);
         expectEquals (presetsComp.getPresetMenuText(), String ("Test2"), "Initial preset text is incorrect!");
 
         const auto* menu = presetsComp.getPresetMenuBox().getRootMenu();
         auto menuItem = getMenuItem (*menu, "Test1");
         menuItem->action();
+        MessageManager::getInstance()->runDispatchLoopUntil (5);
         expectEquals (presetsComp.getPresetMenuText(), String ("Test1"), "Loaded preset text is incorrect!");
+
+        auto userPresetConfigFile = presetMgr.getUserPresetConfigFile();
+        userPresetConfigFile.deleteRecursively();
+    }
+
+    void backgroundThreadTest()
+    {
+        DummyPlugin plugin { true };
+        auto& presetMgr = plugin.getPresetManager();
+        auto param = plugin.getParameters()[0];
+
+        ScopedFile presetPath ("preset_path");
+        presetPath.file.createDirectory();
+
+        ScopedFile presetFile1 ("preset_path/Test1.preset");
+        presetMgr.saveUserPreset (presetFile1.file);
+
+        setParameter (param, 0.1f);
+        ScopedFile presetFile2 ("preset_path/Test2.preset");
+        presetMgr.saveUserPreset (presetFile2.file);
+
+        chowdsp::PresetsComp presetsComp { presetMgr };
+        presetMgr.setUserPresetConfigFile ("preset_config.txt");
+        presetMgr.setUserPresetPath (presetPath.file);
+
+        std::atomic<bool> threadFinished { false };
+        Thread::launch ([&] {
+            Thread::sleep (10); // wait for message manager...
+            expectEquals (presetsComp.getPresetMenuText(), String ("Test2"), "Initial preset text is incorrect!");
+
+            const auto* menu = presetsComp.getPresetMenuBox().getRootMenu();
+            auto menuItem = getMenuItem (*menu, "Test1");
+            menuItem->action();
+            Thread::sleep (10); // wait for message manager...
+            expectEquals (presetsComp.getPresetMenuText(), String ("Test1"), "Loaded preset text is incorrect!");
+
+            threadFinished = true;
+        });
+
+        while (! threadFinished)
+            MessageManager::getInstance()->runDispatchLoopUntil (10);
 
         auto userPresetConfigFile = presetMgr.getUserPresetConfigFile();
         userPresetConfigFile.deleteRecursively();
@@ -165,6 +212,9 @@ public:
 
         beginTest ("Load Preset Test");
         loadPresetTest();
+
+        beginTest ("Background Thread Test");
+        backgroundThreadTest();
     }
 };
 

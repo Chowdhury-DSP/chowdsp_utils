@@ -49,6 +49,8 @@ private:
 
     std::shared_ptr<juce::FileChooser> fileChooser;
 
+    std::atomic<bool> waitingForTextBoxUpdate { false }; // needed for async updating
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetsComp)
 };
 
