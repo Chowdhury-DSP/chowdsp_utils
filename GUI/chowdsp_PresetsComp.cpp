@@ -62,7 +62,7 @@ PresetsComp::PresetsComp (PresetManager& presetManager) : manager (presetManager
 PresetsComp::~PresetsComp()
 {
     manager.removeListener (this);
-    
+
     // make sure we don't have any outstanding calls to MessageManager::callAsync
     while (waitingForTextBoxUpdate)
         juce::MessageManager::getInstance()->runDispatchLoopUntil (10);
