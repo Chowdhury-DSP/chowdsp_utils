@@ -62,6 +62,10 @@ PresetsComp::PresetsComp (PresetManager& presetManager) : manager (presetManager
 PresetsComp::~PresetsComp()
 {
     manager.removeListener (this);
+    
+    // make sure we don't have any outstanding calls to MessageManager::callAsync
+    while (waitingForTextBoxUpdate)
+        juce::MessageManager::getInstance()->runDispatchLoopUntil (10);
 }
 
 void PresetsComp::goToNextPreset (bool forward)
@@ -259,8 +263,11 @@ void PresetsComp::updatePresetBoxText()
     if (manager.getIsDirty())
         name += "*";
 
-    juce::MessageManagerLock mml;
-    presetBox.setText (name, juce::dontSendNotification);
+    waitingForTextBoxUpdate = true;
+    juce::MessageManager::callAsync ([=] {
+        presetBox.setText (name, juce::dontSendNotification);
+        waitingForTextBoxUpdate = false;
+    });
 }
 
 } // namespace chowdsp
