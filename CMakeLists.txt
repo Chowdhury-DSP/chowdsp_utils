@@ -27,6 +27,7 @@ target_compile_definitions(chowdsp_utils_tests PRIVATE
     JUCE_UNIT_TESTS=0
     JUCE_USE_CURL=0
     JUCE_WEB_BROWSER=0
+    JUCE_MODAL_LOOPS_PERMITTED=1
 )
 
 target_link_libraries(chowdsp_utils_tests PRIVATE
@@ -51,6 +52,7 @@ target_compile_definitions(chowdsp_gui_test PRIVATE
     JUCE_UNIT_TESTS=0
     JUCE_USE_CURL=0
     JUCE_WEB_BROWSER=0
+    JUCE_MODAL_LOOPS_PERMITTED=1
 )
 
 target_link_libraries(chowdsp_gui_test PRIVATE chowdsp_utils foleys_gui_magic)

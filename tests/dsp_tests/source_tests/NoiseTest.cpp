@@ -129,7 +129,7 @@ public:
 
         if (replacing)
         {
-            for (int n = 0; n < nSamples; n += blockSize)
+            for (int n = 0; n < (int) nSamples; n += blockSize)
             {
                 auto block = outBlock.getSubBlock ((size_t) n, (size_t) blockSize);
                 dsp::ProcessContextReplacing<FloatType> ctx (block);
@@ -138,7 +138,7 @@ public:
         }
         else
         {
-            for (int n = 0; n < nSamples; n += blockSize)
+            for (int n = 0; n < (int) nSamples; n += blockSize)
             {
                 auto inSubBlock = inBlock.getSubBlock ((size_t) n, (size_t) blockSize);
                 auto outSubBlock = outBlock.getSubBlock ((size_t) n, (size_t) blockSize);
