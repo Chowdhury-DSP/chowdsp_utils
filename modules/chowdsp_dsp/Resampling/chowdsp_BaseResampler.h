@@ -10,6 +10,9 @@ namespace ResamplingTypes
         /** Default constructor */
         BaseResampler() = default;
 
+        /** Default destructor */
+        virtual ~BaseResampler() = default;
+
         /** Prepares the resampler for a given input sample rate */
         virtual void prepare (double sampleRate, double startRatio = 1.0) = 0;
 
@@ -18,7 +21,7 @@ namespace ResamplingTypes
 
         /** Sets the ratio of the output sample rate over input sample rate */
         virtual void setResampleRatio (float newRatio) = 0;
-        
+
         /** Returns the ratio of the output sample rate over input sample rate */
         virtual float getResampleRatio() const noexcept = 0;
 
