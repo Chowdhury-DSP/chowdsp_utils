@@ -1,3 +1,5 @@
+#include "chowdsp_PresetsComp.h"
+
 namespace
 {
 #if JUCE_IOS

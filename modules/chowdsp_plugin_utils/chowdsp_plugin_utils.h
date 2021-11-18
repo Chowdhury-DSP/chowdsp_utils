@@ -3,11 +3,11 @@
 
     BEGIN_JUCE_MODULE_DECLARATION
 
-    ID:            chowdsp_utils
+    ID:            chowdsp_plugin_utils
     vendor:        Chowdhury DSP
-    version:       1.0.0
-    name:          ChowDSP Shared Code
-    description:   Shared code for ChowDSP plugins and applications
+    version:       0.0.1
+    name:          ChowDSP Plugin Utilities
+    description:   Utilities for creating ChowDSP plugins
     dependencies:  juce_core, juce_audio_basics, juce_audio_devices, juce_audio_formats,
                    juce_audio_utils, juce_audio_processors, juce_gui_basics
 
@@ -20,13 +20,6 @@
  */
 
 #pragma once
-
-/** Config: CHOWDSP_USE_FOLEYS_CLASSES
- *          Enables the module to use foleys_gui_magic classes. Set this to 0 if you're not using foleys_gui_magic.
- */
-#ifndef CHOWDSP_USE_FOLEYS_CLASSES
-#define CHOWDSP_USE_FOLEYS_CLASSES 1
-#endif
 
 // STL includes
 #include <unordered_map>
@@ -48,5 +41,16 @@ JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 JUCE_END_IGNORE_WARNINGS_MSVC
 #endif
 
-#include "PluginUtils/chowdsp_PluginUtils.h"
-#include "GUI/chowdsp_GUI.h"
+#include "Parameters/chowdsp_ParamUtils.h"
+#include "Version/chowdsp_VersionUtils.h"
+
+#include "Presets/chowdsp_Preset.h"
+#include "Presets/chowdsp_PresetManager.h"
+
+#include "PluginBase/chowdsp_DummySynthSound.h"
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wzero-as-null-pointer-constant", // Clang doesn't like HasAddParameters checker
+                                     "-Winconsistent-missing-destructor-override")
+#include "PluginBase/chowdsp_PluginBase.h"
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+
+#include "PluginBase/chowdsp_SynthBase.h"

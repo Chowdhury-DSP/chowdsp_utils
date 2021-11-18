@@ -1,3 +1,5 @@
+#include "chowdsp_PresetManager.h"
+
 namespace chowdsp
 {
 PresetManager::PresetManager (juce::AudioProcessorValueTreeState& vtState) : vts (vtState),

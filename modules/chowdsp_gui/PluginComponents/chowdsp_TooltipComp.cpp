@@ -1,3 +1,5 @@
+#include "chowdsp_TooltipComp.h"
+
 namespace chowdsp
 {
 TooltipComponent::TooltipComponent()

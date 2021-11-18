@@ -1,3 +1,5 @@
+#include "chowdsp_InfoComp.h"
+
 namespace chowdsp
 {
 InfoComp::InfoComp (const juce::AudioProcessor::WrapperType pluginWrapperType) : wrapperType (pluginWrapperType),

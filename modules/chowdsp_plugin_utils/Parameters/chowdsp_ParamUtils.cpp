@@ -1,3 +1,5 @@
+#include "chowdsp_ParamUtils.h"
+
 namespace chowdsp
 {
 namespace ParamUtils

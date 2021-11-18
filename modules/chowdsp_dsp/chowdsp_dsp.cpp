@@ -1,6 +1,6 @@
 #include "chowdsp_dsp.h"
 
-#include "chowdsp_Panner.cpp"
+#include "Other/chowdsp_Panner.cpp"
 
 // filters
 #include "Filters/chowdsp_StateVariableFilter.cpp"

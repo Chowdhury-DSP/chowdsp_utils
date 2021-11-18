@@ -1,3 +1,5 @@
+#include "chowdsp_Preset.h"
+
 namespace chowdsp
 {
 Preset::Preset (const juce::String& thisName,

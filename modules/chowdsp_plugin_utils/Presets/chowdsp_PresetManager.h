@@ -1,5 +1,7 @@
 #pragma once
 
+#include "chowdsp_Preset.h"
+
 namespace chowdsp
 {
 /**

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../Version/chowdsp_VersionUtils.h"
+
 namespace chowdsp
 {
 /** Information for storing a plugin preset */

@@ -1,3 +1,5 @@
+#include "chowdsp_TitleComp.h"
+
 namespace chowdsp
 {
 TitleComp::TitleComp()

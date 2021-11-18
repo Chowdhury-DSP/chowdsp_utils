@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../../chowdsp_plugin_utils/Presets/chowdsp_PresetManager.h"
+
 namespace chowdsp
 {
 /** A component to display a presets menu */

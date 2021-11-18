@@ -1,3 +1,5 @@
+#include "chowdsp_VersionUtils.h"
+
 namespace chowdsp
 {
 namespace VersionUtils
