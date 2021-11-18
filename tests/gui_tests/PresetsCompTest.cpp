@@ -30,19 +30,19 @@ public:
         presetMgr.setUserPresetConfigFile ("preset_config.txt");
         presetMgr.setUserPresetPath (presetPath.file);
 
-        MessageManager::getInstance()->runDispatchLoopUntil (50);
+        MessageManager::getInstance()->runDispatchLoopUntil (75);
         expectEquals (presetsComp.getPresetMenuText(), String ("Test2"), "Initial preset text is incorrect!");
 
         setParameter (param, 0.9f);
-        MessageManager::getInstance()->runDispatchLoopUntil (50);
+        MessageManager::getInstance()->runDispatchLoopUntil (75);
         expectEquals (presetsComp.getPresetMenuText(), String ("Test2*"), "Dirty preset text is incorrect!");
 
         presetsComp.goToNextPreset (true);
-        MessageManager::getInstance()->runDispatchLoopUntil (50);
+        MessageManager::getInstance()->runDispatchLoopUntil (75);
         expectEquals (presetsComp.getPresetMenuText(), String ("Test1"), "Loaded preset text is incorrect!");
 
         setParameter (param, 0.9f);
-        MessageManager::getInstance()->runDispatchLoopUntil (50);
+        MessageManager::getInstance()->runDispatchLoopUntil (75);
         expectEquals (presetsComp.getPresetMenuText(), String ("Test1*"), "Dirty preset text is incorrect!");
 
         auto userPresetConfigFile = presetMgr.getUserPresetConfigFile();
@@ -140,13 +140,13 @@ public:
         presetMgr.setUserPresetConfigFile ("preset_config.txt");
         presetMgr.setUserPresetPath (presetPath.file);
 
-        MessageManager::getInstance()->runDispatchLoopUntil (50);
+        MessageManager::getInstance()->runDispatchLoopUntil (75);
         expectEquals (presetsComp.getPresetMenuText(), String ("Test2"), "Initial preset text is incorrect!");
 
         const auto* menu = presetsComp.getPresetMenuBox().getRootMenu();
         auto menuItem = getMenuItem (*menu, "Test1");
         menuItem->action();
-        MessageManager::getInstance()->runDispatchLoopUntil (50);
+        MessageManager::getInstance()->runDispatchLoopUntil (75);
         expectEquals (presetsComp.getPresetMenuText(), String ("Test1"), "Loaded preset text is incorrect!");
 
         auto userPresetConfigFile = presetMgr.getUserPresetConfigFile();
@@ -188,7 +188,7 @@ public:
         });
 
         while (! threadFinished)
-            MessageManager::getInstance()->runDispatchLoopUntil (50);
+            MessageManager::getInstance()->runDispatchLoopUntil (75);
 
         auto userPresetConfigFile = presetMgr.getUserPresetConfigFile();
         userPresetConfigFile.deleteRecursively();
