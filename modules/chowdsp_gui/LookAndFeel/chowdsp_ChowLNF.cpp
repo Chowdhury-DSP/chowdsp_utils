@@ -243,4 +243,16 @@ juce::Label* ChowLNF::createSliderTextBox (juce::Slider& slider)
     return l;
 }
 
+juce::Component* ChowLNF::getParentComponentForMenuOptions (const juce::PopupMenu::Options& options)
+{
+#if JUCE_IOS
+    if (juce::PluginHostType::getPluginLoadedAs() == juce::AudioProcessor::wrapperType_AudioUnitv3)
+    {
+        if (options.getParentComponent() == nullptr && options.getTargetComponent() != nullptr)
+            return options.getTargetComponent()->getTopLevelComponent();
+    }
+#endif
+    return juce::LookAndFeel_V2::getParentComponentForMenuOptions (options);
+}
+
 } // namespace chowdsp
