@@ -1,5 +1,10 @@
 #include "../DummyPlugin.h"
 
+namespace
+{
+constexpr int guiShowTime = 1000;
+}
+
 /** Empty component filled with a single colour */
 class PlainComponent : public Component
 {
@@ -58,7 +63,11 @@ public:
 
         auto infoComp = std::make_unique<chowdsp::InfoComp> (AudioProcessor::WrapperType::wrapperType_AAX);
         tabs.addTab ("Tab2", Colours::darksalmon, infoComp.release(), true);
+
         addAndMakeVisible (tabs);
+        Timer::callAfterDelay (guiShowTime / 4, [=] { tabs.setOrientation (TabbedButtonBar::TabsAtBottom); });
+        Timer::callAfterDelay (guiShowTime / 2, [=] { tabs.setOrientation (TabbedButtonBar::TabsAtRight); });
+        Timer::callAfterDelay (guiShowTime * 3 / 4, [=] { tabs.setOrientation (TabbedButtonBar::TabsAtLeft); });
 
         menu.addItemList ({ "Item1", "Item2", "Item3" }, 1);
         menu.setSelectedItemIndex (0, sendNotification);
@@ -69,6 +78,7 @@ public:
         presetsComp.setNextPrevButton (nullptr, true);
         presetsComp.setNextPrevButton (nullptr, false);
         addAndMakeVisible (presetsComp);
+        Timer::callAfterDelay (guiShowTime * 3 / 4, [=] { presetsComp.getPresetMenuBox().showPopup(); });
 
         setSize (500, 500);
     }
@@ -124,8 +134,8 @@ public:
 
         setVisible (true);
 
-        Timer::callAfterDelay (500, [=] { comp->tabs.setCurrentTabIndex (1); });
-        Timer::callAfterDelay (10000, [=] { closeButtonPressed(); });
+        Timer::callAfterDelay (guiShowTime / 2, [=] { comp->tabs.setCurrentTabIndex (1); });
+        Timer::callAfterDelay (guiShowTime, [=] { closeButtonPressed(); });
     }
 
     void closeButtonPressed() override

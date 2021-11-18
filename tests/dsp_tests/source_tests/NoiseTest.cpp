@@ -109,7 +109,7 @@ public:
     }
 
     template <typename FloatType>
-    void runNoiseTest (typename chowdsp::Noise<FloatType>::NoiseType type, float noiseSlope = 0.0f, float maxErr = 3.5f, size_t nCh = 1, bool replacing = true)
+    void runNoiseTest (typename chowdsp::Noise<FloatType>::NoiseType type, float noiseSlope = 0.0f, float maxErr = 4.0f, size_t nCh = 1, bool replacing = true)
     {
         chowdsp::Noise<FloatType> noise;
 
@@ -167,10 +167,10 @@ public:
         runNoiseTest<vec4> (chowdsp::Noise<vec4>::NoiseType::Normal);
 
         beginTest ("Pink Noise Test");
-        runNoiseTest<float> (chowdsp::Noise<float>::NoiseType::Pink, -3.0f, 3.5f, 2, false);
+        runNoiseTest<float> (chowdsp::Noise<float>::NoiseType::Pink, -3.0f, 4.0f, 2, false);
 
         beginTest ("Pink Noise Test (SIMD)");
-        runNoiseTest<vec4> (chowdsp::Noise<vec4>::NoiseType::Pink, -3.0f, 3.5f, 2, false);
+        runNoiseTest<vec4> (chowdsp::Noise<vec4>::NoiseType::Pink, -3.0f, 4.0f, 2, false);
     }
 };
 
