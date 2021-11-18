@@ -16,8 +16,11 @@ namespace ResamplingTypes
         /** Resets the state of the resampler */
         virtual void reset() = 0;
 
-        /** Sets the ratio of the output sample rate to input sample rate */
+        /** Sets the ratio of the output sample rate over input sample rate */
         virtual void setResampleRatio (float newRatio) = 0;
+        
+        /** Returns the ratio of the output sample rate over input sample rate */
+        virtual float getResampleRatio() const noexcept = 0;
 
         /** Processes a buffer of samples
      * 

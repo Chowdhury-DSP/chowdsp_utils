@@ -34,7 +34,7 @@ public:
             r.reset();
     }
 
-    /** Sets the ratio of input and output sample rates
+    /** Sets the ratio of output sample rate over input sample rate
      * 
      *  @param ratio    The resampling ratio. Must be in [0.1, 10.0]
      */
@@ -43,6 +43,12 @@ public:
         auto ratioClamped = juce::jlimit (0.01f, 100.0f, ratio);
         for (auto& r : resamplers)
             r.setResampleRatio (ratioClamped);
+    }
+
+    /** Returns the ratio of output sample rate over input sample rate */
+    float getResampleRatio() const noexcept
+    {
+        return resamplers[0].getResampleRatio();
     }
 
     /** Processes an input block of samples

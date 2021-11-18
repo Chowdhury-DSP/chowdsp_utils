@@ -68,12 +68,15 @@ namespace ResamplingTypes
             std::fill (state, &state[BUFFER_SIZE * 2], 0.0f);
         }
 
-        /** Sets the ratio of the output sample rate to state sample rate */
+        /** Sets the ratio of the output sample rate over input sample rate */
         void setResampleRatio (float newRatio) override
         {
             ratio = static_cast<double> (newRatio);
             dPhaseO = 1.0 / ratio;
         }
+
+        /** Return the ratio of the output sample rate over input sample rate */
+        float getResampleRatio() const noexcept override { return (float) ratio; }
 
         /** Processes a buffer of samples
          * 
