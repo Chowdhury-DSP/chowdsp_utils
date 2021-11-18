@@ -23,6 +23,8 @@
   ==============================================================================
 */
 
+#pragma once
+
 namespace chowdsp
 {
 /** Base class for delay lines with any interpolation type */

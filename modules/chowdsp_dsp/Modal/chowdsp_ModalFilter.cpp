@@ -1,3 +1,5 @@
+#include "chowdsp_ModalFilter.h"
+
 namespace chowdsp
 {
 template <typename T>

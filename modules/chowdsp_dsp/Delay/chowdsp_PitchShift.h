@@ -1,3 +1,5 @@
+#pragma once
+
 namespace chowdsp
 {
 /** A processor for pitch shifting in real-time, using a ring-buffer and interpolation.

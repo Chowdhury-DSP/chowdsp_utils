@@ -1,3 +1,5 @@
+#include "chowdsp_BypassProcessor.h"
+
 namespace chowdsp
 {
 template <typename SampleType, typename DelayType>

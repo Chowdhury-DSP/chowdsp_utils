@@ -7,6 +7,7 @@ include(CTest)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../../JUCE JUCE)
 juce_add_modules(../foleys_gui_magic)
 juce_add_modules(.)
+juce_add_modules(modules/chowdsp_dsp)
 
 # set up test executables
 juce_add_console_app(chowdsp_utils_tests)
@@ -31,6 +32,7 @@ target_compile_definitions(chowdsp_utils_tests PRIVATE
 )
 
 target_link_libraries(chowdsp_utils_tests PRIVATE
+    chowdsp_dsp
     chowdsp_utils
     foleys_gui_magic
     UnitTestData
@@ -55,12 +57,16 @@ target_compile_definitions(chowdsp_gui_test PRIVATE
     JUCE_MODAL_LOOPS_PERMITTED=1
 )
 
-target_link_libraries(chowdsp_gui_test PRIVATE chowdsp_utils foleys_gui_magic)
+target_link_libraries(chowdsp_gui_test PRIVATE
+    chowdsp_dsp
+    chowdsp_utils
+    foleys_gui_magic
+)
 
 add_test(NAME chowdsp_gui_test COMMAND chowdsp_gui_test)
 
 # configure wdf standalone test
-target_include_directories(wdf_test PUBLIC DSP/WDF)
+target_include_directories(wdf_test PUBLIC modules/chowdsp_dsp/WDF)
 add_test(NAME wdf_test COMMAND wdf_test)
 
 # Test with libsamplerate (if available)

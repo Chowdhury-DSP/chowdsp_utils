@@ -1,4 +1,4 @@
-#include "chowdsp_DSP.h"
+#include "chowdsp_dsp.h"
 
 #include "chowdsp_Panner.cpp"
 
@@ -12,4 +12,4 @@
 #include "Resampling/chowdsp_SRCResampler.cpp"
 
 // convolution
-#include "Convolution/ConvolutionEngine.cpp"
+#include "Convolution/chowdsp_ConvolutionEngine.cpp"

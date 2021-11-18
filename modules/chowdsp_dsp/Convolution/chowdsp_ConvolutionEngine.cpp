@@ -1,3 +1,5 @@
+#include "chowdsp_ConvolutionEngine.h"
+
 namespace chowdsp
 {
 ConvolutionEngine::ConvolutionEngine (const float* samples,

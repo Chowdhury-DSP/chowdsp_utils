@@ -1,3 +1,5 @@
+#include "chowdsp_SRCResampler.h"
+
 #if CHOWDSP_USE_LIBSAMPLERATE
 
 namespace chowdsp

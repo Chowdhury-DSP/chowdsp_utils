@@ -151,7 +151,7 @@ void Noise<T>::process (const ProcessContext& context) noexcept
 
     // copy input to output if needed
     if (context.usesSeparateInputAndOutputBlocks())
-        copyBlocks (outBlock, inBlock);
+        AudioBlockHelpers::copyBlocks (outBlock, inBlock);
 
     // add random to output
     outBlock += randBlock;

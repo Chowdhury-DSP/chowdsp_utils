@@ -1,3 +1,5 @@
+#include "chowdsp_StateVariableFilter.h"
+
 namespace chowdsp
 {
 //==============================================================================

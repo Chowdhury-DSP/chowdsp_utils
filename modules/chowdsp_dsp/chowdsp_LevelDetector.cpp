@@ -1,3 +1,5 @@
+#include "chowdsp_LevelDetector.h"
+
 namespace chowdsp
 {
 inline float calcTimeConstant (float timeMs, float expFactor)

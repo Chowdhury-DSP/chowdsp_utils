@@ -1,3 +1,5 @@
+#pragma once
+
 namespace chowdsp
 {
 /** A resampler using an internal resampling type

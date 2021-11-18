@@ -1,3 +1,5 @@
+#pragma once
+
 #if CHOWDSP_USE_LIBSAMPLERATE
 
 namespace chowdsp
