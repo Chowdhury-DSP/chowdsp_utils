@@ -6,7 +6,6 @@ include(CTest)
 # set up JUCE
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../../JUCE JUCE)
 juce_add_modules(../foleys_gui_magic)
-juce_add_modules(.)
 juce_add_modules(modules/chowdsp_dsp)
 juce_add_modules(modules/chowdsp_gui)
 juce_add_modules(modules/chowdsp_plugin_utils)
