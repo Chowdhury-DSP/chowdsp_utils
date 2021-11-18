@@ -109,7 +109,7 @@ public:
     }
 
     template <typename FloatType>
-    void runNoiseTest (typename chowdsp::Noise<FloatType>::NoiseType type, float noiseSlope = 0.0f, float maxErr = 3.0f, size_t nCh = 1, bool replacing = true)
+    void runNoiseTest (typename chowdsp::Noise<FloatType>::NoiseType type, float noiseSlope = 0.0f, float maxErr = 3.5f, size_t nCh = 1, bool replacing = true)
     {
         chowdsp::Noise<FloatType> noise;
 

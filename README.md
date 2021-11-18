@@ -4,10 +4,10 @@
 [![License](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://opensource.org/licenses/GPL-3.0)
 [![codecov](https://codecov.io/gh/Chowdhury-DSP/chowdsp_utils/branch/master/graph/badge.svg?token=84B35MB5QS)](https://codecov.io/gh/Chowdhury-DSP/chowdsp_utils)
 
-This repository contains a JUCE module with utilities for building Chowdhury DSP plugins.
+This repository contains JUCE modules with utilities for building Chowdhury DSP plugins.
 
-The module currently contains the following utility classes:
-- DSP
+The modules currently contains the following utility classes:
+- chowdsp_dsp
   - Delay Line: similar to `juce::dsp::DelayLine` but with 5th-order Lagrange interpolation and Sinc interpolation.
   - Pitch Shifter: using a ring buffer with two read pointers.
   - Filters: functions for bilinear transform, IIR filters with static order, and an optimized State Variable Filter.
@@ -15,11 +15,11 @@ The module currently contains the following utility classes:
   - Sources: sine wave generator, noise generator
   - Wave Digital Filters: all linear circuit elements, series/parallel junctions, and diodes.
   - Some extra functions and classes for SIMD operations.
-- GUI
+- chowdsp_gui
   - Custom `LookAndFeel`.
   - Custom tooltip viewer.
   - Component to display plugin info (version, format, etc.).
-- Plugin Utilities
+- chowdsp_plugin_utils
   - Base class for audio effect plugin.
   - Base class for synth plugin.
   - Utility class for managing plugin presets.

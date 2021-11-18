@@ -6,7 +6,9 @@ include(CTest)
 # set up JUCE
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../../JUCE JUCE)
 juce_add_modules(../foleys_gui_magic)
-juce_add_modules(.)
+juce_add_modules(modules/chowdsp_dsp)
+juce_add_modules(modules/chowdsp_gui)
+juce_add_modules(modules/chowdsp_plugin_utils)
 
 # set up test executables
 juce_add_console_app(chowdsp_utils_tests)
@@ -20,7 +22,6 @@ add_subdirectory(tests)
 
 # configure chowdsp_utils_test
 target_compile_definitions(chowdsp_utils_tests PRIVATE
-    CHOWDSP_UNIT_TESTS=1
     JucePlugin_Name="DummyPlugin"
     JucePlugin_Manufacturer="chowdsp"
     JucePlugin_VersionString="9.9.9"
@@ -31,7 +32,9 @@ target_compile_definitions(chowdsp_utils_tests PRIVATE
 )
 
 target_link_libraries(chowdsp_utils_tests PRIVATE
-    chowdsp_utils
+    chowdsp_dsp
+    chowdsp_gui
+    chowdsp_plugin_utils
     foleys_gui_magic
     UnitTestData
     juce::juce_recommended_config_flags
@@ -45,7 +48,6 @@ add_test(NAME chowdsp_utils_tests COMMAND chowdsp_utils_tests)
 
 # configure chowdsp_gui_test
 target_compile_definitions(chowdsp_gui_test PRIVATE
-    CHOWDSP_UNIT_TESTS=1
     JucePlugin_Name="DummyPlugin"
     JucePlugin_Manufacturer="chowdsp"
     JucePlugin_VersionString="9.9.9"
@@ -55,12 +57,17 @@ target_compile_definitions(chowdsp_gui_test PRIVATE
     JUCE_MODAL_LOOPS_PERMITTED=1
 )
 
-target_link_libraries(chowdsp_gui_test PRIVATE chowdsp_utils foleys_gui_magic)
+target_link_libraries(chowdsp_gui_test PRIVATE
+    chowdsp_dsp
+    chowdsp_gui
+    chowdsp_plugin_utils
+    foleys_gui_magic
+)
 
 add_test(NAME chowdsp_gui_test COMMAND chowdsp_gui_test)
 
 # configure wdf standalone test
-target_include_directories(wdf_test PUBLIC DSP/WDF)
+target_include_directories(wdf_test PUBLIC modules/chowdsp_dsp/WDF)
 add_test(NAME wdf_test COMMAND wdf_test)
 
 # Test with libsamplerate (if available)
