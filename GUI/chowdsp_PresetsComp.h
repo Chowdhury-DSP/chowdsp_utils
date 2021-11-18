@@ -4,7 +4,8 @@ namespace chowdsp
 {
 /** A component to display a presets menu */
 class PresetsComp : public juce::Component,
-                    private PresetManager::Listener
+                    private PresetManager::Listener,
+                    private juce::Timer
 {
 public:
     enum ColourIDs
@@ -20,6 +21,7 @@ public:
 
     void paint (juce::Graphics& g) override;
     void resized() override;
+    void timerCallback() override;
 
     juce::String getPresetMenuText() const noexcept { return presetBox.getText(); }
     juce::ComboBox& getPresetMenuBox() { return presetBox; }
@@ -49,7 +51,7 @@ private:
 
     std::shared_ptr<juce::FileChooser> fileChooser;
 
-    std::atomic<bool> waitingForTextBoxUpdate { false }; // needed for async updating
+    juce::String presetBoxText;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetsComp)
 };
