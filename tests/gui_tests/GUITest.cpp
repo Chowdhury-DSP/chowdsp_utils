@@ -104,7 +104,7 @@ public:
     TabbedComponent tabs;
 
 private:
-    SharedResourcePointer<chowdsp::LNFAllocator> lnfAllocator;
+    chowdsp::SharedLNFAllocator lnfAllocator;
 
     Slider slider;
     Slider linSlider;
