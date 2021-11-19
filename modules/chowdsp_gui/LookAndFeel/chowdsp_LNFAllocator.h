@@ -63,4 +63,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LNFAllocator)
 };
 
+/** Helpful alias for creating a SharedResourcePointer<LNFAllocator> */
+using SharedLNFAllocator = juce::SharedResourcePointer<LNFAllocator>;
+
 } // namespace chowdsp

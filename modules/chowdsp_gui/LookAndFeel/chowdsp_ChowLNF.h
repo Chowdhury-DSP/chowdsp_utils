@@ -37,6 +37,9 @@ public:
     /** Creates a text box for a slider */
     juce::Label* createSliderTextBox (juce::Slider& slider) override;
 
+    /** Finds the proper parent component for a popup menu with these options */
+    juce::Component* getParentComponentForMenuOptions (const juce::PopupMenu::Options& options) override;
+
 protected:
     std::unique_ptr<juce::Drawable> knob = juce::Drawable::createFromImageData (chowdsp_BinaryData::knob_svg, chowdsp_BinaryData::knob_svgSize);
     std::unique_ptr<juce::Drawable> pointer = juce::Drawable::createFromImageData (chowdsp_BinaryData::pointer_svg, chowdsp_BinaryData::pointer_svgSize);
