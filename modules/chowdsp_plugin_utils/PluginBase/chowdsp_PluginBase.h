@@ -50,6 +50,8 @@ public:
     void getStateInformation (juce::MemoryBlock& data) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    void setUsePresetManagerForPluginInterface (bool shouldUse) { usePresetManagerForPluginInterface = shouldUse; }
+
 protected:
     using Parameters = std::vector<std::unique_ptr<juce::RangedAudioParameter>>;
     juce::AudioProcessorValueTreeState vts;
@@ -62,6 +64,8 @@ protected:
 
 private:
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+
+    bool usePresetManagerForPluginInterface = true;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginBase)
 };
@@ -125,7 +129,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginBase<Processor>::creat
 template <class Processor>
 int PluginBase<Processor>::getNumPrograms()
 {
-    if (presetManager == nullptr)
+    if (presetManager == nullptr || ! usePresetManagerForPluginInterface)
         return 1;
 
     return presetManager->getNumPresets();
@@ -134,7 +138,7 @@ int PluginBase<Processor>::getNumPrograms()
 template <class Processor>
 int PluginBase<Processor>::getCurrentProgram()
 {
-    if (presetManager == nullptr)
+    if (presetManager == nullptr || ! usePresetManagerForPluginInterface)
         return 0;
 
     return presetManager->getCurrentPresetIndex();
@@ -143,7 +147,7 @@ int PluginBase<Processor>::getCurrentProgram()
 template <class Processor>
 void PluginBase<Processor>::setCurrentProgram (int index)
 {
-    if (presetManager == nullptr)
+    if (presetManager == nullptr || ! usePresetManagerForPluginInterface)
         return;
 
     presetManager->loadPresetFromIndex (index);
@@ -152,7 +156,7 @@ void PluginBase<Processor>::setCurrentProgram (int index)
 template <class Processor>
 const juce::String PluginBase<Processor>::getProgramName (int index)
 {
-    if (presetManager == nullptr)
+    if (presetManager == nullptr || ! usePresetManagerForPluginInterface)
         return {};
 
     return presetManager->getPresetName (index);

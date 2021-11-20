@@ -59,8 +59,6 @@ PresetsComp::PresetsComp (PresetManager& presetManager) : manager (presetManager
     setupNextPrevButton (nextPresetButton, true);
 
     updatePresetBoxText();
-
-    startTimerHz (20);
 }
 
 PresetsComp::~PresetsComp()
@@ -256,7 +254,7 @@ void PresetsComp::savePresetFile (const juce::String& fileName)
     manager.saveUserPreset (presetPath.getChildFile (fileName));
 }
 
-void PresetsComp::timerCallback()
+void PresetsComp::handleAsyncUpdate()
 {
     if (presetBox.getText() != presetBoxText)
         presetBox.setText (presetBoxText, juce::dontSendNotification);
@@ -268,6 +266,8 @@ void PresetsComp::updatePresetBoxText()
     presetBoxText = currentPreset == nullptr ? juce::String() : manager.getCurrentPreset()->getName();
     if (manager.getIsDirty())
         presetBoxText += "*";
+
+    triggerAsyncUpdate();
 }
 
 } // namespace chowdsp

@@ -129,11 +129,44 @@ public:
         presetMgr.saveUserPreset (presetFile2.file);
 
         expectEquals (dummy.getNumPrograms(), presetMgr.getNumPresets(), "Num presets incorrect!");
+        expectEquals (dummy.getCurrentProgram(), presetMgr.getCurrentPresetIndex(), "Initial program index incorrect!");
 
         dummy.setCurrentProgram (0);
-        expectEquals (dummy.getCurrentProgram(), presetMgr.getCurrentPresetIndex(), "Current program index incorrect!");
+        expectEquals (dummy.getCurrentProgram(), presetMgr.getCurrentPresetIndex(), "New program index incorrect!");
 
         expectEquals (dummy.getProgramName (0), presetMgr.getPresetName (0), "Program name incorrect!");
+
+        auto userPresetConfigFile = presetMgr.getUserPresetConfigFile();
+        userPresetConfigFile.deleteRecursively();
+    }
+
+    void programInterfaceOffTest()
+    {
+        using namespace test_utils;
+
+        DummyPlugin dummy { true };
+        dummy.setUsePresetManagerForPluginInterface (false);
+
+        ScopedFile presetPath ("preset_path");
+        presetPath.file.createDirectory();
+
+        auto& presetMgr = dummy.getPresetManager();
+        presetMgr.setUserPresetConfigFile ("preset_config.txt");
+        presetMgr.setUserPresetPath (presetPath.file);
+
+        ScopedFile presetFile1 ("preset_path/test1.preset");
+        presetMgr.saveUserPreset (presetFile1.file);
+
+        ScopedFile presetFile2 ("preset_path/test2.preset");
+        presetMgr.saveUserPreset (presetFile2.file);
+
+        expectEquals (dummy.getNumPrograms(), 1, "Num presets incorrect!");
+        expectEquals (dummy.getCurrentProgram(), 0, "Initial program index incorrect!");
+
+        dummy.setCurrentProgram (0);
+        expectEquals (dummy.getCurrentProgram(), 0, "New program index incorrect!");
+
+        expectEquals (dummy.getProgramName (0), String(), "Program name incorrect!");
 
         auto userPresetConfigFile = presetMgr.getUserPresetConfigFile();
         userPresetConfigFile.deleteRecursively();
@@ -158,6 +191,9 @@ public:
 
         beginTest ("Program Interface Test");
         programInterfaceTest();
+
+        beginTest ("Program Interface Off Test");
+        programInterfaceOffTest();
     }
 };
 

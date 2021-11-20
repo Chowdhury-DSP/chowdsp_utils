@@ -7,7 +7,7 @@ namespace chowdsp
 /** A component to display a presets menu */
 class PresetsComp : public juce::Component,
                     private PresetManager::Listener,
-                    private juce::Timer
+                    private juce::AsyncUpdater
 {
 public:
     enum ColourIDs
@@ -23,7 +23,7 @@ public:
 
     void paint (juce::Graphics& g) override;
     void resized() override;
-    void timerCallback() override;
+    void handleAsyncUpdate() override;
 
     juce::String getPresetMenuText() const noexcept { return presetBox.getText(); }
     juce::ComboBox& getPresetMenuBox() { return presetBox; }
