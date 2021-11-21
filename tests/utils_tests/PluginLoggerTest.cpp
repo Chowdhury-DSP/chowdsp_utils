@@ -40,7 +40,8 @@ public:
         constexpr int numIters = 100;
 
         auto logsDirectory = FileLogger::getSystemLogFileFolder().getChildFile (logFileSubDir);
-        auto getNumLogFiles = [&] {
+        auto getNumLogFiles = [&]
+        {
             return logsDirectory.getNumberOfChildFiles (File::findFiles, "*");
         };
 
@@ -49,7 +50,8 @@ public:
             using LoggerPtr = std::unique_ptr<chowdsp::PluginLogger>;
             std::vector<std::future<LoggerPtr>> futures;
             for (int j = 0; j < numLoggersAtOnce; ++j)
-                futures.push_back (std::async (std::launch::async, [] { return std::make_unique<chowdsp::PluginLogger> (logFileSubDir, logFileNameRoot); }));
+                futures.push_back (std::async (std::launch::async, []
+                                               { return std::make_unique<chowdsp::PluginLogger> (logFileSubDir, logFileNameRoot); }));
 
             auto numLogFiles = getNumLogFiles();
             expectLessOrEqual (numLogFiles, 55, "Too many log files found in logs directory!");
@@ -82,7 +84,6 @@ public:
             expectEquals (newNumTopLevelWindows, prevNumTopLevelWindows + 1, "AlertWindow not created!");
 
             // Linux on CI doesn't like trying to open the log file!
-#if ! JUCE_LINUX
             for (int i = 0; i < newNumTopLevelWindows; ++i)
             {
                 if (auto* alertWindow = dynamic_cast<AlertWindow*> (TopLevelWindow::getTopLevelWindow (i)))
@@ -92,7 +93,6 @@ public:
                     break;
                 }
             }
-#endif
         }
 
         // the next logger should not!
@@ -113,8 +113,10 @@ public:
         beginTest ("Limit Num Log Files Test");
         limitNumLogFilesTest();
 
+#if ! JUCE_LINUX
         beginTest ("Crash Log Test");
         crashLogTest();
+#endif
 
         // clean up after ourselves...
         auto logsDirectory = FileLogger::getSystemLogFileFolder().getChildFile (logFileSubDir);
