@@ -3,11 +3,11 @@ name: CI-ARM
 on:
   push:
     branches:
-    - master
-    - develop
+      - master
+      - develop
   pull_request:
     branches:
-    - master
+      - master
 
   workflow_dispatch:
 
@@ -19,42 +19,42 @@ jobs:
     if: contains(toJson(github.event.commits), '***NO_CI***') == false && contains(toJson(github.event.commits), '[ci skip]') == false && contains(toJson(github.event.commits), '[skip ci]') == false
     name: Test module on ARM Mac
     runs-on: macos-latest
-    
+
     steps:
-    - name: Get latest CMake
-      uses: lukka/get-cmake@latest 
+      - name: Get latest CMake
+        uses: lukka/get-cmake@latest
 
-    - name: Checkout code
-      uses: actions/checkout@v2
-      with:
-        path: ${{env.WORK_DIR}}
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          path: ${{env.WORK_DIR}}
 
-    - name: Set up environment
-      working-directory: ${{github.workspace}}
-      run: |
-        git clone --depth 1 --branch 6.0.8 https://github.com/juce-framework/JUCE.git
-        cd JUCE_modules
-        git clone --single-branch --branch chowdsp https://github.com/Chowdhury-DSP/foleys_gui_magic.git
+      - name: Set up environment
+        working-directory: ${{github.workspace}}
+        run: |
+          git clone --depth 1 --branch 6.1.2 https://github.com/juce-framework/JUCE.git
+          cd JUCE_modules
+          git clone --single-branch --branch chowdsp https://github.com/Chowdhury-DSP/foleys_gui_magic.git
 
-    - name: Install xsimd
-      working-directory: ${{github.workspace}}/JUCE_modules
-      run: |
-        git clone https://github.com/xtensor-stack/xsimd
-        cd xsimd
-        git reset --hard e37730f3938a3f58e418ec1c70482fd7ddced7a1
+      - name: Install xsimd
+        working-directory: ${{github.workspace}}/JUCE_modules
+        run: |
+          git clone https://github.com/xtensor-stack/xsimd
+          cd xsimd
+          git reset --hard e37730f3938a3f58e418ec1c70482fd7ddced7a1
 
-    - name: Configure
-      working-directory: ${{env.WORK_DIR}}
-      env:
-        CMAKE_ARGS: ${{ matrix.cmake_args }}
-      shell: bash
-      run: cmake -Bbuild -GXcode -D"CMAKE_OSX_ARCHITECTURES=arm64;x86_64" -DXSIMD_PATH=../xsimd
+      - name: Configure
+        working-directory: ${{env.WORK_DIR}}
+        env:
+          CMAKE_ARGS: ${{ matrix.cmake_args }}
+        shell: bash
+        run: cmake -Bbuild -GXcode -D"CMAKE_OSX_ARCHITECTURES=arm64;x86_64" -DXSIMD_PATH=../xsimd
 
-    - name: Build
-      working-directory: ${{env.WORK_DIR}}/build
-      shell: bash
-      run: cmake --build . --config Release --parallel 4 | xcpretty
+      - name: Build
+        working-directory: ${{env.WORK_DIR}}/build
+        shell: bash
+        run: cmake --build . --config Release --parallel 4 | xcpretty
 
-    - name: Test
-      working-directory: ${{env.WORK_DIR}}/build
-      run: ctest -C Release -V
+      - name: Test
+        working-directory: ${{env.WORK_DIR}}/build
+        run: ctest -C Release -V
