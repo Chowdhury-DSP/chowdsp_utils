@@ -115,9 +115,12 @@ PluginLogger::~PluginLogger()
 
 void PluginLogger::handleCrashWithSignal (int signal)
 {
-    JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wint-to-void-pointer-cast")
+    JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wint-to-void-pointer-cast",
+                                         "-Wint-to-pointer-cast")
+    JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4312)
     logger_detail::signalHandler ((void*) signal);
     JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+    JUCE_END_IGNORE_WARNINGS_MSVC
 }
 
 void PluginLogger::defaultCrashLogAnalyzer (const juce::File& logFile)
