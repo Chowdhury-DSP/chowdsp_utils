@@ -5,3 +5,5 @@
 
 #include "Presets/chowdsp_Preset.cpp"
 #include "Presets/chowdsp_PresetManager.cpp"
+
+#include "Logging/chowdsp_PluginLogger.cpp"
