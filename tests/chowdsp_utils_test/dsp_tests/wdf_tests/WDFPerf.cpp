@@ -26,8 +26,7 @@ public:
         auto* x = buffer.getReadPointer (0);
 
         Time time;
-        auto timeProcess = [&] (auto& proc)
-        {
+        auto timeProcess = [&] (auto& proc) {
             auto start = time.getMillisecondCounterHiRes();
             float output = 0.0f;
             for (int i = 0; i < buffer.getNumSamples(); ++i)
