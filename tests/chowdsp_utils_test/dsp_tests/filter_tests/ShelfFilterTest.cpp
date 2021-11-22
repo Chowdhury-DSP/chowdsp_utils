@@ -1,5 +1,4 @@
-#include "test_utils.h"
-#include <JuceHeader.h>
+#include <test_utils.h>
 
 namespace Constants
 {

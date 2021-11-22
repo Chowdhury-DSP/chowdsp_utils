@@ -1,4 +1,4 @@
-#include "../DummyPlugin.h"
+#include "chowdsp_utils/tests/chowdsp_utils_test/DummyPlugin.h"
 
 namespace
 {
@@ -9,8 +9,8 @@ constexpr int guiShowTime = 1000;
 class PlainComponent : public Component
 {
 public:
-    PlainComponent (Colour colour)
-        : colour (colour)
+    PlainComponent (Colour c)
+        : colour (c)
     {
     }
 
@@ -65,9 +65,12 @@ public:
         tabs.addTab ("Tab2", Colours::darksalmon, infoComp.release(), true);
 
         addAndMakeVisible (tabs);
-        Timer::callAfterDelay (guiShowTime / 4, [=] { tabs.setOrientation (TabbedButtonBar::TabsAtBottom); });
-        Timer::callAfterDelay (guiShowTime / 2, [=] { tabs.setOrientation (TabbedButtonBar::TabsAtRight); });
-        Timer::callAfterDelay (guiShowTime * 3 / 4, [=] { tabs.setOrientation (TabbedButtonBar::TabsAtLeft); });
+        Timer::callAfterDelay (guiShowTime / 4, [=]
+                               { tabs.setOrientation (TabbedButtonBar::TabsAtBottom); });
+        Timer::callAfterDelay (guiShowTime / 2, [=]
+                               { tabs.setOrientation (TabbedButtonBar::TabsAtRight); });
+        Timer::callAfterDelay (guiShowTime * 3 / 4, [=]
+                               { tabs.setOrientation (TabbedButtonBar::TabsAtLeft); });
 
         menu.addItemList ({ "Item1", "Item2", "Item3" }, 1);
         menu.setSelectedItemIndex (0, sendNotification);
@@ -78,7 +81,8 @@ public:
         presetsComp.setNextPrevButton (nullptr, true);
         presetsComp.setNextPrevButton (nullptr, false);
         addAndMakeVisible (presetsComp);
-        Timer::callAfterDelay (guiShowTime * 3 / 4, [=] { presetsComp.getPresetMenuBox().showPopup(); });
+        Timer::callAfterDelay (guiShowTime * 3 / 4, [=]
+                               { presetsComp.getPresetMenuBox().showPopup(); });
 
         setSize (500, 500);
     }
@@ -134,8 +138,10 @@ public:
 
         setVisible (true);
 
-        Timer::callAfterDelay (guiShowTime / 2, [=] { comp->tabs.setCurrentTabIndex (1); });
-        Timer::callAfterDelay (guiShowTime, [=] { closeButtonPressed(); });
+        Timer::callAfterDelay (guiShowTime / 2, [=]
+                               { comp->tabs.setCurrentTabIndex (1); });
+        Timer::callAfterDelay (guiShowTime, [=]
+                               { closeButtonPressed(); });
     }
 
     void closeButtonPressed() override
@@ -162,7 +168,7 @@ public:
     bool moreThanOneInstanceAllowed() override { return false; }
 
     //==============================================================================
-    void initialise (const String& commandLine) override
+    void initialise (const String&) override
     {
         // This method is where you should put your application's initialisation code..
         mainWindow = std::make_unique<GUIWindow>();

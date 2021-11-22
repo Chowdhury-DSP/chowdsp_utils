@@ -1,5 +1,4 @@
-#include "test_utils.h"
-#include <JuceHeader.h>
+#include <test_utils.h>
 
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wpessimizing-move") // Clang doesn't like std::move
 

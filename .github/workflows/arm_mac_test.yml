@@ -48,7 +48,7 @@ jobs:
         env:
           CMAKE_ARGS: ${{ matrix.cmake_args }}
         shell: bash
-        run: cmake -Bbuild -GXcode -D"CMAKE_OSX_ARCHITECTURES=arm64;x86_64" -DXSIMD_PATH=../xsimd
+        run: cmake -Bbuild -DCHOWDSP_ENABLE_TESTING=ON -GXcode -D"CMAKE_OSX_ARCHITECTURES=arm64;x86_64" -DXSIMD_PATH=../xsimd
 
       - name: Build
         working-directory: ${{env.WORK_DIR}}/build
