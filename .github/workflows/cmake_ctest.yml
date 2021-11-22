@@ -64,7 +64,7 @@ jobs:
         env:
           CMAKE_ARGS: ${{ matrix.cmake_args }}
         shell: bash
-        run: cmake -Bbuild $CMAKE_ARGS
+        run: cmake -Bbuild -DCHOWDSP_ENABLE_TESTING=ON $CMAKE_ARGS
 
       - name: Build
         working-directory: ${{env.WORK_DIR}}/build

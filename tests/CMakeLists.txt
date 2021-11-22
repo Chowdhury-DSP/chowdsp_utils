@@ -1,52 +1,22 @@
-target_sources(chowdsp_utils_tests PRIVATE
-        test.cpp
+include(CTest)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+include(SubprojectVersion)
+include(EnableCoverageFlags)
+include(SetupJuceTest)
 
-        dsp_tests/BBDTest.cpp
-        dsp_tests/BypassTest.cpp
-        dsp_tests/ConvolutionTest.cpp
-        dsp_tests/GainTest.cpp
-        dsp_tests/PannerTest.cpp
-        dsp_tests/PitchShiftTest.cpp
-        dsp_tests/ResamplerTest.cpp
+# set up JUCE
+add_subdirectory(${CMAKE_SOURCE_DIR}/../../JUCE JUCE)
+subproject_version(JUCE juce_version)
+message(STATUS "VERSION for JUCE: ${juce_version}")
 
-        dsp_tests/source_tests/NoiseTest.cpp
-        dsp_tests/source_tests/SineTest.cpp
+juce_add_modules(
+    ${CMAKE_SOURCE_DIR}/../foleys_gui_magic
+    ${CMAKE_SOURCE_DIR}/modules/chowdsp_dsp
+    ${CMAKE_SOURCE_DIR}/modules/chowdsp_gui
+    ${CMAKE_SOURCE_DIR}/modules/chowdsp_plugin_utils)
 
-        dsp_tests/filter_tests/ModalFilterTest.cpp
-        dsp_tests/filter_tests/NthOrderFilterTest.cpp
-        dsp_tests/filter_tests/ShelfFilterTest.cpp
+option(CODE_COVERAGE "Enable coverage reporting" OFF)
 
-        dsp_tests/simd_tests/SIMDComplexTest.cpp
-        dsp_tests/simd_tests/SIMDSmoothedValueTest.cpp
-        dsp_tests/simd_tests/SIMDUtilsTest.cpp
-
-        dsp_tests/wdf_tests/OmegaTest.cpp
-        dsp_tests/wdf_tests/RTypeTest.cpp
-        dsp_tests/wdf_tests/SIMDWDFTest.cpp
-        dsp_tests/wdf_tests/StaticWDFTest.cpp
-        dsp_tests/wdf_tests/WDFTest.cpp
-        dsp_tests/wdf_tests/WDFPerf.cpp
-
-        gui_tests/FoleysTest.cpp
-        gui_tests/LNFAllocatorTest.cpp
-        gui_tests/PresetsCompTest.cpp
-
-        utils_tests/ParamStringsTest.cpp
-        utils_tests/PluginBaseTest.cpp
-        utils_tests/VersionUtilsTest.cpp
-        utils_tests/PresetTest.cpp
-        utils_tests/PresetManagerTest.cpp
-        utils_tests/PluginLoggerTest.cpp
-        )
-
-target_sources(chowdsp_gui_test PRIVATE
-        gui_tests/GUITest.cpp
-        )
-
-target_sources(wdf_test PRIVATE
-        wdf_standalone_test.cpp
-        )
-
-juce_add_binary_data(UnitTestData SOURCES
-        utils_tests/test_preset.preset
-        )
+add_subdirectory(chowdsp_utils_test)
+add_subdirectory(chowdsp_gui_test)
+add_subdirectory(wdf_standalone_test)

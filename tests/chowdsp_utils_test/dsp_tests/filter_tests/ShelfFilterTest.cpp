@@ -1,4 +1,4 @@
-#include "test_utils.h"
+#include "chowdsp_utils_test/test_utils.h"
 #include <JuceHeader.h>
 
 namespace Constants
@@ -42,7 +42,8 @@ public:
         chowdsp::ShelfFilter shelfFilter;
         shelfFilter.calcCoefs (Constants::lowGain, Constants::highGain, Constants::fc, Constants::fs);
 
-        auto testFrequency = [=, &shelfFilter] (float freq, float expGain, const String& message) {
+        auto testFrequency = [=, &shelfFilter] (float freq, float expGain, const String& message)
+        {
             auto buffer = test_utils::makeSineWave (freq, Constants::fs, 1.0f);
 
             shelfFilter.reset();

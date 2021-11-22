@@ -1,4 +1,4 @@
-#include "test_utils.h"
+#include "chowdsp_utils_test/test_utils.h"
 #include "CommonWDFTests.h"
 
 namespace
