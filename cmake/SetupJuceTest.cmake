@@ -23,7 +23,7 @@ function(setup_juce_test target)
         juce::juce_recommended_warning_flags
     )
 
-    add_test(NAME ${target} COMMAND ${target})
+    add_test(NAME ${target} COMMAND $<TARGET_FILE:${target}>)
 
     # supress warning from Foley's
     if ((CMAKE_CXX_COMPILER_ID STREQUAL "MSVC") OR (CMAKE_CXX_SIMULATE_ID STREQUAL "MSVC"))
