@@ -1,4 +1,4 @@
-#include "../DummyPlugin.h"
+#include "chowdsp_utils/tests/chowdsp_utils_test/DummyPlugin.h"
 
 namespace
 {
@@ -9,8 +9,8 @@ constexpr int guiShowTime = 1000;
 class PlainComponent : public Component
 {
 public:
-    PlainComponent (Colour colour)
-        : colour (colour)
+    PlainComponent (Colour c)
+        : colour (c)
     {
     }
 
@@ -162,7 +162,7 @@ public:
     bool moreThanOneInstanceAllowed() override { return false; }
 
     //==============================================================================
-    void initialise (const String& commandLine) override
+    void initialise (const String&) override
     {
         // This method is where you should put your application's initialisation code..
         mainWindow = std::make_unique<GUIWindow>();
