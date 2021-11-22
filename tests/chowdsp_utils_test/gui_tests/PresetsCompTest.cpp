@@ -1,5 +1,5 @@
-#include "chowdsp_utils_test/DummyPlugin.h"
-#include "chowdsp_utils_test/test_utils.h"
+#include <DummyPlugin.h>
+#include <test_utils.h>
 
 using namespace test_utils;
 

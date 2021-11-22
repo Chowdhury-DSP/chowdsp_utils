@@ -1,4 +1,4 @@
-#include "chowdsp_utils_test/test_utils.h"
+#include <test_utils.h>
 
 using namespace chowdsp;
 
