@@ -1,4 +1,4 @@
-#include "test_utils.h"
+#include "chowdsp_utils_test/test_utils.h"
 #include <JuceHeader.h>
 
 namespace Constants
@@ -18,7 +18,8 @@ public:
     template <typename Filter>
     void testFilter (Filter& filt, std::vector<float> freqs, std::vector<float> mags, std::vector<float> errs, const StringArray& messages)
     {
-        auto testFrequency = [=, &filt] (float freq, float expGain, float err, const String& message) {
+        auto testFrequency = [=, &filt] (float freq, float expGain, float err, const String& message)
+        {
             auto buffer = test_utils::makeSineWave (freq, Constants::fs, 1.0f);
 
             filt.reset();
