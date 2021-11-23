@@ -91,6 +91,26 @@ public:
     }
 
     template <typename RType>
+    void resamplerResetTest()
+    {
+        std::vector<float> inData;
+        gen_sine (inData, 100.0f, origSampleRate, origBlockSize);
+
+        std::vector<float> outData1 (origBlockSize * 2);
+        std::vector<float> outData2 (origBlockSize * 2);
+
+        RType resampler;
+        resampler.prepare (origSampleRate, 2.0);
+
+        auto outSamples1 = resampler.process (inData.data(), outData1.data(), origBlockSize);
+
+        resampler.reset();
+        auto outSamples2 = resampler.process (inData.data(), outData2.data(), origBlockSize);
+
+        expectEquals (outSamples2, outSamples1, "Incorrect number of generated samples after reset!");
+    }
+
+    template <typename RType>
     void resamplingFactorTest()
     {
         chowdsp::ResampledProcess<RType> resampledProcess;
@@ -213,6 +233,9 @@ public:
         beginTest ("Lanczos Wide");
         testResampler<LanczosResampler<4096, 32>> (100.0f, 0.01, 0.05);
 
+        beginTest ("Resampler Reset Test (Lanczos)");
+        resamplerResetTest<LanczosResampler<>>();
+
         beginTest ("Resampling Ratio Test (Lanczos)");
         resamplingFactorTest<LanczosResampler<>>();
 
@@ -232,6 +255,9 @@ public:
         beginTest ("SRC Fastest");
         testResampler<SRCResampler<SRC_SINC_FASTEST>> (100.0f, 1.0e-5, 0.01);
 
+        beginTest ("Resampler Reset Test (SRC)");
+        resamplerResetTest<SRCResampler<>>();
+
         beginTest ("Resampling Ratio Test (SRC)");
         resamplingFactorTest<SRCResampler<>>();
 
@@ -241,8 +267,6 @@ public:
         beginTest ("Resampled Process Test (SRC)");
         resampledProcessTest<SRCResampler<SRC_SINC_FASTEST>> (100.0f, 1.0e-5, 0.01);
 #endif
-
-        std::cout << "Finished!" << std::endl;
     }
 };
 
