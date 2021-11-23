@@ -3,11 +3,28 @@
 namespace chowdsp
 {
 template <typename FloatType, typename ValueSmoothingTypes>
+void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::setParameterHandle (std::atomic<float>* handle)
+{
+    parameterHandle = handle;
+    reset (*parameterHandle);
+}
+
+template <typename FloatType, typename ValueSmoothingTypes>
 void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::prepare (double fs, int samplesPerBlock)
 {
     sampleRate = fs;
     buffer.setSize (1, samplesPerBlock);
 
+    if (parameterHandle != nullptr)
+        reset (*parameterHandle);
+    else
+        reset();
+}
+
+template <typename FloatType, typename ValueSmoothingTypes>
+void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::reset (FloatType resetValue)
+{
+    smoother.setTargetValue (resetValue);
     reset();
 }
 

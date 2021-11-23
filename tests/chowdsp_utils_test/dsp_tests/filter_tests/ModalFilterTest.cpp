@@ -25,7 +25,7 @@ public:
         if (std::is_same_v<T, float>)
             return "Float";
         if (std::is_same_v<T, double>)
-            return "Float";
+            return "Double";
         if (std::is_same_v<T, dsp::SIMDRegister<float>>)
             return "SIMD Float";
         if (std::is_same_v<T, dsp::SIMDRegister<double>>)

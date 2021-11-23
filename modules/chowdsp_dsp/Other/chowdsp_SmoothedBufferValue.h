@@ -19,10 +19,13 @@ public:
      *
      * @param handle A parameter handle to use for smoothing
      */
-    void setParameterHandle (std::atomic<float>* handle) { parameterHandle = handle; }
+    void setParameterHandle (std::atomic<float>* handle);
 
     /** Prepare the smoother to process samples with a given sample rate and block size. */
     void prepare (double sampleRate, int samplesPerBlock);
+
+    /** Resets the state of the smoother with a given value. */
+    void reset (FloatType resetValue);
 
     /** Resets the state of the smoother. */
     void reset();
