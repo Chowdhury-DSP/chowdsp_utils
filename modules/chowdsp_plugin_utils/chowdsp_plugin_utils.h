@@ -42,6 +42,7 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 #endif
 
 #include "Parameters/chowdsp_ParamUtils.h"
+#include "Parameters/chowdsp_ForwardingParameter.h"
 #include "Version/chowdsp_VersionUtils.h"
 
 #include "Presets/chowdsp_Preset.h"
