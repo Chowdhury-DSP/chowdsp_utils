@@ -5,6 +5,7 @@ target_sources(chowdsp_utils_tests PRIVATE
     PresetTest.cpp
     PresetManagerTest.cpp
     PluginLoggerTest.cpp
+    ForwardingParameterTest.cpp
 )
 
 juce_add_binary_data(UnitTestData SOURCES
