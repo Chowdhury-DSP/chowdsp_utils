@@ -35,7 +35,7 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
 #elif defined(_M_ARM64) || defined(__arm64__) || defined(__aarch64__)
     inline vec4 operator/ (const vec4& l, const vec4& r)
     {
-        return vdivq_f32 (l.value, r.value)
+        return vdivq_f32 (l.value, r.value);
     }
 
     inline vec2 operator/ (const vec2& l, const vec2& r)
