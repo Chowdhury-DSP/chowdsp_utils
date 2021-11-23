@@ -13,15 +13,17 @@ template <typename ResamplerType>
 class ResamplingProcessor
 {
 public:
+    static_assert (std::is_base_of<ResamplingTypes::BaseResampler, ResamplerType>::value, "ResamplerType must be derived from BaseResampler");
+
     /** Default constructor */
     ResamplingProcessor() = default;
 
     /** Prepares the resampler to process a new stream of data */
-    void prepare (const juce::dsp::ProcessSpec& spec)
+    void prepare (const juce::dsp::ProcessSpec& spec, double startRatio = 1.0)
     {
         resamplers = std::vector<ResamplerType> (spec.numChannels);
         for (auto& r : resamplers)
-            r.prepare (spec.sampleRate);
+            r.prepare (spec.sampleRate, startRatio);
 
         outputBuffer.setSize ((int) spec.numChannels,
                               (int) spec.maximumBlockSize * 20);

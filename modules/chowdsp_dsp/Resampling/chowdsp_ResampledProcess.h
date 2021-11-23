@@ -7,13 +7,15 @@ template <typename ResamplerType>
 class ResampledProcess
 {
 public:
+    static_assert (std::is_base_of<ResamplingTypes::BaseResampler, ResamplerType>::value, "ResamplerType must be derived from BaseResampler");
+
     ResampledProcess() = default;
 
     /** Prepares the resampler to process a new stream of data */
-    void prepare (const juce::dsp::ProcessSpec& spec)
+    void prepare (const juce::dsp::ProcessSpec& spec, double startRatio = 1.0)
     {
-        inputResampler.prepare (spec);
-        outputResampler.prepare (spec);
+        inputResampler.prepare (spec, startRatio);
+        outputResampler.prepare (spec, 1.0 / startRatio);
 
         leftoverBuffer.resize (spec.numChannels, 0.0f);
         leftoverAvailable = false;
@@ -92,7 +94,7 @@ public:
             for (int ch = 0; ch < (int) outputBlock.getNumChannels(); ++ch)
             {
                 auto* destData = outputBlock.getChannelPointer ((size_t) ch);
-                destData[0] = leftoverBuffer[ch];
+                destData[0] = leftoverBuffer[(size_t) ch];
             }
 
             destStart = 1;
@@ -121,7 +123,7 @@ public:
                 auto* destData = outputBlock.getChannelPointer ((size_t) ch);
                 juce::FloatVectorOperations::copy (destData + destStart, srcData, expectedSamples);
 
-                leftoverBuffer[ch] = srcData[availableSamples - 1];
+                leftoverBuffer[(size_t) ch] = srcData[availableSamples - 1];
             }
 
             leftoverAvailable = true;

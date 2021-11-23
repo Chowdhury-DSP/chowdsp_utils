@@ -5,6 +5,7 @@ namespace
 constexpr float origSampleRate = 48000.0;
 constexpr int origNumSamples = 4800;
 constexpr int origBlockSize = 480;
+constexpr float testSRRatios[] = { 1.0f, 2.0f, 1.5f, 0.5f, 0.667f };
 } // namespace
 
 class ResamplerTest : public UnitTest
@@ -15,14 +16,14 @@ public:
     void gen_sine (std::vector<float>& audio, float freq, float fs, int num_samples)
     {
         audio.resize ((size_t) num_samples, 0.0f);
-        std::generate (audio.begin(), audio.end(), [=, n = 0.0f]() mutable {
-            return std::sin (MathConstants<float>::twoPi * (float) n++ * freq / fs);
-        });
+        std::generate (audio.begin(), audio.end(), [=, n = 0.0f]() mutable
+                       { return std::sin (MathConstants<float>::twoPi * (float) n++ * freq / fs); });
     }
 
     std::pair<int, int> calc_latency (const std::vector<float>& data, const std::vector<float>& ref_data)
     {
-        auto find_first_point5 = [] (const std::vector<float>& x) -> int {
+        auto find_first_point5 = [] (const std::vector<float>& x) -> int
+        {
             for (size_t i = 0; i < x.size(); ++i)
             {
                 if (x[i] >= 0.5f)
@@ -67,25 +68,25 @@ public:
     {
         std::vector<float> inData;
         gen_sine (inData, freq, origSampleRate, origNumSamples);
-        auto testSampleRate = [=] (float outSampleRate) {
+        auto testSampleRate = [=] (float outSampleRate)
+        {
             const auto ratio = outSampleRate / origSampleRate;
 
             RType resampler;
             resampler.prepare (origSampleRate, ratio);
 
-            constexpr size_t block_size = 256;
             std::vector<float> out (size_t (origNumSamples * ratio) + 1, 0.0f);
 
             size_t out_ptr = 0;
-            for (size_t i = 0; i + block_size < inData.size(); i += block_size)
-                out_ptr += resampler.process (&inData[i], &out[out_ptr], block_size);
+            for (size_t i = 0; i + origBlockSize < inData.size(); i += origBlockSize)
+                out_ptr += resampler.process (&inData[i], &out[out_ptr], origBlockSize);
 
             auto [avgError, maxError] = calc_error (freq, outSampleRate, out, (int) out_ptr);
             expectLessThan (avgError, avgErrLimit, "Avg. Error is too large! Sample rate: " + String (outSampleRate));
             expectLessThan (maxError, maxErrLimit, "Max Error is too large! Sample rate: " + String (outSampleRate));
         };
 
-        for (auto factor : { 1.0f, 2.0f, 1.5f, 0.5f, 0.667f })
+        for (auto factor : testSRRatios)
             testSampleRate (origSampleRate * factor);
     }
 
@@ -95,7 +96,7 @@ public:
         chowdsp::ResampledProcess<RType> resampledProcess;
         resampledProcess.prepare ({ (double) origSampleRate, (uint32) origBlockSize, 1 });
 
-        for (auto factor : { 1.0f, 2.0f, 1.5f, 0.5f, 0.667f })
+        for (auto factor : testSRRatios)
         {
             resampledProcess.setResampleRatio (factor);
 
@@ -111,7 +112,7 @@ public:
         chowdsp::ResampledProcess<RType> resampledProcess;
         resampledProcess.prepare ({ (double) origSampleRate, (uint32) origBlockSize, 1 });
 
-        for (auto factor : { 1.0f, 2.0f, 1.5f, 0.5f, 0.667f })
+        for (auto factor : testSRRatios)
         {
             resampledProcess.setTargetSampleRate (origSampleRate * factor);
 
@@ -125,21 +126,24 @@ public:
     {
         std::vector<float> inData;
         gen_sine (inData, freq, origSampleRate, origNumSamples);
-        auto testSampleRate = [=] (float targetSampleRate) {
+        auto testSampleRate = [=] (float targetSampleRate)
+        {
             const auto ratio = targetSampleRate / origSampleRate;
             const auto expBlockSize = int ((float) origBlockSize * ratio);
 
             chowdsp::ResampledProcess<RType> resampler;
-            resampler.prepare ({ (double) origSampleRate, (uint32) origBlockSize, 1 });
-            resampler.setTargetSampleRate (targetSampleRate);
+            resampler.prepare ({ (double) origSampleRate, (uint32) origBlockSize, 1 }, (double) ratio);
 
             AudioBuffer<float> buffer (1, origNumSamples);
             buffer.copyFrom (0, 0, inData.data(), origNumSamples);
             dsp::AudioBlock<float> rBlock (buffer);
 
+            AudioBuffer<float> outBuffer (1, origNumSamples);
+
             std::vector<float> out (size_t (origNumSamples * ratio) + 1, 0.0f);
 
             size_t out_ptr = 0;
+            int out_ptr2 = 0;
             for (int i = 0; i + origBlockSize < origNumSamples; i += origBlockSize)
             {
                 auto block = rBlock.getSubBlock ((size_t) i, (size_t) origBlockSize);
@@ -152,14 +156,44 @@ public:
                 auto rPtr = resampledBlock.getChannelPointer (0);
                 std::copy (rPtr, rPtr + rSize, out.begin() + (int) out_ptr);
                 out_ptr += rSize;
+
+                resampler.processOut (resampledBlock, block);
+                const auto* blockPtr = block.getChannelPointer (0);
+                const auto maxValue = FloatVectorOperations::findMaximum (blockPtr, origBlockSize);
+                if (maxValue > 0.0f)
+                {
+                    outBuffer.copyFrom (0, out_ptr2, blockPtr, origBlockSize);
+                    out_ptr2 += origBlockSize;
+                }
             }
 
-            auto [avgError, maxError] = calc_error (freq, targetSampleRate, out, (int) out_ptr);
-            expectLessThan (avgError, avgErrLimit, "Avg. Error is too large! Sample rate: " + String (targetSampleRate));
-            expectLessThan (maxError, maxErrLimit, "Max Error is too large! Sample rate: " + String (targetSampleRate));
+            { // test resampled signal
+                auto [avgError, maxError] = calc_error (freq, targetSampleRate, out, (int) out_ptr);
+                expectLessThan (avgError, avgErrLimit, "Avg. Error at target Fs is too large! Sample rate: " + String (targetSampleRate));
+                expectLessThan (maxError, maxErrLimit, "Max Error at target Fs is too large! Sample rate: " + String (targetSampleRate));
+            }
+
+            { // test signal after conversion back to original sample rate
+                const auto* outBlockPtr = outBuffer.getReadPointer (0);
+                auto phase = std::asin (outBlockPtr[0]);
+                const auto phaseDelta = MathConstants<float>::twoPi * freq / origSampleRate;
+
+                float error = 0.0f;
+                for (int i = 0; i < out_ptr2; ++i)
+                {
+                    auto expected = std::sin (phase);
+                    auto actual = outBlockPtr[i];
+                    error += std::abs (actual - expected);
+
+                    phase += phaseDelta;
+                }
+
+                auto avgError = error / (float) out_ptr2;
+                expectLessThan (avgError, 0.1f, "Avg. Error at original Fs is too large! Sample rate: " + String (targetSampleRate));
+            }
         };
 
-        for (auto factor : { 1.0f, 2.0f, 1.5f, 0.5f, 0.667f })
+        for (auto factor : testSRRatios)
             testSampleRate (origSampleRate * factor);
     }
 
@@ -205,8 +239,10 @@ public:
         resamplingSampleRateTest<SRCResampler<>>();
 
         beginTest ("Resampled Process Test (SRC)");
-        resampledProcessTest<SRCResampler<SRC_SINC_FASTEST>> (100.0f, 1.0e-5, 0.05);
+        resampledProcessTest<SRCResampler<SRC_SINC_FASTEST>> (100.0f, 1.0e-5, 0.01);
 #endif
+
+        std::cout << "Finished!" << std::endl;
     }
 };
 
