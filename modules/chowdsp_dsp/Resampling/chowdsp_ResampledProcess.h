@@ -14,11 +14,9 @@ public:
     {
         inputResampler.prepare (spec);
         outputResampler.prepare (spec);
-        delayBuffer.prepare (spec);
-        delayBuffer.setDelay (0.0f);
 
-        delayCount = 0;
-        firstPass = true;
+        leftoverBuffer.resize (spec.numChannels, 0.0f);
+        leftoverAvailable = false;
 
         baseFs = (float) spec.sampleRate;
     }
@@ -28,10 +26,9 @@ public:
     {
         inputResampler.reset();
         outputResampler.reset();
-        delayBuffer.reset();
 
-        delayCount = 0;
-        firstPass = true;
+        std::fill (leftoverBuffer.begin(), leftoverBuffer.end(), 0.0f);
+        leftoverAvailable = false;
     }
 
     /** Sets the ratio of target sample rate over input sample rate
@@ -79,20 +76,28 @@ public:
         auto expectedSamples = (int) outputBlock.getNumSamples();
         int destStart = 0;
 
-        // get old samples from the delay buffer first
-        if (delayCount > 0)
+        if (std::abs (availableSamples - expectedSamples) > 1)
+        {
+            // we might have a few buffers that are severely under-run
+            // when starting to process with a new sample rate.
+            // For now, it's okay to clear those out, but if this branch
+            // is being hit regularly during processing, then something
+            // must be wrong!
+            outputBlock.clear();
+            return;
+        }
+
+        if (leftoverAvailable) // pop leftover samples
         {
             for (int ch = 0; ch < (int) outputBlock.getNumChannels(); ++ch)
             {
                 auto* destData = outputBlock.getChannelPointer ((size_t) ch);
-
-                for (int n = 0; n < delayCount; ++n)
-                    destData[n] = delayBuffer.popSample (ch);
+                destData[0] = leftoverBuffer[ch];
             }
 
-            destStart += delayCount;
-            expectedSamples -= delayCount;
-            delayCount = 0;
+            destStart = 1;
+            expectedSamples -= 1;
+            leftoverAvailable = false;
         }
 
         // do we have exactly the right number of samples to fill the output buffer?
@@ -110,41 +115,17 @@ public:
         // we have some extra samples after the buffer is filled!
         if (availableSamples > expectedSamples)
         {
-            const auto diff = availableSamples - expectedSamples;
             for (int ch = 0; ch < (int) outputBlock.getNumChannels(); ++ch)
             {
                 const auto* srcData = outBlockTemp.getChannelPointer ((size_t) ch);
                 auto* destData = outputBlock.getChannelPointer ((size_t) ch);
                 juce::FloatVectorOperations::copy (destData + destStart, srcData, expectedSamples);
 
-                for (int n = 0; n < diff; ++n)
-                    delayBuffer.pushSample (ch, srcData[destStart + expectedSamples + n]);
+                leftoverBuffer[ch] = srcData[availableSamples - 1];
             }
 
-            delayCount += diff;
+            leftoverAvailable = true;
             return;
-        }
-
-        // we don't have enough samples available to fill the buffer!
-        {
-            // this should only happen the first time!
-            jassert (firstPass);
-
-            const auto diff = expectedSamples - availableSamples;
-            for (int ch = 0; ch < (int) outputBlock.getNumChannels(); ++ch)
-            {
-                const auto* srcData = outBlockTemp.getChannelPointer ((size_t) ch);
-                auto* destData = outputBlock.getChannelPointer ((size_t) ch);
-
-                // front-pad with zeros
-                juce::FloatVectorOperations::fill (destData + destStart, 0.0f, diff + 1);
-                juce::FloatVectorOperations::copy (destData + destStart + diff, srcData, availableSamples - 1);
-
-                delayBuffer.pushSample (ch, srcData[availableSamples - 1]);
-            }
-
-            firstPass = false;
-            delayCount = 1;
         }
     }
 
@@ -154,10 +135,8 @@ private:
 
     float baseFs = 48000.0f;
 
-    DelayLine<float, DelayLineInterpolationTypes::None> delayBuffer { 16 };
-
-    int delayCount = 0;
-    bool firstPass = true;
+    std::vector<float> leftoverBuffer;
+    bool leftoverAvailable = false;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ResampledProcess)
 };
