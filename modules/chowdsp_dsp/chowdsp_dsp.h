@@ -128,6 +128,7 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 #include "Resampling/chowdsp_LanczosResampler.h"
 #include "Resampling/chowdsp_ResamplingProcessor.h"
 #include "Resampling/chowdsp_SRCResampler.h"
+#include "Resampling/chowdsp_ResampledProcess.h"
 
 // some other useful processors
 #include "Other/chowdsp_BypassProcessor.h"

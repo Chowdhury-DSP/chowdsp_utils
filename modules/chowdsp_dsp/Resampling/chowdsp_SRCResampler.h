@@ -25,8 +25,11 @@ namespace ResamplingTypes
         /** Resets the state of the resampler */
         void reset() override;
 
-        /** Sets the ratio of the output sample rate to input sample rate */
+        /** Sets the ratio of the output sample rate over input sample rate */
         void setResampleRatio (float newRatio) override { ratio = static_cast<double> (newRatio); }
+
+        /** Returns the ratio of the output sample rate over input sample rate */
+        float getResampleRatio() const noexcept override { return (float) ratio; }
 
         /** Processes a buffer of samples
      * 
