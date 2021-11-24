@@ -8,7 +8,8 @@ namespace chowdsp
  * This implementation was borrowed (with permission and some small
  * modifications) from Eyal Amir.
  */
-class ForwardingParameter : public juce::RangedAudioParameter
+class ForwardingParameter : public juce::RangedAudioParameter,
+                            private juce::AudioProcessorParameter::Listener
 {
 public:
     /**
@@ -20,7 +21,7 @@ public:
     explicit ForwardingParameter (const juce::String& id, const juce::String& defaultName = "Unused");
 
     /** Sets a new parameter to be forwarded */
-    void setParam (juce::RangedAudioParameter* paramToUse);
+    void setParam (juce::RangedAudioParameter* paramToUse, const juce::String& newName = {});
 
     /** Sets a new processor to forward to */
     void setProcessor (juce::AudioProcessor* processorToUse);
@@ -35,8 +36,15 @@ private:
 
     const juce::NormalisableRange<float>& getNormalisableRange() const override;
 
-    const juce::String defaultName;
+    void parameterValueChanged (int paramIdx, float newValue) override;
+    void parameterGestureChanged (int paramIdx, bool gestureIsStarting) override;
+
     juce::AudioProcessor* processor = nullptr;
     juce::RangedAudioParameter* internalParam = nullptr;
+
+    const juce::String defaultName;
+    juce::String customName = {};
+
+    bool ignoreCallbacks = false;
 };
 } // namespace chowdsp

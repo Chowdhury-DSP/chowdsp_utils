@@ -12,9 +12,17 @@ ForwardingParameter::ForwardingParameter (const juce::String& id, const juce::St
 {
 }
 
-void ForwardingParameter::setParam (juce::RangedAudioParameter* paramToUse)
+void ForwardingParameter::setParam (juce::RangedAudioParameter* paramToUse, const juce::String& newName)
 {
+    if (internalParam != nullptr)
+        internalParam->removeListener (this);
+
     internalParam = paramToUse;
+
+    if (internalParam != nullptr)
+        internalParam->addListener (this);
+
+    customName = newName;
 
     if (processor != nullptr)
 #if JUCE_VERSION > 0x60007
@@ -35,7 +43,10 @@ float ForwardingParameter::getValue() const
 void ForwardingParameter::setValue (float newValue)
 {
     if (internalParam != nullptr)
-        internalParam->setValue (newValue);
+    {
+        juce::ScopedValueSetter<bool> svs (ignoreCallbacks, true);
+        internalParam->setValueNotifyingHost (newValue);
+    }
 }
 
 float ForwardingParameter::getDefaultValue() const
@@ -64,6 +75,9 @@ float ForwardingParameter::getValueForText (const juce::String& text) const
 
 juce::String ForwardingParameter::getName (int i) const
 {
+    if (customName.isNotEmpty())
+        return customName;
+
     if (internalParam != nullptr)
         return internalParam->getName (i);
 
@@ -81,5 +95,21 @@ const juce::NormalisableRange<float>& ForwardingParameter::getNormalisableRange(
 void ForwardingParameter::setProcessor (juce::AudioProcessor* processorToUse)
 {
     processor = processorToUse;
+}
+
+void ForwardingParameter::parameterValueChanged (int, float newValue)
+{
+    if (ignoreCallbacks)
+        return;
+
+    sendValueChangedMessageToListeners (newValue);
+}
+
+void ForwardingParameter::parameterGestureChanged (int, bool gestureIsStarting)
+{
+    if (gestureIsStarting)
+        beginChangeGesture();
+    else
+        endChangeGesture();
 }
 } // namespace chowdsp
