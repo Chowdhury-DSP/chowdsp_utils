@@ -281,8 +281,11 @@ public:
         beginTest ("User Preset Path Test");
         userPresetPathTest();
 
+        // this test is SUPER slow on Mac, so let's disable it by default
+#if ! JUCE_MAC
         beginTest ("Preset State Test");
         presetStateTest();
+#endif
 
         beginTest ("Default Preset Test");
         defaultPresetTest();
