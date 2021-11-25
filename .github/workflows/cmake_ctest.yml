@@ -60,10 +60,34 @@ jobs:
         run: git clone --depth 1 --branch 7.5.0 https://github.com/xtensor-stack/xsimd
 
       - name: ccache
+        if: runner.os == 'Linux' || runner.os == 'MacOS'
         uses: hendrikmuhs/ccache-action@v1
         with:
           key: cmake_ctest-${{ matrix.os }}
-          verbose: 1
+
+      - name: Download ccache
+        if: runner.os == 'Windows'
+        shell: cmake -P {0}
+        run: |
+          set(ccache_url "https://github.com/cristianadam/ccache/releases/download/v$ENV{CCACHE_VERSION}/${{ runner.os }}.tar.xz")
+          file(DOWNLOAD "${ccache_url}" ./ccache.tar.xz SHOW_PROGRESS)
+          execute_process(COMMAND ${CMAKE_COMMAND} -E tar xvf ./ccache.tar.xz)
+
+      - name: Prepare ccache timestamp
+        if: runner.os == 'Windows'
+        shell: cmake -P {0}
+        run: |
+          string(TIMESTAMP current_date "%Y-%m-%d-%H;%M;%S" UTC)
+          message("::set-output name=timestamp::${current_date}")
+
+      - name: ccache cache files
+        if: runner.os == 'Windows'
+        uses: actions/cache@v1.1.0
+        with:
+          path: .ccache
+          key: cmake_ctest-${{ matrix.os }}-ccache-${{ steps.ccache_cache_timestamp.outputs.timestamp }}
+          restore-keys: |
+            cmake_ctest-${{ matrix.os }}-ccache-
 
       - name: Configure
         working-directory: ${{env.WORK_DIR}}
