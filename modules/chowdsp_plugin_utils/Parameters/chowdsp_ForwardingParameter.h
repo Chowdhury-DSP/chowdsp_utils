@@ -18,7 +18,7 @@ public:
      * @param id            Parameter ID for the <b>forwarded</b> parameter
      * @param defaultName   Name to use when this parameter is not forwarding another one
      */
-    explicit ForwardingParameter (const juce::String& id, const juce::String& defaultName = "Unused");
+    explicit ForwardingParameter (const juce::String& id, juce::UndoManager* um = nullptr, const juce::String& defaultName = "Unused");
 
     /** Sets a new parameter to be forwarded */
     void setParam (juce::RangedAudioParameter* paramToUse, const juce::String& newName = {});
@@ -30,7 +30,7 @@ private:
     struct ForwardingAttachment : private juce::AudioProcessorParameter::Listener,
                                   private juce::AsyncUpdater
     {
-        ForwardingAttachment (juce::RangedAudioParameter& internal, juce::RangedAudioParameter& forwarding);
+        ForwardingAttachment (juce::RangedAudioParameter& internal, juce::RangedAudioParameter& forwarding, juce::UndoManager* um);
         ~ForwardingAttachment() override;
 
         void setNewValue (float paramVal);
@@ -45,9 +45,9 @@ private:
 
         juce::RangedAudioParameter& internalParam;
         juce::RangedAudioParameter& forwardingParam;
+        juce::UndoManager* undoManager;
 
         float newValue = 0.0f;
-        bool ignoreCallbacks = false;
     };
 
     float getValue() const override;
@@ -61,11 +61,11 @@ private:
 
     juce::AudioProcessor* processor = nullptr;
     juce::RangedAudioParameter* internalParam = nullptr;
+
     std::unique_ptr<ForwardingAttachment> attachment;
+    juce::UndoManager* undoManager;
 
     const juce::String defaultName;
     juce::String customName = {};
-
-    bool ignoreCallbacks = false;
 };
 } // namespace chowdsp

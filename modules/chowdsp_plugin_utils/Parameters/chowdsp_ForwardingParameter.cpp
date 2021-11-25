@@ -7,9 +7,8 @@ const juce::NormalisableRange<float> defaultRange { 0.0f, 1.0f, 0.01f, 1.0f };
 
 namespace chowdsp
 {
-// @TODO: Add options for UndoManager...
-ForwardingParameter::ForwardingAttachment::ForwardingAttachment (juce::RangedAudioParameter& internal, juce::RangedAudioParameter& forwarding)
-    : internalParam (internal), forwardingParam (forwarding)
+ForwardingParameter::ForwardingAttachment::ForwardingAttachment (juce::RangedAudioParameter& internal, juce::RangedAudioParameter& forwarding, juce::UndoManager* um)
+    : internalParam (internal), forwardingParam (forwarding), undoManager (um)
 {
     internalParam.addListener (this);
 }
@@ -21,7 +20,9 @@ ForwardingParameter::ForwardingAttachment::~ForwardingAttachment()
 
 void ForwardingParameter::ForwardingAttachment::beginGesture()
 {
-    // @TODO: UndoManager call here...
+    if (undoManager != nullptr)
+        undoManager->beginNewTransaction();
+
     forwardingParam.beginChangeGesture();
 }
 
@@ -52,9 +53,6 @@ void ForwardingParameter::ForwardingAttachment::handleAsyncUpdate()
 
 void ForwardingParameter::ForwardingAttachment::parameterValueChanged (int, float value)
 {
-    if (ignoreCallbacks)
-        return;
-
     forwardingParam.sendValueChangedMessageToListeners (value);
 }
 
@@ -67,8 +65,8 @@ void ForwardingParameter::ForwardingAttachment::parameterGestureChanged (int, bo
 }
 
 //=================================================================================
-ForwardingParameter::ForwardingParameter (const juce::String& id, const juce::String& thisDefaultName)
-    : juce::RangedAudioParameter (id, thisDefaultName), defaultName (thisDefaultName)
+ForwardingParameter::ForwardingParameter (const juce::String& id, juce::UndoManager* um, const juce::String& thisDefaultName)
+    : juce::RangedAudioParameter (id, thisDefaultName), undoManager (um), defaultName (thisDefaultName)
 {
 }
 
@@ -80,7 +78,7 @@ void ForwardingParameter::setParam (juce::RangedAudioParameter* paramToUse, cons
     internalParam = paramToUse;
 
     if (internalParam != nullptr)
-        attachment = std::make_unique<ForwardingAttachment> (*internalParam, *this);
+        attachment = std::make_unique<ForwardingAttachment> (*internalParam, *this, undoManager);
 
     customName = newName;
 
@@ -104,8 +102,6 @@ void ForwardingParameter::setValue (float newValue)
 {
     if (internalParam != nullptr)
     {
-        juce::ScopedValueSetter<bool> svs (ignoreCallbacks, true);
-
         if (newValue != internalParam->getValue())
             attachment->setNewValue (newValue);
     }
