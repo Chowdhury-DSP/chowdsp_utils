@@ -1,4 +1,5 @@
 #include <test_utils.h>
+#include <TimedUnitTest.h>
 #include "CommonWDFTests.h"
 
 namespace
@@ -19,10 +20,10 @@ using namespace chowdsp::WDF;
  * 
  * @TODO: add tests for current divider
  */
-class WDFTest : public UnitTest
+class WDFTest : public TimedUnitTest
 {
 public:
-    WDFTest() : UnitTest ("Wave Digital Filter Test") {}
+    WDFTest() : TimedUnitTest ("Wave Digital Filter Test") {}
 
     void rcLowpassTest()
     {
@@ -208,7 +209,7 @@ public:
             ResistiveCurrentSource<float> { 1000.0f }, "ResistiveCurrentSource", 1000.0f, 2000.0f, [=] (ResistiveCurrentSource<float>& r, float value) { r.setResistanceValue (value); }, [=] (float value) { return value; });
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("Voltage Divider Test");
         voltageDividerTest<float> (*this);

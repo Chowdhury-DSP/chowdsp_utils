@@ -1,4 +1,5 @@
 #include <test_utils.h>
+#include <TimedUnitTest.h>
 
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wpessimizing-move") // Clang doesn't like std::move
 
@@ -31,10 +32,10 @@ constexpr size_t posDiff = negDiff + 1;
  *  - Shifting by semitones
  *  - No shift
  */
-class PitchShiftTest : public UnitTest
+class PitchShiftTest : public TimedUnitTest
 {
 public:
-    PitchShiftTest() : UnitTest ("Pitch Shift Test") {}
+    PitchShiftTest() : TimedUnitTest ("Pitch Shift Test") {}
 
     /** Returns frequency domain SNR in dB */
     float calcSNR (const AudioBuffer<float>& buffer, float freqExpected)
@@ -137,7 +138,7 @@ public:
         expectGreaterOrEqual (snr, minSNR, "SNR too low!");
     }
 
-    void runTest()
+    void runTestTimed()
     {
         beginTest ("Single-sample Processing");
         runPitchShiftTest (false, true, true, 35.0f);

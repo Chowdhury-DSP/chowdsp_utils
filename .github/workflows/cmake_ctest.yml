@@ -28,7 +28,7 @@ jobs:
           - os: windows-latest
             cmake_args: ""
           - os: macos-latest
-            cmake_args: "-GXcode -DXSIMD_PATH=../xsimd"
+            cmake_args: "-DCMAKE_BUILD_TYPE=Release -DXSIMD_PATH=../xsimd"
 
     steps:
       - name: Install Linux Deps
@@ -59,12 +59,18 @@ jobs:
         working-directory: ${{github.workspace}}/JUCE_modules
         run: git clone --depth 1 --branch 7.5.0 https://github.com/xtensor-stack/xsimd
 
+      - name: ccache
+        if: runner.os == 'Linux' || runner.os == 'MacOS'
+        uses: hendrikmuhs/ccache-action@v1
+        with:
+          key: cmake_ctest-${{ matrix.os }}
+
       - name: Configure
         working-directory: ${{env.WORK_DIR}}
         env:
           CMAKE_ARGS: ${{ matrix.cmake_args }}
         shell: bash
-        run: cmake -Bbuild -DCHOWDSP_ENABLE_TESTING=ON $CMAKE_ARGS
+        run: cmake -Bbuild -DCHOWDSP_ENABLE_TESTING=ON -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache $CMAKE_ARGS
 
       - name: Build
         working-directory: ${{env.WORK_DIR}}/build

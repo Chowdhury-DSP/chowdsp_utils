@@ -1,9 +1,9 @@
-#include <JuceHeader.h>
+#include <TimedUnitTest.h>
 
-class LNFAllocatorTest : public UnitTest
+class LNFAllocatorTest : public TimedUnitTest
 {
 public:
-    LNFAllocatorTest() : UnitTest ("LNF Allocator Test")
+    LNFAllocatorTest() : TimedUnitTest ("LNF Allocator Test")
     {
     }
 
@@ -33,7 +33,7 @@ public:
         expect (! allocator.containsLookAndFeelType<LookAndFeel_V4>(), "Allocator should not contain this look and feel!");
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("Get LookAndFeel Test");
         getLookAndFeelTest();

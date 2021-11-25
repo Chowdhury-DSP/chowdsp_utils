@@ -1,4 +1,5 @@
 #include <test_utils.h>
+#include <TimedUnitTest.h>
 
 namespace
 {
@@ -89,10 +90,10 @@ private:
     WDFT::RootRtypeAdaptor<double, S1Type, SeriesRes, S2Type, WDFT::CapacitorAlphaT<double>, WDFT::ResistorT<double>, WDFT::CapacitorAlphaT<double>> R;
 };
 
-class RTypeTest : public UnitTest
+class RTypeTest : public TimedUnitTest
 {
 public:
-    RTypeTest() : UnitTest ("Wave Digital Filter R-Type Test") {}
+    RTypeTest() : TimedUnitTest ("Wave Digital Filter R-Type Test") {}
 
     void freqTest (float lowPot, float highPot, float sineFreq, float expGainDB, float maxErr)
     {
@@ -108,7 +109,7 @@ public:
         expectWithinAbsoluteError (actualGainDB, expGainDB, maxErr);
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("Bass Test");
         freqTest (0.5f, 0.0f, 60.0f, -8.0f, 0.5f);

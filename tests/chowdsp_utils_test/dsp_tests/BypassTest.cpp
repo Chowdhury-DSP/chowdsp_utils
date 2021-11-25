@@ -1,4 +1,4 @@
-#include <JuceHeader.h>
+#include <TimedUnitTest.h>
 
 namespace
 {
@@ -8,10 +8,10 @@ constexpr int pulseSpace = 100;
 constexpr float delaySamp = 5.0f;
 } // namespace
 
-class BypassTest : public UnitTest
+class BypassTest : public TimedUnitTest
 {
 public:
-    BypassTest() : UnitTest ("Bypass Test") {}
+    BypassTest() : TimedUnitTest ("Bypass Test") {}
 
     float* getBufferPtr (AudioBuffer<float>& buffer)
     {
@@ -181,7 +181,7 @@ public:
         checkPulseSpacing (buffer.getReadPointer (0), nIter * nSamples, pulseSpace);
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("Audio Buffer Test");
         audioBufferTest (5);

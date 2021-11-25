@@ -1,4 +1,5 @@
 #include <test_utils.h>
+#include <TimedUnitTest.h>
 
 namespace
 {
@@ -8,10 +9,10 @@ constexpr int nSamples = 512;
 constexpr float lenSeconds = (float) nSamples / fs;
 } // namespace
 
-class PannerTest : public UnitTest
+class PannerTest : public TimedUnitTest
 {
 public:
-    PannerTest() : UnitTest ("Panner Test") {}
+    PannerTest() : TimedUnitTest ("Panner Test") {}
 
     void bufferTest()
     {
@@ -85,7 +86,7 @@ public:
         expectWithinAbsoluteError (rightMag, 1.0f, 1.0e-3f);
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("Buffer Test");
         bufferTest();

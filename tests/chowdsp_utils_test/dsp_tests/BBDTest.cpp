@@ -1,9 +1,10 @@
 #include <test_utils.h>
+#include <TimedUnitTest.h>
 
-class BBDTest : public UnitTest
+class BBDTest : public TimedUnitTest
 {
 public:
-    BBDTest() : UnitTest ("BBD Test") {}
+    BBDTest() : TimedUnitTest ("BBD Test") {}
 
     void processDelay (double fs, float delaySamples, float* samples, int numSamples)
     {
@@ -121,7 +122,7 @@ public:
         expectLessThan (firstNonZero, 170, "First non-zero sample should be less than 170!");
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("Pre-Delay Test");
         preDelayTest();

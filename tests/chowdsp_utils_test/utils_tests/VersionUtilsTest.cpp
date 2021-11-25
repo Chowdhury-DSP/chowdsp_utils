@@ -1,11 +1,11 @@
-#include <JuceHeader.h>
+#include <TimedUnitTest.h>
 
 using namespace chowdsp::VersionUtils;
 
-class VersionUtilsTest : public UnitTest
+class VersionUtilsTest : public TimedUnitTest
 {
 public:
-    VersionUtilsTest() : UnitTest ("Version Utils Test")
+    VersionUtilsTest() : TimedUnitTest ("Version Utils Test")
     {
     }
 
@@ -57,7 +57,7 @@ public:
         expectEquals (v2.getVersionString(), String ("1.2.3"), "Incorrect version string!");
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("Version Compare Test");
         versionCompareTest();

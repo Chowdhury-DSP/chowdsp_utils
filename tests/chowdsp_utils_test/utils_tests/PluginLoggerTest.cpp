@@ -1,5 +1,5 @@
 #include <future>
-#include <JuceHeader.h>
+#include <TimedUnitTest.h>
 
 namespace
 {
@@ -7,10 +7,10 @@ const String logFileSubDir = "chowdsp/utils_test";
 const String logFileNameRoot = "chowdsp_utils_test_Log_";
 } // namespace
 
-class PluginLoggerTest : public UnitTest
+class PluginLoggerTest : public TimedUnitTest
 {
 public:
-    PluginLoggerTest() : UnitTest ("Plugin Logger Test")
+    PluginLoggerTest() : TimedUnitTest ("Plugin Logger Test")
     {
     }
 
@@ -37,10 +37,11 @@ public:
     void limitNumLogFilesTest()
     {
         constexpr int numLoggersAtOnce = 5;
-        constexpr int numIters = 100;
+        constexpr int numIters = 20;
 
         auto logsDirectory = FileLogger::getSystemLogFileFolder().getChildFile (logFileSubDir);
-        auto getNumLogFiles = [&] {
+        auto getNumLogFiles = [&]
+        {
             return logsDirectory.getNumberOfChildFiles (File::findFiles, "*");
         };
 
@@ -49,7 +50,8 @@ public:
             using LoggerPtr = std::unique_ptr<chowdsp::PluginLogger>;
             std::vector<std::future<LoggerPtr>> futures;
             for (int j = 0; j < numLoggersAtOnce; ++j)
-                futures.push_back (std::async (std::launch::async, [] { return std::make_unique<chowdsp::PluginLogger> (logFileSubDir, logFileNameRoot); }));
+                futures.push_back (std::async (std::launch::async, []
+                                               { return std::make_unique<chowdsp::PluginLogger> (logFileSubDir, logFileNameRoot); }));
 
             auto numLogFiles = getNumLogFiles();
             expectLessOrEqual (numLogFiles, 55, "Too many log files found in logs directory!");
@@ -103,7 +105,7 @@ public:
         }
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("Basic Log Test");
         basicLogTest();

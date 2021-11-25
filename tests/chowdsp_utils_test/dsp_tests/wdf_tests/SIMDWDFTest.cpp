@@ -1,4 +1,5 @@
 #include <test_utils.h>
+#include <TimedUnitTest.h>
 #include "CommonWDFTests.h"
 
 namespace
@@ -13,10 +14,10 @@ using namespace chowdsp;
  *   - Test accuracy between SIMD and scalar WDF for diode clipper circuit
  *   - Test accuracy between static and run-time SIMD WDF
  */
-class SIMDWDFTest : public UnitTest
+class SIMDWDFTest : public TimedUnitTest
 {
 public:
-    SIMDWDFTest() : UnitTest ("SIMD Wave Digital Filter Test") {}
+    SIMDWDFTest() : TimedUnitTest ("SIMD Wave Digital Filter Test") {}
 
     void simdSignumTest()
     {
@@ -158,7 +159,7 @@ public:
                 expectWithinAbsoluteError (data2[i].get (k), data1[i].get (k), (FloatType) 1.0e-6, "Static WDF is not equivalent to dynamic!");
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("SIMD Signum Test");
         simdSignumTest();

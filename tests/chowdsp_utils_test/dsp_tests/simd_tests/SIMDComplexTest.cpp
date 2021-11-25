@@ -1,9 +1,9 @@
-#include <JuceHeader.h>
+#include <TimedUnitTest.h>
 
-class SIMDComplexTest : public UnitTest
+class SIMDComplexTest : public TimedUnitTest
 {
 public:
-    SIMDComplexTest() : UnitTest ("SIMD Complex Test") {}
+    SIMDComplexTest() : TimedUnitTest ("SIMD Complex Test") {}
 
     void zeroCheck()
     {
@@ -99,7 +99,7 @@ public:
             expect (powV.atIndex (i) == std::pow (q.atIndex (i), 2.1f));
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("Zero Check");
         zeroCheck();

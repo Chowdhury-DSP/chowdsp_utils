@@ -1,4 +1,5 @@
 #include <test_utils.h>
+#include <TimedUnitTest.h>
 
 namespace
 {
@@ -10,10 +11,10 @@ constexpr float error = 0.1f;
 using namespace chowdsp;
 using namespace chowdsp::WDFT;
 
-class StaticWDFTest : public UnitTest
+class StaticWDFTest : public TimedUnitTest
 {
 public:
-    StaticWDFTest() : UnitTest ("Static Wave Digital Filter Test") {}
+    StaticWDFTest() : TimedUnitTest ("Static Wave Digital Filter Test") {}
 
     template <typename FloatType>
     void voltageDividerTest()
@@ -299,7 +300,7 @@ public:
             ResistiveCurrentSourceT<float> { 1000.0f }, "ResistiveCurrentSource", 1000.0f, 2000.0f, [=] (ResistiveCurrentSourceT<float>& r, float value) { r.setResistanceValue (value); }, [=] (float value) { return value; });
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("Voltage Divider Test");
         voltageDividerTest<float>();
