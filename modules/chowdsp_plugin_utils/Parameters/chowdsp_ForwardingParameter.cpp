@@ -56,7 +56,7 @@ void ForwardingParameter::ForwardingAttachment::parameterValueChanged (int, floa
 {
     if (ignoreCallbacks)
         return;
-    
+
     forwardingParam.sendValueChangedMessageToListeners (value);
 }
 
