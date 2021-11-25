@@ -70,7 +70,7 @@ public:
             const auto ratio = outSampleRate / origSampleRate;
 
             RType resampler;
-            resampler.prepare (origSampleRate, ratio);
+            resampler.prepareWithTargetSampleRate (origSampleRate, outSampleRate);
 
             std::vector<float> out (size_t (origNumSamples * ratio) + 1, 0.0f);
 
