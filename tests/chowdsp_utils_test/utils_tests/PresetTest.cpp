@@ -1,9 +1,9 @@
-#include <JuceHeader.h>
+#include <TimedUnitTest.h>
 
-class PresetTest : public UnitTest
+class PresetTest : public TimedUnitTest
 {
 public:
-    PresetTest() : UnitTest ("Preset Test")
+    PresetTest() : TimedUnitTest ("Preset Test")
     {
     }
 
@@ -107,7 +107,8 @@ public:
         auto testFile = File::getSpecialLocation (File::userHomeDirectory).getChildFile ("test.preset");
         auto xml = std::make_unique<XmlElement> ("TEST_XML");
 
-        auto testPreset = [=] (const chowdsp::Preset& p) {
+        auto testPreset = [=] (const chowdsp::Preset& p)
+        {
             expectEquals (p.getName(), String ("test preset"), "Preset name incorrect!");
             expectEquals (p.getVendor(), String ("test vendor"), "Preset vendor incorrect!");
             expectEquals (p.getCategory(), String ("test category"), "Preset category incorrect!");
@@ -136,7 +137,7 @@ public:
         expectEquals (testValue, 1.0, "Preset test value is incorrect!");
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("File Save/Load Test");
         saveLoadTest();

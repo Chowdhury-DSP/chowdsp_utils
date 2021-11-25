@@ -1,12 +1,13 @@
 #include <DummyPlugin.h>
 #include <test_utils.h>
+#include <TimedUnitTest.h>
 
 using namespace test_utils;
 
-class PresetManagerTest : public UnitTest
+class PresetManagerTest : public TimedUnitTest
 {
 public:
-    PresetManagerTest() : UnitTest ("Preset Manager Test")
+    PresetManagerTest() : TimedUnitTest ("Preset Manager Test")
     {
     }
 
@@ -263,7 +264,7 @@ public:
         userPresetConfigFile.deleteRecursively();
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("User Preset Test");
         userPresetTest();

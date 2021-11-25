@@ -3,7 +3,7 @@
 #include <JuceHeader.h>
 
 template <typename FloatType>
-inline void voltageDividerTest (UnitTest& test)
+inline void voltageDividerTest (TimedUnitTest& test)
 {
     using namespace chowdsp::WDF;
     Resistor<FloatType> r1 ((FloatType) 10000.0);
@@ -23,7 +23,7 @@ inline void voltageDividerTest (UnitTest& test)
 }
 
 template <typename FloatType>
-inline void currentDividerTest (UnitTest& test)
+inline void currentDividerTest (TimedUnitTest& test)
 {
     using namespace chowdsp::WDF;
     Resistor<FloatType> r1 ((FloatType) 10000.0);

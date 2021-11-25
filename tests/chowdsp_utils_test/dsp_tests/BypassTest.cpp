@@ -1,4 +1,4 @@
-#include <JuceHeader.h>
+#include <TimedUnitTest.h>
 
 namespace
 {
@@ -8,10 +8,10 @@ constexpr int pulseSpace = 100;
 constexpr float delaySamp = 5.0f;
 } // namespace
 
-class BypassTest : public UnitTest
+class BypassTest : public TimedUnitTest
 {
 public:
-    BypassTest() : UnitTest ("Bypass Test") {}
+    BypassTest() : TimedUnitTest ("Bypass Test") {}
 
     float* getBufferPtr (AudioBuffer<float>& buffer)
     {
@@ -96,7 +96,8 @@ public:
         for (int i = 0; i < nIter; ++i)
         {
             AudioBuffer<float> subBuffer (buffer.getArrayOfWritePointers(), 1, i * nSamples, nSamples);
-            processFunc (subBuffer, bypass, &onOffParam, [] (float x) { return x + 1.0f; });
+            processFunc (subBuffer, bypass, &onOffParam, [] (float x)
+                         { return x + 1.0f; });
             onOffParam.store (1.0f - onOffParam.load());
         }
 
@@ -115,7 +116,8 @@ public:
         for (int i = 0; i < nIter; ++i)
         {
             auto subBlock = block.getSubBlock (size_t (i * nSamples), (size_t) nSamples);
-            processFunc (subBlock, bypass, &onOffParam, [] (float x) { return x + 1.0f; });
+            processFunc (subBlock, bypass, &onOffParam, [] (float x)
+                         { return x + 1.0f; });
             onOffParam.store (1.0f - onOffParam.load());
         }
 
@@ -139,10 +141,11 @@ public:
         for (int i = 0; i < nIter; ++i)
         {
             AudioBuffer<float> subBuffer (buffer.getArrayOfWritePointers(), 1, i * nSamples, nSamples);
-            processFunc (subBuffer, bypass, &onOffParam, [&] (float x) {
-                delay.pushSample (0, x);
-                return delay.popSample (0);
-            });
+            processFunc (subBuffer, bypass, &onOffParam, [&] (float x)
+                         {
+                             delay.pushSample (0, x);
+                             return delay.popSample (0);
+                         });
 
             if (i % 2 != 0)
                 onOffParam.store (1.0f - onOffParam.load());
@@ -169,10 +172,11 @@ public:
         for (int i = 0; i < nIter; ++i)
         {
             auto subBlock = block.getSubBlock (size_t (i * nSamples), (size_t) nSamples);
-            processFunc (subBlock, bypass, &onOffParam, [&] (float x) {
-                delay.pushSample (0, x);
-                return delay.popSample (0);
-            });
+            processFunc (subBlock, bypass, &onOffParam, [&] (float x)
+                         {
+                             delay.pushSample (0, x);
+                             return delay.popSample (0);
+                         });
 
             if (i % 2 != 0)
                 onOffParam.store (1.0f - onOffParam.load());
@@ -181,7 +185,7 @@ public:
         checkPulseSpacing (buffer.getReadPointer (0), nIter * nSamples, pulseSpace);
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("Audio Buffer Test");
         audioBufferTest (5);

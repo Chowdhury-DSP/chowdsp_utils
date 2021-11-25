@@ -1,9 +1,9 @@
-#include <JuceHeader.h>
+#include <TimedUnitTest.h>
 
-class SIMDComplexTest : public UnitTest
+class SIMDComplexTest : public TimedUnitTest
 {
 public:
-    SIMDComplexTest() : UnitTest ("SIMD Complex Test") {}
+    SIMDComplexTest() : TimedUnitTest ("SIMD Complex Test") {}
 
     void zeroCheck()
     {
@@ -94,12 +94,13 @@ public:
     void mapTest()
     {
         auto q = chowdsp::SIMDComplex<float> ({ 0.f, 1.f, 2.f, 3.f }, { 1.f, 0.f, -1.f, -2.f });
-        auto powV = q.map ([] (const std::complex<float>& f) { return std::pow (f, 2.1f); });
+        auto powV = q.map ([] (const std::complex<float>& f)
+                           { return std::pow (f, 2.1f); });
         for (size_t i = 0; i < chowdsp::SIMDComplex<float>::size; ++i)
             expect (powV.atIndex (i) == std::pow (q.atIndex (i), 2.1f));
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("Zero Check");
         zeroCheck();

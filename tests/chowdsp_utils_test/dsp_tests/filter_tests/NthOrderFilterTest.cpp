@@ -1,4 +1,5 @@
 #include <test_utils.h>
+#include <TimedUnitTest.h>
 
 namespace Constants
 {
@@ -7,17 +8,18 @@ constexpr float fc = 1000.0f;
 } // namespace Constants
 
 /** Unit tests for chowdsp::BypassProcessor */
-class NthOrderFilterTest : public UnitTest
+class NthOrderFilterTest : public TimedUnitTest
 {
 public:
-    NthOrderFilterTest() : UnitTest ("Nth Order Filter Test") {}
+    NthOrderFilterTest() : TimedUnitTest ("Nth Order Filter Test") {}
 
     using FilterType = chowdsp::StateVariableFilterType;
 
     template <typename Filter>
     void testFilter (Filter& filt, std::vector<float> freqs, std::vector<float> mags, std::vector<float> errs, const StringArray& messages)
     {
-        auto testFrequency = [=, &filt] (float freq, float expGain, float err, const String& message) {
+        auto testFrequency = [=, &filt] (float freq, float expGain, float err, const String& message)
+        {
             auto buffer = test_utils::makeSineWave (freq, Constants::fs, 1.0f);
 
             filt.reset();
@@ -76,7 +78,7 @@ public:
         //             { "passband", "high cutoff", "low cutoff" });
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("Lowpass");
         lowpassTest();

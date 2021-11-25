@@ -1,4 +1,4 @@
-#include <JuceHeader.h>
+#include <TimedUnitTest.h>
 #include <algorithm>
 
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wpessimizing-move")
@@ -25,10 +25,10 @@ using vec4 = dsp::SIMDRegister<float>;
  *   - Gaussian (Normal) white noise (flat frequency spectrum)
  *   - Pink noise (-3dB / Oct)
  */
-class NoiseTest : public UnitTest
+class NoiseTest : public TimedUnitTest
 {
 public:
-    NoiseTest() : UnitTest ("Noise Test") {}
+    NoiseTest() : TimedUnitTest ("Noise Test") {}
 
     /** Check the frequency slope of a noise buffer, slope measured in dB/Oct */
     void checkNoiseSlope (const float* buffer, String noiseType, float noiseSlope = 0.0f, float maxErr = 3.0f)
@@ -44,7 +44,8 @@ public:
         for (size_t i = 0; i < nSamples; ++i)
             magnitudes[i] = Decibels::gainToDecibels<float> (std::abs (fftData[i])) - dBNorm;
 
-        auto getMagForFreq = [=] (float freq) -> float {
+        auto getMagForFreq = [=] (float freq) -> float
+        {
             auto idx = size_t ((nSamples / 2) * freq / (fs / 2.0f));
             // average over many bins to smooth
             return std::accumulate (&magnitudes[idx - negDiff], &magnitudes[idx + posDiff], 0.0f) / (float) avgNum;
@@ -129,7 +130,7 @@ public:
 
         if (replacing)
         {
-            for (int n = 0; n < (int) nSamples; n += blockSize)
+            for (int n = 0; n < (int) nSamples; n += (int) blockSize)
             {
                 auto block = outBlock.getSubBlock ((size_t) n, (size_t) blockSize);
                 dsp::ProcessContextReplacing<FloatType> ctx (block);
@@ -138,7 +139,7 @@ public:
         }
         else
         {
-            for (int n = 0; n < (int) nSamples; n += blockSize)
+            for (int n = 0; n < (int) nSamples; n += (int) blockSize)
             {
                 auto inSubBlock = inBlock.getSubBlock ((size_t) n, (size_t) blockSize);
                 auto outSubBlock = outBlock.getSubBlock ((size_t) n, (size_t) blockSize);
@@ -152,7 +153,7 @@ public:
             checkNoiseSlope (vec.data(), getNoiseNameForType<FloatType> (type), noiseSlope, maxErr);
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("Uniform White Noise Test");
         runNoiseTest<float> (chowdsp::Noise<float>::NoiseType::Uniform);

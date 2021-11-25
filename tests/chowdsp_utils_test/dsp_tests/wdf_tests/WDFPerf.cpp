@@ -1,4 +1,5 @@
 #include <test_utils.h>
+#include <TimedUnitTest.h>
 
 using namespace chowdsp;
 
@@ -12,10 +13,10 @@ constexpr float timeSeconds = 1000.0f;
 #endif
 } // namespace
 
-class WDFPerfTest : public UnitTest
+class WDFPerfTest : public TimedUnitTest
 {
 public:
-    WDFPerfTest() : UnitTest ("WDFPerfTest")
+    WDFPerfTest() : TimedUnitTest ("WDFPerfTest")
     {
     }
 
@@ -26,7 +27,8 @@ public:
         auto* x = buffer.getReadPointer (0);
 
         Time time;
-        auto timeProcess = [&] (auto& proc) {
+        auto timeProcess = [&] (auto& proc)
+        {
             auto start = time.getMillisecondCounterHiRes();
             float output = 0.0f;
             for (int i = 0; i < buffer.getNumSamples(); ++i)
@@ -202,7 +204,7 @@ public:
         runPerf (iir, wdf, wdfT);
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("First-order filter test");
         firstOrderTest();

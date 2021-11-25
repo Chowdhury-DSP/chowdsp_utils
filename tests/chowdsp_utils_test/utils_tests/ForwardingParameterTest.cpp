@@ -1,9 +1,10 @@
 #include <DummyPlugin.h>
+#include <TimedUnitTest.h>
 
-class ForwardingParameterTest : public UnitTest
+class ForwardingParameterTest : public TimedUnitTest
 {
 public:
-    ForwardingParameterTest() : UnitTest ("Forwarding Parameter Test")
+    ForwardingParameterTest() : TimedUnitTest ("Forwarding Parameter Test")
     {
     }
 
@@ -48,7 +49,7 @@ public:
         expectEquals (testParam->getValue(), dummyParam->getValue(), "Set parameter value is incorrect!");
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("Null Parameter Test");
         nullParamTest();
