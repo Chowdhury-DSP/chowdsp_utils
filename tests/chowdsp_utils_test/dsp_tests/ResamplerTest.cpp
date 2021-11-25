@@ -16,14 +16,12 @@ public:
     void gen_sine (std::vector<float>& audio, float freq, float fs, int num_samples)
     {
         audio.resize ((size_t) num_samples, 0.0f);
-        std::generate (audio.begin(), audio.end(), [=, n = 0.0f]() mutable
-                       { return std::sin (MathConstants<float>::twoPi * (float) n++ * freq / fs); });
+        std::generate (audio.begin(), audio.end(), [=, n = 0.0f]() mutable { return std::sin (MathConstants<float>::twoPi * (float) n++ * freq / fs); });
     }
 
     std::pair<int, int> calc_latency (const std::vector<float>& data, const std::vector<float>& ref_data)
     {
-        auto find_first_point5 = [] (const std::vector<float>& x) -> int
-        {
+        auto find_first_point5 = [] (const std::vector<float>& x) -> int {
             for (size_t i = 0; i < x.size(); ++i)
             {
                 if (x[i] >= 0.5f)
@@ -68,8 +66,7 @@ public:
     {
         std::vector<float> inData;
         gen_sine (inData, freq, origSampleRate, origNumSamples);
-        auto testSampleRate = [=] (float outSampleRate)
-        {
+        auto testSampleRate = [=] (float outSampleRate) {
             const auto ratio = outSampleRate / origSampleRate;
 
             RType resampler;
@@ -146,8 +143,7 @@ public:
     {
         std::vector<float> inData;
         gen_sine (inData, freq, origSampleRate, origNumSamples);
-        auto testSampleRate = [=] (float targetSampleRate)
-        {
+        auto testSampleRate = [=] (float targetSampleRate) {
             const auto ratio = targetSampleRate / origSampleRate;
             const auto expBlockSize = int ((float) origBlockSize * ratio);
 

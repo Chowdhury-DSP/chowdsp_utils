@@ -106,10 +106,8 @@ public:
         beginTest ("Log2 Test");
         FunctionTest log2Test {
             { (T) 1, (T) 2 },
-            [] (T x)
-            { return chowdsp::Omega::log2_approx<T> (x); },
-            [] (T x)
-            { return std::log2 (x); },
+            [] (T x) { return chowdsp::Omega::log2_approx<T> (x); },
+            [] (T x) { return std::log2 (x); },
             "Log2",
             (T) 0.008
         };
@@ -118,10 +116,8 @@ public:
         beginTest ("Log Test");
         FunctionTest logTest {
             { (T) 8, (T) 12 },
-            [] (T x)
-            { return chowdsp::Omega::log_approx<T> (x); },
-            [] (T x)
-            { return std::log (x); },
+            [] (T x) { return chowdsp::Omega::log_approx<T> (x); },
+            [] (T x) { return std::log (x); },
             "Log",
             (T) 0.005
         };
@@ -130,10 +126,8 @@ public:
         beginTest ("Pow2 Test");
         FunctionTest pow2Test {
             { (T) 0, (T) 1 },
-            [] (T x)
-            { return chowdsp::Omega::pow2_approx<T> (x); },
-            [] (T x)
-            { return std::pow ((T) 2, x); },
+            [] (T x) { return chowdsp::Omega::pow2_approx<T> (x); },
+            [] (T x) { return std::pow ((T) 2, x); },
             "Pow2",
             (T) 0.001
         };
@@ -142,36 +136,30 @@ public:
         beginTest ("Exp Test");
         FunctionTest expTest {
             { (T) -4, (T) 2 },
-            [] (T x)
-            { return chowdsp::Omega::exp_approx<T> (x); },
-            [] (T x)
-            { return std::exp (x); },
+            [] (T x) { return chowdsp::Omega::exp_approx<T> (x); },
+            [] (T x) { return std::exp (x); },
             "Exp",
             (T) 0.005
         };
         checkFunctionAccuracy (expTest);
 
         beginTest ("Omega1 Test");
-        checkWrightOmega ([] (T x)
-                          { return chowdsp::Omega::omega1 (x); },
+        checkWrightOmega ([] (T x) { return chowdsp::Omega::omega1 (x); },
                           "Omega1",
                           (T) 2.1);
 
         beginTest ("Omega2 Test");
-        checkWrightOmega ([] (T x)
-                          { return chowdsp::Omega::omega2 (x); },
+        checkWrightOmega ([] (T x) { return chowdsp::Omega::omega2 (x); },
                           "Omega2",
                           (T) 2.1);
 
         beginTest ("Omega3 Test");
-        checkWrightOmega ([] (T x)
-                          { return chowdsp::Omega::omega3 (x); },
+        checkWrightOmega ([] (T x) { return chowdsp::Omega::omega3 (x); },
                           "Omega3",
                           (T) 0.3);
 
         beginTest ("Omega4 Test");
-        checkWrightOmega ([] (T x)
-                          { return chowdsp::Omega::omega4 (x); },
+        checkWrightOmega ([] (T x) { return chowdsp::Omega::omega4 (x); },
                           "Omega4",
                           (T) 0.05);
     }

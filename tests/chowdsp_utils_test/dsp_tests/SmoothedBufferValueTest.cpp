@@ -44,8 +44,7 @@ public:
 
     void valueCompareTest()
     {
-        auto testSmooth = [=] (auto& ref, auto& comp, FloatType value, int numBlocks)
-        {
+        auto testSmooth = [=] (auto& ref, auto& comp, FloatType value, int numBlocks) {
             ref.setTargetValue (value);
             for (int i = 0; i < numBlocks; ++i)
             {
@@ -82,8 +81,7 @@ public:
 
     void parameterCompareTest()
     {
-        auto testSmooth = [=] (auto& ref, auto& comp, auto* param, FloatType value, int numBlocks)
-        {
+        auto testSmooth = [=] (auto& ref, auto& comp, auto* param, FloatType value, int numBlocks) {
             ref.setTargetValue (value);
             param->setValueNotifyingHost ((float) value);
 

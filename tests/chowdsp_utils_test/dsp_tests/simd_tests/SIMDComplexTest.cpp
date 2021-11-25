@@ -94,8 +94,7 @@ public:
     void mapTest()
     {
         auto q = chowdsp::SIMDComplex<float> ({ 0.f, 1.f, 2.f, 3.f }, { 1.f, 0.f, -1.f, -2.f });
-        auto powV = q.map ([] (const std::complex<float>& f)
-                           { return std::pow (f, 2.1f); });
+        auto powV = q.map ([] (const std::complex<float>& f) { return std::pow (f, 2.1f); });
         for (size_t i = 0; i < chowdsp::SIMDComplex<float>::size; ++i)
             expect (powV.atIndex (i) == std::pow (q.atIndex (i), 2.1f));
     }

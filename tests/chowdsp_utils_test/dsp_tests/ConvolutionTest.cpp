@@ -36,8 +36,7 @@ public:
                 engine.processSamplesWithAddedLatency (testOutput.data() + ptr, testOutput.data() + ptr, irSize);
         }
 
-        auto checkAccuracy = [=] (float* output)
-        {
+        auto checkAccuracy = [=] (float* output) {
             for (size_t i = 0; i < irSize; ++i)
             {
                 auto error = std::abs (output[i] - testIR[i]);

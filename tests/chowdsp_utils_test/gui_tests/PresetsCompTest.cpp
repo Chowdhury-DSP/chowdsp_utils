@@ -175,19 +175,18 @@ public:
         presetMgr.setUserPresetPath (presetPath.file);
 
         std::atomic<bool> threadFinished { false };
-        Thread::launch ([&]
-                        {
-                            Thread::sleep (75); // wait for message manager...
-                            expectEquals (presetsComp.getPresetMenuText(), String ("Test2"), "Initial preset text is incorrect!");
+        Thread::launch ([&] {
+            Thread::sleep (75); // wait for message manager...
+            expectEquals (presetsComp.getPresetMenuText(), String ("Test2"), "Initial preset text is incorrect!");
 
-                            const auto* menu = presetsComp.getPresetMenuBox().getRootMenu();
-                            auto menuItem = getMenuItem (*menu, "Test1");
-                            menuItem->action();
-                            Thread::sleep (75); // wait for message manager...
-                            expectEquals (presetsComp.getPresetMenuText(), String ("Test1"), "Loaded preset text is incorrect!");
+            const auto* menu = presetsComp.getPresetMenuBox().getRootMenu();
+            auto menuItem = getMenuItem (*menu, "Test1");
+            menuItem->action();
+            Thread::sleep (75); // wait for message manager...
+            expectEquals (presetsComp.getPresetMenuText(), String ("Test1"), "Loaded preset text is incorrect!");
 
-                            threadFinished = true;
-                        });
+            threadFinished = true;
+        });
 
         while (! threadFinished)
             MessageManager::getInstance()->runDispatchLoopUntil (75);
