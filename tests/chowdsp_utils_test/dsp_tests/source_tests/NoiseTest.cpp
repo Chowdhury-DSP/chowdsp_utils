@@ -44,7 +44,8 @@ public:
         for (size_t i = 0; i < nSamples; ++i)
             magnitudes[i] = Decibels::gainToDecibels<float> (std::abs (fftData[i])) - dBNorm;
 
-        auto getMagForFreq = [=] (float freq) -> float {
+        auto getMagForFreq = [=] (float freq) -> float
+        {
             auto idx = size_t ((nSamples / 2) * freq / (fs / 2.0f));
             // average over many bins to smooth
             return std::accumulate (&magnitudes[idx - negDiff], &magnitudes[idx + posDiff], 0.0f) / (float) avgNum;
@@ -129,7 +130,7 @@ public:
 
         if (replacing)
         {
-            for (int n = 0; n < (int) nSamples; n += blockSize)
+            for (int n = 0; n < (int) nSamples; n += (int) blockSize)
             {
                 auto block = outBlock.getSubBlock ((size_t) n, (size_t) blockSize);
                 dsp::ProcessContextReplacing<FloatType> ctx (block);
@@ -138,7 +139,7 @@ public:
         }
         else
         {
-            for (int n = 0; n < (int) nSamples; n += blockSize)
+            for (int n = 0; n < (int) nSamples; n += (int) blockSize)
             {
                 auto inSubBlock = inBlock.getSubBlock ((size_t) n, (size_t) blockSize);
                 auto outSubBlock = outBlock.getSubBlock ((size_t) n, (size_t) blockSize);
