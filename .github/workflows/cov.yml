@@ -64,13 +64,6 @@ jobs:
         with:
           key: cov-${{ matrix.os }}
 
-      - name: juceaide cache files
-        uses: actions/cache@v2
-        with:
-          path: ${{env.WORK_DIR}}/build/tests/JUCE/tools
-          key: cmake_ctest-${{ matrix.os }}-juceaide
-          restore-keys: cmake_ctest-${{ matrix.os }}-juceaide
-
       - name: Configure
         working-directory: ${{env.WORK_DIR}}
         shell: bash
