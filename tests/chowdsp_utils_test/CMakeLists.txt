@@ -1,7 +1,7 @@
 juce_add_console_app(chowdsp_utils_tests)
 setup_juce_test(chowdsp_utils_tests)
 
-target_sources(chowdsp_utils_tests PRIVATE test.cpp)
+target_sources(chowdsp_utils_tests PRIVATE TestRunner.cpp)
 add_subdirectory(dsp_tests)
 add_subdirectory(gui_tests)
 add_subdirectory(utils_tests)

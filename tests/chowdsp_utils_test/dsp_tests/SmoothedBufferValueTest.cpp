@@ -1,4 +1,5 @@
 #include <DummyPlugin.h>
+#include <TimedUnitTest.h>
 
 namespace
 {
@@ -14,10 +15,10 @@ constexpr float val4 = 2.5;
 } // namespace
 
 template <typename FloatType, typename SmoothingType>
-class SmoothedBufferValueTest : public UnitTest
+class SmoothedBufferValueTest : public TimedUnitTest
 {
 public:
-    SmoothedBufferValueTest() : UnitTest ("Smoothed Buffer Value Test: " + getSampleType() + " with " + getSmoothingType() + " smoothing")
+    SmoothedBufferValueTest() : TimedUnitTest ("Smoothed Buffer Value Test: " + getSampleType() + " with " + getSmoothingType() + " smoothing")
     {
     }
 
@@ -113,7 +114,7 @@ public:
         testSmooth (refSmooth, compSmooth, param, (FloatType) val1, 5);
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("Value Compare Test");
         valueCompareTest();

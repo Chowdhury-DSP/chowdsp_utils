@@ -1,4 +1,5 @@
 #include <test_utils.h>
+#include <TimedUnitTest.h>
 
 using namespace chowdsp;
 
@@ -12,10 +13,10 @@ constexpr float timeSeconds = 1000.0f;
 #endif
 } // namespace
 
-class WDFPerfTest : public UnitTest
+class WDFPerfTest : public TimedUnitTest
 {
 public:
-    WDFPerfTest() : UnitTest ("WDFPerfTest")
+    WDFPerfTest() : TimedUnitTest ("WDFPerfTest")
     {
     }
 
@@ -202,7 +203,7 @@ public:
         runPerf (iir, wdf, wdfT);
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("First-order filter test");
         firstOrderTest();

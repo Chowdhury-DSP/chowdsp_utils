@@ -1,4 +1,4 @@
-#include <JuceHeader.h>
+#include <TimedUnitTest.h>
 
 namespace
 {
@@ -8,10 +8,10 @@ constexpr int origBlockSize = 480;
 constexpr float testSRRatios[] = { 1.0f, 2.0f, 1.5f, 0.5f, 0.667f };
 } // namespace
 
-class ResamplerTest : public UnitTest
+class ResamplerTest : public TimedUnitTest
 {
 public:
-    ResamplerTest() : UnitTest ("Resampler Test") {}
+    ResamplerTest() : TimedUnitTest ("Resampler Test") {}
 
     void gen_sine (std::vector<float>& audio, float freq, float fs, int num_samples)
     {
@@ -213,7 +213,7 @@ public:
             testSampleRate (origSampleRate * factor);
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         using namespace chowdsp::ResamplingTypes;
 

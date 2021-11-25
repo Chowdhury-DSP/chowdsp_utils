@@ -1,4 +1,4 @@
-#include <JuceHeader.h>
+#include <TimedUnitTest.h>
 
 namespace
 {
@@ -12,10 +12,10 @@ constexpr double err = 1.0e-3;
  *  - single samples
  *  - buffers
 */
-class SineTest : public UnitTest
+class SineTest : public TimedUnitTest
 {
 public:
-    SineTest() : UnitTest ("Sine Test") {}
+    SineTest() : TimedUnitTest ("Sine Test") {}
 
     void singleSampleTest()
     {
@@ -114,7 +114,7 @@ public:
         }
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("Single-Sample Processing Test");
         singleSampleTest();

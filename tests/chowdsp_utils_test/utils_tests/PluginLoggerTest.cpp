@@ -1,5 +1,5 @@
 #include <future>
-#include <JuceHeader.h>
+#include <TimedUnitTest.h>
 
 namespace
 {
@@ -7,10 +7,10 @@ const String logFileSubDir = "chowdsp/utils_test";
 const String logFileNameRoot = "chowdsp_utils_test_Log_";
 } // namespace
 
-class PluginLoggerTest : public UnitTest
+class PluginLoggerTest : public TimedUnitTest
 {
 public:
-    PluginLoggerTest() : UnitTest ("Plugin Logger Test")
+    PluginLoggerTest() : TimedUnitTest ("Plugin Logger Test")
     {
     }
 
@@ -37,7 +37,7 @@ public:
     void limitNumLogFilesTest()
     {
         constexpr int numLoggersAtOnce = 5;
-        constexpr int numIters = 100;
+        constexpr int numIters = 20;
 
         auto logsDirectory = FileLogger::getSystemLogFileFolder().getChildFile (logFileSubDir);
         auto getNumLogFiles = [&] {
@@ -103,7 +103,7 @@ public:
         }
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("Basic Log Test");
         basicLogTest();

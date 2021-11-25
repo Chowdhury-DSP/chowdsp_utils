@@ -1,14 +1,15 @@
 #include <DummyPlugin.h>
 #include <test_utils.h>
+#include <TimedUnitTest.h>
 
 /** Unit tests for chowdsp::PluginBase. Tests functionality:
  *   - saving/loading parameter state
  *   - channel layouts supported
  */
-class PluginBaseTest : public UnitTest
+class PluginBaseTest : public TimedUnitTest
 {
 public:
-    PluginBaseTest() : UnitTest ("Plugin Base Test") {}
+    PluginBaseTest() : TimedUnitTest ("Plugin Base Test") {}
 
     void saveLoadStateTest()
     {
@@ -172,7 +173,7 @@ public:
         userPresetConfigFile.deleteRecursively();
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("Save/Load State Test");
         saveLoadStateTest();

@@ -1,4 +1,4 @@
-#include <JuceHeader.h>
+#include <TimedUnitTest.h>
 
 /** Empty plugin with Foley's Magic Editor */
 class GuiPlugin : public chowdsp::PluginBase<GuiPlugin>
@@ -25,12 +25,12 @@ private:
 /** Unit test to make sure that Foley's Magic Editor can be compiled
  * and created with chowdsp extensions
  */
-class FoleysTest : public UnitTest
+class FoleysTest : public TimedUnitTest
 {
 public:
-    FoleysTest() : UnitTest ("Foleys GUI Test") {}
+    FoleysTest() : TimedUnitTest ("Foleys GUI Test") {}
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("Create Foleys Editor Test");
         GuiPlugin guiPlugin;

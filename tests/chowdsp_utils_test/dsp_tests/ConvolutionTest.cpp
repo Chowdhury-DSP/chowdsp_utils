@@ -1,9 +1,10 @@
 #include <test_utils.h>
+#include <TimedUnitTest.h>
 
-class ConvolutionTest : public UnitTest
+class ConvolutionTest : public TimedUnitTest
 {
 public:
-    ConvolutionTest() : UnitTest ("Convolution Test") {}
+    ConvolutionTest() : TimedUnitTest ("Convolution Test") {}
 
     void createTestIR (std::vector<float>& ir, size_t size)
     {
@@ -88,7 +89,7 @@ public:
         expectLessThan (maxDiff, 0.5f, "IR Transfer is not smooth enough!");
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("Accuracy Test");
         accuracyTest (false, 1.0e-6f);

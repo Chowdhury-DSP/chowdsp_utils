@@ -1,9 +1,9 @@
-#include <JuceHeader.h>
+#include <TimedUnitTest.h>
 
-class PresetTest : public UnitTest
+class PresetTest : public TimedUnitTest
 {
 public:
-    PresetTest() : UnitTest ("Preset Test")
+    PresetTest() : TimedUnitTest ("Preset Test")
     {
     }
 
@@ -136,7 +136,7 @@ public:
         expectEquals (testValue, 1.0, "Preset test value is incorrect!");
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("File Save/Load Test");
         saveLoadTest();

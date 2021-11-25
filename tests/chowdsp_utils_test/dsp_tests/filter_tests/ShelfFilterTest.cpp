@@ -1,4 +1,5 @@
 #include <test_utils.h>
+#include <TimedUnitTest.h>
 
 namespace Constants
 {
@@ -15,10 +16,10 @@ constexpr float maxError = 0.1f;
  *   - High frequencies boosted by +6 dB
  *   - Transition frequency, stable at +0 dB
  */
-class ShelfFilterTest : public UnitTest
+class ShelfFilterTest : public TimedUnitTest
 {
 public:
-    ShelfFilterTest() : UnitTest ("Shelf Filter Test") {}
+    ShelfFilterTest() : TimedUnitTest ("Shelf Filter Test") {}
 
     void plainGainTest()
     {
@@ -56,7 +57,7 @@ public:
         testFrequency (20000.0f, Constants::highGain, "Incorrect gain at high frequencies.");
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("Plain Gain Test");
         plainGainTest();

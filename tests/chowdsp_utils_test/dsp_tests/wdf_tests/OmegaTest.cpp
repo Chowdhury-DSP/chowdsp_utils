@@ -1,4 +1,4 @@
-#include <JuceHeader.h>
+#include <TimedUnitTest.h>
 
 namespace
 {
@@ -52,16 +52,16 @@ std::map<double, double> WO_vals {
  * omega function approximations and sub-functions.
  */
 template <typename T>
-class OmegaTest : public UnitTest
+class OmegaTest : public TimedUnitTest
 {
 public:
     template <typename TT = T, std::enable_if_t<std::is_same_v<TT, float>, int> = 0>
-    OmegaTest() : UnitTest ("Omega Test (float)")
+    OmegaTest() : TimedUnitTest ("Omega Test (float)")
     {
     }
 
     template <typename TT = T, std::enable_if_t<std::is_same_v<TT, double>, int> = 0>
-    explicit OmegaTest() : UnitTest ("Omega Test (double)")
+    explicit OmegaTest() : TimedUnitTest ("Omega Test (double)")
     {
     }
 
@@ -101,7 +101,7 @@ public:
         }
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("Log2 Test");
         FunctionTest log2Test {
@@ -144,16 +144,24 @@ public:
         checkFunctionAccuracy (expTest);
 
         beginTest ("Omega1 Test");
-        checkWrightOmega ([] (T x) { return chowdsp::Omega::omega1 (x); }, "Omega1", (T) 2.1);
+        checkWrightOmega ([] (T x) { return chowdsp::Omega::omega1 (x); },
+                          "Omega1",
+                          (T) 2.1);
 
         beginTest ("Omega2 Test");
-        checkWrightOmega ([] (T x) { return chowdsp::Omega::omega2 (x); }, "Omega2", (T) 2.1);
+        checkWrightOmega ([] (T x) { return chowdsp::Omega::omega2 (x); },
+                          "Omega2",
+                          (T) 2.1);
 
         beginTest ("Omega3 Test");
-        checkWrightOmega ([] (T x) { return chowdsp::Omega::omega3 (x); }, "Omega3", (T) 0.3);
+        checkWrightOmega ([] (T x) { return chowdsp::Omega::omega3 (x); },
+                          "Omega3",
+                          (T) 0.3);
 
         beginTest ("Omega4 Test");
-        checkWrightOmega ([] (T x) { return chowdsp::Omega::omega4 (x); }, "Omega4", (T) 0.05);
+        checkWrightOmega ([] (T x) { return chowdsp::Omega::omega4 (x); },
+                          "Omega4",
+                          (T) 0.05);
     }
 };
 

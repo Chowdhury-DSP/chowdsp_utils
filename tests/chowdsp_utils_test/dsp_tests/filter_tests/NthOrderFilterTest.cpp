@@ -1,4 +1,5 @@
 #include <test_utils.h>
+#include <TimedUnitTest.h>
 
 namespace Constants
 {
@@ -7,10 +8,10 @@ constexpr float fc = 1000.0f;
 } // namespace Constants
 
 /** Unit tests for chowdsp::BypassProcessor */
-class NthOrderFilterTest : public UnitTest
+class NthOrderFilterTest : public TimedUnitTest
 {
 public:
-    NthOrderFilterTest() : UnitTest ("Nth Order Filter Test") {}
+    NthOrderFilterTest() : TimedUnitTest ("Nth Order Filter Test") {}
 
     using FilterType = chowdsp::StateVariableFilterType;
 
@@ -76,7 +77,7 @@ public:
         //             { "passband", "high cutoff", "low cutoff" });
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("Lowpass");
         lowpassTest();

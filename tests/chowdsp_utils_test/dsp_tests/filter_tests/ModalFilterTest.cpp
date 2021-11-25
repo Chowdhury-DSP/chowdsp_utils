@@ -1,4 +1,5 @@
 #include <test_utils.h>
+#include <TimedUnitTest.h>
 
 namespace
 {
@@ -13,12 +14,12 @@ constexpr float modeAmp = 0.1f;
  *   - Check that filter has correct decay time
  */
 template <typename T>
-class ModalFilterTest : public UnitTest
+class ModalFilterTest : public TimedUnitTest
 {
 public:
     using NumericType = typename dsp::SampleTypeHelpers::ElementType<T>::Type;
 
-    ModalFilterTest() : UnitTest ("Modal Filter Test " + getSampleType()) {}
+    ModalFilterTest() : TimedUnitTest ("Modal Filter Test " + getSampleType()) {}
 
     static String getSampleType()
     {
@@ -119,7 +120,7 @@ public:
         expectWithinAbsoluteError (mag, (NumericType) -60.0f, (NumericType) 1.0f, "Incorrect decay time.");
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("Resonant Frequency Sine Test");
         onFreqSineTest();

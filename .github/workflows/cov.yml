@@ -17,8 +17,12 @@ env:
 jobs:
   build_and_test:
     if: contains(toJson(github.event.commits), '***NO_CI***') == false && contains(toJson(github.event.commits), '[ci skip]') == false && contains(toJson(github.event.commits), '[skip ci]') == false
-    name: Analyze test coverage
-    runs-on: ubuntu-latest
+    name: Analyze test coverage ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
+      matrix:
+        os: [ ubuntu-latest, macOS-latest ]
 
     steps:
       - name: Install Linux Deps
@@ -28,6 +32,12 @@ jobs:
           sudo apt install libasound2-dev libcurl4-openssl-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev libsamplerate-dev lcov
           sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 9
           sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
+
+      - name: Install MacOS Deps
+        if: runner.os == 'MacOS'
+        run: |
+          export HOMEBREW_NO_AUTO_UPDATE=1
+          brew install lcov
 
       - name: Get latest CMake
         uses: lukka/get-cmake@latest
@@ -49,10 +59,15 @@ jobs:
         working-directory: ${{github.workspace}}/JUCE_modules
         run: git clone --depth 1 --branch 7.5.0 https://github.com/xtensor-stack/xsimd
 
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1
+        with:
+          key: cov-${{ matrix.os }}
+
       - name: Configure
         working-directory: ${{env.WORK_DIR}}
         shell: bash
-        run: cmake -Bbuild -DCODE_COVERAGE=ON -DCHOWDSP_ENABLE_TESTING=ON -DXSIMD_PATH=../xsimd
+        run: cmake -Bbuild -DCODE_COVERAGE=ON -DCHOWDSP_ENABLE_TESTING=ON -DXSIMD_PATH=../xsimd -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 
       - name: Build
         working-directory: ${{env.WORK_DIR}}/build
