@@ -148,7 +148,7 @@ public:
             const auto expBlockSize = int ((float) origBlockSize * ratio);
 
             chowdsp::ResampledProcess<RType> resampler;
-            resampler.prepare ({ (double) origSampleRate, (uint32) origBlockSize, 1 }, (double) ratio);
+            resampler.prepareWithTargetSampleRate({ (double) origSampleRate, (uint32) origBlockSize, 1 }, (double) targetSampleRate);
 
             AudioBuffer<float> buffer (1, origNumSamples);
             buffer.copyFrom (0, 0, inData.data(), origNumSamples);
