@@ -28,7 +28,7 @@ jobs:
           - os: windows-latest
             cmake_args: ""
           - os: macos-latest
-            cmake_args: "-GXcode -DXSIMD_PATH=../xsimd"
+            cmake_args: "-DCMAKE_BUILD_TYPE=Release -DXSIMD_PATH=../xsimd"
 
     steps:
       - name: Install Linux Deps
@@ -88,6 +88,14 @@ jobs:
           key: cmake_ctest-${{ matrix.os }}-ccache-${{ steps.ccache_cache_timestamp.outputs.timestamp }}
           restore-keys: |
             cmake_ctest-${{ matrix.os }}-ccache-
+
+      - name: juceaide cache files
+        uses: actions/cache@v1.1.0
+        with:
+          path: build/tests/JUCE/tools
+          key: cmake_ctest-${{ matrix.os }}-juceaide
+          restore-keys: |
+            cmake_ctest-${{ matrix.os }}-juceaide
 
       - name: Configure
         working-directory: ${{env.WORK_DIR}}
