@@ -23,6 +23,12 @@ public:
         baseFs = (float) spec.sampleRate;
     }
 
+    /** Prepares the resampler to process a new stream of data at a given target sample rate */
+    void prepareWithTargetSampleRate (const juce::dsp::ProcessSpec& spec, double targetSampleRate)
+    {
+        prepare (spec, targetSampleRate / spec.sampleRate);
+    }
+
     /** Resets the state of the resampler */
     void reset()
     {
