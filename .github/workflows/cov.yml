@@ -18,16 +18,22 @@ jobs:
   build_and_test:
     if: contains(toJson(github.event.commits), '***NO_CI***') == false && contains(toJson(github.event.commits), '[ci skip]') == false && contains(toJson(github.event.commits), '[skip ci]') == false
     name: Analyze test coverage
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
-      - name: Install Linux Deps
-        if: runner.os == 'Linux'
+      #      - name: Install Linux Deps
+      #        if: runner.os == 'Linux'
+      #        run: |
+      #          sudo apt-get update
+      #          sudo apt install libasound2-dev libcurl4-openssl-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev libsamplerate-dev lcov
+      #          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 9
+      #          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
+
+      - name: Install MacOS Deps
+        if: runner.os == 'MacOS'
         run: |
-          sudo apt-get update
-          sudo apt install libasound2-dev libcurl4-openssl-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev libsamplerate-dev lcov
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 9
-          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
+          export HOMEBREW_NO_AUTO_UPDATE=1
+          brew install lcov
 
       - name: Get latest CMake
         uses: lukka/get-cmake@latest
