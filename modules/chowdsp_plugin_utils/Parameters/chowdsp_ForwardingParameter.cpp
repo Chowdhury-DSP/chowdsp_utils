@@ -48,11 +48,15 @@ void ForwardingParameter::ForwardingAttachment::setNewValue (float value)
 
 void ForwardingParameter::ForwardingAttachment::handleAsyncUpdate()
 {
+    const juce::ScopedValueSetter<bool> svs (ignoreCallbacks, true);
     internalParam.setValueNotifyingHost (newValue);
 }
 
 void ForwardingParameter::ForwardingAttachment::parameterValueChanged (int, float value)
 {
+    if (ignoreCallbacks)
+        return;
+    
     forwardingParam.sendValueChangedMessageToListeners (value);
 }
 

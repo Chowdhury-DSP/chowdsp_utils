@@ -48,6 +48,7 @@ private:
         juce::UndoManager* undoManager;
 
         float newValue = 0.0f;
+        bool ignoreCallbacks = false;
     };
 
     float getValue() const override;
