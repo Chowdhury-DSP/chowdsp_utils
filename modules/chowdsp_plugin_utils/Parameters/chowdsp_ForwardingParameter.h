@@ -5,11 +5,11 @@ namespace chowdsp
 /**
  * Class for forwarding "dynamic" parameters from one processor to another.
  *
- * This implementation was borrowed (with permission and some small
- * modifications) from Eyal Amir.
+ * The original implementation for this class was borrowed
+ * (with permission) from Eyal Amir, and then modified a
+ * little bit from there.
  */
-class ForwardingParameter : public juce::RangedAudioParameter,
-                            private juce::AudioProcessorParameter::Listener
+class ForwardingParameter : public juce::RangedAudioParameter
 {
 public:
     /**
@@ -27,6 +27,29 @@ public:
     void setProcessor (juce::AudioProcessor* processorToUse);
 
 private:
+    struct ForwardingAttachment : private juce::AudioProcessorParameter::Listener,
+                                  private juce::AsyncUpdater
+    {
+        ForwardingAttachment (juce::RangedAudioParameter& internal, juce::RangedAudioParameter& forwarding);
+        ~ForwardingAttachment() override;
+
+        void setNewValue (float paramVal);
+
+    private:
+        void beginGesture();
+        void endGesture();
+
+        void handleAsyncUpdate() override;
+        void parameterValueChanged (int paramIdx, float newValue) override;
+        void parameterGestureChanged (int paramIdx, bool gestureIsStarting) override;
+
+        juce::RangedAudioParameter& internalParam;
+        juce::RangedAudioParameter& forwardingParam;
+
+        float newValue = 0.0f;
+        bool ignoreCallbacks = false;
+    };
+
     float getValue() const override;
     void setValue (float newValue) override;
     float getDefaultValue() const override;
@@ -36,11 +59,9 @@ private:
 
     const juce::NormalisableRange<float>& getNormalisableRange() const override;
 
-    void parameterValueChanged (int paramIdx, float newValue) override;
-    void parameterGestureChanged (int paramIdx, bool gestureIsStarting) override;
-
     juce::AudioProcessor* processor = nullptr;
     juce::RangedAudioParameter* internalParam = nullptr;
+    std::unique_ptr<ForwardingAttachment> attachment;
 
     const juce::String defaultName;
     juce::String customName = {};

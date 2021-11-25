@@ -7,6 +7,66 @@ const juce::NormalisableRange<float> defaultRange { 0.0f, 1.0f, 0.01f, 1.0f };
 
 namespace chowdsp
 {
+// @TODO: Add options for UndoManager...
+ForwardingParameter::ForwardingAttachment::ForwardingAttachment (juce::RangedAudioParameter& internal, juce::RangedAudioParameter& forwarding)
+    : internalParam (internal), forwardingParam (forwarding)
+{
+    internalParam.addListener (this);
+}
+
+ForwardingParameter::ForwardingAttachment::~ForwardingAttachment()
+{
+    internalParam.removeListener (this);
+}
+
+void ForwardingParameter::ForwardingAttachment::beginGesture()
+{
+    // @TODO: UndoManager call here...
+    forwardingParam.beginChangeGesture();
+}
+
+void ForwardingParameter::ForwardingAttachment::endGesture()
+{
+    forwardingParam.endChangeGesture();
+}
+
+void ForwardingParameter::ForwardingAttachment::setNewValue (float value)
+{
+    newValue = value;
+
+    if (juce::MessageManager::getInstance()->isThisTheMessageThread())
+    {
+        cancelPendingUpdate();
+        handleAsyncUpdate();
+    }
+    else
+    {
+        triggerAsyncUpdate();
+    }
+}
+
+void ForwardingParameter::ForwardingAttachment::handleAsyncUpdate()
+{
+    internalParam.setValueNotifyingHost (newValue);
+}
+
+void ForwardingParameter::ForwardingAttachment::parameterValueChanged (int, float value)
+{
+    if (ignoreCallbacks)
+        return;
+
+    forwardingParam.sendValueChangedMessageToListeners (value);
+}
+
+void ForwardingParameter::ForwardingAttachment::parameterGestureChanged (int, bool gestureIsStarting)
+{
+    if (gestureIsStarting)
+        beginGesture();
+    else
+        endGesture();
+}
+
+//=================================================================================
 ForwardingParameter::ForwardingParameter (const juce::String& id, const juce::String& thisDefaultName)
     : juce::RangedAudioParameter (id, thisDefaultName), defaultName (thisDefaultName)
 {
@@ -15,12 +75,12 @@ ForwardingParameter::ForwardingParameter (const juce::String& id, const juce::St
 void ForwardingParameter::setParam (juce::RangedAudioParameter* paramToUse, const juce::String& newName)
 {
     if (internalParam != nullptr)
-        internalParam->removeListener (this);
+        attachment.reset();
 
     internalParam = paramToUse;
 
     if (internalParam != nullptr)
-        internalParam->addListener (this);
+        attachment = std::make_unique<ForwardingAttachment> (*internalParam, *this);
 
     customName = newName;
 
@@ -45,7 +105,9 @@ void ForwardingParameter::setValue (float newValue)
     if (internalParam != nullptr)
     {
         juce::ScopedValueSetter<bool> svs (ignoreCallbacks, true);
-        internalParam->setValueNotifyingHost (newValue);
+
+        if (newValue != internalParam->getValue())
+            attachment->setNewValue (newValue);
     }
 }
 
@@ -95,21 +157,5 @@ const juce::NormalisableRange<float>& ForwardingParameter::getNormalisableRange(
 void ForwardingParameter::setProcessor (juce::AudioProcessor* processorToUse)
 {
     processor = processorToUse;
-}
-
-void ForwardingParameter::parameterValueChanged (int, float newValue)
-{
-    if (ignoreCallbacks)
-        return;
-
-    sendValueChangedMessageToListeners (newValue);
-}
-
-void ForwardingParameter::parameterGestureChanged (int, bool gestureIsStarting)
-{
-    if (gestureIsStarting)
-        beginChangeGesture();
-    else
-        endChangeGesture();
 }
 } // namespace chowdsp
