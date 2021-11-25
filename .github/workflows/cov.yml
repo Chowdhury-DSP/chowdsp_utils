@@ -18,16 +18,16 @@ jobs:
   build_and_test:
     if: contains(toJson(github.event.commits), '***NO_CI***') == false && contains(toJson(github.event.commits), '[ci skip]') == false && contains(toJson(github.event.commits), '[skip ci]') == false
     name: Analyze test coverage
-    runs-on: macos-latest
+    runs-on: [ ubuntu-latest, macos-latest ]
 
     steps:
-      #      - name: Install Linux Deps
-      #        if: runner.os == 'Linux'
-      #        run: |
-      #          sudo apt-get update
-      #          sudo apt install libasound2-dev libcurl4-openssl-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev libsamplerate-dev lcov
-      #          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 9
-      #          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
+      - name: Install Linux Deps
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt install libasound2-dev libcurl4-openssl-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev libsamplerate-dev lcov
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 9
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
 
       - name: Install MacOS Deps
         if: runner.os == 'MacOS'
@@ -68,7 +68,7 @@ jobs:
       - name: Test
         uses: GabrielBB/xvfb-action@v1
         with:
-          run: ctest -C Debug -V
+          run: ctest -j4 -C Debug -V
           working-directory: ${{env.WORK_DIR}}/build
 
       - name: Collect Coverage Data
