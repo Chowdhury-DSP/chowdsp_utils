@@ -1,11 +1,11 @@
-#include <JuceHeader.h>
+#include <TimedUnitTest.h>
 
 using namespace chowdsp::ParamUtils;
 
-class ParamStringsTest : public UnitTest
+class ParamStringsTest : public TimedUnitTest
 {
 public:
-    ParamStringsTest() : UnitTest ("Param Strings Test") {}
+    ParamStringsTest() : TimedUnitTest ("Param Strings Test") {}
 
     void freqParamTest()
     {
@@ -50,7 +50,7 @@ public:
         expectEquals (stringToFloatVal ("200"), 200.0f, "Incorrect float value!");
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("Freq. Param Test");
         freqParamTest();

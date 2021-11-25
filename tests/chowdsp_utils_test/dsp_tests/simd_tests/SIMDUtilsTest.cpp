@@ -1,9 +1,9 @@
-#include <JuceHeader.h>
+#include <TimedUnitTest.h>
 
-class SIMDUtilsTest : public UnitTest
+class SIMDUtilsTest : public TimedUnitTest
 {
 public:
-    SIMDUtilsTest() : UnitTest ("SIMD Utils Test") {}
+    SIMDUtilsTest() : TimedUnitTest ("SIMD Utils Test") {}
 
     template <typename T>
     void testDivide()
@@ -172,7 +172,7 @@ public:
         }
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("Float Divide Test");
         testDivide<float>();

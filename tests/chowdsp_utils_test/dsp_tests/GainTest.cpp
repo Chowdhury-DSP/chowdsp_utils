@@ -1,4 +1,5 @@
 #include <test_utils.h>
+#include <TimedUnitTest.h>
 
 namespace
 {
@@ -6,10 +7,10 @@ constexpr float fs = 44100.0f;
 }
 
 /** Unit tests for chowdsp::Gain */
-class GainTest : public UnitTest
+class GainTest : public TimedUnitTest
 {
 public:
-    GainTest() : UnitTest ("Gain Test") {}
+    GainTest() : TimedUnitTest ("Gain Test") {}
 
     void gainTest (float gain)
     {
@@ -27,7 +28,7 @@ public:
         expectWithinAbsoluteError (mag / refMag, gain, (float) 1.0e-6, "Incorrect gain!");
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("Flat Test");
         gainTest (1.0f);

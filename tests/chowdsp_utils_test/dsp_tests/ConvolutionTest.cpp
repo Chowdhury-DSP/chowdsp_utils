@@ -1,9 +1,10 @@
 #include <test_utils.h>
+#include <TimedUnitTest.h>
 
-class ConvolutionTest : public UnitTest
+class ConvolutionTest : public TimedUnitTest
 {
 public:
-    ConvolutionTest() : UnitTest ("Convolution Test") {}
+    ConvolutionTest() : TimedUnitTest ("Convolution Test") {}
 
     void createTestIR (std::vector<float>& ir, size_t size)
     {
@@ -35,7 +36,8 @@ public:
                 engine.processSamplesWithAddedLatency (testOutput.data() + ptr, testOutput.data() + ptr, irSize);
         }
 
-        auto checkAccuracy = [=] (float* output) {
+        auto checkAccuracy = [=] (float* output)
+        {
             for (size_t i = 0; i < irSize; ++i)
             {
                 auto error = std::abs (output[i] - testIR[i]);
@@ -88,7 +90,7 @@ public:
         expectLessThan (maxDiff, 0.5f, "IR Transfer is not smooth enough!");
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("Accuracy Test");
         accuracyTest (false, 1.0e-6f);

@@ -1,21 +1,21 @@
-#include <JuceHeader.h>
+#include <TimedUnitTest.h>
 
 using namespace chowdsp::SIMDUtils;
 
 /** Copied from the JUCE SmoothedValue unit test, and adapted for SIMD types */
 template <class FloatType, class SmoothType>
-class CommonSmoothedValueTests : public UnitTest
+class CommonSmoothedValueTests : public TimedUnitTest
 {
 public:
     using SmoothedValueType = SIMDSmoothedValue<FloatType, SmoothType>;
     using VecType = dsp::SIMDRegister<FloatType>;
 
     CommonSmoothedValueTests()
-        : UnitTest ("Common Smoothed Value Tests: " + String (std::is_same<FloatType, float>::value ? "Float" : "Double"))
+        : TimedUnitTest ("Common Smoothed Value Tests: " + String (std::is_same<FloatType, float>::value ? "Float" : "Double"))
     {
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("Initial state");
         {

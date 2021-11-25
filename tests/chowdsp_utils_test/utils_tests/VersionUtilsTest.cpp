@@ -1,17 +1,18 @@
-#include <JuceHeader.h>
+#include <TimedUnitTest.h>
 
 using namespace chowdsp::VersionUtils;
 
-class VersionUtilsTest : public UnitTest
+class VersionUtilsTest : public TimedUnitTest
 {
 public:
-    VersionUtilsTest() : UnitTest ("Version Utils Test")
+    VersionUtilsTest() : TimedUnitTest ("Version Utils Test")
     {
     }
 
     void versionCompareTest()
     {
-        auto checkVersions = [=] (const String& strV1, const String& strV2, const std::array<bool, 6>& exp) {
+        auto checkVersions = [=] (const String& strV1, const String& strV2, const std::array<bool, 6>& exp)
+        {
             const Version v1 (strV1);
             const Version v2 (strV2);
 
@@ -57,7 +58,7 @@ public:
         expectEquals (v2.getVersionString(), String ("1.2.3"), "Incorrect version string!");
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("Version Compare Test");
         versionCompareTest();

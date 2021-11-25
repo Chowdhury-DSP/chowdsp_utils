@@ -1,9 +1,10 @@
 #include <test_utils.h>
+#include <TimedUnitTest.h>
 
-class BBDTest : public UnitTest
+class BBDTest : public TimedUnitTest
 {
 public:
-    BBDTest() : UnitTest ("BBD Test") {}
+    BBDTest() : TimedUnitTest ("BBD Test") {}
 
     void processDelay (double fs, float delaySamples, float* samples, int numSamples)
     {
@@ -76,7 +77,8 @@ public:
         constexpr int numSamples = 2048;
         constexpr auto lenSeconds = (float) numSamples / (float) fs;
 
-        auto runBuffer = [=] (float filterFreq, auto& samples) {
+        auto runBuffer = [=] (float filterFreq, auto& samples)
+        {
             chowdsp::BBD::BBDDelayWrapper<8192> delay;
             delay.prepare ({ fs, (uint32) numSamples, 1 });
             delay.setDelay (1.0f);
@@ -121,7 +123,7 @@ public:
         expectLessThan (firstNonZero, 170, "First non-zero sample should be less than 170!");
     }
 
-    void runTest() override
+    void runTestTimed() override
     {
         beginTest ("Pre-Delay Test");
         preDelayTest();
