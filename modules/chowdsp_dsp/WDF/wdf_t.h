@@ -128,10 +128,25 @@ namespace WDFT
      * @param value: Capacitance value in Farads
      * @param fs: WDF sample rate
      */
-        CapacitorT (T value, T fs) : C_value (value),
-                                     fs (fs)
+        CapacitorT (T value, T fs = (NumericType) 48000.0) : C_value (value),
+                                                             fs (fs)
         {
             calcImpedance();
+        }
+
+        /** Prepares the capacitor to operate at a new sample rate */
+        void prepare (T sampleRate)
+        {
+            fs = sampleRate;
+            propagateImpedanceChange();
+
+            reset();
+        }
+
+        /** Resets the capacitor state */
+        void reset()
+        {
+            z = (T) 0.0;
         }
 
         /** Sets the capacitance value of the WDF capacitor, in Farads. */
@@ -175,7 +190,7 @@ namespace WDFT
         T C_value = (T) 1.0e-6;
         T z = (T) 0.0;
 
-        const T fs;
+        T fs;
     };
 
     /** WDF Capacitor Node with alpha transform parameter */
@@ -189,13 +204,28 @@ namespace WDFT
      * @param alpha: alpha value to be used for the alpha transform,
      *             use 0 for Backwards Euler, use 1 for Bilinear Transform.
      */
-        CapacitorAlphaT (T value, T fs, T alpha = 1.0) : C_value (value),
-                                                         fs (fs),
-                                                         alpha (alpha),
-                                                         b_coef (((T) 1.0 - alpha) / (T) 2.0),
-                                                         a_coef (((T) 1.0 + alpha) / (T) 2.0)
+        CapacitorAlphaT (T value, T fs = 48000.0, T alpha = 1.0) : C_value (value),
+                                                                   fs (fs),
+                                                                   alpha (alpha),
+                                                                   b_coef (((T) 1.0 - alpha) / (T) 2.0),
+                                                                   a_coef (((T) 1.0 + alpha) / (T) 2.0)
         {
             calcImpedance();
+        }
+
+        /** Prepares the capacitor to operate at a new sample rate */
+        void prepare (T sampleRate)
+        {
+            fs = sampleRate;
+            propagateImpedanceChange();
+
+            reset();
+        }
+
+        /** Resets the capacitor state */
+        void reset()
+        {
+            z = (T) 0.0;
         }
 
         /** Sets the capacitance value of the WDF capacitor, in Farads. */
@@ -239,7 +269,7 @@ namespace WDFT
         T C_value = (T) 1.0e-6;
         T z = (T) 0.0;
 
-        const T fs;
+        T fs;
 
         const T alpha;
         const T b_coef;
@@ -255,10 +285,25 @@ namespace WDFT
          * @param value: Inductance value in Farads
          * @param fs: WDF sample rate
          */
-        InductorT (T value, T fs) : L_value (value),
-                                    fs (fs)
+        InductorT (T value, T fs = (NumericType) 48000.0) : L_value (value),
+                                                            fs (fs)
         {
             calcImpedance();
+        }
+
+        /** Prepares the inductor to operate at a new sample rate */
+        void prepare (T sampleRate)
+        {
+            fs = sampleRate;
+            propagateImpedanceChange();
+
+            reset();
+        }
+
+        /** Resets the inductor state */
+        void reset()
+        {
+            z = (T) 0.0;
         }
 
         /** Sets the inductance value of the WDF inductor, in Henries. */
@@ -300,7 +345,7 @@ namespace WDFT
         T L_value = (T) 1.0e-6;
         T z = (T) 0.0;
 
-        const T fs;
+        T fs;
     };
 
     /** WDF Inductor Node with alpha transform parameter */
@@ -321,6 +366,21 @@ namespace WDFT
                                                         a_coef (((T) 1.0 + alpha) / (T) 2.0)
         {
             calcImpedance();
+        }
+
+        /** Prepares the inductor to operate at a new sample rate */
+        void prepare (T sampleRate)
+        {
+            fs = sampleRate;
+            propagateImpedanceChange();
+
+            reset();
+        }
+
+        /** Resets the inductor state */
+        void reset()
+        {
+            z = (T) 0.0;
         }
 
         /** Sets the inductance value of the WDF inductor, in Henries. */
@@ -362,7 +422,7 @@ namespace WDFT
         T L_value = (T) 1.0e-6;
         T z = (T) 0.0;
 
-        const T fs;
+        T fs;
 
         const T alpha;
         const T b_coef;
