@@ -78,7 +78,7 @@ namespace WDFT
         /** Creates a new WDF Resistor with a given resistance.
          * @param value: resistance in Ohms
          */
-        ResistorT (T value) : R_value (value)
+        explicit ResistorT (T value) : R_value (value)
         {
             calcImpedance();
         }
@@ -128,8 +128,8 @@ namespace WDFT
      * @param value: Capacitance value in Farads
      * @param fs: WDF sample rate
      */
-        CapacitorT (T value, T fs = (NumericType) 48000.0) : C_value (value),
-                                                             fs (fs)
+        explicit CapacitorT (T value, T fs = (NumericType) 48000.0) : C_value (value),
+                                                                      fs (fs)
         {
             calcImpedance();
         }
@@ -204,11 +204,11 @@ namespace WDFT
      * @param alpha: alpha value to be used for the alpha transform,
      *             use 0 for Backwards Euler, use 1 for Bilinear Transform.
      */
-        CapacitorAlphaT (T value, T fs = 48000.0, T alpha = 1.0) : C_value (value),
-                                                                   fs (fs),
-                                                                   alpha (alpha),
-                                                                   b_coef (((T) 1.0 - alpha) / (T) 2.0),
-                                                                   a_coef (((T) 1.0 + alpha) / (T) 2.0)
+        explicit CapacitorAlphaT (T value, T fs = 48000.0, T alpha = 1.0) : C_value (value),
+                                                                            fs (fs),
+                                                                            alpha (alpha),
+                                                                            b_coef (((T) 1.0 - alpha) / (T) 2.0),
+                                                                            a_coef (((T) 1.0 + alpha) / (T) 2.0)
         {
             calcImpedance();
         }
@@ -285,8 +285,8 @@ namespace WDFT
          * @param value: Inductance value in Farads
          * @param fs: WDF sample rate
          */
-        InductorT (T value, T fs = (NumericType) 48000.0) : L_value (value),
-                                                            fs (fs)
+        explicit InductorT (T value, T fs = (NumericType) 48000.0) : L_value (value),
+                                                                     fs (fs)
         {
             calcImpedance();
         }
@@ -453,7 +453,6 @@ namespace WDFT
             G = port1.G + port2.G;
             R = (T) 1.0 / G;
             port1Reflect = port1.G / G;
-            port2Reflect = port2.G / G;
         }
 
         /** Accepts an incident wave into a WDF parallel adaptor. */
@@ -485,7 +484,6 @@ namespace WDFT
 
     private:
         T port1Reflect = (T) 1.0;
-        T port2Reflect = (T) 1.0;
 
         T bTemp = (T) 0.0;
         T bDiff = (T) 0.0;
@@ -513,7 +511,6 @@ namespace WDFT
             R = port1.R + port2.R;
             G = (T) 1.0 / R;
             port1Reflect = port1.R / R;
-            port2Reflect = port2.R / R;
         }
 
         /** Accepts an incident wave into a WDF series adaptor. */
@@ -540,7 +537,6 @@ namespace WDFT
 
     private:
         T port1Reflect = (T) 1.0;
-        T port2Reflect = (T) 1.0;
     };
 
     /** WDF Voltage Polarity Inverter */
@@ -549,7 +545,7 @@ namespace WDFT
     {
     public:
         /** Creates a new WDF polarity inverter */
-        PolarityInverterT (PortType& p) : port1 (p)
+        explicit PolarityInverterT (PortType& p) : port1 (p)
         {
             port1.connectToParent (this);
             calcImpedance();
@@ -589,7 +585,7 @@ namespace WDFT
     class IdealVoltageSourceT final : public RootWDF
     {
     public:
-        IdealVoltageSourceT (Next& next)
+        explicit IdealVoltageSourceT (Next& next)
         {
             next.connectToParent (this);
             calcImpedance();
@@ -629,7 +625,7 @@ namespace WDFT
         /** Creates a new resistive voltage source.
          * @param value: initial resistance value, in Ohms
          */
-        ResistiveVoltageSourceT (T value = (NumericType) 1.0e-9) : R_value (value)
+        explicit ResistiveVoltageSourceT (T value = (NumericType) 1.0e-9) : R_value (value)
         {
             calcImpedance();
         }
@@ -679,7 +675,7 @@ namespace WDFT
     class IdealCurrentSourceT final : public RootWDF
     {
     public:
-        IdealCurrentSourceT (Next& n) : next (n)
+        explicit IdealCurrentSourceT (Next& n) : next (n)
         {
             next.connectToParent (this);
             calcImpedance();
@@ -731,7 +727,7 @@ namespace WDFT
         /** Creates a new resistive current source.
          * @param value: initial resistance value, in Ohms
          */
-        ResistiveCurrentSourceT (T value = (NumericType) 1.0e9) : R_value (value)
+        explicit ResistiveCurrentSourceT (T value = (NumericType) 1.0e9) : R_value (value)
         {
             calcImpedance();
         }
@@ -1000,6 +996,40 @@ namespace WDFT
         T logR_Is_overVt;
 
         Next& next;
+    };
+
+    /** WDF Switch (non-adaptable) */
+    template <typename T, typename Next>
+    class SwitchT final : public RootWDF
+    {
+    public:
+        CREATE_WDFT_MEMBERS
+
+        explicit SwitchT (Next& next)
+        {
+            next.connectToParent (this);
+        }
+
+        inline void calcImpedance() override {}
+
+        /** Sets the state of the switch. */
+        void setClosed (bool shouldClose) { closed = shouldClose; }
+
+        /** Accepts an incident wave into a WDF switch. */
+        inline void incident (T x) noexcept
+        {
+            a = x;
+        }
+
+        /** Propogates a reflected wave from a WDF switch. */
+        inline T reflected() noexcept
+        {
+            b = closed ? -a : a;
+            return b;
+        }
+
+    private:
+        bool closed = true;
     };
 
 #undef CREATE_WDFT_MEMBERS

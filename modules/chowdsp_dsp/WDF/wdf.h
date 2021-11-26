@@ -339,33 +339,19 @@ namespace WDF
 
     /** WDF Switch (non-adaptable) */
     template <typename T>
-    class Switch final : public WDF<T>
+    class Switch final : public WDFWrapper<T, WDFT::SwitchT<T, WDF<T>>>
     {
     public:
-        Switch() : WDF<T> ("Switch")
+        Switch (WDF<T>* next) : WDFWrapper<T, WDFT::SwitchT<T, WDF<T>>> ("Switch", *next)
         {
+            next->connectToNode (this);
         }
-
-        inline void calcImpedance() override {}
 
         /** Sets the state of the switch. */
-        void setClosed (bool shouldClose) { closed = shouldClose; }
-
-        /** Accepts an incident wave into a WDF switch. */
-        inline void incident (T x) noexcept override
+        void setClosed (bool shouldClose)
         {
-            this->a = x;
+            this->internalWDF.setClosed (shouldClose);
         }
-
-        /** Propogates a reflected wave from a WDF switch. */
-        inline T reflected() noexcept override
-        {
-            this->b = closed ? -this->a : this->a;
-            return this->b;
-        }
-
-    private:
-        bool closed = true;
     };
 
     /** WDF Open circuit (non-adaptable) */
