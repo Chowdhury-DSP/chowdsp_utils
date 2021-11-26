@@ -196,11 +196,31 @@ namespace WDF
         {
         }
 
+        /** Creates a new WDF Capacitor.
+         * @param value: Capacitance value in Farads
+         */
+        Capacitor (T value) : WDFWrapper<T, WDFT::CapacitorT<T>> ("Capacitor", value)
+        {
+        }
+
         /** Sets the capacitance value of the WDF capacitor, in Farads. */
         void setCapacitanceValue (T newC)
         {
             this->internalWDF.setCapacitanceValue (newC);
             this->propagateImpedance();
+        }
+
+        /** Prepares the capacitor to operate at a new sample rate */
+        void prepare (T sampleRate)
+        {
+            this->internalWDF.prepare (sampleRate);
+            this->propagateImpedance();
+        }
+
+        /** Resets the capacitor state */
+        void reset()
+        {
+            this->internalWDF.reset();
         }
     };
 
@@ -225,6 +245,19 @@ namespace WDF
             this->internalWDF.setCapacitanceValue (newC);
             this->propagateImpedance();
         }
+
+        /** Prepares the capacitor to operate at a new sample rate */
+        void prepare (T sampleRate)
+        {
+            this->internalWDF.prepare (sampleRate);
+            this->propagateImpedance();
+        }
+
+        /** Resets the capacitor state */
+        void reset()
+        {
+            this->internalWDF.reset();
+        }
     };
 
     /** WDF Inductor Node */
@@ -240,11 +273,31 @@ namespace WDF
         {
         }
 
+        /** Creates a new WDF Inductor.
+     * @param value: Inductance value in Farads
+     */
+        Inductor (T value) : WDFWrapper<T, WDFT::InductorT<T>> ("Inductor", value)
+        {
+        }
+
         /** Sets the inductance value of the WDF inductor, in Henries. */
         void setInductanceValue (T newL)
         {
             this->internalWDF.setInductanceValue (newL);
             this->propagateImpedance();
+        }
+
+        /** Prepares the inductor to operate at a new sample rate */
+        void prepare (T sampleRate)
+        {
+            this->internalWDF.prepare (sampleRate);
+            this->propagateImpedance();
+        }
+
+        /** Resets the inductor state */
+        void reset()
+        {
+            this->internalWDF.reset();
         }
     };
 
@@ -268,6 +321,19 @@ namespace WDF
         {
             this->internalWDF.setInductanceValue (newL);
             this->propagateImpedance();
+        }
+
+        /** Prepares the inductor to operate at a new sample rate */
+        void prepare (T sampleRate)
+        {
+            this->internalWDF.prepare (sampleRate);
+            this->propagateImpedance();
+        }
+
+        /** Resets the inductor state */
+        void reset()
+        {
+            this->internalWDF.reset();
         }
     };
 
