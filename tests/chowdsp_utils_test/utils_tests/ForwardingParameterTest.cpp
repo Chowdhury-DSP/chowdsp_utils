@@ -91,25 +91,28 @@ public:
         auto* forwardingParam = new chowdsp::ForwardingParameter ("param", &undoManager, "NONE");
         dummy.addParameter (forwardingParam);
         forwardingParam->setProcessor (&dummy);
-        forwardingParam->setParam (dummyParam);
+        forwardingParam->setParam (dummyParam, "Custom Name");
+
         auto* testParam = (AudioProcessorParameter*) forwardingParam;
+        expectEquals (testParam->getName (1024), String ("Custom Name"), "Custom parameter name is incorrect!");
 
         std::atomic<bool> threadFinished { false };
-        Thread::launch ([&] {
-            constexpr float error = 1.0e-6f;
-            constexpr float value1 = 0.8f;
+        Thread::launch ([&]
+                        {
+                            constexpr float error = 1.0e-6f;
+                            constexpr float value1 = 0.8f;
 
-            testParam->setValue (value1);
-            testParam->sendValueChangedMessageToListeners (value1);
+                            testParam->setValue (value1);
+                            testParam->sendValueChangedMessageToListeners (value1);
 
-            Thread::sleep (100);
+                            Thread::sleep (100);
 
-            expectWithinAbsoluteError (testParam->getValue(), value1, error, "Forwarded param value set from forwarded param is incorrect!");
-            expectWithinAbsoluteError (dummyParam->getValue(), value1, error, "Internal param value set from forwarded param is incorrect!");
+                            expectWithinAbsoluteError (testParam->getValue(), value1, error, "Forwarded param value set from forwarded param is incorrect!");
+                            expectWithinAbsoluteError (dummyParam->getValue(), value1, error, "Internal param value set from forwarded param is incorrect!");
 
-            // do stuff on background thread
-            threadFinished = true;
-        });
+                            // do stuff on background thread
+                            threadFinished = true;
+                        });
 
         while (! threadFinished)
             MessageManager::getInstance()->runDispatchLoopUntil (100);
