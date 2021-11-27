@@ -293,7 +293,7 @@ namespace WDFT
          * @param value: Inductance value in Farads
          * @param fs: WDF sample rate
          */
-        explicit InductorT (T value, T fs = (NumericType) 48000.0) : L_value (value),
+        explicit InductorT (T value, T fs = (T) 48000.0) : L_value (value),
                                                                      fs (fs)
         {
             calcImpedance();
