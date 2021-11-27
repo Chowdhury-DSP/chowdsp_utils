@@ -596,6 +596,65 @@ namespace WDFT
         PortType& port1;
     };
 
+    /** WDF y-parameter 2-port (short circuit admittance) */
+    template <typename T, typename PortType>
+    class YParameterT final : public BaseWDF
+    {
+    public:
+        /** Creates a new WDF Y-Parameter, with the given coefficients */
+        YParameterT (PortType& port1, T y11, T y12, T y21, T y22) : port1 (port1)
+        {
+            y[0][0] = y11;
+            y[0][1] = y12;
+            y[1][0] = y21;
+            y[1][1] = y22;
+
+            port1.connectToParent (this);
+            calcImpedance();
+        }
+
+        /** Calculates the impedance of the WDF Y-Parameter */
+        inline void calcImpedance() override
+        {
+            denominator = y[1][1] + port1.R * y[0][0] * y[1][1] - port1.R * y[0][1] * y[1][0];
+            R = (port1.R * y[0][0] + (T) 1.0) / denominator;
+            G = (T) 1.0 / R;
+
+            T rSq = port1.R * port1.R;
+            T num1A = -y[1][1] * rSq * y[0][0] * y[0][0];
+            T num2A = y[0][1] * y[1][0] * rSq * y[0][0];
+
+            A = (num1A + num2A + y[1][1]) / (denominator * (port1.R * y[0][0] + (T) 1.0));
+            B = -port1.R * y[0][1] / (port1.R * y[0][0] + (T) 1.0);
+            C = -y[1][0] / denominator;
+        }
+
+        /** Accepts an incident wave into a WDF Y-Parameter. */
+        inline void incident (T x) noexcept
+        {
+            a = x;
+            port1.incident (A * port1.b + B * x);
+        }
+
+        /** Propogates a reflected wave from a WDF Y-Parameter. */
+        inline T reflected() noexcept
+        {
+            b = C * port1.reflected();
+            return b;
+        }
+
+        CREATE_WDFT_MEMBERS
+
+    private:
+        PortType& port1;
+        T y[2][2] = { { (T) 0.0, (T) 0.0 }, { (T) 0.0, (T) 0.0 } };
+
+        T denominator = (T) 1.0;
+        T A = (T) 1.0;
+        T B = (T) 1.0;
+        T C = (T) 1.0;
+    };
+
     /** WDF Ideal Voltage source (non-adaptable) */
     template <typename T, typename Next>
     class IdealVoltageSourceT final : public RootWDF

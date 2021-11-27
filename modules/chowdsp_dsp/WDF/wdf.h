@@ -398,56 +398,13 @@ template <typename T, typename WDFType>
 
     /** WDF y-parameter 2-port (short circuit admittance) */
     template <typename T>
-    class YParameter final : public WDF<T>
+    class YParameter final : public WDFWrapper<T, WDFT::YParameterT<T, WDF<T>>>
     {
     public:
-        YParameter (WDF<T>* port1, T y11, T y12, T y21, T y22) : WDF<T> ("YParameter"),
-                                                                 port1 (port1)
+        YParameter (WDF<T>* port1, T y11, T y12, T y21, T y22) : WDFWrapper<T, WDFT::YParameterT<T, WDF<T>>> ("YParameter", *port1, y11, y12, y21, y22)
         {
-            y[0][0] = y11;
-            y[0][1] = y12;
-            y[1][0] = y21;
-            y[1][1] = y22;
-
             port1->connectToNode (this);
-            calcImpedance();
         }
-
-        inline void calcImpedance() override
-        {
-            denominator = y[1][1] + port1->R * y[0][0] * y[1][1] - port1->R * y[0][1] * y[1][0];
-            this->R = (port1->R * y[0][0] + (T) 1.0) / denominator;
-            this->G = (T) 1.0 / this->R;
-
-            T rSq = port1->R * port1->R;
-            T num1A = -y[1][1] * rSq * y[0][0] * y[0][0];
-            T num2A = y[0][1] * y[1][0] * rSq * y[0][0];
-
-            A = (num1A + num2A + y[1][1]) / (denominator * (port1->R * y[0][0] + (T) 1.0));
-            B = -port1->R * y[0][1] / (port1->R * y[0][0] + (T) 1.0);
-            C = -y[1][0] / denominator;
-        }
-
-        inline void incident (T x) noexcept override
-        {
-            this->a = x;
-            port1->incident (A * port1->b + B * x);
-        }
-
-        inline T reflected() noexcept override
-        {
-            this->b = C * port1->reflected();
-            return this->b;
-        }
-
-    private:
-        WDF<T>* port1;
-        T y[2][2] = { { (T) 0.0, (T) 0.0 }, { (T) 0.0, (T) 0.0 } };
-
-        T denominator = (T) 1.0;
-        T A = (T) 1.0;
-        T B = (T) 1.0;
-        T C = (T) 1.0;
     };
 
     /** WDF 3-port parallel adaptor */
