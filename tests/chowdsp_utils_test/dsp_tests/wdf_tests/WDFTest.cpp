@@ -73,6 +73,26 @@ public:
         expectWithinAbsoluteError (yParam.current(), y21 * res.voltage() + y22 * voltage, (FloatType) 1.0e-3, "Y-Parameter current 2 is incorrect");
     }
 
+    template <typename FloatType>
+    inline void shockleyDiodeTest (FloatType maxErr)
+    {
+        constexpr auto saturationCurrent = (FloatType) 1.0e-7;
+        constexpr auto thermalVoltage = (FloatType) 25.85e-3;
+        constexpr auto voltage = (FloatType) -0.35;
+
+        using namespace chowdsp::WDF;
+        ResistiveVoltageSource<FloatType> Vs;
+        PolarityInverter<FloatType> I1 { &Vs };
+        Diode<FloatType> D1 { &I1, saturationCurrent, thermalVoltage };
+
+        Vs.setVoltage (voltage);
+        D1.incident (I1.reflected());
+        I1.incident (D1.reflected());
+
+        auto expectedCurrent = saturationCurrent * (std::exp (-voltage / thermalVoltage) - (FloatType) 1.0);
+        expectWithinAbsoluteError (D1.current(), expectedCurrent, maxErr, "Diode current is incorrect!");
+    }
+
     void rcLowpassTest()
     {
         using FloatType = double;
@@ -270,6 +290,9 @@ public:
         beginTest ("Current Divider Test");
         currentDividerTest<float> (*this);
         currentDividerTest<double> (*this);
+
+        beginTest ("Shockley Diode Test");
+        shockleyDiodeTest<double> (1.0e-3);
 
         beginTest ("Current Switch Test");
         currentSwitchTest<float>();

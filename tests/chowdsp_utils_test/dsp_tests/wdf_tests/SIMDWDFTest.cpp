@@ -33,6 +33,28 @@ public:
             expectEquals (signumReg.get (i), (float) signum (testReg.get (i)), "SIMD Signum is incorrect!");
     }
 
+    template <typename FloatType>
+    inline void shockleyDiodeTest (FloatType maxErr)
+    {
+        using SIMDType = dsp::SIMDRegister<FloatType>;
+
+        constexpr auto saturationCurrent = (FloatType) 1.0e-7;
+        constexpr auto thermalVoltage = (FloatType) 25.85e-3;
+        constexpr auto voltage = (FloatType) -0.35;
+
+        using namespace chowdsp::WDF;
+        ResistiveVoltageSource<SIMDType> Vs;
+        PolarityInverter<SIMDType> I1 { &Vs };
+        Diode<SIMDType> D1 { &I1, saturationCurrent, thermalVoltage };
+
+        Vs.setVoltage (voltage);
+        D1.incident (I1.reflected());
+        I1.incident (D1.reflected());
+
+        auto expectedCurrent = saturationCurrent * (std::exp (-voltage / thermalVoltage) - (FloatType) 1.0);
+        expectWithinAbsoluteError (D1.current().get (0), expectedCurrent, maxErr, "Diode current is incorrect!");
+    }
+
     void diodeClipperSIMDTest()
     {
         using FloatType = double;
@@ -169,6 +191,9 @@ public:
         voltageDividerTest<dsp::SIMDRegister<double>> (*this);
         currentDividerTest<dsp::SIMDRegister<float>> (*this);
         currentDividerTest<dsp::SIMDRegister<double>> (*this);
+
+        beginTest ("SIMD Diode Test");
+        shockleyDiodeTest<double> (1.0e-3);
         diodeClipperSIMDTest();
 
         beginTest ("Static SIMD WDF Test");
