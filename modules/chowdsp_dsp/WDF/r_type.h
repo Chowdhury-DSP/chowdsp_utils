@@ -9,21 +9,19 @@
 #include <xsimd/xsimd.hpp>
 #endif
 
-namespace chowdsp
+namespace chowdsp::WDFT
 {
-namespace WDFT
+/** Utility functions used internally by the R-Type adaptor */
+namespace rtype_detail
 {
-    /** Utility functions used internally by the R-Type adaptor */
-    namespace rtype_detail
+    /** Functions to do a function for each element in the tuple */
+    template <typename Fn, typename Tuple, size_t... Ix>
+    constexpr void forEachInTuple (Fn&& fn, Tuple&& tuple, std::index_sequence<Ix...>) noexcept (noexcept (std::initializer_list<int> { (fn (std::get<Ix> (tuple), Ix), 0)... }))
     {
-        /** Functions to do a function for each element in the tuple */
-        template <typename Fn, typename Tuple, size_t... Ix>
-        constexpr void forEachInTuple (Fn&& fn, Tuple&& tuple, std::index_sequence<Ix...>) noexcept (noexcept (std::initializer_list<int> { (fn (std::get<Ix> (tuple), Ix), 0)... }))
-        {
-            (void) std::initializer_list<int> { ((void) fn (std::get<Ix> (tuple), Ix), 0)... };
-        }
+        (void) std::initializer_list<int> { ((void) fn (std::get<Ix> (tuple), Ix), 0)... };
+    }
 
-        template <typename T>
+    template <typename T>
         using TupleIndexSequence = std::make_index_sequence<std::tuple_size<std::remove_cv_t<std::remove_reference_t<T>>>::value>;
 
         template <typename Fn, typename Tuple>
@@ -60,7 +58,7 @@ namespace WDFT
     {
         static constexpr auto numPorts = sizeof...(PortTypes); // number of ports connected to RtypeAdaptor
     public:
-        RootRtypeAdaptor (std::tuple<PortTypes&...> dps) : downPorts (dps)
+        explicit RootRtypeAdaptor (std::tuple<PortTypes&...> dps) : downPorts (dps)
         {
             for (int i = 0; i < (int) numPorts; i++)
             {
@@ -172,7 +170,6 @@ namespace WDFT
         T b_vec alignas (16)[numPorts]; // temp matrix of outputs from Rport
     };
 
-} // namespace WDFT
 } // namespace chowdsp
 
 #endif // RTYPE_H_INCLUDED

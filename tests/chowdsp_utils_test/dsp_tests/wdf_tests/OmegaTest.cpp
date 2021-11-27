@@ -56,12 +56,12 @@ class OmegaTest : public TimedUnitTest
 {
 public:
     template <typename TT = T, std::enable_if_t<std::is_same_v<TT, float>, int> = 0>
-    OmegaTest() : TimedUnitTest ("Omega Test (float)")
+    OmegaTest() : TimedUnitTest ("Omega Test (float)", "Wave Digital Filters")
     {
     }
 
     template <typename TT = T, std::enable_if_t<std::is_same_v<TT, double>, int> = 0>
-    explicit OmegaTest() : TimedUnitTest ("Omega Test (double)")
+    explicit OmegaTest() : TimedUnitTest ("Omega Test (double)", "Wave Digital Filters")
     {
     }
 

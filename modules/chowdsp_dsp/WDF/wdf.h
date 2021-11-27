@@ -232,6 +232,7 @@ template <typename T, typename WDFType>
         void setAlpha (T newAlpha)
         {
             this->internalWDF.setAlpha (newAlpha);
+            this->propagateImpedance();
         }
     };
 
@@ -280,7 +281,7 @@ template <typename T, typename WDFType>
      * @param alpha: alpha value to be used for the alpha transform,
      *               use 0 for Backwards Euler, use 1 for Bilinear Transform.
      */
-        InductorAlpha (T value, T fs, T alpha = 1.0) : WDFWrapper<T, WDFT::InductorAlphaT<T>> ("Inductor", value, fs, alpha)
+        explicit InductorAlpha (T value, T fs = 48000.0, T alpha = 1.0) : WDFWrapper<T, WDFT::InductorAlphaT<T>> ("Inductor", value, fs, alpha)
         {
         }
 
@@ -308,6 +309,7 @@ template <typename T, typename WDFType>
         void setAlpha (T newAlpha)
         {
             this->internalWDF.setAlpha (newAlpha);
+            this->propagateImpedance();
         }
     };
 
@@ -482,7 +484,7 @@ template <typename T, typename WDFType>
         /** Creates a new resistive current source.
      * @param value: initial resistance value, in Ohms
      */
-        ResistiveCurrentSource (T value = (NumericType) 1.0e9) : WDFWrapper<T, WDFT::ResistiveCurrentSourceT<T>> ("Resistive Current", value)
+        explicit ResistiveCurrentSource (T value = (NumericType) 1.0e9) : WDFWrapper<T, WDFT::ResistiveCurrentSourceT<T>> ("Resistive Current", value)
         {
         }
 
@@ -502,7 +504,7 @@ template <typename T, typename WDFType>
     class IdealCurrentSource final : public WDFWrapper<T, WDFT::IdealCurrentSourceT<T, WDF<T>>>
     {
     public:
-        IdealCurrentSource (WDF<T>* next) : WDFWrapper<T, WDFT::IdealCurrentSourceT<T, WDF<T>>> ("Ideal Current", *next)
+        explicit IdealCurrentSource (WDF<T>* next) : WDFWrapper<T, WDFT::IdealCurrentSourceT<T, WDF<T>>> ("Ideal Current", *next)
         {
             next->connectToNode (this);
         }

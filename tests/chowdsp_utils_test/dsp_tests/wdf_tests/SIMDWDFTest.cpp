@@ -17,7 +17,7 @@ using namespace chowdsp;
 class SIMDWDFTest : public TimedUnitTest
 {
 public:
-    SIMDWDFTest() : TimedUnitTest ("SIMD Wave Digital Filter Test") {}
+    SIMDWDFTest() : TimedUnitTest ("SIMD Wave Digital Filter Test", "Wave Digital Filters") {}
 
     void simdSignumTest()
     {

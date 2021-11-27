@@ -232,8 +232,10 @@ namespace WDFT
         void setAlpha (T newAlpha)
         {
             alpha = newAlpha;
-            b_coef (((T) 1.0 - alpha) / (T) 2.0);
-            a_coef (((T) 1.0 + alpha) / (T) 2.0);
+            b_coef = ((T) 1.0 - alpha) / (T) 2.0;
+            a_coef = ((T) 1.0 + alpha) / (T) 2.0;
+
+            propagateImpedanceChange();
         }
 
         /** Sets the capacitance value of the WDF capacitor, in Farads. */
@@ -395,8 +397,10 @@ namespace WDFT
         void setAlpha (T newAlpha)
         {
             alpha = newAlpha;
-            b_coef (((T) 1.0 - alpha) / (T) 2.0);
-            a_coef (((T) 1.0 + alpha) / (T) 2.0);
+            b_coef = ((T) 1.0 - alpha) / (T) 2.0;
+            a_coef = ((T) 1.0 + alpha) / (T) 2.0;
+
+            propagateImpedanceChange();
         }
 
         /** Sets the inductance value of the WDF inductor, in Henries. */
@@ -838,7 +842,7 @@ namespace WDFT
         /** Propogates a reflected wave from a WDF resistive current source. */
         inline T reflected() noexcept
         {
-            b = (T) 2.0 * R * Is;
+            b = R * Is;
             return b;
         }
 
