@@ -296,7 +296,7 @@ namespace WDFT
          * @param fs: WDF sample rate
          */
         explicit InductorT (T value, T fs = (T) 48000.0) : L_value (value),
-                                                                     fs (fs)
+                                                           fs (fs)
         {
             calcImpedance();
         }
