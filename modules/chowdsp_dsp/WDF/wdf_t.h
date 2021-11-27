@@ -204,11 +204,11 @@ namespace WDFT
      * @param alpha: alpha value to be used for the alpha transform,
      *             use 0 for Backwards Euler, use 1 for Bilinear Transform.
      */
-        explicit CapacitorAlphaT (T value, T fs = 48000.0, T alpha = 1.0) : C_value (value),
-                                                                            fs (fs),
-                                                                            alpha (alpha),
-                                                                            b_coef (((T) 1.0 - alpha) / (T) 2.0),
-                                                                            a_coef (((T) 1.0 + alpha) / (T) 2.0)
+        explicit CapacitorAlphaT (T value, T fs = (T) 48000.0, T alpha = (T) 1.0) : C_value (value),
+                                                                                    fs (fs),
+                                                                                    alpha (alpha),
+                                                                                    b_coef (((T) 1.0 - alpha) / (T) 2.0),
+                                                                                    a_coef (((T) 1.0 + alpha) / (T) 2.0)
         {
             calcImpedance();
         }
@@ -226,6 +226,14 @@ namespace WDFT
         void reset()
         {
             z = (T) 0.0;
+        }
+
+        /** Sets a new alpha value to use for the alpha transform */
+        void setAlpha (T newAlpha)
+        {
+            alpha = newAlpha;
+            b_coef (((T) 1.0 - alpha) / (T) 2.0);
+            a_coef (((T) 1.0 + alpha) / (T) 2.0);
         }
 
         /** Sets the capacitance value of the WDF capacitor, in Farads. */
@@ -271,9 +279,9 @@ namespace WDFT
 
         T fs;
 
-        const T alpha;
-        const T b_coef;
-        const T a_coef;
+        T alpha;
+        T b_coef;
+        T a_coef;
     };
 
     /** WDF Inductor Node */
@@ -359,11 +367,11 @@ namespace WDFT
          * @param alpha: alpha value to be used for the alpha transform,
          *               use 0 for Backwards Euler, use 1 for Bilinear Transform.
          */
-        InductorAlphaT (T value, T fs, T alpha = 1.0) : L_value (value),
-                                                        fs (fs),
-                                                        alpha (alpha),
-                                                        b_coef (((T) 1.0 - alpha) / (T) 2.0),
-                                                        a_coef (((T) 1.0 + alpha) / (T) 2.0)
+        explicit InductorAlphaT (T value, T fs = (T) 48000.0, T alpha = (T) 1.0) : L_value (value),
+                                                                                   fs (fs),
+                                                                                   alpha (alpha),
+                                                                                   b_coef (((T) 1.0 - alpha) / (T) 2.0),
+                                                                                   a_coef (((T) 1.0 + alpha) / (T) 2.0)
         {
             calcImpedance();
         }
@@ -381,6 +389,14 @@ namespace WDFT
         void reset()
         {
             z = (T) 0.0;
+        }
+
+        /** Sets a new alpha value to use for the alpha transform */
+        void setAlpha (T newAlpha)
+        {
+            alpha = newAlpha;
+            b_coef (((T) 1.0 - alpha) / (T) 2.0);
+            a_coef (((T) 1.0 + alpha) / (T) 2.0);
         }
 
         /** Sets the inductance value of the WDF inductor, in Henries. */
@@ -424,9 +440,9 @@ namespace WDFT
 
         T fs;
 
-        const T alpha;
-        const T b_coef;
-        const T a_coef;
+        T alpha;
+        T b_coef;
+        T a_coef;
     };
 
     /** WDF 3-port parallel adaptor */
@@ -804,9 +820,9 @@ namespace WDFT
         void setDiodeParameters (T newIs, T newVt, T nDiodes)
         {
             Is = newIs;
-            _Vt = nDiodes * newVt;
-            twoVt = (T) 2 * _Vt;
-            oneOverVt = (T) 1 / _Vt;
+            Vt = nDiodes * newVt;
+            twoVt = (T) 2 * Vt;
+            oneOverVt = (T) 1 / Vt;
             calcImpedance();
         }
 
@@ -836,7 +852,7 @@ namespace WDFT
         {
             // See eqn (18) from reference paper
             T lambda = (T) signum (a);
-            b = a + (T) 2 * lambda * (R_Is - _Vt * Omega::omega4 (logR_Is_overVt + lambda * a * oneOverVt + R_Is_overVt));
+            b = a + (T) 2 * lambda * (R_Is - Vt * Omega::omega4 (logR_Is_overVt + lambda * a * oneOverVt + R_Is_overVt));
         }
 
         /** Implementation for float/double (Best). */
@@ -870,7 +886,7 @@ namespace WDFT
         {
             // See eqn (18) from reference paper
             T lambda = signumSIMD (a);
-            b = a + (T) 2 * lambda * (R_Is - _Vt * Omega::omega4 (logR_Is_overVt + lambda * a * oneOverVt + R_Is_overVt));
+            b = a + (T) 2 * lambda * (R_Is - Vt * Omega::omega4 (logR_Is_overVt + lambda * a * oneOverVt + R_Is_overVt));
         }
 
         /** Implementation for SIMD float/double (Best). */
@@ -899,7 +915,7 @@ namespace WDFT
         }
 #endif
         T Is; // reverse saturation current
-        T _Vt; // thermal voltage
+        T Vt; // thermal voltage
 
         // pre-computed vars
         T twoVt;
@@ -915,7 +931,7 @@ namespace WDFT
      * See Werner et al., "An Improved and Generalized Diode Clipper Model for Wave Digital Filters"
      * https://www.researchgate.net/publication/299514713_An_Improved_and_Generalized_Diode_Clipper_Model_for_Wave_Digital_Filters
      */
-    template <typename T, typename Next, DiodeQuality Quality = DiodeQuality::Best>
+    template <typename T, typename Next>
     class DiodeT final : public RootWDF
     {
     public:
@@ -1053,19 +1069,19 @@ namespace WDFT
     // useful "factory" functions to you don't have to declare all the template parameters
 
     template <typename T, typename P1Type, typename P2Type>
-    WDFParallelT<T, P1Type, P2Type> makeParallel (P1Type& p1, P2Type& p2)
+    [[maybe_unused]] WDFParallelT<T, P1Type, P2Type> makeParallel (P1Type& p1, P2Type& p2)
     {
         return WDFParallelT<T, P1Type, P2Type> (p1, p2);
     }
 
     template <typename T, typename P1Type, typename P2Type>
-    WDFSeriesT<T, P1Type, P2Type> makeSeries (P1Type& p1, P2Type& p2)
+    [[maybe_unused]] WDFSeriesT<T, P1Type, P2Type> makeSeries (P1Type& p1, P2Type& p2)
     {
         return WDFSeriesT<T, P1Type, P2Type> (p1, p2);
     }
 
     template <typename T, typename PType>
-    PolarityInverterT<T, PType> makeInverter (PType& p1)
+    [[maybe_unused]] PolarityInverterT<T, PType> makeInverter (PType& p1)
     {
         return PolarityInverterT<T, PType> (p1);
     }

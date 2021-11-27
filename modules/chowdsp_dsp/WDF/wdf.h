@@ -2,6 +2,7 @@
 #define WDF_H_INCLUDED
 
 #include <string>
+#include <utility>
 #include "wdf_t.h"
 
 // we want to be able to use this header without JUCE, so let's #if out JUCE-specific implementations
@@ -9,108 +10,83 @@
 #include "signum.h"
 #include "omega.h"
 
-namespace chowdsp
-{
-/**
- * A framework for creating circuit emulations with Wave Digital Filters.
- * For more technical information, see:
- * - https://www.eit.lth.se/fileadmin/eit/courses/eit085f/Fettweis_Wave_Digital_Filters_Theory_and_Practice_IEEE_Proc_1986_-_This_is_a_real_challange.pdf
- * - https://searchworks.stanford.edu/view/11891203
- * 
- * To start, initialize all your circuit elements and connections.
- * Be sure to pick a "root" node, and call `root.connectToNode (adaptor);`
- * 
- * To run the simulation, call the following code
- * once per sample:
- * ```
- * // set source inputs here...
- * 
- * root.incident (adaptor.reflected());
- * // if probing the root node, do that here...
- * adaptor.incident (root.reflected());
- * 
- * // probe other elements here...
- * ```
- * 
- * To probe a node, call `element.voltage()` or `element.current()`.
- */
-namespace WDF
+namespace chowdsp::WDF
 {
 #if USING_JUCE
-    using namespace SIMDUtils;
+using namespace SIMDUtils;
 #endif // USING_JUCE
 
-    /** Wave digital filter base class */
-    template <typename T>
-    class WDF : public WDFT::BaseWDF
-    {
-        using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+/** Wave digital filter base class */
+template <typename T>
+class WDF : public WDFT::BaseWDF
+{
+    using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
 
-    public:
-        WDF (std::string type) : type (type) {}
-        virtual ~WDF() = default;
+public:
+    explicit WDF (std::string type) : type (std::move (type)) {}
+    virtual ~WDF() = default;
 
-        void connectToNode (WDF<T>* p) { parent = p; }
+    void connectToNode (WDF<T>* p) { parent = p; }
 
-        /** Sub-classes override this function to propagate
+    /** Sub-classes override this function to propagate
      * an impedance change to the upstream elements in
      * the WDF tree.
      */
-        virtual inline void propagateImpedance()
-        {
-            calcImpedance();
+    virtual inline void propagateImpedance()
+    {
+        calcImpedance();
 
-            if (parent != nullptr)
-                parent->propagateImpedance();
-        }
+        if (parent != nullptr)
+            parent->propagateImpedance();
+    }
 
-        /** Sub-classes override this function to accept an incident wave. */
-        virtual void incident (T x) noexcept = 0;
+    /** Sub-classes override this function to accept an incident wave. */
+    virtual void incident (T x) noexcept = 0;
 
-        /** Sub-classes override this function to propogate a reflected wave. */
-        virtual T reflected() noexcept = 0;
+    /** Sub-classes override this function to propogate a reflected wave. */
+    virtual T reflected() noexcept = 0;
 
-        /** Probe the voltage across this circuit element. */
-        inline T voltage() const noexcept
-        {
-            return (a + b) / (T) 2.0;
-        }
+    /** Probe the voltage across this circuit element. */
+    inline T voltage() const noexcept
+    {
+        return (a + b) / (T) 2.0;
+    }
 
-        /**Probe the current through this circuit element. */
-        inline T current() const noexcept
-        {
-            return (a - b) / ((T) 2.0 * R);
-        }
+    /**Probe the current through this circuit element. */
+    inline T current() const noexcept
+    {
+        return (a - b) / ((T) 2.0 * R);
+    }
 
-        // These classes need access to a,b
-        template <typename>
-        friend class YParameter;
+    // These classes need access to a,b
+    template <typename>
+    friend class YParameter;
 
-        template <typename>
-        friend class WDFParallel;
+    template <typename>
+    friend class WDFParallel;
 
-        template <typename>
-        friend class WDFSeries;
+    template <typename>
+    friend class WDFSeries;
 
-        T R = (NumericType) 1.0e-9; // impedance
-        T G = (T) 1.0 / R; // admittance
+    T R = (NumericType) 1.0e-9; // impedance
+    T G = (T) 1.0 / R; // admittance
 
-        T a = (T) 0.0; // incident wave
-        T b = (T) 0.0; // reflected wave
+    T a = (T) 0.0; // incident wave
+    T b = (T) 0.0; // reflected wave
 
-    private:
-        const std::string type;
+private:
+    const std::string type;
 
-        WDF<T>* parent = nullptr;
-    };
+    WDF<T>* parent = nullptr;
+};
 
-    template <typename T, typename WDFType>
+template <typename T, typename WDFType>
     class WDFWrapper : public WDF<T>
     {
     public:
         template <typename... Args>
-        WDFWrapper (std::string name, Args&&... args) : WDF<T> (name),
-                                                        internalWDF (std::forward<Args> (args)...)
+        explicit WDFWrapper (std::string name, Args&&... args) : WDF<T> (name),
+                                                                 internalWDF (std::forward<Args> (args)...)
         {
             calcImpedance();
         }
@@ -171,7 +147,7 @@ namespace WDF
         /** Creates a new WDF Resistor with a given resistance.
          * @param value: resistance in Ohms
          */
-        Resistor (T value) : WDFWrapper<T, WDFT::ResistorT<T>> ("Resistor", value)
+        explicit Resistor (T value) : WDFWrapper<T, WDFT::ResistorT<T>> ("Resistor", value)
         {
         }
 
@@ -192,14 +168,7 @@ namespace WDF
          * @param value: Capacitance value in Farads
          * @param fs: WDF sample rate
          */
-        Capacitor (T value, T fs) : WDFWrapper<T, WDFT::CapacitorT<T>> ("Capacitor", value, fs)
-        {
-        }
-
-        /** Creates a new WDF Capacitor.
-         * @param value: Capacitance value in Farads
-         */
-        Capacitor (T value) : WDFWrapper<T, WDFT::CapacitorT<T>> ("Capacitor", value)
+        explicit Capacitor (T value, T fs = (T) 48000.0) : WDFWrapper<T, WDFT::CapacitorT<T>> ("Capacitor", value, fs)
         {
         }
 
@@ -235,7 +204,7 @@ namespace WDF
          * @param alpha: alpha value to be used for the alpha transform,
          *               use 0 for Backwards Euler, use 1 for Bilinear Transform.
          */
-        CapacitorAlpha (T value, T fs, T alpha = 1.0) : WDFWrapper<T, WDFT::CapacitorAlphaT<T>> ("Capacitor", value, fs, alpha)
+        explicit CapacitorAlpha (T value, T fs = (T) 48000.0, T alpha = (T) 1.0) : WDFWrapper<T, WDFT::CapacitorAlphaT<T>> ("Capacitor", value, fs, alpha)
         {
         }
 
@@ -258,6 +227,12 @@ namespace WDF
         {
             this->internalWDF.reset();
         }
+
+        /** Sets a new alpha value to use for the alpha transform */
+        void setAlpha (T newAlpha)
+        {
+            this->internalWDF.setAlpha (newAlpha);
+        }
     };
 
     /** WDF Inductor Node */
@@ -269,14 +244,7 @@ namespace WDF
      * @param value: Inductance value in Farads
      * @param fs: WDF sample rate
      */
-        Inductor (T value, T fs) : WDFWrapper<T, WDFT::InductorT<T>> ("Inductor", value, fs)
-        {
-        }
-
-        /** Creates a new WDF Inductor.
-     * @param value: Inductance value in Farads
-     */
-        Inductor (T value) : WDFWrapper<T, WDFT::InductorT<T>> ("Inductor", value)
+        explicit Inductor (T value, T fs = (T) 48000.0) : WDFWrapper<T, WDFT::InductorT<T>> ("Inductor", value, fs)
         {
         }
 
@@ -335,6 +303,12 @@ namespace WDF
         {
             this->internalWDF.reset();
         }
+
+        /** Sets a new alpha value to use for the alpha transform */
+        void setAlpha (T newAlpha)
+        {
+            this->internalWDF.setAlpha (newAlpha);
+        }
     };
 
     /** WDF Switch (non-adaptable) */
@@ -342,7 +316,7 @@ namespace WDF
     class Switch final : public WDFWrapper<T, WDFT::SwitchT<T, WDF<T>>>
     {
     public:
-        Switch (WDF<T>* next) : WDFWrapper<T, WDFT::SwitchT<T, WDF<T>>> ("Switch", *next)
+        explicit Switch (WDF<T>* next) : WDFWrapper<T, WDFT::SwitchT<T, WDF<T>>> ("Switch", *next)
         {
             next->connectToNode (this);
         }
@@ -416,7 +390,7 @@ namespace WDF
         /** Creates a new WDF polarity inverter
          * @param port1: the port to connect to the inverter
          */
-        PolarityInverter (WDF<T>* port1) : WDFWrapper<T, WDFT::PolarityInverterT<T, WDF<T>>> ("Polarity Inverter", *port1)
+        explicit PolarityInverter (WDF<T>* port1) : WDFWrapper<T, WDFT::PolarityInverterT<T, WDF<T>>> ("Polarity Inverter", *port1)
         {
             port1->connectToNode (this);
         }
@@ -512,7 +486,7 @@ namespace WDF
         /** Creates a new resistive voltage source.
      * @param value: initial resistance value, in Ohms
      */
-        ResistiveVoltageSource (T value = (NumericType) 1.0e-9) : WDFWrapper<T, WDFT::ResistiveVoltageSourceT<T>> ("Resistive Voltage", value)
+        explicit ResistiveVoltageSource (T value = (NumericType) 1.0e-9) : WDFWrapper<T, WDFT::ResistiveVoltageSourceT<T>> ("Resistive Voltage", value)
         {
         }
 
@@ -532,7 +506,7 @@ namespace WDF
     class IdealVoltageSource final : public WDFWrapper<T, WDFT::IdealVoltageSourceT<T, WDF<T>>>
     {
     public:
-        IdealVoltageSource (WDF<T>* next) : WDFWrapper<T, WDFT::IdealVoltageSourceT<T, WDF<T>>> ("IdealVoltage", *next)
+        explicit IdealVoltageSource (WDF<T>* next) : WDFWrapper<T, WDFT::IdealVoltageSourceT<T, WDF<T>>> ("IdealVoltage", *next)
         {
             next->connectToNode (this);
         }
@@ -632,7 +606,6 @@ namespace WDF
         }
     };
 
-} // namespace WDF
 } // namespace chowdsp
 
 #undef USING_JUCE
