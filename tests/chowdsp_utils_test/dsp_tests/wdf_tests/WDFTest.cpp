@@ -23,7 +23,75 @@ using namespace chowdsp::WDF;
 class WDFTest : public TimedUnitTest
 {
 public:
-    WDFTest() : TimedUnitTest ("Wave Digital Filter Test") {}
+    WDFTest() : TimedUnitTest ("Wave Digital Filter Test", "Wave Digital Filters") {}
+
+    template <typename FloatType>
+    void currentSwitchTest()
+    {
+        Resistor<FloatType> r1 ((FloatType) 10000.0);
+        ResistiveCurrentSource<FloatType> Is;
+
+        WDFSeries<FloatType> s1 (&r1, &Is);
+        Switch<FloatType> sw { &s1 };
+
+        // run with switch closed
+        sw.setClosed (true);
+        Is.setCurrent ((FloatType) 1.0);
+        sw.incident (s1.reflected());
+        s1.incident (sw.reflected());
+
+        auto currentClosed = r1.current();
+        expectWithinAbsoluteError (currentClosed, (FloatType) -1.0, (FloatType) 1.0e-3, "Current with switch closed is incorrect!");
+
+        // run with switch open
+        sw.setClosed (false);
+        sw.incident (s1.reflected());
+        s1.incident (sw.reflected());
+
+        auto currentOpen = r1.current();
+        expectEquals (currentOpen, (FloatType) 0.0, "Current with switch open is incorrect!");
+    }
+
+    template <typename FloatType>
+    void yParameterTest()
+    {
+        constexpr auto y11 = (FloatType) 0.11;
+        constexpr auto y12 = (FloatType) 0.22;
+        constexpr auto y21 = (FloatType) 0.33;
+        constexpr auto y22 = (FloatType) 0.44;
+        constexpr auto voltage = (FloatType) 2.0;
+
+        Resistor<FloatType> res { (FloatType) 10000.0 };
+        YParameter<FloatType> yParam { &res, y11, y12, y21, y22 };
+        IdealVoltageSource<FloatType> Vs { &yParam };
+
+        Vs.setVoltage (voltage);
+        Vs.incident (yParam.reflected());
+        yParam.incident (Vs.reflected());
+
+        expectWithinAbsoluteError (-res.current(), y11 * res.voltage() + y12 * voltage, (FloatType) 1.0e-3, "Y-Parameter current 1 is incorrect");
+        expectWithinAbsoluteError (yParam.current(), y21 * res.voltage() + y22 * voltage, (FloatType) 1.0e-3, "Y-Parameter current 2 is incorrect");
+    }
+
+    template <typename FloatType>
+    inline void shockleyDiodeTest (FloatType maxErr)
+    {
+        constexpr auto saturationCurrent = (FloatType) 1.0e-7;
+        constexpr auto thermalVoltage = (FloatType) 25.85e-3;
+        constexpr auto voltage = (FloatType) -0.35;
+
+        using namespace chowdsp::WDF;
+        ResistiveVoltageSource<FloatType> Vs;
+        PolarityInverter<FloatType> I1 { &Vs };
+        Diode<FloatType> D1 { &I1, saturationCurrent, thermalVoltage };
+
+        Vs.setVoltage (voltage);
+        D1.incident (I1.reflected());
+        I1.incident (D1.reflected());
+
+        auto expectedCurrent = saturationCurrent * (std::exp (-voltage / thermalVoltage) - (FloatType) 1.0);
+        expectWithinAbsoluteError (D1.current(), expectedCurrent, maxErr, "Diode current is incorrect!");
+    }
 
     void rcLowpassTest()
     {
@@ -98,14 +166,17 @@ public:
         // reference filter
         float refMag;
         {
-            Capacitor<float> c1 (C, (float) _fs);
+            Capacitor<float> c1 (C);
             Resistor<float> r1 (R);
-            Inductor<float> l1 (L, (float) _fs);
+            Inductor<float> l1 (L);
 
             WDFSeries<float> s1 (&r1, &c1);
             WDFSeries<float> s2 (&s1, &l1);
             PolarityInverter<float> p1 (&s2);
             IdealVoltageSource<float> vs { &p1 };
+
+            c1.prepare ((float) _fs);
+            l1.prepare ((float) _fs);
 
             auto refSine = test_utils::makeSineWave (10.0e3f, (float) _fs, 1.0f);
             processBuffer (refSine.getWritePointer (0), refSine.getNumSamples(), vs, p1, l1);
@@ -113,17 +184,22 @@ public:
             expectWithinAbsoluteError (refMag, 0.0f, 0.1f, "Reference highpass passband gain is incorrect!");
         }
 
+        CapacitorAlpha<float> c1 (C);
+        Resistor<float> r1 (R);
+        InductorAlpha<float> l1 (L);
+
+        WDFSeries<float> s1 (&r1, &c1);
+        WDFSeries<float> s2 (&s1, &l1);
+        PolarityInverter<float> p1 (&s2);
+        IdealVoltageSource<float> vs { &p1 };
+
         // alpha = 1.0 filter
         {
             constexpr float alpha = 1.0f;
-            CapacitorAlpha<float> c1 (C, (float) _fs, alpha);
-            Resistor<float> r1 (R);
-            InductorAlpha<float> l1 (L, (float) _fs, alpha);
-
-            WDFSeries<float> s1 (&r1, &c1);
-            WDFSeries<float> s2 (&s1, &l1);
-            PolarityInverter<float> p1 (&s2);
-            IdealVoltageSource<float> vs { &p1 };
+            c1.prepare ((float) _fs);
+            c1.setAlpha (alpha);
+            l1.prepare ((float) _fs);
+            l1.setAlpha (alpha);
 
             auto a1Sine = test_utils::makeSineWave (10.0e3f, (float) _fs, 1.0f);
             processBuffer (a1Sine.getWritePointer (0), a1Sine.getNumSamples(), vs, p1, l1);
@@ -135,14 +211,10 @@ public:
         // alpha = 0.1 filter
         {
             constexpr float alpha = 0.1f;
-            CapacitorAlpha<float> c1 (C, (float) _fs, alpha);
-            Resistor<float> r1 (R);
-            InductorAlpha<float> l1 (L, (float) _fs, alpha);
-
-            WDFSeries<float> s1 (&r1, &c1);
-            WDFSeries<float> s2 (&s1, &l1);
-            PolarityInverter<float> p1 (&s2);
-            IdealVoltageSource<float> vs { &p1 };
+            c1.reset();
+            c1.setAlpha (alpha);
+            l1.reset();
+            l1.setAlpha (alpha);
 
             auto a01Sine = test_utils::makeSineWave (10.0e3f, (float) _fs, 1.0f);
             processBuffer (a01Sine.getWritePointer (0), a01Sine.getNumSamples(), vs, p1, l1);
@@ -218,6 +290,17 @@ public:
         beginTest ("Current Divider Test");
         currentDividerTest<float> (*this);
         currentDividerTest<double> (*this);
+
+        beginTest ("Shockley Diode Test");
+        shockleyDiodeTest<double> (1.0e-3);
+
+        beginTest ("Current Switch Test");
+        currentSwitchTest<float>();
+        currentSwitchTest<double>();
+
+        beginTest ("Y-Parameter Test");
+        yParameterTest<float>();
+        yParameterTest<double>();
 
         beginTest ("RC Lowpass Test");
         rcLowpassTest();

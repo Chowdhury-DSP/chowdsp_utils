@@ -93,7 +93,7 @@ private:
 class RTypeTest : public TimedUnitTest
 {
 public:
-    RTypeTest() : TimedUnitTest ("Wave Digital Filter R-Type Test") {}
+    RTypeTest() : TimedUnitTest ("Wave Digital Filter R-Type Test", "Wave Digital Filters") {}
 
     void freqTest (float lowPot, float highPot, float sineFreq, float expGainDB, float maxErr)
     {

@@ -14,12 +14,11 @@ using namespace chowdsp::WDFT;
 class StaticWDFTest : public TimedUnitTest
 {
 public:
-    StaticWDFTest() : TimedUnitTest ("Static Wave Digital Filter Test") {}
+    StaticWDFTest() : TimedUnitTest ("Static Wave Digital Filter Test", "Wave Digital Filters") {}
 
     template <typename FloatType>
     void voltageDividerTest()
     {
-        using namespace chowdsp::WDFT;
         ResistorT<FloatType> r1 ((FloatType) 10000.0);
         ResistorT<FloatType> r2 ((FloatType) 10000.0);
 
@@ -40,7 +39,6 @@ public:
     template <typename FloatType>
     void currentDividerTest()
     {
-        using namespace chowdsp::WDF;
         ResistorT<FloatType> r1 ((FloatType) 10000.0);
         ResistorT<FloatType> r2 ((FloatType) 10000.0);
 
@@ -53,6 +51,33 @@ public:
 
         auto iOut = current<FloatType> (r2);
         expectEquals (iOut, (FloatType) 0.5, "Current divider: incorrect current!");
+    }
+
+    template <typename FloatType>
+    void currentSwitchTest()
+    {
+        ResistorT<FloatType> r1 ((FloatType) 10000.0);
+        ResistiveCurrentSourceT<FloatType> Is;
+
+        auto s1 = makeSeries<FloatType> (r1, Is);
+        SwitchT<FloatType, decltype (s1)> sw { s1 };
+
+        // run with switch closed
+        sw.setClosed (true);
+        Is.setCurrent ((FloatType) 1.0);
+        sw.incident (s1.reflected());
+        s1.incident (sw.reflected());
+
+        auto currentClosed = current<FloatType> (r1);
+        expectWithinAbsoluteError (currentClosed, (FloatType) -1.0, (FloatType) 1.0e-3, "Current with switch closed is incorrect!");
+
+        // run with switch open
+        sw.setClosed (false);
+        sw.incident (s1.reflected());
+        s1.incident (sw.reflected());
+
+        auto currentOpen = current<FloatType> (r1);
+        expectEquals (currentOpen, (FloatType) 0.0, "Current with switch open is incorrect!");
     }
 
     void rcLowpassTest()
@@ -129,9 +154,12 @@ public:
         // reference filter
         float refMag;
         {
-            CapacitorT<float> c1 (C, (float) _fs);
+            CapacitorT<float> c1 (C);
             ResistorT<float> r1 (R);
-            InductorT<float> l1 (L, (float) _fs);
+            InductorT<float> l1 (L);
+
+            c1.prepare ((float) _fs);
+            l1.prepare ((float) _fs);
 
             WDFSeriesT<float, ResistorT<float>, CapacitorT<float>> s1 { r1, c1 };
             WDFSeriesT<float, WDFSeriesT<float, ResistorT<float>, CapacitorT<float>>, InductorT<float>> s2 { s1, l1 };
@@ -145,18 +173,23 @@ public:
             expectWithinAbsoluteError (refMag, 0.0f, 0.1f, "Reference highpass passband gain is incorrect!");
         }
 
+        CapacitorAlphaT<float> c1 (C);
+        ResistorT<float> r1 (R);
+        InductorAlphaT<float> l1 (L);
+
+        auto s1 = makeSeries<float> (r1, c1);
+        auto s2 = makeSeries<float> (s1, l1);
+        auto p1 = makeInverter<float> (s2);
+
+        IdealVoltageSourceT<float, decltype (p1)> vs { p1 };
+
         // alpha = 1.0 filter
         {
             constexpr float alpha = 1.0f;
-            CapacitorAlphaT<float> c1 (C, (float) _fs, alpha);
-            ResistorT<float> r1 (R);
-            InductorAlphaT<float> l1 (L, (float) _fs, alpha);
-
-            WDFSeriesT<float, ResistorT<float>, CapacitorAlphaT<float>> s1 { r1, c1 };
-            WDFSeriesT<float, WDFSeriesT<float, ResistorT<float>, CapacitorAlphaT<float>>, InductorAlphaT<float>> s2 { s1, l1 };
-            PolarityInverterT<float, WDFSeriesT<float, WDFSeriesT<float, ResistorT<float>, CapacitorAlphaT<float>>, InductorAlphaT<float>>> p1 { s2 };
-
-            IdealVoltageSourceT<float, decltype (p1)> vs { p1 };
+            c1.prepare ((float) _fs);
+            c1.setAlpha (alpha);
+            l1.prepare ((float) _fs);
+            l1.setAlpha (alpha);
 
             auto a1Sine = test_utils::makeSineWave (10.0e3f, (float) _fs, 1.0f);
             processBuffer (a1Sine.getWritePointer (0), a1Sine.getNumSamples(), vs, p1, l1);
@@ -168,15 +201,10 @@ public:
         // alpha = 0.1 filter
         {
             constexpr float alpha = 0.1f;
-            CapacitorAlphaT<float> c1 (C, (float) _fs, alpha);
-            ResistorT<float> r1 (R);
-            InductorAlphaT<float> l1 (L, (float) _fs, alpha);
-
-            WDFSeriesT<float, ResistorT<float>, CapacitorAlphaT<float>> s1 { r1, c1 };
-            WDFSeriesT<float, WDFSeriesT<float, ResistorT<float>, CapacitorAlphaT<float>>, InductorAlphaT<float>> s2 { s1, l1 };
-            PolarityInverterT<float, WDFSeriesT<float, WDFSeriesT<float, ResistorT<float>, CapacitorAlphaT<float>>, InductorAlphaT<float>>> p1 { s2 };
-
-            IdealVoltageSourceT<float, decltype (p1)> vs { p1 };
+            c1.reset();
+            c1.setAlpha (alpha);
+            l1.reset();
+            l1.setAlpha (alpha);
 
             auto a01Sine = test_utils::makeSineWave (10.0e3f, (float) _fs, 1.0f);
             processBuffer (a01Sine.getWritePointer (0), a01Sine.getNumSamples(), vs, p1, l1);
@@ -208,11 +236,11 @@ public:
 
             WDF::DiodePair<FloatType, Q> dp { I1.get(), (FloatType) 2.52e-9 };
 
-            for (int i = 0; i < num; ++i)
+            for (double& i : data1)
             {
-                Vs.setVoltage (data1[i]);
+                Vs.setVoltage (i);
                 dp.incident (P1->reflected());
-                data1[i] = C1->voltage();
+                i = C1->voltage();
                 P1->incident (dp.reflected());
             }
         }
@@ -229,11 +257,11 @@ public:
 
             DiodePairT<FloatType, decltype (I1), Q> dp { I1, (FloatType) 2.52e-9 };
 
-            for (int i = 0; i < num; ++i)
+            for (double& i : data2)
             {
-                Vs.setVoltage (data2[i]);
+                Vs.setVoltage (i);
                 dp.incident (P1.reflected());
-                data2[i] = voltage<FloatType> (C1);
+                i = voltage<FloatType> (C1);
                 P1.incident (dp.reflected());
             }
         }
@@ -309,6 +337,10 @@ public:
         beginTest ("Current Divider Test");
         currentDividerTest<float>();
         currentDividerTest<double>();
+
+        beginTest ("Current Switch Test");
+        currentSwitchTest<float>();
+        currentSwitchTest<double>();
 
         beginTest ("RC Lowpass Test");
         rcLowpassTest();
