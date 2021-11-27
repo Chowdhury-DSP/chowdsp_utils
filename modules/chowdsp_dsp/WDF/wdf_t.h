@@ -128,8 +128,8 @@ namespace WDFT
      * @param value: Capacitance value in Farads
      * @param fs: WDF sample rate
      */
-        explicit CapacitorT (T value, T fs = (NumericType) 48000.0) : C_value (value),
-                                                                      fs (fs)
+        explicit CapacitorT (T value, T fs = (T) 48000.0) : C_value (value),
+                                                            fs (fs)
         {
             calcImpedance();
         }
