@@ -52,6 +52,27 @@ public:
         expectEquals (currentOpen, (FloatType) 0.0, "Current with switch open is incorrect!");
     }
 
+    template <typename FloatType>
+    void yParameterTest()
+    {
+        constexpr auto y11 = (FloatType) 0.11;
+        constexpr auto y12 = (FloatType) 0.22;
+        constexpr auto y21 = (FloatType) 0.33;
+        constexpr auto y22 = (FloatType) 0.44;
+        constexpr auto voltage = (FloatType) 2.0;
+
+        Resistor<FloatType> res { (FloatType) 10000.0 };
+        YParameter<FloatType> yParam { &res, y11, y12, y21, y22 };
+        IdealVoltageSource<FloatType> Vs { &yParam };
+
+        Vs.setVoltage (voltage);
+        Vs.incident (yParam.reflected());
+        yParam.incident (Vs.reflected());
+
+        expectWithinAbsoluteError (-res.current(), y11 * res.voltage() + y12 * voltage, (FloatType) 1.0e-3, "Y-Parameter current 1 is incorrect");
+        expectWithinAbsoluteError (yParam.current(), y21 * res.voltage() + y22 * voltage, (FloatType) 1.0e-3, "Y-Parameter current 2 is incorrect");
+    }
+
     void rcLowpassTest()
     {
         using FloatType = double;
@@ -253,6 +274,10 @@ public:
         beginTest ("Current Switch Test");
         currentSwitchTest<float>();
         currentSwitchTest<double>();
+
+        beginTest ("Y-Parameter Test");
+        yParameterTest<float>();
+        yParameterTest<double>();
 
         beginTest ("RC Lowpass Test");
         rcLowpassTest();
