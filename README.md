@@ -13,7 +13,7 @@ The modules currently contains the following utility classes:
   - Filters: functions for bilinear transform, IIR filters with static order, and an optimized State Variable Filter.
   - Modal: modal filter/oscillator using Max Mathews Phasor Filter.
   - Sources: sine wave generator, noise generator
-  - Wave Digital Filters: all linear circuit elements, series/parallel junctions, and diodes.
+  - Wave Digital Filters: linear circuit elements, series/parallel junctions, diodes, and a few others.
   - Some extra functions and classes for SIMD operations.
 - chowdsp_gui
   - Custom `LookAndFeel`.
