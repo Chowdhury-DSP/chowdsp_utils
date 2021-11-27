@@ -14,6 +14,7 @@ function(setup_juce_test target)
     )
 
     target_link_libraries(${target} PRIVATE
+        juce::juce_dsp
         chowdsp_dsp
         chowdsp_gui
         chowdsp_plugin_utils
