@@ -16,7 +16,7 @@ constexpr float timeSeconds = 1000.0f;
 class WDFPerfTest : public TimedUnitTest
 {
 public:
-    WDFPerfTest() : TimedUnitTest ("WDFPerfTest")
+    WDFPerfTest() : TimedUnitTest ("WDFPerfTest", "Wave Digital Filters")
     {
     }
 

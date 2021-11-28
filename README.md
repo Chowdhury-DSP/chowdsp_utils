@@ -14,7 +14,7 @@ There are currently 3 modules each containing the following classes:
   - Modal: modal filter/oscillator using Max Mathews Phasor Filter.
   - Sources: "magic circle" sine wave oscillator, noise generator.
   - Resampling: classes for doing non-integer sample rate conversion, and processing audio at a target sample rate.
-  - Wave Digital Filters: all linear circuit elements, series/parallel junctions, and diodes.
+  - Wave Digital Filters: linear circuit elements, series/parallel junctions, diodes, and a few others.
   - Some extra functions and classes for SIMD operations.
 - chowdsp_gui
   - Custom `LookAndFeel`.

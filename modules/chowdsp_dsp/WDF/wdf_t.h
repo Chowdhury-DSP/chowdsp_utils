@@ -78,7 +78,7 @@ namespace WDFT
         /** Creates a new WDF Resistor with a given resistance.
          * @param value: resistance in Ohms
          */
-        ResistorT (T value) : R_value (value)
+        explicit ResistorT (T value) : R_value (value)
         {
             calcImpedance();
         }
@@ -128,10 +128,25 @@ namespace WDFT
      * @param value: Capacitance value in Farads
      * @param fs: WDF sample rate
      */
-        CapacitorT (T value, T fs) : C_value (value),
-                                     fs (fs)
+        explicit CapacitorT (T value, T fs = (T) 48000.0) : C_value (value),
+                                                            fs (fs)
         {
             calcImpedance();
+        }
+
+        /** Prepares the capacitor to operate at a new sample rate */
+        void prepare (T sampleRate)
+        {
+            fs = sampleRate;
+            propagateImpedanceChange();
+
+            reset();
+        }
+
+        /** Resets the capacitor state */
+        void reset()
+        {
+            z = (T) 0.0;
         }
 
         /** Sets the capacitance value of the WDF capacitor, in Farads. */
@@ -175,7 +190,7 @@ namespace WDFT
         T C_value = (T) 1.0e-6;
         T z = (T) 0.0;
 
-        const T fs;
+        T fs;
     };
 
     /** WDF Capacitor Node with alpha transform parameter */
@@ -189,13 +204,38 @@ namespace WDFT
      * @param alpha: alpha value to be used for the alpha transform,
      *             use 0 for Backwards Euler, use 1 for Bilinear Transform.
      */
-        CapacitorAlphaT (T value, T fs, T alpha = 1.0) : C_value (value),
-                                                         fs (fs),
-                                                         alpha (alpha),
-                                                         b_coef (((T) 1.0 - alpha) / (T) 2.0),
-                                                         a_coef (((T) 1.0 + alpha) / (T) 2.0)
+        explicit CapacitorAlphaT (T value, T fs = (T) 48000.0, T alpha = (T) 1.0) : C_value (value),
+                                                                                    fs (fs),
+                                                                                    alpha (alpha),
+                                                                                    b_coef (((T) 1.0 - alpha) / (T) 2.0),
+                                                                                    a_coef (((T) 1.0 + alpha) / (T) 2.0)
         {
             calcImpedance();
+        }
+
+        /** Prepares the capacitor to operate at a new sample rate */
+        void prepare (T sampleRate)
+        {
+            fs = sampleRate;
+            propagateImpedanceChange();
+
+            reset();
+        }
+
+        /** Resets the capacitor state */
+        void reset()
+        {
+            z = (T) 0.0;
+        }
+
+        /** Sets a new alpha value to use for the alpha transform */
+        void setAlpha (T newAlpha)
+        {
+            alpha = newAlpha;
+            b_coef = ((T) 1.0 - alpha) / (T) 2.0;
+            a_coef = ((T) 1.0 + alpha) / (T) 2.0;
+
+            propagateImpedanceChange();
         }
 
         /** Sets the capacitance value of the WDF capacitor, in Farads. */
@@ -239,11 +279,11 @@ namespace WDFT
         T C_value = (T) 1.0e-6;
         T z = (T) 0.0;
 
-        const T fs;
+        T fs;
 
-        const T alpha;
-        const T b_coef;
-        const T a_coef;
+        T alpha;
+        T b_coef;
+        T a_coef;
     };
 
     /** WDF Inductor Node */
@@ -255,10 +295,25 @@ namespace WDFT
          * @param value: Inductance value in Farads
          * @param fs: WDF sample rate
          */
-        InductorT (T value, T fs) : L_value (value),
-                                    fs (fs)
+        explicit InductorT (T value, T fs = (T) 48000.0) : L_value (value),
+                                                           fs (fs)
         {
             calcImpedance();
+        }
+
+        /** Prepares the inductor to operate at a new sample rate */
+        void prepare (T sampleRate)
+        {
+            fs = sampleRate;
+            propagateImpedanceChange();
+
+            reset();
+        }
+
+        /** Resets the inductor state */
+        void reset()
+        {
+            z = (T) 0.0;
         }
 
         /** Sets the inductance value of the WDF inductor, in Henries. */
@@ -300,7 +355,7 @@ namespace WDFT
         T L_value = (T) 1.0e-6;
         T z = (T) 0.0;
 
-        const T fs;
+        T fs;
     };
 
     /** WDF Inductor Node with alpha transform parameter */
@@ -314,13 +369,38 @@ namespace WDFT
          * @param alpha: alpha value to be used for the alpha transform,
          *               use 0 for Backwards Euler, use 1 for Bilinear Transform.
          */
-        InductorAlphaT (T value, T fs, T alpha = 1.0) : L_value (value),
-                                                        fs (fs),
-                                                        alpha (alpha),
-                                                        b_coef (((T) 1.0 - alpha) / (T) 2.0),
-                                                        a_coef (((T) 1.0 + alpha) / (T) 2.0)
+        explicit InductorAlphaT (T value, T fs = (T) 48000.0, T alpha = (T) 1.0) : L_value (value),
+                                                                                   fs (fs),
+                                                                                   alpha (alpha),
+                                                                                   b_coef (((T) 1.0 - alpha) / (T) 2.0),
+                                                                                   a_coef (((T) 1.0 + alpha) / (T) 2.0)
         {
             calcImpedance();
+        }
+
+        /** Prepares the inductor to operate at a new sample rate */
+        void prepare (T sampleRate)
+        {
+            fs = sampleRate;
+            propagateImpedanceChange();
+
+            reset();
+        }
+
+        /** Resets the inductor state */
+        void reset()
+        {
+            z = (T) 0.0;
+        }
+
+        /** Sets a new alpha value to use for the alpha transform */
+        void setAlpha (T newAlpha)
+        {
+            alpha = newAlpha;
+            b_coef = ((T) 1.0 - alpha) / (T) 2.0;
+            a_coef = ((T) 1.0 + alpha) / (T) 2.0;
+
+            propagateImpedanceChange();
         }
 
         /** Sets the inductance value of the WDF inductor, in Henries. */
@@ -362,11 +442,11 @@ namespace WDFT
         T L_value = (T) 1.0e-6;
         T z = (T) 0.0;
 
-        const T fs;
+        T fs;
 
-        const T alpha;
-        const T b_coef;
-        const T a_coef;
+        T alpha;
+        T b_coef;
+        T a_coef;
     };
 
     /** WDF 3-port parallel adaptor */
@@ -393,7 +473,6 @@ namespace WDFT
             G = port1.G + port2.G;
             R = (T) 1.0 / G;
             port1Reflect = port1.G / G;
-            port2Reflect = port2.G / G;
         }
 
         /** Accepts an incident wave into a WDF parallel adaptor. */
@@ -425,7 +504,6 @@ namespace WDFT
 
     private:
         T port1Reflect = (T) 1.0;
-        T port2Reflect = (T) 1.0;
 
         T bTemp = (T) 0.0;
         T bDiff = (T) 0.0;
@@ -453,7 +531,6 @@ namespace WDFT
             R = port1.R + port2.R;
             G = (T) 1.0 / R;
             port1Reflect = port1.R / R;
-            port2Reflect = port2.R / R;
         }
 
         /** Accepts an incident wave into a WDF series adaptor. */
@@ -480,7 +557,6 @@ namespace WDFT
 
     private:
         T port1Reflect = (T) 1.0;
-        T port2Reflect = (T) 1.0;
     };
 
     /** WDF Voltage Polarity Inverter */
@@ -489,7 +565,7 @@ namespace WDFT
     {
     public:
         /** Creates a new WDF polarity inverter */
-        PolarityInverterT (PortType& p) : port1 (p)
+        explicit PolarityInverterT (PortType& p) : port1 (p)
         {
             port1.connectToParent (this);
             calcImpedance();
@@ -524,12 +600,71 @@ namespace WDFT
         PortType& port1;
     };
 
+    /** WDF y-parameter 2-port (short circuit admittance) */
+    template <typename T, typename PortType>
+    class YParameterT final : public BaseWDF
+    {
+    public:
+        /** Creates a new WDF Y-Parameter, with the given coefficients */
+        YParameterT (PortType& port1, T y11, T y12, T y21, T y22) : port1 (port1)
+        {
+            y[0][0] = y11;
+            y[0][1] = y12;
+            y[1][0] = y21;
+            y[1][1] = y22;
+
+            port1.connectToParent (this);
+            calcImpedance();
+        }
+
+        /** Calculates the impedance of the WDF Y-Parameter */
+        inline void calcImpedance() override
+        {
+            denominator = y[1][1] + port1.R * y[0][0] * y[1][1] - port1.R * y[0][1] * y[1][0];
+            R = (port1.R * y[0][0] + (T) 1.0) / denominator;
+            G = (T) 1.0 / R;
+
+            T rSq = port1.R * port1.R;
+            T num1A = -y[1][1] * rSq * y[0][0] * y[0][0];
+            T num2A = y[0][1] * y[1][0] * rSq * y[0][0];
+
+            A = (num1A + num2A + y[1][1]) / (denominator * (port1.R * y[0][0] + (T) 1.0));
+            B = -port1.R * y[0][1] / (port1.R * y[0][0] + (T) 1.0);
+            C = -y[1][0] / denominator;
+        }
+
+        /** Accepts an incident wave into a WDF Y-Parameter. */
+        inline void incident (T x) noexcept
+        {
+            a = x;
+            port1.incident (A * port1.b + B * x);
+        }
+
+        /** Propogates a reflected wave from a WDF Y-Parameter. */
+        inline T reflected() noexcept
+        {
+            b = C * port1.reflected();
+            return b;
+        }
+
+        CREATE_WDFT_MEMBERS
+
+    private:
+        PortType& port1;
+        T y[2][2] = { { (T) 0.0, (T) 0.0 }, { (T) 0.0, (T) 0.0 } };
+
+        T denominator = (T) 1.0;
+        T A = (T) 1.0;
+        T B = (T) 1.0;
+        T C = (T) 1.0;
+    };
+
     /** WDF Ideal Voltage source (non-adaptable) */
     template <typename T, typename Next>
     class IdealVoltageSourceT final : public RootWDF
     {
     public:
-        IdealVoltageSourceT (Next& next)
+        explicit IdealVoltageSourceT (Next& next)
         {
             next.connectToParent (this);
             calcImpedance();
@@ -569,7 +704,7 @@ namespace WDFT
         /** Creates a new resistive voltage source.
          * @param value: initial resistance value, in Ohms
          */
-        ResistiveVoltageSourceT (T value = (NumericType) 1.0e-9) : R_value (value)
+        explicit ResistiveVoltageSourceT (T value = (NumericType) 1.0e-9) : R_value (value)
         {
             calcImpedance();
         }
@@ -619,7 +754,7 @@ namespace WDFT
     class IdealCurrentSourceT final : public RootWDF
     {
     public:
-        IdealCurrentSourceT (Next& n) : next (n)
+        explicit IdealCurrentSourceT (Next& n) : next (n)
         {
             next.connectToParent (this);
             calcImpedance();
@@ -671,7 +806,7 @@ namespace WDFT
         /** Creates a new resistive current source.
          * @param value: initial resistance value, in Ohms
          */
-        ResistiveCurrentSourceT (T value = (NumericType) 1.0e9) : R_value (value)
+        explicit ResistiveCurrentSourceT (T value = (NumericType) 1.0e9) : R_value (value)
         {
             calcImpedance();
         }
@@ -707,7 +842,7 @@ namespace WDFT
         /** Propogates a reflected wave from a WDF resistive current source. */
         inline T reflected() noexcept
         {
-            b = (T) 2.0 * R * Is;
+            b = R * Is;
             return b;
         }
 
@@ -748,9 +883,9 @@ namespace WDFT
         void setDiodeParameters (T newIs, T newVt, T nDiodes)
         {
             Is = newIs;
-            _Vt = nDiodes * newVt;
-            twoVt = (T) 2 * _Vt;
-            oneOverVt = (T) 1 / _Vt;
+            Vt = nDiodes * newVt;
+            twoVt = (T) 2 * Vt;
+            oneOverVt = (T) 1 / Vt;
             calcImpedance();
         }
 
@@ -780,7 +915,7 @@ namespace WDFT
         {
             // See eqn (18) from reference paper
             T lambda = (T) signum (a);
-            b = a + (T) 2 * lambda * (R_Is - _Vt * Omega::omega4 (logR_Is_overVt + lambda * a * oneOverVt + R_Is_overVt));
+            b = a + (T) 2 * lambda * (R_Is - Vt * Omega::omega4 (logR_Is_overVt + lambda * a * oneOverVt + R_Is_overVt));
         }
 
         /** Implementation for float/double (Best). */
@@ -814,7 +949,7 @@ namespace WDFT
         {
             // See eqn (18) from reference paper
             T lambda = signumSIMD (a);
-            b = a + (T) 2 * lambda * (R_Is - _Vt * Omega::omega4 (logR_Is_overVt + lambda * a * oneOverVt + R_Is_overVt));
+            b = a + (T) 2 * lambda * (R_Is - Vt * Omega::omega4 (logR_Is_overVt + lambda * a * oneOverVt + R_Is_overVt));
         }
 
         /** Implementation for SIMD float/double (Best). */
@@ -843,7 +978,7 @@ namespace WDFT
         }
 #endif
         T Is; // reverse saturation current
-        T _Vt; // thermal voltage
+        T Vt; // thermal voltage
 
         // pre-computed vars
         T twoVt;
@@ -859,7 +994,7 @@ namespace WDFT
      * See Werner et al., "An Improved and Generalized Diode Clipper Model for Wave Digital Filters"
      * https://www.researchgate.net/publication/299514713_An_Improved_and_Generalized_Diode_Clipper_Model_for_Wave_Digital_Filters
      */
-    template <typename T, typename Next, DiodeQuality Quality = DiodeQuality::Best>
+    template <typename T, typename Next>
     class DiodeT final : public RootWDF
     {
     public:
@@ -942,6 +1077,40 @@ namespace WDFT
         Next& next;
     };
 
+    /** WDF Switch (non-adaptable) */
+    template <typename T, typename Next>
+    class SwitchT final : public RootWDF
+    {
+    public:
+        CREATE_WDFT_MEMBERS
+
+        explicit SwitchT (Next& next)
+        {
+            next.connectToParent (this);
+        }
+
+        inline void calcImpedance() override {}
+
+        /** Sets the state of the switch. */
+        void setClosed (bool shouldClose) { closed = shouldClose; }
+
+        /** Accepts an incident wave into a WDF switch. */
+        inline void incident (T x) noexcept
+        {
+            a = x;
+        }
+
+        /** Propogates a reflected wave from a WDF switch. */
+        inline T reflected() noexcept
+        {
+            b = closed ? -a : a;
+            return b;
+        }
+
+    private:
+        bool closed = true;
+    };
+
 #undef CREATE_WDFT_MEMBERS
 
     //==============================================================
@@ -963,19 +1132,19 @@ namespace WDFT
     // useful "factory" functions to you don't have to declare all the template parameters
 
     template <typename T, typename P1Type, typename P2Type>
-    WDFParallelT<T, P1Type, P2Type> makeParallel (P1Type& p1, P2Type& p2)
+    [[maybe_unused]] WDFParallelT<T, P1Type, P2Type> makeParallel (P1Type& p1, P2Type& p2)
     {
         return WDFParallelT<T, P1Type, P2Type> (p1, p2);
     }
 
     template <typename T, typename P1Type, typename P2Type>
-    WDFSeriesT<T, P1Type, P2Type> makeSeries (P1Type& p1, P2Type& p2)
+    [[maybe_unused]] WDFSeriesT<T, P1Type, P2Type> makeSeries (P1Type& p1, P2Type& p2)
     {
         return WDFSeriesT<T, P1Type, P2Type> (p1, p2);
     }
 
     template <typename T, typename PType>
-    PolarityInverterT<T, PType> makeInverter (PType& p1)
+    [[maybe_unused]] PolarityInverterT<T, PType> makeInverter (PType& p1)
     {
         return PolarityInverterT<T, PType> (p1);
     }
