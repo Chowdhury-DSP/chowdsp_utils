@@ -29,7 +29,7 @@ void InfoComp::paint (juce::Graphics& g)
 #if defined JucePlugin_VersionString
     auto versionStr = "v" + juce::String (JucePlugin_VersionString) + " ";
 #else
-    auto versionStr = "No Version" + " ";
+    auto versionStr = juce::String ("No Version ");
 #endif
     auto dspStr = juce::String ("~ DSP by ");
     auto totalStr = platformStr + typeStr + versionStr + dspStr + linkButton.getButtonText();

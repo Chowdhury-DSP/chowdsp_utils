@@ -97,7 +97,7 @@ std::unique_ptr<juce::XmlElement> Preset::toXml() const
 #if defined JucePlugin_Name
     presetXml->setAttribute (pluginTag, JucePlugin_Name);
 #else
-    presetXml->setAttribute (pluginTag, {});
+    presetXml->setAttribute (pluginTag, juce::String());
 #endif
     presetXml->setAttribute (vendorTag, vendor);
     presetXml->setAttribute (categoryTag, category);
