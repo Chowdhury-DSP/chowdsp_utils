@@ -76,6 +76,8 @@ ForwardingParameter::ForwardingParameter (const juce::String& id, juce::UndoMana
 
 void ForwardingParameter::setParam (juce::RangedAudioParameter* paramToUse, const juce::String& newName)
 {
+    juce::SpinLock::ScopedLockType sl (paramLock);
+
     if (internalParam != nullptr)
         attachment.reset();
 
@@ -104,6 +106,10 @@ float ForwardingParameter::getValue() const
 
 void ForwardingParameter::setValue (float newValue)
 {
+    juce::SpinLock::ScopedTryLockType stl (paramLock);
+    if (! stl.isLocked())
+        return;
+
     if (internalParam != nullptr)
     {
         if (newValue != internalParam->getValue())

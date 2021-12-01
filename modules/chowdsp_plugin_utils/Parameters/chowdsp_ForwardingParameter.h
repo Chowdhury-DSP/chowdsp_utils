@@ -65,6 +65,7 @@ private:
 
     std::unique_ptr<ForwardingAttachment> attachment;
     juce::UndoManager* undoManager;
+    juce::SpinLock paramLock;
 
     const juce::String defaultName;
     juce::String customName = {};
