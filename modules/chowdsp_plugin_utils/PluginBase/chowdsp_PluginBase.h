@@ -2,6 +2,9 @@
 
 namespace chowdsp
 {
+/** Type to use for parameters that can be used to initialise a ValueTreeState */
+using Parameters = std::vector<std::unique_ptr<juce::RangedAudioParameter>>;
+
 /**
  * Base class for plugin processors.
  * 
@@ -53,7 +56,7 @@ public:
     void setUsePresetManagerForPluginInterface (bool shouldUse) { usePresetManagerForPluginInterface = shouldUse; }
 
 protected:
-    using Parameters = std::vector<std::unique_ptr<juce::RangedAudioParameter>>;
+    using Parameters = Parameters;
     juce::AudioProcessorValueTreeState vts;
 
 #if CHOWDSP_USE_FOLEYS_CLASSES
