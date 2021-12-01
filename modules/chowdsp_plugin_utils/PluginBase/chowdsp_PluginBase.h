@@ -14,9 +14,9 @@ class PluginBase : public juce::AudioProcessor
 {
 public:
     PluginBase();
-    PluginBase (juce::UndoManager* um);
-    PluginBase (const juce::AudioProcessor::BusesProperties& layout);
-    ~PluginBase();
+    explicit PluginBase (juce::UndoManager* um);
+    explicit PluginBase (const juce::AudioProcessor::BusesProperties& layout);
+    ~PluginBase() override = default;
 
     const juce::String getName() const override { return JucePlugin_Name; }
 
@@ -106,11 +106,6 @@ PluginBase<Processor>::PluginBase (juce::UndoManager* um) : AudioProcessor (Buse
 template <class Processor>
 PluginBase<Processor>::PluginBase (const juce::AudioProcessor::BusesProperties& layout) : AudioProcessor (layout),
                                                                                           vts (*this, nullptr, juce::Identifier ("Parameters"), createParameterLayout())
-{
-}
-
-template <class Processor>
-PluginBase<Processor>::~PluginBase()
 {
 }
 
