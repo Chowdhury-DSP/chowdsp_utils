@@ -6,7 +6,7 @@
 class DummyPlugin : public chowdsp::PluginBase<DummyPlugin>
 {
 public:
-    DummyPlugin (bool withPresetMgr = false)
+    DummyPlugin (bool withPresetMgr = false) : chowdsp::PluginBase<DummyPlugin> (&undoManager)
     {
         if (withPresetMgr)
             presetManager = std::make_unique<chowdsp::PresetManager> (vts);
@@ -20,8 +20,12 @@ public:
     void releaseResources() override {}
     void processAudioBlock (AudioBuffer<float>&) override {}
 
+    UndoManager& getUndoManager() { return undoManager; }
+
     AudioProcessorValueTreeState& getVTS() { return vts; }
 
 private:
+    UndoManager undoManager;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DummyPlugin)
 };

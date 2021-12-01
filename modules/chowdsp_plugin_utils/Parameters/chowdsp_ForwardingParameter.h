@@ -5,8 +5,9 @@ namespace chowdsp
 /**
  * Class for forwarding "dynamic" parameters from one processor to another.
  *
- * This implementation was borrowed (with permission and some small
- * modifications) from Eyal Amir.
+ * The original implementation for this class was borrowed
+ * (with permission) from Eyal Amir, and then modified a
+ * little bit from there.
  */
 class ForwardingParameter : public juce::RangedAudioParameter
 {
@@ -17,15 +18,39 @@ public:
      * @param id            Parameter ID for the <b>forwarded</b> parameter
      * @param defaultName   Name to use when this parameter is not forwarding another one
      */
-    explicit ForwardingParameter (const juce::String& id, const juce::String& defaultName = "Unused");
+    explicit ForwardingParameter (const juce::String& id, juce::UndoManager* um = nullptr, const juce::String& defaultName = "Unused");
 
     /** Sets a new parameter to be forwarded */
-    void setParam (juce::RangedAudioParameter* paramToUse);
+    void setParam (juce::RangedAudioParameter* paramToUse, const juce::String& newName = {});
 
     /** Sets a new processor to forward to */
     void setProcessor (juce::AudioProcessor* processorToUse);
 
 private:
+    struct ForwardingAttachment : private juce::AudioProcessorParameter::Listener,
+                                  private juce::AsyncUpdater
+    {
+        ForwardingAttachment (juce::RangedAudioParameter& internal, juce::RangedAudioParameter& forwarding, juce::UndoManager* um);
+        ~ForwardingAttachment() override;
+
+        void setNewValue (float paramVal);
+
+    private:
+        void beginGesture();
+        void endGesture();
+
+        void handleAsyncUpdate() override;
+        void parameterValueChanged (int paramIdx, float newValue) override;
+        void parameterGestureChanged (int paramIdx, bool gestureIsStarting) override;
+
+        juce::RangedAudioParameter& internalParam;
+        juce::RangedAudioParameter& forwardingParam;
+        juce::UndoManager* undoManager;
+
+        float newValue = 0.0f;
+        bool ignoreCallbacks = false;
+    };
+
     float getValue() const override;
     void setValue (float newValue) override;
     float getDefaultValue() const override;
@@ -35,8 +60,14 @@ private:
 
     const juce::NormalisableRange<float>& getNormalisableRange() const override;
 
-    const juce::String defaultName;
     juce::AudioProcessor* processor = nullptr;
     juce::RangedAudioParameter* internalParam = nullptr;
+
+    std::unique_ptr<ForwardingAttachment> attachment;
+    juce::UndoManager* undoManager;
+    juce::SpinLock paramLock;
+
+    const juce::String defaultName;
+    juce::String customName = {};
 };
 } // namespace chowdsp
