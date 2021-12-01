@@ -56,7 +56,7 @@ public:
     void setUsePresetManagerForPluginInterface (bool shouldUse) { usePresetManagerForPluginInterface = shouldUse; }
 
 protected:
-    using Parameters = Parameters;
+    using Parameters = chowdsp::Parameters;
     juce::AudioProcessorValueTreeState vts;
 
 #if CHOWDSP_USE_FOLEYS_CLASSES
