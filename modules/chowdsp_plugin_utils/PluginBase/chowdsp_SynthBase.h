@@ -13,9 +13,10 @@ template <class Processor>
 class SynthBase : public PluginBase<Processor>
 {
 public:
-    SynthBase (const juce::AudioProcessor::BusesProperties& layout = juce::AudioProcessor::BusesProperties().withOutput ("Output", juce::AudioChannelSet::stereo(), true)) : PluginBase<Processor> (layout)
+    explicit SynthBase (const juce::AudioProcessor::BusesProperties& layout = juce::AudioProcessor::BusesProperties().withOutput ("Output", juce::AudioChannelSet::stereo(), true)) : PluginBase<Processor> (layout)
     {
     }
+    ~SynthBase() override = default;
 
     bool acceptsMidi() const override { return true; }
 
@@ -27,7 +28,9 @@ public:
 
         buffer.clear();
 
+#if CHOWDSP_USE_FOLEYS_CLASSES
         this->magicState.processMidiBuffer (midi, buffer.getNumSamples(), true);
+#endif
 
         processSynth (buffer, midi);
     }
