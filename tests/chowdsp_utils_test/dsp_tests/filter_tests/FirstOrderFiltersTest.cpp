@@ -20,8 +20,7 @@ public:
         chowdsp::FirstOrderLPF<T> lpFilter;
         lpFilter.calcCoefs ((T) fc, (T) fs);
 
-        auto testFrequency = [=, &lpFilter] (T freq, T expGain, const String& message)
-        {
+        auto testFrequency = [=, &lpFilter] (T freq, T expGain, const String& message) {
             auto buffer = test_utils::makeSineWave<T> (freq, fs, (T) 1);
 
             lpFilter.reset();
@@ -43,8 +42,7 @@ public:
         chowdsp::FirstOrderHPF<T> hpFilter;
         hpFilter.calcCoefs ((T) fc, (T) fs);
 
-        auto testFrequency = [=, &hpFilter] (T freq, T expGain, const String& message)
-        {
+        auto testFrequency = [=, &hpFilter] (T freq, T expGain, const String& message) {
             auto buffer = test_utils::makeSineWave<T> (freq, fs, (T) 1);
 
             hpFilter.reset();
