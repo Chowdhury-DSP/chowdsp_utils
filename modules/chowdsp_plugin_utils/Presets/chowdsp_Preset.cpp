@@ -19,6 +19,7 @@ Preset::Preset (const juce::String& thisName,
 
 Preset::Preset (const juce::File& presetFile)
 {
+    file = presetFile;
     auto xml = juce::XmlDocument::parse (presetFile);
     initialise (xml.get());
 }

@@ -161,7 +161,7 @@ void PresetManager::loadPresetState (const juce::XmlElement* xml)
 
 Preset PresetManager::loadUserPresetFromFile (const juce::File& file)
 {
-    return { file };
+    return Preset { file };
 }
 
 int PresetManager::getIndexForPreset (const Preset& preset) const
