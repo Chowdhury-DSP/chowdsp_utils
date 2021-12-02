@@ -3,7 +3,7 @@
 class PresetTest : public TimedUnitTest
 {
 public:
-    PresetTest() : TimedUnitTest ("Preset Test")
+    PresetTest() : TimedUnitTest ("Preset Test", "Presets")
     {
     }
 
@@ -96,7 +96,7 @@ public:
             goodXML->setAttribute (chowdsp::Preset::pluginTag, JucePlugin_Name);
             goodXML->setAttribute (chowdsp::Preset::vendorTag, "Test Vendor");
             goodXML->setAttribute (chowdsp::Preset::versionTag, JucePlugin_VersionString);
-            goodXML->addChildElement (new XmlElement ("Test State"));
+            goodXML->addChildElement (new XmlElement ("Test_State"));
             chowdsp::Preset preset { goodXML.get() };
             expect (preset.isValid(), "Good preset should be valid!");
         }

@@ -7,7 +7,7 @@ using namespace test_utils;
 class PresetManagerTest : public TimedUnitTest
 {
 public:
-    PresetManagerTest() : TimedUnitTest ("Preset Manager Test")
+    PresetManagerTest() : TimedUnitTest ("Preset Manager Test", "Presets")
     {
     }
 
