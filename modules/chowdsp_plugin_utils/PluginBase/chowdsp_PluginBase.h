@@ -21,7 +21,11 @@ public:
     explicit PluginBase (const juce::AudioProcessor::BusesProperties& layout);
     ~PluginBase() override = default;
 
+#if defined JucePlugin_Name
     const juce::String getName() const override { return JucePlugin_Name; }
+#else
+    const juce::String getName() const override { return juce::String(); }
+#endif
 
     bool acceptsMidi() const override { return false; }
     bool producesMidi() const override { return false; }
