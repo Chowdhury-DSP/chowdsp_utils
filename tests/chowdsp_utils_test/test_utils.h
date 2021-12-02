@@ -6,13 +6,14 @@ namespace test_utils
 {
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wpessimizing-move") // Clang doesn't like std::move
 
-inline AudioBuffer<float> makeSineWave (float frequency, float sampleRate, float lengthSeconds)
+template <typename FloatType = float>
+inline AudioBuffer<FloatType> makeSineWave (FloatType frequency, FloatType sampleRate, FloatType lengthSeconds)
 {
     const int lengthSamples = int (lengthSeconds * sampleRate);
-    AudioBuffer<float> sineBuffer (1, lengthSamples);
+    AudioBuffer<FloatType> sineBuffer (1, lengthSamples);
 
     for (int n = 0; n < lengthSamples; ++n)
-        sineBuffer.setSample (0, n, std::sin (MathConstants<float>::twoPi * frequency * (float) n / sampleRate));
+        sineBuffer.setSample (0, n, std::sin (MathConstants<FloatType>::twoPi * frequency * (FloatType) n / sampleRate));
 
     return std::move (sineBuffer);
 }
