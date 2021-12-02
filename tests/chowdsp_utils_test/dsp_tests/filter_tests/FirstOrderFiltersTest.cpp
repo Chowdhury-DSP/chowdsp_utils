@@ -5,7 +5,7 @@ namespace Constants
 {
 constexpr float fs = 48000.0f;
 constexpr float fc = 500.0f;
-} // namespace
+} // namespace Constants
 
 class FirstOrderFiltersTest : public TimedUnitTest
 {
