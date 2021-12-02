@@ -7,7 +7,7 @@ using namespace test_utils;
 class PresetsCompTest : public TimedUnitTest
 {
 public:
-    PresetsCompTest() : TimedUnitTest ("Presets Component Test")
+    PresetsCompTest() : TimedUnitTest ("Presets Component Test", "Presets")
     {
     }
 

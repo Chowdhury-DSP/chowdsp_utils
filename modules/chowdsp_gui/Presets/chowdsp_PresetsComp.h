@@ -18,7 +18,7 @@ public:
     };
 
     /** Creates an Presets component for the given preset manager */
-    PresetsComp (PresetManager& presetManager);
+    explicit PresetsComp (PresetManager& presetManager);
     ~PresetsComp() override;
 
     void paint (juce::Graphics& g) override;
@@ -38,6 +38,7 @@ public:
 
 protected:
     virtual void chooseUserPresetFolder (std::function<void()> onFinish = {});
+    virtual int createPresetsMenu (int optionID);
     virtual int addPresetOptions (int optionID);
     virtual void saveUserPreset();
     virtual void updatePresetBoxText();
