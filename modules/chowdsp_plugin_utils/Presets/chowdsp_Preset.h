@@ -11,10 +11,10 @@ struct Preset
     Preset (const juce::String& name, const juce::String& vendor, const juce::XmlElement& stateXml, const juce::String& category = {});
 
     /** Create a preset from a file */
-    Preset (const juce::File& presetFile);
+    explicit Preset (const juce::File& presetFile);
 
     /** Create a preset from xml */
-    Preset (const juce::XmlElement* presetXml);
+    explicit Preset (const juce::XmlElement* presetXml);
 
     /** Create a preset from BinaryData */
     Preset (const void* presetData, size_t presetDataSize);
@@ -49,6 +49,12 @@ struct Preset
     /** Returns the preset's state */
     const juce::XmlElement* getState() const noexcept { return state.get(); }
 
+    /**
+     * Returns the file path where this preset was loaded from.
+     * If the preset was not loaded from a file, this will return an empty path.
+     */
+    const juce::File& getPresetFile() const noexcept { return file; }
+
     friend bool operator== (const Preset& p1, const Preset& p2);
 
     static const juce::Identifier presetTag;
@@ -65,6 +71,8 @@ private:
     juce::String category;
     std::unique_ptr<VersionUtils::Version> version;
     std::unique_ptr<juce::XmlElement> state;
+
+    juce::File file;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Preset)
 };

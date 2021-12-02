@@ -139,8 +139,14 @@ void PresetsComp::presetListUpdated()
 {
     presetBox.getRootMenu()->clear();
 
-    std::map<juce::String, juce::PopupMenu> presetMapItems;
     int optionID = 0;
+    optionID = createPresetsMenu (optionID);
+    addPresetOptions (optionID);
+}
+
+int PresetsComp::createPresetsMenu (int optionID)
+{
+    std::map<juce::String, juce::PopupMenu> presetMapItems;
     for (const auto& presetIDPair : manager.getPresetMap())
     {
         const auto presetID = presetIDPair.first;
@@ -161,7 +167,7 @@ void PresetsComp::presetListUpdated()
     for (auto& [vendorName, menu] : presetMapItems)
         presetBox.getRootMenu()->addSubMenu (vendorName, menu);
 
-    addPresetOptions (optionID);
+    return optionID;
 }
 
 int PresetsComp::addPresetOptions (int optionID)
