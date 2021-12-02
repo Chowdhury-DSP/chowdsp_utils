@@ -11,7 +11,7 @@ constexpr float fc = 1000.0f;
 class NthOrderFilterTest : public TimedUnitTest
 {
 public:
-    NthOrderFilterTest() : TimedUnitTest ("Nth Order Filter Test") {}
+    NthOrderFilterTest() : TimedUnitTest ("Nth Order Filter Test", "Filters") {}
 
     using FilterType = chowdsp::StateVariableFilterType;
 
