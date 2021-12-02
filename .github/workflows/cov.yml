@@ -85,7 +85,7 @@ jobs:
         shell: bash
         run: |
           lcov --directory . --capture --output-file coverage.info
-          lcov --remove coverage.info '/usr/*' "${HOME}"'/.cache/*' '*JUCE/modules*' '*xsimd/include*' '*foleys_*' '*chowdsp_utils/tests*' --output-file coverage.info
+          lcov --remove coverage.info '/usr/*' "${HOME}"'/.cache/*' '/Applications/Xcode*' '*JUCE/modules*' '*xsimd/include*' '*foleys_*' '*chowdsp_utils/tests*' --output-file coverage.info
 
       - name: Report Coverage Data
         working-directory: ${{env.WORK_DIR}}
