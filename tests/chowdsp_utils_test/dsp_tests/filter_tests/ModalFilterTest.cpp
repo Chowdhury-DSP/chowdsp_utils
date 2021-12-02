@@ -19,7 +19,7 @@ class ModalFilterTest : public TimedUnitTest
 public:
     using NumericType = typename dsp::SampleTypeHelpers::ElementType<T>::Type;
 
-    ModalFilterTest() : TimedUnitTest ("Modal Filter Test " + getSampleType()) {}
+    ModalFilterTest() : TimedUnitTest ("Modal Filter Test " + getSampleType(), "Filters") {}
 
     static String getSampleType()
     {

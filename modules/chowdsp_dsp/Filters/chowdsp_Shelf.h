@@ -34,10 +34,7 @@ public:
 
         auto rho = std::sqrt (highGain / lowGain);
         auto K = (T) 1 / std::tan (juce::MathConstants<T>::pi * fc / fs);
-
-        T bs[2] { highGain / rho, lowGain };
-        T as[2] { 1.0f / rho, 1.0f };
-        Bilinear::BilinearTransform<T, 2>::call (this->b, this->a, bs, as, K);
+        Bilinear::BilinearTransform<T, 2>::call (this->b, this->a, { highGain / rho, lowGain }, { 1.0f / rho, 1.0f }, K);
     }
 
 private:

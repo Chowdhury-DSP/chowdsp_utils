@@ -19,7 +19,7 @@ constexpr float maxError = 0.1f;
 class ShelfFilterTest : public TimedUnitTest
 {
 public:
-    ShelfFilterTest() : TimedUnitTest ("Shelf Filter Test") {}
+    ShelfFilterTest() : TimedUnitTest ("Shelf Filter Test", "Filters") {}
 
     void plainGainTest()
     {
