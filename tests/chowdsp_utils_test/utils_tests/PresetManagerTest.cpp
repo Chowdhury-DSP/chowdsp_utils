@@ -36,7 +36,7 @@ public:
         expectEquals (param->getValue(), testValue, "Preset value is incorrect!");
 
         auto userPresetConfigFile = presetMgr.getUserPresetConfigFile();
-        userPresetConfigFile.deleteRecursively();
+        userPresetConfigFile.deleteFile();
     }
 
     void presetDirtyTest()
@@ -130,7 +130,7 @@ public:
         expect (presetNames.isEmpty(), "Some preset names are missing (" + String (presetNames.size()) + ")!");
 
         auto userPresetConfigFile = presetMgr.getUserPresetConfigFile();
-        userPresetConfigFile.deleteRecursively();
+        userPresetConfigFile.deleteFile();
     }
 
     void userPresetPathTest()
@@ -165,7 +165,7 @@ public:
 
             auto userPresetConfigFile = presetMgr.getUserPresetConfigFile();
             expect (userPresetConfigFile.existsAsFile(), "Preset config file does not exist!");
-            userPresetConfigFile.deleteRecursively();
+            userPresetConfigFile.deleteFile();
         }
 
         {
@@ -183,11 +183,11 @@ public:
             expectEquals (presetMgr.getNumPresets(), 0, "Num presets after loading empty directory incorrect!");
 
             auto userPresetConfigFile = presetMgr.getUserPresetConfigFile();
-            userPresetConfigFile.deleteRecursively();
+            userPresetConfigFile.deleteFile();
         }
 
         for (auto& file : presetFiles)
-            file.deleteRecursively();
+            file.deleteFile();
     }
 
     void presetStateTest()
@@ -220,7 +220,7 @@ public:
         expect (presetMgr->getIsDirty(), "Dirty state after loading is incorrect!");
 
         auto userPresetConfigFile = presetMgr->getUserPresetConfigFile();
-        userPresetConfigFile.deleteRecursively();
+        userPresetConfigFile.deleteFile();
     }
 
     void defaultPresetTest()
@@ -261,7 +261,7 @@ public:
         expectWithinAbsoluteError (param->getValue(), testValue2, 1.0e-3f, "Default preset when trying to load bad state not loaded correctly!");
 
         auto userPresetConfigFile = presetMgr.getUserPresetConfigFile();
-        userPresetConfigFile.deleteRecursively();
+        userPresetConfigFile.deleteFile();
     }
 
     void runTestTimed() override
