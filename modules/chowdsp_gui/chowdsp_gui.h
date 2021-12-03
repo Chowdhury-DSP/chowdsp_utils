@@ -62,7 +62,6 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 #include "Assets/chowdsp_BinaryData.h"
 
 #include "LookAndFeel/chowdsp_ChowLNF.h"
-#include "LookAndFeel/chowdsp_LNFAllocator.h"
 
 #include "PluginComponents/chowdsp_SystemInfo.h"
 #include "PluginComponents/chowdsp_InfoComp.h"
