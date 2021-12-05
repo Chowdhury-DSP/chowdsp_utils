@@ -2,12 +2,23 @@
 
 namespace chowdsp
 {
+/**
+ * First-order lowpass filter (-6 dB / octave).
+ * This filter can be used to model an ideal RC lowpwass filter.
+ */
 template <typename T>
 class FirstOrderLPF final : public chowdsp::IIRFilter<1, T>
 {
 public:
     FirstOrderLPF() = default;
 
+    /**
+     * Calculates the filter coefficients for a given cutoff frequency and sample rate.
+     * The analog prototype transfer function is:
+     *            1
+     *  H(s) = ---------
+     *         s  +  1
+     */
     void calcCoefs (T fc, T fs)
     {
         using namespace Bilinear;
@@ -21,12 +32,23 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FirstOrderLPF)
 };
 
+/**
+ * First-order highpass filter (-6 dB / octave).
+ * This filter can be used to model an ideal RC highpass filter.
+ */
 template <typename T>
 class FirstOrderHPF final : public chowdsp::IIRFilter<1, T>
 {
 public:
     FirstOrderHPF() = default;
 
+    /**
+     * Calculates the filter coefficients for a given cutoff frequency and sample rate.
+     * The analog prototype transfer function is:
+     *            s
+     *  H(s) = ---------
+     *         s  +  1
+     */
     void calcCoefs (T fc, T fs)
     {
         using namespace Bilinear;
