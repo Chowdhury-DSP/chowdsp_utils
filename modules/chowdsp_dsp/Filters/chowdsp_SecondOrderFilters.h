@@ -20,7 +20,7 @@ public:
     void calcCoefs (T fc, T qVal, T gain, T fs)
     {
         using namespace Bilinear;
-        
+
         const auto wc = juce::MathConstants<T>::twoPi * fc;
         const auto K = computeKValue (fc, fs);
 
@@ -35,10 +35,6 @@ public:
     /**
      * Calculates the filter coefficients for a given cutoff frequency,
      * Q value, gain (in Decibels), and sample rate.
-     * The analog prototype transfer function is:
-     *          s^2 + (1 / Q) * G * s + 1
-     *  H(s) = ---------------------------
-     *           s^2 + (1 / Q) * s  +  1
      */
     void calcCoefsDB (T fc, T qVal, T gainDB, T fs)
     {

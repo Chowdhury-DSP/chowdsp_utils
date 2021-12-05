@@ -39,7 +39,7 @@ namespace Bilinear
         static inline void call (T (&b)[3], T (&a)[3], const T (&bs)[3], const T (&as)[3], T K)
         {
             const auto KSq = K * K;
-            const float a0 = as[0] * KSq + as[1] * K + as[2];
+            const auto a0 = as[0] * KSq + as[1] * K + as[2];
 
             a[0] = 1.0f;
             a[1] = 2.0f * (as[2] - as[0] * KSq) / a0;

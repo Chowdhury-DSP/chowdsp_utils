@@ -14,6 +14,7 @@ target_sources(chowdsp_utils_tests PRIVATE
     filter_tests/FirstOrderFiltersTest.cpp
     filter_tests/ModalFilterTest.cpp
     filter_tests/NthOrderFilterTest.cpp
+    filter_tests/SecondOrderFiltersTest.cpp
     filter_tests/ShelfFilterTest.cpp
 
     simd_tests/SIMDComplexTest.cpp
