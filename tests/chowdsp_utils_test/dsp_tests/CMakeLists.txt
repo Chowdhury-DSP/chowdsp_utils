@@ -5,6 +5,7 @@ target_sources(chowdsp_utils_tests PRIVATE
     GainTest.cpp
     PannerTest.cpp
     PitchShiftTest.cpp
+    PolynomialsTest.cpp
     ResamplerTest.cpp
     SmoothedBufferValueTest.cpp
 

@@ -138,6 +138,7 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 #include "Other/chowdsp_LevelDetector.h"
 #include "Other/chowdsp_Panner.h"
 #include "Other/chowdsp_SmoothedBufferValue.h"
+#include "Other/chowdsp_Polynomials.h"
 
 // sound sources
 #include "Sources/chowdsp_Noise.h"
