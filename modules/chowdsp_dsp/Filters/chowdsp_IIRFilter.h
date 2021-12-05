@@ -10,7 +10,10 @@ template <size_t order, typename FloatType = float>
 class IIRFilter
 {
 public:
-    IIRFilter() = default;
+    IIRFilter()
+    {
+        reset();
+    }
 
     /** Reset filter state */
     virtual void reset()
