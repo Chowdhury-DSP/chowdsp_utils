@@ -994,7 +994,7 @@ namespace WDFT
      * See Werner et al., "An Improved and Generalized Diode Clipper Model for Wave Digital Filters"
      * https://www.researchgate.net/publication/299514713_An_Improved_and_Generalized_Diode_Clipper_Model_for_Wave_Digital_Filters
      */
-    template <typename T, typename Next>
+    template <typename T, typename Next, DiodeQuality Quality = DiodeQuality::Best>
     class DiodeT final : public RootWDF
     {
     public:
