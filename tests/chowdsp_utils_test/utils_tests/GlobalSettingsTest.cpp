@@ -22,7 +22,7 @@ public:
 
         settings.initialise (settingsFile, 1);
         expectEquals ((int) settings.getProperty (test1.name), (int) test1.value, "Property 1 is incorrect!");
-        expectEquals ((String) settings.getProperty (test2.name), (String) test2.value, "Property 2 is incorrect!");
+        expectEquals (settings.getProperty (test2.name).toString(), test2.value.toString(), "Property 2 is incorrect!");
 
         settings.getSettingsFile().deleteFile();
     }
@@ -34,7 +34,7 @@ public:
 
         settings.addProperties ({ test1, test2 });
         expectEquals ((int) settings.getProperty (test1.name), (int) test1.value, "Property 1 is incorrect!");
-        expectEquals ((String) settings.getProperty (test2.name), (String) test2.value, "Property 2 is incorrect!");
+        expectEquals (settings.getProperty (test2.name).toString(), test2.value.toString(), "Property 2 is incorrect!");
 
         settings.getSettingsFile().deleteFile();
     }
@@ -53,11 +53,11 @@ public:
 
         settings.addProperties ({ test1, test2 });
         expectEquals ((int) settings.getProperty (test1.name), (int) test1.value, "Property 1 is incorrect!");
-        expectEquals ((String) settings.getProperty (test2.name), (String) test2.value, "Property 2 is incorrect!");
+        expectEquals (settings.getProperty (test2.name).toString(), test2.value.toString(), "Property 2 is incorrect!");
 
         settings.initialise (settingsFile, 1);
         expectEquals ((int) settings.getProperty (test1.name), (int) test1.value, "Property 1 is incorrect after 2nd init!");
-        expectEquals ((String) settings.getProperty (test2.name), (String) test2.value, "Property 2 is incorrect after 2nd init!");
+        expectEquals (settings.getProperty (test2.name).toString(), test2.value.toString(), "Property 2 is incorrect after 2nd init!");
 
         settings.getSettingsFile().deleteFile();
     }
@@ -107,7 +107,7 @@ public:
             settings.addProperties ({ test1, test2 });
 
             expectEquals ((int) settings.getProperty (test1.name), (int) test1.value, "Property 1 is incorrect after 2nd init!");
-            expectEquals ((String) settings.getProperty (test2.name), (String) test2.value, "Property 2 is incorrect after 2nd init!");
+            expectEquals (settings.getProperty (test2.name).toString(), test2.value.toString(), "Property 2 is incorrect after 2nd init!");
 
             settings.getSettingsFile().deleteFile();
         }
@@ -125,7 +125,7 @@ public:
                 if (id == test1.name)
                     test1Value = (int) v;
                 else if (id == test2.name)
-                    test2Value = (String) v;
+                    test2Value = v.toString();
             }
         } testListener;
 
