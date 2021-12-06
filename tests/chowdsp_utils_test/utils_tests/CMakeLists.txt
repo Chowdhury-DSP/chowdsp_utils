@@ -1,12 +1,14 @@
 target_sources(chowdsp_utils_tests PRIVATE
+    FileListenerTest.cpp
+    ForwardingParameterTest.cpp
+    GlobalSettingsTest.cpp
     ParamStringsTest.cpp
     PluginBaseTest.cpp
-    VersionUtilsTest.cpp
-    PresetTest.cpp
-    PresetManagerTest.cpp
     PluginLoggerTest.cpp
-    ForwardingParameterTest.cpp
+    PresetManagerTest.cpp
+    PresetTest.cpp
     LNFAllocatorTest.cpp
+    VersionUtilsTest.cpp
 )
 
 juce_add_binary_data(UnitTestData SOURCES
