@@ -8,3 +8,4 @@
 #include "Presets/chowdsp_PresetManager.cpp"
 
 #include "Logging/chowdsp_PluginLogger.cpp"
+#include "Files/chowdsp_FileListener.cpp"
