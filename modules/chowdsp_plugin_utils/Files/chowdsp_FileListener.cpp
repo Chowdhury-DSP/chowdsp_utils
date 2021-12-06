@@ -23,18 +23,6 @@ void FileListener::timerCallback()
 
     // needs update!
     fileModificationTime = newModificationTime;
-    fileChanged (fileToListenTo);
+    listenerFileChanged();
 }
-
-//void FileListener::addListener (Listener* l)
-//{
-//    l->fileChanged (fileToListenTo);
-//    listeners.add (l);
-//}
-//
-//void FileListener::removeListener (Listener* l)
-//{
-//    listeners.remove (l);
-//}
-}
-
+} // namespace chowdsp

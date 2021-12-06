@@ -2,14 +2,18 @@
 
 namespace chowdsp
 {
+/** Abstract class to allow the derived class to listen for changes to a file. */
 class FileListener : private juce::Timer
 {
 public:
+    /** Initialize this FileListener for a given file and update time. */
     FileListener (const juce::File& file, int timerSeconds);
 
-    virtual void fileChanged (const juce::File& /*file*/) = 0;
+    /** Override this class to do something when the file has changed. */
+    virtual void listenerFileChanged() = 0;
 
-    const juce::File& getFile() const noexcept { return fileToListenTo; }
+    /** Returns the file that is currently being listened to. */
+    const juce::File& getListenerFile() const noexcept { return fileToListenTo; }
 
 private:
     void timerCallback() override;
@@ -19,4 +23,4 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FileListener)
 };
-}
+} // namespace chowdsp
