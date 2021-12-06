@@ -44,14 +44,12 @@ void GlobalPluginSettings::addPropertyListener (const juce::Identifier& id, List
 
 void GlobalPluginSettings::removePropertyListener (const juce::Identifier& id, Listener* listener)
 {
-    listeners.removeIf ([&id, &listener] (ListenerPair& pair)
-                        { return pair.first == id && pair.second == listener; });
+    listeners.removeIf ([&id, &listener] (ListenerPair& pair) { return pair.first == id && pair.second == listener; });
 }
 
 void GlobalPluginSettings::removePropertyListener (Listener* listener)
 {
-    listeners.removeIf ([&listener] (ListenerPair& pair)
-                        { return pair.second == listener; });
+    listeners.removeIf ([&listener] (ListenerPair& pair) { return pair.second == listener; });
 }
 
 juce::File GlobalPluginSettings::getSettingsFile() const noexcept

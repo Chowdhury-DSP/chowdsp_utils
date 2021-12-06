@@ -133,8 +133,7 @@ public:
         settings.initialise (settingsFile, 1);
         settings.addProperties ({ test1, test2 }, &testListener);
 
-        auto setSettingsVal = [&] (const Identifier& name, var val)
-        {
+        auto setSettingsVal = [&] (const Identifier& name, var val) {
             auto settingsXml = XmlDocument::parse (settings.getSettingsFile());
             NamedValueSet settingsSet;
             settingsSet.setFromXmlAttributes (*settingsXml);
