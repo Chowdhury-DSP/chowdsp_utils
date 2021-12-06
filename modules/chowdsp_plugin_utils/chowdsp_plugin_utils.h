@@ -48,11 +48,11 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 #include "Presets/chowdsp_Preset.h"
 #include "Presets/chowdsp_PresetManager.h"
 
+#include "Files/chowdsp_FileListener.h"
 #include "Logging/chowdsp_PluginLogger.h"
 
+#include "SharedUtils/chowdsp_GlobalPluginSettings.h"
 #include "SharedUtils/chowdsp_LNFAllocator.h"
-
-#include "Files/chowdsp_FileListener.h"
 
 #include "PluginBase/chowdsp_DummySynthSound.h"
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wzero-as-null-pointer-constant", // Clang doesn't like HasAddParameters checker
