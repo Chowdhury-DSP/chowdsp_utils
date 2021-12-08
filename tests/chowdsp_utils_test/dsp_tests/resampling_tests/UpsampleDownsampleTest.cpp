@@ -54,21 +54,6 @@ public:
         return Decibels::gainToDecibels (signalAccum / noiseAccum);
     }
 
-    void upsampleRatioTest()
-    {
-        auto testRatio = [=] (int ratio)
-        {
-            chowdsp::Upsampler<float> upsampler;
-            upsampler.prepare ({ sampleRate, blockSize, 1 }, ratio);
-            expectEquals (upsampler.getUpsamplingRatio(), ratio, "Upsampler ratio is incorrect!");
-        };
-
-        testRatio (1);
-        testRatio (2);
-        testRatio (4);
-        testRatio (8);
-    }
-
     void upsampleQualityTest()
     {
         chowdsp::Upsampler<float> upsampler;
@@ -83,13 +68,32 @@ public:
         expectGreaterThan (snr, 60.0f, "Signal to noise ratio is too low!");
     }
 
+    void downsampleQualityTest()
+    {
+        chowdsp::Downsampler<float, 8> downsampler;
+        downsampler.prepare ({ 2.0 * sampleRate, (uint32) blockSize, 1 }, 2);
+
+        constexpr float testFreq = 42000.0f;
+        auto sineBuffer = test_utils::makeSineWave (testFreq, 2.0f * (float) sampleRate, (int) blockSize);
+        auto downsampledBlock = downsampler.process (dsp::AudioBlock<float> (sineBuffer));
+
+        float squaredSum = 0.0f;
+        for (size_t n = 0; n < blockSize / 2; ++n)
+            squaredSum += std::pow (downsampledBlock.getSample (0, (int) n), 2.0f);
+
+        auto rms = Decibels::gainToDecibels (std::sqrt (squaredSum / (blockSize / 2)));
+
+        expectEquals (downsampledBlock.getNumSamples(), blockSize / (size_t) downsampler.getDownsamplingRatio(), "Downsampled block size is incorrect!");
+        expectLessThan (rms, -50.0f, "RMS level is too high!");
+    }
+
     void runTestTimed() override
     {
-        beginTest ("Upsample Ratio Test");
-        upsampleRatioTest();
-
         beginTest ("Upsample Quality Test");
         upsampleQualityTest();
+
+        beginTest ("Downsample Quality Test");
+        downsampleQualityTest();
     }
 };
 
