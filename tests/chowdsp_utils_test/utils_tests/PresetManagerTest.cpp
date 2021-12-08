@@ -242,6 +242,7 @@ public:
         ScopedFile presetFile ("preset_path/test.preset");
         presetMgr.saveUserPreset (presetFile.file);
         presetMgr.setDefaultPreset (chowdsp::Preset { presetFile.file });
+        expect (chowdsp::Preset { presetFile.file } == *presetMgr.getDefaultPreset(), "Default preset not set correctly!");
 
         setParameter (param, initialValue);
         presetMgr.loadDefaultPreset();
@@ -262,6 +263,26 @@ public:
 
         auto userPresetConfigFile = presetMgr.getUserPresetConfigFile();
         userPresetConfigFile.deleteFile();
+    }
+
+    void triggerPresetListUpdateTest()
+    {
+        struct TestListener : chowdsp::PresetManager::Listener
+        {
+            bool listenerCalled = false;
+
+            void presetListUpdated() override
+            {
+                listenerCalled = true;
+            }
+        } testListener;
+
+        DummyPlugin plugin;
+        chowdsp::PresetManager presetMgr { plugin.getVTS() };
+        presetMgr.addListener (&testListener);
+
+        presetMgr.triggerPresetListUpdate();
+        expect (testListener.listenerCalled, "Preset list update not triggered!");
     }
 
     void runTestTimed() override
@@ -289,6 +310,9 @@ public:
 
         beginTest ("Default Preset Test");
         defaultPresetTest();
+
+        beginTest ("Trigger Preset List Update Test");
+        triggerPresetListUpdateTest();
     }
 };
 

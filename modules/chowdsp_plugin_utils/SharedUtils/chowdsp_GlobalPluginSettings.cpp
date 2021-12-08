@@ -26,30 +26,54 @@ void GlobalPluginSettings::initialise (const juce::String& settingsFile, int tim
 
 void GlobalPluginSettings::addProperties (std::initializer_list<juce::NamedValueSet::NamedValue> properties, Listener* listener)
 {
+    jassert (fileListener != nullptr); // Trying to add properties before initalizing? Don't do that!
+
     juce::Array<juce::NamedValueSet::NamedValue> propertiesToAdd (std::move (properties));
     for (auto& prop : propertiesToAdd)
     {
         if (! globalProperties.contains (prop.name))
             globalProperties.set (prop.name, std::move (prop.value));
-        listeners.add (std::make_pair (prop.name, listener));
+        addPropertyListener (prop.name, listener);
     }
 
     writeSettingsToFile();
 }
 
+void GlobalPluginSettings::setProperty (const juce::Identifier& name, juce::var&& property)
+{
+    if (! globalProperties.contains (name))
+        return;
+
+    globalProperties.set (name, std::move (property));
+    writeSettingsToFile();
+
+    for (auto* l : listeners[name.toString()])
+        l->propertyChanged (name, globalProperties[name]);
+}
+
 void GlobalPluginSettings::addPropertyListener (const juce::Identifier& id, Listener* listener)
 {
-    listeners.addIfNotAlreadyThere (std::make_pair (id, listener));
+    if (listener == nullptr)
+        return;
+
+    listeners[id.toString()].addIfNotAlreadyThere (listener);
 }
 
 void GlobalPluginSettings::removePropertyListener (const juce::Identifier& id, Listener* listener)
 {
-    listeners.removeIf ([&id, &listener] (ListenerPair& pair) { return pair.first == id && pair.second == listener; });
+    if (listeners.find (id.toString()) == listeners.end())
+    {
+        jassertfalse; // this property does not have any listeners!
+        return;
+    }
+
+    listeners.at (id.toString()).removeAllInstancesOf (listener);
 }
 
 void GlobalPluginSettings::removePropertyListener (Listener* listener)
 {
-    listeners.removeIf ([&listener] (ListenerPair& pair) { return pair.second == listener; });
+    for (auto& [_, propListeners] : listeners)
+        propListeners.removeAllInstancesOf (listener);
 }
 
 juce::File GlobalPluginSettings::getSettingsFile() const noexcept
@@ -91,11 +115,8 @@ bool GlobalPluginSettings::loadSettingsFromFile()
     {
         if (prop.value != globalProperties[prop.name])
         {
-            for (auto& [tag, l] : listeners)
-            {
-                if (tag == prop.name)
-                    l->propertyChanged (tag, globalProperties[prop.name]);
-            }
+            for (auto* l : listeners[prop.name.toString()])
+                l->propertyChanged (prop.name, globalProperties[prop.name]);
         }
     }
 
