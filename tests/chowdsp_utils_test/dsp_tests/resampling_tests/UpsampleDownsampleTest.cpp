@@ -35,8 +35,7 @@ public:
         for (size_t i = 0; i < blockSize; ++i)
             magnitudes[i] = std::pow (fftData[i] / scaleNorm, 2.0f);
 
-        auto getMagForFreq = [=] (float freq) -> float
-        {
+        auto getMagForFreq = [=] (float freq) -> float {
             auto idx = size_t ((blockSize / 2) * freq / (fs / 2.0f));
             // average over a few bins to smooth
             return std::accumulate (&magnitudes[idx - negDiff], &magnitudes[idx + posDiff], 0.0f) / (float) avgNum;
