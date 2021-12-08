@@ -2,12 +2,19 @@
 
 namespace chowdsp
 {
+/**
+ * Utility class for downsampling a signal by an integer ratio
+ *
+ * @tparam T            Data type to process
+ * @tparam FilterOrder  Filter order to use for anti-aliasing filter (this should be an even number)
+ */
 template <typename T, int FilterOrder = 4>
 class Downsampler
 {
 public:
     Downsampler() = default;
 
+    /** Prepares the downsampler to process signal at a given upsampling ratio */
     void prepare (juce::dsp::ProcessSpec spec, int upsampleRatio)
     {
         ratio = upsampleRatio;
@@ -28,6 +35,7 @@ public:
         reset();
     }
 
+    /** Resets the downsampler state */
     void reset()
     {
         for (auto& channelFilters : aaFilters)
@@ -37,8 +45,16 @@ public:
         downsampledBuffer.clear();
     }
 
+    /** Returns the current downsampling ratio */
     int getDownsamplingRatio() const noexcept { return ratio; }
 
+    /**
+     * Process a single-channel block of data
+     * @param data              Block of input samples
+     * @param upsampledData     Block of output samples. Must point to a block of memory of size numSamples / ratio
+     * @param channel           Channel index to process
+     * @param numSamples        Number of input samples to process
+     */
     void process (const T* data, T* downsampledData, const int channel, const int numSamples) noexcept
     {
         for (int n = 0; n < numSamples; ++n)
@@ -53,6 +69,7 @@ public:
         }
     }
 
+    /** Process a block of data */
     juce::dsp::AudioBlock<T> process (const juce::dsp::AudioBlock<T>& block) noexcept
     {
         auto outBlock = juce::dsp::AudioBlock<T> { downsampledBuffer };
