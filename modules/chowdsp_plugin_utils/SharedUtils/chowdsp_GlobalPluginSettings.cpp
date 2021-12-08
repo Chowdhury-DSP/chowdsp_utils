@@ -37,6 +37,22 @@ void GlobalPluginSettings::addProperties (std::initializer_list<juce::NamedValue
     writeSettingsToFile();
 }
 
+void GlobalPluginSettings::setProperty (const juce::Identifier& name, juce::var&& property)
+{
+    if (! globalProperties.contains (name))
+        return;
+
+    globalProperties.set (name, std::move (property));
+    writeSettingsToFile();
+
+    // @TODO: refactor this to a separate method
+    for (auto& [tag, l] : listeners)
+    {
+        if (tag == name)
+            l->propertyChanged (tag, globalProperties[name]);
+    }
+}
+
 void GlobalPluginSettings::addPropertyListener (const juce::Identifier& id, Listener* listener)
 {
     listeners.addIfNotAlreadyThere (std::make_pair (id, listener));

@@ -30,6 +30,15 @@ public:
     /** Returns the settings property with a give name */
     const juce::var& getProperty (const juce::Identifier& name) const noexcept { return globalProperties[name]; }
 
+    /** Returns true if the given setting already exists */
+    bool hasProperty (const juce::Identifier& name) const noexcept { return globalProperties.contains (name); }
+
+    /**
+     * If a property with this name has been added to the plugin settings,
+     * it will be set to the new value.
+     */
+    void setProperty (const juce::Identifier& name, juce::var&& property);
+
     /** Adds a listener for a given property */
     void addPropertyListener (const juce::Identifier& id, Listener* listener);
 
