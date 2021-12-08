@@ -8,6 +8,8 @@ class SecondOrderLPF final : public chowdsp::IIRFilter<2, T>
 {
 public:
     SecondOrderLPF() = default;
+    SecondOrderLPF (SecondOrderLPF&&) noexcept = default;
+    SecondOrderLPF& operator= (SecondOrderLPF&&) noexcept = default;
 
     /**
      * Calculates the filter coefficients for a given cutoff frequency, Q value, and sample rate.
@@ -28,6 +30,8 @@ class SecondOrderHPF final : public chowdsp::IIRFilter<2, T>
 {
 public:
     SecondOrderHPF() = default;
+    SecondOrderHPF (SecondOrderHPF&&) noexcept = default;
+    SecondOrderHPF& operator= (SecondOrderHPF&&) noexcept = default;
 
     /**
      * Calculates the filter coefficients for a given cutoff frequency, Q value, and sample rate.
@@ -48,6 +52,8 @@ class SecondOrderBPF final : public chowdsp::IIRFilter<2, T>
 {
 public:
     SecondOrderBPF() = default;
+    SecondOrderBPF (SecondOrderBPF&&) noexcept = default;
+    SecondOrderBPF& operator= (SecondOrderBPF&&) noexcept = default;
 
     /**
      * Calculates the filter coefficients for a given cutoff frequency, Q value, and sample rate.
@@ -68,6 +74,8 @@ class NotchFilter final : public chowdsp::IIRFilter<2, T>
 {
 public:
     NotchFilter() = default;
+    NotchFilter (NotchFilter&&) noexcept = default;
+    NotchFilter& operator= (NotchFilter&&) noexcept = default;
 
     /**
      * Calculates the filter coefficients for a given cutoff frequency, Q value, and sample rate.
@@ -88,6 +96,8 @@ class PeakingFilter final : public chowdsp::IIRFilter<2, T>
 {
 public:
     PeakingFilter() = default;
+    PeakingFilter (PeakingFilter&&) noexcept = default;
+    PeakingFilter& operator= (PeakingFilter&&) noexcept = default;
 
     /**
      * Calculates the filter coefficients for a given cutoff frequency, Q value, gain, and sample rate.
@@ -115,6 +125,8 @@ class LowShelfFilter final : public chowdsp::IIRFilter<2, T>
 {
 public:
     LowShelfFilter() = default;
+    LowShelfFilter (LowShelfFilter&&) noexcept = default;
+    LowShelfFilter& operator= (LowShelfFilter&&) noexcept = default;
 
     /**
      * Calculates the filter coefficients for a given cutoff frequency, Q value, gain, and sample rate.
@@ -142,6 +154,8 @@ class HighShelfFilter final : public chowdsp::IIRFilter<2, T>
 {
 public:
     HighShelfFilter() = default;
+    HighShelfFilter (HighShelfFilter&&) noexcept = default;
+    HighShelfFilter& operator= (HighShelfFilter&&) noexcept = default;
 
     /**
      * Calculates the filter coefficients for a given cutoff frequency, Q value, gain, and sample rate.

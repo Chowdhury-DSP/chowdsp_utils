@@ -15,6 +15,9 @@ public:
         reset();
     }
 
+    IIRFilter (IIRFilter&&) noexcept = default;
+    IIRFilter& operator= (IIRFilter&&) noexcept = default;
+
     /** Reset filter state */
     virtual void reset()
     {

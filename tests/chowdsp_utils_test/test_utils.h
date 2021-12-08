@@ -18,6 +18,17 @@ inline AudioBuffer<FloatType> makeSineWave (FloatType frequency, FloatType sampl
     return std::move (sineBuffer);
 }
 
+template <typename FloatType = float>
+inline AudioBuffer<FloatType> makeSineWave (FloatType frequency, FloatType sampleRate, int lengthSamples)
+{
+    AudioBuffer<FloatType> sineBuffer (1, lengthSamples);
+
+    for (int n = 0; n < lengthSamples; ++n)
+        sineBuffer.setSample (0, n, std::sin (MathConstants<FloatType>::twoPi * frequency * (FloatType) n / sampleRate));
+
+    return std::move (sineBuffer);
+}
+
 inline AudioBuffer<float> makeImpulse (float amplitude, float sampleRate, float lengthSeconds)
 {
     const int lengthSamples = int (lengthSeconds * sampleRate);
