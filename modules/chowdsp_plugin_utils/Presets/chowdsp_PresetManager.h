@@ -41,6 +41,9 @@ public:
      */
     void setDefaultPreset (Preset&& defaultPreset);
 
+    /** Returns a pointer to the default preset. */
+    const chowdsp::Preset* getDefaultPreset() const noexcept { return defaultPreset; }
+
     /** Loads the default preset. */
     void loadDefaultPreset();
 
@@ -84,6 +87,9 @@ public:
 
     /** Returns the map used to store the available presets */
     const auto& getPresetMap() const { return presetMap; }
+
+    /** Tell listeners that the preset list has been updated */
+    void triggerPresetListUpdate() { listeners.call (&Listener::presetListUpdated); }
 
     /** Listener class to hear alerts about preset manager changes */
     struct Listener
