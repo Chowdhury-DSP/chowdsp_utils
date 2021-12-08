@@ -11,6 +11,8 @@ class FirstOrderLPF final : public chowdsp::IIRFilter<1, T>
 {
 public:
     FirstOrderLPF() = default;
+    FirstOrderLPF (FirstOrderLPF&&) noexcept = default;
+    FirstOrderLPF& operator= (FirstOrderLPF&&) noexcept = default;
 
     /**
      * Calculates the filter coefficients for a given cutoff frequency and sample rate.
@@ -41,6 +43,8 @@ class FirstOrderHPF final : public chowdsp::IIRFilter<1, T>
 {
 public:
     FirstOrderHPF() = default;
+    FirstOrderHPF (FirstOrderHPF&&) noexcept = default;
+    FirstOrderHPF& operator= (FirstOrderHPF&&) noexcept = default;
 
     /**
      * Calculates the filter coefficients for a given cutoff frequency and sample rate.

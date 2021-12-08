@@ -6,7 +6,6 @@ target_sources(chowdsp_utils_tests PRIVATE
     PannerTest.cpp
     PitchShiftTest.cpp
     PolynomialsTest.cpp
-    ResamplerTest.cpp
     SmoothedBufferValueTest.cpp
 
     source_tests/NoiseTest.cpp
@@ -17,6 +16,9 @@ target_sources(chowdsp_utils_tests PRIVATE
     filter_tests/NthOrderFilterTest.cpp
     filter_tests/SecondOrderFiltersTest.cpp
     filter_tests/ShelfFilterTest.cpp
+
+    resampling_tests/ResamplerTest.cpp
+    resampling_tests/UpsampleDownsampleTest.cpp
 
     simd_tests/SIMDComplexTest.cpp
     simd_tests/SIMDSmoothedValueTest.cpp

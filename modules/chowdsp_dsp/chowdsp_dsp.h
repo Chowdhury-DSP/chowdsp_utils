@@ -126,6 +126,7 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 #include "Modal/chowdsp_ModalFilter.h"
 
 // resamplers
+#include "Resampling/chowdsp_Upsampler.h"
 #include "Resampling/chowdsp_BaseResampler.h"
 #include "Resampling/chowdsp_LanczosResampler.h"
 #include "Resampling/chowdsp_ResamplingProcessor.h"
