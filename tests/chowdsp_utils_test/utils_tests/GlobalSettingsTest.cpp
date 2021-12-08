@@ -133,7 +133,8 @@ public:
         settings.initialise (settingsFile, 1);
         settings.addProperties ({ test1, test2 }, &testListener);
 
-        auto setSettingsVal = [&] (const Identifier& name, var val) {
+        auto setSettingsVal = [&] (const Identifier& name, var val)
+        {
             auto settingsXml = XmlDocument::parse (settings.getSettingsFile());
             NamedValueSet settingsSet;
             settingsSet.setFromXmlAttributes (*settingsXml);
@@ -154,12 +155,14 @@ public:
 
         const String testStr1 = "RRRRR";
         settings.addPropertyListener (test2.name, &testListener);
-        setSettingsVal (test2.name, testStr1);
+        settings.setProperty (test2.name, testStr1);
         expectEquals (testListener.test2Value, testStr1, "Listener value not set!");
 
         const String testStr2 = "BBBBB";
         settings.removePropertyListener (test2.name, &testListener);
-        setSettingsVal (test2.name, testStr2);
+        settings.removePropertyListener ("NOT_A_PROPERTY", &testListener);
+        settings.setProperty (test2.name, testStr2);
+        settings.setProperty ("NOT_A_PROPERTY", testStr2);
         expectEquals (testListener.test2Value, testStr1, "Listener value should not be set after listener removed!");
 
         settings.getSettingsFile().deleteFile();

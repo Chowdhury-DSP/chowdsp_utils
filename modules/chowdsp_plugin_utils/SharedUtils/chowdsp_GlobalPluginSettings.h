@@ -66,8 +66,9 @@ private:
     std::unique_ptr<SettingsFileListener> fileListener;
     juce::NamedValueSet globalProperties;
 
-    using ListenerPair = std::pair<juce::Identifier, Listener*>;
-    juce::Array<ListenerPair> listeners;
+    // @TODO: figure out how to map over identifiers! Then this should be much faster.
+    // Ongoing discussion here: https://forum.juce.com/t/std-hash-specialisation-for-identifier-unordered-map/25157/18
+    std::unordered_map<juce::String, juce::Array<Listener*>> listeners;
 
     const static juce::Identifier settingsTag;
 
