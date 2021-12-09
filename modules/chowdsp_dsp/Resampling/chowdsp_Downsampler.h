@@ -15,9 +15,9 @@ public:
     Downsampler() = default;
 
     /** Prepares the downsampler to process signal at a given upsampling ratio */
-    void prepare (juce::dsp::ProcessSpec spec, int upsampleRatio)
+    void prepare (juce::dsp::ProcessSpec spec, int downsampleRatio)
     {
-        ratio = upsampleRatio;
+        ratio = downsampleRatio;
         downsampledBuffer.setSize ((int) spec.numChannels, (int) spec.maximumBlockSize / ratio);
 
         aaFilters.clear();
@@ -68,7 +68,7 @@ public:
             downsampledData[startSample] = y;
         }
 
-        juce::FloatVectorOperations::multiply (downsampledData, (T) 1 / (T) ratio, numSamples * ratio);
+        juce::FloatVectorOperations::multiply (downsampledData, (T) 1 / (T) ratio, numSamples / ratio);
     }
 
     /** Process a block of data */
