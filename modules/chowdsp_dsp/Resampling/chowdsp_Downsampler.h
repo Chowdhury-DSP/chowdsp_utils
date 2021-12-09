@@ -67,6 +67,8 @@ public:
 
             downsampledData[startSample] = y;
         }
+
+        juce::FloatVectorOperations::multiply (downsampledData, (T) 1 / (T) ratio, numSamples * ratio);
     }
 
     /** Process a block of data */
@@ -87,7 +89,7 @@ private:
     int ratio = 1;
     std::vector<std::vector<SecondOrderLPF<T>>> aaFilters; // anti-aliasing filters
 
-    juce::AudioBuffer<float> downsampledBuffer;
+    juce::AudioBuffer<T> downsampledBuffer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Downsampler)
 };
