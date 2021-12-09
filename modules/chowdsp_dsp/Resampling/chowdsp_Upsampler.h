@@ -68,6 +68,8 @@ public:
 
         for (auto& filt : aiFilters[(size_t) channel])
             filt.processBlock (upsampledData, numSamples * ratio);
+
+        juce::FloatVectorOperations::multiply (upsampledData, (T) ratio, numSamples * ratio);
     }
 
     /** Process a block of data */
@@ -88,7 +90,7 @@ private:
     int ratio = 1;
     std::vector<std::vector<SecondOrderLPF<T>>> aiFilters; // anti-imaging filters
 
-    juce::AudioBuffer<float> upsampledBuffer;
+    juce::AudioBuffer<T> upsampledBuffer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Upsampler)
 };

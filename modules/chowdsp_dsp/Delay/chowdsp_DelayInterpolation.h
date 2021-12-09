@@ -213,7 +213,7 @@ namespace DelayLineInterpolationTypes
 
         Note that Sinc interpolation cannot currently be used with SIMD data types!
     */
-    JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324) // MSVC doesn't like Foley's hiding class members
+    JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324) // MSVC doesn't like other variables hiding class members
     template <typename T, size_t N, size_t M = 256>
     struct Sinc
     {
@@ -240,14 +240,14 @@ namespace DelayLineInterpolationTypes
         {
             if (x == (T) 0)
                 return (T) 1;
-            return (std::sin (juce::MathConstants<float>::pi * x)) / (juce::MathConstants<float>::pi * x);
+            return (std::sin (juce::MathConstants<T>::pi * x)) / (juce::MathConstants<T>::pi * x);
         }
 
         inline T symmetric_blackman (T i, int n) const noexcept
         {
             i -= (n / 2);
             return ((T) 0.42 - (T) 0.5 * std::cos (juce::MathConstants<T>::twoPi * i / (n))
-                    + (T) 0.08 * std::cos (4 * juce::MathConstants<float>::pi * i / (n)));
+                    + (T) 0.08 * std::cos (4 * juce::MathConstants<T>::pi * i / (n)));
         }
 
         void reset (int newTotalSize) { totalSize = newTotalSize; }
