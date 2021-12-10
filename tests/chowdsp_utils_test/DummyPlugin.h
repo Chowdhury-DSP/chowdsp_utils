@@ -14,7 +14,7 @@ public:
 
     static void addParameters (Parameters& params)
     {
-        params.push_back (std::make_unique<AudioParameterFloat> ("dummy", "Dummy", 0.0f, 1.0f, 0.5f));
+        chowdsp::ParamUtils::emplace_param<AudioParameterFloat> (params, "dummy", "Dummy", 0.0f, 1.0f, 0.5f);
     }
 
     void releaseResources() override {}

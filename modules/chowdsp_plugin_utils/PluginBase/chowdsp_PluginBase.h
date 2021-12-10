@@ -2,9 +2,6 @@
 
 namespace chowdsp
 {
-/** Type to use for parameters that can be used to initialise a ValueTreeState */
-using Parameters = std::vector<std::unique_ptr<juce::RangedAudioParameter>>;
-
 /**
  * Base class for plugin processors.
  * 
