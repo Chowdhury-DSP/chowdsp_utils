@@ -2,6 +2,9 @@
 
 namespace chowdsp
 {
+/** Type to use for parameters that can be used to initialise a ValueTreeState */
+using Parameters = std::vector<std::unique_ptr<juce::RangedAudioParameter>>;
+
 namespace ParamUtils
 {
     using VTSParam = juce::AudioProcessorValueTreeState::Parameter;
@@ -24,6 +27,15 @@ namespace ParamUtils
     juce::String floatValToString (float floatVal);
     juce::String floatValToStringDecimal (float floatVal, int numDecimalPlaces);
     float stringToFloatVal (const juce::String& s);
+
+    /**
+     * Useful alias for `params.push_back (std::make_unique<ParamType> (args...));`
+     */
+    template <typename ParamType, typename... Args>
+    void emplace_param (Parameters& params, Args&&... args)
+    {
+        params.push_back (std::make_unique<ParamType> (std::forward<Args> (args)...));
+    }
 
 } // namespace ParamUtils
 
