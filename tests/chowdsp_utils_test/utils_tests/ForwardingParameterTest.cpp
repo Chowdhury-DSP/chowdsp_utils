@@ -33,7 +33,9 @@ public:
         auto* forwardingParam = new chowdsp::ForwardingParameter ("param", &undoManager, "NONE");
         dummy.addParameter (forwardingParam);
         forwardingParam->setProcessor (&dummy);
+
         forwardingParam->setParam (dummyParam);
+        expect (forwardingParam->getParam() == dummyParam, "Forwarding Parameter is not pointing to the correct parameter!");
 
         auto* testParam = (AudioProcessorParameter*) forwardingParam;
         expectEquals (testParam->getName (1024), dummyParam->getName (1024), "Parameter name is incorrect!");
@@ -73,6 +75,8 @@ public:
         expectWithinAbsoluteError (dummyParam->getValue(), value1, error, "Internal param value set from undo is incorrect!");
 
         forwardingParam->setParam (nullptr);
+        expect (forwardingParam->getParam() == nullptr, "Forwarding Parameter should be pointing to anything!");
+
         dummyParam->beginChangeGesture();
         dummyParam->setValueNotifyingHost (value2);
         MessageManager::getInstance()->runDispatchLoopUntil (100);
