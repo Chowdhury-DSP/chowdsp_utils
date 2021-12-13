@@ -23,6 +23,9 @@ public:
     /** Sets a new parameter to be forwarded */
     void setParam (juce::RangedAudioParameter* paramToUse, const juce::String& newName = {});
 
+    /** Returns te parameter currently being forwarded */
+    const auto* getParam() const noexcept { return internalParam; }
+
     /** Sets a new processor to forward to */
     void setProcessor (juce::AudioProcessor* processorToUse);
 
