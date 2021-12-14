@@ -36,7 +36,7 @@ public:
     double processSample (double inSamp)
     {
         Vres.setVoltage (inSamp);
-        R.incident (0.0);
+        R.compute();
 
         return WDFT::voltage<double> (Res1m) + WDFT::voltage<double> (S2) + WDFT::voltage<double> (Res3m);
     }
