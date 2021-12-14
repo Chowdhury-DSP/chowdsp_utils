@@ -28,6 +28,7 @@ namespace SampleTypeHelpers // Internal classes needed for handling sample type 
 } // namespace SampleTypeHelpers
 #endif
 
+/** API for constructing Wave Digital Filters fixed at compile-time */
 namespace WDFT
 {
 #if USING_JUCE

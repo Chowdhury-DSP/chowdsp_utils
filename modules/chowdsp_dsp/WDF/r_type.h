@@ -11,6 +11,7 @@
 
 namespace chowdsp::WDFT
 {
+#ifndef DOXYGEN
 /** Utility functions used internally by the R-Type adaptor */
 namespace rtype_detail
 {
@@ -47,58 +48,10 @@ namespace rtype_detail
 
         alignas (alignment) std::array<ElementType, (size_t) arraySize> array;
     };
-} // namespace rtype_detail
 
-/**
- *  A non-adaptable R-Type adaptor.
- *  For more information see: https://searchworks.stanford.edu/view/11891203, chapter 2
- */
-template <typename T, typename... PortTypes>
-class RootRtypeAdaptor
-{
-    static constexpr auto numPorts = sizeof...(PortTypes); // number of ports connected to RtypeAdaptor
-public:
-    explicit RootRtypeAdaptor (std::tuple<PortTypes&...> dps) : downPorts (dps)
-    {
-        for (int i = 0; i < (int) numPorts; i++)
-        {
-            b_vec[i] = (T) 0;
-            a_vec[i] = (T) 0;
-        }
-
-        // @TODO: I don't think this is necessary since this is the root?
-        // rtype_detail::forEachInTuple ([&] (auto& port, size_t) { port.connectToParent (this); }, downPorts);
-    }
-
-    /** Use this function to set the scattering matrix data. */
-    void setSMatrixData (const T (&mat)[numPorts][numPorts])
-    {
-        for (int i = 0; i < (int) numPorts; ++i)
-            for (int j = 0; j < (int) numPorts; ++j)
-                S_matrix[i][j] = mat[i][j];
-    }
-
-    /** Computes the incident wave. Note that the input value is not used. */
-    inline void incident (T /*downWave*/) noexcept
-    {
-        RtypeScatter (S_matrix, a_vec, b_vec);
-        rtype_detail::forEachInTuple ([&] (auto& port, size_t i) {
-            port.incident (b_vec[i]);
-            a_vec[i] = port.reflected();
-        },
-                                      downPorts);
-    }
-
-    template <int port_idx>
-    constexpr auto getPort()
-    {
-        return std::get<port_idx> (downPorts);
-    }
-
-protected:
     /** Implementation for float/double. */
-    template <typename C = T>
-    static inline typename std::enable_if<std::is_same<float, C>::value || std::is_same<double, C>::value, void>::type
+    template <typename T, int numPorts>
+    inline typename std::enable_if<std::is_same<float, T>::value || std::is_same<double, T>::value, void>::type
         RtypeScatter (const rtype_detail::AlignedArray<T, numPorts> (&S_)[numPorts], const T (&a_)[numPorts], T (&b_)[numPorts])
     {
         // input matrix (S) of size dim x dim
@@ -148,10 +101,8 @@ protected:
 
 #if USING_JUCE
     /** Implementation for SIMD float/double. */
-    template <typename C = T>
-    static inline typename std::enable_if<std::is_same<juce::dsp::SIMDRegister<float>, C>::value
-                                              || std::is_same<juce::dsp::SIMDRegister<double>, C>::value,
-                                          void>::type
+    template <typename T, int numPorts>
+    inline typename std::enable_if<std::is_same<juce::dsp::SIMDRegister<float>, T>::value || std::is_same<juce::dsp::SIMDRegister<double>, T>::value, void>::type
         RtypeScatter (const rtype_detail::AlignedArray<T, numPorts> (&S_)[numPorts], const T (&a_)[numPorts], T (&b_)[numPorts])
     {
         for (int c = 0; c < (int) numPorts; ++c)
@@ -162,6 +113,167 @@ protected:
         }
     }
 #endif // USING JUCE
+} // namespace rtype_detail
+#endif // DOXYGEN
+
+/**
+ *  A non-adaptable R-Type adaptor.
+ *  For more information see: https://searchworks.stanford.edu/view/11891203, chapter 2
+ */
+template <typename T, typename... PortTypes>
+class RootRtypeAdaptor : public RootWDF
+{
+public:
+    /** Number of ports connected to RootRtypeAdaptor */
+    static constexpr auto numPorts = sizeof...(PortTypes);
+
+    explicit RootRtypeAdaptor (std::tuple<PortTypes&...> dps) : downPorts (dps)
+    {
+        for (int i = 0; i < (int) numPorts; i++)
+        {
+            b_vec[i] = (T) 0;
+            a_vec[i] = (T) 0;
+        }
+
+        rtype_detail::forEachInTuple ([&] (auto& port, size_t)
+                                      { port.connectToParent (this); },
+                                      downPorts);
+    }
+
+    /**
+     * If you are using this element in a WDF tree, you MUST implement
+     * this method to update the scattering matrix.
+     */
+    std::function<void (const T (&)[numPorts])> calcImpedanceFunc = [] (const T (&)[numPorts]) {};
+
+    /** Recomuptes internal variables based on the incoming impedances */
+    void calcImpedance() override
+    {
+        T portImpedances[numPorts];
+        rtype_detail::forEachInTuple ([&] (auto& port, size_t i)
+                                      { portImpedances[i] = port.R; },
+                                      downPorts);
+
+        calcImpedanceFunc (portImpedances);
+    }
+
+    /** Use this function to set the scattering matrix data. */
+    void setSMatrixData (const T (&mat)[numPorts][numPorts])
+    {
+        for (int i = 0; i < (int) numPorts; ++i)
+            for (int j = 0; j < (int) numPorts; ++j)
+                S_matrix[i][j] = mat[i][j];
+    }
+
+    /** Computes both the incident and reflected waves at this root node. */
+    inline void compute() noexcept
+    {
+        rtype_detail::RtypeScatter (S_matrix, a_vec, b_vec);
+        rtype_detail::forEachInTuple ([&] (auto& port, size_t i)
+                                      {
+                                          port.incident (b_vec[i]);
+                                          a_vec[i] = port.reflected(); },
+                                      downPorts);
+    }
+
+protected:
+    std::tuple<PortTypes&...> downPorts; // tuple of ports connected to RtypeAdaptor
+
+    rtype_detail::AlignedArray<T, numPorts> S_matrix[numPorts]; // square matrix representing S
+    T a_vec alignas (16)[numPorts]; // temp matrix of inputs to Rport
+    T b_vec alignas (16)[numPorts]; // temp matrix of outputs from Rport
+};
+
+/**
+ *  An adaptable R-Type adaptor.
+ *  For more information see: https://searchworks.stanford.edu/view/11891203, chapter 2
+ */
+template <typename T, int upPortIndex, typename... PortTypes>
+class RtypeAdaptor : public BaseWDF
+{
+public:
+    /** Number of ports connected to RtypeAdaptor */
+    static constexpr auto numPorts = sizeof...(PortTypes) + 1;
+
+    explicit RtypeAdaptor (std::tuple<PortTypes&...> dps) : downPorts (dps)
+    {
+        for (int i = 0; i < (int) numPorts; i++)
+        {
+            b_vec[i] = (T) 0;
+            a_vec[i] = (T) 0;
+        }
+
+        rtype_detail::forEachInTuple ([&] (auto& port, size_t)
+                                      { port.connectToParent (this); },
+                                      downPorts);
+    }
+
+    /**
+     * If you are using this element in a WDF tree, you MUST implement
+     * this method to update the scattering matrix. The method should
+     * return the mew port impedance.
+     */
+    std::function<T (const T (&)[numPorts - 1])> calcImpedanceFunc = [] (const T (&)[numPorts - 1])
+    { return (T) 1; };
+
+    /** Re-computes the port impedance at the adapted upward-facing port */
+    void calcImpedance() override
+    {
+        T portImpedances[numPorts - 1];
+        rtype_detail::forEachInTuple ([&] (auto& port, size_t i)
+                                      { portImpedances[i] = port.R; },
+                                      downPorts);
+
+        R = calcImpedanceFunc (portImpedances);
+        G = (T) 1 / R;
+    }
+
+    /** Use this function to set the scattering matrix data. */
+    void setSMatrixData (const T (&mat)[numPorts][numPorts])
+    {
+        for (int i = 0; i < (int) numPorts; ++i)
+            for (int j = 0; j < (int) numPorts; ++j)
+                S_matrix[i][j] = mat[i][j];
+    }
+
+    /** Computes the incident wave. */
+    inline void incident (T downWave) noexcept
+    {
+        a = downWave;
+        a_vec[upPortIndex] = a;
+
+        rtype_detail::RtypeScatter (S_matrix, a_vec, b_vec);
+        rtype_detail::forEachInTuple ([&] (auto& port, size_t i)
+                                      {
+                                          auto portIndex = getPortIndex ((int) i);
+                                          port.incident (b_vec[portIndex]); },
+                                      downPorts);
+    }
+
+    /** Computes the reflected wave */
+    inline T reflected() noexcept
+    {
+        rtype_detail::forEachInTuple ([&] (auto& port, size_t i)
+                                      {
+                                          auto portIndex = getPortIndex ((int) i);
+                                          a_vec[portIndex] = port.reflected(); },
+                                      downPorts);
+
+        b = b_vec[upPortIndex];
+        return b;
+    }
+
+    using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+    T R = (NumericType) 1.0e-9; /* impedance */
+    T G = (T) 1.0 / R; /* admittance */
+    T a = (T) 0.0; /* incident wave */
+    T b = (T) 0.0; /* reflected wave */
+
+protected:
+    constexpr auto getPortIndex (int tupleIndex)
+    {
+        return tupleIndex < upPortIndex ? tupleIndex : tupleIndex + 1;
+    }
 
     std::tuple<PortTypes&...> downPorts; // tuple of ports connected to RtypeAdaptor
 
