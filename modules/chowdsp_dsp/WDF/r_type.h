@@ -211,7 +211,7 @@ public:
     /**
      * If you are using this element in a WDF tree, you MUST implement
      * this method to update the scattering matrix. The method should
-     * return the mew port impedance.
+     * return the new port impedance.
      */
     std::function<T (const T (&)[numPorts - 1])> calcImpedanceFunc = [] (const T (&)[numPorts - 1])
     { return (T) 1; };
