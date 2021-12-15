@@ -11,23 +11,7 @@
 
 namespace chowdsp
 {
-#ifndef DOXYGEN
-namespace SampleTypeHelpers // Internal classes needed for handling sample type classes
-{
-    template <typename T, bool = std::is_floating_point<T>::value>
-    struct ElementType
-    {
-        using Type = T;
-    };
-
-    template <typename T>
-    struct ElementType<T, false>
-    {
-        using Type = typename T::value_type;
-    };
-} // namespace SampleTypeHelpers
-#endif
-
+/** API for constructing Wave Digital Filters fixed at compile-time */
 namespace WDFT
 {
 #if USING_JUCE

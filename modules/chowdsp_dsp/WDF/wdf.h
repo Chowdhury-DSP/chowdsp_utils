@@ -10,6 +10,7 @@
 #include "signum.h"
 #include "omega.h"
 
+/** API for constructing Wave Digital Filters with run-time flexibility */
 namespace chowdsp::WDF
 {
 #if USING_JUCE
