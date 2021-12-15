@@ -67,8 +67,6 @@ public:
 
             downsampledData[startSample] = y;
         }
-
-        juce::FloatVectorOperations::multiply (downsampledData, (T) 1 / (T) ratio, numSamples / ratio);
     }
 
     /** Process a block of data */

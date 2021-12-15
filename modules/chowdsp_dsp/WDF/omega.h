@@ -187,7 +187,7 @@ namespace Omega
         return y - (y - exp_approx<T> (x - y)) / (y + (T) 1);
     }
 
-#if USING_JUCE
+#if WDF_USING_JUCE
     /** First-order approximation of the Wright Omega functions */
     template <typename T>
     inline juce::dsp::SIMDRegister<T> omega1 (juce::dsp::SIMDRegister<T> x)
@@ -224,7 +224,7 @@ namespace Omega
             y.set (i, omega4 (x.get (i)));
         return y;
     }
-#endif // USING_JUCE
+#endif // WDF_USING_JUCE
 
 } // namespace Omega
 } // namespace chowdsp
