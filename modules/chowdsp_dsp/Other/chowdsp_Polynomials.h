@@ -1,5 +1,8 @@
 #pragma once
 
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wsign-conversion",
+                                     "-Waggresize-loop-optimizations")
+
 namespace chowdsp
 {
 /** Useful methods for working with and evaluating polynomials */
@@ -60,3 +63,5 @@ namespace Polynomials
     }
 } // namespace Polynomials
 } // namespace chowdsp
+
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE

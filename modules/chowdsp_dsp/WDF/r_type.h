@@ -9,6 +9,8 @@
 #include <xsimd/xsimd.hpp>
 #endif
 
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wsign-conversion")
+
 namespace chowdsp::WDFT
 {
 #ifndef DOXYGEN
@@ -278,5 +280,7 @@ protected:
 };
 
 } // namespace chowdsp::WDFT
+
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
 #endif // RTYPE_H_INCLUDED
