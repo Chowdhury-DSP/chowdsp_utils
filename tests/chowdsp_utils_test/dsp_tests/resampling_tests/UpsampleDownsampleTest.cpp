@@ -5,7 +5,7 @@ namespace
 {
 constexpr size_t fftOrder = 15;
 constexpr size_t blockSize = 1 << fftOrder;
-constexpr double sampleRate = 48000.0;
+constexpr double _sampleRate = 48000.0;
 
 // FFT smoothing constants
 constexpr size_t avgNum = 3;
@@ -56,12 +56,12 @@ public:
     void upsampleQualityTest()
     {
         chowdsp::Upsampler<float> upsampler;
-        upsampler.prepare ({ sampleRate, (uint32) blockSize, 1 }, 2);
+        upsampler.prepare ({ _sampleRate, (uint32) blockSize, 1 }, 2);
 
         constexpr float testFreq = 10000.0f;
-        auto sineBuffer = test_utils::makeSineWave (testFreq, (float) sampleRate, (int) blockSize);
+        auto sineBuffer = test_utils::makeSineWave (testFreq, (float) _sampleRate, (int) blockSize);
         auto upsampledBlock = upsampler.process (dsp::AudioBlock<float> (sineBuffer));
-        auto snr = calcSNR (upsampledBlock, testFreq, (float) sampleRate * (float) upsampler.getUpsamplingRatio());
+        auto snr = calcSNR (upsampledBlock, testFreq, (float) _sampleRate * (float) upsampler.getUpsamplingRatio());
 
         expectEquals (upsampledBlock.getNumSamples(), blockSize * (size_t) upsampler.getUpsamplingRatio(), "Upsampled block size is incorrect!");
         expectGreaterThan (snr, 60.0f, "Signal to noise ratio is too low!");
@@ -70,10 +70,10 @@ public:
     void downsampleQualityTest()
     {
         chowdsp::Downsampler<float, 8> downsampler;
-        downsampler.prepare ({ 2.0 * sampleRate, (uint32) blockSize, 1 }, 2);
+        downsampler.prepare ({ 2.0 * _sampleRate, (uint32) blockSize, 1 }, 2);
 
         constexpr float testFreq = 42000.0f;
-        auto sineBuffer = test_utils::makeSineWave (testFreq, 2.0f * (float) sampleRate, (int) blockSize);
+        auto sineBuffer = test_utils::makeSineWave (testFreq, 2.0f * (float) _sampleRate, (int) blockSize);
         auto downsampledBlock = downsampler.process (dsp::AudioBlock<float> (sineBuffer));
 
         float squaredSum = 0.0f;

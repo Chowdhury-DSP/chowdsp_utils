@@ -11,23 +11,7 @@
 
 namespace chowdsp
 {
-#ifndef DOXYGEN
-namespace SampleTypeHelpers // Internal classes needed for handling sample type classes
-{
-    template <typename T, bool = std::is_floating_point<T>::value>
-    struct ElementType
-    {
-        using Type = T;
-    };
-
-    template <typename T>
-    struct ElementType<T, false>
-    {
-        using Type = typename T::value_type;
-    };
-} // namespace SampleTypeHelpers
-#endif
-
+/** API for constructing Wave Digital Filters fixed at compile-time */
 namespace WDFT
 {
 #if USING_JUCE
@@ -63,12 +47,22 @@ namespace WDFT
         void connectToParent (BaseWDF*) {}
     };
 
-#define CREATE_WDFT_MEMBERS                                               \
-    using NumericType = typename SampleTypeHelpers::ElementType<T>::Type; \
-    T R = (NumericType) 1.0e-9; /* impedance */                           \
-    T G = (T) 1.0 / R; /* admittance */                                   \
-    T a = (T) 0.0; /* incident wave */                                    \
-    T b = (T) 0.0; /* reflected wave */
+#ifndef DOXYGEN
+    /** Helper struct for common WDF member variables */
+    template <typename T>
+    struct WDFMembers
+    {
+#if USING_JUCE
+        using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+#else
+        using NumericType = T;
+#endif
+        T R = (NumericType) 1.0e-9; /* impedance */
+        T G = (T) 1.0 / R; /* admittance */
+        T a = (T) 0.0; /* incident wave */
+        T b = (T) 0.0; /* reflected wave */
+    };
+#endif // DOXYGEN
 
     /** WDF Resistor Node */
     template <typename T>
@@ -96,24 +90,24 @@ namespace WDFT
         /** Computes the impedance of the WDF resistor, Z_R = R. */
         inline void calcImpedance() override
         {
-            R = R_value;
-            G = (T) 1.0 / R;
+            wdf.R = R_value;
+            wdf.G = (T) 1.0 / wdf.R;
         }
 
         /** Accepts an incident wave into a WDF resistor. */
         inline void incident (T x) noexcept
         {
-            a = x;
+            wdf.a = x;
         }
 
         /** Propogates a reflected wave from a WDF resistor. */
         inline T reflected() noexcept
         {
-            b = 0.0;
-            return b;
+            wdf.b = 0.0;
+            return wdf.b;
         }
 
-        CREATE_WDFT_MEMBERS
+        WDFMembers<T> wdf;
 
     private:
         T R_value = (T) 1.0e-9;
@@ -166,25 +160,25 @@ namespace WDFT
          */
         inline void calcImpedance() override
         {
-            R = (T) 1.0 / ((T) 2.0 * C_value * fs);
-            G = (T) 1.0 / R;
+            wdf.R = (T) 1.0 / ((T) 2.0 * C_value * fs);
+            wdf.G = (T) 1.0 / wdf.R;
         }
 
         /** Accepts an incident wave into a WDF capacitor. */
         inline void incident (T x) noexcept
         {
-            a = x;
-            z = a;
+            wdf.a = x;
+            z = wdf.a;
         }
 
         /** Propogates a reflected wave from a WDF capacitor. */
         inline T reflected() noexcept
         {
-            b = z;
-            return b;
+            wdf.b = z;
+            return wdf.b;
         }
 
-        CREATE_WDFT_MEMBERS
+        WDFMembers<T> wdf;
 
     private:
         T C_value = (T) 1.0e-6;
@@ -255,25 +249,25 @@ namespace WDFT
          */
         inline void calcImpedance() override
         {
-            R = (T) 1.0 / (((T) 1.0 + alpha) * C_value * fs);
-            G = (T) 1.0 / R;
+            wdf.R = (T) 1.0 / (((T) 1.0 + alpha) * C_value * fs);
+            wdf.G = (T) 1.0 / wdf.R;
         }
 
         /** Accepts an incident wave into a WDF capacitor. */
         inline void incident (T x) noexcept
         {
-            a = x;
-            z = a;
+            wdf.a = x;
+            z = wdf.a;
         }
 
         /** Propogates a reflected wave from a WDF capacitor. */
         inline T reflected() noexcept
         {
-            b = b_coef * b + a_coef * z;
-            return b;
+            wdf.b = b_coef * wdf.b + a_coef * z;
+            return wdf.b;
         }
 
-        CREATE_WDFT_MEMBERS
+        WDFMembers<T> wdf;
 
     private:
         T C_value = (T) 1.0e-6;
@@ -331,25 +325,25 @@ namespace WDFT
          */
         inline void calcImpedance() override
         {
-            R = (T) 2.0 * L_value * fs;
-            G = (T) 1.0 / R;
+            wdf.R = (T) 2.0 * L_value * fs;
+            wdf.G = (T) 1.0 / wdf.R;
         }
 
         /** Accepts an incident wave into a WDF inductor. */
         inline void incident (T x) noexcept
         {
-            a = x;
-            z = a;
+            wdf.a = x;
+            z = wdf.a;
         }
 
         /** Propogates a reflected wave from a WDF inductor. */
         inline T reflected() noexcept
         {
-            b = -z;
-            return b;
+            wdf.b = -z;
+            return wdf.b;
         }
 
-        CREATE_WDFT_MEMBERS
+        WDFMembers<T> wdf;
 
     private:
         T L_value = (T) 1.0e-6;
@@ -418,25 +412,25 @@ namespace WDFT
          */
         inline void calcImpedance() override
         {
-            R = ((T) 1.0 + alpha) * L_value * fs;
-            G = (T) 1.0 / R;
+            wdf.R = ((T) 1.0 + alpha) * L_value * fs;
+            wdf.G = (T) 1.0 / wdf.R;
         }
 
         /** Accepts an incident wave into a WDF inductor. */
         inline void incident (T x) noexcept
         {
-            a = x;
-            z = a;
+            wdf.a = x;
+            z = wdf.a;
         }
 
         /** Propogates a reflected wave from a WDF inductor. */
         inline T reflected() noexcept
         {
-            b = b_coef * b - a_coef * z;
-            return b;
+            wdf.b = b_coef * wdf.b - a_coef * z;
+            return wdf.b;
         }
 
-        CREATE_WDFT_MEMBERS
+        WDFMembers<T> wdf;
 
     private:
         T L_value = (T) 1.0e-6;
@@ -470,9 +464,9 @@ namespace WDFT
          */
         inline void calcImpedance() override
         {
-            G = port1.G + port2.G;
-            R = (T) 1.0 / G;
-            port1Reflect = port1.G / G;
+            wdf.G = port1.wdf.G + port2.wdf.G;
+            wdf.R = (T) 1.0 / wdf.G;
+            port1Reflect = port1.wdf.G / wdf.G;
         }
 
         /** Accepts an incident wave into a WDF parallel adaptor. */
@@ -481,7 +475,7 @@ namespace WDFT
             auto b2 = x + bTemp;
             port1.incident (bDiff + b2);
             port2.incident (b2);
-            a = x;
+            wdf.a = x;
         }
 
         /** Propogates a reflected wave from a WDF parallel adaptor. */
@@ -490,17 +484,17 @@ namespace WDFT
             port1.reflected();
             port2.reflected();
 
-            bDiff = port2.b - port1.b;
+            bDiff = port2.wdf.b - port1.wdf.b;
             bTemp = (T) 0 - port1Reflect * bDiff;
-            b = port2.b + bTemp;
+            wdf.b = port2.wdf.b + bTemp;
 
-            return b;
+            return wdf.b;
         }
 
         Port1Type& port1;
         Port2Type& port2;
 
-        CREATE_WDFT_MEMBERS
+        WDFMembers<T> wdf;
 
     private:
         T port1Reflect = (T) 1.0;
@@ -528,32 +522,32 @@ namespace WDFT
          */
         inline void calcImpedance() override
         {
-            R = port1.R + port2.R;
-            G = (T) 1.0 / R;
-            port1Reflect = port1.R / R;
+            wdf.R = port1.wdf.R + port2.wdf.R;
+            wdf.G = (T) 1.0 / wdf.R;
+            port1Reflect = port1.wdf.R / wdf.R;
         }
 
         /** Accepts an incident wave into a WDF series adaptor. */
         inline void incident (T x) noexcept
         {
-            auto b1 = port1.b - port1Reflect * (x + port1.b + port2.b);
+            auto b1 = port1.wdf.b - port1Reflect * (x + port1.wdf.b + port2.wdf.b);
             port1.incident (b1);
             port2.incident ((T) 0 - (x + b1));
 
-            a = x;
+            wdf.a = x;
         }
 
         /** Propogates a reflected wave from a WDF series adaptor. */
         inline T reflected() noexcept
         {
-            b = (T) 0 - (port1.reflected() + port2.reflected());
-            return b;
+            wdf.b = (T) 0 - (port1.reflected() + port2.reflected());
+            return wdf.b;
         }
 
         Port1Type& port1;
         Port2Type& port2;
 
-        CREATE_WDFT_MEMBERS
+        WDFMembers<T> wdf;
 
     private:
         T port1Reflect = (T) 1.0;
@@ -576,25 +570,25 @@ namespace WDFT
          */
         inline void calcImpedance() override
         {
-            R = port1.R;
-            G = (T) 1.0 / R;
+            wdf.R = port1.wdf.R;
+            wdf.G = (T) 1.0 / wdf.R;
         }
 
         /** Accepts an incident wave into a WDF inverter. */
         inline void incident (T x) noexcept
         {
-            a = x;
+            wdf.a = x;
             port1.incident ((T) 0 - x);
         }
 
         /** Propogates a reflected wave from a WDF inverter. */
         inline T reflected() noexcept
         {
-            b = (T) 0 - port1.reflected();
-            return b;
+            wdf.b = (T) 0 - port1.reflected();
+            return wdf.b;
         }
 
-        CREATE_WDFT_MEMBERS
+        WDFMembers<T> wdf;
 
     private:
         PortType& port1;
@@ -620,34 +614,34 @@ namespace WDFT
         /** Calculates the impedance of the WDF Y-Parameter */
         inline void calcImpedance() override
         {
-            denominator = y[1][1] + port1.R * y[0][0] * y[1][1] - port1.R * y[0][1] * y[1][0];
-            R = (port1.R * y[0][0] + (T) 1.0) / denominator;
-            G = (T) 1.0 / R;
+            denominator = y[1][1] + port1.wdf.R * y[0][0] * y[1][1] - port1.wdf.R * y[0][1] * y[1][0];
+            wdf.R = (port1.wdf.R * y[0][0] + (T) 1.0) / denominator;
+            wdf.G = (T) 1.0 / wdf.R;
 
-            T rSq = port1.R * port1.R;
+            T rSq = port1.wdf.R * port1.wdf.R;
             T num1A = -y[1][1] * rSq * y[0][0] * y[0][0];
             T num2A = y[0][1] * y[1][0] * rSq * y[0][0];
 
-            A = (num1A + num2A + y[1][1]) / (denominator * (port1.R * y[0][0] + (T) 1.0));
-            B = -port1.R * y[0][1] / (port1.R * y[0][0] + (T) 1.0);
+            A = (num1A + num2A + y[1][1]) / (denominator * (port1.wdf.R * y[0][0] + (T) 1.0));
+            B = -port1.wdf.R * y[0][1] / (port1.wdf.R * y[0][0] + (T) 1.0);
             C = -y[1][0] / denominator;
         }
 
         /** Accepts an incident wave into a WDF Y-Parameter. */
         inline void incident (T x) noexcept
         {
-            a = x;
-            port1.incident (A * port1.b + B * x);
+            wdf.a = x;
+            port1.incident (A * port1.wdf.b + B * x);
         }
 
         /** Propogates a reflected wave from a WDF Y-Parameter. */
         inline T reflected() noexcept
         {
-            b = C * port1.reflected();
-            return b;
+            wdf.b = C * port1.reflected();
+            return wdf.b;
         }
 
-        CREATE_WDFT_MEMBERS
+        WDFMembers<T> wdf;
 
     private:
         PortType& port1;
@@ -678,17 +672,17 @@ namespace WDFT
         /** Accepts an incident wave into a WDF ideal voltage source. */
         inline void incident (T x) noexcept
         {
-            a = x;
+            wdf.a = x;
         }
 
         /** Propogates a reflected wave from a WDF ideal voltage source. */
         inline T reflected() noexcept
         {
-            b = (T) 0 - a + (T) 2.0 * Vs;
-            return b;
+            wdf.b = (T) 0 - wdf.a + (T) 2.0 * Vs;
+            return wdf.b;
         }
 
-        CREATE_WDFT_MEMBERS
+        WDFMembers<T> wdf;
 
     private:
         T Vs = (T) 0.0;
@@ -699,12 +693,10 @@ namespace WDFT
     class ResistiveVoltageSourceT final : public BaseWDF
     {
     public:
-        CREATE_WDFT_MEMBERS
-
         /** Creates a new resistive voltage source.
          * @param value: initial resistance value, in Ohms
          */
-        explicit ResistiveVoltageSourceT (T value = (NumericType) 1.0e-9) : R_value (value)
+        explicit ResistiveVoltageSourceT (T value = typename WDFMembers<T>::NumericType (1.0e-9)) : R_value (value)
         {
             calcImpedance();
         }
@@ -724,8 +716,8 @@ namespace WDFT
          */
         inline void calcImpedance() override
         {
-            R = R_value;
-            G = (T) 1.0 / R;
+            wdf.R = R_value;
+            wdf.G = (T) 1.0 / wdf.R;
         }
 
         /** Sets the voltage of the voltage source, in Volts */
@@ -734,15 +726,17 @@ namespace WDFT
         /** Accepts an incident wave into a WDF resistive voltage source. */
         inline void incident (T x) noexcept
         {
-            a = x;
+            wdf.a = x;
         }
 
         /** Propogates a reflected wave from a WDF resistive voltage source. */
         inline T reflected() noexcept
         {
-            b = Vs;
-            return b;
+            wdf.b = Vs;
+            return wdf.b;
         }
+
+        WDFMembers<T> wdf;
 
     private:
         T Vs = (T) 0.0;
@@ -762,7 +756,7 @@ namespace WDFT
 
         inline void calcImpedance() override
         {
-            twoR = (T) 2.0 * next.R;
+            twoR = (T) 2.0 * next.wdf.R;
             twoR_Is = twoR * Is;
         }
 
@@ -776,17 +770,17 @@ namespace WDFT
         /** Accepts an incident wave into a WDF ideal current source. */
         inline void incident (T x) noexcept
         {
-            a = x;
+            wdf.a = x;
         }
 
         /** Propogates a reflected wave from a WDF ideal current source. */
         inline T reflected() noexcept
         {
-            b = twoR_Is + a;
-            return b;
+            wdf.b = twoR_Is + wdf.a;
+            return wdf.b;
         }
 
-        CREATE_WDFT_MEMBERS
+        WDFMembers<T> wdf;
 
     private:
         Next& next;
@@ -801,12 +795,10 @@ namespace WDFT
     class ResistiveCurrentSourceT final : public BaseWDF
     {
     public:
-        CREATE_WDFT_MEMBERS
-
         /** Creates a new resistive current source.
          * @param value: initial resistance value, in Ohms
          */
-        explicit ResistiveCurrentSourceT (T value = (NumericType) 1.0e9) : R_value (value)
+        explicit ResistiveCurrentSourceT (T value = typename WDFMembers<T>::NumericType (1.0e9)) : R_value (value)
         {
             calcImpedance();
         }
@@ -826,8 +818,8 @@ namespace WDFT
          */
         inline void calcImpedance() override
         {
-            R = R_value;
-            G = (T) 1.0 / R;
+            wdf.R = R_value;
+            wdf.G = (T) 1.0 / wdf.R;
         }
 
         /** Sets the current of the current source, in Amps */
@@ -836,15 +828,17 @@ namespace WDFT
         /** Accepts an incident wave into a WDF resistive current source. */
         inline void incident (T x) noexcept
         {
-            a = x;
+            wdf.a = x;
         }
 
         /** Propogates a reflected wave from a WDF resistive current source. */
         inline T reflected() noexcept
         {
-            b = R * Is;
-            return b;
+            wdf.b = wdf.R * Is;
+            return wdf.b;
         }
+
+        WDFMembers<T> wdf;
 
     private:
         T Is = (T) 0.0;
@@ -866,14 +860,12 @@ namespace WDFT
     class DiodePairT final : public RootWDF
     {
     public:
-        CREATE_WDFT_MEMBERS
-
         /** Creates a new WDF diode pair, with the given diode specifications.
          * @param Is: reverse saturation current
          * @param Vt: thermal voltage
          * @param next: the next element in the WDF connection tree
          */
-        DiodePairT (Next& n, T Is, T Vt = (NumericType) 25.85e-3, T nDiodes = 1) : next (n)
+        DiodePairT (Next& n, T Is, T Vt = typename WDFMembers<T>::NumericType (25.85e-3), T nDiodes = 1) : next (n)
         {
             next.connectToParent (this);
             setDiodeParameters (Is, Vt, nDiodes);
@@ -897,15 +889,17 @@ namespace WDFT
         /** Accepts an incident wave into a WDF diode pair. */
         inline void incident (T x) noexcept
         {
-            a = x;
+            wdf.a = x;
         }
 
         /** Propogates a reflected wave from a WDF diode pair. */
         inline T reflected() noexcept
         {
             reflectedInternal();
-            return b;
+            return wdf.b;
         }
+
+        WDFMembers<T> wdf;
 
     private:
         /** Implementation for float/double (Good). */
@@ -914,8 +908,8 @@ namespace WDFT
             reflectedInternal() noexcept
         {
             // See eqn (18) from reference paper
-            T lambda = (T) signum (a);
-            b = a + (T) 2 * lambda * (R_Is - Vt * Omega::omega4 (logR_Is_overVt + lambda * a * oneOverVt + R_Is_overVt));
+            T lambda = (T) signum (wdf.a);
+            wdf.b = wdf.a + (T) 2 * lambda * (R_Is - Vt * Omega::omega4 (logR_Is_overVt + lambda * wdf.a * oneOverVt + R_Is_overVt));
         }
 
         /** Implementation for float/double (Best). */
@@ -924,16 +918,16 @@ namespace WDFT
             reflectedInternal() noexcept
         {
             // See eqn (39) from reference paper
-            T lambda = (T) signum (a);
-            T lambda_a_over_vt = lambda * a * oneOverVt;
-            b = a - twoVt * lambda * (Omega::omega4 (logR_Is_overVt + lambda_a_over_vt) - Omega::omega4 (logR_Is_overVt - lambda_a_over_vt));
+            T lambda = (T) signum (wdf.a);
+            T lambda_a_over_vt = lambda * wdf.a * oneOverVt;
+            wdf.b = wdf.a - twoVt * lambda * (Omega::omega4 (logR_Is_overVt + lambda_a_over_vt) - Omega::omega4 (logR_Is_overVt - lambda_a_over_vt));
         }
 
         template <typename C = T>
         inline typename std::enable_if<std::is_floating_point<C>::value, void>::type
             calcImpedanceInternal() noexcept
         {
-            R_Is = next.R * Is;
+            R_Is = next.wdf.R * Is;
             R_Is_overVt = R_Is * oneOverVt;
             logR_Is_overVt = std::log (R_Is_overVt);
         }
@@ -948,8 +942,8 @@ namespace WDFT
             reflectedInternal() noexcept
         {
             // See eqn (18) from reference paper
-            T lambda = signumSIMD (a);
-            b = a + (T) 2 * lambda * (R_Is - Vt * Omega::omega4 (logR_Is_overVt + lambda * a * oneOverVt + R_Is_overVt));
+            T lambda = signumSIMD (wdf.a);
+            wdf.b = wdf.a + (T) 2 * lambda * (R_Is - Vt * Omega::omega4 (logR_Is_overVt + lambda * wdf.a * oneOverVt + R_Is_overVt));
         }
 
         /** Implementation for SIMD float/double (Best). */
@@ -961,9 +955,9 @@ namespace WDFT
             reflectedInternal() noexcept
         {
             // See eqn (39) from reference paper
-            T lambda = signumSIMD (a);
-            T lambda_a_over_vt = lambda * a * oneOverVt;
-            b = a - twoVt * lambda * (Omega::omega4 (logR_Is_overVt + lambda_a_over_vt) - Omega::omega4 (logR_Is_overVt - lambda_a_over_vt));
+            T lambda = signumSIMD (wdf.a);
+            T lambda_a_over_vt = lambda * wdf.a * oneOverVt;
+            wdf.b = wdf.a - twoVt * lambda * (Omega::omega4 (logR_Is_overVt + lambda_a_over_vt) - Omega::omega4 (logR_Is_overVt - lambda_a_over_vt));
         }
 
         template <typename C = T>
@@ -972,7 +966,7 @@ namespace WDFT
                                        void>::type
             calcImpedanceInternal() noexcept
         {
-            R_Is = next.R * Is;
+            R_Is = next.wdf.R * Is;
             R_Is_overVt = R_Is * oneOverVt;
             logR_Is_overVt = logSIMD (R_Is_overVt);
         }
@@ -998,14 +992,12 @@ namespace WDFT
     class DiodeT final : public RootWDF
     {
     public:
-        CREATE_WDFT_MEMBERS
-
         /** Creates a new WDF diode, with the given diode specifications.
          * @param Is: reverse saturation current
          * @param Vt: thermal voltage
          * @param next: the next element in the WDF connection tree
          */
-        DiodeT (Next& n, T Is, T Vt = (NumericType) 25.85e-3, T nDiodes = 1) : next (n)
+        DiodeT (Next& n, T Is, T Vt = typename WDFMembers<T>::NumericType (25.85e-3), T nDiodes = 1) : next (n)
         {
             next.connectToParent (this);
             setDiodeParameters (Is, Vt, nDiodes);
@@ -1029,16 +1021,18 @@ namespace WDFT
         /** Accepts an incident wave into a WDF diode. */
         inline void incident (T x) noexcept
         {
-            a = x;
+            wdf.a = x;
         }
 
         /** Propogates a reflected wave from a WDF diode. */
         inline T reflected() noexcept
         {
             // See eqn (10) from reference paper
-            b = a + twoR_Is - twoVt * Omega::omega4 (logR_Is_overVt + a * oneOverVt + R_Is_overVt);
-            return b;
+            wdf.b = wdf.a + twoR_Is - twoVt * Omega::omega4 (logR_Is_overVt + wdf.a * oneOverVt + R_Is_overVt);
+            return wdf.b;
         }
+
+        WDFMembers<T> wdf;
 
     private:
         /** Implementation for float/double. */
@@ -1046,8 +1040,8 @@ namespace WDFT
         inline typename std::enable_if<std::is_floating_point<C>::value, void>::type
             calcImpedanceInternal() noexcept
         {
-            twoR_Is = (T) 2 * next.R * Is;
-            R_Is_overVt = next.R * Is * oneOverVt;
+            twoR_Is = (T) 2 * next.wdf.R * Is;
+            R_Is_overVt = next.wdf.R * Is * oneOverVt;
             logR_Is_overVt = std::log (R_Is_overVt);
         }
 
@@ -1059,8 +1053,8 @@ namespace WDFT
                                        void>::type
             calcImpedanceInternal() noexcept
         {
-            twoR_Is = (T) 2 * next.R * Is;
-            R_Is_overVt = next.R * Is * oneOverVt;
+            twoR_Is = (T) 2 * next.wdf.R * Is;
+            R_Is_overVt = next.wdf.R * Is * oneOverVt;
             logR_Is_overVt = logSIMD (R_Is_overVt);
         }
 #endif
@@ -1082,8 +1076,6 @@ namespace WDFT
     class SwitchT final : public RootWDF
     {
     public:
-        CREATE_WDFT_MEMBERS
-
         explicit SwitchT (Next& next)
         {
             next.connectToParent (this);
@@ -1097,21 +1089,21 @@ namespace WDFT
         /** Accepts an incident wave into a WDF switch. */
         inline void incident (T x) noexcept
         {
-            a = x;
+            wdf.a = x;
         }
 
         /** Propogates a reflected wave from a WDF switch. */
         inline T reflected() noexcept
         {
-            b = closed ? -a : a;
-            return b;
+            wdf.b = closed ? -wdf.a : wdf.a;
+            return wdf.b;
         }
+
+        WDFMembers<T> wdf;
 
     private:
         bool closed = true;
     };
-
-#undef CREATE_WDFT_MEMBERS
 
     //==============================================================
 
@@ -1119,14 +1111,14 @@ namespace WDFT
     template <typename T, typename WDFType>
     inline T voltage (const WDFType& wdf) noexcept
     {
-        return (wdf.a + wdf.b) * (T) 0.5;
+        return (wdf.wdf.a + wdf.wdf.b) * (T) 0.5;
     }
 
     /**Probe the current through this circuit element. */
     template <typename T, typename WDFType>
     inline T current (const WDFType& wdf) noexcept
     {
-        return (wdf.a - wdf.b) * ((T) 0.5 * wdf.G);
+        return (wdf.wdf.a - wdf.wdf.b) * ((T) 0.5 * wdf.wdf.G);
     }
 
     // useful "factory" functions to you don't have to declare all the template parameters

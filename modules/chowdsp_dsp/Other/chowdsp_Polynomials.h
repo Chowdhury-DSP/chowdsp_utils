@@ -42,17 +42,21 @@ namespace Polynomials
     template <int ORDER, typename T>
     inline T estrin (const T (&coeffs)[ORDER + 1], const T x)
     {
-        if constexpr (ORDER == 1) // base case
+        if constexpr (ORDER <= 1) // base case
+        {
             return coeffs[1] + coeffs[0] * x;
+        }
+        else
+        {
+            T temp[ORDER / 2 + 1];
+            for (int n = ORDER; n >= 0; n -= 2)
+                temp[n / 2] = coeffs[n] + coeffs[n - 1] * x;
 
-        T temp[ORDER / 2 + 1];
-        for (int n = ORDER; n >= 0; n -= 2)
-            temp[n / 2] = coeffs[n] + coeffs[n - 1] * x;
+            if constexpr (ORDER % 2 == 0) // even order polynomial
+                temp[0] = coeffs[0];
 
-        if constexpr (ORDER % 2 == 0) // even order polynomial
-            temp[0] = coeffs[0];
-
-        return estrin<ORDER / 2> (temp, x * x); // recurse!
+            return estrin<ORDER / 2>(temp, x * x); // recurse!
+        }
     }
 } // namespace Polynomials
 } // namespace chowdsp
