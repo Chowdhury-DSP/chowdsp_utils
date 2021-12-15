@@ -5,7 +5,10 @@
 #include <type_traits>
 
 // we want to be able to use this header without JUCE, so let's #if out JUCE-specific implementations
-#define USING_JUCE JUCE_WINDOWS || JUCE_ANDROID || JUCE_BSD || JUCE_LINUX || JUCE_MAC || JUCE_IOS || JUCE_WASM
+#ifndef WDF_USING_JUCE
+#define WDF_USING_JUCE JUCE_WINDOWS || JUCE_ANDROID || JUCE_BSD || JUCE_LINUX || JUCE_MAC || JUCE_IOS || JUCE_WASM
+#endif
+
 #include "signum.h"
 #include "omega.h"
 
@@ -14,9 +17,9 @@ namespace chowdsp
 /** API for constructing Wave Digital Filters fixed at compile-time */
 namespace WDFT
 {
-#if USING_JUCE
+#if WDF_USING_JUCE
     using namespace SIMDUtils;
-#endif // USING_JUCE
+#endif // WDF_USING_JUCE
 
     class BaseWDF
     {
@@ -52,7 +55,7 @@ namespace WDFT
     template <typename T>
     struct WDFMembers
     {
-#if USING_JUCE
+#if WDF_USING_JUCE
         using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
 #else
         using NumericType = T;
@@ -932,7 +935,7 @@ namespace WDFT
             logR_Is_overVt = std::log (R_Is_overVt);
         }
 
-#if USING_JUCE
+#if WDF_USING_JUCE
         /** Implementation for SIMD float/double (Good). */
         template <typename C = T, DiodeQuality Q = Quality>
         inline typename std::enable_if<(std::is_same<juce::dsp::SIMDRegister<float>, C>::value
@@ -1045,7 +1048,7 @@ namespace WDFT
             logR_Is_overVt = std::log (R_Is_overVt);
         }
 
-#if USING_JUCE
+#if WDF_USING_JUCE
         /** Implementation for SIMD float/double. */
         template <typename C = T>
         inline typename std::enable_if<std::is_same<juce::dsp::SIMDRegister<float>, C>::value
@@ -1143,7 +1146,5 @@ namespace WDFT
 
 } // namespace WDFT
 } // namespace chowdsp
-
-#undef USING_JUCE
 
 #endif // WDF_T_INCLUDED

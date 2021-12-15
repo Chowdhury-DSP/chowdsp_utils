@@ -101,7 +101,7 @@ namespace rtype_detail
 #endif // SIMD options
     }
 
-#if USING_JUCE
+#if WDF_USING_JUCE
     /** Implementation for SIMD float/double. */
     template <typename T, int numPorts>
     inline typename std::enable_if<std::is_same<juce::dsp::SIMDRegister<float>, T>::value || std::is_same<juce::dsp::SIMDRegister<double>, T>::value, void>::type

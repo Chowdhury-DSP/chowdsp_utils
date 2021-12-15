@@ -9,7 +9,7 @@ inline int signum (T val)
     return (T (0) < val) - (val < T (0));
 }
 
-#if USING_JUCE
+#if WDF_USING_JUCE
 /** Signum function to determine the sign of the input. */
 template <typename T>
 inline juce::dsp::SIMDRegister<T> signumSIMD (juce::dsp::SIMDRegister<T> val)

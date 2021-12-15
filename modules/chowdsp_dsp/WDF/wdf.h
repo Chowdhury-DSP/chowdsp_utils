@@ -5,17 +5,12 @@
 #include <utility>
 #include "wdf_t.h"
 
-// we want to be able to use this header without JUCE, so let's #if out JUCE-specific implementations
-#define USING_JUCE JUCE_WINDOWS || JUCE_ANDROID || JUCE_BSD || JUCE_LINUX || JUCE_MAC || JUCE_IOS || JUCE_WASM
-#include "signum.h"
-#include "omega.h"
-
 /** API for constructing Wave Digital Filters with run-time flexibility */
 namespace chowdsp::WDF
 {
-#if USING_JUCE
+#if WDF_USING_JUCE
 using namespace SIMDUtils;
-#endif // USING_JUCE
+#endif // WDF_USING_JUCE
 
 /** Wave digital filter base class */
 template <typename T>
@@ -564,6 +559,6 @@ public:
 
 } // namespace chowdsp::WDF
 
-#undef USING_JUCE
+#undef WDF_USING_JUCE
 
 #endif // WDF_H_INCLUDED
