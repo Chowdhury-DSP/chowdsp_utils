@@ -55,7 +55,7 @@ namespace WDFT
     template <typename T>
     struct WDFMembers
     {
-#if USING_JUCE
+#if WDF_USING_JUCE
         using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
 #else
         using NumericType = T;
@@ -1146,7 +1146,5 @@ namespace WDFT
 
 } // namespace WDFT
 } // namespace chowdsp
-
-#undef WDF_USING_JUCE
 
 #endif // WDF_T_INCLUDED
