@@ -139,7 +139,8 @@ public:
             a_vec[i] = (T) 0;
         }
 
-        rtype_detail::forEachInTuple ([&] (auto& port, size_t) { port.connectToParent (this); },
+        rtype_detail::forEachInTuple ([&] (auto& port, size_t)
+                                      { port.connectToParent (this); },
                                       downPorts);
     }
 
@@ -152,7 +153,8 @@ public:
     constexpr auto getPortImpedances()
     {
         std::array<T, numPorts> portImpedances;
-        rtype_detail::forEachInTuple ([&] (auto& port, size_t i) { portImpedances[i] = port.R; },
+        rtype_detail::forEachInTuple ([&] (auto& port, size_t i)
+                                      { portImpedances[i] = port.wdf.R; },
                                       downPorts);
 
         return portImpedances;
@@ -170,7 +172,8 @@ public:
     inline void compute() noexcept
     {
         rtype_detail::RtypeScatter (S_matrix, a_vec, b_vec);
-        rtype_detail::forEachInTuple ([&] (auto& port, size_t i) {
+        rtype_detail::forEachInTuple ([&] (auto& port, size_t i)
+                                      {
                                           port.incident (b_vec[i]);
                                           a_vec[i] = port.reflected(); },
                                       downPorts);
@@ -209,21 +212,23 @@ public:
             a_vec[i] = (T) 0;
         }
 
-        rtype_detail::forEachInTuple ([&] (auto& port, size_t) { port.connectToParent (this); },
+        rtype_detail::forEachInTuple ([&] (auto& port, size_t)
+                                      { port.connectToParent (this); },
                                       downPorts);
     }
 
     /** Re-computes the port impedance at the adapted upward-facing port */
     void calcImpedance() override
     {
-        R = ImpedanceCalculator::calcImpedance (*this);
-        G = (T) 1 / R;
+        wdf.R = ImpedanceCalculator::calcImpedance (*this);
+        wdf.G = (T) 1 / wdf.R;
     }
 
     constexpr auto getPortImpedances()
     {
         std::array<T, numPorts - 1> portImpedances;
-        rtype_detail::forEachInTuple ([&] (auto& port, size_t i) { portImpedances[i] = port.R; },
+        rtype_detail::forEachInTuple ([&] (auto& port, size_t i)
+                                      { portImpedances[i] = port.wdf.R; },
                                       downPorts);
 
         return portImpedances;
@@ -240,11 +245,12 @@ public:
     /** Computes the incident wave. */
     inline void incident (T downWave) noexcept
     {
-        a = downWave;
-        a_vec[upPortIndex] = a;
+        wdf.a = downWave;
+        a_vec[upPortIndex] = wdf.a;
 
         rtype_detail::RtypeScatter (S_matrix, a_vec, b_vec);
-        rtype_detail::forEachInTuple ([&] (auto& port, size_t i) {
+        rtype_detail::forEachInTuple ([&] (auto& port, size_t i)
+                                      {
                                           auto portIndex = getPortIndex ((int) i);
                                           port.incident (b_vec[portIndex]); },
                                       downPorts);
@@ -253,20 +259,17 @@ public:
     /** Computes the reflected wave */
     inline T reflected() noexcept
     {
-        rtype_detail::forEachInTuple ([&] (auto& port, size_t i) {
+        rtype_detail::forEachInTuple ([&] (auto& port, size_t i)
+                                      {
                                           auto portIndex = getPortIndex ((int) i);
                                           a_vec[portIndex] = port.reflected(); },
                                       downPorts);
 
-        b = b_vec[upPortIndex];
-        return b;
+        wdf.b = b_vec[upPortIndex];
+        return wdf.b;
     }
 
-    using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
-    T R = (NumericType) 1.0e-9; /* impedance */
-    T G = (T) 1.0 / R; /* admittance */
-    T a = (T) 0.0; /* incident wave */
-    T b = (T) 0.0; /* reflected wave */
+    WDFMembers<T> wdf;
 
 protected:
     constexpr auto getPortIndex (int tupleIndex)
