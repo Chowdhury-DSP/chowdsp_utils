@@ -10,6 +10,7 @@
 #include "signum.h"
 #include "omega.h"
 
+/** API for constructing Wave Digital Filters with run-time flexibility */
 namespace chowdsp::WDF
 {
 #if USING_JUCE
@@ -20,7 +21,7 @@ using namespace SIMDUtils;
 template <typename T>
 class WDF : public WDFT::BaseWDF
 {
-    using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+    using NumericType = typename WDFT::WDFMembers<T>::NumericType;
 
 public:
     explicit WDF (std::string type) : type (std::move (type)) {}
@@ -49,13 +50,13 @@ public:
     /** Probe the voltage across this circuit element. */
     inline T voltage() const noexcept
     {
-        return (a + b) / (T) 2.0;
+        return (wdf.a + wdf.b) / (T) 2.0;
     }
 
     /**Probe the current through this circuit element. */
     inline T current() const noexcept
     {
-        return (a - b) / ((T) 2.0 * R);
+        return (wdf.a - wdf.b) / ((T) 2.0 * wdf.R);
     }
 
     // These classes need access to a,b
@@ -68,11 +69,7 @@ public:
     template <typename>
     friend class WDFSeries;
 
-    T R = (NumericType) 1.0e-9; // impedance
-    T G = (T) 1.0 / R; // admittance
-
-    T a = (T) 0.0; // incident wave
-    T b = (T) 0.0; // reflected wave
+    WDFT::WDFMembers<T> wdf;
 
 private:
     const std::string type;
@@ -95,22 +92,22 @@ public:
     inline void calcImpedance() override
     {
         internalWDF.calcImpedance();
-        this->R = internalWDF.R;
-        this->G = internalWDF.G;
+        this->wdf.R = internalWDF.wdf.R;
+        this->wdf.G = internalWDF.wdf.G;
     }
 
     /** Accepts an incident wave into a WDF resistor. */
     inline void incident (T x) noexcept override
     {
-        this->a = x;
+        this->wdf.a = x;
         internalWDF.incident (x);
     }
 
     /** Propogates a reflected wave from a WDF resistor. */
     inline T reflected() noexcept override
     {
-        this->b = internalWDF.reflected();
-        return this->b;
+        this->wdf.b = internalWDF.reflected();
+        return this->wdf.b;
     }
 
 protected:
@@ -439,7 +436,7 @@ public:
 template <typename T>
 class ResistiveVoltageSource final : public WDFWrapper<T, WDFT::ResistiveVoltageSourceT<T>>
 {
-    using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+    using NumericType = typename WDFT::WDFMembers<T>::NumericType;
 
 public:
     /** Creates a new resistive voltage source.
@@ -478,7 +475,7 @@ public:
 template <typename T>
 class ResistiveCurrentSource final : public WDFWrapper<T, WDFT::ResistiveCurrentSourceT<T>>
 {
-    using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+    using NumericType = typename WDFT::WDFMembers<T>::NumericType;
 
 public:
     /** Creates a new resistive current source.
@@ -520,7 +517,7 @@ public:
 template <typename T, WDFT::DiodeQuality Q = WDFT::DiodeQuality::Best>
 class DiodePair final : public WDFRootWrapper<T, WDFT::DiodePairT<T, WDF<T>, Q>>
 {
-    using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+    using NumericType = typename WDFT::WDFMembers<T>::NumericType;
 
 public:
     /** Creates a new WDF diode pair, with the given diode specifications.
@@ -546,7 +543,7 @@ public:
 template <typename T>
 class Diode final : public WDFRootWrapper<T, WDFT::DiodeT<T, WDF<T>>>
 {
-    using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+    using NumericType = typename WDFT::WDFMembers<T>::NumericType;
 
 public:
     /** Creates a new WDF diode, with the given diode specifications.
