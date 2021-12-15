@@ -141,8 +141,7 @@ public:
             a_vec[i] = (T) 0;
         }
 
-        rtype_detail::forEachInTuple ([&] (auto& port, size_t)
-                                      { port.connectToParent (this); },
+        rtype_detail::forEachInTuple ([&] (auto& port, size_t) { port.connectToParent (this); },
                                       downPorts);
     }
 
@@ -155,8 +154,7 @@ public:
     constexpr auto getPortImpedances()
     {
         std::array<T, numPorts> portImpedances {};
-        rtype_detail::forEachInTuple ([&] (auto& port, size_t i)
-                                      { portImpedances[i] = port.wdf.R; },
+        rtype_detail::forEachInTuple ([&] (auto& port, size_t i) { portImpedances[i] = port.wdf.R; },
                                       downPorts);
 
         return portImpedances;
@@ -174,8 +172,7 @@ public:
     inline void compute() noexcept
     {
         rtype_detail::RtypeScatter (S_matrix, a_vec, b_vec);
-        rtype_detail::forEachInTuple ([&] (auto& port, size_t i)
-                                      {
+        rtype_detail::forEachInTuple ([&] (auto& port, size_t i) {
                                           port.incident (b_vec[i]);
                                           a_vec[i] = port.reflected(); },
                                       downPorts);
@@ -214,8 +211,7 @@ public:
             a_vec[i] = (T) 0;
         }
 
-        rtype_detail::forEachInTuple ([&] (auto& port, size_t)
-                                      { port.connectToParent (this); },
+        rtype_detail::forEachInTuple ([&] (auto& port, size_t) { port.connectToParent (this); },
                                       downPorts);
     }
 
@@ -229,8 +225,7 @@ public:
     constexpr auto getPortImpedances()
     {
         std::array<T, numPorts - 1> portImpedances {};
-        rtype_detail::forEachInTuple ([&] (auto& port, size_t i)
-                                      { portImpedances[i] = port.wdf.R; },
+        rtype_detail::forEachInTuple ([&] (auto& port, size_t i) { portImpedances[i] = port.wdf.R; },
                                       downPorts);
 
         return portImpedances;
@@ -251,8 +246,7 @@ public:
         a_vec[upPortIndex] = wdf.a;
 
         rtype_detail::RtypeScatter (S_matrix, a_vec, b_vec);
-        rtype_detail::forEachInTuple ([&] (auto& port, size_t i)
-                                      {
+        rtype_detail::forEachInTuple ([&] (auto& port, size_t i) {
                                           auto portIndex = getPortIndex ((int) i);
                                           port.incident (b_vec[portIndex]); },
                                       downPorts);
@@ -261,8 +255,7 @@ public:
     /** Computes the reflected wave */
     inline T reflected() noexcept
     {
-        rtype_detail::forEachInTuple ([&] (auto& port, size_t i)
-                                      {
+        rtype_detail::forEachInTuple ([&] (auto& port, size_t i) {
                                           auto portIndex = getPortIndex ((int) i);
                                           a_vec[portIndex] = port.reflected(); },
                                       downPorts);
