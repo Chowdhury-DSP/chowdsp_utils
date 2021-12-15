@@ -55,7 +55,7 @@ namespace Polynomials
             if constexpr (ORDER % 2 == 0) // even order polynomial
                 temp[0] = coeffs[0];
 
-            return estrin<ORDER / 2>(temp, x * x); // recurse!
+            return estrin<ORDER / 2> (temp, x * x); // recurse!
         }
     }
 } // namespace Polynomials
