@@ -119,8 +119,12 @@ namespace rtype_detail
 /**
  *  A non-adaptable R-Type adaptor.
  *  For more information see: https://searchworks.stanford.edu/view/11891203, chapter 2
+ *
+ *  The ImpedanceCalculator template argument with a static method of the form:
+ *  template <typename RType>
+ *  static void calcImpedance (RType& R);
  */
-template <typename T, typename... PortTypes>
+template <typename T, typename ImpedanceCalculator, typename... PortTypes>
 class RootRtypeAdaptor : public RootWDF
 {
 public:
@@ -140,21 +144,20 @@ public:
                                       downPorts);
     }
 
-    /**
-     * If you are using this element in a WDF tree, you MUST implement
-     * this method to update the scattering matrix.
-     */
-    std::function<void (const T (&)[numPorts])> calcImpedanceFunc = [] (const T (&)[numPorts]) {};
-
-    /** Recomuptes internal variables based on the incoming impedances */
+    /** Recomputes internal variables based on the incoming impedances */
     void calcImpedance() override
     {
-        T portImpedances[numPorts];
+        ImpedanceCalculator::calcImpedance (*this);
+    }
+
+    constexpr auto getPortImpedances()
+    {
+        std::array<T, numPorts> portImpedances;
         rtype_detail::forEachInTuple ([&] (auto& port, size_t i)
                                       { portImpedances[i] = port.R; },
                                       downPorts);
 
-        calcImpedanceFunc (portImpedances);
+        return portImpedances;
     }
 
     /** Use this function to set the scattering matrix data. */
@@ -187,8 +190,14 @@ protected:
 /**
  *  An adaptable R-Type adaptor.
  *  For more information see: https://searchworks.stanford.edu/view/11891203, chapter 2
+ *
+ *  The upPortIndex argument descibes with port of the scattering matrix is being adapted.
+ *
+ *  The ImpedanceCalculator template argument with a static method of the form:
+ *  template <typename RType>
+ *  static T calcImpedance (RType& R);
  */
-template <typename T, int upPortIndex, typename... PortTypes>
+template <typename T, int upPortIndex, typename ImpedanceCalculator, typename... PortTypes>
 class RtypeAdaptor : public BaseWDF
 {
 public:
@@ -208,24 +217,21 @@ public:
                                       downPorts);
     }
 
-    /**
-     * If you are using this element in a WDF tree, you MUST implement
-     * this method to update the scattering matrix. The method should
-     * return the new port impedance.
-     */
-    std::function<T (const T (&)[numPorts - 1])> calcImpedanceFunc = [] (const T (&)[numPorts - 1])
-    { return (T) 1; };
-
     /** Re-computes the port impedance at the adapted upward-facing port */
     void calcImpedance() override
     {
-        T portImpedances[numPorts - 1];
+        R = ImpedanceCalculator::calcImpedance (*this);
+        G = (T) 1 / R;
+    }
+
+    constexpr auto getPortImpedances()
+    {
+        std::array<T, numPorts - 1> portImpedances;
         rtype_detail::forEachInTuple ([&] (auto& port, size_t i)
                                       { portImpedances[i] = port.R; },
                                       downPorts);
 
-        R = calcImpedanceFunc (portImpedances);
-        G = (T) 1 / R;
+        return portImpedances;
     }
 
     /** Use this function to set the scattering matrix data. */
