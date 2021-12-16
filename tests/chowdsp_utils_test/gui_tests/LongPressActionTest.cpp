@@ -1,4 +1,5 @@
 #include "TimedUnitTest.h"
+#include "test_utils.h"
 
 class LongPressActionTest : public TimedUnitTest
 {
@@ -21,12 +22,6 @@ public:
             expect (hasLongPressOccured, "Long press did not occur as expected!");
         else
             expect (! hasLongPressOccured, "Long press occured when it was not expected!");
-    }
-
-    auto createDummyMouseEvent (Component* comp)
-    {
-        auto mouseSource = Desktop::getInstance().getMainMouseSource();
-        return MouseEvent { mouseSource, Point<float> {}, ModifierKeys {}, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, comp, comp, Time::getCurrentTime(), Point<float> {}, Time::getCurrentTime(), 1, false };
     }
 
     void runTestTimed() override
@@ -73,6 +68,7 @@ public:
                             expect (! longPress.isLongPressActionEnabled(), "Long-press should be disabled!");
                         });
 
+        using namespace test_utils;
         beginTest ("Component Long-Press Test");
         checkLongPress (true,
                         [=] (auto& longPress)
