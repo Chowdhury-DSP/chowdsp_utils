@@ -13,8 +13,7 @@ public:
     {
         bool hasLongPressOccured = false;
         chowdsp::LongPressActionHelper longPress;
-        longPress.longPressCallback = [&] (Point<int>)
-        { hasLongPressOccured = true; };
+        longPress.longPressCallback = [&] (Point<int>) { hasLongPressOccured = true; };
 
         callback (longPress);
 
@@ -28,8 +27,7 @@ public:
     {
         beginTest ("Start and Don't Move Test");
         checkLongPress (true,
-                        [] (auto& longPress)
-                        {
+                        [] (auto& longPress) {
                             longPress.startPress (Point<int> {});
                             longPress.setDragDistance (1.0f);
                             MessageManager::getInstance()->runDispatchLoopUntil (1000);
@@ -37,8 +35,7 @@ public:
 
         beginTest ("Start and Move Too Far Test");
         checkLongPress (false,
-                        [] (auto& longPress)
-                        {
+                        [] (auto& longPress) {
                             longPress.startPress (Point<int> {});
                             longPress.setDragDistance (20.0f);
                             MessageManager::getInstance()->runDispatchLoopUntil (1000);
@@ -46,8 +43,7 @@ public:
 
         beginTest ("Start and Abort Test");
         checkLongPress (false,
-                        [this] (auto& longPress)
-                        {
+                        [this] (auto& longPress) {
                             longPress.startPress (Point<int> {});
                             expect (longPress.isBeingPressed(), "Press should be started!");
                             MessageManager::getInstance()->runDispatchLoopUntil (200);
@@ -56,8 +52,7 @@ public:
 
         beginTest ("Long-Press Disabled Test");
         checkLongPress (false,
-                        [this] (auto& longPress)
-                        {
+                        [this] (auto& longPress) {
                             longPress.setLongPressActionEnabled (false);
                             longPress.startPress (Point<int> {});
 
@@ -71,8 +66,7 @@ public:
         using namespace test_utils;
         beginTest ("Component Long-Press Test");
         checkLongPress (true,
-                        [=] (auto& longPress)
-                        {
+                        [=] (auto& longPress) {
                             Component comp;
                             longPress.setAssociatedComponent (&comp);
 
@@ -84,8 +78,7 @@ public:
 
         beginTest ("Component Short-Press Test");
         checkLongPress (false,
-                        [=] (auto& longPress)
-                        {
+                        [=] (auto& longPress) {
                             Component comp;
                             longPress.setAssociatedComponent (&comp);
 

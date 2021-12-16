@@ -2,7 +2,6 @@
 
 namespace chowdsp
 {
-
 /**
  * JUCE currently does not have a way of doing
  * "long-press" mouse actions that are pretty convenient

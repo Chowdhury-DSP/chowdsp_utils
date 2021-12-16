@@ -2,7 +2,6 @@
 
 namespace chowdsp
 {
-
 LongPressActionHelper::LongPressActionHelper() : LongPressActionHelper (Parameters())
 {
 }
