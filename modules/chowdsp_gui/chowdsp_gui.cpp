@@ -3,6 +3,9 @@
 #include "Assets/chowdsp_BinaryData.cpp"
 #include "LookAndFeel/chowdsp_ChowLNF.cpp"
 
+#include "Helpers/chowdsp_LongPressActionHelper.cpp"
+#include "Helpers/chowdsp_PopupMenuHelper.cpp"
+
 #include "PluginComponents/chowdsp_InfoComp.cpp"
 #include "PluginComponents/chowdsp_TitleComp.cpp"
 #include "PluginComponents/chowdsp_TooltipComp.cpp"
