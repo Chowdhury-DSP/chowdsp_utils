@@ -3,6 +3,10 @@
 namespace chowdsp
 {
 
+LongPressActionHelper::LongPressActionHelper() : LongPressActionHelper (Parameters())
+{
+}
+
 LongPressActionHelper::LongPressActionHelper (const Parameters& params) : dragDistanceThreshold (params.dragDistanceThreshold),
                                                                           pressLengthMs (params.pressLengthMilliseconds)
 {
@@ -12,8 +16,7 @@ LongPressActionHelper::~LongPressActionHelper()
 {
     stopTimer();
 
-    if (component != nullptr)
-        component->removeMouseListener (this);
+    setAssociatedComponent (nullptr);
 }
 
 void LongPressActionHelper::setAssociatedComponent (juce::Component* comp)

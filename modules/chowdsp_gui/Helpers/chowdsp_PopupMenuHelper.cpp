@@ -19,8 +19,7 @@ PopupMenuHelper::PopupMenuHelper (const LongPressActionHelper::Parameters& param
 
 PopupMenuHelper::~PopupMenuHelper()
 {
-    if (component != nullptr)
-        component->removeMouseListener (this);
+    setAssociatedComponent (nullptr);
 }
 
 void PopupMenuHelper::setAssociatedComponent (juce::Component* comp)
