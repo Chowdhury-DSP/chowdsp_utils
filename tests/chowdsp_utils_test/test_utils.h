@@ -77,4 +77,10 @@ inline void setParameter (AudioProcessorParameter* param, float value)
     MessageManager::getInstance()->runDispatchLoopUntil (250);
 }
 
+inline auto createDummyMouseEvent (Component* comp, ModifierKeys mods = {})
+{
+    auto mouseSource = Desktop::getInstance().getMainMouseSource();
+    return MouseEvent { mouseSource, Point<float> {}, mods, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, comp, comp, Time::getCurrentTime(), Point<float> {}, Time::getCurrentTime(), 1, false };
+}
+
 } // namespace test_utils
