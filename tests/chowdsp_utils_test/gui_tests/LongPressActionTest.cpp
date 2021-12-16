@@ -74,6 +74,8 @@ public:
                             longPress.mouseDrag (createDummyMouseEvent (&comp));
                             MessageManager::getInstance()->runDispatchLoopUntil (1000);
                             longPress.mouseUp (createDummyMouseEvent (&comp));
+
+                            longPress.setAssociatedComponent (nullptr);
                         });
 
         beginTest ("Component Short-Press Test");
@@ -85,6 +87,8 @@ public:
                             longPress.mouseDown (createDummyMouseEvent (&comp));
                             MessageManager::getInstance()->runDispatchLoopUntil (200);
                             longPress.mouseUp (createDummyMouseEvent (&comp));
+
+                            longPress.setAssociatedComponent (nullptr);
                         });
     }
 };
