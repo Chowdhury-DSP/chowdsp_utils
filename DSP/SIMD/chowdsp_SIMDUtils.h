@@ -282,7 +282,7 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
     }
 
 // Template specializations for NEON double precision
-#if (! CHOWDSP_USE_CUSTOM_JUCE_DSP) && (defined(_M_ARM64) || defined(__arm64__) || defined(__aarch64__))
+#if ( CHOWDSP_USE_CUSTOM_JUCE_DSP) && (defined(_M_ARM64) || defined(__arm64__) || defined(__aarch64__))
     // We need to specialize the double versions of the functions
     /** SIMD implementation of std::exp */
     template <>
