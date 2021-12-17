@@ -165,7 +165,7 @@ public:
                     vec.set (j, (FloatType) r.nextFloat());
                 }
             }
-
+            
             auto isnan = chowdsp::SIMDUtils::isnanSIMD (vec);
             auto testNumNans = std::abs ((int) isnan.sum());
             expectEquals (testNumNans, numNans, "Incorrect number of NANs detected!");

@@ -277,8 +277,8 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
     template <typename T>
     inline typename juce::dsp::SIMDRegister<T>::vMaskType isnanSIMD (juce::dsp::SIMDRegister<T> x)
     {
-        using Vec = juce::dsp::SIMDRegister<T>;
-        return Vec::notEqual ((Vec) xsimd::isnan ((x_type<T>) x.value), (Vec) 0);
+        using MaskVec = typename juce::dsp::SIMDRegister<T>::vMaskType;
+        return (MaskVec) xsimd::isnan ((x_type<T>) x.value);
     }
 
 // Template specializations for NEON double precision
