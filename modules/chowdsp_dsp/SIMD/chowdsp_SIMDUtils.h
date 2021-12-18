@@ -277,8 +277,15 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
     template <typename T>
     inline typename juce::dsp::SIMDRegister<T>::vMaskType isnanSIMD (juce::dsp::SIMDRegister<T> x)
     {
+        // For some reason, xsimd::isnan returns a batch of doubles when using SSE
+        // but returns a batch of unsigned ints when using ARM NEON.
+#if JUCE_ARM
         using MaskVec = typename juce::dsp::SIMDRegister<T>::vMaskType;
         return (MaskVec) xsimd::isnan ((x_type<T>) x.value);
+#else
+        using Vec = juce::dsp::SIMDRegister<T>;
+        return Vec::notEqual ((Vec) xsimd::isnan ((x_type<T>) x.value), (Vec) 0);
+#endif
     }
 
 // Template specializations for NEON double precision
