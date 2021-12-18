@@ -136,6 +136,11 @@ void PresetManager::loadPreset (const Preset& preset)
     setIsDirty (false);
     listeners.call (&Listener::selectedPresetChanged);
 
+    // For some reason, when VST3 in Ableton Live (Win64), calling updateHostDisplay
+    // causes the plugin to load the preset at index 1. @TODO: figure out the problem!
+    if (processor.wrapperType == juce::AudioProcessor::WrapperType::wrapperType_VST3)
+        return;
+
 #if JUCE_VERSION > 0x60007
     processor.updateHostDisplay (juce::AudioProcessorListener::ChangeDetails().withProgramChanged (true));
 #else
