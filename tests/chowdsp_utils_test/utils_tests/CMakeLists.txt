@@ -1,4 +1,5 @@
 target_sources(chowdsp_utils_tests PRIVATE
+    AudioUIBackgroundTaskTest.cpp
     FileListenerTest.cpp
     ForwardingParameterTest.cpp
     GlobalSettingsTest.cpp

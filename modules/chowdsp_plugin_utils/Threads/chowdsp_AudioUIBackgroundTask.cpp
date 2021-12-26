@@ -7,7 +7,7 @@ AudioUIBackgroundTask::AudioUIBackgroundTask (const juce::String& name) : juce::
 {
 }
 
-void AudioUIBackgroundTask::prepare (double sampleRate, int samplesPerBlock)
+void AudioUIBackgroundTask::prepare (double sampleRate, int samplesPerBlock, int numChannels)
 {
     if (isThreadRunning())
         stopThread (-1);
@@ -15,9 +15,15 @@ void AudioUIBackgroundTask::prepare (double sampleRate, int samplesPerBlock)
     isPrepared = false;
 
     prepareTask (sampleRate, samplesPerBlock, requestedDataSize);
-    data.resize (2 * juce::jmax (requestedDataSize, samplesPerBlock));
 
-    auto refreshTime = (double) data.size() / sampleRate; // time (seconds) for the whole buffer to be refreshed
+    data.clear();
+    const auto dataSize = 2 * juce::jmax (requestedDataSize, samplesPerBlock);
+    for (int ch = 0; ch < numChannels; ++ch)
+        data.emplace_back (dataSize);
+
+    latestData.setSize (numChannels, requestedDataSize);
+
+    auto refreshTime = (double) data[0].size() / sampleRate; // time (seconds) for the whole buffer to be refreshed
     waitMilliseconds = int (1000.0 * refreshTime);
 
     writePosition = 0;
@@ -27,10 +33,18 @@ void AudioUIBackgroundTask::prepare (double sampleRate, int samplesPerBlock)
         startThread();
 }
 
-void AudioUIBackgroundTask::pushSamples (const float* samples, int numSamples)
+void AudioUIBackgroundTask::pushSamples (int channel, const float* samples, int numSamples)
 {
-    data.push (samples, numSamples);
-    writePosition = data.getWritePointer();
+    data[(size_t) channel].push (samples, numSamples);
+    writePosition = data[(size_t) channel].getWritePointer();
+}
+
+void AudioUIBackgroundTask::pushSamples (const juce::AudioBuffer<float>& buffer)
+{
+    for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
+        data[(size_t) ch].push (buffer.getReadPointer (ch), buffer.getNumSamples());
+
+    writePosition = data[0].getWritePointer();
 }
 
 void AudioUIBackgroundTask::setShouldBeRunning (bool shouldRun)
@@ -57,7 +71,11 @@ void AudioUIBackgroundTask::run()
         if (threadShouldExit())
             return;
 
-        const auto* latestData = data.data (writePosition - requestedDataSize);
+        latestData.clear();
+        const auto dataOffset = writePosition - requestedDataSize;
+        for (int ch = 0; ch < latestData.getNumChannels(); ++ch)
+            latestData.copyFrom (ch, 0, data[(size_t) ch].data (dataOffset), requestedDataSize);
+        
         runTask (latestData);
 
         wait (waitMilliseconds);
