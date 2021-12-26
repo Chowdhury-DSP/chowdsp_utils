@@ -70,6 +70,35 @@ Based on: https://forum.juce.com/t/divide-by-simdregister/28968/18
 #endif
 
     //============================================================
+    /**
+     * JUCE SIMD has the correct overloads for dsp::SIMDRegister<T> * T,
+     * but not for T * dsp::SIMDRegister<T>. So let's implement them here...
+     */
+    template <typename T>
+    inline juce::dsp::SIMDRegister<T> operator+ (T l, const juce::dsp::SIMDRegister<T>& r)
+    {
+        return r + l;
+    }
+
+    template <typename T>
+    inline juce::dsp::SIMDRegister<T> operator- (T l, const juce::dsp::SIMDRegister<T>& r)
+    {
+        return (juce::dsp::SIMDRegister<T>) l - r;
+    }
+
+    template <typename T>
+    inline juce::dsp::SIMDRegister<T> operator* (T l, const juce::dsp::SIMDRegister<T>& r)
+    {
+        return r * l;
+    }
+
+    template <typename T>
+    inline juce::dsp::SIMDRegister<T> operator/ (T l, const juce::dsp::SIMDRegister<T>& r)
+    {
+        return (juce::dsp::SIMDRegister<T>) l / r;
+    }
+
+    //============================================================
     /** JUCE doesn't natively support loading unaligned SIMD registers,
  *  but most SIMD instruction sets do have load unaligned instructions,
  *  so let's implement them where we can!
