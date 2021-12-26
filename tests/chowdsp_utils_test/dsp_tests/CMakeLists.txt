@@ -6,6 +6,7 @@ target_sources(chowdsp_utils_tests PRIVATE
     PannerTest.cpp
     PitchShiftTest.cpp
 
+    math_tests/FloatVectorOperationsTest.cpp
     math_tests/PolynomialsTest.cpp
 
     data_structure_tests/SmoothedBufferValueTest.cpp

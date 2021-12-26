@@ -89,6 +89,7 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 #include "SIMD/chowdsp_SIMDComplex.h"
 
 // math helpers
+#include "Math/chowdsp_FloatVectorOperations.h"
 #include "Math/chowdsp_Polynomials.h"
 
 // some useful data structures

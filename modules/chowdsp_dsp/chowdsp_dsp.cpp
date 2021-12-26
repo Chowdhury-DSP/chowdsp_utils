@@ -1,5 +1,8 @@
 #include "chowdsp_dsp.h"
 
+// math helpers
+#include "Math/chowdsp_FloatVectorOperations.cpp"
+
 // data structures
 #include "DataStructures/chowdsp_SmoothedBufferValue.cpp"
 
