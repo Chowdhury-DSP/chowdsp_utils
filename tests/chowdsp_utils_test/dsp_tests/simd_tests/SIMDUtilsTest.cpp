@@ -8,13 +8,46 @@ public:
     template <typename T>
     void testDivide()
     {
-        dsp::SIMDRegister<T> six (6.0f);
-        dsp::SIMDRegister<T> two (2.0f);
+        dsp::SIMDRegister<T> six ((T) 6);
+        dsp::SIMDRegister<T> two ((T) 2);
 
         using namespace chowdsp::SIMDUtils;
         auto three = six / two;
 
         expect (three.get (0) == (T) 3, "Divide is incorrect!");
+    }
+
+    template <typename T>
+    void testArithmetic()
+    {
+        constexpr auto six = (T) 6;
+        dsp::SIMDRegister<T> two ((T) 2);
+
+        using namespace chowdsp::SIMDUtils;
+
+        // addition
+        {
+            auto eight = six + two;
+            expect (eight.get (0) == (T) 8, "Addition is incorrect!");
+        }
+
+        // subtraction
+        {
+            auto four = six - two;
+            expect (four.get (0) == (T) 4, "Subtraction is incorrect!");
+        }
+
+        // multiplication
+        {
+            auto twelve = six * two;
+            expect (twelve.get (0) == (T) 12, "Multiplication is incorrect!");
+        }
+
+        // division
+        {
+            auto three = six / two;
+            expect (three.get (0) == (T) 3, "Division is incorrect!");
+        }
     }
 
     void testClampPi()
@@ -179,6 +212,12 @@ public:
 
         beginTest ("Double Divide Test");
         testDivide<double>();
+
+        beginTest ("Float Arithmetic Test");
+        testArithmetic<float>();
+
+        beginTest ("Double Arithmetic Test");
+        testArithmetic<double>();
 
         beginTest ("Clamp To Pi Range Test");
         testClampPi();
