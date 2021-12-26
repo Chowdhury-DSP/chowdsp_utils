@@ -48,8 +48,7 @@ public:
     template <typename T>
     void wrapAndClearTest (Random& r)
     {
-        auto getRandomVal = [&]()
-        {
+        auto getRandomVal = [&]() {
             if constexpr (std::is_same<T, float>::value)
                 return r.nextFloat() * 2.0f - 1.0f;
             else if (std::is_same<T, int>::value)
