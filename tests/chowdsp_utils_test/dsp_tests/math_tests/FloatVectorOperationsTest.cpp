@@ -18,12 +18,12 @@ public:
 
         constexpr auto maxErr = (T) 1.0e-3;
 
-        auto expected = std::accumulate (values.begin(), values.end(), (T) 0);
         auto actual = chowdsp::FloatVectorOperations::accumulate (values.data(), numValues);
+        auto expected = std::accumulate (values.begin(), values.end(), (T) 0);
         expectWithinAbsoluteError (actual, expected, maxErr, "Aligned accumulate is incorrect!");
 
-        expected = std::accumulate (values.begin() + 1, values.end(), (T) 0);
         actual = chowdsp::FloatVectorOperations::accumulate (values.data() + 1, numValues - 1);
+        expected = std::accumulate (values.begin() + 1, values.end(), (T) 0);
         expectWithinAbsoluteError (actual, expected, maxErr, "Unaligned accumulate is incorrect!");
     }
 
@@ -42,20 +42,20 @@ public:
 
         constexpr auto maxErr = (T) 1.0e-3;
 
-        auto expected = std::inner_product (values1.begin(), values1.end(), values2.begin(), (T) 0);
         auto actual = chowdsp::FloatVectorOperations::innerProduct (values1.data(), values2.data(), numValues);
+        auto expected = std::inner_product (values1.begin(), values1.end(), values2.begin(), (T) 0);
         expectWithinAbsoluteError (actual, expected, maxErr, "Aligned innerProduct is incorrect!");
 
-        expected = std::inner_product (values1.begin() + 1, values1.end(), values2.begin(), (T) 0);
         actual = chowdsp::FloatVectorOperations::innerProduct (values1.data() + 1, values2.data(), numValues - 1);
+        expected = std::inner_product (values1.begin() + 1, values1.end(), values2.begin(), (T) 0);
         expectWithinAbsoluteError (actual, expected, maxErr, "Unaligned/Aligned innerProduct is incorrect!");
 
-        expected = std::inner_product (values1.begin(), values1.end() - 1, values2.begin() + 1, (T) 0);
         actual = chowdsp::FloatVectorOperations::innerProduct (values1.data(), values2.data() + 1, numValues - 1);
+        expected = std::inner_product (values1.begin(), values1.end() - 1, values2.begin() + 1, (T) 0);
         expectWithinAbsoluteError (actual, expected, maxErr, "Aligned/Unaligned innerProduct is incorrect!");
 
-        expected = std::inner_product (values1.begin() + 1, values1.end(), values2.begin() + 1, (T) 0);
         actual = chowdsp::FloatVectorOperations::innerProduct (values1.data() + 1, values2.data() + 1, numValues - 1);
+        expected = std::inner_product (values1.begin() + 1, values1.end(), values2.begin() + 1, (T) 0);
         expectWithinAbsoluteError (actual, expected, maxErr, "Unaligned innerProduct is incorrect!");
     }
 
