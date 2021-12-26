@@ -2,7 +2,6 @@
 
 namespace chowdsp
 {
-
 AudioUIBackgroundTask::AudioUIBackgroundTask (const juce::String& name) : juce::Thread (name)
 {
 }
@@ -75,7 +74,7 @@ void AudioUIBackgroundTask::run()
         const auto dataOffset = writePosition - requestedDataSize;
         for (int ch = 0; ch < latestData.getNumChannels(); ++ch)
             latestData.copyFrom (ch, 0, data[(size_t) ch].data (dataOffset), requestedDataSize);
-        
+
         runTask (latestData);
 
         wait (waitMilliseconds);
