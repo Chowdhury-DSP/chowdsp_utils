@@ -5,8 +5,10 @@ target_sources(chowdsp_utils_tests PRIVATE
     GainTest.cpp
     PannerTest.cpp
     PitchShiftTest.cpp
-    PolynomialsTest.cpp
-    SmoothedBufferValueTest.cpp
+
+    math_tests/PolynomialsTest.cpp
+
+    data_structure_tests/SmoothedBufferValueTest.cpp
 
     source_tests/NoiseTest.cpp
     source_tests/SineTest.cpp
