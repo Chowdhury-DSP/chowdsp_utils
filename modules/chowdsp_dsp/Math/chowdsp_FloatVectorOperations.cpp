@@ -90,7 +90,8 @@ namespace detail
 
         // Main loop here:
         T result {};
-        auto vecLoop = [&] (auto&& loadOp1, auto&& loadOp2) {
+        auto vecLoop = [&] (auto&& loadOp1, auto&& loadOp2)
+        {
             while (--numVecOps >= 0)
             {
                 result = vecOp (result, loadOp1 (src1), loadOp2 (src2));
@@ -100,8 +101,10 @@ namespace detail
         };
 
         // define load operations
-        auto loadA = [] (const T* val) { return juce::dsp::SIMDRegister<T>::fromRawArray (val); };
-        auto loadU = [] (const T* val) { return loadUnaligned (val); };
+        auto loadA = [] (const T* val)
+        { return juce::dsp::SIMDRegister<T>::fromRawArray (val); };
+        auto loadU = [] (const T* val)
+        { return loadUnaligned (val); };
 
         // select load operations based on data alignment
         const auto isSrc1Aligned = isAligned (src1);
@@ -140,9 +143,11 @@ bool isUsingVDSP()
 #endif
 }
 
+// @TODO: Figure out why vDSP_sve is failing unit tests in CI?
+
 float accumulate (const float* src, int numValues) noexcept
 {
-#if JUCE_USE_VDSP_FRAMEWORK
+#if 0 // JUCE_USE_VDSP_FRAMEWORK
     float result = 0.0f;
     vDSP_sve (src, 1, &result, (vDSP_Length) numValues);
     return result;
@@ -150,14 +155,16 @@ float accumulate (const float* src, int numValues) noexcept
     return detail::reduce (
         src,
         numValues,
-        [] (auto prev, auto next) { return prev + next; },
-        [] (auto prev, auto next) { return prev + next.sum(); });
+        [] (auto prev, auto next)
+        { return prev + next; },
+        [] (auto prev, auto next)
+        { return prev + next.sum(); });
 #endif
 }
 
 double accumulate (const double* src, int numValues) noexcept
 {
-#if JUCE_USE_VDSP_FRAMEWORK
+#if 0 // JUCE_USE_VDSP_FRAMEWORK
     double result = 0.0;
     vDSP_sveD (src, 1, &result, (vDSP_Length) numValues);
     return result;
@@ -165,8 +172,10 @@ double accumulate (const double* src, int numValues) noexcept
     return detail::reduce (
         src,
         numValues,
-        [] (auto prev, auto next) { return prev + next; },
-        [] (auto prev, auto next) { return prev + next.sum(); });
+        [] (auto prev, auto next)
+        { return prev + next; },
+        [] (auto prev, auto next)
+        { return prev + next.sum(); });
 #endif
 }
 
@@ -182,8 +191,10 @@ float innerProduct (const float* src1, const float* src2, int numValues) noexcep
         src2,
         numValues,
         0.0f,
-        [] (auto prev, auto next1, auto next2) { return prev + next1 * next2; },
-        [] (auto prev, auto next1, auto next2) { return prev + (next1 * next2).sum(); });
+        [] (auto prev, auto next1, auto next2)
+        { return prev + next1 * next2; },
+        [] (auto prev, auto next1, auto next2)
+        { return prev + (next1 * next2).sum(); });
 #endif
 }
 
@@ -199,8 +210,10 @@ double innerProduct (const double* src1, const double* src2, int numValues) noex
         src2,
         numValues,
         0.0,
-        [] (auto prev, auto next1, auto next2) { return prev + next1 * next2; },
-        [] (auto prev, auto next1, auto next2) { return prev + (next1 * next2).sum(); });
+        [] (auto prev, auto next1, auto next2)
+        { return prev + next1 * next2; },
+        [] (auto prev, auto next1, auto next2)
+        { return prev + (next1 * next2).sum(); });
 #endif
 }
 } // namespace chowdsp::FloatVectorOperations

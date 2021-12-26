@@ -71,14 +71,18 @@ public:
         beginTest ("Accumulate Test");
         accumulateTest<float> (rand, { 2, 6 });
         accumulateTest<float> (rand, { 100, 200 });
+        accumulateTest<float> (rand, { 113, 114 });
         accumulateTest<double> (rand, { 2, 6 });
         accumulateTest<double> (rand, { 100, 200 });
+        accumulateTest<double> (rand, { 113, 114 });
 
         beginTest ("Inner Product Test");
         innerProdTest<float> (rand, { 2, 6 });
         innerProdTest<float> (rand, { 100, 200 });
+        innerProdTest<float> (rand, { 113, 114 });
         innerProdTest<double> (rand, { 2, 6 });
         innerProdTest<double> (rand, { 100, 200 });
+        innerProdTest<double> (rand, { 113, 114 });
     }
 };
 
