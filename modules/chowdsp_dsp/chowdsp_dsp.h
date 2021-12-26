@@ -87,7 +87,15 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 #include "SIMD/chowdsp_SIMDUtils.h"
 #include "SIMD/chowdsp_SIMDSmoothedValue.h"
 #include "SIMD/chowdsp_SIMDComplex.h"
-#include "Other/chowdsp_AudioBlockHelpers.h"
+
+// math helpers
+#include "Math/chowdsp_FloatVectorOperations.h"
+#include "Math/chowdsp_Polynomials.h"
+
+// some useful data structures
+#include "DataStructures/chowdsp_AudioBlockHelpers.h"
+#include "DataStructures/chowdsp_DoubleBuffer.h"
+#include "DataStructures/chowdsp_SmoothedBufferValue.h"
 
 // WDF tools
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wshadow-field", // Ignore Clang warnings for WDFs
@@ -136,12 +144,10 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 #include "Resampling/chowdsp_ResampledProcess.h"
 
 // some other useful processors
-#include "Other/chowdsp_BypassProcessor.h"
-#include "Other/chowdsp_GainProcessor.h"
-#include "Other/chowdsp_LevelDetector.h"
-#include "Other/chowdsp_Panner.h"
-#include "Other/chowdsp_SmoothedBufferValue.h"
-#include "Other/chowdsp_Polynomials.h"
+#include "Processors/chowdsp_BypassProcessor.h"
+#include "Processors/chowdsp_GainProcessor.h"
+#include "Processors/chowdsp_LevelDetector.h"
+#include "Processors/chowdsp_Panner.h"
 
 // sound sources
 #include "Sources/chowdsp_Noise.h"
