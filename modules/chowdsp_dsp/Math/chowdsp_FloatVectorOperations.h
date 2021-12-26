@@ -3,6 +3,9 @@
 /** Extensions of juce::FloatVectorOperations */
 namespace chowdsp::FloatVectorOperations
 {
+/** Returns true if the library is currently using the Apple vDSP framework */
+[[maybe_unused]] bool isUsingVDSP();
+
 /** Sums all the values in the given array. */
 [[maybe_unused]] float accumulate (const float* src, int numValues) noexcept;
 

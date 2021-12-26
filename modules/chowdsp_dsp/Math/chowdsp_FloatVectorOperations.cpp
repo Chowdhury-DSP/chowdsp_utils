@@ -88,9 +88,7 @@ namespace detail
         if (numVecOps < 2)
             return reduceFallback (src1, src2, numValues, init, scalarOp);
 
-        const auto isSrc1Aligned = isAligned (src1);
-        const auto isSrc2Aligned = isAligned (src2);
-
+        // Main loop here:
         T result {};
         auto vecLoop = [&] (auto&& loadOp1, auto&& loadOp2)
         {
@@ -102,11 +100,15 @@ namespace detail
             }
         };
 
+        // define load operations
         auto loadA = [] (const T* val)
         { return juce::dsp::SIMDRegister<T>::fromRawArray (val); };
         auto loadU = [] (const T* val)
         { return loadUnaligned (val); };
 
+        // select load operations based on data alignment
+        const auto isSrc1Aligned = isAligned (src1);
+        const auto isSrc2Aligned = isAligned (src2);
         if (isSrc1Aligned && isSrc2Aligned)
             vecLoop (loadA, loadA);
         else if (isSrc1Aligned)
@@ -132,13 +134,20 @@ namespace detail
 } // namespace detail
 #endif
 
+bool isUsingVDSP()
+{
+#if JUCE_USE_VDSP_FRAMEWORK
+    return true;
+#else
+    return false;
+#endif
+}
+
 float accumulate (const float* src, int numValues) noexcept
 {
 #if JUCE_USE_VDSP_FRAMEWORK
-    static_assert (false, "Using vDSP!");
-    std::cout << "Doing vDSP accumulate!" << std::endl;
     float result = 0.0f;
-    vDSP_sve (src, 1, &result, numValues);
+    vDSP_sve (src, 1, &result, (vDSP_Length) numValues);
     return result;
 #else
     return detail::reduce (
@@ -154,9 +163,8 @@ float accumulate (const float* src, int numValues) noexcept
 double accumulate (const double* src, int numValues) noexcept
 {
 #if JUCE_USE_VDSP_FRAMEWORK
-    std::cout << "Doing vDSP accumulate!" << std::endl;
     double result = 0.0;
-    vDSP_sveD (src, 1, &result, numValues);
+    vDSP_sveD (src, 1, &result, (vDSP_Length) numValues);
     return result;
 #else
     return detail::reduce (
@@ -172,9 +180,8 @@ double accumulate (const double* src, int numValues) noexcept
 float innerProduct (const float* src1, const float* src2, int numValues) noexcept
 {
 #if JUCE_USE_VDSP_FRAMEWORK
-    std::cout << "Doing vDSP inner_prod!" << std::endl;
     float result = 0.0f;
-    vDSP_dotpr (src1, 1, src2, 1, &result, numValues);
+    vDSP_dotpr (src1, 1, src2, 1, &result, (vDSP_Length) numValues);
     return result;
 #else
     return detail::reduce (
@@ -192,9 +199,8 @@ float innerProduct (const float* src1, const float* src2, int numValues) noexcep
 double innerProduct (const double* src1, const double* src2, int numValues) noexcept
 {
 #if JUCE_USE_VDSP_FRAMEWORK
-    std::cout << "Doing vDSP inner_prod!" << std::endl;
     double result = 0.0;
-    vDSP_dotprD (src1, 1, src2, 1, &result, numValues);
+    vDSP_dotprD (src1, 1, src2, 1, &result, (vDSP_Length) numValues);
     return result;
 #else
     return detail::reduce (

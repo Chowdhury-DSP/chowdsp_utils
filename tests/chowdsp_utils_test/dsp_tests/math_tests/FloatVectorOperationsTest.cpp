@@ -61,6 +61,11 @@ public:
 
     void runTestTimed() override
     {
+        if (chowdsp::FloatVectorOperations::isUsingVDSP())
+            std::cout << "chowdsp::FloatVectorOperations: using vDSP" << std::endl;
+        else
+            std::cout << "chowdsp::FloatVectorOperations: not using vDSP" << std::endl;
+
         auto rand = getRandom();
 
         beginTest ("Accumulate Test");
