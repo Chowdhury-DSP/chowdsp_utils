@@ -148,6 +148,7 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 #include "Processors/chowdsp_GainProcessor.h"
 #include "Processors/chowdsp_LevelDetector.h"
 #include "Processors/chowdsp_Panner.h"
+#include "Processors/chowdsp_TunerProcessor.h"
 
 // sound sources
 #include "Sources/chowdsp_Noise.h"
