@@ -20,22 +20,46 @@ public:
     DoubleBuffer() = default;
 
     /** Constructor with initial size and value */
-    DoubleBuffer (int initialSize, T initialValue = T (0))
+    explicit DoubleBuffer (int initialSize, T initialValue = T (0))
     {
         resize (initialSize, initialValue);
     }
 
+    /** Returns the current size of the buffer */
     int size() const noexcept { return (int) internal.size() / 2; }
 
+    /** Returns the current position of the buffer's write pointer */
     int getWritePointer() const noexcept { return writePointer; }
 
+    /**
+     * Allows the buffer to be resized, with a given default value.
+     * It is worth noting that this is the only DoubleBuffer method that allocates memory.
+     */
     void resize (int size, T defaultValue = T (0))
     {
         internal.resize ((size_t) size * 2, defaultValue);
         writePointer = 0;
     }
 
-    const float* data (int start = 0) const noexcept
+    /** Clear's the DoubleBuffer's data */
+    void clear()
+    {
+        fill ((T) 0);
+    }
+
+    /** Fill's the DoubleBuffer with a single value */
+    void fill (T value)
+    {
+        if constexpr (std::is_floating_point<T>::value)
+            juce::FloatVectorOperations::fill (internal.data(), value, size() * 2);
+        else
+            std::fill (internal.begin(), internal.end(), value);
+
+        writePointer = 0;
+    }
+
+    /** Returns a pointer to the buffer data, with a given starting position */
+    const T* data (int start = 0) const noexcept
     {
         // need to give the buffer some size before trying to read!
         jassert (size() > 0);
@@ -44,6 +68,7 @@ public:
         return internal.data() + start;
     }
 
+    /** Pushes a new block of data into the buffer */
     void push (const T* data, int numElements)
     {
         const auto currentSize = size();
@@ -88,7 +113,6 @@ public:
                 std::copy (data, data + samplesTillEnd, buffer1 + writePointer);
                 std::copy (data, data + samplesTillEnd, buffer2 + writePointer);
 
-                const auto leftoverSamples = numElements - samplesTillEnd;
                 std::copy (data + samplesTillEnd, data + numElements, buffer1);
                 std::copy (data + samplesTillEnd, data + numElements, buffer2);
             }
