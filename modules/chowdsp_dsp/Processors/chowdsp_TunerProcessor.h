@@ -5,7 +5,7 @@ namespace chowdsp
 namespace TuningHelpers
 {
     /** Converts a frequency in Hz to the corresponding MIDI note number, and cents away from that note's correct frequency */
-    inline std::pair<int, double> frequencyHzToNoteAndCents (double freq) noexcept
+    [[maybe_unused]] inline std::pair<int, double> frequencyHzToNoteAndCents (double freq) noexcept
     {
         const int noteNum = juce::roundToIntAccurate (12.0 * std::log2 ((freq / 440.0)) + 69.0);
 
@@ -35,7 +35,7 @@ public:
     /** Prepares the tuner to process data at a given sample rate */
     void prepare (double sampleRate)
     {
-        constexpr double lowestFreqHz = 5.0;
+        constexpr double lowestFreqHz = 10.0;
         autocorrelationSize = juce::nextPowerOfTwo (int (sampleRate / lowestFreqHz) + 1);
 
         fs = (T) sampleRate;
