@@ -7,12 +7,12 @@ constexpr int blockSize = 1 << 19;
 
 struct SimpleTask : chowdsp::AudioUIBackgroundTask
 {
-    SimpleTask (UnitTest* thisTest) : chowdsp::AudioUIBackgroundTask ("Basic Task"),
-                                      ut (thisTest)
+    explicit SimpleTask (UnitTest* thisTest) : chowdsp::AudioUIBackgroundTask ("Basic Task"),
+                                               ut (thisTest)
     {
     }
 
-    void prepareTask (double, int, int& requestedBlockSize) override
+    void prepareTask (double, int, int& requestedBlockSize, int& /*waitMs*/) override
     {
         requestedBlockSize = blockSize;
     }
