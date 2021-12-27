@@ -13,7 +13,8 @@ void AudioUIBackgroundTask::prepare (double sampleRate, int samplesPerBlock, int
 
     isPrepared = false;
 
-    prepareTask (sampleRate, samplesPerBlock, requestedDataSize);
+    waitMilliseconds = -1;
+    prepareTask (sampleRate, samplesPerBlock, requestedDataSize, waitMilliseconds);
 
     data.clear();
     const auto dataSize = 2 * juce::jmax (requestedDataSize, samplesPerBlock);
@@ -22,8 +23,11 @@ void AudioUIBackgroundTask::prepare (double sampleRate, int samplesPerBlock, int
 
     latestData.setSize (numChannels, requestedDataSize);
 
-    auto refreshTime = (double) data[0].size() / sampleRate; // time (seconds) for the whole buffer to be refreshed
-    waitMilliseconds = int (1000.0 * refreshTime);
+    if (waitMilliseconds < 0)
+    {
+        auto refreshTime = (double) data[0].size() / sampleRate; // time (seconds) for the whole buffer to be refreshed
+        waitMilliseconds = int (1000.0 * refreshTime);
+    }
 
     writePosition = 0;
     isPrepared = true;

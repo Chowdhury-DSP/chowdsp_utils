@@ -18,14 +18,6 @@ public:
     /** Prepares the class to accept a new audio stream */
     void prepare (double sampleRate, int samplesPerBlock, int numChannels);
 
-    /**
-     * Override this method to prepare the child class.
-     *
-     * Make sure to set `blockSizeToRequest` with the block
-     * size needed for the consuming process.
-     */
-    virtual void prepareTask (double /*sampleRate*/, int /*samplesPerBlock*/, int& blockSizeToRequest) = 0;
-
     /** Call this from the audio thread to push a new block of samples */
     void pushSamples (const juce::AudioBuffer<float>& buffer);
 
@@ -34,6 +26,18 @@ public:
 
     /** Set this method from the UI thread when you want the background task to start/stop running */
     void setShouldBeRunning (bool shouldRun);
+
+protected:
+    /**
+     * Override this method to prepare the child class.
+     *
+     * Make sure to set `blockSizeToRequest` with the block
+     * size needed for the consuming process.
+     *
+     * If your process needs a custom refresh time, make sure to fill
+     * in that field as well.
+     */
+    virtual void prepareTask (double /*sampleRate*/, int /*samplesPerBlock*/, int& blockSizeToRequest, int& customRefreshTimeMs) = 0;
 
     /** Child classes must override this method to actually do the background task */
     virtual void runTask (const juce::AudioBuffer<float>& /*data*/) = 0;
