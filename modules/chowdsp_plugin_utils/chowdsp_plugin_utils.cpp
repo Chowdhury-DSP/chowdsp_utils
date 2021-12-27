@@ -10,3 +10,4 @@
 #include "Files/chowdsp_FileListener.cpp"
 #include "Logging/chowdsp_PluginLogger.cpp"
 #include "SharedUtils/chowdsp_GlobalPluginSettings.cpp"
+#include "Threads/chowdsp_AudioUIBackgroundTask.cpp"
