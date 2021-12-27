@@ -192,7 +192,9 @@ void ChowLNF::drawLinearSlider (juce::Graphics& g, int x, int y, int width, int 
     juce::Path backgroundTrack;
     backgroundTrack.startNewSubPath (startPoint);
     backgroundTrack.lineTo (endPoint);
-    g.setColour (slider.findColour (juce::Slider::backgroundColourId));
+
+    const auto alphaMult = slider.isEnabled() ? 1.0f : 0.4f;
+    g.setColour (slider.findColour (juce::Slider::backgroundColourId).withAlpha (alphaMult));
     g.strokePath (backgroundTrack, { trackWidth, juce::PathStrokeType::curved, juce::PathStrokeType::rounded });
 
     juce::Path valueTrack;
@@ -210,13 +212,13 @@ void ChowLNF::drawLinearSlider (juce::Graphics& g, int x, int y, int width, int 
 
     valueTrack.startNewSubPath (minPoint);
     valueTrack.lineTo (maxPoint);
-    g.setColour (slider.findColour (juce::Slider::thumbColourId));
+    g.setColour (slider.findColour (juce::Slider::thumbColourId).withAlpha (alphaMult));
     g.strokePath (valueTrack, { trackWidth, juce::PathStrokeType::curved, juce::PathStrokeType::rounded });
 
     auto thumbRect = juce::Rectangle<float> (static_cast<float> (thumbWidth),
                                              static_cast<float> (thumbWidth))
                          .withCentre (maxPoint);
-    knob->drawWithin (g, thumbRect, juce::RectanglePlacement::stretchToFit, 1.0f);
+    knob->drawWithin (g, thumbRect, juce::RectanglePlacement::stretchToFit, alphaMult);
 }
 
 juce::Slider::SliderLayout ChowLNF::getSliderLayout (juce::Slider& slider)
