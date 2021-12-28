@@ -51,6 +51,7 @@ jobs:
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v1
         with:
+          source-root: ${{env.WORK_DIR}}
           languages: cpp
 
       - name: Configure
