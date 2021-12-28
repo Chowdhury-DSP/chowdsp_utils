@@ -5,24 +5,6 @@ namespace
 constexpr int guiShowTime = 1000;
 }
 
-/** Empty component filled with a single colour */
-class PlainComponent : public Component
-{
-public:
-    PlainComponent (Colour c)
-        : colour (c)
-    {
-    }
-
-    void paint (Graphics& g) override
-    {
-        g.fillAll (colour);
-    }
-
-private:
-    const Colour colour;
-};
-
 /** Test GUI component that includes subcomponents defined
  *  in chowdsp_utils, or modified by chowdsp::ChowLNF:
  *   - Tabbed Component
@@ -155,7 +137,7 @@ private:
 class GUITest : public JUCEApplication
 {
 public:
-    GUITest() {}
+    GUITest() = default;
 
     const String getApplicationName() override { return "GUITest"; }
     const String getApplicationVersion() override { return "1.0.0"; }

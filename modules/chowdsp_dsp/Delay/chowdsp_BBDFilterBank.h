@@ -54,7 +54,7 @@ namespace BBD
         using Complex4 = SIMDComplex<T>;
 
     public:
-        InputFilterBank (T sampleTime) : Ts (sampleTime)
+        explicit InputFilterBank (T sampleTime) : Ts (sampleTime)
         {
             float root_real alignas (16)[4];
             float root_imag alignas (16)[4];
@@ -111,7 +111,7 @@ namespace BBD
         Complex4 poles;
         Complex4 root_corr;
         Complex4 pole_corr;
-        juce::dsp::SIMDRegister<T> pole_corr_angle;
+        juce::dsp::SIMDRegister<T> pole_corr_angle {};
 
         Complex4 Aplus;
 
@@ -125,7 +125,7 @@ namespace BBD
         using Complex4 = SIMDComplex<T>;
 
     public:
-        OutputFilterBank (float sampleTime) : Ts (sampleTime)
+        explicit OutputFilterBank (float sampleTime) : Ts (sampleTime)
         {
             float gcoefs_real alignas (16)[4];
             float gcoefs_imag alignas (16)[4];
@@ -177,7 +177,7 @@ namespace BBD
         Complex4 poles;
         Complex4 root_corr;
         Complex4 pole_corr;
-        juce::dsp::SIMDRegister<float> pole_corr_angle;
+        juce::dsp::SIMDRegister<float> pole_corr_angle {};
 
         Complex4 Aplus;
 

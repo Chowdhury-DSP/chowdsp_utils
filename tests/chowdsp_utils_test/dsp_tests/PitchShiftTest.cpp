@@ -53,19 +53,18 @@ public:
             magnitudes[i] = std::pow (fftData[i] / scaleNorm, 2.0f);
 
         auto getMagForFreq = [=] (float freq) -> float {
-            auto idx = size_t ((blockSize / 2) * freq / (fs / 2.0f));
+            auto idx = size_t (((float) blockSize / 2.0f) * freq / (fs / 2.0f));
             // average over a few bins to smooth
             return std::accumulate (&magnitudes[idx - negDiff], &magnitudes[idx + posDiff], 0.0f) / (float) avgNum;
         };
 
         float noiseAccum = 0.0f;
-        float signalAccum = 0.0f;
         float freqInc = (float) fs / (float) blockSize;
 
         for (float freq = 20.0f; freq < 0.66667f * freqExpected; freq += freqInc)
             noiseAccum += getMagForFreq (freq);
 
-        signalAccum = getMagForFreq (freqExpected);
+        float signalAccum = getMagForFreq (freqExpected);
 
         for (float freq = 1.5f * freqExpected; freq < (float) fs * 0.48f; freq += freqInc)
             noiseAccum += getMagForFreq (freq);

@@ -6,7 +6,7 @@ class BBDTest : public TimedUnitTest
 public:
     BBDTest() : TimedUnitTest ("BBD Test") {}
 
-    void processDelay (double fs, float delaySamples, float* samples, int numSamples)
+    static void processDelay (double fs, float delaySamples, float* samples, int numSamples)
     {
         chowdsp::BBD::BBDDelayWrapper<8192> delay;
         delay.prepare ({ fs, (uint32) numSamples, 1 });
@@ -20,7 +20,7 @@ public:
         }
     }
 
-    int findFirstNonZero (const float* bufferPtr, const int numSamples)
+    static int findFirstNonZero (const float* bufferPtr, const int numSamples)
     {
         int firstNonZero = -1;
         for (int i = 0; i < numSamples; ++i)

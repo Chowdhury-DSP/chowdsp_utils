@@ -13,18 +13,18 @@ class BypassTest : public TimedUnitTest
 public:
     BypassTest() : TimedUnitTest ("Bypass Test") {}
 
-    float* getBufferPtr (AudioBuffer<float>& buffer)
+    [[maybe_unused]] static float* getBufferPtr (AudioBuffer<float>& buffer)
     {
         return buffer.getWritePointer (0);
     }
 
-    float* getBufferPtr (dsp::AudioBlock<float>& block)
+    static float* getBufferPtr (dsp::AudioBlock<float>& block)
     {
         return block.getChannelPointer (0);
     }
 
     template <typename AudioContainerType>
-    void processFunc (AudioContainerType& bufferOrBlock, chowdsp::BypassProcessor<float>& bypass, std::atomic<float>* onOffParam, std::function<float (float)> sampleFunc)
+    void processFunc (AudioContainerType& bufferOrBlock, chowdsp::BypassProcessor<float>& bypass, std::atomic<float>* onOffParam, const std::function<float (float)>& sampleFunc)
     {
         auto onOff = bypass.toBool (onOffParam);
         if (! bypass.processBlockIn (bufferOrBlock, onOff))
@@ -51,7 +51,7 @@ public:
         expectLessThan (maxDiff, thresh, message);
     }
 
-    void createPulseTrain (float* buffer, const int numSamples, int spacingSamples)
+    static void createPulseTrain (float* buffer, const int numSamples, int spacingSamples)
     {
         for (int n = 0; n < numSamples; n += spacingSamples)
             buffer[n] = 1.0f;
@@ -114,7 +114,7 @@ public:
         dsp::AudioBlock<float> block (buffer);
         for (int i = 0; i < nIter; ++i)
         {
-            auto subBlock = block.getSubBlock (size_t (i * nSamples), (size_t) nSamples);
+            auto subBlock = block.getSubBlock ((size_t) i * (size_t) nSamples, (size_t) nSamples);
             processFunc (subBlock, bypass, &onOffParam, [] (float x) { return x + 1.0f; });
             onOffParam.store (1.0f - onOffParam.load());
         }
@@ -141,8 +141,7 @@ public:
             AudioBuffer<float> subBuffer (buffer.getArrayOfWritePointers(), 1, i * nSamples, nSamples);
             processFunc (subBuffer, bypass, &onOffParam, [&] (float x) {
                 delay.pushSample (0, x);
-                return delay.popSample (0);
-            });
+                return delay.popSample (0); });
 
             if (i % 2 != 0)
                 onOffParam.store (1.0f - onOffParam.load());
@@ -168,11 +167,10 @@ public:
         dsp::AudioBlock<float> block (buffer);
         for (int i = 0; i < nIter; ++i)
         {
-            auto subBlock = block.getSubBlock (size_t (i * nSamples), (size_t) nSamples);
+            auto subBlock = block.getSubBlock ((size_t) i * (size_t) nSamples, (size_t) nSamples);
             processFunc (subBlock, bypass, &onOffParam, [&] (float x) {
                 delay.pushSample (0, x);
-                return delay.popSample (0);
-            });
+                return delay.popSample (0); });
 
             if (i % 2 != 0)
                 onOffParam.store (1.0f - onOffParam.load());

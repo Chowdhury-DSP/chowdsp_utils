@@ -1,39 +1,36 @@
 #pragma once
 
-namespace chowdsp
+namespace chowdsp::SystemInfo
 {
-namespace SystemInfo
+constexpr std::string_view getOSDescription()
 {
-    constexpr std::string_view getOSDescription()
-    {
 #if JUCE_WINDOWS
 #if JUCE_64BIT
-        return "Win64";
+    return "Win64";
 #elif JUCE_32BIT
-        return "Win32";
+    return "Win32";
 #endif
 #elif JUCE_MAC
-        return "Mac";
+    return "Mac";
 #elif JUCE_IOS
-        return "IOS";
+    return "IOS";
 #elif JUCE_LINUX
 #if JUCE_64BIT
-        return "Linux64";
+    return "Linux64";
 #elif JUCE_32BIT
-        return "Linux32";
+    return "Linux32";
 #endif
 #endif
-    }
+}
 
-    constexpr std::string_view getProcArch()
-    {
+constexpr std::string_view getProcArch()
+{
 #if JUCE_INTEL
-        return "Intel";
+    return "Intel";
 #elif JUCE_ARM
-        return "ARM";
+    return "ARM";
 #else
-        return "N/A";
+    return "N/A";
 #endif
-    }
-} // namespace SystemInfo
-} // namespace chowdsp
+}
+} // namespace chowdsp::SystemInfo

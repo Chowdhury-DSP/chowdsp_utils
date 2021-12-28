@@ -134,6 +134,6 @@ const juce::Identifier Preset::pluginTag { "plugin" };
 const juce::Identifier Preset::vendorTag { "vendor" };
 const juce::Identifier Preset::categoryTag { "category" };
 const juce::Identifier Preset::versionTag { "version" };
-const juce::Identifier Preset::stateTag { "Parameters" };
+[[maybe_unused]] const juce::Identifier Preset::stateTag { "Parameters" };
 
 } // namespace chowdsp

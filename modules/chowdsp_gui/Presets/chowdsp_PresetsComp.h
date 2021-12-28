@@ -37,7 +37,7 @@ public:
     void setNextPrevButton (const juce::Drawable* image, bool isNext);
 
 protected:
-    virtual void chooseUserPresetFolder (std::function<void()> onFinish = {});
+    virtual void chooseUserPresetFolder (const std::function<void()>& onFinish);
     virtual int createPresetsMenu (int optionID);
     virtual int addPresetOptions (int optionID);
     virtual void saveUserPreset();

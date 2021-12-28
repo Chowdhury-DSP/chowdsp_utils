@@ -63,7 +63,7 @@ struct Preset
     static const juce::Identifier vendorTag;
     static const juce::Identifier categoryTag;
     static const juce::Identifier versionTag;
-    static const juce::Identifier stateTag;
+    [[maybe_unused]] static const juce::Identifier stateTag;
 
 private:
     juce::String name;

@@ -23,7 +23,7 @@ public:
      * @param newSubtitle   Secondary plugin title
      * @param font          Font size to use for drawing the title
     */
-    void setStrings (juce::String newTitle, juce::String newSubtitle, float font);
+    void setStrings (const juce::String& newTitle, const juce::String& newSubtitle, float font);
 
 private:
     juce::String title;

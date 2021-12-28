@@ -6,7 +6,7 @@
 class DummyPlugin : public chowdsp::PluginBase<DummyPlugin>
 {
 public:
-    DummyPlugin (bool withPresetMgr = false) : chowdsp::PluginBase<DummyPlugin> (&undoManager)
+    explicit DummyPlugin (bool withPresetMgr = false) : chowdsp::PluginBase<DummyPlugin> (&undoManager)
     {
         if (withPresetMgr)
             presetManager = std::make_unique<chowdsp::PresetManager> (vts);

@@ -21,7 +21,7 @@ public:
 
     void simdSignumTest()
     {
-        dsp::SIMDRegister<float> testReg;
+        dsp::SIMDRegister<float> testReg {};
         testReg.set (0, -1.0f);
         testReg.set (1, 0.0f);
         testReg.set (2, 0.5f);

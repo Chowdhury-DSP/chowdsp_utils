@@ -6,7 +6,7 @@ class ConvolutionTest : public TimedUnitTest
 public:
     ConvolutionTest() : TimedUnitTest ("Convolution Test") {}
 
-    void createTestIR (std::vector<float>& ir, size_t size)
+    static void createTestIR (std::vector<float>& ir, size_t size)
     {
         const auto halfSize = size / 2;
 

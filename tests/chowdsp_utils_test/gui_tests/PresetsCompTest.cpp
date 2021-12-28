@@ -50,7 +50,7 @@ public:
         userPresetConfigFile.deleteRecursively();
     }
 
-    PopupMenu::Item* getMenuItem (const PopupMenu& menu, const String& itemText)
+    static PopupMenu::Item* getMenuItem (const PopupMenu& menu, const String& itemText)
     {
         auto menuIter = PopupMenu::MenuItemIterator (menu, true);
         while (menuIter.next())
@@ -62,7 +62,7 @@ public:
         return nullptr;
     }
 
-    void chooserPresetFolderTest()
+    static void chooserPresetFolderTest()
     {
         DummyPlugin plugin { true };
         auto& presetMgr = plugin.getPresetManager();
@@ -73,7 +73,7 @@ public:
         menuItem->action();
     }
 
-    void goToPresetFolderTest()
+    static void goToPresetFolderTest()
     {
         DummyPlugin plugin;
         ScopedFile presetPath ("preset_path");
@@ -109,12 +109,12 @@ public:
 
         menuItem->action();
         nameEditor.onEscapeKey();
-        expect (nameEditor.isVisible() == false, "Name Editor should be invisible after ESC!");
+        expect (! nameEditor.isVisible(), "Name Editor should be invisible after ESC!");
         expectEquals (presetMgr.getNumPresets(), 0, "Escape key should not save user preset!");
 
         menuItem->action();
         nameEditor.onReturnKey();
-        expect (nameEditor.isVisible() == false, "Name Editor should be invisible after RETURN!");
+        expect (! nameEditor.isVisible(), "Name Editor should be invisible after RETURN!");
         expectEquals (presetMgr.getNumPresets(), 1, "Return key did not save user preset!");
 
         auto userPresetConfigFile = presetMgr.getUserPresetConfigFile();
@@ -185,8 +185,7 @@ public:
             Thread::sleep (75); // wait for message manager...
             expectEquals (presetsComp.getPresetMenuText(), String ("Test1"), "Loaded preset text is incorrect!");
 
-            threadFinished = true;
-        });
+            threadFinished = true; });
 
         while (! threadFinished)
             MessageManager::getInstance()->runDispatchLoopUntil (75);

@@ -192,7 +192,7 @@ int PresetsComp::addPresetOptions (int optionID)
         if (folder.isDirectory())
             folder.startAsProcess();
         else
-            chooseUserPresetFolder();
+            chooseUserPresetFolder ({});
     };
     menu->addItem (goToFolderItem);
 
@@ -200,7 +200,7 @@ int PresetsComp::addPresetOptions (int optionID)
     chooseFolderItem.itemID = ++optionID;
     chooseFolderItem.action = [=] {
         updatePresetBoxText();
-        chooseUserPresetFolder();
+        chooseUserPresetFolder ({});
     };
     menu->addItem (chooseFolderItem);
 #endif
@@ -208,7 +208,7 @@ int PresetsComp::addPresetOptions (int optionID)
     return optionID;
 }
 
-void PresetsComp::chooseUserPresetFolder (std::function<void()> onFinish)
+void PresetsComp::chooseUserPresetFolder (const std::function<void()>& onFinish)
 {
     constexpr auto folderChooserFlags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectDirectories;
     fileChooser = std::make_shared<juce::FileChooser> ("Choose User Preset Folder");
@@ -217,8 +217,7 @@ void PresetsComp::chooseUserPresetFolder (std::function<void()> onFinish)
             manager.setUserPresetPath (chooser.getResult());
 
             if (onFinish != nullptr)
-                onFinish();
-        });
+                onFinish(); });
     }
 }
 

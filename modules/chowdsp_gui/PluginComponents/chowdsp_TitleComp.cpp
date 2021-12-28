@@ -26,7 +26,7 @@ void TitleComp::paint (juce::Graphics& g)
     drawText (subtitle);
 }
 
-void TitleComp::setStrings (juce::String newTitle, juce::String newSubtitle, float newFont)
+void TitleComp::setStrings (const juce::String& newTitle, const juce::String& newSubtitle, float newFont)
 {
     font = newFont == 0.0f ? (float) getHeight() : newFont;
 

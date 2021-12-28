@@ -5,6 +5,7 @@ namespace chowdsp
 /** Type to use for parameters that can be used to initialise a ValueTreeState */
 using Parameters = std::vector<std::unique_ptr<juce::RangedAudioParameter>>;
 
+/** Useful methods for creating juce::AudioProcessorParameter's */
 namespace ParamUtils
 {
     using VTSParam = juce::AudioProcessorValueTreeState::Parameter;

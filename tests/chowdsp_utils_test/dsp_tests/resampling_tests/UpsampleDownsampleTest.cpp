@@ -36,7 +36,7 @@ public:
             magnitudes[i] = std::pow (fftData[i] / scaleNorm, 2.0f);
 
         auto getMagForFreq = [=] (float freq) -> float {
-            auto idx = size_t ((blockSize / 2) * freq / (fs / 2.0f));
+            auto idx = size_t (((float) blockSize / 2.0f) * freq / (fs / 2.0f));
             // average over a few bins to smooth
             return std::accumulate (&magnitudes[idx - negDiff], &magnitudes[idx + posDiff], 0.0f) / (float) avgNum;
         };
@@ -80,7 +80,7 @@ public:
         for (size_t n = 0; n < blockSize / 2; ++n)
             squaredSum += std::pow (downsampledBlock.getSample (0, (int) n), 2.0f);
 
-        auto rms = Decibels::gainToDecibels (std::sqrt (squaredSum / (blockSize / 2)));
+        auto rms = Decibels::gainToDecibels (std::sqrt (squaredSum / ((float) blockSize / 2.0f)));
 
         expectEquals (downsampledBlock.getNumSamples(), blockSize / (size_t) downsampler.getDownsamplingRatio(), "Downsampled block size is incorrect!");
         expectLessThan (rms, -50.0f, "RMS level is too high!");

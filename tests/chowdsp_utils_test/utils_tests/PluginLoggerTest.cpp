@@ -48,6 +48,7 @@ public:
         {
             using LoggerPtr = std::unique_ptr<chowdsp::PluginLogger>;
             std::vector<std::future<LoggerPtr>> futures;
+            futures.reserve (numLoggersAtOnce);
             for (int j = 0; j < numLoggersAtOnce; ++j)
                 futures.push_back (std::async (std::launch::async, [] { return std::make_unique<chowdsp::PluginLogger> (logFileSubDir, logFileNameRoot); }));
 
