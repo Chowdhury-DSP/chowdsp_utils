@@ -7,7 +7,7 @@ TooltipComponent::TooltipComponent()
     setColour (backgroundColourID, juce::Colours::transparentBlack);
     setColour (textColourID, juce::Colours::lightgrey);
     setColour (nameColourID, juce::Colours::white);
-    
+
     startTimer (123);
 }
 

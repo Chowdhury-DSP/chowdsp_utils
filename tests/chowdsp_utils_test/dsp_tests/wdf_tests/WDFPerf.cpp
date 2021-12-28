@@ -25,9 +25,8 @@ public:
     {
         auto buffer = test_utils::makeNoise (_fs, timeSeconds);
         auto* x = buffer.getReadPointer (0);
-        
-        auto timeProcess = [&] (auto& proc)
-        {
+
+        auto timeProcess = [&] (auto& proc) {
             auto start = Time::getMillisecondCounterHiRes();
             float output = 0.0f;
             for (int i = 0; i < buffer.getNumSamples(); ++i)

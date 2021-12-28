@@ -96,8 +96,7 @@ public:
         for (int i = 0; i < nIter; ++i)
         {
             AudioBuffer<float> subBuffer (buffer.getArrayOfWritePointers(), 1, i * nSamples, nSamples);
-            processFunc (subBuffer, bypass, &onOffParam, [] (float x)
-                         { return x + 1.0f; });
+            processFunc (subBuffer, bypass, &onOffParam, [] (float x) { return x + 1.0f; });
             onOffParam.store (1.0f - onOffParam.load());
         }
 
@@ -116,8 +115,7 @@ public:
         for (int i = 0; i < nIter; ++i)
         {
             auto subBlock = block.getSubBlock ((size_t) i * (size_t) nSamples, (size_t) nSamples);
-            processFunc (subBlock, bypass, &onOffParam, [] (float x)
-                         { return x + 1.0f; });
+            processFunc (subBlock, bypass, &onOffParam, [] (float x) { return x + 1.0f; });
             onOffParam.store (1.0f - onOffParam.load());
         }
 
@@ -141,8 +139,7 @@ public:
         for (int i = 0; i < nIter; ++i)
         {
             AudioBuffer<float> subBuffer (buffer.getArrayOfWritePointers(), 1, i * nSamples, nSamples);
-            processFunc (subBuffer, bypass, &onOffParam, [&] (float x)
-                         {
+            processFunc (subBuffer, bypass, &onOffParam, [&] (float x) {
                 delay.pushSample (0, x);
                 return delay.popSample (0); });
 
@@ -171,8 +168,7 @@ public:
         for (int i = 0; i < nIter; ++i)
         {
             auto subBlock = block.getSubBlock ((size_t) i * (size_t) nSamples, (size_t) nSamples);
-            processFunc (subBlock, bypass, &onOffParam, [&] (float x)
-                         {
+            processFunc (subBlock, bypass, &onOffParam, [&] (float x) {
                 delay.pushSample (0, x);
                 return delay.popSample (0); });
 

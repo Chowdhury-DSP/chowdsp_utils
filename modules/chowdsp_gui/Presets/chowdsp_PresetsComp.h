@@ -88,8 +88,7 @@ public:
     void update() override
     {
 #if FOLEYS_ENABLE_BINARY_DATA
-        auto getDrawable = [] (const juce::String& name)
-        {
+        auto getDrawable = [] (const juce::String& name) {
             int dataSize = 0;
             const char* data = BinaryData::getNamedResource (name.toRawUTF8(), dataSize);
             return juce::Drawable::createFromImageData (data, (size_t) dataSize);
@@ -111,8 +110,7 @@ public:
 
     std::vector<foleys::SettableProperty> getSettableProperties() const override
     {
-        std::function<void (juce::ComboBox&)> createAssetFilesMenuLambda = [=] (juce::ComboBox&)
-        {
+        std::function<void (juce::ComboBox&)> createAssetFilesMenuLambda = [=] (juce::ComboBox&) {
             magicBuilder.getMagicState().createAssetFilesMenu();
         };
 
