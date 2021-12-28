@@ -11,7 +11,7 @@ namespace chowdsp
 class GainProcessor
 {
 public:
-    GainProcessor() {}
+    GainProcessor() = default;
 
     /** Resets the state of the processor */
     void reset()

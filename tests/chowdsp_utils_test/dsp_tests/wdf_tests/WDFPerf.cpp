@@ -25,14 +25,14 @@ public:
     {
         auto buffer = test_utils::makeNoise (_fs, timeSeconds);
         auto* x = buffer.getReadPointer (0);
-
-        Time time;
-        auto timeProcess = [&] (auto& proc) {
-            auto start = time.getMillisecondCounterHiRes();
+        
+        auto timeProcess = [&] (auto& proc)
+        {
+            auto start = Time::getMillisecondCounterHiRes();
             float output = 0.0f;
             for (int i = 0; i < buffer.getNumSamples(); ++i)
                 output = proc.processSample (x[i]);
-            auto duration = (time.getMillisecondCounterHiRes() - start) / 1000.0;
+            auto duration = (Time::getMillisecondCounterHiRes() - start) / 1000.0;
             std::cout << "Final output: " << output << std::endl;
             return duration;
         };

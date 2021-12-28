@@ -5,7 +5,7 @@
 class TimedUnitTest : public UnitTest
 {
 public:
-    TimedUnitTest (const String& name, const String& category = {}) : UnitTest (name, category)
+    explicit TimedUnitTest (const String& name, const String& category = {}) : UnitTest (name, category)
     {
     }
 

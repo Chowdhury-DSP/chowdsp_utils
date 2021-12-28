@@ -12,10 +12,10 @@ namespace chowdsp
 struct IRTransfer
 {
     // create a new IRTransfer object for a given convolution engine
-    IRTransfer (const ConvolutionEngine& eng) : fftSize (eng.fftSize),
-                                                blockSize (eng.blockSize),
-                                                irNumSamples (eng.irNumSamples),
-                                                irFFT (std::make_unique<juce::dsp::FFT> (juce::roundToInt (std::log2 (fftSize))))
+    explicit IRTransfer (const ConvolutionEngine& eng) : fftSize (eng.fftSize),
+                                                         blockSize (eng.blockSize),
+                                                         irNumSamples (eng.irNumSamples),
+                                                         irFFT (std::make_unique<juce::dsp::FFT> (juce::roundToInt (std::log2 (fftSize))))
     {
         ConvolutionEngine::updateSegmentsIfNecessary (eng.numSegments, buffersImpulseSegments, fftSize);
     }

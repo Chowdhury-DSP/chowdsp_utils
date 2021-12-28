@@ -7,8 +7,7 @@ TooltipComponent::TooltipComponent()
     setColour (backgroundColourID, juce::Colours::transparentBlack);
     setColour (textColourID, juce::Colours::lightgrey);
     setColour (nameColourID, juce::Colours::white);
-
-    showTip.store (false);
+    
     startTimer (123);
 }
 

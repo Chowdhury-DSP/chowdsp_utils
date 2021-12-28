@@ -17,7 +17,7 @@ class PresetManager : private juce::AudioProcessorValueTreeState::Listener
 {
 public:
     /** Creates a new preset manager for an APVTS */
-    PresetManager (juce::AudioProcessorValueTreeState& vts);
+    explicit PresetManager (juce::AudioProcessorValueTreeState& vts);
     ~PresetManager() override;
 
     /** Loads a preset for a given index. */

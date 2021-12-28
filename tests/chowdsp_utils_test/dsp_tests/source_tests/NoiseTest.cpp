@@ -31,7 +31,7 @@ public:
     NoiseTest() : TimedUnitTest ("Noise Test") {}
 
     /** Check the frequency slope of a noise buffer, slope measured in dB/Oct */
-    void checkNoiseSlope (const float* buffer, String noiseType, float noiseSlope = 0.0f, float maxErr = 3.0f)
+    void checkNoiseSlope (const float* buffer, const String& noiseType, float noiseSlope = 0.0f, float maxErr = 3.0f)
     {
         dsp::FFT fft (fftOrder);
 
@@ -44,8 +44,9 @@ public:
         for (size_t i = 0; i < nSamples; ++i)
             magnitudes[i] = Decibels::gainToDecibels<float> (std::abs (fftData[i])) - dBNorm;
 
-        auto getMagForFreq = [=] (float freq) -> float {
-            auto idx = size_t ((nSamples / 2) * freq / (fs / 2.0f));
+        auto getMagForFreq = [=] (float freq) -> float
+        {
+            auto idx = size_t (((float) nSamples / 2.0f) * freq / (fs / 2.0f));
             // average over many bins to smooth
             return std::accumulate (&magnitudes[idx - negDiff], &magnitudes[idx + posDiff], 0.0f) / (float) avgNum;
         };
@@ -76,10 +77,10 @@ public:
             return "Pink Noise";
 
         jassertfalse;
-        return String();
+        return {};
     }
 
-    std::vector<std::vector<float>> getTestVector (const dsp::AudioBlock<float> data)
+    [[maybe_unused]] static std::vector<std::vector<float>> getTestVector (const dsp::AudioBlock<float> data)
     {
         const auto numChannels = data.getNumChannels();
         const auto numSamples = data.getNumSamples();
@@ -94,7 +95,7 @@ public:
         return std::move (vecs);
     }
 
-    std::vector<std::vector<float>> getTestVector (const dsp::AudioBlock<vec4> data)
+    static std::vector<std::vector<float>> getTestVector (const dsp::AudioBlock<vec4> data)
     {
         const auto numChannels = data.getNumChannels();
         const auto numSamples = data.getNumSamples();

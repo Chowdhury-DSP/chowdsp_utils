@@ -18,11 +18,11 @@ public:
 
     void paint (juce::Graphics& g) override;
     void timerCallback() override;
-    void getTipFor (juce::Component& c, juce::String& newTip, juce::String& newName);
+    static void getTipFor (juce::Component& c, juce::String& newTip, juce::String& newName);
 
 protected:
     juce::String name, tip;
-    std::atomic_bool showTip;
+    std::atomic_bool showTip { false };
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TooltipComponent)

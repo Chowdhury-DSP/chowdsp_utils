@@ -112,7 +112,7 @@ void PresetManager::saveUserPreset (const juce::File& file)
     auto stateXml = savePresetState();
     const auto name = file.getFileNameWithoutExtension();
 
-    keepAlivePreset = std::make_unique<Preset> (name, "User", *stateXml.get());
+    keepAlivePreset = std::make_unique<Preset> (name, "User", *stateXml);
     if (keepAlivePreset != nullptr)
     {
         keepAlivePreset->toFile (file);

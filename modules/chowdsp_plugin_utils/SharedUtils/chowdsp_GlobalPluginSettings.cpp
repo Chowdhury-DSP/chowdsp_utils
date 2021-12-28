@@ -79,7 +79,7 @@ void GlobalPluginSettings::removePropertyListener (Listener* listener)
 juce::File GlobalPluginSettings::getSettingsFile() const noexcept
 {
     if (fileListener == nullptr)
-        return juce::File();
+        return {};
 
     return fileListener->getListenerFile();
 }

@@ -7,7 +7,7 @@ class InfoComp : public juce::Component
 {
 public:
     /** Creates an Info component for the given plugin wrapper type */
-    InfoComp (const juce::AudioProcessor::WrapperType wrapperType);
+    explicit InfoComp (const juce::AudioProcessor::WrapperType wrapperType);
 
     enum ColourIDs
     {

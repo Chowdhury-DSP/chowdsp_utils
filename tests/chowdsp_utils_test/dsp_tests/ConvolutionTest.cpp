@@ -6,7 +6,7 @@ class ConvolutionTest : public TimedUnitTest
 public:
     ConvolutionTest() : TimedUnitTest ("Convolution Test") {}
 
-    void createTestIR (std::vector<float>& ir, size_t size)
+    static void createTestIR (std::vector<float>& ir, size_t size)
     {
         const auto halfSize = size / 2;
 
@@ -36,7 +36,8 @@ public:
                 engine.processSamplesWithAddedLatency (testOutput.data() + ptr, testOutput.data() + ptr, irSize);
         }
 
-        auto checkAccuracy = [=] (float* output) {
+        auto checkAccuracy = [=] (float* output)
+        {
             for (size_t i = 0; i < irSize; ++i)
             {
                 auto error = std::abs (output[i] - testIR[i]);

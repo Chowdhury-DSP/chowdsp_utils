@@ -122,7 +122,7 @@ public:
     }
 
     template <typename FloatType>
-    void baseMathTest (int nIter, std::function<FloatType (FloatType)> floatFunc, std::function<dsp::SIMDRegister<FloatType> (dsp::SIMDRegister<FloatType>)> simdFunc, FloatType maxErr, String functionName, const NormalisableRange<FloatType>& range)
+    void baseMathTest (int nIter, std::function<FloatType (FloatType)> floatFunc, std::function<dsp::SIMDRegister<FloatType> (dsp::SIMDRegister<FloatType>)> simdFunc, FloatType maxErr, const String& functionName, const NormalisableRange<FloatType>& range)
     {
         for (int i = 0; i < nIter; ++i)
         {
