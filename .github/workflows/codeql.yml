@@ -1,0 +1,68 @@
+name: CodeQL
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+    branches:
+      - master
+
+  workflow_dispatch:
+
+env:
+  WORK_DIR: ${{github.workspace}}/JUCE_modules/chowdsp_utils
+
+jobs:
+  build_and_test:
+    if: contains(toJson(github.event.commits), '***NO_CI***') == false && contains(toJson(github.event.commits), '[ci skip]') == false && contains(toJson(github.event.commits), '[skip ci]') == false
+    name: Run CodeQL Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install Linux Deps
+        run: |
+          sudo apt-get update
+          sudo apt install libasound2-dev libcurl4-openssl-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev libsamplerate-dev
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 9
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
+
+      - name: Get latest CMake
+        uses: lukka/get-cmake@latest
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          path: ${{env.WORK_DIR}}
+
+      - name: Set up environment
+        working-directory: ${{github.workspace}}
+        run: |
+          git clone --depth 1 --branch 6.1.2 https://github.com/juce-framework/JUCE.git
+          cd JUCE_modules
+          git clone --single-branch --branch chowdsp https://github.com/Chowdhury-DSP/foleys_gui_magic.git
+
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1
+        with:
+          key: codeql-ubuntu
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v1
+        with:
+          source-root: ${{env.WORK_DIR}}
+          languages: cpp
+
+      - name: Configure
+        working-directory: ${{env.WORK_DIR}}
+        shell: bash
+        run: cmake -Bbuild -DCHOWDSP_ENABLE_TESTING=ON -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+
+      - name: Build
+        working-directory: ${{env.WORK_DIR}}/build
+        shell: bash
+        run: cmake --build . --parallel 4
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v1
