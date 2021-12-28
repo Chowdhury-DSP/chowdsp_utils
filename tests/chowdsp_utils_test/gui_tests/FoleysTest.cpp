@@ -4,7 +4,7 @@
 class GuiPlugin : public chowdsp::PluginBase<GuiPlugin>
 {
 public:
-    GuiPlugin() {}
+    GuiPlugin() = default;
 
     static void addParameters (Parameters& /*params*/) {}
     void prepareToPlay (double, int) override {}

@@ -25,10 +25,6 @@ namespace NoiseHelpers
     using namespace SIMDUtils;
 
     /** Returns a uniform random number in [0, 1) */
-    template <typename T>
-    T uniform01 (juce::Random&) noexcept;
-
-    /** Returns a uniform random number in [0, 1) */
     template <>
     inline double uniform01 (juce::Random& r) noexcept
     {

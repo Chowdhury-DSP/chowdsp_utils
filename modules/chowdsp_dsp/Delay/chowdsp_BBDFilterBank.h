@@ -54,7 +54,7 @@ namespace BBD
         using Complex4 = SIMDComplex<T>;
 
     public:
-        InputFilterBank (T sampleTime) : Ts (sampleTime)
+        explicit InputFilterBank (T sampleTime) : Ts (sampleTime)
         {
             float root_real alignas (16)[4];
             float root_imag alignas (16)[4];
@@ -77,10 +77,12 @@ namespace BBD
             constexpr float originalCutoff = 9900.0f;
             const float freqFactor = freq / originalCutoff;
             root_corr = roots * freqFactor;
-            pole_corr = poles.map ([&freqFactor, this] (const std::complex<float>& f) { return std::exp (f * freqFactor * Ts); });
+            pole_corr = poles.map ([&freqFactor, this] (const std::complex<float>& f)
+                                   { return std::exp (f * freqFactor * Ts); });
 
             pole_corr_angle =
-                pole_corr.map_float ([] (const std::complex<float>& f) { return std::arg (f); });
+                pole_corr.map_float ([] (const std::complex<float>& f)
+                                     { return std::arg (f); });
 
             gCoef = root_corr * Ts;
         }
@@ -88,7 +90,8 @@ namespace BBD
         inline void set_time (float tn) noexcept
         {
             Gcalc =
-                gCoef * pole_corr.map ([&tn] (const std::complex<float>& f) { return std::pow (f, tn); });
+                gCoef * pole_corr.map ([&tn] (const std::complex<float>& f)
+                                       { return std::pow (f, tn); });
         }
 
         inline void set_delta (float delta) noexcept
@@ -111,7 +114,7 @@ namespace BBD
         Complex4 poles;
         Complex4 root_corr;
         Complex4 pole_corr;
-        juce::dsp::SIMDRegister<T> pole_corr_angle;
+        juce::dsp::SIMDRegister<T> pole_corr_angle {};
 
         Complex4 Aplus;
 
@@ -125,7 +128,7 @@ namespace BBD
         using Complex4 = SIMDComplex<T>;
 
     public:
-        OutputFilterBank (float sampleTime) : Ts (sampleTime)
+        explicit OutputFilterBank (float sampleTime) : Ts (sampleTime)
         {
             float gcoefs_real alignas (16)[4];
             float gcoefs_imag alignas (16)[4];
@@ -150,17 +153,20 @@ namespace BBD
         {
             constexpr float originalCutoff = 9500.0f;
             const float freqFactor = freq / originalCutoff;
-            pole_corr = poles.map ([&freqFactor, this] (const std::complex<float>& f) { return std::exp (f * freqFactor * Ts); });
+            pole_corr = poles.map ([&freqFactor, this] (const std::complex<float>& f)
+                                   { return std::exp (f * freqFactor * Ts); });
 
             pole_corr_angle =
-                pole_corr.map_float ([] (const std::complex<float>& f) { return std::arg (f); });
+                pole_corr.map_float ([] (const std::complex<float>& f)
+                                     { return std::arg (f); });
 
             Amult = gCoef * pole_corr;
         }
 
         inline void set_time (float tn) noexcept
         {
-            Gcalc = Amult * pole_corr.map ([&tn] (const std::complex<float>& f) { return std::pow (f, 1.0f - tn); });
+            Gcalc = Amult * pole_corr.map ([&tn] (const std::complex<float>& f)
+                                           { return std::pow (f, 1.0f - tn); });
         }
 
         inline void set_delta (float delta) noexcept { Aplus = BBDFilterSpec::fast_complex_pow (pole_corr_angle, -delta); }
@@ -177,7 +183,7 @@ namespace BBD
         Complex4 poles;
         Complex4 root_corr;
         Complex4 pole_corr;
-        juce::dsp::SIMDRegister<float> pole_corr_angle;
+        juce::dsp::SIMDRegister<float> pole_corr_angle {};
 
         Complex4 Aplus;
 

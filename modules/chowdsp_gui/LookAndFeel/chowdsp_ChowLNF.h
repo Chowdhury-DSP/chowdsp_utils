@@ -23,7 +23,7 @@ public:
     void positionComboBoxText (juce::ComboBox& box, juce::Label& label) override;
 
     /** Creates tabbed layout for tabbed components */
-    void createTabTextLayout (const juce::TabBarButton& button, float length, float depth, juce::Colour colour, juce::TextLayout& textLayout);
+    static void createTabTextLayout (const juce::TabBarButton& button, float length, float depth, juce::Colour colour, juce::TextLayout& textLayout);
 
     /** Draws a tabbed button */
     void drawTabButton (juce::TabBarButton& button, juce::Graphics& g, bool isMouseOver, bool isMouseDown) override;

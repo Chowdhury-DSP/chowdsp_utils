@@ -55,11 +55,11 @@ JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
 struct ScopedFile
 {
-    ScopedFile (const String& name) : file (File::getSpecialLocation (File::userHomeDirectory).getChildFile (name))
+    explicit ScopedFile (const String& name) : file (File::getSpecialLocation (File::userHomeDirectory).getChildFile (name))
     {
     }
 
-    ScopedFile (const File& thisFile) : file (thisFile)
+    explicit ScopedFile (const File& thisFile) : file (thisFile)
     {
     }
 

@@ -22,12 +22,12 @@ public:
         {
             String currentFileText {};
 
-            TestListener (const File& f) : chowdsp::FileListener (f, 1)
+            explicit TestListener (const File& f) : chowdsp::FileListener (f, 1)
             {
                 listenerFileChanged();
             }
 
-            void listenerFileChanged() override
+            void listenerFileChanged() final
             {
                 currentFileText = getListenerFile().loadFileAsString();
             }

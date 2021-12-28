@@ -65,12 +65,12 @@ struct ConvolutionEngine
     static void prepareForConvolution (float* samples, size_t fftSize) noexcept;
 
     // Does the convolution operation itself only on half of the frequency domain samples.
-    void convolutionProcessingAndAccumulate (const float* input, const float* impulse, float* output);
+    void convolutionProcessingAndAccumulate (const float* input, const float* impulse, float* output) const;
 
     // Undoes the re-organization of samples from the function prepareForConvolution.
     // Then takes the conjugate of the frequency domain first half of samples to fill the
     // second half, so that the inverse transform will return real samples in the time domain.
-    void updateSymmetricFrequencyDomainData (float* samples) noexcept;
+    void updateSymmetricFrequencyDomainData (float* samples) const noexcept;
 
     //==============================================================================
     const size_t irNumSamples;

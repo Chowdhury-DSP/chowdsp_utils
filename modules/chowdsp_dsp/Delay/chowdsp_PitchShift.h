@@ -133,8 +133,8 @@ private:
     SampleType shift; // Shift factor to increment read ptr
     std::vector<SampleType> crossfade; // crossfade gain
 
-    int overlap; // crossfade overlap
-    int totalSize; // max buffer size
+    int overlap = 0; // crossfade overlap
+    int totalSize = 0; // max buffer size
     SampleType halfSize; // half buffer size
 
     SampleType alpha = 0.0; // Needed for Thiran interpolation

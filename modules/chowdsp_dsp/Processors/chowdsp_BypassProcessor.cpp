@@ -43,7 +43,8 @@ bool BypassProcessor<SampleType, DelayType>::processBlockIn (const juce::dsp::Au
         Toss,
     };
 
-    auto doDelayOp = [] (auto& sampleBuffer, auto& delay, DelayOp op) {
+    auto doDelayOp = [] (auto& sampleBuffer, auto& delay, DelayOp op)
+    {
         if (delay.getDelay() == SampleType (0))
             return;
 
@@ -71,7 +72,7 @@ bool BypassProcessor<SampleType, DelayType>::processBlockIn (const juce::dsp::Au
 
     doDelayOp (block, compDelay, DelayOp::Push);
 
-    if (onOffParam == false && prevOnOffParam == false)
+    if (! onOffParam && ! prevOnOffParam)
     {
         doDelayOp (block, compDelay, DelayOp::Pop);
         return false;
@@ -103,9 +104,10 @@ void BypassProcessor<SampleType, DelayType>::processBlockOut (juce::AudioBuffer<
 template <typename SampleType, typename DelayType>
 void BypassProcessor<SampleType, DelayType>::processBlockOut (juce::dsp::AudioBlock<float>& block, bool onOffParam)
 {
-    auto fadeOutputBuffer = [onOffParam] (auto* blockPtr, const auto* fadePtr, const int startSample, const int numSamples) {
-        SampleType startGain = onOffParam == false ? static_cast<SampleType> (1) // fade out
-                                                   : static_cast<SampleType> (0); // fade in
+    auto fadeOutputBuffer = [onOffParam] (auto* blockPtr, const auto* fadePtr, const int startSample, const int numSamples)
+    {
+        SampleType startGain = ! onOffParam ? static_cast<SampleType> (1) // fade out
+                                            : static_cast<SampleType> (0); // fade in
         SampleType endGain = static_cast<SampleType> (1) - startGain;
 
         SampleType gain = startGain;

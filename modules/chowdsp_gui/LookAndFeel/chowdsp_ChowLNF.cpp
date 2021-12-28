@@ -20,9 +20,9 @@ void ChowLNF::drawRotarySlider (juce::Graphics& g, int x, int y, int width, int 
     if (diameter < 16)
         return;
 
-    juce::Point<float> centre (x + std::floor (width * 0.5f + 0.5f), y + std::floor (height * 0.5f + 0.5f));
+    juce::Point<float> centre ((float) x + std::floor ((float) width * 0.5f + 0.5f), (float) y + std::floor ((float) height * 0.5f + 0.5f));
     diameter -= (diameter % 2) ? 9 : 8;
-    float radius = diameter * 0.5f;
+    float radius = (float) diameter * 0.5f;
     x = int (centre.x - radius);
     y = int (centre.y - radius);
 

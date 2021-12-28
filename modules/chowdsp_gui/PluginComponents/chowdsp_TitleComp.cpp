@@ -14,7 +14,8 @@ void TitleComp::paint (juce::Graphics& g)
     auto curFont = g.getCurrentFont();
     auto b = getLocalBounds();
 
-    auto drawText = [=, &g, &b] (const juce::String& text) {
+    auto drawText = [=, &g, &b] (const juce::String& text)
+    {
         auto width = curFont.getStringWidth (text);
         g.drawFittedText (text, b.removeFromLeft (width), juce::Justification::left, 1);
     };
@@ -26,7 +27,7 @@ void TitleComp::paint (juce::Graphics& g)
     drawText (subtitle);
 }
 
-void TitleComp::setStrings (juce::String newTitle, juce::String newSubtitle, float newFont)
+void TitleComp::setStrings (const juce::String& newTitle, const juce::String& newSubtitle, float newFont)
 {
     font = newFont == 0.0f ? (float) getHeight() : newFont;
 

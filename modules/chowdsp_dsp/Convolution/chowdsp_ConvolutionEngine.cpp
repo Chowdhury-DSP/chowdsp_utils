@@ -35,7 +35,7 @@ void ConvolutionEngine::updateSegmentsIfNecessary (size_t numSegmentsToUpdate, s
         segments.clear();
 
         for (size_t i = 0; i < numSegmentsToUpdate; ++i)
-            segments.push_back ({ 1, static_cast<int> (fftSize * 2) });
+            segments.emplace_back (1, static_cast<int> (fftSize * 2));
     }
 }
 
@@ -246,7 +246,7 @@ void ConvolutionEngine::prepareForConvolution (float* samples, size_t fftSize) n
         samples[i + FFTSizeDiv2] = -samples[((fftSize - i) << 1) + 1];
 }
 
-void ConvolutionEngine::convolutionProcessingAndAccumulate (const float* input, const float* impulse, float* output)
+void ConvolutionEngine::convolutionProcessingAndAccumulate (const float* input, const float* impulse, float* output) const
 {
     auto FFTSizeDiv2 = fftSize / 2;
 
@@ -259,7 +259,7 @@ void ConvolutionEngine::convolutionProcessingAndAccumulate (const float* input, 
     output[fftSize] += input[fftSize] * impulse[fftSize];
 }
 
-void ConvolutionEngine::updateSymmetricFrequencyDomainData (float* samples) noexcept
+void ConvolutionEngine::updateSymmetricFrequencyDomainData (float* samples) const noexcept
 {
     auto FFTSizeDiv2 = fftSize / 2;
 

@@ -5,24 +5,6 @@ namespace
 constexpr int guiShowTime = 1000;
 }
 
-/** Empty component filled with a single colour */
-class PlainComponent : public Component
-{
-public:
-    PlainComponent (Colour c)
-        : colour (c)
-    {
-    }
-
-    void paint (Graphics& g) override
-    {
-        g.fillAll (colour);
-    }
-
-private:
-    const Colour colour;
-};
-
 /** Test GUI component that includes subcomponents defined
  *  in chowdsp_utils, or modified by chowdsp::ChowLNF:
  *   - Tabbed Component
@@ -65,9 +47,12 @@ public:
         tabs.addTab ("Tab2", Colours::darksalmon, infoComp.release(), true);
 
         addAndMakeVisible (tabs);
-        Timer::callAfterDelay (guiShowTime / 4, [=] { tabs.setOrientation (TabbedButtonBar::TabsAtBottom); });
-        Timer::callAfterDelay (guiShowTime / 2, [=] { tabs.setOrientation (TabbedButtonBar::TabsAtRight); });
-        Timer::callAfterDelay (guiShowTime * 3 / 4, [=] { tabs.setOrientation (TabbedButtonBar::TabsAtLeft); });
+        Timer::callAfterDelay (guiShowTime / 4, [=]
+                               { tabs.setOrientation (TabbedButtonBar::TabsAtBottom); });
+        Timer::callAfterDelay (guiShowTime / 2, [=]
+                               { tabs.setOrientation (TabbedButtonBar::TabsAtRight); });
+        Timer::callAfterDelay (guiShowTime * 3 / 4, [=]
+                               { tabs.setOrientation (TabbedButtonBar::TabsAtLeft); });
 
         menu.addItemList ({ "Item1", "Item2", "Item3" }, 1);
         menu.setSelectedItemIndex (0, sendNotification);
@@ -78,7 +63,8 @@ public:
         presetsComp.setNextPrevButton (nullptr, true);
         presetsComp.setNextPrevButton (nullptr, false);
         addAndMakeVisible (presetsComp);
-        Timer::callAfterDelay (guiShowTime * 3 / 4, [=] { presetsComp.getPresetMenuBox().showPopup(); });
+        Timer::callAfterDelay (guiShowTime * 3 / 4, [=]
+                               { presetsComp.getPresetMenuBox().showPopup(); });
 
         setSize (500, 500);
     }
@@ -134,8 +120,10 @@ public:
 
         setVisible (true);
 
-        Timer::callAfterDelay (guiShowTime / 2, [=] { comp->tabs.setCurrentTabIndex (1); });
-        Timer::callAfterDelay (guiShowTime, [=] { closeButtonPressed(); });
+        Timer::callAfterDelay (guiShowTime / 2, [=]
+                               { comp->tabs.setCurrentTabIndex (1); });
+        Timer::callAfterDelay (guiShowTime, [=]
+                               { closeButtonPressed(); });
     }
 
     void closeButtonPressed() override
@@ -155,7 +143,7 @@ private:
 class GUITest : public JUCEApplication
 {
 public:
-    GUITest() {}
+    GUITest() = default;
 
     const String getApplicationName() override { return "GUITest"; }
     const String getApplicationVersion() override { return "1.0.0"; }

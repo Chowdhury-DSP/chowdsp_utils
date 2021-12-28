@@ -36,9 +36,9 @@ public:
     }
 
 protected:
-    float expFactor;
+    float expFactor = 1.0f;
     SampleType yOld;
-    bool increasing;
+    bool increasing = true;
 
     SampleType tauAtt = (SampleType) 1;
     SampleType tauRel = (SampleType) 1;
