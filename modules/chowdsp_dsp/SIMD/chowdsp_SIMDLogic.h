@@ -26,7 +26,7 @@ inline juce::dsp::SIMDRegister<T> select (MaskType<T> b, juce::dsp::SIMDRegister
     return (juce::dsp::SIMDRegister<T>) xsimd::select ((b_type<T>) b.value, (x_type<T>) t.value, (x_type<T>) f.value);
 }
 
-#if // (! CHOWDSP_USE_CUSTOM_JUCE_DSP) && (defined(_M_ARM64) || defined(__arm64__) || defined(__aarch64__))
+#if (! CHOWDSP_USE_CUSTOM_JUCE_DSP) && (defined(_M_ARM64) || defined(__arm64__) || defined(__aarch64__))
 /** Ternary select operation */
 template <>
 inline juce::dsp::SIMDRegister<double>::vMaskType isnanSIMD (juce::dsp::SIMDRegister<double> x)
