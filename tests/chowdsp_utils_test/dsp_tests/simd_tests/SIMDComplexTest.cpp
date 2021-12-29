@@ -3,7 +3,7 @@
 class SIMDComplexTest : public TimedUnitTest
 {
 public:
-    SIMDComplexTest() : TimedUnitTest ("SIMD Complex Test") {}
+    SIMDComplexTest() : TimedUnitTest ("SIMD Complex Test", "SIMD") {}
 
     void zeroCheck()
     {

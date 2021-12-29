@@ -11,7 +11,7 @@ public:
     using VecType = dsp::SIMDRegister<FloatType>;
 
     CommonSmoothedValueTests()
-        : TimedUnitTest ("Common Smoothed Value Tests: " + String (std::is_same<FloatType, float>::value ? "Float" : "Double"))
+        : TimedUnitTest ("Common Smoothed Value Tests: " + String (std::is_same<FloatType, float>::value ? "Float" : "Double"), "SIMD")
     {
     }
 

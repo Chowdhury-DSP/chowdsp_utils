@@ -23,27 +23,10 @@ struct SIMDComplex
     {
     }
 
-    constexpr SIMDComplex (Type r[size], Type i[size])
+    SIMDComplex<Type> (const Type (&r)[size], const Type (&i)[size])
     {
-        _r = T::fromRawArray (r);
-        _i = T::fromRawArray (i);
-    }
-
-    SIMDComplex<Type> (std::initializer_list<Type> r, std::initializer_list<Type> i)
-    {
-        if (r.size() != size && i.size() != size)
-        {
-            throw std::invalid_argument ("Initialize lists must be of size 4");
-        }
-        Type rfl alignas (16)[size], ifl alignas (16)[size];
-        for (size_t q = 0; q < size; ++q)
-        {
-            rfl[q] = *(r.begin() + q);
-            ifl[q] = *(i.begin() + q);
-        }
-
-        _r = T::fromRawArray (rfl);
-        _i = T::fromRawArray (ifl);
+        _r = SIMDUtils::loadUnaligned (r);
+        _i = SIMDUtils::loadUnaligned (i);
     }
 
     inline T real() const noexcept { return _r; }
