@@ -23,7 +23,7 @@ public:
         aaFilters.clear();
         aaFilters.resize (spec.numChannels);
 
-        auto fc = T (0.98 * (spec.sampleRate * 0.5));
+        auto fc = T (0.995 * (spec.sampleRate * 0.5));
         auto Qs = QValCalcs::butterworth_Qs<T, FilterOrder>();
         for (size_t ch = 0; ch < spec.numChannels; ++ch)
         {
