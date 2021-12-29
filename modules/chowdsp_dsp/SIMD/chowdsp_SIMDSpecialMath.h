@@ -374,4 +374,51 @@ inline typename juce::dsp::SIMDRegister<T>::vMaskType isnanSIMD (juce::dsp::SIMD
     return Vec::notEqual (y, (Vec) 0);
 }
 #endif // CHOWDSP_USE_XSIMD
+
+#ifdef __AVX2__
+/** Default SIMG register alignment */
+constexpr int CHOWDSP_DEFAULT_SIMD_ALIGNMENT = 32;
+#else
+/** Default SIMG register alignment */
+constexpr int CHOWDSP_DEFAULT_SIMD_ALIGNMENT = 16;
+#endif
+
+/** Returns the maximum value from the SIMD register */
+template <typename T>
+inline T hMaxSIMD (juce::dsp::SIMDRegister<T> x)
+{
+    constexpr auto vecSize = juce::dsp::SIMDRegister<T>::size();
+    T v alignas (CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[vecSize];
+    x.copyToRawArray (v);
+
+    if constexpr (vecSize == 2)
+        return juce::jmax (v[0], v[1]);
+    else if (vecSize == 4)
+        return juce::jmax (v[0], v[1], v[2], v[3]);
+    else
+        return juce::jmax (juce::jmax (v[0], v[1], v[2], v[3]), juce::jmax (v[4], v[5], v[6], v[7]));
+}
+
+/** Returns the minimum value from the SIMD register */
+template <typename T>
+inline T hMinSIMD (juce::dsp::SIMDRegister<T> x)
+{
+    constexpr auto vecSize = juce::dsp::SIMDRegister<T>::size();
+    T v alignas (CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[vecSize];
+    x.copyToRawArray (v);
+
+    if constexpr (vecSize == 2)
+        return juce::jmin (v[0], v[1]);
+    else if (vecSize == 4)
+        return juce::jmin (v[0], v[1], v[2], v[3]);
+    else
+        return juce::jmin (juce::jmin (v[0], v[1], v[2], v[3]), juce::jmin (v[4], v[5], v[6], v[7]));
+}
+
+/** Returns the maximum absolute value from the SIMD register */
+template <typename T>
+inline T hAbsMaxSIMD (juce::dsp::SIMDRegister<T> x)
+{
+    return hMaxSIMD (juce::dsp::SIMDRegister<T>::abs (x));
+}
 } // namespace chowdsp::SIMDUtils

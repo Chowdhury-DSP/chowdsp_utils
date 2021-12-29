@@ -59,6 +59,28 @@ public:
         expectWithinAbsoluteError (actual, expected, maxErr, "Unaligned innerProduct is incorrect!");
     }
 
+    template <typename T>
+    void absMaxTest (Random& r, Range<int> range)
+    {
+        auto refAbsMax = [] (const auto& begin, const auto end) { return std::abs (*std::max_element (begin, end, [] (auto a, auto b) { return std::abs (a) < std::abs (b); })); };
+
+        auto numValues = r.nextInt (range);
+        std::vector<T> values ((size_t) numValues, (T) 0);
+
+        for (auto& v : values)
+            v = (T) (r.nextFloat() * 2.0f - 1.0f);
+
+        constexpr auto maxErr = (T) 1.0e-3;
+
+        auto actual = chowdsp::FloatVectorOperations::findAbsoluteMaximum (values.data(), numValues);
+        auto expected = refAbsMax (values.begin(), values.end());
+        expectWithinAbsoluteError (actual, expected, maxErr, "Aligned absolute maximum is incorrect!");
+
+        actual = chowdsp::FloatVectorOperations::findAbsoluteMaximum (values.data() + 1, numValues - 1);
+        expected = refAbsMax (values.begin() + 1, values.end());
+        expectWithinAbsoluteError (actual, expected, maxErr, "Unaligned absolute maximum is incorrect!");
+    }
+
     void runTestTimed() override
     {
         if (chowdsp::FloatVectorOperations::isUsingVDSP())
@@ -72,7 +94,7 @@ public:
         accumulateTest<float> (rand, { 2, 6 });
         accumulateTest<float> (rand, { 100, 200 });
         accumulateTest<float> (rand, { 113, 114 });
-        accumulateTest<double> (rand, { 2, 6 });
+        accumulateTest<double> (rand, { 2, 4 });
         accumulateTest<double> (rand, { 100, 200 });
         accumulateTest<double> (rand, { 113, 114 });
 
@@ -80,9 +102,17 @@ public:
         innerProdTest<float> (rand, { 2, 6 });
         innerProdTest<float> (rand, { 100, 200 });
         innerProdTest<float> (rand, { 113, 114 });
-        innerProdTest<double> (rand, { 2, 6 });
+        innerProdTest<double> (rand, { 2, 4 });
         innerProdTest<double> (rand, { 100, 200 });
         innerProdTest<double> (rand, { 113, 114 });
+
+        beginTest ("Absolute Maximum Test");
+        absMaxTest<float> (rand, { 2, 6 });
+        absMaxTest<float> (rand, { 100, 200 });
+        absMaxTest<float> (rand, { 113, 114 });
+        absMaxTest<double> (rand, { 2, 4 });
+        absMaxTest<double> (rand, { 100, 200 });
+        absMaxTest<double> (rand, { 113, 114 });
     }
 };
 
