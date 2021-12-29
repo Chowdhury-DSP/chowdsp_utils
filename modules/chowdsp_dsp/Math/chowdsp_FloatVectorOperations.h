@@ -17,4 +17,10 @@ namespace chowdsp::FloatVectorOperations
 
 /** Computes the inner product between the two arrays. */
 [[maybe_unused]] double innerProduct (const double* src1, const double* src2, int numValues) noexcept;
+
+/** Finds the absolute maximum value in the given array */
+[[maybe_unused]] float findAbsoluteMaximum (const float* src, int numValues) noexcept;
+
+/** Finds the absolute maximum value in the given array */
+[[maybe_unused]] double findAbsoluteMaximum (const double* src, int numValues) noexcept;
 } // namespace chowdsp::FloatVectorOperations
