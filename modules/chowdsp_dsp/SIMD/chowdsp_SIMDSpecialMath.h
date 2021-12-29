@@ -363,11 +363,12 @@ inline juce::dsp::SIMDRegister<T> tanhSIMD (juce::dsp::SIMDRegister<T> x)
 template <typename T>
 inline typename juce::dsp::SIMDRegister<T>::vMaskType isnanSIMD (juce::dsp::SIMDRegister<T> x)
 {
-    auto y = typename juce::dsp::SIMDRegister<T>::vMaskType();
+    auto y = juce::dsp::SIMDRegister<T>();
     for (size_t i = 0; i < x.size(); ++i)
-        y.set (i, std::isnan (x.get (i)));
+        y.set (i, (T) std::isnan (x.get (i)));
 
-    return y;
+    using Vec = juce::dsp::SIMDRegister<T>;
+    return Vec::notEqual (y, (Vec) 0);
 }
 #endif // CHOWDSP_USE_XSIMD
 } // namespace chowdsp::SIMDUtils
