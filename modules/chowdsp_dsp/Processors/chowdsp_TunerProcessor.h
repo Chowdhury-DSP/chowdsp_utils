@@ -52,8 +52,7 @@ public:
     void process (const T* data)
     {
         // exit early if buffer is silent!
-        auto minMax = juce::FloatVectorOperations::findMinAndMax (data, autocorrelationSize);
-        if (std::abs (minMax.getStart()) < (T) 1.0e-2 && std::abs (minMax.getEnd()) < (T) 1.0e-2)
+        if (FloatVectorOperations::findAbsoluteMaximum (data, autocorrelationSize) < (T) 1.0e-2)
         {
             curFreqHz = (T) 1;
             return;
