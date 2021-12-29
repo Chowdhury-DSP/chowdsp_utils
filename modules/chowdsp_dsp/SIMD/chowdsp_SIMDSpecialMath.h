@@ -9,9 +9,6 @@ namespace chowdsp::SIMDUtils
  */
 
 #if CHOWDSP_USE_XSIMD // XSIMD implementations
-template <typename T>
-using x_type = xsimd::batch<T, juce::dsp::SIMDRegister<T>::size()>;
-
 /** SIMD implementation of std::exp */
 template <typename T>
 inline juce::dsp::SIMDRegister<T> expSIMD (juce::dsp::SIMDRegister<T> x)

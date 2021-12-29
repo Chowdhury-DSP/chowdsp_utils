@@ -85,6 +85,7 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 // SIMD
 #include "SIMD/chowdsp_SampleTypeHelpers.h"
 #include "SIMD/chowdsp_SIMDUtils.h"
+#include "SIMD/chowdsp_SIMDLogic.h"
 #include "SIMD/chowdsp_SIMDArithmetic.h"
 #include "SIMD/chowdsp_SIMDSpecialMath.h"
 #include "SIMD/chowdsp_SIMDFastMath.h"
