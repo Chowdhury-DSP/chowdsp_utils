@@ -60,6 +60,7 @@ private:
 };
 
 #if CHOWDSP_USE_FOLEYS_CLASSES
+// LCOV_EXCL_START
 /** Foley's GUI wrapper for PresetsComp */
 template <typename ProcType>
 class PresetsItem : public foleys::GuiItem
@@ -88,7 +89,8 @@ public:
     void update() override
     {
 #if FOLEYS_ENABLE_BINARY_DATA
-        auto getDrawable = [] (const juce::String& name) {
+        auto getDrawable = [] (const juce::String& name)
+        {
             int dataSize = 0;
             const char* data = BinaryData::getNamedResource (name.toRawUTF8(), dataSize);
             return juce::Drawable::createFromImageData (data, (size_t) dataSize);
@@ -105,12 +107,13 @@ public:
             presetsComp->setNextPrevButton (getDrawable (prevButtonName).get(), false);
         else
             presetsComp->setNextPrevButton (nullptr, false);
-#endif
+#endif // FOLEYS_ENABLE_BINARY_DATA
     }
 
     std::vector<foleys::SettableProperty> getSettableProperties() const override
     {
-        std::function<void (juce::ComboBox&)> createAssetFilesMenuLambda = [=] (juce::ComboBox&) {
+        std::function<void (juce::ComboBox&)> createAssetFilesMenuLambda = [=] (juce::ComboBox&)
+        {
             magicBuilder.getMagicState().createAssetFilesMenu();
         };
 
@@ -139,6 +142,7 @@ const juce::Identifier PresetsItem<ProcType>::pNextButton { "next-button" };
 template <typename ProcType>
 const juce::Identifier PresetsItem<ProcType>::pPrevButton { "prev-button" };
 
-#endif
+// LCOV_EXCL_STOP
+#endif // CHOWDSP_USE_FOLEYS_CLASSES
 
 } // namespace chowdsp

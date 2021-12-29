@@ -28,6 +28,7 @@ private:
 };
 
 #if CHOWDSP_USE_FOLEYS_CLASSES
+// LCOV_EXCL_START
 /** Foley's GUI wrapper for InfoComp */
 class InfoItem : public foleys::GuiItem
 {
@@ -59,6 +60,7 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (InfoItem)
 };
-#endif
+// LCOV_EXCL_STOP
+#endif // CHOWDSP_USE_FOLEYS_CLASSES
 
 } // namespace chowdsp
