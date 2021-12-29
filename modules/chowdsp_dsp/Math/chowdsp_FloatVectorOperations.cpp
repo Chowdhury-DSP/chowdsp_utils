@@ -79,8 +79,7 @@ namespace detail
     template <typename T, typename ScalarOp, typename VecOp>
     T reduce (const T* src, int numValues, T init, ScalarOp&& scalarOp, VecOp&& vecOp)
     {
-        return reduce (src, numValues, init, scalarOp, vecOp, [] (auto val)
-                       { return val.sum(); });
+        return reduce (src, numValues, init, scalarOp, vecOp, [] (auto val) { return val.sum(); });
     }
 
     template <typename T, typename ScalarOp>
@@ -100,8 +99,7 @@ namespace detail
             return reduceFallback (src1, src2, numValues, init, scalarOp);
 
         // Main loop here:
-        auto vecLoop = [&] (auto&& loadOp1, auto&& loadOp2)
-        {
+        auto vecLoop = [&] (auto&& loadOp1, auto&& loadOp2) {
             juce::dsp::SIMDRegister<T> resultVec {};
             while (--numVecOps >= 0)
             {
@@ -114,10 +112,8 @@ namespace detail
         };
 
         // define load operations
-        auto loadA = [] (const T* val)
-        { return juce::dsp::SIMDRegister<T>::fromRawArray (val); };
-        auto loadU = [] (const T* val)
-        { return loadUnaligned (val); };
+        auto loadA = [] (const T* val) { return juce::dsp::SIMDRegister<T>::fromRawArray (val); };
+        auto loadU = [] (const T* val) { return loadUnaligned (val); };
 
         // select load operations based on data alignment
         const auto isSrc1Aligned = isAligned (src1);
@@ -143,8 +139,7 @@ namespace detail
     template <typename T, typename ScalarOp, typename VecOp>
     T reduce (const T* src1, const T* src2, int numValues, T init, ScalarOp&& scalarOp, VecOp&& vecOp)
     {
-        return reduce (src1, src2, numValues, init, scalarOp, vecOp, [] (auto val)
-                       { return val.sum(); });
+        return reduce (src1, src2, numValues, init, scalarOp, vecOp, [] (auto val) { return val.sum(); });
     }
 
     template <typename T, typename ScalarOp>
@@ -177,8 +172,7 @@ float accumulate (const float* src, int numValues) noexcept
         src,
         numValues,
         0.0f,
-        [] (auto prev, auto next)
-        { return prev + next; });
+        [] (auto prev, auto next) { return prev + next; });
 #endif
 }
 
@@ -193,8 +187,7 @@ double accumulate (const double* src, int numValues) noexcept
         src,
         numValues,
         0.0,
-        [] (auto prev, auto next)
-        { return prev + next; });
+        [] (auto prev, auto next) { return prev + next; });
 #endif
 }
 
@@ -210,8 +203,7 @@ float innerProduct (const float* src1, const float* src2, int numValues) noexcep
         src2,
         numValues,
         0.0f,
-        [] (auto prev, auto next1, auto next2)
-        { return prev + next1 * next2; });
+        [] (auto prev, auto next1, auto next2) { return prev + next1 * next2; });
 #endif
 }
 
@@ -227,8 +219,7 @@ double innerProduct (const double* src1, const double* src2, int numValues) noex
         src2,
         numValues,
         0.0,
-        [] (auto prev, auto next1, auto next2)
-        { return prev + next1 * next2; });
+        [] (auto prev, auto next1, auto next2) { return prev + next1 * next2; });
 #endif
 }
 
@@ -246,12 +237,9 @@ float findAbsoluteMaximum (const float* src, int numValues) noexcept
         src,
         numValues,
         0.0f,
-        [] (auto a, auto b)
-        { return juce::jmax (std::abs (a), std::abs (b)); },
-        [] (auto a, auto b)
-        { return Vec::max (Vec::abs (a), Vec::abs (b)); },
-        [] (auto x)
-        { return SIMDUtils::hAbsMaxSIMD (x); });
+        [] (auto a, auto b) { return juce::jmax (std::abs (a), std::abs (b)); },
+        [] (auto a, auto b) { return Vec::max (Vec::abs (a), Vec::abs (b)); },
+        [] (auto x) { return SIMDUtils::hAbsMaxSIMD (x); });
 #endif
 }
 
@@ -267,12 +255,9 @@ double findAbsoluteMaximum (const double* src, int numValues) noexcept
         src,
         numValues,
         0.0,
-        [] (auto a, auto b)
-        { return juce::jmax (a, std::abs (b)); },
-        [] (auto a, auto b)
-        { return Vec::max (a, Vec::abs (b)); },
-        [] (auto x)
-        { return SIMDUtils::hMaxSIMD (x); });
+        [] (auto a, auto b) { return juce::jmax (a, std::abs (b)); },
+        [] (auto a, auto b) { return Vec::max (a, Vec::abs (b)); },
+        [] (auto x) { return SIMDUtils::hMaxSIMD (x); });
 #endif
 }
 } // namespace chowdsp::FloatVectorOperations
