@@ -91,15 +91,11 @@ public:
     template <typename T>
     void hMinMaxTest (int nIter, Random& r)
     {
-        auto refMax = [] (const auto& data)
-        { return *std::max_element (data.begin(), data.end()); };
+        auto refMax = [] (const auto& data) { return *std::max_element (data.begin(), data.end()); };
 
-        auto refMin = [] (const auto& data)
-        { return *std::min_element (data.begin(), data.end()); };
+        auto refMin = [] (const auto& data) { return *std::min_element (data.begin(), data.end()); };
 
-        auto refAbsMax = [] (const auto& data)
-        { return std::abs (*std::max_element (data.begin(), data.end(), [] (auto a, auto b)
-                                              { return std::abs (a) < std::abs (b); })); };
+        auto refAbsMax = [] (const auto& data) { return std::abs (*std::max_element (data.begin(), data.end(), [] (auto a, auto b) { return std::abs (a) < std::abs (b); })); };
 
         for (int i = 0; i < nIter; ++i)
         {

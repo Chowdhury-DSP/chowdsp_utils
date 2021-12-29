@@ -62,9 +62,7 @@ public:
     template <typename T>
     void absMaxTest (Random& r, Range<int> range)
     {
-        auto refAbsMax = [] (const auto& begin, const auto end)
-        { return std::abs (*std::max_element (begin, end, [] (auto a, auto b)
-                                              { return std::abs (a) < std::abs (b); })); };
+        auto refAbsMax = [] (const auto& begin, const auto end) { return std::abs (*std::max_element (begin, end, [] (auto a, auto b) { return std::abs (a) < std::abs (b); })); };
 
         auto numValues = r.nextInt (range);
         std::vector<T> values ((size_t) numValues, (T) 0);
