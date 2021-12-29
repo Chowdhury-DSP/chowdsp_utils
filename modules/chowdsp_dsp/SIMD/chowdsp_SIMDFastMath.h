@@ -65,4 +65,4 @@ inline juce::dsp::SIMDRegister<T> clampToPiRangeSIMD (juce::dsp::SIMDRegister<T>
     p = p + off;
     return p - mpi;
 }
-}
+} // namespace chowdsp::SIMDUtils
