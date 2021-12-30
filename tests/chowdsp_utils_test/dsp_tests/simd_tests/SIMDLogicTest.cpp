@@ -11,7 +11,7 @@ public:
     void selectTest()
     {
         using Vec = typename dsp::SIMDRegister<T>;
-        Vec vec;
+        Vec vec {};
         for (size_t i = 0; i < Vec::size(); ++i)
             vec.set (i, i < Vec::size() / 2 ? (T) -1 : (T) 1);
 
@@ -30,7 +30,7 @@ public:
     void selectIsNANTest()
     {
         using Vec = typename dsp::SIMDRegister<T>;
-        Vec vec;
+        Vec vec {};
         for (size_t i = 0; i < Vec::size(); ++i)
             vec.set (i, i < Vec::size() / 2 ? (T) 1 : (T) NAN);
 
@@ -49,7 +49,7 @@ public:
     void andNotTest()
     {
         using Vec = typename dsp::SIMDRegister<T>;
-        Vec vec;
+        Vec vec {};
         for (size_t i = 0; i < Vec::size(); ++i)
             vec.set (i, (T) i);
 

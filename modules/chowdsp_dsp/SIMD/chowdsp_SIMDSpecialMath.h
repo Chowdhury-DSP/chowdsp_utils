@@ -393,7 +393,7 @@ inline T hMaxSIMD (juce::dsp::SIMDRegister<T> x)
 
     if constexpr (vecSize == 2)
         return juce::jmax (v[0], v[1]);
-    else if (vecSize == 4)
+    else if constexpr (vecSize == 4)
         return juce::jmax (v[0], v[1], v[2], v[3]);
     else
         return juce::jmax (juce::jmax (v[0], v[1], v[2], v[3]), juce::jmax (v[4], v[5], v[6], v[7]));
@@ -409,7 +409,7 @@ inline T hMinSIMD (juce::dsp::SIMDRegister<T> x)
 
     if constexpr (vecSize == 2)
         return juce::jmin (v[0], v[1]);
-    else if (vecSize == 4)
+    else if constexpr (vecSize == 4)
         return juce::jmin (v[0], v[1], v[2], v[3]);
     else
         return juce::jmin (juce::jmin (v[0], v[1], v[2], v[3]), juce::jmin (v[4], v[5], v[6], v[7]));
