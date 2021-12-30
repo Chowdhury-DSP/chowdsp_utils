@@ -60,6 +60,7 @@ private:
 };
 
 #if CHOWDSP_USE_FOLEYS_CLASSES
+// LCOV_EXCL_START
 /** Foley's GUI wrapper for PresetsComp */
 template <typename ProcType>
 class PresetsItem : public foleys::GuiItem
@@ -105,7 +106,7 @@ public:
             presetsComp->setNextPrevButton (getDrawable (prevButtonName).get(), false);
         else
             presetsComp->setNextPrevButton (nullptr, false);
-#endif
+#endif // FOLEYS_ENABLE_BINARY_DATA
     }
 
     std::vector<foleys::SettableProperty> getSettableProperties() const override
@@ -139,6 +140,7 @@ const juce::Identifier PresetsItem<ProcType>::pNextButton { "next-button" };
 template <typename ProcType>
 const juce::Identifier PresetsItem<ProcType>::pPrevButton { "prev-button" };
 
-#endif
+// LCOV_EXCL_STOP
+#endif // CHOWDSP_USE_FOLEYS_CLASSES
 
 } // namespace chowdsp
