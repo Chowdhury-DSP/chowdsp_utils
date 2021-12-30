@@ -11,6 +11,7 @@ target_sources(chowdsp_utils_tests PRIVATE
     math_tests/PolynomialsTest.cpp
 
     data_structure_tests/DoubleBufferTest.cpp
+    data_structure_tests/RebufferProcessorTest.cpp
     data_structure_tests/SmoothedBufferValueTest.cpp
 
     source_tests/NoiseTest.cpp
