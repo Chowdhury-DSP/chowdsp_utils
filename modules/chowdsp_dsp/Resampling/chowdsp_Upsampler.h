@@ -83,7 +83,7 @@ public:
         for (size_t ch = 0; ch < numChannels; ++ch)
             process (block.getChannelPointer (ch), outBlock.getChannelPointer (ch), (int) ch, numSamples);
 
-        return outBlock;
+        return outBlock.getSubBlock (0, size_t (numSamples * ratio));
     }
 
 private:
