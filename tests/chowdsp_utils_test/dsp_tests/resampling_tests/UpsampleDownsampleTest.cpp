@@ -53,46 +53,82 @@ public:
         return Decibels::gainToDecibels (signalAccum / noiseAccum);
     }
 
-    void upsampleQualityTest()
+    template <typename ProcType>
+    static AudioBuffer<float> processInSubBlocks (ProcType& proc, AudioBuffer<float>& inBuffer, int subBlockSize = blockSize / 8)
     {
-        chowdsp::Upsampler<float> upsampler;
-        upsampler.prepare ({ _sampleRate, (uint32) blockSize, 1 }, 2);
+        AudioBuffer<float> outBuffer (inBuffer);
+        int outBufferPtr = 0;
+
+        dsp::AudioBlock<float> inBlock { inBuffer };
+        for (int i = 0; i < inBuffer.getNumSamples(); i += subBlockSize)
+        {
+            auto outBlock = proc.process (inBlock.getSubBlock ((size_t) i, (size_t) subBlockSize));
+
+            auto numOutSamples = (int) outBlock.getNumSamples();
+            if (outBufferPtr + numOutSamples > outBuffer.getNumSamples())
+                outBuffer.setSize (1, outBufferPtr + numOutSamples, true);
+
+            outBuffer.copyFrom (0, outBufferPtr, outBlock.getChannelPointer (0), numOutSamples);
+            outBufferPtr += numOutSamples;
+        }
+
+        outBuffer.setSize (1, outBufferPtr, true);
+
+        JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wpessimizing-move") // Clang doesn't like std::move
+        return std::move (outBuffer);
+        JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+    }
+
+    template <int FilterOrd = 4>
+    void upsampleQualityTest (int upsampleRatio)
+    {
+        chowdsp::Upsampler<float, FilterOrd> upsampler;
+        upsampler.prepare ({ _sampleRate, (uint32) blockSize, 1 }, upsampleRatio);
 
         constexpr float testFreq = 10000.0f;
         auto sineBuffer = test_utils::makeSineWave (testFreq, (float) _sampleRate, (int) blockSize);
-        auto upsampledBlock = upsampler.process (dsp::AudioBlock<float> (sineBuffer));
+        auto upsampledBuffer = processInSubBlocks (upsampler, sineBuffer);
+        auto upsampledBlock = dsp::AudioBlock<float> (upsampledBuffer);
         auto snr = calcSNR (upsampledBlock, testFreq, (float) _sampleRate * (float) upsampler.getUpsamplingRatio());
 
-        expectEquals (upsampledBlock.getNumSamples(), blockSize * (size_t) upsampler.getUpsamplingRatio(), "Upsampled block size is incorrect!");
-        expectGreaterThan (snr, 60.0f, "Signal to noise ratio is too low!");
+        expectEquals (upsampledBuffer.getNumSamples(), (int) blockSize * upsampler.getUpsamplingRatio(), "Upsampled block size is incorrect!");
+        expectGreaterThan (snr, 70.0f, "Signal to noise ratio is too low!");
     }
 
-    void downsampleQualityTest()
+    template <int FilterOrd = 8>
+    void downsampleQualityTest (int downsampleRatio)
     {
-        chowdsp::Downsampler<float, 8> downsampler;
-        downsampler.prepare ({ 2.0 * _sampleRate, (uint32) blockSize, 1 }, 2);
+        chowdsp::Downsampler<float, FilterOrd> downsampler;
+        downsampler.prepare ({ (double) downsampleRatio * _sampleRate, (uint32) blockSize, 1 }, downsampleRatio);
 
         constexpr float testFreq = 42000.0f;
-        auto sineBuffer = test_utils::makeSineWave (testFreq, 2.0f * (float) _sampleRate, (int) blockSize);
-        auto downsampledBlock = downsampler.process (dsp::AudioBlock<float> (sineBuffer));
+        auto thisBlockSize = downsampleRatio * (int) blockSize;
+        auto sineBuffer = test_utils::makeSineWave (testFreq, (float) downsampleRatio * (float) _sampleRate, thisBlockSize);
+        auto downsampledBuffer = processInSubBlocks (downsampler, sineBuffer, downsampleRatio * 256);
 
         float squaredSum = 0.0f;
-        for (size_t n = 0; n < blockSize / 2; ++n)
-            squaredSum += std::pow (downsampledBlock.getSample (0, (int) n), 2.0f);
+        for (int n = 0; n < (int) blockSize / downsampleRatio; ++n)
+            squaredSum += std::pow (downsampledBuffer.getSample (0, n), 2.0f);
 
         auto rms = Decibels::gainToDecibels (std::sqrt (squaredSum / ((float) blockSize / 2.0f)));
 
-        expectEquals (downsampledBlock.getNumSamples(), blockSize / (size_t) downsampler.getDownsamplingRatio(), "Downsampled block size is incorrect!");
+        expectEquals (downsampledBuffer.getNumSamples(), thisBlockSize / downsampler.getDownsamplingRatio(), "Downsampled block size is incorrect!");
         expectLessThan (rms, -50.0f, "RMS level is too high!");
     }
 
     void runTestTimed() override
     {
-        beginTest ("Upsample Quality Test");
-        upsampleQualityTest();
+        beginTest ("Upsample 2x Quality Test");
+        upsampleQualityTest (2);
 
-        beginTest ("Downsample Quality Test");
-        downsampleQualityTest();
+        beginTest ("Upsample 3x Quality Test");
+        upsampleQualityTest<8> (3);
+
+        beginTest ("Downsample 2x Quality Test");
+        downsampleQualityTest (2);
+
+        beginTest ("Downsample 3x Quality Test");
+        downsampleQualityTest<16> (3);
     }
 };
 
