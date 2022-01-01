@@ -223,8 +223,6 @@ double innerProduct (const double* src1, const double* src2, int numValues) noex
 #endif
 }
 
-// @TODO: Figure out why vDSP_maxmgv fails for unaligned data?
-
 float findAbsoluteMaximum (const float* src, int numValues) noexcept
 {
 #if JUCE_USE_VDSP_FRAMEWORK
