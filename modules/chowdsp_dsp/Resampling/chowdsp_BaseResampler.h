@@ -1,7 +1,9 @@
 #pragma once
 
+/** Various methods for resampling, that may be used with ResamplingProcessor or ResampledProcess */
 namespace chowdsp::ResamplingTypes
 {
+/** Abstract class which defines the basic methods that all other resampling types must implement */
 class BaseResampler
 {
 public:

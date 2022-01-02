@@ -204,6 +204,10 @@ struct Thiran
     double alpha = 0.0;
 };
 
+#ifndef DOXYGEN
+JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324) // MSVC doesn't like other variables hiding class members
+#endif
+
 /**
     Successive samples in the delay line will be interpolated using Sinc
     interpolation. This method is somewhat less efficient than the others,
@@ -211,7 +215,6 @@ struct Thiran
 
     Note that Sinc interpolation cannot currently be used with SIMD data types!
 */
-JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324) // MSVC doesn't like other variables hiding class members
 template <typename T, size_t N, size_t M = 256>
 struct Sinc
 {

@@ -2,6 +2,7 @@
 
 namespace chowdsp
 {
+#ifndef DOXYGEN
 /** Helper functions for generating noise signals.
  *  NOT desgined to be used directly.
  */
@@ -11,6 +12,7 @@ namespace NoiseHelpers
     template <typename T>
     T uniform01 (juce::Random&) noexcept;
 } // namespace NoiseHelpers
+#endif // DOXYGEN
 
 /** Audio processor that adds noise to an audio buffer.
  *  Currently support white noise with a uniform or normal

@@ -1,5 +1,6 @@
 #pragma once
 
+/** Tools for working with software versioning. */
 namespace chowdsp::VersionUtils
 {
 /** Utility class to manage version strings. */
@@ -13,12 +14,12 @@ public:
 
     juce::String getVersionString() const;
 
-    friend bool operator== (const Version& v1, const Version& v2);
-    friend bool operator!= (const Version& v1, const Version& v2);
-    friend bool operator> (const Version& v1, const Version& v2);
-    friend bool operator< (const Version& v1, const Version& v2);
-    friend bool operator>= (const Version& v1, const Version& v2);
-    friend bool operator<= (const Version& v1, const Version& v2);
+    friend bool operator== (const Version& v1, const Version& v2) noexcept;
+    friend bool operator!= (const Version& v1, const Version& v2) noexcept;
+    friend bool operator> (const Version& v1, const Version& v2) noexcept;
+    friend bool operator< (const Version& v1, const Version& v2) noexcept;
+    friend bool operator>= (const Version& v1, const Version& v2) noexcept;
+    friend bool operator<= (const Version& v1, const Version& v2) noexcept;
 
 private:
     int major = 0;

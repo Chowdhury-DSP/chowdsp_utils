@@ -83,9 +83,11 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginBase)
 };
 
-/** Class that uses SFINAE to ensure that the
- *  processor class has an `addParameters` function
-*/
+#ifndef DOXYGEN
+/**
+ * Class that uses SFINAE to ensure that the
+ * processor class has an `addParameters` function
+ */
 template <typename T>
 class HasAddParameters
 {
@@ -103,6 +105,7 @@ public:
         value = sizeof (test<T> (nullptr)) == sizeof (char)
     };
 };
+#endif // DOXYGEN
 
 template <class Processor>
 PluginBase<Processor>::PluginBase() : AudioProcessor (BusesProperties().withInput ("Input", juce::AudioChannelSet::stereo(), true).withOutput ("Output", juce::AudioChannelSet::stereo(), true)),

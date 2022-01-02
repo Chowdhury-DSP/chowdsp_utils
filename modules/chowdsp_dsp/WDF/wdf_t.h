@@ -12,12 +12,14 @@
 #include "signum.h"
 #include "omega.h"
 
+/** API for constructing Wave Digital Filters with a fixed compile-time architecture */
 namespace chowdsp::WDFT
 {
 #if WDF_USING_JUCE
 using namespace SIMDUtils;
 #endif // WDF_USING_JUCE
 
+/** Base WDF class for propagating impedance changes between elements */
 class BaseWDF
 {
 public:
@@ -37,6 +39,7 @@ protected:
     BaseWDF* parent = nullptr;
 };
 
+/** Base class for propagating impedance changes into root WDF elements */
 class RootWDF : public BaseWDF
 {
 public:
@@ -852,7 +855,8 @@ enum DiodeQuality
     Best, // see reference eqn (39)
 };
 
-/** WDF diode pair (non-adaptable)
+/**
+ * WDF diode pair (non-adaptable)
  * See Werner et al., "An Improved and Generalized Diode Clipper Model for Wave Digital Filters"
  * https://www.researchgate.net/publication/299514713_An_Improved_and_Generalized_Diode_Clipper_Model_for_Wave_Digital_Filters
  */
@@ -860,11 +864,13 @@ template <typename T, typename Next, DiodeQuality Quality = DiodeQuality::Best>
 class DiodePairT final : public RootWDF
 {
 public:
-    /** Creates a new WDF diode pair, with the given diode specifications.
-         * @param Is: reverse saturation current
-         * @param Vt: thermal voltage
-         * @param next: the next element in the WDF connection tree
-         */
+    /**
+     * Creates a new WDF diode pair, with the given diode specifications.
+     * @param n: the next element in the WDF connection tree
+     * @param Is: reverse saturation current
+     * @param Vt: thermal voltage
+     * @param nDiodes: the number of series diodes
+     */
     DiodePairT (Next& n, T Is, T Vt = typename WDFMembers<T>::NumericType (25.85e-3), T nDiodes = 1) : next (n)
     {
         next.connectToParent (this);
@@ -984,19 +990,22 @@ private:
     Next& next;
 };
 
-/** WDF diode (non-adaptable)
-     * See Werner et al., "An Improved and Generalized Diode Clipper Model for Wave Digital Filters"
-     * https://www.researchgate.net/publication/299514713_An_Improved_and_Generalized_Diode_Clipper_Model_for_Wave_Digital_Filters
-     */
+/**
+ * WDF diode (non-adaptable)
+ * See Werner et al., "An Improved and Generalized Diode Clipper Model for Wave Digital Filters"
+ * https://www.researchgate.net/publication/299514713_An_Improved_and_Generalized_Diode_Clipper_Model_for_Wave_Digital_Filters
+ */
 template <typename T, typename Next, DiodeQuality Quality = DiodeQuality::Best>
 class DiodeT final : public RootWDF
 {
 public:
-    /** Creates a new WDF diode, with the given diode specifications.
-         * @param Is: reverse saturation current
-         * @param Vt: thermal voltage
-         * @param next: the next element in the WDF connection tree
-         */
+    /**
+     * Creates a new WDF diode, with the given diode specifications.
+     * @param n: the next element in the WDF connection tree
+     * @param Is: reverse saturation current
+     * @param Vt: thermal voltage
+     * @param nDiodes: the number of series diodes
+     */
     DiodeT (Next& n, T Is, T Vt = typename WDFMembers<T>::NumericType (25.85e-3), T nDiodes = 1) : next (n)
     {
         next.connectToParent (this);
@@ -1121,20 +1130,23 @@ inline T current (const WDFType& wdf) noexcept
     return (wdf.wdf.a - wdf.wdf.b) * ((T) 0.5 * wdf.wdf.G);
 }
 
-// useful "factory" functions to you don't have to declare all the template parameters
+// useful "factory" functions so you don't have to declare all the template parameters
 
+/** Factory method for creating a parallel adaptor between two elements. */
 template <typename T, typename P1Type, typename P2Type>
 [[maybe_unused]] WDFParallelT<T, P1Type, P2Type> makeParallel (P1Type& p1, P2Type& p2)
 {
     return WDFParallelT<T, P1Type, P2Type> (p1, p2);
 }
 
+/** Factory method for creating a series adaptor between two elements. */
 template <typename T, typename P1Type, typename P2Type>
 [[maybe_unused]] WDFSeriesT<T, P1Type, P2Type> makeSeries (P1Type& p1, P2Type& p2)
 {
     return WDFSeriesT<T, P1Type, P2Type> (p1, p2);
 }
 
+/** Factory method for creating a polarity inverter. */
 template <typename T, typename PType>
 [[maybe_unused]] PolarityInverterT<T, PType> makeInverter (PType& p1)
 {

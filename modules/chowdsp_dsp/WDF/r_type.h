@@ -123,8 +123,10 @@ namespace rtype_detail
  *  For more information see: https://searchworks.stanford.edu/view/11891203, chapter 2
  *
  *  The ImpedanceCalculator template argument with a static method of the form:
+ *  @code
  *  template <typename RType>
  *  static void calcImpedance (RType& R);
+ *  @endcode
  */
 template <typename T, typename ImpedanceCalculator, typename... PortTypes>
 class RootRtypeAdaptor : public RootWDF
@@ -178,7 +180,7 @@ public:
                                       downPorts);
     }
 
-protected:
+private:
     std::tuple<PortTypes&...> downPorts; // tuple of ports connected to RtypeAdaptor
 
     rtype_detail::AlignedArray<T, numPorts> S_matrix[numPorts]; // square matrix representing S
@@ -193,8 +195,10 @@ protected:
  *  The upPortIndex argument descibes with port of the scattering matrix is being adapted.
  *
  *  The ImpedanceCalculator template argument with a static method of the form:
+ *  @code
  *  template <typename RType>
  *  static T calcImpedance (RType& R);
+ *  @endcode
  */
 template <typename T, int upPortIndex, typename ImpedanceCalculator, typename... PortTypes>
 class RtypeAdaptor : public BaseWDF
@@ -266,7 +270,7 @@ public:
 
     WDFMembers<T> wdf;
 
-protected:
+private:
     constexpr auto getPortIndex (int tupleIndex)
     {
         return tupleIndex < upPortIndex ? tupleIndex : tupleIndex + 1;

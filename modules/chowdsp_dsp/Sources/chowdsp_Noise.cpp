@@ -20,6 +20,7 @@ void Noise<T>::reset() noexcept
     juce::dsp::Gain<T>::reset();
 }
 
+#ifndef DOXYGEN
 namespace NoiseHelpers
 {
     using namespace SIMDUtils;
@@ -118,6 +119,7 @@ namespace NoiseHelpers
     }
 
 } // namespace NoiseHelpers
+#endif // DOXYGEN
 
 template <typename T>
 template <typename ProcessContext>
