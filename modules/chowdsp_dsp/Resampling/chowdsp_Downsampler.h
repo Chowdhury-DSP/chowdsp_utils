@@ -53,7 +53,7 @@ public:
     /**
      * Process a single-channel block of data
      * @param data              Block of input samples.
-     * @param upsampledData     Block of output samples. Must point to a block of memory of size numSamples / ratio.
+     * @param downsampledData   Block of output samples. Must point to a block of memory of size numSamples / ratio.
      * @param channel           Channel index to process.
      * @param numSamples        Number of input samples to process. Must be an integer multiple of the ratio.
      */

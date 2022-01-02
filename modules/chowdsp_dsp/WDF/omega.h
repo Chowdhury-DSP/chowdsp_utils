@@ -27,6 +27,14 @@
 
 #include <algorithm>
 
+/**
+ * Useful approximations for evaluating the Wright Omega function.
+ *
+ * This approach was devloped by Stefano D'Angelo, and adapted from his
+ * original implementation under the MIT license.
+ * - Paper: https://www.dafx.de/paper-archive/2019/DAFx2019_paper_5.pdf
+ * - Original Source: https://www.dangelo.audio/dafx2019-omega.html
+ */
 namespace chowdsp::Omega
 {
 /** approximation for log_2(x), optimized on the range [1, 2] */

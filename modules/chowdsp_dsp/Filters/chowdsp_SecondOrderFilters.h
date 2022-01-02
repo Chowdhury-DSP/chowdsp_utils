@@ -13,10 +13,7 @@ public:
 
     /**
      * Calculates the filter coefficients for a given cutoff frequency, Q value, and sample rate.
-     * The analog prototype transfer function is:
-     *                    1
-     *  H(s) = -----------------------
-     *           s^2 + (s / Q) +  1
+     * The analog prototype transfer function is: \f$ H(s) = \frac{1}{s^2 + s/Q + 1} \f$
      */
     void calcCoefs (T fc, T qVal, T fs);
 
@@ -35,10 +32,7 @@ public:
 
     /**
      * Calculates the filter coefficients for a given cutoff frequency, Q value, and sample rate.
-     * The analog prototype transfer function is:
-     *                   s^2
-     *  H(s) = ------------------------
-     *           s^2 + (s / Q)  +  1
+     * The analog prototype transfer function is: \f$ H(s) = \frac{s^2}{s^2 + s/Q + 1} \f$
      */
     void calcCoefs (T fc, T qVal, T fs);
 
@@ -57,10 +51,7 @@ public:
 
     /**
      * Calculates the filter coefficients for a given cutoff frequency, Q value, and sample rate.
-     * The analog prototype transfer function is:
-     *                 s / Q
-     *  H(s) = ---------------------
-     *          s^2 + (s / Q) +  1
+     * The analog prototype transfer function is: \f$ H(s) = \frac{s/Q}{s^2 + s/Q + 1} \f$
      */
     void calcCoefs (T fc, T qVal, T fs);
 
@@ -79,10 +70,7 @@ public:
 
     /**
      * Calculates the filter coefficients for a given cutoff frequency, Q value, and sample rate.
-     * The analog prototype transfer function is:
-     *                s^2 + 1
-     *  H(s) = ---------------------
-     *          s^2 + (s / Q) +  1
+     * The analog prototype transfer function is: \f$ H(S) = \frac{s^2 + 1}{s^2 + s/Q + 1} \f$
      */
     void calcCoefs (T fc, T qVal, T fs);
 
@@ -102,10 +90,7 @@ public:
     /**
      * Calculates the filter coefficients for a given cutoff frequency, Q value, gain, and sample rate.
      * Note that the gain should be in units of linear gain, NOT Decibels.
-     * The analog prototype transfer function is:
-     *          s^2 + G * (s / Q) + 1
-     *  H(s) = -----------------------
-     *            s^2 + (s / Q) + 1
+     * The analog prototype transfer function is: \f$ H(s) = \frac{s^2 + G s/Q + 1}{s^2 + s/Q + 1} \f$
      */
     void calcCoefs (T fc, T qVal, T gain, T fs);
 
@@ -131,10 +116,7 @@ public:
     /**
      * Calculates the filter coefficients for a given cutoff frequency, Q value, gain, and sample rate.
      * Note that the gain should be in units of linear gain, NOT Decibels.
-     * The analog prototype transfer function is:
-     *              s^2 + sqrt(A) * (s / Q) + A
-     *  H(s) = A ---------------------------------
-     *            A * s^2 + sqrt(A) * (s / Q) + 1
+     * The analog prototype transfer function is: \f$ H(s) = A \frac{s^2 + \sqrt{A} s/Q + A}{A s^2 + \sqrt{A} s/Q + 1} \f$
      */
     void calcCoefs (T fc, T qVal, T gain, T fs);
 
@@ -160,10 +142,7 @@ public:
     /**
      * Calculates the filter coefficients for a given cutoff frequency, Q value, gain, and sample rate.
      * Note that the gain should be in units of linear gain, NOT Decibels.
-     * The analog prototype transfer function is:
-     *            A * s^2 + sqrt(A) * (s / Q) + 1
-     *  H(s) = A ---------------------------------
-     *              s^2 + sqrt(A) * (s / Q) + A
+     * The analog prototype transfer function is: \f$ H(s) = A \frac{As^2 + \sqrt{A} s/Q + 1}{s^2 + \sqrt{A} s/Q + A} \f$
      */
     void calcCoefs (T fc, T qVal, T gain, T fs);
 

@@ -1,7 +1,9 @@
 #pragma once
 
+/** Methods for retreiving information about the target system. */
 namespace chowdsp::SystemInfo
 {
+/** Returns the current operating system and bit-depth. */
 constexpr std::string_view getOSDescription()
 {
 #if JUCE_WINDOWS
@@ -23,6 +25,10 @@ constexpr std::string_view getOSDescription()
 #endif
 }
 
+/**
+ * Returns the target system architecture.
+ * Currently only "Intel" or "ARM".
+ */
 constexpr std::string_view getProcArch()
 {
 #if JUCE_INTEL

@@ -2,34 +2,37 @@
 
 class SIMDComplexTest : public TimedUnitTest
 {
+    template <typename T>
+    using SIMDComplex = chowdsp::SIMDUtils::SIMDComplex<T>;
+
 public:
     SIMDComplexTest() : TimedUnitTest ("SIMD Complex Test", "SIMD") {}
 
     void zeroCheck()
     {
-        auto a = chowdsp::SIMDComplex<float>();
+        auto a = SIMDComplex<float>();
         expect (a.atIndex (0) == std::complex<float> { 0, 0 }, "Zero initiatalisation incorrect!");
 
         auto b = a + a;
-        for (size_t i = 0; i < chowdsp::SIMDComplex<float>::size; ++i)
+        for (size_t i = 0; i < SIMDComplex<float>::size; ++i)
             expect (a.atIndex (i) == b.atIndex (i), "Zero elements incorrect!");
     }
 
     template <typename T>
     void mathTest()
     {
-        chowdsp::SIMDComplex<T> q;
-        chowdsp::SIMDComplex<T> r;
+        SIMDComplex<T> q;
+        SIMDComplex<T> r;
 
         if constexpr (std::is_same<T, float>::value)
         {
-            q = chowdsp::SIMDComplex<T> ({ (T) 0.f, (T) 1.f, (T) 2.f, (T) 3.f }, { (T) 1.f, (T) 0.f, (T) -1.f, (T) -2.f });
-            r = chowdsp::SIMDComplex<T> ({ (T) 12.f, (T) 1.2f, (T) 2.4f, (T) 3.7f }, { (T) 1.2f, (T) 0.4f, (T) -1.2f, (T) -2.7f });
+            q = SIMDComplex<T> ({ (T) 0.f, (T) 1.f, (T) 2.f, (T) 3.f }, { (T) 1.f, (T) 0.f, (T) -1.f, (T) -2.f });
+            r = SIMDComplex<T> ({ (T) 12.f, (T) 1.2f, (T) 2.4f, (T) 3.7f }, { (T) 1.2f, (T) 0.4f, (T) -1.2f, (T) -2.7f });
         }
         else if (std::is_same<T, double>::value)
         {
-            q = chowdsp::SIMDComplex<T> ({ (T) 0.f, (T) 1.f }, { (T) 1.f, (T) 0.f });
-            r = chowdsp::SIMDComplex<T> ({ (T) 12.f, (T) 1.2f }, { (T) 1.2f, (T) 0.4f });
+            q = SIMDComplex<T> ({ (T) 0.f, (T) 1.f }, { (T) 1.f, (T) 0.f });
+            r = SIMDComplex<T> ({ (T) 12.f, (T) 1.2f }, { (T) 1.2f, (T) 0.4f });
         }
 
         expect (q.atIndex (0) == std::complex<T> ((T) 0.f, (T) 1.f));
@@ -41,15 +44,15 @@ public:
         }
 
         auto qpr = q + r;
-        for (size_t i = 0; i < chowdsp::SIMDComplex<T>::size; ++i)
+        for (size_t i = 0; i < SIMDComplex<T>::size; ++i)
             expect (qpr.atIndex (i) == q.atIndex (i) + r.atIndex (i), "Addition incorrect!");
 
         auto qtr = q * r;
-        for (size_t i = 0; i < chowdsp::SIMDComplex<T>::size; ++i)
+        for (size_t i = 0; i < SIMDComplex<T>::size; ++i)
             expect (qtr.atIndex (i) == q.atIndex (i) * r.atIndex (i), "Multiplication incorrect!");
 
         T sum = (T) 0;
-        for (size_t i = 0; i < chowdsp::SIMDComplex<T>::size; ++i)
+        for (size_t i = 0; i < SIMDComplex<T>::size; ++i)
             sum += qtr.atIndex (i).real();
 
         T sumSIMD = qtr.real().sum();
@@ -59,7 +62,7 @@ public:
     template <typename T>
     void expTest()
     {
-        T angles alignas (16)[chowdsp::SIMDComplex<T>::size];
+        T angles alignas (16)[SIMDComplex<T>::size];
         angles[0] = 0;
         angles[1] = MathConstants<T>::pi / (T) 2;
         if constexpr (std::is_same<T, float>::value)
@@ -68,7 +71,7 @@ public:
             angles[3] = MathConstants<T>::pi;
         }
         auto asse = dsp::SIMDRegister<T>::fromRawArray (angles);
-        auto c = chowdsp::SIMDComplex<T>::fastExp (asse);
+        auto c = SIMDComplex<T>::fastExp (asse);
 
         auto c0 = c.atIndex (0);
         expectWithinAbsoluteError ((T) 1, c0.real(), (T) 1e-5);
@@ -93,9 +96,10 @@ public:
 
     void mapTest()
     {
-        auto q = chowdsp::SIMDComplex<float> ({ 0.f, 1.f, 2.f, 3.f }, { 1.f, 0.f, -1.f, -2.f });
-        auto powV = q.map ([] (const std::complex<float>& f) { return std::pow (f, 2.1f); });
-        for (size_t i = 0; i < chowdsp::SIMDComplex<float>::size; ++i)
+        auto q = SIMDComplex<float> ({ 0.f, 1.f, 2.f, 3.f }, { 1.f, 0.f, -1.f, -2.f });
+        auto powV = q.map ([] (const std::complex<float>& f)
+                           { return std::pow (f, 2.1f); });
+        for (size_t i = 0; i < SIMDComplex<float>::size; ++i)
             expect (powV.atIndex (i) == std::pow (q.atIndex (i), 2.1f));
     }
 

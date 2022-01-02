@@ -16,10 +16,7 @@ public:
 
     /**
      * Calculates the filter coefficients for a given cutoff frequency and sample rate.
-     * The analog prototype transfer function is:
-     *            1
-     *  H(s) = ---------
-     *         s  +  1
+     * The analog prototype transfer function is: \f$ H(s) = \frac{1}{s + 1} \f$
      */
     void calcCoefs (T fc, T fs)
     {
@@ -48,10 +45,7 @@ public:
 
     /**
      * Calculates the filter coefficients for a given cutoff frequency and sample rate.
-     * The analog prototype transfer function is:
-     *            s
-     *  H(s) = ---------
-     *         s  +  1
+     * The analog prototype transfer function is: \f$ H(s) = \frac{s}{s + 1} \f$
      */
     void calcCoefs (T fc, T fs)
     {

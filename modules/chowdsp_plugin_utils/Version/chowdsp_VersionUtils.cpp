@@ -29,36 +29,36 @@ juce::String Version::getVersionString() const
     return juce::String (major) + "." + juce::String (minor) + "." + juce::String (patch);
 }
 
-bool operator== (const Version& v1, const Version& v2)
+bool operator== (const Version& v1, const Version& v2) noexcept
 {
     return v1.major == v2.major && v1.minor == v2.minor && v1.patch == v2.patch;
 }
 
-bool operator!= (const Version& v1, const Version& v2)
+bool operator!= (const Version& v1, const Version& v2) noexcept
 {
     return ! (v1 == v2);
 }
 
-bool operator> (const Version& v1, const Version& v2)
+bool operator> (const Version& v1, const Version& v2) noexcept
 {
     return v1.major > v2.major
            || (v1.major == v2.major && v1.minor > v2.minor)
            || (v1.major == v2.major && v1.minor == v2.minor && v1.patch > v2.patch);
 }
 
-bool operator< (const Version& v1, const Version& v2)
+bool operator< (const Version& v1, const Version& v2) noexcept
 {
     return v1.major < v2.major
            || (v1.major == v2.major && v1.minor < v2.minor)
            || (v1.major == v2.major && v1.minor == v2.minor && v1.patch < v2.patch);
 }
 
-bool operator>= (const Version& v1, const Version& v2)
+bool operator>= (const Version& v1, const Version& v2) noexcept
 {
     return v1 > v2 || v1 == v2;
 }
 
-bool operator<= (const Version& v1, const Version& v2)
+bool operator<= (const Version& v1, const Version& v2) noexcept
 {
     return v1 < v2 || v1 == v2;
 }

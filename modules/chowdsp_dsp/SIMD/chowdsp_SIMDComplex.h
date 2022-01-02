@@ -1,6 +1,6 @@
 #pragma once
 
-namespace chowdsp
+namespace chowdsp::SIMDUtils
 {
 /**
  * Implementation of complex numbers using juce::dsp::SIMDRegister,
@@ -137,4 +137,4 @@ inline SIMDComplex<Type> operator* (const juce::dsp::SIMDRegister<Type>& b, cons
     return { a._r * b, a._i * b };
 }
 
-} // namespace chowdsp
+} // namespace chowdsp::SIMDUtils

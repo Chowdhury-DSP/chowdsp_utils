@@ -4,6 +4,7 @@
 
 namespace chowdsp
 {
+#ifndef DOXYGEN
 namespace logger_detail
 {
     const juce::String openString = "This log file is currently being written to...";
@@ -88,6 +89,7 @@ namespace logger_detail
         shutdownLogger (1);
     }
 } // namespace logger_detail
+#endif // DOXYGEN
 
 PluginLogger::PluginLogger (const juce::String& logFileSubDir, const juce::String& logFileNameRoot) : PluginLogger (LoggerParams { logFileSubDir, logFileNameRoot })
 {
@@ -132,9 +134,9 @@ void PluginLogger::defaultCrashLogAnalyzer (const juce::File& logFile)
                 "A previous instance of this plugin has crashed! Would you like to view the log file?")
             .withButton ("Show Log File")
             .withButton ("Cancel");
-    juce::AlertWindow::showAsync (alertOptions, [logFile] (int result) {
+    juce::AlertWindow::showAsync (alertOptions, [logFile] (int result)
+                                  {
         if (result == 1)
-            logFile.startAsProcess();
-    });
+            logFile.startAsProcess(); });
 }
 } // namespace chowdsp

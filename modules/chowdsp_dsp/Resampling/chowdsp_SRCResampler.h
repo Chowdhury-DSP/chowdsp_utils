@@ -1,6 +1,6 @@
 #pragma once
 
-#if CHOWDSP_USE_LIBSAMPLERATE
+#if CHOWDSP_USE_LIBSAMPLERATE || DOXYGEN
 
 namespace chowdsp::ResamplingTypes
 {
@@ -46,4 +46,4 @@ private:
 
 } // namespace chowdsp::ResamplingTypes
 
-#endif // CHOWDSP_USE_LIBSAMPLERATE
+#endif // CHOWDSP_USE_LIBSAMPLERATE || DOXYGEN
