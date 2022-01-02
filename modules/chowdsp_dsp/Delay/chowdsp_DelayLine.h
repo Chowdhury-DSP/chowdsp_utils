@@ -27,6 +27,7 @@
 
 namespace chowdsp
 {
+#ifndef DOXYGEN
 /** Base class for delay lines with any interpolation type */
 template <typename SampleType>
 class DelayLineBase
@@ -74,6 +75,7 @@ protected:
     std::vector<SampleType> v;
     std::vector<int> writePos, readPos;
 };
+#endif // DOXYGEN
 
 //==============================================================================
 /**
@@ -87,8 +89,6 @@ protected:
 
     Note: If you intend to change the delay in real time, you may want to smooth
     changes to the delay systematically using either a ramp or a low-pass filter.
-
-    @see SmoothedValue, FirstOrderTPTFilter
 */
 template <typename SampleType, typename InterpolationType = DelayLineInterpolationTypes::Linear>
 class DelayLine : public DelayLineBase<SampleType>

@@ -2,6 +2,7 @@
 
 namespace chowdsp
 {
+/** Helpful methods for workign with tuning information */
 namespace TuningHelpers
 {
     /** Converts a frequency in Hz to the corresponding MIDI note number, and cents away from that note's correct frequency */

@@ -16,6 +16,7 @@ public:
      * Construct a new forwarding parameter.
      *
      * @param id            Parameter ID for the <b>forwarded</b> parameter
+     * @param um            UndoManager to use with this parameter
      * @param defaultName   Name to use when this parameter is not forwarding another one
      */
     explicit ForwardingParameter (const juce::String& id, juce::UndoManager* um = nullptr, const juce::String& defaultName = "Unused");
@@ -23,7 +24,7 @@ public:
     /** Sets a new parameter to be forwarded */
     void setParam (juce::RangedAudioParameter* paramToUse, const juce::String& newName = {});
 
-    /** Returns te parameter currently being forwarded */
+    /** Returns the parameter currently being forwarded */
     const auto* getParam() const noexcept { return internalParam; }
 
     /** Sets a new processor to forward to */

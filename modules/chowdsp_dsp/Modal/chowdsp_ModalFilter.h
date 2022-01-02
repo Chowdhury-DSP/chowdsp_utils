@@ -91,7 +91,7 @@ template <typename FloatType>
 class ModalFilter<juce::dsp::SIMDRegister<FloatType>>
 {
     using VType = juce::dsp::SIMDRegister<FloatType>;
-    using CType = SIMDComplex<FloatType>;
+    using CType = SIMDUtils::SIMDComplex<FloatType>;
 
 public:
     ModalFilter() = default;

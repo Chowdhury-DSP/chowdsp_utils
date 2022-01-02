@@ -9,10 +9,11 @@
  */
 namespace chowdsp::Bilinear
 {
-/** Dummy generic bilinear transform (@TODO: actually implement this) */
+/** Dummy generic bilinear transform */
 template <typename T, size_t N>
 struct BilinearTransform
 {
+    // @TODO: actually implement this
     static inline void call (T (&b)[N], T (&a)[N], const T (&bs)[N], const T (&as)[N], T K);
 };
 
@@ -48,7 +49,7 @@ struct BilinearTransform<T, 3>
     }
 };
 
-/** Computes the warping factor "K" so that the frequency fc is matched at sampel rate fs */
+/** Computes the warping factor "K" so that the frequency fc is matched at sample rate fs */
 template <typename T>
 inline T computeKValue (T fc, T fs)
 {

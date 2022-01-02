@@ -2,10 +2,12 @@
 
 namespace chowdsp
 {
+#ifndef DOXYGEN
 inline float calcTimeConstant (float timeMs, float expFactor)
 {
     return timeMs < 1.0e-3f ? 0.0f : 1.0f - std::exp (expFactor / timeMs);
 }
+#endif
 
 template <typename SampleType>
 void LevelDetector<SampleType>::setParameters (float attackTimeMs, float releaseTimeMs)

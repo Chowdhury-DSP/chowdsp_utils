@@ -55,7 +55,8 @@ struct Preset
      */
     const juce::File& getPresetFile() const noexcept { return file; }
 
-    friend bool operator== (const Preset& p1, const Preset& p2);
+    /** Returns true if the two presets are equivalent. */
+    bool operator== (const Preset& other) const noexcept;
 
     static const juce::Identifier presetTag;
     static const juce::Identifier nameTag;
