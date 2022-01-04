@@ -13,7 +13,7 @@ inline typename std::enable_if<std::is_floating_point<T>::value, void>::type
 
 /** Copy the information from one block to another (SIMD types) */
 template <typename T>
-inline typename std::enable_if<std::is_same<T, juce::dsp::SIMDRegister<typename SampleTypeHelpers::ElementType<T>::Type>>::value, void>::type
+inline typename std::enable_if<SampleTypeHelpers::IsSIMDRegister<T>, void>::type
     copyBlocks (juce::dsp::AudioBlock<T>& dest, const juce::dsp::AudioBlock<const T>& src)
 {
     for (size_t ch = 0; ch < dest.getNumChannels(); ++ch)

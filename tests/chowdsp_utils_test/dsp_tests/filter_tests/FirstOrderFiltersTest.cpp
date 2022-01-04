@@ -14,39 +14,43 @@ public:
     {
     }
 
-    template <typename T, typename FilterType>
-    void testFrequency (FilterType& filter, T freq, T expGainDB, T maxError, const String& message)
+    template <typename T, typename FilterType, typename NumericType = typename chowdsp::SampleTypeHelpers::ElementType<T>::Type>
+    void testFrequency (FilterType& filter, NumericType freq, NumericType expGainDB, NumericType maxError, const String& message)
     {
-        auto buffer = test_utils::makeSineWave<T> (freq, Constants::fs, (T) 1);
+        auto buffer = test_utils::makeSineWave<NumericType> (freq, Constants::fs, (NumericType) 1);
+
+        HeapBlock<char> dataBlock;
+        auto block = test_utils::bufferToBlock<T> (dataBlock, buffer);
 
         filter.reset();
-        filter.processBlock (buffer.getWritePointer (0), buffer.getNumSamples());
+        filter.processBlock (block.getChannelPointer (0), buffer.getNumSamples());
 
+        test_utils::blockToBuffer (buffer, block);
         const auto halfSamples = buffer.getNumSamples() / 2;
         auto magDB = Decibels::gainToDecibels (buffer.getMagnitude (halfSamples, halfSamples));
         expectWithinAbsoluteError (magDB, expGainDB, maxError, message);
     }
 
-    template <typename T>
-    void firstOrderLPFTest (T maxError)
+    template <typename T, typename NumericType = typename chowdsp::SampleTypeHelpers::ElementType<T>::Type>
+    void firstOrderLPFTest (NumericType maxError)
     {
         chowdsp::FirstOrderLPF<T> lpFilter;
-        lpFilter.calcCoefs ((T) Constants::fc, (T) Constants::fs);
+        lpFilter.calcCoefs ((T) Constants::fc, (NumericType) Constants::fs);
 
-        testFrequency (lpFilter, (T) 1, (T) 0, maxError, "Incorrect gain at low frequencies.");
-        testFrequency (lpFilter, (T) Constants::fc, (T) -3.01, maxError, "Incorrect gain at cutoff frequency.");
-        testFrequency (lpFilter, Constants::fc * (T) 4, (T) -12.3, (T) 0.1, "Incorrect gain at high frequencies.");
+        testFrequency<T> (lpFilter, (NumericType) 1, (NumericType) 0, maxError, "Incorrect gain at low frequencies.");
+        testFrequency<T> (lpFilter, (NumericType) Constants::fc, (NumericType) -3.01, maxError, "Incorrect gain at cutoff frequency.");
+        testFrequency<T> (lpFilter, Constants::fc * (NumericType) 4, (NumericType) -12.3, (NumericType) 0.1, "Incorrect gain at high frequencies.");
     }
 
-    template <typename T>
-    void firstOrderHPFTest (T maxError)
+    template <typename T, typename NumericType = typename chowdsp::SampleTypeHelpers::ElementType<T>::Type>
+    void firstOrderHPFTest (NumericType maxError)
     {
         chowdsp::FirstOrderHPF<T> hpFilter;
-        hpFilter.calcCoefs ((T) Constants::fc, (T) Constants::fs);
+        hpFilter.calcCoefs ((T) Constants::fc, (NumericType) Constants::fs);
 
-        testFrequency (hpFilter, (T) Constants::fc / 4, (T) -12.3, (T) 0.1, "Incorrect gain at low frequencies.");
-        testFrequency (hpFilter, (T) Constants::fc, (T) -3, maxError, "Incorrect gain at cutoff frequency.");
-        testFrequency (hpFilter, (T) Constants::fs * (T) 0.498, (T) 0, maxError, "Incorrect gain at high frequencies.");
+        testFrequency<T> (hpFilter, (NumericType) Constants::fc / 4, (NumericType) -12.3, (NumericType) 0.1, "Incorrect gain at low frequencies.");
+        testFrequency<T> (hpFilter, (NumericType) Constants::fc, (NumericType) -3, maxError, "Incorrect gain at cutoff frequency.");
+        testFrequency<T> (hpFilter, (NumericType) Constants::fs * (NumericType) 0.498, (NumericType) 0, maxError, "Incorrect gain at high frequencies.");
     }
 
     void runTestTimed() override
@@ -55,9 +59,17 @@ public:
         firstOrderLPFTest<float> (1.0e-2f);
         firstOrderLPFTest<double> (1.0e-2);
 
+        beginTest ("First Order LPF SIMD Test");
+        firstOrderLPFTest<dsp::SIMDRegister<float>> (1.0e-2f);
+        firstOrderLPFTest<dsp::SIMDRegister<double>> (1.0e-2);
+
         beginTest ("First Order HPF Test");
         firstOrderHPFTest<float> (1.0e-2f);
         firstOrderHPFTest<double> (1.0e-2);
+
+        beginTest ("First Order HPF SIMD Test");
+        firstOrderHPFTest<dsp::SIMDRegister<float>> (1.0e-2f);
+        firstOrderHPFTest<dsp::SIMDRegister<double>> (1.0e-2);
     }
 };
 

@@ -47,7 +47,7 @@ public:
 
         @param newFrequencyHz the new cutoff frequency in Hz.
     */
-    void setCutoffFrequency (NumericType newFrequencyHz);
+    void setCutoffFrequency (SampleType newFrequencyHz);
 
     /** Sets the resonance of the filter.
 
@@ -55,14 +55,14 @@ public:
         parameter. To have a standard 12 dB / octave filter, the value must be set
         at 1 / sqrt(2).
     */
-    void setResonance (NumericType newResonance);
+    void setResonance (SampleType newResonance);
 
     //==============================================================================
     /** Returns the cutoff frequency of the filter. */
-    NumericType getCutoffFrequency() const noexcept { return cutoffFrequency; }
+    SampleType getCutoffFrequency() const noexcept { return cutoffFrequency; }
 
     /** Returns the resonance of the filter. */
-    NumericType getResonance() const noexcept { return resonance; }
+    SampleType getResonance() const noexcept { return resonance; }
 
     //==============================================================================
     /** Initialises the filter. */
@@ -147,12 +147,12 @@ private:
     void update();
 
     //==============================================================================
-    NumericType g, h, R2, gh, gpR2, g2;
+    SampleType g, h, R2, gh, gpR2, g2;
     std::vector<SampleType> s1 { 2 }, s2 { 2 };
 
     double sampleRate = 44100.0;
-    NumericType cutoffFrequency = static_cast<NumericType> (1000.0),
-                resonance = static_cast<NumericType> (1.0 / std::sqrt (2.0));
+    SampleType cutoffFrequency = static_cast<NumericType> (1000.0),
+               resonance = static_cast<NumericType> (1.0 / std::sqrt (2.0));
 };
 
 } //namespace chowdsp
