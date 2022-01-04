@@ -104,4 +104,11 @@ inline juce::dsp::SIMDRegister<T> operator/ (T l, const juce::dsp::SIMDRegister<
 {
     return (juce::dsp::SIMDRegister<T>) l / r;
 }
+
+/** Computes the unary minus of a SIMDRegister */
+template <typename T>
+inline juce::dsp::SIMDRegister<T> operator- (const juce::dsp::SIMDRegister<T>& x)
+{
+    return juce::dsp::SIMDRegister<T>() - x;
+}
 } // namespace chowdsp::SIMDUtils
