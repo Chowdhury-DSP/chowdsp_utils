@@ -6,6 +6,8 @@ namespace chowdsp
 template <typename T>
 class SecondOrderLPF final : public chowdsp::IIRFilter<2, T>
 {
+    using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+
 public:
     SecondOrderLPF() = default;
     SecondOrderLPF (SecondOrderLPF&&) noexcept = default;
@@ -15,7 +17,7 @@ public:
      * Calculates the filter coefficients for a given cutoff frequency, Q value, and sample rate.
      * The analog prototype transfer function is: \f$ H(s) = \frac{1}{s^2 + s/Q + 1} \f$
      */
-    void calcCoefs (T fc, T qVal, T fs);
+    void calcCoefs (T fc, T qVal, NumericType fs);
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SecondOrderLPF)
@@ -25,6 +27,8 @@ private:
 template <typename T>
 class SecondOrderHPF final : public chowdsp::IIRFilter<2, T>
 {
+    using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+
 public:
     SecondOrderHPF() = default;
     SecondOrderHPF (SecondOrderHPF&&) noexcept = default;
@@ -34,7 +38,7 @@ public:
      * Calculates the filter coefficients for a given cutoff frequency, Q value, and sample rate.
      * The analog prototype transfer function is: \f$ H(s) = \frac{s^2}{s^2 + s/Q + 1} \f$
      */
-    void calcCoefs (T fc, T qVal, T fs);
+    void calcCoefs (T fc, T qVal, NumericType fs);
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SecondOrderHPF)
@@ -44,6 +48,8 @@ private:
 template <typename T>
 class SecondOrderBPF final : public chowdsp::IIRFilter<2, T>
 {
+    using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+
 public:
     SecondOrderBPF() = default;
     SecondOrderBPF (SecondOrderBPF&&) noexcept = default;
@@ -53,7 +59,7 @@ public:
      * Calculates the filter coefficients for a given cutoff frequency, Q value, and sample rate.
      * The analog prototype transfer function is: \f$ H(s) = \frac{s/Q}{s^2 + s/Q + 1} \f$
      */
-    void calcCoefs (T fc, T qVal, T fs);
+    void calcCoefs (T fc, T qVal, NumericType fs);
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SecondOrderBPF)
@@ -63,6 +69,8 @@ private:
 template <typename T>
 class NotchFilter final : public chowdsp::IIRFilter<2, T>
 {
+    using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+
 public:
     NotchFilter() = default;
     NotchFilter (NotchFilter&&) noexcept = default;
@@ -72,7 +80,7 @@ public:
      * Calculates the filter coefficients for a given cutoff frequency, Q value, and sample rate.
      * The analog prototype transfer function is: \f$ H(S) = \frac{s^2 + 1}{s^2 + s/Q + 1} \f$
      */
-    void calcCoefs (T fc, T qVal, T fs);
+    void calcCoefs (T fc, T qVal, NumericType fs);
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NotchFilter)
@@ -82,6 +90,8 @@ private:
 template <typename T>
 class PeakingFilter final : public chowdsp::IIRFilter<2, T>
 {
+    using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+
 public:
     PeakingFilter() = default;
     PeakingFilter (PeakingFilter&&) noexcept = default;
@@ -92,13 +102,13 @@ public:
      * Note that the gain should be in units of linear gain, NOT Decibels.
      * The analog prototype transfer function is: \f$ H(s) = \frac{s^2 + G s/Q + 1}{s^2 + s/Q + 1} \f$
      */
-    void calcCoefs (T fc, T qVal, T gain, T fs);
+    void calcCoefs (T fc, T qVal, T gain, NumericType fs);
 
     /**
      * Calculates the filter coefficients for a given cutoff frequency,
      * Q value, gain (in Decibels), and sample rate.
      */
-    void calcCoefsDB (T fc, T qVal, T gainDB, T fs);
+    void calcCoefsDB (T fc, T qVal, T gainDB, NumericType fs);
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PeakingFilter)
@@ -108,6 +118,8 @@ private:
 template <typename T>
 class LowShelfFilter final : public chowdsp::IIRFilter<2, T>
 {
+    using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+
 public:
     LowShelfFilter() = default;
     LowShelfFilter (LowShelfFilter&&) noexcept = default;
@@ -118,13 +130,13 @@ public:
      * Note that the gain should be in units of linear gain, NOT Decibels.
      * The analog prototype transfer function is: \f$ H(s) = A \frac{s^2 + \sqrt{A} s/Q + A}{A s^2 + \sqrt{A} s/Q + 1} \f$
      */
-    void calcCoefs (T fc, T qVal, T gain, T fs);
+    void calcCoefs (T fc, T qVal, T gain, NumericType fs);
 
     /**
      * Calculates the filter coefficients for a given cutoff frequency,
      * Q value, gain (in Decibels), and sample rate.
      */
-    void calcCoefsDB (T fc, T qVal, T gainDB, T fs);
+    void calcCoefsDB (T fc, T qVal, T gainDB, NumericType fs);
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LowShelfFilter)
@@ -134,6 +146,8 @@ private:
 template <typename T>
 class HighShelfFilter final : public chowdsp::IIRFilter<2, T>
 {
+    using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+
 public:
     HighShelfFilter() = default;
     HighShelfFilter (HighShelfFilter&&) noexcept = default;
@@ -144,13 +158,13 @@ public:
      * Note that the gain should be in units of linear gain, NOT Decibels.
      * The analog prototype transfer function is: \f$ H(s) = A \frac{As^2 + \sqrt{A} s/Q + 1}{s^2 + \sqrt{A} s/Q + A} \f$
      */
-    void calcCoefs (T fc, T qVal, T gain, T fs);
+    void calcCoefs (T fc, T qVal, T gain, NumericType fs);
 
     /**
      * Calculates the filter coefficients for a given cutoff frequency,
      * Q value, gain (in Decibels), and sample rate.
      */
-    void calcCoefsDB (T fc, T qVal, T gainDB, T fs);
+    void calcCoefsDB (T fc, T qVal, T gainDB, NumericType fs);
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (HighShelfFilter)

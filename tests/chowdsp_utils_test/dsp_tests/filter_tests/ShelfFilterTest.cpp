@@ -21,33 +21,44 @@ class ShelfFilterTest : public TimedUnitTest
 public:
     ShelfFilterTest() : TimedUnitTest ("Shelf Filter Test", "Filters") {}
 
+    template <typename T, typename NumericType = typename chowdsp::SampleTypeHelpers::ElementType<T>::Type>
     void plainGainTest()
     {
-        chowdsp::ShelfFilter shelfFilter;
+        chowdsp::ShelfFilter<T> shelfFilter;
         shelfFilter.reset();
-        shelfFilter.calcCoefs (2.0f, 2.0f, Constants::fc, Constants::fs);
+        shelfFilter.calcCoefs ((T) 2, (T) 2, (T) Constants::fc, Constants::fs);
 
-        auto buffer = test_utils::makeNoise (Constants::fs, 1.0f);
+        auto buffer = test_utils::makeNoise (Constants::fs, (NumericType) 1);
         const int numSamples = buffer.getNumSamples();
         auto refMag = buffer.getRMSLevel (0, 0, numSamples);
 
-        shelfFilter.processBlock (buffer.getWritePointer (0), numSamples);
+        HeapBlock<char> dataBlock;
+        auto block = test_utils::bufferToBlock<T> (dataBlock, buffer);
+
+        shelfFilter.processBlock (block.getChannelPointer (0), numSamples);
+
+        test_utils::blockToBuffer (buffer, block);
         auto mag = buffer.getRMSLevel (0, 0, numSamples);
 
         expectWithinAbsoluteError (mag / refMag, 2.0f, (float) 1.0e-6, "Incorrect behavior when filter reduces to a simple gain.");
     }
 
+    template <typename T, typename NumericType = typename chowdsp::SampleTypeHelpers::ElementType<T>::Type>
     void boostCutTest()
     {
-        chowdsp::ShelfFilter shelfFilter;
-        shelfFilter.calcCoefs (Constants::lowGain, Constants::highGain, Constants::fc, Constants::fs);
+        chowdsp::ShelfFilter<T> shelfFilter;
+        shelfFilter.calcCoefs ((T) Constants::lowGain, (T) Constants::highGain, (T) Constants::fc, Constants::fs);
 
         auto testFrequency = [=, &shelfFilter] (float freq, float expGain, const String& message) {
-            auto buffer = test_utils::makeSineWave (freq, Constants::fs, 1.0f);
+            auto buffer = test_utils::makeSineWave (freq, Constants::fs, (NumericType) 1);
+
+            HeapBlock<char> dataBlock;
+            auto block = test_utils::bufferToBlock<T> (dataBlock, buffer);
 
             shelfFilter.reset();
-            shelfFilter.processBlock (buffer.getWritePointer (0), buffer.getNumSamples());
+            shelfFilter.processBlock (block.getChannelPointer (0), buffer.getNumSamples());
 
+            test_utils::blockToBuffer (buffer, block);
             auto mag = buffer.getMagnitude (0, buffer.getNumSamples());
             expectWithinAbsoluteError (mag, expGain, Constants::maxError, message);
         };
@@ -60,10 +71,16 @@ public:
     void runTestTimed() override
     {
         beginTest ("Plain Gain Test");
-        plainGainTest();
+        plainGainTest<float>();
+
+        beginTest ("Plain Gain SIMD Test");
+        plainGainTest<dsp::SIMDRegister<float>>();
 
         beginTest ("Boost/Cut Test");
-        boostCutTest();
+        boostCutTest<float>();
+
+        beginTest ("Boost/Cut SIMD Test");
+        boostCutTest<dsp::SIMDRegister<float>>();
     }
 };
 

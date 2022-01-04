@@ -2,11 +2,12 @@ namespace chowdsp
 {
 //================================================================
 template <typename T>
-void SecondOrderLPF<T>::calcCoefs (T fc, T qVal, T fs)
+void SecondOrderLPF<T>::calcCoefs (T fc, T qVal, NumericType fs)
 {
     using namespace Bilinear;
+    using namespace SIMDUtils;
 
-    const auto wc = juce::MathConstants<T>::twoPi * fc;
+    const auto wc = juce::MathConstants<NumericType>::twoPi * fc;
     const auto K = computeKValue (fc, fs);
 
     auto kSqTerm = (T) 1 / (wc * wc);
@@ -17,11 +18,12 @@ void SecondOrderLPF<T>::calcCoefs (T fc, T qVal, T fs)
 
 //================================================================
 template <typename T>
-void SecondOrderHPF<T>::calcCoefs (T fc, T qVal, T fs)
+void SecondOrderHPF<T>::calcCoefs (T fc, T qVal, NumericType fs)
 {
     using namespace Bilinear;
+    using namespace SIMDUtils;
 
-    const auto wc = juce::MathConstants<T>::twoPi * fc;
+    const auto wc = juce::MathConstants<NumericType>::twoPi * fc;
     const auto K = computeKValue (fc, fs);
 
     auto kSqTerm = (T) 1 / (wc * wc);
@@ -32,11 +34,12 @@ void SecondOrderHPF<T>::calcCoefs (T fc, T qVal, T fs)
 
 //================================================================
 template <typename T>
-void SecondOrderBPF<T>::calcCoefs (T fc, T qVal, T fs)
+void SecondOrderBPF<T>::calcCoefs (T fc, T qVal, NumericType fs)
 {
     using namespace Bilinear;
+    using namespace SIMDUtils;
 
-    const auto wc = juce::MathConstants<T>::twoPi * fc;
+    const auto wc = juce::MathConstants<NumericType>::twoPi * fc;
     const auto K = computeKValue (fc, fs);
 
     auto kSqTerm = (T) 1 / (wc * wc);
@@ -47,11 +50,12 @@ void SecondOrderBPF<T>::calcCoefs (T fc, T qVal, T fs)
 
 //================================================================
 template <typename T>
-void NotchFilter<T>::calcCoefs (T fc, T qVal, T fs)
+void NotchFilter<T>::calcCoefs (T fc, T qVal, NumericType fs)
 {
     using namespace Bilinear;
+    using namespace SIMDUtils;
 
-    const auto wc = juce::MathConstants<T>::twoPi * fc;
+    const auto wc = juce::MathConstants<NumericType>::twoPi * fc;
     const auto K = computeKValue (fc, fs);
 
     auto kSqTerm = (T) 1 / (wc * wc);
@@ -62,38 +66,62 @@ void NotchFilter<T>::calcCoefs (T fc, T qVal, T fs)
 
 //================================================================
 template <typename T>
-void PeakingFilter<T>::calcCoefs (T fc, T qVal, T gain, T fs)
+void PeakingFilter<T>::calcCoefs (T fc, T qVal, T gain, NumericType fs)
 {
     using namespace Bilinear;
+    using namespace SIMDUtils;
 
-    const auto wc = juce::MathConstants<T>::twoPi * fc;
+    const auto wc = juce::MathConstants<NumericType>::twoPi * fc;
     const auto K = computeKValue (fc, fs);
 
     auto kSqTerm = (T) 1 / (wc * wc);
     auto kTerm = (T) 1 / (qVal * wc);
-    auto kNum = gain > (T) 1 ? kTerm * gain : kTerm;
-    auto kDen = gain < (T) 1 ? kTerm / gain : kTerm;
+
+    T kNum {}, kDen {};
+    if constexpr (std::is_floating_point<T>::value)
+    {
+        kNum = gain > (T) 1 ? kTerm * gain : kTerm;
+        kDen = gain < (T) 1 ? kTerm / gain : kTerm;
+    }
+    else if constexpr (SampleTypeHelpers::IsSIMDRegister<T>)
+    {
+        kNum = select (T::greaterThan (gain, (T) 1), kTerm * gain, kTerm);
+        kDen = select (T::lessThan (gain, (T) 1), kTerm / gain, kTerm);
+    }
 
     BilinearTransform<T, 3>::call (this->b, this->a, { kSqTerm, kNum, (T) 1 }, { kSqTerm, kDen, (T) 1 }, K);
 }
 
 template <typename T>
-void PeakingFilter<T>::calcCoefsDB (T fc, T qVal, T gainDB, T fs)
+void PeakingFilter<T>::calcCoefsDB (T fc, T qVal, T gainDB, NumericType fs)
 {
-    calcCoefs (fc, qVal, juce::Decibels::decibelsToGain (gainDB), fs);
+    if constexpr (std::is_floating_point<T>::value)
+        calcCoefs (fc, qVal, juce::Decibels::decibelsToGain (gainDB), fs);
+    else if constexpr (SampleTypeHelpers::IsSIMDRegister<T>)
+        calcCoefs (fc, qVal, SIMDUtils::decibelsToGain (gainDB), fs);
 }
 
 //================================================================
 template <typename T>
-void LowShelfFilter<T>::calcCoefs (T fc, T qVal, T gain, T fs)
+void LowShelfFilter<T>::calcCoefs (T fc, T qVal, T gain, NumericType fs)
 {
     using namespace Bilinear;
+    using namespace SIMDUtils;
 
-    const auto wc = juce::MathConstants<T>::twoPi * fc;
+    const auto wc = juce::MathConstants<NumericType>::twoPi * fc;
     const auto K = computeKValue (fc, fs);
 
-    auto A = std::sqrt (gain);
-    auto Aroot = std::sqrt (A);
+    T A {}, Aroot {};
+    if constexpr (std::is_floating_point<T>::value)
+    {
+        A = std::sqrt (gain);
+        Aroot = std::sqrt (A);
+    }
+    else if constexpr (SampleTypeHelpers::IsSIMDRegister<T>)
+    {
+        A = sqrtSIMD (gain);
+        Aroot = sqrtSIMD (A);
+    }
 
     auto kSqTerm = (T) 1 / (wc * wc);
     auto kTerm = Aroot / (qVal * wc);
@@ -102,22 +130,35 @@ void LowShelfFilter<T>::calcCoefs (T fc, T qVal, T gain, T fs)
 }
 
 template <typename T>
-void LowShelfFilter<T>::calcCoefsDB (T fc, T qVal, T gainDB, T fs)
+void LowShelfFilter<T>::calcCoefsDB (T fc, T qVal, T gainDB, NumericType fs)
 {
-    calcCoefs (fc, qVal, juce::Decibels::decibelsToGain (gainDB), fs);
+    if constexpr (std::is_floating_point<T>::value)
+        calcCoefs (fc, qVal, juce::Decibels::decibelsToGain (gainDB), fs);
+    else if constexpr (SampleTypeHelpers::IsSIMDRegister<T>)
+        calcCoefs (fc, qVal, SIMDUtils::decibelsToGain (gainDB), fs);
 }
 
 //================================================================
 template <typename T>
-void HighShelfFilter<T>::calcCoefs (T fc, T qVal, T gain, T fs)
+void HighShelfFilter<T>::calcCoefs (T fc, T qVal, T gain, NumericType fs)
 {
     using namespace Bilinear;
+    using namespace SIMDUtils;
 
-    const auto wc = juce::MathConstants<T>::twoPi * fc;
+    const auto wc = juce::MathConstants<NumericType>::twoPi * fc;
     const auto K = computeKValue (fc, fs);
 
-    auto A = std::sqrt (gain);
-    auto Aroot = std::sqrt (A);
+    T A {}, Aroot {};
+    if constexpr (std::is_floating_point<T>::value)
+    {
+        A = std::sqrt (gain);
+        Aroot = std::sqrt (A);
+    }
+    else if constexpr (SampleTypeHelpers::IsSIMDRegister<T>)
+    {
+        A = sqrtSIMD (gain);
+        Aroot = sqrtSIMD (A);
+    }
 
     auto kSqTerm = (T) 1 / (wc * wc);
     auto kTerm = Aroot / (qVal * wc);
@@ -126,8 +167,11 @@ void HighShelfFilter<T>::calcCoefs (T fc, T qVal, T gain, T fs)
 }
 
 template <typename T>
-void HighShelfFilter<T>::calcCoefsDB (T fc, T qVal, T gainDB, T fs)
+void HighShelfFilter<T>::calcCoefsDB (T fc, T qVal, T gainDB, NumericType fs)
 {
-    calcCoefs (fc, qVal, juce::Decibels::decibelsToGain (gainDB), fs);
+    if constexpr (std::is_floating_point<T>::value)
+        calcCoefs (fc, qVal, juce::Decibels::decibelsToGain (gainDB), fs);
+    else if constexpr (SampleTypeHelpers::IsSIMDRegister<T>)
+        calcCoefs (fc, qVal, SIMDUtils::decibelsToGain (gainDB), fs);
 }
 } // namespace chowdsp
