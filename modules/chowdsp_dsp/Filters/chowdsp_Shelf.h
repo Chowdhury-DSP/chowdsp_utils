@@ -8,6 +8,8 @@ namespace chowdsp
 template <typename T = float>
 class ShelfFilter : public IIRFilter<1, T>
 {
+    using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+
 public:
     ShelfFilter() = default;
 
@@ -20,7 +22,7 @@ public:
      * For information on the filter coefficient derivation,
      * see Abel and Berners dsp4dae, pg. 249
      */
-    void calcCoefs (T lowGain, T highGain, T fc, T fs)
+    void calcCoefs (T lowGain, T highGain, T fc, NumericType fs)
     {
         // reduce to simple gain element
         if (lowGain == highGain)
@@ -32,8 +34,20 @@ public:
             return;
         }
 
-        auto rho = std::sqrt (highGain / lowGain);
-        auto K = (T) 1 / std::tan (juce::MathConstants<T>::pi * fc / fs);
+        using namespace SIMDUtils;
+
+        T rho {}, K;
+        if constexpr (std::is_floating_point<T>::value)
+        {
+            rho = std::sqrt (highGain / lowGain);
+            K = (T) 1 / std::tan (juce::MathConstants<NumericType>::pi * fc / fs);
+        }
+        else if constexpr (SampleTypeHelpers::IsSIMDRegister<T>)
+        {
+            rho = sqrtSIMD (highGain / lowGain);
+            K = (T) 1 / tanSIMD (juce::MathConstants<NumericType>::pi * fc / fs);
+        }
+
         Bilinear::BilinearTransform<T, 2>::call (this->b, this->a, { highGain / rho, lowGain }, { 1.0f / rho, 1.0f }, K);
     }
 

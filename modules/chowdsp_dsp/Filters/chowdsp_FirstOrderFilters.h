@@ -9,6 +9,8 @@ namespace chowdsp
 template <typename T>
 class FirstOrderLPF final : public chowdsp::IIRFilter<1, T>
 {
+    using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+
 public:
     FirstOrderLPF() = default;
     FirstOrderLPF (FirstOrderLPF&&) noexcept = default;
@@ -18,11 +20,12 @@ public:
      * Calculates the filter coefficients for a given cutoff frequency and sample rate.
      * The analog prototype transfer function is: \f$ H(s) = \frac{1}{s + 1} \f$
      */
-    void calcCoefs (T fc, T fs)
+    void calcCoefs (T fc, NumericType fs)
     {
         using namespace Bilinear;
+        using namespace SIMDUtils;
 
-        const auto wc = juce::MathConstants<T>::twoPi * fc;
+        const auto wc = juce::MathConstants<NumericType>::twoPi * fc;
         const auto K = computeKValue (fc, fs);
         BilinearTransform<T, 2>::call (this->b, this->a, { (T) 0, (T) 1 }, { (T) 1 / wc, (T) 1 }, K);
     }
@@ -38,6 +41,8 @@ private:
 template <typename T>
 class FirstOrderHPF final : public chowdsp::IIRFilter<1, T>
 {
+    using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+
 public:
     FirstOrderHPF() = default;
     FirstOrderHPF (FirstOrderHPF&&) noexcept = default;
@@ -47,11 +52,12 @@ public:
      * Calculates the filter coefficients for a given cutoff frequency and sample rate.
      * The analog prototype transfer function is: \f$ H(s) = \frac{s}{s + 1} \f$
      */
-    void calcCoefs (T fc, T fs)
+    void calcCoefs (T fc, NumericType fs)
     {
         using namespace Bilinear;
+        using namespace SIMDUtils;
 
-        const auto wc = juce::MathConstants<T>::twoPi * fc;
+        const auto wc = juce::MathConstants<NumericType>::twoPi * fc;
         const auto K = computeKValue (fc, fs);
         BilinearTransform<T, 2>::call (this->b, this->a, { (T) 1 / wc, (T) 0 }, { (T) 1 / wc, (T) 1 }, K);
     }

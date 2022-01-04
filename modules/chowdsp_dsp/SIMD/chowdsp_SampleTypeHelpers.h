@@ -16,4 +16,8 @@ struct ElementType<T, false>
 {
     using Type = typename T::value_type;
 };
+
+/** Useful struct for determining if a type is a SIMDRegister */
+template <typename T, typename NumericType = typename ElementType<T>::Type, typename SIMDType = juce::dsp::SIMDRegister<NumericType>>
+inline constexpr bool IsSIMDRegister = std::is_same<T, SIMDType>::value;
 } // namespace chowdsp::SampleTypeHelpers

@@ -16,7 +16,7 @@ void StateVariableFilter<SampleType>::setCutoffFrequency (SampleType newCutoffFr
     {
         jassert (juce::isPositiveAndBelow (newCutoffFrequencyHz, static_cast<NumericType> (sampleRate * 0.5)));
     }
-    else
+    else if constexpr (SampleTypeHelpers::IsSIMDRegister<SampleType>)
     {
         for (size_t i = 0; i < SampleType::size(); ++i)
             jassert (juce::isPositiveAndBelow (newCutoffFrequencyHz.get (i), static_cast<NumericType> (sampleRate * 0.5)));
@@ -33,7 +33,7 @@ void StateVariableFilter<SampleType>::setResonance (SampleType newResonance)
     {
         jassert (newResonance > static_cast<NumericType> (0));
     }
-    else
+    else if constexpr (SampleTypeHelpers::IsSIMDRegister<SampleType>)
     {
         for (size_t i = 0; i < SampleType::size(); ++i)
             jassert (newResonance.get (i) > static_cast<NumericType> (0));
@@ -88,7 +88,7 @@ void StateVariableFilter<SampleType>::update()
 
     if constexpr (std::is_floating_point<SampleType>::value)
         g = static_cast<NumericType> (std::tan (juce::MathConstants<NumericType>::pi * cutoffFrequency / sampleRate));
-    else
+    else if constexpr (SampleTypeHelpers::IsSIMDRegister<SampleType>)
         g = tanSIMD (juce::MathConstants<NumericType>::pi * cutoffFrequency / (NumericType) sampleRate);
 
     R2 = ((NumericType) 1.0 / resonance);

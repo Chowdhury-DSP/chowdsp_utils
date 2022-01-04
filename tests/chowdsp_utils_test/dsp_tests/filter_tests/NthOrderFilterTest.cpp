@@ -23,25 +23,13 @@ public:
             auto buffer = test_utils::makeSineWave (freq, Constants::fs, 1.0f);
 
             HeapBlock<char> dataBlock;
-            dsp::AudioBlock<T> block { dataBlock, 1, (size_t) buffer.getNumSamples() };
-            for (int i = 0; i < buffer.getNumSamples(); ++i)
-                block.setSample (0, i, buffer.getSample (0, i));
+            auto block = test_utils::bufferToBlock<T> (dataBlock, buffer);
 
             filt.reset();
             dsp::ProcessContextReplacing<T> ctx (block);
             filt.process (ctx);
 
-            if constexpr (std::is_floating_point<T>::value)
-            {
-                for (int i = 0; i < buffer.getNumSamples(); ++i)
-                    buffer.setSample (0, i, block.getSample (0, i));
-            }
-            else
-            {
-                for (int i = 0; i < buffer.getNumSamples(); ++i)
-                    buffer.setSample (0, i, block.getSample (0, i).get (0));
-            }
-
+            test_utils::blockToBuffer (buffer, block);
             auto halfBlock = buffer.getNumSamples() / 2;
             auto mag = Decibels::gainToDecibels (buffer.getMagnitude (halfBlock, halfBlock));
             expectWithinAbsoluteError (mag, expGain, err, message);

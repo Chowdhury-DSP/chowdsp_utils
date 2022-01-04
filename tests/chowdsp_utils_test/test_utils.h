@@ -51,6 +51,33 @@ inline AudioBuffer<float> makeNoise (float sampleRate, float lengthSeconds)
 
     return std::move (noiseBuffer);
 }
+
+/** Convert from a AudioBuffer to AudioBlock (maybe changing data type...) */
+template <typename T, typename NumericType = typename chowdsp::SampleTypeHelpers::ElementType<T>::Type>
+inline dsp::AudioBlock<T> bufferToBlock (HeapBlock<char>& dataBlock, const AudioBuffer<NumericType>& buffer)
+{
+    dsp::AudioBlock<T> block { dataBlock, 1, (size_t) buffer.getNumSamples() };
+    for (int i = 0; i < buffer.getNumSamples(); ++i)
+        block.setSample (0, i, buffer.getSample (0, i));
+
+    return std::move (block);
+}
+
+/** Convert from a AudioBlock to AudioBuffer (maybe changing data type...) */
+template <typename T, typename NumericType = typename chowdsp::SampleTypeHelpers::ElementType<T>::Type>
+inline void blockToBuffer (AudioBuffer<NumericType>& buffer, const dsp::AudioBlock<T>& block)
+{
+    if constexpr (std::is_floating_point<T>::value)
+    {
+        for (int i = 0; i < buffer.getNumSamples(); ++i)
+            buffer.setSample (0, i, block.getSample (0, i));
+    }
+    else
+    {
+        for (int i = 0; i < buffer.getNumSamples(); ++i)
+            buffer.setSample (0, i, block.getSample (0, i).get (0));
+    }
+}
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
 struct ScopedFile
