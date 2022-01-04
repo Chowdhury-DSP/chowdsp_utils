@@ -48,6 +48,12 @@ public:
             auto three = six / two;
             expect (three.get (0) == (T) 3, "Division is incorrect!");
         }
+
+        // unary minus
+        {
+            auto negTwo = -two;
+            expect (negTwo.get (0) == (T) -2, "Negation is incorrect!");
+        }
     }
 
     void runTestTimed() override
