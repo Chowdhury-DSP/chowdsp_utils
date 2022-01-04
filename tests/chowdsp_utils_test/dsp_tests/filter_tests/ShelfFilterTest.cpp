@@ -49,8 +49,7 @@ public:
         chowdsp::ShelfFilter<T> shelfFilter;
         shelfFilter.calcCoefs ((T) Constants::lowGain, (T) Constants::highGain, (T) Constants::fc, Constants::fs);
 
-        auto testFrequency = [=, &shelfFilter] (float freq, float expGain, const String& message)
-        {
+        auto testFrequency = [=, &shelfFilter] (float freq, float expGain, const String& message) {
             auto buffer = test_utils::makeSineWave (freq, Constants::fs, (NumericType) 1);
 
             HeapBlock<char> dataBlock;

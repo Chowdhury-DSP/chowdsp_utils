@@ -147,7 +147,7 @@ void HighShelfFilter<T>::calcCoefs (T fc, T qVal, T gain, NumericType fs)
 
     const auto wc = juce::MathConstants<NumericType>::twoPi * fc;
     const auto K = computeKValue (fc, fs);
-    
+
     T A {}, Aroot {};
     if constexpr (std::is_floating_point<T>::value)
     {
