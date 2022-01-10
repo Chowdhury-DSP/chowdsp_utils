@@ -3,6 +3,7 @@ target_sources(chowdsp_utils_tests PRIVATE
     FileListenerTest.cpp
     ForwardingParameterTest.cpp
     GlobalSettingsTest.cpp
+    ParamHelpersTest.cpp
     ParamStringsTest.cpp
     PluginBaseTest.cpp
     PluginLoggerTest.cpp

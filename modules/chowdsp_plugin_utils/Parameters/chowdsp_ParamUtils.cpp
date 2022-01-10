@@ -67,4 +67,24 @@ juce::String floatValToStringDecimal (float floatVal, int numDecimalPlaces)
 
 float stringToFloatVal (const juce::String& s) { return s.getFloatValue(); }
 
+void createFreqParameter (Parameters& params, const juce::String& id, const juce::String& name, float min, float max, float centre, float defaultValue)
+{
+    auto freqRange = createNormalisableRange (min, max, centre);
+    emplace_param<VTSParam> (params, id, name, juce::String(), freqRange, defaultValue, &freqValToString, &stringToFreqVal);
+}
+
+void createPercentParameter (Parameters& params, const juce::String& id, const juce::String& name, float defaultValue)
+{
+    emplace_param<VTSParam> (params, id, name, juce::String(), juce::NormalisableRange { 0.0f, 1.0f }, defaultValue, &percentValToString, &stringToPercentVal);
+}
+
+void createGainDBParameter (Parameters& params, const juce::String& id, const juce::String& name, float min, float max, float defaultValue, float centerValue)
+{
+    juce::NormalisableRange<float> range { min, max };
+    if (centerValue > -1000.0f)
+        range.setSkewForCentre (centerValue);
+
+    emplace_param<VTSParam> (params, id, name, juce::String(), range, defaultValue, &gainValToString, &stringToGainVal);
+}
+
 } // namespace chowdsp::ParamUtils
