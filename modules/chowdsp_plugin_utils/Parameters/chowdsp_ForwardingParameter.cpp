@@ -82,10 +82,6 @@ void ForwardingParameter::setParam (juce::RangedAudioParameter* paramToUse, cons
         attachment.reset();
 
     internalParam = paramToUse;
-
-    if (internalParam != nullptr)
-        attachment = std::make_unique<ForwardingAttachment> (*internalParam, *this, undoManager);
-
     customName = newName;
 
     if (processor != nullptr)
@@ -94,6 +90,12 @@ void ForwardingParameter::setParam (juce::RangedAudioParameter* paramToUse, cons
 #else
         processor->updateHostDisplay();
 #endif
+
+    if (internalParam != nullptr)
+    {
+        setValueNotifyingHost (internalParam->getValue());
+        attachment = std::make_unique<ForwardingAttachment> (*internalParam, *this, undoManager);
+    }
 }
 
 float ForwardingParameter::getValue() const
