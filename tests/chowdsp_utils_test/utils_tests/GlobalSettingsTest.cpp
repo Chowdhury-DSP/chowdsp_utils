@@ -138,8 +138,7 @@ public:
         settings.initialise (settingsFile, 1);
         settings.addProperties ({ test1, test2 }, &testListener);
 
-        auto setSettingsVal = [&] (std::string_view name, const auto& val)
-        {
+        auto setSettingsVal = [&] (std::string_view name, const auto& val) {
             auto settingsJson = fromFile (settings.getSettingsFile());
             settingsJson["plugin_settings"][name.data()] = val;
 
