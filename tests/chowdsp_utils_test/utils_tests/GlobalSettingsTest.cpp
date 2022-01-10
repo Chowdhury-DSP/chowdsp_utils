@@ -1,9 +1,11 @@
 #include <TimedUnitTest.h>
 
+using namespace chowdsp::JSONUtils;
+
 namespace
 {
-NamedValueSet::NamedValue test1 { "test1", 35 };
-NamedValueSet::NamedValue test2 { "test2", "TEST" };
+chowdsp::GlobalPluginSettings::SettingProperty test1 { "test1", 35 };
+chowdsp::GlobalPluginSettings::SettingProperty test2 { "test2", "TEST" };
 
 const String settingsFile = "settings_file.settings";
 } // namespace
@@ -21,8 +23,8 @@ public:
         settings.addProperties ({ test1, test2 });
 
         settings.initialise (settingsFile, 1);
-        expectEquals ((int) settings.getProperty (test1.name), (int) test1.value, "Property 1 is incorrect!");
-        expectEquals (settings.getProperty (test2.name).toString(), test2.value.toString(), "Property 2 is incorrect!");
+        expectEquals (settings.getProperty<int> (test1.first), (int) test1.second, "Property 1 is incorrect!");
+        expectEquals (settings.getProperty<String> (test2.first), (String) test2.second, "Property 2 is incorrect!");
 
         settings.getSettingsFile().deleteFile();
     }
@@ -33,8 +35,8 @@ public:
         settings.initialise ("settings_file.settings", 1);
 
         settings.addProperties ({ test1, test2 });
-        expectEquals ((int) settings.getProperty (test1.name), (int) test1.value, "Property 1 is incorrect!");
-        expectEquals (settings.getProperty (test2.name).toString(), test2.value.toString(), "Property 2 is incorrect!");
+        expectEquals (settings.getProperty<int> (test1.first), (int) test1.second, "Property 1 is incorrect!");
+        expectEquals (settings.getProperty<String> (test2.first), (String) test2.second, "Property 2 is incorrect!");
 
         settings.getSettingsFile().deleteFile();
     }
@@ -42,7 +44,7 @@ public:
     void noInit()
     {
         chowdsp::GlobalPluginSettings settings;
-        expect (settings.getProperty (test1.name).isVoid(), "Property should be void!");
+        expectEquals (settings.getProperty<int> (test1.first), 0, "Property should be null!");
         expect (settings.getSettingsFile() == File(), "Settings file should not exist!");
     }
 
@@ -52,12 +54,12 @@ public:
         settings.initialise (settingsFile, 1);
 
         settings.addProperties ({ test1, test2 });
-        expectEquals ((int) settings.getProperty (test1.name), (int) test1.value, "Property 1 is incorrect!");
-        expectEquals (settings.getProperty (test2.name).toString(), test2.value.toString(), "Property 2 is incorrect!");
+        expectEquals (settings.getProperty<int> (test1.first), (int) test1.second, "Property 1 is incorrect!");
+        expectEquals (settings.getProperty<String> (test2.first), (String) test2.second, "Property 2 is incorrect!");
 
         settings.initialise (settingsFile, 1);
-        expectEquals ((int) settings.getProperty (test1.name), (int) test1.value, "Property 1 is incorrect after 2nd init!");
-        expectEquals (settings.getProperty (test2.name).toString(), test2.value.toString(), "Property 2 is incorrect after 2nd init!");
+        expectEquals (settings.getProperty<int> (test1.first), (int) test1.second, "Property 1 is incorrect after 2nd init!");
+        expectEquals (settings.getProperty<String> (test2.first), (String) test2.second, "Property 2 is incorrect after 2nd init!");
 
         settings.getSettingsFile().deleteFile();
     }
@@ -77,7 +79,7 @@ public:
         {
             chowdsp::GlobalPluginSettings settings;
             settings.initialise (settingsFile, 1);
-            expect (settings.getProperty (test1.name).isVoid(), "Property should be void!");
+            expectEquals (settings.getProperty<int> (test1.first), 0, "Property should be null!");
             settings.addProperties ({ test1, test2 });
         }
 
@@ -87,7 +89,7 @@ public:
         {
             chowdsp::GlobalPluginSettings settings;
             settings.initialise (settingsFile, 1);
-            expect (settings.getProperty (test1.name).isVoid(), "Property should be void!");
+            expectEquals (settings.getProperty<int> (test1.first), 0, "Property should be null!");
         }
 
         settingsFileState.deleteFile();
@@ -106,8 +108,8 @@ public:
             settings.initialise (settingsFile, 1);
             settings.addProperties ({ test1, test2 });
 
-            expectEquals ((int) settings.getProperty (test1.name), (int) test1.value, "Property 1 is incorrect after 2nd init!");
-            expectEquals (settings.getProperty (test2.name).toString(), test2.value.toString(), "Property 2 is incorrect after 2nd init!");
+            expectEquals (settings.getProperty<int> (test1.first), (int) test1.second, "Property 1 is incorrect after 2nd init!");
+            expectEquals (settings.getProperty<String> (test2.first), (String) test2.second, "Property 2 is incorrect after 2nd init!");
 
             settings.getSettingsFile().deleteFile();
         }
@@ -117,54 +119,110 @@ public:
     {
         struct TestListener : chowdsp::GlobalPluginSettings::Listener
         {
+            chowdsp::GlobalPluginSettings* settings = nullptr;
             int test1Value = 0;
             String test2Value {};
 
-            void propertyChanged (const Identifier& id, const var& v) override
+            void globalSettingChanged (const std::string_view& id) override
             {
-                if (id == test1.name)
-                    test1Value = (int) v;
-                else if (id == test2.name)
-                    test2Value = v.toString();
+                if (id == test1.first)
+                    test1Value = settings->getProperty<int> (id);
+                else if (id == test2.first)
+                    test2Value = settings->getProperty<String> (id);
             }
         } testListener;
 
         chowdsp::GlobalPluginSettings settings;
+        testListener.settings = &settings;
+
         settings.initialise (settingsFile, 1);
         settings.addProperties ({ test1, test2 }, &testListener);
 
-        auto setSettingsVal = [&] (const Identifier& name, const var& val) {
-            auto settingsXml = XmlDocument::parse (settings.getSettingsFile());
-            NamedValueSet settingsSet;
-            settingsSet.setFromXmlAttributes (*settingsXml);
-            settingsSet.set (name, val);
-            settingsSet.copyToXmlAttributes (*settingsXml);
-            settingsXml->writeTo (settings.getSettingsFile());
+        auto setSettingsVal = [&] (std::string_view name, const auto& val)
+        {
+            auto settingsJson = fromFile (settings.getSettingsFile());
+            settingsJson["plugin_settings"][name.data()] = val;
+
+            toFile (settingsJson, settings.getSettingsFile());
             MessageManager::getInstance()->runDispatchLoopUntil (1500);
         };
 
         constexpr int testVal1 = 22;
-        setSettingsVal (test1.name, testVal1);
+        setSettingsVal (test1.first, testVal1);
         expectEquals (testListener.test1Value, testVal1, "Listener value not set!");
+
+        setSettingsVal (test1.first, "testVal2");
+        expectEquals (testListener.test1Value, testVal1, "Listener value should not be set with wrong data type!");
 
         constexpr int testVal2 = 80;
         settings.removePropertyListener (&testListener);
-        setSettingsVal (test1.name, testVal2);
+        setSettingsVal (test1.first, testVal2);
         expectEquals (testListener.test1Value, testVal1, "Listener value should not be set after listener removed!");
 
         const String testStr1 = "RRRRR";
-        settings.addPropertyListener (test2.name, &testListener);
-        settings.setProperty (test2.name, testStr1);
+        settings.addPropertyListener (test2.first, &testListener);
+        settings.setProperty (test2.first, testStr1);
         expectEquals (testListener.test2Value, testStr1, "Listener value not set!");
 
+        settings.setProperty (test2.first, 45);
+        expectEquals (testListener.test2Value, testStr1, "Listener value should not be set when set with the wrong data type!");
+
         const String testStr2 = "BBBBB";
-        settings.removePropertyListener (test2.name, &testListener);
+        settings.removePropertyListener (test2.first, &testListener);
         settings.removePropertyListener ("NOT_A_PROPERTY", &testListener);
-        settings.setProperty (test2.name, testStr2);
+        settings.setProperty (test2.first, testStr2);
         settings.setProperty ("NOT_A_PROPERTY", testStr2);
         expectEquals (testListener.test2Value, testStr1, "Listener value should not be set after listener removed!");
 
         settings.getSettingsFile().deleteFile();
+    }
+
+    void setWrongDataTypeTest()
+    {
+        chowdsp::GlobalPluginSettings settings;
+        settings.initialise (settingsFile, 1);
+        settings.addProperties ({ test1, test2 });
+
+        expectEquals (settings.getProperty<int> (test1.first), (int) test1.second, "Property 1 is incorrect!");
+        expectEquals (settings.getProperty<String> (test2.first), (String) test2.second, "Property 2 is incorrect!");
+
+        settings.setProperty (test1.first, String ("ZZZZ"));
+        settings.setProperty (test2.first, 90);
+
+        expectEquals (settings.getProperty<int> (test1.first), (int) test1.second, "Property 1 is incorrect!");
+        expectEquals (settings.getProperty<String> (test2.first), (String) test2.second, "Property 2 is incorrect!");
+    }
+
+    void wreckSettingsFile()
+    {
+        {
+            chowdsp::GlobalPluginSettings settings;
+            settings.initialise (settingsFile, 1);
+            settings.addProperties ({ test1, test2 });
+
+            auto settingsJson = fromFile (settings.getSettingsFile());
+            settingsJson = chowdsp::json ({});
+            toFile (settingsJson, settings.getSettingsFile());
+            MessageManager::getInstance()->runDispatchLoopUntil (1500);
+
+            expectEquals (settings.getProperty<int> (test1.first), (int) test1.second, "Property 1 is incorrect!");
+            expectEquals (settings.getProperty<String> (test2.first), (String) test2.second, "Property 2 is incorrect!");
+        }
+
+        {
+            chowdsp::GlobalPluginSettings settings;
+            settings.initialise (settingsFile, 1);
+            settings.addProperties ({ test1, test2 });
+
+            auto settingsJson = fromFile (settings.getSettingsFile());
+            settingsJson = chowdsp::json ({});
+            settingsJson["dummy"] = 42;
+            toFile (settingsJson, settings.getSettingsFile());
+            MessageManager::getInstance()->runDispatchLoopUntil (1500);
+
+            expectEquals (settings.getProperty<int> (test1.first), (int) test1.second, "Property 1 is incorrect!");
+            expectEquals (settings.getProperty<String> (test2.first), (String) test2.second, "Property 2 is incorrect!");
+        }
     }
 
     void runTestTimed() override
@@ -196,6 +254,12 @@ public:
 
         beginTest ("Settings Listener Test");
         settingsListenerTest();
+
+        beginTest ("Set Wrong Data Type Test");
+        setWrongDataTypeTest();
+
+        beginTest ("Wreck Settings File Test");
+        wreckSettingsFile();
     }
 };
 

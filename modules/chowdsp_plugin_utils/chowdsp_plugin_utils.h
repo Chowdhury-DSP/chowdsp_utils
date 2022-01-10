@@ -45,6 +45,8 @@ JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 JUCE_END_IGNORE_WARNINGS_MSVC
 #endif
 
+#include "Serialization/chowdsp_JSON.h"
+
 #include "Parameters/chowdsp_ParamUtils.h"
 #include "Parameters/chowdsp_ForwardingParameter.h"
 #include "Version/chowdsp_VersionUtils.h"
