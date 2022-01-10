@@ -178,11 +178,13 @@ void GlobalPluginSettings::writeSettingsToFile()
     JSONUtils::toFile (settingsJson, settingsFile);
 }
 
+template void GlobalPluginSettings::setProperty<bool> (SettingID name, bool property);
 template void GlobalPluginSettings::setProperty<int> (SettingID name, int property);
 template void GlobalPluginSettings::setProperty<double> (SettingID name, double property);
 template void GlobalPluginSettings::setProperty<juce::String> (SettingID name, juce::String property);
 template void GlobalPluginSettings::setProperty<json> (SettingID name, json property);
 
+template bool GlobalPluginSettings::getProperty<bool> (SettingID name);
 template int GlobalPluginSettings::getProperty<int> (SettingID name);
 template double GlobalPluginSettings::getProperty<double> (SettingID name);
 template juce::String GlobalPluginSettings::getProperty<juce::String> (SettingID name);
