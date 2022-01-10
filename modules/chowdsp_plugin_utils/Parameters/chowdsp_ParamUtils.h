@@ -38,6 +38,25 @@ namespace ParamUtils
         params.push_back (std::make_unique<ParamType> (std::forward<Args> (args)...));
     }
 
+    /** Useful method for creating a juce::NormalisableRange with a centre value */
+    template <typename T>
+    juce::NormalisableRange<T> createNormalisableRange (T start, T end, T centre)
+    {
+        auto range = juce::NormalisableRange { start, end };
+        range.setSkewForCentre (centre);
+
+        return range;
+    }
+
+    /** Helper method for creating frequency parameters */
+    void createFreqParameter (Parameters& params, const juce::String& id, const juce::String& name, float min, float max, float centre, float defaultValue);
+
+    /** Helper method for creating percent parameters */
+    void createPercentParameter (Parameters& params, const juce::String& id, const juce::String& name, float defaultValue);
+
+    /** Helper method for creating gain parameters in Decibels */
+    void createGainDBParameter (Parameters& params, const juce::String& id, const juce::String& name, float min, float max, float defaultValue, float centerValue = -1000.0f);
+
 } // namespace ParamUtils
 
 } // namespace chowdsp
