@@ -6,6 +6,14 @@ namespace chowdsp::SIMDUtils
 using vec4 = juce::dsp::SIMDRegister<float>;
 using vec2 = juce::dsp::SIMDRegister<double>;
 
+#ifdef __AVX2__
+/** Default SIMG register alignment */
+constexpr int CHOWDSP_DEFAULT_SIMD_ALIGNMENT = 32;
+#else
+/** Default SIMG register alignment */
+constexpr int CHOWDSP_DEFAULT_SIMD_ALIGNMENT = 16;
+#endif
+
 //============================================================
 /**
  *  JUCE doesn't natively support loading unaligned SIMD registers,

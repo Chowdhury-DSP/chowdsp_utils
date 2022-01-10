@@ -58,10 +58,10 @@ class InputFilterBank
 public:
     explicit InputFilterBank (T sampleTime) : Ts (sampleTime)
     {
-        float root_real alignas (16)[4];
-        float root_imag alignas (16)[4];
-        float pole_real alignas (16)[4];
-        float pole_imag alignas (16)[4];
+        float root_real alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[Complex4::size] {};
+        float root_imag alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[Complex4::size] {};
+        float pole_real alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[Complex4::size] {};
+        float pole_imag alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[Complex4::size] {};
         for (size_t i = 0; i < BBDFilterSpec::N_filt; ++i)
         {
             root_real[i] = BBDFilterSpec::iFiltRoot[i].real();
@@ -130,10 +130,10 @@ class OutputFilterBank
 public:
     explicit OutputFilterBank (float sampleTime) : Ts (sampleTime)
     {
-        float gcoefs_real alignas (16)[4];
-        float gcoefs_imag alignas (16)[4];
-        float pole_real alignas (16)[4];
-        float pole_imag alignas (16)[4];
+        float gcoefs_real alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[Complex4::size] {};
+        float gcoefs_imag alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[Complex4::size] {};
+        float pole_real alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[Complex4::size] {};
+        float pole_imag alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[Complex4::size] {};
         for (size_t i = 0; i < BBDFilterSpec::N_filt; ++i)
         {
             auto gVal = BBDFilterSpec::oFiltRoot[i] / BBDFilterSpec::oFiltPole[i];

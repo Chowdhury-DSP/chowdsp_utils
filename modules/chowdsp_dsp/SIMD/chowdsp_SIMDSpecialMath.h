@@ -375,14 +375,6 @@ inline typename juce::dsp::SIMDRegister<T>::vMaskType isnanSIMD (juce::dsp::SIMD
 }
 #endif // CHOWDSP_USE_XSIMD
 
-#ifdef __AVX2__
-/** Default SIMG register alignment */
-constexpr int CHOWDSP_DEFAULT_SIMD_ALIGNMENT = 32;
-#else
-/** Default SIMG register alignment */
-constexpr int CHOWDSP_DEFAULT_SIMD_ALIGNMENT = 16;
-#endif
-
 /** Returns the maximum value from the SIMD register */
 template <typename T>
 inline T hMaxSIMD (juce::dsp::SIMDRegister<T> x)
