@@ -5,12 +5,20 @@ namespace chowdsp
 /**
  * Utility class to hold plugin settings that should be shared between
  * plugin instances. It should typically be used as a SharedResourcePointer.
+ *
+ * @TODO: Update this class when nlohmann::json supports std::string_view
  */
 class GlobalPluginSettings
 {
 public:
     /** Default constructor */
     GlobalPluginSettings() = default;
+    
+    /** Type alias for setting ID */
+    using SettingID = std::string_view;
+
+    /** Type alias for setting property with ID */
+    using SettingProperty = std::pair<SettingID, json>;
 
     /** Initialise this settings object for a given file, and update time */
     void initialise (const juce::String& settingsFile, int timerSeconds = 5);
@@ -21,29 +29,32 @@ public:
         virtual ~Listener() = default;
 
         /** This method will be called when a property has changed */
-        virtual void propertyChanged (const juce::Identifier&, const juce::var&) = 0;
+        virtual void globalSettingChanged (SettingID) = 0;
     };
 
     /** Adds a set of properties to the plugin settings, and adds a listener for those properties */
-    void addProperties (std::initializer_list<juce::NamedValueSet::NamedValue> properties, Listener* listener = nullptr);
+    void addProperties (std::initializer_list<SettingProperty> properties, Listener* listener = nullptr);
 
     /** Returns the settings property with a give name */
-    const juce::var& getProperty (const juce::Identifier& name) const noexcept { return globalProperties[name]; }
+    template <typename T>
+    T getProperty (SettingID name);
 
     /** Returns true if the given setting already exists */
-    bool hasProperty (const juce::Identifier& name) const noexcept { return globalProperties.contains (name); }
+    bool hasProperty (SettingID name) const noexcept { return globalProperties.contains (name); }
 
     /**
      * If a property with this name has been added to the plugin settings,
-     * it will be set to the new value.
+     * it will be set to the new value. Note that the type of the property
+     * must be the same as the type that was originally set for that property.
      */
-    void setProperty (const juce::Identifier& name, juce::var&& property);
+    template <typename T>
+    void setProperty (SettingID name, T property);
 
     /** Adds a listener for a given property */
-    void addPropertyListener (const juce::Identifier& id, Listener* listener);
+    void addPropertyListener (SettingID id, Listener* listener);
 
     /** Removes a listener for a given property */
-    void removePropertyListener (const juce::Identifier& id, Listener* listener);
+    void removePropertyListener (SettingID id, Listener* listener);
 
     /** Removes a listener from all its properties */
     void removePropertyListener (Listener* listener);
@@ -64,13 +75,11 @@ private:
     };
 
     std::unique_ptr<SettingsFileListener> fileListener;
-    juce::NamedValueSet globalProperties;
+    json globalProperties;
 
-    // @TODO: figure out how to map over identifiers! Then this should be much faster.
-    // Ongoing discussion here: https://forum.juce.com/t/std-hash-specialisation-for-identifier-unordered-map/25157/18
-    std::unordered_map<juce::String, juce::Array<Listener*>> listeners;
+    std::unordered_map<SettingID, juce::Array<Listener*>> listeners;
 
-    const static juce::Identifier settingsTag;
+    static constexpr SettingID settingsTag = "plugin_settings";
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GlobalPluginSettings)
 };
