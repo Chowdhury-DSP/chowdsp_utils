@@ -2,6 +2,8 @@
 
 namespace chowdsp
 {
+using json = nlohmann::json;
+
 /**
  * Utility class to hold plugin settings that should be shared between
  * plugin instances. It should typically be used as a SharedResourcePointer.
@@ -21,7 +23,7 @@ public:
         virtual ~Listener() = default;
 
         /** This method will be called when a property has changed */
-        virtual void propertyChanged (const juce::Identifier&, const juce::var&) = 0;
+        virtual void globalSettingChanged (const juce::Identifier&, const juce::var&) = 0;
     };
 
     /** Adds a set of properties to the plugin settings, and adds a listener for those properties */

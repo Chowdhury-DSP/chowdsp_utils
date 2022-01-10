@@ -24,6 +24,9 @@
 // STL includes
 #include <unordered_map>
 
+// third party includes
+#include "third_party/nlohmann/json.hpp"
+
 // JUCE includes
 #include <juce_core/juce_core.h>
 #include <juce_audio_basics/juce_audio_basics.h>
