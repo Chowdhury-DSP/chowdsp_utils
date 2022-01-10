@@ -24,6 +24,9 @@
 // STL includes
 #include <unordered_map>
 
+// third party includes
+#include "third_party/nlohmann/json.hpp"
+
 // JUCE includes
 #include <juce_core/juce_core.h>
 #include <juce_audio_basics/juce_audio_basics.h>
@@ -41,6 +44,8 @@ JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4458) // MSVC doesn't like Foley's hiding class
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 JUCE_END_IGNORE_WARNINGS_MSVC
 #endif
+
+#include "Serialization/chowdsp_JSON.h"
 
 #include "Parameters/chowdsp_ParamUtils.h"
 #include "Parameters/chowdsp_ForwardingParameter.h"

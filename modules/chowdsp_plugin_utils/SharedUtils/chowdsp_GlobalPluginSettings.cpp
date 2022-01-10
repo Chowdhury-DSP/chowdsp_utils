@@ -24,50 +24,77 @@ void GlobalPluginSettings::initialise (const juce::String& settingsFile, int tim
         writeSettingsToFile();
 }
 
-void GlobalPluginSettings::addProperties (std::initializer_list<juce::NamedValueSet::NamedValue> properties, Listener* listener)
+void GlobalPluginSettings::addProperties (std::initializer_list<SettingProperty> properties, Listener* listener)
 {
     jassert (fileListener != nullptr); // Trying to add properties before initalizing? Don't do that!
 
-    juce::Array<juce::NamedValueSet::NamedValue> propertiesToAdd (std::move (properties));
-    for (auto& prop : propertiesToAdd)
+    for (auto& [name, value] : properties)
     {
-        if (! globalProperties.contains (prop.name))
-            globalProperties.set (prop.name, std::move (prop.value));
-        addPropertyListener (prop.name, listener);
+        if (! globalProperties.contains (name))
+            globalProperties[name.data()] = std::move (value);
+        addPropertyListener (name, listener);
     }
 
     writeSettingsToFile();
 }
 
-void GlobalPluginSettings::setProperty (const juce::Identifier& name, juce::var&& property)
+template <typename T>
+T GlobalPluginSettings::getProperty (SettingID name)
 {
-    if (! globalProperties.contains (name))
-        return;
+    try
+    {
+        return globalProperties[name.data()].get<T>();
+    }
+    catch (...)
+    {
+        // property was of the wrong data type!
+        jassertfalse;
 
-    globalProperties.set (name, std::move (property));
-    writeSettingsToFile();
-
-    for (auto* l : listeners[name.toString()])
-        l->propertyChanged (name, globalProperties[name]);
+        return {};
+    }
 }
 
-void GlobalPluginSettings::addPropertyListener (const juce::Identifier& id, Listener* listener)
+template <typename T>
+void GlobalPluginSettings::setProperty (SettingID name, T property)
+{
+    if (! globalProperties.contains (name))
+    {
+        // property must be added before it can be set!
+        jassertfalse;
+        return;
+    }
+
+    if (! JSONUtils::isSameType (json (T {}), globalProperties[name.data()]))
+    {
+        // new property must have the same type as the original!
+        jassertfalse;
+        return;
+    }
+
+    globalProperties[name.data()] = property;
+    writeSettingsToFile();
+
+    for (auto* l : listeners[name])
+        l->globalSettingChanged (name);
+}
+
+void GlobalPluginSettings::addPropertyListener (SettingID id, Listener* listener)
 {
     if (listener == nullptr)
         return;
 
-    listeners[id.toString()].addIfNotAlreadyThere (listener);
+    listeners[id].addIfNotAlreadyThere (listener);
 }
 
-void GlobalPluginSettings::removePropertyListener (const juce::Identifier& id, Listener* listener)
+void GlobalPluginSettings::removePropertyListener (SettingID id, Listener* listener)
 {
-    if (listeners.find (id.toString()) == listeners.end())
+    if (listeners.find (id) == listeners.end())
     {
         jassertfalse; // this property does not have any listeners!
         return;
     }
 
-    listeners.at (id.toString()).removeAllInstancesOf (listener);
+    listeners.at (id).removeAllInstancesOf (listener);
 }
 
 void GlobalPluginSettings::removePropertyListener (Listener* listener)
@@ -93,30 +120,43 @@ bool GlobalPluginSettings::loadSettingsFromFile()
     if (! settingsFile.existsAsFile())
         return false;
 
-    auto settingsXml = juce::XmlDocument::parse (settingsFile);
-    if (settingsXml == nullptr)
+    json settingsJson;
+    try
+    {
+        settingsJson = JSONUtils::fromFile (settingsFile);
+    }
+    catch (...)
+    {
+        // something went wrong when trying to read the properties file...
+        jassertfalse;
+        return false;
+    }
+
+    if (! settingsJson.contains (settingsTag.data()))
     {
         // invalid settings!
         settingsFile.deleteRecursively();
         return false;
     }
 
-    if (settingsXml->getTagName() != settingsTag.toString())
-    {
-        // invalid settings!
-        settingsFile.deleteRecursively();
-        return false;
-    }
+    const auto oldProperties = globalProperties;
+    globalProperties = settingsJson[settingsTag.data()];
 
-    juce::NamedValueSet oldProperties = globalProperties;
-    globalProperties.setFromXmlAttributes (*settingsXml);
-
-    for (const auto& prop : oldProperties)
+    for (const auto& [name, value] : oldProperties.items())
     {
-        if (prop.value != globalProperties[prop.name])
+        auto& newProperty = globalProperties[name.data()];
+        if (! JSONUtils::isSameType (value, newProperty))
         {
-            for (auto* l : listeners[prop.name.toString()])
-                l->propertyChanged (prop.name, globalProperties[prop.name]);
+            // new property does not have the same type as the original!
+            jassertfalse;
+
+            newProperty = value;
+        }
+
+        if (value != newProperty)
+        {
+            for (auto* l : listeners[name])
+                l->globalSettingChanged (name);
         }
     }
 
@@ -129,10 +169,22 @@ void GlobalPluginSettings::writeSettingsToFile()
         return;
 
     auto& settingsFile = fileListener->getListenerFile();
-    juce::XmlElement settingsXml { settingsTag };
-    globalProperties.copyToXmlAttributes (settingsXml);
-    settingsXml.writeTo (settingsFile);
+
+    json settingsJson;
+    settingsJson[settingsTag.data()] = globalProperties;
+
+    JSONUtils::toFile (settingsJson, settingsFile);
 }
 
-const juce::Identifier GlobalPluginSettings::settingsTag { "plugin_settings" };
+template void GlobalPluginSettings::setProperty<bool> (SettingID name, bool property);
+template void GlobalPluginSettings::setProperty<int> (SettingID name, int property);
+template void GlobalPluginSettings::setProperty<double> (SettingID name, double property);
+template void GlobalPluginSettings::setProperty<juce::String> (SettingID name, juce::String property);
+template void GlobalPluginSettings::setProperty<json> (SettingID name, json property);
+
+template bool GlobalPluginSettings::getProperty<bool> (SettingID name);
+template int GlobalPluginSettings::getProperty<int> (SettingID name);
+template double GlobalPluginSettings::getProperty<double> (SettingID name);
+template juce::String GlobalPluginSettings::getProperty<juce::String> (SettingID name);
+template json GlobalPluginSettings::getProperty<json> (SettingID name);
 } // namespace chowdsp
