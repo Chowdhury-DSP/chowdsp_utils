@@ -5,13 +5,15 @@ namespace chowdsp
 /**
  * Utility class to hold plugin settings that should be shared between
  * plugin instances. It should typically be used as a SharedResourcePointer.
+ *
+ * @TODO: Update this class when nlohmann::json supports std::string_view
  */
 class GlobalPluginSettings
 {
 public:
     /** Default constructor */
     GlobalPluginSettings() = default;
-
+    
     /** Type alias for setting ID */
     using SettingID = std::string_view;
 
@@ -27,7 +29,7 @@ public:
         virtual ~Listener() = default;
 
         /** This method will be called when a property has changed */
-        virtual void globalSettingChanged (const SettingID&) = 0;
+        virtual void globalSettingChanged (SettingID) = 0;
     };
 
     /** Adds a set of properties to the plugin settings, and adds a listener for those properties */
