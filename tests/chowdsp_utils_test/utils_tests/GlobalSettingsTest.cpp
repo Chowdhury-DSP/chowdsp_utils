@@ -23,8 +23,8 @@ public:
         settings.addProperties ({ test1, test2 });
 
         settings.initialise (settingsFile, 1);
-        expectEquals (settings.getProperty<int> (test1.first), (int) test1.second, "Property 1 is incorrect!");
-        expectEquals (settings.getProperty<String> (test2.first), (String) test2.second, "Property 2 is incorrect!");
+        expectEquals (settings.getProperty<int> (test1.first), test1.second.get<int>(), "Property 1 is incorrect!");
+        expectEquals (settings.getProperty<String> (test2.first), test2.second.get<String>(), "Property 2 is incorrect!");
 
         settings.getSettingsFile().deleteFile();
     }
@@ -35,8 +35,8 @@ public:
         settings.initialise ("settings_file.settings", 1);
 
         settings.addProperties ({ test1, test2 });
-        expectEquals (settings.getProperty<int> (test1.first), (int) test1.second, "Property 1 is incorrect!");
-        expectEquals (settings.getProperty<String> (test2.first), (String) test2.second, "Property 2 is incorrect!");
+        expectEquals (settings.getProperty<int> (test1.first), test1.second.get<int>(), "Property 1 is incorrect!");
+        expectEquals (settings.getProperty<String> (test2.first), test2.second.get<String>(), "Property 2 is incorrect!");
 
         settings.getSettingsFile().deleteFile();
     }
@@ -54,12 +54,12 @@ public:
         settings.initialise (settingsFile, 1);
 
         settings.addProperties ({ test1, test2 });
-        expectEquals (settings.getProperty<int> (test1.first), (int) test1.second, "Property 1 is incorrect!");
-        expectEquals (settings.getProperty<String> (test2.first), (String) test2.second, "Property 2 is incorrect!");
+        expectEquals (settings.getProperty<int> (test1.first), test1.second.get<int>(), "Property 1 is incorrect!");
+        expectEquals (settings.getProperty<String> (test2.first), test2.second.get<String>(), "Property 2 is incorrect!");
 
         settings.initialise (settingsFile, 1);
-        expectEquals (settings.getProperty<int> (test1.first), (int) test1.second, "Property 1 is incorrect after 2nd init!");
-        expectEquals (settings.getProperty<String> (test2.first), (String) test2.second, "Property 2 is incorrect after 2nd init!");
+        expectEquals (settings.getProperty<int> (test1.first), test1.second.get<int>(), "Property 1 is incorrect after 2nd init!");
+        expectEquals (settings.getProperty<String> (test2.first), test2.second.get<String>(), "Property 2 is incorrect after 2nd init!");
 
         settings.getSettingsFile().deleteFile();
     }
@@ -108,8 +108,8 @@ public:
             settings.initialise (settingsFile, 1);
             settings.addProperties ({ test1, test2 });
 
-            expectEquals (settings.getProperty<int> (test1.first), (int) test1.second, "Property 1 is incorrect after 2nd init!");
-            expectEquals (settings.getProperty<String> (test2.first), (String) test2.second, "Property 2 is incorrect after 2nd init!");
+            expectEquals (settings.getProperty<int> (test1.first), test1.second.get<int>(), "Property 1 is incorrect after 2nd init!");
+            expectEquals (settings.getProperty<String> (test2.first), test2.second.get<String>(), "Property 2 is incorrect after 2nd init!");
 
             settings.getSettingsFile().deleteFile();
         }
@@ -182,14 +182,14 @@ public:
         settings.initialise (settingsFile, 1);
         settings.addProperties ({ test1, test2 });
 
-        expectEquals (settings.getProperty<int> (test1.first), (int) test1.second, "Property 1 is incorrect!");
-        expectEquals (settings.getProperty<String> (test2.first), (String) test2.second, "Property 2 is incorrect!");
+        expectEquals (settings.getProperty<int> (test1.first), test1.second.get<int>(), "Property 1 is incorrect!");
+        expectEquals (settings.getProperty<String> (test2.first), test2.second.get<String>(), "Property 2 is incorrect!");
 
         settings.setProperty (test1.first, String ("ZZZZ"));
         settings.setProperty (test2.first, 90);
 
-        expectEquals (settings.getProperty<int> (test1.first), (int) test1.second, "Property 1 is incorrect!");
-        expectEquals (settings.getProperty<String> (test2.first), (String) test2.second, "Property 2 is incorrect!");
+        expectEquals (settings.getProperty<int> (test1.first), test1.second.get<int>(), "Property 1 is incorrect!");
+        expectEquals (settings.getProperty<String> (test2.first), test2.second.get<String>(), "Property 2 is incorrect!");
     }
 
     void wreckSettingsFile()
@@ -204,8 +204,8 @@ public:
             toFile (settingsJson, settings.getSettingsFile());
             MessageManager::getInstance()->runDispatchLoopUntil (1500);
 
-            expectEquals (settings.getProperty<int> (test1.first), (int) test1.second, "Property 1 is incorrect!");
-            expectEquals (settings.getProperty<String> (test2.first), (String) test2.second, "Property 2 is incorrect!");
+            expectEquals (settings.getProperty<int> (test1.first), test1.second.get<int>(), "Property 1 is incorrect!");
+            expectEquals (settings.getProperty<String> (test2.first), test2.second.get<String>(), "Property 2 is incorrect!");
         }
 
         {
@@ -219,8 +219,8 @@ public:
             toFile (settingsJson, settings.getSettingsFile());
             MessageManager::getInstance()->runDispatchLoopUntil (1500);
 
-            expectEquals (settings.getProperty<int> (test1.first), (int) test1.second, "Property 1 is incorrect!");
-            expectEquals (settings.getProperty<String> (test2.first), (String) test2.second, "Property 2 is incorrect!");
+            expectEquals (settings.getProperty<int> (test1.first), test1.second.get<int>(), "Property 1 is incorrect!");
+            expectEquals (settings.getProperty<String> (test2.first), test2.second.get<String>(), "Property 2 is incorrect!");
         }
     }
 
