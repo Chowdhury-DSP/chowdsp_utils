@@ -12,7 +12,10 @@ public:
     /** Default constructor */
     GlobalPluginSettings() = default;
 
+    /** Type alias for setting ID */
     using SettingID = std::string_view;
+
+    /** Type alias for setting property with ID */
     using SettingProperty = std::pair<SettingID, json>;
 
     /** Initialise this settings object for a given file, and update time */
@@ -39,7 +42,8 @@ public:
 
     /**
      * If a property with this name has been added to the plugin settings,
-     * it will be set to the new value.
+     * it will be set to the new value. Note that the type of the property
+     * must be the same as the type that was originally set for that property.
      */
     template <typename T>
     void setProperty (SettingID name, T property);
@@ -70,7 +74,6 @@ private:
 
     std::unique_ptr<SettingsFileListener> fileListener;
     json globalProperties;
-    json defaultProperties;
 
     std::unordered_map<SettingID, juce::Array<Listener*>> listeners;
 

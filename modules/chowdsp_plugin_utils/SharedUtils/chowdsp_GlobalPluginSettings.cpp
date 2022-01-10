@@ -30,8 +30,6 @@ void GlobalPluginSettings::addProperties (std::initializer_list<SettingProperty>
 
     for (auto& [name, value] : properties)
     {
-        defaultProperties[name.data()] = value;
-
         if (! globalProperties.contains (name))
             globalProperties[name.data()] = std::move (value);
         addPropertyListener (name, listener);
