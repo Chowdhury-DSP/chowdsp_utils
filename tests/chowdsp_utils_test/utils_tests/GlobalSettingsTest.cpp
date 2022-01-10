@@ -123,7 +123,7 @@ public:
             int test1Value = 0;
             String test2Value {};
 
-            void globalSettingChanged (const std::string_view& id) override
+            void globalSettingChanged (chowdsp::GlobalPluginSettings::SettingID id) override
             {
                 if (id == test1.first)
                     test1Value = settings->getProperty<int> (id);
@@ -138,7 +138,8 @@ public:
         settings.initialise (settingsFile, 1);
         settings.addProperties ({ test1, test2 }, &testListener);
 
-        auto setSettingsVal = [&] (std::string_view name, const auto& val) {
+        auto setSettingsVal = [&] (std::string_view name, const auto& val)
+        {
             auto settingsJson = fromFile (settings.getSettingsFile());
             settingsJson["plugin_settings"][name.data()] = val;
 
