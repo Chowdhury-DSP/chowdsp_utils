@@ -13,7 +13,7 @@ class GlobalPluginSettings
 public:
     /** Default constructor */
     GlobalPluginSettings() = default;
-    
+
     /** Type alias for setting ID */
     using SettingID = std::string_view;
 
