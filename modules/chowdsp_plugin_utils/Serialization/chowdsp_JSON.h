@@ -30,11 +30,24 @@ using json = nlohmann::json;
  */
 namespace JSONUtils
 {
+    /** Load a json object from a juce::InputStream */
+    inline json fromInputStream (juce::InputStream& stream)
+    {
+        return json::parse (stream.readEntireStreamAsString().toStdString());
+    }
+
+    /** Load a json object from binary data */
+    inline json fromBinaryData (const void* data, int dataSize)
+    {
+        juce::MemoryInputStream jsonInputStream { data, (size_t) dataSize, false };
+        return fromInputStream (jsonInputStream);
+    }
+
     /** Load a json object from a file */
     inline json fromFile (const juce::File& file)
     {
         juce::FileInputStream jsonInputStream { file };
-        return json::parse (jsonInputStream.readEntireStreamAsString().toStdString());
+        return fromInputStream (jsonInputStream);
     }
 
     /** Dump a json object to a file */
