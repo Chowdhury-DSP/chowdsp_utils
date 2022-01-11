@@ -753,7 +753,7 @@ class IdealCurrentSourceT final : public RootWDF
 public:
     explicit IdealCurrentSourceT (Next& n) : next (n)
     {
-        next.connectToParent (this);
+        n.connectToParent (this);
         calcImpedance();
     }
 
@@ -786,7 +786,7 @@ public:
     WDFMembers<T> wdf;
 
 private:
-    Next& next;
+    const Next& next;
 
     T Is = (T) 0.0;
     T twoR;
@@ -873,7 +873,7 @@ public:
      */
     DiodePairT (Next& n, T Is, T Vt = typename WDFMembers<T>::NumericType (25.85e-3), T nDiodes = 1) : next (n)
     {
-        next.connectToParent (this);
+        n.connectToParent (this);
         setDiodeParameters (Is, Vt, nDiodes);
     }
 
@@ -987,7 +987,7 @@ private:
     T R_Is_overVt;
     T logR_Is_overVt;
 
-    Next& next;
+    const Next& next;
 };
 
 /**
@@ -1008,7 +1008,7 @@ public:
      */
     DiodeT (Next& n, T Is, T Vt = typename WDFMembers<T>::NumericType (25.85e-3), T nDiodes = 1) : next (n)
     {
-        next.connectToParent (this);
+        n.connectToParent (this);
         setDiodeParameters (Is, Vt, nDiodes);
     }
 
@@ -1077,7 +1077,7 @@ private:
     T R_Is_overVt;
     T logR_Is_overVt;
 
-    Next& next;
+    const Next& next;
 };
 
 /** WDF Switch (non-adaptable) */
