@@ -248,6 +248,11 @@ void PresetsComp::saveUserPreset()
         presetNameEditor.setVisible (false);
         updatePresetBoxText();
     };
+
+    presetNameEditor.onFocusLost = [=] {
+        presetNameEditor.setVisible (false);
+        updatePresetBoxText();
+    };
 }
 
 void PresetsComp::savePresetFile (const juce::String& fileName)
