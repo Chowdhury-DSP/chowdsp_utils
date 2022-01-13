@@ -91,6 +91,12 @@ public:
     /** Tell listeners that the preset list has been updated */
     void triggerPresetListUpdate() { listeners.call (&Listener::presetListUpdated); }
 
+    /** Set the name to use for user presets */
+    void setUserPresetName (const juce::String& newName);
+
+    /** Returns a vector of all the user-saved presets */
+    std::vector<const Preset*> getUserPresets() const;
+
     /** Listener class to hear alerts about preset manager changes */
     struct Listener
     {
@@ -145,6 +151,7 @@ private:
     const Preset* currentPreset = nullptr;
     const Preset* defaultPreset = nullptr;
 
+    juce::String userPresetsName;
     juce::String userPresetConfigPath;
 
     std::unique_ptr<Preset> keepAlivePreset;

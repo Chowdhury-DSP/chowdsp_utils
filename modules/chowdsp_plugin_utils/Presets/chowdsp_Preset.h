@@ -40,6 +40,9 @@ struct Preset
     /** Returns the name of the vendor that created this preset */
     const juce::String& getVendor() const noexcept { return vendor; }
 
+    /** Changes the name of the vendor that created this preset */
+    void setVendor (const juce::String& newVendor) { vendor = newVendor; }
+
     /** Returns the name of the preset category */
     const juce::String& getCategory() const noexcept { return category; }
 

@@ -285,6 +285,48 @@ public:
         expect (testListener.listenerCalled, "Preset list update not triggered!");
     }
 
+    void getUserPresetsTest()
+    {
+        DummyPlugin plugin;
+
+        ScopedFile presetPath ("preset_path");
+        presetPath.file.createDirectory();
+        std::vector<File> presetFiles;
+
+        chowdsp::PresetManager presetMgr { plugin.getVTS() };
+        presetMgr.setUserPresetConfigFile ("preset_config.txt");
+        presetMgr.setUserPresetPath (presetPath.file);
+
+        auto userPresetPath = presetMgr.getUserPresetPath();
+        presetFiles.push_back (userPresetPath.getChildFile ("test1.preset"));
+        presetMgr.saveUserPreset (presetFiles.back());
+
+        presetFiles.push_back (userPresetPath.getChildFile ("test2.preset"));
+        presetMgr.saveUserPreset (presetFiles.back());
+
+        String testUserName = "User";
+        presetMgr.setUserPresetName (testUserName);
+        for (const auto* preset : presetMgr.getUserPresets())
+            expectEquals (preset->getVendor(), testUserName, "Default user vendor name is incorrect!");
+
+        testUserName = "TestUserName";
+        presetMgr.setUserPresetName (testUserName);
+        for (const auto* preset : presetMgr.getUserPresets())
+            expectEquals (preset->getVendor(), testUserName, "Set user vendor name is incorrect!");
+
+        String testUserName2 = "TestUserName2";
+        presetMgr.setUserPresetName (testUserName);
+        for (const auto* preset : presetMgr.getUserPresets())
+            expectEquals (preset->getVendor(), testUserName, "Changing user vendor name that is not default should not change existing user preset names!");
+
+        for (auto& file : presetFiles)
+            file.deleteFile();
+    }
+
+    void setUserPresetNameTest()
+    {
+    }
+
     void runTestTimed() override
     {
         beginTest ("User Preset Test");
@@ -313,6 +355,12 @@ public:
 
         beginTest ("Trigger Preset List Update Test");
         triggerPresetListUpdateTest();
+
+        beginTest ("Get User Presets Test");
+        getUserPresetsTest();
+
+        beginTest ("Set User Presets Name Test");
+        setUserPresetNameTest();
     }
 };
 

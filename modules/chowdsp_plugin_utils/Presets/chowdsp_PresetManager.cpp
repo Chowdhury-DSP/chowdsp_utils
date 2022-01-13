@@ -1,9 +1,15 @@
 #include "chowdsp_PresetManager.h"
 
+namespace
+{
+const juce::String defaultUserPresetsName { "User" };
+}
+
 namespace chowdsp
 {
 PresetManager::PresetManager (juce::AudioProcessorValueTreeState& vtState) : vts (vtState),
-                                                                             processor (vts.processor)
+                                                                             processor (vts.processor),
+                                                                             userPresetsName (defaultUserPresetsName)
 {
     for (auto* param : processor.getParameters())
     {
@@ -11,7 +17,7 @@ PresetManager::PresetManager (juce::AudioProcessorValueTreeState& vtState) : vts
             vts.addParameterListener (paramCast->paramID, this);
     }
 
-    userIDMap.insert ({ "User", userUserIDStart });
+    userIDMap.insert ({ userPresetsName, userUserIDStart });
 }
 
 PresetManager::~PresetManager()
@@ -112,7 +118,7 @@ void PresetManager::saveUserPreset (const juce::File& file)
     auto stateXml = savePresetState();
     const auto name = file.getFileNameWithoutExtension();
 
-    keepAlivePreset = std::make_unique<Preset> (name, "User", *stateXml);
+    keepAlivePreset = std::make_unique<Preset> (name, userPresetsName, *stateXml);
     if (keepAlivePreset != nullptr)
     {
         keepAlivePreset->toFile (file);
@@ -233,6 +239,48 @@ juce::File PresetManager::getUserPresetPath() const
     return {};
 }
 
+std::vector<const Preset*> PresetManager::getUserPresets() const
+{
+    std::vector<const Preset*> userPresets;
+
+    int presetID = userIDMap.at (userPresetsName);
+    while (presetMap.find (presetID) != presetMap.end())
+        userPresets.push_back (&presetMap.at (presetID++));
+
+    JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wpessimizing-move")
+    return std::move (userPresets);
+    JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+}
+
+void PresetManager::setUserPresetName (const juce::String& newName)
+{
+    if (newName == userPresetsName)
+        return;
+
+    auto actualNewName = newName.isEmpty() ? defaultUserPresetsName : newName;
+
+    if (userIDMap.find (userPresetsName) != userIDMap.end()) // previous user name was the default!
+    {
+        // move existing user presets to new username
+        int presetID = userIDMap[userPresetsName];
+        while (presetMap.find (presetID) != presetMap.end())
+        {
+            auto& preset = presetMap.at (presetID++);
+            preset.setVendor (newName);
+
+            jassert (preset.getPresetFile() != juce::File());
+            preset.toFile (preset.getPresetFile());
+        }
+    }
+
+    userIDMap[actualNewName] = userUserIDStart;
+    userIDMap.erase (userPresetsName);
+
+    userPresetsName = actualNewName;
+
+    loadUserPresetsFromFolder (getUserPresetPath());
+}
+
 void PresetManager::loadUserPresetsFromFolder (const juce::File& file)
 {
     std::vector<Preset> presets;
@@ -240,7 +288,7 @@ void PresetManager::loadUserPresetsFromFolder (const juce::File& file)
         presets.push_back (loadUserPresetFromFile (f));
 
     // delete old user presets
-    int presetID = userIDMap["User"];
+    int presetID = userIDMap[userPresetsName];
     while (presetMap.find (presetID) != presetMap.end())
         presetMap.erase (presetID++);
 
