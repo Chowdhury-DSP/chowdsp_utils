@@ -121,6 +121,8 @@ protected:
 
     void setUserPresetName (const juce::String& newName);
 
+    std::vector<const Preset*> getUserPresets() const;
+
     juce::AudioProcessorValueTreeState& vts;
     juce::AudioProcessor& processor;
 

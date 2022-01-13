@@ -239,13 +239,25 @@ juce::File PresetManager::getUserPresetPath() const
     return {};
 }
 
+std::vector<const Preset*> PresetManager::getUserPresets() const
+{
+    std::vector<const Preset*> userPresets;
+
+    int presetID = userIDMap.at (userPresetsName);
+    while (presetMap.find (presetID) != presetMap.end())
+        userPresets.push_back (&presetMap.at (presetID++));
+
+    JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wpessimizing-move")
+    return std::move (userPresets);
+    JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+}
+
 void PresetManager::setUserPresetName (const juce::String& newName)
 {
     if (newName == userPresetsName)
         return;
 
-    if (newName.isEmpty())
-        newName = defaultUserPresetsName;
+    auto actualNewName = newName.isEmpty() ? defaultUserPresetsName : newName;
 
     if (userIDMap.find (userPresetsName) != userIDMap.end()) // previous user name was the default!
     {
@@ -261,10 +273,10 @@ void PresetManager::setUserPresetName (const juce::String& newName)
         }
     }
 
-    userIDMap[newName] = userUserIDStart;
+    userIDMap[actualNewName] = userUserIDStart;
     userIDMap.erase (userPresetsName);
 
-    userPresetsName = newName;
+    userPresetsName = actualNewName;
 
     loadUserPresetsFromFolder (getUserPresetPath());
 }
