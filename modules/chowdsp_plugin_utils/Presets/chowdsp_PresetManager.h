@@ -119,6 +119,8 @@ protected:
     /** Override this to suppor backwards compatibility for user presets */
     virtual Preset loadUserPresetFromFile (const juce::File& file);
 
+    void setUserPresetName (const juce::String& newName);
+
     juce::AudioProcessorValueTreeState& vts;
     juce::AudioProcessor& processor;
 
@@ -145,6 +147,7 @@ private:
     const Preset* currentPreset = nullptr;
     const Preset* defaultPreset = nullptr;
 
+    juce::String userPresetsName;
     juce::String userPresetConfigPath;
 
     std::unique_ptr<Preset> keepAlivePreset;
