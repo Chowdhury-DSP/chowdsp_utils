@@ -91,6 +91,12 @@ public:
     /** Tell listeners that the preset list has been updated */
     void triggerPresetListUpdate() { listeners.call (&Listener::presetListUpdated); }
 
+    /** Set the name to use for user presets */
+    void setUserPresetName (const juce::String& newName);
+
+    /** Returns a vector of all the user-saved presets */
+    std::vector<const Preset*> getUserPresets() const;
+
     /** Listener class to hear alerts about preset manager changes */
     struct Listener
     {
@@ -118,10 +124,6 @@ protected:
 
     /** Override this to suppor backwards compatibility for user presets */
     virtual Preset loadUserPresetFromFile (const juce::File& file);
-
-    void setUserPresetName (const juce::String& newName);
-
-    std::vector<const Preset*> getUserPresets() const;
 
     juce::AudioProcessorValueTreeState& vts;
     juce::AudioProcessor& processor;
