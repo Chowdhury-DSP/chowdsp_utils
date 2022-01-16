@@ -38,21 +38,27 @@ public:
      * or call with nullptr to remove the OpenGL context from the
      * previous component.
      */
-    void attachToComponent (juce::Component* component);
+    void attach();
+
+    void detach();
+
+    bool isAttached() const noexcept { return attached; }
+
+    void setComponent (juce::Component* component);
 
     /** Returns the currently attached component, or nullptr. */
-    juce::Component* getAttachedComponent();
+    juce::Component* getComponent() const noexcept { return component; }
 
 #if JUCE_MODULE_AVAILABLE_juce_opengl
     /** Returns the OpenGL context. */
-    juce::OpenGLContext& getOpenGLContext()
-    {
-        return openglContext;
-    }
+    juce::OpenGLContext& getOpenGLContext() { return openglContext; }
 #endif
 
 private:
-    void componentBeingDeleted (juce::Component& component) override;
+    void componentBeingDeleted (juce::Component& component) final;
+
+    juce::Component* component = nullptr;
+    bool attached = false;
 
 #if JUCE_MODULE_AVAILABLE_juce_opengl
     juce::OpenGLContext openglContext;

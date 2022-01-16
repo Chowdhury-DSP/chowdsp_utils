@@ -4,41 +4,63 @@ namespace chowdsp
 {
 OpenGLHelper::~OpenGLHelper()
 {
-    attachToComponent (nullptr);
+    componentBeingDeleted (*component);
 }
 
-void OpenGLHelper::attachToComponent (juce::Component* component)
+void OpenGLHelper::attach()
 {
-    if (component == getAttachedComponent())
-        return; // no change!
-
 #if JUCE_MODULE_AVAILABLE_juce_opengl
-    // remove if currently attached to a component
-    if (auto* oldComp = openglContext.getTargetComponent())
+    if (component == nullptr)
     {
-        openglContext.detach();
-        oldComp->removeComponentListener (this);
+        // make sure to set the component before trying to attach!
+        jassertfalse;
+        return;
     }
 
-    if (component)
+    if (attached)
+        return;
+
+    attached = true;
+    openglContext.attachTo (*component);
+#endif
+}
+
+void OpenGLHelper::detach()
+{
+#if JUCE_MODULE_AVAILABLE_juce_opengl
+    if (! attached)
+        return;
+
+    attached = false;
+    openglContext.detach();
+#endif
+}
+
+void OpenGLHelper::setComponent (juce::Component* newComp)
+{
+    if (component != nullptr)
     {
-        openglContext.attachTo (*component);
+        component->removeComponentListener (this);
+        if (attached)
+            detach();
+    }
+
+    component = newComp;
+
+    if (component != nullptr)
+    {
         component->addComponentListener (this);
+        if (attached)
+            attach();
     }
-#endif
 }
 
-juce::Component* OpenGLHelper::getAttachedComponent()
+void OpenGLHelper::componentBeingDeleted (juce::Component& c)
 {
-#if JUCE_MODULE_AVAILABLE_juce_opengl
-    return openglContext.getTargetComponent();
-#else
-    return nullptr;
-#endif
-}
+    jassert (component == &c);
 
-void OpenGLHelper::componentBeingDeleted (juce::Component&)
-{
-    attachToComponent (nullptr);
+    component->removeComponentListener (this);
+    if (attached)
+        detach();
 }
 } // namespace chowdsp
