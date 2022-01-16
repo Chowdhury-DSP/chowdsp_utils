@@ -4,15 +4,10 @@ namespace chowdsp
 {
 
 /**
- * Helper class for attaching an OpenGL context to
- * a component. To use the class, call `attachToComponent()`
- * with the component that needs OpenGL. Then, if OpenGL
- * is available, the component will have a context attached
- * until it is destroyed, or until the attach method is
- * called again with a new component.
+ * Helper class for attaching an OpenGL context to a component.
  *
- * If OpenGL is not available, the class can still be used,
- * but nothing will be happen.
+ * If OpenGL is not available, the class can still be used
+ * pretty much the same way, but nothing will happen.
  */
 class OpenGLHelper : private juce::ComponentListener
 {
@@ -33,21 +28,23 @@ public:
 #endif
     }
 
-    /**
-     * Use this method to attach the OpenGL to a given component,
-     * or call with nullptr to remove the OpenGL context from the
-     * previous component.
-     */
+    /** Use this method to attach the OpenGL to the current component. */
     void attach();
 
+    /**
+     * Use this method to detach the OpenGL to the current component.
+     * If no component is currently set, nothing will happen.
+     */
     void detach();
 
+    /** Returns true if the OpenGL context is currently attached. */
     bool isAttached() const noexcept { return attached; }
 
+    /** Sets the component to attach an OpenGL context to. */
     void setComponent (juce::Component* component);
 
     /** Returns the currently attached component, or nullptr. */
-    juce::Component* getComponent() const noexcept { return component; }
+    juce::Component* getComponent() const noexcept { return component.getComponent(); }
 
 #if JUCE_MODULE_AVAILABLE_juce_opengl
     /** Returns the OpenGL context. */
@@ -57,7 +54,7 @@ public:
 private:
     void componentBeingDeleted (juce::Component& component) final;
 
-    juce::Component* component = nullptr;
+    juce::Component::SafePointer<juce::Component> component;
     bool attached = false;
 
 #if JUCE_MODULE_AVAILABLE_juce_opengl
