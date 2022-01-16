@@ -57,6 +57,8 @@ private:
     juce::Component::SafePointer<juce::Component> component;
     bool attached = false;
 
+    bool shouldAttachNextComponent = false;
+
 #if JUCE_MODULE_AVAILABLE_juce_opengl
     juce::OpenGLContext openglContext;
 #endif

@@ -12,10 +12,11 @@ void OpenGLHelper::attach()
 {
     if (component == nullptr)
     {
-        // make sure to set the component before trying to attach!
-        jassertfalse;
+        shouldAttachNextComponent = true;
         return;
     }
+
+    shouldAttachNextComponent = false;
 
     if (attached)
         return;
@@ -30,6 +31,8 @@ void OpenGLHelper::attach()
 
 void OpenGLHelper::detach()
 {
+    shouldAttachNextComponent = false;
+
     if (! attached)
         return;
 
@@ -52,7 +55,7 @@ void OpenGLHelper::setComponent (juce::Component* newComp)
 
     component = newComp;
 
-    if (component != nullptr && wasAttached)
+    if (component != nullptr && (wasAttached || shouldAttachNextComponent))
         attach();
 }
 
