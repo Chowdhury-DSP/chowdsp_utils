@@ -1,5 +1,7 @@
 #include <TimedUnitTest.h>
 
+#if ! JUCE_LINUX // adding test component to desktop fails on Linux
+
 namespace
 {
 std::unique_ptr<Component> getTestComponent()
@@ -96,3 +98,5 @@ public:
 };
 
 static OpenGLHelperTest openGlHelperTest;
+
+#endif // ! JUCE_LINUX
