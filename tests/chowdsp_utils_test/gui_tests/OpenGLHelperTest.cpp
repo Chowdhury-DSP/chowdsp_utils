@@ -2,8 +2,6 @@
 
 namespace
 {
-constexpr auto openGLOn = chowdsp::OpenGLHelper::isOpenGLAvailable();
-
 std::unique_ptr<Component> getTestComponent()
 {
     auto testComp = std::make_unique<Component>();
