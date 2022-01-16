@@ -47,6 +47,10 @@
 #include <juce_audio_formats/juce_audio_formats.h>
 #include <juce_audio_utils/juce_audio_utils.h>
 
+#if JUCE_MODULE_AVAILABLE_juce_opengl
+#include <juce_opengl/juce_opengl.h>
+#endif
+
 #if CHOWDSP_USE_FOLEYS_CLASSES
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wunused-function") // GCC doesn't like Foley's static functions
 JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4458) // MSVC doesn't like Foley's hiding class members
@@ -65,6 +69,7 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 
 #include "Helpers/chowdsp_LongPressActionHelper.h"
 #include "Helpers/chowdsp_PopupMenuHelper.h"
+#include "Helpers/chowdsp_OpenGLHelper.h"
 
 #include "PluginComponents/chowdsp_SystemInfo.h"
 #include "PluginComponents/chowdsp_InfoComp.h"
