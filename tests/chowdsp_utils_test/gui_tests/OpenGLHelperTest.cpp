@@ -139,15 +139,24 @@ public:
         expect (openGlHelper.isAttached(), "Should still be attached!");
     }
 
-    void attachToNullTest()
+    void attachToNullTest (bool detach)
     {
         chowdsp::OpenGLHelper openGlHelper;
-
-        openGlHelper.setComponent (nullptr);
         expect (openGlHelper.getComponent() == nullptr, "Attached component should be nullptr!");
 
         openGlHelper.attach();
         expect (! openGlHelper.isAttached(), "Should not be able to attach to null component!");
+
+        if (detach)
+            openGlHelper.detach();
+
+        auto testComp = getTestComponent();
+        openGlHelper.setComponent (testComp.get());
+
+        if (detach)
+            expect (! openGlHelper.isAttached(), "Should NOT be attached!");
+        else
+            expect (openGlHelper.isAttached(), "Should be attached!");
     }
 
     void runTestTimed() override
@@ -169,7 +178,8 @@ public:
         newAttachTest();
 
         beginTest ("Attach To Null Test");
-        attachToNullTest();
+        attachToNullTest (true);
+        attachToNullTest (false);
     }
 };
 
