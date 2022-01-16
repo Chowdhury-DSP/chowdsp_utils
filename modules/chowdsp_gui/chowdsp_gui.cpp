@@ -5,6 +5,7 @@
 
 #include "Helpers/chowdsp_LongPressActionHelper.cpp"
 #include "Helpers/chowdsp_PopupMenuHelper.cpp"
+#include "Helpers/chowdsp_OpenGLHelper.cpp"
 
 #include "PluginComponents/chowdsp_InfoComp.cpp"
 #include "PluginComponents/chowdsp_TitleComp.cpp"
