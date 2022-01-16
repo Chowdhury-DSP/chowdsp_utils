@@ -2,7 +2,6 @@
 
 namespace chowdsp
 {
-
 class OpenGLHelper : private juce::ComponentListener
 {
 public:
