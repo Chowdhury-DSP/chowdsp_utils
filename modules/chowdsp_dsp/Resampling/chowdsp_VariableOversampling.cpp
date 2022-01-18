@@ -17,9 +17,6 @@ VariableOversampling<FloatType>::VariableOversampling (juce::AudioProcessorValue
             return OSFactor::EightX;
         if (factorStr == "16x")
             return OSFactor::SixteenX;
-
-        jassertfalse; // unknown string!
-        return OSFactor::OneX;
     };
 
     auto stringToOSMode = [] (const juce::String& modeStr) -> OSMode
@@ -28,16 +25,13 @@ VariableOversampling<FloatType>::VariableOversampling (juce::AudioProcessorValue
             return OSMode::MinPhase;
         if (modeStr == "Linear Phase")
             return OSMode::LinPhase;
-
-        jassertfalse; // unknown string!
-        return OSMode::MinPhase;
     };
 
     osParam = dynamic_cast<juce::AudioParameterChoice*> (vts.getParameter (paramPrefix + "_factor"));
     osModeParam = dynamic_cast<juce::AudioParameterChoice*> (vts.getParameter (paramPrefix + "_mode"));
     osOfflineParam = dynamic_cast<juce::AudioParameterChoice*> (vts.getParameter (paramPrefix + "_render_factor"));
     osOfflineModeParam = dynamic_cast<juce::AudioParameterChoice*> (vts.getParameter (paramPrefix + "_render_mode"));
-    osOfflineSameParam = dynamic_cast<juce::AudioParameterChoice*> (vts.getParameter (paramPrefix + "_render_like_realtime"));
+    osOfflineSameParam = dynamic_cast<juce::AudioParameterBool*> (vts.getParameter (paramPrefix + "_render_like_realtime"));
 
     // either createParameterLayout was not called, or paramPrefix is incorrect!
     jassert (osParam != nullptr);
@@ -51,11 +45,27 @@ VariableOversampling<FloatType>::VariableOversampling (juce::AudioProcessorValue
         for (const auto& factorStr : osParam->choices)
         {
             auto osFactor = stringToOSFactor (factorStr);
-            overSamplers.push_back (std::make_unique<juce::dsp::Oversampling<FloatType>> (numChannels, static_cast<int> (osFactor), filterType, true, useIntegerLatency));
+            oversamplers.add (std::make_unique<juce::dsp::Oversampling<FloatType>> (numChannels, static_cast<int> (osFactor), filterType, true, useIntegerLatency));
         }
     }
 
     numOSChoices = osParam->choices.size();
+}
+
+template <typename FloatType>
+void VariableOversampling<FloatType>::createParameterLayout (std::vector<std::unique_ptr<juce::RangedAudioParameter>>& params,
+                                                             OSFactor defaultFactor,
+                                                             OSMode defaultMode,
+                                                             bool includeRenderOptions,
+                                                             const juce::String& paramPrefix)
+{
+    createParameterLayout (params,
+                           { OSFactor::OneX, OSFactor::TwoX, OSFactor::FourX, OSFactor::EightX, OSFactor::SixteenX },
+                           { OSMode::MinPhase, OSMode::LinPhase },
+                           defaultFactor,
+                           defaultMode,
+                           includeRenderOptions,
+                           paramPrefix);
 }
 
 template <typename FloatType>
@@ -126,13 +136,13 @@ void VariableOversampling<FloatType>::createParameterLayout (std::vector<std::un
     }
 }
 
-int getOSIndex (float osFactor, float osMode, int numOSChoices) { return (int) osFactor + (numOSChoices * (int) osMode); }
+int getOSIndex (int osFactor, int osMode, int numOSChoices) { return osFactor + (numOSChoices * osMode); }
 
 template <typename FloatType>
 bool VariableOversampling<FloatType>::updateOSFactor()
 {
     curOS = getOSIndex (*osParam, *osModeParam, numOSChoices);
-    if (proc.isNonRealtime() && osOfflineParam != nullptr && *osOfflineSameParam == 0.0f)
+    if (proc.isNonRealtime() && osOfflineParam != nullptr && ! *osOfflineSameParam)
     {
         curOS = getOSIndex (*osOfflineParam, *osOfflineModeParam, numOSChoices);
     }
@@ -153,7 +163,7 @@ void VariableOversampling<FloatType>::prepareToPlay (double sr, int samplesPerBl
 
     curOS = getOSIndex (*osParam, *osModeParam, numOSChoices);
 
-    for (auto& os : overSamplers)
+    for (auto& os : oversamplers)
         os->initProcessing ((size_t) samplesPerBlock);
 
     prevOS = curOS;
@@ -162,7 +172,7 @@ void VariableOversampling<FloatType>::prepareToPlay (double sr, int samplesPerBl
 template <typename FloatType>
 void VariableOversampling<FloatType>::reset()
 {
-    for (auto& os : overSamplers)
+    for (auto& os : oversamplers)
         os->reset();
 }
 
