@@ -25,6 +25,7 @@
 
 // resamplers
 #include "Resampling/chowdsp_SRCResampler.cpp"
+#include "Resampling/chowdsp_VariableOversampling.cpp"
 
 // convolution
 #include "Convolution/chowdsp_ConvolutionEngine.cpp"

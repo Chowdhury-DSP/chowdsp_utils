@@ -2,7 +2,6 @@
 
 namespace chowdsp
 {
-
 /**
  * Helper class for attaching an OpenGL context to a component.
  *
