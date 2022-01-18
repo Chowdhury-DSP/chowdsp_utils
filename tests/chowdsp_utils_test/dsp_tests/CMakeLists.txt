@@ -25,6 +25,7 @@ target_sources(chowdsp_utils_tests PRIVATE
 
     resampling_tests/ResamplerTest.cpp
     resampling_tests/UpsampleDownsampleTest.cpp
+    resampling_tests/VariableOversamplingTest.cpp
 
     simd_tests/SIMDArithmeticTest.cpp
     simd_tests/SIMDComplexTest.cpp
