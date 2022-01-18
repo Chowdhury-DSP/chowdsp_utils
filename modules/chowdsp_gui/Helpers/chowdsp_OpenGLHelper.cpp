@@ -61,6 +61,8 @@ void OpenGLHelper::setComponent (juce::Component* newComp)
 
 void OpenGLHelper::componentBeingDeleted (juce::Component& c)
 {
+    ignoreUnused (c);
+
     jassert (component == &c);
 
     if (attached)

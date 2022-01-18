@@ -16,6 +16,9 @@ VariableOversampling<FloatType>::VariableOversampling (juce::AudioProcessorValue
             return OSFactor::EightX;
         if (factorStr == "16x")
             return OSFactor::SixteenX;
+
+        jassertfalse; // unknown OS factor
+        return OSFactor::OneX;
     };
 
     auto stringToOSMode = [] (const juce::String& modeStr) -> OSMode {
@@ -23,6 +26,9 @@ VariableOversampling<FloatType>::VariableOversampling (juce::AudioProcessorValue
             return OSMode::MinPhase;
         if (modeStr == "Linear Phase")
             return OSMode::LinPhase;
+
+        jassertfalse; // unknown OS mode
+        return OSMode::MinPhase;
     };
 
     osParam = dynamic_cast<juce::AudioParameterChoice*> (vts.getParameter (paramPrefix + "_factor"));
