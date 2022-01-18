@@ -53,8 +53,7 @@ public:
         TestPlugin testPlugin;
         testPlugin.prepareToPlay (_sampleRate, _blockSize);
 
-        auto checkOSFactor = [&] (int expectedFactor, const String& message)
-        {
+        auto checkOSFactor = [&] (int expectedFactor, const String& message) {
             AudioBuffer<float> buffer (2, _blockSize);
             testPlugin.processAudioBlock (buffer);
             testPlugin.releaseResources();
@@ -91,8 +90,7 @@ public:
         testPlugin.setNonRealtime (true);
         testPlugin.prepareToPlay (_sampleRate, _blockSize);
 
-        auto checkOSFactor = [&] (int expectedFactor, const String& message)
-        {
+        auto checkOSFactor = [&] (int expectedFactor, const String& message) {
             AudioBuffer<float> buffer (2, _blockSize);
             testPlugin.processAudioBlock (buffer);
             expectEquals (testPlugin.lastOSBlockSize, expectedFactor * _blockSize, message);
@@ -132,8 +130,7 @@ public:
         TestPlugin testPlugin;
         testPlugin.prepareToPlay (_sampleRate, _blockSize);
 
-        auto checkLatency = [&] (const String& message)
-        {
+        auto checkLatency = [&] (const String& message) {
             AudioBuffer<float> buffer (1, _blockSize);
             buffer.clear();
             buffer.setSample (0, 0, 1.0f);
@@ -141,8 +138,7 @@ public:
             testPlugin.releaseResources();
 
             auto* outData = buffer.getReadPointer (0);
-            auto maxElement = std::max_element (outData, &outData[_blockSize], [] (auto a, auto b)
-                                                { return abs (a) < abs (b); });
+            auto maxElement = std::max_element (outData, &outData[_blockSize], [] (auto a, auto b) { return abs (a) < abs (b); });
             auto actualLatencySamples = std::distance (outData, maxElement);
 
             auto expLatencySamples = testPlugin.oversampling.getLatencySamples();

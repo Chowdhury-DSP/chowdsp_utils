@@ -5,8 +5,7 @@ namespace chowdsp
 template <typename FloatType>
 VariableOversampling<FloatType>::VariableOversampling (juce::AudioProcessorValueTreeState& vts, int numChannels, bool useIntegerLatency, const juce::String& paramPrefix) : proc (vts.processor)
 {
-    auto stringToOSFactor = [] (const juce::String& factorStr) -> OSFactor
-    {
+    auto stringToOSFactor = [] (const juce::String& factorStr) -> OSFactor {
         if (factorStr == "1x")
             return OSFactor::OneX;
         if (factorStr == "2x")
@@ -19,8 +18,7 @@ VariableOversampling<FloatType>::VariableOversampling (juce::AudioProcessorValue
             return OSFactor::SixteenX;
     };
 
-    auto stringToOSMode = [] (const juce::String& modeStr) -> OSMode
-    {
+    auto stringToOSMode = [] (const juce::String& modeStr) -> OSMode {
         if (modeStr == "Min. Phase")
             return OSMode::MinPhase;
         if (modeStr == "Linear Phase")
@@ -77,8 +75,7 @@ void VariableOversampling<FloatType>::createParameterLayout (std::vector<std::un
                                                              bool includeRenderOptions,
                                                              const juce::String& paramPrefix)
 {
-    auto osFactorToString = [] (auto factor) -> juce::String
-    {
+    auto osFactorToString = [] (auto factor) -> juce::String {
         switch (factor)
         {
             case OSFactor::OneX:
@@ -94,8 +91,7 @@ void VariableOversampling<FloatType>::createParameterLayout (std::vector<std::un
         }
     };
 
-    auto osModeToString = [] (auto mode) -> juce::String
-    {
+    auto osModeToString = [] (auto mode) -> juce::String {
         switch (mode)
         {
             case OSMode::MinPhase:
