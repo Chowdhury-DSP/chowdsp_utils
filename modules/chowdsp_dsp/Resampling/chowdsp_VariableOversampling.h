@@ -84,7 +84,7 @@ public:
     float getLatencySamples() const noexcept { return (float) oversamplers[curOS]->getLatencyInSamples(); }
 
     /** Returns the current latency introduced by the oversampling process in milliseconds */
-    float getLatencyMilliseconds (int osIndex) const noexcept { return ((float) oversamplers[osIndex]->getLatencyInSamples() / sampleRate) * 1000.0f; }
+    float getLatencyMilliseconds() const noexcept { return ((float) oversamplers[curOS]->getLatencyInSamples() / sampleRate) * 1000.0f; }
 
     /** Upsample a new block of data */
     auto processSamplesUp (const juce::dsp::AudioBlock<const FloatType>& inputBlock) noexcept { return oversamplers[curOS]->processSamplesUp (inputBlock); }
