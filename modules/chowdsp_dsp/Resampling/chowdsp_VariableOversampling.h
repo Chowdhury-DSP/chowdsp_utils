@@ -80,17 +80,26 @@ public:
     /** Call this method tbefore processing a block of audio to check if a different oversampler should be used */
     bool updateOSFactor();
 
+    /** Get the index of a given oversampler */
+    int getOSIndex (int osFactor, int osMode) { return osFactor + (numOSChoices * osMode); }
+
     /** Returns the samples of latency introduced by the oversampling process */
     float getLatencySamples() const noexcept { return (float) oversamplers[curOS]->getLatencyInSamples(); }
 
-    /** Returns the current latency introduced by the oversampling process in milliseconds */
-    float getLatencyMilliseconds() const noexcept { return ((float) oversamplers[curOS]->getLatencyInSamples() / sampleRate) * 1000.0f; }
+    /**
+     * Returns the current latency introduced by the oversampling process in milliseconds,
+     * or provide the oversampler index to get the latency of one specific oversampler.
+     */
+    float getLatencyMilliseconds (int osIndex = -1) const noexcept { return ((float) oversamplers[osIndex < 0 ? curOS : osIndex]->getLatencyInSamples() / sampleRate) * 1000.0f; }
 
     /** Upsample a new block of data */
     auto processSamplesUp (const juce::dsp::AudioBlock<const FloatType>& inputBlock) noexcept { return oversamplers[curOS]->processSamplesUp (inputBlock); }
 
     /** Downsample the last block of data into the given output block */
     void processSamplesDown (juce::dsp::AudioBlock<FloatType>& outputBlock) noexcept { oversamplers[curOS]->processSamplesDown (outputBlock); }
+
+    /** Returns the set of parameters used by the oversamplers */
+    auto getParameters() { return std::tie (osParam, osModeParam, osOfflineParam, osOfflineModeParam, osOfflineSameParam); }
 
 private:
     juce::AudioParameterChoice* osParam = nullptr;

@@ -144,15 +144,13 @@ void VariableOversampling<FloatType>::createParameterLayout (std::vector<std::un
     }
 }
 
-int getOSIndex (int osFactor, int osMode, int numOSChoices) { return osFactor + (numOSChoices * osMode); }
-
 template <typename FloatType>
 bool VariableOversampling<FloatType>::updateOSFactor()
 {
-    curOS = getOSIndex (*osParam, *osModeParam, numOSChoices);
+    curOS = getOSIndex (*osParam, *osModeParam);
     if (proc.isNonRealtime() && osOfflineParam != nullptr && ! *osOfflineSameParam)
     {
-        curOS = getOSIndex (*osOfflineParam, *osOfflineModeParam, numOSChoices);
+        curOS = getOSIndex (*osOfflineParam, *osOfflineModeParam);
     }
 
     if (curOS != prevOS)
@@ -169,7 +167,7 @@ void VariableOversampling<FloatType>::prepareToPlay (double sr, int samplesPerBl
 {
     sampleRate = (float) sr;
 
-    curOS = getOSIndex (*osParam, *osModeParam, numOSChoices);
+    curOS = getOSIndex (*osParam, *osModeParam);
 
     for (auto& os : oversamplers)
         os->initProcessing ((size_t) samplesPerBlock);
