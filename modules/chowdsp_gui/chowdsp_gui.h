@@ -75,6 +75,7 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 #include "PluginComponents/chowdsp_InfoComp.h"
 #include "PluginComponents/chowdsp_TitleComp.h"
 #include "PluginComponents/chowdsp_TooltipComp.h"
+#include "PluginComponents/chowdsp_WindowInPlugin.h"
 
 #if CHOWDSP_NEEDS_PRESETS_COMPONENT
 #include "Presets/chowdsp_PresetsComp.h"

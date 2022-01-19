@@ -4,4 +4,5 @@ target_sources(chowdsp_utils_tests PRIVATE
     OpenGLHelperTest.cpp
     PopupMenuHelperTest.cpp
     PresetsCompTest.cpp
+    WindowInPluginTest.cpp
 )
