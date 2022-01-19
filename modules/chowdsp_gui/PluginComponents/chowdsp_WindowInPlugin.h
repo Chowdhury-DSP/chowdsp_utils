@@ -2,7 +2,6 @@
 
 namespace chowdsp
 {
-
 /**
  * It's not a good idea to create windows from a plugin,
  * so here's a little wrapper class to create a window
