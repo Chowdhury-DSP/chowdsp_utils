@@ -95,6 +95,9 @@ void VariableOversampling<FloatType>::createParameterLayout (std::vector<std::un
             case OSFactor::SixteenX:
                 return "16x";
         }
+
+        jassertfalse; // unknown OS factor
+        return {};
     };
 
     auto osModeToString = [] (auto mode) -> juce::String {
@@ -105,6 +108,9 @@ void VariableOversampling<FloatType>::createParameterLayout (std::vector<std::un
             case OSMode::LinPhase:
                 return "Linear Phase";
         }
+
+        jassertfalse; // unknown OS mode
+        return {};
     };
 
     juce::StringArray osFactorChoices;
