@@ -1,8 +1,8 @@
 #include <TimedUnitTest.h>
 
-struct TestPlugin : public chowdsp::PluginBase<TestPlugin>
+struct TestPlugin2 : public chowdsp::PluginBase<TestPlugin2>
 {
-    TestPlugin() : oversampling (vts) {}
+    TestPlugin2() : oversampling (vts) {}
 
     static void addParameters (Parameters& params)
     {
@@ -20,9 +20,9 @@ struct TestPlugin : public chowdsp::PluginBase<TestPlugin>
     chowdsp::VariableOversampling<float> oversampling;
 };
 
-struct TestPlugin2 : public chowdsp::PluginBase<TestPlugin2>
+struct TestPlugin3 : public chowdsp::PluginBase<TestPlugin3>
 {
-    TestPlugin2() : oversampling (vts) {}
+    TestPlugin3() : oversampling (vts) {}
 
     static void addParameters (Parameters& params)
     {
@@ -45,9 +45,9 @@ class OversamplingMenuTest : public TimedUnitTest
 public:
     OversamplingMenuTest() : TimedUnitTest ("Oversampling Menu Test") {}
 
-    void withOfflineOptionsTest()
+    static void withOfflineOptionsTest()
     {
-        TestPlugin plugin;
+        TestPlugin2 plugin;
         chowdsp::OversamplingMenu<chowdsp::VariableOversampling<float>> menu (plugin.oversampling, plugin.getVTS());
 
         menu.setBounds (0, 0, 100, 100);
@@ -60,9 +60,9 @@ public:
         *osOfflineSameParam = false;
     }
 
-    void withoutOfflineOptionsTest()
+    static void withoutOfflineOptionsTest()
     {
-        TestPlugin2 plugin;
+        TestPlugin3 plugin;
         chowdsp::OversamplingMenu<chowdsp::VariableOversampling<float>> menu (plugin.oversampling, plugin.getVTS());
 
         menu.setBounds (0, 0, 100, 100);
