@@ -134,9 +134,6 @@ void OversamplingMenu<OSType>::generateComboBoxMenu()
             continue;
 
         bool isOfflineParam = paramIdx >= OSOfflineParam;
-        if (isOfflineParam && ! offlineParamsAvailable)
-            continue;
-
         auto* thisMenu = isOfflineParam ? &offlineMenu : menu;
         auto& thisMenuIdx = isOfflineParam ? offlineMenuIdx : menuIdx;
         auto& thisMenuOffset = isOfflineParam ? offlineMenuOffset : menuOffset;
