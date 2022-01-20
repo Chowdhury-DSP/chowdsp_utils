@@ -8,6 +8,7 @@
 #include "Helpers/chowdsp_OpenGLHelper.cpp"
 
 #include "PluginComponents/chowdsp_InfoComp.cpp"
+#include "PluginComponents/chowdsp_OversamplingMenu.cpp"
 #include "PluginComponents/chowdsp_TitleComp.cpp"
 #include "PluginComponents/chowdsp_TooltipComp.cpp"
 
