@@ -4,7 +4,6 @@
 
 namespace chowdsp
 {
-
 /** Menu that can be used as an interface for chowdsp::VariableOversampling */
 template <typename OSType>
 class OversamplingMenu : public juce::Component
