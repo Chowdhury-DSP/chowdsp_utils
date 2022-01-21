@@ -1,4 +1,4 @@
-//#include "chowdsp_AudioUIBackgroundTask.h"
+#include "chowdsp_AudioUIBackgroundTask.h"
 
 namespace chowdsp
 {

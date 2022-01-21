@@ -9,7 +9,7 @@
     name:          ChowDSP Plugin Utilities
     description:   Utilities for creating ChowDSP plugins
     dependencies:  juce_core, juce_audio_basics, juce_audio_devices, juce_audio_formats,
-                   juce_audio_utils, juce_audio_processors, juce_gui_basics, chowdsp_dsp
+                   juce_audio_utils, juce_audio_processors, juce_gui_basics
 
     website:       https://ccrma.stanford.edu/~jatin/chowdsp
     license:       GPLv3
@@ -35,7 +35,6 @@
 #include <juce_audio_devices/juce_audio_devices.h>
 #include <juce_audio_formats/juce_audio_formats.h>
 #include <juce_audio_utils/juce_audio_utils.h>
-#include <chowdsp_dsp/chowdsp_dsp.h>
 
 #if CHOWDSP_USE_FOLEYS_CLASSES
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wunused-function") // GCC doesn't like Foley's static functions
