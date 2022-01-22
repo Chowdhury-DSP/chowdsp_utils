@@ -1,6 +1,6 @@
 # setup_juce_test(<target-name>)
 #
-# Enables code coverage flags for this target
+# Configures a JUCE unit test app
 function(setup_juce_test target)
     juce_generate_juce_header(${target})
 
