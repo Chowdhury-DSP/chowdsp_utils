@@ -1,25 +1,14 @@
-#include <random>
+#include <algorithm>
+#include <numeric>
 
 #include <benchmark/benchmark.h>
 
 #include <JuceHeader.h>
+#include "bench_utils.h"
 
-template <typename T>
-auto makeRandomVector (int num)
-{
-    std::random_device rnd_device;
-    std::mt19937 mersenne_engine { rnd_device() }; // Generates random integers
-    std::normal_distribution<float> dist { (T) 0, (T) 1 };
-
-    std::vector<T> vec ((size_t) num);
-    std::generate (vec.begin(), vec.end(), [&dist, &mersenne_engine]()
-                   { return dist (mersenne_engine); });
-
-    return std::move (vec);
-}
-
+/** Accumulate benchmarks............................ */
 constexpr int accumulateN = 10000;
-const auto accumulateVecFloat = makeRandomVector<float> (accumulateN);
+const auto accumulateVecFloat = bench_utils::makeRandomVector<float> (accumulateN);
 
 static void AccumulateSTLFloat (benchmark::State& state)
 {
@@ -40,5 +29,55 @@ static void AccumulateChowFloat (benchmark::State& state)
     }
 }
 BENCHMARK (AccumulateChowFloat);
+
+/** Inner Product benchmarks............................ */
+constexpr int innerProdN = 50000;
+const auto innerProdVecFloat1 = bench_utils::makeRandomVector<float> (innerProdN);
+const auto innerProdVecFloat2 = bench_utils::makeRandomVector<float> (innerProdN);
+
+static void InnerProdSTLFloat (benchmark::State& state)
+{
+    for (auto _ : state)
+    {
+        auto prod = std::inner_product (innerProdVecFloat1.begin(), innerProdVecFloat1.end(), innerProdVecFloat2.begin(), 0.0f);
+        benchmark::DoNotOptimize (prod);
+    }
+}
+BENCHMARK (InnerProdSTLFloat);
+
+static void InnerProdChowFloat (benchmark::State& state)
+{
+    for (auto _ : state)
+    {
+        auto prod = chowdsp::FloatVectorOperations::innerProduct (innerProdVecFloat1.data(), innerProdVecFloat2.data(), innerProdN);
+        benchmark::DoNotOptimize (prod);
+    }
+}
+BENCHMARK (InnerProdChowFloat);
+
+/** Find Absolute Maximum benchmarks............................ */
+constexpr int absMaxN = 50000;
+const auto absMaxVecFloat = bench_utils::makeRandomVector<float> (absMaxN);
+
+static void AbsMaxSTLFloat (benchmark::State& state)
+{
+    for (auto _ : state)
+    {
+        auto max = std::abs (*std::max_element (absMaxVecFloat.begin(), absMaxVecFloat.end(), [] (auto a, auto b)
+                                                { return std::abs (a) < std::abs (b); }));
+        benchmark::DoNotOptimize (max);
+    }
+}
+BENCHMARK (AbsMaxSTLFloat);
+
+static void AbsMaxChowFloat (benchmark::State& state)
+{
+    for (auto _ : state)
+    {
+        auto max = chowdsp::FloatVectorOperations::findAbsoluteMaximum (absMaxVecFloat.data(), absMaxN);
+        benchmark::DoNotOptimize (max);
+    }
+}
+BENCHMARK (AbsMaxChowFloat);
 
 BENCHMARK_MAIN();

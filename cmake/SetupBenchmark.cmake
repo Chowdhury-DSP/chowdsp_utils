@@ -28,4 +28,9 @@ function(setup_benchmark target file)
         target_include_directories(${target} PRIVATE ${CMAKE_SOURCE_DIR}/${XSIMD_PATH}/include)
         target_compile_definitions(${target} PRIVATE CHOWDSP_USE_XSIMD=1)
     endif ()
+
+    add_custom_command(TARGET ${target}
+                       POST_BUILD
+                       COMMAND ${CMAKE_COMMAND} -E echo "copying $<TARGET_FILE:${target}> to ${PROJECT_BINARY_DIR}/${target}"
+                       COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${target}> ${PROJECT_BINARY_DIR}/${target})
 endfunction(setup_benchmark)
