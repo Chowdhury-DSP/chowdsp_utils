@@ -63,8 +63,7 @@ static void AbsMaxSTLFloat (benchmark::State& state)
 {
     for (auto _ : state)
     {
-        auto max = std::abs (*std::max_element (absMaxVecFloat.begin(), absMaxVecFloat.end(), [] (auto a, auto b)
-                                                { return std::abs (a) < std::abs (b); }));
+        auto max = std::abs (*std::max_element (absMaxVecFloat.begin(), absMaxVecFloat.end(), [] (auto a, auto b) { return std::abs (a) < std::abs (b); }));
         benchmark::DoNotOptimize (max);
     }
 }
