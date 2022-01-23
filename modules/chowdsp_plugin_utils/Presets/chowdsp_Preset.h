@@ -20,7 +20,10 @@ struct Preset
     Preset (const void* presetData, size_t presetDataSize);
 
     /** Move constructor */
-    Preset (Preset&&) = default;
+    Preset (Preset&&) noexcept = default;
+
+    /** Move assignment operator */
+    Preset& operator= (Preset&&) noexcept = default;
 
     /** Saves this preset to a file */
     void toFile (const juce::File& presetFile) const;
