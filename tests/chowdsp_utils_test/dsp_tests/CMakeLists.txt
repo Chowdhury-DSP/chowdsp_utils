@@ -40,5 +40,4 @@ target_sources(chowdsp_utils_tests PRIVATE
     wdf_tests/SIMDWDFTest.cpp
     wdf_tests/StaticWDFTest.cpp
     wdf_tests/WDFTest.cpp
-    wdf_tests/WDFPerf.cpp
 )

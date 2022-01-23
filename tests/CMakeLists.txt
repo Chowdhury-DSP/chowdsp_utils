@@ -3,6 +3,8 @@ include(SubprojectVersion)
 include(EnableCoverageFlags)
 include(SetupJuceTest)
 
+message(STATUS "Configuring tests for chowdsp_utils")
+
 # set up JUCE
 add_subdirectory(${CMAKE_SOURCE_DIR}/../../JUCE JUCE)
 subproject_version(JUCE juce_version)
