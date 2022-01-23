@@ -21,3 +21,4 @@ CPMAddPackage(
 )
 
 setup_benchmark(FloatVectorOperationsBench FloatVectorOperationsBench.cpp)
+setup_benchmark(WDFvsIIRBench WDFvsIIRBench.cpp)

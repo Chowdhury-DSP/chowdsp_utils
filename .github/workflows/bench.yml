@@ -78,7 +78,12 @@ jobs:
         shell: bash
         run: cmake --build . --config Release --parallel 4
 
-      - name: "Bench: FloatVectorOperations"
+      - name: "Bench: Float Vector Operations"
         working-directory: ${{env.WORK_DIR}}/build
         shell: bash
         run: ./FloatVectorOperationsBench
+
+      - name: "Bench: IIR vs. WDF"
+        working-directory: ${{env.WORK_DIR}}/build
+        shell: bash
+        run: ./IIRvsWDFBench

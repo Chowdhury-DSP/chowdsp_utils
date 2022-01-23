@@ -22,6 +22,21 @@ function(setup_benchmark target file)
         benchmark::benchmark
     )
 
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+        if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+            # Any Clang
+            if(CMAKE_CXX_COMPILER_ID MATCHES "^AppleClang$")
+                # Apple Clang only
+            endif()
+        elseif(CMAKE_CXX_COMPILER_ID MATCHES "^GNU$")
+           # GCC only
+           target_compile_options(${target} PUBLIC
+               -Wno-pessimizing-move
+               -Wno-redundant-decls
+           )
+        endif()
+    endif()
+
     # Link with xsimd (if path is defined)
     if (XSIMD_PATH)
         message(STATUS "Using XSIMD")
