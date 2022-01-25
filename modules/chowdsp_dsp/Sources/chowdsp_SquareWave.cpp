@@ -31,11 +31,11 @@ void SquareWave<T>::process (const ProcessContext& context) noexcept
     auto&& outBlock = context.getOutputBlock();
     auto&& inBlock = context.getInputBlock();
 
+    if (context.usesSeparateInputAndOutputBlocks())
+        context.getOutputBlock().clear();
+
     if (context.isBypassed)
     {
-        if (context.usesSeparateInputAndOutputBlocks())
-            context.getOutputBlock().clear();
-
         auto len = outBlock.getNumSamples();
         for (size_t i = 0; i < len; ++i)
             processSample();
@@ -44,7 +44,7 @@ void SquareWave<T>::process (const ProcessContext& context) noexcept
     }
 
     auto&& intBlock = interMediateData.getSubBlock (0, outBlock.getNumSamples());
-    saw2.template process (juce::dsp::ProcessContextNonReplacing<T> { inBlock, intBlock });
+    saw2.template process<juce::dsp::ProcessContextNonReplacing<T>> (juce::dsp::ProcessContextNonReplacing<T> { inBlock, intBlock });
 
     if (context.usesSeparateInputAndOutputBlocks())
         outBlock += intBlock;
@@ -52,7 +52,7 @@ void SquareWave<T>::process (const ProcessContext& context) noexcept
         AudioBlockHelpers::copyBlocks (outBlock, intBlock);
 
     intBlock.clear();
-    saw1.template process (juce::dsp::ProcessContextReplacing<T> { intBlock });
+    saw1.template process<juce::dsp::ProcessContextReplacing<T>> (juce::dsp::ProcessContextReplacing<T> { intBlock });
     outBlock -= intBlock;
 }
 } // namespace chowdsp
