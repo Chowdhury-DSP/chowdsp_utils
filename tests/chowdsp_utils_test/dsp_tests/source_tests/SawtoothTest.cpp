@@ -15,8 +15,7 @@ public:
     void referenceTest()
     {
         // our osc has 1/2 sample delay so, run the reference osc at 2x sample rate, and check every other.
-        dsp::Oscillator<float> refOsc { [] (auto x)
-                                        { return x / MathConstants<float>::pi; } };
+        dsp::Oscillator<float> refOsc { [] (auto x) { return x / MathConstants<float>::pi; } };
         refOsc.prepare ({ 2.0 * _sampleRate, (uint32) _blockSize, 1 });
         refOsc.setFrequency (testFreq, true);
 
@@ -36,8 +35,7 @@ public:
     void simdReferenceTest()
     {
         // our osc has 1/2 sample delay so, run the reference osc at 2x sample rate, and check every other.
-        dsp::Oscillator<float> refOsc { [] (auto x)
-                                        { return x / MathConstants<float>::pi; } };
+        dsp::Oscillator<float> refOsc { [] (auto x) { return x / MathConstants<float>::pi; } };
         refOsc.prepare ({ 2.0 * _sampleRate, (uint32) _blockSize, 1 });
         refOsc.setFrequency (testFreq, true);
 
@@ -60,8 +58,7 @@ public:
 
     void processReplacingTest()
     {
-        dsp::Oscillator<float> refOsc { [] (auto x)
-                                        { return x / MathConstants<float>::pi; } };
+        dsp::Oscillator<float> refOsc { [] (auto x) { return x / MathConstants<float>::pi; } };
         refOsc.prepare ({ 2.0 * _sampleRate, (uint32) _blockSize, 1 });
         refOsc.setFrequency (testFreq, true);
 
@@ -89,8 +86,7 @@ public:
 
     void processNonReplacingTest()
     {
-        dsp::Oscillator<float> refOsc { [] (auto x)
-                                        { return x / MathConstants<float>::pi; } };
+        dsp::Oscillator<float> refOsc { [] (auto x) { return x / MathConstants<float>::pi; } };
         refOsc.prepare ({ 2.0 * _sampleRate, (uint32) _blockSize, 2 });
         refOsc.setFrequency (testFreq, true);
 
@@ -134,8 +130,7 @@ public:
 
     void bypassTest()
     {
-        dsp::Oscillator<float> refOsc { [] (auto x)
-                                        { return x / MathConstants<float>::pi; } };
+        dsp::Oscillator<float> refOsc { [] (auto x) { return x / MathConstants<float>::pi; } };
         refOsc.prepare ({ 2.0 * _sampleRate, (uint32) _blockSize, 1 });
         refOsc.setFrequency (testFreq, true);
 
