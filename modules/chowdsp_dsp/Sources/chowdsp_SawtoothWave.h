@@ -1,0 +1,77 @@
+#pragma once
+
+namespace chowdsp
+{
+/**
+ * Sawtooth wave generated using "Differentiated Polynomial Waveforms" (DPW),
+ * with 2nd-order polynomials.
+ *
+ * Reference: "Alias-Suppressed Oscillators Based on Differentiated Polynomial Waveforms",
+ * Valimaki, Nan, Smith, and Abel.
+ * https://mac.kaist.ac.kr/pubs/ValimakiNamSmithAbel-taslp2010.pdf
+ */
+template <typename T>
+class SawtoothWave
+{
+public:
+    SawtoothWave() = default;
+
+    /** Sets the frequency of the oscillator. */
+    void setFrequency (T newFrequency) noexcept;
+
+    /** Returns the current frequency of the oscillator. */
+    T getFrequency() const noexcept { return freq; }
+
+    /** Prepares the oscillator to process at a given sample rate */
+    void prepare (const juce::dsp::ProcessSpec& spec) noexcept;
+
+    /** Resets the internal state of the oscillator */
+    void reset() noexcept;
+
+    /** Resets the internal state of the oscillator with an initial phase */
+    void reset (T phase) noexcept;
+
+    /** Returns the result of processing a single sample. */
+    inline T processSample() noexcept
+    {
+        // anti-alias with DPW
+        auto s = (T) 2 * phi - (T) 1; // see eqn (1)
+        auto adWave = s * s; // 2nd-order polynomial of anti-derivative
+        auto y = adWave - z; // differentiate
+        z = adWave; // update state
+
+        updatePhase();
+
+        return waveformPreservingScale * y;
+    }
+
+    /** Processes the input and output buffers supplied in the processing context. */
+    template <typename ProcessContext>
+    void process (const ProcessContext& context) noexcept;
+
+private:
+    inline void updatePhase() noexcept
+    {
+        using namespace SIMDUtils;
+
+        phi += deltaPhase;
+        if constexpr (std::is_floating_point<T>::value)
+            phi = phi >= (T) 1 ? phi - (T) 1 : phi;
+        else if constexpr (SampleTypeHelpers::IsSIMDRegister<T>)
+            phi = select (T::greaterThanOrEqual (phi, (T) 1), phi - (T) 1, phi);
+    }
+
+    T z {};
+    T phi {};
+
+    T deltaPhase {};
+    T waveformPreservingScale {};
+
+    T freq = static_cast<T> (0.0);
+    T fs = static_cast<T> (44100.0);
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SawtoothWave)
+};
+} // namespace chowdsp
+
+#include "chowdsp_SawtoothWave.cpp"

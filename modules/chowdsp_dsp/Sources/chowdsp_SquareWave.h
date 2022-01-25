@@ -1,0 +1,54 @@
+#pragma once
+
+namespace chowdsp
+{
+/**
+ * Square wave generated using "Differentiated Polynomial Waveforms" (DPW),
+ * with 2nd-order polynomials.
+ *
+ * Reference: "Alias-Suppressed Oscillators Based on Differentiated Polynomial Waveforms",
+ * Valimaki, Nan, Smith, and Abel.
+ * https://mac.kaist.ac.kr/pubs/ValimakiNamSmithAbel-taslp2010.pdf
+ */
+template <typename T>
+class SquareWave
+{
+public:
+    SquareWave() = default;
+
+    /** Sets the frequency of the oscillator. */
+    void setFrequency (T newFrequency) noexcept;
+
+    /** Returns the current frequency of the oscillator. */
+    T getFrequency() const noexcept { return saw1.getFrequency(); }
+
+    /** Prepares the oscillator to process at a given sample rate */
+    void prepare (const juce::dsp::ProcessSpec& spec) noexcept;
+
+    /** Resets the internal state of the oscillator */
+    void reset() noexcept;
+
+    /** Resets the internal state of the oscillator with an initial phase */
+    void reset (T phase) noexcept;
+
+    /** Returns the result of processing a single sample. */
+    inline T processSample() noexcept
+    {
+        return saw1.processSample() - saw2.processSample();
+    }
+
+    /** Processes the input and output buffers supplied in the processing context. */
+    template <typename ProcessContext>
+    void process (const ProcessContext& context) noexcept;
+
+private:
+    SawtoothWave<T> saw1, saw2;
+
+    juce::HeapBlock<char> dataBlock;
+    juce::dsp::AudioBlock<T> interMediateData;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SquareWave)
+};
+} // namespace chowdsp
+
+#include "chowdsp_SquareWave.cpp"
