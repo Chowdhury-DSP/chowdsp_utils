@@ -4,17 +4,17 @@
 namespace chowdsp::AudioBlockHelpers
 {
 /** Copy the information from one block to another (float/double) */
-template <typename T>
+template <typename T, typename OtherT>
 inline typename std::enable_if<std::is_floating_point<T>::value, void>::type
-    copyBlocks (juce::dsp::AudioBlock<T>& dest, const juce::dsp::AudioBlock<const T>& src)
+    copyBlocks (juce::dsp::AudioBlock<T>& dest, const juce::dsp::AudioBlock<OtherT>& src)
 {
     dest.copyFrom (src);
 }
 
 /** Copy the information from one block to another (SIMD types) */
-template <typename T>
+template <typename T, typename OtherT>
 inline typename std::enable_if<SampleTypeHelpers::IsSIMDRegister<T>, void>::type
-    copyBlocks (juce::dsp::AudioBlock<T>& dest, const juce::dsp::AudioBlock<const T>& src)
+    copyBlocks (juce::dsp::AudioBlock<T>& dest, const juce::dsp::AudioBlock<OtherT>& src)
 {
     for (size_t ch = 0; ch < dest.getNumChannels(); ++ch)
     {

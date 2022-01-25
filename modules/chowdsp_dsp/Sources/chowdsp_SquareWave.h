@@ -33,7 +33,7 @@ public:
     /** Returns the result of processing a single sample. */
     inline T processSample() noexcept
     {
-        return saw1.processSample() - saw2.processSample();
+        return saw2.processSample() - saw1.processSample();
     }
 
     /** Processes the input and output buffers supplied in the processing context. */

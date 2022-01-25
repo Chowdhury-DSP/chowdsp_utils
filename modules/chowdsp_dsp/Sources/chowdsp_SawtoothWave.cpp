@@ -47,7 +47,9 @@ void SawtoothWave<T>::process (const ProcessContext& context) noexcept
 
     if (context.isBypassed)
     {
-        context.getOutputBlock().clear();
+        if (context.usesSeparateInputAndOutputBlocks())
+            context.getOutputBlock().clear();
+        
         for (size_t i = 0; i < len; ++i)
             processSample();
 

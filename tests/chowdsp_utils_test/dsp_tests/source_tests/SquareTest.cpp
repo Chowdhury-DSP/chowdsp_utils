@@ -7,20 +7,20 @@ constexpr auto _blockSize = 512;
 constexpr auto testFreq = 100.0f;
 } // namespace
 
-class SawtoothTest : public TimedUnitTest
+class SquareTest : public TimedUnitTest
 {
 public:
-    SawtoothTest() : TimedUnitTest ("Sawtooth Test") {}
+    SquareTest() : TimedUnitTest ("Square Test") {}
 
     void referenceTest()
     {
         // our osc has 1/2 sample delay so, run the reference osc at 2x sample rate, and check every other.
         dsp::Oscillator<float> refOsc { [] (auto x)
-                                        { return x / MathConstants<float>::pi; } };
+                                        { return x < 0.0f ? 1.0f : -1.0f; } };
         refOsc.prepare ({ 2.0 * _sampleRate, (uint32) _blockSize, 1 });
         refOsc.setFrequency (testFreq, true);
 
-        chowdsp::SawtoothWave<float> testOsc;
+        chowdsp::SquareWave<float> testOsc;
         testOsc.prepare ({ _sampleRate, (uint32) _blockSize, 1 });
         testOsc.setFrequency (testFreq);
         expectEquals (testOsc.getFrequency(), testFreq, "Set frequency is incorrect!");
@@ -37,11 +37,11 @@ public:
     {
         // our osc has 1/2 sample delay so, run the reference osc at 2x sample rate, and check every other.
         dsp::Oscillator<float> refOsc { [] (auto x)
-                                        { return x / MathConstants<float>::pi; } };
+                                        { return x < 0.0f ? 1.0f : -1.0f; } };
         refOsc.prepare ({ 2.0 * _sampleRate, (uint32) _blockSize, 1 });
         refOsc.setFrequency (testFreq, true);
 
-        chowdsp::SawtoothWave<dsp::SIMDRegister<float>> testOsc;
+        chowdsp::SquareWave<dsp::SIMDRegister<float>> testOsc;
         testOsc.prepare ({ _sampleRate, (uint32) _blockSize, 1 });
         testOsc.setFrequency (testFreq);
         expectEquals (testOsc.getFrequency().get (0), testFreq, "Set frequency is incorrect!");
@@ -61,7 +61,7 @@ public:
     void processReplacingTest()
     {
         dsp::Oscillator<float> refOsc { [] (auto x)
-                                        { return x / MathConstants<float>::pi; } };
+                                        { return x < 0.0f ? 1.0f : -1.0f; } };
         refOsc.prepare ({ 2.0 * _sampleRate, (uint32) _blockSize, 1 });
         refOsc.setFrequency (testFreq, true);
 
@@ -70,7 +70,7 @@ public:
         auto refBlock = dsp::AudioBlock<float> { refBuffer };
         refOsc.process (dsp::ProcessContextReplacing<float> { refBlock });
 
-        chowdsp::SawtoothWave<float> testOsc;
+        chowdsp::SquareWave<float> testOsc;
         testOsc.prepare ({ _sampleRate, (uint32) _blockSize, 1 });
         testOsc.setFrequency (testFreq);
 
@@ -90,7 +90,7 @@ public:
     void processNonReplacingTest()
     {
         dsp::Oscillator<float> refOsc { [] (auto x)
-                                        { return x / MathConstants<float>::pi; } };
+                                        { return x < 0.0f ? 1.0f : -1.0f; } };
         refOsc.prepare ({ 2.0 * _sampleRate, (uint32) _blockSize, 2 });
         refOsc.setFrequency (testFreq, true);
 
@@ -100,7 +100,7 @@ public:
         auto refBlock = dsp::AudioBlock<float> { refBuffer };
         refOsc.process (dsp::ProcessContextNonReplacing<float> { inputBuffer1, refBlock });
 
-        chowdsp::SawtoothWave<float> testOsc;
+        chowdsp::SquareWave<float> testOsc;
         testOsc.prepare ({ _sampleRate, (uint32) _blockSize, 2 });
         testOsc.setFrequency (testFreq);
 
@@ -124,7 +124,7 @@ public:
 
     void zeroHzTest()
     {
-        chowdsp::SawtoothWave<float> testOsc;
+        chowdsp::SquareWave<float> testOsc;
         testOsc.prepare ({ _sampleRate, (uint32) _blockSize, 1 });
         testOsc.setFrequency (0.0f);
 
@@ -135,7 +135,7 @@ public:
     void bypassTest()
     {
         dsp::Oscillator<float> refOsc { [] (auto x)
-                                        { return x / MathConstants<float>::pi; } };
+                                        { return x < 0.0f ? 1.0f : -1.0f; } };
         refOsc.prepare ({ 2.0 * _sampleRate, (uint32) _blockSize, 1 });
         refOsc.setFrequency (testFreq, true);
 
@@ -144,7 +144,7 @@ public:
         auto refBlock = dsp::AudioBlock<float> { refBuffer };
         refOsc.process (dsp::ProcessContextReplacing<float> { refBlock });
 
-        chowdsp::SawtoothWave<float> testOsc;
+        chowdsp::SquareWave<float> testOsc;
         testOsc.prepare ({ _sampleRate, (uint32) _blockSize, 1 });
         testOsc.setFrequency (testFreq);
 
@@ -199,4 +199,4 @@ public:
     }
 };
 
-static SawtoothTest sawtoothTest;
+static SquareTest squareTest;
