@@ -3,7 +3,9 @@
 namespace chowdsp
 {
 /**
- * Sawtooth wave generated using "Differentiated Polynomial Waveforms" (DPW),
+ * Sawtooth wave following the equation y = phase, where phase goes from [-1, 1].
+ *
+ * The wave is generated using "Differentiated Polynomial Waveforms" (DPW),
  * with 2nd-order polynomials.
  *
  * Reference: "Alias-Suppressed Oscillators Based on Differentiated Polynomial Waveforms",
@@ -25,18 +27,14 @@ public:
     /** Prepares the oscillator to process at a given sample rate */
     void prepare (const juce::dsp::ProcessSpec& spec) noexcept;
 
-    /** Resets the internal state of the oscillator */
-    void reset() noexcept;
-
-    /** Resets the internal state of the oscillator with an initial phase */
-    void reset (T phase) noexcept;
+    /** Resets the internal state of the oscillator, with a phase in range [-1, 1] */
+    void reset (T phase = (T) -1) noexcept;
 
     /** Returns the result of processing a single sample. */
     inline T processSample() noexcept
     {
         // anti-alias with DPW
-        auto s = (T) 2 * phi - (T) 1; // see eqn (1)
-        auto adWave = s * s; // 2nd-order polynomial of anti-derivative
+        auto adWave = phi * phi; // 2nd-order polynomial of anti-derivative
         auto y = adWave - z; // differentiate
         z = adWave; // update state
 
@@ -56,9 +54,9 @@ private:
 
         phi += deltaPhase;
         if constexpr (std::is_floating_point<T>::value)
-            phi = phi >= (T) 1 ? phi - (T) 1 : phi;
+            phi = phi >= (T) 1 ? phi - (T) 2 : phi;
         else if constexpr (SampleTypeHelpers::IsSIMDRegister<T>)
-            phi = select (T::greaterThanOrEqual (phi, (T) 1), phi - (T) 1, phi);
+            phi = select (T::greaterThanOrEqual (phi, (T) 1), phi - (T) 2, phi);
     }
 
     T z {};

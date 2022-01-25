@@ -17,22 +17,10 @@ void SquareWave<T>::prepare (const juce::dsp::ProcessSpec& spec) noexcept
 }
 
 template <typename T>
-void SquareWave<T>::reset() noexcept
-{
-    reset (T {});
-}
-
-template <typename T>
 void SquareWave<T>::reset (T phase) noexcept
 {
     saw1.reset (phase);
-
-    auto phasePlusHalf = phase + (T) 0.5;
-    if constexpr (std::is_floating_point<T>::value)
-        phasePlusHalf = phasePlusHalf >= (T) 1 ? phasePlusHalf - (T) 1 : phasePlusHalf;
-    else if constexpr (SampleTypeHelpers::IsSIMDRegister<T>)
-        phasePlusHalf = SIMDUtils::select (T::greaterThanOrEqual (phasePlusHalf, (T) 1), phasePlusHalf - (T) 1, phasePlusHalf);
-    saw2.reset (phasePlusHalf);
+    saw2.reset (phase + (T) 0.5);
 }
 
 template <typename T>

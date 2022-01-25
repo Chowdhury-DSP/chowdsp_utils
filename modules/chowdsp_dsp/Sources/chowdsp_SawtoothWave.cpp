@@ -6,7 +6,7 @@ void SawtoothWave<T>::setFrequency (T newFrequency) noexcept
     using namespace SIMDUtils;
 
     freq = newFrequency;
-    deltaPhase = freq / fs;
+    deltaPhase = (T) 2 * freq / fs;
 
     // scale by zero if freq == 0, to avoid divide by zero issue
     waveformPreservingScale = fs / ((T) 4 * freq);
@@ -25,16 +25,13 @@ void SawtoothWave<T>::prepare (const juce::dsp::ProcessSpec& spec) noexcept
 }
 
 template <typename T>
-void SawtoothWave<T>::reset() noexcept
-{
-    reset (T {});
-}
-
-template <typename T>
 void SawtoothWave<T>::reset (T phase) noexcept
 {
-    z = T();
-    phi = phase;
+    // make sure initial phase is in range
+    phi = phase - deltaPhase;
+    updatePhase();
+
+    z = phi * phi;
 }
 
 template <typename T>
@@ -52,38 +49,38 @@ void SawtoothWave<T>::process (const ProcessContext& context) noexcept
     {
         context.getOutputBlock().clear();
         for (size_t i = 0; i < len; ++i)
-            updatePhase();
+            processSample();
+
+        return;
     }
-    else
+
+    T z_temp = z;
+    T phi_temp = phi;
+    size_t ch;
+
+    for (ch = 0; ch < juce::jmin (numChannels, inputChannels); ++ch)
     {
-        T z_temp = z;
-        T phi_temp = phi;
-        size_t ch;
+        z = z_temp;
+        phi = phi_temp;
 
-        for (ch = 0; ch < juce::jmin (numChannels, inputChannels); ++ch)
-        {
-            z = z_temp;
-            phi = phi_temp;
+        auto* dst = outBlock.getChannelPointer (ch);
+        auto* src = inBlock.getChannelPointer (ch);
 
-            auto* dst = outBlock.getChannelPointer (ch);
-            auto* src = inBlock.getChannelPointer (ch);
+        if (context.usesSeparateInputAndOutputBlocks())
+            juce::FloatVectorOperations::copy (dst, src, (int) len);
 
-            if (context.usesSeparateInputAndOutputBlocks())
-                juce::FloatVectorOperations::copy (dst, src, (int) len);
+        for (size_t i = 0; i < len; ++i)
+            dst[i] += processSample();
+    }
 
-            for (size_t i = 0; i < len; ++i)
-                dst[i] += processSample();
-        }
+    for (; ch < numChannels; ++ch)
+    {
+        z = z_temp;
+        phi = phi_temp;
+        auto* dst = outBlock.getChannelPointer (ch);
 
-        for (; ch < numChannels; ++ch)
-        {
-            z = z_temp;
-            phi = phi_temp;
-            auto* dst = outBlock.getChannelPointer (ch);
-
-            for (size_t i = 0; i < len; ++i)
-                dst[i] = processSample();
-        }
+        for (size_t i = 0; i < len; ++i)
+            dst[i] = processSample();
     }
 }
 } // namespace chowdsp
