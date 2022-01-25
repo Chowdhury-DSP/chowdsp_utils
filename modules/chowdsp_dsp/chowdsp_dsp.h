@@ -159,4 +159,6 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 
 // sound sources
 #include "Sources/chowdsp_Noise.h"
+#include "Sources/chowdsp_SawtoothWave.h"
 #include "Sources/chowdsp_SineWave.h"
+#include "Sources/chowdsp_SquareWave.h"

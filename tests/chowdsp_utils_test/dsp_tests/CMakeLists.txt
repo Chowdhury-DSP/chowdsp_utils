@@ -16,6 +16,8 @@ target_sources(chowdsp_utils_tests PRIVATE
 
     source_tests/NoiseTest.cpp
     source_tests/SineTest.cpp
+     source_tests/SawtoothTest.cpp
+     source_tests/SquareTest.cpp
 
     filter_tests/FirstOrderFiltersTest.cpp
     filter_tests/ModalFilterTest.cpp
