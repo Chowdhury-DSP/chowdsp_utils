@@ -94,6 +94,9 @@ public:
     /** Set the name to use for user presets */
     void setUserPresetName (const juce::String& newName);
 
+    /** Returns the name being used for user presets */
+    juce::String getUserPresetName() const noexcept { return userPresetsName; };
+
     /** Returns a vector of all the user-saved presets */
     std::vector<const Preset*> getUserPresets() const;
 
@@ -128,6 +131,8 @@ protected:
     juce::AudioProcessorValueTreeState& vts;
     juce::AudioProcessor& processor;
 
+    std::unique_ptr<Preset> keepAlivePreset;
+
 private:
     void parameterChanged (const juce::String& parameterID, float newValue) override;
     std::pair<const int, Preset>& addFactoryPreset (Preset&& preset);
@@ -153,8 +158,7 @@ private:
 
     juce::String userPresetsName;
     juce::String userPresetConfigPath;
-
-    std::unique_ptr<Preset> keepAlivePreset;
+    
     static const juce::Identifier presetDirtyTag;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetManager)
