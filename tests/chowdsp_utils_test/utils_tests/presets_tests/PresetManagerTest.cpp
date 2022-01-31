@@ -306,25 +306,23 @@ public:
 
         String testUserName = "User";
         presetMgr.setUserPresetName (testUserName);
+        expectEquals (presetMgr.getUserPresetName(), testUserName, "Default user name is incorrect!");
         for (const auto* preset : presetMgr.getUserPresets())
             expectEquals (preset->getVendor(), testUserName, "Default user vendor name is incorrect!");
 
         testUserName = "TestUserName";
         presetMgr.setUserPresetName (testUserName);
+        expectEquals (presetMgr.getUserPresetName(), testUserName, "Default user name is incorrect!");
         for (const auto* preset : presetMgr.getUserPresets())
             expectEquals (preset->getVendor(), testUserName, "Set user vendor name is incorrect!");
 
-        String testUserName2 = "TestUserName2";
         presetMgr.setUserPresetName (testUserName);
+        expectEquals (presetMgr.getUserPresetName(), testUserName, "Default user name is incorrect!");
         for (const auto* preset : presetMgr.getUserPresets())
             expectEquals (preset->getVendor(), testUserName, "Changing user vendor name that is not default should not change existing user preset names!");
 
         for (auto& file : presetFiles)
             file.deleteFile();
-    }
-
-    void setUserPresetNameTest()
-    {
     }
 
     void runTestTimed() override
@@ -358,9 +356,6 @@ public:
 
         beginTest ("Get User Presets Test");
         getUserPresetsTest();
-
-        beginTest ("Set User Presets Name Test");
-        setUserPresetNameTest();
     }
 };
 
