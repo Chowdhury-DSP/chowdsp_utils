@@ -92,7 +92,10 @@ public:
     void triggerPresetListUpdate() { listeners.call (&Listener::presetListUpdated); }
 
     /** Set the name to use for user presets */
-    void setUserPresetName (const juce::String& newName);
+    virtual void setUserPresetName (const juce::String& newName);
+
+    /** Returns the name being used for user presets */
+    juce::String getUserPresetName() const noexcept { return userPresetsName; };
 
     /** Returns a vector of all the user-saved presets */
     std::vector<const Preset*> getUserPresets() const;
@@ -128,14 +131,6 @@ protected:
     juce::AudioProcessorValueTreeState& vts;
     juce::AudioProcessor& processor;
 
-private:
-    void parameterChanged (const juce::String& parameterID, float newValue) override;
-    std::pair<const int, Preset>& addFactoryPreset (Preset&& preset);
-    const Preset* findPreset (const Preset& preset) const;
-
-    int getIndexForPreset (const Preset& preset) const;
-    const Preset* getPresetForIndex (int index) const;
-
     enum
     {
         factoryUserNumIDs = 1000,
@@ -145,16 +140,25 @@ private:
     std::map<int, Preset> presetMap;
     std::unordered_map<juce::String, int> userIDMap;
 
+    juce::String userPresetsName;
+    std::unique_ptr<Preset> keepAlivePreset;
+
+private:
+    void parameterChanged (const juce::String& parameterID, float newValue) override;
+    std::pair<const int, Preset>& addFactoryPreset (Preset&& preset);
+    const Preset* findPreset (const Preset& preset) const;
+
+    int getIndexForPreset (const Preset& preset) const;
+    const Preset* getPresetForIndex (int index) const;
+
     juce::ListenerList<Listener> listeners;
     bool isDirty = false;
 
     const Preset* currentPreset = nullptr;
     const Preset* defaultPreset = nullptr;
 
-    juce::String userPresetsName;
     juce::String userPresetConfigPath;
 
-    std::unique_ptr<Preset> keepAlivePreset;
     static const juce::Identifier presetDirtyTag;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetManager)

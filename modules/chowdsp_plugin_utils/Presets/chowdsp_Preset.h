@@ -26,7 +26,7 @@ struct Preset
     Preset& operator= (Preset&&) noexcept = default;
 
     /** Saves this preset to a file */
-    void toFile (const juce::File& presetFile) const;
+    void toFile (const juce::File& presetFile);
 
     /** Saves this preset to xml */
     std::unique_ptr<juce::XmlElement> toXml() const;
