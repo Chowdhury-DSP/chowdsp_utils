@@ -75,7 +75,7 @@ void Preset::initialise (const juce::XmlElement* xml)
     state = std::make_unique<juce::XmlElement> (*xmlState);
 }
 
-void Preset::toFile (const juce::File& presetFile) const
+void Preset::toFile (const juce::File& presetFile)
 {
     auto presetXml = toXml();
 
@@ -85,6 +85,8 @@ void Preset::toFile (const juce::File& presetFile) const
     presetFile.deleteRecursively();
     presetFile.create();
     presetXml->writeTo (presetFile);
+
+    file = presetFile;
 }
 
 std::unique_ptr<juce::XmlElement> Preset::toXml() const
