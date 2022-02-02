@@ -102,6 +102,7 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 #include "DataStructures/chowdsp_DoubleBuffer.h"
 #include "DataStructures/chowdsp_RebufferedProcessor.h"
 #include "DataStructures/chowdsp_SmoothedBufferValue.h"
+#include "DataStructures/chowdsp_ScopedValue.h"
 
 // WDF tools
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wshadow-field", // Ignore Clang warnings for WDFs
