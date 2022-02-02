@@ -64,12 +64,19 @@ struct Preset
     /** Returns true if the two presets are equivalent. */
     bool operator== (const Preset& other) const noexcept;
 
+    /** Returns true if the two presets are NOT equivalent. */
+    bool operator!= (const Preset& other) const noexcept;
+
+    /** XML Element to store any extra information (e.g. a preset description) */
+    juce::XmlElement extraInfo { extraInfoTag };
+
     static const juce::Identifier presetTag;
     static const juce::Identifier nameTag;
     static const juce::Identifier pluginTag;
     static const juce::Identifier vendorTag;
     static const juce::Identifier categoryTag;
     static const juce::Identifier versionTag;
+    static const juce::Identifier extraInfoTag;
     [[maybe_unused]] static const juce::Identifier stateTag;
 
 private:

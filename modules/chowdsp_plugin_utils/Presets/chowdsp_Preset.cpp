@@ -68,6 +68,9 @@ void Preset::initialise (const juce::XmlElement* xml)
 
     version = std::make_unique<VersionUtils::Version> (versionStr);
 
+    if (auto* xmlExtraInfo = xml->getChildByName (extraInfoTag))
+        extraInfo = std::move (*xmlExtraInfo);
+
     auto* xmlState = xml->getChildElement (0);
     if (xmlState == nullptr)
         return;
@@ -107,6 +110,7 @@ std::unique_ptr<juce::XmlElement> Preset::toXml() const
     presetXml->setAttribute (versionTag, version->getVersionString());
 
     presetXml->addChildElement (new juce::XmlElement (*state));
+    presetXml->addChildElement (new juce::XmlElement (extraInfo));
 
     JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wpessimizing-move")
     return std::move (presetXml);
@@ -126,8 +130,16 @@ bool Preset::operator== (const Preset& other) const noexcept
     if (state == nullptr)
         return false;
 
-    return name == other.name && vendor == other.vendor && category == other.category && *version == *other.version
-           && state->isEquivalentTo (other.state.get(), true);
+    const auto infoEqual = name == other.name && vendor == other.vendor && category == other.category && *version == *other.version;
+    const auto stateEqual = state->isEquivalentTo (other.state.get(), true);
+    const auto extraInfoEqual = extraInfo.isEquivalentTo (&other.extraInfo, true);
+
+    return infoEqual && stateEqual && extraInfoEqual;
+}
+
+bool Preset::operator!= (const Preset& other) const noexcept
+{
+    return ! (*this == other);
 }
 
 const juce::Identifier Preset::presetTag { "Preset" };
@@ -136,6 +148,7 @@ const juce::Identifier Preset::pluginTag { "plugin" };
 const juce::Identifier Preset::vendorTag { "vendor" };
 const juce::Identifier Preset::categoryTag { "category" };
 const juce::Identifier Preset::versionTag { "version" };
+const juce::Identifier Preset::extraInfoTag { "extra_info" };
 [[maybe_unused]] const juce::Identifier Preset::stateTag { "Parameters" };
 
 } // namespace chowdsp

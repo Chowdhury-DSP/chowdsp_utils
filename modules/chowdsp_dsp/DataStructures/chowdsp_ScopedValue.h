@@ -18,10 +18,10 @@ class ScopedValue
 public:
     explicit ScopedValue (T& val) : value (val), ref (val) {}
 
-    ~ScopedValue() { ref = value; };
+    ~ScopedValue() { ref = value; }
 
     /** Returns a reference to the value */
-    inline T& get() { return value; };
+    inline T& get() { return value; }
 
 protected:
     T value;
