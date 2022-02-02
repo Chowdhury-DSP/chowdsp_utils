@@ -13,6 +13,7 @@ target_sources(chowdsp_utils_tests PRIVATE
     data_structure_tests/DoubleBufferTest.cpp
     data_structure_tests/RebufferProcessorTest.cpp
     data_structure_tests/SmoothedBufferValueTest.cpp
+    data_structure_tests/ScopedValueTest.cpp
 
     source_tests/NoiseTest.cpp
     source_tests/SineTest.cpp
