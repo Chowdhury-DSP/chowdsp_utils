@@ -14,7 +14,7 @@ public:
         {
             chowdsp::ScopedValue x_scoped { x };
             expectEquals (x_scoped.get(), x, "Initial value is incorrect!");
-            
+
             x_scoped.get() = testVal1;
             expectEquals (x_scoped.get(), testVal1, "Set value is incorrect!");
         }

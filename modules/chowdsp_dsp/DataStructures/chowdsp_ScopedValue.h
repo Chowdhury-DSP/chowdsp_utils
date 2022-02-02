@@ -2,7 +2,6 @@
 
 namespace chowdsp
 {
-
 /**
  * Scoped object that stores a value from a variable on construction
  * and writes the final value back to that variable on deletion.
