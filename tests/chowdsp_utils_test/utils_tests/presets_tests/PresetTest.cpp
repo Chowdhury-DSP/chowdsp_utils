@@ -120,8 +120,7 @@ public:
         auto testFile = File::getSpecialLocation (File::userHomeDirectory).getChildFile ("test.preset");
         auto xml = std::make_unique<XmlElement> ("TEST_XML");
 
-        auto testPreset = [=] (const chowdsp::Preset& p)
-        {
+        auto testPreset = [=] (const chowdsp::Preset& p) {
             expectEquals (p.getName(), String ("test preset"), "Preset name incorrect!");
             expectEquals (p.getVendor(), String ("test vendor"), "Preset vendor incorrect!");
             expectEquals (p.getCategory(), String ("test category"), "Preset category incorrect!");
