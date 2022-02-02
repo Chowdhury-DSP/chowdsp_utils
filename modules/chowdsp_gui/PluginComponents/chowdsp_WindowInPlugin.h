@@ -66,6 +66,9 @@ private:
 
     void componentParentHierarchyChanged (juce::Component&) override
     {
+        if (dynamic_cast<juce::AudioProcessorEditor*> (getParentComponent()))
+            return; // don't want to go past the plugin editor!
+
         auto* topLevelComp = creatorComp.getTopLevelComponent();
         jassert (topLevelComp != nullptr);
 
