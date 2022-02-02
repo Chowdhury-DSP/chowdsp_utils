@@ -95,7 +95,7 @@ public:
     virtual void setUserPresetName (const juce::String& newName);
 
     /** Returns the name being used for user presets */
-    juce::String getUserPresetName() const noexcept { return userPresetsName; };
+    juce::String getUserPresetName() const noexcept { return userPresetsName; }
 
     /** Returns a vector of all the user-saved presets */
     std::vector<const Preset*> getUserPresets() const;

@@ -25,6 +25,7 @@ public:
 
         chowdsp::Preset filePreset (testFile);
         expect (filePreset.isValid(), "File preset is not valid!");
+        expectEquals (filePreset.getPresetFile().getFullPathName(), testFile.getFullPathName(), "Preset file is incorrect!");
 
         auto compareVal = filePreset.getState()->getDoubleAttribute (testTag);
         expectEquals (compareVal, testValue, "Saved value is incorrect!");
@@ -38,6 +39,15 @@ public:
             XmlElement* nullXml = nullptr;
             chowdsp::Preset preset { nullXml };
             expect (! preset.isValid(), "Null XML preset should be invalid!");
+
+            File testFile = File::getSpecialLocation (File::userHomeDirectory).getChildFile ("test_null.preset");
+            preset.toFile (testFile);
+            expect (! testFile.existsAsFile(), "Invalid presets can't be saved to a file!");
+
+            expect (preset.toXml() == nullptr, "Invalid preset should return nullptr XML!");
+
+            chowdsp::Preset testValidPreset { BinaryData::test_preset_preset, BinaryData::test_preset_presetSize };
+            expect (preset != testValidPreset, "Invalid preset should not equal valid preset!");
         }
 
         {
@@ -88,6 +98,9 @@ public:
             noStateXML->setAttribute (chowdsp::Preset::versionTag, JucePlugin_VersionString);
             chowdsp::Preset preset { noStateXML.get() };
             expect (! preset.isValid(), "XML with no state should be invalid!");
+
+            chowdsp::Preset testValidPreset { BinaryData::test_preset_preset, BinaryData::test_preset_presetSize };
+            expect (preset != testValidPreset, "Invalid preset should not equal valid preset!");
         }
 
         {
@@ -107,7 +120,8 @@ public:
         auto testFile = File::getSpecialLocation (File::userHomeDirectory).getChildFile ("test.preset");
         auto xml = std::make_unique<XmlElement> ("TEST_XML");
 
-        auto testPreset = [=] (const chowdsp::Preset& p) {
+        auto testPreset = [=] (const chowdsp::Preset& p)
+        {
             expectEquals (p.getName(), String ("test preset"), "Preset name incorrect!");
             expectEquals (p.getVendor(), String ("test vendor"), "Preset vendor incorrect!");
             expectEquals (p.getCategory(), String ("test category"), "Preset category incorrect!");
@@ -136,6 +150,53 @@ public:
         expectEquals (testValue, 1.0, "Preset test value is incorrect!");
     }
 
+    void extraInfoPresetTest()
+    {
+        const String presetName = "Test Preset";
+        const String vendorName = "Test Vendor";
+        const String testTag = "test_attribute";
+        const String testTag2 = "test_attribute2";
+        constexpr double testValue = 0.5;
+        constexpr double testValue2 = 0.99;
+
+        XmlElement presetXml ("Parameters");
+        presetXml.setAttribute (testTag, testValue);
+
+        chowdsp::Preset testPreset (presetName, vendorName, presetXml);
+        testPreset.extraInfo.setAttribute (testTag2, testValue2);
+        expect (testPreset.isValid(), "Test preset is not valid!");
+
+        File testFile = File::getSpecialLocation (File::userHomeDirectory).getChildFile ("test.preset");
+        testPreset.toFile (testFile);
+
+        chowdsp::Preset filePreset (testFile);
+        expect (filePreset.isValid(), "File preset is not valid!");
+
+        auto compareVal = filePreset.getState()->getDoubleAttribute (testTag);
+        expectEquals (compareVal, testValue, "Saved value is incorrect!");
+
+        auto compareVal2 = filePreset.extraInfo.getDoubleAttribute (testTag2);
+        expectEquals (compareVal2, testValue2, "Extra info value is incorrect!");
+
+        testFile.deleteFile();
+    }
+
+    void presetsEqualTest()
+    {
+        chowdsp::Preset testPreset { BinaryData::test_preset_preset, BinaryData::test_preset_presetSize };
+        expect (testPreset == testPreset, "Preset should equal itself!");
+
+        const String presetName = "Test Preset";
+        const String vendorName = "Test Vendor";
+        const String testTag = "test_attribute";
+        constexpr double testValue = 0.5;
+
+        XmlElement presetXml ("Parameters");
+        presetXml.setAttribute (testTag, testValue);
+        chowdsp::Preset testPreset2 (presetName, vendorName, presetXml);
+        expect (testPreset != testPreset2, "These presets should not be equivalent!");
+    }
+
     void runTestTimed() override
     {
         beginTest ("File Save/Load Test");
@@ -149,6 +210,12 @@ public:
 
         beginTest ("Binary Data Preset Test");
         binaryDataPresetTest();
+
+        beginTest ("Extra Info Preset Test");
+        extraInfoPresetTest();
+
+        beginTest ("Presets Equal Test");
+        presetsEqualTest();
     }
 };
 
