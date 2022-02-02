@@ -24,9 +24,6 @@ public:
     /** Returns a reference to the value */
     inline T& get() { return value; };
 
-    /** Returns a const reference to the value */
-    inline const T& get() const { return value; };
-
 protected:
     T value;
     T& ref;
