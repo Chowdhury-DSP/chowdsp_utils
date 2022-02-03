@@ -24,9 +24,9 @@ public:
 
     /** Create a window for a component with a non-default constructor */
     template <typename... Args>
-    explicit WindowInPlugin (Component& creatorComponent, Args... args) : DocumentWindow (juce::String(), juce::Colours::black, closeButton, false),
-                                                                          creatorComp (creatorComponent),
-                                                                          viewComponent (std::forward<Args...> (args...))
+    explicit WindowInPlugin (Component& creatorComponent, Args&&... args) : DocumentWindow (juce::String(), juce::Colours::black, closeButton, false),
+                                                                            creatorComp (creatorComponent),
+                                                                            viewComponent (std::forward<Args> (args)...)
     {
         initialise();
     }
