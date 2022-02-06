@@ -75,7 +75,7 @@ public:
     void setUserPresetPath (const juce::File& file);
 
     /** Load's user presets from the given directory */
-    void loadUserPresetsFromFolder (const juce::File& file);
+    virtual void loadUserPresetsFromFolder (const juce::File& file);
 
     /** Saves the preset manager state to an XML element */
     std::unique_ptr<juce::XmlElement> saveXmlState() const;
