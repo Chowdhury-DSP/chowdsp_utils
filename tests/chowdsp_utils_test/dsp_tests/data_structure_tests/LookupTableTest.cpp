@@ -90,13 +90,11 @@ private:
     static constexpr int N = 1 << 17;
     static constexpr int TestN = 1000;
 
-    const juce::dsp::LookupTableTransform<float> juceLUT { [] (auto x)
-                                                           { return std::tanh (x); },
+    const juce::dsp::LookupTableTransform<float> juceLUT { [] (auto x) { return std::tanh (x); },
                                                            minVal,
                                                            maxVal,
                                                            N };
-    const chowdsp::LookupTableTransform<float> chowLUT { [] (auto x)
-                                                         { return std::tanh (x); },
+    const chowdsp::LookupTableTransform<float> chowLUT { [] (auto x) { return std::tanh (x); },
                                                          minVal,
                                                          maxVal,
                                                          N };
