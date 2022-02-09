@@ -87,3 +87,8 @@ jobs:
         working-directory: ${{env.WORK_DIR}}/build
         shell: bash
         run: ./WDFvsIIRBench
+
+      - name: "Bench: Lookup Table"
+        working-directory: ${{env.WORK_DIR}}/build
+        shell: bash
+        run: ./LookupTableBench
