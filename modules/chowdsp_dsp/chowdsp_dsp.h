@@ -96,6 +96,7 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 // math helpers
 #include "Math/chowdsp_FloatVectorOperations.h"
 #include "Math/chowdsp_Polynomials.h"
+#include "Math/chowdsp_Power.h"
 
 // some useful data structures
 #include "DataStructures/chowdsp_AudioBlockHelpers.h"
@@ -157,6 +158,7 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 #include "Processors/chowdsp_GainProcessor.h"
 #include "Processors/chowdsp_LevelDetector.h"
 #include "Processors/chowdsp_Panner.h"
+#include "Processors/chowdsp_SoftClipper.h"
 #include "Processors/chowdsp_TunerProcessor.h"
 
 // sound sources
