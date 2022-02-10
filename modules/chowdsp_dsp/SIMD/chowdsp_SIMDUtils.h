@@ -30,7 +30,14 @@ inline vec4 loadUnaligned (const float* ptr)
 #endif
 
 #elif defined(_M_ARM64) || defined(__arm64__) || defined(__aarch64__)
+#if CHOWDSP_USE_CUSTOM_JUCE_DSP
     return { vld1q_f32 (ptr) };
+#else
+    auto reg = vec4 (0.0f);
+    auto* regPtr = reinterpret_cast<float*> (&reg.value);
+    std::copy (ptr, ptr + vec4::size(), regPtr);
+    return reg;
+#endif
 #else
     // fallback implementation
     auto reg = vec4 (0.0f);
@@ -50,7 +57,14 @@ inline vec2 loadUnaligned (const double* ptr)
 #endif
 
 #elif defined(_M_ARM64) || defined(__arm64__) || defined(__aarch64__)
+#if CHOWDSP_USE_CUSTOM_JUCE_DSP
     return { vld1q_f64 (ptr) };
+#else
+    auto reg = vec2 (0.0);
+    auto* regPtr = reinterpret_cast<double*> (&reg.value);
+    std::copy (ptr, ptr + vec2::size(), regPtr);
+    return reg;
+#endif
 #else
     // fallback implementation
     auto reg = vec2 (0.0);
@@ -70,7 +84,12 @@ inline void storeUnaligned (float* ptr, const vec4& vec)
 #endif
 
 #elif defined(_M_ARM64) || defined(__arm64__) || defined(__aarch64__)
+#if CHOWDSP_USE_CUSTOM_JUCE_DSP
     vst1q_f32 (ptr, vec.value);
+#else
+    const auto* regPtr = reinterpret_cast<const float*> (&vec.value);
+    std::copy (regPtr, regPtr + vec4::size(), ptr);
+#endif
 #else
     // fallback implementation
     const auto* regPtr = reinterpret_cast<const float*> (&vec.value);
@@ -88,7 +107,12 @@ inline void storeUnaligned (double* ptr, const vec2& vec)
 #endif
 
 #elif defined(_M_ARM64) || defined(__arm64__) || defined(__aarch64__)
+#if CHOWDSP_USE_CUSTOM_JUCE_DSP
     vst1q_f64 (ptr, vec.value);
+#else
+    const auto* regPtr = reinterpret_cast<const double*> (&vec.value);
+    std::copy (regPtr, regPtr + vec2::size(), ptr);
+#endif
 #else
     // fallback implementation
     const auto* regPtr = reinterpret_cast<const double*> (&vec.value);
