@@ -33,6 +33,37 @@ public:
         }
     }
 
+    template <int exponent>
+    void vectorPowerTest (Random& r)
+    {
+        float testFloats[N] {};
+        double testDoubles[N] {};
+
+        float expFloats[N] {};
+        double expDoubles[N] {};
+
+        float actualFloats[N] {};
+        double actualDoubles[N] {};
+
+        for (int n = 0; n < N; ++n)
+        {
+            testFloats[n] = r.nextFloat();
+            expFloats[n] = std::pow (testFloats[n], (float) exponent);
+
+            testDoubles[n] = r.nextDouble();
+            expDoubles[n] = std::pow (testDoubles[n], (double) exponent);
+        }
+
+        ipow<exponent> (actualFloats, testFloats, N);
+        ipow<exponent> (actualDoubles, testDoubles, N);
+
+        for (int n = 0; n < N; ++n)
+        {
+            expectWithinAbsoluteError (actualFloats[n], expFloats[n], maxErrFloat, "Float power is incorrect for exponent: " + String (exponent));
+            expectWithinAbsoluteError (actualDoubles[n], expDoubles[n], maxErrDouble, "Double power is incorrect for exponent: " + String (exponent));
+        }
+    }
+
     void runTestTimed() override
     {
         auto&& rand = getRandom();
@@ -55,6 +86,25 @@ public:
         scalarPowerTest<14> (rand);
         scalarPowerTest<15> (rand);
         scalarPowerTest<16> (rand);
+
+        beginTest ("Vector Power Test");
+        vectorPowerTest<0> (rand);
+        vectorPowerTest<1> (rand);
+        vectorPowerTest<2> (rand);
+        vectorPowerTest<3> (rand);
+        vectorPowerTest<4> (rand);
+        vectorPowerTest<5> (rand);
+        vectorPowerTest<6> (rand);
+        vectorPowerTest<7> (rand);
+        vectorPowerTest<8> (rand);
+        vectorPowerTest<9> (rand);
+        vectorPowerTest<10> (rand);
+        vectorPowerTest<11> (rand);
+        vectorPowerTest<12> (rand);
+        vectorPowerTest<13> (rand);
+        vectorPowerTest<14> (rand);
+        vectorPowerTest<15> (rand);
+        vectorPowerTest<16> (rand);
     }
 };
 
