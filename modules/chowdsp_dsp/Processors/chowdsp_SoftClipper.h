@@ -2,6 +2,14 @@
 
 namespace chowdsp
 {
+/**
+ * A normalized polynomial soft clipper. The soft clipper will
+ * have a slope of 1 through the origin, and will have max/min
+ * clipping values of +/- 1.
+ *
+ * @tparam degree   The degree of the polynomial. Use a higher degree to get closer to a hard-clipper. Note that that the degree must be an odd integer.
+ * @tparam T        The data type to process. Must be float/double (for now)
+ */
 template <int degree, typename T = float>
 class SoftClipper
 {
@@ -10,11 +18,13 @@ class SoftClipper
 public:
     SoftClipper() = default;
 
+    /** Prepare the soft clipper to process a stream of data. */
     void prepare (const juce::dsp::ProcessSpec& spec)
     {
         exponentData = std::vector<T> (spec.maximumBlockSize, (T) 0);
     }
 
+    /** Process an individual sample. */
     static inline T processSample (T x) noexcept
     {
         x = juce::jlimit ((T) -1, (T) 1, x * normFactor);
@@ -22,6 +32,7 @@ public:
         return x * invNormFactor;
     }
 
+    /** Process a block the given processing context. */
     template <typename ProcessContext>
     void process (const ProcessContext& context) noexcept
     {
