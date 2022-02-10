@@ -2,7 +2,6 @@
 
 namespace chowdsp
 {
-
 template <int degree, typename T = float>
 class SoftClipper
 {
