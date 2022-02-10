@@ -33,8 +33,7 @@ public:
         }
     }
 
-    template <int exponent>
-    void vectorPowerTest (Random& r)
+    void vectorPowerTest (Random& r, int exponent)
     {
         float testFloats[N] {};
         double testDoubles[N] {};
@@ -54,8 +53,8 @@ public:
             expDoubles[n] = std::pow (testDoubles[n], (double) exponent);
         }
 
-        ipow<exponent> (actualFloats, testFloats, N);
-        ipow<exponent> (actualDoubles, testDoubles, N);
+        chowdsp::FloatVectorOperations::integerPower (actualFloats, testFloats, exponent, N);
+        chowdsp::FloatVectorOperations::integerPower (actualDoubles, testDoubles, exponent, N);
 
         for (int n = 0; n < N; ++n)
         {
@@ -86,25 +85,12 @@ public:
         scalarPowerTest<14> (rand);
         scalarPowerTest<15> (rand);
         scalarPowerTest<16> (rand);
+        scalarPowerTest<17> (rand);
+        scalarPowerTest<18> (rand);
 
         beginTest ("Vector Power Test");
-        vectorPowerTest<0> (rand);
-        vectorPowerTest<1> (rand);
-        vectorPowerTest<2> (rand);
-        vectorPowerTest<3> (rand);
-        vectorPowerTest<4> (rand);
-        vectorPowerTest<5> (rand);
-        vectorPowerTest<6> (rand);
-        vectorPowerTest<7> (rand);
-        vectorPowerTest<8> (rand);
-        vectorPowerTest<9> (rand);
-        vectorPowerTest<10> (rand);
-        vectorPowerTest<11> (rand);
-        vectorPowerTest<12> (rand);
-        vectorPowerTest<13> (rand);
-        vectorPowerTest<14> (rand);
-        vectorPowerTest<15> (rand);
-        vectorPowerTest<16> (rand);
+        for (int exp = 0; exp < 19; ++exp)
+            vectorPowerTest (rand, exp);
     }
 };
 
