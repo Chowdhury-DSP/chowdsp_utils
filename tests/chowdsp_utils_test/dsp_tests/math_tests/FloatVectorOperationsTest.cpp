@@ -81,6 +81,48 @@ public:
         expectWithinAbsoluteError (actual, expected, maxErr, "Unaligned absolute maximum is incorrect!");
     }
 
+    template <typename T>
+    void integerPowerTest (Random& r, Range<int> range)
+    {
+        for (int exponent = 0; exponent < 19; ++exponent)
+        {
+            auto numValues = r.nextInt (range);
+            std::vector<T> inValues ((size_t) numValues, (T) 0);
+            std::vector<T> expValues ((size_t) numValues, (T) 0);
+            std::vector<T> actualValues ((size_t) numValues, (T) 0);
+
+            for (auto& v : inValues)
+                v = (T) (r.nextFloat() * 2.0f - 1.0f);
+
+            constexpr auto maxErr = (T) 1.0e-6;
+            std::transform (inValues.begin(), inValues.end(), expValues.begin(), [exponent] (auto x) { return std::pow (x, (T) exponent); });
+
+            {
+                chowdsp::FloatVectorOperations::integerPower (actualValues.data(), inValues.data(), exponent, numValues);
+                for (size_t i = 0; i < (size_t) numValues; ++i)
+                    expectWithinAbsoluteError (actualValues[i], expValues[i], maxErr, "Aligned value is incorrect!");
+            }
+
+            {
+                chowdsp::FloatVectorOperations::integerPower (actualValues.data(), inValues.data() + 1, exponent, numValues - 1);
+                for (size_t i = 1; i < (size_t) numValues; ++i)
+                    expectWithinAbsoluteError (actualValues[i - 1], expValues[i], maxErr, "Aligned value is incorrect!");
+            }
+
+            {
+                chowdsp::FloatVectorOperations::integerPower (actualValues.data() + 1, inValues.data(), exponent, numValues - 1);
+                for (size_t i = 1; i < (size_t) numValues; ++i)
+                    expectWithinAbsoluteError (actualValues[i], expValues[i - 1], maxErr, "Aligned value is incorrect!");
+            }
+
+            {
+                chowdsp::FloatVectorOperations::integerPower (actualValues.data() + 1, inValues.data() + 1, exponent, numValues - 1);
+                for (size_t i = 1; i < (size_t) numValues; ++i)
+                    expectWithinAbsoluteError (actualValues[i], expValues[i], maxErr, "Aligned value is incorrect!");
+            }
+        }
+    }
+
     void runTestTimed() override
     {
         if (chowdsp::FloatVectorOperations::isUsingVDSP())
@@ -113,6 +155,14 @@ public:
         absMaxTest<double> (rand, { 2, 4 });
         absMaxTest<double> (rand, { 100, 200 });
         absMaxTest<double> (rand, { 113, 114 });
+
+        beginTest ("Integer Power Test");
+        integerPowerTest<float> (rand, { 2, 6 });
+        integerPowerTest<float> (rand, { 100, 200 });
+        integerPowerTest<float> (rand, { 113, 114 });
+        integerPowerTest<double> (rand, { 2, 4 });
+        integerPowerTest<double> (rand, { 100, 200 });
+        integerPowerTest<double> (rand, { 113, 114 });
     }
 };
 
