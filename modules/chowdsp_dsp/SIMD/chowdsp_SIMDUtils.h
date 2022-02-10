@@ -66,4 +66,45 @@ inline vec2 loadUnaligned (const double* ptr)
     return reg;
 #endif
 }
+
+inline void storeUnaligned (float* ptr, const vec4& vec)
+{
+#if defined(__i386__) || defined(__amd64__) || defined(_M_X64) || defined(_X86_) || defined(_M_IX86)
+#ifdef __AVX2__
+    _mm256_storeu_ps (ptr, vec.value);
+#else
+    _mm_storeu_ps (ptr, vec.value);
+#endif
+
+#elif defined(_M_ARM64) || defined(__arm64__) || defined(__aarch64__)
+    vst1q_f32 (ptr, vec.value);
+#else
+    // fallback implementation
+    auto* regPtr = reinterpret_cast<float*> (&vec.value);
+    std::copy (regPtr, regPtr + vec4::size(), ptr);
+#endif
+}
+
+inline void storeUnaligned (double* ptr, const vec2& vec)
+{
+#if defined(__i386__) || defined(__amd64__) || defined(_M_X64) || defined(_X86_) || defined(_M_IX86)
+#ifdef __AVX2__
+    _mm256_storeu_pd (ptr, vec.value);
+#else
+    _mm_storeu_pd (ptr, vec.value);
+#endif
+
+#elif defined(_M_ARM64) || defined(__arm64__) || defined(__aarch64__)
+#if CHOWDSP_USE_CUSTOM_JUCE_DSP
+    vst1q_f64 (ptr, vec.value);
+#else
+    auto* regPtr = reinterpret_cast<double*> (&vec.value);
+    std::copy (regPtr, regPtr + vec2::size(), ptr);
+#endif
+#else
+    // fallback implementation
+    auto* regPtr = reinterpret_cast<double*> (&vec.value);
+    std::copy (regPtr, regPtr + vec2::size(), ptr);
+#endif
+}
 } // namespace chowdsp::SIMDUtils

@@ -23,4 +23,10 @@ namespace chowdsp::FloatVectorOperations
 
 /** Finds the absolute maximum value in the given array */
 [[maybe_unused]] double findAbsoluteMaximum (const double* src, int numValues) noexcept;
+
+/** Takes the exponent of each value to an integer power */
+[[maybe_unused]] void integerPower (float* dest, const float* src, int exponent, int numValues) noexcept;
+
+/** Takes the exponent of each value to an integer power */
+[[maybe_unused]] void integerPower (double* dest, const double* src, int exponent, int numValues) noexcept;
 } // namespace chowdsp::FloatVectorOperations
