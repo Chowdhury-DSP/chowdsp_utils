@@ -65,6 +65,50 @@ public:
         }
     }
 
+    void antiderivativeTest()
+    {
+        {
+            float testArr[4];
+            chowdsp::Polynomials::antiderivative<2> ({ 1.0f, 2.0f, 1.0f }, testArr, -1.0f);
+            expectEquals (testArr[0], 1.0f / 3.0f, "Degree 3 is incorrect!");
+            expectEquals (testArr[1], 1.0f, "Degree 2 is incorrect!");
+            expectEquals (testArr[2], 1.0f, "Degree 1 is incorrect!");
+            expectEquals (testArr[3], -1.0f, "Degree 0 is incorrect!");
+        }
+
+        {
+            double testArr[7];
+            chowdsp::Polynomials::antiderivative<5> ({ 10.0, 2.0, 1.0, 0.0, -3.0, -2.5 }, testArr);
+            expectEquals (testArr[0], 10.0 / 6.0, "Degree 6 is incorrect!");
+            expectEquals (testArr[1], 2.0 / 5.0, "Degree 5 is incorrect!");
+            expectEquals (testArr[2], 1.0 / 4.0, "Degree 4 is incorrect!");
+            expectEquals (testArr[3], 0.0, "Degree 3 is incorrect!");
+            expectEquals (testArr[4], -3.0 / 2.0, "Degree 2 is incorrect!");
+            expectEquals (testArr[5], -2.5, "Degree 1 is incorrect!");
+            expectEquals (testArr[6], 0.0, "Degree 0 is incorrect!");
+        }
+    }
+
+    void derivativeTest()
+    {
+        {
+            float testArr[2];
+            chowdsp::Polynomials::derivative<2> ({ 1.0f, 2.0f, 1.0f }, testArr);
+            expectEquals (testArr[0], 2.0f, "Degree 1 is incorrect!");
+            expectEquals (testArr[1], 2.0f, "Degree 0 is incorrect!");
+        }
+
+        {
+            double testArr[5];
+            chowdsp::Polynomials::derivative<5> ({ 10.0, 2.0, 1.0, 0.0, -3.0, -2.5 }, testArr);
+            expectEquals (testArr[0], 50.0, "Degree 4 is incorrect!");
+            expectEquals (testArr[1], 8.0, "Degree 3 is incorrect!");
+            expectEquals (testArr[2], 3.0, "Degree 2 is incorrect!");
+            expectEquals (testArr[3], 0.0, "Degree 1 is incorrect!");
+            expectEquals (testArr[4], -3.0, "Degree 0 is incorrect!");
+        }
+    }
+
     void runTestTimed() override
     {
         const float float4[] = { 1.0f, 0.0f, -12.0f, 0.5f, 0.0f };
@@ -114,6 +158,12 @@ public:
         estrinsMethodTest<4> (vfloat4, testFloatVals);
         estrinsMethodTest<4> (double4, testVDoubleVals);
         estrinsMethodTest<7> (vdouble7, testVDoubleVals);
+
+        beginTest ("Antiderivative Test");
+        antiderivativeTest();
+
+        beginTest ("Derivative Test");
+        derivativeTest();
     }
 };
 

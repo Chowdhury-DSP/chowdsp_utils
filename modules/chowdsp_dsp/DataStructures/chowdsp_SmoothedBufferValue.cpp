@@ -45,7 +45,7 @@ template <typename FloatType, typename ValueSmoothingTypes>
 void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::process (int numSamples)
 {
     jassert (parameterHandle != nullptr);
-    process (*parameterHandle, numSamples);
+    process ((FloatType) *parameterHandle, numSamples);
 }
 
 template <typename FloatType, typename ValueSmoothingTypes>
