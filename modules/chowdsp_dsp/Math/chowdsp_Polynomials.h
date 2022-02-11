@@ -83,9 +83,20 @@ template <int ORDER, typename T>
 constexpr void antiderivative (const T (&coeffs)[ORDER + 1], T (&ad_coeffs)[ORDER + 2], T C = (T) 0)
 {
     for (int n = 0; n <= ORDER; ++n)
-        ad_coeffs[n + 1] = coeffs[n] / T (n + 1);
+        ad_coeffs[n] = coeffs[n] / T (ORDER + 1 - n);
 
-    ad_coeffs[0] = C;
+    ad_coeffs[ORDER + 1] = C;
+}
+
+/**
+ * Computes the coefficients of the derivative of a polynomial.
+ * Coefficients should be given in the form { a_n, a_n-1, ..., a_1, a_0 }
+ */
+template <int ORDER, typename T>
+constexpr void derivative (const T (&coeffs)[ORDER + 1], T (&d_coeffs)[ORDER])
+{
+    for (int n = 0; n < ORDER; ++n)
+        d_coeffs[n] = coeffs[n] * T (ORDER - n);
 }
 } // namespace chowdsp::Polynomials
 
