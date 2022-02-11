@@ -74,6 +74,19 @@ inline constexpr P<T, X> estrin (const T (&coeffs)[ORDER + 1], const X x)
         return estrin<ORDER / 2> (temp, x * x); // recurse!
     }
 }
+
+/**
+ * Computes the coefficients of the antiderivative of a polynomial.
+ * Coefficients should be given in the form { a_n, a_n-1, ..., a_1, a_0 }
+ */
+template <int ORDER, typename T>
+constexpr void antiderivative (const T (&coeffs)[ORDER + 1], T (&ad_coeffs)[ORDER + 2], T C = (T) 0)
+{
+    for (int n = 0; n <= ORDER; ++n)
+        ad_coeffs[n + 1] = coeffs[n] / T (n + 1);
+
+    ad_coeffs[0] = C;
+}
 } // namespace chowdsp::Polynomials
 
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
