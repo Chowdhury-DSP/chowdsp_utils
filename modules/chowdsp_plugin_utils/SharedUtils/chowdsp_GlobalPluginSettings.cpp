@@ -173,6 +173,12 @@ void GlobalPluginSettings::writeSettingsToFile()
     json settingsJson;
     settingsJson[settingsTag.data()] = globalProperties;
 
+    if (! settingsFile.existsAsFile())
+    {
+        settingsFile.deleteRecursively();
+        settingsFile.create();
+    }
+
     JSONUtils::toFile (settingsJson, settingsFile);
 }
 
