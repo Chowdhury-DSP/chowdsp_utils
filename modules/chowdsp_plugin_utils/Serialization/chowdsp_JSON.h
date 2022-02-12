@@ -53,6 +53,8 @@ namespace JSONUtils
     /** Dump a json object to a file */
     inline void toFile (const json& j, const juce::File& file)
     {
+        // You've gotta create the file before writing JSON to it!
+        jassert (file.existsAsFile());
         file.replaceWithText (j.dump());
     }
 
