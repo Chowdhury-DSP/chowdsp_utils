@@ -62,7 +62,9 @@ public:
     template <typename T>
     void absMaxTest (Random& r, Range<int> range)
     {
-        auto refAbsMax = [] (const auto& begin, const auto end) { return std::abs (*std::max_element (begin, end, [] (auto a, auto b) { return std::abs (a) < std::abs (b); })); };
+        auto refAbsMax = [] (const auto& begin, const auto end)
+        { return std::abs (*std::max_element (begin, end, [] (auto a, auto b)
+                                              { return std::abs (a) < std::abs (b); })); };
 
         auto numValues = r.nextInt (range);
         std::vector<T> values ((size_t) numValues, (T) 0);
@@ -95,7 +97,8 @@ public:
                 v = (T) (r.nextFloat() * 2.0f - 1.0f);
 
             constexpr auto maxErr = (T) 1.0e-6;
-            std::transform (inValues.begin(), inValues.end(), expValues.begin(), [exponent] (auto x) { return std::pow (x, (T) exponent); });
+            std::transform (inValues.begin(), inValues.end(), expValues.begin(), [exponent] (auto x)
+                            { return std::pow (x, (T) exponent); });
 
             {
                 chowdsp::FloatVectorOperations::integerPower (actualValues.data(), inValues.data(), exponent, numValues);
@@ -121,6 +124,34 @@ public:
                     expectWithinAbsoluteError (actualValues[i], expValues[i], maxErr, "Aligned value is incorrect!");
             }
         }
+    }
+
+    template <typename T>
+    void computeRMSTest (Random& r, Range<int> range)
+    {
+        auto idealRMS = [] (const auto* data, int numSamples)
+        {
+            T squareSum = (T) 0;
+            for (int i = 0; i < numSamples; ++i)
+                squareSum += data[i] * data[i];
+            return std::sqrt (squareSum / (T) numSamples);
+        };
+
+        auto numValues = r.nextInt (range);
+        std::vector<T> values ((size_t) numValues, (T) 0);
+
+        for (auto& v : values)
+            v = (T) (r.nextFloat() * 2.0f - 1.0f);
+
+        constexpr auto maxErr = (T) 1.0e-3;
+
+        auto actual = chowdsp::FloatVectorOperations::computeRMS (values.data(), numValues);
+        auto expected = idealRMS (values.data(), numValues);
+        expectWithinAbsoluteError (actual, expected, maxErr, "Aligned RMS is incorrect!");
+
+        actual = chowdsp::FloatVectorOperations::computeRMS (values.data() + 1, numValues - 1);
+        expected = idealRMS (values.data() + 1, numValues - 1);
+        expectWithinAbsoluteError (actual, expected, maxErr, "Unaligned RMS is incorrect!");
     }
 
     void runTestTimed() override
@@ -163,6 +194,14 @@ public:
         integerPowerTest<double> (rand, { 2, 4 });
         integerPowerTest<double> (rand, { 100, 200 });
         integerPowerTest<double> (rand, { 113, 114 });
+
+        beginTest ("RMS Test");
+        computeRMSTest<float> (rand, { 2, 6 });
+        computeRMSTest<float> (rand, { 100, 200 });
+        computeRMSTest<float> (rand, { 113, 114 });
+        computeRMSTest<double> (rand, { 2, 4 });
+        computeRMSTest<double> (rand, { 100, 200 });
+        computeRMSTest<double> (rand, { 113, 114 });
     }
 };
 
