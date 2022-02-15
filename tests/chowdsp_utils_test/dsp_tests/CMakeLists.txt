@@ -1,12 +1,14 @@
 target_sources(chowdsp_utils_tests PRIVATE
     BBDTest.cpp
     BypassTest.cpp
-    ConvolutionTest.cpp
     GainTest.cpp
     PannerTest.cpp
     PitchShiftTest.cpp
     SoftClipperTest.cpp
     TunerTest.cpp
+
+    convolution_tests/ConvolutionTest.cpp
+    convolution_tests/IRHelpersTest.cpp
 
     math_tests/FloatVectorOperationsTest.cpp
     math_tests/PolynomialsTest.cpp
