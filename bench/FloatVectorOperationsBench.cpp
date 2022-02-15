@@ -63,7 +63,8 @@ static void AbsMaxSTLFloat (benchmark::State& state)
 {
     for (auto _ : state)
     {
-        auto max = std::abs (*std::max_element (absMaxVecFloat.begin(), absMaxVecFloat.end(), [] (auto a, auto b) { return std::abs (a) < std::abs (b); }));
+        auto max = std::abs (*std::max_element (absMaxVecFloat.begin(), absMaxVecFloat.end(), [] (auto a, auto b)
+                                                { return std::abs (a) < std::abs (b); }));
         benchmark::DoNotOptimize (max);
     }
 }
@@ -78,5 +79,37 @@ static void AbsMaxChowFloat (benchmark::State& state)
     }
 }
 BENCHMARK (AbsMaxChowFloat);
+
+/** RMS benchmarks............................ */
+constexpr int rmsN = 10000;
+const auto rmsVecFloat = bench_utils::makeRandomVector<float> (rmsN);
+
+static void RMSSTLFloat (benchmark::State& state)
+{
+    auto idealRMS = [] (const auto* data, int numSamples)
+    {
+        float squareSum = 0.0f;
+        for (int i = 0; i < numSamples; ++i)
+            squareSum += data[i] * data[i];
+        return std::sqrt (squareSum / (float) numSamples);
+    };
+
+    for (auto _ : state)
+    {
+        auto sum = idealRMS (rmsVecFloat.data(), rmsN);
+        benchmark::DoNotOptimize (sum);
+    }
+}
+BENCHMARK (RMSSTLFloat);
+
+static void RMSChowFloat (benchmark::State& state)
+{
+    for (auto _ : state)
+    {
+        auto sum = chowdsp::FloatVectorOperations::computeRMS (rmsVecFloat.data(), rmsN);
+        benchmark::DoNotOptimize (sum);
+    }
+}
+BENCHMARK (RMSChowFloat);
 
 BENCHMARK_MAIN();

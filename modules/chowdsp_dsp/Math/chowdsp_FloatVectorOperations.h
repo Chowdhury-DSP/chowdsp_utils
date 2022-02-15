@@ -29,4 +29,10 @@ namespace chowdsp::FloatVectorOperations
 
 /** Takes the exponent of each value to an integer power */
 [[maybe_unused]] void integerPower (double* dest, const double* src, int exponent, int numValues) noexcept;
+
+/** Computes the Root-Mean-Square average of the input data.. */
+[[maybe_unused]] float computeRMS (const float* src, int numValues) noexcept;
+
+/** Computes the Root-Mean-Square average of the input data.. */
+[[maybe_unused]] double computeRMS (const double* src, int numValues) noexcept;
 } // namespace chowdsp::FloatVectorOperations
