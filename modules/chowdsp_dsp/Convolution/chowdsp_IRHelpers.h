@@ -14,4 +14,4 @@ namespace chowdsp::IRHelpers
  * @param fft               A shared FFT object to use for the computation
  */
 void makeLinearPhase (float* linearPhaseIR, const float* originalIR, int numSamples, juce::dsp::FFT& fft);
-}
+} // namespace chowdsp::IRHelpers

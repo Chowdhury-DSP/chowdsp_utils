@@ -24,8 +24,7 @@ void makeLinearPhase (float* linearPhaseIR, const float* originalIR, int numSamp
     std::generate (
         delayKernels.begin(),
         delayKernels.end(),
-        [numSamples, n = 0.0f, phaseIncrement]() mutable
-        {
+        [numSamples, n = 0.0f, phaseIncrement]() mutable {
             using namespace std::complex_literals;
             return std::exp (-1.0if * ((float) numSamples / 2) * (n++ * phaseIncrement));
         });
@@ -36,13 +35,11 @@ void makeLinearPhase (float* linearPhaseIR, const float* originalIR, int numSamp
         freqDomainData.end(),
         delayKernels.begin(),
         freqDomainData.begin(),
-        [] (auto H, auto phi)
-        { return phi * std::abs (H); });
+        [] (auto H, auto phi) { return phi * std::abs (H); });
 
     // perform inverse FFT
     fft.perform (freqDomainData.data(), timeDomainData.data(), true);
-    std::transform (timeDomainData.begin(), timeDomainData.end(), linearPhaseIR, [] (auto x)
-                    { return std::real (x); });
+    std::transform (timeDomainData.begin(), timeDomainData.end(), linearPhaseIR, [] (auto x) { return std::real (x); });
 
     // remove DC offset
     const auto hLinMean = FloatVectorOperations::accumulate (linearPhaseIR, numSamples) / (float) numSamples;

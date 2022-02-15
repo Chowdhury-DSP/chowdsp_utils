@@ -62,9 +62,7 @@ public:
     template <typename T>
     void absMaxTest (Random& r, Range<int> range)
     {
-        auto refAbsMax = [] (const auto& begin, const auto end)
-        { return std::abs (*std::max_element (begin, end, [] (auto a, auto b)
-                                              { return std::abs (a) < std::abs (b); })); };
+        auto refAbsMax = [] (const auto& begin, const auto end) { return std::abs (*std::max_element (begin, end, [] (auto a, auto b) { return std::abs (a) < std::abs (b); })); };
 
         auto numValues = r.nextInt (range);
         std::vector<T> values ((size_t) numValues, (T) 0);
@@ -97,8 +95,7 @@ public:
                 v = (T) (r.nextFloat() * 2.0f - 1.0f);
 
             constexpr auto maxErr = (T) 1.0e-6;
-            std::transform (inValues.begin(), inValues.end(), expValues.begin(), [exponent] (auto x)
-                            { return std::pow (x, (T) exponent); });
+            std::transform (inValues.begin(), inValues.end(), expValues.begin(), [exponent] (auto x) { return std::pow (x, (T) exponent); });
 
             {
                 chowdsp::FloatVectorOperations::integerPower (actualValues.data(), inValues.data(), exponent, numValues);
@@ -129,8 +126,7 @@ public:
     template <typename T>
     void computeRMSTest (Random& r, Range<int> range)
     {
-        auto idealRMS = [] (const auto* data, int numSamples)
-        {
+        auto idealRMS = [] (const auto* data, int numSamples) {
             T squareSum = (T) 0;
             for (int i = 0; i < numSamples; ++i)
                 squareSum += data[i] * data[i];

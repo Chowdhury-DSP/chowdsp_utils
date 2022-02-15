@@ -63,8 +63,7 @@ static void AbsMaxSTLFloat (benchmark::State& state)
 {
     for (auto _ : state)
     {
-        auto max = std::abs (*std::max_element (absMaxVecFloat.begin(), absMaxVecFloat.end(), [] (auto a, auto b)
-                                                { return std::abs (a) < std::abs (b); }));
+        auto max = std::abs (*std::max_element (absMaxVecFloat.begin(), absMaxVecFloat.end(), [] (auto a, auto b) { return std::abs (a) < std::abs (b); }));
         benchmark::DoNotOptimize (max);
     }
 }
@@ -86,8 +85,7 @@ const auto rmsVecFloat = bench_utils::makeRandomVector<float> (rmsN);
 
 static void RMSSTLFloat (benchmark::State& state)
 {
-    auto idealRMS = [] (const auto* data, int numSamples)
-    {
+    auto idealRMS = [] (const auto* data, int numSamples) {
         float squareSum = 0.0f;
         for (int i = 0; i < numSamples; ++i)
             squareSum += data[i] * data[i];
