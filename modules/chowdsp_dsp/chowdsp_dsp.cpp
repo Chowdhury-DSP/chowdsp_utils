@@ -30,6 +30,7 @@
 
 // convolution
 #include "Convolution/chowdsp_ConvolutionEngine.cpp"
+#include "Convolution/chowdsp_IRHelpers.cpp"
 
 // processors
 #include "Processors/chowdsp_Panner.cpp"

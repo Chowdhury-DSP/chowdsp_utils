@@ -128,6 +128,7 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 // convolution
 #include "Convolution/chowdsp_ConvolutionEngine.h"
 #include "Convolution/chowdsp_IRTransfer.h"
+#include "Convolution/chowdsp_IRHelpers.h"
 
 // filter tools
 #include "Filters/chowdsp_BilinearUtils.h"

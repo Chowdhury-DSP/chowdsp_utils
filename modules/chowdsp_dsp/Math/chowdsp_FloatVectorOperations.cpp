@@ -404,4 +404,34 @@ void integerPower (double* dest, const double* src, int exponent, int numValues)
 {
     integerPowerT (dest, src, exponent, numValues);
 }
+
+float computeRMS (const float* src, int numValues) noexcept
+{
+#if JUCE_USE_VDSP_FRAMEWORK
+    float result = 0.0f;
+    vDSP_rmsqv (src, 1, &result, (vDSP_Length) numValues);
+    return result;
+#else
+    const auto squareSum = detail::reduce (src,
+                                           numValues,
+                                           0.0f,
+                                           [] (auto prev, auto next) { return prev + next * next; });
+    return std::sqrt (squareSum / (float) numValues);
+#endif
+}
+
+double computeRMS (const double* src, int numValues) noexcept
+{
+#if JUCE_USE_VDSP_FRAMEWORK
+    double result = 0.0;
+    vDSP_rmsqvD (src, 1, &result, (vDSP_Length) numValues);
+    return result;
+#else
+    const auto squareSum = detail::reduce (src,
+                                           numValues,
+                                           0.0,
+                                           [] (auto prev, auto next) { return prev + next * next; });
+    return std::sqrt (squareSum / (double) numValues);
+#endif
+}
 } // namespace chowdsp::FloatVectorOperations
