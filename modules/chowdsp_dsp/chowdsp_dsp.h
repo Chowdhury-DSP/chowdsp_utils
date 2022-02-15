@@ -155,6 +155,7 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 #include "Resampling/chowdsp_VariableOversampling.h"
 
 // some other useful processors
+#include "Processors/chowdsp_AudioTimer.h"
 #include "Processors/chowdsp_BypassProcessor.h"
 #include "Processors/chowdsp_GainProcessor.h"
 #include "Processors/chowdsp_LevelDetector.h"
