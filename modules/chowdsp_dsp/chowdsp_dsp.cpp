@@ -33,4 +33,5 @@
 #include "Convolution/chowdsp_IRHelpers.cpp"
 
 // processors
+#include "Processors/chowdsp_AudioTimer.cpp"
 #include "Processors/chowdsp_Panner.cpp"

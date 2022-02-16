@@ -1,4 +1,5 @@
 target_sources(chowdsp_utils_tests PRIVATE
+    AudioTimerTest.cpp
     BBDTest.cpp
     BypassTest.cpp
     GainTest.cpp
