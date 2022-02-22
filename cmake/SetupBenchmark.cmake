@@ -1,3 +1,5 @@
+add_library(chowdsp_modules_benchmarks INTERFACE)
+
 # setup_benchmark(<target-name> <file-name>)
 #
 # Sets up a minimal benchmarking app
@@ -48,4 +50,6 @@ function(setup_benchmark target file)
                        POST_BUILD
                        COMMAND ${CMAKE_COMMAND} -E echo "copying $<TARGET_FILE:${target}> to ${PROJECT_BINARY_DIR}/${target}"
                        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${target}> ${PROJECT_BINARY_DIR}/${target})
+
+    target_link_libraries(chowdsp_modules_benchmarks INTERFACE ${target})
 endfunction(setup_benchmark)

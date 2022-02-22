@@ -1,4 +1,21 @@
-target_sources(chowdsp_utils_tests PRIVATE
+setup_juce_unit_test(chowdsp_dsp_unit_tests)
+
+# Test with libsamplerate (if available)
+find_package(samplerate)
+if (SAMPLERATE_FOUND)
+    message(STATUS "libsamplerate found")
+    target_link_libraries(chowdsp_dsp_unit_tests PRIVATE samplerate::samplerate)
+    target_compile_definitions(chowdsp_dsp_unit_tests PRIVATE CHOWDSP_USE_LIBSAMPLERATE=1)
+endif ()
+
+# Test with xsimd (if path is defined)
+if (XSIMD_PATH)
+    message(STATUS "Using XSIMD")
+    target_include_directories(chowdsp_dsp_unit_tests PRIVATE ${CMAKE_SOURCE_DIR}/${XSIMD_PATH}/include)
+    target_compile_definitions(chowdsp_dsp_unit_tests PRIVATE CHOWDSP_USE_XSIMD=1)
+endif ()
+
+target_sources(chowdsp_dsp_unit_tests PRIVATE
     AudioTimerTest.cpp
     BBDTest.cpp
     BypassTest.cpp

@@ -51,7 +51,7 @@ jobs:
       - name: Set up environment
         working-directory: ${{github.workspace}}
         run: |
-          git clone --depth 1 --branch 6.1.2 https://github.com/juce-framework/JUCE.git
+          git clone --depth 1 --branch 6.1.5 https://github.com/juce-framework/JUCE.git
           cd JUCE_modules
           git clone --single-branch --branch chowdsp https://github.com/Chowdhury-DSP/foleys_gui_magic.git
 
@@ -76,7 +76,7 @@ jobs:
       - name: Build
         working-directory: ${{env.WORK_DIR}}/build
         shell: bash
-        run: cmake --build . --config Release --parallel 4
+        run: cmake --build . --config Release --target chowdsp_modules_benchmarks --parallel 4
 
       - name: "Bench: Float Vector Operations"
         working-directory: ${{env.WORK_DIR}}/build

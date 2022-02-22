@@ -1,4 +1,12 @@
-target_sources(chowdsp_utils_tests PRIVATE
+setup_juce_unit_test(chowdsp_utils_unit_tests)
+
+juce_add_binary_data(UnitTestData SOURCES
+    presets_tests/test_preset.preset
+)
+
+target_link_libraries(chowdsp_utils_unit_tests PRIVATE UnitTestData)
+
+target_sources(chowdsp_utils_unit_tests PRIVATE
     AudioUIBackgroundTaskTest.cpp
     FileListenerTest.cpp
     GlobalSettingsTest.cpp
@@ -15,9 +23,3 @@ target_sources(chowdsp_utils_tests PRIVATE
     presets_tests/PresetManagerTest.cpp
     presets_tests/PresetTest.cpp
 )
-
-juce_add_binary_data(UnitTestData SOURCES
-    presets_tests/test_preset.preset
-)
-
-target_link_libraries(chowdsp_utils_tests PRIVATE UnitTestData)

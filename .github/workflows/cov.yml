@@ -54,7 +54,7 @@ jobs:
       - name: Set up environment
         working-directory: ${{github.workspace}}
         run: |
-          git clone --depth 1 --branch 6.1.2 https://github.com/juce-framework/JUCE.git
+          git clone --depth 1 --branch 6.1.5 https://github.com/juce-framework/JUCE.git
           cd JUCE_modules
           git clone --single-branch --branch chowdsp https://github.com/Chowdhury-DSP/foleys_gui_magic.git
 
@@ -83,7 +83,7 @@ jobs:
       - name: Test
         uses: GabrielBB/xvfb-action@v1
         with:
-          run: ctest -C Debug -V
+          run: ctest -j4 -C Debug -V
           working-directory: ${{env.WORK_DIR}}/build
 
       - name: Collect Coverage Data

@@ -1,3 +1,3 @@
 cd build
 cmake --build . --parallel
-ctest -j2 -C Debug -V
+ctest -j4 -C Debug -V
