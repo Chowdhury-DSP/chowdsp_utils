@@ -2,7 +2,6 @@
 
 namespace chowdsp
 {
-
 juce::String StandardInfoProvider::getManufacturerString()
 {
 #if defined JucePlugin_Manufacturer
