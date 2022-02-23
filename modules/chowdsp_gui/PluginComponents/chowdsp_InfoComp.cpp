@@ -1,17 +1,8 @@
-#include "chowdsp_InfoComp.h"
-
 namespace chowdsp
 {
-InfoComp::InfoComp (const juce::AudioProcessor::WrapperType pluginWrapperType) : wrapperType (pluginWrapperType),
-#if defined JucePlugin_Manufacturer
-#if defined JucePlugin_ManufacturerWebsite
-                                                                                 linkButton (JucePlugin_Manufacturer, juce::URL (JucePlugin_ManufacturerWebsite))
-#else
-                                                                                 linkButton (JucePlugin_Manufacturer, juce::URL ("https://chowdsp.com"))
-#endif
-#else
-                                                                                 linkButton ("Manu", juce::URL ("https://website.com"))
-#endif
+template <typename InfoProvider, typename ProcType>
+InfoComp<InfoProvider, ProcType>::InfoComp (const ProcType& processor) : proc (processor),
+                                                                         linkButton (InfoProvider::getManufacturerString(), InfoProvider::getManufacturerWebsiteURL())
 {
     setColour (text1ColourID, juce::Colours::grey);
     setColour (text2ColourID, juce::Colours::white);
@@ -19,18 +10,15 @@ InfoComp::InfoComp (const juce::AudioProcessor::WrapperType pluginWrapperType) :
     addAndMakeVisible (linkButton);
 }
 
-void InfoComp::paint (juce::Graphics& g)
+template <typename InfoProvider, typename ProcType>
+void InfoComp<InfoProvider, ProcType>::paint (juce::Graphics& g)
 {
     auto width = (float) getWidth() - 10.0f;
 
     using namespace SystemInfo;
-    auto platformStr = juce::String (getOSDescription().data()) + "-" + juce::String (getProcArch().data()) + ", ";
-    auto typeStr = juce::String (juce::AudioProcessor::getWrapperTypeDescription (wrapperType)) + ", ";
-#if defined JucePlugin_VersionString
-    auto versionStr = "v" + juce::String (JucePlugin_VersionString) + " ";
-#else
-    auto versionStr = juce::String ("No Version ");
-#endif
+    auto platformStr = InfoProvider::getPlatformString() + ", ";
+    auto typeStr = InfoProvider::getWrapperTypeString (proc) + ", ";
+    auto versionStr = InfoProvider::getVersionString() + " ";
     auto dspStr = juce::String ("~ DSP by ");
     auto totalStr = platformStr + typeStr + versionStr + dspStr + linkButton.getButtonText();
 
@@ -46,7 +34,8 @@ void InfoComp::paint (juce::Graphics& g)
     auto font = g.getCurrentFont();
     auto b = getLocalBounds();
 
-    auto drawText = [=, &g, &b] (const juce::String& text) {
+    auto drawText = [=, &g, &b] (const juce::String& text)
+    {
         auto w = font.getStringWidth (text);
         g.drawFittedText (text, b.removeFromLeft (w), juce::Justification::left, 1);
     };
@@ -66,16 +55,18 @@ void InfoComp::paint (juce::Graphics& g)
     linkButton.setColour (juce::HyperlinkButton::ColourIds::textColourId, findColour (text2ColourID));
     resized();
 
-#if JUCE_DEBUG
-    g.fillAll (juce::Colours::red);
-    g.setColour (juce::Colours::yellow);
-    g.setFont (juce::Font ((float) getHeight()).boldened());
-    g.drawFittedText ("DEBUG", getLocalBounds(), juce::Justification::centred, 1);
-    linkButton.setVisible (false);
-#endif
+    if constexpr (InfoProvider::showDebugFlag())
+    {
+        g.fillAll (juce::Colours::red);
+        g.setColour (juce::Colours::yellow);
+        g.setFont (juce::Font ((float) getHeight()).boldened());
+        g.drawFittedText ("DEBUG", getLocalBounds(), juce::Justification::centred, 1);
+        linkButton.setVisible (false);
+    }
 }
 
-void InfoComp::resized()
+template <typename InfoProvider, typename ProcType>
+void InfoComp<InfoProvider, ProcType>::resized()
 {
     linkButton.setBounds (linkX, 0, 100, getHeight());
 }
