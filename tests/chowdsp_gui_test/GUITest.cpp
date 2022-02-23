@@ -43,7 +43,7 @@ public:
         titleComp->setStrings ("Title", "subtitle", 18.0f);
         tabs.addTab ("Tab1", Colours::darkkhaki, titleComp.release(), true);
 
-        auto infoComp = std::make_unique<chowdsp::InfoComp> (AudioProcessor::WrapperType::wrapperType_AAX);
+        auto infoComp = std::make_unique<chowdsp::InfoComp<>> (dummy);
         tabs.addTab ("Tab2", Colours::darksalmon, infoComp.release(), true);
 
         addAndMakeVisible (tabs);
