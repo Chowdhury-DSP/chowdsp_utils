@@ -3,11 +3,12 @@
 namespace chowdsp
 {
 /** A simple component to display the type, version, and manufacturer of a plugin */
+template <typename InfoProvider = StandardInfoProvider, typename ProcType = juce::AudioProcessor>
 class InfoComp : public juce::Component
 {
 public:
     /** Creates an Info component for the given plugin wrapper type */
-    explicit InfoComp (const juce::AudioProcessor::WrapperType wrapperType);
+    explicit InfoComp (const ProcType& processor);
 
     enum ColourIDs
     {
@@ -19,7 +20,7 @@ public:
     void resized() override;
 
 private:
-    const juce::AudioProcessor::WrapperType wrapperType;
+    const ProcType& proc;
     juce::HyperlinkButton linkButton;
 
     int linkX = 0;
@@ -30,19 +31,24 @@ private:
 #if CHOWDSP_USE_FOLEYS_CLASSES
 // LCOV_EXCL_START
 /** Foley's GUI wrapper for InfoComp */
+template <typename InfoProvider = StandardInfoProvider, typename ProcType = juce::AudioProcessor>
 class InfoItem : public foleys::GuiItem
 {
+    using ItemType = InfoItem<InfoProvider, ProcType>;
+
 public:
-    FOLEYS_DECLARE_GUI_FACTORY (InfoItem)
+    FOLEYS_DECLARE_GUI_FACTORY (ItemType)
 
     InfoItem (foleys::MagicGUIBuilder& builder, const juce::ValueTree& node) : foleys::GuiItem (builder, node)
     {
         setColourTranslation ({
-            { "text1", InfoComp::text1ColourID },
-            { "text2", InfoComp::text2ColourID },
+            { "text1", InfoComp<InfoProvider, ProcType>::text1ColourID },
+            { "text2", InfoComp<InfoProvider, ProcType>::text2ColourID },
         });
 
-        infoComp = std::make_unique<InfoComp> (builder.getMagicState().getProcessor()->wrapperType);
+        auto* proc = dynamic_cast<ProcType*> (builder.getMagicState().getProcessor());
+        jassert (proc != nullptr); // wrong type of processor!
+        infoComp = std::make_unique<InfoComp<InfoProvider, ProcType>> (*proc);
         addAndMakeVisible (infoComp.get());
     }
 
@@ -56,7 +62,7 @@ public:
     }
 
 private:
-    std::unique_ptr<InfoComp> infoComp;
+    std::unique_ptr<InfoComp<InfoProvider, ProcType>> infoComp;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (InfoItem)
 };
@@ -64,3 +70,5 @@ private:
 #endif // CHOWDSP_USE_FOLEYS_CLASSES
 
 } // namespace chowdsp
+
+#include "chowdsp_InfoComp.cpp"
