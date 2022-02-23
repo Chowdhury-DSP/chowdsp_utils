@@ -11,7 +11,7 @@ inline void registerGUIClasses (std::unique_ptr<foleys::MagicGUIBuilder>& builde
 {
     builder->registerLookAndFeel ("MyLNF", std::make_unique<ChowLNF>());
     builder->registerFactory ("TooltipComp", &TooltipItem::factory);
-    builder->registerFactory ("InfoComp", &InfoItem::factory);
+    builder->registerFactory ("InfoComp", &InfoItem<>::factory);
     builder->registerFactory ("TitleComp", &TitleItem::factory);
 }
 

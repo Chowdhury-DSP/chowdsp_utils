@@ -71,7 +71,9 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 #include "Helpers/chowdsp_PopupMenuHelper.h"
 #include "Helpers/chowdsp_OpenGLHelper.h"
 
-#include "PluginComponents/chowdsp_SystemInfo.h"
+#include "InfoUtils/chowdsp_InfoProvider.h"
+#include "InfoUtils/chowdsp_SystemInfo.h"
+
 #include "PluginComponents/chowdsp_InfoComp.h"
 #include "PluginComponents/chowdsp_OversamplingMenu.h"
 #include "PluginComponents/chowdsp_TitleComp.h"
