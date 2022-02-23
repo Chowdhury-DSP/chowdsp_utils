@@ -2,7 +2,7 @@ namespace chowdsp
 {
 template <typename InfoProvider, typename ProcType>
 InfoComp<InfoProvider, ProcType>::InfoComp (const ProcType& processor) : proc (processor),
-                                                                         linkButton (InfoProvider::getManufacturer(), InfoProvider::getManufacturerWebsiteURL())
+                                                                         linkButton (InfoProvider::getManufacturerString(), InfoProvider::getManufacturerWebsiteURL())
 {
     setColour (text1ColourID, juce::Colours::grey);
     setColour (text2ColourID, juce::Colours::white);
@@ -34,7 +34,8 @@ void InfoComp<InfoProvider, ProcType>::paint (juce::Graphics& g)
     auto font = g.getCurrentFont();
     auto b = getLocalBounds();
 
-    auto drawText = [=, &g, &b] (const juce::String& text) {
+    auto drawText = [=, &g, &b] (const juce::String& text)
+    {
         auto w = font.getStringWidth (text);
         g.drawFittedText (text, b.removeFromLeft (w), juce::Justification::left, 1);
     };

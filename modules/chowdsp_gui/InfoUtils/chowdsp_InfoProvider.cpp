@@ -38,13 +38,4 @@ juce::String StandardInfoProvider::getWrapperTypeString (const juce::AudioProces
 {
     return juce::String { juce::AudioProcessor::getWrapperTypeDescription (proc.wrapperType) };
 }
-
-constexpr bool StandardInfoProvider::showDebugFlag()
-{
-#if JUCE_DEBUG
-    return true;
-#else
-    return false;
-#endif
-}
 } // namespace chowdsp

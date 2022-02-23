@@ -24,6 +24,13 @@ struct StandardInfoProvider
     static juce::String getWrapperTypeString (const juce::AudioProcessor& proc);
 
     /** Returns true if a "debug" flag should be shown */
-    static constexpr bool showDebugFlag();
+    static constexpr bool showDebugFlag()
+    {
+#if JUCE_DEBUG
+        return true;
+#else
+        return false;
+#endif
+    }
 };
 } // namespace chowdsp
