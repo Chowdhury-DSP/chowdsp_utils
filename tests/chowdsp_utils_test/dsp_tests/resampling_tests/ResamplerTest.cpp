@@ -5,6 +5,7 @@ namespace
 constexpr float origSampleRate = 48000.0;
 constexpr int origNumSamples = 4800;
 constexpr int origBlockSize = 480;
+constexpr int origBlockSizeLong = 3200;
 constexpr float testSRRatios[] = { 1.0f, 2.0f, 1.5f, 0.5f, 0.667f };
 } // namespace
 
@@ -62,7 +63,7 @@ public:
     }
 
     template <typename RType>
-    void testResampler (float freq, double avgErrLimit, double maxErrLimit)
+    void testResampler (float freq, double avgErrLimit, double maxErrLimit, bool longBlock = false)
     {
         std::vector<float> inData;
         gen_sine (inData, freq, origSampleRate, origNumSamples);
@@ -74,9 +75,14 @@ public:
 
             std::vector<float> out (size_t (origNumSamples * ratio) + 1, 0.0f);
 
+            const auto blockSizeToUse = size_t (longBlock ? origBlockSizeLong : origBlockSize);
             size_t out_ptr = 0;
-            for (size_t i = 0; i + origBlockSize < inData.size(); i += origBlockSize)
-                out_ptr += resampler.process (&inData[i], &out[out_ptr], origBlockSize);
+            for (size_t i = 0; i < inData.size();)
+            {
+                auto samplesToProcess = jmin (blockSizeToUse, inData.size() - i);
+                out_ptr += resampler.process (&inData[i], &out[out_ptr], samplesToProcess);
+                i += samplesToProcess;
+            }
 
             auto [avgError, maxError] = calc_error (freq, outSampleRate, out, (int) out_ptr);
             expectLessThan (avgError, avgErrLimit, "Avg. Error is too large! Sample rate: " + String (outSampleRate));
@@ -228,6 +234,9 @@ public:
 
         beginTest ("Lanczos Wide");
         testResampler<LanczosResampler<4096, 32>> (100.0f, 0.01, 0.05);
+
+        beginTest ("Lanczos Short, Large BlockSize");
+        testResampler<LanczosResampler<2048>> (100.0f, 0.01, 0.05, true);
 
         beginTest ("Resampler Reset Test (Lanczos)");
         resamplerResetTest<LanczosResampler<>>();

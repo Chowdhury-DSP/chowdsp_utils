@@ -25,7 +25,7 @@ jobs:
         include:
           - os: ubuntu-latest
             cmake_args: "-DCMAKE_BUILD_TYPE=Release -DXSIMD_PATH=../xsimd"
-          - os: windows-latest
+          - os: windows-2019
             cmake_args: ""
           - os: macos-latest
             cmake_args: "-DCMAKE_BUILD_TYPE=Release -DXSIMD_PATH=../xsimd"
