@@ -82,22 +82,19 @@ public:
          */
     size_t process (const float* input, float* output, size_t numSamples) noexcept override
     {
-        // If the number of input samples is larger than the BUFFER_SIZE, then we need to process in pieces to avoid buffer overrun
-        if (numSamples >= BUFFER_SIZE)
+        // If the number of input samples is too large, then we need to process in pieces to avoid buffer overrun
+        if (numSamples > BUFFER_SIZE / 2)
         {
-            int samplesGenerated = 0;
-            for (int i = 0; i < numSamples;)
+            size_t samplesGenerated = 0;
+            for (size_t samplesProcessed = 0; samplesProcessed < numSamples;)
             {
-                int samplesToProcess = juce::jmin (numSamples - i, BUFFER_SIZE - 1);
-                samplesGenerated += process (input + i, output + i, samplesToProcess);
-                i += samplesToProcess;
+                auto samplesToProcess = juce::jmin (numSamples - samplesProcessed, BUFFER_SIZE / 2);
+                samplesGenerated += process (input + samplesProcessed, output + samplesGenerated, samplesToProcess);
+                samplesProcessed += samplesToProcess;
             }
 
             return samplesGenerated;
         }
-
-        // unless this condition is true, unexpected behaviour will ensue!! (buffer overflow...)
-        jassert (numSamples < BUFFER_SIZE);
 
         renormalizePhases();
 
