@@ -44,7 +44,13 @@ struct ConvolutionEngine
     /** Creates a new convolution engine for a given IR, note that while future IRs
         may be loaded into this engine, the IR size MUST stay the same.
      */
-    ConvolutionEngine (const float* samples, size_t numSamples, size_t maxBlockSize);
+    ConvolutionEngine (size_t numSamples, size_t maxBlockSize, const float* initialIR = nullptr);
+
+    /** Move constructor */
+    ConvolutionEngine (ConvolutionEngine&&) noexcept;
+
+    /** Move assignment operator */
+    ConvolutionEngine& operator= (ConvolutionEngine&& other) noexcept;
 
     // resets the state of this convolution
     void reset();
@@ -83,6 +89,8 @@ struct ConvolutionEngine
 
     juce::AudioBuffer<float> bufferInput, bufferOutput, bufferTempOutput, bufferOverlap;
     std::vector<juce::AudioBuffer<float>> buffersInputSegments, buffersImpulseSegments;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ConvolutionEngine)
 };
 
 } // namespace chowdsp
