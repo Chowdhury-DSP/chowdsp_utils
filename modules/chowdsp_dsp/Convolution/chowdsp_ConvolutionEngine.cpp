@@ -2,9 +2,7 @@
 
 namespace chowdsp
 {
-ConvolutionEngine::ConvolutionEngine (const float* samples,
-                                      size_t numSamples,
-                                      size_t maxBlockSize)
+ConvolutionEngine::ConvolutionEngine (size_t numSamples, size_t maxBlockSize, const float* initialIR)
     : irNumSamples (numSamples),
       blockSize ((size_t) juce::nextPowerOfTwo ((int) maxBlockSize)),
       fftSize (blockSize > 128 ? 2 * blockSize : 4 * blockSize),
@@ -21,9 +19,37 @@ ConvolutionEngine::ConvolutionEngine (const float* samples,
     updateSegmentsIfNecessary (numInputSegments, buffersInputSegments, fftSize);
     updateSegmentsIfNecessary (numSegments, buffersImpulseSegments, fftSize);
 
-    setNewIR (samples);
+    if (initialIR != nullptr)
+        setNewIR (initialIR);
 
     reset();
+}
+
+ConvolutionEngine::ConvolutionEngine (ConvolutionEngine&& other) noexcept : irNumSamples (other.irNumSamples),
+                                                                            blockSize (other.blockSize),
+                                                                            fftSize (other.fftSize),
+                                                                            fftObject (std::move (const_cast<std::unique_ptr<juce::dsp::FFT>&> (other.fftObject))),
+                                                                            numSegments (other.numSegments),
+                                                                            numInputSegments (other.numInputSegments),
+                                                                            currentSegment (other.currentSegment),
+                                                                            inputDataPos (other.inputDataPos),
+                                                                            bufferInput (std::move (other.bufferInput)),
+                                                                            bufferOutput (std::move (other.bufferOutput)),
+                                                                            bufferTempOutput (std::move (other.bufferTempOutput)),
+                                                                            bufferOverlap (std::move (other.bufferOverlap)),
+                                                                            buffersInputSegments (std::move (other.buffersInputSegments)),
+                                                                            buffersImpulseSegments (std::move (other.buffersImpulseSegments))
+{
+}
+
+ConvolutionEngine& ConvolutionEngine::operator= (ConvolutionEngine&& other) noexcept
+{
+    if (this != &other)
+    {
+        this->~ConvolutionEngine();
+        new (this) ConvolutionEngine (std::move (other));
+    }
+    return *this;
 }
 
 void ConvolutionEngine::updateSegmentsIfNecessary (size_t numSegmentsToUpdate, std::vector<juce::AudioBuffer<float>>& segments, size_t fftSize)
@@ -33,7 +59,7 @@ void ConvolutionEngine::updateSegmentsIfNecessary (size_t numSegmentsToUpdate, s
         || (size_t) segments[0].getNumSamples() != fftSize * 2)
     {
         segments.clear();
-
+        segments.reserve (numSegmentsToUpdate);
         for (size_t i = 0; i < numSegmentsToUpdate; ++i)
             segments.emplace_back (1, static_cast<int> (fftSize * 2));
     }
