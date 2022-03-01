@@ -25,10 +25,28 @@ public:
             expectWithinAbsoluteError (irData[i], idealIR[i], 1.0e-6f, "Linear phase IR value is incorrect!");
     }
 
+    void minimumPhaseTest()
+    {
+        constexpr int pow2Factor = 4;
+        constexpr int irLength = 1 << pow2Factor;
+
+        dsp::FFT fft { pow2Factor };
+        float irData[irLength] = { 0.0f, 0.16666667f, 0.33333333f, 0.5f, 0.66666667f, 0.83333333f, 1.0f, 1.0f, 0.85714286f, 0.71428571f, 0.57142857f, 0.42857143f, 0.28571429f, 0.14285714f, 0.0f, 0.0f };
+
+        chowdsp::IRHelpers::makeMinimumPhase (irData, irData, irLength, fft);
+
+        static constexpr float idealIR[] = { 0.13861501f, 0.32544317f, 0.52749507f, 0.66966621f, 0.79626566f, 0.92809213f, 0.9691116f, 0.8975361f, 0.75961539f, 0.60798622f, 0.46236642f, 0.31255422f, 0.163782f, 0.04407101f, -0.03153687f, -0.07106336f };
+        for (int i = 0; i < irLength; ++i)
+            expectWithinAbsoluteError (irData[i], idealIR[i], 1.0e-6f, "Linear phase IR value is incorrect!");
+    }
+
     void runTestTimed() override
     {
         beginTest ("Linear Phase Test");
         linearPhaseTest();
+
+        beginTest ("Minumum Phase Test");
+        minimumPhaseTest();
     }
 };
 
