@@ -2,7 +2,6 @@
 
 namespace chowdsp
 {
-
 /** Implementations of methods commonly used in combinatorics */
 namespace Combinatorics
 {

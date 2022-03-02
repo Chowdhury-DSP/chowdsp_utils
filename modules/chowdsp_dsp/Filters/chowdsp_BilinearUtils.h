@@ -20,8 +20,8 @@ struct BilinearTransform
 
         for (int j = 0; j < N; ++j)
         {
-            T val_b{};
-            T val_a{};
+            T val_b {};
+            T val_a {};
             T k_val = (T) 1;
 
             for (int i = 0; i < N; ++i)
