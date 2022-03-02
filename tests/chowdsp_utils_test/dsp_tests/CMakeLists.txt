@@ -27,6 +27,7 @@ target_sources(chowdsp_utils_tests PRIVATE
     source_tests/SawtoothTest.cpp
     source_tests/SquareTest.cpp
 
+    filter_tests/BilinearUtilsTest.cpp
     filter_tests/FirstOrderFiltersTest.cpp
     filter_tests/ModalFilterTest.cpp
     filter_tests/NthOrderFilterTest.cpp
