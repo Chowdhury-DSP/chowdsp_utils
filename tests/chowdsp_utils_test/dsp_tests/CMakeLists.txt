@@ -11,6 +11,7 @@ target_sources(chowdsp_utils_tests PRIVATE
     convolution_tests/ConvolutionTest.cpp
     convolution_tests/IRHelpersTest.cpp
 
+    math_tests/CombinatoricsTest.cpp
     math_tests/FloatVectorOperationsTest.cpp
     math_tests/PolynomialsTest.cpp
     math_tests/PowerTest.cpp
