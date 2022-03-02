@@ -11,6 +11,7 @@ target_sources(chowdsp_utils_tests PRIVATE
     convolution_tests/ConvolutionTest.cpp
     convolution_tests/IRHelpersTest.cpp
 
+    math_tests/CombinatoricsTest.cpp
     math_tests/FloatVectorOperationsTest.cpp
     math_tests/PolynomialsTest.cpp
     math_tests/PowerTest.cpp
@@ -26,6 +27,7 @@ target_sources(chowdsp_utils_tests PRIVATE
     source_tests/SawtoothTest.cpp
     source_tests/SquareTest.cpp
 
+    filter_tests/BilinearUtilsTest.cpp
     filter_tests/FirstOrderFiltersTest.cpp
     filter_tests/ModalFilterTest.cpp
     filter_tests/NthOrderFilterTest.cpp

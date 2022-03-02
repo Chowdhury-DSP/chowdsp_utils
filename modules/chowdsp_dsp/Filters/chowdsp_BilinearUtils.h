@@ -9,12 +9,56 @@
  */
 namespace chowdsp::Bilinear
 {
-/** Dummy generic bilinear transform */
-template <typename T, size_t N>
+/** Bilinear transform for a (N-1)-order filter */
+template <typename T, int N>
 struct BilinearTransform
 {
-    // @TODO: actually implement this
-    static inline void call (T (&b)[N], T (&a)[N], const T (&bs)[N], const T (&as)[N], T K);
+    static inline void call (T (&b)[N], T (&a)[N], const T (&bs)[N], const T (&as)[N], T K)
+    {
+        using Combinatorics::combination, Power::ipow;
+        constexpr int M = N - 1;
+
+        for (int j = 0; j < N; ++j)
+        {
+            T val_b{};
+            T val_a{};
+            T k_val = (T) 1;
+
+            for (int i = 0; i < N; ++i)
+            {
+                int n1_pow = 1;
+                for (int k = 0; k < i + 1; ++k)
+                {
+                    const auto comb_i_k = combination (i, k);
+                    const auto k_pow = k_val * n1_pow;
+
+                    for (int l = 0; l < N - i; ++l)
+                    {
+                        if (k + l != j)
+                            continue;
+
+                        const auto coeff_mult = comb_i_k * combination (M - i, l) * k_pow;
+                        val_b += coeff_mult * bs[M - i];
+                        val_a += coeff_mult * as[M - i];
+                    }
+
+                    n1_pow *= -1;
+                }
+
+                k_val *= K;
+            }
+
+            b[j] = val_b;
+            a[j] = val_a;
+        }
+
+        // normalize coefficients
+        for (int j = N - 1; j >= 0; --j)
+        {
+            b[j] /= a[0];
+            a[j] /= a[0];
+        }
+    }
 };
 
 /** Bilinear transform for a first-order filter */
