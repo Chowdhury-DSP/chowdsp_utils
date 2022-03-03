@@ -15,7 +15,8 @@ public:
 
         Component comp;
         chowdsp::PopupMenuHelper popupMenu;
-        popupMenu.popupMenuCallback = [&] (PopupMenu&, PopupMenu::Options&) { hasPopupMenuShown = true; };
+        popupMenu.popupMenuCallback = [&] (PopupMenu&, PopupMenu::Options&)
+        { hasPopupMenuShown = true; };
         popupMenu.setAssociatedComponent (&comp);
 
         callback (popupMenu, comp);
@@ -32,13 +33,15 @@ public:
 
         beginTest ("Normal Mouse-Click Test");
         checkPopupMenu (false,
-                        [&] (auto& menuHelper, auto& comp) {
+                        [&] (auto& menuHelper, auto& comp)
+                        {
                             menuHelper.mouseDown (createDummyMouseEvent (&comp));
                         });
 
         beginTest ("RMB Mouse-Click Test");
         checkPopupMenu (true,
-                        [&] (auto& menuHelper, auto& comp) {
+                        [&] (auto& menuHelper, auto& comp)
+                        {
                             ModifierKeys mods { ModifierKeys::Flags::rightButtonModifier };
                             auto mouseEvent = createDummyMouseEvent (&comp, mods);
                             menuHelper.mouseDown (mouseEvent);
@@ -46,8 +49,9 @@ public:
 
         beginTest ("Long-Press Test");
         checkPopupMenu (true,
-                        [&] (auto& menuHelper, auto& comp) {
-                            menuHelper.setLongPressEnabled (true);
+                        [&] (auto& menuHelper, auto& comp)
+                        {
+                            menuHelper.setLongPressSourceTypes ({ MouseInputSource::mouse });
                             expect (menuHelper.isLongPressEnabled(), "Long-presses should be enabled!");
 
                             auto& longPress = menuHelper.getLongPressActionHelper();
@@ -58,9 +62,10 @@ public:
 
         beginTest ("Short-Press Test");
         checkPopupMenu (false,
-                        [&] (auto& menuHelper, auto& comp) {
-                            menuHelper.setLongPressEnabled (true);
-                            expect (menuHelper.isLongPressEnabled(), "Long-presses should be enabled!");
+                        [&] (auto& menuHelper, auto& comp)
+                        {
+                            menuHelper.setLongPressSourceTypes ({ MouseInputSource::mouse });
+                            expect (menuHelper.isLongPressEnabled (MouseInputSource::mouse), "Long-presses should be enabled for mouse source type!");
 
                             auto& longPress = menuHelper.getLongPressActionHelper();
                             longPress.mouseDown (createDummyMouseEvent (&comp));

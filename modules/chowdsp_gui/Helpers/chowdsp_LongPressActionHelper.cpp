@@ -28,9 +28,9 @@ void LongPressActionHelper::setAssociatedComponent (juce::Component* comp)
         component->addMouseListener (this, false);
 }
 
-void LongPressActionHelper::startPress (const juce::Point<int>& newDownPosition)
+void LongPressActionHelper::startPress (const juce::Point<int>& newDownPosition, PressSourceType pressType)
 {
-    if (! isEnabled)
+    if (! allowedInputSourceTypes.contains (pressType))
         return;
 
     pressStarted = true;
@@ -47,7 +47,7 @@ void LongPressActionHelper::abortPress()
 
 void LongPressActionHelper::mouseDown (const juce::MouseEvent& e)
 {
-    startPress (e.getMouseDownPosition());
+    startPress (e.getMouseDownPosition(), e.source.getType());
 }
 
 void LongPressActionHelper::mouseDrag (const juce::MouseEvent& e)

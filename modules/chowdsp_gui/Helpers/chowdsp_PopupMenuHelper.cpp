@@ -8,11 +8,8 @@ PopupMenuHelper::PopupMenuHelper() : PopupMenuHelper (LongPressActionHelper::Par
 
 PopupMenuHelper::PopupMenuHelper (const LongPressActionHelper::Parameters& params) : longPress (params)
 {
-#if ! JUCE_IOS
-    setLongPressEnabled (false);
-#endif
-
-    longPress.longPressCallback = [=] (juce::Point<int>) { showPopupMenu(); };
+    longPress.longPressCallback = [=] (juce::Point<int>)
+    { showPopupMenu(); };
 }
 
 PopupMenuHelper::~PopupMenuHelper()
