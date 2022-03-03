@@ -28,14 +28,17 @@ public:
     /** Use this method to manually trigger the popup menu */
     void showPopupMenu();
 
-    /**
-     * Set if long-press actions should trigger popup menus.
-     * By default, this flag is true on iOS, and false otherwise.
-     */
-    void setLongPressEnabled (bool shouldBeEnabled) { longPress.setLongPressActionEnabled (shouldBeEnabled); }
-
-    /** Returns true if long-press actions should trigger popup menus */
+    /** Returns true if long-press actions should trigger popup menus for any input source */
     bool isLongPressEnabled() const { return longPress.isLongPressActionEnabled(); }
+
+    /** Returns true if long-press actions should trigger popup menus for the given input source */
+    bool isLongPressEnabled (LongPressActionHelper::PressSourceType type) const { return longPress.isLongPressActionEnabled (type); }
+
+    /**
+     * Set if long-press actions should trigger popup menus for the given input source types.
+     * By default, long-presses will trigger popup menus for touch and pen input soruces.
+     */
+    void setLongPressSourceTypes (juce::Array<LongPressActionHelper::PressSourceType>&& types) { longPress.setLongPressSourceTypes (std::move (types)); }
 
     /** Overrides a MouseListener callback */
     void mouseDown (const juce::MouseEvent& e) override;

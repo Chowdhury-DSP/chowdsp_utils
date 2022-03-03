@@ -12,6 +12,9 @@ class LongPressActionHelper : private juce::Timer,
                               private juce::MouseListener
 {
 public:
+    /** Types of input sources that can be used as presses */
+    using PressSourceType = juce::MouseInputSource::InputSourceType;
+
     /** Parameters for determining whether a long-press has occured */
     struct Parameters
     {
@@ -35,7 +38,7 @@ public:
     void setAssociatedComponent (juce::Component* comp);
 
     /** Manually start a press at a given position */
-    void startPress (const juce::Point<int>& newDownPosition);
+    void startPress (const juce::Point<int>& newDownPosition, PressSourceType pressType = PressSourceType::mouse);
 
     /** Manually abort a press that is in-progress */
     void abortPress();
@@ -46,11 +49,14 @@ public:
     /** Updates how far the mouse has been dragged since the press began */
     void setDragDistance (float newDistance) { dragDistance = newDistance; }
 
-    /** Returns true if long-press actions are enabled */
-    bool isLongPressActionEnabled() const { return isEnabled; }
+    /** Returns true if long-press actions are enabled for any input source */
+    bool isLongPressActionEnabled() const { return ! allowedInputSourceTypes.isEmpty(); }
 
-    /** Use this function to enable/disable long-press actions */
-    void setLongPressActionEnabled (bool shouldBeEnabled) { isEnabled = shouldBeEnabled; }
+    /** Returns true if long-press actions are enabled for the given input source */
+    bool isLongPressActionEnabled (PressSourceType type) const { return allowedInputSourceTypes.contains (type); }
+
+    /** Use this function to enable/disable long-press actions for various input types */
+    void setLongPressSourceTypes (juce::Array<PressSourceType>&& types) { allowedInputSourceTypes = std::move (types); }
 
     /** Overrides a MouseListener callback */
     void mouseDown (const juce::MouseEvent& e) override;
@@ -73,7 +79,7 @@ private:
     const float dragDistanceThreshold;
     const int pressLengthMs;
 
-    bool isEnabled = true;
+    juce::Array<PressSourceType> allowedInputSourceTypes { PressSourceType::touch, PressSourceType::pen };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LongPressActionHelper)
 };
