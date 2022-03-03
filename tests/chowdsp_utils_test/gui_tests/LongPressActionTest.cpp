@@ -50,7 +50,7 @@ public:
                         [this] (auto& longPress) {
                             longPress.startPress (Point<int> {});
                             expect (longPress.isBeingPressed(), "Press should be started!");
-                            MessageManager::getInstance()->runDispatchLoopUntil (200);
+                            MessageManager::getInstance()->runDispatchLoopUntil (100);
                             longPress.abortPress();
                         });
 
@@ -91,7 +91,7 @@ public:
                             longPress.setAssociatedComponent (&comp);
 
                             longPress.mouseDown (createDummyMouseEvent (&comp));
-                            MessageManager::getInstance()->runDispatchLoopUntil (200);
+                            MessageManager::getInstance()->runDispatchLoopUntil (100);
                             longPress.mouseUp (createDummyMouseEvent (&comp));
 
                             longPress.setAssociatedComponent (nullptr);
