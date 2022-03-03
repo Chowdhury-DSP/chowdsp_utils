@@ -23,8 +23,7 @@ void transformIRFreqDomain (float* targetIR, const float* originalIR, int numSam
 
     // perform inverse FFT
     fft.perform (freqDomainData.data(), timeDomainData.data(), true);
-    std::transform (timeDomainData.begin(), timeDomainData.end(), targetIR, [] (auto x)
-                    { return std::real (x); });
+    std::transform (timeDomainData.begin(), timeDomainData.end(), targetIR, [] (auto x) { return std::real (x); });
 
     if (removeDCBias) // remove DC offset
     {
@@ -46,8 +45,7 @@ void makeLinearPhase (float* linearPhaseIR, const float* originalIR, int numSamp
         originalIR,
         numSamples,
         fft,
-        [numSamples] (auto& freqDomainData)
-        {
+        [numSamples] (auto& freqDomainData) {
             // compute delay kernels
             std::vector<std::complex<float>> delayKernels ((size_t) numSamples, std::complex<float> {});
             const auto phaseIncrement = juce::MathConstants<float>::twoPi / float (numSamples - 1);
@@ -63,8 +61,7 @@ void makeLinearPhase (float* linearPhaseIR, const float* originalIR, int numSamp
                 freqDomainData.end(),
                 delayKernels.begin(),
                 freqDomainData.begin(),
-                [] (auto H, auto phi)
-                { return phi * std::abs (H); });
+                [] (auto H, auto phi) { return phi * std::abs (H); });
         },
         true,
         true);
@@ -77,10 +74,8 @@ void makeMinimumPhase (float* minimumPhaseIR, const float* originalIR, int numSa
         originalIR,
         numSamples,
         fft,
-        [numSamples, &fft] (auto& freqDomainData)
-        {
-            auto hilbert = [&fft] (std::complex<float>* output, const std::complex<float>* input, int nSamples)
-            {
+        [numSamples, &fft] (auto& freqDomainData) {
+            auto hilbert = [&fft] (std::complex<float>* output, const std::complex<float>* input, int nSamples) {
                 std::vector<std::complex<float>> H ((size_t) nSamples, std::complex<float> {});
                 fft.perform (input, H.data(), false);
 
@@ -94,16 +89,14 @@ void makeMinimumPhase (float* minimumPhaseIR, const float* originalIR, int numSa
                 std::transform (H.begin(),
                                 H.begin() + halfN + modN,
                                 H.begin(),
-                                [] (auto X)
-                                {
+                                [] (auto X) {
                                     using namespace std::complex_literals;
                                     return 1.0if * X;
                                 });
                 std::transform (H.begin() + halfN + 1,
                                 H.end(),
                                 H.begin() + halfN + 1,
-                                [] (auto X)
-                                {
+                                [] (auto X) {
                                     using namespace std::complex_literals;
                                     return -1.0if * X;
                                 });
@@ -115,16 +108,14 @@ void makeMinimumPhase (float* minimumPhaseIR, const float* originalIR, int numSa
                 freqDomainData.begin(),
                 freqDomainData.end(),
                 freqDomainData.begin(),
-                [] (auto H)
-                { return std::abs (H); });
+                [] (auto H) { return std::abs (H); });
 
             std::vector<std::complex<float>> arg_H ((size_t) numSamples, std::complex<float> {});
             std::transform (
                 freqDomainData.begin(),
                 freqDomainData.end(),
                 arg_H.begin(),
-                [] (auto H)
-                { return std::log (H); });
+                [] (auto H) { return std::log (H); });
 
             hilbert (arg_H.data(), arg_H.data(), numSamples);
 
@@ -133,8 +124,7 @@ void makeMinimumPhase (float* minimumPhaseIR, const float* originalIR, int numSa
                 freqDomainData.end(),
                 arg_H.begin(),
                 freqDomainData.begin(),
-                [] (auto H, auto arg_H_val)
-                {
+                [] (auto H, auto arg_H_val) {
                     using namespace std::complex_literals;
                     return H * std::exp (1.0if * arg_H_val);
                 });
