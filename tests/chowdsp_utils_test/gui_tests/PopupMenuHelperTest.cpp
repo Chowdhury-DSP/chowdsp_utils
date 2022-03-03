@@ -47,7 +47,7 @@ public:
         beginTest ("Long-Press Test");
         checkPopupMenu (true,
                         [&] (auto& menuHelper, auto& comp) {
-                            menuHelper.setLongPressEnabled (true);
+                            menuHelper.setLongPressSourceTypes ({ MouseInputSource::mouse });
                             expect (menuHelper.isLongPressEnabled(), "Long-presses should be enabled!");
 
                             auto& longPress = menuHelper.getLongPressActionHelper();
@@ -59,8 +59,8 @@ public:
         beginTest ("Short-Press Test");
         checkPopupMenu (false,
                         [&] (auto& menuHelper, auto& comp) {
-                            menuHelper.setLongPressEnabled (true);
-                            expect (menuHelper.isLongPressEnabled(), "Long-presses should be enabled!");
+                            menuHelper.setLongPressSourceTypes ({ MouseInputSource::mouse });
+                            expect (menuHelper.isLongPressEnabled (MouseInputSource::mouse), "Long-presses should be enabled for mouse source type!");
 
                             auto& longPress = menuHelper.getLongPressActionHelper();
                             longPress.mouseDown (createDummyMouseEvent (&comp));
