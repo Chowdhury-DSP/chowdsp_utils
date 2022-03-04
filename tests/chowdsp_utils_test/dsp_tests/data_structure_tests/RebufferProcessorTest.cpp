@@ -37,7 +37,7 @@ public:
 
         TestProcessor proc;
         proc.ut = this;
-        
+
         dsp::ProcessSpec spec { fs, (uint32) inputBlockSize, uint32 (fewerChannels ? 2 : 1) };
         proc.prepare (spec);
 
