@@ -17,10 +17,10 @@ public:
     {
         rebufferSize = prepareRebuffering (spec);
 
-        const int numChannels = (int) spec.numChannels;
+        numChannelsAllocated = (int) spec.numChannels;
 
         for (auto& buffer : reBuffers)
-            buffer.setSize (numChannels, rebufferSize);
+            buffer.setSize (numChannelsAllocated, rebufferSize);
 
         reset();
     }
@@ -38,18 +38,25 @@ public:
     /** Processes a block of audio data */
     void processBlock (juce::AudioBuffer<FloatType>& buffer) noexcept
     {
+        const auto numChannels = buffer.getNumChannels();
         const auto numSamples = buffer.getNumSamples();
+
+        jassert (numChannels <= numChannelsAllocated); // too many input channels!
+
+        // Just in case we're prepared for 2 channels, but the caller only wants 1 channel
+        for (auto& b : reBuffers)
+            b.setSize (numChannels, rebufferSize, true, false, true);
 
         // buffer size is small enough to process all at once
         if (numSamples <= rebufferSize)
             return processInternal (buffer);
 
         // buffer needs to be processed in smaller parts
-        juce::AudioBuffer<float> shortBuffer (buffer.getArrayOfWritePointers(), buffer.getNumChannels(), 0, rebufferSize);
+        juce::AudioBuffer<float> shortBuffer (buffer.getArrayOfWritePointers(), numChannels, 0, rebufferSize);
         processInternal (shortBuffer);
 
         juce::AudioBuffer<float> leftoverBuffer (buffer.getArrayOfWritePointers(),
-                                                 buffer.getNumChannels(),
+                                                 numChannels,
                                                  rebufferSize,
                                                  numSamples - rebufferSize);
         processBlock (leftoverBuffer);
@@ -110,6 +117,7 @@ private:
     }
 
     int rebufferSize = 0;
+    int numChannelsAllocated = 0;
 
     juce::AudioBuffer<float> reBuffers[2];
     int bufferCount = 0;
