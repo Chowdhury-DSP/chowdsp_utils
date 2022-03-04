@@ -16,6 +16,7 @@
 
 // data structures
 #include "DataStructures/chowdsp_LookupTableTransform.cpp"
+#include "DataStructures/chowdsp_RebufferedProcessor.cpp"
 #include "DataStructures/chowdsp_SmoothedBufferValue.cpp"
 
 // filters
