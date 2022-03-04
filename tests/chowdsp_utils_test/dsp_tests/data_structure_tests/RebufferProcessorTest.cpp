@@ -13,26 +13,32 @@ public:
 
     struct TestProcessor : public chowdsp::RebufferedProcessor<float>
     {
-        int prepareRebuffering (const juce::dsp::ProcessSpec& spec) override
+        int prepareRebuffering (const juce::dsp::ProcessSpec&) override
         {
-            ignoreUnused (spec);
             return rebufferedBlockSize;
         }
 
         void processRebufferedBlock (AudioBuffer<float>& buffer) override
         {
+            ut->expectEquals (buffer.getNumChannels(), 1, "Number of channels is incorrect!");
+            ut->expectEquals (buffer.getNumSamples(), rebufferedBlockSize, "Block size is incorrect!");
+
             buffer.applyGain (2.0f);
         }
+
+        TimedUnitTest* ut = nullptr;
     };
 
-    void rebufferTest (int inputBlockSize)
+    void rebufferTest (int inputBlockSize, bool fewerChannels = false)
     {
         constexpr double fs = 48000.0f;
         constexpr int numBlocks = 10;
         auto buffer = test_utils::makeSineWave (100.0f, (float) fs, inputBlockSize * numBlocks);
 
         TestProcessor proc;
-        dsp::ProcessSpec spec { fs, (uint32) inputBlockSize, 1 };
+        proc.ut = this;
+        
+        dsp::ProcessSpec spec { fs, (uint32) inputBlockSize, uint32 (fewerChannels ? 2 : 1) };
         proc.prepare (spec);
 
         AudioBuffer<float> refBuffer (1, buffer.getNumSamples());
@@ -64,6 +70,9 @@ public:
 
         beginTest ("Longer Blocks Test");
         rebufferTest (rebufferedBlockSize + 200);
+
+        beginTest ("Fewer Channels Test");
+        rebufferTest (rebufferedBlockSize, true);
     }
 };
 
