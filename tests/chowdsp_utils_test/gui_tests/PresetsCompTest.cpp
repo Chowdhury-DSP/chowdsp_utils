@@ -213,8 +213,10 @@ public:
         beginTest ("Load Preset Test");
         loadPresetTest();
 
+#if ! JUCE_WINDOWS
         beginTest ("Background Thread Test");
         backgroundThreadTest();
+#endif
     }
 };
 
