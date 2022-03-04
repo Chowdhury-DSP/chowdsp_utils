@@ -108,7 +108,7 @@ public:
             for (size_t ptr = 0; ptr < testOutput.size(); ptr += irSize)
                 eng.processSamplesWithAddedLatency (testOutput.data() + ptr, testOutput.data() + ptr, irSize);
 
-            checkAccuracy (testOutput.data() + (int) irSize, testIR.data(), irSize, 1.0e-6f);
+            checkAccuracy (testOutput.data() + (int) irSize, testIR.data(), (int) irSize, 1.0e-6f);
         };
 
         JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wself-move")
