@@ -52,7 +52,7 @@ public:
     {
         FloatType y = z[1] + x * b[0];
 
-        for (int i = 1; i < order; ++i)
+        for (size_t i = 1; i < order; ++i)
             z[i] = z[i + 1] + x * b[i] - y * a[i];
 
         z[order] = x * b[order] - y * a[order];
