@@ -26,7 +26,7 @@ struct SimpleTask : chowdsp::AudioUIBackgroundTask
 
         if (wasReset)
         {
-            ut->expectWithinAbsoluteError (mag, mags[prevIndex], 0.0f, "Magnitude after reset is incorrect!");
+            ut->expectWithinAbsoluteError (mag, 0.0f, 0.1f, "Magnitude after reset is incorrect!");
             wasReset.store (false);
         }
         else
@@ -101,7 +101,7 @@ public:
 
             task.reset();
             task.wasReset.store (true);
-            expectWithinAbsoluteError (task.mag, mags[task.prevIndex], 0.0f, "Magnitude after reset is incorrect!");
+            expectWithinAbsoluteError (task.mag, 0.0f, 0.1f, "Magnitude after reset is incorrect!");
 
             while (magsIndex < mags.size() - 1)
             {
