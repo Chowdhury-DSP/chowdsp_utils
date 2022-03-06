@@ -36,6 +36,15 @@ void AudioUIBackgroundTask::prepare (double sampleRate, int samplesPerBlock, int
         startThread();
 }
 
+void AudioUIBackgroundTask::reset()
+{
+    for (auto& buffer : data)
+        buffer.clear();
+
+    writePosition = 0;
+    resetTask();
+}
+
 void AudioUIBackgroundTask::pushSamples (int channel, const float* samples, int numSamples)
 {
     data[(size_t) channel].push (samples, numSamples);

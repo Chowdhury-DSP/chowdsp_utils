@@ -24,6 +24,9 @@ public:
     /** Prepares the class to accept a new audio stream */
     void prepare (double sampleRate, int samplesPerBlock, int numChannels);
 
+    /** Reset's the task state */
+    void reset();
+
     /** Call this from the audio thread to push a new block of samples */
     void pushSamples (const juce::AudioBuffer<float>& buffer);
 
@@ -44,6 +47,12 @@ protected:
      * in that field as well.
      */
     virtual void prepareTask (double /*sampleRate*/, int /*samplesPerBlock*/, int& blockSizeToRequest, int& customRefreshTimeMs) = 0;
+
+    /**
+     * If you task needs to reset any state, override
+     * this method and reset the state here!
+     */
+    virtual void resetTask() {}
 
     /** Child classes must override this method to actually do the background task */
     virtual void runTask (const juce::AudioBuffer<float>& /*data*/) = 0;

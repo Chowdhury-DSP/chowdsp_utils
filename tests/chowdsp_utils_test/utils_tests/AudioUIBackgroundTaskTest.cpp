@@ -23,7 +23,16 @@ struct SimpleTask : chowdsp::AudioUIBackgroundTask
             return;
 
         mag = buffer.getMagnitude (0, buffer.getNumSamples());
-        ut->expectWithinAbsoluteError (mag, mags[prevIndex], 0.1f, "Magnitude is incorrect!");
+
+        if (wasReset)
+        {
+            ut->expectWithinAbsoluteError (mag, 0.0f, 0.1f, "Magnitude after reset is incorrect!");
+            wasReset.store (false);
+        }
+        else
+        {
+            ut->expectWithinAbsoluteError (mag, mags[prevIndex], 0.1f, "Magnitude is incorrect!");
+        }
 
         prevIndex.store (magsIndex->load());
         readyForInc = true;
@@ -34,6 +43,7 @@ struct SimpleTask : chowdsp::AudioUIBackgroundTask
     std::atomic<size_t> prevIndex {};
     std::atomic<size_t>* magsIndex = nullptr;
     float mag = 0.0f;
+    std::atomic_bool wasReset { false };
 };
 } // namespace
 
@@ -83,6 +93,16 @@ public:
 
         std::atomic_bool uiThreadFinished { false };
         Thread::launch ([&] { // fake UI thread
+            while (magsIndex < mags.size() / 2)
+            {
+                expectWithinAbsoluteError (task.mag, mags[task.prevIndex], 0.1f, "Magnitude read from UI thread is incorrect!");
+                Thread::sleep (1);
+            }
+
+            task.reset();
+            task.wasReset.store (true);
+            expectWithinAbsoluteError (task.mag, 0.0f, 0.1f, "Magnitude after reset is incorrect!");
+
             while (magsIndex < mags.size() - 1)
             {
                 expectWithinAbsoluteError (task.mag, mags[task.prevIndex], 0.1f, "Magnitude read from UI thread is incorrect!");
