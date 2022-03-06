@@ -48,6 +48,12 @@ protected:
      */
     virtual void prepareTask (double /*sampleRate*/, int /*samplesPerBlock*/, int& blockSizeToRequest, int& customRefreshTimeMs) = 0;
 
+    /**
+     * If you task needs to reset any state, override
+     * this method and reset the state here!
+     */
+    virtual void resetTask() {}
+
     /** Child classes must override this method to actually do the background task */
     virtual void runTask (const juce::AudioBuffer<float>& /*data*/) = 0;
 

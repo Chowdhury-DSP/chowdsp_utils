@@ -42,6 +42,7 @@ void AudioUIBackgroundTask::reset()
         buffer.clear();
 
     writePosition = 0;
+    resetTask();
 }
 
 void AudioUIBackgroundTask::pushSamples (int channel, const float* samples, int numSamples)
