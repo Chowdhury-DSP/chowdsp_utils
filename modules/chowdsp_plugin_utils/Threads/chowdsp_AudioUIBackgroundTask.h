@@ -24,6 +24,9 @@ public:
     /** Prepares the class to accept a new audio stream */
     void prepare (double sampleRate, int samplesPerBlock, int numChannels);
 
+    /** Reset's the task state */
+    void reset();
+
     /** Call this from the audio thread to push a new block of samples */
     void pushSamples (const juce::AudioBuffer<float>& buffer);
 
