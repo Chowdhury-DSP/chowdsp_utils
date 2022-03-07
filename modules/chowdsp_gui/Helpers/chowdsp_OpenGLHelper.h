@@ -37,13 +37,13 @@ public:
     void detach();
 
     /** Returns true if the OpenGL context is currently attached. */
-    bool isAttached() const noexcept { return attached; }
+    [[nodiscard]] bool isAttached() const noexcept { return attached; }
 
     /** Sets the component to attach an OpenGL context to. */
     void setComponent (juce::Component* component);
 
     /** Returns the currently attached component, or nullptr. */
-    juce::Component* getComponent() const noexcept { return component.getComponent(); }
+    [[nodiscard]] juce::Component* getComponent() const noexcept { return component.getComponent(); }
 
 #if JUCE_MODULE_AVAILABLE_juce_opengl
     /** Returns the OpenGL context. */

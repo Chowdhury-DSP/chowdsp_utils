@@ -22,7 +22,7 @@ public:
     void processBlock (juce::AudioBuffer<FloatType>& buffer) noexcept;
 
     /** Returns the latency (samples) introduced by this processor */
-    virtual int getLatencySamples() const noexcept { return rebufferSize; }
+    [[nodiscard]] virtual int getLatencySamples() const noexcept { return rebufferSize; }
 
 protected:
     /**

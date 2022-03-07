@@ -42,7 +42,7 @@ public:
         curGain = gain;
     }
 
-    float getGain() const noexcept { return curGain; }
+    [[nodiscard]] float getGain() const noexcept { return curGain; }
 
 private:
     float curGain = 1.0f;

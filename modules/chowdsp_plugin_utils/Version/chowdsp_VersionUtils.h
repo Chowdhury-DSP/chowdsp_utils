@@ -12,7 +12,7 @@ public:
     Version (const Version&) = default;
     Version& operator= (const Version&) = default;
 
-    juce::String getVersionString() const;
+    [[nodiscard]] juce::String getVersionString() const;
 
     friend bool operator== (const Version& v1, const Version& v2) noexcept;
     friend bool operator!= (const Version& v1, const Version& v2) noexcept;

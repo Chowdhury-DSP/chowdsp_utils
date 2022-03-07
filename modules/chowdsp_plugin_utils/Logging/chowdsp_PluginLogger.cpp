@@ -12,17 +12,6 @@ namespace logger_detail
     const juce::String crashString = "Plugin crashing!!!";
     const juce::String crashExaminedString = "The crash in this log file is now being examined!";
 
-    struct LogFileComparator
-    {
-        static int compareElements (juce::File first, juce::File second)
-        {
-            const auto firstTime = first.getLastModificationTime().toMilliseconds();
-            const auto secondTime = second.getLastModificationTime().toMilliseconds();
-
-            return firstTime < secondTime ? 1 : -1;
-        }
-    };
-
     using FileArray = juce::Array<juce::File>;
     FileArray getLogFilesSorted (const PluginLogger::LoggerParams& params)
     {
@@ -36,9 +25,18 @@ namespace logger_detail
         const auto numLogFiles = logFilesDir.getNumberOfChildFiles (juce::File::findFiles, logFileWildcard);
         logFiles.ensureStorageAllocated (numLogFiles);
 
-        LogFileComparator comparator; // sort (newest files first)
         for (const auto& entry : juce::RangedDirectoryIterator (logFilesDir, false, logFileWildcard))
-            logFiles.addSorted (comparator, entry.getFile());
+            logFiles.add (entry.getFile());
+
+        //sort logFiles (newest first)
+        std::sort (logFiles.begin(),
+                   logFiles.end(),
+                   [] (const auto& first, const auto& second)
+                   {
+                       const auto firstTime = first.getLastModificationTime().toMilliseconds();
+                       const auto secondTime = second.getLastModificationTime().toMilliseconds();
+                       return firstTime < secondTime;
+                   });
 
         return logFiles;
     }
@@ -134,7 +132,8 @@ void PluginLogger::defaultCrashLogAnalyzer (const juce::File& logFile)
                 "A previous instance of this plugin has crashed! Would you like to view the log file?")
             .withButton ("Show Log File")
             .withButton ("Cancel");
-    juce::AlertWindow::showAsync (alertOptions, [logFile] (int result) {
+    juce::AlertWindow::showAsync (alertOptions, [logFile] (int result)
+                                  {
         if (result == 1)
             logFile.startAsProcess(); });
 }

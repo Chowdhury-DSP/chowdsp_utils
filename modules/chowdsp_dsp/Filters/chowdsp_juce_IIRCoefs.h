@@ -344,12 +344,12 @@ struct Coefficients : public juce::dsp::ProcessorState
 
     //==============================================================================
     /** Returns the filter order associated with the coefficients */
-    constexpr size_t getFilterOrder() const noexcept { return order; }
+    [[nodiscard]] constexpr size_t getFilterOrder() const noexcept { return order; }
 
     /** Returns the magnitude frequency response of the filter for a given frequency
         and sample rate
     */
-    double getMagnitudeForFrequency (double frequency, double sampleRate) const noexcept
+    [[nodiscard]] double getMagnitudeForFrequency (double frequency, double sampleRate) const noexcept
     {
         constexpr juce::dsp::Complex<double> j (0, 1);
         const auto* coefs = coefficients.begin();
@@ -416,7 +416,7 @@ struct Coefficients : public juce::dsp::ProcessorState
     /** Returns the phase frequency response of the filter for a given frequency and
         sample rate
     */
-    double getPhaseForFrequency (double frequency, double sampleRate) const noexcept
+    [[nodiscard]] double getPhaseForFrequency (double frequency, double sampleRate) const noexcept
     {
         constexpr juce::dsp::Complex<double> j (0, 1);
         const auto* coefs = coefficients.begin();

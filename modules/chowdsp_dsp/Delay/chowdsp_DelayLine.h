@@ -39,7 +39,7 @@ public:
     virtual ~DelayLineBase() = default;
 
     virtual void setDelay (NumericType /* newDelayInSamples */) = 0;
-    virtual NumericType getDelay() const = 0;
+    [[nodiscard]] virtual NumericType getDelay() const = 0;
 
     virtual void prepare (const juce::dsp::ProcessSpec& /* spec */) = 0;
     virtual void reset() = 0;

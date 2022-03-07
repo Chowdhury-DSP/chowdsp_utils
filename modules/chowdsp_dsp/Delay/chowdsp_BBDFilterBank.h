@@ -147,7 +147,7 @@ public:
         poles = Complex4 (pole_real, pole_imag);
     }
 
-    inline float calcH0() const noexcept { return -1.0f * gCoef.real().sum(); }
+    [[nodiscard]] inline float calcH0() const noexcept { return -1.0f * gCoef.real().sum(); }
 
     inline void set_freq (float freq)
     {
