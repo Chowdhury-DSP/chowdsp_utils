@@ -44,8 +44,8 @@ namespace NoiseHelpers
     inline vec2 uniform01 (juce::Random& r) noexcept
     {
         double sample alignas (16)[vec2::size()];
-        for (size_t i = 0; i < vec2::size(); ++i)
-            sample[i] = r.nextDouble();
+        for (auto& x : sample)
+            x = r.nextDouble();
 
         return vec2::fromRawArray (sample);
     }
@@ -55,8 +55,8 @@ namespace NoiseHelpers
     inline vec4 uniform01 (juce::Random& r) noexcept
     {
         float sample alignas (16)[vec4::size()];
-        for (size_t i = 0; i < vec4::size(); ++i)
-            sample[i] = r.nextFloat();
+        for (auto& x : sample)
+            x = r.nextFloat();
 
         return vec4::fromRawArray (sample);
     }
