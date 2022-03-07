@@ -77,8 +77,8 @@ class WDFWrapper : public WDF<T>
 {
 public:
     template <typename... Args>
-    explicit WDFWrapper (std::string name, Args&&... args) : WDF<T> (name),
-                                                             internalWDF (std::forward<Args> (args)...)
+    explicit WDFWrapper (const std::string& name, Args&&... args) : WDF<T> (name),
+                                                                    internalWDF (std::forward<Args> (args)...)
     {
         calcImpedance();
     }
@@ -114,7 +114,7 @@ class WDFRootWrapper : public WDFWrapper<T, WDFType>
 {
 public:
     template <typename Next, typename... Args>
-    WDFRootWrapper (std::string name, Next& next, Args&&... args) : WDFWrapper<T, WDFType> (name, std::forward<Args> (args)...)
+    WDFRootWrapper (const std::string& name, Next& next, Args&&... args) : WDFWrapper<T, WDFType> (name, std::forward<Args> (args)...)
     {
         next.connectToNode (this);
         calcImpedance();

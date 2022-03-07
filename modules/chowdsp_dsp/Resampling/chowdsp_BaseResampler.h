@@ -23,7 +23,7 @@ public:
     virtual void setResampleRatio (float newRatio) = 0;
 
     /** Returns the ratio of the output sample rate over input sample rate */
-    virtual float getResampleRatio() const noexcept = 0;
+    [[nodiscard]] virtual float getResampleRatio() const noexcept = 0;
 
     /** Processes a buffer of samples
      * 

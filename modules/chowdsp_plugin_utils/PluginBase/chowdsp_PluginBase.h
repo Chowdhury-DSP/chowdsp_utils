@@ -19,12 +19,12 @@ public:
     ~PluginBase() override = default;
 
 #if defined JucePlugin_Name
-    const juce::String getName() const override
+    const juce::String getName() const override // NOLINT(readability-const-return-type): Needs to return a const String for override compatibility
     {
         return JucePlugin_Name;
     }
 #else
-    const juce::String getName() const override
+    const juce::String getName() const override // NOLINT(readability-const-return-type): Needs to return a const String for override compatibility
     {
         return juce::String();
     }
@@ -165,7 +165,7 @@ void PluginBase<Processor>::setCurrentProgram (int index)
 }
 
 template <class Processor>
-const juce::String PluginBase<Processor>::getProgramName (int index)
+const juce::String PluginBase<Processor>::getProgramName (int index) // NOLINT(readability-const-return-type): Needs to return a const String for override compatibility
 {
     if (presetManager == nullptr || ! usePresetManagerForPluginInterface)
         return {};
@@ -225,7 +225,7 @@ void PluginBase<Processor>::setStateInformation (const void* data, int sizeInByt
 #else
     std::unique_ptr<juce::XmlElement> xmlState (getXmlFromBinary (data, sizeInBytes));
 
-    if (xmlState.get() != nullptr)
+    if (xmlState != nullptr)
         if (xmlState->hasTagName (vts.state.getType()))
             vts.replaceState (juce::ValueTree::fromXml (*xmlState));
 #endif

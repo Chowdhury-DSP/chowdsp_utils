@@ -109,10 +109,10 @@ public:
         beginTest ("Basic Log Test");
         basicLogTest();
 
+#if ! JUCE_LINUX
         beginTest ("Limit Num Log Files Test");
         limitNumLogFilesTest();
 
-#if ! JUCE_LINUX
         beginTest ("Crash Log Test");
         crashLogTest();
 #endif

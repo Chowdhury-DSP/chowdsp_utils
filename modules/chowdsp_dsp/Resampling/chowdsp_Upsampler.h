@@ -46,7 +46,7 @@ public:
     }
 
     /** Returns the current upsampling ratio */
-    int getUpsamplingRatio() const noexcept { return ratio; }
+    [[nodiscard]] int getUpsamplingRatio() const noexcept { return ratio; }
 
     /**
      * Process a single-channel block of data

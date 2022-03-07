@@ -34,7 +34,7 @@ public:
     void setRampLength (double rampLengthSeconds);
 
     /** Returns true if the value is currently being smoothed */
-    bool isSmoothing() const noexcept { return smoother.isSmoothing(); }
+    [[nodiscard]] bool isSmoothing() const noexcept { return smoother.isSmoothing(); }
 
     /**
      * Process smoothing for the current parameter handle.
@@ -49,7 +49,7 @@ public:
     void process (FloatType value, int numSamples);
 
     /** Returns a pointer to the current smoothed buffer. */
-    const FloatType* getSmoothedBuffer() const { return buffer.getReadPointer (0); }
+    [[nodiscard]] const FloatType* getSmoothedBuffer() const { return buffer.getReadPointer (0); }
 
 private:
     juce::AudioBuffer<FloatType> buffer;

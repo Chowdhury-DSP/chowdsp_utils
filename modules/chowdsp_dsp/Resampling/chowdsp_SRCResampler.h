@@ -27,7 +27,7 @@ public:
     void setResampleRatio (float newRatio) override { ratio = static_cast<double> (newRatio); }
 
     /** Returns the ratio of the output sample rate over input sample rate */
-    float getResampleRatio() const noexcept override { return (float) ratio; }
+    [[nodiscard]] float getResampleRatio() const noexcept override { return (float) ratio; }
 
     /** Processes a buffer of samples
      * 

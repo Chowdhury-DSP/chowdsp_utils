@@ -19,13 +19,13 @@ public:
     void advance (int numSamples);
 
     /** Return the current time in samples. */
-    juce::int64 getTimeSamples() const noexcept;
+    [[nodiscard]] juce::int64 getTimeSamples() const noexcept;
 
     /** Return the current time in milliseconds. */
-    double getTimeMilliseconds() const noexcept;
+    [[nodiscard]] double getTimeMilliseconds() const noexcept;
 
     /** Return the current time in seconds. */
-    double getTimeSeconds() const noexcept;
+    [[nodiscard]] double getTimeSeconds() const noexcept;
 
 private:
     double sampleTimeSeconds = 0.0;

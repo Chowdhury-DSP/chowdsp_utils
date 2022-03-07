@@ -13,7 +13,7 @@ public:
     virtual void listenerFileChanged() = 0;
 
     /** Returns the file that is currently being listened to. */
-    const juce::File& getListenerFile() const noexcept { return fileToListenTo; }
+    [[nodiscard]] const juce::File& getListenerFile() const noexcept { return fileToListenTo; }
 
 private:
     void timerCallback() override;

@@ -26,10 +26,10 @@ public:
     }
 
     /** Returns the current size of the buffer */
-    int size() const noexcept { return (int) internal.size() / 2; }
+    [[nodiscard]] int size() const noexcept { return (int) internal.size() / 2; }
 
     /** Returns the current position of the buffer's write pointer */
-    int getWritePointer() const noexcept { return writePointer; }
+    [[nodiscard]] int getWritePointer() const noexcept { return writePointer; }
 
     /**
      * Allows the buffer to be resized, with a given default value.
@@ -59,7 +59,7 @@ public:
     }
 
     /** Returns a pointer to the buffer data, with a given starting position */
-    const T* data (int start = 0) const noexcept
+    [[nodiscard]] const T* data (int start = 0) const noexcept
     {
         // need to give the buffer some size before trying to read!
         jassert (size() > 0);

@@ -75,7 +75,7 @@ public:
     void reset();
 
     /** Returns the oversampling factor currently in use */
-    int getOSFactor() const noexcept { return (int) oversamplers[curOS]->getOversamplingFactor(); }
+    [[nodiscard]] int getOSFactor() const noexcept { return (int) oversamplers[curOS]->getOversamplingFactor(); }
 
     /** Call this method tbefore processing a block of audio to check if a different oversampler should be used */
     bool updateOSFactor();
@@ -84,13 +84,13 @@ public:
     int getOSIndex (int osFactor, int osMode) { return osFactor + (numOSChoices * osMode); }
 
     /** Returns the samples of latency introduced by the oversampling process */
-    float getLatencySamples() const noexcept { return (float) oversamplers[curOS]->getLatencyInSamples(); }
+    [[nodiscard]] float getLatencySamples() const noexcept { return (float) oversamplers[curOS]->getLatencyInSamples(); }
 
     /**
      * Returns the current latency introduced by the oversampling process in milliseconds,
      * or provide the oversampler index to get the latency of one specific oversampler.
      */
-    float getLatencyMilliseconds (int osIndex = -1) const noexcept { return ((float) oversamplers[osIndex < 0 ? curOS : osIndex]->getLatencyInSamples() / sampleRate) * 1000.0f; }
+    [[nodiscard]] float getLatencyMilliseconds (int osIndex = -1) const noexcept { return ((float) oversamplers[osIndex < 0 ? curOS : osIndex]->getLatencyInSamples() / sampleRate) * 1000.0f; }
 
     /** Upsample a new block of data */
     auto processSamplesUp (const juce::dsp::AudioBlock<const FloatType>& inputBlock) noexcept { return oversamplers[curOS]->processSamplesUp (inputBlock); }

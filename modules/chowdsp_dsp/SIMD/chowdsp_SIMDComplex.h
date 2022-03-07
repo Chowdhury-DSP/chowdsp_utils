@@ -13,7 +13,7 @@ struct SIMDComplex
     T _r, _i;
     static constexpr size_t size = T::size();
 
-    constexpr SIMDComplex (const T& r = T (0), const T& i = T (0))
+    constexpr SIMDComplex (const T& r = T (0), const T& i = T (0)) //NOLINT(google-explicit-constructor) we want to be able use this constructor implicitly (see math ops at the bottom of this file)
         : _r (r), _i (i)
     {
     }
@@ -29,8 +29,8 @@ struct SIMDComplex
         _i = SIMDUtils::loadUnaligned (i);
     }
 
-    inline T real() const noexcept { return _r; }
-    inline T imag() const noexcept { return _i; }
+    [[nodiscard]] inline T real() const noexcept { return _r; }
+    [[nodiscard]] inline T imag() const noexcept { return _i; }
 
     inline SIMDComplex<Type>& operator+= (const SIMDComplex<Type>& o)
     {
@@ -39,7 +39,7 @@ struct SIMDComplex
         return *this;
     }
 
-    std::complex<Type> atIndex (size_t idx) const
+    [[nodiscard]] std::complex<Type> atIndex (size_t idx) const
     {
         return std::complex<Type> { _r.get (idx), _i.get (idx) };
     }

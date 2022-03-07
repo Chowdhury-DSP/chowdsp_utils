@@ -44,16 +44,16 @@ public:
     void abortPress();
 
     /** Returns true if a mouse-press is currently in-progress */
-    bool isBeingPressed() const noexcept { return pressStarted; }
+    [[nodiscard]] bool isBeingPressed() const noexcept { return pressStarted; }
 
     /** Updates how far the mouse has been dragged since the press began */
     void setDragDistance (float newDistance) { dragDistance = newDistance; }
 
     /** Returns true if long-press actions are enabled for any input source */
-    bool isLongPressActionEnabled() const { return ! allowedInputSourceTypes.isEmpty(); }
+    [[nodiscard]] bool isLongPressActionEnabled() const { return ! allowedInputSourceTypes.isEmpty(); }
 
     /** Returns true if long-press actions are enabled for the given input source */
-    bool isLongPressActionEnabled (PressSourceType type) const { return allowedInputSourceTypes.contains (type); }
+    [[nodiscard]] bool isLongPressActionEnabled (PressSourceType type) const { return allowedInputSourceTypes.contains (type); }
 
     /** Use this function to enable/disable long-press actions for various input types */
     void setLongPressSourceTypes (juce::Array<PressSourceType>&& types) { allowedInputSourceTypes = std::move (types); }

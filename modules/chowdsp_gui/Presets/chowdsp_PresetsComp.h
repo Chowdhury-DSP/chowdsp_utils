@@ -109,7 +109,7 @@ public:
 #endif // FOLEYS_ENABLE_BINARY_DATA
     }
 
-    std::vector<foleys::SettableProperty> getSettableProperties() const override
+    [[nodiscard]] std::vector<foleys::SettableProperty> getSettableProperties() const override
     {
         std::function<void (juce::ComboBox&)> createAssetFilesMenuLambda = [=] (juce::ComboBox&) {
             magicBuilder.getMagicState().createAssetFilesMenu();

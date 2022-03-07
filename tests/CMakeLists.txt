@@ -21,3 +21,12 @@ option(CODE_COVERAGE "Enable coverage reporting" OFF)
 add_subdirectory(chowdsp_utils_test)
 add_subdirectory(chowdsp_gui_test)
 add_subdirectory(wdf_standalone_test)
+
+option(CHOWDSP_RUN_CLANG_TIDY "Run clang-tidy on chowdsp modules" OFF)
+if(CHOWDSP_RUN_CLANG_TIDY)
+    message(STATUS "Configuring clang-tidy target")
+    add_custom_target(chowdsp_utils_clang_tidy
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        COMMAND clang-tidy -p build "modules/chowdsp_dsp/chowdsp_dsp.cpp" "modules/chowdsp_gui/chowdsp_gui.cpp" "modules/chowdsp_plugin_utils/chowdsp_plugin_utils.cpp"
+    )
+endif()
