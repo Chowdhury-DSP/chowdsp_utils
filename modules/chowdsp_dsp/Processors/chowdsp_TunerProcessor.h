@@ -28,7 +28,7 @@ public:
     TunerProcessor() = default;
 
     /** Returns the size of the buffer needed to compute auto-correlation-based frequency detection */
-    int getAutocorrelationSize() const noexcept { return autocorrelationSize; }
+    [[nodiscard]] int getAutocorrelationSize() const noexcept { return autocorrelationSize; }
 
     /** Returns the current frequency detected by the tuner */
     T getCurrentFrequencyHz() const noexcept { return curFreqHz; }

@@ -29,10 +29,10 @@ public:
     void showPopupMenu();
 
     /** Returns true if long-press actions should trigger popup menus for any input source */
-    bool isLongPressEnabled() const { return longPress.isLongPressActionEnabled(); }
+    [[nodiscard]] bool isLongPressEnabled() const { return longPress.isLongPressActionEnabled(); }
 
     /** Returns true if long-press actions should trigger popup menus for the given input source */
-    bool isLongPressEnabled (LongPressActionHelper::PressSourceType type) const { return longPress.isLongPressActionEnabled (type); }
+    [[nodiscard]] bool isLongPressEnabled (LongPressActionHelper::PressSourceType type) const { return longPress.isLongPressActionEnabled (type); }
 
     /**
      * Set if long-press actions should trigger popup menus for the given input source types.

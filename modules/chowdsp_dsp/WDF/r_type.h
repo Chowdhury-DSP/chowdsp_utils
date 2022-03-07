@@ -46,7 +46,7 @@ namespace rtype_detail
         auto data() noexcept { return array.data(); }
         auto data() const noexcept { return array.data(); }
 
-        int size() const noexcept { return arraySize; }
+        int size() const noexcept { return arraySize; } // NOLINT(modernize-use-nodiscard): nodiscard is C++17 and later
 
         alignas (alignment) std::array<ElementType, (size_t) arraySize> array;
     };

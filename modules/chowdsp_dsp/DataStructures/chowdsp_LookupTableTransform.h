@@ -59,7 +59,7 @@ public:
         @return      The approximated value for the provided input value.
         @see processSample, operator(), operator[]
     */
-    FloatType processSampleUnchecked (FloatType value) const noexcept
+    [[nodiscard]] FloatType processSampleUnchecked (FloatType value) const noexcept
     {
         jassert (value >= minInputValue && value <= maxInputValue);
         return lookupTable[scaler * value + offset];
@@ -75,7 +75,7 @@ public:
         @return      The approximated value for the provided input value.
         @see processSampleUnchecked, operator(), operator[]
     */
-    FloatType processSample (FloatType value) const noexcept
+    [[nodiscard]] FloatType processSample (FloatType value) const noexcept
     {
         auto index = scaler * juce::jlimit (minInputValue, maxInputValue, value) + offset;
         jassert (juce::isPositiveAndBelow (index, FloatType (lookupTable.getNumPoints())));

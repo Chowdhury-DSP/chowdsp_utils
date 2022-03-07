@@ -48,7 +48,7 @@ public:
     TitleItem (foleys::MagicGUIBuilder& builder, const juce::ValueTree& node);
 
     void update() override;
-    std::vector<foleys::SettableProperty> getSettableProperties() const override;
+    [[nodiscard]] std::vector<foleys::SettableProperty> getSettableProperties() const override;
 
     juce::Component* getWrappedComponent() override { return &comp; }
 

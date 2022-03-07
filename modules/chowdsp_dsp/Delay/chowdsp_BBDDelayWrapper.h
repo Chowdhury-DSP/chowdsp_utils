@@ -33,7 +33,7 @@ public:
     }
 
     /** Returns the delay length in samples */
-    float getDelay() const final { return delaySamp; }
+    [[nodiscard]] float getDelay() const final { return delaySamp; }
 
     /** Prepares the delay line for processing */
     void prepare (const juce::dsp::ProcessSpec& spec) final

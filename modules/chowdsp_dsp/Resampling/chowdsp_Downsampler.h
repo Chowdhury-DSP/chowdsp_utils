@@ -48,7 +48,7 @@ public:
     }
 
     /** Returns the current downsampling ratio */
-    int getDownsamplingRatio() const noexcept { return ratio; }
+    [[nodiscard]] int getDownsamplingRatio() const noexcept { return ratio; }
 
     /**
      * Process a single-channel block of data
