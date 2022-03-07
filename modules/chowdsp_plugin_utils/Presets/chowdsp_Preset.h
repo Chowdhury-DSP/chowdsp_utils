@@ -29,37 +29,37 @@ struct Preset
     void toFile (const juce::File& presetFile);
 
     /** Saves this preset to xml */
-    std::unique_ptr<juce::XmlElement> toXml() const;
+    [[nodiscard]] std::unique_ptr<juce::XmlElement> toXml() const;
 
     /** Initialise the preset from XML data */
     void initialise (const juce::XmlElement* xml);
 
     /** Returns true if this preset is valid */
-    bool isValid() const;
+    [[nodiscard]] bool isValid() const;
 
     /** Returns the preset's name */
-    const juce::String& getName() const noexcept { return name; }
+    [[nodiscard]] const juce::String& getName() const noexcept { return name; }
 
     /** Returns the name of the vendor that created this preset */
-    const juce::String& getVendor() const noexcept { return vendor; }
+    [[nodiscard]] const juce::String& getVendor() const noexcept { return vendor; }
 
     /** Changes the name of the vendor that created this preset */
     void setVendor (const juce::String& newVendor) { vendor = newVendor; }
 
     /** Returns the name of the preset category */
-    const juce::String& getCategory() const noexcept { return category; }
+    [[nodiscard]] const juce::String& getCategory() const noexcept { return category; }
 
     /** Returns the version of the plugin that was used to create this preset */
-    const VersionUtils::Version& getVersion() const noexcept { return *version; }
+    [[nodiscard]] const VersionUtils::Version& getVersion() const noexcept { return *version; }
 
     /** Returns the preset's state */
-    const juce::XmlElement* getState() const noexcept { return state.get(); }
+    [[nodiscard]] const juce::XmlElement* getState() const noexcept { return state.get(); }
 
     /**
      * Returns the file path where this preset was loaded from.
      * If the preset was not loaded from a file, this will return an empty path.
      */
-    const juce::File& getPresetFile() const noexcept { return file; }
+    [[nodiscard]] const juce::File& getPresetFile() const noexcept { return file; }
 
     /** Returns true if the two presets are equivalent. */
     bool operator== (const Preset& other) const noexcept;

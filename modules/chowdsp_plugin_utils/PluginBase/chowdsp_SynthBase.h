@@ -18,7 +18,7 @@ public:
     }
     ~SynthBase() override = default;
 
-    bool acceptsMidi() const override { return true; }
+    [[nodiscard]] bool acceptsMidi() const override { return true; }
 
     virtual void processSynth (juce::AudioBuffer<float>&, juce::MidiBuffer&) = 0;
 

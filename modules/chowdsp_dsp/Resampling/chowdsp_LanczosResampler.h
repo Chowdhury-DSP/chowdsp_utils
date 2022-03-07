@@ -74,7 +74,7 @@ public:
     }
 
     /** Return the ratio of the output sample rate over input sample rate */
-    float getResampleRatio() const noexcept override { return (float) ratio; }
+    [[nodiscard]] float getResampleRatio() const noexcept override { return (float) ratio; }
 
     /** Processes a buffer of samples
          * 
@@ -134,7 +134,7 @@ private:
         phaseI += dPhaseI;
     }
 
-    inline float readZOH (double xBack) const
+    [[nodiscard]] inline float readZOH (double xBack) const
     {
         double p0 = wp - xBack;
         int idx0 = (int) p0;
@@ -145,7 +145,7 @@ private:
         return state[idx0];
     }
 
-    inline float readLin (double xBack) const
+    [[nodiscard]] inline float readLin (double xBack) const
     {
         double p0 = wp - xBack;
         int idx0 = (int) p0;
@@ -157,7 +157,7 @@ private:
         return (1.0f - frac) * state[idx0] + frac * state[idx0 + 1];
     }
 
-    inline float read (double xBack) const
+    [[nodiscard]] inline float read (double xBack) const
     {
         double p0 = wp - xBack;
         int idx0 = (int) floor (p0);

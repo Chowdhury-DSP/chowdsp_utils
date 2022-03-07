@@ -59,10 +59,10 @@ public:
 
     //==============================================================================
     /** Returns the cutoff frequency of the filter. */
-    SampleType getCutoffFrequency() const noexcept { return cutoffFrequency; }
+    [[nodiscard]] SampleType getCutoffFrequency() const noexcept { return cutoffFrequency; }
 
     /** Returns the resonance of the filter. */
-    SampleType getResonance() const noexcept { return resonance; }
+    [[nodiscard]] SampleType getResonance() const noexcept { return resonance; }
 
     //==============================================================================
     /** Initialises the filter. */

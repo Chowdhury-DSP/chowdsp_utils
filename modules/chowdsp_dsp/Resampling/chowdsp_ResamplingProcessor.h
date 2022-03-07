@@ -48,7 +48,7 @@ public:
     }
 
     /** Returns the ratio of output sample rate over input sample rate */
-    float getResampleRatio() const noexcept
+    [[nodiscard]] float getResampleRatio() const noexcept
     {
         return resamplers[0].getResampleRatio();
     }
