@@ -96,6 +96,7 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 // math helpers
 #include "Math/chowdsp_Combinatorics.h"
 #include "Math/chowdsp_FloatVectorOperations.h"
+#include "Math/chowdsp_MatrixOps.h"
 #include "Math/chowdsp_Polynomials.h"
 #include "Math/chowdsp_Power.h"
 
