@@ -4,7 +4,6 @@
 
 namespace chowdsp
 {
-
 /** Useful matrix operations */
 namespace MatrixOps
 {
@@ -66,7 +65,7 @@ namespace MatrixOps
         /** Perform unscaled Hadamard transformation using recursion */
         template <typename T = FloatType>
         static inline typename std::enable_if<std::is_floating_point<T>::value || (size > 1), void>::type
-            recursiveUnscaled(FloatType* out, const FloatType* in)
+            recursiveUnscaled (FloatType* out, const FloatType* in)
         {
             if constexpr (size == 1)
                 return;
@@ -90,10 +89,10 @@ namespace MatrixOps
         /** Perform unscaled Hadamard transformation (SIMD fallback) */
         template <typename T = FloatType>
         static inline typename std::enable_if<SampleTypeHelpers::IsSIMDRegister<T> && size == 1, void>::type
-            recursiveUnscaled(FloatType* out, const FloatType* in)
+            recursiveUnscaled (FloatType* out, const FloatType* in)
         {
             constexpr auto VecSize = FloatType::size();
-            NumericType arr alignas(16)[VecSize];
+            NumericType arr alignas (16)[VecSize];
 
             in[0].copyToRawArray (arr);
             Hadamard<NumericType, VecSize>::recursiveUnscaled (arr, arr);
@@ -103,7 +102,7 @@ namespace MatrixOps
         /** Perform out-of-place Hadamard transformation (scalar types) */
         template <typename T = FloatType>
         static inline typename std::enable_if<std::is_floating_point<T>::value, void>::type
-            outOfPlace(FloatType* out, const FloatType* in)
+            outOfPlace (FloatType* out, const FloatType* in)
         {
             recursiveUnscaled (out, in);
             juce::FloatVectorOperations::multiply (out, scalingFactor, size);
@@ -112,7 +111,7 @@ namespace MatrixOps
         /** Perform out-of-place Hadamard transformation (SIMD types) */
         template <typename T = FloatType>
         static inline typename std::enable_if<SampleTypeHelpers::IsSIMDRegister<T>, void>::type
-            outOfPlace(FloatType* out, const FloatType* in)
+            outOfPlace (FloatType* out, const FloatType* in)
         {
             recursiveUnscaled (out, in);
 
@@ -121,13 +120,14 @@ namespace MatrixOps
         }
 
         /** Perform in-place Hadamard transformation */
-        static inline void inPlace(FloatType* arr)
+        static inline void inPlace (FloatType* arr)
         {
             outOfPlace (arr, arr);
         }
     };
 
-    template <typename FloatType, int size> const typename Hadamard<FloatType, size>::NumericType Hadamard<FloatType, size>::scalingFactor = std::sqrt ((Hadamard<FloatType, size>::NumericType) 1 / (Hadamard<FloatType, size>::NumericType) (size * SampleTypeHelpers::ElementType<FloatType>::Size));
+    template <typename FloatType, int size>
+    const typename Hadamard<FloatType, size>::NumericType Hadamard<FloatType, size>::scalingFactor = std::sqrt ((Hadamard<FloatType, size>::NumericType) 1 / (Hadamard<FloatType, size>::NumericType) (size * SampleTypeHelpers::ElementType<FloatType>::Size));
 } // namespace MatrixOps
 
 } // namespace chowdsp
