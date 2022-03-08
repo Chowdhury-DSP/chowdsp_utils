@@ -13,6 +13,7 @@ target_sources(chowdsp_utils_tests PRIVATE
 
     math_tests/CombinatoricsTest.cpp
     math_tests/FloatVectorOperationsTest.cpp
+    math_tests/MatrixOpsTest.cpp
     math_tests/PolynomialsTest.cpp
     math_tests/PowerTest.cpp
 
