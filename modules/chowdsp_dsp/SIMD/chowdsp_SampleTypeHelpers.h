@@ -9,12 +9,14 @@ template <typename T, bool = std::is_floating_point<T>::value>
 struct ElementType
 {
     using Type = T;
+    static constexpr int Size = 1;
 };
 
 template <typename T>
 struct ElementType<T, false>
 {
     using Type = typename T::value_type;
+    static constexpr int Size = T::size();
 };
 
 /** Useful struct for determining if a type is a SIMDRegister */
