@@ -2,7 +2,6 @@
 
 namespace chowdsp
 {
-
 /**
  * Base class for doing Constant Overlap-Add processing with a given window.
  *
