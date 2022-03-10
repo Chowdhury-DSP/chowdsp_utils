@@ -134,8 +134,7 @@ void PluginLogger::defaultCrashLogAnalyzer (const juce::File& logFile)
                 "A previous instance of this plugin has crashed! Would you like to view the log file?")
             .withButton ("Show Log File")
             .withButton ("Cancel");
-    juce::AlertWindow::showAsync (alertOptions, [logFile] (int result)
-                                  {
+    juce::AlertWindow::showAsync (alertOptions, [logFile] (int result) {
         if (result == 1)
             logFile.startAsProcess(); });
 }
