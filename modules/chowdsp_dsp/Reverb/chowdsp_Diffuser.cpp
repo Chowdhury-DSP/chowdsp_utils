@@ -2,14 +2,14 @@
 
 namespace chowdsp::Reverb
 {
-double DefaultDiffuserConfig::getDelayMult (int channelIndex, int nChannels)
+inline double DefaultDiffuserConfig::getDelayMult (int channelIndex, int nChannels)
 {
     const auto rangeLow = (double) channelIndex / (double) nChannels;
     const auto rangeHigh = double (channelIndex + 1) / (double) nChannels;
     return rangeLow + juce::Random::getSystemRandom().nextDouble() * (rangeHigh - rangeLow);
 }
 
-double DefaultDiffuserConfig::getPolarityMultiplier (int /*channelIndex*/, int /*nChannels*/)
+inline double DefaultDiffuserConfig::getPolarityMultiplier (int /*channelIndex*/, int /*nChannels*/)
 {
     return juce::Random::getSystemRandom().nextBool() ? 1.0 : -1.0;
 }
@@ -29,6 +29,13 @@ void Diffuser<FloatType, nChannels, DelayInterpType>::prepare (double sampleRate
 }
 
 template <typename FloatType, int nChannels, typename DelayInterpType>
+void Diffuser<FloatType, nChannels, DelayInterpType>::reset()
+{
+    for (auto& delay : delays)
+        delay.reset();
+}
+
+template <typename FloatType, int nChannels, typename DelayInterpType>
 void Diffuser<FloatType, nChannels, DelayInterpType>::setDiffusionTimeMs (FloatType diffusionTimeMs)
 {
     for (size_t i = 0; i < (size_t) nChannels; ++i)
@@ -45,6 +52,13 @@ void DiffuserChain<nStages, DiffuserType>::prepare (double sampleRate)
         stages[i].template prepare<DiffuserConfig> (sampleRate);
         diffusionTimeMults[i] = (FloatType) DiffuserChainConfig::getDiffusionMult ((int) i, nStages);
     }
+}
+
+template <int nStages, typename DiffuserType>
+void DiffuserChain<nStages, DiffuserType>::reset()
+{
+    for (auto& stage : stages)
+        stage.reset();
 }
 
 template <int nStages, typename DiffuserType>

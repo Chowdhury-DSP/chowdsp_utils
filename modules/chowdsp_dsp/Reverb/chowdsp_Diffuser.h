@@ -40,6 +40,9 @@ public:
     template <typename DiffuserConfig = DefaultDiffuserConfig>
     void prepare (double sampleRate);
 
+    /** Resets the diffuser state */
+    void reset();
+
     /** Sets the diffusion time in milliseconds */
     void setDiffusionTimeMs (FloatType diffusionTimeMs);
 
@@ -101,6 +104,9 @@ public:
     /** Prepares the diffuser chain with a given sample rate and configurations */
     template <typename DiffuserChainConfig = DiffuserChainEqualConfig, typename DiffuserConfig = DefaultDiffuserConfig>
     void prepare (double sampleRate);
+
+    /** Resets the state of each diffuser */
+    void reset();
 
     /** Sets the diffusion time of the diffusion chain */
     void setDiffusionTimeMs (FloatType diffusionTimeMs);
