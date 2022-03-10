@@ -1,62 +1,56 @@
-//#include "chowdsp_Diffuser.h"
+#include "chowdsp_Diffuser.h"
 
 namespace chowdsp::Reverb
 {
-#ifndef DOXYGEN
-namespace detail
+double DefaultDiffuserConfig::getDelayMult (int channelIndex, int nChannels)
 {
-    template <typename T, std::size_t N, std::size_t Idx = N>
-    struct array_maker
-    {
-        template <typename... Ts>
-        static std::array<T, N> make_array (const T& v, Ts... tail)
-        {
-            return array_maker<T, N, Idx - 1>::make_array (v, v, tail...);
-        }
-    };
-
-    template <typename T, std::size_t N>
-    struct array_maker<T, N, 1>
-    {
-        template <typename... Ts>
-        static std::array<T, N> make_array (const T& v, Ts... tail)
-        {
-            return std::array<T, N> { v, tail... };
-        }
-    };
-} // namespace detail
-#endif // DOXYGEN
-
-//======================================================================
-double DefaultDiffuserConfig::getDelaySamples (int channelIndex, int nChannels, double sampleRate)
-{
-    const auto delaySamplesRange = (double) delayRangeMs * 0.001 * sampleRate;
-    const auto rangeLow = delaySamplesRange * channelIndex / nChannels;
-    const auto rangeHigh = delaySamplesRange * (channelIndex + 1) / nChannels;
-
-    return rangeLow + rand.nextDouble() * (rangeHigh - rangeLow);
+    const auto rangeLow = (double) channelIndex / (double) nChannels;
+    const auto rangeHigh = double (channelIndex + 1) / (double) nChannels;
+    return rangeLow + juce::Random::getSystemRandom().nextDouble() * (rangeHigh - rangeLow);
 }
 
 double DefaultDiffuserConfig::getPolarityMultiplier (int /*channelIndex*/, int /*nChannels*/)
 {
-    return rand.nextBool() ? 1.0 : -1.0;
+    return juce::Random::getSystemRandom().nextBool() ? 1.0 : -1.0;
 }
 
 //======================================================================
 template <typename FloatType, int nChannels, typename DelayInterpType>
-Diffuser<FloatType, nChannels, DelayInterpType>::Diffuser() : delays (detail::array_maker<DelayType, nChannels> (DelayType { 1 << 18 }))
+template <typename DiffuserConfig>
+void Diffuser<FloatType, nChannels, DelayInterpType>::prepare (double sampleRate)
 {
+    fs = (FloatType) sampleRate;
+    for (size_t i = 0; i < (size_t) nChannels; ++i)
+    {
+        delays[i].prepare ({ sampleRate, 128, 1 });
+        delayRelativeMults[i] = (FloatType) DiffuserConfig::getDelayMult ((int) i, nChannels);
+        polarityMultipliers[i] = (FloatType) DiffuserConfig::getPolarityMultiplier ((int) i, nChannels);
+    }
 }
 
 template <typename FloatType, int nChannels, typename DelayInterpType>
-template <typename DiffuserConfig>
-void Diffuser<FloatType, nChannels, DelayInterpType>::prepare (double sampleRate, const DiffuserConfig& config)
+void Diffuser<FloatType, nChannels, DelayInterpType>::setDiffusionTimeMs (FloatType diffusionTimeMs)
 {
-    for (int i = 0; i < nChannels; ++i)
+    for (size_t i = 0; i < (size_t) nChannels; ++i)
+        delays[i].setDelay (delayRelativeMults[i] * diffusionTimeMs * (FloatType) 0.001 * fs);
+}
+
+//======================================================================
+template <int nStages, typename DiffuserType>
+template <typename DiffuserChainConfig, typename DiffuserConfig>
+void DiffuserChain<nStages, DiffuserType>::prepare (double sampleRate)
+{
+    for (size_t i = 0; i < (size_t) nStages; ++i)
     {
-        delays[i].prepare ({ sampleRate, 128, 1 });
-        delays[i].setDelay ((FloatType) config.getDelaySamples (i, nChannels, sampleRate));
-        polarityMultipliers[i] = (FloatType) config.getPolarityMultiplier (i, nChannels);
+        stages[i].template prepare<DiffuserConfig> (sampleRate);
+        diffusionTimeMults[i] = (FloatType) DiffuserChainConfig::getDiffusionMult ((int) i, nStages);
     }
+}
+
+template <int nStages, typename DiffuserType>
+void DiffuserChain<nStages, DiffuserType>::setDiffusionTimeMs (FloatType diffusionTimeMs)
+{
+    for (size_t i = 0; i < (size_t) nStages; ++i)
+        stages[i].setDiffusionTimeMs (diffusionTimeMs * diffusionTimeMults[i]);
 }
 } // namespace chowdsp::Reverb
