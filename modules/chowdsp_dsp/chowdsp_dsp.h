@@ -176,3 +176,4 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 
 // some reverb utils
 #include "Reverb/chowdsp_Diffuser.h"
+#include "Reverb/chowdsp_FDN.h"

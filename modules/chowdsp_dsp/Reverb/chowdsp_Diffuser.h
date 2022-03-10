@@ -27,9 +27,7 @@ class Diffuser
 {
     struct DelayType : public chowdsp::DelayLine<FloatType, DelayInterpType>
     {
-        DelayType() : chowdsp::DelayLine<FloatType, DelayInterpType> (1 << 18)
-        {
-        }
+        DelayType() : chowdsp::DelayLine<FloatType, DelayInterpType> (1 << 18) {}
     };
 
 public:
@@ -74,7 +72,7 @@ private:
 
     alignas (16) std::array<FloatType, nChannels> outData;
 
-    FloatType fs = (FloatType) 44100;
+    FloatType fs = (FloatType) 48000;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Diffuser)
 };
