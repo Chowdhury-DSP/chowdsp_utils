@@ -40,7 +40,8 @@ public:
         constexpr int numIters = 20;
 
         auto logsDirectory = FileLogger::getSystemLogFileFolder().getChildFile (logFileSubDir);
-        auto getNumLogFiles = [&] {
+        auto getNumLogFiles = [&]
+        {
             return logsDirectory.getNumberOfChildFiles (File::findFiles, "*");
         };
 
@@ -50,7 +51,8 @@ public:
             std::vector<std::future<LoggerPtr>> futures;
             futures.reserve (numLoggersAtOnce);
             for (int j = 0; j < numLoggersAtOnce; ++j)
-                futures.push_back (std::async (std::launch::async, [] { return std::make_unique<chowdsp::PluginLogger> (logFileSubDir, logFileNameRoot); }));
+                futures.push_back (std::async (std::launch::async, []
+                                               { return std::make_unique<chowdsp::PluginLogger> (logFileSubDir, logFileNameRoot); }));
 
             auto numLogFiles = getNumLogFiles();
             expectLessOrEqual (numLogFiles, 55, "Too many log files found in logs directory!");
@@ -109,10 +111,10 @@ public:
         beginTest ("Basic Log Test");
         basicLogTest();
 
-#if ! JUCE_LINUX
         beginTest ("Limit Num Log Files Test");
         limitNumLogFilesTest();
 
+#if ! JUCE_LINUX
         beginTest ("Crash Log Test");
         crashLogTest();
 #endif
