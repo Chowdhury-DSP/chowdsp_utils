@@ -40,6 +40,8 @@ target_sources(chowdsp_utils_tests PRIVATE
     resampling_tests/UpsampleDownsampleTest.cpp
     resampling_tests/VariableOversamplingTest.cpp
 
+    reverb_tests/DiffuserTest.cpp
+
     simd_tests/SIMDArithmeticTest.cpp
     simd_tests/SIMDComplexTest.cpp
     simd_tests/SIMDFastMathTest.cpp
