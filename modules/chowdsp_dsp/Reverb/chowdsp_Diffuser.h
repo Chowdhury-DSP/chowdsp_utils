@@ -28,7 +28,8 @@ class Diffuser
     struct DelayType : public chowdsp::DelayLine<FloatType, DelayInterpType>
     {
         DelayType() : chowdsp::DelayLine<FloatType, DelayInterpType> (1 << 18)
-        {}
+        {
+        }
     };
 
 public:
@@ -71,7 +72,7 @@ private:
     std::array<FloatType, nChannels> delayRelativeMults;
     std::array<FloatType, nChannels> polarityMultipliers;
 
-    alignas(16) std::array<FloatType, nChannels> outData;
+    alignas (16) std::array<FloatType, nChannels> outData;
 
     FloatType fs = (FloatType) 44100;
 
@@ -98,6 +99,7 @@ template <int nStages, typename DiffuserType = Diffuser<float, 8>>
 class DiffuserChain
 {
     using FloatType = typename DiffuserType::Float;
+
 public:
     DiffuserChain() = default;
 
