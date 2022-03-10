@@ -18,7 +18,8 @@ void DefaultFDNConfig<FloatType, nChannels>::reset()
 template <typename FloatType, int nChannels>
 double DefaultFDNConfig<FloatType, nChannels>::getDelayMult (int channelIndex)
 {
-    return std::pow (2.0, (double) channelIndex / (double) nChannels);
+    return DefaultDiffuserConfig::getDelayMult (channelIndex, nChannels);
+    //    return std::pow (2.0, (double) channelIndex / (double) nChannels);
 }
 
 template <typename FloatType, int nChannels>

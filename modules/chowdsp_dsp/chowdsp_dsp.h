@@ -50,6 +50,9 @@
 #define CHOWDSP_USE_CUSTOM_JUCE_DSP 0
 #endif
 
+// STL includes
+#include <random>
+
 // JUCE includes
 #include <juce_core/juce_core.h>
 #include <juce_audio_basics/juce_audio_basics.h>

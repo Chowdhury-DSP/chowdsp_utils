@@ -14,6 +14,8 @@ struct DefaultDiffuserConfig
 
     /** Chooses polarity multipliers randomly */
     static double getPolarityMultiplier (int channelIndex, int nChannels);
+
+    static void fillChannelSwapIndexes (size_t* indexes, int numChannels);
 };
 
 /**
@@ -52,7 +54,7 @@ public:
         for (size_t i = 0; i < (size_t) nChannels; ++i)
         {
             delays[i].pushSample (0, data[i]);
-            outData[i] = delays[i].popSample (0);
+            outData[i] = delays[channelSwapIndexes[i]].popSample (0);
         }
 
         // Mix with a Hadamard matrix
@@ -69,6 +71,7 @@ private:
     std::array<DelayType, nChannels> delays;
     std::array<FloatType, nChannels> delayRelativeMults;
     std::array<FloatType, nChannels> polarityMultipliers;
+    std::array<size_t, nChannels> channelSwapIndexes;
 
     alignas (16) std::array<FloatType, nChannels> outData;
 
