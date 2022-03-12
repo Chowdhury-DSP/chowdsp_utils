@@ -159,10 +159,20 @@ public:
             expect (openGlHelper.isAttached(), "Should be attached!");
     }
 
+    void checkOpenGLAvailableTest()
+    {
+        chowdsp::OpenGLHelper openGlHelper;
+        auto isOpenGLAvailable = openGlHelper.isOpenGLAvailable();
+
+#if JUCE_MODULE_AVAILABLE_juce_opengl
+        expect (isOpenGLAvailable, "OpenGL should be available on this platform!");
+#else
+        expect (! isOpenGLAvailable, "OpenGL should not be available on this platform!");
+#endif
+    }
+
     void runTestTimed() override
     {
-        auto isOpenGLAvailable = chowdsp::OpenGLHelper::isOpenGLAvailable();
-
         beginTest ("Attach To Component Test");
         attachToComponentTest (true);
         attachToComponentTest (false);
@@ -182,6 +192,9 @@ public:
         beginTest ("Attach To Null Test");
         attachToNullTest (true);
         attachToNullTest (false);
+
+        beginTest ("Check OpenGL Available Test");
+        checkOpenGLAvailableTest();
     }
 };
 

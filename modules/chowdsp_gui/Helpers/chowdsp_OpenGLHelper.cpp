@@ -10,48 +10,46 @@ namespace
 #if JUCE_MODULE_AVAILABLE_juce_opengl
 juce::String getGLString (GLenum value)
 {
-    return reinterpret_cast<const char*> (juce::gl::glGetString (value)); // NB: glGetString is from v2.0+.
+    if (juce::gl::glGetString != nullptr)
+        return reinterpret_cast<const char*> (juce::gl::glGetString (value)); // NB: glGetString is from v2.0+.
+
+    return juce::String {};
 }
 
-auto createOpenGLTestComp()
+auto createOpenGLTestComp (juce::OpenGLContext& ctx)
 {
     struct TestComponent : juce::Component
     {
-        juce::OpenGLContext ctx;
+        juce::OpenGLContext& ctx;
 
-        TestComponent()
+        explicit TestComponent (juce::OpenGLContext& context) : ctx (context)
         {
             setSize (1, 1);
             setVisible (true);
             addToDesktop (juce::ComponentPeer::windowIsTemporary);
             ctx.attachTo (*this);
         }
-        ~TestComponent() override
-        {
-            ctx.detach();
-        }
-
-        void paint (juce::Graphics&) override
-        {
-            std::cout << "PAINTING..." << std::endl;
-        }
+        ~TestComponent() override { ctx.detach(); }
     };
 
-    return std::make_unique<TestComponent>();
+    return std::make_unique<TestComponent> (ctx);
 }
 #endif
 
-void logOpenGLStats()
+void checkOpenGLStats (juce::OpenGLContext& ctx, int& openGLMajorVersion, int& openGLMinorVersion)
 {
 #if JUCE_MODULE_AVAILABLE_juce_opengl
-    auto testComp = createOpenGLTestComp();
+    auto testComp = createOpenGLTestComp (ctx);
     std::atomic_bool waiting { true };
     testComp->ctx.executeOnGLThread (
-        [&waiting] (juce::OpenGLContext&)
+        [&waiting, &openGLMajorVersion, &openGLMinorVersion] (juce::OpenGLContext&)
         {
             GLint major = 0, minor = 0;
             juce::gl::glGetIntegerv (juce::gl::GL_MAJOR_VERSION, &major);
             juce::gl::glGetIntegerv (juce::gl::GL_MINOR_VERSION, &minor);
+
+            openGLMajorVersion = (int) major;
+            openGLMinorVersion = (int) minor;
 
             juce::String openGLStats;
             openGLStats
@@ -67,10 +65,11 @@ void logOpenGLStats()
             waiting = false;
         },
         false);
+
     while (waiting)
         juce::MessageManager::getInstance()->runDispatchLoopUntil (100);
-    std::cout << "DONE" << std::endl;
 #else
+    juce::ignoreUnused (openGLMajorVersion, openGLMinorVersion);
     juce::Logger::writeToLog ("JUCE: program was not compiled with OpenGL!");
 #endif
 }
@@ -81,7 +80,7 @@ namespace chowdsp
 {
 OpenGLHelper::OpenGLHelper()
 {
-    logOpenGLStats();
+    checkOpenGLStats (openglContext, openGLMajorVersion, openGLMinorVersion);
 }
 
 OpenGLHelper::~OpenGLHelper()
@@ -90,15 +89,10 @@ OpenGLHelper::~OpenGLHelper()
         componentBeingDeleted (*component);
 }
 
-bool OpenGLHelper::isOpenGLAvailable()
+bool OpenGLHelper::isOpenGLAvailable() const noexcept
 {
 #if JUCE_MODULE_AVAILABLE_juce_opengl
-    logOpenGLStats();
-
-    GLint major = 0;
-    juce::gl::glGetIntegerv (juce::gl::GL_MAJOR_VERSION, &major);
-
-    return major >= 2; // For OpenGL drivers below v2.0, we get a black screen
+    return openGLMajorVersion >= 2; // For OpenGL drivers below v2.0, we get a black screen
 #else
     return false;
 #endif
