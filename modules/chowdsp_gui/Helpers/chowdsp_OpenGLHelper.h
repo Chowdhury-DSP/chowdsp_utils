@@ -18,7 +18,7 @@ public:
     ~OpenGLHelper() override;
 
     /** Returns true if OpenGL is available/ */
-    bool isOpenGLAvailable() const noexcept;
+    [[nodiscard]] bool isOpenGLAvailable() const noexcept;
 
     /** Use this method to attach the OpenGL to the current component. */
     void attach();

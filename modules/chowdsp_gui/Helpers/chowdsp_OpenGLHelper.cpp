@@ -71,7 +71,7 @@ void checkOpenGLStats (juce::OpenGLContext& ctx, int& openGLMajorVersion, int& o
 
 namespace chowdsp
 {
-OpenGLHelper::OpenGLHelper()
+OpenGLHelper::OpenGLHelper() //NOLINT(modernize-use-equals-default): can only be default if compiling without OpenGL
 {
 #if JUCE_MODULE_AVAILABLE_juce_opengl
     checkOpenGLStats (openglContext, openGLMajorVersion, openGLMinorVersion);
@@ -84,7 +84,7 @@ OpenGLHelper::~OpenGLHelper()
         componentBeingDeleted (*component);
 }
 
-bool OpenGLHelper::isOpenGLAvailable() const noexcept
+bool OpenGLHelper::isOpenGLAvailable() const noexcept // NOLINT(readability-convert-member-functions-to-static): can only be static if compiling without OpenGL
 {
 #if JUCE_MODULE_AVAILABLE_juce_opengl
     return openGLMajorVersion >= 2; // For OpenGL drivers below v2.0, we get a black screen
