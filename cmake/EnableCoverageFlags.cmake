@@ -12,5 +12,10 @@ function(enable_coverage_flags target)
         )
 
         target_link_options(${target} PUBLIC --coverage)
-    endif(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    else() # MSVC
+        message(STATUS "${target} -- Appending code coverage compiler flags for MSVC")
+        target_compile_definitions(${target} PRIVATE
+            CHOWDSP_MSVC_COVERAGE=1
+        )
+    endif()
 endfunction(enable_coverage_flags)
