@@ -12,20 +12,13 @@ class OpenGLHelper : private juce::ComponentListener
 {
 public:
     /** Default constructor */
-    OpenGLHelper() = default;
+    OpenGLHelper();
 
     /** Destructor */
     ~OpenGLHelper() override;
 
     /** Returns true if OpenGL is available/ */
-    static constexpr bool isOpenGLAvailable()
-    {
-#if JUCE_MODULE_AVAILABLE_juce_opengl
-        return true;
-#else
-        return false;
-#endif
-    }
+    static bool isOpenGLAvailable();
 
     /** Use this method to attach the OpenGL to the current component. */
     void attach();

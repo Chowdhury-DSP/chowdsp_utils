@@ -50,7 +50,7 @@ public:
 
 #if CHECK_OPENGL_CONTEXT_TESTS
         actualContext = OpenGLContext::getContextAttachedTo (*testComp);
-        expect (actualContext == nullptr, "Component OpenGL context should bt nullptr!");
+        expect (actualContext == nullptr, "Component OpenGL context should be nullptr!");
 #endif
 
         if (detach)
@@ -161,6 +161,8 @@ public:
 
     void runTestTimed() override
     {
+        auto isOpenGLAvailable = chowdsp::OpenGLHelper::isOpenGLAvailable();
+
         beginTest ("Attach To Component Test");
         attachToComponentTest (true);
         attachToComponentTest (false);
