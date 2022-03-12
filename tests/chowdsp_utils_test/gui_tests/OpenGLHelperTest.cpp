@@ -193,8 +193,10 @@ public:
         attachToNullTest (true);
         attachToNullTest (false);
 
+#if CHECK_OPENGL_CONTEXT_TESTS
         beginTest ("Check OpenGL Available Test");
         checkOpenGLAvailableTest();
+#endif
     }
 };
 
