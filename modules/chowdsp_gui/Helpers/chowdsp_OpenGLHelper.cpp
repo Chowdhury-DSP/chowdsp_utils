@@ -5,9 +5,9 @@
 // under the ISC license:
 // https://github.com/SquarePine/squarepine_core/blob/main/modules/squarepine_graphics/components/HighPerformanceRendererConfigurator.cpp
 
+#if JUCE_MODULE_AVAILABLE_juce_opengl
 namespace
 {
-#if JUCE_MODULE_AVAILABLE_juce_opengl
 juce::String getGLString (GLenum value)
 {
     if (juce::gl::glGetString != nullptr)
@@ -34,11 +34,9 @@ auto createOpenGLTestComp (juce::OpenGLContext& ctx)
 
     return std::make_unique<TestComponent> (ctx);
 }
-#endif
 
 void checkOpenGLStats (juce::OpenGLContext& ctx, int& openGLMajorVersion, int& openGLMinorVersion)
 {
-#if JUCE_MODULE_AVAILABLE_juce_opengl
     auto testComp = createOpenGLTestComp (ctx);
     std::atomic_bool waiting { true };
     testComp->ctx.executeOnGLThread (
@@ -68,19 +66,17 @@ void checkOpenGLStats (juce::OpenGLContext& ctx, int& openGLMajorVersion, int& o
 
     while (waiting)
         juce::MessageManager::getInstance()->runDispatchLoopUntil (100);
-#else
-    juce::ignoreUnused (openGLMajorVersion, openGLMinorVersion);
-    juce::Logger::writeToLog ("JUCE: program was not compiled with OpenGL!");
-#endif
 }
-
 } // namespace
+#endif
 
 namespace chowdsp
 {
 OpenGLHelper::OpenGLHelper()
 {
+#if JUCE_MODULE_AVAILABLE_juce_opengl
     checkOpenGLStats (openglContext, openGLMajorVersion, openGLMinorVersion);
+#endif
 }
 
 OpenGLHelper::~OpenGLHelper()
