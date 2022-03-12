@@ -16,7 +16,7 @@ template <typename T>
 struct ElementType<T, false>
 {
     using Type = typename T::value_type;
-    static constexpr int Size = T::size();
+    static constexpr int Size = (int) T::size();
 };
 
 /** Useful struct for determining if a type is a SIMDRegister */

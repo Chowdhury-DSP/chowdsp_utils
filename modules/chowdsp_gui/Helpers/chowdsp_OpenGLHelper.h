@@ -12,20 +12,13 @@ class OpenGLHelper : private juce::ComponentListener
 {
 public:
     /** Default constructor */
-    OpenGLHelper() = default;
+    OpenGLHelper();
 
     /** Destructor */
     ~OpenGLHelper() override;
 
     /** Returns true if OpenGL is available/ */
-    static constexpr bool isOpenGLAvailable()
-    {
-#if JUCE_MODULE_AVAILABLE_juce_opengl
-        return true;
-#else
-        return false;
-#endif
-    }
+    bool isOpenGLAvailable() const noexcept;
 
     /** Use this method to attach the OpenGL to the current component. */
     void attach();
@@ -61,6 +54,9 @@ private:
 #if JUCE_MODULE_AVAILABLE_juce_opengl
     juce::OpenGLContext openglContext;
 #endif
+
+    int openGLMajorVersion = 0;
+    int openGLMinorVersion = 0;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OpenGLHelper)
 };

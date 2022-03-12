@@ -50,7 +50,7 @@ public:
 
 #if CHECK_OPENGL_CONTEXT_TESTS
         actualContext = OpenGLContext::getContextAttachedTo (*testComp);
-        expect (actualContext == nullptr, "Component OpenGL context should bt nullptr!");
+        expect (actualContext == nullptr, "Component OpenGL context should be nullptr!");
 #endif
 
         if (detach)
@@ -159,6 +159,18 @@ public:
             expect (openGlHelper.isAttached(), "Should be attached!");
     }
 
+    void checkOpenGLAvailableTest()
+    {
+        chowdsp::OpenGLHelper openGlHelper;
+        auto isOpenGLAvailable = openGlHelper.isOpenGLAvailable();
+
+#if JUCE_MODULE_AVAILABLE_juce_opengl
+        expect (isOpenGLAvailable, "OpenGL should be available on this platform!");
+#else
+        expect (! isOpenGLAvailable, "OpenGL should not be available on this platform!");
+#endif
+    }
+
     void runTestTimed() override
     {
         beginTest ("Attach To Component Test");
@@ -180,6 +192,9 @@ public:
         beginTest ("Attach To Null Test");
         attachToNullTest (true);
         attachToNullTest (false);
+
+        beginTest ("Check OpenGL Available Test");
+        checkOpenGLAvailableTest();
     }
 };
 
