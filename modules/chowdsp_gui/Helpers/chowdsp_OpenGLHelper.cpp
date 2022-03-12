@@ -40,8 +40,7 @@ void checkOpenGLStats (juce::OpenGLContext& ctx, int& openGLMajorVersion, int& o
     auto testComp = createOpenGLTestComp (ctx);
     std::atomic_bool waiting { true };
     testComp->ctx.executeOnGLThread (
-        [&waiting, &openGLMajorVersion, &openGLMinorVersion] (juce::OpenGLContext&)
-        {
+        [&waiting, &openGLMajorVersion, &openGLMinorVersion] (juce::OpenGLContext&) {
             GLint major = 0, minor = 0;
             juce::gl::glGetIntegerv (juce::gl::GL_MAJOR_VERSION, &major);
             juce::gl::glGetIntegerv (juce::gl::GL_MINOR_VERSION, &minor);
