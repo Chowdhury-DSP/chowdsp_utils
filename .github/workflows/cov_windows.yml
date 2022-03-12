@@ -1,0 +1,68 @@
+name: Coverage-Windows
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+    branches:
+      - master
+
+  workflow_dispatch:
+
+env:
+  WORK_DIR: ${{github.workspace}}/JUCE_modules/chowdsp_utils
+
+jobs:
+  build_and_test:
+    if: contains(toJson(github.event.commits), '***NO_CI***') == false && contains(toJson(github.event.commits), '[ci skip]') == false && contains(toJson(github.event.commits), '[skip ci]') == false
+    name: Analyze test coverage windows
+    runs-on: windows-2019
+
+    steps:
+      - name: Install Windows Deps
+        run: |
+          choco install OpenCppCoverage -y
+          echo "C:\Program Files\OpenCppCoverage" >> $env:GITHUB_PATH
+
+      - name: Get latest CMake
+        uses: lukka/get-cmake@latest
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          path: ${{env.WORK_DIR}}
+
+      - name: Set up environment
+        working-directory: ${{github.workspace}}
+        run: |
+          git clone --depth 1 --branch 6.1.2 https://github.com/juce-framework/JUCE.git
+          cd JUCE_modules
+          git clone --single-branch --branch chowdsp https://github.com/Chowdhury-DSP/foleys_gui_magic.git
+
+      - name: Configure
+        working-directory: ${{env.WORK_DIR}}
+        env:
+          CMAKE_ARGS: ${{ matrix.cmake_args }}
+        shell: bash
+        run: cmake -Bbuild -DCHOWDSP_ENABLE_TESTING=ON
+
+      - name: Build
+        working-directory: ${{env.WORK_DIR}}/build
+        shell: bash
+        run: cmake --build . --parallel
+
+      - name: Test
+        working-directory: ${{env.WORK_DIR}}
+        shell: bash
+        run: |
+          OpenCppCoverage.exe --sources modules --excluded_sources *JUCE\\modules --excluded_sources *JUCE_modules\\foleys_gui_magic --excluded_sources tests --excluded_sources *third_party --excluded_sources build --export_type cobertura:chowdsp_utils_cov_win.xml -- build\\tests\\chowdsp_utils_test\\chowdsp_utils_tests_artefacts\\Debug\\chowdsp_utils_tests.exe
+          OpenCppCoverage.exe --sources modules --excluded_sources *JUCE\\modules --excluded_sources *JUCE_modules\\foleys_gui_magic --excluded_sources tests --excluded_sources *third_party --excluded_sources build --export_type cobertura:chowdsp_utils_cov_win.xml -- build\\tests\\chowdsp_gui_test\\chowdsp_gui_test_artefacts\\Debug\\chowdsp_gui_test.exe
+          OpenCppCoverage.exe --sources modules --excluded_sources *JUCE\\modules --excluded_sources *JUCE_modules\\foleys_gui_magic --excluded_sources tests --excluded_sources *third_party --excluded_sources build --export_type cobertura:chowdsp_utils_cov_win.xml -- build\\tests\\wdf_standalone_test\\Debug\\wdf_test.exe
+
+      - name: Upload Report to Codecov
+        uses: codecov/codecov-action@v1.3.2
+        with:
+          files: ${{env.WORK_DIR}}/chowdsp_utils_cov_win.xml
+          fail_ci_if_error: true

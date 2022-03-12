@@ -67,22 +67,26 @@ namespace MatrixOps
         static inline typename std::enable_if<std::is_floating_point<T>::value || (size > 1), void>::type
             recursiveUnscaled (FloatType* out, const FloatType* in)
         {
-            if constexpr (size == 1)
-                return;
-
-            constexpr int hSize = size / 2;
-
-            // Two (unscaled) Hadamards of half the size
-            Hadamard<FloatType, hSize>::recursiveUnscaled (out, in);
-            Hadamard<FloatType, hSize>::recursiveUnscaled (out + hSize, in + hSize);
-
-            // Combine the two halves using sum/difference
-            for (int i = 0; i < hSize; ++i)
+            if constexpr (size <= 1)
             {
-                FloatType a = in[i];
-                FloatType b = in[i + hSize];
-                out[i] = a + b;
-                out[i + hSize] = a - b;
+                return;
+            }
+            else
+            {
+                constexpr int hSize = size / 2;
+
+                // Two (unscaled) Hadamards of half the size
+                Hadamard<FloatType, hSize>::recursiveUnscaled (out, in);
+                Hadamard<FloatType, hSize>::recursiveUnscaled (out + hSize, in + hSize);
+
+                // Combine the two halves using sum/difference
+                for (int i = 0; i < hSize; ++i)
+                {
+                    FloatType a = in[i];
+                    FloatType b = in[i + hSize];
+                    out[i] = a + b;
+                    out[i + hSize] = a - b;
+                }
             }
         }
 
