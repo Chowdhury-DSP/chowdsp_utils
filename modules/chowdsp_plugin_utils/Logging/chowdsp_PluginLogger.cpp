@@ -131,11 +131,27 @@ void PluginLogger::defaultCrashLogAnalyzer (const juce::File& logFile)
         juce::MessageBoxOptions()
             .withTitle ("Crash detected!")
             .withMessage (
-                "A previous instance of this plugin has crashed! Would you like to view the log file?")
+                "A previous instance of this plugin has crashed! Would you like to view the logs?")
+#if JUCE_IOS
+            .withButton ("Copy Logs")
+#else
             .withButton ("Show Log File")
+#endif
             .withButton ("Cancel");
-    juce::AlertWindow::showAsync (alertOptions, [logFile] (int result) {
-        if (result == 1)
-            logFile.startAsProcess(); });
+
+    juce::AlertWindow::showAsync (
+        alertOptions,
+        [logFile] (int result)
+        {
+            if (result == 1)
+            {
+#if JUCE_IOS
+                juce::SystemClipboard::copyTextToClipboard (logFile.loadFileAsString());
+#else
+                logFile.startAsProcess();
+#endif
+
+            }
+        });
 }
 } // namespace chowdsp
