@@ -32,7 +32,7 @@ public:
         setParameter (param, dummyValue);
         expectEquals (param->getValue(), dummyValue, "Changed value is incorrect!");
 
-        presetMgr.loadPresetFromIndex (0);
+        presetMgr.loadPreset (presetMgr.getPresetMap().begin()->second);
         expectEquals (param->getValue(), testValue, "Preset value is incorrect!");
 
         auto userPresetConfigFile = presetMgr.getUserPresetConfigFile();
