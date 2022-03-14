@@ -53,10 +53,10 @@ private:
 
 #if JUCE_MODULE_AVAILABLE_juce_opengl
     juce::OpenGLContext openglContext;
-#endif
 
     int openGLMajorVersion = 0;
     int openGLMinorVersion = 0;
+#endif
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OpenGLHelper)
 };
