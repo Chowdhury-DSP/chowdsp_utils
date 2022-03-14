@@ -37,8 +37,10 @@ void PresetManager::parameterChanged (const juce::String&, float)
 
 void PresetManager::loadPresetFromIndex (int index)
 {
-    const Preset* presetToLoad = getPresetForIndex (index);
+    if (currentPreset != nullptr && index == getIndexForPreset (*currentPreset))
+        return;
 
+    const Preset* presetToLoad = getPresetForIndex (index);
     if (presetToLoad != nullptr)
         loadPreset (*presetToLoad);
 }
