@@ -44,7 +44,8 @@ public:
 
     void valueCompareTest()
     {
-        auto testSmooth = [=] (auto& ref, auto& comp, FloatType value, int numBlocks) {
+        auto testSmooth = [=] (auto& ref, auto& comp, FloatType value, int numBlocks)
+        {
             ref.setTargetValue (value);
             for (int i = 0; i < numBlocks; ++i)
             {
@@ -53,6 +54,8 @@ public:
 
                 for (int n = 0; n < maxBlockSize; ++n)
                     expectEquals (smoothData[n], ref.getNextValue(), "SmoothedValue was inaccurate!");
+
+                expectEquals (comp.getCurrentValue(), ref.getCurrentValue(), "Current value is innacurate!");
             }
 
             expect (comp.isSmoothing() == ref.isSmoothing(), "SmoothedBufferValue is not smoothing correctly!");
@@ -79,9 +82,11 @@ public:
         testSmooth (refSmooth2, compSmooth, (FloatType) val4, 5);
     }
 
-    void parameterCompareTest()
+    template <typename MapFuncType>
+    void parameterCompareTest (MapFuncType&& mapFunc)
     {
-        auto testSmooth = [=] (auto& ref, auto& comp, auto* param, FloatType value, int numBlocks) {
+        auto testSmooth = [=] (auto& ref, auto& comp, auto* param, FloatType value, int numBlocks)
+        {
             ref.setTargetValue (value);
             param->setValueNotifyingHost ((float) value);
 
@@ -91,7 +96,7 @@ public:
                 const auto* smoothData = comp.getSmoothedBuffer();
 
                 for (int n = 0; n < maxBlockSize; ++n)
-                    expectEquals (smoothData[n], ref.getNextValue(), "SmoothedValue was inaccurate!");
+                    expectEquals (smoothData[n], mapFunc (ref.getNextValue()), "SmoothedValue was inaccurate!");
             }
 
             expect (comp.isSmoothing() == ref.isSmoothing(), "SmoothedBufferValue is not smoothing correctly!");
@@ -105,6 +110,8 @@ public:
         SmoothedValue<FloatType, SmoothingType> refSmooth;
 
         compSmooth.setParameterHandle (vts.getRawParameterValue ("dummy"));
+        compSmooth.mappingFunction = [&] (auto x)
+        { return mapFunc (x); };
         compSmooth.prepare (fs, maxBlockSize);
         compSmooth.setRampLength (rampLegnth1);
 
@@ -120,7 +127,12 @@ public:
         valueCompareTest();
 
         beginTest ("Parameter Compare Test");
-        parameterCompareTest();
+        parameterCompareTest ([] (auto x)
+                              { return x; });
+
+        beginTest ("Parameter Mapping Test");
+        parameterCompareTest ([] (auto x)
+                              { return std::pow (x, 10.0f); });
     }
 };
 
