@@ -37,7 +37,7 @@ public:
     [[nodiscard]] bool isSmoothing() const noexcept { return smoother.isSmoothing(); }
 
     /** Returns the current smoothed value */
-    FloatType getCurrentValue() const noexcept { return smoother.getCurrentValue(); }
+    [[nodiscard]] FloatType getCurrentValue() const noexcept { return smoother.getCurrentValue(); }
 
     /**
      * Process smoothing for the current parameter handle.
@@ -60,7 +60,8 @@ public:
      * If using a custom mapping function, make sure this is set properly before calling
      * `prepare()` or `reset()`.
      */
-    std::function<FloatType (FloatType)> mappingFunction = [] (auto x) { return x; };
+    std::function<FloatType (FloatType)> mappingFunction = [] (auto x)
+    { return x; };
 
 private:
     juce::AudioBuffer<FloatType> buffer;
