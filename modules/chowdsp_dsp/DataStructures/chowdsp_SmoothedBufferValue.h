@@ -36,6 +36,9 @@ public:
     /** Returns true if the value is currently being smoothed */
     [[nodiscard]] bool isSmoothing() const noexcept { return smoother.isSmoothing(); }
 
+    /** Returns the current smoothed value */
+    FloatType getCurrentValue() const noexcept { return smoother.getCurrentValue(); }
+
     /**
      * Process smoothing for the current parameter handle.
      * Please don't call this function if the parameter handle has nt been set!
@@ -50,6 +53,14 @@ public:
 
     /** Returns a pointer to the current smoothed buffer. */
     [[nodiscard]] const FloatType* getSmoothedBuffer() const { return buffer.getReadPointer (0); }
+
+    /**
+     * Optional mapping function to map from the set value to the smoothed value.
+     *
+     * If using a custom mapping function, make sure this is set properly before calling
+     * `prepare()` or `reset()`.
+     */
+    std::function<FloatType (FloatType)> mappingFunction = [] (auto x) { return x; };
 
 private:
     juce::AudioBuffer<FloatType> buffer;
