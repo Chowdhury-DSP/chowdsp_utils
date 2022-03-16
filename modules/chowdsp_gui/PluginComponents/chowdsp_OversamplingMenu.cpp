@@ -14,8 +14,6 @@ OversamplingMenu<OSType>::OversamplingMenu (OSType& osMgr, juce::AudioProcessorV
     setColour (outlineColourID, juce::Colours::white);
     setColour (accentColourID, juce::Colours::yellow);
 
-    addAndMakeVisible (comboBox);
-
     std::tie (parameters[OSParam],
               parameters[OSMode],
               parameters[OSOfflineParam],
@@ -44,33 +42,14 @@ OversamplingMenu<OSType>::OversamplingMenu (OSType& osMgr, juce::AudioProcessorV
     }
 
     generateComboBoxMenu();
-    addComponentListener (this);
 }
 
 template <typename OSType>
-OversamplingMenu<OSType>::~OversamplingMenu()
+void OversamplingMenu<OSType>::updateColours()
 {
-    removeComponentListener (this);
-}
-
-template <typename OSType>
-void OversamplingMenu<OSType>::resized()
-{
-    comboBox.setBounds (getLocalBounds());
-}
-
-template <typename OSType>
-void OversamplingMenu<OSType>::componentNameChanged (juce::Component&)
-{
-    comboBox.setName (getName());
-}
-
-template <typename OSType>
-void OversamplingMenu<OSType>::paint (juce::Graphics&)
-{
-    comboBox.setColour (juce::ComboBox::ColourIds::backgroundColourId, findColour (backgroundColourID));
-    comboBox.setColour (juce::ComboBox::ColourIds::textColourId, findColour (textColourID));
-    comboBox.setColour (juce::ComboBox::ColourIds::outlineColourId, findColour (outlineColourID));
+    setColour (juce::ComboBox::ColourIds::backgroundColourId, findColour (backgroundColourID));
+    setColour (juce::ComboBox::ColourIds::textColourId, findColour (textColourID));
+    setColour (juce::ComboBox::ColourIds::outlineColourId, findColour (outlineColourID));
 
     auto newAccentColour = findColour (accentColourID);
     if (accentColour != newAccentColour)
@@ -78,13 +57,15 @@ void OversamplingMenu<OSType>::paint (juce::Graphics&)
         accentColour = newAccentColour;
         generateComboBoxMenu();
     }
+
+    repaint();
 }
 
 template <typename OSType>
 void OversamplingMenu<OSType>::generateComboBoxMenu()
 {
-    comboBox.clear();
-    auto* menu = comboBox.getRootMenu();
+    clear();
+    auto* menu = getRootMenu();
 
     auto createParamItem = [=] (juce::PopupMenu::Item& item,
                                 auto* parameter,
@@ -172,7 +153,7 @@ void OversamplingMenu<OSType>::generateComboBoxMenu()
     juce::String comboBoxText = selectedText.first;
     if (! sameAsRT && offlineParamsAvailable)
         comboBoxText += " / " + selectedText.second;
-    comboBox.setText (comboBoxText);
+    setText (comboBoxText);
 
     if (offlineParamsAvailable)
     {
