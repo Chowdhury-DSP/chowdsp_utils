@@ -29,6 +29,9 @@ public:
     /** Implements juce::Component */
     void resized() override;
 
+    /** Returns the juce::ComboBox used by the menu internally */
+    const auto& getMenuComboBox() const { return comboBox; }
+
 private:
     void generateComboBoxMenu();
     void componentNameChanged (juce::Component& comp) override;
