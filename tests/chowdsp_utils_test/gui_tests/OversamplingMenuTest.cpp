@@ -70,20 +70,6 @@ public:
         menu.paint (g);
     }
 
-    void boxNameTest()
-    {
-        TestPlugin2 plugin;
-        chowdsp::OversamplingMenu<chowdsp::VariableOversampling<float>> menu (plugin.oversampling, plugin.getVTS());
-
-        const String name1 = "Name 1";
-        menu.setName (name1);
-        expectEquals (menu.getMenuComboBox().getName(), name1, "Set name is incorrect!");
-
-        const String name2 = "Name 2";
-        menu.setName (name2);
-        expectEquals (menu.getMenuComboBox().getName(), name2, "Set name is incorrect!");
-    }
-
     void runTestTimed() override
     {
         beginTest ("With Offline Options Test");
@@ -91,9 +77,6 @@ public:
 
         beginTest ("Without Offline Options Test");
         withoutOfflineOptionsTest();
-
-        beginTest ("Box Name Test");
-        boxNameTest();
     }
 };
 
