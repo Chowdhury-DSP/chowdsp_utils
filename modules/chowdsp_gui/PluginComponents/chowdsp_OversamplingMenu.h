@@ -30,7 +30,7 @@ public:
     void resized() override;
 
     /** Returns the juce::ComboBox used by the menu internally */
-    const auto& getMenuComboBox() const { return comboBox; }
+    [[nodiscard]] const auto& getMenuComboBox() const { return comboBox; }
 
 private:
     void generateComboBoxMenu();
