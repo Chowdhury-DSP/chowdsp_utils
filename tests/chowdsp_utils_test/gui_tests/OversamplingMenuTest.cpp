@@ -45,29 +45,26 @@ class OversamplingMenuTest : public TimedUnitTest
 public:
     OversamplingMenuTest() : TimedUnitTest ("Oversampling Menu Test") {}
 
-    static void withOfflineOptionsTest()
+    void withOfflineOptionsTest()
     {
         TestPlugin2 plugin;
         chowdsp::OversamplingMenu<chowdsp::VariableOversampling<float>> menu (plugin.oversampling, plugin.getVTS());
-
-        menu.setBounds (0, 0, 100, 100);
-        Graphics g { Image() };
-        menu.paint (g);
 
         auto& vts = plugin.getVTS();
         const String& paramPrefix = "os";
         auto* osOfflineSameParam = dynamic_cast<juce::AudioParameterBool*> (vts.getParameter (paramPrefix + "_render_like_realtime"));
         *osOfflineSameParam = false;
+
+        expectEquals (menu.getRootMenu()->getNumItems(), 11, "Menu has the inccorect number of items!");
     }
 
-    static void withoutOfflineOptionsTest()
+    void withoutOfflineOptionsTest()
     {
         TestPlugin3 plugin;
         chowdsp::OversamplingMenu<chowdsp::VariableOversampling<float>> menu (plugin.oversampling, plugin.getVTS());
+        menu.updateColours();
 
-        menu.setBounds (0, 0, 100, 100);
-        Graphics g { Image() };
-        menu.paint (g);
+        expectEquals (menu.getRootMenu()->getNumItems(), 10, "Menu has the inccorect number of items!");
     }
 
     void runTestTimed() override
