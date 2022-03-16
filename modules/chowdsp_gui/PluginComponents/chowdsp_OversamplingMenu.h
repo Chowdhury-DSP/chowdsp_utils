@@ -6,7 +6,8 @@ namespace chowdsp
 {
 /** Menu that can be used as an interface for chowdsp::VariableOversampling */
 template <typename OSType>
-class OversamplingMenu : public juce::Component
+class OversamplingMenu : public juce::Component,
+                         private juce::ComponentListener
 {
 public:
     enum ColourIDs
@@ -20,6 +21,8 @@ public:
     /** Constructor with fields for the oversampling object, and APVTS */
     OversamplingMenu (OSType& osManager, juce::AudioProcessorValueTreeState& vts);
 
+    ~OversamplingMenu() override;
+
     /** Implements juce::Component */
     void paint (juce::Graphics&) override;
 
@@ -28,6 +31,7 @@ public:
 
 private:
     void generateComboBoxMenu();
+    void componentNameChanged (juce::Component& comp) override;
 
     juce::ComboBox comboBox;
     juce::Colour accentColour;

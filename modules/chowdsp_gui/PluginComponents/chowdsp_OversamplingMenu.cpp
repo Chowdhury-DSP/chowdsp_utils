@@ -44,12 +44,31 @@ OversamplingMenu<OSType>::OversamplingMenu (OSType& osMgr, juce::AudioProcessorV
     }
 
     generateComboBoxMenu();
+    addComponentListener (this);
+}
+
+template <typename OSType>
+OversamplingMenu<OSType>::~OversamplingMenu()
+{
+    removeComponentListener (this);
 }
 
 template <typename OSType>
 void OversamplingMenu<OSType>::resized()
 {
     comboBox.setBounds (getLocalBounds());
+}
+
+template <typename OSType>
+void OversamplingMenu<OSType>::componentNameChanged (juce::Component& comp)
+{
+    if (&comp != this)
+    {
+        jassertfalse; // this should be the only component we're listening to!
+        return;
+    }
+
+    comboBox.setName (comp.getName());
 }
 
 template <typename OSType>
