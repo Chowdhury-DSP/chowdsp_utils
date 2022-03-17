@@ -38,14 +38,21 @@ public:
     }
 
     /**
-     * Sets the cutoff frequency of the anti-alisaing
+     * Sets the cutoff frequency of the input anti-imaging
      * filter used by the bucket-brigade device
      */
-    void setFilterFreq (float freqHz)
+    void setInputFilterFreq (float freqHz = BBDFilterSpec::inputFilterOriginalCutoff)
     {
         inputFilter->set_freq (ALIEN ? freqHz * 0.2f : freqHz);
         inputFilter->set_time (tn);
+    }
 
+    /**
+     * Sets the cutoff frequency of the output anti-aliasing
+     * filter used by the bucket-brigade device
+     */
+    void setOutputFilterFreq (float freqHz = BBDFilterSpec::outputFilterOriginalCutoff)
+    {
         outputFilter->set_freq (ALIEN ? freqHz * 0.2f : freqHz);
         outputFilter->set_time (tn);
     }
@@ -70,15 +77,13 @@ public:
         outputFilter->set_delta (doubleTs);
     }
 
-    /** Processes a sample with the delay line */
+    /** Processes a sample with the delay line (ALIEN MODE) */
     template <bool A = ALIEN>
     inline typename std::enable_if<A, float>::type
         process (float u) noexcept
     {
         SIMDComplex<float> xOutAccum;
-        float sum = 0.0f;
-        float yBBD = 0.0f;
-        float delta = 0.0f;
+        float sum, yBBD, delta;
         while (tn < 1.0f)
         {
             if (evenOn)
@@ -86,7 +91,7 @@ public:
                 inputFilter->calcG();
                 sum = SIMDComplexMulReal (inputFilter->Gcalc, inputFilter->x).sum();
                 buffer[bufferPtr++] = sum;
-                bufferPtr = (bufferPtr < STAGES) ? bufferPtr : 0;
+                bufferPtr = (bufferPtr <= STAGES) ? bufferPtr : 0;
             }
             else
             {
@@ -108,14 +113,13 @@ public:
         return H0 * yBBD_old + sumOut;
     }
 
+    /** Processes a sample with the delay line (BBD MODE) */
     template <bool A = ALIEN>
     inline typename std::enable_if<! A, float>::type
         process (float u) noexcept
     {
         SIMDComplex<float> xOutAccum;
-        float sum = 0.0f;
-        float yBBD = 0.0f;
-        float delta = 0.0f;
+        float sum, yBBD, delta;
         while (tn < Ts)
         {
             if (evenOn)
@@ -123,7 +127,7 @@ public:
                 inputFilter->calcG();
                 sum = SIMDComplexMulReal (inputFilter->Gcalc, inputFilter->x).sum();
                 buffer[bufferPtr++] = sum;
-                bufferPtr = (bufferPtr < STAGES) ? bufferPtr : 0;
+                bufferPtr = (bufferPtr <= STAGES) ? bufferPtr : 0;
             }
             else
             {
@@ -153,9 +157,6 @@ private:
     std::unique_ptr<InputFilterBank> inputFilter;
     std::unique_ptr<OutputFilterBank> outputFilter;
     float H0 = 1.0f;
-
-    std::array<std::complex<float>, BBDFilterSpec::N_filt> xIn;
-    std::array<std::complex<float>, BBDFilterSpec::N_filt> xOut;
 
     std::array<float, STAGES> buffer;
     size_t bufferPtr = 0;

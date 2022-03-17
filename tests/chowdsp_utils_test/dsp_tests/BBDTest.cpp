@@ -47,7 +47,7 @@ public:
         processDelay (fs, (float) numSamples / 2.0f, bufferPtr, numSamples);
 
         auto firstNonZero = findFirstNonZero (bufferPtr, numSamples);
-        expectEquals (firstNonZero, numSamples / 2, "First non-zero sample is incorrect!");
+        expectEquals (firstNonZero, numSamples / 2 + 1, "First non-zero sample is incorrect!");
     }
 
     void postDelayTest()
