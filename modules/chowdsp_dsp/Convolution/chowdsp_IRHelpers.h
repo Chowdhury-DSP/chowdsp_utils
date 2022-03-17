@@ -26,4 +26,18 @@ void makeLinearPhase (float* linearPhaseIR, const float* originalIR, int numSamp
  * @param fft               A shared FFT object to use for the computation
  */
 void makeMinimumPhase (float* minimumPhaseIR, const float* originalIR, int numSamples, juce::dsp::FFT& fft);
+
+/**
+ * Transforms an impulse response to have exactly half the magnitude response of the original.
+ *
+ * This can be useful for creating a linear phase IR from a prototype filter. Just run an
+ * impulse through the filter forwards and backwards, then use this method to get half the
+ * magnitude response.
+ *
+ * @param halfMagIR     A "destination" pointer to the half magnitude IR data
+ * @param originalIR    A "source" pointer to the original IR data
+ * @param numSamples    The length of the impulse response in samples
+ * @param fft           A shared FFT object to use for the computation
+ */
+void makeHalfMagnitude (float* halfMagIR, const float* originalIR, int numSamples, juce::dsp::FFT& fft);
 } // namespace chowdsp::IRHelpers
