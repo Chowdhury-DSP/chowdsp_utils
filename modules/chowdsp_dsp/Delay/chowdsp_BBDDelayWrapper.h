@@ -19,8 +19,22 @@ public:
     /** Sets the anti-aliasing filter frequency */
     void setFilterFreq (float freqHz)
     {
+        setInputFilterFreq (freqHz);
+        setOutputFilterFreq (freqHz);
+    }
+
+    /** Sets the input anti-imaging filter frequency */
+    void setInputFilterFreq (float freqHz)
+    {
         for (auto& line : lines)
-            line.setFilterFreq (freqHz);
+            line.setInputFilterFreq (freqHz);
+    }
+
+    /** Sets the output anti-aliasing filter frequency */
+    void setOutputFilterFreq (float freqHz)
+    {
+        for (auto& line : lines)
+            line.setOutputFilterFreq (freqHz);
     }
 
     /** Sets the delay length in samples */
@@ -46,7 +60,8 @@ public:
         {
             lines.emplace_back();
             lines[ch].prepare (sampleRate);
-            lines[ch].setFilterFreq (10000.0f);
+            lines[ch].setInputFilterFreq();
+            lines[ch].setOutputFilterFreq();
         }
     }
 
