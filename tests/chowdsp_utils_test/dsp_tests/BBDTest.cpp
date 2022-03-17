@@ -47,7 +47,7 @@ public:
         processDelay (fs, (float) numSamples / 2.0f, bufferPtr, numSamples);
 
         auto firstNonZero = findFirstNonZero (bufferPtr, numSamples);
-        expectEquals (firstNonZero, numSamples / 2, "First non-zero sample is incorrect!");
+        expectEquals (firstNonZero, numSamples / 2 + 1, "First non-zero sample is incorrect!");
     }
 
     void postDelayTest()
@@ -77,7 +77,8 @@ public:
         constexpr int numSamples = 2048;
         constexpr auto lenSeconds = (float) numSamples / (float) fs;
 
-        auto runBuffer = [=] (float filterFreq, auto& samples) {
+        auto runBuffer = [=] (float filterFreq, auto& samples)
+        {
             chowdsp::BBD::BBDDelayWrapper<8192> delay;
             delay.prepare ({ fs, (uint32) numSamples, 1 });
             delay.setDelay (1.0f);
