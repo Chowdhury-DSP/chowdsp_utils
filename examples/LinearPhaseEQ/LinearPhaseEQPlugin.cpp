@@ -9,17 +9,19 @@ const juce::String peakingFilterQTag = "peak_filter_q";
 const juce::String peakingFilterGainTag = "peak_filter_gain";
 const juce::String highCutFreqTag = "high_cut_freq";
 const juce::String highCutQTag = "high_cut_q";
+const juce::String linPhaseModeTag = "linear_phase_mode";
 } // namespace
 
 LinearPhaseEQPlugin::LinearPhaseEQPlugin()
 {
     lowCutFreqHz = vts.getRawParameterValue (lowCutFreqTag);
     lowCutQ = vts.getRawParameterValue (lowCutQTag);
-    peakingFilterHz = vts.getRawParameterValue (peakingFilterFreqTag);
+    peakingFilterFreqHz = vts.getRawParameterValue (peakingFilterFreqTag);
     peakingFilterQ = vts.getRawParameterValue (peakingFilterQTag);
     peakingFilterGainDB = vts.getRawParameterValue (peakingFilterGainTag);
     highCutFreqHz = vts.getRawParameterValue (highCutFreqTag);
     highCutQ = vts.getRawParameterValue (highCutQTag);
+    linPhaseModeOn = vts.getRawParameterValue (linPhaseModeTag);
 }
 
 void LinearPhaseEQPlugin::addParameters (Parameters& params)
@@ -39,14 +41,47 @@ void LinearPhaseEQPlugin::addParameters (Parameters& params)
     addQParam (highCutQTag, "High Cut Q");
 
     createGainDBParameter (params, peakingFilterGainTag, "Bell Gain", -18.0f, 18.0f, 0.0f);
+
+    emplace_param<juce::AudioParameterBool> (params, linPhaseModeTag, "Linear Phase", false);
 }
 
 void LinearPhaseEQPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
+    protoEQ.prepare ({ sampleRate, (juce::uint32) samplesPerBlock, 1 });
+
+    setEQParams (true);
+}
+
+void LinearPhaseEQPlugin::setEQParams (bool force)
+{
+    protoEQ.setParameters ({
+                               *lowCutFreqHz,
+                               *lowCutQ,
+                               *peakingFilterFreqHz,
+                               *peakingFilterQ,
+                               *peakingFilterGainDB,
+                               *highCutFreqHz,
+                               *highCutQ,
+                           },
+                           force);
 }
 
 void LinearPhaseEQPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
 {
+    // only processing in mono for now!
+
+    if (*linPhaseModeOn == 0)
+    {
+        setEQParams();
+        protoEQ.processBlock (buffer);
+    }
+    else
+    {
+        // @TODO
+    }
+
+    for (int ch = 1; ch < buffer.getNumChannels(); ++ch)
+        buffer.copyFrom (ch, 0, buffer, 0, 0, buffer.getNumSamples());
 }
 
 juce::AudioProcessorEditor* LinearPhaseEQPlugin::createEditor()

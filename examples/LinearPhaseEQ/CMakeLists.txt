@@ -10,6 +10,7 @@ juce_add_plugin(LinearPhaseEQ
 
 target_sources(LinearPhaseEQ
     PRIVATE
+        PrototypeEQ.cpp
         LinearPhaseEQPlugin.cpp
 )
 
