@@ -17,6 +17,8 @@ using SIMDComplex = SIMDUtils::SIMDComplex<T>;
 namespace BBDFilterSpec
 {
     constexpr size_t N_filt = 4;
+    constexpr float inputFilterOriginalCutoff = 9900.0f;
+    constexpr float outputFilterOriginalCutoff = 9500.0f;
 
     constexpr std::complex<float> iFiltRoot[] = { { -10329.2715f, -329.848f },
                                                   { -10329.2715f, +329.848f },
@@ -76,8 +78,7 @@ public:
 
     inline void set_freq (float freq)
     {
-        constexpr float originalCutoff = 9900.0f;
-        const float freqFactor = freq / originalCutoff;
+        const float freqFactor = freq / BBDFilterSpec::inputFilterOriginalCutoff;
         root_corr = roots * freqFactor;
         pole_corr = poles.map ([&freqFactor, this] (const std::complex<float>& f) { return std::exp (f * freqFactor * Ts); });
 
@@ -151,8 +152,7 @@ public:
 
     inline void set_freq (float freq)
     {
-        constexpr float originalCutoff = 9500.0f;
-        const float freqFactor = freq / originalCutoff;
+        const float freqFactor = freq / BBDFilterSpec::outputFilterOriginalCutoff;
         pole_corr = poles.map ([&freqFactor, this] (const std::complex<float>& f) { return std::exp (f * freqFactor * Ts); });
 
         pole_corr_angle =

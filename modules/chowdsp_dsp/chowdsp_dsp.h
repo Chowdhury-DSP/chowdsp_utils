@@ -123,10 +123,10 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 // delay
 #include "Delay/chowdsp_DelayInterpolation.h"
 #include "Delay/chowdsp_DelayLine.h"
-#include "Delay/chowdsp_BBDFilterBank.h"
-#include "Delay/chowdsp_BBDDelayLine.h"
-#include "Delay/chowdsp_BBDDelayWrapper.h"
 #include "Delay/chowdsp_PitchShift.h"
+#include "Delay/BBD/chowdsp_BBDFilterBank.h"
+#include "Delay/BBD/chowdsp_BBDDelayLine.h"
+#include "Delay/BBD/chowdsp_BBDDelayWrapper.h"
 
 // convolution
 #include "Convolution/chowdsp_ConvolutionEngine.h"
