@@ -1,22 +1,21 @@
-message(STATUS "Configuring example: LinearPhaseEQ")
+message(STATUS "Configuring example: SimpleReverb")
 
-juce_add_plugin(LinearPhaseEQ
+juce_add_plugin(SimpleReverb
     COMPANY_NAME chowdsp
     PLUGIN_MANUFACTURER_CODE Chow
-    PLUGIN_CODE linP
+    PLUGIN_CODE sRvb
     FORMATS VST3 AU Standalone
-    PRODUCT_NAME LinearPhaseEQ
+    PRODUCT_NAME SimpleReverb
 
     MICROPHONE_PERMISSION_ENABLED TRUE
 )
 
-target_sources(LinearPhaseEQ
+target_sources(SimpleReverb
     PRIVATE
-        PrototypeEQ.cpp
-        LinearPhaseEQPlugin.cpp
+        SimpleReverbPlugin.cpp
 )
 
-target_compile_definitions(LinearPhaseEQ
+target_compile_definitions(SimpleReverb
     PUBLIC
         JUCE_DISPLAY_SPLASH_SCREEN=0
         JUCE_REPORT_APP_USAGE=0
@@ -25,7 +24,7 @@ target_compile_definitions(LinearPhaseEQ
         JUCE_VST3_CAN_REPLACE_VST2=0
 )
 
-target_link_libraries(LinearPhaseEQ
+target_link_libraries(SimpleReverb
     PRIVATE
         juce::juce_audio_utils
         juce::juce_dsp
