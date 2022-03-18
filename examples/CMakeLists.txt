@@ -12,3 +12,4 @@ juce_add_modules(
 )
 
 add_subdirectory(LinearPhaseEQ)
+add_subdirectory(SimpleReverb)
