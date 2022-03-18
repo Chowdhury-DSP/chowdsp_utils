@@ -99,6 +99,7 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 #include "Math/chowdsp_MatrixOps.h"
 #include "Math/chowdsp_Polynomials.h"
 #include "Math/chowdsp_Power.h"
+#include "Math/chowdsp_OtherMathOps.h"
 
 // some useful data structures
 #include "DataStructures/chowdsp_AudioBlockHelpers.h"

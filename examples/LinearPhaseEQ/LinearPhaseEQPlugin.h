@@ -3,6 +3,7 @@
 #include <chowdsp_plugin_utils/chowdsp_plugin_utils.h>
 
 #include "PrototypeEQ.h"
+#include "chowdsp_LinearPhaseEQ.h"
 
 class LinearPhaseEQPlugin : public chowdsp::PluginBase<LinearPhaseEQPlugin>
 {
@@ -18,6 +19,7 @@ public:
     juce::AudioProcessorEditor* createEditor() override;
 
 private:
+    PrototypeEQ::Params makeEQParams() const;
     void setEQParams (bool force = false);
 
     std::atomic<float>* lowCutFreqHz = nullptr;
@@ -30,6 +32,7 @@ private:
     std::atomic<float>* linPhaseModeOn = nullptr;
 
     PrototypeEQ protoEQ;
+    chowdsp::LinearPhaseEQ<PrototypeEQ> linPhaseEQ;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LinearPhaseEQPlugin)
 };
