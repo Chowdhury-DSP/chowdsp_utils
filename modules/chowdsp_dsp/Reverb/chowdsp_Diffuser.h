@@ -14,6 +14,8 @@ struct DefaultDiffuserConfig
 
     /** Chooses polarity multipliers randomly */
     static double getPolarityMultiplier (int channelIndex, int nChannels);
+
+    static void fillChannelSwapIndexes (size_t* indexes, int numChannels);
 };
 
 /**
@@ -27,9 +29,7 @@ class Diffuser
 {
     struct DelayType : public chowdsp::DelayLine<FloatType, DelayInterpType>
     {
-        DelayType() : chowdsp::DelayLine<FloatType, DelayInterpType> (1 << 18)
-        {
-        }
+        DelayType() : chowdsp::DelayLine<FloatType, DelayInterpType> (1 << 18) {}
     };
 
 public:
@@ -54,7 +54,7 @@ public:
         for (size_t i = 0; i < (size_t) nChannels; ++i)
         {
             delays[i].pushSample (0, data[i]);
-            outData[i] = delays[i].popSample (0);
+            outData[i] = delays[channelSwapIndexes[i]].popSample (0);
         }
 
         // Mix with a Hadamard matrix
@@ -71,10 +71,11 @@ private:
     std::array<DelayType, nChannels> delays;
     std::array<FloatType, nChannels> delayRelativeMults;
     std::array<FloatType, nChannels> polarityMultipliers;
+    std::array<size_t, nChannels> channelSwapIndexes;
 
     alignas (16) std::array<FloatType, nChannels> outData;
 
-    FloatType fs = (FloatType) 44100;
+    FloatType fs = (FloatType) 48000;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Diffuser)
 };

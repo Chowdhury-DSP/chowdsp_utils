@@ -14,12 +14,24 @@ inline double DefaultDiffuserConfig::getPolarityMultiplier (int /*channelIndex*/
     return juce::Random::getSystemRandom().nextBool() ? 1.0 : -1.0;
 }
 
+inline void DefaultDiffuserConfig::fillChannelSwapIndexes (size_t* indexes, int numChannels)
+{
+    std::random_device rd;
+    std::mt19937 g (rd());
+
+    std::iota (indexes, indexes + numChannels, 0);
+    std::shuffle (indexes, indexes + numChannels, g);
+}
+
 //======================================================================
 template <typename FloatType, int nChannels, typename DelayInterpType>
 template <typename DiffuserConfig>
 void Diffuser<FloatType, nChannels, DelayInterpType>::prepare (double sampleRate)
 {
     fs = (FloatType) sampleRate;
+
+    DiffuserConfig::fillChannelSwapIndexes (channelSwapIndexes.data(), nChannels);
+
     for (size_t i = 0; i < (size_t) nChannels; ++i)
     {
         delays[i].prepare ({ sampleRate, 128, 1 });
