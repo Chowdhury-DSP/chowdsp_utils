@@ -6,6 +6,18 @@ namespace chowdsp::FloatVectorOperations
 /** Returns true if the library is currently using the Apple vDSP framework */
 [[maybe_unused]] bool isUsingVDSP();
 
+/** Divides a scalar value by the src vector. */
+[[maybe_unused]] void divide (float* dest, const float* dividend, const float* divisor, int numValues) noexcept;
+
+/** Divides a scalar value by the src vector. */
+[[maybe_unused]] void divide (double* dest, const double* dividend, const double* divisor, int numValues) noexcept;
+
+/** Divides a scalar value by the src vector. */
+[[maybe_unused]] void divide (float* dest, float dividend, const float* divisor, int numValues) noexcept;
+
+/** Divides a scalar value by the src vector. */
+[[maybe_unused]] void divide (double* dest, double dividend, const double* divisor, int numValues) noexcept;
+
 /** Sums all the values in the given array. */
 [[maybe_unused]] float accumulate (const float* src, int numValues) noexcept;
 

@@ -88,6 +88,94 @@ namespace detail
     }
 
     template <typename T, typename Op>
+    void binaryOpFallback (T* dest, const T* src1, const T* src2, int numValues, Op&& op)
+    {
+        for (int i = 0; i < numValues; ++i)
+            dest[i] = op (src1[i], src2[i]);
+    }
+
+    template <typename T, typename ScalarOp, typename VecOp, typename LoadOp1Type, typename LoadOp2Type, typename StoreOpType>
+    void binaryOp (T* dest, const T* src1, const T* src2, int numValues, ScalarOp&& scalarOp, VecOp&& vecOp, LoadOp1Type&& loadOp1, LoadOp2Type&& loadOp2, StoreOpType&& storeOp)
+    {
+        constexpr auto vecSize = (int) juce::dsp::SIMDRegister<T>::size();
+        auto numVecOps = numValues / vecSize;
+
+        // Fallback: not enough operations to justify vectorizing!
+        if (numVecOps < 2)
+        {
+            binaryOpFallback (dest, src1, src2, numValues, scalarOp);
+            return;
+        }
+
+        // Main loop here...
+        while (--numVecOps >= 0)
+        {
+            storeOp (dest, vecOp (loadOp1 (src1), loadOp2 (src2)));
+            dest += vecSize;
+            src1 += vecSize;
+            src2 += vecSize;
+        }
+
+        // leftover values that can't be vectorized...
+        auto leftoverValues = numValues % vecSize;
+        if (leftoverValues > 0)
+            binaryOpFallback (dest, src1, src2, leftoverValues, scalarOp);
+    }
+
+    template <typename T, typename ScalarOp, typename VecOp>
+    void binaryOp (T* dest, const T* src1, const T* src2, int numValues, ScalarOp&& scalarOp, VecOp&& vecOp)
+    {
+        auto loadA = [] (const auto* ptr) { return juce::dsp::SIMDRegister<T>::fromRawArray (ptr); };
+
+        auto loadU = [] (const auto* ptr) { return SIMDUtils::loadUnaligned (ptr); };
+
+        auto storeA = [] (auto* ptr, const auto& reg) { return reg.copyToRawArray (ptr); };
+
+        auto storeU = [] (auto* ptr, const auto& reg) { return SIMDUtils::storeUnaligned (ptr, reg); };
+
+        if (isAligned (dest))
+        {
+            if (isAligned (src1))
+            {
+                if (isAligned (src2))
+                    binaryOp (dest, src1, src2, numValues, scalarOp, vecOp, loadA, loadA, storeA);
+                else
+                    binaryOp (dest, src1, src2, numValues, scalarOp, vecOp, loadA, loadU, storeA);
+            }
+            else
+            {
+                if (isAligned (src2))
+                    binaryOp (dest, src1, src2, numValues, scalarOp, vecOp, loadU, loadA, storeA);
+                else
+                    binaryOp (dest, src1, src2, numValues, scalarOp, vecOp, loadU, loadU, storeA);
+            }
+        }
+        else
+        {
+            if (isAligned (src1))
+            {
+                if (isAligned (src2))
+                    binaryOp (dest, src1, src2, numValues, scalarOp, vecOp, loadA, loadA, storeU);
+                else
+                    binaryOp (dest, src1, src2, numValues, scalarOp, vecOp, loadA, loadU, storeU);
+            }
+            else
+            {
+                if (isAligned (src2))
+                    binaryOp (dest, src1, src2, numValues, scalarOp, vecOp, loadU, loadA, storeU);
+                else
+                    binaryOp (dest, src1, src2, numValues, scalarOp, vecOp, loadU, loadU, storeU);
+            }
+        }
+    }
+
+    template <typename T, typename Op>
+    void binaryOp (T* dest, const T* src1, const T* src2, int numValues, Op&& op)
+    {
+        binaryOp (dest, src1, src2, numValues, op, op);
+    }
+
+    template <typename T, typename Op>
     T reduceFallback (const T* src, int numValues, T init, Op&& op)
     {
         for (int i = 0; i < numValues; ++i)
@@ -224,6 +312,64 @@ bool isUsingVDSP()
 #else
     return false;
 #endif
+}
+
+void divide (float* dest, const float* dividend, const float* divisor, int numValues) noexcept
+{
+#if JUCE_USE_VDSP_FRAMEWORK
+#else
+#endif
+    detail::binaryOp (dest,
+                      dividend,
+                      divisor,
+                      numValues,
+                      [] (auto num, auto den) {
+                          using namespace chowdsp::SIMDUtils;
+                          return num / den;
+                      });
+}
+
+void divide (double* dest, const double* dividend, const double* divisor, int numValues) noexcept
+{
+#if JUCE_USE_VDSP_FRAMEWORK
+#else
+#endif
+    detail::binaryOp (dest,
+                      dividend,
+                      divisor,
+                      numValues,
+                      [] (auto num, auto den) {
+                          using namespace chowdsp::SIMDUtils;
+                          return num / den;
+                      });
+}
+
+void divide (float* dest, float dividend, const float* divisor, int numValues) noexcept
+{
+#if JUCE_USE_VDSP_FRAMEWORK
+#else
+#endif
+    detail::unaryOp (dest,
+                     divisor,
+                     numValues,
+                     [dividend] (auto x) {
+                         using namespace chowdsp::SIMDUtils;
+                         return dividend / x;
+                     });
+}
+
+void divide (double* dest, double dividend, const double* divisor, int numValues) noexcept
+{
+#if JUCE_USE_VDSP_FRAMEWORK
+#else
+#endif
+    detail::unaryOp (dest,
+                     divisor,
+                     numValues,
+                     [dividend] (auto x) {
+                         using namespace chowdsp::SIMDUtils;
+                         return dividend / x;
+                     });
 }
 
 // @TODO: Figure out why vDSP_sve is failing unit tests in CI?

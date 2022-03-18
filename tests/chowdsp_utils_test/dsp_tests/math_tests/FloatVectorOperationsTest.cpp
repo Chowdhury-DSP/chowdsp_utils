@@ -7,6 +7,159 @@ public:
     {
     }
 
+    template <typename T, typename VectorOp, typename ReferenceOp>
+    void testReduce1dOp (std::vector<T>& in, VectorOp&& vectorOp, ReferenceOp&& referenceOp, T maxError)
+    {
+        const int numValues = (int) in.size();
+
+        {
+            auto actual = vectorOp (in.data(), numValues);
+            auto expected = referenceOp (in.data(), numValues);
+            expectWithinAbsoluteError (actual, expected, maxError, "Aligned result is incorrect!");
+        }
+
+        {
+            auto actual = vectorOp (in.data() + 1, numValues - 1);
+            auto expected = referenceOp (in.data() + 1, numValues - 1);
+            expectWithinAbsoluteError (actual, expected, maxError, "Unaligned result is incorrect!");
+        }
+    }
+
+    template <typename T, typename VectorOp, typename ReferenceOp>
+    void testReduce2dOp (std::vector<T>& in1, std::vector<T> in2, VectorOp&& vectorOp, ReferenceOp&& referenceOp, T maxError)
+    {
+        const int numValues = (int) in1.size();
+
+        {
+            auto actual = vectorOp (in1.data(), in2.data(), numValues);
+            auto expected = referenceOp (in1.data(), in2.data(), numValues);
+            expectWithinAbsoluteError (actual, expected, maxError, "Aligned result is incorrect!");
+        }
+
+        {
+            auto actual = vectorOp (in1.data() + 1, in2.data(), numValues - 1);
+            auto expected = referenceOp (in1.data() + 1, in2.data(), numValues - 1);
+            expectWithinAbsoluteError (actual, expected, maxError, "Unaligned/Aligned result is incorrect!");
+        }
+
+        {
+            auto actual = vectorOp (in1.data(), in2.data() + 1, numValues - 1);
+            auto expected = referenceOp (in1.data(), in2.data() + 1, numValues - 1);
+            expectWithinAbsoluteError (actual, expected, maxError, "Aligned/Unaligned result is incorrect!");
+        }
+
+        {
+            auto actual = vectorOp (in1.data() + 1, in2.data() + 1, numValues - 1);
+            auto expected = referenceOp (in1.data() + 1, in2.data() + 1, numValues - 1);
+            expectWithinAbsoluteError (actual, expected, maxError, "Unaligned result is incorrect!");
+        }
+    }
+
+    template <typename T, typename VectorOp, typename ReferenceOp>
+    void testUnaryOp (std::vector<T>& in, VectorOp&& vectorOp, ReferenceOp&& referenceOp, T maxError)
+    {
+        std::vector<T> actual (in.size());
+        const int numValues = (int) in.size();
+
+        {
+            vectorOp (actual.data(), in.data(), numValues);
+            for (size_t i = 0; i < (size_t) numValues; ++i)
+                expectWithinAbsoluteError (actual[i], referenceOp (in[i]), maxError, "Result with aligned inputs and ouputs is incorrect!");
+        }
+
+        {
+            vectorOp (actual.data(), in.data() + 1, numValues - 1);
+            for (size_t i = 1; i < (size_t) numValues; ++i)
+                expectWithinAbsoluteError (actual[i - 1], referenceOp (in[i]), maxError, "Result with unaligned input is incorrect!");
+        }
+
+        {
+            vectorOp (actual.data() + 1, in.data(), numValues - 1);
+            for (size_t i = 1; i < (size_t) numValues; ++i)
+                expectWithinAbsoluteError (actual[i], referenceOp (in[i - 1]), maxError, "Result with unaligned output is incorrect!");
+        }
+
+        {
+            vectorOp (actual.data() + 1, in.data() + 1, numValues - 1);
+            for (size_t i = 1; i < (size_t) numValues; ++i)
+                expectWithinAbsoluteError (actual[i], referenceOp (in[i]), maxError, "Result with unaligned input and output is incorrect!");
+        }
+    }
+
+    template <typename T, typename VectorOp, typename ReferenceOp>
+    void testBinaryOp (std::vector<T>& in1, std::vector<T>& in2, VectorOp&& vectorOp, ReferenceOp&& referenceOp, T maxError)
+    {
+        std::vector<T> actual (in1.size() + 1);
+        const int numValues = (int) in1.size();
+
+        for (int resultOffset = 0; resultOffset < 2; ++resultOffset)
+        {
+            String outputStr = (resultOffset == 0) ? "Aligned Output: " : "Unaligned Output: ";
+            auto* actualPtr = actual.data() + resultOffset;
+
+            {
+                vectorOp (actualPtr, in1.data(), in2.data(), numValues);
+                for (size_t i = 0; i < (size_t) numValues; ++i)
+                    expectWithinAbsoluteError (actualPtr[i], referenceOp (in1[i], in2[i]), maxError, outputStr + "Result with aligned inputs is incorrect!");
+            }
+
+            {
+                vectorOp (actualPtr, in1.data() + 1, in2.data(), numValues - 1);
+                for (size_t i = 1; i < (size_t) numValues; ++i)
+                    expectWithinAbsoluteError (actualPtr[i - 1], referenceOp (in1[i], in2[i - 1]), maxError, outputStr + "Result with first unaligned input is incorrect!");
+            }
+
+            {
+                vectorOp (actualPtr, in1.data(), in2.data() + 1, numValues - 1);
+                for (size_t i = 1; i < (size_t) numValues; ++i)
+                    expectWithinAbsoluteError (actualPtr[i - 1], referenceOp (in1[i - 1], in2[i]), maxError, outputStr + "Result with second unaligned input is incorrect!");
+            }
+
+            {
+                vectorOp (actualPtr, in1.data() + 1, in2.data() + 1, numValues - 1);
+                for (size_t i = 1; i < (size_t) numValues; ++i)
+                    expectWithinAbsoluteError (actualPtr[i - 1], referenceOp (in1[i], in2[i]), maxError, outputStr + "Result with both unaligned inputs is incorrect!");
+            }
+        }
+    }
+
+    template <typename T>
+    void divideScalarTest (Random& r, Range<int> range)
+    {
+        auto numValues = r.nextInt (range);
+        std::vector<T> divisor ((size_t) numValues, (T) 0);
+
+        for (auto& v : divisor)
+            v = (T) (r.nextFloat() + 1.0f);
+
+        testUnaryOp (
+            divisor,
+            [] (auto* dest, auto* src, int N) { chowdsp::FloatVectorOperations::divide (dest, (T) 1, src, N); },
+            [] (auto x) { return (T) 1 / x; },
+            (T) 1.0e-3);
+    }
+
+    template <typename T>
+    void divideVectorTest (Random& r, Range<int> range)
+    {
+        auto numValues = r.nextInt (range);
+        std::vector<T> dividend ((size_t) numValues, (T) 0);
+        std::vector<T> divisor ((size_t) numValues, (T) 0);
+
+        for (auto& v : dividend)
+            v = (T) (r.nextFloat() * 2.0f - 1.0f);
+
+        for (auto& v : divisor)
+            v = (T) (r.nextFloat() + 1.0f);
+
+        testBinaryOp (
+            dividend,
+            divisor,
+            [] (auto* dest, auto* src1, auto* src2, int N) { chowdsp::FloatVectorOperations::divide (dest, src1, src2, N); },
+            [] (auto num, auto den) { return num / den; },
+            (T) 1.0e-3);
+    }
+
     template <typename T>
     void accumulateTest (Random& r, Range<int> range)
     {
@@ -16,15 +169,11 @@ public:
         for (auto& v : values)
             v = (T) (r.nextFloat() * 2.0f - 1.0f);
 
-        constexpr auto maxErr = (T) 1.0e-3;
-
-        auto actual = chowdsp::FloatVectorOperations::accumulate (values.data(), numValues);
-        auto expected = std::accumulate (values.begin(), values.end(), (T) 0);
-        expectWithinAbsoluteError (actual, expected, maxErr, "Aligned accumulate is incorrect!");
-
-        actual = chowdsp::FloatVectorOperations::accumulate (values.data() + 1, numValues - 1);
-        expected = std::accumulate (values.begin() + 1, values.end(), (T) 0);
-        expectWithinAbsoluteError (actual, expected, maxErr, "Unaligned accumulate is incorrect!");
+        testReduce1dOp (
+            values,
+            [] (auto* src, int N) { return chowdsp::FloatVectorOperations::accumulate (src, N); },
+            [] (auto* src, int N) { return std::accumulate (src, src + N, (T) 0); },
+            (T) 1.0e-3);
     }
 
     template <typename T>
@@ -40,23 +189,12 @@ public:
         for (auto& v : values2)
             v = (T) (r.nextFloat() * 2.0f - 1.0f);
 
-        constexpr auto maxErr = (T) 1.0e-3;
-
-        auto actual = chowdsp::FloatVectorOperations::innerProduct (values1.data(), values2.data(), numValues);
-        auto expected = std::inner_product (values1.begin(), values1.end(), values2.begin(), (T) 0);
-        expectWithinAbsoluteError (actual, expected, maxErr, "Aligned innerProduct is incorrect!");
-
-        actual = chowdsp::FloatVectorOperations::innerProduct (values1.data() + 1, values2.data(), numValues - 1);
-        expected = std::inner_product (values1.begin() + 1, values1.end(), values2.begin(), (T) 0);
-        expectWithinAbsoluteError (actual, expected, maxErr, "Unaligned/Aligned innerProduct is incorrect!");
-
-        actual = chowdsp::FloatVectorOperations::innerProduct (values1.data(), values2.data() + 1, numValues - 1);
-        expected = std::inner_product (values1.begin(), values1.end() - 1, values2.begin() + 1, (T) 0);
-        expectWithinAbsoluteError (actual, expected, maxErr, "Aligned/Unaligned innerProduct is incorrect!");
-
-        actual = chowdsp::FloatVectorOperations::innerProduct (values1.data() + 1, values2.data() + 1, numValues - 1);
-        expected = std::inner_product (values1.begin() + 1, values1.end(), values2.begin() + 1, (T) 0);
-        expectWithinAbsoluteError (actual, expected, maxErr, "Unaligned innerProduct is incorrect!");
+        testReduce2dOp (
+            values1,
+            values2,
+            [] (auto* src1, auto* src2, int N) { return chowdsp::FloatVectorOperations::innerProduct (src1, src2, N); },
+            [] (auto* src1, auto* src2, int N) { return std::inner_product (src1, src1 + N, src2, (T) 0); },
+            (T) 1.0e-3);
     }
 
     template <typename T>
@@ -70,15 +208,11 @@ public:
         for (auto& v : values)
             v = (T) (r.nextFloat() * 2.0f - 1.0f);
 
-        constexpr auto maxErr = (T) 1.0e-3;
-
-        auto actual = chowdsp::FloatVectorOperations::findAbsoluteMaximum (values.data(), numValues);
-        auto expected = refAbsMax (values.begin(), values.end());
-        expectWithinAbsoluteError (actual, expected, maxErr, "Aligned absolute maximum is incorrect!");
-
-        actual = chowdsp::FloatVectorOperations::findAbsoluteMaximum (values.data() + 1, numValues - 1);
-        expected = refAbsMax (values.begin() + 1, values.end());
-        expectWithinAbsoluteError (actual, expected, maxErr, "Unaligned absolute maximum is incorrect!");
+        testReduce1dOp (
+            values,
+            [] (auto* src, int N) { return chowdsp::FloatVectorOperations::findAbsoluteMaximum (src, N); },
+            [&] (auto* src, int N) { return refAbsMax (src, src + N); },
+            (T) 1.0e-3);
     }
 
     template <typename T>
@@ -88,38 +222,15 @@ public:
         {
             auto numValues = r.nextInt (range);
             std::vector<T> inValues ((size_t) numValues, (T) 0);
-            std::vector<T> expValues ((size_t) numValues, (T) 0);
-            std::vector<T> actualValues ((size_t) numValues, (T) 0);
 
             for (auto& v : inValues)
                 v = (T) (r.nextFloat() * 2.0f - 1.0f);
 
-            constexpr auto maxErr = (T) 1.0e-6;
-            std::transform (inValues.begin(), inValues.end(), expValues.begin(), [exponent] (auto x) { return std::pow (x, (T) exponent); });
-
-            {
-                chowdsp::FloatVectorOperations::integerPower (actualValues.data(), inValues.data(), exponent, numValues);
-                for (size_t i = 0; i < (size_t) numValues; ++i)
-                    expectWithinAbsoluteError (actualValues[i], expValues[i], maxErr, "Aligned value is incorrect!");
-            }
-
-            {
-                chowdsp::FloatVectorOperations::integerPower (actualValues.data(), inValues.data() + 1, exponent, numValues - 1);
-                for (size_t i = 1; i < (size_t) numValues; ++i)
-                    expectWithinAbsoluteError (actualValues[i - 1], expValues[i], maxErr, "Aligned value is incorrect!");
-            }
-
-            {
-                chowdsp::FloatVectorOperations::integerPower (actualValues.data() + 1, inValues.data(), exponent, numValues - 1);
-                for (size_t i = 1; i < (size_t) numValues; ++i)
-                    expectWithinAbsoluteError (actualValues[i], expValues[i - 1], maxErr, "Aligned value is incorrect!");
-            }
-
-            {
-                chowdsp::FloatVectorOperations::integerPower (actualValues.data() + 1, inValues.data() + 1, exponent, numValues - 1);
-                for (size_t i = 1; i < (size_t) numValues; ++i)
-                    expectWithinAbsoluteError (actualValues[i], expValues[i], maxErr, "Aligned value is incorrect!");
-            }
+            testUnaryOp (
+                inValues,
+                [exponent] (auto* dest, auto* src, int N) { chowdsp::FloatVectorOperations::integerPower (dest, src, exponent, N); },
+                [exponent] (auto x) { return std::pow (x, (T) exponent); },
+                (T) 1.0e-6);
         }
     }
 
@@ -139,15 +250,11 @@ public:
         for (auto& v : values)
             v = (T) (r.nextFloat() * 2.0f - 1.0f);
 
-        constexpr auto maxErr = (T) 1.0e-3;
-
-        auto actual = chowdsp::FloatVectorOperations::computeRMS (values.data(), numValues);
-        auto expected = idealRMS (values.data(), numValues);
-        expectWithinAbsoluteError (actual, expected, maxErr, "Aligned RMS is incorrect!");
-
-        actual = chowdsp::FloatVectorOperations::computeRMS (values.data() + 1, numValues - 1);
-        expected = idealRMS (values.data() + 1, numValues - 1);
-        expectWithinAbsoluteError (actual, expected, maxErr, "Unaligned RMS is incorrect!");
+        testReduce1dOp (
+            values,
+            [] (auto* src, int N) { return chowdsp::FloatVectorOperations::computeRMS (src, N); },
+            [&] (auto* src, int N) { return idealRMS (src, N); },
+            (T) 1.0e-3);
     }
 
     void runTestTimed() override
@@ -159,45 +266,58 @@ public:
 
         auto rand = getRandom();
 
+        std::vector<Range<int>> floatTestRanges {
+            { 2, 6 },
+            { 100, 200 },
+            { 113, 114 }
+        };
+        std::vector<Range<int>> doubleTestRanges {
+            { 2, 4 },
+            { 100, 200 },
+            { 113, 114 }
+        };
+
+        beginTest ("Divide Scalar Test");
+        for (const auto& range : floatTestRanges)
+            divideScalarTest<float> (rand, range);
+        for (const auto& range : doubleTestRanges)
+            divideScalarTest<double> (rand, range);
+
+        beginTest ("Divide Vector Test");
+        for (const auto& range : floatTestRanges)
+            divideVectorTest<float> (rand, range);
+        for (const auto& range : doubleTestRanges)
+            divideVectorTest<double> (rand, range);
+
         beginTest ("Accumulate Test");
-        accumulateTest<float> (rand, { 2, 6 });
-        accumulateTest<float> (rand, { 100, 200 });
-        accumulateTest<float> (rand, { 113, 114 });
-        accumulateTest<double> (rand, { 2, 4 });
-        accumulateTest<double> (rand, { 100, 200 });
-        accumulateTest<double> (rand, { 113, 114 });
+        for (const auto& range : floatTestRanges)
+            accumulateTest<float> (rand, range);
+        for (const auto& range : doubleTestRanges)
+            accumulateTest<double> (rand, range);
 
         beginTest ("Inner Product Test");
-        innerProdTest<float> (rand, { 2, 6 });
-        innerProdTest<float> (rand, { 100, 200 });
-        innerProdTest<float> (rand, { 113, 114 });
-        innerProdTest<double> (rand, { 2, 4 });
-        innerProdTest<double> (rand, { 100, 200 });
-        innerProdTest<double> (rand, { 113, 114 });
+        for (const auto& range : floatTestRanges)
+            innerProdTest<float> (rand, range);
+        for (const auto& range : doubleTestRanges)
+            innerProdTest<double> (rand, range);
 
         beginTest ("Absolute Maximum Test");
-        absMaxTest<float> (rand, { 2, 6 });
-        absMaxTest<float> (rand, { 100, 200 });
-        absMaxTest<float> (rand, { 113, 114 });
-        absMaxTest<double> (rand, { 2, 4 });
-        absMaxTest<double> (rand, { 100, 200 });
-        absMaxTest<double> (rand, { 113, 114 });
+        for (const auto& range : floatTestRanges)
+            absMaxTest<float> (rand, range);
+        for (const auto& range : doubleTestRanges)
+            absMaxTest<double> (rand, range);
 
         beginTest ("Integer Power Test");
-        integerPowerTest<float> (rand, { 2, 6 });
-        integerPowerTest<float> (rand, { 100, 200 });
-        integerPowerTest<float> (rand, { 113, 114 });
-        integerPowerTest<double> (rand, { 2, 4 });
-        integerPowerTest<double> (rand, { 100, 200 });
-        integerPowerTest<double> (rand, { 113, 114 });
+        for (const auto& range : floatTestRanges)
+            integerPowerTest<float> (rand, range);
+        for (const auto& range : doubleTestRanges)
+            integerPowerTest<double> (rand, range);
 
         beginTest ("RMS Test");
-        computeRMSTest<float> (rand, { 2, 6 });
-        computeRMSTest<float> (rand, { 100, 200 });
-        computeRMSTest<float> (rand, { 113, 114 });
-        computeRMSTest<double> (rand, { 2, 4 });
-        computeRMSTest<double> (rand, { 100, 200 });
-        computeRMSTest<double> (rand, { 113, 114 });
+        for (const auto& range : floatTestRanges)
+            computeRMSTest<float> (rand, range);
+        for (const auto& range : doubleTestRanges)
+            computeRMSTest<double> (rand, range);
     }
 };
 
