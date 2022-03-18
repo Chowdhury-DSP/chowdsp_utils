@@ -31,10 +31,10 @@ struct DefaultFDNConfig
     static const FloatType* doFeedbackProcess (DefaultFDNConfig& fdnConfig, const FloatType* data);
 
 protected:
-    alignas (16) std::array<FloatType, nChannels> fbData;
+    alignas (16) std::array<FloatType, (size_t) nChannels> fbData;
 
 private:
-    std::array<chowdsp::ShelfFilter<FloatType>, nChannels> shelfs;
+    std::array<chowdsp::ShelfFilter<FloatType>, (size_t) nChannels> shelfs;
     FloatType fs = 48000.0f;
 };
 
@@ -95,12 +95,12 @@ public:
     auto& getFDNConfig() { return fdnConfig; }
 
 private:
-    std::array<DelayType, nChannels> delays;
-    std::array<FloatType, nChannels> delayRelativeMults;
+    std::array<DelayType, (size_t) nChannels> delays;
+    std::array<FloatType, (size_t) nChannels> delayRelativeMults;
 
     FDNConfig fdnConfig;
 
-    alignas (16) std::array<FloatType, nChannels> outData;
+    alignas (16) std::array<FloatType, (size_t) nChannels> outData;
 
     FloatType fs = (FloatType) 48000;
 

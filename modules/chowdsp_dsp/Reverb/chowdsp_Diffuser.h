@@ -68,12 +68,12 @@ public:
     }
 
 private:
-    std::array<DelayType, nChannels> delays;
-    std::array<FloatType, nChannels> delayRelativeMults;
-    std::array<FloatType, nChannels> polarityMultipliers;
-    std::array<size_t, nChannels> channelSwapIndexes;
+    std::array<DelayType, (size_t) nChannels> delays;
+    std::array<FloatType, (size_t) nChannels> delayRelativeMults;
+    std::array<FloatType, (size_t) nChannels> polarityMultipliers;
+    std::array<size_t, (size_t) nChannels> channelSwapIndexes;
 
-    alignas (16) std::array<FloatType, nChannels> outData;
+    alignas (16) std::array<FloatType, (size_t) nChannels> outData;
 
     FloatType fs = (FloatType) 48000;
 
@@ -125,8 +125,8 @@ public:
     }
 
 private:
-    std::array<DiffuserType, nStages> stages;
-    std::array<FloatType, nStages> diffusionTimeMults;
+    std::array<DiffuserType, (size_t) nStages> stages;
+    std::array<FloatType, (size_t) nStages> diffusionTimeMults;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DiffuserChain)
 };

@@ -32,7 +32,7 @@ template <typename FloatType, int nChannels>
 FloatType DefaultFDNConfig<FloatType, nChannels>::calcGainForT60 (FloatType decayTimeMs, FloatType delayTimeMs)
 {
     const auto nTimes = decayTimeMs / delayTimeMs;
-    return std::powf ((FloatType) 0.001, (FloatType) 1 / nTimes);
+    return std::pow ((FloatType) 0.001, (FloatType) 1 / nTimes);
 }
 
 template <typename FloatType, int nChannels>
