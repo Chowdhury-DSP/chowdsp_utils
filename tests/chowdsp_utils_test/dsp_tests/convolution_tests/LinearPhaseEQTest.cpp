@@ -39,6 +39,7 @@ public:
         testEQ.prepare ({ Constants::sampleRate, Constants::blockSize, 1 }, { true });
 
         AudioBuffer<float> buffer (1, Constants::blockSize);
+        buffer.clear();
         buffer.setSample (0, 0, 1.0f);
 
         auto&& block = dsp::AudioBlock<float> { buffer };
@@ -66,6 +67,7 @@ public:
 
         auto processBlock = [&testEQ]() {
             AudioBuffer<float> buffer (1, Constants::blockSize);
+            buffer.clear();
             buffer.setSample (0, 0, 1.0f);
             auto&& block = dsp::AudioBlock<float> { buffer };
             testEQ.process (dsp::ProcessContextReplacing<float> { block });
@@ -105,13 +107,11 @@ public:
 
     void runTestTimed() override
     {
-#if ! JUCE_LINUX // @TODO: these tests fail on Linux for some reason
         beginTest ("Process Test");
         processTest();
 
         beginTest ("Parameters Test");
         parametersTest();
-#endif
 
         beginTest ("FIR Length Test");
         firLengthTest();
