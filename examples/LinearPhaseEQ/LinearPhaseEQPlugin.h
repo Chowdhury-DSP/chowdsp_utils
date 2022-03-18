@@ -3,7 +3,6 @@
 #include <chowdsp_plugin_utils/chowdsp_plugin_utils.h>
 
 #include "PrototypeEQ.h"
-#include "chowdsp_LinearPhaseEQ.h"
 
 class LinearPhaseEQPlugin : public chowdsp::PluginBase<LinearPhaseEQPlugin>
 {

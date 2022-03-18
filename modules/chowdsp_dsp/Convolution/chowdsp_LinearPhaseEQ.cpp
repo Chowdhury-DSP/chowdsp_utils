@@ -40,7 +40,7 @@ void LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::prepare (const juce::dsp::Pro
     irUpdateState.store (IRUpdateState::Good);
     irTransfer = std::make_unique<chowdsp::IRTransfer> (*engines[0]);
 
-    startTimer (5);
+    startTimer (10); // @TODO: should we expose the timer frequency to the user?
 }
 
 template <typename PrototypeEQ, int defaultFIRLength>
@@ -90,7 +90,37 @@ void LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::updateParams()
     prototypeEQ.reset();
     prototypeEQ.processBlock (irBuffer);
 
+    // halve the IR magnitude sicne we processed it twice
     chowdsp::IRHelpers::makeHalfMagnitude (irData, irData, irSize, *fft);
+}
+
+template <typename PrototypeEQ, int defaultFIRLength>
+bool LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::attemptIRTransfer()
+{
+    juce::SpinLock::ScopedTryLockType lock (irTransfer->mutex);
+    if (! lock.isLocked())
+        return false; // we weren't able to grab the irTransfer lock, so let's skip and  try again later!
+
+    // Lock acquired! Let's do the swap
+    for (auto& eng : engines)
+        irTransfer->transferIR (*eng);
+
+    irUpdateState.store (IRUpdateState::Good);
+    return true;
+}
+
+template <typename PrototypeEQ, int defaultFIRLength>
+void LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::processBlocksInternal (const juce::dsp::AudioBlock<const float>& inBlock, juce::dsp::AudioBlock<float>& outBlock) noexcept
+{
+    const auto numChannels = outBlock.getNumChannels();
+    const auto numSamples = outBlock.getNumSamples();
+
+    for (size_t ch = 0; ch < numChannels; ++ch)
+    {
+        engines[ch]->processSamples (inBlock.getChannelPointer (ch),
+                                     outBlock.getChannelPointer (ch),
+                                     numSamples);
+    }
 }
 
 template <typename PrototypeEQ, int defaultFIRLength>
@@ -98,30 +128,17 @@ template <typename ProcessContext>
 void LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::process (const ProcessContext& context)
 {
     if (irUpdateState == IRUpdateState::Ready)
-    {
-        juce::SpinLock::ScopedTryLockType lock (irTransfer->mutex);
-        if (lock.isLocked())
-        {
-            for (auto& eng : engines)
-                irTransfer->transferIR (*eng);
-
-            irUpdateState.store (IRUpdateState::Good);
-        }
-    }
+        attemptIRTransfer();
 
     auto&& inBlock = context.getInputBlock();
     auto&& outBlock = context.getOutputBlock();
 
-    // copy input to output if needed
-    if (context.usesSeparateInputAndOutputBlocks())
-        chowdsp::AudioBlockHelpers::copyBlocks (outBlock, inBlock);
+    // input and output blocks must be the same size!
+    jassert (outBlock.getNumChannels() == inBlock.getNumChannels());
+    jassert (outBlock.getNumSamples() == inBlock.getNumSamples());
 
-    for (size_t ch = 0; ch < outBlock.getNumChannels(); ++ch)
-    {
-        engines[ch]->processSamples (outBlock.getChannelPointer (ch),
-                                     outBlock.getChannelPointer (ch),
-                                     outBlock.getNumSamples());
-    }
+    // Do regular processing
+    processBlocksInternal (inBlock, outBlock);
 }
 
 template <typename PrototypeEQ, int defaultFIRLength>

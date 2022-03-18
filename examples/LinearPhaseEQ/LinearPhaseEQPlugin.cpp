@@ -54,6 +54,9 @@ void LinearPhaseEQPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)
     protoEQ.prepare (spec);
     linPhaseEQ.prepare (spec, makeEQParams());
 
+    // If linear phase mode will always be on, this is the place to report latency to the host!
+    // setLatencySamples (linPhaseEQ.getLatencySamples());
+
     setEQParams (true);
 }
 
