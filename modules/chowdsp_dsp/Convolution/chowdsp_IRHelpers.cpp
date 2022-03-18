@@ -40,6 +40,8 @@ void transformIRFreqDomain (float* targetIR, const float* originalIR, int numSam
 
 void makeLinearPhase (float* linearPhaseIR, const float* originalIR, int numSamples, juce::dsp::FFT& fft)
 {
+    // @TODO: make sure all four types are handled correctly (even/symmetric, odd/symmetric, even/asym, odd/asym), plus add options for symmetric
+
     transformIRFreqDomain (
         linearPhaseIR,
         originalIR,
@@ -127,6 +129,27 @@ void makeMinimumPhase (float* minimumPhaseIR, const float* originalIR, int numSa
                 [] (auto H, auto arg_H_val) {
                     using namespace std::complex_literals;
                     return H * std::exp (1.0if * arg_H_val);
+                });
+        },
+        false,
+        false);
+}
+
+void makeHalfMagnitude (float* halfMagIR, const float* originalIR, int numSamples, juce::dsp::FFT& fft)
+{
+    transformIRFreqDomain (
+        halfMagIR,
+        originalIR,
+        numSamples,
+        fft,
+        [] (auto& freqDomainData) {
+            std::transform (
+                freqDomainData.begin(),
+                freqDomainData.end(),
+                freqDomainData.begin(),
+                [] (auto H) {
+                    using namespace std::complex_literals;
+                    return std::sqrt (std::abs (H)) * std::exp (1.0if * std::arg (H));
                 });
         },
         false,

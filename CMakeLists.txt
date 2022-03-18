@@ -5,8 +5,9 @@ include(CTest)
 
 option(CHOWDSP_ENABLE_TESTING "Enable testing for chowdsp modules" OFF)
 option(CHOWDSP_ENABLE_BENCHMARKS "Enable benchmarks for chowdsp modules" OFF)
+option(CHOWDSP_ENABLE_EXAMPLES "Enable examples for chowdsp modules" OFF)
 
-if(NOT (CHOWDSP_ENABLE_TESTING OR CHOWDSP_ENABLE_BENCHMARKS))
+if(NOT (CHOWDSP_ENABLE_TESTING OR CHOWDSP_ENABLE_BENCHMARKS OR CHOWDSP_ENABLE_EXAMPLES))
     juce_add_modules(
         modules/chowdsp_dsp
         modules/chowdsp_gui
@@ -16,4 +17,6 @@ elseif(CHOWDSP_ENABLE_TESTING)
     add_subdirectory(tests)
 elseif(CHOWDSP_ENABLE_BENCHMARKS)
     add_subdirectory(bench)
+elseif(CHOWDSP_ENABLE_EXAMPLES)
+    add_subdirectory(examples)
 endif()
