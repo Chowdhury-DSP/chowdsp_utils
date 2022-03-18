@@ -6,7 +6,7 @@ ConvolutionEngine::ConvolutionEngine (size_t numSamples, size_t maxBlockSize, co
     : irNumSamples (numSamples),
       blockSize ((size_t) juce::nextPowerOfTwo ((int) maxBlockSize)),
       fftSize (blockSize > 128 ? 2 * blockSize : 4 * blockSize),
-      fftObject (std::make_unique<juce::dsp::FFT> (juce::roundToInt (std::log2 (fftSize)))),
+      fftObject (std::make_unique<juce::dsp::FFT> (chowdsp::log2 (fftSize))),
       numSegments (numSamples / (fftSize - blockSize) + 1u),
       numInputSegments ((blockSize > 128 ? numSegments : 3 * numSegments)),
       bufferInput (1, static_cast<int> (fftSize)),

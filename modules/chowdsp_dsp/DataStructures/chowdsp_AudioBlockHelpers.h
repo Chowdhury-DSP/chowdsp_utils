@@ -24,5 +24,4 @@ inline typename std::enable_if<SampleTypeHelpers::IsSIMDRegister<T>, void>::type
             destPtr[i] = srcPtr[i];
     }
 }
-
 } // namespace chowdsp::AudioBlockHelpers
