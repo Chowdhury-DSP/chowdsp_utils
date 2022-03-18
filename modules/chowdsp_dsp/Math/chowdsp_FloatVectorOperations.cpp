@@ -57,17 +57,13 @@ namespace detail
     template <typename T, typename ScalarOp, typename VecOp>
     void unaryOp (T* dest, const T* src, int numValues, ScalarOp&& scalarOp, VecOp&& vecOp)
     {
-        auto loadA = [] (const auto* ptr)
-        { return juce::dsp::SIMDRegister<T>::fromRawArray (ptr); };
+        auto loadA = [] (const auto* ptr) { return juce::dsp::SIMDRegister<T>::fromRawArray (ptr); };
 
-        auto loadU = [] (const auto* ptr)
-        { return SIMDUtils::loadUnaligned (ptr); };
+        auto loadU = [] (const auto* ptr) { return SIMDUtils::loadUnaligned (ptr); };
 
-        auto storeA = [] (auto* ptr, const auto& reg)
-        { return reg.copyToRawArray (ptr); };
+        auto storeA = [] (auto* ptr, const auto& reg) { return reg.copyToRawArray (ptr); };
 
-        auto storeU = [] (auto* ptr, const auto& reg)
-        { return SIMDUtils::storeUnaligned (ptr, reg); };
+        auto storeU = [] (auto* ptr, const auto& reg) { return SIMDUtils::storeUnaligned (ptr, reg); };
 
         if (isAligned (dest))
         {
@@ -129,17 +125,13 @@ namespace detail
     template <typename T, typename ScalarOp, typename VecOp>
     void binaryOp (T* dest, const T* src1, const T* src2, int numValues, ScalarOp&& scalarOp, VecOp&& vecOp)
     {
-        auto loadA = [] (const auto* ptr)
-        { return juce::dsp::SIMDRegister<T>::fromRawArray (ptr); };
+        auto loadA = [] (const auto* ptr) { return juce::dsp::SIMDRegister<T>::fromRawArray (ptr); };
 
-        auto loadU = [] (const auto* ptr)
-        { return SIMDUtils::loadUnaligned (ptr); };
+        auto loadU = [] (const auto* ptr) { return SIMDUtils::loadUnaligned (ptr); };
 
-        auto storeA = [] (auto* ptr, const auto& reg)
-        { return reg.copyToRawArray (ptr); };
+        auto storeA = [] (auto* ptr, const auto& reg) { return reg.copyToRawArray (ptr); };
 
-        auto storeU = [] (auto* ptr, const auto& reg)
-        { return SIMDUtils::storeUnaligned (ptr, reg); };
+        auto storeU = [] (auto* ptr, const auto& reg) { return SIMDUtils::storeUnaligned (ptr, reg); };
 
         if (isAligned (dest))
         {
@@ -242,8 +234,7 @@ namespace detail
     template <typename T, typename ScalarOp, typename VecOp>
     T reduce (const T* src, int numValues, T init, ScalarOp&& scalarOp, VecOp&& vecOp)
     {
-        return reduce (src, numValues, init, scalarOp, vecOp, [] (auto val)
-                       { return val.sum(); });
+        return reduce (src, numValues, init, scalarOp, vecOp, [] (auto val) { return val.sum(); });
     }
 
     template <typename T, typename ScalarOp>
@@ -263,8 +254,7 @@ namespace detail
             return reduceFallback (src1, src2, numValues, init, scalarOp);
 
         // Main loop here:
-        auto vecLoop = [&] (auto&& loadOp1, auto&& loadOp2)
-        {
+        auto vecLoop = [&] (auto&& loadOp1, auto&& loadOp2) {
             juce::dsp::SIMDRegister<T> resultVec {};
             while (--numVecOps >= 0)
             {
@@ -277,10 +267,8 @@ namespace detail
         };
 
         // define load operations
-        auto loadA = [] (const T* val)
-        { return juce::dsp::SIMDRegister<T>::fromRawArray (val); };
-        auto loadU = [] (const T* val)
-        { return loadUnaligned (val); };
+        auto loadA = [] (const T* val) { return juce::dsp::SIMDRegister<T>::fromRawArray (val); };
+        auto loadU = [] (const T* val) { return loadUnaligned (val); };
 
         // select load operations based on data alignment
         const auto isSrc1Aligned = isAligned (src1);
@@ -306,8 +294,7 @@ namespace detail
     template <typename T, typename ScalarOp, typename VecOp>
     T reduce (const T* src1, const T* src2, int numValues, T init, ScalarOp&& scalarOp, VecOp&& vecOp)
     {
-        return reduce (src1, src2, numValues, init, scalarOp, vecOp, [] (auto val)
-                       { return val.sum(); });
+        return reduce (src1, src2, numValues, init, scalarOp, vecOp, [] (auto val) { return val.sum(); });
     }
 
     template <typename T, typename ScalarOp>
@@ -336,8 +323,7 @@ void divide (float* dest, const float* dividend, const float* divisor, int numVa
                       dividend,
                       divisor,
                       numValues,
-                      [] (auto num, auto den)
-                      {
+                      [] (auto num, auto den) {
                           using namespace chowdsp::SIMDUtils;
                           return num / den;
                       });
@@ -352,8 +338,7 @@ void divide (double* dest, const double* dividend, const double* divisor, int nu
                       dividend,
                       divisor,
                       numValues,
-                      [] (auto num, auto den)
-                      {
+                      [] (auto num, auto den) {
                           using namespace chowdsp::SIMDUtils;
                           return num / den;
                       });
@@ -367,8 +352,7 @@ void divide (float* dest, float dividend, const float* divisor, int numValues) n
     detail::unaryOp (dest,
                      divisor,
                      numValues,
-                     [dividend] (auto x)
-                     {
+                     [dividend] (auto x) {
                          using namespace chowdsp::SIMDUtils;
                          return dividend / x;
                      });
@@ -382,8 +366,7 @@ void divide (double* dest, double dividend, const double* divisor, int numValues
     detail::unaryOp (dest,
                      divisor,
                      numValues,
-                     [dividend] (auto x)
-                     {
+                     [dividend] (auto x) {
                          using namespace chowdsp::SIMDUtils;
                          return dividend / x;
                      });
@@ -402,8 +385,7 @@ float accumulate (const float* src, int numValues) noexcept
         src,
         numValues,
         0.0f,
-        [] (auto prev, auto next)
-        { return prev + next; });
+        [] (auto prev, auto next) { return prev + next; });
 #endif
 }
 
@@ -418,8 +400,7 @@ double accumulate (const double* src, int numValues) noexcept
         src,
         numValues,
         0.0,
-        [] (auto prev, auto next)
-        { return prev + next; });
+        [] (auto prev, auto next) { return prev + next; });
 #endif
 }
 
@@ -435,8 +416,7 @@ float innerProduct (const float* src1, const float* src2, int numValues) noexcep
         src2,
         numValues,
         0.0f,
-        [] (auto prev, auto next1, auto next2)
-        { return prev + next1 * next2; });
+        [] (auto prev, auto next1, auto next2) { return prev + next1 * next2; });
 #endif
 }
 
@@ -452,8 +432,7 @@ double innerProduct (const double* src1, const double* src2, int numValues) noex
         src2,
         numValues,
         0.0,
-        [] (auto prev, auto next1, auto next2)
-        { return prev + next1 * next2; });
+        [] (auto prev, auto next1, auto next2) { return prev + next1 * next2; });
 #endif
 }
 
@@ -469,12 +448,9 @@ float findAbsoluteMaximum (const float* src, int numValues) noexcept
         src,
         numValues,
         0.0f,
-        [] (auto a, auto b)
-        { return juce::jmax (std::abs (a), std::abs (b)); },
-        [] (auto a, auto b)
-        { return Vec::max (Vec::abs (a), Vec::abs (b)); },
-        [] (auto x)
-        { return SIMDUtils::hAbsMaxSIMD (x); });
+        [] (auto a, auto b) { return juce::jmax (std::abs (a), std::abs (b)); },
+        [] (auto a, auto b) { return Vec::max (Vec::abs (a), Vec::abs (b)); },
+        [] (auto x) { return SIMDUtils::hAbsMaxSIMD (x); });
 #endif
 }
 
@@ -490,12 +466,9 @@ double findAbsoluteMaximum (const double* src, int numValues) noexcept
         src,
         numValues,
         0.0,
-        [] (auto a, auto b)
-        { return juce::jmax (a, std::abs (b)); },
-        [] (auto a, auto b)
-        { return Vec::max (a, Vec::abs (b)); },
-        [] (auto x)
-        { return SIMDUtils::hMaxSIMD (x); });
+        [] (auto a, auto b) { return juce::jmax (a, std::abs (b)); },
+        [] (auto a, auto b) { return Vec::max (a, Vec::abs (b)); },
+        [] (auto x) { return SIMDUtils::hMaxSIMD (x); });
 #endif
 }
 
@@ -519,68 +492,51 @@ void integerPowerT (T* dest, const T* src, int exponent, int numValues) noexcept
             juce::FloatVectorOperations::multiply (dest, src, src, numValues);
             break;
         case 3:
-            detail::unaryOp (dest, src, numValues, [] (auto x)
-                             { return ipow<3> (x); });
+            detail::unaryOp (dest, src, numValues, [] (auto x) { return ipow<3> (x); });
             break;
         case 4:
-            detail::unaryOp (dest, src, numValues, [] (auto x)
-                             { return ipow<4> (x); });
+            detail::unaryOp (dest, src, numValues, [] (auto x) { return ipow<4> (x); });
             break;
         case 5:
-            detail::unaryOp (dest, src, numValues, [] (auto x)
-                             { return ipow<5> (x); });
+            detail::unaryOp (dest, src, numValues, [] (auto x) { return ipow<5> (x); });
             break;
         case 6:
-            detail::unaryOp (dest, src, numValues, [] (auto x)
-                             { return ipow<6> (x); });
+            detail::unaryOp (dest, src, numValues, [] (auto x) { return ipow<6> (x); });
             break;
         case 7:
-            detail::unaryOp (dest, src, numValues, [] (auto x)
-                             { return ipow<7> (x); });
+            detail::unaryOp (dest, src, numValues, [] (auto x) { return ipow<7> (x); });
             break;
         case 8:
-            detail::unaryOp (dest, src, numValues, [] (auto x)
-                             { return ipow<8> (x); });
+            detail::unaryOp (dest, src, numValues, [] (auto x) { return ipow<8> (x); });
             break;
         case 9:
-            detail::unaryOp (dest, src, numValues, [] (auto x)
-                             { return ipow<9> (x); });
+            detail::unaryOp (dest, src, numValues, [] (auto x) { return ipow<9> (x); });
             break;
         case 10:
-            detail::unaryOp (dest, src, numValues, [] (auto x)
-                             { return ipow<10> (x); });
+            detail::unaryOp (dest, src, numValues, [] (auto x) { return ipow<10> (x); });
             break;
         case 11:
-            detail::unaryOp (dest, src, numValues, [] (auto x)
-                             { return ipow<11> (x); });
+            detail::unaryOp (dest, src, numValues, [] (auto x) { return ipow<11> (x); });
             break;
         case 12:
-            detail::unaryOp (dest, src, numValues, [] (auto x)
-                             { return ipow<12> (x); });
+            detail::unaryOp (dest, src, numValues, [] (auto x) { return ipow<12> (x); });
             break;
         case 13:
-            detail::unaryOp (dest, src, numValues, [] (auto x)
-                             { return ipow<13> (x); });
+            detail::unaryOp (dest, src, numValues, [] (auto x) { return ipow<13> (x); });
             break;
         case 14:
-            detail::unaryOp (dest, src, numValues, [] (auto x)
-                             { return ipow<14> (x); });
+            detail::unaryOp (dest, src, numValues, [] (auto x) { return ipow<14> (x); });
             break;
         case 15:
-            detail::unaryOp (dest, src, numValues, [] (auto x)
-                             { return ipow<15> (x); });
+            detail::unaryOp (dest, src, numValues, [] (auto x) { return ipow<15> (x); });
             break;
         case 16:
-            detail::unaryOp (dest, src, numValues, [] (auto x)
-                             { return ipow<16> (x); });
+            detail::unaryOp (dest, src, numValues, [] (auto x) { return ipow<16> (x); });
             break;
         default:
             // this method will not be as fast for values outside the range [0, 16]
             detail::unaryOp (
-                dest, src, numValues, [exponent] (auto x)
-                { return std::pow (x, (T) exponent); },
-                [exponent] (auto x)
-                { return SIMDUtils::powSIMD (x, juce::dsp::SIMDRegister<T> ((T) exponent)); });
+                dest, src, numValues, [exponent] (auto x) { return std::pow (x, (T) exponent); }, [exponent] (auto x) { return SIMDUtils::powSIMD (x, juce::dsp::SIMDRegister<T> ((T) exponent)); });
             break;
     }
 }
@@ -605,8 +561,7 @@ float computeRMS (const float* src, int numValues) noexcept
     const auto squareSum = detail::reduce (src,
                                            numValues,
                                            0.0f,
-                                           [] (auto prev, auto next)
-                                           { return prev + next * next; });
+                                           [] (auto prev, auto next) { return prev + next * next; });
     return std::sqrt (squareSum / (float) numValues);
 #endif
 }
@@ -621,8 +576,7 @@ double computeRMS (const double* src, int numValues) noexcept
     const auto squareSum = detail::reduce (src,
                                            numValues,
                                            0.0,
-                                           [] (auto prev, auto next)
-                                           { return prev + next * next; });
+                                           [] (auto prev, auto next) { return prev + next * next; });
     return std::sqrt (squareSum / (double) numValues);
 #endif
 }

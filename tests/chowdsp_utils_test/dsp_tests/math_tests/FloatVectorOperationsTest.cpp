@@ -134,10 +134,8 @@ public:
 
         testUnaryOp (
             divisor,
-            [] (auto* dest, auto* src, int N)
-            { chowdsp::FloatVectorOperations::divide (dest, (T) 1, src, N); },
-            [] (auto x)
-            { return (T) 1 / x; },
+            [] (auto* dest, auto* src, int N) { chowdsp::FloatVectorOperations::divide (dest, (T) 1, src, N); },
+            [] (auto x) { return (T) 1 / x; },
             (T) 1.0e-3);
     }
 
@@ -157,10 +155,8 @@ public:
         testBinaryOp (
             dividend,
             divisor,
-            [] (auto* dest, auto* src1, auto* src2, int N)
-            { chowdsp::FloatVectorOperations::divide (dest, src1, src2, N); },
-            [] (auto num, auto den)
-            { return num / den; },
+            [] (auto* dest, auto* src1, auto* src2, int N) { chowdsp::FloatVectorOperations::divide (dest, src1, src2, N); },
+            [] (auto num, auto den) { return num / den; },
             (T) 1.0e-3);
     }
 
@@ -175,10 +171,8 @@ public:
 
         testReduce1dOp (
             values,
-            [] (auto* src, int N)
-            { return chowdsp::FloatVectorOperations::accumulate (src, N); },
-            [] (auto* src, int N)
-            { return std::accumulate (src, src + N, (T) 0); },
+            [] (auto* src, int N) { return chowdsp::FloatVectorOperations::accumulate (src, N); },
+            [] (auto* src, int N) { return std::accumulate (src, src + N, (T) 0); },
             (T) 1.0e-3);
     }
 
@@ -198,19 +192,15 @@ public:
         testReduce2dOp (
             values1,
             values2,
-            [] (auto* src1, auto* src2, int N)
-            { return chowdsp::FloatVectorOperations::innerProduct (src1, src2, N); },
-            [] (auto* src1, auto* src2, int N)
-            { return std::inner_product (src1, src1 + N, src2, (T) 0); },
+            [] (auto* src1, auto* src2, int N) { return chowdsp::FloatVectorOperations::innerProduct (src1, src2, N); },
+            [] (auto* src1, auto* src2, int N) { return std::inner_product (src1, src1 + N, src2, (T) 0); },
             (T) 1.0e-3);
     }
 
     template <typename T>
     void absMaxTest (Random& r, Range<int> range)
     {
-        auto refAbsMax = [] (const auto& begin, const auto end)
-        { return std::abs (*std::max_element (begin, end, [] (auto a, auto b)
-                                              { return std::abs (a) < std::abs (b); })); };
+        auto refAbsMax = [] (const auto& begin, const auto end) { return std::abs (*std::max_element (begin, end, [] (auto a, auto b) { return std::abs (a) < std::abs (b); })); };
 
         auto numValues = r.nextInt (range);
         std::vector<T> values ((size_t) numValues, (T) 0);
@@ -220,10 +210,8 @@ public:
 
         testReduce1dOp (
             values,
-            [] (auto* src, int N)
-            { return chowdsp::FloatVectorOperations::findAbsoluteMaximum (src, N); },
-            [&] (auto* src, int N)
-            { return refAbsMax (src, src + N); },
+            [] (auto* src, int N) { return chowdsp::FloatVectorOperations::findAbsoluteMaximum (src, N); },
+            [&] (auto* src, int N) { return refAbsMax (src, src + N); },
             (T) 1.0e-3);
     }
 
@@ -240,10 +228,8 @@ public:
 
             testUnaryOp (
                 inValues,
-                [exponent] (auto* dest, auto* src, int N)
-                { chowdsp::FloatVectorOperations::integerPower (dest, src, exponent, N); },
-                [exponent] (auto x)
-                { return std::pow (x, (T) exponent); },
+                [exponent] (auto* dest, auto* src, int N) { chowdsp::FloatVectorOperations::integerPower (dest, src, exponent, N); },
+                [exponent] (auto x) { return std::pow (x, (T) exponent); },
                 (T) 1.0e-6);
         }
     }
@@ -251,8 +237,7 @@ public:
     template <typename T>
     void computeRMSTest (Random& r, Range<int> range)
     {
-        auto idealRMS = [] (const auto* data, int numSamples)
-        {
+        auto idealRMS = [] (const auto* data, int numSamples) {
             T squareSum = (T) 0;
             for (int i = 0; i < numSamples; ++i)
                 squareSum += data[i] * data[i];
@@ -267,10 +252,8 @@ public:
 
         testReduce1dOp (
             values,
-            [] (auto* src, int N)
-            { return chowdsp::FloatVectorOperations::computeRMS (src, N); },
-            [&] (auto* src, int N)
-            { return idealRMS (src, N); },
+            [] (auto* src, int N) { return chowdsp::FloatVectorOperations::computeRMS (src, N); },
+            [&] (auto* src, int N) { return idealRMS (src, N); },
             (T) 1.0e-3);
     }
 
