@@ -59,14 +59,12 @@ void SimpleReverbPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
     mixer.setWetMixProportion (*dryWetParam);
     mixer.pushDrySamples (block);
 
-    auto loadSamples = [] (float* inVec, float xL, float xR)
-    {
+    auto loadSamples = [] (float* inVec, float xL, float xR) {
         for (int i = 0; i < 8; ++i)
             inVec[i] = i % 2 == 0 ? xL : xR;
     };
 
-    auto storeSamples = [] (const float* outVec, float& xL, float& xR)
-    {
+    auto storeSamples = [] (const float* outVec, float& xL, float& xR) {
         xL = 0.0f;
         xR = 0.0f;
         for (int i = 0; i < 8; ++i)
@@ -76,8 +74,7 @@ void SimpleReverbPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
         }
     };
 
-    auto processSample = [this, &loadSamples, &storeSamples] (float* inVec, float& xL, float& xR)
-    {
+    auto processSample = [this, &loadSamples, &storeSamples] (float* inVec, float& xL, float& xR) {
         loadSamples (inVec, xL, xR);
         auto* diffuserOutVec = diffuserChain.process (inVec);
         auto* fdnOutVec = fdn.process (diffuserOutVec);
