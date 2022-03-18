@@ -10,12 +10,14 @@ target_sources(chowdsp_utils_tests PRIVATE
 
     convolution_tests/ConvolutionTest.cpp
     convolution_tests/IRHelpersTest.cpp
+    convolution_tests/LinearPhaseEQTest.cpp
 
     math_tests/CombinatoricsTest.cpp
     math_tests/FloatVectorOperationsTest.cpp
     math_tests/MatrixOpsTest.cpp
     math_tests/PolynomialsTest.cpp
     math_tests/PowerTest.cpp
+    math_tests/OtherMathOpsTest.cpp
 
     data_structure_tests/COLAProcessorTest.cpp
     data_structure_tests/DoubleBufferTest.cpp

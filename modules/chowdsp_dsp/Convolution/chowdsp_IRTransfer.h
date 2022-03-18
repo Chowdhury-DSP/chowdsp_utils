@@ -1,5 +1,7 @@
 #pragma once
 
+#include "chowdsp_ConvolutionEngine.h"
+
 namespace chowdsp
 {
 /** A utility class to help smoothly transfer a new IR
@@ -15,7 +17,7 @@ struct IRTransfer
     explicit IRTransfer (const ConvolutionEngine& eng) : fftSize (eng.fftSize),
                                                          blockSize (eng.blockSize),
                                                          irNumSamples (eng.irNumSamples),
-                                                         irFFT (std::make_unique<juce::dsp::FFT> (juce::roundToInt (std::log2 (fftSize))))
+                                                         irFFT (std::make_unique<juce::dsp::FFT> (chowdsp::log2 (fftSize)))
     {
         ConvolutionEngine::updateSegmentsIfNecessary (eng.numSegments, buffersImpulseSegments, fftSize);
     }
