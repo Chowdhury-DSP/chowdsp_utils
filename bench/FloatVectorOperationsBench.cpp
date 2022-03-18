@@ -6,6 +6,55 @@
 #include <JuceHeader.h>
 #include "bench_utils.h"
 
+/** Divide Scalar benchmarks............................ */
+constexpr int divScalarN = 100000;
+const auto divScalarVecFloat = bench_utils::makeRandomVector<float> (divScalarN);
+auto divScalarOutVecFloat = std::vector<float> (divScalarN, 0.0f);
+
+static void DivideScalarSTLFloat (benchmark::State& state)
+{
+    for (auto _ : state)
+    {
+        std::transform (divScalarVecFloat.begin(), divScalarVecFloat.end(), divScalarOutVecFloat.begin(), [] (auto x)
+                        { return 1.0f / x; });
+    }
+}
+BENCHMARK (DivideScalarSTLFloat);
+
+static void DivideScalarChowFloat (benchmark::State& state)
+{
+    for (auto _ : state)
+    {
+        chowdsp::FloatVectorOperations::divide (divScalarOutVecFloat.data(), 1.0f, divScalarVecFloat.data(), divScalarN);
+    }
+}
+BENCHMARK (DivideScalarChowFloat);
+
+/** Divide Vector benchmarks............................ */
+constexpr int divVectorN = 100000;
+const auto divVectorVecFloat1 = bench_utils::makeRandomVector<float> (divVectorN);
+const auto divVectorVecFloat2 = bench_utils::makeRandomVector<float> (divVectorN);
+auto divVectorOutVecFloat = std::vector<float> (divVectorN, 0.0f);
+
+static void DivideVectorSTLFloat (benchmark::State& state)
+{
+    for (auto _ : state)
+    {
+        std::transform (divVectorVecFloat1.begin(), divVectorVecFloat1.end(), divVectorVecFloat2.begin(), divVectorOutVecFloat.begin(), [] (auto a, auto b)
+                        { return a / b; });
+    }
+}
+BENCHMARK (DivideVectorSTLFloat);
+
+static void DivideVectorChowFloat (benchmark::State& state)
+{
+    for (auto _ : state)
+    {
+        chowdsp::FloatVectorOperations::divide (divVectorOutVecFloat.data(), divVectorVecFloat1.data(), divVectorVecFloat2.data(), divVectorN);
+    }
+}
+BENCHMARK (DivideVectorChowFloat);
+
 /** Accumulate benchmarks............................ */
 constexpr int accumulateN = 10000;
 const auto accumulateVecFloat = bench_utils::makeRandomVector<float> (accumulateN);
@@ -63,7 +112,8 @@ static void AbsMaxSTLFloat (benchmark::State& state)
 {
     for (auto _ : state)
     {
-        auto max = std::abs (*std::max_element (absMaxVecFloat.begin(), absMaxVecFloat.end(), [] (auto a, auto b) { return std::abs (a) < std::abs (b); }));
+        auto max = std::abs (*std::max_element (absMaxVecFloat.begin(), absMaxVecFloat.end(), [] (auto a, auto b)
+                                                { return std::abs (a) < std::abs (b); }));
         benchmark::DoNotOptimize (max);
     }
 }
@@ -85,7 +135,8 @@ const auto rmsVecFloat = bench_utils::makeRandomVector<float> (rmsN);
 
 static void RMSSTLFloat (benchmark::State& state)
 {
-    auto idealRMS = [] (const auto* data, int numSamples) {
+    auto idealRMS = [] (const auto* data, int numSamples)
+    {
         float squareSum = 0.0f;
         for (int i = 0; i < numSamples; ++i)
             squareSum += data[i] * data[i];
