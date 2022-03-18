@@ -4,6 +4,7 @@
 
 #include "EQParams.h"
 
+/** "Prototype" EQ from which the linear phase EQ will be constructed. */
 class PrototypeEQ
 {
 public:
@@ -11,7 +12,7 @@ public:
 
     using Params = EQParams;
 
-    void setParameters (const Params& params, bool force);
+    void setParameters (const Params& params, bool force = false);
 
     void prepare (const juce::dsp::ProcessSpec& spec);
 

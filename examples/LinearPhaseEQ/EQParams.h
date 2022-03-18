@@ -1,9 +1,12 @@
 #pragma once
 
+/** Parameters to determine the filter behaviour */
 struct EQParams
 {
+    // parameters
     float lowCutFreqHz, lowCutQ, peakingFilterFreqHz, peakingFilterQ, peakingFilterGainDB, highCutFreqHz, highCutQ;
 
+    // we need this method so we can know if two parameter sets are equivalent.
     bool operator== (const EQParams& other) const
     {
         return lowCutFreqHz == other.lowCutFreqHz

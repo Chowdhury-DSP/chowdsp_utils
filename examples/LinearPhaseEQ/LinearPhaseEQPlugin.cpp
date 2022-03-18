@@ -50,14 +50,16 @@ void LinearPhaseEQPlugin::addParameters (Parameters& params)
 
 void LinearPhaseEQPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
+    const auto&& eqParams = makeEQParams();
     const auto spec = juce::dsp::ProcessSpec { sampleRate, (juce::uint32) samplesPerBlock, 1 };
+
     protoEQ.prepare (spec);
-    linPhaseEQ.prepare (spec, makeEQParams());
+    protoEQ.setParameters (eqParams, true);
+
+    linPhaseEQ.prepare (spec, makeEQParams()); // prepare the linear phase EQ with some initial parameters
 
     // If linear phase mode will always be on, this is the place to report latency to the host!
     // setLatencySamples (linPhaseEQ.getLatencySamples());
-
-    setEQParams (true);
 }
 
 PrototypeEQ::Params LinearPhaseEQPlugin::makeEQParams() const
@@ -73,10 +75,10 @@ PrototypeEQ::Params LinearPhaseEQPlugin::makeEQParams() const
     };
 }
 
-void LinearPhaseEQPlugin::setEQParams (bool force)
+void LinearPhaseEQPlugin::setEQParams()
 {
     const auto&& eqParams = makeEQParams();
-    protoEQ.setParameters (eqParams, force);
+    protoEQ.setParameters (eqParams);
     linPhaseEQ.setParameters (eqParams);
 }
 
@@ -85,17 +87,23 @@ void LinearPhaseEQPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
     // Warning: only processing in mono for now!
     buffer.copyFrom (0, 0, buffer, 1, 0, buffer.getNumSamples());
 
+    // update the linear phase EQ parameters. This operation is safe to do from
+    // any thread, but we'll do it on the audio thread here.
     setEQParams();
+
     if (*linPhaseModeOn == 0)
     {
+        // For A/B testing purposes: process the prototype EQ
         protoEQ.processBlock (buffer);
     }
     else
     {
+        // Here we are: processing the linear phase EQ!
         auto&& block = juce::dsp::AudioBlock<float> { buffer }.getSingleChannelBlock (0);
         linPhaseEQ.process (juce::dsp::ProcessContextReplacing<float> { block });
     }
 
+    // Since we're only doing mono for this example, let's copy the first channel to fill any other channels
     for (int ch = 1; ch < buffer.getNumChannels(); ++ch)
         buffer.copyFrom (ch, 0, buffer, 0, 0, buffer.getNumSamples());
 }

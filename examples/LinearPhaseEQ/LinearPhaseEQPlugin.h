@@ -4,6 +4,7 @@
 
 #include "PrototypeEQ.h"
 
+/** Example plugin to demonstrate the use of chowdsp::LinearPhaseEQ */
 class LinearPhaseEQPlugin : public chowdsp::PluginBase<LinearPhaseEQPlugin>
 {
 public:
@@ -19,7 +20,7 @@ public:
 
 private:
     PrototypeEQ::Params makeEQParams() const;
-    void setEQParams (bool force = false);
+    void setEQParams();
 
     std::atomic<float>* lowCutFreqHz = nullptr;
     std::atomic<float>* lowCutQ = nullptr;
@@ -30,6 +31,9 @@ private:
     std::atomic<float>* highCutQ = nullptr;
     std::atomic<float>* linPhaseModeOn = nullptr;
 
+    // In general, you only need to create a linear phase EQ, but in this case
+    // we want to be able to A/B test, so we'll create both the prototype and
+    // the linear phase EQs
     PrototypeEQ protoEQ;
     chowdsp::LinearPhaseEQ<PrototypeEQ> linPhaseEQ;
 
