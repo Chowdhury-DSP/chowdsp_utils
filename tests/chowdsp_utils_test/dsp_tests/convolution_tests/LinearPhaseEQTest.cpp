@@ -35,8 +35,7 @@ public:
     {
         constexpr int FIRLength = 16;
         chowdsp::LinearPhaseEQ<NotAFilter, FIRLength> testEQ;
-        testEQ.updatePrototypeEQParameters = [] (auto& eq, auto& params)
-        { eq.onOff = params.onOff; };
+        testEQ.updatePrototypeEQParameters = [] (auto& eq, auto& params) { eq.onOff = params.onOff; };
         testEQ.prepare ({ Constants::sampleRate, Constants::blockSize, 1 }, { true });
 
         AudioBuffer<float> buffer (1, Constants::blockSize);
@@ -62,12 +61,10 @@ public:
     {
         constexpr int FIRLength = 16;
         chowdsp::LinearPhaseEQ<NotAFilter, FIRLength> testEQ;
-        testEQ.updatePrototypeEQParameters = [] (auto& eq, auto& params)
-        { eq.onOff = params.onOff; };
+        testEQ.updatePrototypeEQParameters = [] (auto& eq, auto& params) { eq.onOff = params.onOff; };
         testEQ.prepare ({ Constants::sampleRate, Constants::blockSize, 1 }, { true });
 
-        auto processBlock = [&testEQ]()
-        {
+        auto processBlock = [&testEQ]() {
             AudioBuffer<float> buffer (1, Constants::blockSize);
             buffer.setSample (0, 0, 1.0f);
             auto&& block = dsp::AudioBlock<float> { buffer };
@@ -88,8 +85,7 @@ public:
     {
         constexpr int FIRLength = 16;
         chowdsp::LinearPhaseEQ<NotAFilter, FIRLength> testEQ;
-        testEQ.updatePrototypeEQParameters = [] (auto& eq, auto& params)
-        { eq.onOff = params.onOff; };
+        testEQ.updatePrototypeEQParameters = [] (auto& eq, auto& params) { eq.onOff = params.onOff; };
 
         {
             testEQ.prepare ({ 48000.0, Constants::blockSize, 1 }, { true });
