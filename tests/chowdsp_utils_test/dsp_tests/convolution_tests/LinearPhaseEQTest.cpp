@@ -3,7 +3,7 @@
 namespace Constants
 {
 constexpr double sampleRate = 48000.0;
-constexpr int blockSize = 64;
+constexpr int blockSize = 512;
 } // namespace Constants
 
 struct NotAFilter
@@ -33,7 +33,7 @@ public:
 
     void processTest()
     {
-        constexpr int FIRLength = 16;
+        constexpr int FIRLength = 128;
         chowdsp::LinearPhaseEQ<NotAFilter, FIRLength> testEQ;
         testEQ.updatePrototypeEQParameters = [] (auto& eq, auto& params) { eq.onOff = params.onOff; };
         testEQ.prepare ({ Constants::sampleRate, Constants::blockSize, 1 }, { true });
@@ -44,14 +44,14 @@ public:
         auto&& block = dsp::AudioBlock<float> { buffer };
         testEQ.process (dsp::ProcessContextReplacing<float> { block });
 
-        for (int i = 0; i < Constants::blockSize; ++i)
+        for (int i = 0; i < FIRLength; ++i)
         {
             const auto sample = buffer.getSample (0, i);
 
             if (i == FIRLength / 2)
                 expectWithinAbsoluteError (sample, 1.0f, 1.0e-3f, "Shifted impulse is incorrect!");
             else
-                expectLessThan (sample, 1.0e-3f, "Signal other than the impulse was detected!");
+                expectLessThan (sample, 1.0e-3f, "Signal other than the impulse was detected at index " + String (i) + "!");
         }
 
         expectEquals (testEQ.getLatencySamples(), FIRLength / 2, "Reported latency is incorrect!");
