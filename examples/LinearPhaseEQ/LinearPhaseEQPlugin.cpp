@@ -23,8 +23,7 @@ LinearPhaseEQPlugin::LinearPhaseEQPlugin()
     highCutQ = vts.getRawParameterValue (highCutQTag);
     linPhaseModeOn = vts.getRawParameterValue (linPhaseModeTag);
 
-    linPhaseEQ.updatePrototypeEQParameters = [] (auto& eq, auto& eqParams)
-    { eq.setParameters (eqParams, true); };
+    linPhaseEQ.updatePrototypeEQParameters = [] (auto& eq, auto& eqParams) { eq.setParameters (eqParams, true); };
 }
 
 void LinearPhaseEQPlugin::addParameters (Parameters& params)
@@ -34,8 +33,7 @@ void LinearPhaseEQPlugin::addParameters (Parameters& params)
     createFreqParameter (params, peakingFilterFreqTag, "Bell Freq.", 20.0f, 20000.0f, 2000.0f, 1000.0f);
     createFreqParameter (params, highCutFreqTag, "High Cut Freq.", 1000.0f, 20000.0f, 4000.0f, 20000.0f);
 
-    auto addQParam = [&params] (const juce::String& tag, const juce::String& name)
-    {
+    auto addQParam = [&params] (const juce::String& tag, const juce::String& name) {
         emplace_param<VTSParam> (params, tag, name, juce::String(), createNormalisableRange (0.1f, 10.0f, 0.7071f), 0.7071f, &floatValToString, &stringToFloatVal);
     };
 

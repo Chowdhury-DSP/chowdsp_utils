@@ -4,7 +4,6 @@
 
 namespace chowdsp
 {
-
 /**
  * Class for creating a linear phase EQ, using a "prototype" EQ, which is not linear phase.
  *

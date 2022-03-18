@@ -2,8 +2,7 @@
 
 void PrototypeEQ::setParameters (const Params& params, bool force)
 {
-    auto setParam = [force] (auto& smoother, float newValue)
-    {
+    auto setParam = [force] (auto& smoother, float newValue) {
         if (force)
             smoother.setCurrentAndTargetValue (newValue);
         else
@@ -70,25 +69,19 @@ void PrototypeEQ::processHighCut (juce::AudioBuffer<float>& buffer)
 {
     const auto isSmoothing = highCutFreqHzSmooth.isSmoothing() || highCutQSmooth.isSmoothing();
     processFilter (
-        buffer, highCutFilter, [this]
-        { highCutFilter.calcCoefs (highCutFreqHzSmooth.getNextValue(), highCutQSmooth.getNextValue(), fs); },
-        isSmoothing);
+        buffer, highCutFilter, [this] { highCutFilter.calcCoefs (highCutFreqHzSmooth.getNextValue(), highCutQSmooth.getNextValue(), fs); }, isSmoothing);
 }
 
 void PrototypeEQ::processPeaking (juce::AudioBuffer<float>& buffer)
 {
     const auto isSmoothing = peakingFilterFreqHzSmooth.isSmoothing() || peakingFilterQSmooth.isSmoothing() || peakingFilterGainSmooth.isSmoothing();
     processFilter (
-        buffer, peakingFilter, [this]
-        { peakingFilter.calcCoefs (peakingFilterFreqHzSmooth.getNextValue(), peakingFilterQSmooth.getNextValue(), peakingFilterGainSmooth.getNextValue(), fs); },
-        isSmoothing);
+        buffer, peakingFilter, [this] { peakingFilter.calcCoefs (peakingFilterFreqHzSmooth.getNextValue(), peakingFilterQSmooth.getNextValue(), peakingFilterGainSmooth.getNextValue(), fs); }, isSmoothing);
 }
 
 void PrototypeEQ::processLowCut (juce::AudioBuffer<float>& buffer)
 {
     const auto isSmoothing = lowCutFreqHzSmooth.isSmoothing() || lowCutQSmooth.isSmoothing();
     processFilter (
-        buffer, lowCutFilter, [this]
-        { lowCutFilter.calcCoefs (lowCutFreqHzSmooth.getNextValue(), lowCutQSmooth.getNextValue(), fs); },
-        isSmoothing);
+        buffer, lowCutFilter, [this] { lowCutFilter.calcCoefs (lowCutFreqHzSmooth.getNextValue(), lowCutQSmooth.getNextValue(), fs); }, isSmoothing);
 }
