@@ -69,6 +69,7 @@ namespace MatrixOps
         {
             if constexpr (size <= 1)
             {
+                juce::ignoreUnused (out, in);
                 return;
             }
             else

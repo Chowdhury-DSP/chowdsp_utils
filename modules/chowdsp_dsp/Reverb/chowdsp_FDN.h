@@ -66,7 +66,7 @@ public:
      * Note that modulation is applied as a multiplier of the base delay time.
      */
     template <int NModulators>
-    void setDelayTimeMsWithModulators (FloatType delayTimeMs, FloatType (&modulationAmt)[NModulators]);
+    void setDelayTimeMsWithModulators (FloatType delayTimeMs, FloatType (&modulationAmt)[(size_t) NModulators]);
 
     /** Returns the delay time of a given FDN channel */
     FloatType getChannelDelayMs (size_t channelIndex) const noexcept;

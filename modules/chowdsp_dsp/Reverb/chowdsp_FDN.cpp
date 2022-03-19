@@ -88,7 +88,7 @@ void FDN<FDNConfig, DelayInterpType>::setDelayTimeMs (FloatType delayTimeMs)
 
 template <typename FDNConfig, typename DelayInterpType>
 template <int NModulators>
-void FDN<FDNConfig, DelayInterpType>::setDelayTimeMsWithModulators (FloatType delayTimeMs, FloatType (&modulationAmt)[NModulators])
+void FDN<FDNConfig, DelayInterpType>::setDelayTimeMsWithModulators (FloatType delayTimeMs, FloatType (&modulationAmt)[(size_t) NModulators])
 {
     static_assert (NModulators <= nChannels, "Can't have more modulators than channels!");
 

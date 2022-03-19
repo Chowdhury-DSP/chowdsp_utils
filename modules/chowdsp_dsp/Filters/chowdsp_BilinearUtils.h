@@ -13,7 +13,7 @@ namespace chowdsp::Bilinear
 template <typename T, int N>
 struct BilinearTransform
 {
-    static inline void call (T (&b)[N], T (&a)[N], const T (&bs)[N], const T (&as)[N], T K)
+    static inline void call (T (&b)[(size_t) N], T (&a)[(size_t) N], const T (&bs)[(size_t) N], const T (&as)[(size_t) N], T K)
     {
         using Combinatorics::combination, Power::ipow;
         constexpr int M = N - 1;
