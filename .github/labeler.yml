@@ -20,6 +20,12 @@ presets:
 tests:
   - tests/**/*
 
+benchmarks:
+  - bench/**/*
+
+examples:
+  - examples/**/*
+
 documentation:
   - doxygen/*
   - README.md
