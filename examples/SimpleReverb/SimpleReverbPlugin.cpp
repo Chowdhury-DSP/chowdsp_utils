@@ -101,7 +101,7 @@ void SimpleReverbPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
         const auto modAmountMult = modAmountSmoother.skip (samplesToProcess);
         for (float& lfoVal : lfoVals)
             lfoVal = lfoVal * modAmountMult * 0.01f + 1.0f;
-        fdn.setDelayTimeMsWithModulators (fdnTimeSmoother.skip (samplesToProcess), lfoVals);
+        fdn.setDelayTimeMsWithModulators<2> (fdnTimeSmoother.skip (samplesToProcess), lfoVals);
 
         fdn.getFDNConfig().setDecayTimeMs (fdn, fdnT60LowSmoother.skip (samplesToProcess), fdnT60HighSmoother.skip (samplesToProcess), 1000.0f);
 
