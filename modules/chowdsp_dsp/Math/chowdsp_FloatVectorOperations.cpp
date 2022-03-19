@@ -317,8 +317,8 @@ bool isUsingVDSP()
 void divide (float* dest, const float* dividend, const float* divisor, int numValues) noexcept
 {
 #if JUCE_USE_VDSP_FRAMEWORK
+    vDSP_vdiv (divisor, 1, dividend, 1, dest, 1, (vDSP_Length) numValues);
 #else
-#endif
     detail::binaryOp (dest,
                       dividend,
                       divisor,
@@ -327,13 +327,14 @@ void divide (float* dest, const float* dividend, const float* divisor, int numVa
                           using namespace chowdsp::SIMDUtils;
                           return num / den;
                       });
+#endif
 }
 
 void divide (double* dest, const double* dividend, const double* divisor, int numValues) noexcept
 {
 #if JUCE_USE_VDSP_FRAMEWORK
+    vDSP_vdivD (divisor, 1, dividend, 1, dest, 1, (vDSP_Length) numValues);
 #else
-#endif
     detail::binaryOp (dest,
                       dividend,
                       divisor,
@@ -342,13 +343,14 @@ void divide (double* dest, const double* dividend, const double* divisor, int nu
                           using namespace chowdsp::SIMDUtils;
                           return num / den;
                       });
+#endif
 }
 
 void divide (float* dest, float dividend, const float* divisor, int numValues) noexcept
 {
 #if JUCE_USE_VDSP_FRAMEWORK
+    vDSP_svdiv (&dividend, divisor, 1, dest, 1, (vDSP_Length) numValues);
 #else
-#endif
     detail::unaryOp (dest,
                      divisor,
                      numValues,
@@ -356,13 +358,14 @@ void divide (float* dest, float dividend, const float* divisor, int numValues) n
                          using namespace chowdsp::SIMDUtils;
                          return dividend / x;
                      });
+#endif
 }
 
 void divide (double* dest, double dividend, const double* divisor, int numValues) noexcept
 {
 #if JUCE_USE_VDSP_FRAMEWORK
+    vDSP_svdivD (&dividend, divisor, 1, dest, 1, (vDSP_Length) numValues);
 #else
-#endif
     detail::unaryOp (dest,
                      divisor,
                      numValues,
@@ -370,6 +373,7 @@ void divide (double* dest, double dividend, const double* divisor, int numValues
                          using namespace chowdsp::SIMDUtils;
                          return dividend / x;
                      });
+#endif
 }
 
 // @TODO: Figure out why vDSP_sve is failing unit tests in CI?
