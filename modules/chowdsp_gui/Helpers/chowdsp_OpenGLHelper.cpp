@@ -5,7 +5,7 @@
 // under the ISC license:
 // https://github.com/SquarePine/squarepine_core/blob/main/modules/squarepine_graphics/components/HighPerformanceRendererConfigurator.cpp
 
-#if JUCE_MODULE_AVAILABLE_juce_opengl
+#if CHOWDSP_OPENGL_IS_AVAILABLE
 namespace
 {
 juce::String getGLString (GLenum value)
@@ -37,10 +37,12 @@ auto createOpenGLTestComp (juce::OpenGLContext& ctx)
 
 void checkOpenGLStats (juce::OpenGLContext& ctx, int& openGLMajorVersion, int& openGLMinorVersion)
 {
+    juce::Logger::writeToLog ("Attempting to check OpnGL stats...");
     auto testComp = createOpenGLTestComp (ctx);
     std::atomic_bool waiting { true };
     testComp->ctx.executeOnGLThread (
-        [&waiting, &openGLMajorVersion, &openGLMinorVersion] (juce::OpenGLContext&) {
+        [&waiting, &openGLMajorVersion, &openGLMinorVersion] (juce::OpenGLContext&)
+        {
             GLint major = 0, minor = 0;
             juce::gl::glGetIntegerv (juce::gl::GL_MAJOR_VERSION, &major);
             juce::gl::glGetIntegerv (juce::gl::GL_MINOR_VERSION, &minor);
@@ -73,7 +75,7 @@ namespace chowdsp
 {
 OpenGLHelper::OpenGLHelper() //NOLINT(modernize-use-equals-default): can only be default if compiling without OpenGL
 {
-#if JUCE_MODULE_AVAILABLE_juce_opengl
+#if CHOWDSP_OPENGL_IS_AVAILABLE
     checkOpenGLStats (openglContext, openGLMajorVersion, openGLMinorVersion);
 #endif
 }
@@ -86,7 +88,7 @@ OpenGLHelper::~OpenGLHelper()
 
 bool OpenGLHelper::isOpenGLAvailable() const noexcept // NOLINT(readability-convert-member-functions-to-static): can only be static if compiling without OpenGL
 {
-#if JUCE_MODULE_AVAILABLE_juce_opengl
+#if CHOWDSP_OPENGL_IS_AVAILABLE
     return openGLMajorVersion >= 2; // For OpenGL drivers below v2.0, we get a black screen
 #else
     return false;
@@ -108,7 +110,7 @@ void OpenGLHelper::attach()
 
     attached = true;
 
-#if JUCE_MODULE_AVAILABLE_juce_opengl
+#if CHOWDSP_OPENGL_IS_AVAILABLE
     openglContext.attachTo (*component);
     component->addComponentListener (this);
 #endif
@@ -123,7 +125,7 @@ void OpenGLHelper::detach()
 
     attached = false;
 
-#if JUCE_MODULE_AVAILABLE_juce_opengl
+#if CHOWDSP_OPENGL_IS_AVAILABLE
     openglContext.detach();
 
     if (component != nullptr)
