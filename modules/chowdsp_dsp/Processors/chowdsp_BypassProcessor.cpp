@@ -2,18 +2,31 @@
 
 namespace chowdsp
 {
-template <typename SampleType, typename DelayType>
-void BypassProcessor<SampleType, DelayType>::prepare (int samplesPerBlock, bool onOffParam)
+template <typename SampleType, typename DelayInterpType>
+void BypassProcessor<SampleType, DelayInterpType>::prepare (const juce::dsp::ProcessSpec& spec, bool onOffParam)
 {
     prevOnOffParam = onOffParam;
-    fadeBuffer.setSize (2, samplesPerBlock);
+    fadeBuffer.setSize ((int) spec.numChannels, (int) spec.maximumBlockSize);
     fadeBlock = juce::dsp::AudioBlock<SampleType> (fadeBuffer);
 
-    compDelay.prepare ({ 48000.0, (juce::uint32) samplesPerBlock, 2 }); // sample rate does not matter
+    compDelay.prepare (spec); // sample rate does not matter
 }
 
-template <typename SampleType, typename DelayType>
-void BypassProcessor<SampleType, DelayType>::setLatencySamples (int delaySamples)
+template <typename SampleType, typename DelayInterpType>
+void BypassProcessor<SampleType, DelayInterpType>::setLatencySamples (int delaySamples)
+{
+    setLatencySamplesInternal ((SampleType) delaySamples);
+}
+
+template <typename SampleType, typename DelayInterpType>
+void BypassProcessor<SampleType, DelayInterpType>::setLatencySamples (SampleType delaySamples)
+{
+    static_assert (! std::is_same<DelayInterpType, DelayLineInterpolationTypes::None>::value, "Attempting to set non-integer latency value without using delay interpolation!");
+    setLatencySamplesInternal (delaySamples);
+}
+
+template <typename SampleType, typename DelayInterpType>
+void BypassProcessor<SampleType, DelayInterpType>::setLatencySamplesInternal (SampleType delaySamples)
 {
     if (delaySamples == prevDelay)
         return;
@@ -26,15 +39,15 @@ void BypassProcessor<SampleType, DelayType>::setLatencySamples (int delaySamples
     prevDelay = delaySamples;
 }
 
-template <typename SampleType, typename DelayType>
-bool BypassProcessor<SampleType, DelayType>::processBlockIn (juce::AudioBuffer<SampleType>& buffer, bool onOffParam)
+template <typename SampleType, typename DelayInterpType>
+bool BypassProcessor<SampleType, DelayInterpType>::processBlockIn (juce::AudioBuffer<SampleType>& buffer, bool onOffParam)
 {
     juce::dsp::AudioBlock<float> block (buffer);
     return processBlockIn (block, onOffParam);
 }
 
-template <typename SampleType, typename DelayType>
-bool BypassProcessor<SampleType, DelayType>::processBlockIn (const juce::dsp::AudioBlock<SampleType>& block, bool onOffParam)
+template <typename SampleType, typename DelayInterpType>
+bool BypassProcessor<SampleType, DelayInterpType>::processBlockIn (const juce::dsp::AudioBlock<SampleType>& block, bool onOffParam)
 {
     enum class DelayOp
     {
@@ -93,15 +106,15 @@ bool BypassProcessor<SampleType, DelayType>::processBlockIn (const juce::dsp::Au
     return true;
 }
 
-template <typename SampleType, typename DelayType>
-void BypassProcessor<SampleType, DelayType>::processBlockOut (juce::AudioBuffer<SampleType>& buffer, bool onOffParam)
+template <typename SampleType, typename DelayInterpType>
+void BypassProcessor<SampleType, DelayInterpType>::processBlockOut (juce::AudioBuffer<SampleType>& buffer, bool onOffParam)
 {
     juce::dsp::AudioBlock<float> block { buffer };
     processBlockOut (block, onOffParam);
 }
 
-template <typename SampleType, typename DelayType>
-void BypassProcessor<SampleType, DelayType>::processBlockOut (juce::dsp::AudioBlock<float>& block, bool onOffParam)
+template <typename SampleType, typename DelayInterpType>
+void BypassProcessor<SampleType, DelayInterpType>::processBlockOut (juce::dsp::AudioBlock<SampleType>& block, bool onOffParam)
 {
     auto fadeOutputBuffer = [onOffParam] (auto* blockPtr, const auto* fadePtr, const int startSample, const int numSamples) {
         SampleType startGain = ! onOffParam ? static_cast<SampleType> (1) // fade out
@@ -143,8 +156,8 @@ void BypassProcessor<SampleType, DelayType>::processBlockOut (juce::dsp::AudioBl
         prevOnOffParam = onOffParam;
 }
 
-template <typename SampleType, typename DelayType>
-int BypassProcessor<SampleType, DelayType>::getFadeStartSample (const int numSamples)
+template <typename SampleType, typename DelayInterpType>
+int BypassProcessor<SampleType, DelayInterpType>::getFadeStartSample (const int numSamples)
 {
     if (latencySampleCount <= 0)
     {
