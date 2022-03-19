@@ -22,7 +22,7 @@ namespace chowdsp
  * }
  * ```
  */
-template <typename SampleType, typename DelayType = DelayLineInterpolationTypes::None>
+template <typename SampleType, typename DelayInterpType = DelayLineInterpolationTypes::None>
 class BypassProcessor
 {
 public:
@@ -89,7 +89,7 @@ private:
     juce::AudioBuffer<SampleType> fadeBuffer;
     juce::dsp::AudioBlock<SampleType> fadeBlock;
 
-    DelayLine<SampleType, DelayType> compDelay { 1 << 18 }; // max latency = 2^18 = 262144 samples
+    DelayLine<SampleType, DelayInterpType> compDelay { 1 << 18 }; // max latency = 2^18 = 262144 samples
     SampleType prevDelay {};
     int latencySampleCount = -1;
 

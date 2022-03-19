@@ -23,8 +23,8 @@ public:
         return block.getChannelPointer (0);
     }
 
-    template <typename AudioContainerType>
-    void processFunc (AudioContainerType& bufferOrBlock, chowdsp::BypassProcessor<float>& bypass, std::atomic<float>* onOffParam, const std::function<float (float)>& sampleFunc)
+    template <typename AudioContainerType, typename BypassType>
+    void processFunc (AudioContainerType& bufferOrBlock, BypassType& bypass, std::atomic<float>* onOffParam, const std::function<float (float)>& sampleFunc)
     {
         auto onOff = bypass.toBool (onOffParam);
         if (! bypass.processBlockIn (bufferOrBlock, onOff))
@@ -89,7 +89,7 @@ public:
     {
         chowdsp::BypassProcessor<float> bypass;
         std::atomic<float> onOffParam { 0.0f };
-        bypass.prepare (nSamples, bypass.toBool (&onOffParam));
+        bypass.prepare ({ fs, (uint32) nSamples, 1 }, bypass.toBool (&onOffParam));
 
         AudioBuffer<float> buffer (1, nIter * nSamples);
         buffer.clear();
@@ -107,7 +107,7 @@ public:
     {
         chowdsp::BypassProcessor<float> bypass;
         std::atomic<float> onOffParam { 0.0f };
-        bypass.prepare (nSamples, bypass.toBool (&onOffParam));
+        bypass.prepare ({ fs, (uint32) nSamples, 1 }, bypass.toBool (&onOffParam));
 
         AudioBuffer<float> buffer (1, nIter * nSamples);
         buffer.clear();
@@ -124,10 +124,10 @@ public:
 
     void bufferDelayTest (int nIter)
     {
-        chowdsp::BypassProcessor<float> bypass;
+        chowdsp::BypassProcessor<float, chowdsp::DelayLineInterpolationTypes::Linear> bypass;
         std::atomic<float> onOffParam { 0.0f };
-        bypass.prepare (nSamples, bypass.toBool (&onOffParam));
-        bypass.setLatencySamples ((int) delaySamp);
+        bypass.prepare ({ fs, (uint32) nSamples, 1 }, bypass.toBool (&onOffParam));
+        bypass.setLatencySamples (delaySamp);
 
         chowdsp::DelayLine<float> delay { 2048 };
         delay.prepare ({ fs, (uint32) nSamples, 1 });
@@ -154,7 +154,7 @@ public:
     {
         chowdsp::BypassProcessor<float> bypass;
         std::atomic<float> onOffParam { 0.0f };
-        bypass.prepare (nSamples, bypass.toBool (&onOffParam));
+        bypass.prepare ({ fs, (uint32) nSamples, 1 }, bypass.toBool (&onOffParam));
         bypass.setLatencySamples ((int) delaySamp);
 
         chowdsp::DelayLine<float> delay { 2048 };
