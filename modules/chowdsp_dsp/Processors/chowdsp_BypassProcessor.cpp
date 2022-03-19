@@ -3,17 +3,30 @@
 namespace chowdsp
 {
 template <typename SampleType, typename DelayType>
-void BypassProcessor<SampleType, DelayType>::prepare (int samplesPerBlock, bool onOffParam)
+void BypassProcessor<SampleType, DelayType>::prepare (const juce::dsp::ProcessSpec& spec, bool onOffParam)
 {
     prevOnOffParam = onOffParam;
-    fadeBuffer.setSize (2, samplesPerBlock);
+    fadeBuffer.setSize ((int) spec.numChannels, (int) spec.maximumBlockSize);
     fadeBlock = juce::dsp::AudioBlock<SampleType> (fadeBuffer);
 
-    compDelay.prepare ({ 48000.0, (juce::uint32) samplesPerBlock, 2 }); // sample rate does not matter
+    compDelay.prepare (spec); // sample rate does not matter
 }
 
 template <typename SampleType, typename DelayType>
 void BypassProcessor<SampleType, DelayType>::setLatencySamples (int delaySamples)
+{
+    setLatencySamplesInternal ((SampleType) delaySamples);
+}
+
+template <typename SampleType, typename DelayType>
+void BypassProcessor<SampleType, DelayType>::setLatencySamples (SampleType delaySamples)
+{
+    static_assert (! std::is_same<DelayType, DelayLine<SampleType, DelayLineInterpolationTypes::None>>::value, "Attempting to set non-integer latency value without using delay interpolation!");
+    setLatencySamplesInternal (delaySamples);
+}
+
+template <typename SampleType, typename DelayType>
+void BypassProcessor<SampleType, DelayType>::setLatencySamplesInternal (SampleType delaySamples)
 {
     if (delaySamples == prevDelay)
         return;
@@ -101,9 +114,10 @@ void BypassProcessor<SampleType, DelayType>::processBlockOut (juce::AudioBuffer<
 }
 
 template <typename SampleType, typename DelayType>
-void BypassProcessor<SampleType, DelayType>::processBlockOut (juce::dsp::AudioBlock<float>& block, bool onOffParam)
+void BypassProcessor<SampleType, DelayType>::processBlockOut (juce::dsp::AudioBlock<SampleType>& block, bool onOffParam)
 {
-    auto fadeOutputBuffer = [onOffParam] (auto* blockPtr, const auto* fadePtr, const int startSample, const int numSamples) {
+    auto fadeOutputBuffer = [onOffParam] (auto* blockPtr, const auto* fadePtr, const int startSample, const int numSamples)
+    {
         SampleType startGain = ! onOffParam ? static_cast<SampleType> (1) // fade out
                                             : static_cast<SampleType> (0); // fade in
         SampleType endGain = static_cast<SampleType> (1) - startGain;

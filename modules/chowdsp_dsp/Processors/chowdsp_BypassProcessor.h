@@ -35,7 +35,7 @@ public:
     }
 
     /** Allocated required memory, and resets the property */
-    void prepare (int samplesPerBlock, bool onOffParam);
+    void prepare (const juce::dsp::ProcessSpec& spec, bool onOffParam);
 
     /**
      * If the non-bypassed processing has some associated
@@ -44,6 +44,14 @@ public:
      * correctly time-aligned.
      */
     void setLatencySamples (int delaySamples);
+
+    /**
+     * If the non-bypassed processing has some associated
+     * latency, it is recommended to report the latency
+     * time here, so that the bypass processing will be
+     * correctly time-aligned.
+     */
+    void setLatencySamples (SampleType delaySamples);
 
     /**
       * Call this at the start of your processBlock().
@@ -71,17 +79,18 @@ public:
       * It will fade the dry signal back in with the main
       * signal as needed.
       */
-    void processBlockOut (juce::dsp::AudioBlock<float>& block, bool onOffParam);
+    void processBlockOut (juce::dsp::AudioBlock<SampleType>& block, bool onOffParam);
 
 private:
+    void setLatencySamplesInternal (SampleType delaySamples);
     int getFadeStartSample (const int numSamples);
 
     bool prevOnOffParam = false;
     juce::AudioBuffer<SampleType> fadeBuffer;
     juce::dsp::AudioBlock<SampleType> fadeBlock;
 
-    DelayLine<float, DelayType> compDelay { 48000 }; // max latency
-    int prevDelay = 0;
+    DelayLine<SampleType, DelayType> compDelay { 1 << 18 }; // max latency = 2^18 = 262144 samples
+    SampleType prevDelay {};
     int latencySampleCount = -1;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BypassProcessor)
