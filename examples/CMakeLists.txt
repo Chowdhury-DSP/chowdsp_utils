@@ -11,5 +11,10 @@ juce_add_modules(
     ${CMAKE_SOURCE_DIR}/modules/chowdsp_plugin_utils
 )
 
+add_compile_options(
+  $<$<CXX_COMPILER_ID:MSVC>:/WX>
+  $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Werror>
+)
+
 add_subdirectory(LinearPhaseEQ)
 add_subdirectory(SimpleReverb)

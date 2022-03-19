@@ -65,3 +65,8 @@ jobs:
         working-directory: ${{env.WORK_DIR}}/build
         shell: bash
         run: cmake --build . --target LinearPhaseEQ_Standalone --parallel 4
+
+      - name: "Build Example: SimpleReverb"
+        working-directory: ${{env.WORK_DIR}}/build
+        shell: bash
+        run: cmake --build . --target SimpleReverb_Standalone --parallel 4
