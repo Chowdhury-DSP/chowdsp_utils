@@ -89,6 +89,21 @@ inline juce::dsp::SIMDRegister<T> tanhSIMD (juce::dsp::SIMDRegister<T> x)
     return (juce::dsp::SIMDRegister<T>) xsimd::tanh ((x_type<T>) x.value);
 }
 
+/** SIMD implementation of std::atan2 */
+template <typename T>
+inline juce::dsp::SIMDRegister<T> atan2SIMD (juce::dsp::SIMDRegister<T> y, juce::dsp::SIMDRegister<T> x)
+{
+    return (juce::dsp::SIMDRegister<T>) xsimd::atan2 ((x_type<T>) y.value, (x_type<T>) x.value);
+}
+
+/** SIMD implementation of sincos */
+template <typename T>
+inline std::pair<juce::dsp::SIMDRegister<T>, juce::dsp::SIMDRegister<T>> sincosSIMD (juce::dsp::SIMDRegister<T> x)
+{
+    auto sincos = xsimd::sincos ((x_type<T>) x.value);
+    return std::make_pair ((juce::dsp::SIMDRegister<T>) std::get<0> (sincos), (juce::dsp::SIMDRegister<T>) std::get<1> (sincos));
+}
+
 /** SIMD implementation of std::isnan */
 template <typename T>
 inline typename juce::dsp::SIMDRegister<T>::vMaskType isnanSIMD (juce::dsp::SIMDRegister<T> x)
@@ -228,6 +243,31 @@ inline juce::dsp::SIMDRegister<double> tanhSIMD (juce::dsp::SIMDRegister<double>
     return y;
 }
 
+/** SIMD implementation of std::atan2 */
+template <>
+inline juce::dsp::SIMDRegister<double> atan2SIMD (juce::dsp::SIMDRegister<double> y, juce::dsp::SIMDRegister<double> x)
+{
+    auto res = juce::dsp::SIMDRegister<double> ((double) 0);
+    for (size_t i = 0; i < x.size(); ++i)
+        res.set (i, std::atan2 (y.get (i), x.get (i)));
+
+    return res;
+}
+
+template <>
+inline std::pair<juce::dsp::SIMDRegister<T>, juce::dsp::SIMDRegister<T>> sincosSIMD (juce::dsp::SIMDRegister<double> x)
+{
+    auto sin = juce::dsp::SIMDRegister<double> ((double) 0);
+    auto cos = juce::dsp::SIMDRegister<double> ((double) 0);
+    for (size_t i = 0; i < x.size(); ++i)
+    {
+        sin.set (i, std::sin (x.get (i)));
+        cos.set (i, std::cos (x.get (i)));
+    }
+
+    return std::make_pair (sin, cos);
+}
+
 /** SIMD implementation of std::isnan */
 template <>
 inline juce::dsp::SIMDRegister<double>::vMaskType isnanSIMD (juce::dsp::SIMDRegister<double> x)
@@ -360,6 +400,32 @@ inline juce::dsp::SIMDRegister<T> tanhSIMD (juce::dsp::SIMDRegister<T> x)
         y.set (i, std::tanh (x.get (i)));
 
     return y;
+}
+
+/** SIMD implementation of std::atan2 */
+template <typename T>
+inline juce::dsp::SIMDRegister<T> atan2SIMD (juce::dsp::SIMDRegister<T> y, juce::dsp::SIMDRegister<T> x)
+{
+    auto res = juce::dsp::SIMDRegister<T> ((T) 0);
+    for (size_t i = 0; i < x.size(); ++i)
+        res.set (i, std::atan2 (y.get (i), x.get (i)));
+
+    return res;
+}
+
+/** SIMD implementation of sincos */
+template <typename T>
+inline std::pair<juce::dsp::SIMDRegister<T>, juce::dsp::SIMDRegister<T>> sincosSIMD (juce::dsp::SIMDRegister<T> x)
+{
+    auto sin = juce::dsp::SIMDRegister<T> ((T) 0);
+    auto cos = juce::dsp::SIMDRegister<T> ((T) 0);
+    for (size_t i = 0; i < x.size(); ++i)
+    {
+        sin.set (i, std::sin (x.get (i)));
+        cos.set (i, std::cos (x.get (i)));
+    }
+
+    return std::make_pair (sin, cos);
 }
 
 /** SIMD implementation of std::isnan */

@@ -18,62 +18,76 @@ public:
             expect (a.atIndex (i) == b.atIndex (i), "Zero elements incorrect!");
     }
 
-    template <typename T, typename VectorOpType, typename ScalarOpType>
-    void testMathOp (Random& r, int nIter, VectorOpType&& vectorOp, ScalarOpType&& scalarOp, const String& mathOpName, T maxErr)
+    template <typename T>
+    void checkResult (std::complex<T> result_scalar, SIMDComplex<T> result_vec, const String& mathOpName, const String& opType, T maxErr)
     {
-        auto checkResult = [this] (auto result_scalar, auto result_vec, const String& mathOpName, const String& opType, T maxErr)
+        auto isNanOrInf = [] (auto x)
         {
-            if (std::isinf (result_scalar.real()) || std::isinf (result_scalar.imag()) || std::isnan (result_scalar.real()) || std::isnan (result_scalar.imag()))
-                return;
-
-            expectWithinAbsoluteError (result_vec.atIndex (0).real(), result_scalar.real(), maxErr, mathOpName + ": " + opType + ", real incorrect!");
-            expectWithinAbsoluteError (result_vec.atIndex (0).imag(), result_scalar.imag(), maxErr, mathOpName + ": " + opType + ", imag incorrect!");
+            return std::isinf (x.real()) || std::isinf (x.imag()) || std::isnan (x.real()) || std::isnan (x.imag());
         };
 
-        auto testComplexComplexOp = [&] ()
+        if (isNanOrInf (result_scalar))
+            return;
+
+        auto at0 = result_vec.atIndex (0);
+        if (isNanOrInf (at0))
+            return;
+
+        expectWithinAbsoluteError (at0.real(), result_scalar.real(), maxErr, mathOpName + ": " + opType + ", real incorrect!");
+        expectWithinAbsoluteError (at0.imag(), result_scalar.imag(), maxErr, mathOpName + ": " + opType + ", imag incorrect!");
+    };
+
+    template <typename T>
+    void checkResult (T result_scalar, dsp::SIMDRegister<T> result_vec, const String& mathOpName, const String& opType, T maxErr)
+    {
+        expectWithinAbsoluteError (result_vec.get (0), result_scalar, maxErr, mathOpName + ": " + opType + ", real incorrect!");
+    };
+
+    template <typename T, typename VectorOpType, typename ScalarOpType, bool doVector = true>
+    void testMathOp (Random& r, int nIter, VectorOpType&& vectorOp, ScalarOpType&& scalarOp, const String& mathOpName, T maxErr, int range = 100)
+    {
+        auto randVal = [&r, range] ()
+        { return (T) r.nextInt ({ -range, range }); };
+
+        for (int i = 0; i < nIter; ++i)
         {
-            const auto a_scalar = std::complex<T> ((T) r.nextInt ({ -100, 100 }), (T) r.nextInt ({ -100, 100 }));
-            const auto b_scalar = std::complex<T> ((T) r.nextInt ({ -100, 100 }), (T) r.nextInt ({ -100, 100 }));
+            const auto a_scalar = std::complex<T> (randVal(), randVal());
+            const auto b_scalar = std::complex<T> (randVal(), randVal());
             SIMDComplex<T> a_vec { a_scalar.real(), a_scalar.imag() };
             SIMDComplex<T> b_vec { b_scalar.real(), b_scalar.imag() };
 
             checkResult (scalarOp (a_scalar, b_scalar), vectorOp (a_vec, b_vec), mathOpName, "complex x complex", maxErr);
-        };
+        }
 
-        auto testComplexVectorOp = [&] ()
+        if constexpr (doVector)
         {
-            const auto a_scalar = std::complex<T> ((T) r.nextInt ({ -100, 100 }), (T) r.nextInt ({ -100, 100 }));
-            const auto b_scalar = (T) r.nextInt ({ -100, 100 });
-            SIMDComplex<T> a_vec { a_scalar.real(), a_scalar.imag() };
-            dsp::SIMDRegister<T> b_vec { b_scalar };
+            for (int i = 0; i < nIter; ++i)
+            {
+                const auto a_scalar = std::complex<T> (randVal(), randVal());
+                const auto b_scalar = randVal();
+                SIMDComplex<T> a_vec { a_scalar.real(), a_scalar.imag() };
+                dsp::SIMDRegister<T> b_vec { b_scalar };
 
-            checkResult (scalarOp (a_scalar, b_scalar), vectorOp (a_vec, b_vec), mathOpName, "complex x vector", maxErr);
-            checkResult (scalarOp (b_scalar, a_scalar), vectorOp (b_vec, a_vec), mathOpName, "vector x complex", maxErr);
-        };
+                checkResult (scalarOp (a_scalar, b_scalar), vectorOp (a_vec, b_vec), mathOpName, "complex x vector", maxErr);
+                checkResult (scalarOp (b_scalar, a_scalar), vectorOp (b_vec, a_vec), mathOpName, "vector x complex", maxErr);
+            }
+        }
 
-        auto testComplexScalarOp = [&] ()
+        for (int i = 0; i < nIter; ++i)
         {
-            const auto a_scalar = std::complex<T> ((T) r.nextInt ({ -100, 100 }), (T) r.nextInt ({ -100, 100 }));
-            const auto b_scalar = (T) r.nextInt ({ -100, 100 });
+            const auto a_scalar = std::complex<T> (randVal(), randVal());
+            const auto b_scalar = randVal();
             SIMDComplex<T> a_vec { a_scalar.real(), a_scalar.imag() };
 
             checkResult (scalarOp (a_scalar, b_scalar), vectorOp (a_vec, b_scalar), mathOpName, "complex x scalar", maxErr);
             checkResult (scalarOp (b_scalar, a_scalar), vectorOp (b_scalar, a_vec), mathOpName, "scalar x complex", maxErr);
-        };
-
-
-        for (int i = 0; i < nIter; ++i)
-        {
-            testComplexComplexOp();
-            testComplexVectorOp();
-            testComplexScalarOp();
-        };
+        }
     }
 
-    template <typename T, typename OpType>
-    void testMathOp (Random& r, int nIter, OpType&& mathOp, const String& mathOpName, T maxErr)
+    template <typename T, typename OpType, bool doVector = true>
+    void testMathOp (Random& r, int nIter, OpType&& mathOp, const String& mathOpName, T maxErr, int range = 100)
     {
-        testMathOp (r, nIter, std::forward<OpType> (mathOp), std::forward<OpType> (mathOp), mathOpName, maxErr);
+        testMathOp <T, OpType, OpType, doVector> (r, nIter, std::forward<OpType> (mathOp), std::forward<OpType> (mathOp), mathOpName, maxErr, range);
     }
 
     template <typename T>
@@ -84,6 +98,27 @@ public:
         testMathOp (r, nIter, [] (auto a, auto b) { return a - b; }, "Subtraction", maxError);
         testMathOp (r, nIter, [] (auto a, auto b) { return a * b; }, "Multiplication", maxError);
         testMathOp (r, nIter, [] (auto a, auto b) { return a / b; }, "Division", maxError * (T) 2);
+    }
+
+    template <typename T>
+    void specialMathTest(Random& r, int nIter, T maxError)
+    {
+        using namespace chowdsp::SIMDUtils;
+        using std::abs, std::arg, std::exp, std::log, std::pow;
+
+        auto absOp = [] (auto a, auto b) { return abs (a) + abs (b); };
+        testMathOp<T, decltype (absOp), false> (r, nIter, std::move (absOp), "Absolute Value", maxError);
+
+        auto argOp = [] (auto a, auto b) { return arg (a) + arg (b); };
+        testMathOp<T, decltype (argOp), false> (r, nIter, std::move (argOp), "Argument", maxError);
+
+        auto expOp = [] (auto a, auto b) { return exp (a) + exp (b); };
+        testMathOp<T, decltype (expOp), false> (r, nIter, std::move (expOp), "Exp", maxError * (T) 100, 5);
+
+        auto logOp = [] (auto a, auto b) { return log (a) + log (b); };
+        testMathOp<T, decltype (logOp), false> (r, nIter, std::move (logOp), "Log", maxError);
+
+        testMathOp<T> (r, nIter, [] (auto a, auto b) { return pow (a, b); }, "Pow", maxError * (T) 1000, 2);
     }
 
     template <typename T>
@@ -136,16 +171,16 @@ public:
         beginTest ("Zero Check");
         zeroCheck();
 
-        beginTest ("Math Test (float)");
+        beginTest ("Math Test");
         mathTest<float> (rand, 100, 1.0e-6f);
-
-        beginTest ("Math Test (double)");
         mathTest<double> (rand, 100, 1.0e-12);
 
-        beginTest ("Exponential Test (float)");
-        fastExpTest<float>();
+        beginTest ("Special Math Ops Test");
+        specialMathTest<float> (rand, 100, 1.0e-6f);
+        specialMathTest<double> (rand, 100, 1.0e-12);
 
-        beginTest ("Exponential Test (double)");
+        beginTest ("Fast Exponential Test");
+        fastExpTest<float>();
         fastExpTest<double>();
 
         beginTest ("Map Test");
