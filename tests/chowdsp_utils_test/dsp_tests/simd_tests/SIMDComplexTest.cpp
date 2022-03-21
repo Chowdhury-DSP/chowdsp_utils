@@ -18,49 +18,76 @@ public:
             expect (a.atIndex (i) == b.atIndex (i), "Zero elements incorrect!");
     }
 
-    template <typename T>
-    void mathTest()
+    template <typename T, typename VectorOpType, typename ScalarOpType>
+    void testMathOp (Random& r, int nIter, VectorOpType&& vectorOp, ScalarOpType&& scalarOp, const String& mathOpName, T maxErr)
     {
-        SIMDComplex<T> q;
-        SIMDComplex<T> r;
-
-        if constexpr (std::is_same<T, float>::value)
+        auto checkResult = [this] (auto result_scalar, auto result_vec, const String& mathOpName, const String& opType, T maxErr)
         {
-            q = SIMDComplex<T> ({ (T) 0.f, (T) 1.f, (T) 2.f, (T) 3.f }, { (T) 1.f, (T) 0.f, (T) -1.f, (T) -2.f });
-            r = SIMDComplex<T> ({ (T) 12.f, (T) 1.2f, (T) 2.4f, (T) 3.7f }, { (T) 1.2f, (T) 0.4f, (T) -1.2f, (T) -2.7f });
-        }
-        else if (std::is_same<T, double>::value)
+            if (std::isinf (result_scalar.real()) || std::isinf (result_scalar.imag()) || std::isnan (result_scalar.real()) || std::isnan (result_scalar.imag()))
+                return;
+
+            expectWithinAbsoluteError (result_vec.atIndex (0).real(), result_scalar.real(), maxErr, mathOpName + ": " + opType + ", real incorrect!");
+            expectWithinAbsoluteError (result_vec.atIndex (0).imag(), result_scalar.imag(), maxErr, mathOpName + ": " + opType + ", imag incorrect!");
+        };
+
+        auto testComplexComplexOp = [&] ()
         {
-            q = SIMDComplex<T> ({ (T) 0.f, (T) 1.f }, { (T) 1.f, (T) 0.f });
-            r = SIMDComplex<T> ({ (T) 12.f, (T) 1.2f }, { (T) 1.2f, (T) 0.4f });
-        }
+            const auto a_scalar = std::complex<T> ((T) r.nextInt ({ -100, 100 }), (T) r.nextInt ({ -100, 100 }));
+            const auto b_scalar = std::complex<T> ((T) r.nextInt ({ -100, 100 }), (T) r.nextInt ({ -100, 100 }));
+            SIMDComplex<T> a_vec { a_scalar.real(), a_scalar.imag() };
+            SIMDComplex<T> b_vec { b_scalar.real(), b_scalar.imag() };
 
-        expect (q.atIndex (0) == std::complex<T> ((T) 0.f, (T) 1.f));
-        expect (q.atIndex (1) == std::complex<T> ((T) 1.f, (T) 0.f));
-        if constexpr (std::is_same<T, float>::value)
+            checkResult (scalarOp (a_scalar, b_scalar), vectorOp (a_vec, b_vec), mathOpName, "complex x complex", maxErr);
+        };
+
+        auto testComplexVectorOp = [&] ()
         {
-            expect (q.atIndex (2) == std::complex<T> ((T) 2.f, (T) -1.f));
-            expect (q.atIndex (3) == std::complex<T> ((T) 3.f, (T) -2.f));
-        }
+            const auto a_scalar = std::complex<T> ((T) r.nextInt ({ -100, 100 }), (T) r.nextInt ({ -100, 100 }));
+            const auto b_scalar = (T) r.nextInt ({ -100, 100 });
+            SIMDComplex<T> a_vec { a_scalar.real(), a_scalar.imag() };
+            dsp::SIMDRegister<T> b_vec { b_scalar };
 
-        auto qpr = q + r;
-        for (size_t i = 0; i < SIMDComplex<T>::size; ++i)
-            expect (qpr.atIndex (i) == q.atIndex (i) + r.atIndex (i), "Addition incorrect!");
+            checkResult (scalarOp (a_scalar, b_scalar), vectorOp (a_vec, b_vec), mathOpName, "complex x vector", maxErr);
+            checkResult (scalarOp (b_scalar, a_scalar), vectorOp (b_vec, a_vec), mathOpName, "vector x complex", maxErr);
+        };
 
-        auto qtr = q * r;
-        for (size_t i = 0; i < SIMDComplex<T>::size; ++i)
-            expect (qtr.atIndex (i) == q.atIndex (i) * r.atIndex (i), "Multiplication incorrect!");
+        auto testComplexScalarOp = [&] ()
+        {
+            const auto a_scalar = std::complex<T> ((T) r.nextInt ({ -100, 100 }), (T) r.nextInt ({ -100, 100 }));
+            const auto b_scalar = (T) r.nextInt ({ -100, 100 });
+            SIMDComplex<T> a_vec { a_scalar.real(), a_scalar.imag() };
 
-        T sum = (T) 0;
-        for (size_t i = 0; i < SIMDComplex<T>::size; ++i)
-            sum += qtr.atIndex (i).real();
+            checkResult (scalarOp (a_scalar, b_scalar), vectorOp (a_vec, b_scalar), mathOpName, "complex x scalar", maxErr);
+            checkResult (scalarOp (b_scalar, a_scalar), vectorOp (b_scalar, a_vec), mathOpName, "scalar x complex", maxErr);
+        };
 
-        T sumSIMD = qtr.real().sum();
-        expectWithinAbsoluteError (sum, sumSIMD, (T) 1e-5, "Sum incorrect!");
+
+        for (int i = 0; i < nIter; ++i)
+        {
+            testComplexComplexOp();
+            testComplexVectorOp();
+            testComplexScalarOp();
+        };
+    }
+
+    template <typename T, typename OpType>
+    void testMathOp (Random& r, int nIter, OpType&& mathOp, const String& mathOpName, T maxErr)
+    {
+        testMathOp (r, nIter, std::forward<OpType> (mathOp), std::forward<OpType> (mathOp), mathOpName, maxErr);
     }
 
     template <typename T>
-    void expTest()
+    void mathTest(Random& r, int nIter, T maxError)
+    {
+        using namespace chowdsp::SIMDUtils;
+        testMathOp (r, nIter, [] (auto a, auto b) { return a + b; }, "Addition", maxError);
+        testMathOp (r, nIter, [] (auto a, auto b) { return a - b; }, "Subtraction", maxError);
+        testMathOp (r, nIter, [] (auto a, auto b) { return a * b; }, "Multiplication", maxError);
+        testMathOp (r, nIter, [] (auto a, auto b) { return a / b; }, "Division", maxError * (T) 2);
+    }
+
+    template <typename T>
+    void fastExpTest()
     {
         T angles alignas (16)[SIMDComplex<T>::size];
         angles[0] = 0;
@@ -104,20 +131,22 @@ public:
 
     void runTestTimed() override
     {
+        auto rand = getRandom();
+
         beginTest ("Zero Check");
         zeroCheck();
 
         beginTest ("Math Test (float)");
-        mathTest<float>();
+        mathTest<float> (rand, 100, 1.0e-6f);
 
         beginTest ("Math Test (double)");
-        mathTest<double>();
+        mathTest<double> (rand, 100, 1.0e-12);
 
         beginTest ("Exponential Test (float)");
-        expTest<float>();
+        fastExpTest<float>();
 
         beginTest ("Exponential Test (double)");
-        expTest<double>();
+        fastExpTest<double>();
 
         beginTest ("Map Test");
         mapTest();

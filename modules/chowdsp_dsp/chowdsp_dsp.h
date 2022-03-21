@@ -95,6 +95,7 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 #include "SIMD/chowdsp_SIMDDecibels.h"
 #include "SIMD/chowdsp_SIMDSmoothedValue.h"
 #include "SIMD/chowdsp_SIMDComplex.h"
+#include "SIMD/chowdsp_SIMDComplexMathOps.h"
 
 // math helpers
 #include "Math/chowdsp_Combinatorics.h"
