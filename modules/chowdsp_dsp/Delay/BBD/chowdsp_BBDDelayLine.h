@@ -83,15 +83,14 @@ public:
         process (float u) noexcept
     {
         SIMDComplex<float> xOutAccum;
-        float sum, yBBD, delta;
+        float yBBD, delta;
         while (tn < 1.0f)
         {
             if (evenOn)
             {
                 inputFilter->calcG();
-                sum = SIMDComplexMulReal (inputFilter->Gcalc, inputFilter->x).sum();
-                buffer[bufferPtr++] = sum;
-                bufferPtr = (bufferPtr <= STAGES) ? bufferPtr : 0;
+                buffer[bufferPtr++] = SIMDComplexMulReal (inputFilter->Gcalc, inputFilter->x).sum();
+                bufferPtr = (bufferPtr < STAGES) ? bufferPtr : 0;
             }
             else
             {
@@ -119,15 +118,14 @@ public:
         process (float u) noexcept
     {
         SIMDComplex<float> xOutAccum;
-        float sum, yBBD, delta;
+        float yBBD, delta;
         while (tn < Ts)
         {
             if (evenOn)
             {
                 inputFilter->calcG();
-                sum = SIMDComplexMulReal (inputFilter->Gcalc, inputFilter->x).sum();
-                buffer[bufferPtr++] = sum;
-                bufferPtr = (bufferPtr <= STAGES) ? bufferPtr : 0;
+                buffer[bufferPtr++] = SIMDComplexMulReal (inputFilter->Gcalc, inputFilter->x).sum();
+                bufferPtr = (bufferPtr < STAGES) ? bufferPtr : 0;
             }
             else
             {
