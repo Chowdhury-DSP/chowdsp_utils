@@ -104,19 +104,19 @@ inline std::pair<juce::dsp::SIMDRegister<T>, juce::dsp::SIMDRegister<T>> sincosS
     using namespace xsimd;
     using batch_type = x_type<T>;
 
-    const batch_type self = (batch_type) in.value;
-    const batch_type x = abs (self);
-    batch_type xr = nan<batch_type>();
-    const batch_type n = xsimd::detail::trigo_reducer<batch_type>::reduce (x, xr);
-    auto tmp = select (n >= batch_type ((T) 2), batch_type ((T) 1), batch_type ((T) 0));
+    const auto self = (batch_type) in.value;
+    const auto x = abs (self);
+    auto xr = nan<batch_type>();
+    const auto n = xsimd::detail::trigo_reducer<batch_type>::reduce (x, xr);
+    auto tmp = select(n >= batch_type ((T) 2), batch_type ((T) 1), batch_type ((T) 0));
     auto swap_bit = fma (batch_type ((T) -2), tmp, n);
-    const batch_type z = xr * xr;
-    const batch_type se = xsimd::detail::trigo_evaluation<batch_type>::sin_eval (z, xr);
-    const batch_type ce = xsimd::detail::trigo_evaluation<batch_type>::cos_eval (z);
+    const auto z = xr * xr;
+    const auto se = xsimd::detail::trigo_evaluation<batch_type>::sin_eval (z, xr);
+    const auto ce = xsimd::detail::trigo_evaluation<batch_type>::cos_eval (z);
     auto sin_sign_bit = bitofsign (self) ^ select (tmp != batch_type ((T) 0), signmask<batch_type>(), batch_type ((T) 0));
-    const batch_type sin_z1 = select (swap_bit == batch_type ((T) 0), se, ce);
+    const auto sin_z1 = select (swap_bit == batch_type ((T) 0), se, ce);
     auto cos_sign_bit = select ((swap_bit ^ tmp) != batch_type ((T) 0), signmask<batch_type>(), batch_type ((T) 0));
-    const batch_type cos_z1 = select (swap_bit != batch_type ((T) 0), se, ce);
+    const auto cos_z1 = select (swap_bit != batch_type ((T) 0), se, ce);
     return std::make_pair (juce::dsp::SIMDRegister<T> (sin_z1 ^ sin_sign_bit), juce::dsp::SIMDRegister<T> (cos_z1 ^ cos_sign_bit));
 }
 
@@ -271,7 +271,7 @@ inline juce::dsp::SIMDRegister<double> atan2SIMD (juce::dsp::SIMDRegister<double
 }
 
 template <>
-inline std::pair<juce::dsp::SIMDRegister<T>, juce::dsp::SIMDRegister<T>> sincosSIMD (juce::dsp::SIMDRegister<double> x)
+inline std::pair<juce::dsp::SIMDRegister<double>, juce::dsp::SIMDRegister<double>> sincosSIMD (juce::dsp::SIMDRegister<double> x)
 {
     auto sin = juce::dsp::SIMDRegister<double> ((double) 0);
     auto cos = juce::dsp::SIMDRegister<double> ((double) 0);
