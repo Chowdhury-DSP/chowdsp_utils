@@ -80,18 +80,15 @@ public:
     {
         const float freqFactor = freq / BBDFilterSpec::inputFilterOriginalCutoff;
         root_corr = roots * freqFactor;
-        pole_corr = poles.map ([&freqFactor, this] (const std::complex<float>& f) { return std::exp (f * freqFactor * Ts); });
-
-        pole_corr_angle =
-            pole_corr.map_float ([] (const std::complex<float>& f) { return std::arg (f); });
+        pole_corr = chowdsp::SIMDUtils::exp (poles * (freqFactor * Ts));
+        pole_corr_angle = chowdsp::SIMDUtils::arg (pole_corr);
 
         gCoef = root_corr * Ts;
     }
 
     inline void set_time (float tn) noexcept
     {
-        Gcalc =
-            gCoef * pole_corr.map ([&tn] (const std::complex<float>& f) { return std::pow (f, tn); });
+        Gcalc = gCoef * chowdsp::SIMDUtils::pow (pole_corr, tn);
     }
 
     inline void set_delta (float delta) noexcept
@@ -153,17 +150,15 @@ public:
     inline void set_freq (float freq)
     {
         const float freqFactor = freq / BBDFilterSpec::outputFilterOriginalCutoff;
-        pole_corr = poles.map ([&freqFactor, this] (const std::complex<float>& f) { return std::exp (f * freqFactor * Ts); });
-
-        pole_corr_angle =
-            pole_corr.map_float ([] (const std::complex<float>& f) { return std::arg (f); });
+        pole_corr = chowdsp::SIMDUtils::exp (poles * (freqFactor * Ts));
+        pole_corr_angle = chowdsp::SIMDUtils::arg (pole_corr);
 
         Amult = gCoef * pole_corr;
     }
 
     inline void set_time (float tn) noexcept
     {
-        Gcalc = Amult * pole_corr.map ([&tn] (const std::complex<float>& f) { return std::pow (f, 1.0f - tn); });
+        Gcalc = Amult * chowdsp::SIMDUtils::pow (pole_corr, 1.0f - tn);
     }
 
     inline void set_delta (float delta) noexcept { Aplus = BBDFilterSpec::fast_complex_pow (pole_corr_angle, -delta); }

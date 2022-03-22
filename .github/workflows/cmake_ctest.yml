@@ -24,11 +24,11 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            cmake_args: "-DCMAKE_BUILD_TYPE=Release -DXSIMD_PATH=../xsimd"
+            cmake_args: "-DCMAKE_BUILD_TYPE=Release"
           - os: windows-2019
             cmake_args: ""
           - os: macos-latest
-            cmake_args: "-DCMAKE_BUILD_TYPE=Release -DXSIMD_PATH=../xsimd"
+            cmake_args: "-DCMAKE_BUILD_TYPE=Release"
 
     steps:
       - name: Install Linux Deps
@@ -53,11 +53,6 @@ jobs:
           git clone --depth 1 --branch 6.1.2 https://github.com/juce-framework/JUCE.git
           cd JUCE_modules
           git clone --single-branch --branch chowdsp https://github.com/Chowdhury-DSP/foleys_gui_magic.git
-
-      - name: Install xsimd
-        if: runner.os == 'Linux' || runner.os == 'MacOS'
-        working-directory: ${{github.workspace}}/JUCE_modules
-        run: git clone --depth 1 --branch 7.5.0 https://github.com/xtensor-stack/xsimd
 
       - name: ccache
         if: runner.os == 'Linux' || runner.os == 'MacOS'

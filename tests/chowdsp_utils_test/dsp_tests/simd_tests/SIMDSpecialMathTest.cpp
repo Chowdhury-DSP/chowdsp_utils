@@ -22,12 +22,28 @@ public:
     }
 
     template <typename FloatType>
+    void baseMathTest2D (int nIter, Random& r, std::function<FloatType (FloatType, FloatType)> floatFunc, std::function<dsp::SIMDRegister<FloatType> (dsp::SIMDRegister<FloatType>, dsp::SIMDRegister<FloatType>)> simdFunc, FloatType maxErr, const String& functionName, const NormalisableRange<FloatType>& range)
+    {
+        for (int i = 0; i < nIter; ++i)
+        {
+            auto input1 = range.convertFrom0to1 ((FloatType) r.nextDouble());
+            auto input2 = range.convertFrom0to1 ((FloatType) r.nextDouble());
+            auto expected = floatFunc (input1, input2);
+            auto actual = simdFunc (dsp::SIMDRegister<FloatType> (input1), dsp::SIMDRegister<FloatType> (input2));
+
+            for (size_t j = 0; j < dsp::SIMDRegister<FloatType>::size(); ++j)
+                expectWithinAbsoluteError (actual.get (j), expected, maxErr, "SIMD function is incorrect: " + functionName);
+        }
+    }
+
+    template <typename FloatType>
     void mathTest (int nIter, Random& r, FloatType maxErr)
     {
         const auto minus10To10 = NormalisableRange<FloatType> ((FloatType) -10, (FloatType) 10);
         const auto minus1To1 = NormalisableRange<FloatType> ((FloatType) -1, (FloatType) 1);
         const auto sinhRange = NormalisableRange<FloatType> ((FloatType) -3, (FloatType) 3);
         const auto zeroTo10 = NormalisableRange<FloatType> ((FloatType) 0, (FloatType) 10);
+        const auto zeroTo2 = NormalisableRange<FloatType> ((FloatType) 0, (FloatType) 2);
         const auto logRange = NormalisableRange<FloatType> ((FloatType) 0.01, (FloatType) 10);
 
 #define FLOATFUNC(func) [] (FloatType x) { return func (x); }
@@ -46,20 +62,22 @@ public:
         baseMathTest<FloatType> (nIter, r, FLOATFUNC (Decibels::gainToDecibels), SIMDFUNC (gainToDecibels), maxErr, "gainToDecibels", minus10To10);
         baseMathTest<FloatType> (nIter, r, FLOATFUNC (Decibels::decibelsToGain), SIMDFUNC (decibelsToGain), maxErr, "decibelsToGain", minus10To10);
 
+        baseMathTest<FloatType> (
+            nIter, r, FLOATFUNC (std::sin), [] (auto x) { return std::get<0> (sincosSIMD (x)); }, maxErr, "sincos", minus10To10);
+        baseMathTest<FloatType> (
+            nIter, r, FLOATFUNC (std::cos), [] (auto x) { return std::get<1> (sincosSIMD (x)); }, maxErr, "sincos", minus10To10);
+
 #undef FLOATFUNC
 #undef SIMDFUNC
 
-        // test std::pow (needs 2 inputs)
-        for (int i = 0; i < nIter; ++i)
-        {
-            auto a = (FloatType) r.nextDouble();
-            auto b = (FloatType) r.nextDouble();
-            auto expected = std::pow (a, b);
-            auto actual = powSIMD (dsp::SIMDRegister<FloatType> (a), dsp::SIMDRegister<FloatType> (b));
+#define FLOATFUNC2D(func) [] (FloatType a, FloatType b) { return func (a, b); }
+#define SIMDFUNC2D(func) [] (dsp::SIMDRegister<FloatType> a, dsp::SIMDRegister<FloatType> b) { return func (a, b); }
 
-            for (size_t j = 0; j < dsp::SIMDRegister<FloatType>::size(); ++j)
-                expectWithinAbsoluteError (actual.get (j), expected, maxErr, "SIMD function is incorrect: pow");
-        }
+        baseMathTest2D<FloatType> (nIter, r, FLOATFUNC2D (std::pow), SIMDFUNC2D (powSIMD), maxErr * (FloatType) 100, "pow", zeroTo2);
+        baseMathTest2D<FloatType> (nIter, r, FLOATFUNC2D (std::atan2), SIMDFUNC2D (atan2SIMD), maxErr, "pow", minus10To10);
+
+#undef FLOATFUNC2D
+#undef SIMDFUNC2D
     }
 
     template <typename FloatType>

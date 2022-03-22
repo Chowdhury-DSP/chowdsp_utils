@@ -4,11 +4,9 @@ namespace chowdsp::SIMDUtils
 {
 /**
  *  JUCE SIMD registers don't directly support more compilcated math functions
- *  We can use xsimd to enable this if xsimd is available, otherwise,
- *  let's implement a fallback.
+ *  We can use xsimd to enable these operations.
  */
 
-#if CHOWDSP_USE_XSIMD // XSIMD implementations
 template <typename T>
 using x_type = xsimd::batch<T, juce::dsp::SIMDRegister<T>::size()>;
 
@@ -87,6 +85,39 @@ template <typename T>
 inline juce::dsp::SIMDRegister<T> tanhSIMD (juce::dsp::SIMDRegister<T> x)
 {
     return (juce::dsp::SIMDRegister<T>) xsimd::tanh ((x_type<T>) x.value);
+}
+
+/** SIMD implementation of std::atan2 */
+template <typename T>
+inline juce::dsp::SIMDRegister<T> atan2SIMD (juce::dsp::SIMDRegister<T> y, juce::dsp::SIMDRegister<T> x)
+{
+    return (juce::dsp::SIMDRegister<T>) xsimd::atan2 ((x_type<T>) y.value, (x_type<T>) x.value);
+}
+
+/** SIMD implementation of sincos */
+template <typename T>
+inline std::pair<juce::dsp::SIMDRegister<T>, juce::dsp::SIMDRegister<T>> sincosSIMD (juce::dsp::SIMDRegister<T> in)
+{
+    // @TODO: the latest version of xsimd has this method built in, so we should use that when we upgrade.
+    // Until then, the method is re-implemented here.
+    // Reference: https://github.com/xtensor-stack/xsimd/blob/master/include/xsimd/arch/generic/xsimd_generic_trigo.hpp#L704
+    using namespace xsimd;
+    using batch_type = x_type<T>;
+
+    const auto self = (batch_type) in.value;
+    const auto x = abs (self);
+    auto xr = nan<batch_type>();
+    const auto n = xsimd::detail::trigo_reducer<batch_type>::reduce (x, xr);
+    auto tmp = select (n >= batch_type ((T) 2), batch_type ((T) 1), batch_type ((T) 0));
+    auto swap_bit = fma (batch_type ((T) -2), tmp, n);
+    const auto z = xr * xr;
+    const auto se = xsimd::detail::trigo_evaluation<batch_type>::sin_eval (z, xr);
+    const auto ce = xsimd::detail::trigo_evaluation<batch_type>::cos_eval (z);
+    auto sin_sign_bit = bitofsign (self) ^ select (tmp != batch_type ((T) 0), signmask<batch_type>(), batch_type ((T) 0));
+    const auto sin_z1 = select (swap_bit == batch_type ((T) 0), se, ce);
+    auto cos_sign_bit = select ((swap_bit ^ tmp) != batch_type ((T) 0), signmask<batch_type>(), batch_type ((T) 0));
+    const auto cos_z1 = select (swap_bit != batch_type ((T) 0), se, ce);
+    return std::make_pair (juce::dsp::SIMDRegister<T> (sin_z1 ^ sin_sign_bit), juce::dsp::SIMDRegister<T> (cos_z1 ^ cos_sign_bit));
 }
 
 /** SIMD implementation of std::isnan */
@@ -228,6 +259,31 @@ inline juce::dsp::SIMDRegister<double> tanhSIMD (juce::dsp::SIMDRegister<double>
     return y;
 }
 
+/** SIMD implementation of std::atan2 */
+template <>
+inline juce::dsp::SIMDRegister<double> atan2SIMD (juce::dsp::SIMDRegister<double> y, juce::dsp::SIMDRegister<double> x)
+{
+    auto res = juce::dsp::SIMDRegister<double> ((double) 0);
+    for (size_t i = 0; i < x.size(); ++i)
+        res.set (i, std::atan2 (y.get (i), x.get (i)));
+
+    return res;
+}
+
+template <>
+inline std::pair<juce::dsp::SIMDRegister<double>, juce::dsp::SIMDRegister<double>> sincosSIMD (juce::dsp::SIMDRegister<double> x)
+{
+    auto sin = juce::dsp::SIMDRegister<double> ((double) 0);
+    auto cos = juce::dsp::SIMDRegister<double> ((double) 0);
+    for (size_t i = 0; i < x.size(); ++i)
+    {
+        sin.set (i, std::sin (x.get (i)));
+        cos.set (i, std::cos (x.get (i)));
+    }
+
+    return std::make_pair (sin, cos);
+}
+
 /** SIMD implementation of std::isnan */
 template <>
 inline juce::dsp::SIMDRegister<double>::vMaskType isnanSIMD (juce::dsp::SIMDRegister<double> x)
@@ -239,141 +295,6 @@ inline juce::dsp::SIMDRegister<double>::vMaskType isnanSIMD (juce::dsp::SIMDRegi
     return y;
 }
 #endif // (! CHOWDSP_USE_CUSTOM_JUCE_DSP) && (defined(_M_ARM64) || defined(__arm64__) || defined(__aarch64__))
-
-#else // fallback implemetations (! CHOWDSP_USE_XSIMD)
-/** SIMD implementation of std::exp */
-template <typename T>
-inline juce::dsp::SIMDRegister<T> expSIMD (juce::dsp::SIMDRegister<T> x)
-{
-    auto y = juce::dsp::SIMDRegister<T> ((T) 0);
-    for (size_t i = 0; i < x.size(); ++i)
-        y.set (i, std::exp (x.get (i)));
-
-    return y;
-}
-
-/** SIMD implementation of std::log */
-template <typename T>
-inline juce::dsp::SIMDRegister<T> logSIMD (juce::dsp::SIMDRegister<T> x)
-{
-    auto y = juce::dsp::SIMDRegister<T> ((T) 0);
-    for (size_t i = 0; i < x.size(); ++i)
-        y.set (i, std::log (x.get (i)));
-
-    return y;
-}
-
-/** SIMD implementation of std::log */
-template <typename T>
-inline juce::dsp::SIMDRegister<T> log10SIMD (juce::dsp::SIMDRegister<T> x)
-{
-    auto y = juce::dsp::SIMDRegister<T> ((T) 0);
-    for (size_t i = 0; i < x.size(); ++i)
-        y.set (i, std::log10 (x.get (i)));
-
-    return y;
-}
-
-/** SIMD implementation of std::pow */
-template <typename T>
-inline juce::dsp::SIMDRegister<T> powSIMD (juce::dsp::SIMDRegister<T> a, juce::dsp::SIMDRegister<T> b)
-{
-    auto y = juce::dsp::SIMDRegister<T> ((T) 0);
-    for (size_t i = 0; i < a.size(); ++i)
-        y.set (i, std::pow (a.get (i), b.get (i)));
-
-    return y;
-}
-
-/** SIMD implementation of std::sqrt */
-template <typename T>
-inline juce::dsp::SIMDRegister<T> sqrtSIMD (juce::dsp::SIMDRegister<T> x)
-{
-    auto y = juce::dsp::SIMDRegister<T> ((T) 0);
-    for (size_t i = 0; i < x.size(); ++i)
-        y.set (i, std::sqrt (x.get (i)));
-
-    return y;
-}
-
-/** SIMD implementation of std::sin */
-template <typename T>
-inline juce::dsp::SIMDRegister<T> sinSIMD (juce::dsp::SIMDRegister<T> x)
-{
-    auto y = juce::dsp::SIMDRegister<T> ((T) 0);
-    for (size_t i = 0; i < x.size(); ++i)
-        y.set (i, std::sin (x.get (i)));
-
-    return y;
-}
-
-/** SIMD implementation of std::cos */
-template <typename T>
-inline juce::dsp::SIMDRegister<T> cosSIMD (juce::dsp::SIMDRegister<T> x)
-{
-    auto y = juce::dsp::SIMDRegister<T> ((T) 0);
-    for (size_t i = 0; i < x.size(); ++i)
-        y.set (i, std::cos (x.get (i)));
-
-    return y;
-}
-
-/** SIMD implementation of std::tan */
-template <typename T>
-inline juce::dsp::SIMDRegister<T> tanSIMD (juce::dsp::SIMDRegister<T> x)
-{
-    auto y = juce::dsp::SIMDRegister<T> ((T) 0);
-    for (size_t i = 0; i < x.size(); ++i)
-        y.set (i, std::tan (x.get (i)));
-
-    return y;
-}
-
-/** SIMD implementation of std::sinh */
-template <typename T>
-inline juce::dsp::SIMDRegister<T> sinhSIMD (juce::dsp::SIMDRegister<T> x)
-{
-    auto y = juce::dsp::SIMDRegister<T> ((T) 0);
-    for (size_t i = 0; i < x.size(); ++i)
-        y.set (i, std::sinh (x.get (i)));
-
-    return y;
-}
-
-/** SIMD implementation of std::cosh */
-template <typename T>
-inline juce::dsp::SIMDRegister<T> coshSIMD (juce::dsp::SIMDRegister<T> x)
-{
-    auto y = juce::dsp::SIMDRegister<T> ((T) 0);
-    for (size_t i = 0; i < x.size(); ++i)
-        y.set (i, std::cosh (x.get (i)));
-
-    return y;
-}
-
-/** SIMD implementation of std::tanh */
-template <typename T>
-inline juce::dsp::SIMDRegister<T> tanhSIMD (juce::dsp::SIMDRegister<T> x)
-{
-    auto y = juce::dsp::SIMDRegister<T> ((T) 0);
-    for (size_t i = 0; i < x.size(); ++i)
-        y.set (i, std::tanh (x.get (i)));
-
-    return y;
-}
-
-/** SIMD implementation of std::isnan */
-template <typename T>
-inline typename juce::dsp::SIMDRegister<T>::vMaskType isnanSIMD (juce::dsp::SIMDRegister<T> x)
-{
-    auto y = juce::dsp::SIMDRegister<T>();
-    for (size_t i = 0; i < x.size(); ++i)
-        y.set (i, (T) std::isnan (x.get (i)));
-
-    using Vec = juce::dsp::SIMDRegister<T>;
-    return Vec::notEqual (y, (Vec) 0);
-}
-#endif // CHOWDSP_USE_XSIMD
 
 /** Returns the maximum value from the SIMD register */
 template <typename T>
