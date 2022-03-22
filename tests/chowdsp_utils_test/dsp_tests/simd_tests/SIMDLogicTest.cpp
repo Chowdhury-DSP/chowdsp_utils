@@ -64,6 +64,32 @@ public:
         }
     }
 
+    template <typename T>
+    void anyTest()
+    {
+        using Vec = typename dsp::SIMDRegister<T>;
+        Vec vec {};
+        for (size_t i = 0; i < Vec::size(); ++i)
+            vec.set (i, (T) i);
+
+        expect (! any (Vec::greaterThan (vec, (T) 100)), "Any is incorrect when none of the results are true");
+        expect (any (Vec::greaterThanOrEqual (vec, (T) 1)), "Any is incorrect when some of the results are true");
+        expect (any (Vec::greaterThan (vec, (T) -1)), "Any is incorrect when all of the results are true");
+    }
+
+    template <typename T>
+    void allTest()
+    {
+        using Vec = typename dsp::SIMDRegister<T>;
+        Vec vec {};
+        for (size_t i = 0; i < Vec::size(); ++i)
+            vec.set (i, (T) i);
+
+        expect (! all (Vec::greaterThan (vec, (T) 100)), "All is incorrect when none of the results are true");
+        expect (! all (Vec::greaterThanOrEqual (vec, (T) 1)), "All is incorrect when some of the results are true");
+        expect (all (Vec::greaterThan (vec, (T) -1)), "All is incorrect when all of the results are true");
+    }
+
     void runTestTimed() override
     {
         beginTest ("Select Test");
@@ -77,6 +103,14 @@ public:
         beginTest ("AND NOT Test");
         andNotTest<float>();
         andNotTest<double>();
+
+        beginTest ("ANY test");
+        anyTest<float>();
+        anyTest<double>();
+
+        beginTest ("ALL test");
+        allTest<float>();
+        allTest<double>();
     }
 };
 

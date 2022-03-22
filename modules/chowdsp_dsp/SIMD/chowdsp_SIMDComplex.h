@@ -13,13 +13,18 @@ struct SIMDComplex
     T _r, _i;
     static constexpr size_t size = T::size();
 
-    constexpr SIMDComplex (const T& r = T (0), const T& i = T (0)) //NOLINT(google-explicit-constructor) we want to be able use this constructor implicitly (see math ops at the bottom of this file)
+    constexpr SIMDComplex (const T& r = T (0), const T& i = T (0)) //NOLINT(google-explicit-constructor) we want to be able to use this constructor implicitly (see math ops at the bottom of this file)
         : _r (r), _i (i)
     {
     }
 
     constexpr SIMDComplex (Type r, Type i)
         : _r (T (r)), _i (T (i))
+    {
+    }
+
+    constexpr SIMDComplex (std::complex<Type> c) //NOLINT(google-explicit-constructor) we want to be able to use this constructor implicitly (see math ops at the bottom of this file)
+        : _r (T (c.real())), _i (T (c.imag()))
     {
     }
 
@@ -94,47 +99,4 @@ struct SIMDComplex
         return T::fromRawArray (out);
     }
 };
-
-template <typename Type>
-inline SIMDComplex<Type> operator+ (const SIMDComplex<Type>& a, const SIMDComplex<Type>& b)
-{
-    return { a._r + b._r, a._i + b._i };
-}
-
-template <typename Type>
-inline juce::dsp::SIMDRegister<Type> SIMDComplexMulReal (const SIMDComplex<Type>& a, const SIMDComplex<Type>& b)
-{
-    return (a._r * b._r) - (a._i * b._i);
-}
-
-template <typename Type>
-inline juce::dsp::SIMDRegister<Type> SIMDComplexMulImag (const SIMDComplex<Type>& a, const SIMDComplex<Type>& b)
-{
-    return (a._r * b._i) + (a._i * b._r);
-}
-
-template <typename Type>
-inline SIMDComplex<Type> operator* (const SIMDComplex<Type>& a, const SIMDComplex<Type>& b)
-{
-    return { SIMDComplexMulReal (a, b), SIMDComplexMulImag (a, b) };
-}
-
-template <typename Type>
-inline SIMDComplex<Type> operator* (const SIMDComplex<Type>& a, const Type& b)
-{
-    return { a._r * b, a._i * b };
-}
-
-template <typename Type>
-inline SIMDComplex<Type> operator* (const SIMDComplex<Type>& a, const juce::dsp::SIMDRegister<Type>& b)
-{
-    return { a._r * b, a._i * b };
-}
-
-template <typename Type>
-inline SIMDComplex<Type> operator* (const juce::dsp::SIMDRegister<Type>& b, const SIMDComplex<Type>& a)
-{
-    return { a._r * b, a._i * b };
-}
-
 } // namespace chowdsp::SIMDUtils
