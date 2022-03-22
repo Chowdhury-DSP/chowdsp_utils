@@ -4,7 +4,7 @@
 #include "wdf_t.h"
 #include <array>
 
-#if CHOWDSP_USE_XSIMD
+#if WDF_USE_XSIMD
 #include <cassert>
 #include <xsimd/xsimd.hpp>
 #endif
@@ -60,7 +60,7 @@ namespace rtype_detail
         // input vector (a) of size 1 x dim
         // output vector (b) of size 1 x dim
 
-#if CHOWDSP_USE_XSIMD
+#if defined (XSIMD_HPP)
         using v_type = xsimd::simd_type<T>;
         constexpr auto simd_size = (int) v_type::size;
         constexpr auto vec_size = (int) numPorts - (int) numPorts % simd_size;
