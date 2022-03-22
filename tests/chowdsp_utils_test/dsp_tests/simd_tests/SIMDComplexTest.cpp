@@ -19,48 +19,110 @@ public:
     }
 
     template <typename T>
-    void mathTest()
+    void checkResult (std::complex<T> result_scalar, SIMDComplex<T> result_vec, const String& mathOpName, const String& opType, T maxErr)
     {
-        SIMDComplex<T> q;
-        SIMDComplex<T> r;
-
-        if constexpr (std::is_same<T, float>::value)
+        auto isNanOrInf = [] (auto x)
         {
-            q = SIMDComplex<T> ({ (T) 0.f, (T) 1.f, (T) 2.f, (T) 3.f }, { (T) 1.f, (T) 0.f, (T) -1.f, (T) -2.f });
-            r = SIMDComplex<T> ({ (T) 12.f, (T) 1.2f, (T) 2.4f, (T) 3.7f }, { (T) 1.2f, (T) 0.4f, (T) -1.2f, (T) -2.7f });
-        }
-        else if (std::is_same<T, double>::value)
+            return std::isinf (x.real()) || std::isinf (x.imag()) || std::isnan (x.real()) || std::isnan (x.imag());
+        };
+
+        if (isNanOrInf (result_scalar))
+            return;
+
+        auto at0 = result_vec.atIndex (0);
+        if (isNanOrInf (at0))
+            return;
+
+        expectWithinAbsoluteError (at0.real(), result_scalar.real(), maxErr, mathOpName + ": " + opType + ", real incorrect!");
+        expectWithinAbsoluteError (at0.imag(), result_scalar.imag(), maxErr, mathOpName + ": " + opType + ", imag incorrect!");
+    };
+
+    template <typename T>
+    void checkResult (T result_scalar, dsp::SIMDRegister<T> result_vec, const String& mathOpName, const String& opType, T maxErr)
+    {
+        expectWithinAbsoluteError (result_vec.get (0), result_scalar, maxErr, mathOpName + ": " + opType + ", real incorrect!");
+    };
+
+    template <typename T, typename VectorOpType, typename ScalarOpType, bool doVector = true>
+    void testMathOp (Random& r, int nIter, VectorOpType&& vectorOp, ScalarOpType&& scalarOp, const String& mathOpName, T maxErr, int range = 100)
+    {
+        auto randVal = [&r, range] ()
+        { return (T) r.nextInt ({ -range, range }); };
+
+        for (int i = 0; i < nIter; ++i)
         {
-            q = SIMDComplex<T> ({ (T) 0.f, (T) 1.f }, { (T) 1.f, (T) 0.f });
-            r = SIMDComplex<T> ({ (T) 12.f, (T) 1.2f }, { (T) 1.2f, (T) 0.4f });
+            const auto a_scalar = std::complex<T> (randVal(), randVal());
+            const auto b_scalar = std::complex<T> (randVal(), randVal());
+            SIMDComplex<T> a_vec { a_scalar.real(), a_scalar.imag() };
+            SIMDComplex<T> b_vec { b_scalar.real(), b_scalar.imag() };
+
+            checkResult (scalarOp (a_scalar, b_scalar), vectorOp (a_vec, b_vec), mathOpName, "complex x complex", maxErr);
         }
 
-        expect (q.atIndex (0) == std::complex<T> ((T) 0.f, (T) 1.f));
-        expect (q.atIndex (1) == std::complex<T> ((T) 1.f, (T) 0.f));
-        if constexpr (std::is_same<T, float>::value)
+        if constexpr (doVector)
         {
-            expect (q.atIndex (2) == std::complex<T> ((T) 2.f, (T) -1.f));
-            expect (q.atIndex (3) == std::complex<T> ((T) 3.f, (T) -2.f));
+            for (int i = 0; i < nIter; ++i)
+            {
+                const auto a_scalar = std::complex<T> (randVal(), randVal());
+                const auto b_scalar = randVal();
+                SIMDComplex<T> a_vec { a_scalar.real(), a_scalar.imag() };
+                dsp::SIMDRegister<T> b_vec { b_scalar };
+
+                checkResult (scalarOp (a_scalar, b_scalar), vectorOp (a_vec, b_vec), mathOpName, "complex x vector", maxErr);
+                checkResult (scalarOp (b_scalar, a_scalar), vectorOp (b_vec, a_vec), mathOpName, "vector x complex", maxErr);
+            }
         }
 
-        auto qpr = q + r;
-        for (size_t i = 0; i < SIMDComplex<T>::size; ++i)
-            expect (qpr.atIndex (i) == q.atIndex (i) + r.atIndex (i), "Addition incorrect!");
+        for (int i = 0; i < nIter; ++i)
+        {
+            const auto a_scalar = std::complex<T> (randVal(), randVal());
+            const auto b_scalar = randVal();
+            SIMDComplex<T> a_vec { a_scalar.real(), a_scalar.imag() };
 
-        auto qtr = q * r;
-        for (size_t i = 0; i < SIMDComplex<T>::size; ++i)
-            expect (qtr.atIndex (i) == q.atIndex (i) * r.atIndex (i), "Multiplication incorrect!");
+            checkResult (scalarOp (a_scalar, b_scalar), vectorOp (a_vec, b_scalar), mathOpName, "complex x scalar", maxErr);
+            checkResult (scalarOp (b_scalar, a_scalar), vectorOp (b_scalar, a_vec), mathOpName, "scalar x complex", maxErr);
+        }
+    }
 
-        T sum = (T) 0;
-        for (size_t i = 0; i < SIMDComplex<T>::size; ++i)
-            sum += qtr.atIndex (i).real();
-
-        T sumSIMD = qtr.real().sum();
-        expectWithinAbsoluteError (sum, sumSIMD, (T) 1e-5, "Sum incorrect!");
+    template <typename T, typename OpType, bool doVector = true>
+    void testMathOp (Random& r, int nIter, OpType&& mathOp, const String& mathOpName, T maxErr, int range = 100)
+    {
+        testMathOp <T, OpType, OpType, doVector> (r, nIter, std::forward<OpType> (mathOp), std::forward<OpType> (mathOp), mathOpName, maxErr, range);
     }
 
     template <typename T>
-    void expTest()
+    void mathTest(Random& r, int nIter, T maxError)
+    {
+        using namespace chowdsp::SIMDUtils;
+        testMathOp (r, nIter, [] (auto a, auto b) { return a + b; }, "Addition", maxError);
+        testMathOp (r, nIter, [] (auto a, auto b) { return a - b; }, "Subtraction", maxError);
+        testMathOp (r, nIter, [] (auto a, auto b) { return a * b; }, "Multiplication", maxError);
+        testMathOp (r, nIter, [] (auto a, auto b) { return a / b; }, "Division", maxError * (T) 2);
+    }
+
+    template <typename T>
+    void specialMathTest(Random& r, int nIter, T maxError)
+    {
+        using namespace chowdsp::SIMDUtils;
+        using std::abs, std::arg, std::exp, std::log, std::pow;
+
+        auto absOp = [] (auto a, auto b) { return abs (a) + abs (b); };
+        testMathOp<T, decltype (absOp), false> (r, nIter, std::move (absOp), "Absolute Value", maxError);
+
+        auto argOp = [] (auto a, auto b) { return arg (a) + arg (b); };
+        testMathOp<T, decltype (argOp), false> (r, nIter, std::move (argOp), "Argument", maxError);
+
+        auto expOp = [] (auto a, auto b) { return exp (a) + exp (b); };
+        testMathOp<T, decltype (expOp), false> (r, nIter, std::move (expOp), "Exp", maxError * (T) 100, 5);
+
+        auto logOp = [] (auto a, auto b) { return log (a) + log (b); };
+        testMathOp<T, decltype (logOp), false> (r, nIter, std::move (logOp), "Log", maxError);
+
+        testMathOp<T> (r, nIter, [] (auto a, auto b) { return pow (a, b); }, "Pow", maxError * (T) 1000, 2);
+    }
+
+    template <typename T>
+    void fastExpTest()
     {
         T angles alignas (16)[SIMDComplex<T>::size];
         angles[0] = 0;
@@ -104,20 +166,22 @@ public:
 
     void runTestTimed() override
     {
+        auto rand = getRandom();
+
         beginTest ("Zero Check");
         zeroCheck();
 
-        beginTest ("Math Test (float)");
-        mathTest<float>();
+        beginTest ("Math Test");
+        mathTest<float> (rand, 100, 1.0e-6f);
+        mathTest<double> (rand, 100, 1.0e-12);
 
-        beginTest ("Math Test (double)");
-        mathTest<double>();
+        beginTest ("Special Math Ops Test");
+        specialMathTest<float> (rand, 100, 1.0e-6f);
+        specialMathTest<double> (rand, 100, 1.0e-12);
 
-        beginTest ("Exponential Test (float)");
-        expTest<float>();
-
-        beginTest ("Exponential Test (double)");
-        expTest<double>();
+        beginTest ("Fast Exponential Test");
+        fastExpTest<float>();
+        fastExpTest<double>();
 
         beginTest ("Map Test");
         mapTest();
