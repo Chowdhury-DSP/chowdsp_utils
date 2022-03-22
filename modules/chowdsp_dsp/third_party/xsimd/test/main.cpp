@@ -23,7 +23,7 @@ info_map_type init_instruction_map()
     info_map_type res;
 #ifdef XSIMD_X86_INSTR_SET_AVAILABLE
     res[XSIMD_X86_SSE_VERSION] = "Intel SSE";
-    res[XSIMD_X86_SSE2_VERSION] = "Intel SSE2"; 
+    res[XSIMD_X86_SSE2_VERSION] = "Intel SSE2";
     res[XSIMD_X86_SSE3_VERSION] = "Intel SSE3";
     res[XSIMD_X86_SSSE3_VERSION] = "Intel SSSE3";
     res[XSIMD_X86_SSE4_1_VERSION] = "Intel SSE4.1";
@@ -36,7 +36,7 @@ info_map_type init_instruction_map()
     res[XSIMD_X86_AMD_SSE4A_VERSION] = "AMD SSE4A";
     res[XSIMD_X86_AMD_FMA4_VERSION] = "AMD FMA4";
     res[XSIMD_X86_AMD_XOP_VERSION] = "AMD XOP";
-#elif defined(XSIMD_PPC_INSTR_SET_AVAILABLE) 
+#elif defined(XSIMD_PPC_INSTR_SET_AVAILABLE)
     res[XSIMD_PPC_VMX_VERSION] = "PowerPC VM";
     res[XSIMD_PPC_VSX_VERSION] = "PowerPC VSX";
     res[XSIMD_PPC_QPX_VERSION] = "PowerPC QPX";
@@ -51,17 +51,17 @@ info_map_type init_instruction_map()
 
 std::string get_instruction_set_name()
 {
-    static info_map_type info_map(init_instruction_map());
+    static info_map_type info_map (init_instruction_map());
     return info_map[XSIMD_INSTR_SET];
 }
 
-int main(int argc, char* argv[])
+int main (int argc, char* argv[])
 {
-    std::ofstream out("log/xsimd_info.log", std::ios_base::out);
+    std::ofstream out ("log/xsimd_info.log", std::ios_base::out);
     std::string instruction_set = get_instruction_set_name();
     out << "Instruction set: " << instruction_set << std::endl;
     std::cout << "Instruction set: " << instruction_set << std::endl;
 
-    ::testing::InitGoogleTest(&argc, argv);
+    ::testing::InitGoogleTest (&argc, argv);
     return RUN_ALL_TESTS();
 }
