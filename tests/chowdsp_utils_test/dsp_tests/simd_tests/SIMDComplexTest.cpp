@@ -148,7 +148,7 @@ public:
         testMathOp<T, decltype (logOp), false> (r, nIter, std::move (logOp), "Log", maxError);
 
         testMathOp<T> (
-            r, nIter, [] (auto a, auto b) { return pow (a, b); }, "Pow", maxError * (T) 100, (T) 1.75);
+            r, nIter, [] (auto a, auto b) { return pow (a, b); }, "Pow", maxError * (T) 100, (T) 1.25);
     }
 
     template <typename T>
