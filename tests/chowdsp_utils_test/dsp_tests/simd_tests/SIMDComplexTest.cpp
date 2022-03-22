@@ -21,8 +21,7 @@ public:
     template <typename T>
     void checkResult (std::complex<T> result_scalar, SIMDComplex<T> result_vec, const String& mathOpName, const String& opType, T maxErr)
     {
-        auto isNanOrInf = [] (auto x)
-        {
+        auto isNanOrInf = [] (auto x) {
             return std::isinf (x.real()) || std::isinf (x.imag()) || std::isnan (x.real()) || std::isnan (x.imag());
         };
 
@@ -46,8 +45,7 @@ public:
     template <typename T, typename VectorOpType, typename ScalarOpType, bool doVector = true>
     void testMathOp (Random& r, int nIter, VectorOpType&& vectorOp, ScalarOpType&& scalarOp, const String& mathOpName, T maxErr, int range = 100)
     {
-        auto randVal = [&r, range] ()
-        { return (T) r.nextInt ({ -range, range }); };
+        auto randVal = [&r, range]() { return (T) r.nextInt ({ -range, range }); };
 
         for (int i = 0; i < nIter; ++i)
         {
@@ -87,21 +85,25 @@ public:
     template <typename T, typename OpType, bool doVector = true>
     void testMathOp (Random& r, int nIter, OpType&& mathOp, const String& mathOpName, T maxErr, int range = 100)
     {
-        testMathOp <T, OpType, OpType, doVector> (r, nIter, std::forward<OpType> (mathOp), std::forward<OpType> (mathOp), mathOpName, maxErr, range);
+        testMathOp<T, OpType, OpType, doVector> (r, nIter, std::forward<OpType> (mathOp), std::forward<OpType> (mathOp), mathOpName, maxErr, range);
     }
 
     template <typename T>
-    void mathTest(Random& r, int nIter, T maxError)
+    void mathTest (Random& r, int nIter, T maxError)
     {
         using namespace chowdsp::SIMDUtils;
-        testMathOp (r, nIter, [] (auto a, auto b) { return a + b; }, "Addition", maxError);
-        testMathOp (r, nIter, [] (auto a, auto b) { return a - b; }, "Subtraction", maxError);
-        testMathOp (r, nIter, [] (auto a, auto b) { return a * b; }, "Multiplication", maxError);
-        testMathOp (r, nIter, [] (auto a, auto b) { return a / b; }, "Division", maxError * (T) 2);
+        testMathOp (
+            r, nIter, [] (auto a, auto b) { return a + b; }, "Addition", maxError);
+        testMathOp (
+            r, nIter, [] (auto a, auto b) { return a - b; }, "Subtraction", maxError);
+        testMathOp (
+            r, nIter, [] (auto a, auto b) { return a * b; }, "Multiplication", maxError);
+        testMathOp (
+            r, nIter, [] (auto a, auto b) { return a / b; }, "Division", maxError * (T) 2);
     }
 
     template <typename T>
-    void specialMathTest(Random& r, int nIter, T maxError)
+    void specialMathTest (Random& r, int nIter, T maxError)
     {
         using namespace chowdsp::SIMDUtils;
         using std::abs, std::arg, std::exp, std::log, std::pow;
@@ -118,7 +120,8 @@ public:
         auto logOp = [] (auto a, auto b) { return log (a) + log (b); };
         testMathOp<T, decltype (logOp), false> (r, nIter, std::move (logOp), "Log", maxError);
 
-        testMathOp<T> (r, nIter, [] (auto a, auto b) { return pow (a, b); }, "Pow", maxError * (T) 1000, 2);
+        testMathOp<T> (
+            r, nIter, [] (auto a, auto b) { return pow (a, b); }, "Pow", maxError * (T) 1000, 2);
     }
 
     template <typename T>
