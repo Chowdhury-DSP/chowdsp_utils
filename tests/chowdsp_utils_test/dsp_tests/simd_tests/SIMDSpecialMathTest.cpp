@@ -43,6 +43,7 @@ public:
         const auto minus1To1 = NormalisableRange<FloatType> ((FloatType) -1, (FloatType) 1);
         const auto sinhRange = NormalisableRange<FloatType> ((FloatType) -3, (FloatType) 3);
         const auto zeroTo10 = NormalisableRange<FloatType> ((FloatType) 0, (FloatType) 10);
+        const auto zeroTo2 = NormalisableRange<FloatType> ((FloatType) 0, (FloatType) 2);
         const auto logRange = NormalisableRange<FloatType> ((FloatType) 0.01, (FloatType) 10);
 
 #define FLOATFUNC(func) [] (FloatType x) { return func (x); }
@@ -72,7 +73,7 @@ public:
 #define FLOATFUNC2D(func) [] (FloatType a, FloatType b) { return func (a, b); }
 #define SIMDFUNC2D(func) [] (dsp::SIMDRegister<FloatType> a, dsp::SIMDRegister<FloatType> b) { return func (a, b); }
 
-        baseMathTest2D<FloatType> (nIter, r, FLOATFUNC2D (std::pow), SIMDFUNC2D (powSIMD), maxErr, "pow", zeroTo10);
+        baseMathTest2D<FloatType> (nIter, r, FLOATFUNC2D (std::pow), SIMDFUNC2D (powSIMD), maxErr * (FloatType) 100, "pow", zeroTo2);
         baseMathTest2D<FloatType> (nIter, r, FLOATFUNC2D (std::atan2), SIMDFUNC2D (atan2SIMD), maxErr, "pow", minus10To10);
 
 #undef FLOATFUNC2D

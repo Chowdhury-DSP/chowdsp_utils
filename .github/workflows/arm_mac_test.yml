@@ -36,19 +36,12 @@ jobs:
           cd JUCE_modules
           git clone --single-branch --branch chowdsp https://github.com/Chowdhury-DSP/foleys_gui_magic.git
 
-      - name: Install xsimd
-        working-directory: ${{github.workspace}}/JUCE_modules
-        run: |
-          git clone https://github.com/xtensor-stack/xsimd
-          cd xsimd
-          git reset --hard e37730f3938a3f58e418ec1c70482fd7ddced7a1
-
       - name: Configure
         working-directory: ${{env.WORK_DIR}}
         env:
           CMAKE_ARGS: ${{ matrix.cmake_args }}
         shell: bash
-        run: cmake -Bbuild -DCHOWDSP_ENABLE_TESTING=ON -GXcode -D"CMAKE_OSX_ARCHITECTURES=arm64" -DXSIMD_PATH=../xsimd -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+        run: cmake -Bbuild -DCHOWDSP_ENABLE_TESTING=ON -GXcode -D"CMAKE_OSX_ARCHITECTURES=arm64" -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 
       - name: Build
         working-directory: ${{env.WORK_DIR}}/build

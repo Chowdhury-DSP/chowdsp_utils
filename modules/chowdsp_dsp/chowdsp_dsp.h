@@ -31,16 +31,6 @@
 #define CHOWDSP_USE_LIBSAMPLERATE 0
 #endif
 
-/** Config: CHOWDSP_USE_XSIMD
-            Enable XSIMD library for accelerated SIMD functions.
-
-            You must ensure that xsimd headers are in the include paths.
-            You must respect the xsimd license when enabling this option.
-  */
-#ifndef CHOWDSP_USE_XSIMD
-#define CHOWDSP_USE_XSIMD 0
-#endif
-
 /** Config: CHOWDSP_USE_CUSTOM_JUCE_DSP
             Use chowdsp_juce_dsp instead of juce_dsp.
 
@@ -51,6 +41,7 @@
 #endif
 
 // STL includes
+#include <cassert>
 #include <random>
 
 // JUCE includes
@@ -61,6 +52,18 @@
 #include <juce_audio_formats/juce_audio_formats.h>
 #include <juce_audio_utils/juce_audio_utils.h>
 
+// Third-party includes
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wcast-align",
+                                     "-Wimplicit-int-conversion",
+                                     "-Wshadow",
+                                     "-Wsign-conversion",
+                                     "-Wzero-as-null-pointer-constant",
+                                     "-Wc++98-compat-extra-semi")
+JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4244)
+#include "third_party/xsimd/include/xsimd/xsimd.hpp"
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+JUCE_END_IGNORE_WARNINGS_MSVC
+
 #if CHOWDSP_USE_CUSTOM_JUCE_DSP
 #include <chowdsp_juce_dsp/chowdsp_juce_dsp.h>
 #else
@@ -69,20 +72,6 @@
 
 #if CHOWDSP_USE_LIBSAMPLERATE
 #include <samplerate.h>
-#endif
-
-#if CHOWDSP_USE_XSIMD
-JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wcast-align",
-                                     "-Wimplicit-int-conversion",
-                                     "-Wshadow",
-                                     "-Wsign-conversion",
-                                     "-Wzero-as-null-pointer-constant",
-                                     "-Wc++98-compat-extra-semi")
-JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4244)
-#include <cassert>
-#include <xsimd/xsimd.hpp>
-JUCE_END_IGNORE_WARNINGS_GCC_LIKE
-JUCE_END_IGNORE_WARNINGS_MSVC
 #endif
 
 // SIMD

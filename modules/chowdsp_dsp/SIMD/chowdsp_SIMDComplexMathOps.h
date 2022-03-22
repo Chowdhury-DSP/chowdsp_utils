@@ -159,6 +159,7 @@ inline SIMDComplex<BaseType> select (typename juce::dsp::SIMDRegister<BaseType>:
 template <typename BaseType>
 inline SIMDComplex<BaseType> pow (const SIMDComplex<BaseType>& a, const SIMDComplex<BaseType>& z)
 {
+    // Reference: https://github.com/xtensor-stack/xsimd/blob/master/include/xsimd/arch/generic/xsimd_generic_math.hpp#L1909
     using VecType = juce::dsp::SIMDRegister<BaseType>;
     auto absa = abs (a);
     auto arga = arg (a);

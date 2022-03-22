@@ -37,13 +37,6 @@ function(setup_benchmark target file)
         endif()
     endif()
 
-    # Link with xsimd (if path is defined)
-    if (XSIMD_PATH)
-        message(STATUS "Using XSIMD")
-        target_include_directories(${target} PRIVATE ${CMAKE_SOURCE_DIR}/${XSIMD_PATH}/include)
-        target_compile_definitions(${target} PRIVATE CHOWDSP_USE_XSIMD=1)
-    endif ()
-
     add_custom_command(TARGET ${target}
                        POST_BUILD
                        COMMAND ${CMAKE_COMMAND} -E echo "copying $<TARGET_FILE:${target}> to ${PROJECT_BINARY_DIR}/${target}"
