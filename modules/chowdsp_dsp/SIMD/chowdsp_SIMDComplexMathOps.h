@@ -169,10 +169,10 @@ inline SIMDComplex<BaseType> pow (const SIMDComplex<BaseType>& a, const SIMDComp
     auto theta = x * arga;
 
     const auto ze = VecType ((BaseType) 0);
-    auto cond = (y == ze);
+    auto cond = VecType::equal (y, ze);
     r = select (cond, r, r * expSIMD (-y * arga));
     theta = select (cond, theta, theta + y * logSIMD (absa));
-    return select (absa == ze, SIMDComplex<BaseType> {}, SIMDComplex<BaseType> { r * cosSIMD (theta), r * sinSIMD (theta) });
+    return { r * cosSIMD (theta), r * sinSIMD (theta) };
 }
 
 /** SIMDComplex implementation of std::pow */
@@ -186,9 +186,7 @@ inline typename std::enable_if<std::is_same<OtherType, BaseType>::value || std::
     auto arga = arg (a);
     auto r = powSIMD (absa, (VecType) x);
     auto theta = x * arga;
-
-    const auto ze = VecType ((BaseType) 0);
-    return select (absa == ze, SIMDComplex<BaseType> {}, SIMDComplex<BaseType> { r * cosSIMD (theta), r * sinSIMD (theta) });
+    return { r * cosSIMD (theta), r * sinSIMD (theta) };
 }
 
 /** SIMDComplex implementation of std::pow */
@@ -197,7 +195,22 @@ inline typename std::enable_if<std::is_same<OtherType, BaseType>::value || std::
                                SIMDComplex<BaseType>>::type
     pow (OtherType a, const SIMDComplex<BaseType>& z)
 {
+    // @TODO: there's probably some optimization we can do here, knowing that the base is real?
     using VecType = juce::dsp::SIMDRegister<BaseType>;
     return pow (SIMDComplex<BaseType> { a, VecType {} }, z);
+}
+
+template <typename BaseType>
+inline typename juce::dsp::SIMDRegister<BaseType>::vMaskType operator== (const SIMDComplex<BaseType>& a, const SIMDComplex<BaseType>& b)
+{
+    using VecType = juce::dsp::SIMDRegister<BaseType>;
+    return VecType::equal (a._r, b._r) & VecType::equal (a._i, b._i);
+}
+
+template <typename BaseType>
+inline typename juce::dsp::SIMDRegister<BaseType>::vMaskType operator!= (const SIMDComplex<BaseType>& a, const SIMDComplex<BaseType>& b)
+{
+    using VecType = juce::dsp::SIMDRegister<BaseType>;
+    return VecType::notEqual (a._r, b._r) | VecType::notEqual (a._i, b._i);
 }
 } // namespace chowdsp::SIMDUtils

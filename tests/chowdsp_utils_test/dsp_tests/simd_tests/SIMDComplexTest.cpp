@@ -30,7 +30,10 @@ public:
 
         auto at0 = result_vec.atIndex (0);
         if (isNanOrInf (at0))
+        {
+            jassertfalse;
             return;
+        }
 
         expectWithinAbsoluteError (at0.real(), result_scalar.real(), maxErr, mathOpName + ": " + opType + ", real incorrect!");
         expectWithinAbsoluteError (at0.imag(), result_scalar.imag(), maxErr, mathOpName + ": " + opType + ", imag incorrect!");
@@ -39,13 +42,23 @@ public:
     template <typename T>
     void checkResult (T result_scalar, dsp::SIMDRegister<T> result_vec, const String& mathOpName, const String& opType, T maxErr)
     {
-        expectWithinAbsoluteError (result_vec.get (0), result_scalar, maxErr, mathOpName + ": " + opType + ", real incorrect!");
+        if (std::isinf (result_scalar) || std::isnan (result_scalar))
+            return;
+
+        auto at0 = result_vec.get (0);
+        if (std::isinf (at0) || std::isnan (at0))
+        {
+            jassertfalse;
+            return;
+        }
+
+        expectWithinAbsoluteError (at0, result_scalar, maxErr, mathOpName + ": " + opType + ", real incorrect!");
     };
 
     template <typename T, typename VectorOpType, typename ScalarOpType, bool doVector = true>
-    void testMathOp (Random& r, int nIter, VectorOpType&& vectorOp, ScalarOpType&& scalarOp, const String& mathOpName, T maxErr, int range = 100)
+    void testMathOp (Random& r, int nIter, VectorOpType&& vectorOp, ScalarOpType&& scalarOp, const String& mathOpName, T maxErr, T range = (T) 100)
     {
-        auto randVal = [&r, range]() { return (T) r.nextInt ({ -range, range }); };
+        auto randVal = [&r, range]() { return (T) (2.0f * r.nextFloat() * (float) range - (float) range); };
 
         for (int i = 0; i < nIter; ++i)
         {
@@ -83,7 +96,7 @@ public:
     }
 
     template <typename T, typename OpType, bool doVector = true>
-    void testMathOp (Random& r, int nIter, OpType&& mathOp, const String& mathOpName, T maxErr, int range = 100)
+    void testMathOp (Random& r, int nIter, OpType&& mathOp, const String& mathOpName, T maxErr, T range = (T) 100)
     {
         testMathOp<T, OpType, OpType, doVector> (r, nIter, std::forward<OpType> (mathOp), std::forward<OpType> (mathOp), mathOpName, maxErr, range);
     }
@@ -99,7 +112,21 @@ public:
         testMathOp (
             r, nIter, [] (auto a, auto b) { return a * b; }, "Multiplication", maxError);
         testMathOp (
-            r, nIter, [] (auto a, auto b) { return a / b; }, "Division", maxError * (T) 2);
+            r, nIter, [] (auto a, auto b) { return a / b; }, "Division", maxError * (T) 10);
+
+        {
+            const auto scalar = std::complex<T> ((T) r.nextFloat(), (T) r.nextFloat());
+            SIMDComplex<T> a_vec { scalar.real(), scalar.imag() };
+            expect (chowdsp::SIMDUtils::all (a_vec == SIMDComplex<T> (scalar)), "SIMDComplex == returns FALSE when condition is TRUE");
+            expect (! chowdsp::SIMDUtils::any (a_vec != SIMDComplex<T> (scalar)), "SIMDComplex != returns TRUE when condition is FALSE");
+        }
+
+        {
+            const auto scalar = std::complex<T> ((T) r.nextFloat(), (T) r.nextFloat());
+            SIMDComplex<T> a_vec { scalar.real() + (T) 1, scalar.imag() };
+            expect (! chowdsp::SIMDUtils::any (a_vec == SIMDComplex<T> (scalar)), "SIMDComplex == returns TRUE when condition is FALSE");
+            expect (chowdsp::SIMDUtils::all (a_vec != SIMDComplex<T> (scalar)), "SIMDComplex != returns FALSE when condition is TRUE");
+        }
     }
 
     template <typename T>
@@ -115,13 +142,13 @@ public:
         testMathOp<T, decltype (argOp), false> (r, nIter, std::move (argOp), "Argument", maxError);
 
         auto expOp = [] (auto a, auto b) { return exp (a) + exp (b); };
-        testMathOp<T, decltype (expOp), false> (r, nIter, std::move (expOp), "Exp", maxError * (T) 100, 5);
+        testMathOp<T, decltype (expOp), false> (r, nIter, std::move (expOp), "Exp", maxError * (T) 100, (T) 2.5);
 
         auto logOp = [] (auto a, auto b) { return log (a) + log (b); };
         testMathOp<T, decltype (logOp), false> (r, nIter, std::move (logOp), "Log", maxError);
 
         testMathOp<T> (
-            r, nIter, [] (auto a, auto b) { return pow (a, b); }, "Pow", maxError * (T) 1000, 2);
+            r, nIter, [] (auto a, auto b) { return pow (a, b); }, "Pow", maxError * (T) 100, (T) 1.75);
     }
 
     template <typename T>
@@ -179,8 +206,8 @@ public:
         mathTest<double> (rand, 100, 1.0e-12);
 
         beginTest ("Special Math Ops Test");
-        specialMathTest<float> (rand, 100, 1.0e-6f);
-        specialMathTest<double> (rand, 100, 1.0e-12);
+        specialMathTest<float> (rand, 100, 1.0e-4f);
+        specialMathTest<double> (rand, 100, 1.0e-8);
 
         beginTest ("Fast Exponential Test");
         fastExpTest<float>();

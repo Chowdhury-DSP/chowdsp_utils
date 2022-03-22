@@ -23,6 +23,11 @@ struct SIMDComplex
     {
     }
 
+    constexpr SIMDComplex (std::complex<Type> c) //NOLINT(google-explicit-constructor) we want to be able to use this constructor implicitly (see math ops at the bottom of this file)
+        : _r (T (c.real())), _i (T (c.imag()))
+    {
+    }
+
     SIMDComplex<Type> (const Type (&r)[size], const Type (&i)[size])
     {
         _r = SIMDUtils::loadUnaligned (r);
