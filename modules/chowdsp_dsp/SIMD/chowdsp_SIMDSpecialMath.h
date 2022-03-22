@@ -108,7 +108,7 @@ inline std::pair<juce::dsp::SIMDRegister<T>, juce::dsp::SIMDRegister<T>> sincosS
     const auto x = abs (self);
     auto xr = nan<batch_type>();
     const auto n = xsimd::detail::trigo_reducer<batch_type>::reduce (x, xr);
-    auto tmp = select(n >= batch_type ((T) 2), batch_type ((T) 1), batch_type ((T) 0));
+    auto tmp = select (n >= batch_type ((T) 2), batch_type ((T) 1), batch_type ((T) 0));
     auto swap_bit = fma (batch_type ((T) -2), tmp, n);
     const auto z = xr * xr;
     const auto se = xsimd::detail::trigo_evaluation<batch_type>::sin_eval (z, xr);
