@@ -209,8 +209,7 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r)
-                           { return l % r; });
+                           [](const value_type& l, const value_type& r) { return l % r; });
             batch_type res = batch_lhs() % batch_rhs();
             EXPECT_BATCH_EQ(res, expected) << print_function_name("batch % batch");
         }
@@ -223,8 +222,7 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [nb_sh](const value_type& v)
-                           { return v << nb_sh; });
+                           [nb_sh](const value_type& v) { return v << nb_sh; });
             batch_type res = batch_lhs() << nb_sh;
             EXPECT_BATCH_EQ(res, expected) << print_function_name("batch << scalar");
         }
@@ -232,8 +230,7 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), shift.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r)
-                           { return l << r; });
+                           [](const value_type& l, const value_type& r) { return l << r; });
             batch_type res = batch_lhs() << batch_shift();
             EXPECT_BATCH_EQ(res, expected) << print_function_name("batch << batch");
         }
@@ -241,8 +238,7 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [nb_sh](const value_type& v)
-                           { return v >> nb_sh; });
+                           [nb_sh](const value_type& v) { return v >> nb_sh; });
             batch_type res = batch_lhs() >> nb_sh;
             EXPECT_BATCH_EQ(res, expected) << print_function_name("batch >> scalar");
         }
@@ -250,8 +246,7 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), shift.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r)
-                           { return l >> r; });
+                           [](const value_type& l, const value_type& r) { return l >> r; });
             batch_type res = batch_lhs() >> batch_shift();
             EXPECT_BATCH_EQ(res, expected) << print_function_name("batch >> batch");
         }

@@ -46,8 +46,7 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [](const value_type& l)
-                           { return std::sqrt(l); });
+                           [](const value_type& l) { return std::sqrt(l); });
             batch_type res = sqrt(batch_lhs());
             EXPECT_BATCH_EQ(res, expected) << print_function_name("sqrt");
         }

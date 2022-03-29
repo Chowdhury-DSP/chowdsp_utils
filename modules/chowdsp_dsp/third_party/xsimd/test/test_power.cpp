@@ -48,8 +48,7 @@ protected:
         // pow
         {
             std::transform(lhs_input.cbegin(), lhs_input.cend(), rhs_input.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r)
-                           { return std::pow(l, r); });
+                           [](const value_type& l, const value_type& r) { return std::pow(l, r); });
             batch_type lhs_in, rhs_in, out;
             for (size_t i = 0; i < nb_input; i += size)
             {
@@ -65,8 +64,7 @@ protected:
         {
             long k = 0;
             std::transform(lhs_input.cbegin(), lhs_input.cend(), expected.begin(),
-                           [&k, this](const value_type& l)
-                           { auto arg = k / size - nb_input / size / 2; ++k; return std::pow(l, arg); });
+                           [&k, this](const value_type& l) { auto arg = k / size - nb_input / size / 2; ++k; return std::pow(l, arg); });
             batch_type lhs_in, out;
             for (size_t i = 0; i < nb_input; i += size)
             {
@@ -80,8 +78,7 @@ protected:
         // hypot
         {
             std::transform(lhs_input.cbegin(), lhs_input.cend(), rhs_input.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r)
-                           { return std::hypot(l, r); });
+                           [](const value_type& l, const value_type& r) { return std::hypot(l, r); });
             batch_type lhs_in, rhs_in, out;
             for (size_t i = 0; i < nb_input; i += size)
             {
@@ -96,8 +93,7 @@ protected:
         // cbrt
         {
             std::transform(lhs_input.cbegin(), lhs_input.cend(), expected.begin(),
-                           [](const value_type& l)
-                           { return std::cbrt(l); });
+                           [](const value_type& l) { return std::cbrt(l); });
             batch_type lhs_in, out;
             for (size_t i = 0; i < nb_input; i += size)
             {

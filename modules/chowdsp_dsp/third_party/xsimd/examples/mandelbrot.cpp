@@ -245,8 +245,7 @@ void run_arch(
     std::vector<int, xsimd::aligned_allocator<int>>& buffer)
 {
     std::fill(buffer.begin(), buffer.end(), 0);
-    auto stats = bencher([&]()
-                         { xsimd::mandelbrot<arch>(x0, y0, x1, y1, width, height, maxIters, buffer.data()); });
+    auto stats = bencher([&]() { xsimd::mandelbrot<arch>(x0, y0, x1, y1, width, height, maxIters, buffer.data()); });
 
     const float scalar_min = stats.min().count();
 
@@ -303,8 +302,7 @@ int main()
 
     std::fill(buf.begin(), buf.end(), 0);
 
-    auto stats_scalar = bencher([&]()
-                                { scalar::mandelbrot(x0, y0, x1, y1, width, height, maxIters, buf.data()); });
+    auto stats_scalar = bencher([&]() { scalar::mandelbrot(x0, y0, x1, y1, width, height, maxIters, buf.data()); });
 
     const float scalar_min = stats_scalar.min().count();
 
@@ -317,8 +315,7 @@ int main()
 
     std::fill(buf.begin(), buf.end(), 0);
 
-    auto stats_omp = bencher([&]()
-                             { omp::mandelbrot(x0, y0, x1, y1, width, height, maxIters, buf.data()); });
+    auto stats_omp = bencher([&]() { omp::mandelbrot(x0, y0, x1, y1, width, height, maxIters, buf.data()); });
 
     const float omp_min = stats_omp.min().count();
 
