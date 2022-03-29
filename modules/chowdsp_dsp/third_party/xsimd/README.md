@@ -1,6 +1,5 @@
 # ![xsimd](docs/source/xsimd.svg)
 
-[![Travis](https://travis-ci.org/xtensor-stack/xsimd.svg?branch=master)](https://travis-ci.org/xtensor-stack/xsimd)
 [![Appveyor](https://ci.appveyor.com/api/projects/status/wori7my48os31nu0?svg=true)](https://ci.appveyor.com/project/xtensor-stack/xsimd)
 [![Azure](https://dev.azure.com/xtensor-stack/xtensor-stack/_apis/build/status/xtensor-stack.xsimd?branchName=master)](https://dev.azure.com/xtensor-stack/xtensor-stack/_build/latest?definitionId=3&branchName=master)
 [![Documentation Status](http://readthedocs.org/projects/xsimd/badge/?version=latest)](https://xsimd.readthedocs.io/en/latest/?badge=latest)
@@ -39,31 +38,12 @@ ARM          | ARMv7, ARMv8
 
 ## Installation
 
-Although `xsimd` is a header-only library, we provide standardized means to install it, with package managers or with cmake.
+### Install from conda-forge
 
-Besides the xsimd headers, all these methods place the `CMake` project configuration file in the right location so that
-third-party projects can use cmake's `find_package` to locate xsimd headers.
-
-### Install with conda
-
-A package for xsimd is available on the conda package manager.
+A package for xsimd is available on the mamba (or conda) package manager.
 
 ```bash
-conda install -c conda-forge xsimd
-```
-
-### Install with Conan
-
-If you are using Conan to manage your dependencies, merely add `xsimd/x.y.z@omaralvarez/public-conan` to your requires, where x.y.z
-is the release version you want to use. Please file issues in [conan-xsimd](https://github.com/omaralvarez/conan-xsimd) if you
-experience problems with the packages. Sample `conanfile.txt`:
-
-```
-[requires]
-xsimd/7.2.3@omaralvarez/public-conan
-
-[generators]
-cmake
+mamba install -c conda-forge xsimd
 ```
 
 ### Install with Spack
@@ -90,9 +70,53 @@ To get started with using `xsimd`, check out the full documentation
 
 http://xsimd.readthedocs.io/
 
+## Dependencies
+
+`xsimd` has an optional dependency on the [xtl](https://github.com/xtensor-stack/xtl) library:
+
+| `xsimd` | `xtl` (optional) |
+|---------|------------------|
+|  master |     ^0.7.0       |
+|  8.x    |     ^0.7.0       |
+|  7.x    |     ^0.7.0       |
+
+The dependency on `xtl` is required if you want to support vectorization for `xtl::xcomplex`. In this case, you must build your project with C++14 support enabled.
+
 ## Usage
 
-### Explicit use of an instruction set extension
+The version 8 of the library is a complete rewrite and there are some slight differences with 7.x versions.
+A migration guide will be available soon. In the meanwhile, the following examples show how to use both versions
+7 and 8 of the library?
+
+### Explicit use of an instruction set extension (8.x)
+
+Here is an example that computes the mean of two sets of 4 double floating point values, assuming AVX extension is supported:
+```cpp
+#include <iostream>
+#include "xsimd/xsimd.hpp"
+
+namespace xs = xsimd;
+
+int main(int argc, char* argv[])
+{
+    xs::batch<double, xs::avx2> a(1.5, 2.5, 3.5, 4.5);
+    xs::batch<double, xs::avx2> b(2.5, 3.5, 4.5, 5.5);
+    auto mean = (a + b) / 2;
+    std::cout << mean << std::endl;
+    return 0;
+}
+```
+
+Do not forget to enable AVX extension when building the example. With gcc or clang, this is done with the `-march=native` flag,
+on MSVC you have to pass the `/arch:AVX` option.
+
+This example outputs:
+
+```cpp
+(2.0, 3.0, 4.0, 5.0)
+```
+
+### Explicit use of an instruction set extension (7.x and 8.x)
 
 Here is an example that computes the mean of two sets of 4 double floating point values, assuming AVX extension is supported:
 ```cpp
@@ -120,7 +144,7 @@ This example outputs:
 (2.0, 3.0, 4.0, 5.0)
 ```
 
-### Auto detection of the instruction set extension to be used
+### Auto detection of the instruction set extension to be used (7.x)
 
 The same computation operating on vectors and using the most performant instruction set available:
 
@@ -130,7 +154,7 @@ The same computation operating on vectors and using the most performant instruct
 #include "xsimd/xsimd.hpp"
 
 namespace xs = xsimd;
-using vector_type = std::vector<double, xsimd::aligned_allocator<double, XSIMD_DEFAULT_ALIGNMENT>>;
+using vector_type = std::vector<double, xsimd::aligned_allocator<double>>;
 
 void mean(const vector_type& a, const vector_type& b, vector_type& res)
 {
@@ -162,7 +186,7 @@ the loop from the example becomes:
 #include "xsimd/stl/algorithms.hpp"
 
 namespace xs = xsimd;
-using vector_type = std::vector<double, xsimd::aligned_allocator<double, XSIMD_DEFAULT_ALIGNMENT>>;
+using vector_type = std::vector<double, xsimd::aligned_allocator<double>>;
 
 void mean(const vector_type& a, const vector_type& b, vector_type& res)
 {
