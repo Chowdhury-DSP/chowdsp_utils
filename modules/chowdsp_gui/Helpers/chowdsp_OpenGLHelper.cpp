@@ -16,6 +16,19 @@ juce::String getGLString (GLenum value)
     return juce::String {};
 }
 
+std::pair<int, int> getGLVersion()
+{
+    if (juce::gl::glGetIntegerv != nullptr)
+    {
+        GLint major = 0, minor = 0;
+        juce::gl::glGetIntegerv (juce::gl::GL_MAJOR_VERSION, &major);
+        juce::gl::glGetIntegerv (juce::gl::GL_MINOR_VERSION, &minor);
+        return { (int) major, (int) minor };
+    }
+
+    return { 0, 0 };
+}
+
 auto createOpenGLTestComp (juce::OpenGLContext& ctx)
 {
     struct TestComponent : juce::Component
@@ -37,27 +50,24 @@ auto createOpenGLTestComp (juce::OpenGLContext& ctx)
 
 void checkOpenGLStats (juce::OpenGLContext& ctx, int& openGLMajorVersion, int& openGLMinorVersion)
 {
-    juce::Logger::writeToLog ("Attempting to check OpnGL stats...");
+    juce::Logger::writeToLog ("Attempting to check OpenGL stats...");
     auto testComp = createOpenGLTestComp (ctx);
     std::atomic_bool waiting { true };
     testComp->ctx.executeOnGLThread (
         [&waiting, &openGLMajorVersion, &openGLMinorVersion] (juce::OpenGLContext&)
         {
-            GLint major = 0, minor = 0;
-            juce::gl::glGetIntegerv (juce::gl::GL_MAJOR_VERSION, &major);
-            juce::gl::glGetIntegerv (juce::gl::GL_MINOR_VERSION, &minor);
+            juce::Logger::writeToLog ("Requesting OpenGL version number...");
+            std::tie (openGLMajorVersion, openGLMinorVersion) = getGLVersion();
 
-            openGLMajorVersion = (int) major;
-            openGLMinorVersion = (int) minor;
-
+            juce::Logger::writeToLog ("Preparing to print OpenGL stats...");
             juce::String openGLStats;
             openGLStats
                 << "=== OpenGL/GPU Information ===\n"
                 << "Vendor: " << getGLString (juce::gl::GL_VENDOR) << "\n"
                 << "Renderer: " << getGLString (juce::gl::GL_RENDERER) << "\n"
                 << "OpenGL Version: " << getGLString (juce::gl::GL_VERSION) << "\n"
-                << "OpenGL Major: " << juce::String (major) << "\n"
-                << "OpenGL Minor: " << juce::String (minor) << "\n"
+                << "OpenGL Major: " << juce::String (openGLMajorVersion) << "\n"
+                << "OpenGL Minor: " << juce::String (openGLMinorVersion) << "\n"
                 << "OpenGL Shading Language Version: " << getGLString (juce::gl::GL_SHADING_LANGUAGE_VERSION) << "\n";
 
             juce::Logger::writeToLog (openGLStats);
