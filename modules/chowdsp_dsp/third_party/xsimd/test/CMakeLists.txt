@@ -2,6 +2,7 @@
 # Copyright (c) Johan Mabille, Sylvain Corlay, Wolf Vollprecht and         #
 # Martin Renou                                                             #
 # Copyright (c) QuantStack                                                 #
+# Copyright (c) Serge Guelton                                              #
 #                                                                          #
 # Distributed under the terms of the BSD 3-Clause License.                 #
 #                                                                          #
@@ -30,6 +31,8 @@ include(CheckCXXCompilerFlag)
 
 string(TOUPPER "${CMAKE_BUILD_TYPE}" U_CMAKE_BUILD_TYPE)
 
+OPTION(XSIMD_ENABLE_WERROR "Turn on -Werror" OFF)
+
 ################
 # ARM SETTINGS #
 ################
@@ -52,7 +55,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU"
         set(CMAKE_SYSTEM_PROCESSOR arm)
         set(CMAKE_C_COMPILER_TARGET arm-linux-gnueabi)
         set(CMAKE_CXX_COMPILER_TARGET arm-linux-gnueabi)
-        
+
         include_directories(/usr/${ARM_ARCH_DIRECTORY}/include/c++/${ARM_GCC_VER}/${ARM_ARCH_DIRECTORY}/)
         include_directories(/usr/${ARM_ARCH_DIRECTORY}/include/c++/${ARM_GCC_VER}/)
         include_directories(/usr/${ARM_ARCH_DIRECTORY}/include/)
@@ -63,15 +66,12 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU"
         if(ARM_ARCH_DIRECTORY MATCHES "arm-linux-gnueabi")
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfpu=neon -mfloat-abi=softfp -target arm-linux-gnueabi")
         else ()
-            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -target aarch64-linux-gnueabi")
-            set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -maarch64linux")
-            message(STATUS "CMAKE_CXX_LINK_FLAGS: ${CMAKE_CXX_LINK_FLAGS}")
-            set(CMAKE_CXX_LINK_EXECUTABLE "<CMAKE_LINKER> <FLAGS> <CMAKE_CXX_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
+            # delegating to gcc here
         endif()
         message(STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
         message(STATUS "CMAKE_CXX_LINK_EXECUTABLE: ${CMAKE_CXX_LINK_EXECUTABLE}")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wunused-parameter -Wextra -Wreorder -std=c++11")
-    elseif(${CMAKE_SYSTEM_PROCESSOR} MATCHES "^ppc64")
+    elseif(${CMAKE_SYSTEM_PROCESSOR} MATCHES "^ppc64"  OR ${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fPIC -mcpu=${TARGET_ARCH} -mtune=${TARGET_ARCH} -Wunused-parameter -Wextra -Wreorder -std=c++11")
     elseif(NOT WIN32)
         if(NOT CMAKE_CXX_FLAGS MATCHES "-march")
@@ -90,7 +90,7 @@ endif()
 
 if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /MP /bigobj")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:AVX2")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4244 /wd4267 /wd4005 /wd4146 /wd4800")
     set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
 endif()
 
@@ -142,43 +142,38 @@ include_directories(${GTEST_INCLUDE_DIRS})
 
 set(XSIMD_TESTS
     main.cpp
-    xsimd_api_test.hpp
-    xsimd_api_test.cpp
-    xsimd_algorithms.cpp
-    xsimd_basic_test.hpp
-    xsimd_basic_test.cpp
-    xsimd_basic_math_test.hpp
-    xsimd_basic_math_test.cpp
-    xsimd_complex_basic_test.hpp
-    xsimd_complex_tester.hpp
-    xsimd_error_gamma_test.hpp
-    xsimd_error_gamma_test.cpp
-    xsimd_exponential_test.hpp
-    xsimd_exponential_test.cpp
-    xsimd_cexponential_test.hpp
-    xsimd_cexponential_test.cpp
-    xsimd_chyperbolic_test.hpp
-    xsimd_chyperbolic_test.cpp
-    xsimd_cpower_test.hpp
-    xsimd_cpower_test.cpp
-    xsimd_ctrigonometric_test.hpp
-    xsimd_ctrigonometric_test.cpp
-    xsimd_fp_manipulation_test.hpp
-    xsimd_fp_manipulation_test.cpp
-    xsimd_hyperbolic_test.hpp
-    xsimd_hyperbolic_test.cpp
-    xsimd_interface_test.cpp
-    xsimd_memory_test.cpp
-    xsimd_poly_evaluation_test.cpp
-    xsimd_poly_evaluation_test.hpp
-    xsimd_power_test.hpp
-    xsimd_power_test.cpp
-    xsimd_rounding_test.hpp
-    xsimd_rounding_test.cpp
-    xsimd_tester.hpp
-    xsimd_test_utils.hpp
-    xsimd_trigonometric_test.hpp
-    xsimd_trigonometric_test.cpp
+    test_algorithms.cpp
+    test_api.cpp
+    test_arch.cpp
+    test_basic_math.cpp
+    test_batch.cpp
+    test_batch_bool.cpp
+    test_batch_cast.cpp
+    test_batch_complex.cpp
+    test_batch_float.cpp
+    test_batch_int.cpp
+    test_bitwise_cast.cpp
+    test_batch_constant.cpp
+    test_complex_exponential.cpp
+    test_complex_hyperbolic.cpp
+    test_complex_power.cpp
+    test_complex_trigonometric.cpp
+    test_conversion.cpp
+    test_error_gamma.cpp
+    test_exponential.cpp
+    test_extract_pair.cpp
+    test_fp_manipulation.cpp
+    test_hyperbolic.cpp
+    test_load_store.cpp
+    test_memory.cpp
+    test_poly_evaluation.cpp
+    test_power.cpp
+    test_rounding.cpp
+    test_select.cpp
+    test_shuffle_128.cpp
+    test_traits.cpp
+    test_trigonometric.cpp
+    test_utils.hpp
 )
 
 add_executable(test_xsimd ${XSIMD_TESTS} ${XSIMD_HEADERS})
@@ -210,4 +205,8 @@ if (CROSS_COMPILE_ARM)
     add_custom_target(xtest COMMAND qemu-arm -L /usr/arm-linux-gnueabi/ test_xsimd DEPENDS test_xsimd)
 else()
     add_custom_target(xtest COMMAND test_xsimd DEPENDS test_xsimd)
+endif()
+
+if (XSIMD_ENABLE_WERROR)
+    target_compile_options(test_xsimd PRIVATE -Werror -Wall -DXSIMD_SKIP_ON_WERROR)
 endif()

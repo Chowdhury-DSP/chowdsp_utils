@@ -67,7 +67,7 @@ namespace rtype_detail
 
         for (int c = 0; c < (int) numPorts; ++c)
         {
-            v_type bc { (T) 0 };
+            v_type bc {};
             for (int r = 0; r < vec_size; r += simd_size)
                 bc = xsimd::fma (xsimd::load_aligned (S_[c].data() + r), xsimd::load_aligned (a_ + r), bc);
             b_[c] = xsimd::hadd (bc);

@@ -8,7 +8,7 @@ namespace chowdsp::SIMDUtils
  */
 
 template <typename T>
-using x_type = xsimd::batch<T, juce::dsp::SIMDRegister<T>::size()>;
+using x_type = xsimd::batch<T>;
 
 /** SIMD implementation of std::exp */
 template <typename T>
@@ -96,28 +96,10 @@ inline juce::dsp::SIMDRegister<T> atan2SIMD (juce::dsp::SIMDRegister<T> y, juce:
 
 /** SIMD implementation of sincos */
 template <typename T>
-inline std::pair<juce::dsp::SIMDRegister<T>, juce::dsp::SIMDRegister<T>> sincosSIMD (juce::dsp::SIMDRegister<T> in)
+inline std::pair<juce::dsp::SIMDRegister<T>, juce::dsp::SIMDRegister<T>> sincosSIMD (juce::dsp::SIMDRegister<T> x)
 {
-    // @TODO: the latest version of xsimd has this method built in, so we should use that when we upgrade.
-    // Until then, the method is re-implemented here.
-    // Reference: https://github.com/xtensor-stack/xsimd/blob/master/include/xsimd/arch/generic/xsimd_generic_trigo.hpp#L704
-    using namespace xsimd;
-    using batch_type = x_type<T>;
-
-    const auto self = (batch_type) in.value;
-    const auto x = abs (self);
-    auto xr = nan<batch_type>();
-    const auto n = xsimd::detail::trigo_reducer<batch_type>::reduce (x, xr);
-    auto tmp = select (n >= batch_type ((T) 2), batch_type ((T) 1), batch_type ((T) 0));
-    auto swap_bit = fma (batch_type ((T) -2), tmp, n);
-    const auto z = xr * xr;
-    const auto se = xsimd::detail::trigo_evaluation<batch_type>::sin_eval (z, xr);
-    const auto ce = xsimd::detail::trigo_evaluation<batch_type>::cos_eval (z);
-    auto sin_sign_bit = bitofsign (self) ^ select (tmp != batch_type ((T) 0), signmask<batch_type>(), batch_type ((T) 0));
-    const auto sin_z1 = select (swap_bit == batch_type ((T) 0), se, ce);
-    auto cos_sign_bit = select ((swap_bit ^ tmp) != batch_type ((T) 0), signmask<batch_type>(), batch_type ((T) 0));
-    const auto cos_z1 = select (swap_bit != batch_type ((T) 0), se, ce);
-    return std::make_pair (juce::dsp::SIMDRegister<T> (sin_z1 ^ sin_sign_bit), juce::dsp::SIMDRegister<T> (cos_z1 ^ cos_sign_bit));
+    auto [sin, cos] = xsimd::sincos ((x_type<T>) x.value);
+    return std::make_pair (juce::dsp::SIMDRegister<T> (sin), juce::dsp::SIMDRegister<T> (cos));
 }
 
 /** SIMD implementation of std::isnan */

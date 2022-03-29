@@ -56,6 +56,7 @@
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wcast-align",
                                      "-Wimplicit-int-conversion",
                                      "-Wshadow",
+                                     "-Wshadow-field",
                                      "-Wsign-conversion",
                                      "-Wzero-as-null-pointer-constant",
                                      "-Wc++98-compat-extra-semi")
