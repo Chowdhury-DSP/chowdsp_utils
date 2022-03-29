@@ -13,9 +13,7 @@ template <class Processor>
 class PluginBase : public juce::AudioProcessor
 {
 public:
-    PluginBase();
-    explicit PluginBase (juce::UndoManager* um);
-    explicit PluginBase (const juce::AudioProcessor::BusesProperties& layout);
+    explicit PluginBase (juce::UndoManager* um = nullptr, const juce::AudioProcessor::BusesProperties& layout = getDefaultBusLayout());
     ~PluginBase() override = default;
 
 #if defined JucePlugin_Name
@@ -76,6 +74,8 @@ protected:
     std::unique_ptr<chowdsp::PresetManager> presetManager;
 
 private:
+    static juce::AudioProcessor::BusesProperties getDefaultBusLayout();
+
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
     bool usePresetManagerForPluginInterface = true;
@@ -108,20 +108,16 @@ public:
 #endif // DOXYGEN
 
 template <class Processor>
-PluginBase<Processor>::PluginBase() : AudioProcessor (BusesProperties().withInput ("Input", juce::AudioChannelSet::stereo(), true).withOutput ("Output", juce::AudioChannelSet::stereo(), true)),
-                                      vts (*this, nullptr, juce::Identifier ("Parameters"), createParameterLayout())
+juce::AudioProcessor::BusesProperties PluginBase<Processor>::getDefaultBusLayout()
 {
+    return BusesProperties()
+        .withInput ("Input", juce::AudioChannelSet::stereo(), true)
+        .withOutput ("Output", juce::AudioChannelSet::stereo(), true);
 }
 
 template <class Processor>
-PluginBase<Processor>::PluginBase (juce::UndoManager* um) : AudioProcessor (BusesProperties().withInput ("Input", juce::AudioChannelSet::stereo(), true).withOutput ("Output", juce::AudioChannelSet::stereo(), true)),
-                                                            vts (*this, um, juce::Identifier ("Parameters"), createParameterLayout())
-{
-}
-
-template <class Processor>
-PluginBase<Processor>::PluginBase (const juce::AudioProcessor::BusesProperties& layout) : AudioProcessor (layout),
-                                                                                          vts (*this, nullptr, juce::Identifier ("Parameters"), createParameterLayout())
+PluginBase<Processor>::PluginBase (juce::UndoManager* um, const juce::AudioProcessor::BusesProperties& layout) : AudioProcessor (layout),
+                                                                                                                 vts (*this, um, juce::Identifier ("Parameters"), createParameterLayout())
 {
 }
 
