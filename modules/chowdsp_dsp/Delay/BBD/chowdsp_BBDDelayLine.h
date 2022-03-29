@@ -64,7 +64,7 @@ public:
      */
     void setDelayTime (float delaySec) noexcept
     {
-        delaySec = juce::jmax (Ts, delaySec); // don't divide by zero!!
+        delaySec = juce::jmax (Ts, delaySec - Ts); // don't divide by zero!!
 
         const auto clock_rate_hz = (2.0f * (float) STAGES) / delaySec;
         Ts_bbd = 1.0f / clock_rate_hz;
