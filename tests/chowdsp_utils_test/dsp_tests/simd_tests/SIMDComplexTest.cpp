@@ -37,7 +37,7 @@ public:
 
         expectWithinAbsoluteError (at0.real(), result_scalar.real(), maxErr, mathOpName + ": " + opType + ", real incorrect!");
         expectWithinAbsoluteError (at0.imag(), result_scalar.imag(), maxErr, mathOpName + ": " + opType + ", imag incorrect!");
-    };
+    }
 
     template <typename T>
     void checkResult (T result_scalar, dsp::SIMDRegister<T> result_vec, const String& mathOpName, const String& opType, T maxErr)
@@ -53,7 +53,7 @@ public:
         }
 
         expectWithinAbsoluteError (at0, result_scalar, maxErr, mathOpName + ": " + opType + ", real incorrect!");
-    };
+    }
 
     template <typename T, typename VectorOpType, typename ScalarOpType, bool doVector = true>
     void testMathOp (Random& r, int nIter, VectorOpType&& vectorOp, ScalarOpType&& scalarOp, const String& mathOpName, T maxErr, T range = (T) 100)

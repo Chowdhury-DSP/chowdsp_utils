@@ -64,7 +64,7 @@ public:
      */
     void setDelayTime (float delaySec) noexcept
     {
-        delaySec = juce::jmax (Ts, delaySec); // don't divide by zero!!
+        delaySec = juce::jmax (Ts, delaySec - Ts); // don't divide by zero!!
 
         const auto clock_rate_hz = (2.0f * (float) STAGES) / delaySec;
         Ts_bbd = 1.0f / clock_rate_hz;
@@ -90,7 +90,7 @@ public:
             {
                 inputFilter->calcG();
                 buffer[bufferPtr++] = SIMDComplexMulReal (inputFilter->Gcalc, inputFilter->x).sum();
-                bufferPtr = (bufferPtr < STAGES) ? bufferPtr : 0;
+                bufferPtr = (bufferPtr <= STAGES) ? bufferPtr : 0;
             }
             else
             {
@@ -125,7 +125,7 @@ public:
             {
                 inputFilter->calcG();
                 buffer[bufferPtr++] = SIMDComplexMulReal (inputFilter->Gcalc, inputFilter->x).sum();
-                bufferPtr = (bufferPtr < STAGES) ? bufferPtr : 0;
+                bufferPtr = (bufferPtr <= STAGES) ? bufferPtr : 0;
             }
             else
             {
@@ -156,7 +156,7 @@ private:
     std::unique_ptr<OutputFilterBank> outputFilter;
     float H0 = 1.0f;
 
-    std::array<float, STAGES> buffer;
+    std::array<float, STAGES + 1> buffer;
     size_t bufferPtr = 0;
 
     float yBBD_old = 0.0f;
