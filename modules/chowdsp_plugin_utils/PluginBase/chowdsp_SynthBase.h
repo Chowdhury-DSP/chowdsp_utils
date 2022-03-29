@@ -13,9 +13,10 @@ template <class Processor>
 class SynthBase : public PluginBase<Processor>
 {
 public:
-    explicit SynthBase (const juce::AudioProcessor::BusesProperties& layout = juce::AudioProcessor::BusesProperties().withOutput ("Output", juce::AudioChannelSet::stereo(), true)) : PluginBase<Processor> (layout)
+    explicit SynthBase (juce::UndoManager* um = nullptr, const juce::AudioProcessor::BusesProperties& layout = getDefaultBusLayout()) : PluginBase<Processor> (um, layout)
     {
     }
+
     ~SynthBase() override = default;
 
     bool acceptsMidi() const override { return true; }
@@ -36,6 +37,11 @@ public:
     }
 
 private:
+    static juce::AudioProcessor::BusesProperties getDefaultBusLayout()
+    {
+        return juce::AudioProcessor::BusesProperties().withOutput ("Output", juce::AudioChannelSet::stereo(), true);
+    }
+
     void processAudioBlock (juce::AudioBuffer<float>&) override {}
 };
 
