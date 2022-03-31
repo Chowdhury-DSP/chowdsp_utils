@@ -65,7 +65,7 @@ AudioUIBackgroundTask<BackgroundTaskType>::~AudioUIBackgroundTask()
 {
     if (this->isBackgroundTaskRunning())
     {
-        jassertfalse; // You should always stop running the backgroudn task before trying to delete it!
+        jassertfalse; // You should always stop running the background task before trying to delete it!
         this->stopTask();
     }
 }

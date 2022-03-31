@@ -19,7 +19,7 @@ namespace detail
         void run() override;
         virtual int runTaskOnBackgroundThread() = 0;
 
-        bool isBackgroundTaskRunning() const { return isThreadRunning(); }
+        [[nodiscard]] bool isBackgroundTaskRunning() const { return isThreadRunning(); }
         void startTask() { startThread(); }
         void stopTask() { stopThread (-1); }
     };
@@ -34,7 +34,7 @@ namespace detail
         int useTimeSlice() override { return runTaskOnBackgroundThread(); }
         virtual int runTaskOnBackgroundThread() = 0;
 
-        bool isBackgroundTaskRunning() const;
+        [[nodiscard]] bool isBackgroundTaskRunning() const;
         void startTask();
         void stopTask();
 
@@ -61,7 +61,7 @@ namespace detail
  * or `TimeSliceAudioUIBackgroundTask` instead of using this class directly.
  */
 template <typename BackgroundTaskType>
-class AudioUIBackgroundTask : public BackgroundTaskType
+class AudioUIBackgroundTask : private BackgroundTaskType
 {
 public:
     /** Constructor with a name for the background thread */
@@ -84,6 +84,17 @@ public:
 
     /** Set this method from the UI thread when you want the background task to start/stop running */
     void setShouldBeRunning (bool shouldRun);
+
+    /** Returns true if the task is currently running */
+    [[nodiscard]] bool isTaskRunning() const { return this->isBackgroundTaskRunning(); }
+
+    /** Assigns this task to use a custom TimeSliceThread, rather than the default shared TimeSliceThread */
+    template <typename Type = BackgroundTaskType>
+    typename std::enable_if<std::is_same<Type, detail::TimeSliceBackgroundTask>::value, void>::type
+        setTimeSliceThreadToUse (juce::TimeSliceThread* thread)
+    {
+        detail::TimeSliceBackgroundTask::setTimeSliceThreadToUse (thread);
+    }
 
 protected:
     /**
