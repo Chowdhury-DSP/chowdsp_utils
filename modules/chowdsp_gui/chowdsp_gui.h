@@ -35,6 +35,13 @@
 #define CHOWDSP_NEEDS_PRESETS_COMPONENT 1
 #endif
 
+/** Config: FOLEYS_ENABLE_OPEN_GL_CONTEXT
+            If selected an juce OpenGLCOntext is attached. Not a big difference on OSX, but vital on Windows.
+  */
+#ifndef CHOWDSP_ENABLE_OPEN_GL_CONTEXT
+#define CHOWDSP_ENABLE_OPEN_GL_CONTEXT 1
+#endif
+
 // STL includes
 #include <unordered_map>
 
@@ -47,8 +54,11 @@
 #include <juce_audio_formats/juce_audio_formats.h>
 #include <juce_audio_utils/juce_audio_utils.h>
 
-#if JUCE_MODULE_AVAILABLE_juce_opengl
+#if JUCE_MODULE_AVAILABLE_juce_opengl && CHOWDSP_ENABLE_OPEN_GL_CONTEXT
+#define CHOWDSP_OPENGL_IS_AVAILABLE 1
 #include <juce_opengl/juce_opengl.h>
+#else
+#define CHOWDSP_OPENGL_IS_AVAILABLE 0
 #endif
 
 #if CHOWDSP_USE_FOLEYS_CLASSES
