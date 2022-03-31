@@ -8,14 +8,52 @@
 
 namespace chowdsp
 {
+#ifndef DOXYGEN
+namespace detail
+{
+    /** Simple wrapper around juce::Thread that is compatible with AudioUIBackgroundTask */
+    struct SingleThreadBackgroundTask : public juce::Thread
+    {
+        explicit SingleThreadBackgroundTask (const juce::String& name) : juce::Thread (name) {}
+        void run() override;
+        virtual int runTaskOnBackgroundThread() = 0;
+    };
+
+    /** juce::TimeSliceClient that is compatible with AudioUIBackgroundTask */
+    struct TimeSliceBackgroundTask : public juce::TimeSliceClient
+    {
+        explicit TimeSliceBackgroundTask (const juce::String&);
+        ~TimeSliceBackgroundTask() override;
+
+        void setTimeSliceThreadToUse (juce::TimeSliceThread* newTimeSliceThreadToUse);
+
+        int useTimeSlice() override { return runTaskOnBackgroundThread(); }
+        virtual int runTaskOnBackgroundThread() = 0;
+
+    private:
+        struct TimeSliceThread : juce::TimeSliceThread
+        {
+            TimeSliceThread() : juce::TimeSliceThread ("Audio UI Background Thread") {}
+        };
+
+        juce::SharedResourcePointer<TimeSliceThread> sharedTimeSliceThread;
+        juce::TimeSliceThread* timeSliceThreadToUse = sharedTimeSliceThread;
+    };
+} // namespace detail
+#endif // DOXYGEN
+
 /**
  * Let's say you need a class that can accept data from the audio thread,
  * do some computation with that data on a background thread, and then report
  * the computation result to the UI thread. This would be that class!
  *
  * The common scenario here is when you need a meter, or other audio visualization.
+ *
+ * It is recommended to use a type alias, like `SingleThreadAudioUIBackgroundTask`
+ * or `TimeSliceAudioUIBackgroundTask` instead of using this class directly.
  */
-class AudioUIBackgroundTask : public juce::Thread
+template <typename BackgroundTaskType>
+class AudioUIBackgroundTask : public BackgroundTaskType
 {
 public:
     /** Constructor with a name for the background thread */
@@ -58,7 +96,7 @@ protected:
     virtual void runTask (const juce::AudioBuffer<float>& /*data*/) = 0;
 
 private:
-    void run() override;
+    int runTaskOnBackgroundThread() override;
 
     std::vector<chowdsp::DoubleBuffer<float>> data;
     std::atomic<int> writePosition { 0 };
@@ -73,4 +111,10 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioUIBackgroundTask)
 };
+
+/** AudioUIBackgroundTask that will run on its own dedicated thread */
+using SingleThreadAudioUIBackgroundTask = AudioUIBackgroundTask<detail::SingleThreadBackgroundTask>;
+
+/** AudioUIBackgroundTask that will run in a time slice */
+using TimeSliceAudioUIBackgroundTask = AudioUIBackgroundTask<detail::SingleThreadBackgroundTask>;
 } // namespace chowdsp

@@ -2,14 +2,47 @@
 
 namespace chowdsp
 {
-AudioUIBackgroundTask::AudioUIBackgroundTask (const juce::String& name) : juce::Thread (name)
+namespace detail
+{
+    void SingleThreadBackgroundTask::run()
+    {
+        while (true)
+        {
+            if (this->threadShouldExit())
+                return;
+
+            this->wait (runTaskOnBackgroundThread());
+        }
+    }
+
+    TimeSliceBackgroundTask::TimeSliceBackgroundTask (const juce::String&)
+    {
+        timeSliceThreadToUse->addTimeSliceClient (this);
+    }
+
+    TimeSliceBackgroundTask::~TimeSliceBackgroundTask()
+    {
+        timeSliceThreadToUse->removeTimeSliceClient (this);
+    }
+
+    void TimeSliceBackgroundTask::setTimeSliceThreadToUse (juce::TimeSliceThread* newTimeSliceThreadToUse)
+    {
+        timeSliceThreadToUse->removeTimeSliceClient (this);
+        timeSliceThreadToUse = newTimeSliceThreadToUse;
+        timeSliceThreadToUse->addTimeSliceClient (this);
+    }
+} // namespace detail
+
+template <typename BackgroundTaskType>
+AudioUIBackgroundTask<BackgroundTaskType>::AudioUIBackgroundTask (const juce::String& name) : BackgroundTaskType (name)
 {
 }
 
-void AudioUIBackgroundTask::prepare (double sampleRate, int samplesPerBlock, int numChannels)
+template <typename BackgroundTaskType>
+void AudioUIBackgroundTask<BackgroundTaskType>::prepare (double sampleRate, int samplesPerBlock, int numChannels)
 {
-    if (isThreadRunning())
-        stopThread (-1);
+    if (this->isThreadRunning())
+        this->stopThread (-1);
 
     isPrepared = false;
 
@@ -33,10 +66,11 @@ void AudioUIBackgroundTask::prepare (double sampleRate, int samplesPerBlock, int
     isPrepared = true;
 
     if (shouldBeRunning)
-        startThread();
+        this->startThread();
 }
 
-void AudioUIBackgroundTask::reset()
+template <typename BackgroundTaskType>
+void AudioUIBackgroundTask<BackgroundTaskType>::reset()
 {
     for (auto& buffer : data)
         buffer.clear();
@@ -45,13 +79,15 @@ void AudioUIBackgroundTask::reset()
     resetTask();
 }
 
-void AudioUIBackgroundTask::pushSamples (int channel, const float* samples, int numSamples)
+template <typename BackgroundTaskType>
+void AudioUIBackgroundTask<BackgroundTaskType>::pushSamples (int channel, const float* samples, int numSamples)
 {
     data[(size_t) channel].push (samples, numSamples);
     writePosition = data[(size_t) channel].getWritePointer();
 }
 
-void AudioUIBackgroundTask::pushSamples (const juce::AudioBuffer<float>& buffer)
+template <typename BackgroundTaskType>
+void AudioUIBackgroundTask<BackgroundTaskType>::pushSamples (const juce::AudioBuffer<float>& buffer)
 {
     for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
         data[(size_t) ch].push (buffer.getReadPointer (ch), buffer.getNumSamples());
@@ -59,38 +95,37 @@ void AudioUIBackgroundTask::pushSamples (const juce::AudioBuffer<float>& buffer)
     writePosition = data[0].getWritePointer();
 }
 
-void AudioUIBackgroundTask::setShouldBeRunning (bool shouldRun)
+template <typename BackgroundTaskType>
+void AudioUIBackgroundTask<BackgroundTaskType>::setShouldBeRunning (bool shouldRun)
 {
     shouldBeRunning = shouldRun;
 
-    if (! shouldRun && isThreadRunning())
+    if (! shouldRun && this->isThreadRunning())
     {
-        stopThread (-1);
+        this->stopThread (-1);
         return;
     }
 
-    if (isPrepared && shouldRun && ! isThreadRunning())
+    if (isPrepared && shouldRun && ! this->isThreadRunning())
     {
-        startThread();
+        this->startThread();
         return;
     }
 }
 
-void AudioUIBackgroundTask::run()
+template <typename BackgroundTaskType>
+int AudioUIBackgroundTask<BackgroundTaskType>::runTaskOnBackgroundThread()
 {
-    while (true)
-    {
-        if (threadShouldExit())
-            return;
+    latestData.clear();
+    const auto dataOffset = writePosition - requestedDataSize;
+    for (int ch = 0; ch < latestData.getNumChannels(); ++ch)
+        latestData.copyFrom (ch, 0, data[(size_t) ch].data (dataOffset), requestedDataSize);
 
-        latestData.clear();
-        const auto dataOffset = writePosition - requestedDataSize;
-        for (int ch = 0; ch < latestData.getNumChannels(); ++ch)
-            latestData.copyFrom (ch, 0, data[(size_t) ch].data (dataOffset), requestedDataSize);
+    runTask (latestData);
 
-        runTask (latestData);
-
-        wait (waitMilliseconds);
-    }
+    return waitMilliseconds;
 }
+
+template class AudioUIBackgroundTask<detail::SingleThreadBackgroundTask>;
+//template class AudioUIBackgroundTask<juce::TimeSliceClient>;
 } // namespace chowdsp
