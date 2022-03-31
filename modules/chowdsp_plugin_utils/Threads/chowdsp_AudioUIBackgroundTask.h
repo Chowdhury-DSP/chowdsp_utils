@@ -12,23 +12,31 @@ namespace chowdsp
 namespace detail
 {
     /** Simple wrapper around juce::Thread that is compatible with AudioUIBackgroundTask */
-    struct SingleThreadBackgroundTask : public juce::Thread
+    struct SingleThreadBackgroundTask : private juce::Thread
     {
         explicit SingleThreadBackgroundTask (const juce::String& name) : juce::Thread (name) {}
+
         void run() override;
         virtual int runTaskOnBackgroundThread() = 0;
+
+        bool isBackgroundTaskRunning() const { return isThreadRunning(); }
+        void startTask() { startThread(); }
+        void stopTask() { stopThread (-1); }
     };
 
     /** juce::TimeSliceClient that is compatible with AudioUIBackgroundTask */
-    struct TimeSliceBackgroundTask : public juce::TimeSliceClient
+    struct TimeSliceBackgroundTask : private juce::TimeSliceClient
     {
-        explicit TimeSliceBackgroundTask (const juce::String&);
-        ~TimeSliceBackgroundTask() override;
+        explicit TimeSliceBackgroundTask (const juce::String&) {}
 
         void setTimeSliceThreadToUse (juce::TimeSliceThread* newTimeSliceThreadToUse);
 
         int useTimeSlice() override { return runTaskOnBackgroundThread(); }
         virtual int runTaskOnBackgroundThread() = 0;
+
+        bool isBackgroundTaskRunning() const;
+        void startTask();
+        void stopTask();
 
     private:
         struct TimeSliceThread : juce::TimeSliceThread
@@ -58,6 +66,9 @@ class AudioUIBackgroundTask : public BackgroundTaskType
 public:
     /** Constructor with a name for the background thread */
     explicit AudioUIBackgroundTask (const juce::String& name);
+
+    /** Default destructor */
+    ~AudioUIBackgroundTask() override;
 
     /** Prepares the class to accept a new audio stream */
     void prepare (double sampleRate, int samplesPerBlock, int numChannels);
@@ -116,5 +127,5 @@ private:
 using SingleThreadAudioUIBackgroundTask = AudioUIBackgroundTask<detail::SingleThreadBackgroundTask>;
 
 /** AudioUIBackgroundTask that will run in a time slice */
-using TimeSliceAudioUIBackgroundTask = AudioUIBackgroundTask<detail::SingleThreadBackgroundTask>;
+using TimeSliceAudioUIBackgroundTask = AudioUIBackgroundTask<detail::TimeSliceBackgroundTask>;
 } // namespace chowdsp

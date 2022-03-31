@@ -15,21 +15,43 @@ namespace detail
         }
     }
 
-    TimeSliceBackgroundTask::TimeSliceBackgroundTask (const juce::String&)
-    {
-        timeSliceThreadToUse->addTimeSliceClient (this);
-    }
-
-    TimeSliceBackgroundTask::~TimeSliceBackgroundTask()
-    {
-        timeSliceThreadToUse->removeTimeSliceClient (this);
-    }
-
     void TimeSliceBackgroundTask::setTimeSliceThreadToUse (juce::TimeSliceThread* newTimeSliceThreadToUse)
     {
-        timeSliceThreadToUse->removeTimeSliceClient (this);
+        const auto wasRunning = isBackgroundTaskRunning();
+        if (wasRunning)
+            stopTask();
+
         timeSliceThreadToUse = newTimeSliceThreadToUse;
+
+        if (wasRunning)
+            startTask();
+    }
+
+    bool TimeSliceBackgroundTask::isBackgroundTaskRunning() const
+    {
+        for (int i = 0; i < timeSliceThreadToUse->getNumClients(); ++i)
+        {
+            if (timeSliceThreadToUse->getClient (i) == this)
+                return true;
+        }
+
+        return false;
+    }
+
+    void TimeSliceBackgroundTask::startTask()
+    {
         timeSliceThreadToUse->addTimeSliceClient (this);
+
+        if (! timeSliceThreadToUse->isThreadRunning())
+            timeSliceThreadToUse->startThread();
+    }
+
+    void TimeSliceBackgroundTask::stopTask()
+    {
+        timeSliceThreadToUse->removeTimeSliceClient (this);
+
+        if (timeSliceThreadToUse->getNumClients() == 0)
+            timeSliceThreadToUse->stopThread (-1);
     }
 } // namespace detail
 
@@ -39,10 +61,20 @@ AudioUIBackgroundTask<BackgroundTaskType>::AudioUIBackgroundTask (const juce::St
 }
 
 template <typename BackgroundTaskType>
+AudioUIBackgroundTask<BackgroundTaskType>::~AudioUIBackgroundTask()
+{
+    if (this->isBackgroundTaskRunning())
+    {
+        jassertfalse; // You should always stop running the backgroudn task before trying to delete it!
+        this->stopTask();
+    }
+}
+
+template <typename BackgroundTaskType>
 void AudioUIBackgroundTask<BackgroundTaskType>::prepare (double sampleRate, int samplesPerBlock, int numChannels)
 {
-    if (this->isThreadRunning())
-        this->stopThread (-1);
+    if (this->isBackgroundTaskRunning())
+        this->stopTask();
 
     isPrepared = false;
 
@@ -66,7 +98,7 @@ void AudioUIBackgroundTask<BackgroundTaskType>::prepare (double sampleRate, int 
     isPrepared = true;
 
     if (shouldBeRunning)
-        this->startThread();
+        this->startTask();
 }
 
 template <typename BackgroundTaskType>
@@ -100,15 +132,15 @@ void AudioUIBackgroundTask<BackgroundTaskType>::setShouldBeRunning (bool shouldR
 {
     shouldBeRunning = shouldRun;
 
-    if (! shouldRun && this->isThreadRunning())
+    if (! shouldRun && this->isBackgroundTaskRunning())
     {
-        this->stopThread (-1);
+        this->stopTask();
         return;
     }
 
-    if (isPrepared && shouldRun && ! this->isThreadRunning())
+    if (isPrepared && shouldRun && ! this->isBackgroundTaskRunning())
     {
-        this->startThread();
+        this->startTask();
         return;
     }
 }
@@ -127,5 +159,5 @@ int AudioUIBackgroundTask<BackgroundTaskType>::runTaskOnBackgroundThread()
 }
 
 template class AudioUIBackgroundTask<detail::SingleThreadBackgroundTask>;
-//template class AudioUIBackgroundTask<juce::TimeSliceClient>;
+template class AudioUIBackgroundTask<detail::TimeSliceBackgroundTask>;
 } // namespace chowdsp
