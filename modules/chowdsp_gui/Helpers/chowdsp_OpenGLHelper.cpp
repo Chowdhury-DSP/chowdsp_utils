@@ -5,7 +5,7 @@
 // under the ISC license:
 // https://github.com/SquarePine/squarepine_core/blob/main/modules/squarepine_graphics/components/HighPerformanceRendererConfigurator.cpp
 
-#if JUCE_MODULE_AVAILABLE_juce_opengl
+#if CHOWDSP_OPENGL_IS_AVAILABLE
 namespace
 {
 juce::String getGLString (GLenum value)
@@ -14,6 +14,19 @@ juce::String getGLString (GLenum value)
         return reinterpret_cast<const char*> (juce::gl::glGetString (value)); // NB: glGetString is from v2.0+.
 
     return juce::String {};
+}
+
+std::pair<int, int> getGLVersion()
+{
+    if (juce::gl::glGetIntegerv != nullptr)
+    {
+        GLint major = 0, minor = 0;
+        juce::gl::glGetIntegerv (juce::gl::GL_MAJOR_VERSION, &major);
+        juce::gl::glGetIntegerv (juce::gl::GL_MINOR_VERSION, &minor);
+        return { (int) major, (int) minor };
+    }
+
+    return { 0, 0 };
 }
 
 auto createOpenGLTestComp (juce::OpenGLContext& ctx)
@@ -37,34 +50,41 @@ auto createOpenGLTestComp (juce::OpenGLContext& ctx)
 
 void checkOpenGLStats (juce::OpenGLContext& ctx, int& openGLMajorVersion, int& openGLMinorVersion)
 {
-    auto testComp = createOpenGLTestComp (ctx);
-    std::atomic_bool waiting { true };
-    testComp->ctx.executeOnGLThread (
-        [&waiting, &openGLMajorVersion, &openGLMinorVersion] (juce::OpenGLContext&) {
-            GLint major = 0, minor = 0;
-            juce::gl::glGetIntegerv (juce::gl::GL_MAJOR_VERSION, &major);
-            juce::gl::glGetIntegerv (juce::gl::GL_MINOR_VERSION, &minor);
+    try
+    {
+        juce::Logger::writeToLog ("Attempting to check OpenGL stats...");
+        auto testComp = createOpenGLTestComp (ctx);
+        std::atomic_bool waiting { true };
+        testComp->ctx.executeOnGLThread (
+            [&waiting, &openGLMajorVersion, &openGLMinorVersion] (juce::OpenGLContext&)
+            {
+                juce::Logger::writeToLog ("Requesting OpenGL version number...");
+                std::tie (openGLMajorVersion, openGLMinorVersion) = getGLVersion();
 
-            openGLMajorVersion = (int) major;
-            openGLMinorVersion = (int) minor;
+                juce::Logger::writeToLog ("Preparing to print OpenGL stats...");
+                juce::String openGLStats;
+                openGLStats
+                    << "=== OpenGL/GPU Information ===\n"
+                    << "Vendor: " << getGLString (juce::gl::GL_VENDOR) << "\n"
+                    << "Renderer: " << getGLString (juce::gl::GL_RENDERER) << "\n"
+                    << "OpenGL Version: " << getGLString (juce::gl::GL_VERSION) << "\n"
+                    << "OpenGL Major: " << juce::String (openGLMajorVersion) << "\n"
+                    << "OpenGL Minor: " << juce::String (openGLMinorVersion) << "\n"
+                    << "OpenGL Shading Language Version: " << getGLString (juce::gl::GL_SHADING_LANGUAGE_VERSION) << "\n";
 
-            juce::String openGLStats;
-            openGLStats
-                << "=== OpenGL/GPU Information ===\n"
-                << "Vendor: " << getGLString (juce::gl::GL_VENDOR) << "\n"
-                << "Renderer: " << getGLString (juce::gl::GL_RENDERER) << "\n"
-                << "OpenGL Version: " << getGLString (juce::gl::GL_VERSION) << "\n"
-                << "OpenGL Major: " << juce::String (major) << "\n"
-                << "OpenGL Minor: " << juce::String (minor) << "\n"
-                << "OpenGL Shading Language Version: " << getGLString (juce::gl::GL_SHADING_LANGUAGE_VERSION) << "\n";
+                juce::Logger::writeToLog (openGLStats);
+                waiting = false;
+            },
+            false);
 
-            juce::Logger::writeToLog (openGLStats);
-            waiting = false;
-        },
-        false);
-
-    while (waiting)
-        juce::MessageManager::getInstance()->runDispatchLoopUntil (100);
+        while (waiting)
+            juce::MessageManager::getInstance()->runDispatchLoopUntil (100);
+    }
+    catch (...)
+    {
+        openGLMajorVersion = 0;
+        openGLMinorVersion = 0;
+    }
 }
 } // namespace
 #endif
@@ -73,7 +93,7 @@ namespace chowdsp
 {
 OpenGLHelper::OpenGLHelper() //NOLINT(modernize-use-equals-default): can only be default if compiling without OpenGL
 {
-#if JUCE_MODULE_AVAILABLE_juce_opengl
+#if CHOWDSP_OPENGL_IS_AVAILABLE
     checkOpenGLStats (openglContext, openGLMajorVersion, openGLMinorVersion);
 #endif
 }
@@ -86,7 +106,7 @@ OpenGLHelper::~OpenGLHelper()
 
 bool OpenGLHelper::isOpenGLAvailable() const noexcept // NOLINT(readability-convert-member-functions-to-static): can only be static if compiling without OpenGL
 {
-#if JUCE_MODULE_AVAILABLE_juce_opengl
+#if CHOWDSP_OPENGL_IS_AVAILABLE
     return openGLMajorVersion >= 2; // For OpenGL drivers below v2.0, we get a black screen
 #else
     return false;
@@ -108,7 +128,7 @@ void OpenGLHelper::attach()
 
     attached = true;
 
-#if JUCE_MODULE_AVAILABLE_juce_opengl
+#if CHOWDSP_OPENGL_IS_AVAILABLE
     openglContext.attachTo (*component);
     component->addComponentListener (this);
 #endif
@@ -123,7 +143,7 @@ void OpenGLHelper::detach()
 
     attached = false;
 
-#if JUCE_MODULE_AVAILABLE_juce_opengl
+#if CHOWDSP_OPENGL_IS_AVAILABLE
     openglContext.detach();
 
     if (component != nullptr)

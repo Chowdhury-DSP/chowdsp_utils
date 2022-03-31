@@ -38,7 +38,7 @@ public:
     /** Returns the currently attached component, or nullptr. */
     [[nodiscard]] juce::Component* getComponent() const noexcept { return component.getComponent(); }
 
-#if JUCE_MODULE_AVAILABLE_juce_opengl
+#if CHOWDSP_OPENGL_IS_AVAILABLE
     /** Returns the OpenGL context. */
     juce::OpenGLContext& getOpenGLContext() { return openglContext; }
 #endif
@@ -51,7 +51,7 @@ private:
 
     bool shouldAttachNextComponent = false;
 
-#if JUCE_MODULE_AVAILABLE_juce_opengl
+#if CHOWDSP_OPENGL_IS_AVAILABLE
     juce::OpenGLContext openglContext;
 
     int openGLMajorVersion = 0;
