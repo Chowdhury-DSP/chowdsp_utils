@@ -5,9 +5,10 @@ namespace
 constexpr std::array<float, 9> mags { 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f };
 constexpr int blockSize = 1 << 19;
 
-struct SimpleTask : chowdsp::AudioUIBackgroundTask
+template <typename Task>
+struct SimpleTask : Task
 {
-    explicit SimpleTask (UnitTest* thisTest) : chowdsp::AudioUIBackgroundTask ("Basic Task"),
+    explicit SimpleTask (UnitTest* thisTest) : Task ("Basic Task"),
                                                ut (thisTest)
     {
     }
@@ -47,22 +48,39 @@ struct SimpleTask : chowdsp::AudioUIBackgroundTask
 };
 } // namespace
 
+template <typename TaskType>
 class AudioUIBackgroundTaskTest : public TimedUnitTest
 {
 public:
-    AudioUIBackgroundTaskTest() : TimedUnitTest ("Audio/UI Background Task Test")
+    AudioUIBackgroundTaskTest() : TimedUnitTest (getTestName(), "Threads")
     {
     }
 
-    void audioThreadTest()
+    static String getTestName()
+    {
+        if constexpr (std::is_same<TaskType, chowdsp::SingleThreadAudioUIBackgroundTask>::value)
+            return "Single Thread Audio/UI Background Task Test";
+
+        return "Time Slice Audio/UI Background Task Test";
+    }
+
+    void audioThreadTest (TimeSliceThread* timeSliceThread = nullptr)
     {
         std::atomic<size_t> magsIndex {};
 
-        SimpleTask task (this);
+        SimpleTask<TaskType> task (this);
         task.magsIndex = &magsIndex;
+        expect (! task.isTaskRunning(), "Task should not be running yet!");
+
+        if constexpr (std::is_same<TaskType, chowdsp::TimeSliceAudioUIBackgroundTask>::value)
+        {
+            if (timeSliceThread != nullptr)
+                task.setTimeSliceThreadToUse (timeSliceThread);
+        }
 
         task.prepare (48.0e3, blockSize, 1);
         task.setShouldBeRunning (true);
+        expect (task.isTaskRunning(), "Task should now be running!");
 
         std::vector<float> data ((size_t) blockSize, 0.0f);
         while (magsIndex < mags.size() - 1)
@@ -78,13 +96,14 @@ public:
         }
 
         task.setShouldBeRunning (false);
+        expect (! task.isTaskRunning(), "Task should no longer be running!");
     }
 
     void guiThreadTest()
     {
         std::atomic<size_t> magsIndex {};
 
-        SimpleTask task (this);
+        SimpleTask<TaskType> task (this);
         task.magsIndex = &magsIndex;
 
         task.prepare (24.0e3, 128, 1);
@@ -133,6 +152,26 @@ public:
             Thread::sleep (1);
     }
 
+    void customTimeSliceThreadTest()
+    {
+        std::atomic<size_t> magsIndex {};
+
+        SimpleTask<TaskType> task (this);
+        task.magsIndex = &magsIndex;
+        expect (! task.isTaskRunning(), "Task should not be running yet!");
+
+        task.prepare (48.0e3, blockSize, 1);
+        task.setShouldBeRunning (true);
+        expect (task.isTaskRunning(), "Task should now be running!");
+
+        TimeSliceThread timeSliceThread { "Test Thread" };
+        task.setTimeSliceThreadToUse (&timeSliceThread);
+
+        audioThreadTest (&timeSliceThread);
+
+        task.setShouldBeRunning (false);
+    }
+
     void runTestTimed() override
     {
         beginTest ("Audio Thread Test");
@@ -140,7 +179,14 @@ public:
 
         beginTest ("GUI Thread Test");
         guiThreadTest();
+
+        if constexpr (std::is_same<TaskType, chowdsp::TimeSliceAudioUIBackgroundTask>::value)
+        {
+            beginTest ("Custom TimeSliceThread Test");
+            customTimeSliceThreadTest();
+        }
     }
 };
 
-static AudioUIBackgroundTaskTest audioUiBackgroundTaskTest;
+static AudioUIBackgroundTaskTest<chowdsp::SingleThreadAudioUIBackgroundTask> singleThreadAudioUiBackgroundTaskTest;
+static AudioUIBackgroundTaskTest<chowdsp::TimeSliceAudioUIBackgroundTask> timeSliceAudioUiBackgroundTaskTest;
