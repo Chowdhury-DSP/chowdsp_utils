@@ -200,6 +200,6 @@ public:
     }
 };
 
-//#if ! JUCE_LINUX // can't run this test on Linux CI for some reason!
+#if ! JUCE_LINUX // can't run this test on Linux CI for some reason!
 static OpenGLHelperTest openGlHelperTest;
-//#endif
+#endif

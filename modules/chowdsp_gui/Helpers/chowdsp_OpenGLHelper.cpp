@@ -50,40 +50,31 @@ auto createOpenGLTestComp (juce::OpenGLContext& ctx)
 
 void checkOpenGLStats (juce::OpenGLContext& ctx, int& openGLMajorVersion, int& openGLMinorVersion)
 {
-    try
-    {
-        juce::Logger::writeToLog ("Attempting to check OpenGL stats...");
-        auto testComp = createOpenGLTestComp (ctx);
-        std::atomic_bool waiting { true };
-        testComp->ctx.executeOnGLThread (
-            [&waiting, &openGLMajorVersion, &openGLMinorVersion] (juce::OpenGLContext&) {
-                juce::Logger::writeToLog ("Requesting OpenGL version number...");
-                std::tie (openGLMajorVersion, openGLMinorVersion) = getGLVersion();
+    juce::Logger::writeToLog ("Attempting to check OpenGL stats...");
+    auto testComp = createOpenGLTestComp (ctx);
+    std::atomic_bool waiting { true };
+    testComp->ctx.executeOnGLThread (
+        [&waiting, &openGLMajorVersion, &openGLMinorVersion] (juce::OpenGLContext&)
+        {
+            std::tie (openGLMajorVersion, openGLMinorVersion) = getGLVersion();
 
-                juce::Logger::writeToLog ("Preparing to print OpenGL stats...");
-                juce::String openGLStats;
-                openGLStats
-                    << "=== OpenGL/GPU Information ===\n"
-                    << "Vendor: " << getGLString (juce::gl::GL_VENDOR) << "\n"
-                    << "Renderer: " << getGLString (juce::gl::GL_RENDERER) << "\n"
-                    << "OpenGL Version: " << getGLString (juce::gl::GL_VERSION) << "\n"
-                    << "OpenGL Major: " << juce::String (openGLMajorVersion) << "\n"
-                    << "OpenGL Minor: " << juce::String (openGLMinorVersion) << "\n"
-                    << "OpenGL Shading Language Version: " << getGLString (juce::gl::GL_SHADING_LANGUAGE_VERSION) << "\n";
+            juce::String openGLStats;
+            openGLStats
+                << "=== OpenGL/GPU Information ===\n"
+                << "Vendor: " << getGLString (juce::gl::GL_VENDOR) << "\n"
+                << "Renderer: " << getGLString (juce::gl::GL_RENDERER) << "\n"
+                << "OpenGL Version: " << getGLString (juce::gl::GL_VERSION) << "\n"
+                << "OpenGL Major: " << juce::String (openGLMajorVersion) << "\n"
+                << "OpenGL Minor: " << juce::String (openGLMinorVersion) << "\n"
+                << "OpenGL Shading Language Version: " << getGLString (juce::gl::GL_SHADING_LANGUAGE_VERSION) << "\n";
 
-                juce::Logger::writeToLog (openGLStats);
-                waiting = false;
-            },
-            false);
+            juce::Logger::writeToLog (openGLStats);
+            waiting = false;
+        },
+        false);
 
-        while (waiting)
-            juce::MessageManager::getInstance()->runDispatchLoopUntil (100);
-    }
-    catch (...)
-    {
-        openGLMajorVersion = 0;
-        openGLMinorVersion = 0;
-    }
+    while (waiting)
+        juce::MessageManager::getInstance()->runDispatchLoopUntil (100);
 }
 } // namespace
 #endif
