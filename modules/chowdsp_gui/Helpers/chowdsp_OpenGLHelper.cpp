@@ -56,8 +56,7 @@ void checkOpenGLStats (juce::OpenGLContext& ctx, int& openGLMajorVersion, int& o
         auto testComp = createOpenGLTestComp (ctx);
         std::atomic_bool waiting { true };
         testComp->ctx.executeOnGLThread (
-            [&waiting, &openGLMajorVersion, &openGLMinorVersion] (juce::OpenGLContext&)
-            {
+            [&waiting, &openGLMajorVersion, &openGLMinorVersion] (juce::OpenGLContext&) {
                 juce::Logger::writeToLog ("Requesting OpenGL version number...");
                 std::tie (openGLMajorVersion, openGLMinorVersion) = getGLVersion();
 
