@@ -11,6 +11,12 @@ public:
 
     ResampledProcess() = default;
 
+    /** Move constructor */
+    ResampledProcess (ResampledProcess&&) noexcept = default;
+
+    /** Move assignment operator */
+    ResampledProcess& operator= (ResampledProcess&&) noexcept = default;
+
     /** Prepares the resampler to process a new stream of data */
     void prepare (const juce::dsp::ProcessSpec& spec, double startRatio = 1.0)
     {
