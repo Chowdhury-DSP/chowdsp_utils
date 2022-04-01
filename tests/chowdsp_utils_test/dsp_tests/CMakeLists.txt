@@ -32,6 +32,7 @@ target_sources(chowdsp_utils_tests PRIVATE
     source_tests/SquareTest.cpp
 
     filter_tests/BilinearUtilsTest.cpp
+    filter_tests/FilterChainTest.cpp
     filter_tests/FirstOrderFiltersTest.cpp
     filter_tests/HilbertFilterTest.cpp
     filter_tests/ModalFilterTest.cpp
