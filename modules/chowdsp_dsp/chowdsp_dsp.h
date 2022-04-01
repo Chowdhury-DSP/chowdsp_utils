@@ -132,6 +132,7 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 // filter tools
 #include "Filters/chowdsp_BilinearUtils.h"
 #include "Filters/chowdsp_IIRFilter.h"
+#include "Filters/chowdsp_FilterChain.h"
 #include "Filters/chowdsp_FirstOrderFilters.h"
 #include "Filters/chowdsp_SecondOrderFilters.h"
 #include "Filters/chowdsp_QValCalcs.h"
