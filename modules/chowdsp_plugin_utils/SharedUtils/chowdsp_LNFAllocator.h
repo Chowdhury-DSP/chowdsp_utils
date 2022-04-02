@@ -45,9 +45,9 @@ public:
 
     /** Checks if the allocator already contains this look and feel */
     template <typename LookAndFeelSubclass>
-    bool containsLookAndFeelType() const
+    [[nodiscard]] bool containsLookAndFeelType() const
     {
-        return lnfs.find (getLNFType<LookAndFeelSubclass>()) != lnfs.end();
+        return lnfs.count (getLNFType<LookAndFeelSubclass>()) > 0;
     }
 
 private:

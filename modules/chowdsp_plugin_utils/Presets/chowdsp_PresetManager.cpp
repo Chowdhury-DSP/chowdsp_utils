@@ -3,7 +3,15 @@
 namespace
 {
 const juce::String defaultUserPresetsName { "User" };
+
+template <typename PresetMapType, typename OpType>
+void doForAllPresetsForUser (int userStartPresetID, PresetMapType& presetMap, OpType&& op)
+{
+    int presetID = userStartPresetID;
+    for (auto presetMapIter = presetMap.find (presetID); presetMapIter != presetMap.end(); presetMapIter = presetMap.find (++presetID))
+        op (presetMapIter);
 }
+} // namespace
 
 namespace chowdsp
 {
@@ -49,17 +57,10 @@ std::pair<const int, Preset>& PresetManager::addFactoryPreset (Preset&& preset)
 {
     const auto& vendor = preset.getVendor();
     int presetID = 0;
-    if (userIDMap.find (vendor) != userIDMap.end())
-    {
-        presetID = userIDMap[vendor];
-    }
-    else
-    {
-        while (userIDMap.find (vendor) != userIDMap.end())
-            presetID += factoryUserNumIDs;
-    }
+    if (const auto userIDMapIter = userIDMap.find (vendor); userIDMapIter != userIDMap.end())
+        presetID = userIDMapIter->second;
 
-    while (presetMap.find (presetID) != presetMap.end())
+    while (presetMap.count (presetID) > 0)
         presetID++;
 
     auto presetResultPair = presetMap.insert ({ presetID, std::move (preset) });
@@ -245,9 +246,8 @@ std::vector<const Preset*> PresetManager::getUserPresets() const
 {
     std::vector<const Preset*> userPresets;
 
-    int presetID = userIDMap.at (userPresetsName);
-    while (presetMap.find (presetID) != presetMap.end())
-        userPresets.push_back (&presetMap.at (presetID++));
+    doForAllPresetsForUser (userIDMap.at (userPresetsName), presetMap, [&userPresets] (auto& presetMapIter)
+                            { userPresets.push_back (&presetMapIter->second); });
 
     JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wpessimizing-move")
     return std::move (userPresets);
@@ -261,24 +261,25 @@ void PresetManager::setUserPresetName (const juce::String& newName)
 
     auto actualNewName = newName.isEmpty() ? defaultUserPresetsName : newName;
 
-    if (userIDMap.find (userPresetsName) != userIDMap.end()) // previous user name was the default!
+    if (const auto userIDMapIter = userIDMap.find (userPresetsName); userIDMapIter != userIDMap.end()) // previous user name was the default!
     {
         // move existing user presets to new username
-        int presetID = userIDMap[userPresetsName];
-        while (presetMap.find (presetID) != presetMap.end())
-        {
-            auto& preset = presetMap.at (presetID++);
-            preset.setVendor (newName);
+        doForAllPresetsForUser (
+            userIDMapIter->second,
+            presetMap,
+            [&newName] (auto presetMapIter)
+            {
+                auto& preset = presetMapIter->second;
+                preset.setVendor (newName);
 
-            jassert (preset.getPresetFile() != juce::File());
-            preset.toFile (preset.getPresetFile());
-        }
+                jassert (preset.getPresetFile() != juce::File());
+                preset.toFile (preset.getPresetFile());
+            });
     }
 
-    userIDMap[actualNewName] = userUserIDStart;
     userIDMap.erase (userPresetsName);
-
     userPresetsName = actualNewName;
+    userIDMap.insert_or_assign (userPresetsName, userUserIDStart);
 
     loadUserPresetsFromFolder (getUserPresetPath());
 }
@@ -290,9 +291,8 @@ void PresetManager::loadUserPresetsFromFolder (const juce::File& file)
         presets.push_back (loadUserPresetFromFile (f));
 
     // delete old user presets
-    int presetID = userIDMap[userPresetsName];
-    while (presetMap.find (presetID) != presetMap.end())
-        presetMap.erase (presetID++);
+    doForAllPresetsForUser (userIDMap[userPresetsName], presetMap, [this] (auto& presetMapIter)
+                            { presetMap.erase (presetMapIter); });
 
     addPresets (presets);
 }
