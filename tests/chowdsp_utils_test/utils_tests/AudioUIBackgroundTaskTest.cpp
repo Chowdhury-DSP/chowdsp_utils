@@ -60,8 +60,8 @@ public:
     {
         if constexpr (std::is_same<TaskType, chowdsp::SingleThreadAudioUIBackgroundTask>::value)
             return "Single Thread Audio/UI Background Task Test";
-
-        return "Time Slice Audio/UI Background Task Test";
+        else
+            return "Time Slice Audio/UI Background Task Test";
     }
 
     void audioThreadTest (TimeSliceThread* timeSliceThread = nullptr)

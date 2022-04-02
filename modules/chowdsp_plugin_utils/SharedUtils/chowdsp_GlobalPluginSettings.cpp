@@ -88,13 +88,14 @@ void GlobalPluginSettings::addPropertyListener (SettingID id, Listener* listener
 
 void GlobalPluginSettings::removePropertyListener (SettingID id, Listener* listener)
 {
-    if (listeners.find (id) == listeners.end())
+    const auto listenersForIDIter = listeners.find (id);
+    if (listenersForIDIter == listeners.end())
     {
         jassertfalse; // this property does not have any listeners!
         return;
     }
 
-    listeners.at (id).removeAllInstancesOf (listener);
+    listenersForIDIter->second.removeAllInstancesOf (listener);
 }
 
 void GlobalPluginSettings::removePropertyListener (Listener* listener)
