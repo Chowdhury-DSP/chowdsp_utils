@@ -10,7 +10,7 @@
 #endif
 
 #if WDF_USING_JUCE
-JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE("-Wsign-conversion")
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wsign-conversion")
 #endif
 
 // Define a default SIMD alignment
