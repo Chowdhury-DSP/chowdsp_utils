@@ -567,6 +567,4 @@ public:
 
 } // namespace chowdsp::WDF
 
-#undef WDF_USING_JUCE
-
 #endif // WDF_H_INCLUDED
