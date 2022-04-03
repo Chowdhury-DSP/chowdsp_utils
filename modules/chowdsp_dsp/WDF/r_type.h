@@ -9,7 +9,9 @@
 #include <xsimd/xsimd.hpp>
 #endif
 
+#if WDF_USING_JUCE
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wsign-conversion")
+#endif
 
 namespace chowdsp::WDFT
 {
@@ -285,6 +287,8 @@ private:
 
 } // namespace chowdsp::WDFT
 
+#if WDF_USING_JUCE
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+#endif
 
 #endif // RTYPE_H_INCLUDED
