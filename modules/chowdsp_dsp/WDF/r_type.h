@@ -9,6 +9,10 @@
 #include <xsimd/xsimd.hpp>
 #endif
 
+#if WDF_USING_JUCE
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE("-Wsign-conversion")
+#endif
+
 // Define a default SIMD alignment
 #if defined(XSIMD_HPP)
 constexpr int WDF_DEFAULT_SIMD_ALIGNMENT = xsimd::simd_type<float>::size == 8 ? 32 : 16;
@@ -292,5 +296,9 @@ private:
 };
 
 } // namespace chowdsp::WDFT
+
+#if WDF_USING_JUCE
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+#endif
 
 #endif // RTYPE_H_INCLUDED
