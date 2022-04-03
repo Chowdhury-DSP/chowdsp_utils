@@ -10,7 +10,12 @@
 #endif
 
 #if WDF_USING_JUCE
+#warning "Compiling with JUCE!!!"
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wsign-conversion")
+#endif
+
+#if ! WDF_USING_JUCE
+constexpr int CHOWDSP_DEFAULT_SIMD_ALIGNMENT = 16;
 #endif
 
 namespace chowdsp::WDFT
@@ -35,7 +40,7 @@ namespace rtype_detail
         forEachInTuple (std::forward<Fn> (fn), std::forward<Tuple> (tuple), TupleIndexSequence<Tuple> {});
     }
 
-    template <typename ElementType, int arraySize, int alignment = 16>
+    template <typename ElementType, int arraySize, int alignment = CHOWDSP_DEFAULT_SIMD_ALIGNMENT>
     struct AlignedArray
     {
         ElementType& operator[] (int index) noexcept { return array[(size_t) index]; }
@@ -53,10 +58,16 @@ namespace rtype_detail
         alignas (alignment) std::array<ElementType, (size_t) arraySize> array;
     };
 
+    template <typename T, int nRows, int nCols = nRows, int alignment = CHOWDSP_DEFAULT_SIMD_ALIGNMENT>
+    using Matrix = AlignedArray<T, nRows, alignment>[nCols];
+
+    template <typename T, int N>
+    using Array = T[N];
+
     /** Implementation for float/double. */
     template <typename T, int numPorts>
     inline typename std::enable_if<std::is_same<float, T>::value || std::is_same<double, T>::value, void>::type
-        RtypeScatter (const rtype_detail::AlignedArray<T, numPorts> (&S_)[numPorts], const T (&a_)[numPorts], T (&b_)[numPorts])
+        RtypeScatter (const Matrix<T, numPorts>& S_, const Array<T, numPorts>& a_, Array<T, numPorts>& b_)
     {
         // input matrix (S) of size dim x dim
         // input vector (a) of size 1 x dim
@@ -65,9 +76,9 @@ namespace rtype_detail
 #if defined(XSIMD_HPP)
         using v_type = xsimd::simd_type<T>;
         constexpr auto simd_size = (int) v_type::size;
-        constexpr auto vec_size = (int) numPorts - (int) numPorts % simd_size;
+        constexpr auto vec_size = numPorts - numPorts % simd_size;
 
-        for (int c = 0; c < (int) numPorts; ++c)
+        for (int c = 0; c < numPorts; ++c)
         {
             v_type bc {};
             for (int r = 0; r < vec_size; r += simd_size)
@@ -75,29 +86,29 @@ namespace rtype_detail
             b_[c] = xsimd::hadd (bc);
 
             // remainder of ops that can't be vectorized
-            for (int r = vec_size; r < (int) numPorts; ++r)
+            for (int r = vec_size; r < numPorts; ++r)
                 b_[c] += S_[c][r] * a_[r];
         }
 #elif JUCE_USE_SIMD
         using v_type = juce::dsp::SIMDRegister<T>;
         constexpr auto simd_size = (int) v_type::size();
-        constexpr auto vec_size = (int) numPorts - (int) numPorts % simd_size;
+        constexpr auto vec_size = numPorts - numPorts % simd_size;
 
-        for (int c = 0; c < (int) numPorts; ++c)
+        for (int c = 0; c < numPorts; ++c)
         {
             b_[c] = (T) 0;
             for (int r = 0; r < vec_size; r += simd_size)
                 b_[c] += (v_type::fromRawArray (S_[c].data() + r) * v_type::fromRawArray (a_ + r)).sum();
 
             // remainder of ops that can't be vectorized
-            for (int r = vec_size; r < (int) numPorts; ++r)
+            for (int r = vec_size; r < numPorts; ++r)
                 b_[c] += S_[c][r] * a_[r];
         }
 #else // No SIMD
-        for (int c = 0; c < (int) numPorts; ++c)
+        for (int c = 0; c < numPorts; ++c)
         {
             b_[c] = (T) 0;
-            for (int r = 0; r < (int) numPorts; ++r)
+            for (int r = 0; r < numPorts; ++r)
                 b_[c] += S_[c][r] * a_[r];
         }
 #endif // SIMD options
@@ -107,12 +118,12 @@ namespace rtype_detail
     /** Implementation for SIMD float/double. */
     template <typename T, int numPorts>
     inline typename std::enable_if<std::is_same<juce::dsp::SIMDRegister<float>, T>::value || std::is_same<juce::dsp::SIMDRegister<double>, T>::value, void>::type
-        RtypeScatter (const rtype_detail::AlignedArray<T, numPorts> (&S_)[numPorts], const T (&a_)[numPorts], T (&b_)[numPorts])
+        RtypeScatter (const Matrix<T, numPorts>, const Array<T, numPorts>& a_, Array<T, numPorts>& b_)
     {
-        for (int c = 0; c < (int) numPorts; ++c)
+        for (int c = 0; c < numPorts; ++c)
         {
             b_[c] = (T) 0;
-            for (int r = 0; r < (int) numPorts; ++r)
+            for (int r = 0; r < numPorts; ++r)
                 b_[c] += S_[c][r] * a_[r];
         }
     }
@@ -135,11 +146,11 @@ class RootRtypeAdaptor : public RootWDF
 {
 public:
     /** Number of ports connected to RootRtypeAdaptor */
-    static constexpr auto numPorts = sizeof...(PortTypes);
+    static constexpr auto numPorts = int (sizeof...(PortTypes));
 
     explicit RootRtypeAdaptor (std::tuple<PortTypes&...> dps) : downPorts (dps)
     {
-        for (int i = 0; i < (int) numPorts; i++)
+        for (int i = 0; i < numPorts; i++)
         {
             b_vec[i] = (T) 0;
             a_vec[i] = (T) 0;
@@ -167,8 +178,8 @@ public:
     /** Use this function to set the scattering matrix data. */
     void setSMatrixData (const T (&mat)[numPorts][numPorts])
     {
-        for (int i = 0; i < (int) numPorts; ++i)
-            for (int j = 0; j < (int) numPorts; ++j)
+        for (int i = 0; i < numPorts; ++i)
+            for (int j = 0; j < numPorts; ++j)
                 S_matrix[i][j] = mat[i][j];
     }
 
@@ -185,9 +196,9 @@ public:
 private:
     std::tuple<PortTypes&...> downPorts; // tuple of ports connected to RtypeAdaptor
 
-    rtype_detail::AlignedArray<T, numPorts> S_matrix[numPorts]; // square matrix representing S
-    T a_vec alignas (16)[numPorts]; // temp matrix of inputs to Rport
-    T b_vec alignas (16)[numPorts]; // temp matrix of outputs from Rport
+    rtype_detail::Matrix<T, numPorts> S_matrix; // square matrix representing S
+    T a_vec alignas (CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[numPorts]; // temp matrix of inputs to Rport
+    T b_vec alignas (CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[numPorts]; // temp matrix of outputs from Rport
 };
 
 /**
@@ -207,11 +218,11 @@ class RtypeAdaptor : public BaseWDF
 {
 public:
     /** Number of ports connected to RtypeAdaptor */
-    static constexpr auto numPorts = sizeof...(PortTypes) + 1;
+    static constexpr auto numPorts = int (sizeof...(PortTypes) + 1);
 
     explicit RtypeAdaptor (std::tuple<PortTypes&...> dps) : downPorts (dps)
     {
-        for (int i = 0; i < (int) numPorts; i++)
+        for (int i = 0; i < numPorts; i++)
         {
             b_vec[i] = (T) 0;
             a_vec[i] = (T) 0;
@@ -240,8 +251,8 @@ public:
     /** Use this function to set the scattering matrix data. */
     void setSMatrixData (const T (&mat)[numPorts][numPorts])
     {
-        for (int i = 0; i < (int) numPorts; ++i)
-            for (int j = 0; j < (int) numPorts; ++j)
+        for (int i = 0; i < numPorts; ++i)
+            for (int j = 0; j < numPorts; ++j)
                 S_matrix[i][j] = mat[i][j];
     }
 
@@ -280,9 +291,9 @@ private:
 
     std::tuple<PortTypes&...> downPorts; // tuple of ports connected to RtypeAdaptor
 
-    rtype_detail::AlignedArray<T, numPorts> S_matrix[numPorts]; // square matrix representing S
-    T a_vec alignas (16)[numPorts]; // temp matrix of inputs to Rport
-    T b_vec alignas (16)[numPorts]; // temp matrix of outputs from Rport
+    rtype_detail::Matrix<T, numPorts> S_matrix; // square matrix representing S
+    T a_vec alignas (CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[numPorts]; // temp matrix of inputs to Rport
+    T b_vec alignas (CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[numPorts]; // temp matrix of outputs from Rport
 };
 
 } // namespace chowdsp::WDFT
