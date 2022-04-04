@@ -14,7 +14,7 @@ public:
         expect (a.atIndex (0) == std::complex<float> { 0, 0 }, "Zero initiatalisation incorrect!");
 
         auto b = a + a;
-        for (size_t i = 0; i < SIMDComplex<float>::size; ++i)
+        for (size_t i = 0; i < SIMDComplex<float>::size(); ++i)
             expect (a.atIndex (i) == b.atIndex (i), "Zero elements incorrect!");
     }
 
@@ -154,7 +154,7 @@ public:
     template <typename T>
     void fastExpTest()
     {
-        T angles alignas (16)[SIMDComplex<T>::size];
+        T angles alignas (16)[SIMDComplex<T>::size()];
         angles[0] = 0;
         angles[1] = MathConstants<T>::pi / (T) 2;
         if constexpr (std::is_same<T, float>::value)
@@ -190,7 +190,7 @@ public:
     {
         auto q = SIMDComplex<float> ({ 0.f, 1.f, 2.f, 3.f }, { 1.f, 0.f, -1.f, -2.f });
         auto powV = q.map ([] (const std::complex<float>& f) { return std::pow (f, 2.1f); });
-        for (size_t i = 0; i < SIMDComplex<float>::size; ++i)
+        for (size_t i = 0; i < SIMDComplex<float>::size(); ++i)
             expect (powV.atIndex (i) == std::pow (q.atIndex (i), 2.1f));
     }
 
