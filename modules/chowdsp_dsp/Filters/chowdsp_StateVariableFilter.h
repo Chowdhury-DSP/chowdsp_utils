@@ -36,7 +36,7 @@ class StateVariableFilter
 public:
     //==============================================================================
     using Type = StateVariableFilterType;
-    using NumericType = typename SampleTypeHelpers::ElementType<SampleType>::Type;
+    using NumericType = SampleTypeHelpers::NumericType<SampleType>;
 
     //==============================================================================
     /** Constructor. */

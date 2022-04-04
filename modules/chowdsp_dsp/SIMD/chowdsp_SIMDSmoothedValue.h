@@ -42,7 +42,7 @@ public:
 
     /** Constructor. */
     SIMDSmoothedValue() noexcept
-        : SIMDSmoothedValue ((SmFloatType) (std::is_same<SmoothingType, juce::ValueSmoothingTypes::Linear>::value ? 0 : 1))
+        : SIMDSmoothedValue ((SmFloatType) (std::is_same_v<SmoothingType, juce::ValueSmoothingTypes::Linear> ? 0 : 1))
     {
     }
 
@@ -50,7 +50,7 @@ public:
     explicit SIMDSmoothedValue (SmFloatType initialValue) noexcept
     {
         // Multiplicative smoothed values cannot ever reach 0!
-        jassert (! (std::is_same<SmoothingType, juce::ValueSmoothingTypes::Multiplicative>::value && initialValue == 0));
+        jassert (! (std::is_same_v<SmoothingType, juce::ValueSmoothingTypes::Multiplicative> && initialValue == 0));
 
         // Visual Studio can't handle base class initialisation with CRTP
         this->currentValue = initialValue;
@@ -93,7 +93,7 @@ public:
         }
 
         // Multiplicative smoothed values cannot ever reach 0!
-        jassert (! (std::is_same<SmoothingType, juce::ValueSmoothingTypes::Multiplicative>::value && newValue == 0));
+        jassert (! (std::is_same_v<SmoothingType, juce::ValueSmoothingTypes::Multiplicative> && newValue == 0));
 
         this->target = newValue;
         this->countdown = stepsToTarget;
@@ -146,10 +146,10 @@ private:
 
     //==============================================================================
     template <typename T>
-    using LinearVoid = typename std::enable_if<std::is_same<T, juce::ValueSmoothingTypes::Linear>::value, void>::type;
+    using LinearVoid = std::enable_if_t<std::is_same_v<T, juce::ValueSmoothingTypes::Linear>, void>;
 
     template <typename T>
-    using MultiplicativeVoid = typename std::enable_if<std::is_same<T, juce::ValueSmoothingTypes::Multiplicative>::value, void>::type;
+    using MultiplicativeVoid = std::enable_if_t<std::is_same_v<T, juce::ValueSmoothingTypes::Multiplicative>, void>;
 
     //==============================================================================
     template <typename T = SmoothingType>

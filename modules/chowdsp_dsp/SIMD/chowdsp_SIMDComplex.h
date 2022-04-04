@@ -10,6 +10,8 @@ template <typename Type>
 struct SIMDComplex
 {
     using T = juce::dsp::SIMDRegister<Type>;
+    using value_type = Type;
+
     T _r, _i;
     static constexpr size_t size = T::size();
 

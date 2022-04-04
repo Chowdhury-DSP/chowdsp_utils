@@ -21,7 +21,7 @@ void BypassProcessor<SampleType, DelayInterpType>::setLatencySamples (int delayS
 template <typename SampleType, typename DelayInterpType>
 void BypassProcessor<SampleType, DelayInterpType>::setLatencySamples (SampleType delaySamples)
 {
-    static_assert (! std::is_same<DelayInterpType, DelayLineInterpolationTypes::None>::value, "Attempting to set non-integer latency value without using delay interpolation!");
+    static_assert (! std::is_same_v<DelayInterpType, DelayLineInterpolationTypes::None>, "Attempting to set non-integer latency value without using delay interpolation!");
     setLatencySamplesInternal (delaySamples);
 }
 

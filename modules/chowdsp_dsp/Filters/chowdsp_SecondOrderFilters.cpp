@@ -78,7 +78,7 @@ void PeakingFilter<T>::calcCoefs (T fc, T qVal, T gain, NumericType fs)
     auto kTerm = (T) 1 / (qVal * wc);
 
     T kNum {}, kDen {};
-    if constexpr (std::is_floating_point<T>::value)
+    if constexpr (std::is_floating_point_v<T>)
     {
         kNum = gain > (T) 1 ? kTerm * gain : kTerm;
         kDen = gain < (T) 1 ? kTerm / gain : kTerm;
@@ -95,7 +95,7 @@ void PeakingFilter<T>::calcCoefs (T fc, T qVal, T gain, NumericType fs)
 template <typename T>
 void PeakingFilter<T>::calcCoefsDB (T fc, T qVal, T gainDB, NumericType fs)
 {
-    if constexpr (std::is_floating_point<T>::value)
+    if constexpr (std::is_floating_point_v<T>)
         calcCoefs (fc, qVal, juce::Decibels::decibelsToGain (gainDB), fs);
     else if constexpr (SampleTypeHelpers::IsSIMDRegister<T>)
         calcCoefs (fc, qVal, SIMDUtils::decibelsToGain (gainDB), fs);
@@ -112,7 +112,7 @@ void LowShelfFilter<T>::calcCoefs (T fc, T qVal, T gain, NumericType fs)
     const auto K = computeKValue (fc, fs);
 
     T A {}, Aroot {};
-    if constexpr (std::is_floating_point<T>::value)
+    if constexpr (std::is_floating_point_v<T>)
     {
         A = std::sqrt (gain);
         Aroot = std::sqrt (A);
@@ -132,7 +132,7 @@ void LowShelfFilter<T>::calcCoefs (T fc, T qVal, T gain, NumericType fs)
 template <typename T>
 void LowShelfFilter<T>::calcCoefsDB (T fc, T qVal, T gainDB, NumericType fs)
 {
-    if constexpr (std::is_floating_point<T>::value)
+    if constexpr (std::is_floating_point_v<T>)
         calcCoefs (fc, qVal, juce::Decibels::decibelsToGain (gainDB), fs);
     else if constexpr (SampleTypeHelpers::IsSIMDRegister<T>)
         calcCoefs (fc, qVal, SIMDUtils::decibelsToGain (gainDB), fs);
@@ -149,7 +149,7 @@ void HighShelfFilter<T>::calcCoefs (T fc, T qVal, T gain, NumericType fs)
     const auto K = computeKValue (fc, fs);
 
     T A {}, Aroot {};
-    if constexpr (std::is_floating_point<T>::value)
+    if constexpr (std::is_floating_point_v<T>)
     {
         A = std::sqrt (gain);
         Aroot = std::sqrt (A);
@@ -169,7 +169,7 @@ void HighShelfFilter<T>::calcCoefs (T fc, T qVal, T gain, NumericType fs)
 template <typename T>
 void HighShelfFilter<T>::calcCoefsDB (T fc, T qVal, T gainDB, NumericType fs)
 {
-    if constexpr (std::is_floating_point<T>::value)
+    if constexpr (std::is_floating_point_v<T>)
         calcCoefs (fc, qVal, juce::Decibels::decibelsToGain (gainDB), fs);
     else if constexpr (SampleTypeHelpers::IsSIMDRegister<T>)
         calcCoefs (fc, qVal, SIMDUtils::decibelsToGain (gainDB), fs);
