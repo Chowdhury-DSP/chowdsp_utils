@@ -7,8 +7,6 @@ namespace chowdsp
 /** Useful matrix operations */
 namespace MatrixOps
 {
-    using namespace SampleTypeHelpers;
-
     /**
      * Methods for implementing a Householder mixing matrix.
      * Inspired by: https://github.com/Signalsmith-Audio/reverb-example-code/blob/main/mix-matrix.h
@@ -17,8 +15,8 @@ namespace MatrixOps
     struct HouseHolder
     {
     private:
-        using NumericType = NumericType<FloatType>;
-        static constexpr NumericType multiplier = (NumericType) -2 / (NumericType) (size * ElementType<FloatType>::Size);
+        using NumericType = SampleTypeHelpers::NumericType<FloatType>;
+        static constexpr NumericType multiplier = (NumericType) -2 / (NumericType) (size * SampleTypeHelpers::ElementType<FloatType>::Size);
 
     public:
         /** Perform out-of-place Householder transform (scalar types) */
@@ -32,7 +30,7 @@ namespace MatrixOps
 
         /** Perform out-of-place Householder transform (SIMD types) */
         template <typename T = FloatType>
-        static inline std::enable_if_t<IsSIMDRegister<T>, void>
+        static inline std::enable_if_t<SampleTypeHelpers::IsSIMDRegister<T>, void>
             outOfPlace (FloatType* out, const FloatType* in)
         {
             NumericType sum = 0;
@@ -60,7 +58,7 @@ namespace MatrixOps
     struct Hadamard
     {
     private:
-        using NumericType = NumericType<FloatType>;
+        using NumericType = SampleTypeHelpers::NumericType<FloatType>;
         static const NumericType scalingFactor;
 
     public:
@@ -95,7 +93,7 @@ namespace MatrixOps
 
         /** Perform unscaled Hadamard transformation (SIMD fallback) */
         template <typename T = FloatType>
-        static inline std::enable_if_t<IsSIMDRegister<T> && size == 1, void>
+        static inline std::enable_if_t<SampleTypeHelpers::IsSIMDRegister<T> && size == 1, void>
             recursiveUnscaled (FloatType* out, const FloatType* in)
         {
             constexpr auto VecSize = FloatType::size();
@@ -117,7 +115,7 @@ namespace MatrixOps
 
         /** Perform out-of-place Hadamard transformation (SIMD types) */
         template <typename T = FloatType>
-        static inline std::enable_if_t<IsSIMDRegister<T>, void>
+        static inline std::enable_if_t<SampleTypeHelpers::IsSIMDRegister<T>, void>
             outOfPlace (FloatType* out, const FloatType* in)
         {
             recursiveUnscaled (out, in);
@@ -134,7 +132,7 @@ namespace MatrixOps
     };
 
     template <typename FloatType, int size>
-    const NumericType<FloatType> Hadamard<FloatType, size>::scalingFactor = std::sqrt ((NumericType) 1 / NumericType (size * ElementType<FloatType>::Size));
+    const SampleTypeHelpers::NumericType<FloatType> Hadamard<FloatType, size>::scalingFactor = std::sqrt ((NumericType) 1 / NumericType (size * SampleTypeHelpers::ElementType<FloatType>::Size));
 } // namespace MatrixOps
 
 } // namespace chowdsp
