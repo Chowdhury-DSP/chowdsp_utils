@@ -7,7 +7,7 @@ template <typename ResamplerType>
 class ResampledProcess
 {
 public:
-    static_assert (std::is_base_of<ResamplingTypes::BaseResampler, ResamplerType>::value, "ResamplerType must be derived from BaseResampler");
+    static_assert (std::is_base_of_v<ResamplingTypes::BaseResampler, ResamplerType>, "ResamplerType must be derived from BaseResampler");
 
     ResampledProcess() = default;
 

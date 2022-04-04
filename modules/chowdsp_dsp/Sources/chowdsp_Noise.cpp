@@ -75,10 +75,10 @@ namespace NoiseHelpers
     template <typename T>
     struct normal
     {
-        using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+        using NumericType = SampleTypeHelpers::NumericType<T>;
 
         template <typename C = T>
-        inline typename std::enable_if<std::is_floating_point<C>::value, C>::type
+        inline std::enable_if_t<std::is_floating_point_v<C>, C>
             operator() (size_t /*ch*/, juce::Random& r) const noexcept
         {
             // Box-Muller transform
@@ -89,7 +89,7 @@ namespace NoiseHelpers
         }
 
         template <typename C = T>
-        inline typename std::enable_if<! std::is_floating_point<C>::value, C>::type
+        inline std::enable_if_t<SampleTypeHelpers::IsSIMDRegister<T>, C>
             operator() (size_t /*ch*/, juce::Random& r) const noexcept
         {
             // Box-Muller transform

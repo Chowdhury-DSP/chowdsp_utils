@@ -12,7 +12,7 @@ StateVariableFilter<SampleType>::StateVariableFilter()
 template <typename SampleType>
 void StateVariableFilter<SampleType>::setCutoffFrequency (SampleType newCutoffFrequencyHz)
 {
-    if constexpr (std::is_floating_point<SampleType>::value)
+    if constexpr (std::is_floating_point_v<SampleType>)
     {
         jassert (juce::isPositiveAndBelow (newCutoffFrequencyHz, static_cast<NumericType> (sampleRate * 0.5)));
     }
@@ -29,7 +29,7 @@ void StateVariableFilter<SampleType>::setCutoffFrequency (SampleType newCutoffFr
 template <typename SampleType>
 void StateVariableFilter<SampleType>::setResonance (SampleType newResonance)
 {
-    if constexpr (std::is_floating_point<SampleType>::value)
+    if constexpr (std::is_floating_point_v<SampleType>)
     {
         jassert (newResonance > static_cast<NumericType> (0));
     }
@@ -86,7 +86,7 @@ void StateVariableFilter<SampleType>::update()
 {
     using namespace SIMDUtils;
 
-    if constexpr (std::is_floating_point<SampleType>::value)
+    if constexpr (std::is_floating_point_v<SampleType>)
         g = static_cast<NumericType> (std::tan (juce::MathConstants<NumericType>::pi * cutoffFrequency / sampleRate));
     else if constexpr (SampleTypeHelpers::IsSIMDRegister<SampleType>)
         g = tanSIMD (juce::MathConstants<NumericType>::pi * cutoffFrequency / (NumericType) sampleRate);

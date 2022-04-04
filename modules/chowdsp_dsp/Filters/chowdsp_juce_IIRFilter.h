@@ -135,7 +135,7 @@ public:
      *  first-order filter.
     */
     template <int N = order>
-    inline typename std::enable_if<N == 1, SampleType>::type
+    inline std::enable_if_t<N == 1, SampleType>
         JUCE_VECTOR_CALLTYPE
         processSample (SampleType x, NumericType* c) noexcept
     {
@@ -148,7 +148,7 @@ public:
      *  second-order filter.
     */
     template <int N = order>
-    inline typename std::enable_if<N == 2, SampleType>::type
+    inline std::enable_if_t<N == 2, SampleType>
         JUCE_VECTOR_CALLTYPE
         processSample (SampleType x, NumericType* c) noexcept
     {
@@ -162,7 +162,7 @@ public:
      *  filter orders greater than 2.
     */
     template <int N = order>
-    inline typename std::enable_if<(N > 2), SampleType>::type
+    inline std::enable_if_t<(N > 2), SampleType>
         JUCE_VECTOR_CALLTYPE
         processSample (SampleType x, NumericType* c) noexcept
     {

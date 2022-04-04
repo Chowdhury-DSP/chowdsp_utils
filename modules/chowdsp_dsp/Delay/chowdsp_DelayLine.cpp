@@ -55,7 +55,7 @@ void DelayLine<SampleType, InterpolationType>::setDelay (DelayLine<SampleType, I
 }
 
 template <typename SampleType, typename InterpolationType>
-typename DelayLine<SampleType, InterpolationType>::NumericType DelayLine<SampleType, InterpolationType>::getDelay() const
+SampleTypeHelpers::ProcessorNumericType<DelayLine<SampleType, InterpolationType>> DelayLine<SampleType, InterpolationType>::getDelay() const
 {
     return delay;
 }

@@ -104,13 +104,12 @@ inline std::pair<juce::dsp::SIMDRegister<T>, juce::dsp::SIMDRegister<T>> sincosS
 
 /** SIMD implementation of std::isnan */
 template <typename T>
-inline typename juce::dsp::SIMDRegister<T>::vMaskType isnanSIMD (juce::dsp::SIMDRegister<T> x)
+inline SampleTypeHelpers::vMaskTypeSIMD<T> isnanSIMD (juce::dsp::SIMDRegister<T> x)
 {
     // For some reason, xsimd::isnan returns a batch of doubles when using SSE
     // but returns a batch of unsigned ints when using ARM NEON.
 #if JUCE_ARM
-    using MaskVec = typename juce::dsp::SIMDRegister<T>::vMaskType;
-    return (MaskVec) xsimd::isnan ((x_type<T>) x.value);
+    return (SampleTypeHelpers::vMaskTypeSIMD<T>) xsimd::isnan ((x_type<T>) x.value);
 #else
     using Vec = juce::dsp::SIMDRegister<T>;
     return Vec::notEqual ((Vec) xsimd::isnan ((x_type<T>) x.value), (Vec) 0);
