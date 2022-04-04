@@ -5,7 +5,6 @@
 /** Useful structs for determining the internal data type of SIMD types */
 namespace chowdsp::SampleTypeHelpers
 {
-
 template <typename T, bool = std::is_floating_point_v<T> || std::is_same_v<T, std::complex<float>> || std::is_same_v<T, std::complex<double>>>
 struct ElementType
 {
