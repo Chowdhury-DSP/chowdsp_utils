@@ -15,7 +15,7 @@ struct SIMDComplex
     T _r, _i;
 
     static constexpr size_t numElements = T::size();
-    static constexpr size_t size() noexcept    { return numElements; }
+    static constexpr size_t size() noexcept { return numElements; }
 
     constexpr SIMDComplex (const T& r = T (0), const T& i = T (0)) //NOLINT(google-explicit-constructor) we want to be able to use this constructor implicitly (see math ops at the bottom of this file)
         : _r (r), _i (i)
