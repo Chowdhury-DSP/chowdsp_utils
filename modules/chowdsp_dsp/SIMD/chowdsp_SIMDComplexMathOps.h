@@ -2,6 +2,8 @@
 
 namespace chowdsp::SIMDUtils
 {
+using namespace SampleTypeHelpers;
+
 template <typename BaseType>
 inline SIMDComplex<BaseType> operator+ (const SIMDComplex<BaseType>& a, const SIMDComplex<BaseType>& b)
 {
@@ -9,16 +11,14 @@ inline SIMDComplex<BaseType> operator+ (const SIMDComplex<BaseType>& a, const SI
 }
 
 template <typename BaseType, typename OtherType>
-inline typename std::enable_if<std::is_same<OtherType, BaseType>::value || std::is_same<OtherType, juce::dsp::SIMDRegister<BaseType>>::value,
-                               SIMDComplex<BaseType>>::type
+inline std::enable_if_t<std::is_same_v<NumericType<OtherType>, BaseType>, SIMDComplex<BaseType>>
     operator+ (const SIMDComplex<BaseType>& a, OtherType b)
 {
     return { a._r + b, a._i };
 }
 
 template <typename BaseType, typename OtherType>
-inline typename std::enable_if<std::is_same<OtherType, BaseType>::value || std::is_same<OtherType, juce::dsp::SIMDRegister<BaseType>>::value,
-                               SIMDComplex<BaseType>>::type
+inline std::enable_if_t<std::is_same_v<NumericType<OtherType>, BaseType>, SIMDComplex<BaseType>>
     operator+ (OtherType b, const SIMDComplex<BaseType>& a)
 {
     return a + b;
@@ -31,16 +31,14 @@ inline SIMDComplex<BaseType> operator- (const SIMDComplex<BaseType>& a, const SI
 }
 
 template <typename BaseType, typename OtherType>
-inline typename std::enable_if<std::is_same<OtherType, BaseType>::value || std::is_same<OtherType, juce::dsp::SIMDRegister<BaseType>>::value,
-                               SIMDComplex<BaseType>>::type
+inline std::enable_if_t<std::is_same_v<NumericType<OtherType>, BaseType>, SIMDComplex<BaseType>>
     operator- (const SIMDComplex<BaseType>& a, OtherType b)
 {
     return { a._r - b, a._i };
 }
 
 template <typename BaseType, typename OtherType>
-inline typename std::enable_if<std::is_same<OtherType, BaseType>::value || std::is_same<OtherType, juce::dsp::SIMDRegister<BaseType>>::value,
-                               SIMDComplex<BaseType>>::type
+inline std::enable_if_t<std::is_same_v<NumericType<OtherType>, BaseType>, SIMDComplex<BaseType>>
     operator- (OtherType b, const SIMDComplex<BaseType>& a)
 {
     return { b - a._r, -a._i };
@@ -65,16 +63,14 @@ inline SIMDComplex<BaseType> operator* (const SIMDComplex<BaseType>& a, const SI
 }
 
 template <typename BaseType, typename OtherType>
-inline typename std::enable_if<std::is_same<OtherType, BaseType>::value || std::is_same<OtherType, juce::dsp::SIMDRegister<BaseType>>::value,
-                               SIMDComplex<BaseType>>::type
+inline std::enable_if_t<std::is_same_v<NumericType<OtherType>, BaseType>, SIMDComplex<BaseType>>
     operator* (const SIMDComplex<BaseType>& a, OtherType b)
 {
     return { a._r * b, a._i * b };
 }
 
 template <typename BaseType, typename OtherType>
-inline typename std::enable_if<std::is_same<OtherType, BaseType>::value || std::is_same<OtherType, juce::dsp::SIMDRegister<BaseType>>::value,
-                               SIMDComplex<BaseType>>::type
+inline std::enable_if_t<std::is_same_v<NumericType<OtherType>, BaseType>, SIMDComplex<BaseType>>
     operator* (OtherType b, const SIMDComplex<BaseType>& a)
 {
     return a * b;
@@ -103,16 +99,14 @@ inline SIMDComplex<BaseType> operator/ (const SIMDComplex<BaseType>& a, const SI
 }
 
 template <typename BaseType, typename OtherType>
-inline typename std::enable_if<std::is_same<OtherType, BaseType>::value || std::is_same<OtherType, juce::dsp::SIMDRegister<BaseType>>::value,
-                               SIMDComplex<BaseType>>::type
+inline std::enable_if_t<std::is_same_v<NumericType<OtherType>, BaseType>, SIMDComplex<BaseType>>
     operator/ (const SIMDComplex<BaseType>& a, OtherType b)
 {
     return { a._r / b, a._i / b };
 }
 
 template <typename BaseType, typename OtherType>
-inline typename std::enable_if<std::is_same<OtherType, BaseType>::value || std::is_same<OtherType, juce::dsp::SIMDRegister<BaseType>>::value,
-                               SIMDComplex<BaseType>>::type
+inline std::enable_if_t<std::is_same_v<NumericType<OtherType>, BaseType>, SIMDComplex<BaseType>>
     operator/ (OtherType a, const SIMDComplex<BaseType>& b)
 {
     const auto denom = absSquared (b);
@@ -150,7 +144,7 @@ inline SIMDComplex<BaseType> log (const SIMDComplex<BaseType>& z)
 
 /** Ternary select operation for SIMD complex */
 template <typename BaseType>
-inline SIMDComplex<BaseType> select (typename juce::dsp::SIMDRegister<BaseType>::vMaskType b, SIMDComplex<BaseType> t, SIMDComplex<BaseType> f)
+inline SIMDComplex<BaseType> select (vMaskTypeSIMD<BaseType> b, SIMDComplex<BaseType> t, SIMDComplex<BaseType> f)
 {
     return { (t._r & b) + (f._r & ~b), (t._i & b) + (f._i & ~b) };
 }
@@ -177,8 +171,7 @@ inline SIMDComplex<BaseType> pow (const SIMDComplex<BaseType>& a, const SIMDComp
 
 /** SIMDComplex implementation of std::pow */
 template <typename BaseType, typename OtherType>
-inline typename std::enable_if<std::is_same<OtherType, BaseType>::value || std::is_same<OtherType, juce::dsp::SIMDRegister<BaseType>>::value,
-                               SIMDComplex<BaseType>>::type
+inline std::enable_if_t<std::is_same_v<NumericType<OtherType>, BaseType>, SIMDComplex<BaseType>>
     pow (const SIMDComplex<BaseType>& a, OtherType x)
 {
     using VecType = juce::dsp::SIMDRegister<BaseType>;
@@ -191,8 +184,7 @@ inline typename std::enable_if<std::is_same<OtherType, BaseType>::value || std::
 
 /** SIMDComplex implementation of std::pow */
 template <typename BaseType, typename OtherType>
-inline typename std::enable_if<std::is_same<OtherType, BaseType>::value || std::is_same<OtherType, juce::dsp::SIMDRegister<BaseType>>::value,
-                               SIMDComplex<BaseType>>::type
+inline std::enable_if_t<std::is_same_v<NumericType<OtherType>, BaseType>, SIMDComplex<BaseType>>
     pow (OtherType a, const SIMDComplex<BaseType>& z)
 {
     // @TODO: there's probably some optimization we can do here, knowing that the base is real?
@@ -201,14 +193,14 @@ inline typename std::enable_if<std::is_same<OtherType, BaseType>::value || std::
 }
 
 template <typename BaseType>
-inline typename juce::dsp::SIMDRegister<BaseType>::vMaskType operator== (const SIMDComplex<BaseType>& a, const SIMDComplex<BaseType>& b)
+inline vMaskTypeSIMD<BaseType> operator== (const SIMDComplex<BaseType>& a, const SIMDComplex<BaseType>& b)
 {
     using VecType = juce::dsp::SIMDRegister<BaseType>;
     return VecType::equal (a._r, b._r) & VecType::equal (a._i, b._i);
 }
 
 template <typename BaseType>
-inline typename juce::dsp::SIMDRegister<BaseType>::vMaskType operator!= (const SIMDComplex<BaseType>& a, const SIMDComplex<BaseType>& b)
+inline vMaskTypeSIMD<BaseType> operator!= (const SIMDComplex<BaseType>& a, const SIMDComplex<BaseType>& b)
 {
     using VecType = juce::dsp::SIMDRegister<BaseType>;
     return VecType::notEqual (a._r, b._r) | VecType::notEqual (a._i, b._i);

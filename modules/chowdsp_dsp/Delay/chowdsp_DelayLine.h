@@ -32,9 +32,9 @@ namespace chowdsp
 template <typename SampleType>
 class DelayLineBase
 {
-    using NumericType = typename SampleTypeHelpers::ElementType<SampleType>::Type;
-
 public:
+    using NumericType = SampleTypeHelpers::NumericType<SampleType>;
+
     DelayLineBase() = default;
     virtual ~DelayLineBase() = default;
 
@@ -93,7 +93,7 @@ protected:
 template <typename SampleType, typename InterpolationType = DelayLineInterpolationTypes::Linear>
 class DelayLine : public DelayLineBase<SampleType>
 {
-    using NumericType = typename SampleTypeHelpers::ElementType<SampleType>::Type;
+    using NumericType = SampleTypeHelpers::ProcessorNumericType<DelayLine>;
 
 public:
     //==============================================================================

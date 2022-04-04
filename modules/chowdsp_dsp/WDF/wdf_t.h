@@ -56,7 +56,7 @@ template <typename T>
 struct WDFMembers
 {
 #if WDF_USING_JUCE
-    using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+    using NumericType = typename juce::dsp::SampleTypeHelpers::ElementType<T>::Type;
 #else
     using NumericType = T;
 #endif
@@ -65,6 +65,10 @@ struct WDFMembers
     T a = (T) 0.0; /* incident wave */
     T b = (T) 0.0; /* reflected wave */
 };
+
+/** Type alias for a SIMD numeric type */
+template <typename T>
+using NumericType = typename WDFMembers<T>::NumericType;
 #endif // DOXYGEN
 
 /** WDF Resistor Node */
@@ -699,7 +703,7 @@ public:
     /** Creates a new resistive voltage source.
          * @param value: initial resistance value, in Ohms
          */
-    explicit ResistiveVoltageSourceT (T value = typename WDFMembers<T>::NumericType (1.0e-9)) : R_value (value)
+    explicit ResistiveVoltageSourceT (T value = NumericType<T> (1.0e-9)) : R_value (value)
     {
         calcImpedance();
     }
@@ -801,7 +805,7 @@ public:
     /** Creates a new resistive current source.
          * @param value: initial resistance value, in Ohms
          */
-    explicit ResistiveCurrentSourceT (T value = typename WDFMembers<T>::NumericType (1.0e9)) : R_value (value)
+    explicit ResistiveCurrentSourceT (T value = NumericType<T> (1.0e9)) : R_value (value)
     {
         calcImpedance();
     }
@@ -871,7 +875,7 @@ public:
      * @param Vt: thermal voltage
      * @param nDiodes: the number of series diodes
      */
-    DiodePairT (Next& n, T Is, T Vt = typename WDFMembers<T>::NumericType (25.85e-3), T nDiodes = 1) : next (n)
+    DiodePairT (Next& n, T Is, T Vt = NumericType<T> (25.85e-3), T nDiodes = 1) : next (n)
     {
         n.connectToParent (this);
         setDiodeParameters (Is, Vt, nDiodes);
@@ -1006,7 +1010,7 @@ public:
      * @param Vt: thermal voltage
      * @param nDiodes: the number of series diodes
      */
-    DiodeT (Next& n, T Is, T Vt = typename WDFMembers<T>::NumericType (25.85e-3), T nDiodes = 1) : next (n)
+    DiodeT (Next& n, T Is, T Vt = NumericType<T> (25.85e-3), T nDiodes = 1) : next (n)
     {
         n.connectToParent (this);
         setDiodeParameters (Is, Vt, nDiodes);

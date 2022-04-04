@@ -21,7 +21,7 @@ inline constexpr P<T, X> naive (const T (&coeffs)[ORDER + 1], const X x)
 {
     P<T, X> sum = coeffs[ORDER];
 
-    if constexpr (std::is_same<X, juce::dsp::SIMDRegister<float>>::value || std::is_same<X, juce::dsp::SIMDRegister<double>>::value)
+    if constexpr (SampleTypeHelpers::IsSIMDRegister<X>)
     {
         for (int n = 0; n < ORDER; ++n)
             sum += coeffs[n] * powSIMD (x, X (ORDER - n));

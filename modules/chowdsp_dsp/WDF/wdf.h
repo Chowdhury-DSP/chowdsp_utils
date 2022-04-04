@@ -12,12 +12,12 @@ namespace chowdsp::WDF
 using namespace SIMDUtils;
 #endif // WDF_USING_JUCE
 
+using WDFT::NumericType;
+
 /** Wave digital filter base class */
 template <typename T>
 class WDF : public WDFT::BaseWDF
 {
-    using NumericType = typename WDFT::WDFMembers<T>::NumericType;
-
 public:
     explicit WDF (std::string type) : type (std::move (type)) {}
     virtual ~WDF() = default;
@@ -431,13 +431,11 @@ public:
 template <typename T>
 class ResistiveVoltageSource final : public WDFWrapper<T, WDFT::ResistiveVoltageSourceT<T>>
 {
-    using NumericType = typename WDFT::WDFMembers<T>::NumericType;
-
 public:
     /** Creates a new resistive voltage source.
      * @param value: initial resistance value, in Ohms
      */
-    explicit ResistiveVoltageSource (T value = (NumericType) 1.0e-9) : WDFWrapper<T, WDFT::ResistiveVoltageSourceT<T>> ("Resistive Voltage", value)
+    explicit ResistiveVoltageSource (T value = (NumericType<T>) 1.0e-9) : WDFWrapper<T, WDFT::ResistiveVoltageSourceT<T>> ("Resistive Voltage", value)
     {
     }
 
@@ -470,13 +468,11 @@ public:
 template <typename T>
 class ResistiveCurrentSource final : public WDFWrapper<T, WDFT::ResistiveCurrentSourceT<T>>
 {
-    using NumericType = typename WDFT::WDFMembers<T>::NumericType;
-
 public:
     /** Creates a new resistive current source.
      * @param value: initial resistance value, in Ohms
      */
-    explicit ResistiveCurrentSource (T value = (NumericType) 1.0e9) : WDFWrapper<T, WDFT::ResistiveCurrentSourceT<T>> ("Resistive Current", value)
+    explicit ResistiveCurrentSource (T value = (NumericType<T>) 1.0e9) : WDFWrapper<T, WDFT::ResistiveCurrentSourceT<T>> ("Resistive Current", value)
     {
     }
 
@@ -513,8 +509,6 @@ public:
 template <typename T, WDFT::DiodeQuality Q = WDFT::DiodeQuality::Best>
 class DiodePair final : public WDFRootWrapper<T, WDFT::DiodePairT<T, WDF<T>, Q>>
 {
-    using NumericType = typename WDFT::WDFMembers<T>::NumericType;
-
 public:
     /**
      * Creates a new WDF diode pair, with the given diode specifications.
@@ -523,7 +517,7 @@ public:
      * @param Vt: thermal voltage
      * @param nDiodes: the number of series diodes
      */
-    DiodePair (WDF<T>* next, T Is, T Vt = (NumericType) 25.85e-3, T nDiodes = (T) 1) : WDFRootWrapper<T, WDFT::DiodePairT<T, WDF<T>, Q>> ("DiodePair", *next, *next, Is, Vt, nDiodes)
+    DiodePair (WDF<T>* next, T Is, T Vt = (NumericType<T>) 25.85e-3, T nDiodes = (T) 1) : WDFRootWrapper<T, WDFT::DiodePairT<T, WDF<T>, Q>> ("DiodePair", *next, *next, Is, Vt, nDiodes)
     {
         next->connectToNode (this);
     }
@@ -543,8 +537,6 @@ public:
 template <typename T>
 class Diode final : public WDFRootWrapper<T, WDFT::DiodeT<T, WDF<T>>>
 {
-    using NumericType = typename WDFT::WDFMembers<T>::NumericType;
-
 public:
     /**
      * Creates a new WDF diode, with the given diode specifications.
@@ -553,7 +545,7 @@ public:
      * @param Vt: thermal voltage
      * @param nDiodes: the number of series diodes
      */
-    Diode (WDF<T>* next, T Is, T Vt = (NumericType) 25.85e-3, T nDiodes = 1) : WDFRootWrapper<T, WDFT::DiodeT<T, WDF<T>>> ("Diode", *next, *next, Is, Vt, nDiodes)
+    Diode (WDF<T>* next, T Is, T Vt = (NumericType<T>) 25.85e-3, T nDiodes = 1) : WDFRootWrapper<T, WDFT::DiodeT<T, WDF<T>>> ("Diode", *next, *next, Is, Vt, nDiodes)
     {
         next->connectToNode (this);
     }

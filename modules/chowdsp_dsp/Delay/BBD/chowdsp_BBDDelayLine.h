@@ -79,7 +79,7 @@ public:
 
     /** Processes a sample with the delay line (ALIEN MODE) */
     template <bool A = ALIEN>
-    inline typename std::enable_if<A, float>::type
+    inline std::enable_if_t<A, float>
         process (float u) noexcept
     {
         SIMDComplex<float> xOutAccum;
@@ -114,7 +114,7 @@ public:
 
     /** Processes a sample with the delay line (BBD MODE) */
     template <bool A = ALIEN>
-    inline typename std::enable_if<! A, float>::type
+    inline std::enable_if_t<! A, float>
         process (float u) noexcept
     {
         SIMDComplex<float> xOutAccum;

@@ -14,7 +14,7 @@ inline B andnot (B a, B b)
 
 /** Ternary select operation */
 template <typename T>
-inline juce::dsp::SIMDRegister<T> select (MaskType<T> b, juce::dsp::SIMDRegister<T> t, juce::dsp::SIMDRegister<T> f)
+inline juce::dsp::SIMDRegister<T> select (SampleTypeHelpers::vMaskTypeSIMD<T> b, juce::dsp::SIMDRegister<T> t, juce::dsp::SIMDRegister<T> f)
 {
     return (t & b) + (f & ~b);
 }

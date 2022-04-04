@@ -19,9 +19,9 @@ namespace NoiseHelpers
  *  distribution, or pink noise (-3dB / Oct).
 */
 template <typename T>
-class Noise : public juce::dsp::Gain<typename SampleTypeHelpers::ElementType<T>::Type>
+class Noise : public juce::dsp::Gain<SampleTypeHelpers::NumericType<T>>
 {
-    using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+    using NumericType = SampleTypeHelpers::NumericType<T>;
 
 public:
     enum NoiseType
@@ -56,7 +56,7 @@ private:
     T processSample (T) { return (T) 0; } // hide from dsp::Gain
 
     template <typename C = T>
-    inline typename std::enable_if<std::is_floating_point<C>::value, void>::type
+    inline std::enable_if_t<std::is_floating_point_v<C>, void>
         applyGain (juce::dsp::AudioBlock<T>& block)
     {
         juce::dsp::ProcessContextReplacing<T> context (block);
@@ -64,7 +64,7 @@ private:
     }
 
     template <typename C = T>
-    inline typename std::enable_if<! std::is_floating_point<C>::value, void>::type
+    inline std::enable_if_t<SampleTypeHelpers::IsSIMDRegister<C>, void>
         applyGain (juce::dsp::AudioBlock<T>& block)
     {
         if (block.getNumChannels() == 1)
