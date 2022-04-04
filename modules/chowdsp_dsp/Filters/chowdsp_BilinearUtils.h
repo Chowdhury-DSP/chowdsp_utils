@@ -97,7 +97,7 @@ struct BilinearTransform<T, 3>
 
 /** Computes the warping factor "K" so that the frequency fc is matched at sample rate fs */
 template <typename T>
-inline typename std::enable_if<std::is_floating_point<T>::value, T>::type
+inline std::enable_if_t<std::is_floating_point_v<T>, T>
     computeKValue (T fc, T fs)
 {
     const auto wc = juce::MathConstants<T>::twoPi * fc;
@@ -106,11 +106,11 @@ inline typename std::enable_if<std::is_floating_point<T>::value, T>::type
 
 /** Computes the warping factor "K" so that the frequency fc is matched at sample rate fs */
 template <typename T>
-inline typename std::enable_if<SampleTypeHelpers::IsSIMDRegister<T>, T>::type
-    computeKValue (T fc, typename SampleTypeHelpers::ElementType<T>::Type fs)
+inline std::enable_if_t<SampleTypeHelpers::IsSIMDRegister<T>, T>
+    computeKValue (T fc, SampleTypeHelpers::NumericType<T> fs)
 {
     using namespace SIMDUtils;
-    using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+    using NumericType = SampleTypeHelpers::NumericType<T>;
 
     const auto wc = juce::MathConstants<NumericType>::twoPi * fc;
     return wc / tanhSIMD (wc / ((NumericType) 2 * fs));

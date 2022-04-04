@@ -55,7 +55,7 @@ template <typename SampleType, size_t order>
 template <typename ProcessContext, bool bypassed>
 void Filter<SampleType, order>::processInternal (const ProcessContext& context) noexcept
 {
-    static_assert (std::is_same<typename ProcessContext::SampleType, SampleType>::value,
+    static_assert (std::is_same_v<typename ProcessContext::SampleType, SampleType>,
                    "The sample-type of the IIR filter must match the sample-type supplied to this process callback");
 
     auto&& inputBlock = context.getInputBlock();

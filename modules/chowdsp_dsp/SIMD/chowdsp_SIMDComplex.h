@@ -10,8 +10,12 @@ template <typename Type>
 struct SIMDComplex
 {
     using T = juce::dsp::SIMDRegister<Type>;
+    using value_type = Type;
+
     T _r, _i;
-    static constexpr size_t size = T::size();
+
+    static constexpr size_t numElements = T::size();
+    static constexpr size_t size() noexcept { return numElements; }
 
     constexpr SIMDComplex (const T& r = T (0), const T& i = T (0)) //NOLINT(google-explicit-constructor) we want to be able to use this constructor implicitly (see math ops at the bottom of this file)
         : _r (r), _i (i)
@@ -28,7 +32,7 @@ struct SIMDComplex
     {
     }
 
-    SIMDComplex<Type> (const Type (&r)[size], const Type (&i)[size])
+    SIMDComplex<Type> (const Type (&r)[numElements], const Type (&i)[numElements])
     {
         _r = SIMDUtils::loadUnaligned (r);
         _i = SIMDUtils::loadUnaligned (i);
@@ -69,12 +73,12 @@ struct SIMDComplex
 
     inline SIMDComplex<Type> map (std::function<std::complex<Type> (const std::complex<Type>&)> f) const noexcept
     {
-        Type rfl alignas (16)[size], ifl alignas (16)[size];
+        Type rfl alignas (16)[numElements], ifl alignas (16)[numElements];
         _r.copyToRawArray (rfl);
         _i.copyToRawArray (ifl);
 
-        Type rflR alignas (16)[size], iflR alignas (16)[size];
-        for (size_t i = 0; i < size; ++i)
+        Type rflR alignas (16)[numElements], iflR alignas (16)[numElements];
+        for (size_t i = 0; i < numElements; ++i)
         {
             auto a = std::complex<Type> { rfl[i], ifl[i] };
             auto b = f (a);
@@ -86,12 +90,12 @@ struct SIMDComplex
 
     inline juce::dsp::SIMDRegister<Type> map_float (std::function<Type (const std::complex<Type>&)> f) const noexcept
     {
-        Type rfl alignas (16)[size], ifl alignas (16)[size];
+        Type rfl alignas (16)[numElements], ifl alignas (16)[numElements];
         _r.copyToRawArray (rfl);
         _i.copyToRawArray (ifl);
 
-        Type out alignas (16)[size];
-        for (size_t i = 0; i < size; ++i)
+        Type out alignas (16)[numElements];
+        for (size_t i = 0; i < numElements; ++i)
         {
             auto a = std::complex<Type> { rfl[i], ifl[i] };
             out[i] = f (a);

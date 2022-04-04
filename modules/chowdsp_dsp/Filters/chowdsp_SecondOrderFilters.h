@@ -6,7 +6,7 @@ namespace chowdsp
 template <typename T>
 class SecondOrderLPF final : public chowdsp::IIRFilter<2, T>
 {
-    using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+    using NumericType = SampleTypeHelpers::ProcessorNumericType<SecondOrderLPF>;
 
 public:
     SecondOrderLPF() = default;
@@ -27,7 +27,7 @@ private:
 template <typename T>
 class SecondOrderHPF final : public chowdsp::IIRFilter<2, T>
 {
-    using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+    using NumericType = SampleTypeHelpers::ProcessorNumericType<SecondOrderHPF>;
 
 public:
     SecondOrderHPF() = default;
@@ -48,7 +48,7 @@ private:
 template <typename T>
 class SecondOrderBPF final : public chowdsp::IIRFilter<2, T>
 {
-    using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+    using NumericType = SampleTypeHelpers::ProcessorNumericType<SecondOrderBPF>;
 
 public:
     SecondOrderBPF() = default;
@@ -69,7 +69,7 @@ private:
 template <typename T>
 class NotchFilter final : public chowdsp::IIRFilter<2, T>
 {
-    using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+    using NumericType = SampleTypeHelpers::ProcessorNumericType<NotchFilter>;
 
 public:
     NotchFilter() = default;
@@ -90,7 +90,7 @@ private:
 template <typename T>
 class PeakingFilter final : public chowdsp::IIRFilter<2, T>
 {
-    using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+    using NumericType = SampleTypeHelpers::ProcessorNumericType<PeakingFilter>;
 
 public:
     PeakingFilter() = default;
@@ -118,7 +118,7 @@ private:
 template <typename T>
 class LowShelfFilter final : public chowdsp::IIRFilter<2, T>
 {
-    using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+    using NumericType = SampleTypeHelpers::ProcessorNumericType<LowShelfFilter>;
 
 public:
     LowShelfFilter() = default;
@@ -146,7 +146,7 @@ private:
 template <typename T>
 class HighShelfFilter final : public chowdsp::IIRFilter<2, T>
 {
-    using NumericType = typename SampleTypeHelpers::ElementType<T>::Type;
+    using NumericType = SampleTypeHelpers::ProcessorNumericType<HighShelfFilter>;
 
 public:
     HighShelfFilter() = default;

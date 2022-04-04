@@ -44,8 +44,7 @@ struct Coefficients : public juce::dsp::ProcessorState
         Most people will want to use the static methods instead of this, but the
         constructor is public to allow tinkerers to create their own custom filters!
     */
-    // template <class = typename std::enable_if<IsFirstOrder>::type>
-    template <size_t N = order, typename = typename std::enable_if<N == 1>::type>
+    template <size_t N = order, typename = std::enable_if_t<N == 1>>
     Coefficients (NumericType b0, NumericType b1, NumericType a0, NumericType a1)
     {
         jassert (a0 != 0);
@@ -57,7 +56,7 @@ struct Coefficients : public juce::dsp::ProcessorState
                          a1 * a0inv };
     }
 
-    template <size_t N = order, typename = typename std::enable_if<N == 2>::type>
+    template <size_t N = order, typename = std::enable_if_t<N == 2>>
     Coefficients (NumericType b0, NumericType b1, NumericType b2, NumericType a0, NumericType a1, NumericType a2)
     {
         jassert (a0 != 0);
@@ -71,7 +70,7 @@ struct Coefficients : public juce::dsp::ProcessorState
                          a2 * a0inv };
     }
 
-    template <size_t N = order, typename = typename std::enable_if<N == 3>::type>
+    template <size_t N = order, std::enable_if_t<N == 3>>
     Coefficients (NumericType b0, NumericType b1, NumericType b2, NumericType b3, NumericType a0, NumericType a1, NumericType a2, NumericType a3)
     {
         jassert (a0 != 0);

@@ -10,6 +10,8 @@ template <size_t order, typename FloatType = float>
 class IIRFilter
 {
 public:
+    using NumericType = SampleTypeHelpers::NumericType<FloatType>;
+
     IIRFilter()
     {
         reset();
@@ -26,7 +28,7 @@ public:
 
     /** Optimized processing call for first-order filter */
     template <int N = order>
-    inline typename std::enable_if<N == 1, FloatType>::type
+    inline std::enable_if_t<N == 1, FloatType>
         processSample (FloatType x) noexcept
     {
         FloatType y = z[1] + x * b[0];
@@ -36,7 +38,7 @@ public:
 
     /** Optimized processing call for second-order filter */
     template <int N = order>
-    inline typename std::enable_if<N == 2, FloatType>::type
+    inline std::enable_if_t<N == 2, FloatType>
         processSample (FloatType x) noexcept
     {
         FloatType y = z[1] + x * b[0];
@@ -47,7 +49,7 @@ public:
 
     /** Generalized processing call for Nth-order filter */
     template <int N = order>
-    inline typename std::enable_if<(N > 2), FloatType>::type
+    inline std::enable_if_t<(N > 2), FloatType>
         processSample (FloatType x) noexcept
     {
         FloatType y = z[1] + x * b[0];

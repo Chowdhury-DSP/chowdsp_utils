@@ -10,35 +10,35 @@ namespace chowdsp::Power
 
 /** Optimized integer power method. */
 template <int exp, typename T>
-constexpr typename std::enable_if<exp == 0, T>::type
+constexpr std::enable_if_t<exp == 0, T>
     ipow (T) noexcept
 {
     return (T) 1;
 }
 
 template <int exp, typename T>
-constexpr typename std::enable_if<exp == 1, T>::type
+constexpr std::enable_if_t<exp == 1, T>
     ipow (T a) noexcept
 {
     return a;
 }
 
 template <int exp, typename T>
-constexpr typename std::enable_if<exp == 2, T>::type
+constexpr std::enable_if_t<exp == 2, T>
     ipow (T a) noexcept
 {
     return a * a;
 }
 
 template <int exp, typename T>
-constexpr typename std::enable_if<exp == 3, T>::type
+constexpr std::enable_if_t<exp == 3, T>
     ipow (T a) noexcept
 {
     return ipow<2> (a) * a;
 }
 
 template <int exp, typename T>
-constexpr typename std::enable_if<exp == 4, T>::type
+constexpr std::enable_if_t<exp == 4, T>
     ipow (T a) noexcept
 {
     const auto b = ipow<2> (a);
@@ -46,14 +46,14 @@ constexpr typename std::enable_if<exp == 4, T>::type
 }
 
 template <int exp, typename T>
-constexpr typename std::enable_if<exp == 5, T>::type
+constexpr std::enable_if_t<exp == 5, T>
     ipow (T a) noexcept
 {
     return ipow<4> (a) * a;
 }
 
 template <int exp, typename T>
-constexpr typename std::enable_if<exp == 6, T>::type
+constexpr std::enable_if_t<exp == 6, T>
     ipow (T a) noexcept
 {
     const auto b = ipow<2> (a);
@@ -61,14 +61,14 @@ constexpr typename std::enable_if<exp == 6, T>::type
 }
 
 template <int exp, typename T>
-constexpr typename std::enable_if<exp == 7, T>::type
+constexpr std::enable_if_t<exp == 7, T>
     ipow (T a) noexcept
 {
     return ipow<6> (a) * a;
 }
 
 template <int exp, typename T>
-constexpr typename std::enable_if<exp == 8, T>::type
+constexpr std::enable_if_t<exp == 8, T>
     ipow (T a) noexcept
 {
     const auto d = ipow<4> (a);
@@ -76,7 +76,7 @@ constexpr typename std::enable_if<exp == 8, T>::type
 }
 
 template <int exp, typename T>
-constexpr typename std::enable_if<exp == 9, T>::type
+constexpr std::enable_if_t<exp == 9, T>
     ipow (T a) noexcept
 {
     const auto c = ipow<3> (a);
@@ -84,7 +84,7 @@ constexpr typename std::enable_if<exp == 9, T>::type
 }
 
 template <int exp, typename T>
-constexpr typename std::enable_if<exp == 10, T>::type
+constexpr std::enable_if_t<exp == 10, T>
     ipow (T a) noexcept
 {
     const auto e = ipow<5> (a);
@@ -92,14 +92,14 @@ constexpr typename std::enable_if<exp == 10, T>::type
 }
 
 template <int exp, typename T>
-constexpr typename std::enable_if<exp == 11, T>::type
+constexpr std::enable_if_t<exp == 11, T>
     ipow (T a) noexcept
 {
     return ipow<10> (a) * a;
 }
 
 template <int exp, typename T>
-constexpr typename std::enable_if<exp == 12, T>::type
+constexpr std::enable_if_t<exp == 12, T>
     ipow (T a) noexcept
 {
     const auto d = ipow<4> (a);
@@ -107,14 +107,14 @@ constexpr typename std::enable_if<exp == 12, T>::type
 }
 
 template <int exp, typename T>
-constexpr typename std::enable_if<exp == 13, T>::type
+constexpr std::enable_if_t<exp == 13, T>
     ipow (T a) noexcept
 {
     return ipow<12> (a) * a;
 }
 
 template <int exp, typename T>
-constexpr typename std::enable_if<exp == 14, T>::type
+constexpr std::enable_if_t<exp == 14, T>
     ipow (T a) noexcept
 {
     const auto g = ipow<7> (a);
@@ -122,7 +122,7 @@ constexpr typename std::enable_if<exp == 14, T>::type
 }
 
 template <int exp, typename T>
-constexpr typename std::enable_if<exp == 15, T>::type
+constexpr std::enable_if_t<exp == 15, T>
     ipow (T a) noexcept
 {
     const auto e = ipow<5> (a);
@@ -130,7 +130,7 @@ constexpr typename std::enable_if<exp == 15, T>::type
 }
 
 template <int exp, typename T>
-constexpr typename std::enable_if<exp == 16, T>::type
+constexpr std::enable_if_t<exp == 16, T>
     ipow (T a) noexcept
 {
     const auto h = ipow<8> (a);
@@ -140,14 +140,14 @@ constexpr typename std::enable_if<exp == 16, T>::type
 // For exponents larger than 16, use exponantiation by squaring (https://en.wikipedia.org/wiki/Exponentiation_by_squaring)
 
 template <int exp, typename T>
-constexpr typename std::enable_if<(exp > 16) && exp % 2 == 0, T>::type
+constexpr std::enable_if_t<(exp > 16) && exp % 2 == 0, T>
     ipow (T a) noexcept
 {
     return ipow<exp / 2> (ipow<2> (a));
 }
 
 template <int exp, typename T>
-constexpr typename std::enable_if<(exp > 16) && exp % 2 != 0, T>::type
+constexpr std::enable_if_t<(exp > 16) && exp % 2 != 0, T>
     ipow (T a) noexcept
 {
     return ipow<(exp - 1) / 2> (ipow<2> (a)) * a;

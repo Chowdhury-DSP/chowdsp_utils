@@ -136,7 +136,6 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 #include "Filters/chowdsp_FirstOrderFilters.h"
 #include "Filters/chowdsp_SecondOrderFilters.h"
 #include "Filters/chowdsp_QValCalcs.h"
-#include "Filters/chowdsp_Shelf.h"
 #include "Filters/chowdsp_StateVariableFilter.h"
 #include "Filters/chowdsp_NthOrderFilter.h"
 #include "Filters/chowdsp_juce_IIRFilter.h"
