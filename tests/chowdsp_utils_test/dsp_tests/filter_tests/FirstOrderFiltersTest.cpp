@@ -49,7 +49,7 @@ public:
         hpFilter.calcCoefs ((T) Constants::fc, (NumericType) Constants::fs);
 
         testFrequency<T> (hpFilter, (NumericType) Constants::fc / 4, (NumericType) -12.3, (NumericType) 0.1, "Incorrect gain at low frequencies.");
-        testFrequency<T> (hpFilter, (NumericType) Constants::fc, (NumericType) -3, maxError, "Incorrect gain at cutoff frequency.");
+        testFrequency<T> (hpFilter, (NumericType) Constants::fc, (NumericType) -3.01, maxError, "Incorrect gain at cutoff frequency.");
         testFrequency<T> (hpFilter, (NumericType) Constants::fs * (NumericType) 0.498, (NumericType) 0, maxError, "Incorrect gain at high frequencies.");
     }
 

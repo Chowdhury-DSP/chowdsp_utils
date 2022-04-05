@@ -73,7 +73,7 @@ public:
     }
 
     /** Process a block of data */
-    juce::dsp::AudioBlock<T> process (const juce::dsp::AudioBlock<T>& block) noexcept
+    juce::dsp::AudioBlock<T> process (const juce::dsp::AudioBlock<const T>& block) noexcept
     {
         auto outBlock = juce::dsp::AudioBlock<T> { upsampledBuffer };
 
