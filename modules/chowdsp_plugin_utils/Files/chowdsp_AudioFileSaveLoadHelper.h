@@ -2,7 +2,6 @@
 
 namespace chowdsp
 {
-
 /** Helper class for interfacing between AudioBuffers and files. */
 class AudioFileSaveLoadHelper
 {
