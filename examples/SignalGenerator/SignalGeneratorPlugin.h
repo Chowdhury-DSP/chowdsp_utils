@@ -31,11 +31,11 @@ private:
     juce::dsp::Gain<float> gain;
 
     juce::AudioBuffer<float> upsampledBuffer;
-    chowdsp::Downsampler<float> resample2;
-    chowdsp::Downsampler<float> resample3;
-    chowdsp::Downsampler<float> resample4;
+    chowdsp::Downsampler<float, 12> resample2;
+    chowdsp::Downsampler<float, 12> resample3;
+    chowdsp::Downsampler<float, 12> resample4;
 
-    chowdsp::Downsampler<float>* resampler = nullptr;
+    chowdsp::Downsampler<float, 12>* resampler = nullptr;
     int previousUpSampleChoice = 0;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SignalGeneratorPlugin)
