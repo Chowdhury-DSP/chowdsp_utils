@@ -100,8 +100,7 @@ void SignalGeneratorPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
     buffer.clear();
     auto&& block = juce::dsp::AudioBlock<float> { buffer };
 
-    auto processTone = [this, &block, numChannels = buffer.getNumChannels(), numSamples = buffer.getNumSamples()] (auto& tone)
-    {
+    auto processTone = [this, &block, numChannels = buffer.getNumChannels(), numSamples = buffer.getNumSamples()] (auto& tone) {
         auto targetFrequency = freqHzParam->load();
         if (targetFrequency > 0.48f * (float) getSampleRate())
         {
