@@ -1,4 +1,5 @@
 target_sources(chowdsp_utils_tests PRIVATE
+    AudioFileSaveLoadHelperTest.cpp
     AudioUIBackgroundTaskTest.cpp
     FileListenerTest.cpp
     GlobalSettingsTest.cpp

@@ -40,16 +40,23 @@ inline AudioBuffer<float> makeImpulse (float amplitude, float sampleRate, float 
     return std::move (impBuffer);
 }
 
+inline AudioBuffer<float> makeNoise (juce::Random& rand, int numSamples, int numChannels = 1)
+{
+    AudioBuffer<float> noiseBuffer (numChannels, numSamples);
+
+    for (int ch = 0; ch < numChannels; ++ch)
+        for (int n = 0; n < numSamples; ++n)
+            noiseBuffer.setSample (ch, n, (rand.nextFloat() - 0.5f) * 2.0f);
+
+    return std::move (noiseBuffer);
+}
+
 inline AudioBuffer<float> makeNoise (float sampleRate, float lengthSeconds)
 {
     const int lengthSamples = int (lengthSeconds * sampleRate);
-    AudioBuffer<float> noiseBuffer (1, lengthSamples);
-
     Random rand;
-    for (int n = 0; n < lengthSamples; ++n)
-        noiseBuffer.setSample (0, n, (rand.nextFloat() - 0.5f) * 2.0f);
 
-    return std::move (noiseBuffer);
+    return makeNoise (rand, lengthSamples);
 }
 
 /** Convert from a AudioBuffer to AudioBlock (maybe changing data type...) */
