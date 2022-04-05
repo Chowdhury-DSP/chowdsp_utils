@@ -27,16 +27,16 @@ public:
         const auto kVal = chowdsp::Bilinear::computeKValue (10000.0f, fs);
 
         beginTest ("First-Order Bilinear Transform");
-        testBilinearTransform ({ 1.0f, 2.0f }, { 2.0f, 3.0f }, { 0.5000026f, -0.49998177f }, { 1.f, -0.99996875f }, 2 * fs);
-        testBilinearTransform ({ 1.0f, 2.0f }, { 2.0f, 3.0f }, { 0.50000229f, -0.49998399f }, { 1.f, -0.99997256f }, kVal);
+        testBilinearTransform ({ 1.0f, 2.0f }, { 2.0f, 3.0f }, { 0.500002623f, -0.499981761f }, { 1.f, -0.999968767f }, 2 * fs);
+        testBilinearTransform ({ 1.0f, 2.0f }, { 2.0f, 3.0f }, { 0.50000304f, -0.499978632f }, { 1.f, -0.999963343f }, kVal);
 
         beginTest ("Second-Order Bilinear Transform");
-        testBilinearTransform ({ 1.0f, 2.0f, 3.0 }, { 2.0f, 3.0f, 4.0f }, { 0.5000026f, -0.99998437f, 0.49998177f }, { 1.f, -1.99996875f, 0.99996875f }, 2 * fs);
-        testBilinearTransform ({ 1.0f, 2.0f, 3.0 }, { 2.0f, 3.0f, 4.0f }, { 0.50000229f, -0.99998628f, 0.49998399f }, { 1.f, -1.99997256f, 0.99997256f }, kVal);
+        testBilinearTransform ({ 1.0f, 2.0f, 3.0 }, { 2.0f, 3.0f, 4.0f }, { 0.500002623f, -0.999984323f, 0.499981731f }, { 1.f, -1.99996865f, 0.999968647f }, 2 * fs);
+        testBilinearTransform ({ 1.0f, 2.0f, 3.0 }, { 2.0f, 3.0f, 4.0f }, { 0.50000304f, -0.999981701f, 0.499978632f }, { 1.f, -1.9999634f, 0.999963343f }, kVal);
 
         beginTest ("Fourth-Order Bilinear Transform");
-        testBilinearTransform ({ 1.0f, 2.0f, 3.0f, 4.0f, 5.0f }, { 2.0f, 3.0f, 4.0f, 5.0f, 6.0f }, { 0.5000026f, -1.99998958f, 2.99995312f, -1.99994792f, 0.49998177f }, { 1.f, -3.99996875f, 5.99990625f, -3.99990625f, 0.99996875f }, 2 * fs);
-        testBilinearTransform ({ 1.0f, 2.0f, 3.0f, 4.0f, 5.0f }, { 2.0f, 3.0f, 4.0f, 5.0f, 6.0f }, { 0.50000229f, -1.99999085f, 2.99995884f, -1.99995427f, 0.49998399f }, { 1.f, -3.99997256f, 5.99991768f, -3.99991768f, 0.99997256f }, kVal);
+        testBilinearTransform ({ 1.0f, 2.0f, 3.0f, 4.0f, 5.0f }, { 2.0f, 3.0f, 4.0f, 5.0f, 6.0f }, { 0.500002623f, -1.99998963f, 2.99995327f, -1.99994779f, 0.499981761f }, { 1.f, -3.99996853f, 5.99990654f, -3.9999063f, 0.999968707f }, 2 * fs);
+        testBilinearTransform ({ 1.0f, 2.0f, 3.0f, 4.0f, 5.0f }, { 2.0f, 3.0f, 4.0f, 5.0f, 6.0f }, { 0.500003099f, -1.99998784f, 2.99994516f, -1.99993896f, 0.499978632f }, { 1.f, -3.99996352f, 5.99989032f, -3.99989009f, 0.999963402f }, kVal);
     }
 };
 

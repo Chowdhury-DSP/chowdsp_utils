@@ -54,8 +54,8 @@ public:
         chowdsp::SecondOrderHPF<T> filter;
         filter.calcCoefs ((T) fc, (T) Qval, (NumericType) fs);
 
-        testFrequency<T> (filter, (NumericType) fc / (NumericType) 4, (NumericType) -24.0, (NumericType) 0.1, "Incorrect gain at low frequencies.");
-        testFrequency<T> (filter, (NumericType) fc, (NumericType) -3.0, maxError, "Incorrect gain at cutoff frequency.");
+        testFrequency<T> (filter, (NumericType) fc / (NumericType) 4, (NumericType) -24.1, (NumericType) 0.1, "Incorrect gain at low frequencies.");
+        testFrequency<T> (filter, (NumericType) fc, (NumericType) -3.01, maxError, "Incorrect gain at cutoff frequency.");
         testFrequency<T> (filter, (NumericType) fs * (NumericType) 0.498, (NumericType) 0, maxError, "Incorrect gain at high frequencies.");
     }
 
@@ -81,7 +81,12 @@ public:
         filter.calcCoefs ((T) fc, (T) Qval, (NumericType) fs);
 
         testFrequency<T> (filter, (NumericType) 1, (NumericType) 0, maxError, "Incorrect gain at low frequencies.");
-        testFrequency<T> (filter, (NumericType) fc, (NumericType) -60, (NumericType) 5, "Incorrect gain at center frequency.");
+
+        if constexpr (std::is_same_v<NumericType, float>)
+            testFrequency<T> (filter, (NumericType) fc, (NumericType) -65, (NumericType) 5, "Incorrect gain at center frequency.");
+        else
+            testFrequency<T> (filter, (NumericType) fc, (NumericType) -100, (NumericType) 5, "Incorrect gain at center frequency.");
+
         testFrequency<T> (filter, (NumericType) fs * (NumericType) 0.498, (NumericType) 0, maxError, "Incorrect gain at high frequencies.");
     }
 

@@ -25,7 +25,7 @@ public:
         aaFilters.clear();
         aaFilters.resize (spec.numChannels);
 
-        auto fc = T (0.995 * (spec.sampleRate * 0.5));
+        auto fc = T (0.995 * ((spec.sampleRate / ratio) * 0.5));
         auto Qs = QValCalcs::butterworth_Qs<T, FilterOrder>();
         for (size_t ch = 0; ch < spec.numChannels; ++ch)
         {
@@ -78,7 +78,7 @@ public:
      * Process a block of data.
      * Note that the block size must be an integer multiple of the downsampling ratio.
      */
-    juce::dsp::AudioBlock<T> process (const juce::dsp::AudioBlock<T>& block) noexcept
+    juce::dsp::AudioBlock<T> process (const juce::dsp::AudioBlock<const T>& block) noexcept
     {
         auto outBlock = juce::dsp::AudioBlock<T> { downsampledBuffer };
 

@@ -18,3 +18,4 @@ add_compile_options(
 
 add_subdirectory(LinearPhaseEQ)
 add_subdirectory(SimpleReverb)
+add_subdirectory(SignalGenerator)
