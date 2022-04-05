@@ -29,9 +29,9 @@ LinearPhaseEQPlugin::LinearPhaseEQPlugin()
 void LinearPhaseEQPlugin::addParameters (Parameters& params)
 {
     using namespace chowdsp::ParamUtils;
-    createFreqParameter (params, lowCutFreqTag, "Low Cut Freq.", 20.0f, 1000.0f, 400.0f, 20.0f);
+    createFreqParameter (params, lowCutFreqTag, "Low Cut Freq.", 5.0f, 1000.0f, 400.0f, 20.0f);
     createFreqParameter (params, peakingFilterFreqTag, "Bell Freq.", 20.0f, 20000.0f, 2000.0f, 1000.0f);
-    createFreqParameter (params, highCutFreqTag, "High Cut Freq.", 1000.0f, 20000.0f, 4000.0f, 20000.0f);
+    createFreqParameter (params, highCutFreqTag, "High Cut Freq.", 1000.0f, 25000.0f, 4000.0f, 20000.0f);
 
     auto addQParam = [&params] (const juce::String& tag, const juce::String& name) {
         emplace_param<VTSParam> (params, tag, name, juce::String(), createNormalisableRange (0.1f, 10.0f, 0.7071f), 0.7071f, &floatValToString, &stringToFloatVal);

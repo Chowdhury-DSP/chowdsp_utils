@@ -14,7 +14,7 @@ void PrototypeEQ::setParameters (const Params& params, bool force)
     setParam (peakingFilterFreqHzSmooth, params.peakingFilterFreqHz);
     setParam (peakingFilterQSmooth, params.peakingFilterQ);
     setParam (peakingFilterGainSmooth, juce::Decibels::decibelsToGain (params.peakingFilterGainDB));
-    setParam (highCutFreqHzSmooth, params.highCutFreqHz);
+    setParam (highCutFreqHzSmooth, juce::jmin (params.highCutFreqHz, 0.4995f * fs));
     setParam (highCutQSmooth, params.highCutQ);
 }
 

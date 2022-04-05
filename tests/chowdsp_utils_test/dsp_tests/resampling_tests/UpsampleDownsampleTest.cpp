@@ -54,12 +54,12 @@ public:
     }
 
     template <typename ProcType>
-    static AudioBuffer<float> processInSubBlocks (ProcType& proc, AudioBuffer<float>& inBuffer, int subBlockSize = blockSize / 8)
+    static AudioBuffer<float> processInSubBlocks (ProcType& proc, const AudioBuffer<float>& inBuffer, int subBlockSize = blockSize / 8)
     {
         AudioBuffer<float> outBuffer (inBuffer);
         int outBufferPtr = 0;
 
-        dsp::AudioBlock<float> inBlock { inBuffer };
+        dsp::AudioBlock<const float> inBlock { inBuffer };
         for (int i = 0; i < inBuffer.getNumSamples(); i += subBlockSize)
         {
             auto outBlock = proc.process (inBlock.getSubBlock ((size_t) i, (size_t) subBlockSize));
@@ -92,14 +92,14 @@ public:
         auto snr = calcSNR (upsampledBlock, testFreq, (float) _sampleRate * (float) upsampler.getUpsamplingRatio());
 
         expectEquals (upsampledBuffer.getNumSamples(), (int) blockSize * upsampler.getUpsamplingRatio(), "Upsampled block size is incorrect!");
-        expectGreaterThan (snr, 70.0f, "Signal to noise ratio is too low!");
+        expectGreaterThan (snr, 60.0f, "Signal to noise ratio is too low!");
     }
 
     template <int FilterOrd = 8>
     void downsampleQualityTest (int downsampleRatio)
     {
         chowdsp::Downsampler<float, FilterOrd> downsampler;
-        downsampler.prepare ({ (double) downsampleRatio * _sampleRate, (uint32) blockSize, 1 }, downsampleRatio);
+        downsampler.prepare ({ (double) downsampleRatio * _sampleRate, (uint32) downsampleRatio * (uint32) blockSize, 1 }, downsampleRatio);
 
         constexpr float testFreq = 42000.0f;
         auto thisBlockSize = downsampleRatio * (int) blockSize;
