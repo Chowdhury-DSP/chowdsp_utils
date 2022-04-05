@@ -53,6 +53,7 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 #include "Presets/chowdsp_Preset.h"
 #include "Presets/chowdsp_PresetManager.h"
 
+#include "Files/chowdsp_AudioFileSaveLoadHelper.h"
 #include "Files/chowdsp_FileListener.h"
 #include "Logging/chowdsp_PluginLogger.h"
 
