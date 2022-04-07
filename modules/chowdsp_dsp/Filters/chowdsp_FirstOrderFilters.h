@@ -71,7 +71,7 @@ private:
  * a set gain at high frequencies, and a transition frequency.
  */
 template <typename T = float>
-class ShelfFilter : public IIRFilter<1, T>
+class ShelfFilter final : public IIRFilter<1, T>
 {
     using NumericType = SampleTypeHelpers::ProcessorNumericType<ShelfFilter>;
 
