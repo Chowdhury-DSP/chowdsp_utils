@@ -77,6 +77,8 @@ class ShelfFilter : public IIRFilter<1, T>
 
 public:
     ShelfFilter() = default;
+    ShelfFilter (ShelfFilter&&) noexcept = default;
+    ShelfFilter& operator= (ShelfFilter&&) noexcept = default;
 
     /** Calculates the coefficients for the filter.
      * @param lowGain: the gain of the filter at low frequencies
