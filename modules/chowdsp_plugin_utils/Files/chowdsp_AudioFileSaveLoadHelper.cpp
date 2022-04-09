@@ -12,9 +12,40 @@ AudioFileSaveLoadHelper::~AudioFileSaveLoadHelper()
     formatManager.clearFormats();
 }
 
+std::unique_ptr<juce::AudioFormatReader> AudioFileSaveLoadHelper::createReaderFor (const juce::File& file)
+{
+    return std::unique_ptr<juce::AudioFormatReader> (formatManager.createReaderFor (file));
+}
+
+std::unique_ptr<juce::AudioFormatWriter> AudioFileSaveLoadHelper::createWriterFor (const juce::File& file, const AudioFileWriterParams& params)
+{
+    auto* format = formatManager.findFormatForFileExtension (file.getFileExtension());
+    if (format == nullptr)
+    {
+        juce::Logger::writeToLog ("Unable to determine audio format for file " + file.getFullPathName());
+        jassertfalse;
+        return nullptr;
+    }
+
+    auto audioFileStream = std::make_unique<juce::FileOutputStream> (file);
+    auto bitDepth = params.bitsPerSample > 0 ? params.bitsPerSample : format->getPossibleBitDepths().getLast();
+
+    if (auto writer = std::unique_ptr<juce::AudioFormatWriter> (format->createWriterFor (audioFileStream.get(), params.sampleRateToUse, params.numberOfChannels, bitDepth, params.metadataValues, params.qualityOptionIndex)))
+    {
+        // the audio format writer now owns the file stream pointer, so let's release it here to avoid a double-delete
+        auto* releasedFileStream = audioFileStream.release();
+        juce::ignoreUnused (releasedFileStream);
+        return writer;
+    }
+
+    juce::Logger::writeToLog ("Unable to create audio format writer for file " + file.getFullPathName());
+    jassertfalse;
+    return nullptr;
+}
+
 std::pair<juce::AudioBuffer<float>, double> AudioFileSaveLoadHelper::loadFile (const juce::File& file)
 {
-    std::unique_ptr<juce::AudioFormatReader> reader (formatManager.createReaderFor (file));
+    auto reader = createReaderFor (file);
     if (reader == nullptr)
     {
         juce::Logger::writeToLog ("Unable to create audio format reader for file " + file.getFullPathName());
@@ -38,23 +69,9 @@ std::pair<juce::AudioBuffer<float>, double> AudioFileSaveLoadHelper::loadFile (c
 
 bool AudioFileSaveLoadHelper::saveBufferToFile (const juce::File& file, const juce::AudioBuffer<float>& buffer, double sampleRate)
 {
-    auto* format = formatManager.findFormatForFileExtension (file.getFileExtension());
-    if (format == nullptr)
-    {
-        juce::Logger::writeToLog ("Unable to determine audio format for file " + file.getFullPathName());
-        jassertfalse;
-        return false;
-    }
+    if (auto writer = createWriterFor (file, AudioFileWriterParams { sampleRate, (unsigned int) buffer.getNumChannels() }))
+        return writer->writeFromAudioSampleBuffer (buffer, 0, buffer.getNumSamples());
 
-    auto bitDepth = format->getPossibleBitDepths().getLast(); // use max bit depth by default
-    std::unique_ptr<juce::AudioFormatWriter> writer (format->createWriterFor (new juce::FileOutputStream (file), sampleRate, (unsigned int) buffer.getNumChannels(), bitDepth, {}, 0));
-    if (writer == nullptr)
-    {
-        juce::Logger::writeToLog ("Unable to create audio format writer for file " + file.getFullPathName());
-        jassertfalse;
-        return false;
-    }
-
-    return writer->writeFromAudioSampleBuffer (buffer, 0, buffer.getNumSamples());
+    return false;
 }
 } // namespace chowdsp
