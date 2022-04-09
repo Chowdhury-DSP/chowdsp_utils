@@ -32,7 +32,8 @@ std::unique_ptr<juce::AudioFormatWriter> AudioFileSaveLoadHelper::createWriterFo
 
     if (auto writer = std::unique_ptr<juce::AudioFormatWriter> (format->createWriterFor (audioFileStream.get(), params.sampleRateToUse, params.numberOfChannels, bitDepth, params.metadataValues, params.qualityOptionIndex)))
     {
-        audioFileStream.release();
+        // the audio format writer now owns the file stream pointer, so let's release it here to avoid a double-delete
+        auto* releasedFileStream = audioFileStream.release();
         return writer;
     }
 
