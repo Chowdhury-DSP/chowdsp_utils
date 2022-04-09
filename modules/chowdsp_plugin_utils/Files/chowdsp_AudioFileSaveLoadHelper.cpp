@@ -34,6 +34,7 @@ std::unique_ptr<juce::AudioFormatWriter> AudioFileSaveLoadHelper::createWriterFo
     {
         // the audio format writer now owns the file stream pointer, so let's release it here to avoid a double-delete
         auto* releasedFileStream = audioFileStream.release();
+        juce::ignoreUnused (releasedFileStream);
         return writer;
     }
 
