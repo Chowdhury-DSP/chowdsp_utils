@@ -1,4 +1,4 @@
-#include "chowdsp_ModalFilterbank.h"
+#include "chowdsp_ModalFilterBank.h"
 
 namespace chowdsp
 {

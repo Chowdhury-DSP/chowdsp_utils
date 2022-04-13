@@ -92,4 +92,4 @@ private:
 };
 } // namespace chowdsp
 
-#include "chowdsp_ModalFilterbank.cpp"
+#include "chowdsp_ModalFilterBank.cpp"
