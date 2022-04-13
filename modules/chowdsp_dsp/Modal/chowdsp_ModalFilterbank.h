@@ -90,6 +90,6 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ModalFilterBank)
 };
-}
+} // namespace chowdsp
 
 #include "chowdsp_ModalFilterbank.cpp"
