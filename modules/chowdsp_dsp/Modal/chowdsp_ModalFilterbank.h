@@ -2,13 +2,6 @@
 
 namespace chowdsp
 {
-/** Divides two numbers and rounds up if there is a remainder. */
-template <typename T>
-constexpr T ceiling_divide(T num, T den)
-{
-    return (num + den - 1) / den;
-}
-
 template <int maxNumModes, typename SampleType = float>
 class ModalFilterBank
 {
