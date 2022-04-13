@@ -106,6 +106,9 @@ void ModalFilterBank<maxNumModes, SampleType>::setNumModesToProcess (int newNumM
     numModesToProcess = newNumModesToProcess;
     numVecModesToProcess = ceiling_divide (newNumModesToProcess, vecSize);
     setModeAmplitudesInternal();
+
+    for (size_t modeIndex = numVecModesToProcess; modeIndex < maxNumVecModes; ++modeIndex)
+        modes[modeIndex].reset();
 }
 
 template <int maxNumModes, typename SampleType>
