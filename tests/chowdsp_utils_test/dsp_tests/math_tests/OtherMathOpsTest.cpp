@@ -17,10 +17,23 @@ public:
         expectEquals (chowdsp::log2 (128), 7, "Log2(128) is incorrect!");
     }
 
+    void ceilingDivideTest()
+    {
+        expectEquals (chowdsp::ceiling_divide (3, 4), 1, "Ceiling divide 3 / 4 should equal 1");
+        expectEquals (chowdsp::ceiling_divide (4, 4), 1, "Ceiling divide 4 / 4 should equal 1");
+        expectEquals (chowdsp::ceiling_divide (5, 4), 2, "Ceiling divide 5 / 4 should equal 2");
+        expectEquals (chowdsp::ceiling_divide (7, 4), 2, "Ceiling divide 7 / 4 should equal 2");
+        expectEquals (chowdsp::ceiling_divide (8, 4), 2, "Ceiling divide 8 / 4 should equal 2");
+        expectEquals (chowdsp::ceiling_divide (9, 4), 3, "Ceiling divide 9 / 4 should equal 3");
+    }
+
     void runTestTimed() override
     {
         beginTest ("Log2 Test");
         log2Test();
+
+        beginTest ("Ceiling Divide Test");
+        ceilingDivideTest();
     }
 };
 
