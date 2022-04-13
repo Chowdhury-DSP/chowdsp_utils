@@ -143,6 +143,7 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 
 // modal tools
 #include "Modal/chowdsp_ModalFilter.h"
+#include "Modal/chowdsp_ModalFilterBank.h"
 
 // resamplers
 #include "Resampling/chowdsp_Upsampler.h"
