@@ -14,6 +14,7 @@ public:
 
     ModalFilterBank() = default;
 
+    /** Normalization constant will set the level of the first mode, or pass a negative normalization constant to disable normalization */
     void setModeAmplitudes (const SampleType (&ampsReal)[maxNumModes], const SampleType (&ampsImag)[maxNumModes], SampleType normalize = 1.0f);
     void setModeAmplitudes (const std::complex<SampleType> (&amps)[maxNumModes], SampleType normalize = 1.0f);
     void setModeFrequencies (const SampleType (&baseFrequencies)[maxNumModes], SampleType frequencyMultiplier = (SampleType) 1);
