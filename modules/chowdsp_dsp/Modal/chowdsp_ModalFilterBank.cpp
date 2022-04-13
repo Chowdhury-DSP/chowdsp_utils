@@ -2,14 +2,14 @@
 
 namespace chowdsp
 {
-template <int maxNumModes, typename SampleType>
+template <size_t maxNumModes, typename SampleType>
 template <typename PerModeFunc, typename PerVecModeFunc>
 void ModalFilterBank<maxNumModes, SampleType>::doForModes (PerModeFunc&& perModeFunc, PerVecModeFunc&& perVecModeFunc)
 {
-    int i = 0;
+    size_t i = 0;
     for (auto& mode : modes)
     {
-        for (int j = 0; j < vecSize; ++j)
+        for (size_t j = 0; j < vecSize; ++j)
             perModeFunc (j, i * vecSize + j);
 
         perVecModeFunc (mode);
@@ -17,14 +17,14 @@ void ModalFilterBank<maxNumModes, SampleType>::doForModes (PerModeFunc&& perMode
     }
 }
 
-template <int maxNumModes, typename SampleType>
+template <size_t maxNumModes, typename SampleType>
 typename ModalFilterBank<maxNumModes, SampleType>::Vec ModalFilterBank<maxNumModes, SampleType>::tau2t60 (Vec tau, SampleType originalSampleRate)
 {
     using namespace SIMDUtils;
     return Vec ((SampleType) 1) / (logSIMD (expSIMD (originalSampleRate / tau)) / log1000);
 }
 
-template <int maxNumModes, typename SampleType>
+template <size_t maxNumModes, typename SampleType>
 void ModalFilterBank<maxNumModes, SampleType>::setModeAmplitudes (const SampleType (&ampsReal)[maxNumModes], const SampleType (&ampsImag)[maxNumModes], SampleType normalize)
 {
     for (size_t i = 0; i < (size_t) maxNumModes; ++i)
@@ -34,7 +34,7 @@ void ModalFilterBank<maxNumModes, SampleType>::setModeAmplitudes (const SampleTy
     setModeAmplitudesInternal();
 }
 
-template <int maxNumModes, typename SampleType>
+template <size_t maxNumModes, typename SampleType>
 void ModalFilterBank<maxNumModes, SampleType>::setModeAmplitudes (const std::complex<SampleType> (&amps)[maxNumModes], SampleType normalize)
 {
     std::copy (amps, amps + maxNumModes, amplitudeData.begin());
@@ -42,7 +42,7 @@ void ModalFilterBank<maxNumModes, SampleType>::setModeAmplitudes (const std::com
     setModeAmplitudesInternal();
 }
 
-template <int maxNumModes, typename SampleType>
+template <size_t maxNumModes, typename SampleType>
 void ModalFilterBank<maxNumModes, SampleType>::updateAmplitudeNormalizationFactor (SampleType normalize)
 {
     auto lowestModeMag = std::abs (amplitudeData[0]);
@@ -52,51 +52,51 @@ void ModalFilterBank<maxNumModes, SampleType>::updateAmplitudeNormalizationFacto
         amplitudeNormalizationFactor = (SampleType) 1;
 }
 
-template <int maxNumModes, typename SampleType>
+template <size_t maxNumModes, typename SampleType>
 void ModalFilterBank<maxNumModes, SampleType>::setModeAmplitudesInternal()
 {
     float modeAmps alignas (16)[vecSize] {};
     float modePhases alignas (16)[vecSize] {};
     doForModes (
-        [&] (int j, int modeIndex) {
-            modeAmps[j] = modeIndex < numModesToProcess ? std::abs (amplitudeData[(size_t) modeIndex]) * amplitudeNormalizationFactor : (SampleType) 0;
-            modePhases[j] = modeIndex < numModesToProcess ? std::arg (amplitudeData[(size_t) modeIndex]) : (SampleType) 0;
+        [&] (size_t j, size_t modeIndex) {
+            modeAmps[j] = modeIndex < numModesToProcess ? std::abs (amplitudeData[modeIndex]) * amplitudeNormalizationFactor : (SampleType) 0;
+            modePhases[j] = modeIndex < numModesToProcess ? std::arg (amplitudeData[modeIndex]) : (SampleType) 0;
         },
         [&] (auto& mode) { mode.setAmp (Vec::fromRawArray (modeAmps), Vec::fromRawArray (modePhases)); });
 }
 
-template <int maxNumModes, typename SampleType>
+template <size_t maxNumModes, typename SampleType>
 void ModalFilterBank<maxNumModes, SampleType>::setModeFrequencies (const SampleType (&baseFrequencies)[maxNumModes], SampleType frequencyMultiplier)
 {
     float modeFreqs alignas (16)[vecSize] {};
     doForModes (
-        [&] (int j, int modeIndex) {
+        [&] (size_t j, size_t modeIndex) {
             auto freq = modeIndex < maxNumModes ? (baseFrequencies[modeIndex] * frequencyMultiplier) : (SampleType) 0;
             modeFreqs[j] = freq > maxFreq ? (SampleType) 0 : freq;
         },
         [&] (auto& mode) { mode.setFreq (Vec::fromRawArray (modeFreqs)); });
 }
 
-template <int maxNumModes, typename SampleType>
+template <size_t maxNumModes, typename SampleType>
 void ModalFilterBank<maxNumModes, SampleType>::setModeDecays (const SampleType (&baseTaus)[maxNumModes], SampleType originalSampleRate, SampleType decayFactor)
 {
     float modeTaus alignas (16)[vecSize] {};
     doForModes (
-        [&] (int j, int modeIndex) { modeTaus[j] = modeIndex < maxNumModes ? baseTaus[modeIndex] : (SampleType) 1; },
+        [&] (size_t j, size_t modeIndex) { modeTaus[j] = modeIndex < maxNumModes ? baseTaus[modeIndex] : (SampleType) 1; },
         [&] (auto& mode) { mode.setDecay (tau2t60 (Vec::fromRawArray (modeTaus), originalSampleRate) * decayFactor); });
 }
 
-template <int maxNumModes, typename SampleType>
+template <size_t maxNumModes, typename SampleType>
 void ModalFilterBank<maxNumModes, SampleType>::setModeDecays (const SampleType (&t60s)[maxNumModes])
 {
     float modeT60s alignas (16)[vecSize] {};
     doForModes (
-        [&] (int j, int modeIndex) { modeT60s[j] = modeIndex < maxNumModes ? t60s[modeIndex] : (SampleType) 0; },
+        [&] (size_t j, size_t modeIndex) { modeT60s[j] = modeIndex < maxNumModes ? t60s[modeIndex] : (SampleType) 0; },
         [&] (auto& mode) { mode.setDecay (Vec::fromRawArray (modeT60s)); });
 }
 
-template <int maxNumModes, typename SampleType>
-void ModalFilterBank<maxNumModes, SampleType>::setNumModesToProcess (int newNumModesToProcess)
+template <size_t maxNumModes, typename SampleType>
+void ModalFilterBank<maxNumModes, SampleType>::setNumModesToProcess (size_t newNumModesToProcess)
 {
     jassert (newNumModesToProcess <= maxNumModes);
 
@@ -108,7 +108,7 @@ void ModalFilterBank<maxNumModes, SampleType>::setNumModesToProcess (int newNumM
         modes[modeIndex].reset();
 }
 
-template <int maxNumModes, typename SampleType>
+template <size_t maxNumModes, typename SampleType>
 void ModalFilterBank<maxNumModes, SampleType>::prepare (double sampleRate, int samplesPerBlock)
 {
     maxFreq = SampleType (0.495 * sampleRate);
@@ -118,53 +118,53 @@ void ModalFilterBank<maxNumModes, SampleType>::prepare (double sampleRate, int s
         mode.prepare ((SampleType) sampleRate);
 }
 
-template <int maxNumModes, typename SampleType>
+template <size_t maxNumModes, typename SampleType>
 void ModalFilterBank<maxNumModes, SampleType>::reset()
 {
     for (auto& mode : modes)
         mode.reset();
 }
 
-template <int maxNumModes, typename SampleType>
+template <size_t maxNumModes, typename SampleType>
 void ModalFilterBank<maxNumModes, SampleType>::process (const juce::AudioBuffer<SampleType>& buffer) noexcept
 {
     const auto&& block = juce::dsp::AudioBlock<const SampleType> { buffer };
     process (block);
 }
 
-template <int maxNumModes, typename SampleType>
+template <size_t maxNumModes, typename SampleType>
 void ModalFilterBank<maxNumModes, SampleType>::process (const juce::dsp::AudioBlock<const SampleType>& block) noexcept
 {
-    const auto numSamples = (int) block.getNumSamples();
+    const auto numSamples = block.getNumSamples();
 
-    renderBuffer.setSize (1, numSamples, false, false, true);
+    renderBuffer.setSize (1, (int) numSamples, false, false, true);
     renderBuffer.clear();
 
     const auto* blockPtr = block.getChannelPointer (0);
     auto* renderPtr = renderBuffer.getWritePointer (0);
 
-    for (size_t modeIdx = 0; modeIdx < (size_t) numVecModesToProcess; ++modeIdx)
+    for (size_t modeIdx = 0; modeIdx < numVecModesToProcess; ++modeIdx)
     {
-        for (int n = 0; n < numSamples; ++n)
+        for (size_t n = 0; n < numSamples; ++n)
             renderPtr[n] += modes[modeIdx].processSample (blockPtr[n]).sum();
     }
 }
 
-template <int maxNumModes, typename SampleType>
+template <size_t maxNumModes, typename SampleType>
 template <typename Modulator>
 void ModalFilterBank<maxNumModes, SampleType>::processWithModulation (const juce::dsp::AudioBlock<const SampleType>& block, Modulator&& modulator) noexcept
 {
-    const auto numSamples = (int) block.getNumSamples();
+    const auto numSamples = block.getNumSamples();
 
-    renderBuffer.setSize (1, numSamples, false, false, true);
+    renderBuffer.setSize (1, (int) numSamples, false, false, true);
     renderBuffer.clear();
 
     const auto* blockPtr = block.getChannelPointer (0);
     auto* renderPtr = renderBuffer.getWritePointer (0);
 
-    for (size_t modeIdx = 0; modeIdx < (size_t) numVecModesToProcess; ++modeIdx)
+    for (size_t modeIdx = 0; modeIdx < numVecModesToProcess; ++modeIdx)
     {
-        for (int n = 0; n < numSamples; ++n)
+        for (size_t n = 0; n < numSamples; ++n)
         {
             modulator (modes[modeIdx], modeIdx, n);
             renderPtr[n] += modes[modeIdx].processSample (blockPtr[n]).sum();
@@ -172,6 +172,6 @@ void ModalFilterBank<maxNumModes, SampleType>::processWithModulation (const juce
     }
 }
 
-template <int maxNumModes, typename SampleType>
+template <size_t maxNumModes, typename SampleType>
 const SampleType ModalFilterBank<maxNumModes, SampleType>::log1000 = std::log ((SampleType) 1000);
 } // namespace chowdsp

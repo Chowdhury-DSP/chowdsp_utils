@@ -3,14 +3,14 @@
 namespace chowdsp
 {
 /** A parallel bank of modal filters, with SIMD vectorization */
-template <int maxNumModes, typename SampleType = float>
+template <size_t maxNumModes, typename SampleType = float>
 class ModalFilterBank
 {
     static_assert (std::is_floating_point_v<SampleType>, "SampleType must be a floating point type!");
 
 public:
     using Vec = juce::dsp::SIMDRegister<SampleType>;
-    static constexpr auto vecSize = (int) Vec::size();
+    static constexpr auto vecSize = Vec::size();
     static constexpr auto maxNumVecModes = ceiling_divide (maxNumModes, vecSize);
 
     ModalFilterBank() = default;
@@ -41,7 +41,7 @@ public:
     void setModeDecays (const SampleType (&t60s)[maxNumModes]);
 
     /** Selects the number of modes to process */
-    void setNumModesToProcess (int numModesToProcess);
+    void setNumModesToProcess (size_t numModesToProcess);
 
     /** Prepares the filter bank to process a new audio stream */
     void prepare (double sampleRate, int samplesPerBlock);
@@ -83,8 +83,8 @@ private:
 
     juce::AudioBuffer<SampleType> renderBuffer;
     SampleType maxFreq = (SampleType) 0;
-    int numModesToProcess = maxNumModes;
-    int numVecModesToProcess = maxNumVecModes;
+    size_t numModesToProcess = maxNumModes;
+    size_t numVecModesToProcess = maxNumVecModes;
 
     const static SampleType log1000;
 

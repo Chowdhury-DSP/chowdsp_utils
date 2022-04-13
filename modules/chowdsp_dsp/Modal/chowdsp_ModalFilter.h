@@ -47,7 +47,7 @@ public:
     }
 
     /** Returns the current filter frequency */
-    inline T getFreq() const noexcept { return freq; }
+    [[nodiscard]] inline T getFreq() const noexcept { return freq; }
 
     /** Process a single sample */
     virtual inline T processSample (T x)
@@ -128,7 +128,7 @@ public:
     }
 
     /** Returns the current filter frequency */
-    inline VType getFreq() const noexcept { return freq; }
+    [[nodiscard]] inline VType getFreq() const noexcept { return freq; }
 
     /** Process a single sample */
     virtual inline VType processSample (VType x)
