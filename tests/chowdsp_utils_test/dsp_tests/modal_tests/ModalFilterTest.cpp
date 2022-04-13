@@ -19,7 +19,7 @@ class ModalFilterTest : public TimedUnitTest
 public:
     using NumericType = typename dsp::SampleTypeHelpers::ElementType<T>::Type;
 
-    ModalFilterTest() : TimedUnitTest ("Modal Filter Test " + getSampleType(), "Filters") {}
+    ModalFilterTest() : TimedUnitTest ("Modal Filter Test " + getSampleType(), "Modal") {}
 
     static String getSampleType()
     {
@@ -100,6 +100,11 @@ public:
         filter.setDecay ((T) modeDecay);
         filter.setFreq ((T) testFreq2);
         filter.processBlock (buffer.data(), (int) buffer.size());
+
+        if constexpr (std::is_floating_point_v<T>)
+            expectEquals (filter.getFreq(), (NumericType) testFreq2, "Modal filter frequency is incorrect");
+        else
+            expectEquals (filter.getFreq().get (0), (NumericType) testFreq2, "Modal filter frequency is incorrect");
 
         auto mag = Decibels::gainToDecibels (getMagnitude (buffer));
         expectLessThan (mag - refMag, (NumericType) -24.0f, "Modal filter is resonating at an incorrect frequency.");
