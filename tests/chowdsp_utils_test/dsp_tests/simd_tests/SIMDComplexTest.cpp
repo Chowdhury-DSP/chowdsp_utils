@@ -154,7 +154,7 @@ public:
     template <typename T>
     void fastExpTest()
     {
-        T angles alignas (16)[SIMDComplex<T>::size()];
+        T angles alignas (chowdsp::SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[SIMDComplex<T>::size()];
         angles[0] = 0;
         angles[1] = MathConstants<T>::pi / (T) 2;
         if constexpr (std::is_same<T, float>::value)

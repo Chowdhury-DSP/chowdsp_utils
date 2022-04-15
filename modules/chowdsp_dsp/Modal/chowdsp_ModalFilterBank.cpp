@@ -55,8 +55,8 @@ void ModalFilterBank<maxNumModes, SampleType>::updateAmplitudeNormalizationFacto
 template <size_t maxNumModes, typename SampleType>
 void ModalFilterBank<maxNumModes, SampleType>::setModeAmplitudesInternal()
 {
-    float modeAmps alignas (16)[vecSize] {};
-    float modePhases alignas (16)[vecSize] {};
+    float modeAmps alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[vecSize] {};
+    float modePhases alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[vecSize] {};
     doForModes (
         [&] (size_t j, size_t modeIndex) {
             modeAmps[j] = modeIndex < numModesToProcess ? std::abs (amplitudeData[modeIndex]) * amplitudeNormalizationFactor : (SampleType) 0;
@@ -68,7 +68,7 @@ void ModalFilterBank<maxNumModes, SampleType>::setModeAmplitudesInternal()
 template <size_t maxNumModes, typename SampleType>
 void ModalFilterBank<maxNumModes, SampleType>::setModeFrequencies (const SampleType (&baseFrequencies)[maxNumModes], SampleType frequencyMultiplier)
 {
-    float modeFreqs alignas (16)[vecSize] {};
+    float modeFreqs alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[vecSize] {};
     doForModes (
         [&] (size_t j, size_t modeIndex) {
             auto freq = modeIndex < maxNumModes ? (baseFrequencies[modeIndex] * frequencyMultiplier) : (SampleType) 0;
@@ -80,7 +80,7 @@ void ModalFilterBank<maxNumModes, SampleType>::setModeFrequencies (const SampleT
 template <size_t maxNumModes, typename SampleType>
 void ModalFilterBank<maxNumModes, SampleType>::setModeDecays (const SampleType (&baseTaus)[maxNumModes], SampleType originalSampleRate, SampleType decayFactor)
 {
-    float modeTaus alignas (16)[vecSize] {};
+    float modeTaus alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[vecSize] {};
     doForModes (
         [&] (size_t j, size_t modeIndex) { modeTaus[j] = modeIndex < maxNumModes ? baseTaus[modeIndex] : (SampleType) 1; },
         [&] (auto& mode) { mode.setDecay (tau2t60 (Vec::fromRawArray (modeTaus), originalSampleRate) * decayFactor); });
@@ -89,7 +89,7 @@ void ModalFilterBank<maxNumModes, SampleType>::setModeDecays (const SampleType (
 template <size_t maxNumModes, typename SampleType>
 void ModalFilterBank<maxNumModes, SampleType>::setModeDecays (const SampleType (&t60s)[maxNumModes])
 {
-    float modeT60s alignas (16)[vecSize] {};
+    float modeT60s alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[vecSize] {};
     doForModes (
         [&] (size_t j, size_t modeIndex) { modeT60s[j] = modeIndex < maxNumModes ? t60s[modeIndex] : (SampleType) 0; },
         [&] (auto& mode) { mode.setDecay (Vec::fromRawArray (modeT60s)); });
