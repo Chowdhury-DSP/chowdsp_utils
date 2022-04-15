@@ -35,8 +35,7 @@ void ModalReverbPlugin::addParameters (Parameters& params)
         juce::String(),
         createNormalisableRange (0.0f, 200.0f, 20.0f),
         0.0f,
-        [] (float x)
-        { return juce::String ((int) x); },
+        [] (float x) { return juce::String ((int) x); },
         &stringToFloatVal);
     createFreqParameter (params, modFreqTag, "Mod. Freq", 0.5f, 10.0f, 2.0f, 1.0f);
     createPercentParameter (params, modDepthTag, "Mod. Depth", 0.5f);
@@ -96,8 +95,7 @@ void ModalReverbPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
         const auto* modData = modBuffer.getReadPointer (0);
         modalFilterBank.processWithModulation (
             block,
-            [modData, numModesToMod, freqMult, modDepth] (auto& mode, size_t vecModeIndex, size_t sampleIndex)
-            {
+            [modData, numModesToMod, freqMult, modDepth] (auto& mode, size_t vecModeIndex, size_t sampleIndex) {
                 using Vec = decltype (modalFilterBank)::Vec;
                 const auto modeScalarIndex = vecModeIndex * Vec::size();
                 if (modeScalarIndex >= (size_t) numModesToMod)
