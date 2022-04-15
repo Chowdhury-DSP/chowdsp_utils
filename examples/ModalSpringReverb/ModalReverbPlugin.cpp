@@ -90,6 +90,7 @@ void ModalReverbPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
     }
     else
     {
+        // process modal filter with modulation
         const auto modDepth = modDepthParam->load();
         auto&& block = juce::dsp::AudioBlock<float> { buffer };
         const auto* modData = modBuffer.getReadPointer (0);
