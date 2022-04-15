@@ -22,8 +22,15 @@ private:
     std::atomic<float>* pitchParam = nullptr;
     std::atomic<float>* decayParam = nullptr;
     std::atomic<float>* mixParam = nullptr;
+    std::atomic<float>* modModesParam = nullptr;
+    std::atomic<float>* modFreqParam = nullptr;
+    std::atomic<float>* modDepthParam = nullptr;
 
     chowdsp::ModalFilterBank<ModeParams::numModes> modalFilterBank;
+
+    chowdsp::SineWave<float> modSine;
+    juce::AudioBuffer<float> modBuffer;
+
     juce::dsp::DryWetMixer<float> mixer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ModalReverbPlugin)
