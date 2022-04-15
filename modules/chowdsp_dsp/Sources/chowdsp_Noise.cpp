@@ -43,7 +43,7 @@ namespace NoiseHelpers
     template <>
     inline vec2 uniform01 (juce::Random& r) noexcept
     {
-        double sample alignas (16)[vec2::size()];
+        double sample alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[vec2::size()];
         for (auto& x : sample)
             x = r.nextDouble();
 
@@ -54,7 +54,7 @@ namespace NoiseHelpers
     template <>
     inline vec4 uniform01 (juce::Random& r) noexcept
     {
-        float sample alignas (16)[vec4::size()];
+        float sample alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[vec4::size()];
         for (auto& x : sample)
             x = r.nextFloat();
 

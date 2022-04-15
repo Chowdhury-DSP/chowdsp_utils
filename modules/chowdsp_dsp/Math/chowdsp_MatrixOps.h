@@ -97,7 +97,7 @@ namespace MatrixOps
             recursiveUnscaled (FloatType* out, const FloatType* in)
         {
             constexpr auto VecSize = FloatType::size();
-            NumericType arr alignas (16)[VecSize];
+            NumericType arr alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[VecSize];
 
             in[0].copyToRawArray (arr);
             Hadamard<NumericType, VecSize>::recursiveUnscaled (arr, arr);

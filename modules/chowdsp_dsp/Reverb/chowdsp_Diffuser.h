@@ -73,7 +73,7 @@ private:
     std::array<FloatType, (size_t) nChannels> polarityMultipliers;
     std::array<size_t, (size_t) nChannels> channelSwapIndexes;
 
-    alignas (16) std::array<FloatType, (size_t) nChannels> outData;
+    alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT) std::array<FloatType, (size_t) nChannels> outData;
 
     FloatType fs = (FloatType) 48000;
 

@@ -31,7 +31,7 @@ struct DefaultFDNConfig
     static const FloatType* doFeedbackProcess (DefaultFDNConfig& fdnConfig, const FloatType* data);
 
 protected:
-    alignas (16) std::array<FloatType, (size_t) nChannels> fbData;
+    alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT) std::array<FloatType, (size_t) nChannels> fbData;
 
 private:
     std::array<chowdsp::ShelfFilter<FloatType>, (size_t) nChannels> shelfs;
@@ -100,7 +100,7 @@ private:
 
     FDNConfig fdnConfig;
 
-    alignas (16) std::array<FloatType, (size_t) nChannels> outData;
+    alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT) std::array<FloatType, (size_t) nChannels> outData;
 
     FloatType fs = (FloatType) 48000;
 

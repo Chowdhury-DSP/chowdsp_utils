@@ -73,11 +73,11 @@ struct SIMDComplex
 
     inline SIMDComplex<Type> map (std::function<std::complex<Type> (const std::complex<Type>&)> f) const noexcept
     {
-        Type rfl alignas (16)[numElements], ifl alignas (16)[numElements];
+        Type rfl alignas (CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[numElements], ifl alignas (CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[numElements];
         _r.copyToRawArray (rfl);
         _i.copyToRawArray (ifl);
 
-        Type rflR alignas (16)[numElements], iflR alignas (16)[numElements];
+        Type rflR alignas (CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[numElements], iflR alignas (CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[numElements];
         for (size_t i = 0; i < numElements; ++i)
         {
             auto a = std::complex<Type> { rfl[i], ifl[i] };
@@ -90,11 +90,11 @@ struct SIMDComplex
 
     inline juce::dsp::SIMDRegister<Type> map_float (std::function<Type (const std::complex<Type>&)> f) const noexcept
     {
-        Type rfl alignas (16)[numElements], ifl alignas (16)[numElements];
+        Type rfl alignas (CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[numElements], ifl alignas (CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[numElements];
         _r.copyToRawArray (rfl);
         _i.copyToRawArray (ifl);
 
-        Type out alignas (16)[numElements];
+        Type out alignas (CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[numElements];
         for (size_t i = 0; i < numElements; ++i)
         {
             auto a = std::complex<Type> { rfl[i], ifl[i] };

@@ -271,7 +271,7 @@ struct Sinc
     }
 
     int totalSize = 0;
-    T sinctable alignas (16)[(M + 1) * N * 2];
+    T sinctable alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[(M + 1) * N * 2];
 };
 JUCE_END_IGNORE_WARNINGS_MSVC
 } // namespace chowdsp::DelayLineInterpolationTypes
