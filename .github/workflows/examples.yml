@@ -70,3 +70,13 @@ jobs:
         working-directory: ${{env.WORK_DIR}}/build
         shell: bash
         run: cmake --build . --target SimpleReverb_Standalone --parallel 4
+
+      - name: "Build Example: SignalGenerator"
+        working-directory: ${{env.WORK_DIR}}/build
+        shell: bash
+        run: cmake --build . --target SignalGenerator_Standalone --parallel 4
+
+      - name: "Build Example: ModalSpringReverb"
+        working-directory: ${{env.WORK_DIR}}/build
+        shell: bash
+        run: cmake --build . --target ModalSpringReverb_Standalone --parallel 4
