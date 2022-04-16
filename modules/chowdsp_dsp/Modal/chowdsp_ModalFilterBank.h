@@ -6,9 +6,9 @@ namespace chowdsp
 template <size_t maxNumModes, typename SampleType = float>
 class ModalFilterBank
 {
+public:
     static_assert (std::is_floating_point_v<SampleType>, "SampleType must be a floating point type!");
 
-public:
     using Vec = juce::dsp::SIMDRegister<SampleType>;
     static constexpr auto vecSize = Vec::size();
     static constexpr auto maxNumVecModes = ceiling_divide (maxNumModes, vecSize);

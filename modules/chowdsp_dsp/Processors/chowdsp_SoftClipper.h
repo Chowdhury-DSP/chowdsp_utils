@@ -13,9 +13,9 @@ namespace chowdsp
 template <int degree, typename T = float>
 class SoftClipper
 {
+public:
     static_assert (degree % 2 == 1 && degree > 2, "Degree must be an odd integer, larger than 2!");
 
-public:
     SoftClipper() = default;
 
     /** Prepare the soft clipper to process a stream of data. */
