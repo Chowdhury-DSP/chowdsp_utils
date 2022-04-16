@@ -3,21 +3,23 @@
 namespace chowdsp::ResamplingTypes
 {
 /** A resampling algorithm using Lanczos interpolation.
- *  This implementation is inspired by the one done by
- *  @baconpaul for the Surge Synthesizer.
+ *  This implementation is inspired by the one done by @baconpaul
+ *  for the Surge Synthesizer.
  * 
  *  `BUFFER_SIZE` determines how large of a table the resampler
  *  should use for storing the Lanczos kernel.
  * 
- *  `A` determines the width of the kernel window (in samples),
- *  and should ALWAYS be a multiple of 4.
+ *  `A` determines the width of the kernel window (in samples), and
+ *  should ALWAYS be a multiple of of the default SIMD register width.
  *  
  *  Reference: https://en.wikipedia.org/wiki/Lanczos_resampling
  */
-template <size_t BUFFER_SIZE = 4096, size_t A = 4>
+template <size_t BUFFER_SIZE = 4096, size_t A = juce::dsp::SIMDRegister<float>::size()>
 class LanczosResampler : public BaseResampler
 {
 public:
+    static_assert (A % juce::dsp::SIMDRegister<float>::size() == 0, "A must be a multiple of the SIMD register width");
+
     /** Default constructor */
     LanczosResampler()
     {
