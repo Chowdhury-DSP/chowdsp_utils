@@ -51,9 +51,9 @@ void SignalGeneratorPlugin::prepareToPlay (double sampleRate, int samplesPerBloc
     upsampledBuffer.setSize ((int) spec.numChannels, 4 * samplesPerBlock);
 }
 
-void SignalGeneratorPlugin::prepareTones (double sampleRate, int blockSize)
+void SignalGeneratorPlugin::prepareTones (double sampleRate, int maxSamplesPerBlock)
 {
-    const auto spec = juce::dsp::ProcessSpec { sampleRate, (juce::uint32) blockSize, (juce::uint32) getMainBusNumInputChannels() };
+    const auto spec = juce::dsp::ProcessSpec { sampleRate, (juce::uint32) maxSamplesPerBlock, (juce::uint32) getMainBusNumInputChannels() };
     sine.prepare (spec);
     saw.prepare (spec);
     square.prepare (spec);
@@ -66,27 +66,27 @@ void SignalGeneratorPlugin::setUpSampleChoice()
     {
         previousUpSampleChoice = upsampleChoice;
         auto sampleRate = getSampleRate();
-        auto blockSize = getBlockSize();
+        auto curBlockSize = getBlockSize();
 
         if (upsampleChoice == 0)
         {
             resampler = nullptr;
-            prepareTones (sampleRate, blockSize);
+            prepareTones (sampleRate, curBlockSize);
         }
         else if (upsampleChoice == 1)
         {
             resampler = &resample2;
-            prepareTones (2 * sampleRate, 2 * blockSize);
+            prepareTones (2 * sampleRate, 2 * curBlockSize);
         }
         else if (upsampleChoice == 2)
         {
             resampler = &resample3;
-            prepareTones (3 * sampleRate, 3 * blockSize);
+            prepareTones (3 * sampleRate, 3 * curBlockSize);
         }
         else if (upsampleChoice == 3)
         {
             resampler = &resample4;
-            prepareTones (4 * sampleRate, 4 * blockSize);
+            prepareTones (4 * sampleRate, 4 * curBlockSize);
         }
         else
         {
