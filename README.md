@@ -12,8 +12,8 @@ There are currently 3 modules each containing the following utilities:
   - Delay Line: similar to `juce::dsp::DelayLine` but with 5th-order Lagrange interpolation and Sinc interpolation.
   - Pitch Shifter: using a ring buffer with two read pointers.
   - Filters: functions for bilinear transform, IIR filters with static order, and an optimized State Variable Filter.
-  - Modal: modal filter/oscillator using Max Mathews Phasor Filter.
-  - Sources: "magic circle" sine wave oscillator, anti-aliased saw and square oscilaltors, noise generator.
+  - Modal: modal filter/oscillator using Max Mathews Phasor Filter, and a parallel filterbank to use those modal filters.
+  - Sources: "magic circle" sine wave oscillator, anti-aliased saw and square oscillators, noise generator.
   - Resampling: classes for doing integer or non-integer sample rate conversion, and processing audio at a target sample rate.
   - Wave Digital Filters: linear circuit elements, series/parallel junctions, diodes, R-Type adaptors, and a few others.
   - SIMD Utils: Some extensions on `juce::dsp::SIMDRegister`.
@@ -36,6 +36,8 @@ There are currently 3 modules each containing the following utilities:
   - Shared resource class for managing global plugin settings.
   - JUCE-based Wrapper around `nlohmann::json`.
   - Thread class for running a task that reads from the audio thread, and reports info to the UI thread.
+
+There's also a handful of simple examples in the [`examples/`](https://github.com/Chowdhury-DSP/chowdsp_utils/tree/master/examples) directory.
 
 For complete documentation, see the [API docs](https://ccrma.stanford.edu/~jatin/chowdsp/chowdsp_utils).
 
