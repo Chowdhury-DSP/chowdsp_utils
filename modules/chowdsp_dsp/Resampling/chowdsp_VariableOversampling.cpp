@@ -70,8 +70,8 @@ juce::String VariableOversampling<FloatType>::osModeToString (OSMode mode)
 
 template <typename FloatType>
 VariableOversampling<FloatType>::VariableOversampling (juce::AudioProcessorValueTreeState& vts, bool useIntegerLatency, const juce::String& prefix) : proc (vts.processor),
-                                                                                                                                                                       usingIntegerLatency (useIntegerLatency),
-                                                                                                                                                                       paramPrefix (prefix)
+                                                                                                                                                      usingIntegerLatency (useIntegerLatency),
+                                                                                                                                                      paramPrefix (prefix)
 {
     osParam = dynamic_cast<juce::AudioParameterChoice*> (vts.getParameter (paramPrefix + "_factor"));
     osModeParam = dynamic_cast<juce::AudioParameterChoice*> (vts.getParameter (paramPrefix + "_mode"));
