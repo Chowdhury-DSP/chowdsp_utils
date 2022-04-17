@@ -35,13 +35,20 @@ OversamplingMenu<OSType>::OversamplingMenu (OSType& osMgr, juce::AudioProcessorV
 
         attachments[count] = std::make_unique<juce::ParameterAttachment> (
             *param,
-            [=] (float) { generateComboBoxMenu(); },
+            [=] (float)
+            { generateComboBoxMenu(); },
             vts.undoManager);
 
         count += 1;
     }
 
-    generateComboBoxMenu();
+    osManager.addListener (this);
+}
+
+template <typename OSType>
+OversamplingMenu<OSType>::~OversamplingMenu()
+{
+    osManager.removeListener (this);
 }
 
 template <typename OSType>
@@ -65,6 +72,9 @@ template <typename OSType>
 void OversamplingMenu<OSType>::generateComboBoxMenu()
 {
     clear();
+    if (! osManager.hasBeenPrepared())
+        return;
+
     auto* menu = getRootMenu();
 
     auto createParamItem = [=] (juce::PopupMenu::Item& item,

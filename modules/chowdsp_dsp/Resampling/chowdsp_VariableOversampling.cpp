@@ -183,6 +183,8 @@ void VariableOversampling<FloatType>::prepareToPlay (double sr, int samplesPerBl
     sampleRate = (float) sr;
     curOS = getOSIndex (*osParam, *osModeParam);
     prevOS = curOS;
+
+    listeners.call (&Listener::sampleRateOrBlockSizeChanged);
 }
 
 template <typename FloatType>
@@ -190,6 +192,25 @@ void VariableOversampling<FloatType>::reset()
 {
     for (auto& os : oversamplers)
         os->reset();
+}
+
+template <typename FloatType>
+float VariableOversampling<FloatType>::getLatencySamples() const noexcept
+{
+    jassert (hasBeenPrepared()); // Make sure to prepare the oversampler before calling this!
+
+    return (float) oversamplers[curOS]->getLatencyInSamples();
+}
+
+template <typename FloatType>
+float VariableOversampling<FloatType>::getLatencyMilliseconds (int osIndex) const noexcept
+{
+    jassert (hasBeenPrepared()); // Make sure to prepare the oversampler before calling this!
+
+    osIndex = osIndex < 0 ? curOS : osIndex;
+    jassert (osIndex < oversamplers.size()); // Make sure that osIndex is in range!
+
+    return ((float) oversamplers[osIndex]->getLatencyInSamples() / sampleRate) * 1000.0f;
 }
 
 template class VariableOversampling<float>;

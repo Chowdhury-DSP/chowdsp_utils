@@ -74,6 +74,9 @@ public:
     /** Resets the state of the oversamplers */
     void reset();
 
+    /** Returns true if the oversampling processors have been prepared */
+    [[nodiscard]] bool hasBeenPrepared() const noexcept { return ! oversamplers.isEmpty(); }
+
     /** Returns the oversampling factor currently in use */
     [[nodiscard]] int getOSFactor() const noexcept { return (int) oversamplers[curOS]->getOversamplingFactor(); }
 
@@ -84,13 +87,13 @@ public:
     int getOSIndex (int osFactor, int osMode) { return osFactor + (numOSChoices * osMode); }
 
     /** Returns the samples of latency introduced by the oversampling process */
-    [[nodiscard]] float getLatencySamples() const noexcept { return (float) oversamplers[curOS]->getLatencyInSamples(); }
+    [[nodiscard]] float getLatencySamples() const noexcept;
 
     /**
      * Returns the current latency introduced by the oversampling process in milliseconds,
      * or provide the oversampler index to get the latency of one specific oversampler.
      */
-    [[nodiscard]] float getLatencyMilliseconds (int osIndex = -1) const noexcept { return ((float) oversamplers[osIndex < 0 ? curOS : osIndex]->getLatencyInSamples() / sampleRate) * 1000.0f; }
+    [[nodiscard]] float getLatencyMilliseconds (int osIndex = -1) const noexcept;
 
     /** Upsample a new block of data */
     auto processSamplesUp (const juce::dsp::AudioBlock<const FloatType>& inputBlock) noexcept { return oversamplers[curOS]->processSamplesUp (inputBlock); }
@@ -100,6 +103,15 @@ public:
 
     /** Returns the set of parameters used by the oversamplers */
     auto getParameters() { return std::tie (osParam, osModeParam, osOfflineParam, osOfflineModeParam, osOfflineSameParam); }
+
+    struct Listener
+    {
+        virtual ~Listener() = default;
+        virtual void sampleRateOrBlockSizeChanged() {}
+    };
+
+    void addListener (Listener* l) { listeners.add (l); }
+    void removeListener (Listener* l) { listeners.remove (l); }
 
 private:
     static OSFactor stringToOSFactor (const juce::String& factorStr);
@@ -123,6 +135,8 @@ private:
 
     const bool usingIntegerLatency;
     const juce::String paramPrefix;
+
+    juce::ListenerList<Listener> listeners;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (VariableOversampling)
 };

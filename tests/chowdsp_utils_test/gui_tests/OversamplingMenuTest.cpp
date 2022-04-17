@@ -11,7 +11,7 @@ struct TestPlugin2 : public chowdsp::PluginBase<TestPlugin2>
         decltype (oversampling)::createParameterLayout (params, OSFactor::TwoX, OSMode::MinPhase);
     }
 
-    void prepareToPlay (double, int) override {}
+    void prepareToPlay (double sampleRate, int samplesPerBlock) override { oversampling.prepareToPlay (sampleRate, samplesPerBlock, 2); }
     void releaseResources() override {}
     void processAudioBlock (AudioBuffer<float>&) override {}
 
@@ -31,7 +31,7 @@ struct TestPlugin3 : public chowdsp::PluginBase<TestPlugin3>
         decltype (oversampling)::createParameterLayout (params, OSFactor::TwoX, OSMode::MinPhase, false);
     }
 
-    void prepareToPlay (double, int) override {}
+    void prepareToPlay (double sampleRate, int samplesPerBlock) override { oversampling.prepareToPlay (sampleRate, samplesPerBlock, 2); }
     void releaseResources() override {}
     void processAudioBlock (AudioBuffer<float>&) override {}
 
@@ -48,6 +48,7 @@ public:
     void withOfflineOptionsTest()
     {
         TestPlugin2 plugin;
+        plugin.prepareToPlay (48000.0f, 512);
         chowdsp::OversamplingMenu<chowdsp::VariableOversampling<float>> menu (plugin.oversampling, plugin.getVTS());
 
         auto& vts = plugin.getVTS();
@@ -61,10 +62,20 @@ public:
     void withoutOfflineOptionsTest()
     {
         TestPlugin3 plugin;
+        plugin.prepareToPlay (48000.0f, 512);
         chowdsp::OversamplingMenu<chowdsp::VariableOversampling<float>> menu (plugin.oversampling, plugin.getVTS());
         menu.updateColours();
 
         expectEquals (menu.getRootMenu()->getNumItems(), 10, "Menu has the inccorect number of items!");
+    }
+
+    void beforePrepareTest()
+    {
+        TestPlugin3 plugin;
+        chowdsp::OversamplingMenu<chowdsp::VariableOversampling<float>> menu (plugin.oversampling, plugin.getVTS());
+        menu.updateColours();
+
+        expectEquals (menu.getRootMenu()->getNumItems(), 0, "Menu has the inccorect number of items!");
     }
 
     void runTestTimed() override
@@ -74,6 +85,9 @@ public:
 
         beginTest ("Without Offline Options Test");
         withoutOfflineOptionsTest();
+
+        beginTest ("Before Preparation Test");
+        beforePrepareTest();
     }
 };
 
