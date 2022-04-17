@@ -37,7 +37,7 @@ public:
      * @param useIntegerLatency Set to true to force the oversamplers to use integer latency
      * @param paramPrefix       The same parameter prefix used to create the parameters
      */
-    explicit VariableOversampling (juce::AudioProcessorValueTreeState& vts, int numChannels = 2, bool useIntegerLatency = false, const juce::String& paramPrefix = "os");
+    explicit VariableOversampling (juce::AudioProcessorValueTreeState& vts, bool useIntegerLatency = false, const juce::String& paramPrefix = "os");
 
     /**
      * Creates a parameter layout for variable oversampling,
@@ -69,7 +69,7 @@ public:
                                        const juce::String& paramPrefix = "os");
 
     /** Prepares the oversamplers to process a new stream of audio */
-    void prepareToPlay (double sampleRate, int samplesPerBlock);
+    void prepareToPlay (double sampleRate, int samplesPerBlock, int numChannels);
 
     /** Resets the state of the oversamplers */
     void reset();
@@ -102,6 +102,11 @@ public:
     auto getParameters() { return std::tie (osParam, osModeParam, osOfflineParam, osOfflineModeParam, osOfflineSameParam); }
 
 private:
+    static OSFactor stringToOSFactor (const juce::String& factorStr);
+    static OSMode stringToOSMode (const juce::String& modeStr);
+    static juce::String osFactorToString (OSFactor factor);
+    static juce::String osModeToString (OSMode mode);
+
     juce::AudioParameterChoice* osParam = nullptr;
     juce::AudioParameterChoice* osModeParam = nullptr;
     juce::AudioParameterChoice* osOfflineParam = nullptr;
@@ -115,6 +120,9 @@ private:
     juce::OwnedArray<juce::dsp::Oversampling<FloatType>> oversamplers;
 
     const juce::AudioProcessor& proc;
+
+    const bool usingIntegerLatency;
+    const juce::String paramPrefix;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (VariableOversampling)
 };
