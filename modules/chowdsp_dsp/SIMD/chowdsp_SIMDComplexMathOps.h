@@ -166,7 +166,8 @@ inline SIMDComplex<BaseType> pow (const SIMDComplex<BaseType>& a, const SIMDComp
     auto cond = VecType::equal (y, ze);
     r = select (cond, r, r * expSIMD (-y * arga));
     theta = select (cond, theta, theta + y * logSIMD (absa));
-    return { r * cosSIMD (theta), r * sinSIMD (theta) };
+    auto sincosTheta = sincosSIMD (theta);
+    return { r * sincosTheta.second, r * sincosTheta.first };
 }
 
 /** SIMDComplex implementation of std::pow */
@@ -179,7 +180,8 @@ inline std::enable_if_t<std::is_same_v<NumericType<OtherType>, BaseType>, SIMDCo
     auto arga = arg (a);
     auto r = powSIMD (absa, (VecType) x);
     auto theta = x * arga;
-    return { r * cosSIMD (theta), r * sinSIMD (theta) };
+    auto sincosTheta = sincosSIMD (theta);
+    return { r * sincosTheta.second, r * sincosTheta.first };
 }
 
 /** SIMDComplex implementation of std::pow */
@@ -187,9 +189,22 @@ template <typename BaseType, typename OtherType>
 inline std::enable_if_t<std::is_same_v<NumericType<OtherType>, BaseType>, SIMDComplex<BaseType>>
     pow (OtherType a, const SIMDComplex<BaseType>& z)
 {
-    // @TODO: there's probably some optimization we can do here, knowing that the base is real?
+    // same as the complex/complex implementation above, except that we can skip calling arg()!
     using VecType = juce::dsp::SIMDRegister<BaseType>;
-    return pow (SIMDComplex<BaseType> { a, VecType {} }, z);
+    const auto ze = VecType ((BaseType) 0);
+
+    auto absa = VecType::abs (a);
+    auto arga = select (VecType::greaterThanOrEqual (a, ze), ze, VecType (juce::MathConstants<BaseType>::pi)); // since a is real, we know arg must be either 0 or pi
+    auto x = z.real();
+    auto y = z.imag();
+    auto r = powSIMD (absa, x);
+    auto theta = x * arga;
+
+    auto cond = VecType::equal (y, ze);
+    r = select (cond, r, r * expSIMD (-y * arga));
+    theta = select (cond, theta, theta + y * logSIMD (absa));
+    auto sincosTheta = sincosSIMD (theta);
+    return { r * sincosTheta.second, r * sincosTheta.first };
 }
 
 template <typename BaseType>
