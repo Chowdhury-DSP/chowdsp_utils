@@ -8,6 +8,9 @@ class LevelDetector
 {
 public:
     LevelDetector() = default;
+    LevelDetector (LevelDetector&&) noexcept = default;
+    LevelDetector& operator= (LevelDetector&&) noexcept = default;
+    virtual ~LevelDetector() = default;
 
     /** Sets the current time constants, in milliseconds. */
     void setParameters (float attackTimeMs, float releaseTimeMs);

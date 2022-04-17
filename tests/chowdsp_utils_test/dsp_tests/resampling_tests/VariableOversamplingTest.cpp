@@ -1,5 +1,12 @@
 #include <TimedUnitTest.h>
 
+namespace
+{
+constexpr double _sampleRate = 48000.0;
+constexpr int _blockSize = 512;
+constexpr int _numChannels = 2;
+} // namespace
+
 struct TestPlugin : public chowdsp::PluginBase<TestPlugin>
 {
     TestPlugin() : oversampling (vts) {}
@@ -13,7 +20,7 @@ struct TestPlugin : public chowdsp::PluginBase<TestPlugin>
 
     void prepareToPlay (double sampleRate, int samplesPerBlock) override
     {
-        oversampling.prepareToPlay (sampleRate, samplesPerBlock);
+        oversampling.prepareToPlay (sampleRate, samplesPerBlock, _numChannels);
     }
 
     void releaseResources() override { oversampling.reset(); }
@@ -37,12 +44,6 @@ struct TestPlugin : public chowdsp::PluginBase<TestPlugin>
     chowdsp::VariableOversampling<float> oversampling;
 };
 
-namespace
-{
-constexpr double _sampleRate = 48000.0;
-constexpr int _blockSize = 512;
-} // namespace
-
 class VariableOversamplingTest : public TimedUnitTest
 {
 public:
@@ -54,7 +55,7 @@ public:
         testPlugin.prepareToPlay (_sampleRate, _blockSize);
 
         auto checkOSFactor = [&] (int expectedFactor, const String& message) {
-            AudioBuffer<float> buffer (2, _blockSize);
+            AudioBuffer<float> buffer (_numChannels, _blockSize);
             testPlugin.processAudioBlock (buffer);
             testPlugin.releaseResources();
 
@@ -91,7 +92,7 @@ public:
         testPlugin.prepareToPlay (_sampleRate, _blockSize);
 
         auto checkOSFactor = [&] (int expectedFactor, const String& message) {
-            AudioBuffer<float> buffer (2, _blockSize);
+            AudioBuffer<float> buffer (_numChannels, _blockSize);
             testPlugin.processAudioBlock (buffer);
             expectEquals (testPlugin.lastOSBlockSize, expectedFactor * _blockSize, message);
         };

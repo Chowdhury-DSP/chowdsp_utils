@@ -6,7 +6,8 @@ namespace chowdsp
 {
 /** Menu that can be used as an interface for chowdsp::VariableOversampling */
 template <typename OSType>
-class OversamplingMenu : public juce::ComboBox
+class OversamplingMenu : public juce::ComboBox,
+                         private OSType::Listener
 {
 public:
     enum ColourIDs
@@ -19,10 +20,12 @@ public:
 
     /** Constructor with fields for the oversampling object, and APVTS */
     OversamplingMenu (OSType& osManager, juce::AudioProcessorValueTreeState& vts);
+    ~OversamplingMenu() override;
 
     void updateColours();
 
 private:
+    void sampleRateOrBlockSizeChanged() override { generateComboBoxMenu(); }
     void generateComboBoxMenu();
 
     juce::Colour accentColour;
@@ -59,10 +62,10 @@ public:
     OversamplingMenuItem (foleys::MagicGUIBuilder& builder, const juce::ValueTree& node) : foleys::GuiItem (builder, node)
     {
         setColourTranslation ({
-            { "combo-background", OversamplingMenu<MenuCompType>::backgroundColourID },
-            { "combo-text", OversamplingMenu<MenuCompType>::textColourID },
-            { "combo-outline", OversamplingMenu<MenuCompType>::outlineColourID },
-            { "menu-accent", OversamplingMenu<MenuCompType>::accentColourID },
+            { "combo-background", MenuCompType::backgroundColourID },
+            { "combo-text", MenuCompType::textColourID },
+            { "combo-outline", MenuCompType::outlineColourID },
+            { "menu-accent", MenuCompType::accentColourID },
         });
 
         auto* proc = dynamic_cast<ProcType*> (builder.getMagicState().getProcessor());
