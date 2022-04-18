@@ -5,10 +5,10 @@
 #include "PrototypeEQ.h"
 
 /** Example plugin to demonstrate the use of chowdsp::LinearPhaseEQ */
-class LinearPhaseEQPlugin : public chowdsp::PluginBase<LinearPhaseEQPlugin>
+class SimpleEQPlugin : public chowdsp::PluginBase<SimpleEQPlugin>
 {
 public:
-    LinearPhaseEQPlugin();
+    SimpleEQPlugin();
 
     static void addParameters (Parameters& params);
 
@@ -37,5 +37,5 @@ private:
     PrototypeEQ protoEQ;
     chowdsp::LinearPhaseEQ<PrototypeEQ> linPhaseEQ;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LinearPhaseEQPlugin)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SimpleEQPlugin)
 };

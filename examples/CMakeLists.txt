@@ -48,7 +48,7 @@ function(setup_example_plugin target code)
     )
 endfunction(setup_example_plugin)
 
-add_subdirectory(LinearPhaseEQ)
+add_subdirectory(SimpleEQ)
 add_subdirectory(SimpleReverb)
 add_subdirectory(SignalGenerator)
 add_subdirectory(ModalSpringReverb)
