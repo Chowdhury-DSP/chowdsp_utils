@@ -58,25 +58,24 @@ jobs:
         working-directory: ${{env.WORK_DIR}}
         env:
           CMAKE_ARGS: ${{ matrix.cmake_args }}
-        shell: bash
         run: cmake -Bbuild -DCHOWDSP_ENABLE_EXAMPLES=ON -DCHOWDSP_PATH_TO_JUCE=../../JUCE -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 
-      - name: "Build Example: LinearPhaseEQ"
+      - name: "Build Example: SimpleEQ"
         working-directory: ${{env.WORK_DIR}}/build
-        shell: bash
-        run: cmake --build . --target LinearPhaseEQ_Standalone --parallel 4
+        run: cmake --build . --target SimpleEQ_Standalone --parallel 4
 
       - name: "Build Example: SimpleReverb"
         working-directory: ${{env.WORK_DIR}}/build
-        shell: bash
         run: cmake --build . --target SimpleReverb_Standalone --parallel 4
 
       - name: "Build Example: SignalGenerator"
         working-directory: ${{env.WORK_DIR}}/build
-        shell: bash
         run: cmake --build . --target SignalGenerator_Standalone --parallel 4
 
       - name: "Build Example: ModalSpringReverb"
         working-directory: ${{env.WORK_DIR}}/build
-        shell: bash
         run: cmake --build . --target ModalSpringReverb_Standalone --parallel 4
+
+      - name: "Build Example: AutoWah"
+        working-directory: ${{env.WORK_DIR}}/build
+        run: cmake --build . --target AutoWah_Standalone --parallel 4
