@@ -14,11 +14,11 @@ namespace chowdsp::ResamplingTypes
  *  
  *  Reference: https://en.wikipedia.org/wiki/Lanczos_resampling
  */
-template <size_t BUFFER_SIZE = 4096, size_t A = juce::dsp::SIMDRegister<float>::size()>
+template <size_t BUFFER_SIZE = 4096, size_t A = 4>
 class LanczosResampler : public BaseResampler
 {
 public:
-    static_assert (A % juce::dsp::SIMDRegister<float>::size() == 0, "A must be a multiple of the SIMD register width");
+    static_assert (A % (juce::dsp::SIMDRegister<float>::size() / 2) == 0, "A must be a multiple of half the SIMD register width");
 
     /** Default constructor */
     LanczosResampler()
