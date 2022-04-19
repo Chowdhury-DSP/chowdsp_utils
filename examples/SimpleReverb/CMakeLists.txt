@@ -1,5 +1,3 @@
-message(STATUS "Configuring example: SimpleReverb")
-
 setup_example_plugin(SimpleReverb sRvb)
 
 target_sources(SimpleReverb

@@ -6,9 +6,9 @@ namespace chowdsp
 template <typename T>
 class SecondOrderLPF final : public chowdsp::IIRFilter<2, T>
 {
+public:
     using NumericType = SampleTypeHelpers::ProcessorNumericType<SecondOrderLPF>;
 
-public:
     SecondOrderLPF() = default;
     SecondOrderLPF (SecondOrderLPF&&) noexcept = default;
     SecondOrderLPF& operator= (SecondOrderLPF&&) noexcept = default;
@@ -27,9 +27,9 @@ private:
 template <typename T>
 class SecondOrderHPF final : public chowdsp::IIRFilter<2, T>
 {
+public:
     using NumericType = SampleTypeHelpers::ProcessorNumericType<SecondOrderHPF>;
 
-public:
     SecondOrderHPF() = default;
     SecondOrderHPF (SecondOrderHPF&&) noexcept = default;
     SecondOrderHPF& operator= (SecondOrderHPF&&) noexcept = default;
@@ -48,9 +48,9 @@ private:
 template <typename T>
 class SecondOrderBPF final : public chowdsp::IIRFilter<2, T>
 {
+public:
     using NumericType = SampleTypeHelpers::ProcessorNumericType<SecondOrderBPF>;
 
-public:
     SecondOrderBPF() = default;
     SecondOrderBPF (SecondOrderBPF&&) noexcept = default;
     SecondOrderBPF& operator= (SecondOrderBPF&&) noexcept = default;
@@ -69,9 +69,9 @@ private:
 template <typename T>
 class NotchFilter final : public chowdsp::IIRFilter<2, T>
 {
+public:
     using NumericType = SampleTypeHelpers::ProcessorNumericType<NotchFilter>;
 
-public:
     NotchFilter() = default;
     NotchFilter (NotchFilter&&) noexcept = default;
     NotchFilter& operator= (NotchFilter&&) noexcept = default;
@@ -90,9 +90,9 @@ private:
 template <typename T>
 class PeakingFilter final : public chowdsp::IIRFilter<2, T>
 {
+public:
     using NumericType = SampleTypeHelpers::ProcessorNumericType<PeakingFilter>;
 
-public:
     PeakingFilter() = default;
     PeakingFilter (PeakingFilter&&) noexcept = default;
     PeakingFilter& operator= (PeakingFilter&&) noexcept = default;
@@ -118,9 +118,9 @@ private:
 template <typename T>
 class LowShelfFilter final : public chowdsp::IIRFilter<2, T>
 {
+public:
     using NumericType = SampleTypeHelpers::ProcessorNumericType<LowShelfFilter>;
 
-public:
     LowShelfFilter() = default;
     LowShelfFilter (LowShelfFilter&&) noexcept = default;
     LowShelfFilter& operator= (LowShelfFilter&&) noexcept = default;
@@ -146,9 +146,9 @@ private:
 template <typename T>
 class HighShelfFilter final : public chowdsp::IIRFilter<2, T>
 {
+public:
     using NumericType = SampleTypeHelpers::ProcessorNumericType<HighShelfFilter>;
 
-public:
     HighShelfFilter() = default;
     HighShelfFilter (HighShelfFilter&&) noexcept = default;
     HighShelfFilter& operator= (HighShelfFilter&&) noexcept = default;

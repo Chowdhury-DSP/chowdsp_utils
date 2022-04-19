@@ -17,6 +17,8 @@ add_compile_options(
 )
 
 function(setup_example_plugin target code)
+    message(STATUS "Configuring example: ${target}")
+
     juce_add_plugin(${target}
         COMPANY_NAME chowdsp
         PLUGIN_MANUFACTURER_CODE Chow
@@ -52,3 +54,4 @@ add_subdirectory(SimpleEQ)
 add_subdirectory(SimpleReverb)
 add_subdirectory(SignalGenerator)
 add_subdirectory(ModalSpringReverb)
+add_subdirectory(AutoWah)
