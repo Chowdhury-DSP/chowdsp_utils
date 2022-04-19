@@ -3,8 +3,6 @@
 #include <chowdsp_plugin_utils/chowdsp_plugin_utils.h>
 #include <chowdsp_dsp/chowdsp_dsp.h>
 
-#include "chowdsp_ModFilterWrapper.h"
-
 class AutoWahPlugin : public chowdsp::PluginBase<AutoWahPlugin>
 {
 public:

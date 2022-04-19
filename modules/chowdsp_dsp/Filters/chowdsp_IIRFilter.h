@@ -12,6 +12,7 @@ class IIRFilter
 public:
     using SampleType = FloatType;
     using NumericType = SampleTypeHelpers::NumericType<FloatType>;
+    static constexpr auto Order = order;
 
     IIRFilter()
     {

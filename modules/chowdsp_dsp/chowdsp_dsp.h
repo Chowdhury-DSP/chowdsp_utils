@@ -140,6 +140,7 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 #include "Filters/chowdsp_NthOrderFilter.h"
 #include "Filters/chowdsp_juce_IIRFilter.h"
 #include "Filters/chowdsp_HilbertFilter.h"
+#include "Filters/chowdsp_ModFilterWrapper.h"
 
 // modal tools
 #include "Modal/chowdsp_ModalFilter.h"
