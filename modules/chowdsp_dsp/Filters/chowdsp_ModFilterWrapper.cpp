@@ -2,7 +2,6 @@
 
 namespace chowdsp
 {
-
 template <typename PrototypeFilter>
 void ModFilterWrapper<PrototypeFilter>::prepare (const juce::dsp::ProcessSpec& spec)
 {

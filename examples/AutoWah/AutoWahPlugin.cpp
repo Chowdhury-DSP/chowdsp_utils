@@ -62,8 +62,7 @@ void AutoWahPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
     const auto curFreqMod = 9.0f * *freqModParam;
     wahFilter.process (
         juce::dsp::ProcessContextReplacing<float> { block },
-        [&] (size_t sampleIndex)
-        {
+        [&] (size_t sampleIndex) {
             const auto curFreqHz = baseFreqHz + baseFreqHz * curFreqMod * levelData[sampleIndex];
             wahFilter.calcCoefs (curFreqHz, curQVal, curGain, fs);
         });

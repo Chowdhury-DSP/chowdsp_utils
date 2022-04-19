@@ -60,7 +60,7 @@ private:
 
     void update();
     void snapToZero() noexcept;
-    
+
     PrototypeFilter prototypeFilter;
 
     SampleType g, g2, gSqr, two_gSqr, h, R2, c0, c1, c2;
