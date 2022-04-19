@@ -9,9 +9,9 @@ namespace chowdsp
 template <typename T>
 class FirstOrderLPF final : public chowdsp::IIRFilter<1, T>
 {
+public:
     using NumericType = SampleTypeHelpers::ProcessorNumericType<FirstOrderLPF>;
 
-public:
     FirstOrderLPF() = default;
     FirstOrderLPF (FirstOrderLPF&&) noexcept = default;
     FirstOrderLPF& operator= (FirstOrderLPF&&) noexcept = default;
@@ -41,9 +41,9 @@ private:
 template <typename T>
 class FirstOrderHPF final : public chowdsp::IIRFilter<1, T>
 {
+public:
     using NumericType = SampleTypeHelpers::ProcessorNumericType<FirstOrderHPF>;
 
-public:
     FirstOrderHPF() = default;
     FirstOrderHPF (FirstOrderHPF&&) noexcept = default;
     FirstOrderHPF& operator= (FirstOrderHPF&&) noexcept = default;
@@ -73,9 +73,9 @@ private:
 template <typename T = float>
 class ShelfFilter final : public IIRFilter<1, T>
 {
+public:
     using NumericType = SampleTypeHelpers::ProcessorNumericType<ShelfFilter>;
 
-public:
     ShelfFilter() = default;
     ShelfFilter (ShelfFilter&&) noexcept = default;
     ShelfFilter& operator= (ShelfFilter&&) noexcept = default;

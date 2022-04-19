@@ -38,6 +38,7 @@ target_sources(chowdsp_utils_tests PRIVATE
     filter_tests/NthOrderFilterTest.cpp
     filter_tests/SecondOrderFiltersTest.cpp
     filter_tests/ShelfFilterTest.cpp
+    filter_tests/ModFilterWrapperTest.cpp
 
     modal_tests/ModalFilterTest.cpp
     modal_tests/ModalFilterBankTest.cpp

@@ -10,7 +10,9 @@ template <size_t order, typename FloatType = float>
 class IIRFilter
 {
 public:
+    using SampleType = FloatType;
     using NumericType = SampleTypeHelpers::NumericType<FloatType>;
+    static constexpr auto Order = order;
 
     IIRFilter()
     {
@@ -80,6 +82,9 @@ protected:
     FloatType a[order + 1];
     FloatType b[order + 1];
     FloatType z[order + 1];
+
+    template <typename PrototypeFilter>
+    friend class ModFilterWrapper;
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IIRFilter)
