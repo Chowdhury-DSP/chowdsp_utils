@@ -7,17 +7,23 @@ juce::String getTagForBand (int bandIndex, const juce::String& tag)
     return "band" + juce::String (bandIndex) + "_" + tag;
 }
 
+juce::String getNameForBand (int bandIndex, const juce::String& name)
+{
+    return "Band " + juce::String (bandIndex) + " " + name;
+}
+
 const juce::String freqTag = "filter_freq";
 const juce::String qTag = "filter_q";
 const juce::String gainTag = "filter_gain";
 const juce::String typeTag = "filter_type";
+const juce::String onOffTag = "filter_on_off";
 const juce::String linPhaseModeTag = "linear_phase_mode";
 
 const auto eqTypeChoices = juce::StringArray {
     "1-Pole HPF",
     "2-Pole HPF",
-    "Bell",
     "Low-Shelf",
+    "Bell",
     "High-Shelf",
     "1-Pole LPF",
     "2-Pole LPF",
@@ -32,6 +38,7 @@ SimpleEQPlugin::SimpleEQPlugin()
         bandQ[i] = vts.getRawParameterValue (getTagForBand ((int) i, qTag));
         bandGainDB[i] = vts.getRawParameterValue (getTagForBand ((int) i, gainTag));
         bandType[i] = vts.getRawParameterValue (getTagForBand ((int) i, typeTag));
+        bandOnOff[i] = vts.getRawParameterValue (getTagForBand ((int) i, onOffTag));
     }
 
     linPhaseModeOn = vts.getRawParameterValue (linPhaseModeTag);
@@ -50,10 +57,11 @@ void SimpleEQPlugin::addParameters (Parameters& params)
 
     for (int i = 0; i < (int) EQParams::numBands; ++i)
     {
-        createFreqParameter (params, getTagForBand (i, freqTag), "Band " + juce::String (i) + " Freq.", 20.0f, 20000.0f, 2000.0f, 1000.0f);
-        addQParam (getTagForBand (i, qTag), "Band " + juce::String (i) + " Q");
-        createGainDBParameter (params, getTagForBand (i, gainTag), "Band " + juce::String (i) + " Gain", -18.0f, 18.0f, 0.0f);
-        emplace_param<juce::AudioParameterChoice> (params, getTagForBand (i, typeTag), "Band " + juce::String (i) + " Type", eqTypeChoices, 2);
+        createFreqParameter (params, getTagForBand (i, freqTag), getNameForBand (i, "Freq."), 20.0f, 20000.0f, 2000.0f, 1000.0f);
+        addQParam (getTagForBand (i, qTag), getNameForBand (i, "Q"));
+        createGainDBParameter (params, getTagForBand (i, gainTag), getNameForBand (i, "Gain"), -18.0f, 18.0f, 0.0f);
+        emplace_param<juce::AudioParameterChoice> (params, getTagForBand (i, typeTag), getNameForBand (i, "Type"), eqTypeChoices, 3);
+        emplace_param<juce::AudioParameterBool> (params, getTagForBand (i, onOffTag), getNameForBand (i, "On/Off"), false);
     }
 
     emplace_param<juce::AudioParameterBool> (params, linPhaseModeTag, "Linear Phase", false);
@@ -75,26 +83,19 @@ void SimpleEQPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)
 
 PrototypeEQ::Params SimpleEQPlugin::makeEQParams() const
 {
-    return {
-        EQParams::BandParams {
-            *bandFreqHz[0],
-            *bandQ[0],
-            *bandGainDB[0],
-            (int) *bandType[0],
-        },
-        EQParams::BandParams {
-            *bandFreqHz[1],
-            *bandQ[1],
-            *bandGainDB[1],
-            (int) *bandType[1],
-        },
-        EQParams::BandParams {
-            *bandFreqHz[2],
-            *bandQ[2],
-            *bandGainDB[2],
-            (int) *bandType[2],
-        }
-    };
+    EQParams params {};
+    for (size_t i = 0; i < EQParams::numBands; ++i)
+    {
+        params.bands[i] = EQParams::BandParams {
+            *bandFreqHz[i],
+            *bandQ[i],
+            *bandGainDB[i],
+            (int) *bandType[i],
+            *bandOnOff[i] == 1.0f,
+        };
+    }
+
+    return params;
 }
 
 void SimpleEQPlugin::setEQParams()

@@ -44,6 +44,8 @@ private:
     FloatType fs = FloatType (44100.0);
 
     juce::AudioBuffer<FloatType> fadeBuffer;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EQBand)
 };
 } // namespace chowdsp
 

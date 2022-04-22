@@ -26,6 +26,7 @@ private:
     std::array<std::atomic<float>*, EQParams::numBands> bandQ {};
     std::array<std::atomic<float>*, EQParams::numBands> bandGainDB {};
     std::array<std::atomic<float>*, EQParams::numBands> bandType {};
+    std::array<std::atomic<float>*, EQParams::numBands> bandOnOff {};
     std::atomic<float>* linPhaseModeOn = nullptr;
 
     // In general, you only need to create a linear phase EQ, but in this case

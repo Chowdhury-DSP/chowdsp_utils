@@ -4,30 +4,26 @@ void PrototypeEQ::setParameters (const Params& params)
 {
     for (size_t i = 0; i < Params::numBands; ++i)
     {
-        bands[i].setCutoffFrequency (params.bands[i].bandFreqHz);
-        bands[i].setQValue (params.bands[i].bandQ);
-        bands[i].setGainDB (params.bands[i].bandGainDB);
-        bands[i].setFilterType (params.bands[i].bandType);
+        eq.setCutoffFrequency ((int) i, params.bands[i].bandFreqHz);
+        eq.setQValue ((int) i, params.bands[i].bandQ);
+        eq.setGainDB ((int) i, params.bands[i].bandGainDB);
+        eq.setFilterType ((int) i, params.bands[i].bandType);
+        eq.setBandOnOff ((int) i, params.bands[i].bandOnOff);
     }
 }
 
 void PrototypeEQ::prepare (const juce::dsp::ProcessSpec& spec)
 {
-    for (auto& band : bands)
-        band.prepare (spec);
+    eq.prepare (spec);
 }
 
 void PrototypeEQ::reset()
 {
-    for (auto& band : bands)
-        band.reset();
+    eq.reset();
 }
 
 void PrototypeEQ::processBlock (juce::AudioBuffer<float>& buffer)
 {
     auto&& block = juce::dsp::AudioBlock<float> { buffer };
-    auto&& context = juce::dsp::ProcessContextReplacing<float> { block };
-
-    for (auto& band : bands)
-        band.process (context);
+    eq.process (block);
 }

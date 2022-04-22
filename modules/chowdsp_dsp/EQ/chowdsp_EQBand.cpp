@@ -1,5 +1,6 @@
 namespace chowdsp
 {
+#ifndef DOXYGEN
 namespace eqband_detail
 {
     /** Functions to do a function for each element in the tuple */
@@ -18,6 +19,7 @@ namespace eqband_detail
         forEachInTuple (std::forward<Fn> (fn), std::forward<Tuple> (tuple), TupleIndexSequence<Tuple> {});
     }
 } // namespace eqband_detail
+#endif
 
 template <typename FloatType, typename... FilterChoices>
 EQBand<FloatType, FilterChoices...>::EQBand() = default;

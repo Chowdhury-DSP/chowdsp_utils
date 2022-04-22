@@ -24,12 +24,12 @@ private:
     using EQBand = chowdsp::EQBand<float,
                                    chowdsp::FirstOrderHPF<float>,
                                    chowdsp::SecondOrderHPF<float>,
-                                   chowdsp::PeakingFilter<float>,
                                    chowdsp::LowShelfFilter<float>,
+                                   chowdsp::PeakingFilter<float>,
                                    chowdsp::HighShelfFilter<float>,
                                    chowdsp::FirstOrderLPF<float>,
                                    chowdsp::SecondOrderLPF<float>>;
-    std::array<EQBand, Params::numBands> bands;
+    chowdsp::EQProcessor<float, Params::numBands, EQBand> eq;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PrototypeEQ)
 };

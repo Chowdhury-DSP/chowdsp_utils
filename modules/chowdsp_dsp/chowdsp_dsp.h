@@ -127,7 +127,6 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 #include "Convolution/chowdsp_ConvolutionEngine.h"
 #include "Convolution/chowdsp_IRTransfer.h"
 #include "Convolution/chowdsp_IRHelpers.h"
-#include "Convolution/chowdsp_LinearPhaseEQ.h"
 
 // filter tools
 #include "Filters/chowdsp_BilinearUtils.h"
@@ -141,9 +140,6 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 #include "Filters/chowdsp_juce_IIRFilter.h"
 #include "Filters/chowdsp_HilbertFilter.h"
 #include "Filters/chowdsp_ModFilterWrapper.h"
-
-// EQ tools
-#include "EQ/chowdsp_EQBand.h"
 
 // modal tools
 #include "Modal/chowdsp_ModalFilter.h"
@@ -167,6 +163,11 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 #include "Processors/chowdsp_Panner.h"
 #include "Processors/chowdsp_SoftClipper.h"
 #include "Processors/chowdsp_TunerProcessor.h"
+
+// EQ tools
+#include "EQ/chowdsp_EQBand.h"
+#include "EQ/chowdsp_EQProcessor.h"
+#include "EQ/chowdsp_LinearPhaseEQ.h"
 
 // sound sources
 #include "Sources/chowdsp_Noise.h"

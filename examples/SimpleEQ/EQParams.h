@@ -8,13 +8,15 @@ struct EQParams
     {
         float bandFreqHz, bandQ, bandGainDB;
         int bandType;
+        bool bandOnOff;
 
         bool operator== (const BandParams& other) const
         {
             return bandFreqHz == other.bandFreqHz
                    && bandQ == other.bandQ
                    && bandGainDB == other.bandGainDB
-                   && bandType == other.bandType;
+                   && bandType == other.bandType
+                   && bandOnOff == other.bandOnOff;
         }
     };
 
