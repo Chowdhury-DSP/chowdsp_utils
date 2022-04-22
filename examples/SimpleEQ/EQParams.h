@@ -3,19 +3,31 @@
 /** Parameters to determine the filter behaviour */
 struct EQParams
 {
+    static constexpr size_t numBands = 3;
+    struct BandParams
+    {
+        float bandFreqHz, bandQ, bandGainDB;
+        int bandType;
+
+        bool operator== (const BandParams& other) const
+        {
+            return bandFreqHz == other.bandFreqHz
+                   && bandQ == other.bandQ
+                   && bandGainDB == other.bandGainDB
+                   && bandType == other.bandType;
+        }
+    };
+
     // parameters
-    float lowCutFreqHz, lowCutQ, peakingFilterFreqHz, peakingFilterQ, peakingFilterGainDB, highCutFreqHz, highCutQ;
+    std::array<BandParams, numBands> bands;
 
     // we need this method so we can know if two parameter sets are equivalent.
     bool operator== (const EQParams& other) const
     {
-        return lowCutFreqHz == other.lowCutFreqHz
-               && lowCutQ == other.lowCutQ
-               && peakingFilterFreqHz == other.peakingFilterFreqHz
-               && peakingFilterQ == other.peakingFilterQ
-               && peakingFilterGainDB == other.peakingFilterGainDB
-               && highCutFreqHz == other.highCutFreqHz
-               && highCutFreqHz == other.highCutFreqHz
-               && highCutQ == other.highCutQ;
+        bool result = true;
+        for (size_t i = 0; i < numBands; ++i)
+            result &= bands[i] == other.bands[i];
+
+        return result;
     }
 };

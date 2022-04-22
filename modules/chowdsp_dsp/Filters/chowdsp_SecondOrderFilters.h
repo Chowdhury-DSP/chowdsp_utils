@@ -92,6 +92,7 @@ class PeakingFilter final : public chowdsp::IIRFilter<2, T>
 {
 public:
     using NumericType = SampleTypeHelpers::ProcessorNumericType<PeakingFilter>;
+    static constexpr bool HasGainParameter = true;
 
     PeakingFilter() = default;
     PeakingFilter (PeakingFilter&&) noexcept = default;
@@ -120,6 +121,7 @@ class LowShelfFilter final : public chowdsp::IIRFilter<2, T>
 {
 public:
     using NumericType = SampleTypeHelpers::ProcessorNumericType<LowShelfFilter>;
+    static constexpr bool HasGainParameter = true;
 
     LowShelfFilter() = default;
     LowShelfFilter (LowShelfFilter&&) noexcept = default;
@@ -148,6 +150,7 @@ class HighShelfFilter final : public chowdsp::IIRFilter<2, T>
 {
 public:
     using NumericType = SampleTypeHelpers::ProcessorNumericType<HighShelfFilter>;
+    static constexpr bool HasGainParameter = true;
 
     HighShelfFilter() = default;
     HighShelfFilter (HighShelfFilter&&) noexcept = default;

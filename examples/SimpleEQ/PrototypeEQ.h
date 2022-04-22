@@ -12,7 +12,7 @@ public:
 
     using Params = EQParams;
 
-    void setParameters (const Params& params, bool force = false);
+    void setParameters (const Params& params);
 
     void prepare (const juce::dsp::ProcessSpec& spec);
 
@@ -21,23 +21,15 @@ public:
     void processBlock (juce::AudioBuffer<float>& buffer);
 
 private:
-    void processHighCut (juce::AudioBuffer<float>& buffer);
-    void processPeaking (juce::AudioBuffer<float>& buffer);
-    void processLowCut (juce::AudioBuffer<float>& buffer);
-
-    chowdsp::SecondOrderHPF<float> lowCutFilter;
-    chowdsp::PeakingFilter<float> peakingFilter;
-    chowdsp::SecondOrderLPF<float> highCutFilter;
-
-    juce::SmoothedValue<float, juce::ValueSmoothingTypes::Multiplicative> lowCutFreqHzSmooth;
-    juce::SmoothedValue<float, juce::ValueSmoothingTypes::Multiplicative> lowCutQSmooth;
-    juce::SmoothedValue<float, juce::ValueSmoothingTypes::Multiplicative> peakingFilterFreqHzSmooth;
-    juce::SmoothedValue<float, juce::ValueSmoothingTypes::Multiplicative> peakingFilterQSmooth;
-    juce::SmoothedValue<float, juce::ValueSmoothingTypes::Multiplicative> peakingFilterGainSmooth;
-    juce::SmoothedValue<float, juce::ValueSmoothingTypes::Multiplicative> highCutFreqHzSmooth;
-    juce::SmoothedValue<float, juce::ValueSmoothingTypes::Multiplicative> highCutQSmooth;
-
-    float fs = 48000.0f;
+    using EQBand = chowdsp::EQBand<float,
+                                   chowdsp::FirstOrderHPF<float>,
+                                   chowdsp::SecondOrderHPF<float>,
+                                   chowdsp::PeakingFilter<float>,
+                                   chowdsp::LowShelfFilter<float>,
+                                   chowdsp::HighShelfFilter<float>,
+                                   chowdsp::FirstOrderLPF<float>,
+                                   chowdsp::SecondOrderLPF<float>>;
+    std::array<EQBand, Params::numBands> bands;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PrototypeEQ)
 };

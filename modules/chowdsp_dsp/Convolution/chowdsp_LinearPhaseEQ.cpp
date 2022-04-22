@@ -27,7 +27,7 @@ void LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::prepare (const juce::dsp::Pro
     const auto fftOrder = chowdsp::log2 (irSize);
     fft = std::make_unique<juce::dsp::FFT> (fftOrder);
 
-    prototypeEQ.prepare (spec);
+    prototypeEQ.prepare ({ spec.sampleRate, (juce::uint32) irSize, 1 });
 
     irBuffer = juce::AudioBuffer<float> (1, irSize);
     params = initialParams;

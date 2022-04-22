@@ -142,6 +142,9 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 #include "Filters/chowdsp_HilbertFilter.h"
 #include "Filters/chowdsp_ModFilterWrapper.h"
 
+// EQ tools
+#include "EQ/chowdsp_EQBand.h"
+
 // modal tools
 #include "Modal/chowdsp_ModalFilter.h"
 #include "Modal/chowdsp_ModalFilterBank.h"

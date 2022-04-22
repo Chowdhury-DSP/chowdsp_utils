@@ -22,13 +22,10 @@ private:
     PrototypeEQ::Params makeEQParams() const;
     void setEQParams();
 
-    std::atomic<float>* lowCutFreqHz = nullptr;
-    std::atomic<float>* lowCutQ = nullptr;
-    std::atomic<float>* peakingFilterFreqHz = nullptr;
-    std::atomic<float>* peakingFilterQ = nullptr;
-    std::atomic<float>* peakingFilterGainDB = nullptr;
-    std::atomic<float>* highCutFreqHz = nullptr;
-    std::atomic<float>* highCutQ = nullptr;
+    std::array<std::atomic<float>*, EQParams::numBands> bandFreqHz {};
+    std::array<std::atomic<float>*, EQParams::numBands> bandQ {};
+    std::array<std::atomic<float>*, EQParams::numBands> bandGainDB {};
+    std::array<std::atomic<float>*, EQParams::numBands> bandType {};
     std::atomic<float>* linPhaseModeOn = nullptr;
 
     // In general, you only need to create a linear phase EQ, but in this case
