@@ -13,6 +13,8 @@ public:
     using SampleType = FloatType;
     using NumericType = SampleTypeHelpers::NumericType<FloatType>;
     static constexpr auto Order = order;
+    static constexpr bool HasQParameter = order > 1;
+    static constexpr bool HasGainParameter = false;
 
     IIRFilter()
     {
