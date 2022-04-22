@@ -4,7 +4,7 @@
 
 #include "PrototypeEQ.h"
 
-/** Example plugin to demonstrate the use of chowdsp::LinearPhaseEQ */
+/** Example plugin to demonstrate the use of chowdsp::EQProcessor and chowdsp::LinearPhaseEQ */
 class SimpleEQPlugin : public chowdsp::PluginBase<SimpleEQPlugin>
 {
 public:
@@ -29,11 +29,8 @@ private:
     std::array<std::atomic<float>*, EQParams::numBands> bandOnOff {};
     std::atomic<float>* linPhaseModeOn = nullptr;
 
-    // In general, you only need to create a linear phase EQ, but in this case
-    // we want to be able to A/B test, so we'll create both the prototype and
-    // the linear phase EQs
-    PrototypeEQ protoEQ;
-    chowdsp::LinearPhaseEQ<PrototypeEQ> linPhaseEQ;
+    PrototypeEQ protoEQ; // the regular EQ
+    chowdsp::LinearPhaseEQ<PrototypeEQ> linPhaseEQ; // the linear phase EQ
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SimpleEQPlugin)
 };

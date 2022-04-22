@@ -113,12 +113,12 @@ void SimpleEQPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
 
     if (*linPhaseModeOn == 0)
     {
-        // For A/B testing purposes: process the prototype EQ
+        // Not in linear phase mode, so just process the regular EQ
         protoEQ.processBlock (buffer);
     }
     else
     {
-        // Here we are: processing the linear phase EQ!
+        // Linear phase mode is on: processing the linear phase EQ here!
         auto&& block = juce::dsp::AudioBlock<float> { buffer };
         linPhaseEQ.process (juce::dsp::ProcessContextReplacing<float> { block });
     }
