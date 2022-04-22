@@ -43,15 +43,13 @@ SimpleEQPlugin::SimpleEQPlugin()
 
     linPhaseModeOn = vts.getRawParameterValue (linPhaseModeTag);
 
-    linPhaseEQ.updatePrototypeEQParameters = [] (auto& eq, auto& eqParams)
-    { eq.setParameters (eqParams); };
+    linPhaseEQ.updatePrototypeEQParameters = [] (auto& eq, auto& eqParams) { eq.setParameters (eqParams); };
 }
 
 void SimpleEQPlugin::addParameters (Parameters& params)
 {
     using namespace chowdsp::ParamUtils;
-    auto addQParam = [&params] (const juce::String& tag, const juce::String& name)
-    {
+    auto addQParam = [&params] (const juce::String& tag, const juce::String& name) {
         emplace_param<VTSParam> (params, tag, name, juce::String(), createNormalisableRange (0.1f, 10.0f, 0.7071f), 0.7071f, &floatValToString, &stringToFloatVal);
     };
 

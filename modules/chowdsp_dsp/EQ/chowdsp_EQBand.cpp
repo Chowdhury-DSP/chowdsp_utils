@@ -80,8 +80,7 @@ void EQBand<FloatType, FilterChoices...>::reset()
 {
     for (auto& channelFilters : filters)
     {
-        eqband_detail::forEachInTuple ([] (auto& filter, size_t)
-                                       { filter.reset(); },
+        eqband_detail::forEachInTuple ([] (auto& filter, size_t) { filter.reset(); },
                                        channelFilters);
     }
 
@@ -95,8 +94,7 @@ template <typename FloatType, typename... FilterChoices>
 template <typename FilterType>
 void EQBand<FloatType, FilterChoices...>::processFilterChannel (FilterType& filter, FloatType* samples, int numSamples)
 {
-    auto setParams = [&filter, fs = this->fs] (FloatType curFreq, FloatType curQ, FloatType curGain)
-    {
+    auto setParams = [&filter, fs = this->fs] (FloatType curFreq, FloatType curQ, FloatType curGain) {
         if constexpr (! FilterType::HasQParameter)
             filter.calcCoefs (curFreq, fs);
         else if constexpr (! FilterType::HasGainParameter)
@@ -173,8 +171,7 @@ void EQBand<FloatType, FilterChoices...>::process (const ProcessContext& context
             fadeBuffer.copyFrom ((int) channel, 0, blockPtr, numSamples);
 
         eqband_detail::forEachInTuple (
-            [this, &blockPtr, channel, numSamples] (auto& filter, size_t filterIndex)
-            {
+            [this, &blockPtr, channel, numSamples] (auto& filter, size_t filterIndex) {
                 if ((int) filterIndex == filterType)
                 {
                     processFilterChannel (filter, blockPtr, numSamples);
