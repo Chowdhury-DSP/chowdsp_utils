@@ -96,11 +96,19 @@ void EQBand<FloatType, FilterChoices...>::processFilterChannel (FilterType& filt
 {
     auto setParams = [&filter, fs = this->fs] (FloatType curFreq, FloatType curQ, FloatType curGain) {
         if constexpr (! FilterType::HasQParameter)
+        {
+            juce::ignoreUnused (curQ, curGain);
             filter.calcCoefs (curFreq, fs);
+        }
         else if constexpr (! FilterType::HasGainParameter)
+        {
+            juce::ignoreUnused (curGain);
             filter.calcCoefs (curFreq, curQ, fs);
+        }
         else
+        {
             filter.calcCoefs (curFreq, curQ, curGain, fs);
+        }
     };
 
     const auto isSmoothing = freqSmooth.isSmoothing() || qSmooth.isSmoothing() || gainSmooth.isSmoothing();
