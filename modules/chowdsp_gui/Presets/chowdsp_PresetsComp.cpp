@@ -141,12 +141,23 @@ void PresetsComp::presetListUpdated()
 
     int optionID = 0;
     optionID = createPresetsMenu (optionID);
-    addPresetOptions (optionID);
+    optionID = addSavePresetOptions (optionID);
+    optionID = addSharePresetOptions (optionID);
+
+#if ! JUCE_IOS
+    optionID = addPresetFolderOptions (optionID);
+#endif
 }
 
 int PresetsComp::createPresetsMenu (int optionID)
 {
-    std::map<juce::String, juce::PopupMenu> presetMapItems;
+    struct VendorPresetCollection
+    {
+        std::map<juce::String, juce::PopupMenu> categoryPresetMenus;
+        std::vector<juce::PopupMenu::Item> nonCategoryItems;
+    };
+
+    std::map<juce::String, VendorPresetCollection> presetMapItems;
     for (const auto& presetIDPair : manager.getPresetMap())
     {
         const auto presetID = presetIDPair.first;
@@ -154,58 +165,153 @@ int PresetsComp::createPresetsMenu (int optionID)
 
         juce::PopupMenu::Item presetItem { preset.getName() };
         presetItem.itemID = presetID + 1;
-        presetItem.action = [=, &preset] {
+        presetItem.action = [=, &preset]
+        {
             updatePresetBoxText();
             manager.loadPreset (preset);
         };
 
-        presetMapItems[preset.getVendor()].addItem (presetItem);
+        const auto& presetCategory = preset.getCategory();
+        if (presetCategory.isEmpty())
+            presetMapItems[preset.getVendor()].nonCategoryItems.push_back (presetItem);
+        else
+            presetMapItems[preset.getVendor()].categoryPresetMenus[presetCategory].addItem (presetItem);
 
         optionID = juce::jmax (optionID, presetItem.itemID);
     }
 
-    for (auto& [vendorName, menu] : presetMapItems)
-        presetBox.getRootMenu()->addSubMenu (vendorName, menu);
+    for (auto& [vendorName, vendorCollection] : presetMapItems)
+    {
+        juce::PopupMenu vendorMenu;
+        for (auto& [category, categoryMenu] : vendorCollection.categoryPresetMenus)
+            vendorMenu.addSubMenu (category, categoryMenu);
+
+        std::sort (vendorCollection.nonCategoryItems.begin(), vendorCollection.nonCategoryItems.end(), [] (auto& item1, auto& item2)
+                   { return item1.text < item2.text; });
+        for (auto& extraItem : vendorCollection.nonCategoryItems)
+            vendorMenu.addItem (extraItem);
+
+        presetBox.getRootMenu()->addSubMenu (vendorName, vendorMenu);
+    }
 
     return optionID;
 }
 
-int PresetsComp::addPresetOptions (int optionID)
+template <typename ActionType>
+int PresetsComp::addPresetMenuItem (juce::PopupMenu* menu, int optionID, const juce::String& itemText, ActionType&& action)
+{
+    juce::PopupMenu::Item item { itemText };
+    item.itemID = ++optionID;
+    item.action = [&, forwardedAction = std::forward<ActionType> (action)]
+    {
+        updatePresetBoxText();
+        forwardedAction();
+    };
+    menu->addItem (item);
+
+    return optionID;
+}
+
+int PresetsComp::addSavePresetOptions (int optionID)
 {
     auto menu = presetBox.getRootMenu();
     menu->addSeparator();
 
-    juce::PopupMenu::Item saveItem { "Save Preset" };
-    saveItem.itemID = ++optionID;
-    saveItem.action = [=] {
-        updatePresetBoxText();
-        saveUserPreset();
-    };
-    menu->addItem (saveItem);
+    optionID = addPresetMenuItem (menu,
+                                  optionID,
+                                  "Reset",
+                                  [&]
+                                  {
+                                      if (auto* currentPreset = manager.getCurrentPreset())
+                                          manager.loadPreset (*currentPreset);
+                                  });
 
-#if ! JUCE_IOS
-    juce::PopupMenu::Item goToFolderItem { "Go to Preset folder..." };
-    goToFolderItem.itemID = ++optionID;
-    goToFolderItem.action = [=] {
-        updatePresetBoxText();
-        auto folder = manager.getUserPresetPath();
-        if (folder.isDirectory())
-            folder.startAsProcess();
-        else
-            chooseUserPresetFolder ({});
-    };
-    menu->addItem (goToFolderItem);
-
-    juce::PopupMenu::Item chooseFolderItem { "Choose Preset folder..." };
-    chooseFolderItem.itemID = ++optionID;
-    chooseFolderItem.action = [=] {
-        updatePresetBoxText();
-        chooseUserPresetFolder ({});
-    };
-    menu->addItem (chooseFolderItem);
-#endif
+    optionID = addPresetMenuItem (menu,
+                                  optionID,
+                                  "Save Preset",
+                                  [&]
+                                  { saveUserPreset(); });
 
     return optionID;
+}
+
+int PresetsComp::addSharePresetOptions (int optionID)
+{
+    auto menu = presetBox.getRootMenu();
+    menu->addSeparator();
+
+    optionID = addPresetMenuItem (menu,
+                                  optionID,
+                                  "Copy Current Preset",
+                                  [&]
+                                  {
+                                      if (auto* currentPreset = manager.getCurrentPreset())
+                                          juce::SystemClipboard::copyTextToClipboard (currentPreset->toXml()->toString());
+                                  });
+
+    optionID = addPresetMenuItem (menu,
+                                  optionID,
+                                  "Paste Preset",
+                                  [&]
+                                  {
+                                      const auto presetText = juce::SystemClipboard::getTextFromClipboard();
+                                      if (presetText.isEmpty())
+                                          return;
+
+                                      if (auto presetXml = juce::XmlDocument::parse (presetText))
+                                          loadPresetSafe (Preset { presetXml.get() });
+                                  });
+
+#if ! JUCE_IOS
+    return addPresetMenuItem (menu, optionID, "Load Preset From File", [&]
+                              {
+                                  constexpr auto flags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles;
+                                  fileChooser = std::make_shared<juce::FileChooser> ("Load Preset", manager.getUserPresetPath(), "*" + presetExt, true, false, getTopLevelComponent());
+                                  fileChooser->launchAsync (flags,
+                                                            [&] (const juce::FileChooser& fc)
+                                                            {
+                                                                if (fc.getResults().isEmpty())
+                                                                    return;
+
+                                                                loadPresetSafe (Preset { fc.getResult() });
+                                                            });
+                              });
+#endif
+}
+
+int PresetsComp::addPresetFolderOptions (int optionID)
+{
+    auto menu = presetBox.getRootMenu();
+    menu->addSeparator();
+
+    if (manager.getUserPresetPath().isDirectory())
+    {
+        optionID = addPresetMenuItem (menu, optionID, "Go to Preset Folder...", [&]
+                                      { manager.getUserPresetPath().startAsProcess(); });
+    }
+
+    return addPresetMenuItem (menu, optionID, "Choose Preset Folder...", [&]
+                              { chooseUserPresetFolder ({}); });
+}
+
+void PresetsComp::loadPresetSafe (const Preset& preset)
+{
+    if (preset.isValid())
+    {
+        juce::MessageManager::callAsync (
+            []
+            {
+                juce::NativeMessageBox::show (juce::MessageBoxOptions()
+                                            .withIconType (juce::MessageBoxIconType::WarningIcon)
+                                            .withTitle ("Preset Load Failure")
+                                            .withMessage ("Unable to load preset!")
+                                            .withButton ("OK"));
+            });
+
+        return;
+    }
+
+    manager.loadPreset (preset);
 }
 
 void PresetsComp::chooseUserPresetFolder (const std::function<void()>& onFinish)
