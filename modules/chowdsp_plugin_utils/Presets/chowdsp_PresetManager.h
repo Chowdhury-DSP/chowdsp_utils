@@ -100,6 +100,20 @@ public:
     /** Returns a vector of all the user-saved presets */
     std::vector<const Preset*> getUserPresets() const;
 
+    /** Attempts to load a preset with a custom failure callback, if the preset fails to load. */
+    template <typename FailureCallback>
+    void loadPresetSafe (std::unique_ptr<Preset> presetToLoad, FailureCallback&& failureCallback)
+    {
+        if (presetToLoad == nullptr || ! presetToLoad->isValid())
+        {
+            failureCallback();
+            return;
+        }
+
+        keepAlivePreset = std::move (presetToLoad);
+        loadPreset (*keepAlivePreset);
+    }
+
     /** Listener class to hear alerts about preset manager changes */
     struct Listener
     {
