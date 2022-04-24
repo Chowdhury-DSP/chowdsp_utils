@@ -73,7 +73,7 @@ template <typename ProcType, typename PresetCompType = PresetsComp>
 class PresetsItem : public foleys::GuiItem
 {
 public:
-    static_assert(std::is_base_of_v<PresetsComp, PresetCompType>, "PresetCompType must be derived from chowdsp::PresetsComp");
+    static_assert (std::is_base_of_v<PresetsComp, PresetCompType>, "PresetCompType must be derived from chowdsp::PresetsComp");
 
     FOLEYS_DECLARE_GUI_FACTORY (PresetsItem)
 

@@ -165,8 +165,7 @@ int PresetsComp::createPresetsMenu (int optionID)
 
         juce::PopupMenu::Item presetItem { preset.getName() };
         presetItem.itemID = presetID + 1;
-        presetItem.action = [=, &preset]
-        {
+        presetItem.action = [=, &preset] {
             updatePresetBoxText();
             manager.loadPreset (preset);
         };
@@ -186,8 +185,7 @@ int PresetsComp::createPresetsMenu (int optionID)
         for (auto& [category, categoryMenu] : vendorCollection.categoryPresetMenus)
             vendorMenu.addSubMenu (category, categoryMenu);
 
-        std::sort (vendorCollection.nonCategoryItems.begin(), vendorCollection.nonCategoryItems.end(), [] (auto& item1, auto& item2)
-                   { return item1.text < item2.text; });
+        std::sort (vendorCollection.nonCategoryItems.begin(), vendorCollection.nonCategoryItems.end(), [] (auto& item1, auto& item2) { return item1.text < item2.text; });
         for (auto& extraItem : vendorCollection.nonCategoryItems)
             vendorMenu.addItem (extraItem);
 
@@ -202,8 +200,7 @@ int PresetsComp::addPresetMenuItem (juce::PopupMenu* menu, int optionID, const j
 {
     juce::PopupMenu::Item item { itemText };
     item.itemID = ++optionID;
-    item.action = [&, forwardedAction = std::forward<ActionType> (action)]
-    {
+    item.action = [&, forwardedAction = std::forward<ActionType> (action)] {
         updatePresetBoxText();
         forwardedAction();
     };
@@ -220,8 +217,7 @@ int PresetsComp::addSavePresetOptions (int optionID)
     optionID = addPresetMenuItem (menu,
                                   optionID,
                                   "Reset",
-                                  [&]
-                                  {
+                                  [&] {
                                       if (auto* currentPreset = manager.getCurrentPreset())
                                           manager.loadPreset (*currentPreset);
                                   });
@@ -229,8 +225,7 @@ int PresetsComp::addSavePresetOptions (int optionID)
     optionID = addPresetMenuItem (menu,
                                   optionID,
                                   "Save Preset",
-                                  [&]
-                                  { saveUserPreset(); });
+                                  [&] { saveUserPreset(); });
 
     return optionID;
 }
@@ -243,8 +238,7 @@ int PresetsComp::addSharePresetOptions (int optionID)
     optionID = addPresetMenuItem (menu,
                                   optionID,
                                   "Copy Current Preset",
-                                  [&]
-                                  {
+                                  [&] {
                                       if (auto* currentPreset = manager.getCurrentPreset())
                                           juce::SystemClipboard::copyTextToClipboard (currentPreset->toXml()->toString());
                                   });
@@ -252,8 +246,7 @@ int PresetsComp::addSharePresetOptions (int optionID)
     optionID = addPresetMenuItem (menu,
                                   optionID,
                                   "Paste Preset",
-                                  [&]
-                                  {
+                                  [&] {
                                       const auto presetText = juce::SystemClipboard::getTextFromClipboard();
                                       if (presetText.isEmpty())
                                           return;
@@ -263,19 +256,17 @@ int PresetsComp::addSharePresetOptions (int optionID)
                                   });
 
 #if ! JUCE_IOS
-    return addPresetMenuItem (menu, optionID, "Load Preset From File", [&]
-                              {
-                                  constexpr auto flags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles;
-                                  fileChooser = std::make_shared<juce::FileChooser> ("Load Preset", manager.getUserPresetPath(), "*" + presetExt, true, false, getTopLevelComponent());
-                                  fileChooser->launchAsync (flags,
-                                                            [&] (const juce::FileChooser& fc)
-                                                            {
-                                                                if (fc.getResults().isEmpty())
-                                                                    return;
+    return addPresetMenuItem (menu, optionID, "Load Preset From File", [&] {
+        constexpr auto flags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles;
+        fileChooser = std::make_shared<juce::FileChooser> ("Load Preset", manager.getUserPresetPath(), "*" + presetExt, true, false, getTopLevelComponent());
+        fileChooser->launchAsync (flags,
+                                  [&] (const juce::FileChooser& fc) {
+                                      if (fc.getResults().isEmpty())
+                                          return;
 
-                                                                loadPresetSafe (Preset { fc.getResult() });
-                                                            });
-                              });
+                                      loadPresetSafe (Preset { fc.getResult() });
+                                  });
+    });
 #endif
 }
 
@@ -286,12 +277,10 @@ int PresetsComp::addPresetFolderOptions (int optionID)
 
     if (manager.getUserPresetPath().isDirectory())
     {
-        optionID = addPresetMenuItem (menu, optionID, "Go to Preset Folder...", [&]
-                                      { manager.getUserPresetPath().startAsProcess(); });
+        optionID = addPresetMenuItem (menu, optionID, "Go to Preset Folder...", [&] { manager.getUserPresetPath().startAsProcess(); });
     }
 
-    return addPresetMenuItem (menu, optionID, "Choose Preset Folder...", [&]
-                              { chooseUserPresetFolder ({}); });
+    return addPresetMenuItem (menu, optionID, "Choose Preset Folder...", [&] { chooseUserPresetFolder ({}); });
 }
 
 void PresetsComp::loadPresetSafe (const Preset& preset)
@@ -299,13 +288,12 @@ void PresetsComp::loadPresetSafe (const Preset& preset)
     if (preset.isValid())
     {
         juce::MessageManager::callAsync (
-            []
-            {
+            [] {
                 juce::NativeMessageBox::show (juce::MessageBoxOptions()
-                                            .withIconType (juce::MessageBoxIconType::WarningIcon)
-                                            .withTitle ("Preset Load Failure")
-                                            .withMessage ("Unable to load preset!")
-                                            .withButton ("OK"));
+                                                  .withIconType (juce::MessageBoxIconType::WarningIcon)
+                                                  .withTitle ("Preset Load Failure")
+                                                  .withMessage ("Unable to load preset!")
+                                                  .withButton ("OK"));
             });
 
         return;
