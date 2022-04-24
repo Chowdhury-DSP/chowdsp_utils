@@ -45,7 +45,7 @@ protected:
     virtual void saveUserPreset();
     virtual void updatePresetBoxText();
 
-    void loadPresetSafe (const Preset& preset);
+    virtual void loadPresetSafe (std::unique_ptr<Preset> preset);
 
     template <typename ActionType>
     int addPresetMenuItem (juce::PopupMenu* menu, int optionID, const juce::String& itemText, ActionType&& action);

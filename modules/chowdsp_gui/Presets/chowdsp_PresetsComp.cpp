@@ -252,7 +252,7 @@ int PresetsComp::addSharePresetOptions (int optionID)
                                           return;
 
                                       if (auto presetXml = juce::XmlDocument::parse (presetText))
-                                          loadPresetSafe (Preset { presetXml.get() });
+                                          loadPresetSafe (std::make_unique<Preset> (presetXml.get()));
                                   });
 
 #if ! JUCE_IOS
@@ -264,7 +264,7 @@ int PresetsComp::addSharePresetOptions (int optionID)
                                       if (fc.getResults().isEmpty())
                                           return;
 
-                                      loadPresetSafe (Preset { fc.getResult() });
+                                      loadPresetSafe (std::make_unique<Preset> (fc.getResult()));
                                   });
     });
 #endif
@@ -283,10 +283,9 @@ int PresetsComp::addPresetFolderOptions (int optionID)
     return addPresetMenuItem (menu, optionID, "Choose Preset Folder...", [&] { chooseUserPresetFolder ({}); });
 }
 
-void PresetsComp::loadPresetSafe (const Preset& preset)
+void PresetsComp::loadPresetSafe (std::unique_ptr<Preset> preset)
 {
-    if (preset.isValid())
-    {
+    manager.loadPresetSafe (std::move (preset), [] {
         juce::MessageManager::callAsync (
             [] {
                 juce::NativeMessageBox::show (juce::MessageBoxOptions()
@@ -295,11 +294,7 @@ void PresetsComp::loadPresetSafe (const Preset& preset)
                                                   .withMessage ("Unable to load preset!")
                                                   .withButton ("OK"));
             });
-
-        return;
-    }
-
-    manager.loadPreset (preset);
+    });
 }
 
 void PresetsComp::chooseUserPresetFolder (const std::function<void()>& onFinish)
