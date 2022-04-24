@@ -159,7 +159,7 @@ protected:
     const Preset* currentPreset = nullptr;
 
     juce::ListenerList<Listener> listeners;
-    
+
 private:
     void parameterChanged (const juce::String& parameterID, float newValue) override;
     std::pair<const int, Preset>& addFactoryPreset (Preset&& preset);
