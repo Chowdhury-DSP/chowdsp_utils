@@ -139,8 +139,8 @@ void PresetManager::setIsDirty (bool shouldBeDirty)
 
 void PresetManager::loadPreset (const Preset& preset)
 {
-    currentPreset = &preset;
     loadPresetState (preset.getState());
+    currentPreset = &preset;
 
     setIsDirty (false);
     listeners.call (&Listener::selectedPresetChanged);
@@ -246,7 +246,8 @@ std::vector<const Preset*> PresetManager::getUserPresets() const
 {
     std::vector<const Preset*> userPresets;
 
-    doForAllPresetsForUser (userIDMap.at (userPresetsName), presetMap, [&userPresets] (auto& presetMapIter) { userPresets.push_back (&presetMapIter->second); });
+    doForAllPresetsForUser (userIDMap.at (userPresetsName), presetMap, [&userPresets] (auto& presetMapIter)
+                            { userPresets.push_back (&presetMapIter->second); });
 
     JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wpessimizing-move")
     return std::move (userPresets);
@@ -266,7 +267,8 @@ void PresetManager::setUserPresetName (const juce::String& newName)
         doForAllPresetsForUser (
             userIDMapIter->second,
             presetMap,
-            [&newName] (auto presetMapIter) {
+            [&newName] (auto presetMapIter)
+            {
                 auto& preset = presetMapIter->second;
                 preset.setVendor (newName);
 
@@ -289,7 +291,8 @@ void PresetManager::loadUserPresetsFromFolder (const juce::File& file)
         presets.push_back (loadUserPresetFromFile (f));
 
     // delete old user presets
-    doForAllPresetsForUser (userIDMap[userPresetsName], presetMap, [this] (auto& presetMapIter) { presetMap.erase (presetMapIter); });
+    doForAllPresetsForUser (userIDMap[userPresetsName], presetMap, [this] (auto& presetMapIter)
+                            { presetMap.erase (presetMapIter); });
 
     addPresets (presets);
 }

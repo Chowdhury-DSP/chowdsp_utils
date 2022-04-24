@@ -156,7 +156,10 @@ protected:
 
     juce::String userPresetsName;
     std::unique_ptr<Preset> keepAlivePreset;
+    const Preset* currentPreset = nullptr;
 
+    juce::ListenerList<Listener> listeners;
+    
 private:
     void parameterChanged (const juce::String& parameterID, float newValue) override;
     std::pair<const int, Preset>& addFactoryPreset (Preset&& preset);
@@ -165,10 +168,8 @@ private:
     int getIndexForPreset (const Preset& preset) const;
     const Preset* getPresetForIndex (int index) const;
 
-    juce::ListenerList<Listener> listeners;
     bool isDirty = false;
 
-    const Preset* currentPreset = nullptr;
     const Preset* defaultPreset = nullptr;
 
     juce::String userPresetConfigPath;
