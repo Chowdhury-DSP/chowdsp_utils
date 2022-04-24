@@ -286,14 +286,14 @@ int PresetsComp::addPresetFolderOptions (int optionID)
 void PresetsComp::loadPresetSafe (std::unique_ptr<Preset> preset)
 {
     manager.loadPresetSafe (std::move (preset), [] {
-                                juce::MessageManager::callAsync (
-                                    [] {
-                                        juce::NativeMessageBox::show (juce::MessageBoxOptions()
-                                                                          .withIconType (juce::MessageBoxIconType::WarningIcon)
-                                                                          .withTitle ("Preset Load Failure")
-                                                                          .withMessage ("Unable to load preset!")
-                                                                          .withButton ("OK"));
-                                    });
+        juce::MessageManager::callAsync (
+            [] {
+                juce::NativeMessageBox::show (juce::MessageBoxOptions()
+                                                  .withIconType (juce::MessageBoxIconType::WarningIcon)
+                                                  .withTitle ("Preset Load Failure")
+                                                  .withMessage ("Unable to load preset!")
+                                                  .withButton ("OK"));
+            });
     });
 }
 
