@@ -39,9 +39,16 @@ public:
 protected:
     virtual void chooseUserPresetFolder (const std::function<void()>& onFinish);
     virtual int createPresetsMenu (int optionID);
-    virtual int addPresetOptions (int optionID);
+    virtual int addSavePresetOptions (int optionID);
+    virtual int addSharePresetOptions (int optionID);
+    virtual int addPresetFolderOptions (int optionID);
     virtual void saveUserPreset();
     virtual void updatePresetBoxText();
+
+    void loadPresetSafe (const Preset& preset);
+
+    template <typename ActionType>
+    int addPresetMenuItem (juce::PopupMenu* menu, int optionID, const juce::String& itemText, ActionType&& action);
 
     PresetManager& manager;
 
@@ -62,10 +69,12 @@ private:
 #if CHOWDSP_USE_FOLEYS_CLASSES
 // LCOV_EXCL_START
 /** Foley's GUI wrapper for PresetsComp */
-template <typename ProcType>
+template <typename ProcType, typename PresetCompType = PresetsComp>
 class PresetsItem : public foleys::GuiItem
 {
 public:
+    static_assert(std::is_base_of_v<PresetsComp, PresetCompType>, "PresetCompType must be derived from chowdsp::PresetsComp");
+
     FOLEYS_DECLARE_GUI_FACTORY (PresetsItem)
 
     static const juce::Identifier pNextButton;
@@ -74,15 +83,15 @@ public:
     PresetsItem (foleys::MagicGUIBuilder& builder, const juce::ValueTree& node) : foleys::GuiItem (builder, node)
     {
         setColourTranslation ({
-            { "background", PresetsComp::backgroundColourID },
-            { "text", PresetsComp::textColourID },
-            { "text-highlight", PresetsComp::textHighlightColourID },
+            { "background", PresetCompType::backgroundColourID },
+            { "text", PresetCompType::textColourID },
+            { "text-highlight", PresetCompType::textHighlightColourID },
         });
 
         auto* proc = dynamic_cast<ProcType*> (builder.getMagicState().getProcessor());
         jassert (proc != nullptr);
 
-        presetsComp = std::make_unique<PresetsComp> (proc->getPresetManager());
+        presetsComp = std::make_unique<PresetCompType> (proc->getPresetManager());
         addAndMakeVisible (presetsComp.get());
     }
 
@@ -129,16 +138,16 @@ public:
     }
 
 private:
-    std::unique_ptr<PresetsComp> presetsComp;
+    std::unique_ptr<PresetCompType> presetsComp;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetsItem)
 };
 
-template <typename ProcType>
-const juce::Identifier PresetsItem<ProcType>::pNextButton { "next-button" };
+template <typename ProcType, typename PresetCompType>
+const juce::Identifier PresetsItem<ProcType, PresetCompType>::pNextButton { "next-button" };
 
-template <typename ProcType>
-const juce::Identifier PresetsItem<ProcType>::pPrevButton { "prev-button" };
+template <typename ProcType, typename PresetCompType>
+const juce::Identifier PresetsItem<ProcType, PresetCompType>::pPrevButton { "prev-button" };
 
 // LCOV_EXCL_STOP
 #endif // CHOWDSP_USE_FOLEYS_CLASSES
