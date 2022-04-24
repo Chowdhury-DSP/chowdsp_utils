@@ -69,7 +69,7 @@ public:
         chowdsp::PresetsComp presetsComp { presetMgr };
 
         const auto* menu = presetsComp.getPresetMenuBox().getRootMenu();
-        auto menuItem = getMenuItem (*menu, "Choose Preset folder...");
+        auto menuItem = getMenuItem (*menu, "Choose Preset Folder...");
         menuItem->action();
     }
 
@@ -85,7 +85,7 @@ public:
 
         chowdsp::PresetsComp presetsComp { presetMgr };
         const auto* menu = presetsComp.getPresetMenuBox().getRootMenu();
-        auto menuItem = getMenuItem (*menu, "Go to Preset folder...");
+        auto menuItem = getMenuItem (*menu, "Go to Preset Folder...");
         menuItem->action();
 
         auto userPresetConfigFile = presetMgr.getUserPresetConfigFile();
