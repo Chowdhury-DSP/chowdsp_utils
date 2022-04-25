@@ -61,13 +61,13 @@ public:
 
 private:
     template <typename FilterType>
-    void processFilterChannel (FilterType& filter, FloatType* samples, int numSamples);
+    void processFilterChannel (FilterType& filter, juce::dsp::AudioBlock<FloatType>& block);
 
     void fadeBuffers (const FloatType* fadeInBuffer, const FloatType* fadeOutBuffer, FloatType* targetBuffer, int numSamples);
 
     static constexpr auto numFilterChoices = sizeof...(FilterChoices);
     using Filters = std::tuple<FilterChoices...>;
-    std::vector<Filters> filters;
+    Filters filters;
 
     FloatType freqHzHandle = 1000.0f;
     FloatType qHandle = 0.7071f;
