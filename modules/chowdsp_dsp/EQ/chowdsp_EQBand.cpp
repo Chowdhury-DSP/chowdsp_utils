@@ -63,8 +63,9 @@ void EQBand<FloatType, FilterChoices...>::prepare (const juce::dsp::ProcessSpec&
     fadeBuffer.setSize ((int) spec.numChannels, (int) spec.maximumBlockSize);
     fadeBuffer.clear();
 
-    filters.clear();
-    filters.resize (spec.numChannels);
+    eqband_detail::forEachInTuple ([spec] (auto& filter, size_t)
+                                   { filter.prepare ((int) spec.numChannels); },
+                                   filters);
 
     for (auto* smoother : { &freqSmooth, &qSmooth, &gainSmooth })
     {
@@ -78,11 +79,9 @@ void EQBand<FloatType, FilterChoices...>::prepare (const juce::dsp::ProcessSpec&
 template <typename FloatType, typename... FilterChoices>
 void EQBand<FloatType, FilterChoices...>::reset()
 {
-    for (auto& channelFilters : filters)
-    {
-        eqband_detail::forEachInTuple ([] (auto& filter, size_t) { filter.reset(); },
-                                       channelFilters);
-    }
+    eqband_detail::forEachInTuple ([] (auto& filter, size_t)
+                                   { filter.reset(); },
+                                   filters);
 
     for (auto* smoother : { &freqSmooth, &qSmooth, &gainSmooth })
         smoother->reset();
@@ -92,9 +91,10 @@ void EQBand<FloatType, FilterChoices...>::reset()
 
 template <typename FloatType, typename... FilterChoices>
 template <typename FilterType>
-void EQBand<FloatType, FilterChoices...>::processFilterChannel (FilterType& filter, FloatType* samples, int numSamples)
+void EQBand<FloatType, FilterChoices...>::processFilterChannel (FilterType& filter, juce::dsp::AudioBlock<FloatType>& block)
 {
-    auto setParams = [&filter, fs = this->fs] (FloatType curFreq, FloatType curQ, FloatType curGain) {
+    auto setParams = [&filter, fs = this->fs] (FloatType curFreq, FloatType curQ, FloatType curGain)
+    {
         if constexpr (! FilterType::HasQParameter)
         {
             juce::ignoreUnused (curQ, curGain);
@@ -114,20 +114,18 @@ void EQBand<FloatType, FilterChoices...>::processFilterChannel (FilterType& filt
     const auto isSmoothing = freqSmooth.isSmoothing() || qSmooth.isSmoothing() || gainSmooth.isSmoothing();
     if (isSmoothing)
     {
-        const auto* freqHzValues = freqSmooth.getSmoothedBuffer();
-        const auto* qValues = qSmooth.getSmoothedBuffer();
-        const auto* gainValues = gainSmooth.getSmoothedBuffer();
-
-        for (int n = 0; n < numSamples; ++n)
-        {
-            setParams (freqHzValues[n], qValues[n], gainValues[n]);
-            samples[n] = filter.processSample (samples[n]);
-        }
+        filter.processBlockWithModulation (
+            block,
+            [setParamsFunc = std::forward<decltype (setParams)> (setParams),
+             freqHzValues = freqSmooth.getSmoothedBuffer(),
+             qValues = qSmooth.getSmoothedBuffer(),
+             gainValues = gainSmooth.getSmoothedBuffer()] (int n)
+            { setParamsFunc (freqHzValues[n], qValues[n], gainValues[n]); });
     }
     else
     {
         setParams (freqSmooth.getCurrentValue(), qSmooth.getCurrentValue(), gainSmooth.getCurrentValue());
-        filter.processBlock (samples, numSamples);
+        filter.processBlock (block);
     }
 }
 
@@ -154,7 +152,6 @@ void EQBand<FloatType, FilterChoices...>::process (const ProcessContext& context
     const auto numChannels = block.getNumChannels();
     const auto numSamples = (int) block.getNumSamples();
 
-    jassert (inputBlock.getNumChannels() <= filters.size());
     jassert (inputBlock.getNumChannels() == numChannels);
     jassert (inputBlock.getNumSamples() == (size_t) numSamples);
 
@@ -172,28 +169,35 @@ void EQBand<FloatType, FilterChoices...>::process (const ProcessContext& context
     }
 
     const auto needsFade = filterType != prevFilterType;
-    for (size_t channel = 0; channel < numChannels; ++channel)
+    if (needsFade)
     {
-        auto* blockPtr = block.getChannelPointer (channel);
-        if (needsFade)
-            fadeBuffer.copyFrom ((int) channel, 0, blockPtr, numSamples);
+        for (size_t channel = 0; channel < numChannels; ++channel)
+            fadeBuffer.copyFrom ((int) channel, 0, block.getChannelPointer (channel), numSamples);
+    }
 
-        eqband_detail::forEachInTuple (
-            [this, &blockPtr, channel, numSamples] (auto& filter, size_t filterIndex) {
-                if ((int) filterIndex == filterType)
-                {
-                    processFilterChannel (filter, blockPtr, numSamples);
-                }
-                else if ((int) filterIndex == prevFilterType)
-                {
-                    processFilterChannel (filter, fadeBuffer.getWritePointer ((int) channel), numSamples);
-                    filter.reset();
-                }
-            },
-            filters[channel]);
+    eqband_detail::forEachInTuple (
+        [this, &block] (auto& filter, size_t filterIndex)
+        {
+            if ((int) filterIndex == filterType)
+            {
+                processFilterChannel (filter, block);
+            }
+            else if ((int) filterIndex == prevFilterType)
+            {
+                auto&& fadeBlock = juce::dsp::AudioBlock<FloatType> { fadeBuffer };
+                processFilterChannel (filter, fadeBlock);
+                filter.reset();
+            }
+        },
+        filters);
 
-        if (needsFade)
+    if (needsFade)
+    {
+        for (size_t channel = 0; channel < numChannels; ++channel)
+        {
+            auto* blockPtr = block.getChannelPointer (channel);
             fadeBuffers (blockPtr, fadeBuffer.getReadPointer ((int) channel), blockPtr, numSamples);
+        }
     }
 
     prevFilterType = filterType;
