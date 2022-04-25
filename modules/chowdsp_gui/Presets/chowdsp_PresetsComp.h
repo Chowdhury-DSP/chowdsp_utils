@@ -52,8 +52,7 @@ protected:
     {
         juce::PopupMenu::Item item { itemText };
         item.itemID = ++optionID;
-        item.action = [&, forwardedAction = std::forward<ActionType> (action)]
-        {
+        item.action = [&, forwardedAction = std::forward<ActionType> (action)] {
             updatePresetBoxText();
             forwardedAction();
         };
