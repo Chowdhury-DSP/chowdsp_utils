@@ -48,7 +48,19 @@ protected:
     virtual void loadPresetSafe (std::unique_ptr<Preset> preset);
 
     template <typename ActionType>
-    int addPresetMenuItem (juce::PopupMenu* menu, int optionID, const juce::String& itemText, ActionType&& action);
+    int addPresetMenuItem (juce::PopupMenu* menu, int optionID, const juce::String& itemText, ActionType&& action)
+    {
+        juce::PopupMenu::Item item { itemText };
+        item.itemID = ++optionID;
+        item.action = [&, forwardedAction = std::forward<ActionType> (action)]
+        {
+            updatePresetBoxText();
+            forwardedAction();
+        };
+        menu->addItem (item);
+
+        return optionID;
+    }
 
     PresetManager& manager;
 

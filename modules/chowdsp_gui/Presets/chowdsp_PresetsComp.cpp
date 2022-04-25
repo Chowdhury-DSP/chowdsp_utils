@@ -195,20 +195,6 @@ int PresetsComp::createPresetsMenu (int optionID)
     return optionID;
 }
 
-template <typename ActionType>
-int PresetsComp::addPresetMenuItem (juce::PopupMenu* menu, int optionID, const juce::String& itemText, ActionType&& action)
-{
-    juce::PopupMenu::Item item { itemText };
-    item.itemID = ++optionID;
-    item.action = [&, forwardedAction = std::forward<ActionType> (action)] {
-        updatePresetBoxText();
-        forwardedAction();
-    };
-    menu->addItem (item);
-
-    return optionID;
-}
-
 int PresetsComp::addSavePresetOptions (int optionID)
 {
     auto menu = presetBox.getRootMenu();
