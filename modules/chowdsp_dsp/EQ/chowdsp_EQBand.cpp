@@ -63,8 +63,7 @@ void EQBand<FloatType, FilterChoices...>::prepare (const juce::dsp::ProcessSpec&
     fadeBuffer.setSize ((int) spec.numChannels, (int) spec.maximumBlockSize);
     fadeBuffer.clear();
 
-    eqband_detail::forEachInTuple ([spec] (auto& filter, size_t)
-                                   { filter.prepare ((int) spec.numChannels); },
+    eqband_detail::forEachInTuple ([spec] (auto& filter, size_t) { filter.prepare ((int) spec.numChannels); },
                                    filters);
 
     for (auto* smoother : { &freqSmooth, &qSmooth, &gainSmooth })
@@ -79,8 +78,7 @@ void EQBand<FloatType, FilterChoices...>::prepare (const juce::dsp::ProcessSpec&
 template <typename FloatType, typename... FilterChoices>
 void EQBand<FloatType, FilterChoices...>::reset()
 {
-    eqband_detail::forEachInTuple ([] (auto& filter, size_t)
-                                   { filter.reset(); },
+    eqband_detail::forEachInTuple ([] (auto& filter, size_t) { filter.reset(); },
                                    filters);
 
     for (auto* smoother : { &freqSmooth, &qSmooth, &gainSmooth })
@@ -93,8 +91,7 @@ template <typename FloatType, typename... FilterChoices>
 template <typename FilterType>
 void EQBand<FloatType, FilterChoices...>::processFilterChannel (FilterType& filter, juce::dsp::AudioBlock<FloatType>& block)
 {
-    auto setParams = [&filter, fs = this->fs] (FloatType curFreq, FloatType curQ, FloatType curGain)
-    {
+    auto setParams = [&filter, fs = this->fs] (FloatType curFreq, FloatType curQ, FloatType curGain) {
         if constexpr (! FilterType::HasQParameter)
         {
             juce::ignoreUnused (curQ, curGain);
@@ -119,8 +116,7 @@ void EQBand<FloatType, FilterChoices...>::processFilterChannel (FilterType& filt
             [setParamsFunc = std::forward<decltype (setParams)> (setParams),
              freqHzValues = freqSmooth.getSmoothedBuffer(),
              qValues = qSmooth.getSmoothedBuffer(),
-             gainValues = gainSmooth.getSmoothedBuffer()] (int n)
-            { setParamsFunc (freqHzValues[n], qValues[n], gainValues[n]); });
+             gainValues = gainSmooth.getSmoothedBuffer()] (int n) { setParamsFunc (freqHzValues[n], qValues[n], gainValues[n]); });
     }
     else
     {
@@ -176,8 +172,7 @@ void EQBand<FloatType, FilterChoices...>::process (const ProcessContext& context
     }
 
     eqband_detail::forEachInTuple (
-        [this, &block] (auto& filter, size_t filterIndex)
-        {
+        [this, &block] (auto& filter, size_t filterIndex) {
             if ((int) filterIndex == filterType)
             {
                 processFilterChannel (filter, block);
