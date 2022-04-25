@@ -60,8 +60,13 @@ public:
     void process (const ProcessContext& context);
 
 private:
-    template <typename FilterType>
-    void processFilterChannel (FilterType& filter, juce::dsp::AudioBlock<FloatType>& block);
+    template <typename FilterType, typename T = FloatType, int N = FilterType::Order>
+    std::enable_if_t<std::is_base_of_v<IIRFilter<N, T>, FilterType>, void>
+        processFilterChannel (FilterType& filter, juce::dsp::AudioBlock<FloatType>& block);
+
+    template <typename FilterType, typename T = FloatType, int N = FilterType::Order, StateVariableFilterType type = FilterType::Type>
+    std::enable_if_t<std::is_base_of_v<NthOrderFilter<T, N, type>, FilterType>, void>
+        processFilterChannel (FilterType& filter, juce::dsp::AudioBlock<FloatType>& block);
 
     void fadeBuffers (const FloatType* fadeInBuffer, const FloatType* fadeOutBuffer, FloatType* targetBuffer, int numSamples);
 
