@@ -44,17 +44,21 @@ public:
         tuner.prepare (fs);
         const auto numSamples = tuner.getAutocorrelationSize();
 
-        auto&& buffer = AudioBuffer<float> (1, numSamples);
-        buffer.clear();
-        for (int i = 0; i < numSamples; i += blockSize)
+        for (int n = 0; n < 4; ++n)
         {
-            const auto samplesToProcess = jmin (blockSize, numSamples - i);
-            auto&& block = sineProc.process (samplesToProcess);
+            auto&& buffer = AudioBuffer<float> (1, numSamples);
+            buffer.clear();
+            for (int i = 0; i < numSamples; i += blockSize)
+            {
+                const auto samplesToProcess = jmin (blockSize, numSamples - i);
+                auto&& block = sineProc.process (samplesToProcess);
 
-            buffer.copyFrom (0, i, block.getChannelPointer (0), samplesToProcess);
+                buffer.copyFrom (0, i, block.getChannelPointer (0), samplesToProcess);
+            }
+
+            tuner.process (buffer.getReadPointer (0));
         }
 
-        tuner.process (buffer.getReadPointer (0));
         expectWithinAbsoluteError (tuner.getCurrentFrequencyHz(), sineFreq * repitchFactor, 1.0f, "Repitched frequency is incorrect!");
     }
 
