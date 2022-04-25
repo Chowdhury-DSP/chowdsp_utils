@@ -174,6 +174,7 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 #include "Sources/chowdsp_SawtoothWave.h"
 #include "Sources/chowdsp_SineWave.h"
 #include "Sources/chowdsp_SquareWave.h"
+#include "Sources/chowdsp_RepitchedSource.h"
 
 // some reverb utils
 #include "Reverb/chowdsp_Diffuser.h"

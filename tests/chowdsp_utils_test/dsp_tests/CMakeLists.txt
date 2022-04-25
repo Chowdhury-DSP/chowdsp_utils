@@ -30,6 +30,7 @@ target_sources(chowdsp_utils_tests PRIVATE
     source_tests/SineTest.cpp
     source_tests/SawtoothTest.cpp
     source_tests/SquareTest.cpp
+    source_tests/RepitchedSourceTest.cpp
 
     filter_tests/BilinearUtilsTest.cpp
     filter_tests/FilterChainTest.cpp
