@@ -38,6 +38,7 @@ public:
         sineProc.prepare ({ fs, (uint32) blockSize, 1 });
         sineProc.sine.setFrequency (sineFreq);
         sineProc.setRepitchFactor (repitchFactor);
+        expectEquals (sineProc.getRepitchFactor(), repitchFactor, "Set repitch factor is incorrect!");
 
         chowdsp::TunerProcessor<float> tuner;
         tuner.prepare (fs);
