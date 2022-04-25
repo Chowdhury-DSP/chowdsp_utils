@@ -139,8 +139,8 @@ void PresetManager::setIsDirty (bool shouldBeDirty)
 
 void PresetManager::loadPreset (const Preset& preset)
 {
-    currentPreset = &preset;
     loadPresetState (preset.getState());
+    currentPreset = &preset;
 
     setIsDirty (false);
     listeners.call (&Listener::selectedPresetChanged);
