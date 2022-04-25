@@ -22,11 +22,13 @@ const juce::String linPhaseModeTag = "linear_phase_mode";
 const auto eqTypeChoices = juce::StringArray {
     "1-Pole HPF",
     "2-Pole HPF",
+    "4-Pole HPF",
     "Low-Shelf",
     "Bell",
     "High-Shelf",
     "1-Pole LPF",
     "2-Pole LPF",
+    "4-Pole LPF",
 };
 } // namespace
 
