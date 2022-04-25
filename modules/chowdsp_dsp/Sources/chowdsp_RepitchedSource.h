@@ -14,7 +14,7 @@ public:
     void setRepitchFactor (float newRepitchFactor);
 
     /** Returns the current repitch factor */
-    float getRepitchFactor() const noexcept { return 1.0f / resampler.getResampleRatio(); }
+    [[nodiscard]] float getRepitchFactor() const noexcept { return 1.0f / resampler.getResampleRatio(); }
 
     /** Prepares the repitch source to process a new audio stream */
     void prepare (const juce::dsp::ProcessSpec& spec);
