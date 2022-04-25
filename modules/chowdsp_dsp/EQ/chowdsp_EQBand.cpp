@@ -98,7 +98,7 @@ void EQBand<FloatType, FilterChoices...>::reset()
 }
 
 template <typename FloatType, typename... FilterChoices>
-template <typename FilterType, typename T, int N>
+template <typename FilterType, typename T, size_t N>
 std::enable_if_t<std::is_base_of_v<IIRFilter<N, T>, FilterType>, void>
     EQBand<FloatType, FilterChoices...>::processFilterChannel (FilterType& filter, juce::dsp::AudioBlock<FloatType>& block)
 {
@@ -137,7 +137,7 @@ std::enable_if_t<std::is_base_of_v<IIRFilter<N, T>, FilterType>, void>
 }
 
 template <typename FloatType, typename... FilterChoices>
-template <typename FilterType, typename T, int N, StateVariableFilterType type>
+template <typename FilterType, typename T, size_t N, StateVariableFilterType type>
 std::enable_if_t<std::is_base_of_v<NthOrderFilter<T, N, type>, FilterType>, void>
     EQBand<FloatType, FilterChoices...>::processFilterChannel (FilterType& filter, juce::dsp::AudioBlock<FloatType>& block)
 {

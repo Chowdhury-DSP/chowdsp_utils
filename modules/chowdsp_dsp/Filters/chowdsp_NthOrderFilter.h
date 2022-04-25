@@ -12,15 +12,13 @@ class NthOrderFilter
 {
 public:
     using NumericType = SampleTypeHelpers::NumericType<T>;
-    static constexpr int Order = (int) order;
+    static constexpr auto Order = order;
     static constexpr auto Type = type;
 
     NthOrderFilter() : butterQVals (QValCalcs::butterworth_Qs<NumericType, order>())
     {
         for (size_t i = 0; i < nFilters; ++i)
-        {
             filters[i].setResonance (butterQVals[i]);
-        }
     }
 
     /** Prepares the filter to process an audio stream */
