@@ -10,9 +10,11 @@ namespace chowdsp
 template <typename T, size_t order = 4, StateVariableFilterType type = StateVariableFilterType::Lowpass>
 class NthOrderFilter
 {
-    using NumericType = SampleTypeHelpers::NumericType<T>;
-
 public:
+    using NumericType = SampleTypeHelpers::NumericType<T>;
+    static constexpr int Order = (int) order;
+    static constexpr auto Type = type;
+
     NthOrderFilter() : butterQVals (QValCalcs::butterworth_Qs<NumericType, order>())
     {
         for (size_t i = 0; i < nFilters; ++i)

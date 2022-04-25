@@ -63,8 +63,19 @@ void EQBand<FloatType, FilterChoices...>::prepare (const juce::dsp::ProcessSpec&
     fadeBuffer.setSize ((int) spec.numChannels, (int) spec.maximumBlockSize);
     fadeBuffer.clear();
 
-    eqband_detail::forEachInTuple ([spec] (auto& filter, size_t) { filter.prepare ((int) spec.numChannels); },
-                                   filters);
+    eqband_detail::forEachInTuple (
+        [spec] (auto& filter, size_t)
+        {
+            using FilterType = std::remove_reference_t<decltype(filter)>;
+
+            if constexpr (std::is_base_of_v<IIRFilter<FilterType::Order, FloatType>, FilterType>)
+                filter.prepare ((int) spec.numChannels);
+            else if constexpr (std::is_same_v<NthOrderFilter<FloatType, FilterType::Order, FilterType::Type>, FilterType>)
+                filter.prepare (spec);
+            else
+                jassertfalse; // unknown filter type!
+        },
+        filters);
 
     for (auto* smoother : { &freqSmooth, &qSmooth, &gainSmooth })
     {
@@ -88,8 +99,9 @@ void EQBand<FloatType, FilterChoices...>::reset()
 }
 
 template <typename FloatType, typename... FilterChoices>
-template <typename FilterType>
-void EQBand<FloatType, FilterChoices...>::processFilterChannel (FilterType& filter, juce::dsp::AudioBlock<FloatType>& block)
+template <typename FilterType, typename T, int N>
+std::enable_if_t<std::is_base_of_v<IIRFilter<N, T>, FilterType>, void>
+EQBand<FloatType, FilterChoices...>::processFilterChannel (FilterType& filter, juce::dsp::AudioBlock<FloatType>& block)
 {
     auto setParams = [&filter, fs = this->fs] (FloatType curFreq, FloatType curQ, FloatType curGain) {
         if constexpr (! FilterType::HasQParameter)
@@ -122,6 +134,53 @@ void EQBand<FloatType, FilterChoices...>::processFilterChannel (FilterType& filt
     {
         setParams (freqSmooth.getCurrentValue(), qSmooth.getCurrentValue(), gainSmooth.getCurrentValue());
         filter.processBlock (block);
+    }
+}
+
+template <typename FloatType, typename... FilterChoices>
+template <typename FilterType, typename T, int N, StateVariableFilterType type>
+std::enable_if_t<std::is_base_of_v<NthOrderFilter<T, N, type>, FilterType>, void>
+EQBand<FloatType, FilterChoices...>::processFilterChannel (FilterType& filter, juce::dsp::AudioBlock<FloatType>& block)
+{
+    const auto numChannels = (int) block.getNumChannels();
+    const auto numSamples = (int) block.getNumSamples();
+
+    const auto* freqHzValues = freqSmooth.getSmoothedBuffer();
+    const auto* qValues = qSmooth.getSmoothedBuffer();
+
+    if (freqSmooth.isSmoothing() && qSmooth.isSmoothing())
+    {
+        for (int n = 0; n < numSamples; ++n)
+        {
+            filter.setCutoffFrequency (freqHzValues[n]);
+            filter.setQValue (qValues[n]);
+            for (int ch = 0; ch < numChannels; ++ch)
+                block.setSample (ch, n, filter.processSample (ch, block.getSample (ch, n)));
+        }
+    }
+    else if (freqSmooth.isSmoothing())
+    {
+        for (int n = 0; n < numSamples; ++n)
+        {
+            filter.setCutoffFrequency (freqHzValues[n]);
+            for (int ch = 0; ch < numChannels; ++ch)
+                block.setSample (ch, n, filter.processSample (ch, block.getSample (ch, n)));
+        }
+    }
+    else if (qSmooth.isSmoothing())
+    {
+        for (int n = 0; n < numSamples; ++n)
+        {
+            filter.setQValue (qValues[n]);
+            for (int ch = 0; ch < numChannels; ++ch)
+                block.setSample (ch, n, filter.processSample (ch, block.getSample (ch, n)));
+        }
+    }
+    else
+    {
+        filter.setCutoffFrequency (freqSmooth.getCurrentValue());
+        filter.setQValue (qSmooth.getCurrentValue());
+        filter.process (juce::dsp::ProcessContextReplacing<FloatType> { block });
     }
 }
 
