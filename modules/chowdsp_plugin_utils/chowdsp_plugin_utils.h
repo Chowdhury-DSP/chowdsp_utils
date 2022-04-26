@@ -46,8 +46,11 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 
 #include "Serialization/chowdsp_JSON.h"
 
+#include "MusicTheory/chowdsp_RhythmUtils.h"
+
 #include "Parameters/chowdsp_ParamUtils.h"
 #include "Parameters/chowdsp_ForwardingParameter.h"
+#include "Parameters/chowdsp_RhythmParameter.h"
 #include "Version/chowdsp_VersionUtils.h"
 
 #include "Presets/chowdsp_Preset.h"

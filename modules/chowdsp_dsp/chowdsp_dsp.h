@@ -59,6 +59,7 @@ JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wcast-align",
                                      "-Wshadow-field",
                                      "-Wsign-conversion",
                                      "-Wzero-as-null-pointer-constant",
+                                     "-Wsign-compare",
                                      "-Wc++98-compat-extra-semi")
 JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4244)
 #include "third_party/xsimd/include/xsimd/xsimd.hpp"
