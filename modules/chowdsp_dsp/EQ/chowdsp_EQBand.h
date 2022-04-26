@@ -61,7 +61,7 @@ public:
 
 private:
     template <typename FilterType, typename T = FloatType, size_t N = FilterType::Order>
-    std::enable_if_t<std::is_base_of_v<IIRFilter<N, T>, FilterType>, void>
+    std::enable_if_t<std::is_base_of_v<IIRFilter<N, T>, FilterType> || std::is_base_of_v<SOSFilter<N, T>, FilterType>, void>
         processFilterChannel (FilterType& filter, juce::dsp::AudioBlock<FloatType>& block);
 
     template <typename FilterType, typename T = FloatType, size_t N = FilterType::Order, StateVariableFilterType type = FilterType::Type>
