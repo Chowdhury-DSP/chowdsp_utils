@@ -5,7 +5,7 @@ using namespace chowdsp::ParamUtils;
 class ParamHelpersTest : public TimedUnitTest
 {
 public:
-    ParamHelpersTest() : TimedUnitTest ("Param Helpers Test") {}
+    ParamHelpersTest() : TimedUnitTest ("Param Helpers Test", "Parameters") {}
 
     void checkRange (NormalisableRange<float> range, float start, float end, float centre)
     {

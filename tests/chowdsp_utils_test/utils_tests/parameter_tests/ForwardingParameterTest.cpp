@@ -4,7 +4,7 @@
 class ForwardingParameterTest : public TimedUnitTest
 {
 public:
-    ForwardingParameterTest() : TimedUnitTest ("Forwarding Parameter Test")
+    ForwardingParameterTest() : TimedUnitTest ("Forwarding Parameter Test", "Parameters")
     {
     }
 

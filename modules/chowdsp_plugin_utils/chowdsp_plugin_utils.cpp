@@ -2,6 +2,7 @@
 
 #include "Parameters/chowdsp_ParamUtils.cpp"
 #include "Parameters/chowdsp_ForwardingParameter.cpp"
+#include "Parameters/chowdsp_RhythmParameter.cpp"
 #include "Version/chowdsp_VersionUtils.cpp"
 
 #include "Presets/chowdsp_Preset.cpp"

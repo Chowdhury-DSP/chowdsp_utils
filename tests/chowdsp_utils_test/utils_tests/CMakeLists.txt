@@ -12,9 +12,12 @@ target_sources(chowdsp_utils_tests PRIVATE
     parameter_tests/ForwardingParameterTest.cpp
     parameter_tests/ParamHelpersTest.cpp
     parameter_tests/ParamStringsTest.cpp
+    parameter_tests/RhythmParameterTest.cpp
 
     presets_tests/PresetManagerTest.cpp
     presets_tests/PresetTest.cpp
+
+    music_theory_tests/RhythmUtilsTest.cpp
 )
 
 juce_add_binary_data(UnitTestData SOURCES
