@@ -275,11 +275,11 @@ void PresetsComp::loadPresetSafe (std::unique_ptr<Preset> preset)
         juce::MessageManager::callAsync (
             [] {
                 juce::NativeMessageBox::showAsync (juce::MessageBoxOptions()
-                                                  .withIconType (juce::MessageBoxIconType::WarningIcon)
-                                                  .withTitle ("Preset Load Failure")
-                                                  .withMessage ("Unable to load preset!")
-                                                  .withButton ("OK"),
-                                                  [](int) {});
+                                                       .withIconType (juce::MessageBoxIconType::WarningIcon)
+                                                       .withTitle ("Preset Load Failure")
+                                                       .withMessage ("Unable to load preset!")
+                                                       .withButton ("OK"),
+                                                   [] (int) {});
             });
     });
 }
