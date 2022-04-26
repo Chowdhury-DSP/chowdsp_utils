@@ -37,8 +37,7 @@ public:
         juce::ignoreUnused (qVal);
 
         FloatType bCoefs[3], bOppCoefs[3], aCoefs[3];
-        auto calcCoefsForQ = [&] (FloatType stageFreqOff, FloatType stageQ, FloatType stageLPGain, size_t stageOrder)
-        {
+        auto calcCoefsForQ = [&] (FloatType stageFreqOff, FloatType stageQ, FloatType stageLPGain, size_t stageOrder) {
             switch (type)
             {
                 case ChebyshevFilterType::Lowpass:
