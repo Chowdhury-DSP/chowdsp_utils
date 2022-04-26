@@ -4,7 +4,11 @@
 
 namespace chowdsp
 {
-
+/**
+ * A parameter class derived from AudioParameterChoice representing
+ * a rhythm. This might be useful for making a delay time synced to
+ * the tempo of a song.
+ */
 class RhythmParameter : public juce::AudioParameterChoice
 {
 public:
@@ -13,6 +17,7 @@ public:
                      const std::vector<RhythmUtils::Rhythm>& rhythms = RhythmUtils::getDefaultRhythms(),
                      const RhythmUtils::Rhythm& defaultRhythm = RhythmUtils::QUARTER);
 
+    /** Returns the length of time associated with the current rhythm for a given BPM in seconds */
     double getRhythmTimeSeconds (double tempoBPM) const;
 
 private:

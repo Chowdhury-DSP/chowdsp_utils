@@ -8,6 +8,7 @@ namespace chowdsp
 /** Utilities for managing rhythms in code */
 namespace RhythmUtils
 {
+    /** Simple struct representing the rhythm of a note */
     struct Rhythm
     {
         constexpr Rhythm (const std::string_view& rhythmName,
@@ -16,6 +17,7 @@ namespace RhythmUtils
                                                       label (rhythmLabel),
                                                       tempoFactor (rhythmTempoFactor) {}
 
+        /** Returns the rhythm's label (i.e. a quarter note has the label "1/4" */
         [[nodiscard]] inline juce::String getLabel() const { return { static_cast<std::string> (label) }; }
 
         /** Return time in seconds for rhythm and tempo */
