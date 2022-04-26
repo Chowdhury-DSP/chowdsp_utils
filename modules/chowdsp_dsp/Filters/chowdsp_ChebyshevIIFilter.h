@@ -9,7 +9,14 @@ enum class ChebyshevFilterType
     Highpass
 };
 
-/** A variable-order Type II Chebyshev filter */
+/**
+ * A variable-order Type II Chebyshev filter.
+ *
+ * @tparam order The filter order (must be even)
+ * @tparam type  The filter type
+ * @tparam stopBandAttenuationDB    The attenuation in the stop-band of the filter (should be given as a positive number)
+ * @tparam FloatType    The floating point type to use
+ */
 template <int order, ChebyshevFilterType type = ChebyshevFilterType::Lowpass, int stopBandAttenuationDB = 60, typename FloatType = float>
 class ChebyshevIIFilter : public SOSFilter<order, FloatType>
 {
@@ -26,7 +33,7 @@ public:
     }
 
     /**
-     * Calculates the coefficients for a higher-order Butterworth filter.
+     * Calculates the coefficients for a higher-order Chebyshev filter.
      *
      * Note that the cutoff frequency fc refers to the frequency at which
      * the stop-band starts (i.e. at any frequency above fc, the output
@@ -106,7 +113,7 @@ private:
 
             const auto p_norm = std::sqrt (ipow<2> (poles[i].real()) + ipow<2> (poles[i].imag()));
             freqOffsets[i] = p_norm;
-            qVals[i] = p_norm / ((NumericType) 2 * poles[i].real());
+            qVals[i] = p_norm / ((NumericType) 2 * std::abs (poles[i].real()));
             lpGains[i] = ipow<2> (zeros[i].imag()) / ipow<2> (p_norm);
         }
     }

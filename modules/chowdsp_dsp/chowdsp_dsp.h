@@ -95,6 +95,7 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 #include "Math/chowdsp_Polynomials.h"
 #include "Math/chowdsp_Power.h"
 #include "Math/chowdsp_OtherMathOps.h"
+#include "Math/chowdsp_JacobiElliptic.h"
 
 // some useful data structures
 #include "DataStructures/chowdsp_AudioBlockHelpers.h"
@@ -145,6 +146,7 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 #include "Filters/chowdsp_SOSFilter.h"
 #include "Filters/chowdsp_ButterworthFilter.h"
 #include "Filters/chowdsp_ChebyshevIIFilter.h"
+#include "Filters/chowdsp_EllipticFilter.h"
 
 // modal tools
 #include "Modal/chowdsp_ModalFilter.h"

@@ -25,6 +25,7 @@ const auto eqTypeChoices = juce::StringArray {
     "4-Pole HPF",
     "8-Pole HPF",
     "8-Pole Cheby. HPF",
+    "12-Pole Elliptic HPF",
     "Low-Shelf",
     "Bell",
     "Notch",
@@ -35,6 +36,7 @@ const auto eqTypeChoices = juce::StringArray {
     "4-Pole LPF",
     "8-Pole LPF",
     "8-Pole Cheby. LPF",
+    "12-Pole Elliptic LPF",
 };
 } // namespace
 
