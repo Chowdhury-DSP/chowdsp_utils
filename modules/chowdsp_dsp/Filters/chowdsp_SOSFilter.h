@@ -70,7 +70,7 @@ public:
     }
 
 protected:
-    std::array<IIRFilter<2, FloatType>, order / 2> secondOrderSections;
+    std::array<IIRFilter<2, FloatType>, (size_t) order / 2> secondOrderSections;
 
 private:
     std::vector<FloatType*> channelPointers;

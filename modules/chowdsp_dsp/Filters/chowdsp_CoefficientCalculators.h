@@ -78,14 +78,19 @@ namespace CoefficientCalculators
      * Calculates the filter coefficients for a given cutoff frequency, Q value, and sample rate.
      * The analog prototype transfer function is: \f$ H(s) = \frac{1}{s^2 + s/Q + 1} \f$
      */
-    template <typename T, typename NumericType>
-    void calcSecondOrderLPF (T (&b)[3], T (&a)[3], T fc, T qVal, NumericType fs)
+    template <typename T, typename NumericType, bool MatchCutoff = true>
+    void calcSecondOrderLPF (T (&b)[3], T (&a)[3], T fc, T qVal, NumericType fs, T matchedFc = (T) -1)
     {
         using namespace Bilinear;
         using namespace SIMDUtils;
 
+        if constexpr (MatchCutoff)
+            matchedFc = fc;
+        else
+            matchedFc = matchedFc > (T) 0 ? matchedFc : fc;
+
         const auto wc = juce::MathConstants<NumericType>::twoPi * fc;
-        const auto K = computeKValue (fc, fs);
+        const auto K = computeKValue (matchedFc, fs);
 
         auto kSqTerm = (T) 1 / (wc * wc);
         auto kTerm = (T) 1 / (qVal * wc);
@@ -97,14 +102,19 @@ namespace CoefficientCalculators
      * Calculates the filter coefficients for a given cutoff frequency, Q value, and sample rate.
      * The analog prototype transfer function is: \f$ H(s) = \frac{s^2}{s^2 + s/Q + 1} \f$
      */
-    template <typename T, typename NumericType>
-    void calcSecondOrderHPF (T (&b)[3], T (&a)[3], T fc, T qVal, NumericType fs)
+    template <typename T, typename NumericType, bool MatchCutoff = true>
+    void calcSecondOrderHPF (T (&b)[3], T (&a)[3], T fc, T qVal, NumericType fs, T matchedFc = (T) -1)
     {
         using namespace Bilinear;
         using namespace SIMDUtils;
 
+        if constexpr (MatchCutoff)
+            matchedFc = fc;
+        else
+            matchedFc = matchedFc > (T) 0 ? matchedFc : fc;
+
         const auto wc = juce::MathConstants<NumericType>::twoPi * fc;
-        const auto K = computeKValue (fc, fs);
+        const auto K = computeKValue (matchedFc, fs);
 
         auto kSqTerm = (T) 1 / (wc * wc);
         auto kTerm = (T) 1 / (qVal * wc);

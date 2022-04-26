@@ -15,6 +15,8 @@ enum class ButterworthFilterType
 template <int order, ButterworthFilterType type = ButterworthFilterType::Lowpass, typename FloatType = float>
 class ButterworthFilter : public SOSFilter<order, FloatType>
 {
+    static constexpr auto NFilters = (size_t) order / 2;
+
 public:
     using NumericType = SampleTypeHelpers::NumericType<FloatType>;
     static constexpr bool HasQParameter = true;
@@ -47,12 +49,12 @@ public:
         };
 
         calcCoefsForQ (butterQVals[0] * qVal * juce::MathConstants<NumericType>::sqrt2, 0);
-        for (size_t i = 1; i < (size_t) order / 2; ++i)
+        for (size_t i = 1; i < NFilters; ++i)
             calcCoefsForQ (butterQVals[i], i);
     }
 
 private:
-    const std::array<NumericType, order / 2> butterQVals = QValCalcs::butterworth_Qs<FloatType, order>();
+    const std::array<NumericType, NFilters> butterQVals = QValCalcs::butterworth_Qs<FloatType, (size_t) order>();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ButterworthFilter)
 };
