@@ -5,7 +5,7 @@ using namespace chowdsp::ParamUtils;
 class ParamStringsTest : public TimedUnitTest
 {
 public:
-    ParamStringsTest() : TimedUnitTest ("Param Strings Test") {}
+    ParamStringsTest() : TimedUnitTest ("Param Strings Test", "Parameters") {}
 
     void freqParamTest()
     {
