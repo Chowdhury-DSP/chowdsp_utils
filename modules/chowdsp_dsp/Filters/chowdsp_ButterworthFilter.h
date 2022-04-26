@@ -24,8 +24,7 @@ public:
     void calcCoefs (FloatType fc, FloatType qVal, NumericType fs)
     {
         FloatType bCoefs[3], aCoefs[3];
-        auto calcCoefsForQ = [&] (FloatType stageQ, size_t stageOrder)
-        {
+        auto calcCoefsForQ = [&] (FloatType stageQ, size_t stageOrder) {
             switch (type)
             {
                 case ButterworthFilterType::Lowpass:
