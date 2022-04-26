@@ -1,5 +1,7 @@
 #pragma once
 
+#include "chowdsp_CoefficientCalculators.h"
+
 namespace chowdsp
 {
 /**
@@ -22,12 +24,7 @@ public:
      */
     void calcCoefs (T fc, NumericType fs)
     {
-        using namespace Bilinear;
-        using namespace SIMDUtils;
-
-        const auto wc = juce::MathConstants<NumericType>::twoPi * fc;
-        const auto K = computeKValue (fc, fs);
-        BilinearTransform<T, 2>::call (this->b, this->a, { (T) 0, (T) 1 }, { (T) 1 / wc, (T) 1 }, K);
+        CoefficientCalculators::calcFirstOrderLPF (this->b, this->a, fc, fs);
     }
 
 private:
@@ -54,12 +51,7 @@ public:
      */
     void calcCoefs (T fc, NumericType fs)
     {
-        using namespace Bilinear;
-        using namespace SIMDUtils;
-
-        const auto wc = juce::MathConstants<NumericType>::twoPi * fc;
-        const auto K = computeKValue (fc, fs);
-        BilinearTransform<T, 2>::call (this->b, this->a, { (T) 1 / wc, (T) 0 }, { (T) 1 / wc, (T) 1 }, K);
+        CoefficientCalculators::calcFirstOrderHPF (this->b, this->a, fc, fs);
     }
 
 private:
@@ -91,31 +83,7 @@ public:
      */
     void calcCoefs (T lowGain, T highGain, T fc, NumericType fs)
     {
-        // reduce to simple gain element
-        if (lowGain == highGain)
-        {
-            this->b[0] = lowGain;
-            this->b[1] = (T) 0;
-            this->a[0] = (T) 1;
-            this->a[1] = (T) 0;
-            return;
-        }
-
-        using namespace SIMDUtils;
-
-        T rho {}, K;
-        if constexpr (std::is_floating_point_v<T>)
-        {
-            rho = std::sqrt (highGain / lowGain);
-            K = (T) 1 / std::tan (juce::MathConstants<NumericType>::pi * fc / fs);
-        }
-        else if constexpr (SampleTypeHelpers::IsSIMDRegister<T>)
-        {
-            rho = sqrtSIMD (highGain / lowGain);
-            K = (T) 1 / tanSIMD (juce::MathConstants<NumericType>::pi * fc / fs);
-        }
-
-        Bilinear::BilinearTransform<T, 2>::call (this->b, this->a, { highGain / rho, lowGain }, { 1.0f / rho, 1.0f }, K);
+        CoefficientCalculators::calcFirstOrderShelf (this->b, this->a, lowGain, highGain, fc, fs);
     }
 
 private:
