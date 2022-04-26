@@ -67,7 +67,7 @@ void EQBand<FloatType, FilterChoices...>::prepare (const juce::dsp::ProcessSpec&
         [spec] (auto& filter, size_t) {
             using FilterType = std::remove_reference_t<decltype (filter)>;
 
-            if constexpr (std::is_base_of_v<IIRFilter<FilterType::Order, FloatType>, FilterType>)
+            if constexpr (std::is_base_of_v<IIRFilter<FilterType::Order, FloatType>, FilterType> || std::is_base_of_v<SOSFilter<FilterType::Order, FloatType>, FilterType>)
                 filter.prepare ((int) spec.numChannels);
             else if constexpr (std::is_same_v<NthOrderFilter<FloatType, FilterType::Order, FilterType::Type>, FilterType>)
                 filter.prepare (spec);
@@ -99,7 +99,7 @@ void EQBand<FloatType, FilterChoices...>::reset()
 
 template <typename FloatType, typename... FilterChoices>
 template <typename FilterType, typename T, size_t N>
-std::enable_if_t<std::is_base_of_v<IIRFilter<N, T>, FilterType>, void>
+std::enable_if_t<std::is_base_of_v<IIRFilter<N, T>, FilterType> || std::is_base_of_v<SOSFilter<N, T>, FilterType>, void>
     EQBand<FloatType, FilterChoices...>::processFilterChannel (FilterType& filter, juce::dsp::AudioBlock<FloatType>& block)
 {
     auto setParams = [&filter, fs = this->fs] (FloatType curFreq, FloatType curQ, FloatType curGain) {
