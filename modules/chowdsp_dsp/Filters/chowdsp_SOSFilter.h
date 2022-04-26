@@ -13,6 +13,7 @@ public:
 
     SOSFilter() = default;
 
+    /** Prepares the filter to process a new stream of audio */
     void prepare (int numChannels)
     {
         for (auto& sos : secondOrderSections)
@@ -21,12 +22,14 @@ public:
         channelPointers.resize ((size_t) numChannels);
     }
 
+    /** Resets the filter state */
     void reset()
     {
         for (auto& sos : secondOrderSections)
             sos.reset();
     }
 
+    /** Process a single sample */
     inline FloatType processSample (FloatType x, int channel = 0) noexcept
     {
         for (auto& sos : secondOrderSections)

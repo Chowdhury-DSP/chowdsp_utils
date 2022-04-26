@@ -11,6 +11,7 @@ enum class ButterworthFilterType
     Highpass
 };
 
+/** A variable-order Butterworth filter */
 template <int order, ButterworthFilterType type = ButterworthFilterType::Lowpass, typename FloatType = float>
 class ButterworthFilter : public SOSFilter<order, FloatType>
 {
@@ -21,6 +22,7 @@ public:
 
     ButterworthFilter() = default;
 
+    /** Calculates the coefficients for a higher-order Butterworth filter */
     void calcCoefs (FloatType fc, FloatType qVal, NumericType fs)
     {
         FloatType bCoefs[3], aCoefs[3];
