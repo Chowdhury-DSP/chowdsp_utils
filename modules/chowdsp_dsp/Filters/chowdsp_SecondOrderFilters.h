@@ -1,5 +1,7 @@
 #pragma once
 
+#include "chowdsp_CoefficientCalculators.h"
+
 namespace chowdsp
 {
 /** Second-order lowpass filter. */
@@ -17,7 +19,10 @@ public:
      * Calculates the filter coefficients for a given cutoff frequency, Q value, and sample rate.
      * The analog prototype transfer function is: \f$ H(s) = \frac{1}{s^2 + s/Q + 1} \f$
      */
-    void calcCoefs (T fc, T qVal, NumericType fs);
+    void calcCoefs (T fc, T qVal, NumericType fs)
+    {
+        CoefficientCalculators::calcSecondOrderLPF (this->b, this->a, fc, qVal, fs);
+    }
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SecondOrderLPF)
@@ -38,7 +43,10 @@ public:
      * Calculates the filter coefficients for a given cutoff frequency, Q value, and sample rate.
      * The analog prototype transfer function is: \f$ H(s) = \frac{s^2}{s^2 + s/Q + 1} \f$
      */
-    void calcCoefs (T fc, T qVal, NumericType fs);
+    void calcCoefs (T fc, T qVal, NumericType fs)
+    {
+        CoefficientCalculators::calcSecondOrderHPF (this->b, this->a, fc, qVal, fs);
+    }
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SecondOrderHPF)
@@ -59,7 +67,10 @@ public:
      * Calculates the filter coefficients for a given cutoff frequency, Q value, and sample rate.
      * The analog prototype transfer function is: \f$ H(s) = \frac{s/Q}{s^2 + s/Q + 1} \f$
      */
-    void calcCoefs (T fc, T qVal, NumericType fs);
+    void calcCoefs (T fc, T qVal, NumericType fs)
+    {
+        CoefficientCalculators::calcSecondOrderBPF (this->b, this->a, fc, qVal, fs);
+    }
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SecondOrderBPF)
@@ -80,7 +91,10 @@ public:
      * Calculates the filter coefficients for a given cutoff frequency, Q value, and sample rate.
      * The analog prototype transfer function is: \f$ H(S) = \frac{s^2 + 1}{s^2 + s/Q + 1} \f$
      */
-    void calcCoefs (T fc, T qVal, NumericType fs);
+    void calcCoefs (T fc, T qVal, NumericType fs)
+    {
+        CoefficientCalculators::calcNotchFilter (this->b, this->a, fc, qVal, fs);
+    }
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NotchFilter)
@@ -103,13 +117,19 @@ public:
      * Note that the gain should be in units of linear gain, NOT Decibels.
      * The analog prototype transfer function is: \f$ H(s) = \frac{s^2 + G s/Q + 1}{s^2 + s/Q + 1} \f$
      */
-    void calcCoefs (T fc, T qVal, T gain, NumericType fs);
+    void calcCoefs (T fc, T qVal, T gain, NumericType fs)
+    {
+        CoefficientCalculators::calcPeakingFilter (this->b, this->a, fc, qVal, gain, fs);
+    }
 
     /**
      * Calculates the filter coefficients for a given cutoff frequency,
      * Q value, gain (in Decibels), and sample rate.
      */
-    void calcCoefsDB (T fc, T qVal, T gainDB, NumericType fs);
+    void calcCoefsDB (T fc, T qVal, T gainDB, NumericType fs)
+    {
+        CoefficientCalculators::calcCoefsGainDB (*this, fc, qVal, gainDB, fs);
+    }
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PeakingFilter)
@@ -132,13 +152,19 @@ public:
      * Note that the gain should be in units of linear gain, NOT Decibels.
      * The analog prototype transfer function is: \f$ H(s) = A \frac{s^2 + \sqrt{A} s/Q + A}{A s^2 + \sqrt{A} s/Q + 1} \f$
      */
-    void calcCoefs (T fc, T qVal, T gain, NumericType fs);
+    void calcCoefs (T fc, T qVal, T gain, NumericType fs)
+    {
+        CoefficientCalculators::calcLowShelf (this->b, this->a, fc, qVal, gain, fs);
+    }
 
     /**
      * Calculates the filter coefficients for a given cutoff frequency,
      * Q value, gain (in Decibels), and sample rate.
      */
-    void calcCoefsDB (T fc, T qVal, T gainDB, NumericType fs);
+    void calcCoefsDB (T fc, T qVal, T gainDB, NumericType fs)
+    {
+        CoefficientCalculators::calcCoefsGainDB (*this, fc, qVal, gainDB, fs);
+    }
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LowShelfFilter)
@@ -161,17 +187,21 @@ public:
      * Note that the gain should be in units of linear gain, NOT Decibels.
      * The analog prototype transfer function is: \f$ H(s) = A \frac{As^2 + \sqrt{A} s/Q + 1}{s^2 + \sqrt{A} s/Q + A} \f$
      */
-    void calcCoefs (T fc, T qVal, T gain, NumericType fs);
+    void calcCoefs (T fc, T qVal, T gain, NumericType fs)
+    {
+        CoefficientCalculators::calcHighShelf (this->b, this->a, fc, qVal, gain, fs);
+    }
 
     /**
      * Calculates the filter coefficients for a given cutoff frequency,
      * Q value, gain (in Decibels), and sample rate.
      */
-    void calcCoefsDB (T fc, T qVal, T gainDB, NumericType fs);
+    void calcCoefsDB (T fc, T qVal, T gainDB, NumericType fs)
+    {
+        CoefficientCalculators::calcCoefsGainDB (*this, fc, qVal, gainDB, fs);
+    }
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (HighShelfFilter)
 };
 } // namespace chowdsp
-
-#include "chowdsp_SecondOrderFilters.cpp"

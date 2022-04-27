@@ -18,6 +18,7 @@ target_sources(chowdsp_utils_tests PRIVATE
     math_tests/PolynomialsTest.cpp
     math_tests/PowerTest.cpp
     math_tests/OtherMathOpsTest.cpp
+    math_tests/JacobiEllipticTest.cpp
 
     data_structure_tests/COLAProcessorTest.cpp
     data_structure_tests/DoubleBufferTest.cpp
@@ -40,6 +41,9 @@ target_sources(chowdsp_utils_tests PRIVATE
     filter_tests/SecondOrderFiltersTest.cpp
     filter_tests/ShelfFilterTest.cpp
     filter_tests/ModFilterWrapperTest.cpp
+    filter_tests/ButterworthFilterTest.cpp
+    filter_tests/ChebyshevIIFilterTest.cpp
+    filter_tests/EllipticFilterTest.cpp
 
     modal_tests/ModalFilterTest.cpp
     modal_tests/ModalFilterBankTest.cpp
