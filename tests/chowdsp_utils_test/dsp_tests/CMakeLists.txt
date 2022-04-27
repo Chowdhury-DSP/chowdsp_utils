@@ -18,6 +18,7 @@ target_sources(chowdsp_utils_tests PRIVATE
     math_tests/PolynomialsTest.cpp
     math_tests/PowerTest.cpp
     math_tests/OtherMathOpsTest.cpp
+    math_tests/JacobiEllipticTest.cpp
 
     data_structure_tests/COLAProcessorTest.cpp
     data_structure_tests/DoubleBufferTest.cpp

@@ -5,7 +5,7 @@
 
 namespace chowdsp
 {
-/** Jacobi elliptic methods borrowmed from BOOST.math */
+/** Jacobi elliptic methods mostly borrowmed from BOOST.math */
 namespace jacobi
 {
     template <class T>
@@ -26,40 +26,43 @@ namespace jacobi
         return (Tn + std::asin ((cn / an) * std::sin (Tn))) / 2;
     }
 
+    /**
+     * The function jacobi_elliptic calculates the three copolar Jacobi elliptic functions
+     * sn(u, k), cn(u, k) and dn(u, k).
+     *
+     * This method gives equivalent output to scipy.special.ellipj
+     */
     template <class T>
-    void jacobi_elliptic (const T& x, const T& k, T& sn, T& cn, T& dn)
+    std::tuple<T, T, T> jacobi_elliptic (T x, T k)
     {
-        jassert (k >= 0);
+        jassert (k >= (T) 0);
 
-        if (k > 1)
+        if (k > (T) 1)
         {
             T xp = x * k;
-            T kp = 1 / k;
-            jacobi_elliptic (xp, kp, sn, cn, dn);
+            T kp = (T) 1 / k;
+            auto [sn, cn, dn] = jacobi_elliptic (xp, kp);
             sn *= kp;
-            return;
+            return std::make_tuple (sn, cn, dn);
         }
 
+        // this step is not present in the Boost implementations but is
+        // needed to get the same output as the scipy implementation.
+        k = std::sqrt (k);
+
         // Special cases first:
-        if (x == 0)
+        if (x == (T) 0)
         {
-            cn = 1;
-            dn = 1;
-            sn = 0;
-            return;
+            return std::make_tuple ((T) 0, (T) 1, (T) 1);
         }
-        if (k == 0)
+        if (k == (T) 0)
         {
-            cn = std::cos (x);
-            dn = 1;
-            sn = std::sin (x);
-            return;
+            return std::make_tuple (std::sin (x), std::cos (x), (T) 1);
         }
-        if (k == 1)
+        if (k == (T) 1)
         {
-            cn = dn = 1 / std::cosh (x);
-            sn = std::tanh (x);
-            return;
+            const auto cn_dn = (T) 1 / std::cosh (x);
+            return std::make_tuple (std::tanh (x), cn_dn, cn_dn);
         }
 
         // Asymptotic forms from A&S 16.13:
@@ -68,19 +71,20 @@ namespace jacobi
             T su = std::sin (x);
             T cu = std::cos (x);
             T m = k * k;
-            dn = 1 - m * su * su / 2;
-            cn = cu + m * (x - su * cu) * su / 4;
-            sn = su - m * (x - su * cu) * cu / 4;
-            return;
+            const auto dn = 1 - m * su * su / 2;
+            const auto cn = cu + m * (x - su * cu) * su / 4;
+            const auto sn = su - m * (x - su * cu) * cu / 4;
+            return std::make_tuple (sn, cn, dn);
         }
 
         T T1;
         T kc = 1 - k;
         T k_prime = k < 0.5 ? T (std::sqrt (1 - k * k)) : T (std::sqrt (2 * kc - kc * kc));
         T T0 = jacobi_recurse (x, k, T (1), k_prime, 0, &T1);
-        cn = std::cos (T0);
-        dn = std::cos (T0) / std::cos (T1 - T0);
-        sn = std::sin (T0);
+        const auto cn = std::cos (T0);
+        const auto dn = std::cos (T0) / std::cos (T1 - T0);
+        const auto sn = std::sin (T0);
+        return std::make_tuple (sn, cn, dn);
     }
 } // namespace jacobi
 } // namespace chowdsp

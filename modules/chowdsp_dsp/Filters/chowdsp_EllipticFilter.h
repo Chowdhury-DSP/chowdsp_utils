@@ -227,19 +227,18 @@ private:
 
         for (size_t i = 0; i < j.size(); ++i)
         {
-            jacobi::jacobi_elliptic (j[i] * capk / (double) order, std::sqrt (m), s[i], c[i], d[i]);
+            std::tie (s[i], c[i], d[i]) = jacobi::jacobi_elliptic (j[i] * capk / (double) order, m);
             zeros[i] = std::complex { (NumericType) 0, NumericType (1.0 / (sqrt (m) * s[i])) };
         }
 
         const auto r = arc_jac_sc1 (1.0 / eps, ck1_sq);
         const auto v0 = capk * r / ((double) order * val0);
 
-        double sv, cv, dv;
-        jacobi::jacobi_elliptic (v0, std::sqrt (1.0 - m), sv, cv, dv);
+        auto [sv, cv, dv] = jacobi::jacobi_elliptic (v0, 1.0 - m);
         for (size_t i = 0; i < j.size(); ++i)
         {
-            const auto den = 1.0 - (d[i] * sv) * (d[i] * sv);
-            poles[i] = -std::complex { NumericType (c[i] * d[i] * sv * cv), NumericType (s[i] * dv) } / (NumericType) den;
+            const auto den = (d[i] * sv) * (d[i] * sv) - 1.0;
+            poles[i] = std::complex { NumericType (c[i] * d[i] * sv * cv), NumericType (s[i] * dv) } / (NumericType) den;
         }
     }
 
