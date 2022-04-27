@@ -6,8 +6,6 @@ namespace chowdsp
 enum class ButterworthFilterType
 {
     Lowpass,
-    Bandpass,
-    Bandstop,
     Highpass
 };
 
@@ -33,12 +31,6 @@ public:
             {
                 case ButterworthFilterType::Lowpass:
                     CoefficientCalculators::calcSecondOrderLPF (bCoefs, aCoefs, fc, stageQ, fs);
-                    break;
-                case ButterworthFilterType::Bandpass:
-                    CoefficientCalculators::calcSecondOrderBPF (bCoefs, aCoefs, fc, stageQ, fs);
-                    break;
-                case ButterworthFilterType::Bandstop:
-                    CoefficientCalculators::calcNotchFilter (bCoefs, aCoefs, fc, stageQ, fs);
                     break;
                 case ButterworthFilterType::Highpass:
                     CoefficientCalculators::calcSecondOrderHPF (bCoefs, aCoefs, fc, stageQ, fs);

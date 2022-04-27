@@ -31,7 +31,6 @@ private:
                                    chowdsp::LowShelfFilter<float>,
                                    chowdsp::PeakingFilter<float>,
                                    chowdsp::NotchFilter<float>,
-                                   chowdsp::ButterworthFilter<8, chowdsp::ButterworthFilterType::Bandstop>,
                                    chowdsp::HighShelfFilter<float>,
                                    chowdsp::FirstOrderLPF<float>,
                                    chowdsp::SecondOrderLPF<float>,

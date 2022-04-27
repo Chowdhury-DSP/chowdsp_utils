@@ -29,7 +29,6 @@ const auto eqTypeChoices = juce::StringArray {
     "Low-Shelf",
     "Bell",
     "Notch",
-    "Deep Notch",
     "High-Shelf",
     "1-Pole LPF",
     "2-Pole LPF",
@@ -68,7 +67,7 @@ void SimpleEQPlugin::addParameters (Parameters& params)
         createFreqParameter (params, getTagForBand (i, freqTag), getNameForBand (i, "Freq."), 20.0f, 20000.0f, 2000.0f, 1000.0f);
         addQParam (getTagForBand (i, qTag), getNameForBand (i, "Q"));
         createGainDBParameter (params, getTagForBand (i, gainTag), getNameForBand (i, "Gain"), -18.0f, 18.0f, 0.0f);
-        emplace_param<juce::AudioParameterChoice> (params, getTagForBand (i, typeTag), getNameForBand (i, "Type"), eqTypeChoices, 3);
+        emplace_param<juce::AudioParameterChoice> (params, getTagForBand (i, typeTag), getNameForBand (i, "Type"), eqTypeChoices, 7);
         emplace_param<juce::AudioParameterBool> (params, getTagForBand (i, onOffTag), getNameForBand (i, "On/Off"), false);
     }
 

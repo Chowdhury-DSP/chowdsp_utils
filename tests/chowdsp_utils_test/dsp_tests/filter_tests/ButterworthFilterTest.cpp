@@ -7,25 +7,25 @@ constexpr float fs = 48000.0f;
 constexpr float fc = 1000.0f;
 } // namespace Constants
 
-class NthOrderFilterTest : public TimedUnitTest
+class ButterworthFilterTest : public TimedUnitTest
 {
 public:
-    NthOrderFilterTest() : TimedUnitTest ("Nth Order Filter Test", "Filters") {}
+    ButterworthFilterTest() : TimedUnitTest ("Butterworth Filter Test", "Filters") {}
 
-    using FilterType = chowdsp::StateVariableFilterType;
+    using FilterType = chowdsp::ButterworthFilterType;
 
     template <typename T, typename Filter>
     void testFilter (Filter& filt, std::vector<float> freqs, std::vector<float> mags, std::vector<float> errs, const StringArray& messages)
     {
-        auto testFrequency = [=, &filt] (float freq, float expGain, float err, const String& message) {
+        auto testFrequency = [=, &filt] (float freq, float expGain, float err, const String& message)
+        {
             auto buffer = test_utils::makeSineWave (freq, Constants::fs, 1.0f);
 
             HeapBlock<char> dataBlock;
             auto block = test_utils::bufferToBlock<T> (dataBlock, buffer);
 
             filt.reset();
-            dsp::ProcessContextReplacing<T> ctx (block);
-            filt.process (ctx);
+            filt.processBlock (block);
 
             test_utils::blockToBuffer (buffer, block);
             auto halfBlock = buffer.getNumSamples() / 2;
@@ -40,9 +40,8 @@ public:
     template <typename T>
     void lowpassTest()
     {
-        chowdsp::NthOrderFilter<T, 4, FilterType::Lowpass> filter;
-        filter.prepare ({ Constants::fs, (uint32) Constants::fs, 1 });
-        filter.setCutoffFrequency (Constants::fc);
+        chowdsp::ButterworthFilter<4, FilterType::Lowpass, T> filter;
+        filter.calcCoefs (Constants::fc, (T) 1 / MathConstants<T>::sqrt2, Constants::fs);
 
         testFilter<T> (filter,
                        { 100.0f, Constants::fc, 4 * Constants::fc },
@@ -54,9 +53,8 @@ public:
     template <typename T>
     void highpassTest()
     {
-        chowdsp::NthOrderFilter<T, 4, FilterType::Highpass> filter;
-        filter.prepare ({ Constants::fs, (uint32) Constants::fs, 1 });
-        filter.setCutoffFrequency (Constants::fc);
+        chowdsp::ButterworthFilter<4, FilterType::Highpass, T> filter;
+        filter.calcCoefs (Constants::fc, (T) 1 / MathConstants<T>::sqrt2, Constants::fs);
 
         testFilter<T> (filter,
                        { 10000.0f, Constants::fc, 0.25f * Constants::fc },
@@ -65,39 +63,14 @@ public:
                        { "passband", "cutoff", "stopband" });
     }
 
-    void bandpassTest()
-    {
-        std::cout << "TODO..." << std::endl;
-        // using namespace Constants;
-        // chowdsp::NthOrderFilter<float, 4, FilterType::Bandpass> filter;
-        // filter.prepare ({ fs, (uint32) fs, 1 });
-        // filter.setCutoffFrequency (fc);
-        // filter.setQValue (fc / bandWidth);
-
-        // testFilter (filter,
-        //             { fc, fc + bandWidth / 2, fc - bandWidth / 2 },
-        //             { 0.0f, -3.0f, -3.0f },
-        //             { 0.0001f, 0.01f, 0.01f },
-        //             { "passband", "high cutoff", "low cutoff" });
-    }
-
     void runTestTimed() override
     {
         beginTest ("Lowpass");
         lowpassTest<float>();
 
-        beginTest ("Lowpass SIMD");
-        lowpassTest<dsp::SIMDRegister<float>>();
-
         beginTest ("Highpass");
         highpassTest<float>();
-
-        beginTest ("Highpass SIMD");
-        highpassTest<dsp::SIMDRegister<float>>();
-
-        beginTest ("Bandpass");
-        bandpassTest();
     }
 };
 
-static NthOrderFilterTest nthOrderFilterTest;
+static ButterworthFilterTest butterworthFilterTest;
