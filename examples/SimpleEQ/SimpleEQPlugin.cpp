@@ -23,12 +23,19 @@ const auto eqTypeChoices = juce::StringArray {
     "1-Pole HPF",
     "2-Pole HPF",
     "4-Pole HPF",
+    "8-Pole HPF",
+    "8-Pole Cheby. HPF",
+    "12-Pole Elliptic HPF",
     "Low-Shelf",
     "Bell",
+    "Notch",
     "High-Shelf",
     "1-Pole LPF",
     "2-Pole LPF",
     "4-Pole LPF",
+    "8-Pole LPF",
+    "8-Pole Cheby. LPF",
+    "12-Pole Elliptic LPF",
 };
 } // namespace
 
@@ -60,7 +67,7 @@ void SimpleEQPlugin::addParameters (Parameters& params)
         createFreqParameter (params, getTagForBand (i, freqTag), getNameForBand (i, "Freq."), 20.0f, 20000.0f, 2000.0f, 1000.0f);
         addQParam (getTagForBand (i, qTag), getNameForBand (i, "Q"));
         createGainDBParameter (params, getTagForBand (i, gainTag), getNameForBand (i, "Gain"), -18.0f, 18.0f, 0.0f);
-        emplace_param<juce::AudioParameterChoice> (params, getTagForBand (i, typeTag), getNameForBand (i, "Type"), eqTypeChoices, 3);
+        emplace_param<juce::AudioParameterChoice> (params, getTagForBand (i, typeTag), getNameForBand (i, "Type"), eqTypeChoices, 7);
         emplace_param<juce::AudioParameterBool> (params, getTagForBand (i, onOffTag), getNameForBand (i, "On/Off"), false);
     }
 
