@@ -73,7 +73,7 @@ protected:
     std::array<IIRFilter<2, FloatType>, (size_t) order / 2> secondOrderSections;
 
 private:
-    std::vector<FloatType*> channelPointers;
+    std::vector<FloatType*> channelPointers = std::vector<FloatType*> (1);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SOSFilter)
 };

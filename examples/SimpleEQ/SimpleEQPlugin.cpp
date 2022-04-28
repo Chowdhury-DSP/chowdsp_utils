@@ -52,7 +52,8 @@ SimpleEQPlugin::SimpleEQPlugin()
 
     linPhaseModeOn = vts.getRawParameterValue (linPhaseModeTag);
 
-    linPhaseEQ.updatePrototypeEQParameters = [] (auto& eq, auto& eqParams) { eq.setParameters (eqParams); };
+    linPhaseEQ.updatePrototypeEQParameters = [] (auto& eq, auto& eqParams)
+    { eq.setParameters (eqParams); };
 }
 
 void SimpleEQPlugin::addParameters (Parameters& params)

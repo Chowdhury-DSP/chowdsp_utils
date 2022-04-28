@@ -122,7 +122,7 @@ protected:
     FloatType a[order + 1];
     FloatType b[order + 1];
     std::vector<std::array<FloatType, order + 1>> z;
-    std::vector<FloatType*> channelPointers;
+    std::vector<FloatType*> channelPointers = std::vector<FloatType*> (1);
 
     template <typename PrototypeFilter>
     friend class ModFilterWrapper;
