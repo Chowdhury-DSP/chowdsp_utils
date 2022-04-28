@@ -44,6 +44,7 @@ target_sources(chowdsp_utils_tests PRIVATE
     filter_tests/ButterworthFilterTest.cpp
     filter_tests/ChebyshevIIFilterTest.cpp
     filter_tests/EllipticFilterTest.cpp
+    filter_tests/FractionalOrderFilterTest.cpp
 
     modal_tests/ModalFilterTest.cpp
     modal_tests/ModalFilterBankTest.cpp
