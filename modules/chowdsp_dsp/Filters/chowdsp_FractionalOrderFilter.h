@@ -19,7 +19,7 @@ public:
     /** Prepares the filter to process a new stream of audio */
     void prepare (double sampleRate, int numChannels)
     {
-        fRef = FloatType (sampleRate  / 2.0);
+        fRef = FloatType (sampleRate / 2.0);
 
         for (auto& filt : filters)
             filt.prepare (numChannels);
@@ -42,10 +42,9 @@ public:
     void calcCoefs (FloatType fc, FloatType alpha, NumericType fs)
     {
         const auto k = Bilinear::computeKValue (fc, fs);
-        auto setFilterCoefs = [k](auto& filter, FloatType pole, FloatType zero)
-        {
-            FloatType a_z[2]{};
-            FloatType b_z[2]{};
+        auto setFilterCoefs = [k] (auto& filter, FloatType pole, FloatType zero) {
+            FloatType a_z[2] {};
+            FloatType b_z[2] {};
 
             FloatType a_s[2] = { FloatType (1) / pole, FloatType (-1) };
             FloatType b_s[2] = { FloatType (1) / zero, FloatType (-1) };
@@ -58,7 +57,7 @@ public:
         {
             const auto pole = -juce::MathConstants<NumericType>::twoPi * fc * std::pow (fRef / fc, (NumericType (2 * i - 1) - alpha) / (NumericType (2 * N + 1) - alpha));
             const auto zero = -juce::MathConstants<NumericType>::twoPi * fc * std::pow (fRef / fc, (NumericType (2 * i - 1) + alpha) / (NumericType (2 * N + 1) - alpha));
-            setFilterCoefs (filters[i-1], pole, zero);
+            setFilterCoefs (filters[i - 1], pole, zero);
         }
     }
 
@@ -93,4 +92,4 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FractionalOrderFilter)
 };
-}
+} // namespace chowdsp
