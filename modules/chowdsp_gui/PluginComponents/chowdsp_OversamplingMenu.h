@@ -24,9 +24,11 @@ public:
 
     void updateColours();
 
+protected:
+    virtual void generateComboBoxMenu();
+
 private:
     void sampleRateOrBlockSizeChanged() override { generateComboBoxMenu(); }
-    void generateComboBoxMenu();
 
     juce::Colour accentColour;
 
@@ -51,11 +53,9 @@ private:
 #if CHOWDSP_USE_FOLEYS_CLASSES
 // LCOV_EXCL_START
 /** Foley's GUI wrapper for PresetsComp */
-template <typename ProcType>
+template <typename ProcType, typename MenuCompType = OversamplingMenu<typename std::remove_reference<decltype (std::declval<ProcType>().getOversampling())>::type>>
 class OversamplingMenuItem : public foleys::GuiItem
 {
-    using MenuCompType = OversamplingMenu<typename std::remove_reference<decltype (std::declval<ProcType>().getOversampling())>::type>;
-
 public:
     FOLEYS_DECLARE_GUI_FACTORY (OversamplingMenuItem)
 

@@ -174,7 +174,7 @@ void OversamplingMenu<OSType>::generateComboBoxMenu()
     auto osMode = parameters[1] != nullptr ? parameters[1]->convertFrom0to1 (parameters[1]->getValue()) : 0;
     auto osIndex = osManager.getOSIndex ((int) osParam, (int) osMode);
     auto curLatencyMs = osManager.getLatencyMilliseconds (osIndex);
-    menu->addSectionHeader ("Current Latency: " + juce::String (curLatencyMs, 3) + " ms");
+    menu->addSectionHeader ("Oversampling Latency: " + juce::String (curLatencyMs, 3) + " ms");
 }
 
 template class OversamplingMenu<VariableOversampling<float>>;
