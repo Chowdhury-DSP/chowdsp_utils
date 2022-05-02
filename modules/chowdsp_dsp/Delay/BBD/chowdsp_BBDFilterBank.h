@@ -47,7 +47,9 @@ namespace BBDFilterSpec
     inline SIMDComplex<float> fast_complex_pow (juce::dsp::SIMDRegister<float> angle, float b)
     {
         auto angle_pow = angle * b;
-        return SIMDComplex<float>::fastExp (angle_pow);
+
+        auto [sinAngle, cosAngle] = chowdsp::SIMDUtils::sincosSIMD (angle_pow);
+        return { cosAngle, sinAngle };
     }
 } // namespace BBDFilterSpec
 
