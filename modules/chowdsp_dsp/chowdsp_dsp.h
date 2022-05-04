@@ -105,17 +105,7 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 #include "DataStructures/chowdsp_RebufferedProcessor.h"
 #include "DataStructures/chowdsp_SmoothedBufferValue.h"
 #include "DataStructures/chowdsp_ScopedValue.h"
-
-// WDF tools
-JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wshadow-field", // Ignore Clang warnings for WDFs
-                                     "-Wshadow-field-in-constructor",
-                                     "-Winconsistent-missing-destructor-override")
-JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324)
-#include "WDF/wdf.h"
-#include "WDF/wdf_t.h"
-#include "WDF/r_type.h"
-JUCE_END_IGNORE_WARNINGS_GCC_LIKE
-JUCE_END_IGNORE_WARNINGS_MSVC
+#include "DataStructures/chowdsp_TupleHelpers.h"
 
 // delay
 #include "Delay/chowdsp_DelayInterpolation.h"
