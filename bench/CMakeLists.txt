@@ -21,6 +21,5 @@ CPMAddPackage(
 )
 
 setup_benchmark(FloatVectorOperationsBench FloatVectorOperationsBench.cpp)
-setup_benchmark(WDFvsIIRBench WDFvsIIRBench.cpp)
 setup_benchmark(LookupTableBench LookupTableBench.cpp)
 setup_benchmark(PowerBench PowerBench.cpp)

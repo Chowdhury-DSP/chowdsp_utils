@@ -20,7 +20,6 @@ option(CODE_COVERAGE "Enable coverage reporting" OFF)
 
 add_subdirectory(chowdsp_utils_test)
 add_subdirectory(chowdsp_gui_test)
-add_subdirectory(wdf_standalone_test)
 
 option(CHOWDSP_RUN_CLANG_TIDY "Run clang-tidy on chowdsp modules" OFF)
 if(CHOWDSP_RUN_CLANG_TIDY)

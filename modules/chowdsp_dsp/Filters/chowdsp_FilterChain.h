@@ -40,8 +40,8 @@ public:
     template <typename Func>
     void doForEachFilter (Func&& func)
     {
-        chowdsp::WDFT::rtype_detail::forEachInTuple ([&] (auto& filter, size_t) { func (filter); },
-                                                     filters);
+        chowdsp::TupleHelpers::forEachInTuple ([&] (auto& filter, size_t) { func (filter); },
+                                               filters);
     }
 
     /** Resets each filter in the chain */
