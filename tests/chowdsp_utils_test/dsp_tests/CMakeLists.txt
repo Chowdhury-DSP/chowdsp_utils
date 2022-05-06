@@ -62,10 +62,4 @@ target_sources(chowdsp_utils_tests PRIVATE
     simd_tests/SIMDSmoothedValueTest.cpp
     simd_tests/SIMDSpecialMathTest.cpp
     simd_tests/SIMDUtilsTest.cpp
-
-    wdf_tests/OmegaTest.cpp
-    wdf_tests/RTypeTest.cpp
-    wdf_tests/SIMDWDFTest.cpp
-    wdf_tests/StaticWDFTest.cpp
-    wdf_tests/WDFTest.cpp
 )
