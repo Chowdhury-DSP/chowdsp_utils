@@ -67,6 +67,8 @@ JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4458) // MSVC doesn't like Foley's hiding class
 #include <foleys_gui_magic/foleys_gui_magic.h>
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 JUCE_END_IGNORE_WARNINGS_MSVC
+#else
+#include <chowdsp_dsp/chowdsp_dsp.h>
 #endif
 
 #if FOLEYS_ENABLE_BINARY_DATA
