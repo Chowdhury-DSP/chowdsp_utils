@@ -9,6 +9,7 @@
 
 #include "InfoUtils/chowdsp_InfoProvider.cpp"
 
+#include "PluginComponents/chowdsp_CPUMeter.cpp"
 #include "PluginComponents/chowdsp_TitleComp.cpp"
 #include "PluginComponents/chowdsp_TooltipComp.cpp"
 
