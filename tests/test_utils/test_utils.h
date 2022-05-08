@@ -1,38 +1,40 @@
 #pragma once
 
-#include <JuceHeader.h>
+#include <juce_dsp/juce_dsp.h>
+#include <juce_gui_basics/juce_gui_basics.h>
+#include <juce_audio_processors/juce_audio_processors.h>
 
 namespace test_utils
 {
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wpessimizing-move") // Clang doesn't like std::move
 
 template <typename FloatType = float>
-inline AudioBuffer<FloatType> makeSineWave (FloatType frequency, FloatType sampleRate, FloatType lengthSeconds)
+inline juce::AudioBuffer<FloatType> makeSineWave (FloatType frequency, FloatType sampleRate, FloatType lengthSeconds)
 {
     const int lengthSamples = int (lengthSeconds * sampleRate);
-    AudioBuffer<FloatType> sineBuffer (1, lengthSamples);
+    juce::AudioBuffer<FloatType> sineBuffer (1, lengthSamples);
 
     for (int n = 0; n < lengthSamples; ++n)
-        sineBuffer.setSample (0, n, std::sin (MathConstants<FloatType>::twoPi * frequency * (FloatType) n / sampleRate));
+        sineBuffer.setSample (0, n, std::sin (juce::MathConstants<FloatType>::twoPi * frequency * (FloatType) n / sampleRate));
 
     return std::move (sineBuffer);
 }
 
 template <typename FloatType = float>
-inline AudioBuffer<FloatType> makeSineWave (FloatType frequency, FloatType sampleRate, int lengthSamples)
+inline juce::AudioBuffer<FloatType> makeSineWave (FloatType frequency, FloatType sampleRate, int lengthSamples)
 {
-    AudioBuffer<FloatType> sineBuffer (1, lengthSamples);
+    juce::AudioBuffer<FloatType> sineBuffer (1, lengthSamples);
 
     for (int n = 0; n < lengthSamples; ++n)
-        sineBuffer.setSample (0, n, std::sin (MathConstants<FloatType>::twoPi * frequency * (FloatType) n / sampleRate));
+        sineBuffer.setSample (0, n, std::sin (juce::MathConstants<FloatType>::twoPi * frequency * (FloatType) n / sampleRate));
 
     return std::move (sineBuffer);
 }
 
-inline AudioBuffer<float> makeImpulse (float amplitude, float sampleRate, float lengthSeconds)
+inline juce::AudioBuffer<float> makeImpulse (float amplitude, float sampleRate, float lengthSeconds)
 {
     const int lengthSamples = int (lengthSeconds * sampleRate);
-    AudioBuffer<float> impBuffer (1, lengthSamples);
+    juce::AudioBuffer<float> impBuffer (1, lengthSamples);
     impBuffer.clear();
 
     impBuffer.setSample (0, 0, amplitude);
@@ -40,9 +42,9 @@ inline AudioBuffer<float> makeImpulse (float amplitude, float sampleRate, float 
     return std::move (impBuffer);
 }
 
-inline AudioBuffer<float> makeNoise (juce::Random& rand, int numSamples, int numChannels = 1)
+inline juce::AudioBuffer<float> makeNoise (juce::Random& rand, int numSamples, int numChannels = 1)
 {
-    AudioBuffer<float> noiseBuffer (numChannels, numSamples);
+    juce::AudioBuffer<float> noiseBuffer (numChannels, numSamples);
 
     for (int ch = 0; ch < numChannels; ++ch)
         for (int n = 0; n < numSamples; ++n)
@@ -51,19 +53,19 @@ inline AudioBuffer<float> makeNoise (juce::Random& rand, int numSamples, int num
     return std::move (noiseBuffer);
 }
 
-inline AudioBuffer<float> makeNoise (float sampleRate, float lengthSeconds)
+inline juce::AudioBuffer<float> makeNoise (float sampleRate, float lengthSeconds)
 {
     const int lengthSamples = int (lengthSeconds * sampleRate);
-    Random rand;
+    juce::Random rand;
 
     return makeNoise (rand, lengthSamples);
 }
 
 /** Convert from a AudioBuffer to AudioBlock (maybe changing data type...) */
-template <typename T, typename NumericType = typename chowdsp::SampleTypeHelpers::ElementType<T>::Type>
-inline dsp::AudioBlock<T> bufferToBlock (HeapBlock<char>& dataBlock, const AudioBuffer<NumericType>& buffer)
+template <typename T, typename NumericType = typename juce::dsp::SampleTypeHelpers::ElementType<T>::Type>
+inline juce::dsp::AudioBlock<T> bufferToBlock (juce::HeapBlock<char>& dataBlock, const juce::AudioBuffer<NumericType>& buffer)
 {
-    dsp::AudioBlock<T> block { dataBlock, 1, (size_t) buffer.getNumSamples() };
+    juce::dsp::AudioBlock<T> block { dataBlock, 1, (size_t) buffer.getNumSamples() };
     for (int i = 0; i < buffer.getNumSamples(); ++i)
         block.setSample (0, i, buffer.getSample (0, i));
 
@@ -71,8 +73,8 @@ inline dsp::AudioBlock<T> bufferToBlock (HeapBlock<char>& dataBlock, const Audio
 }
 
 /** Convert from a AudioBlock to AudioBuffer (maybe changing data type...) */
-template <typename T, typename NumericType = typename chowdsp::SampleTypeHelpers::ElementType<T>::Type>
-inline void blockToBuffer (AudioBuffer<NumericType>& buffer, const dsp::AudioBlock<T>& block)
+template <typename T, typename NumericType = typename juce::dsp::SampleTypeHelpers::ElementType<T>::Type>
+inline void blockToBuffer (juce::AudioBuffer<NumericType>& buffer, const juce::dsp::AudioBlock<T>& block)
 {
     if constexpr (std::is_floating_point<T>::value)
     {
@@ -89,11 +91,11 @@ JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
 struct ScopedFile
 {
-    explicit ScopedFile (const String& name) : file (File::getSpecialLocation (File::userHomeDirectory).getChildFile (name))
+    explicit ScopedFile (const juce::String& name) : file (juce::File::getSpecialLocation (juce::File::userHomeDirectory).getChildFile (name))
     {
     }
 
-    explicit ScopedFile (const File& thisFile) : file (thisFile)
+    explicit ScopedFile (const juce::File& thisFile) : file (thisFile)
     {
     }
 
@@ -102,19 +104,19 @@ struct ScopedFile
         file.deleteRecursively();
     }
 
-    const File file;
+    const juce::File file;
 };
 
-inline void setParameter (AudioProcessorParameter* param, float value)
+inline void setParameter (juce::AudioProcessorParameter* param, float value)
 {
     param->setValueNotifyingHost (value);
-    MessageManager::getInstance()->runDispatchLoopUntil (250);
+    juce::MessageManager::getInstance()->runDispatchLoopUntil (250);
 }
 
-inline auto createDummyMouseEvent (Component* comp, ModifierKeys mods = {})
+inline auto createDummyMouseEvent (juce::Component* comp, juce::ModifierKeys mods = {})
 {
-    auto mouseSource = Desktop::getInstance().getMainMouseSource();
-    return MouseEvent { mouseSource, Point<float> {}, mods, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, comp, comp, Time::getCurrentTime(), Point<float> {}, Time::getCurrentTime(), 1, false };
+    auto mouseSource = juce::Desktop::getInstance().getMainMouseSource();
+    return juce::MouseEvent { mouseSource, juce::Point<float> {}, mods, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, comp, comp, juce::Time::getCurrentTime(), juce::Point<float> {}, juce::Time::getCurrentTime(), 1, false };
 }
 
 } // namespace test_utils

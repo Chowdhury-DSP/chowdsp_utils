@@ -1,0 +1,3 @@
+add_subdirectory(chowdsp_gui_test)
+add_subdirectory(chowdsp_foleys_test)
+add_subdirectory(live_gui_test)

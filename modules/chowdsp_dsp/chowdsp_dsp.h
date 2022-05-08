@@ -9,7 +9,7 @@
     name:          ChowDSP DSP Utilities
     description:   Commonly used DSP utilities for ChowDSP plugins
     dependencies:  juce_core, juce_audio_basics, juce_audio_devices, juce_audio_formats,
-                   juce_audio_utils, juce_audio_processors
+                   juce_audio_utils, juce_audio_processors, chowdsp_core
 
     website:       https://ccrma.stanford.edu/~jatin/chowdsp
     license:       GPLv3
@@ -51,6 +51,7 @@
 #include <juce_audio_devices/juce_audio_devices.h>
 #include <juce_audio_formats/juce_audio_formats.h>
 #include <juce_audio_utils/juce_audio_utils.h>
+#include <chowdsp_core/chowdsp_core.h>
 
 // Third-party includes
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wcast-align",
@@ -100,12 +101,10 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 // some useful data structures
 #include "DataStructures/chowdsp_AudioBlockHelpers.h"
 #include "DataStructures/chowdsp_COLAProcessor.h"
-#include "DataStructures/chowdsp_DoubleBuffer.h"
 #include "DataStructures/chowdsp_LookupTableTransform.h"
 #include "DataStructures/chowdsp_RebufferedProcessor.h"
 #include "DataStructures/chowdsp_SmoothedBufferValue.h"
 #include "DataStructures/chowdsp_ScopedValue.h"
-#include "DataStructures/chowdsp_TupleHelpers.h"
 
 // delay
 #include "Delay/chowdsp_DelayInterpolation.h"

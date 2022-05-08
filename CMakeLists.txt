@@ -9,6 +9,9 @@ option(CHOWDSP_ENABLE_EXAMPLES "Enable examples for chowdsp modules" OFF)
 
 if(NOT (CHOWDSP_ENABLE_TESTING OR CHOWDSP_ENABLE_BENCHMARKS OR CHOWDSP_ENABLE_EXAMPLES))
     juce_add_modules(
+        modules/common/chowdsp_core
+        modules/common/chowdsp_json
+
         modules/chowdsp_dsp
         modules/chowdsp_gui
         modules/chowdsp_plugin_utils

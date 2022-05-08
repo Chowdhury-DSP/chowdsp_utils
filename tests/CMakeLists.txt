@@ -14,9 +14,16 @@ juce_add_modules(
     ${CMAKE_SOURCE_DIR}/../foleys_gui_magic
     ${CMAKE_SOURCE_DIR}/modules/common/chowdsp_core
     ${CMAKE_SOURCE_DIR}/modules/common/chowdsp_json
+    ${CMAKE_SOURCE_DIR}/modules/plugin/chowdsp_version
+    ${CMAKE_SOURCE_DIR}/modules/plugin/chowdsp_presets
+    ${CMAKE_SOURCE_DIR}/modules/plugin/chowdsp_parameters
+    ${CMAKE_SOURCE_DIR}/modules/plugin/chowdsp_plugin_base
+    ${CMAKE_SOURCE_DIR}/modules/plugin/chowdsp_plugin_utils
+    ${CMAKE_SOURCE_DIR}/modules/gui/chowdsp_gui
+    ${CMAKE_SOURCE_DIR}/modules/gui/chowdsp_foleys
+    ${CMAKE_SOURCE_DIR}/modules/music/chowdsp_rhythm
+
     ${CMAKE_SOURCE_DIR}/modules/chowdsp_dsp
-    ${CMAKE_SOURCE_DIR}/modules/chowdsp_gui
-    ${CMAKE_SOURCE_DIR}/modules/chowdsp_plugin_utils
 )
 
 option(CODE_COVERAGE "Enable coverage reporting" OFF)
@@ -24,6 +31,9 @@ option(CODE_COVERAGE "Enable coverage reporting" OFF)
 #add_subdirectory(chowdsp_utils_test)
 #add_subdirectory(chowdsp_gui_test)
 add_subdirectory(common_tests)
+add_subdirectory(plugin_tests)
+add_subdirectory(gui_tests)
+add_subdirectory(music_tests)
 
 option(CHOWDSP_RUN_CLANG_TIDY "Run clang-tidy on chowdsp modules" OFF)
 if(CHOWDSP_RUN_CLANG_TIDY)
