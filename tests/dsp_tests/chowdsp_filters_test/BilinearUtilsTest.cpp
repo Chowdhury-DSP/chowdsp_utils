@@ -1,6 +1,8 @@
 #include <TimedUnitTest.h>
 #include <chowdsp_filters/chowdsp_filters.h>
 
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wsign-conversion")
+
 class BilinearUtilsTest : public TimedUnitTest
 {
 public:
@@ -40,5 +42,7 @@ public:
         testBilinearTransform ({ 1.0f, 2.0f, 3.0f, 4.0f, 5.0f }, { 2.0f, 3.0f, 4.0f, 5.0f, 6.0f }, { 0.500003099f, -1.99998784f, 2.99994516f, -1.99993896f, 0.499978632f }, { 1.f, -3.99996352f, 5.99989032f, -3.99989009f, 0.999963402f }, kVal);
     }
 };
+
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
 static BilinearUtilsTest bilinearUtilsTest;

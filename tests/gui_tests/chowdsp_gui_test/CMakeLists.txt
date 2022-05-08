@@ -3,7 +3,7 @@ setup_juce_test(chowdsp_gui_test)
 
 target_link_libraries(chowdsp_gui_test PRIVATE
     juce::juce_dsp
-    chowdsp_dsp
+    chowdsp_dsp_utils
     chowdsp_gui
     chowdsp_presets
     chowdsp_plugin_base

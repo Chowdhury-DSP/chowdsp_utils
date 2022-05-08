@@ -57,10 +57,13 @@
 #include "InfoUtils/chowdsp_SystemInfo.h"
 
 #include "PluginComponents/chowdsp_InfoComp.h"
-#include "PluginComponents/chowdsp_OversamplingMenu.h"
 #include "PluginComponents/chowdsp_TitleComp.h"
 #include "PluginComponents/chowdsp_TooltipComp.h"
 #include "PluginComponents/chowdsp_WindowInPlugin.h"
+
+#if JUCE_MODULE_AVAILABLE_chowdsp_dsp_utils
+#include "PluginComponents/chowdsp_OversamplingMenu.h"
+#endif
 
 #if JUCE_MODULE_AVAILABLE_chowdsp_presets
 #include "Presets/chowdsp_PresetsComp.h"

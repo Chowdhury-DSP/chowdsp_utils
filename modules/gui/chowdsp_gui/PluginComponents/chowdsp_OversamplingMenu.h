@@ -1,7 +1,5 @@
 #pragma once
 
-#if JUCE_MODULE_AVAILABLE_chowdsp_dsp
-
 namespace chowdsp
 {
 /** Menu that can be used as an interface for chowdsp::VariableOversampling */
@@ -50,5 +48,3 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OversamplingMenu)
 };
 } // namespace chowdsp
-
-#endif // JUCE_MODULE_AVAILABLE_chowdsp_dsp

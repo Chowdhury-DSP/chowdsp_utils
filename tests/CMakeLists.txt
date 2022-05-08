@@ -24,6 +24,13 @@ if(CHOWDSP_RUN_CLANG_TIDY)
     message(STATUS "Configuring clang-tidy target")
     add_custom_target(chowdsp_utils_clang_tidy
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        COMMAND clang-tidy -p build "modules/chowdsp_dsp/chowdsp_dsp.cpp" "modules/chowdsp_gui/chowdsp_gui.cpp" "modules/chowdsp_plugin_utils/chowdsp_plugin_utils.cpp"
+        COMMAND clang-tidy -p build "modules/dsp/chowdsp_dsp_data_structures/chowdsp_dsp_data_structures.cpp"
+        COMMAND clang-tidy -p build "modules/dsp/chowdsp_dsp_utils/chowdsp_dsp_utils.cpp"
+        COMMAND clang-tidy -p build "modules/dsp/chowdsp_math/chowdsp_math.cpp"
+        COMMAND clang-tidy -p build "modules/gui/chowdsp_gui/chowdsp_gui.cpp"
+        COMMAND clang-tidy -p build "modules/plugin/chowdsp_parameters/chowdsp_parameters.cpp"
+        COMMAND clang-tidy -p build "modules/plugin/chowdsp_plugin_utils/chowdsp_plugin_utils.cpp"
+        COMMAND clang-tidy -p build "modules/plugin/chowdsp_presets/chowdsp_presets.cpp"
+        COMMAND clang-tidy -p build "modules/plugin/chowdsp_version/chowdsp_version.cpp"
     )
 endif()

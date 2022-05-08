@@ -15,7 +15,7 @@ function(setup_benchmark target file)
 
     target_link_libraries(${target} PRIVATE
         juce::juce_dsp
-        chowdsp_dsp_simd
+        chowdsp_simd
         chowdsp_dsp_data_structures
         chowdsp_math
         juce::juce_recommended_config_flags

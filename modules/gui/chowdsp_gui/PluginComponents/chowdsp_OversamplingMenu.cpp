@@ -1,8 +1,5 @@
+#include <chowdsp_dsp_utils/chowdsp_dsp_utils.h>
 #include "chowdsp_OversamplingMenu.h"
-
-#if JUCE_MODULE_AVAILABLE_chowdsp_dsp
-
-#include "chowdsp_dsp/Resampling/chowdsp_VariableOversampling.h"
 
 namespace chowdsp
 {
@@ -180,5 +177,3 @@ void OversamplingMenu<OSType>::generateComboBoxMenu()
 template class OversamplingMenu<VariableOversampling<float>>;
 template class OversamplingMenu<VariableOversampling<double>>;
 } // namespace chowdsp
-
-#endif // JUCE_MODULE_AVAILABLE_chowdsp_dsp
