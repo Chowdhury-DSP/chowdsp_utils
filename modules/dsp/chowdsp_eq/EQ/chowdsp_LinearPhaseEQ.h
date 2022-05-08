@@ -2,7 +2,7 @@
 
 #include <chowdsp_dsp_utils/chowdsp_dsp_utils.h>
 
-namespace chowdsp
+namespace chowdsp::EQ
 {
 /**
  * Class for creating a linear phase EQ, using a "prototype" EQ, which is not linear phase.
@@ -18,20 +18,20 @@ namespace chowdsp
 template <typename PrototypeEQ, int defaultFIRLength = 4096>
 class LinearPhaseEQ : private juce::HighResolutionTimer
 {
-    using EQParams = typename PrototypeEQ::Params;
+    using ProtoEQParams = typename PrototypeEQ::Params;
 
 public:
     /** Default constructor. */
     LinearPhaseEQ() = default;
 
     /** Implement this function to update the prototype EQ parameters. */
-    std::function<void (PrototypeEQ&, const EQParams&)> updatePrototypeEQParameters = nullptr;
+    std::function<void (PrototypeEQ&, const ProtoEQParams&)> updatePrototypeEQParameters = nullptr;
 
     /** Prepares the EQ to process a new stream of data. */
-    void prepare (const juce::dsp::ProcessSpec& spec, const EQParams& initialParams);
+    void prepare (const juce::dsp::ProcessSpec& spec, const ProtoEQParams& initialParams);
 
     /** Sets the current EQ parameters. */
-    void setParameters (const EQParams& newParams);
+    void setParameters (const ProtoEQParams& newParams);
 
     /** Process a new block of audio data. */
     template <typename ProcessContext>
@@ -50,7 +50,7 @@ private:
     void processBlocksInternal (const juce::dsp::AudioBlock<const float>& inputBlock, juce::dsp::AudioBlock<float>& outputBlock) noexcept;
 
     PrototypeEQ prototypeEQ;
-    EQParams params;
+    EQParams<ProtoEQParams> params;
 
     std::vector<std::unique_ptr<chowdsp::ConvolutionEngine>> engines;
     std::unique_ptr<chowdsp::IRTransfer> irTransfer;
@@ -72,6 +72,6 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LinearPhaseEQ)
 };
-} // namespace chowdsp
+} // namespace chowdsp::EQ
 
 #include "chowdsp_LinearPhaseEQ.cpp"
