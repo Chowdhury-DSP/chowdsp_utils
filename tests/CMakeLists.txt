@@ -14,12 +14,15 @@ juce_add_modules(
     ${CMAKE_SOURCE_DIR}/../foleys_gui_magic
     ${CMAKE_SOURCE_DIR}/modules/chowdsp_dsp
     ${CMAKE_SOURCE_DIR}/modules/chowdsp_gui
-    ${CMAKE_SOURCE_DIR}/modules/chowdsp_plugin_utils)
+    ${CMAKE_SOURCE_DIR}/modules/chowdsp_plugin_utils
+    ${CMAKE_SOURCE_DIR}/modules/common/chowdsp_json
+)
 
 option(CODE_COVERAGE "Enable coverage reporting" OFF)
 
-add_subdirectory(chowdsp_utils_test)
-add_subdirectory(chowdsp_gui_test)
+#add_subdirectory(chowdsp_utils_test)
+#add_subdirectory(chowdsp_gui_test)
+add_subdirectory(common_tests)
 
 option(CHOWDSP_RUN_CLANG_TIDY "Run clang-tidy on chowdsp modules" OFF)
 if(CHOWDSP_RUN_CLANG_TIDY)

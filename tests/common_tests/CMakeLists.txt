@@ -1,0 +1,1 @@
+add_subdirectory(chowdsp_json_test)

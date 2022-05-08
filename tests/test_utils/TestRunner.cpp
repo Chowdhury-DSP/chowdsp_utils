@@ -23,7 +23,9 @@
   ==============================================================================
 */
 
-#include <JuceHeader.h>
+#include <juce_events/juce_events.h>
+
+using namespace juce;
 
 //==============================================================================
 class ConsoleLogger : public Logger

@@ -21,8 +21,3 @@ if (SAMPLERATE_FOUND)
     target_compile_definitions(chowdsp_utils_tests PRIVATE CHOWDSP_USE_LIBSAMPLERATE=1)
     target_link_libraries(chowdsp_utils_tests PRIVATE samplerate::samplerate)
 endif ()
-
-# set coverage flags if needed
-if(CODE_COVERAGE)
-    enable_coverage_flags(chowdsp_utils_tests)
-endif()
