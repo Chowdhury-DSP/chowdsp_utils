@@ -1,7 +1,7 @@
 #pragma once
 
-#include <chowdsp_plugin_utils/chowdsp_plugin_utils.h>
-#include <chowdsp_dsp/chowdsp_dsp.h>
+#include <chowdsp_plugin_base/chowdsp_plugin_base.h>
+#include <chowdsp_reverb/chowdsp_reverb.h>
 
 class SimpleReverbPlugin : public chowdsp::PluginBase<SimpleReverbPlugin>
 {
