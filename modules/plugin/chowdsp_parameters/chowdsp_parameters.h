@@ -33,6 +33,6 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "ParamUtils/chowdsp_ParamUtils.h"
 #include "ParamUtils/chowdsp_ForwardingParameter.h"
 
-#if JUCE_MODULE_AVAILABLE_chowdsp_rhythms
+#if JUCE_MODULE_AVAILABLE_chowdsp_rhythm
 #include "ParamUtils/chowdsp_RhythmParameter.h"
 #endif

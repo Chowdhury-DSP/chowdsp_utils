@@ -1,7 +1,7 @@
 #include <TimedUnitTest.h>
 #include <chowdsp_dsp/chowdsp_dsp.h>
 #include <chowdsp_gui/chowdsp_gui.h>
-#include <chowdsp_plugin_utils/chowdsp_plugin_utils.h>
+#include <chowdsp_plugin_base/chowdsp_plugin_base.h>
 
 struct TestPlugin2 : public chowdsp::PluginBase<TestPlugin2>
 {

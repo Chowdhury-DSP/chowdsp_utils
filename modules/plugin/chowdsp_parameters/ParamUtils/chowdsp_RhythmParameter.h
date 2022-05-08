@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../MusicTheory/chowdsp_RhythmUtils.h"
+#include <chowdsp_rhythm/chowdsp_rhythm.h>
 
 namespace chowdsp
 {

@@ -5,7 +5,8 @@ target_link_libraries(chowdsp_gui_test PRIVATE
     juce::juce_dsp
     chowdsp_dsp
     chowdsp_gui
-    chowdsp_plugin_utils
+    chowdsp_presets
+    chowdsp_plugin_base
 )
 
 target_sources(chowdsp_gui_test PRIVATE
