@@ -1,6 +1,6 @@
 #pragma once
 
-#include <chowdsp_plugin_utils/chowdsp_plugin_utils.h>
+#include <chowdsp_plugin_base/chowdsp_plugin_base.h>
 
 #include "PrototypeEQ.h"
 
