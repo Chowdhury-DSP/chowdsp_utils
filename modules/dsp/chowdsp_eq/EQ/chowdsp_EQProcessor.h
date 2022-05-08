@@ -1,6 +1,6 @@
 #pragma once
 
-namespace chowdsp
+namespace chowdsp::EQ
 {
 /**
  * A fully functioning multi-band equaliser!
@@ -64,6 +64,6 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EQProcessor)
 };
-} // namespace chowdsp
+} // namespace chowdsp::EQ
 
 #include "chowdsp_EQProcessor.cpp"

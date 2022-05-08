@@ -12,13 +12,12 @@ struct NotAFilter
     struct Params
     {
         bool onOff;
-        bool operator== (const Params& other) const { return onOff == other.onOff; }
     };
 
     void prepare (const juce::dsp::ProcessSpec&) {}
     void reset() {}
 
-    void processBlock (juce::AudioBuffer<float>& buffer)
+    void processBlock (juce::AudioBuffer<float>& buffer) const
     {
         if (! onOff)
             buffer.clear();
@@ -35,7 +34,7 @@ public:
     void processTest()
     {
         constexpr int FIRLength = 128;
-        chowdsp::LinearPhaseEQ<NotAFilter, FIRLength> testEQ;
+        chowdsp::EQ::LinearPhaseEQ<NotAFilter, FIRLength> testEQ;
         testEQ.updatePrototypeEQParameters = [] (auto& eq, auto& params) { eq.onOff = params.onOff; };
         testEQ.prepare ({ Constants::sampleRate, Constants::blockSize, 1 }, { true });
 
@@ -62,7 +61,7 @@ public:
     void parametersTest()
     {
         constexpr int FIRLength = 16;
-        chowdsp::LinearPhaseEQ<NotAFilter, FIRLength> testEQ;
+        chowdsp::EQ::LinearPhaseEQ<NotAFilter, FIRLength> testEQ;
         testEQ.updatePrototypeEQParameters = [] (auto& eq, auto& params) { eq.onOff = params.onOff; };
         testEQ.prepare ({ Constants::sampleRate, Constants::blockSize, 1 }, { true });
 
@@ -87,7 +86,7 @@ public:
     void firLengthTest()
     {
         constexpr int FIRLength = 16;
-        chowdsp::LinearPhaseEQ<NotAFilter, FIRLength> testEQ;
+        chowdsp::EQ::LinearPhaseEQ<NotAFilter, FIRLength> testEQ;
         testEQ.updatePrototypeEQParameters = [] (auto& eq, auto& params) { eq.onOff = params.onOff; };
 
         {

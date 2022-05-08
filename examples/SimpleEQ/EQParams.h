@@ -9,27 +9,8 @@ struct EQParams
         float bandFreqHz, bandQ, bandGainDB;
         int bandType;
         bool bandOnOff;
-
-        bool operator== (const BandParams& other) const
-        {
-            return bandFreqHz == other.bandFreqHz
-                   && bandQ == other.bandQ
-                   && bandGainDB == other.bandGainDB
-                   && bandType == other.bandType
-                   && bandOnOff == other.bandOnOff;
-        }
     };
 
     // parameters
-    std::array<BandParams, numBands> bands;
-
-    // we need this method so we can know if two parameter sets are equivalent.
-    bool operator== (const EQParams& other) const
-    {
-        bool result = true;
-        for (size_t i = 0; i < numBands; ++i)
-            result &= bands[i] == other.bands[i];
-
-        return result;
-    }
+    std::array<chowdsp::EQ::EQParams<BandParams>, numBands> bands;
 };

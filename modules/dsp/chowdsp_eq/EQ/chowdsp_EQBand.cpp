@@ -1,4 +1,4 @@
-namespace chowdsp
+namespace chowdsp::EQ
 {
 #ifndef DOXYGEN
 namespace eqband_detail
@@ -256,4 +256,4 @@ void EQBand<FloatType, FilterChoices...>::process (const ProcessContext& context
     prevFilterType = filterType;
 }
 
-} // namespace chowdsp
+} // namespace chowdsp::EQ

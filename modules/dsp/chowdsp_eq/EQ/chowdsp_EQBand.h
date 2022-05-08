@@ -2,7 +2,8 @@
 
 #include <tuple>
 
-namespace chowdsp
+/** ChowDSP EQ utilities */
+namespace chowdsp::EQ
 {
 /**
  * A set of filters intended to be used as a single "band" in a multiband EQ.
@@ -89,6 +90,6 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EQBand)
 };
-} // namespace chowdsp
+} // namespace chowdsp::EQ
 
 #include "chowdsp_EQBand.cpp"

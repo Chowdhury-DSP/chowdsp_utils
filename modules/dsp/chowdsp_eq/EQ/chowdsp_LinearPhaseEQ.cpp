@@ -1,6 +1,6 @@
 #include "chowdsp_LinearPhaseEQ.h"
 
-namespace chowdsp
+namespace chowdsp::EQ
 {
 template <typename PrototypeEQ, int defaultFIRLength>
 int LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::getIRSize (double sampleRate)
@@ -16,7 +16,7 @@ int LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::getIRSize (double sampleRate)
 }
 
 template <typename PrototypeEQ, int defaultFIRLength>
-void LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::prepare (const juce::dsp::ProcessSpec& spec, const EQParams& initialParams)
+void LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::prepare (const juce::dsp::ProcessSpec& spec, const ProtoEQParams& initialParams)
 {
     stopTimer();
 
@@ -55,7 +55,7 @@ void LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::hiResTimerCallback()
 }
 
 template <typename PrototypeEQ, int defaultFIRLength>
-void LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::setParameters (const EQParams& newParams)
+void LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::setParameters (const ProtoEQParams& newParams)
 {
     // no update needed
     if (params == newParams)
@@ -74,7 +74,7 @@ void LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::updateParams()
 {
     // update prototype EQ params...
     jassert (updatePrototypeEQParameters != nullptr); // better make sure this function is set before getting to this point!
-    updatePrototypeEQParameters (prototypeEQ, params);
+    updatePrototypeEQParameters (prototypeEQ, params.params);
 
     // set up IR
     irBuffer.clear();
@@ -146,4 +146,4 @@ int LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::getLatencySamples() const noex
 {
     return irSize / 2;
 }
-} // namespace chowdsp
+} // namespace chowdsp::EQ
