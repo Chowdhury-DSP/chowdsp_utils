@@ -125,12 +125,10 @@ public:
         valueCompareTest();
 
         beginTest ("Parameter Compare Test");
-        parameterCompareTest ([] (auto x)
-                              { return x; });
+        parameterCompareTest ([] (auto x) { return x; });
 
         beginTest ("Parameter Mapping Test");
-        parameterCompareTest ([] (auto x)
-                              { return std::pow (x, 10.0f); });
+        parameterCompareTest ([] (auto x) { return std::pow (x, 10.0f); });
     }
 };
 

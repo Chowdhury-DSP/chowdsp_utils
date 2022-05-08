@@ -64,17 +64,9 @@ public:
         baseMathTest<FloatType> (nIter, r, FLOATFUNC (juce::Decibels::decibelsToGain), SIMDFUNC (decibelsToGain), maxErr, "decibelsToGain", minus10To10);
 
         baseMathTest<FloatType> (
-            nIter, r, FLOATFUNC (std::sin), [] (auto x)
-            { return std::get<0> (sincosSIMD (x)); },
-            maxErr,
-            "sincos",
-            minus10To10);
+            nIter, r, FLOATFUNC (std::sin), [] (auto x) { return std::get<0> (sincosSIMD (x)); }, maxErr, "sincos", minus10To10);
         baseMathTest<FloatType> (
-            nIter, r, FLOATFUNC (std::cos), [] (auto x)
-            { return std::get<1> (sincosSIMD (x)); },
-            maxErr,
-            "sincos",
-            minus10To10);
+            nIter, r, FLOATFUNC (std::cos), [] (auto x) { return std::get<1> (sincosSIMD (x)); }, maxErr, "sincos", minus10To10);
 
 #undef FLOATFUNC
 #undef SIMDFUNC
@@ -118,15 +110,11 @@ public:
     template <typename T>
     void hMinMaxTest (int nIter, juce::Random& r)
     {
-        auto refMax = [] (const auto& data)
-        { return *std::max_element (data.begin(), data.end()); };
+        auto refMax = [] (const auto& data) { return *std::max_element (data.begin(), data.end()); };
 
-        auto refMin = [] (const auto& data)
-        { return *std::min_element (data.begin(), data.end()); };
+        auto refMin = [] (const auto& data) { return *std::min_element (data.begin(), data.end()); };
 
-        auto refAbsMax = [] (const auto& data)
-        { return std::abs (*std::max_element (data.begin(), data.end(), [] (auto a, auto b)
-                                              { return std::abs (a) < std::abs (b); })); };
+        auto refAbsMax = [] (const auto& data) { return std::abs (*std::max_element (data.begin(), data.end(), [] (auto a, auto b) { return std::abs (a) < std::abs (b); })); };
 
         for (int i = 0; i < nIter; ++i)
         {

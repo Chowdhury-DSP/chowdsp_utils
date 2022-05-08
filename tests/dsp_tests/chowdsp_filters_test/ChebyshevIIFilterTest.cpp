@@ -18,8 +18,7 @@ public:
     template <typename T, typename Filter>
     void testFilter (Filter& filt, std::vector<float> freqs, std::vector<float> mags, std::vector<float> errs, const juce::StringArray& messages)
     {
-        auto testFrequency = [=, &filt] (float freq, float expGain, float err, const juce::String& message)
-        {
+        auto testFrequency = [=, &filt] (float freq, float expGain, float err, const juce::String& message) {
             auto buffer = test_utils::makeSineWave (freq, Constants::fs, 1.0f);
 
             juce::HeapBlock<char> dataBlock;

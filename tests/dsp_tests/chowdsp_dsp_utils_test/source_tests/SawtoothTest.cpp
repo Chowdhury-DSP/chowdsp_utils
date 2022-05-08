@@ -16,8 +16,7 @@ public:
     void referenceTest()
     {
         // our osc has 1/2 sample delay so, run the reference osc at 2x sample rate, and check every other.
-        juce::dsp::Oscillator<float> refOsc { [] (auto x)
-                                              { return x / juce::MathConstants<float>::pi; } };
+        juce::dsp::Oscillator<float> refOsc { [] (auto x) { return x / juce::MathConstants<float>::pi; } };
         refOsc.prepare ({ 2.0 * _sampleRate, (juce::uint32) _blockSize, 1 });
         refOsc.setFrequency (testFreq, true);
 
@@ -37,8 +36,7 @@ public:
     void simdReferenceTest()
     {
         // our osc has 1/2 sample delay so, run the reference osc at 2x sample rate, and check every other.
-        juce::dsp::Oscillator<float> refOsc { [] (auto x)
-                                              { return x / juce::MathConstants<float>::pi; } };
+        juce::dsp::Oscillator<float> refOsc { [] (auto x) { return x / juce::MathConstants<float>::pi; } };
         refOsc.prepare ({ 2.0 * _sampleRate, (juce::uint32) _blockSize, 1 });
         refOsc.setFrequency (testFreq, true);
 
@@ -61,8 +59,7 @@ public:
 
     void processReplacingTest()
     {
-        juce::dsp::Oscillator<float> refOsc { [] (auto x)
-                                              { return x / juce::MathConstants<float>::pi; } };
+        juce::dsp::Oscillator<float> refOsc { [] (auto x) { return x / juce::MathConstants<float>::pi; } };
         refOsc.prepare ({ 2.0 * _sampleRate, (juce::uint32) _blockSize, 1 });
         refOsc.setFrequency (testFreq, true);
 
@@ -90,8 +87,7 @@ public:
 
     void processNonReplacingTest()
     {
-        juce::dsp::Oscillator<float> refOsc { [] (auto x)
-                                              { return x / juce::MathConstants<float>::pi; } };
+        juce::dsp::Oscillator<float> refOsc { [] (auto x) { return x / juce::MathConstants<float>::pi; } };
         refOsc.prepare ({ 2.0 * _sampleRate, (juce::uint32) _blockSize, 2 });
         refOsc.setFrequency (testFreq, true);
 
@@ -135,8 +131,7 @@ public:
 
     void bypassTest()
     {
-        juce::dsp::Oscillator<float> refOsc { [] (auto x)
-                                              { return x / juce::MathConstants<float>::pi; } };
+        juce::dsp::Oscillator<float> refOsc { [] (auto x) { return x / juce::MathConstants<float>::pi; } };
         refOsc.prepare ({ 2.0 * _sampleRate, (juce::uint32) _blockSize, 1 });
         refOsc.setFrequency (testFreq, true);
 

@@ -41,8 +41,7 @@ public:
         constexpr int numIters = 20;
 
         auto logsDirectory = juce::FileLogger::getSystemLogFileFolder().getChildFile (logFileSubDir);
-        auto getNumLogFiles = [&]
-        {
+        auto getNumLogFiles = [&] {
             return logsDirectory.getNumberOfChildFiles (juce::File::findFiles, "*");
         };
 

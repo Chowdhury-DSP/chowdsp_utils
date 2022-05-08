@@ -18,8 +18,7 @@ public:
     static void gen_sine (std::vector<float>& audio, float freq, float fs, int num_samples)
     {
         audio.resize ((size_t) num_samples, 0.0f);
-        std::generate (audio.begin(), audio.end(), [=, n = 0.0f]() mutable
-                       { return std::sin (juce::MathConstants<float>::twoPi * (float) n++ * freq / fs); });
+        std::generate (audio.begin(), audio.end(), [=, n = 0.0f]() mutable { return std::sin (juce::MathConstants<float>::twoPi * (float) n++ * freq / fs); });
     }
 
     static std::pair<int, int> calc_latency (const std::vector<float>& data, const std::vector<float>& ref_data)

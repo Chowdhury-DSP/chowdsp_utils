@@ -36,8 +36,7 @@ public:
     {
         constexpr int FIRLength = 128;
         chowdsp::LinearPhaseEQ<NotAFilter, FIRLength> testEQ;
-        testEQ.updatePrototypeEQParameters = [] (auto& eq, auto& params)
-        { eq.onOff = params.onOff; };
+        testEQ.updatePrototypeEQParameters = [] (auto& eq, auto& params) { eq.onOff = params.onOff; };
         testEQ.prepare ({ Constants::sampleRate, Constants::blockSize, 1 }, { true });
 
         juce::AudioBuffer<float> buffer (1, Constants::blockSize);
@@ -64,12 +63,10 @@ public:
     {
         constexpr int FIRLength = 16;
         chowdsp::LinearPhaseEQ<NotAFilter, FIRLength> testEQ;
-        testEQ.updatePrototypeEQParameters = [] (auto& eq, auto& params)
-        { eq.onOff = params.onOff; };
+        testEQ.updatePrototypeEQParameters = [] (auto& eq, auto& params) { eq.onOff = params.onOff; };
         testEQ.prepare ({ Constants::sampleRate, Constants::blockSize, 1 }, { true });
 
-        auto processBlock = [&testEQ]()
-        {
+        auto processBlock = [&testEQ]() {
             juce::AudioBuffer<float> buffer (1, Constants::blockSize);
             buffer.clear();
             buffer.setSample (0, 0, 1.0f);

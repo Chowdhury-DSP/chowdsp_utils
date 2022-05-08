@@ -176,8 +176,7 @@ public:
         presetMgr.setUserPresetPath (presetPath.file);
 
         std::atomic<bool> threadFinished { false };
-        juce::Thread::launch ([&]
-                              {
+        juce::Thread::launch ([&] {
                                   juce::Thread::sleep (75); // wait for message manager...
             expectEquals (presetsComp.getPresetMenuText(), juce::String ("Test2"), "Initial preset text is incorrect!");
 
