@@ -2,6 +2,7 @@
 
 namespace chowdsp
 {
+/** Simple progress bar to visualize CPU usage */
 class CPUMeter : public juce::Component,
                  private juce::Timer
 {

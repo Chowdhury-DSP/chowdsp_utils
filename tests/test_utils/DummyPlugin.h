@@ -20,8 +20,16 @@ public:
         chowdsp::ParamUtils::emplace_param<juce::AudioParameterFloat> (params, "dummy", "Dummy", 0.0f, 1.0f, 0.5f);
     }
 
+    void prepareToPlay (double sampleRate, int samplesPerBlock) override
+    {
+        loadMeasurer.reset (sampleRate, samplesPerBlock);
+    }
+
     void releaseResources() override {}
-    void processAudioBlock (juce::AudioBuffer<float>&) override {}
+    void processAudioBlock (juce::AudioBuffer<float>& buffer) override
+    {
+        juce::AudioProcessLoadMeasurer::ScopedTimer loadTimer { loadMeasurer, buffer.getNumSamples() };
+    }
 
 #if ! JUCE_MODULE_AVAILABLE_foleys_gui_magic
     juce::AudioProcessorEditor* createEditor() override
@@ -30,15 +38,16 @@ public:
     }
 #endif
 
-    juce::UndoManager& getUndoManager()
+    auto& getUndoManager()
     {
         return undoManager;
     }
-
-    juce::AudioProcessorValueTreeState& getVTS() { return vts; }
+    auto& getVTS() { return vts; }
+    auto& getLoadMeasurer() { return loadMeasurer; }
 
 private:
     juce::UndoManager undoManager;
+    juce::AudioProcessLoadMeasurer loadMeasurer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DummyPlugin)
 };
