@@ -28,9 +28,4 @@ function(setup_juce_test target)
     if(CODE_COVERAGE)
         enable_coverage_flags(${target})
     endif()
-
-    # supress warning from Foley's
-#    if ((CMAKE_CXX_COMPILER_ID STREQUAL "MSVC") OR (CMAKE_CXX_SIMULATE_ID STREQUAL "MSVC"))
-#        target_compile_options(${target} PUBLIC /wd4458)
-#    endif ()
 endfunction(setup_juce_test)
