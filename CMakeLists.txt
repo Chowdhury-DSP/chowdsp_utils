@@ -9,7 +9,7 @@ option(CHOWDSP_ENABLE_EXAMPLES "Enable examples for chowdsp modules" OFF)
 
 if(NOT (CHOWDSP_ENABLE_TESTING OR CHOWDSP_ENABLE_BENCHMARKS OR CHOWDSP_ENABLE_EXAMPLES))
     juce_add_modules(
-        ALIAS_NAMESPACE juce
+        ALIAS_NAMESPACE chowdsp
 
         modules/common/chowdsp_core
         modules/common/chowdsp_json
