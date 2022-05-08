@@ -5,12 +5,11 @@
 
     ID:            chowdsp_plugin_utils
     vendor:        Chowdhury DSP
-    version:       0.0.1
+    version:       1.0.0
     name:          ChowDSP Plugin Utilities
     description:   Utilities for creating ChowDSP plugins
-    dependencies:  juce_core, juce_audio_basics, juce_audio_devices, juce_audio_formats,
-                   juce_audio_utils, juce_audio_processors, juce_gui_basics,
-                   chowdsp_core, chowdsp_json
+    dependencies:  juce_events, juce_audio_basics, juce_audio_formats,
+                   juce_gui_basics, chowdsp_core, chowdsp_json
 
     website:       https://ccrma.stanford.edu/~jatin/chowdsp
     license:       GPLv3
@@ -26,13 +25,10 @@
 #include <unordered_map>
 
 // JUCE includes
-#include <juce_core/juce_core.h>
+#include <juce_events/juce_events.h>
 #include <juce_audio_basics/juce_audio_basics.h>
-#include <juce_audio_processors/juce_audio_processors.h>
-#include <juce_gui_basics/juce_gui_basics.h>
-#include <juce_audio_devices/juce_audio_devices.h>
 #include <juce_audio_formats/juce_audio_formats.h>
-#include <juce_audio_utils/juce_audio_utils.h>
+#include <juce_gui_basics/juce_gui_basics.h>
 #include <chowdsp_core/chowdsp_core.h>
 #include <chowdsp_json/chowdsp_json.h>
 

@@ -4,6 +4,10 @@
 #include <type_traits>
 #include <vector>
 
+#if JUCE_MODULE_AVAILABLE_juce_audio_basics
+#include <juce_audio_basics/juce_audio_basics.h>
+#endif
+
 namespace chowdsp
 {
 /**

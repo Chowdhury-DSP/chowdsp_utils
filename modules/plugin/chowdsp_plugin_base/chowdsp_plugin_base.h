@@ -5,15 +5,13 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_plugin_base
    vendor:        Chowdhury DSP
-   version:       0.0.1
+   version:       1.0.0
    name:          ChowDSP Plugin Base
    description:   Base classes for ChowDSP plugins
-   dependencies:  juce_core, juce_audio_basics, juce_audio_devices, juce_audio_formats,
-                  juce_audio_utils, juce_audio_processors, juce_gui_basics,
-                  chowdsp_parameters
+   dependencies:  chowdsp_parameters
 
    website:       https://ccrma.stanford.edu/~jatin/chowdsp
-   license:       BSD 3-clause
+   license:       GPLv3
 
    END_JUCE_MODULE_DECLARATION
 
@@ -23,13 +21,6 @@ BEGIN_JUCE_MODULE_DECLARATION
 #pragma once
 
 // JUCE includes
-#include <juce_core/juce_core.h>
-#include <juce_audio_basics/juce_audio_basics.h>
-#include <juce_audio_processors/juce_audio_processors.h>
-#include <juce_gui_basics/juce_gui_basics.h>
-#include <juce_audio_devices/juce_audio_devices.h>
-#include <juce_audio_formats/juce_audio_formats.h>
-#include <juce_audio_utils/juce_audio_utils.h>
 #include <chowdsp_parameters/chowdsp_parameters.h>
 
 #if JUCE_MODULE_AVAILABLE_chowdsp_presets

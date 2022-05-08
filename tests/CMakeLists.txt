@@ -14,6 +14,13 @@ juce_add_modules(
     ${CMAKE_SOURCE_DIR}/../foleys_gui_magic
     ${CMAKE_SOURCE_DIR}/modules/common/chowdsp_core
     ${CMAKE_SOURCE_DIR}/modules/common/chowdsp_json
+    ${CMAKE_SOURCE_DIR}/modules/dsp/chowdsp_dsp_data_structures
+    ${CMAKE_SOURCE_DIR}/modules/dsp/chowdsp_dsp_utils
+    ${CMAKE_SOURCE_DIR}/modules/dsp/chowdsp_eq
+    ${CMAKE_SOURCE_DIR}/modules/dsp/chowdsp_math
+    ${CMAKE_SOURCE_DIR}/modules/dsp/chowdsp_reverb
+    ${CMAKE_SOURCE_DIR}/modules/dsp/chowdsp_simd
+    ${CMAKE_SOURCE_DIR}/modules/dsp/chowdsp_filters
     ${CMAKE_SOURCE_DIR}/modules/plugin/chowdsp_version
     ${CMAKE_SOURCE_DIR}/modules/plugin/chowdsp_presets
     ${CMAKE_SOURCE_DIR}/modules/plugin/chowdsp_parameters
@@ -22,15 +29,12 @@ juce_add_modules(
     ${CMAKE_SOURCE_DIR}/modules/gui/chowdsp_gui
     ${CMAKE_SOURCE_DIR}/modules/gui/chowdsp_foleys
     ${CMAKE_SOURCE_DIR}/modules/music/chowdsp_rhythm
-
-    ${CMAKE_SOURCE_DIR}/modules/chowdsp_dsp
 )
 
 option(CODE_COVERAGE "Enable coverage reporting" OFF)
 
-#add_subdirectory(chowdsp_utils_test)
-#add_subdirectory(chowdsp_gui_test)
 add_subdirectory(common_tests)
+add_subdirectory(dsp_tests)
 add_subdirectory(plugin_tests)
 add_subdirectory(gui_tests)
 add_subdirectory(music_tests)

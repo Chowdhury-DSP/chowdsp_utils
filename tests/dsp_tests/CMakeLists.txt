@@ -1,0 +1,7 @@
+add_subdirectory(chowdsp_dsp_data_structures_test)
+add_subdirectory(chowdsp_dsp_utils_test)
+add_subdirectory(chowdsp_eq_test)
+add_subdirectory(chowdsp_math_test)
+add_subdirectory(chowdsp_reverb_test)
+add_subdirectory(chowdsp_simd_test)
+add_subdirectory(chowdsp_filters_test)

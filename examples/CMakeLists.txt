@@ -6,7 +6,7 @@ else()
 endif()
 
 juce_add_modules(
-    ${CMAKE_SOURCE_DIR}/modules/chowdsp_dsp
+#    ${CMAKE_SOURCE_DIR}/modules/chowdsp_dsp
     ${CMAKE_SOURCE_DIR}/modules/gui/chowdsp_gui
     ${CMAKE_SOURCE_DIR}/modules/plugin/chowdsp_plugin_utils
 )

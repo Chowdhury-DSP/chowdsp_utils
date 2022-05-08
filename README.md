@@ -4,6 +4,25 @@
 [![License](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://opensource.org/licenses/GPL-3.0)
 [![codecov](https://codecov.io/gh/Chowdhury-DSP/chowdsp_utils/branch/master/graph/badge.svg?token=84B35MB5QS)](https://codecov.io/gh/Chowdhury-DSP/chowdsp_utils)
 
+## Usage
+
+If you are using JUCE with CMake, simply add this repository as a subdirectory after adding JUCE to your CMake project.
+
+```cmake
+add_subdirectory(JUCE)
+add_subdirectory(chowdsp_utils)
+
+target_link_libraries(MyTarget PUBLIC
+    juce::juce_audio_utils
+    juce::juce_dsp
+    # other JUCE libraries...
+    chowdsp_dsp
+    chowdsp_gui
+    chowdsp_plugin_base
+    # Other libraries...
+)
+```
+
 This repository contains JUCE modules with utilities for building Chowdhury DSP plugins.
 
 There are currently 3 modules each containing the following utilities:
@@ -41,23 +60,7 @@ There's also a handful of simple examples in the [`examples/`](https://github.co
 
 For complete documentation, see the [API docs](https://ccrma.stanford.edu/~jatin/chowdsp/chowdsp_utils).
 
-## Usage
 
-If you are using JUCE with CMake, simply add this repository as a subdirectory after adding JUCE to your CMake project.
-
-```cmake
-add_subdirectory(JUCE)
-add_subdirectory(chowdsp_utils)
-
-target_link_libraries(MyTarget PUBLIC
-    juce::juce_audio_utils
-    juce::juce_dsp
-    # other JUCE libraries...
-    chowdsp_dsp
-    chowdsp_gui
-    chowdsp_plugin_utils
-)
-```
 
 Alternatively, you may add these modules from the repository directory from the Projucer.
 

@@ -9,12 +9,24 @@ option(CHOWDSP_ENABLE_EXAMPLES "Enable examples for chowdsp modules" OFF)
 
 if(NOT (CHOWDSP_ENABLE_TESTING OR CHOWDSP_ENABLE_BENCHMARKS OR CHOWDSP_ENABLE_EXAMPLES))
     juce_add_modules(
+        ALIAS_NAMESPACE juce
+
         modules/common/chowdsp_core
         modules/common/chowdsp_json
 
-        modules/chowdsp_dsp
-        modules/chowdsp_gui
-        modules/chowdsp_plugin_utils
+        modules/dsp/chowdsp_dsp_data_structures
+        modules/dsp/chowdsp_simd
+
+        modules/plugin/chowdsp_parameters
+        modules/plugin/chowdsp_plugin_base
+        modules/plugin/chowdsp_plugin_utils
+        modules/plugin/chowdsp_presets
+        modules/plugin/chowdsp_version
+
+        modules/gui/chowdsp_gui
+        modules/gui/chowdsp_foleys
+
+        modules/music/chowdsp_rhythms
     )
 elseif(CHOWDSP_ENABLE_TESTING)
     add_subdirectory(tests)

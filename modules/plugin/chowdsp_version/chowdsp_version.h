@@ -5,7 +5,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_version
    vendor:        Chowdhury DSP
-   version:       0.0.1
+   version:       1.0.0
    name:          ChowDSP Plugin Versioning
    description:   Versioning system for ChowDSP plugins
    dependencies:  juce_core

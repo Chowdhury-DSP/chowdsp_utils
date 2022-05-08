@@ -9,10 +9,6 @@ target_link_libraries(chowdsp_foleys_test PRIVATE
     chowdsp_presets
 )
 
-target_compile_definitions(chowdsp_foleys_test PUBLIC
-    CHOWDSP_NEEDS_PRESETS_COMPONENT=0
-)
-
 target_sources(chowdsp_foleys_test PRIVATE
     ${CMAKE_SOURCE_DIR}/tests/test_utils/TestRunner.cpp
     FoleysTest.cpp
