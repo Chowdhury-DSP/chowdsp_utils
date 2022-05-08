@@ -9,7 +9,6 @@ const juce::Identifier heightTag { "ui_state-ui-height" };
 
 namespace chowdsp
 {
-
 UIState::UIState (juce::AudioProcessorValueTreeState& vtState, int defWidth, int defHeight) : vts (vtState),
                                                                                               defaultWidth (defWidth),
                                                                                               defaultHeight (defHeight)

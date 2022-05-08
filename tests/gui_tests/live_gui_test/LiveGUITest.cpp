@@ -56,12 +56,9 @@ public:
         tabs.addTab ("Tab2", Colours::darksalmon, infoComp.release(), true);
 
         addAndMakeVisible (tabs);
-        Timer::callAfterDelay (guiShowTime / 4, [=]
-                               { tabs.setOrientation (TabbedButtonBar::TabsAtBottom); });
-        Timer::callAfterDelay (guiShowTime / 2, [=]
-                               { tabs.setOrientation (TabbedButtonBar::TabsAtRight); });
-        Timer::callAfterDelay (guiShowTime * 3 / 4, [=]
-                               { tabs.setOrientation (TabbedButtonBar::TabsAtLeft); });
+        Timer::callAfterDelay (guiShowTime / 4, [=] { tabs.setOrientation (TabbedButtonBar::TabsAtBottom); });
+        Timer::callAfterDelay (guiShowTime / 2, [=] { tabs.setOrientation (TabbedButtonBar::TabsAtRight); });
+        Timer::callAfterDelay (guiShowTime * 3 / 4, [=] { tabs.setOrientation (TabbedButtonBar::TabsAtLeft); });
 
         menu.addItemList ({ "Item1", "Item2", "Item3" }, 1);
         menu.setSelectedItemIndex (0, sendNotification);
