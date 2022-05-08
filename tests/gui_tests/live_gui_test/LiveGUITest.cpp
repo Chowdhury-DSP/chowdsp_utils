@@ -20,6 +20,7 @@ constexpr int guiShowTime = 1000;
  *   - chowdsp::InfoComp
  *   - chowdsp::TooltipComp
  *   - chowdsp::PresetsComp
+ *   - chowdsp::CPUMeter
  */
 class GUIComponent : public Component
 {
@@ -42,6 +43,10 @@ public:
         addAndMakeVisible (linSlider);
 
         addAndMakeVisible (toggle);
+
+        addAndMakeVisible (cpuMeter);
+        cpuMeter.setColour (juce::ProgressBar::ColourIds::foregroundColourId, juce::Colours::yellow);
+        cpuMeter.setColour (juce::ProgressBar::ColourIds::backgroundColourId, juce::Colours::black);
 
         auto titleComp = std::make_unique<chowdsp::TitleComp>();
         titleComp->setStrings ("Title", "subtitle", 18.0f);
@@ -80,6 +85,7 @@ public:
         linSlider.setBounds (100, 0, 100, 100);
         toggle.setBounds (200, 0, 100, 100);
         menu.setBounds (300, 40, 100, 30);
+        cpuMeter.setBounds (400, 40, 50, 30);
 
         tabs.setBounds (0, 110, getWidth(), 150);
         tooltips.setBounds (0, 275, getWidth(), 25);
@@ -99,6 +105,8 @@ private:
 
     DummyPlugin dummy { true };
     chowdsp::PresetsComp presetsComp { dummy.getPresetManager() };
+
+    chowdsp::CPUMeter cpuMeter { dummy.getLoadMeasurer() };
 
     chowdsp::TooltipComponent tooltips;
 };
