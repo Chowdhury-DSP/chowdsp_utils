@@ -15,6 +15,11 @@ if(NOT (CHOWDSP_ENABLE_TESTING OR CHOWDSP_ENABLE_BENCHMARKS OR CHOWDSP_ENABLE_EX
         modules/common/chowdsp_json
 
         modules/dsp/chowdsp_dsp_data_structures
+        modules/dsp/chowdsp_dsp_utils
+        modules/dsp/chowdsp_eq
+        modules/dsp/chowdsp_filters
+        modules/dsp/chowdsp_math
+        modules/dsp/chowdsp_reverb
         modules/dsp/chowdsp_simd
 
         modules/plugin/chowdsp_parameters
@@ -26,7 +31,7 @@ if(NOT (CHOWDSP_ENABLE_TESTING OR CHOWDSP_ENABLE_BENCHMARKS OR CHOWDSP_ENABLE_EX
         modules/gui/chowdsp_gui
         modules/gui/chowdsp_foleys
 
-        modules/music/chowdsp_rhythms
+        modules/music/chowdsp_rhythm
     )
 else()
     list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
