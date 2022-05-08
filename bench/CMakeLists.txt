@@ -1,4 +1,3 @@
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 include(CPM)
 include(SubprojectVersion)
 include(SetupBenchmark)
@@ -10,7 +9,7 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/../../JUCE JUCE)
 subproject_version(JUCE juce_version)
 message(STATUS "VERSION for JUCE: ${juce_version}")
 
-juce_add_modules(${CMAKE_SOURCE_DIR}/modules/chowdsp_dsp)
+include(AddJUCEModules)
 
 # download google benchmark
 CPMAddPackage(

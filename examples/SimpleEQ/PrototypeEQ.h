@@ -1,6 +1,6 @@
 #pragma once
 
-#include <chowdsp_dsp/chowdsp_dsp.h>
+#include <chowdsp_eq/chowdsp_eq.h>
 
 #include "EQParams.h"
 

@@ -1,4 +1,3 @@
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 include(SubprojectVersion)
 include(EnableCoverageFlags)
 include(SetupJuceTest)
@@ -10,16 +9,15 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/../../JUCE JUCE)
 subproject_version(JUCE juce_version)
 message(STATUS "VERSION for JUCE: ${juce_version}")
 
-juce_add_modules(
-    ${CMAKE_SOURCE_DIR}/../foleys_gui_magic
-    ${CMAKE_SOURCE_DIR}/modules/chowdsp_dsp
-    ${CMAKE_SOURCE_DIR}/modules/chowdsp_gui
-    ${CMAKE_SOURCE_DIR}/modules/chowdsp_plugin_utils)
+include(AddJUCEModules)
 
 option(CODE_COVERAGE "Enable coverage reporting" OFF)
 
-add_subdirectory(chowdsp_utils_test)
-add_subdirectory(chowdsp_gui_test)
+add_subdirectory(common_tests)
+add_subdirectory(dsp_tests)
+add_subdirectory(plugin_tests)
+add_subdirectory(gui_tests)
+add_subdirectory(music_tests)
 
 option(CHOWDSP_RUN_CLANG_TIDY "Run clang-tidy on chowdsp modules" OFF)
 if(CHOWDSP_RUN_CLANG_TIDY)
