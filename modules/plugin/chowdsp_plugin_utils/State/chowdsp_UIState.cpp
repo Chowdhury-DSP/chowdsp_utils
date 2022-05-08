@@ -19,6 +19,7 @@ UIState::UIState (juce::AudioProcessorValueTreeState& vtState, int defWidth, int
 void UIState::attachToComponent (juce::AudioProcessorEditor& comp)
 {
     comp.addComponentListener (this);
+    comp.setBounds (getLastEditorSize());
 }
 
 juce::Rectangle<int> UIState::getLastEditorSize() const
