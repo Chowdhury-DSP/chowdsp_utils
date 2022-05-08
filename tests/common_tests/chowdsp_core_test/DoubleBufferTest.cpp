@@ -1,4 +1,5 @@
 #include <TimedUnitTest.h>
+#include <chowdsp_core/chowdsp_core.h>
 
 class DoubleBufferTest : public TimedUnitTest
 {
@@ -42,13 +43,14 @@ public:
         std::vector<T> expected { -2, -3, -4, -5, 4, 5, 0, -1 };
         const auto* actual = buffer.data();
         for (int i = 0; i < buffer.size(); ++i)
-            expectEquals (actual[i], expected[(size_t) i], "Incorrect value at index " + String (i));
+            expectEquals (actual[i], expected[(size_t) i], "Incorrect value at index " + juce::String (i));
     }
 
     template <typename T>
-    void wrapAndClearTest (Random& r)
+    void wrapAndClearTest (juce::Random& r)
     {
-        auto getRandomVal = [&]() {
+        auto getRandomVal = [&]()
+        {
             if constexpr (std::is_same<T, float>::value)
                 return r.nextFloat() * 2.0f - 1.0f;
             else if (std::is_same<T, int>::value)
@@ -74,15 +76,15 @@ public:
         const auto* testData = buffer.data ((int) data.size());
         for (int i = 0; i < buffer.size() / 2; ++i)
         {
-            expectEquals (testData[i], lastData[(size_t) i], "Incorrect value at index " + String (i));
+            expectEquals (testData[i], lastData[(size_t) i], "Incorrect value at index " + juce::String (i));
 
             auto secondIdx = i + buffer.size() / 2;
-            expectEquals (testData[secondIdx], secondToLastData[(size_t) i], "Incorrect value at index " + String (secondIdx));
+            expectEquals (testData[secondIdx], secondToLastData[(size_t) i], "Incorrect value at index " + juce::String (secondIdx));
         }
 
         buffer.clear();
         for (int i = 0; i < buffer.size(); ++i)
-            expectEquals (testData[i], (T) 0, "Erroneous non-zero value at index " + String (i));
+            expectEquals (testData[i], (T) 0, "Erroneous non-zero value at index " + juce::String (i));
     }
 
     void runTestTimed() override

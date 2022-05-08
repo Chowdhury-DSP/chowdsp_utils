@@ -1,11 +1,5 @@
 #pragma once
 
-// @TODO: this class needs chowdsp::DoubleBuffer, but we don't want
-// chowdsp_plugin_utils to depend on chowdsp_dsp, so we just include
-// the necessary header here. Eventually ,we should figure out a better
-// way to do this...
-#include "../../chowdsp_dsp/DataStructures/chowdsp_DoubleBuffer.h"
-
 namespace chowdsp
 {
 #ifndef DOXYGEN

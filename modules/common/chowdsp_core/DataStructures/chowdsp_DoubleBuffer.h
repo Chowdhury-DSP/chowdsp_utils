@@ -50,21 +50,19 @@ public:
     /** Fill's the DoubleBuffer with a single value */
     void fill (T value)
     {
-        if constexpr (std::is_floating_point<T>::value)
-            juce::FloatVectorOperations::fill (internal.data(), value, size() * 2);
-        else
-            std::fill (internal.begin(), internal.end(), value);
-
+        std::fill (internal.begin(), internal.end(), value);
         writePointer = 0;
     }
 
     /** Returns a pointer to the buffer data, with a given starting position */
     [[nodiscard]] const T* data (int start = 0) const noexcept
     {
+#if JUCE_MODULE_AVAILABLE_juce_core
         // need to give the buffer some size before trying to read!
         jassert (size() > 0);
+#endif
 
-        start = juce::negativeAwareModulo (start, size());
+        start = negativeAwareModulo (start, size());
         return internal.data() + start;
     }
 
@@ -73,55 +71,59 @@ public:
     {
         const auto currentSize = size();
 
+#if JUCE_MODULE_AVAILABLE_juce_core
         // need to give the buffer some size before trying to push!
         jassert (currentSize > 0);
+#endif
 
         auto* buffer1 = internal.data();
         auto* buffer2 = internal.data() + currentSize;
 
-        // for floating point types we can use juce::FloatVectorOperations for vectorized copy!
-        if constexpr (std::is_floating_point<T>::value)
+        if (writePointer + numElements <= size())
         {
-            if (writePointer + numElements <= size())
-            {
-                juce::FloatVectorOperations::copy (buffer1 + writePointer, data, numElements);
-                juce::FloatVectorOperations::copy (buffer2 + writePointer, data, numElements);
-            }
-            else
-            {
-                const auto samplesTillEnd = currentSize - writePointer;
-                juce::FloatVectorOperations::copy (buffer1 + writePointer, data, samplesTillEnd);
-                juce::FloatVectorOperations::copy (buffer2 + writePointer, data, samplesTillEnd);
-
-                const auto leftoverSamples = numElements - samplesTillEnd;
-                juce::FloatVectorOperations::copy (buffer1, data + samplesTillEnd, leftoverSamples);
-                juce::FloatVectorOperations::copy (buffer2, data + samplesTillEnd, leftoverSamples);
-            }
-
-            writePointer = (writePointer + numElements) % currentSize;
+            copy_internal (buffer1 + writePointer, data, numElements);
+            copy_internal (buffer2 + writePointer, data, numElements);
         }
         else
         {
-            if (writePointer + numElements <= size())
-            {
-                std::copy (data, data + numElements, buffer1 + writePointer);
-                std::copy (data, data + numElements, buffer2 + writePointer);
-            }
-            else
-            {
-                const auto samplesTillEnd = currentSize - writePointer;
-                std::copy (data, data + samplesTillEnd, buffer1 + writePointer);
-                std::copy (data, data + samplesTillEnd, buffer2 + writePointer);
+            const auto samplesTillEnd = currentSize - writePointer;
+            copy_internal (buffer1 + writePointer, data, samplesTillEnd);
+            copy_internal (buffer2 + writePointer, data, samplesTillEnd);
 
-                std::copy (data + samplesTillEnd, data + numElements, buffer1);
-                std::copy (data + samplesTillEnd, data + numElements, buffer2);
-            }
-
-            writePointer = (writePointer + numElements) % currentSize;
+            const auto leftoverSamples = numElements - samplesTillEnd;
+            copy_internal (buffer1, data + samplesTillEnd, leftoverSamples);
+            copy_internal (buffer2, data + samplesTillEnd, leftoverSamples);
         }
+
+        writePointer = (writePointer + numElements) % currentSize;
     }
 
 private:
+    template <typename C = T>
+    std::enable_if_t<std::is_floating_point_v<C>, void>
+        copy_internal (T* dest, const T* src, int N)
+    {
+#if JUCE_MODULE_AVAILABLE_juce_audio_basics
+        juce::FloatVectorOperations::copy (dest, src, N);
+#else
+        std::copy (src, src + N, dest);
+#endif
+    }
+
+    template <typename C = T>
+    std::enable_if_t<! std::is_floating_point_v<C>, void>
+        copy_internal (T* dest, const T* src, int N)
+    {
+        std::copy (src, src + N, dest);
+    }
+
+    template <typename IntegerType>
+    IntegerType negativeAwareModulo (IntegerType dividend, const IntegerType divisor) const noexcept
+    {
+        dividend %= divisor;
+        return (dividend < 0) ? (dividend + divisor) : dividend;
+    }
+
     std::vector<T> internal;
     int writePointer = 0;
 };

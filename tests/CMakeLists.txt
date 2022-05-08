@@ -12,10 +12,11 @@ message(STATUS "VERSION for JUCE: ${juce_version}")
 
 juce_add_modules(
     ${CMAKE_SOURCE_DIR}/../foleys_gui_magic
+    ${CMAKE_SOURCE_DIR}/modules/common/chowdsp_core
+    ${CMAKE_SOURCE_DIR}/modules/common/chowdsp_json
     ${CMAKE_SOURCE_DIR}/modules/chowdsp_dsp
     ${CMAKE_SOURCE_DIR}/modules/chowdsp_gui
     ${CMAKE_SOURCE_DIR}/modules/chowdsp_plugin_utils
-    ${CMAKE_SOURCE_DIR}/modules/common/chowdsp_json
 )
 
 option(CODE_COVERAGE "Enable coverage reporting" OFF)
