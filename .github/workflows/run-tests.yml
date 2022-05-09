@@ -41,6 +41,13 @@ jobs:
                chowdsp_presets_test,
                chowdsp_version_test,
               ]
+        name: [
+                "Test (Ubuntu)",
+                "Test (Windows)",
+                "Test (Mac - Intel)",
+                "Test (Mac - ARM)",
+                "CodeQL (Ubuntu)",
+              ]
         # os: [ubuntu-latest, windows-2019, macos-latest]
         is_arm: [false]
         run_codeql: [false]
