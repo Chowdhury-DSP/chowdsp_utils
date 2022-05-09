@@ -243,9 +243,9 @@ int PresetsComp::addSharePresetOptions (int optionID)
 
 #if ! JUCE_IOS
     return addPresetMenuItem (menu, optionID, "Load Preset From File", [&] {
-        constexpr auto flags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles;
+        constexpr auto fileBrowserFlags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles;
         fileChooser = std::make_shared<juce::FileChooser> ("Load Preset", manager.getUserPresetPath(), "*" + presetExt, true, false, getTopLevelComponent());
-        fileChooser->launchAsync (flags,
+        fileChooser->launchAsync (fileBrowserFlags,
                                   [&] (const juce::FileChooser& fc) {
                                       if (fc.getResults().isEmpty())
                                           return;
