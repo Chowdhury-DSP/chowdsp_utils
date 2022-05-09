@@ -42,33 +42,35 @@ jobs:
                chowdsp_version_test,
               ]
         name: [
-                "Test (Ubuntu)",
-                "Test (Windows)",
-                "Test (Mac - Intel)",
-                "Test (Mac - ARM)",
-                "CodeQL (Ubuntu)",
+                "Test",
+                "Test-ARM",
+                "CodeQL",
               ]
-        # os: [ubuntu-latest, windows-2019, macos-latest]
-        is_arm: [false]
-        run_codeql: [false]
+        os: [ubuntu-latest, windows-2019, macos-latest]
         include:
-          - name: "Test (Ubuntu)"
+          - name: "Test"
             os: ubuntu-latest
             cmake_args: "-DCMAKE_BUILD_TYPE=Release"
-          - name: "Test (Windows)"
+          - name: "Test"
             os: windows-2019
-          - name: "Test (Mac - Intel)"
+          - name: "Test"
             os: macos-latest
             cmake_args: "-DCMAKE_BUILD_TYPE=Release"
-            is_arm: false
-          - name: "Test (Mac - ARM)"
+          - name: "Test-ARM"
             os: macos-latest
             cmake_args: "-GXcode -D\"CMAKE_OSX_ARCHITECTURES=arm64\" -DCMAKE_BUILD_TYPE=Release"
-            is_arm: true
-          - name: "CodeQL (Ubuntu)"
+          - name: "CodeQL"
             os: ubuntu-latest
             cmake_args: "-DCMAKE_BUILD_TYPE=Debug"
-            run_codeql: true
+        exclude:
+          - name: "CodeQL"
+            os: macos-latest
+          - name: "CodeQL"
+            os: windows-2019
+          - name: "Test-ARM"
+            os: ubuntu-latest
+          - name: "Test-ARM"
+            os: windows-2019
 
     steps:
       - name: Install Linux Deps
@@ -95,7 +97,7 @@ jobs:
           git clone --single-branch --branch chowdsp https://github.com/Chowdhury-DSP/foleys_gui_magic.git
 
       - name: Initialize CodeQL
-        if: ${{ matrix.run_codeql }} == true
+        if: ${{ matrix.name }} == "CodeQL"
         uses: github/codeql-action/init@v1
         with:
          source-root: ${{env.WORK_DIR}}
@@ -116,7 +118,7 @@ jobs:
         run: cmake --build . --config Release --parallel 4 --target $TEST_TARGET
 
       - name: "Run Test: ${{ matrix.test }}"
-        if: ${{ matrix.is_arm }} == false && ${{ matrix.run_codeql }} == false
+        if: ${{ matrix.name }} == "Test"
         working-directory: ${{env.WORK_DIR}}/build/test-binary
         shell: bash
         env:
@@ -124,7 +126,7 @@ jobs:
         run: ./$TEST_BINARY
 
       - name: Perform CodeQL Analysis
-        if: ${{ matrix.run_codeql }} == true
+        if: ${{ matrix.name }} == "CodeQL"
         uses: github/codeql-action/analyze@v1
 
       # - name: "Run Test: ${{ matrix.test }}"
