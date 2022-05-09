@@ -6,19 +6,17 @@
 
 namespace BinaryData
 {
-
 //================== test_preset.preset ==================
 static const unsigned char temp_binary_data_0[] =
-"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-"\n"
-"<Preset name=\"Test Preset\" plugin=\"DummyPlugin\" vendor=\"Factory\" category=\"\" version=\"1.0.0\">\n"
-"  <Parameters>\n"
-"    <PARAM id=\"dummy\" value=\"1.0\"/>\n"
-"  </Parameters>\n"
-"</Preset>\n";
+    "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+    "\n"
+    "<Preset name=\"Test Preset\" plugin=\"DummyPlugin\" vendor=\"Factory\" category=\"\" version=\"1.0.0\">\n"
+    "  <Parameters>\n"
+    "    <PARAM id=\"dummy\" value=\"1.0\"/>\n"
+    "  </Parameters>\n"
+    "</Preset>\n";
 
 const char* test_preset_preset = (const char*) temp_binary_data_0;
-
 
 const char* getNamedResource (const char* resourceNameUTF8, int& numBytes);
 const char* getNamedResource (const char* resourceNameUTF8, int& numBytes)
@@ -31,21 +29,22 @@ const char* getNamedResource (const char* resourceNameUTF8, int& numBytes)
 
     switch (hash)
     {
-        case 0xfc138352:  numBytes = 211; return test_preset_preset;
-        default: break;
+        case 0xfc138352:
+            numBytes = 211;
+            return test_preset_preset;
+        default:
+            break;
     }
 
     numBytes = 0;
     return nullptr;
 }
 
-const char* namedResourceList[] =
-{
+const char* namedResourceList[] = {
     "test_preset_preset"
 };
 
-const char* originalFilenames[] =
-{
+const char* originalFilenames[] = {
     "test_preset.preset"
 };
 
@@ -61,4 +60,4 @@ const char* getNamedResourceOriginalFilename (const char* resourceNameUTF8)
     return nullptr;
 }
 
-}
+} // namespace BinaryData
