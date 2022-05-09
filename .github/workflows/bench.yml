@@ -14,7 +14,7 @@ env:
   WORK_DIR: ${{github.workspace}}/JUCE_modules/chowdsp_utils
 
 jobs:
-  build_and_test:
+  build_and_run:
     name: Run benchmarks on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:

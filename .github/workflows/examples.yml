@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - ci-*
   pull_request:
     branches:
       - master
@@ -15,9 +14,8 @@ env:
   WORK_DIR: ${{github.workspace}}/JUCE_modules/chowdsp_utils
 
 jobs:
-  build_and_test:
-    if: contains(toJson(github.event.commits), '***NO_CI***') == false && contains(toJson(github.event.commits), '[ci skip]') == false && contains(toJson(github.event.commits), '[skip ci]') == false
-    name: Build examples on ${{ matrix.os }}
+  build_examples:
+    name: "Build Example ${{ matrix.target }} on ${{ matrix.os }}"
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
