@@ -87,7 +87,7 @@ jobs:
         run: cmake --build . --config Release --parallel 4 --target $TEST_TARGET
 
       - name: "Run Test: ${{ matrix.test }}"
-        if: ! ${{ matrix.is_arm }}
+        if: ${{ matrix.is_arm }} == false
         working-directory: ${{env.WORK_DIR}}/build/test-binary
         shell: bash
         env:
