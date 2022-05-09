@@ -86,11 +86,11 @@ jobs:
           sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
 
       - name: Install lcov (Linux)
-        if: runner.os == 'Linux' && ${{ matrix.run_coverage }} == true
+        if: runner.os == 'Linux' # && ${{ matrix.run_coverage }} == true
         run: sudo apt install lcov
 
       - name: Install lcov (Mac)
-        if: runner.os == 'MacOS' && ${{ matrix.run_coverage }} == true
+        if: runner.os == 'MacOS # && ${{ matrix.run_coverage }} == true
         run: |
           export HOMEBREW_NO_AUTO_UPDATE=1
           brew install lcov
