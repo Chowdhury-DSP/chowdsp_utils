@@ -19,10 +19,10 @@ include(AddJUCEModules)
 option(CODE_COVERAGE "Enable coverage reporting" OFF)
 
 add_subdirectory(common_tests)
-#add_subdirectory(dsp_tests)
-#add_subdirectory(plugin_tests)
+add_subdirectory(dsp_tests)
+add_subdirectory(plugin_tests)
 add_subdirectory(gui_tests)
-#add_subdirectory(music_tests)
+add_subdirectory(music_tests)
 
 option(CHOWDSP_RUN_CLANG_TIDY "Run clang-tidy on chowdsp modules" OFF)
 if(CHOWDSP_RUN_CLANG_TIDY)

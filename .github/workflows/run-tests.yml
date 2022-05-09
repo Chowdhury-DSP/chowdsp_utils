@@ -33,7 +33,6 @@ jobs:
               ]
         name: [
                 "Test",
-                "LiveGUI",
                 "Coverage",
                 "Test-ARM",
                 "CodeQL",
@@ -48,7 +47,7 @@ jobs:
           - name: "Test"
             os: macos-latest
             cmake_args: "-DCMAKE_BUILD_TYPE=Release"
-          - name: "LiveGUI"
+          - name: "Live GUI Test"
             os: ubuntu-latest
             cmake_args: "-DCODE_COVERAGE=ON -DCHOWDSP_BUILD_LIVE_GUI_TEST=ON -DCMAKE_BUILD_TYPE=Debug"
             live_gui: true
@@ -70,10 +69,6 @@ jobs:
             cmake_args: "-DCMAKE_BUILD_TYPE=Debug"
             run_codeql: true
         exclude:
-          - name: "LiveGUI"
-            os: windows-2019
-          - name: "LiveGUI"
-            os: macos-latest
           - name: "Coverage"
             os: windows-2019        
           - name: "Test-ARM"
