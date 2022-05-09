@@ -28,6 +28,7 @@ jobs:
             cmake_args: "-DCMAKE_BUILD_TYPE=Release"
           - name: "Test (Windows)"
             os: windows-2019
+            cmake_args: ""
           - name: "Test (Mac)"
             os: macos-latest
             cmake_args: "-DCMAKE_BUILD_TYPE=Release"
@@ -66,7 +67,9 @@ jobs:
       - name: Build
         working-directory: ${{env.WORK_DIR}}/build
         shell: bash
-        run: cmake --build . --config Release --parallel 4
+        env:
+            TEST_TARGET: ${{ matrix.test }}
+        run: cmake --build . --config Release --parallel 4 --target $TEST_TARGET
 
       - name: "Run Test: ${{ matrix.test }}"
         env:
