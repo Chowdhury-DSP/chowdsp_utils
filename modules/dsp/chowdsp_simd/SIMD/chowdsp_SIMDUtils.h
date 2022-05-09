@@ -57,7 +57,6 @@ inline vec2 loadUnaligned (const double* ptr)
 #endif
 
 #elif defined(_M_ARM64) || defined(__arm64__) || defined(__aarch64__)
-static_assert(false, "ARM CHECK!"); // check that CI runs on ARM @REMOVEME
 #if CHOWDSP_USE_CUSTOM_JUCE_DSP
     return { vld1q_f64 (ptr) };
 #else

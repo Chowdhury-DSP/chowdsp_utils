@@ -23,17 +23,18 @@ jobs:
       matrix:
         tests: [
                 "chowdsp_core_test chowdsp_json_test",
-                "chowdsp_dsp_data_structures_test chowdsp_dsp_utils_test",
-                "chowdsp_eq_test chowdsp_filters_test",
+                # "chowdsp_dsp_data_structures_test chowdsp_dsp_utils_test",
+                # "chowdsp_eq_test chowdsp_filters_test",
                 "chowdsp_math_test chowdsp_reverb_test chowdsp_simd_test",
-                "chowdsp_foleys_test chowdsp_gui_test",
+                # "chowdsp_foleys_test chowdsp_gui_test",
               #  live_gui_test,
                 "chowdsp_rhythm_test chowdsp_parameters_test",
-                "chowdsp_plugin_base_test chowdsp_plugin_utils_test",
-                "chowdsp_presets_test chowdsp_version_test",
+                # "chowdsp_plugin_base_test chowdsp_plugin_utils_test",
+                # "chowdsp_presets_test chowdsp_version_test",
               ]
         name: [
                 "Test",
+                "Coverage",
                 "Test-ARM",
                 "CodeQL",
               ]
@@ -47,6 +48,14 @@ jobs:
           - name: "Test"
             os: macos-latest
             cmake_args: "-DCMAKE_BUILD_TYPE=Release"
+          - name: "Coverage"
+            os: ubuntu-latest
+            cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
+            run_coverage: true
+          - name: "Coverage"
+            os: macos-latest
+            cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
+            run_coverage: true
           - name: "Test-ARM"
             os: macos-latest
             cmake_args: "-GXcode -DCMAKE_OSX_ARCHITECTURES=arm64"
@@ -56,13 +65,15 @@ jobs:
             cmake_args: "-DCMAKE_BUILD_TYPE=Debug"
             run_codeql: true
         exclude:
-          - name: "CodeQL"
-            os: macos-latest
-          - name: "CodeQL"
-            os: windows-2019
+          - name: "Coverage"
+            os: windows-2019        
           - name: "Test-ARM"
             os: ubuntu-latest
           - name: "Test-ARM"
+            os: windows-2019
+          - name: "CodeQL"
+            os: macos-latest
+          - name: "CodeQL"
             os: windows-2019
 
     steps:
@@ -73,7 +84,17 @@ jobs:
           sudo apt install libasound2-dev libcurl4-openssl-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev libsamplerate-dev
           sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 9
           sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
-      
+
+      - name: Install lcov (Linux)
+        if: runner.os == 'Linux' && ${{ matrix.run_coverage }}
+        run: sudo apt install lcov
+
+      - name: Install lcov (Mac)
+        if: runner.os == 'MacOS' && ${{ matrix.run_coverage }}
+        run: |
+          export HOMEBREW_NO_AUTO_UPDATE=1
+          brew install lcov
+
       - name: Get latest CMake
         uses: lukka/get-cmake@latest
 
@@ -119,6 +140,26 @@ jobs:
             echo $exe;
             ./$exe;
           done
+
+      - name: Collect Coverage Data
+        if: ${{ matrix.run_coverage }}
+        working-directory: ${{env.WORK_DIR}}
+        shell: bash
+        run: |
+          lcov --directory . --capture --output-file coverage.info
+          lcov --remove coverage.info '/usr/*' "${HOME}"'/.cache/*' '/Applications/Xcode*' '*JUCE/modules*' '*foleys_*' '*chowdsp_utils/tests*' '*third_party*' --output-file coverage.info
+
+      - name: Report Coverage Data
+        if: ${{ matrix.run_coverage }}
+        working-directory: ${{env.WORK_DIR}}
+        shell: bash
+        run: lcov --list coverage.info
+
+      - name: Upload Coverage Data
+        if: ${{ matrix.run_coverage }}
+        working-directory: ${{env.WORK_DIR}}
+        shell: bash
+        run: bash <(curl -s https://codecov.io/bash) -f coverage.info || echo "Codecov did not collect coverage reports"
 
       - name: Perform CodeQL Analysis
         if: ${{ matrix.run_codeql }}
