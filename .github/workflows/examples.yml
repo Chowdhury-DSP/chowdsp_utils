@@ -4,7 +4,7 @@
 #   push:
 #     branches:
 #       - master
-#       - develop
+#       - ci-*
 #   pull_request:
 #     branches:
 #       - master
@@ -22,7 +22,14 @@
 #     strategy:
 #       fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
 #       matrix:
-#         os: [ubuntu-latest, windows-2019, macOS-latest]
+#         target: [
+#                   AutoWah,
+#                   ModalSpringReverb,
+#                   SignalGenerator,
+#                   SimpleEQ,
+#                   SimpleReverb
+#                 ]
+#         os: [ubuntu-latest, windows-2019, macos-latest]
 
 #     steps:
 #       - name: Install Linux Deps
@@ -48,40 +55,14 @@
 #           cd JUCE_modules
 #           git clone --single-branch --branch chowdsp https://github.com/Chowdhury-DSP/foleys_gui_magic.git
 
-#       - name: ccache
-#         if: runner.os == 'Linux' || runner.os == 'MacOS'
-#         uses: hendrikmuhs/ccache-action@v1
-#         with:
-#           key: examples-${{ matrix.os }}
-
 #       - name: Configure
 #         working-directory: ${{env.WORK_DIR}}
+#         shell: bash
+#         run: cmake -Bbuild -DCHOWDSP_ENABLE_EXAMPLES=ON -DCHOWDSP_PATH_TO_JUCE=../../JUCE
+
+#       - name: "Build Example: ${{ matrix.target }}"
+#         working-directory: ${{env.WORK_DIR}}/build
+#         shell: bash
 #         env:
-#           CMAKE_ARGS: ${{ matrix.cmake_args }}
-#         shell: bash
-#         run: cmake -Bbuild -DCHOWDSP_ENABLE_EXAMPLES=ON -DCHOWDSP_PATH_TO_JUCE=../../JUCE -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
-
-#       - name: "Build Example: SimpleEQ"
-#         working-directory: ${{env.WORK_DIR}}/build
-#         shell: bash
-#         run: cmake --build . --target SimpleEQ_Standalone --parallel 4
-
-#       - name: "Build Example: SimpleReverb"
-#         working-directory: ${{env.WORK_DIR}}/build
-#         shell: bash
-#         run: cmake --build . --target SimpleReverb_Standalone --parallel 4
-
-#       - name: "Build Example: SignalGenerator"
-#         working-directory: ${{env.WORK_DIR}}/build
-#         shell: bash
-#         run: cmake --build . --target SignalGenerator_Standalone --parallel 4
-
-#       - name: "Build Example: ModalSpringReverb"
-#         working-directory: ${{env.WORK_DIR}}/build
-#         shell: bash
-#         run: cmake --build . --target ModalSpringReverb_Standalone --parallel 4
-
-#       - name: "Build Example: AutoWah"
-#         working-directory: ${{env.WORK_DIR}}/build
-#         shell: bash
-#         run: cmake --build . --target AutoWah_Standalone --parallel 4
+#           EXAMPLE_TARGET: ${{ matrix.target }}_Standalone
+#         run: cmake --build . --parallel 4 --target $EXAMPLE_TARGET

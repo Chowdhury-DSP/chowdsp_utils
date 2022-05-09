@@ -2,9 +2,7 @@
 #
 # Sets up a minimal benchmarking app
 function(setup_benchmark target file)
-    juce_add_console_app(${target})
-    juce_generate_juce_header(${target})
-
+    add_executable(${target})
     target_sources(${target} PRIVATE ${file})
 
     target_compile_definitions(${target} PRIVATE
