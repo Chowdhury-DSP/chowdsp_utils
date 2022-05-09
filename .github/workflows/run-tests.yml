@@ -22,6 +22,7 @@ jobs:
       fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
       matrix:
         test: [chowdsp_core_test, chowdsp_json_test]
+        os: [ubuntu-latest, windows-2019, macos-latest]
         include:
           - name: "Test (Ubuntu)"
             os: ubuntu-latest
