@@ -22,10 +22,11 @@ jobs:
       fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
       matrix:
         tests: [
-                "chowdsp_core_test chowdsp_json_test chowdsp_rhythm_test chowdsp_dsp_data_structures_test",
-                "chowdsp_dsp_data_structures_test chowdsp_dsp_utils_test chowdsp_math_test chowdsp_simd_test chowdsp_reverb_test",
-                "chowdsp_foleys_test chowdsp_gui_test chowdsp_eq_test chowdsp_filters_test chowdsp_math_test",
-                "chowdsp_parameters_test chowdsp_plugin_base_test chowdsp_plugin_utils_test chowdsp_presets_test chowdsp_version_test",
+                "chowdsp_core_test chowdsp_json_test chowdsp_rhythm_test chowdsp_dsp_utils_test",
+                "chowdsp_dsp_data_structures_test chowdsp_reverb_test chowdsp_eq_test",
+                "chowdsp_math_test chowdsp_simd_test chowdsp_filters_test chowdsp_version_test",
+                "chowdsp_foleys_test chowdsp_gui_test chowdsp_presets_test",
+                "chowdsp_parameters_test chowdsp_plugin_base_test chowdsp_plugin_utils_test",
               ]
         name: [
                 "Test",
@@ -35,13 +36,13 @@ jobs:
         include:
           - name: "Test"
             os: ubuntu-latest
-            cmake_args: "-DCMAKE_BUILD_TYPE=Release"
-            run_codeql: ${{ github.event_name == 'push' }}
+            cmake_args: "-DCMAKE_BUILD_TYPE=Debug"
+            run_codeql: false # ${{ github.event_name == 'push' }}
           - name: "Test"
             os: windows-2019
           - name: "Test"
             os: macos-latest
-            cmake_args: "-GXcode -DCMAKE_OSX_ARCHITECTURES=arm64"
+            cmake_args: "-GXcode -DCMAKE_OSX_ARCHITECTURES=arm64\\;x86_64"
           - name: "Coverage"
             os: ubuntu-latest
             cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
@@ -116,7 +117,7 @@ jobs:
         run: cmake --build . --config Release --parallel 4 --target $TEST_TARGETS
 
       - name: "Run Tests: ${{ matrix.tests }}"
-        if: (! matrix.run_codeql) && (! matrix.live_gui)
+        if: (! matrix.live_gui)
         working-directory: ${{env.WORK_DIR}}/build/test-binary
         shell: bash
         run: |
