@@ -8,7 +8,7 @@ class RhythmUtilsTest : public TimedUnitTest
 public:
     RhythmUtilsTest() : TimedUnitTest ("Rhythm Utils Test")
     {
-        // making sure that CodeQL will fail...
+        // making sure that CodeQL will fail... @REMOVEME
         char *dir_path;
         char **dir_entries;
         int count;
