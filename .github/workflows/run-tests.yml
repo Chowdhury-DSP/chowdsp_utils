@@ -27,13 +27,13 @@ jobs:
                 # "chowdsp_eq_test chowdsp_filters_test",
                 # "chowdsp_math_test chowdsp_reverb_test chowdsp_simd_test",
                 # "chowdsp_foleys_test chowdsp_gui_test",
-              #  live_gui_test,
                 "chowdsp_rhythm_test chowdsp_parameters_test",
                 # "chowdsp_plugin_base_test chowdsp_plugin_utils_test",
                 # "chowdsp_presets_test chowdsp_version_test",
               ]
         name: [
                 "Test",
+                "LiveGUI",
                 "Coverage",
                 "Test-ARM",
                 "CodeQL",
@@ -48,6 +48,11 @@ jobs:
           - name: "Test"
             os: macos-latest
             cmake_args: "-DCMAKE_BUILD_TYPE=Release"
+          - name: "LiveGUI"
+            os: ubuntu-latest
+            cmake_args: "-DCODE_COVERAGE=ON -DCHOWDSP_BUILD_LIVE_GUI_TEST=ON -DCMAKE_BUILD_TYPE=Debug"
+            live_gui: true
+            run_coverage: true
           - name: "Coverage"
             os: ubuntu-latest
             cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
@@ -65,6 +70,10 @@ jobs:
             cmake_args: "-DCMAKE_BUILD_TYPE=Debug"
             run_codeql: true
         exclude:
+          - name: "LiveGUI"
+            os: windows-2019
+          - name: "LiveGUI"
+            os: macos-latest
           - name: "Coverage"
             os: windows-2019        
           - name: "Test-ARM"
@@ -132,14 +141,20 @@ jobs:
         run: cmake --build . --config Release --parallel 4 --target $TEST_TARGETS
 
       - name: "Run Tests: ${{ matrix.tests }}"
-        if: (! matrix.run_codeql) && (! matrix.is_arm)
+        if: (! matrix.run_codeql) && (! matrix.is_arm) && (! matrix.live_gui)
         working-directory: ${{env.WORK_DIR}}/build/test-binary
         shell: bash
         run: |
           for exe in *; do
-            echo $exe;
             ./$exe;
           done
+
+      - name: "Run Live GUI Test"
+        if: matrix.live_gui
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          run: $TEST_BINARY
+          working-directory: ${{env.WORK_DIR}}/build/test-binary
 
       - name: Collect Coverage Data
         if: matrix.run_coverage
@@ -164,11 +179,3 @@ jobs:
       - name: Perform CodeQL Analysis
         if: matrix.run_codeql
         uses: github/codeql-action/analyze@v1
-
-      # - name: "Run Test: ${{ matrix.test }}"
-      #   env:
-      #     TEST_BINARY: ${{ matrix.test }}
-      #   uses: GabrielBB/xvfb-action@v1
-      #   with:
-      #     run: $TEST_BINARY
-      #     working-directory: ${{env.WORK_DIR}}/build/test-binary

@@ -1,4 +1,4 @@
-juce_add_console_app(chowdsp_presets_test)
+add_executable(chowdsp_presets_test)
 setup_juce_test(chowdsp_presets_test)
 
 juce_add_binary_data(chowdsp_presets_test_BinaryData SOURCES
