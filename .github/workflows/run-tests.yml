@@ -33,15 +33,20 @@ jobs:
                chowdsp_simd_test
               ]
         os: [ubuntu-latest, windows-2019, macos-latest]
+        is_arm: [false]
         include:
           - name: "Test (Ubuntu)"
             os: ubuntu-latest
             cmake_args: "-DCMAKE_BUILD_TYPE=Release"
           - name: "Test (Windows)"
             os: windows-2019
-          - name: "Test (Mac)"
+          - name: "Test (Mac - Intel)"
             os: macos-latest
             cmake_args: "-DCMAKE_BUILD_TYPE=Release"
+          - name: "Test (Mac - ARM)"
+            os: macos-latest
+            is_arm: true
+            cmake_args: "-GXcode -D\"CMAKE_OSX_ARCHITECTURES=arm64\" -DCMAKE_BUILD_TYPE=Release"
 
     steps:
       - name: Install Linux Deps
@@ -82,10 +87,12 @@ jobs:
         run: cmake --build . --config Release --parallel 4 --target $TEST_TARGET
 
       - name: "Run Test: ${{ matrix.test }}"
+        if: ! ${{ matrix.is_arm }}
         working-directory: ${{env.WORK_DIR}}/build/test-binary
+        shell: bash
         env:
           TEST_BINARY: ${{ matrix.test }}
-        run: $TEST_BINARY
+        run: ./$TEST_BINARY
 
       # - name: "Run Test: ${{ matrix.test }}"
       #   env:
