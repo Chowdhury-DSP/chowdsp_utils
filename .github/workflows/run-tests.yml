@@ -54,6 +54,7 @@ jobs:
             run_coverage: true
           - name: "Test-ARM"
             os: macos-latest
+            tests: "chowdsp_simd_test chowdsp_math_test chowdsp_dsp_utils_test"
             cmake_args: "-GXcode -DCMAKE_OSX_ARCHITECTURES=arm64"
             is_arm: true
           - name: "CodeQL"
