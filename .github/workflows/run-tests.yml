@@ -41,7 +41,7 @@ jobs:
                chowdsp_presets_test,
                chowdsp_version_test,
               ]
-        os: [ubuntu-latest, windows-2019, macos-latest]
+        # os: [ubuntu-latest, windows-2019, macos-latest]
         is_arm: [false]
         run_codeql: [false]
         include:
@@ -58,7 +58,7 @@ jobs:
             os: macos-latest
             cmake_args: "-GXcode -D\"CMAKE_OSX_ARCHITECTURES=arm64\" -DCMAKE_BUILD_TYPE=Release"
             is_arm: true
-          - name: "Test (Ubuntu)"
+          - name: "CodeQL (Ubuntu)"
             os: ubuntu-latest
             cmake_args: "-DCMAKE_BUILD_TYPE=Debug"
             run_codeql: true
