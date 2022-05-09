@@ -2,6 +2,7 @@ juce_add_modules(
     ${CMAKE_SOURCE_DIR}/../foleys_gui_magic
     ${CMAKE_SOURCE_DIR}/modules/common/chowdsp_core
     ${CMAKE_SOURCE_DIR}/modules/common/chowdsp_json
+    ${CMAKE_SOURCE_DIR}/modules/common/chowdsp_reflection
     ${CMAKE_SOURCE_DIR}/modules/dsp/chowdsp_dsp_data_structures
     ${CMAKE_SOURCE_DIR}/modules/dsp/chowdsp_dsp_utils
     ${CMAKE_SOURCE_DIR}/modules/dsp/chowdsp_eq

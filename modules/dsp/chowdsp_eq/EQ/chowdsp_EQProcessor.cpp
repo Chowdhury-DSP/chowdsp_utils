@@ -1,4 +1,4 @@
-namespace chowdsp
+namespace chowdsp::EQ
 {
 template <typename FloatType, size_t numBands, typename EQBandType>
 EQProcessor<FloatType, numBands, EQBandType>::EQProcessor() = default;
@@ -77,4 +77,4 @@ void EQProcessor<FloatType, numBands, EQBandType>::process (juce::dsp::AudioBloc
         bypasses[i].processBlockOut (block, onOffs[i]);
     }
 }
-} // namespace chowdsp
+} // namespace chowdsp::EQ

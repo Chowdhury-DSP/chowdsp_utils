@@ -13,6 +13,7 @@ if(NOT (CHOWDSP_ENABLE_TESTING OR CHOWDSP_ENABLE_BENCHMARKS OR CHOWDSP_ENABLE_EX
 
         modules/common/chowdsp_core
         modules/common/chowdsp_json
+        modules/common/chowdsp_reflection
 
         modules/dsp/chowdsp_dsp_data_structures
         modules/dsp/chowdsp_dsp_utils

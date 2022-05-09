@@ -1,0 +1,531 @@
+[library PFR
+    [quickbook 1.6]
+    [version 2.0]
+    [copyright 2016-2022 Antony Polukhin]
+    [category Language Features Emulation]
+    [license
+        Distributed under the Boost Software License, Version 1.0.
+        (See accompanying file LICENSE_1_0.txt or copy at
+        [@http://www.boost.org/LICENSE_1_0.txt])
+    ]
+]
+
+[section Intro]
+
+PFR is a C++14 library for a very basic reflection. It gives you access to structure elements by index and provides other `std::tuple` like methods for user defined types without macro or boilerplate code:
+
+[import ../example/motivating_example0.cpp]
+[pfr_motivating_example]
+
+See [link pfr.limitations_and_configuration [*limitations]].
+
+
+[h2 Usecase example]
+
+Imagine that you are writing the wrapper library for a database. Depending on the usage of PFR users code will look differently:
+
+[table:hand_made_vs_pfr_1
+[[ Without PFR ] [ With PFR ]]
+[[
+```
+#include <db/api.hpp>
+
+struct user_info {
+    std::int64_t id;
+    std::string name, email, login;
+};
+
+user_info retrieve_friend(std::string_view name) {
+    std::tuple info_tuple
+      = db::one_row_as<std::int64_t, std::string, std::string, std::string>(
+        "SELECT id, name, email, login FROM user_infos WHERE name=$0",
+        name
+    );
+
+    ////////////////////////////////////////////////////////////////////////////////
+    user_info info {
+        std::move(std::get<0>(info_tuple)),
+        std::move(std::get<1>(info_tuple)),
+        std::move(std::get<2>(info_tuple)),
+        std::move(std::get<3>(info_tuple)),
+    }
+    ////////////////////////////////////////////////////////////////////////////////
+
+    auto friend_info = ask_user_for_friend(std::move(info));
+
+    db::insert(
+        "INSERT INTO user_infos(id, name, email, login) VALUES ($0, $1, $2, $3)",
+        friend_info.id,    /////////////////////////////////////////////////////////
+        friend_info.name,  // Users are forced to enumerate fields because your
+        friend_info.email, // library can not iterate over the fields of a user
+        friend_info.login  // provided structure
+    );
+
+    return friend_info;
+}
+```
+][
+```
+#include <db/api.hpp>
+
+struct user_info {
+    std::int64_t id;
+    std::string name, email, login;
+};
+
+user_info retrieve_friend(std::string_view name) {
+    // With PFR you can put data directly into user provided structures
+    user_info info = db::one_row_as<user_info>(
+        "SELECT id, name, email, login FROM user_infos WHERE name=$0",
+        name
+    );
+
+    ////////////////// No boilerplate code to move data around /////////////////////
+
+
+
+
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+
+    auto friend_info = ask_user_for_friend(std::move(info));
+
+    db::insert(
+        "INSERT INTO user_infos(id, name, email, login) VALUES ($0, $1, $2, $3)",
+        friend_info     ////////////////////////////////////////////////////////////
+                        // PFR allows you to iterate over all the fields
+                        // of a user provided structure
+                        //
+    );
+
+    return friend_info;
+}
+```
+]]
+]
+
+Otherwise your library could require a customization point for a user type:
+
+
+[table:hand_made_vs_pfr_2
+[[ Without PFR ] [ With PFR ]]
+[[
+```
+#include <db/api.hpp>
+
+struct user_info {
+    std::int64_t id;
+    std::string name, email, login;
+};
+
+/// Customizations via hand-written code or macro like BOOST_FUSION_ADAPT_STRUCT ///
+auto db_api_tie(user_info& ui) noexcept {
+    return std::tie(ui.id, ui.name, ui.email, ui.login);
+}
+
+auto db_api_tie(const user_info& ui) noexcept {
+    return std::tie(ui.id, ui.name, ui.email, ui.login);
+}
+////////////////////////////////////////////////////////////////////////////////////
+```
+][
+```
+#include <db/api.hpp>
+
+struct user_info {
+    std::int64_t id;
+    std::string name, email, login;
+};
+
+//////// With PFR there's no need in hand written customizations /////////////
+
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////
+```
+]]
+]
+
+
+With PFR the code is shorter, more readable and more pleasant to write.
+
+
+
+[h2 Out of the box functionality ]
+
+PFR adds the following out-of-the-box functionality for aggregate initializable structures:
+
+* comparison functions
+* heterogeneous comparators
+* hash
+* IO streaming
+* access to members by index
+* member type retrieval
+* methods for cooperation with `std::tuple`
+* methods to visit each field of the structure
+
+PFR is a header only library that does not depend on Boost. You can just copy the content of the "include" folder [@https://github.com/boostorg/pfr from the PFR github] into your project, and the library will work fine. For a version of the library without `boost::` namespace see [@https://github.com/apolukhin/pfr_non_boost PFR].
+
+[caution Recommended C++ Standards are C++17 and above. Library requires at least C++14! Pre C++14 compilers (C++11, C++03...) are not supported]
+
+[endsect]
+
+
+[section Short Examples for the Impatient]
+
+[import ../example/quick_examples.cpp]
+
+
+[table:quick_examples
+[[ Code snippet ] [ Reference: ]]
+[
+    [ [pfr_quick_examples_get] ]
+    [ [funcref pfr::get] ]
+][
+    [ [pfr_quick_examples_ops] ]
+    [
+
+        [headerref pfr/ops.hpp Header pfr/ops.hpp]:
+
+        * [funcref pfr::eq]
+
+        * [funcref pfr::ne]
+
+        * [funcref pfr::gt]
+
+        * ...
+
+    ]
+][
+    [ [pfr_quick_examples_for_each] ]
+    [
+        [funcref pfr::for_each_field]
+
+        [funcref pfr::io]
+    ]
+][
+    [ [pfr_quick_examples_functions_for] ]
+    [ [macroref PFR_FUNCTIONS_FOR] ]
+][
+    [ [pfr_quick_examples_eq_fields] ]
+    [
+        [headerref pfr/ops_fields.hpp Header pfr/ops_fields.hpp ]:
+
+        * [funcref pfr::eq_fields]
+
+        * [funcref pfr::ne_fields]
+
+        * [funcref pfr::gt_fields]
+
+        * ...
+
+        [headerref pfr/io_fields.hpp Header pfr/io_fields.hpp ]
+
+        * [funcref pfr::io_fields]
+
+    ]
+][
+    [ [pfr_quick_examples_for_each_idx] ]
+    [ [funcref pfr::for_each_field] ]
+][
+    [ [pfr_quick_examples_tuple_size] ]
+    [ [classref pfr::tuple_size] ]
+][
+    [ [pfr_quick_examples_structure_to_tuple] ]
+    [ [funcref pfr::structure_to_tuple] ]
+][
+    [ [pfr_quick_examples_structure_tie] ]
+    [ [funcref pfr::structure_tie] ]
+]]
+
+
+
+[endsect]
+
+
+[section Tutorial]
+
+[import ../example/sample_printing.cpp]
+[import ../example/get.cpp]
+
+
+[section Why tuples are bad and aggregates are more preferable?]
+
+`std::tuple` and `std::pair` are good for generic programming, however they have disadvantages. First of all, code that uses them becomes barely readable. Consider two definitions:
+
+[table:tuples_vs_aggregates
+[[ Tuple ] [ Aggregate ]]
+[[
+```
+using auth_info_tuple = std::tuple<
+    std::int64_t, // What does this integer represents?
+    std::int64_t,
+    std::time_t
+>;
+```
+][
+```
+struct auth_info_aggregate {
+    std::int64_t user_id;    // Oh, now I see!
+    std::int64_t session_id;
+    std::time_t  valid_till;
+};
+```
+]]
+]
+
+Definition via aggregate initializable structure is much more clear. Same story with usages: `return std::get<1>(value);` vs. `return value.session_id;`.
+
+Another advantage of aggregates is a more efficient copy, move construction and assignments.
+
+Because of the above issues some guidelines recommend to [*use aggregates instead of tuples]. However aggregates fail when it comes to the functional like programming.
+
+PFR library [*provides tuple like methods for aggregate initializable structures], making aggregates usable in contexts where only tuples were useful.
+
+[endsect]
+
+[section Accessing structure member by index] [pfr_example_get] [endsect]
+[section Custom printing of aggregates] [pfr_sample_printing] [endsect]
+
+
+[section Three ways of getting operators ]
+
+There are three ways to start using PFR hashing, comparison and streaming for type `T` in your code. Each method has its own drawbacks and suits own cases.
+
+[table:ops_comp Different approaches for operators
+    [[ Approach
+    ][ When to use
+    ][ Operators could be found by ADL ][ Works for local types ][ Usable locally, without affecting code from other scopes ][ Ignores implicit conversion operators ][ Respects user defined operators ]]
+
+    [[
+        [headerref pfr/ops.hpp pfr/ops.hpp: eq, ne, gt, lt, le, ge]
+
+        [headerref pfr/io.hpp pfr/io.hpp: io]
+    ][
+        Use when you need to compare values by provided for them operators or via field-by-field comparison.
+    ][ no ][ yes ][ yes ][ no ][ yes ]]
+
+    [[
+        [macroref PFR_FUNCTIONS_FOR PFR_FUNCTIONS_FOR(T)]
+    ][
+        Use near the type definition to define the whole set of operators for your type.
+    ][ yes ][ no ][ no ][ yes for T ] [ no (compile time error) ]]
+
+    [[
+        [headerref pfr/ops_fields.hpp pfr/ops_fields.hpp: eq_fields, ne_fields, gt_fields, lt_fields, le_fields, ge_fields]
+
+        [headerref pfr/io.hpp pfr/io_fields.hpp: io_fields]
+    ][
+        Use to implement the required set of operators for your type.
+    ][ no ][ yes ][ yes ][ yes ][ yes ]]
+]
+
+More detailed description follows:
+
+[*1. `eq, ne, gt, lt, le, ge, io` approach]
+
+This method is good if you're writing generic algorithms and need to use operators from PFR only if there are no operators defined for the type:
+
+```
+#include <pfr/ops.hpp>
+
+template <class T>
+struct uniform_comparator_less {
+    bool operator()(const T& lhs, const T& rhs) const noexcept {
+        // If T has operator< or conversion operator then it is used.
+        return pfr::lt(lhs, rhs);
+    }
+};
+```
+This methods effects are local to the function. It works even for local types, like structures defined in functions.
+
+
+[*2. PFR_FUNCTIONS_FOR(T) approach]
+
+This method is good if you're writing a structure and wish to define operators for that structure.
+```
+#include <pfr/functions_for.hpp>
+
+struct pair_like {
+    int first;
+    short second;
+};
+
+PFR_FUNCTIONS_FOR(pair_like)   // Defines operators
+
+// ...
+
+assert(pair_like{1, 2} < pair_like{1, 3});
+```
+Argument Dependant Lookup works well. `std::less` will find the operators for `struct pair_like`. [macroref PFR_FUNCTIONS_FOR PFR_FUNCTIONS_FOR(T)]
+can not be used for local types. It does not respect conversion operators of `T`, so for example the following code
+will output different values:
+```
+#include <pfr/functions_for.hpp>
+
+struct empty {
+    operator std::string() { return "empty{}"; }
+};
+// Uncomment to get different output:
+// PFR_FUNCTIONS_FOR(empty)
+
+// ...
+std::cout << empty{}; // Outputs `empty{}` if PFR_FUNCTIONS_FOR(empty) is commented out, '{}' otherwise.
+```
+
+[*3. `eq_fields, ne_fields, gt_fields, lt_fields, le_fields, ge_fields, io_fields` approach]
+
+This method is good if you're willing to provide only some operators for your type:
+
+```
+#include <pfr/io_fields.hpp>
+
+struct pair_like {
+    int first;
+    std::string second;
+};
+
+inline std::ostream& operator<<(std::ostream& os, const pair_like& x) {
+    return os <<  bost::pfr::io_fields(x);
+}
+```
+
+All the `*_fields` functions do ignore user defined operators and work only with fields of a type. This makes them perfect for defining you own operators.
+
+[endsect]
+
+
+[section Reflection of unions ]
+
+You could use tuple-like representation if a type contains union. But be sure that operations for union are manually defined:
+
+```
+#include <pfr/ops.hpp>
+
+union test_union {
+    int i;
+    float f;
+};
+
+inline bool operator==(test_union l, test_union r) noexcept; // Compile time error without this operator
+
+bool some_function(test_union f1, test_union f2) {
+    return pfr::eq(f1, f2); // OK
+}
+
+```
+
+Reflection of unions is disabled in the PFR library for safety reasons. Alas, there's no way to find out [*active] member of a union and accessing an inactive member is an Undefined Behavior. For example, library could always return the first member, but ostreaming `u` in `union {char* c; long long ll; } u; u.ll= 1;` will crash your program with an invalid pointer dereference.
+
+Any attempt to reflect unions leads to a compile time error. In many cases a static assert is triggered that outputs the following message:
+
+```
+error: static_assert failed "====================> PFR: For safety reasons it is forbidden
+        to reflect unions. See `Reflection of unions` section in the docs for more info."
+```
+
+[endsect]
+
+[endsect]
+
+
+[section Limitations and Configuration]
+
+[caution Recommended C++ Standards are C++17 and above. Library requires at least C++14! Pre C++14 compilers (C++11, C++03...) are not supported. ]
+
+PFR library works with types that satisfy the requirements of `SimpleAggregate`: aggregate types without base classes, `const` fields, references, or C arrays:
+
+```
+struct simple_aggregate {  // SimpleAggregate
+    std::string name;
+    int age;
+    boost::uuids::uuid uuid;
+};
+
+struct empty {             // SimpleAggregate
+};
+
+struct aggregate : empty { // not a SimpleAggregate
+    std::string name;
+    int age;
+    boost::uuids::uuid uuid;
+};
+```
+The library may work with aggregates that don't satisfy the requirements of `SimpleAggregate`, but the behavior tends to be non-portable.
+
+[h2 Configuration Macro]
+
+By default PFR [*auto-detects your compiler abilities] and automatically defines the configuration macro into appropriate values. If you wish to override that behavior, just define:
+[table:linkmacro Macros
+    [[Macro name] [Effect]]
+    [[*PFR_USE_CPP17*] [Define to `1` if you wish to override PFR choice and use C++17 structured bindings for reflection. Define to `0` to override PFR choice and disable C++17 structured bindings usage.]]
+    [[*PFR_USE_LOOPHOLE*] [Define to `1` if you wish to override PFR choice and exploit [@http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_active.html#2118 CWG 2118] for reflection. Define to `0` to override PFR choice and disable CWG 2118 usage.]]
+    [[*PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE*] [Define to `0` if you are hit by the template instantiation depth issues with `std::make_integer_sequence` and wish to use PFR version of that metafunction. Define to `1` to override PFR detection logic. ]]
+    [[*PFR_HAS_GUARANTEED_COPY_ELISION*] [Define to `0` if your compiler does not implement C++17 guaranteed copy elision properly and fails to reflect aggregates with non-movable fields. Define to `1` to override PFR detection logic. ]]
+]
+
+
+[h2 Details on Limitations]
+
+The PFRs reflection has some limitations that depend on a C++ Standard and compiler capabilities:
+
+* Static variables are ignored
+* T must be aggregate initializable without empty base classes
+* if T contains C arrays or it is inherited from non-empty type then the result of reflection may differ depending on the C++ version and library configuration
+* Additional limitations if [*PFR_USE_CPP17 == 0]:
+    * Non of the member fields should have a template constructor from one parameter.
+    * Additional limitations if [*PFR_USE_LOOPHOLE == 0]:
+        * T must be constexpr aggregate initializable and all its fields must be constexpr default constructible
+        * [funcref pfr::get], [funcref pfr::structure_to_tuple], [funcref pfr::structure_tie], [headerref pfr/core.hpp pfr::tuple_element] require T to be a POD type with built-in types only.
+
+
+[endsect]
+
+[section How it works]
+
+Short description:
+
+# at compile-time: use aggregate initialization to detect fields count in user-provided structure
+    * [*PFR_USE_CPP17 == 1]:
+        # at compile-time: structured bindings are used to decompose a type `T` to known amount of fields
+    * [*PFR_USE_CPP17 == 0 && PFR_USE_LOOPHOLE == 1]:
+        # at compile-time: use aggregate initialization to detect fields count in user-provided structure
+        # at compile-time: make a structure that is convertible to anything and remember types it has been converted to during aggregate initialization of user-provided structure
+        # at compile-time: using knowledge from previous steps create a tuple with exactly the same layout as in user-provided structure
+        # at compile-time: find offsets for each field in user-provided structure using the tuple from previous step
+        # at run-time: get pointer to each field, knowing the structure address and each field offset
+        # at run-time: a tuple of references to fields is returned => all the tuple methods are available for the structure
+    * [*PFR_USE_CPP17 == 0 && PFR_USE_LOOPHOLE == 0]:
+        # at compile-time: let `I` be is an index of current field, it equals 0
+        # at run-time: `T` is constructed and field `I` is aggregate initialized using a separate instance of structure that is convertible to anything [note Additional care is taken to make sure that all the information about `T` is available to the compiler and that operations on `T` have no side effects, so the compiler can optimize away the unnecessary temporary objects.]
+        # at compile-time: `I += 1`
+        # at compile-time: if `I` does not equal fields count goto step [~c.] from inside of the conversion operator of the structure that is convertible to anything
+        # at compile-time: using knowledge from previous steps create a tuple with exactly the same layout as in user-provided structure
+        # at compile-time: find offsets for each field in user-provided structure using the tuple from previous step
+        # at run-time: get pointer to each field, knowing the structure address and each field offset
+# at run-time: a tuple of references to fields is returned => all the tuple methods are available for the structure
+
+Long description of some basics: [@https://youtu.be/UlNUNxLtBI0 Antony Polukhin: Better C++14 reflections].
+Long description of some basics of C++14 with [link pfr.limitations_and_configuration [*PFR_USE_LOOPHOLE == 0]]: [@https://youtu.be/abdeAew3gmQ Antony Polukhin: C++14 Reflections Without Macros, Markup nor External Tooling].
+Description of the [*PFR_USE_LOOPHOLE == 1] technique by its inventor Alexandr Poltavsky [@http://alexpolt.github.io/type-loophole.html in his blog].
+
+[endsect]
+
+[section Acknowledgements]
+
+Many thanks to Bruno Dutra for showing the technique to precisely reflect aggregate initializable type in C++14 [@https://github.com/apolukhin/magic_get/issues/5 Manual type registering/structured bindings might be unnecessary].
+
+Many thanks to Alexandr Poltavsky for initial implementation the [*PFR_USE_LOOPHOLE == 1] technique and for describing it [@http://alexpolt.github.io/type-loophole.html in his blog].
+
+Many thanks to Chris Beck for implementing the detect-offsets-and-get-field-address functionality that avoids Undefined Behavior of reinterpret_casting layout compatible structures.
+
+Many thanks to the Boost people who participated in the formal review, especially to Benedek Thaler, Steven Watanabe and Andrzej Krzemienski.
+
+[endsect]
+
+[xinclude autodoc_pfr.xml]

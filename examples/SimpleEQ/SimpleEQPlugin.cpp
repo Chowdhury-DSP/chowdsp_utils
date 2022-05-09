@@ -53,6 +53,13 @@ SimpleEQPlugin::SimpleEQPlugin()
     linPhaseModeOn = vts.getRawParameterValue (linPhaseModeTag);
 
     linPhaseEQ.updatePrototypeEQParameters = [] (auto& eq, auto& eqParams) { eq.setParameters (eqParams); };
+
+    vts.addParameterListener (linPhaseModeTag, this);
+}
+
+SimpleEQPlugin::~SimpleEQPlugin()
+{
+    vts.removeParameterListener (linPhaseModeTag, this);
 }
 
 void SimpleEQPlugin::addParameters (Parameters& params)
@@ -84,8 +91,8 @@ void SimpleEQPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)
 
     linPhaseEQ.prepare (spec, makeEQParams()); // prepare the linear phase EQ with some initial parameters
 
-    // If linear phase mode will always be on, this is the place to report latency to the host!
-    // setLatencySamples (linPhaseEQ.getLatencySamples());
+    // make sure the reported latency is up-to-date
+    parameterChanged (linPhaseModeTag, *linPhaseModeOn);
 }
 
 PrototypeEQ::Params SimpleEQPlugin::makeEQParams() const
@@ -128,6 +135,15 @@ void SimpleEQPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
         // Linear phase mode is on: processing the linear phase EQ here!
         auto&& block = juce::dsp::AudioBlock<float> { buffer };
         linPhaseEQ.process (juce::dsp::ProcessContextReplacing<float> { block });
+    }
+}
+
+void SimpleEQPlugin::parameterChanged (const juce::String& parameterID, float newValue)
+{
+    if (parameterID == linPhaseModeTag)
+    {
+        setLatencySamples (newValue == 1.0f ? linPhaseEQ.getLatencySamples() : 0);
+        updateHostDisplay (ChangeDetails().withLatencyChanged (true));
     }
 }
 
