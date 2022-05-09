@@ -22,10 +22,10 @@ jobs:
       fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
       matrix:
         tests: [
-                "chowdsp_core_test chowdsp_json_test",
+                # "chowdsp_core_test chowdsp_json_test",
                 # "chowdsp_dsp_data_structures_test chowdsp_dsp_utils_test",
                 # "chowdsp_eq_test chowdsp_filters_test",
-                "chowdsp_math_test chowdsp_reverb_test chowdsp_simd_test",
+                # "chowdsp_math_test chowdsp_reverb_test chowdsp_simd_test",
                 # "chowdsp_foleys_test chowdsp_gui_test",
               #  live_gui_test,
                 "chowdsp_rhythm_test chowdsp_parameters_test",
@@ -86,11 +86,11 @@ jobs:
           sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
 
       - name: Install lcov (Linux)
-        if: runner.os == 'Linux' && ${{ matrix.run_coverage }}
+        if: runner.os == 'Linux' && ${{ matrix.run_coverage }} == true
         run: sudo apt install lcov
 
       - name: Install lcov (Mac)
-        if: runner.os == 'MacOS' && ${{ matrix.run_coverage }}
+        if: runner.os == 'MacOS' && ${{ matrix.run_coverage }} == true
         run: |
           export HOMEBREW_NO_AUTO_UPDATE=1
           brew install lcov
