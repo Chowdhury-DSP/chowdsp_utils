@@ -1,54 +1,54 @@
-name: Clang-Tidy
+# name: Clang-Tidy
 
-on:
-  push:
-    branches:
-      - master
-      - develop
-  pull_request:
-    branches:
-      - master
+# on:
+#   push:
+#     branches:
+#       - master
+#       - develop
+#   pull_request:
+#     branches:
+#       - master
 
-  workflow_dispatch:
+#   workflow_dispatch:
 
-env:
-  WORK_DIR: ${{github.workspace}}/JUCE_modules/chowdsp_utils
+# env:
+#   WORK_DIR: ${{github.workspace}}/JUCE_modules/chowdsp_utils
 
-jobs:
-  build_and_test:
-    if: contains(toJson(github.event.commits), '***NO_CI***') == false && contains(toJson(github.event.commits), '[ci skip]') == false && contains(toJson(github.event.commits), '[skip ci]') == false
-    name: Run clang-tidy Test module on ${{ matrix.os }}
-    runs-on: ubuntu-latest
+# jobs:
+#   build_and_test:
+#     if: contains(toJson(github.event.commits), '***NO_CI***') == false && contains(toJson(github.event.commits), '[ci skip]') == false && contains(toJson(github.event.commits), '[skip ci]') == false
+#     name: Run clang-tidy Test module on ${{ matrix.os }}
+#     runs-on: ubuntu-latest
 
-    steps:
-      - name: Install Linux Deps
-        run: |
-          sudo apt-get update
-          sudo apt install libasound2-dev libcurl4-openssl-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev libsamplerate-dev clang-tidy
+#     steps:
+#       - name: Install Linux Deps
+#         run: |
+#           sudo apt-get update
+#           sudo apt install libasound2-dev libcurl4-openssl-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev libsamplerate-dev clang-tidy
 
-      - name: Get latest CMake
-        uses: lukka/get-cmake@latest
+#       - name: Get latest CMake
+#         uses: lukka/get-cmake@latest
 
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          path: ${{env.WORK_DIR}}
+#       - name: Checkout code
+#         uses: actions/checkout@v2
+#         with:
+#           path: ${{env.WORK_DIR}}
 
-      - name: Set up environment
-        working-directory: ${{github.workspace}}
-        run: |
-          git clone --depth 1 --branch 6.1.6 https://github.com/juce-framework/JUCE.git
-          cd JUCE_modules
-          git clone --single-branch --branch chowdsp https://github.com/Chowdhury-DSP/foleys_gui_magic.git
+#       - name: Set up environment
+#         working-directory: ${{github.workspace}}
+#         run: |
+#           git clone --depth 1 --branch 6.1.6 https://github.com/juce-framework/JUCE.git
+#           cd JUCE_modules
+#           git clone --single-branch --branch chowdsp https://github.com/Chowdhury-DSP/foleys_gui_magic.git
 
-      - name: Configure
-        working-directory: ${{env.WORK_DIR}}
-        env:
-          CMAKE_ARGS: ${{ matrix.cmake_args }}
-        shell: bash
-        run: cmake -Bbuild -DCHOWDSP_ENABLE_TESTING=ON -DCHOWDSP_RUN_CLANG_TIDY=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+#       - name: Configure
+#         working-directory: ${{env.WORK_DIR}}
+#         env:
+#           CMAKE_ARGS: ${{ matrix.cmake_args }}
+#         shell: bash
+#         run: cmake -Bbuild -DCHOWDSP_ENABLE_TESTING=ON -DCHOWDSP_RUN_CLANG_TIDY=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
-      - name: Build
-        working-directory: ${{env.WORK_DIR}}
-        shell: bash
-        run: cmake --build build --target chowdsp_utils_clang_tidy
+#       - name: Build
+#         working-directory: ${{env.WORK_DIR}}
+#         shell: bash
+#         run: cmake --build build --target chowdsp_utils_clang_tidy

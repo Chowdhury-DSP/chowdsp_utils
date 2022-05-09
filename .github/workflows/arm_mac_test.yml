@@ -1,49 +1,49 @@
-name: CI-ARM
+# name: CI-ARM
 
-on:
-  push:
-    branches:
-      - master
-      - develop
-  pull_request:
-    branches:
-      - master
+# on:
+#   push:
+#     branches:
+#       - master
+#       - develop
+#   pull_request:
+#     branches:
+#       - master
 
-  workflow_dispatch:
+#   workflow_dispatch:
 
-env:
-  WORK_DIR: ${{github.workspace}}/JUCE_modules/chowdsp_utils
+# env:
+#   WORK_DIR: ${{github.workspace}}/JUCE_modules/chowdsp_utils
 
-jobs:
-  build_and_test:
-    if: contains(toJson(github.event.commits), '***NO_CI***') == false && contains(toJson(github.event.commits), '[ci skip]') == false && contains(toJson(github.event.commits), '[skip ci]') == false
-    name: Test module on ARM Mac
-    runs-on: macos-latest
+# jobs:
+#   build_and_test:
+#     if: contains(toJson(github.event.commits), '***NO_CI***') == false && contains(toJson(github.event.commits), '[ci skip]') == false && contains(toJson(github.event.commits), '[skip ci]') == false
+#     name: Test module on ARM Mac
+#     runs-on: macos-latest
 
-    steps:
-      - name: Get latest CMake
-        uses: lukka/get-cmake@latest
+#     steps:
+#       - name: Get latest CMake
+#         uses: lukka/get-cmake@latest
 
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          path: ${{env.WORK_DIR}}
+#       - name: Checkout code
+#         uses: actions/checkout@v2
+#         with:
+#           path: ${{env.WORK_DIR}}
 
-      - name: Set up environment
-        working-directory: ${{github.workspace}}
-        run: |
-          git clone --depth 1 --branch 6.1.6 https://github.com/juce-framework/JUCE.git
-          cd JUCE_modules
-          git clone --single-branch --branch chowdsp https://github.com/Chowdhury-DSP/foleys_gui_magic.git
+#       - name: Set up environment
+#         working-directory: ${{github.workspace}}
+#         run: |
+#           git clone --depth 1 --branch 6.1.6 https://github.com/juce-framework/JUCE.git
+#           cd JUCE_modules
+#           git clone --single-branch --branch chowdsp https://github.com/Chowdhury-DSP/foleys_gui_magic.git
 
-      - name: Configure
-        working-directory: ${{env.WORK_DIR}}
-        env:
-          CMAKE_ARGS: ${{ matrix.cmake_args }}
-        shell: bash
-        run: cmake -Bbuild -DCHOWDSP_ENABLE_TESTING=ON -GXcode -D"CMAKE_OSX_ARCHITECTURES=arm64" -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+#       - name: Configure
+#         working-directory: ${{env.WORK_DIR}}
+#         env:
+#           CMAKE_ARGS: ${{ matrix.cmake_args }}
+#         shell: bash
+#         run: cmake -Bbuild -DCHOWDSP_ENABLE_TESTING=ON -GXcode -D"CMAKE_OSX_ARCHITECTURES=arm64" -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 
-      - name: Build
-        working-directory: ${{env.WORK_DIR}}/build
-        shell: bash
-        run: cmake --build . --config Release --parallel 4 | xcpretty
+#       - name: Build
+#         working-directory: ${{env.WORK_DIR}}/build
+#         shell: bash
+#         run: cmake --build . --config Release --parallel 4 | xcpretty

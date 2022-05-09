@@ -33,4 +33,12 @@ function(setup_juce_test target)
     if ((CMAKE_CXX_COMPILER_ID STREQUAL "MSVC") OR (CMAKE_CXX_SIMULATE_ID STREQUAL "MSVC"))
         target_compile_options(${target} PUBLIC /wd4458)
     endif ()
+
+    add_custom_command(TARGET ${target}
+        POST_BUILD
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        COMMAND ${CMAKE_COMMAND} -E echo "Copying $<TARGET_FILE:${target}> to test-binary"
+        COMMAND ${CMAKE_COMMAND} -E make_directory test-binary
+        COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:${target}>" test-binary
+    )
 endfunction(setup_juce_test)

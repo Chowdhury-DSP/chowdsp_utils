@@ -1,87 +1,87 @@
-name: Examples
+# name: Examples
 
-on:
-  push:
-    branches:
-      - master
-      - develop
-  pull_request:
-    branches:
-      - master
+# on:
+#   push:
+#     branches:
+#       - master
+#       - develop
+#   pull_request:
+#     branches:
+#       - master
 
-  workflow_dispatch:
+#   workflow_dispatch:
 
-env:
-  WORK_DIR: ${{github.workspace}}/JUCE_modules/chowdsp_utils
+# env:
+#   WORK_DIR: ${{github.workspace}}/JUCE_modules/chowdsp_utils
 
-jobs:
-  build_and_test:
-    if: contains(toJson(github.event.commits), '***NO_CI***') == false && contains(toJson(github.event.commits), '[ci skip]') == false && contains(toJson(github.event.commits), '[skip ci]') == false
-    name: Build examples on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
-      matrix:
-        os: [ubuntu-latest, windows-2019, macOS-latest]
+# jobs:
+#   build_and_test:
+#     if: contains(toJson(github.event.commits), '***NO_CI***') == false && contains(toJson(github.event.commits), '[ci skip]') == false && contains(toJson(github.event.commits), '[skip ci]') == false
+#     name: Build examples on ${{ matrix.os }}
+#     runs-on: ${{ matrix.os }}
+#     strategy:
+#       fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
+#       matrix:
+#         os: [ubuntu-latest, windows-2019, macOS-latest]
 
-    steps:
-      - name: Install Linux Deps
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt install libasound2-dev libcurl4-openssl-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev libsamplerate-dev
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 9
-          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
+#     steps:
+#       - name: Install Linux Deps
+#         if: runner.os == 'Linux'
+#         run: |
+#           sudo apt-get update
+#           sudo apt install libasound2-dev libcurl4-openssl-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev libsamplerate-dev
+#           sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 9
+#           sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
 
-      - name: Get latest CMake
-        uses: lukka/get-cmake@latest
+#       - name: Get latest CMake
+#         uses: lukka/get-cmake@latest
 
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          path: ${{env.WORK_DIR}}
+#       - name: Checkout code
+#         uses: actions/checkout@v2
+#         with:
+#           path: ${{env.WORK_DIR}}
 
-      - name: Set up environment
-        working-directory: ${{github.workspace}}
-        run: |
-          git clone --depth 1 --branch 6.1.6 https://github.com/juce-framework/JUCE.git
-          cd JUCE_modules
-          git clone --single-branch --branch chowdsp https://github.com/Chowdhury-DSP/foleys_gui_magic.git
+#       - name: Set up environment
+#         working-directory: ${{github.workspace}}
+#         run: |
+#           git clone --depth 1 --branch 6.1.6 https://github.com/juce-framework/JUCE.git
+#           cd JUCE_modules
+#           git clone --single-branch --branch chowdsp https://github.com/Chowdhury-DSP/foleys_gui_magic.git
 
-      - name: ccache
-        if: runner.os == 'Linux' || runner.os == 'MacOS'
-        uses: hendrikmuhs/ccache-action@v1
-        with:
-          key: examples-${{ matrix.os }}
+#       - name: ccache
+#         if: runner.os == 'Linux' || runner.os == 'MacOS'
+#         uses: hendrikmuhs/ccache-action@v1
+#         with:
+#           key: examples-${{ matrix.os }}
 
-      - name: Configure
-        working-directory: ${{env.WORK_DIR}}
-        env:
-          CMAKE_ARGS: ${{ matrix.cmake_args }}
-        shell: bash
-        run: cmake -Bbuild -DCHOWDSP_ENABLE_EXAMPLES=ON -DCHOWDSP_PATH_TO_JUCE=../../JUCE -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+#       - name: Configure
+#         working-directory: ${{env.WORK_DIR}}
+#         env:
+#           CMAKE_ARGS: ${{ matrix.cmake_args }}
+#         shell: bash
+#         run: cmake -Bbuild -DCHOWDSP_ENABLE_EXAMPLES=ON -DCHOWDSP_PATH_TO_JUCE=../../JUCE -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 
-      - name: "Build Example: SimpleEQ"
-        working-directory: ${{env.WORK_DIR}}/build
-        shell: bash
-        run: cmake --build . --target SimpleEQ_Standalone --parallel 4
+#       - name: "Build Example: SimpleEQ"
+#         working-directory: ${{env.WORK_DIR}}/build
+#         shell: bash
+#         run: cmake --build . --target SimpleEQ_Standalone --parallel 4
 
-      - name: "Build Example: SimpleReverb"
-        working-directory: ${{env.WORK_DIR}}/build
-        shell: bash
-        run: cmake --build . --target SimpleReverb_Standalone --parallel 4
+#       - name: "Build Example: SimpleReverb"
+#         working-directory: ${{env.WORK_DIR}}/build
+#         shell: bash
+#         run: cmake --build . --target SimpleReverb_Standalone --parallel 4
 
-      - name: "Build Example: SignalGenerator"
-        working-directory: ${{env.WORK_DIR}}/build
-        shell: bash
-        run: cmake --build . --target SignalGenerator_Standalone --parallel 4
+#       - name: "Build Example: SignalGenerator"
+#         working-directory: ${{env.WORK_DIR}}/build
+#         shell: bash
+#         run: cmake --build . --target SignalGenerator_Standalone --parallel 4
 
-      - name: "Build Example: ModalSpringReverb"
-        working-directory: ${{env.WORK_DIR}}/build
-        shell: bash
-        run: cmake --build . --target ModalSpringReverb_Standalone --parallel 4
+#       - name: "Build Example: ModalSpringReverb"
+#         working-directory: ${{env.WORK_DIR}}/build
+#         shell: bash
+#         run: cmake --build . --target ModalSpringReverb_Standalone --parallel 4
 
-      - name: "Build Example: AutoWah"
-        working-directory: ${{env.WORK_DIR}}/build
-        shell: bash
-        run: cmake --build . --target AutoWah_Standalone --parallel 4
+#       - name: "Build Example: AutoWah"
+#         working-directory: ${{env.WORK_DIR}}/build
+#         shell: bash
+#         run: cmake --build . --target AutoWah_Standalone --parallel 4
