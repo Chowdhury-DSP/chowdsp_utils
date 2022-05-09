@@ -29,7 +29,7 @@ jobs:
                 # "chowdsp_foleys_test chowdsp_gui_test",
                 "chowdsp_rhythm_test chowdsp_parameters_test",
                 # "chowdsp_plugin_base_test chowdsp_plugin_utils_test",
-                # "chowdsp_presets_test chowdsp_version_test",
+                "chowdsp_presets_test chowdsp_version_test",
               ]
         name: [
                 "Test",
@@ -49,6 +49,7 @@ jobs:
             cmake_args: "-DCMAKE_BUILD_TYPE=Release"
           - name: "Live GUI Test"
             os: ubuntu-latest
+            tests: "live_gui_test"
             cmake_args: "-DCODE_COVERAGE=ON -DCHOWDSP_BUILD_LIVE_GUI_TEST=ON -DCMAKE_BUILD_TYPE=Debug"
             live_gui: true
             run_coverage: true
