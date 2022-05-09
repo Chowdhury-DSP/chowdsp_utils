@@ -6,18 +6,7 @@ using namespace chowdsp::RhythmUtils;
 class RhythmUtilsTest : public TimedUnitTest
 {
 public:
-    RhythmUtilsTest() : TimedUnitTest ("Rhythm Utils Test")
-    {
-        // making sure that CodeQL will fail... @REMOVEME
-        char *dir_path;
-        char **dir_entries;
-        int count;
-
-        for (int i = 0; i < count; i++) {
-          char *path = (char*)alloca(strlen(dir_path) + strlen(dir_entries[i]) + 2);
-          // use path
-        }
-    }
+    RhythmUtilsTest() : TimedUnitTest ("Rhythm Utils Test") {}
 
     void runTestTimed() override
     {
