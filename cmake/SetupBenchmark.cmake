@@ -11,6 +11,7 @@ function(setup_benchmark target file)
         JUCE_USE_CURL=0
         JUCE_WEB_BROWSER=0
         JUCE_MODAL_LOOPS_PERMITTED=1
+        JUCE_STANDALONE_APPLICATION=1
     )
 
     target_link_libraries(${target} PRIVATE
@@ -40,7 +41,10 @@ function(setup_benchmark target file)
     endif()
 
     add_custom_command(TARGET ${target}
-                       POST_BUILD
-                       COMMAND ${CMAKE_COMMAND} -E echo "copying $<TARGET_FILE:${target}> to ${PROJECT_BINARY_DIR}/${target}"
-                       COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${target}> ${PROJECT_BINARY_DIR}/${target})
+        POST_BUILD
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        COMMAND ${CMAKE_COMMAND} -E echo "Copying $<TARGET_FILE:${target}> to bench-binary"
+        COMMAND ${CMAKE_COMMAND} -E make_directory bench-binary
+        COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:${target}>" bench-binary
+    )
 endfunction(setup_benchmark)

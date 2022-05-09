@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - ci-*
   pull_request:
     branches:
       - master
@@ -25,8 +24,9 @@ jobs:
                 "chowdsp_core_test chowdsp_json_test chowdsp_rhythm_test chowdsp_dsp_utils_test",
                 "chowdsp_dsp_data_structures_test chowdsp_reverb_test chowdsp_eq_test",
                 "chowdsp_math_test chowdsp_simd_test chowdsp_filters_test chowdsp_parameters_test",
-                "chowdsp_foleys_test chowdsp_gui_test chowdsp_presets_test",
-                "chowdsp_plugin_base_test chowdsp_plugin_utils_test chowdsp_version_test",
+                "chowdsp_foleys_test chowdsp_presets_test",
+                "chowdsp_plugin_utils_test chowdsp_version_test",
+                "chowdsp_gui_test chowdsp_plugin_base_test",
               ]
         name: [
                 "Test",
