@@ -90,7 +90,7 @@ jobs:
         run: sudo apt install lcov
 
       - name: Install lcov (Mac)
-        if: runner.os == 'MacOS # && ${{ matrix.run_coverage }} == true
+        if: runner.os == 'MacOS' # && ${{ matrix.run_coverage }} == true
         run: |
           export HOMEBREW_NO_AUTO_UPDATE=1
           brew install lcov
