@@ -86,11 +86,11 @@ jobs:
           sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
 
       - name: Install lcov (Linux)
-        if: ${{ matrix.run_coverage }} == true && runner.os == 'Linux'
+        if: matrix.run_coverage && runner.os == 'Linux'
         run: sudo apt install lcov
 
       - name: Install lcov (Mac)
-        if: ${{ matrix.run_coverage }} == true && runner.os == 'MacOS'
+        if: matrix.run_coverage && runner.os == 'MacOS'
         run: |
           export HOMEBREW_NO_AUTO_UPDATE=1
           brew install lcov
@@ -111,7 +111,7 @@ jobs:
           git clone --single-branch --branch chowdsp https://github.com/Chowdhury-DSP/foleys_gui_magic.git
 
       - name: Initialize CodeQL
-        if: ${{ matrix.run_codeql }}
+        if: matrix.run_codeql
         uses: github/codeql-action/init@v1
         with:
          source-root: ${{env.WORK_DIR}}
@@ -120,7 +120,7 @@ jobs:
       - name: Configure
         working-directory: ${{env.WORK_DIR}}
         env:
-          CMAKE_ARGS: ${{ matrix.cmake_args }}
+          CMAKE_ARGS: matrix.cmake_args
         shell: bash
         run: cmake -Bbuild -DCHOWDSP_ENABLE_TESTING=ON $CMAKE_ARGS
 
@@ -132,7 +132,7 @@ jobs:
         run: cmake --build . --config Release --parallel 4 --target $TEST_TARGETS
 
       - name: "Run Tests: ${{ matrix.tests }}"
-        if: ${{ matrix.run_codeql }} == false && ${{ matrix.is_arm }} == false
+        if: (! matrix.run_codeql) && (! matrix.is_arm)
         working-directory: ${{env.WORK_DIR}}/build/test-binary
         shell: bash
         run: |
@@ -142,7 +142,7 @@ jobs:
           done
 
       - name: Collect Coverage Data
-        if: ${{ matrix.run_coverage }}
+        if: matrix.run_coverage
         working-directory: ${{env.WORK_DIR}}
         shell: bash
         run: |
@@ -150,19 +150,19 @@ jobs:
           lcov --remove coverage.info '/usr/*' "${HOME}"'/.cache/*' '/Applications/Xcode*' '*JUCE/modules*' '*foleys_*' '*chowdsp_utils/tests*' '*third_party*' --output-file coverage.info
 
       - name: Report Coverage Data
-        if: ${{ matrix.run_coverage }}
+        if: matrix.run_coverage
         working-directory: ${{env.WORK_DIR}}
         shell: bash
         run: lcov --list coverage.info
 
       - name: Upload Coverage Data
-        if: ${{ matrix.run_coverage }}
+        if: matrix.run_coverage
         working-directory: ${{env.WORK_DIR}}
         shell: bash
         run: bash <(curl -s https://codecov.io/bash) -f coverage.info || echo "Codecov did not collect coverage reports"
 
       - name: Perform CodeQL Analysis
-        if: ${{ matrix.run_codeql }}
+        if: matrix.run_codeql
         uses: github/codeql-action/analyze@v1
 
       # - name: "Run Test: ${{ matrix.test }}"
