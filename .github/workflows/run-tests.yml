@@ -21,7 +21,17 @@ jobs:
     strategy:
       fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
       matrix:
-        test: [chowdsp_core_test, chowdsp_json_test]
+        test: [
+               chowdsp_core_test,
+               chowdsp_json_test,
+               chowdsp_dsp_data_structures_test,
+               chowdsp_dsp_utils_test,
+               chowdsp_eq_test,
+               chowdsp_filters_test,
+               chowdsp_math_test,
+               chowdsp_reverb_test,
+               chowdsp_simd_test
+              ]
         os: [ubuntu-latest, windows-2019, macos-latest]
         include:
           - name: "Test (Ubuntu)"
@@ -29,7 +39,6 @@ jobs:
             cmake_args: "-DCMAKE_BUILD_TYPE=Release"
           - name: "Test (Windows)"
             os: windows-2019
-            cmake_args: ""
           - name: "Test (Mac)"
             os: macos-latest
             cmake_args: "-DCMAKE_BUILD_TYPE=Release"
@@ -69,13 +78,19 @@ jobs:
         working-directory: ${{env.WORK_DIR}}/build
         shell: bash
         env:
-            TEST_TARGET: ${{ matrix.test }}
+          TEST_TARGET: ${{ matrix.test }}
         run: cmake --build . --config Release --parallel 4 --target $TEST_TARGET
 
       - name: "Run Test: ${{ matrix.test }}"
+        working-directory: ${{env.WORK_DIR}}/build/test-binary
         env:
-          TEST_BINARY: test-binary/${{ matrix.test }}
-        uses: GabrielBB/xvfb-action@v1
-        with:
-          run: ./$TEST_BINARY
-          working-directory: ${{env.WORK_DIR}}/build
+          TEST_BINARY: ${{ matrix.test }}
+        run: $TEST_BINARY
+
+      # - name: "Run Test: ${{ matrix.test }}"
+      #   env:
+      #     TEST_BINARY: ${{ matrix.test }}
+      #   uses: GabrielBB/xvfb-action@v1
+      #   with:
+      #     run: $TEST_BINARY
+      #     working-directory: ${{env.WORK_DIR}}/build/test-binary

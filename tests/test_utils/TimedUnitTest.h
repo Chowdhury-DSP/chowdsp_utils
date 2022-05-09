@@ -5,7 +5,7 @@
 class TimedUnitTest : public juce::UnitTest
 {
 public:
-    explicit TimedUnitTest (const juce::String& name, const juce::String& category = {}) : UnitTest (name, category)
+    explicit TimedUnitTest (const juce::String& _name, const juce::String& _category = {}) : UnitTest (_name, _category)
     {
     }
 
