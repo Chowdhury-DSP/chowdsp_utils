@@ -2,7 +2,7 @@
 #include <test_utils.h>
 #include <TimedUnitTest.h>
 #include <chowdsp_presets/chowdsp_presets.h>
-#include <BinaryData.h>
+#include "TestPresetBinaryData.h"
 
 using namespace test_utils;
 

@@ -1,6 +1,10 @@
 #include <benchmark/benchmark.h>
 
-#include <JuceHeader.h>
+#include <juce_dsp/juce_dsp.h>
+#include <chowdsp_simd/chowdsp_simd.h>
+#include <chowdsp_dsp_data_structures/chowdsp_dsp_data_structures.h>
+#include <chowdsp_math/chowdsp_math.h>
+
 #include "bench_utils.h"
 
 constexpr int N = 25000;

@@ -1,6 +1,6 @@
 #include <TimedUnitTest.h>
 #include <chowdsp_presets/chowdsp_presets.h>
-#include <BinaryData.h>
+#include "TestPresetBinaryData.h"
 
 class PresetTest : public TimedUnitTest
 {

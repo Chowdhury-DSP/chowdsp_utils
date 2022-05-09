@@ -5,6 +5,11 @@ include(SetupJuceTest)
 message(STATUS "Configuring tests for chowdsp_utils")
 
 # set up JUCE
+option(CHOWDSP_BUILD_LIVE_GUI_TEST "Build live GUI test app" OFF)
+if(NOT CHOWDSP_BUILD_LIVE_GUI_TEST)
+    message(STATUS "Live GUI test is not being built... skipping juceaide!")
+    set(JUCE_MODULES_ONLY ON CACHE INTERNAL "Only configure the JUCE modules")
+endif()
 add_subdirectory(${CMAKE_SOURCE_DIR}/../../JUCE JUCE)
 subproject_version(JUCE juce_version)
 message(STATUS "VERSION for JUCE: ${juce_version}")

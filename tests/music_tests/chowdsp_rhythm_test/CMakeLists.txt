@@ -1,4 +1,4 @@
-juce_add_console_app(chowdsp_rhythm_test)
+add_executable(chowdsp_rhythm_test)
 setup_juce_test(chowdsp_rhythm_test)
 
 target_link_libraries(chowdsp_rhythm_test PRIVATE
