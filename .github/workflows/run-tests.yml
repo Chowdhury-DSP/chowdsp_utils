@@ -16,7 +16,7 @@ env:
 
 jobs:
   build_and_test:
-    name: Run ${{ matrix.name }} ${{ matrix.test }} on ${{ matrix.os }}
+    name: "Run ${{ matrix.name }} ${{ matrix.tests }} on ${{ matrix.os }}"
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
@@ -88,7 +88,7 @@ jobs:
           git clone --single-branch --branch chowdsp https://github.com/Chowdhury-DSP/foleys_gui_magic.git
 
       - name: Initialize CodeQL
-        if: ${{ matrix.name }} == 'CodeQL'
+        if: ${{ matrix.name }} == CodeQL
         uses: github/codeql-action/init@v1
         with:
          source-root: ${{env.WORK_DIR}}
@@ -106,10 +106,10 @@ jobs:
         shell: bash
         env:
           TEST_TARGETS: ${{ matrix.tests }}
-        run: cmake --build . --config Release --parallel 4 --target $TEST_TARGETs
+        run: cmake --build . --config Release --parallel 4 --target $TEST_TARGETS
 
       - name: "Run Tests: ${{ matrix.tests }}"
-        if: ${{ matrix.name }} == 'Test'
+        if: ${{ matrix.name }} == Test
         working-directory: ${{env.WORK_DIR}}/build
         shell: bash
         run: |
@@ -119,7 +119,7 @@ jobs:
           done
 
       - name: Perform CodeQL Analysis
-        if: ${{ matrix.name }} == 'CodeQL'
+        if: ${{ matrix.name }} == CodeQL
         uses: github/codeql-action/analyze@v1
 
       # - name: "Run Test: ${{ matrix.test }}"
