@@ -31,19 +31,19 @@ jobs:
         name: [
                 "Test",
                 "Coverage",
+                "Test-ARM",
+                "CodeQL",
               ]
         os: [ubuntu-latest, windows-2019, macos-latest]
         include:
           - name: "Test"
             os: ubuntu-latest
-            cmake_args: "-DCMAKE_BUILD_TYPE=Debug"
-            run_codeql: ${{ github.event_name == 'push' }}
+            cmake_args: "-DCMAKE_BUILD_TYPE=Release"
           - name: "Test"
             os: windows-2019
           - name: "Test"
             os: macos-latest
-            cmake_args: "-GXcode -DCMAKE_OSX_ARCHITECTURES=arm64"
-            is_arm: true
+            cmake_args: "-DCMAKE_BUILD_TYPE=Release"
           - name: "Coverage"
             os: ubuntu-latest
             cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
@@ -52,6 +52,14 @@ jobs:
             os: macos-latest
             cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
             run_coverage: true
+          - name: "Test-ARM"
+            os: macos-latest
+            cmake_args: "-GXcode -DCMAKE_OSX_ARCHITECTURES=arm64"
+            is_arm: true
+          - name: "CodeQL"
+            os: ubuntu-latest
+            cmake_args: "-DCMAKE_BUILD_TYPE=Debug"
+            run_codeql: true
           - name: "Live GUI Test"
             os: ubuntu-latest
             tests: "live_gui_test"
@@ -60,6 +68,14 @@ jobs:
             run_coverage: true
         exclude:
           - name: "Coverage"
+            os: windows-2019
+          - name: "Test-ARM"
+            os: ubuntu-latest
+          - name: "Test-ARM"
+            os: windows-2019
+          - name: "CodeQL"
+            os: macos-latest
+          - name: "CodeQL"
             os: windows-2019
 
     steps:
