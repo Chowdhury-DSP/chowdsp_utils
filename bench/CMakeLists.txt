@@ -5,6 +5,7 @@ include(SetupBenchmark)
 message(STATUS "Configuring benchmarks for chowdsp_utils")
 
 # set up JUCE
+set(JUCE_MODULES_ONLY ON CACHE INTERNAL "Only configure the JUCE modules")
 add_subdirectory(${CMAKE_SOURCE_DIR}/../../JUCE JUCE)
 subproject_version(JUCE juce_version)
 message(STATUS "VERSION for JUCE: ${juce_version}")

@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - master
-      - develop
-      - benchmarks
   pull_request:
     branches:
       - master
@@ -16,8 +14,7 @@ env:
   WORK_DIR: ${{github.workspace}}/JUCE_modules/chowdsp_utils
 
 jobs:
-  build_and_test:
-    if: contains(toJson(github.event.commits), '***NO_CI***') == false && contains(toJson(github.event.commits), '[ci skip]') == false && contains(toJson(github.event.commits), '[skip ci]') == false
+  build_and_run:
     name: Run benchmarks on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -55,35 +52,22 @@ jobs:
           cd JUCE_modules
           git clone --single-branch --branch chowdsp https://github.com/Chowdhury-DSP/foleys_gui_magic.git
 
-      - name: ccache
-        if: runner.os == 'Linux' || runner.os == 'MacOS'
-        uses: hendrikmuhs/ccache-action@v1
-        with:
-          key: cmake_ctest-${{ matrix.os }}
-
       - name: Configure
         working-directory: ${{env.WORK_DIR}}
         env:
           CMAKE_ARGS: ${{ matrix.cmake_args }}
         shell: bash
-        run: cmake -Bbuild -DCHOWDSP_ENABLE_BENCHMARKS=ON -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache $CMAKE_ARGS
+        run: cmake -Bbuild -DCHOWDSP_ENABLE_BENCHMARKS=ON $CMAKE_ARGS
 
       - name: Build
         working-directory: ${{env.WORK_DIR}}/build
         shell: bash
         run: cmake --build . --config Release --parallel 4
 
-      - name: "Bench: Float Vector Operations"
-        working-directory: ${{env.WORK_DIR}}/build
+      - name: "Run Benchmarks"
+        working-directory: ${{env.WORK_DIR}}/build/bench-binary
         shell: bash
-        run: ./FloatVectorOperationsBench
-
-      - name: "Bench: Lookup Table"
-        working-directory: ${{env.WORK_DIR}}/build
-        shell: bash
-        run: ./LookupTableBench
-
-      - name: "Bench: Power Functions"
-        working-directory: ${{env.WORK_DIR}}/build
-        shell: bash
-        run: ./PowerBench
+        run: |
+          for exe in *; do
+            ./$exe;
+          done

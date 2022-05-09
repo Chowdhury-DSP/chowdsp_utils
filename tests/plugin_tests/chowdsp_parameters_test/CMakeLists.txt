@@ -1,4 +1,4 @@
-juce_add_console_app(chowdsp_parameters_test)
+add_executable(chowdsp_parameters_test)
 setup_juce_test(chowdsp_parameters_test)
 
 target_link_libraries(chowdsp_parameters_test PRIVATE
