@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
       matrix:
-        check: [clang_tidy, code_ql]
+        check: [clang_tidy]
 
     steps:
       - name: Install Linux Deps
@@ -48,13 +48,6 @@ jobs:
           cd JUCE_modules
           git clone --single-branch --branch chowdsp https://github.com/Chowdhury-DSP/foleys_gui_magic.git
 
-      - name: Initialize CodeQL
-        if: matrix.check == 'code_ql'
-        uses: github/codeql-action/init@v1
-        with:
-         source-root: ${{env.WORK_DIR}}
-         languages: cpp
-
       - name: Configure
         working-directory: ${{env.WORK_DIR}}
         shell: bash
@@ -65,13 +58,3 @@ jobs:
         working-directory: ${{env.WORK_DIR}}
         shell: bash
         run: cmake --build build --parallel 4 --target chowdsp_utils_clang_tidy
-
-      - name: Build CodeQL Target
-        if: matrix.check == 'code_ql'
-        working-directory: ${{env.WORK_DIR}}
-        shell: bash
-        run: cmake --build build --parallel 4 --target chowdsp_utils_codeql
-
-      - name: Perform CodeQL Analysis
-        if: matrix.check == 'code_ql'
-        uses: github/codeql-action/analyze@v1

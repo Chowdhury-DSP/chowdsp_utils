@@ -1,0 +1,50 @@
+name: Build ARM Mac
+
+on:
+  push:
+    branches:
+      - master
+      - "*simd*"
+
+  workflow_dispatch:
+
+env:
+  WORK_DIR: ${{github.workspace}}/JUCE_modules/chowdsp_utils
+
+jobs:
+  build:
+    name: "Build ${{ matrix.tests }} for ARM Mac"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
+      matrix:
+        tests: ["chowdsp_dsp_data_structures_test chowdsp_dsp_utils_test chowdsp_math_test chowdsp_simd_test chowdsp_eq_test chowdsp_filters_test chowdsp_reverb_test"]
+        os: [macos-latest]
+
+    steps:
+      - name: Get latest CMake
+        uses: lukka/get-cmake@latest
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          path: ${{env.WORK_DIR}}
+
+      - name: Set up environment
+        working-directory: ${{github.workspace}}
+        run: |
+          git clone --depth 1 --branch 6.1.6 https://github.com/juce-framework/JUCE.git
+          cd JUCE_modules
+          git clone --single-branch --branch chowdsp https://github.com/Chowdhury-DSP/foleys_gui_magic.git
+
+      - name: Configure
+        working-directory: ${{env.WORK_DIR}}
+        shell: bash
+        run: cmake -Bbuild -DCHOWDSP_ENABLE_TESTING=ON -GXcode -DCMAKE_OSX_ARCHITECTURES=arm64
+
+      - name: Build
+        working-directory: ${{env.WORK_DIR}}/build
+        shell: bash
+        env:
+          TEST_TARGETS: ${{ matrix.tests }}
+        run: cmake --build . --config Release --parallel 4 --target $TEST_TARGETS
