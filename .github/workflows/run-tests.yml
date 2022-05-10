@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - ci-*
   pull_request:
     branches:
       - master
@@ -125,7 +124,7 @@ jobs:
         run: cmake --build . --config Release --parallel 4 --target $TEST_TARGETS
 
       - name: "Run Tests: ${{ matrix.tests }}"
-        if: (! matrix.live_gui)
+        if: (! matrix.live_gui) && (! matrix.run_codeql)
         working-directory: ${{env.WORK_DIR}}/build/test-binary
         shell: bash
         run: |

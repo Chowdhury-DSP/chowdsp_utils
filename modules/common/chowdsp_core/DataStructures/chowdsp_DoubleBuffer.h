@@ -27,23 +27,10 @@ public:
     explicit DoubleBuffer (int initialSize, T initialValue = T (0))
     {
         resize (initialSize, initialValue);
-
-        // @REMOVEME: try to trigger CodeQL failure
-        float i = 0.0f;
-	    //wrong: float used as loop counter
-	    for (i = 0; i < 1000000.0f; i++) { //may execute 1000000 +x/-x times
-	    	//...
-	    }
-	    for (i = 0; i < 100000000.0f; i++) { //may never terminate, as rounding errors 
-	                                         //cancel out the addition of 1.0 once 
-	                                         //i becomes large enough
-	    	//...
-	    }
-        internal[0] = (T) i;
     }
 
     /** Returns the current size of the buffer */
-    int size() const noexcept { return (int) internal.size() / 2; } // @REMOVEME
+    [[nodiscard]] int size() const noexcept { return (int) internal.size() / 2; }
 
     /** Returns the current position of the buffer's write pointer */
     [[nodiscard]] int getWritePointer() const noexcept { return writePointer; }
