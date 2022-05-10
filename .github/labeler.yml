@@ -3,19 +3,16 @@
 # For more information, see https://github.com/actions/labeler
 
 dsp:
-  - modules/chowdsp_dsp/**/*
+  - modules/dsp/**/*
 
 gui:
-  - modules/chowdsp_gui/**/*
-
-wdf:
-  - modules/chowdsp_dsp/WDF/**/*
+  - modules/gui/**/*
 
 plugin-utils:
-  - modules/chowdsp_plugin_utils/**/*
+  - modules/plugin/**/*
 
 presets:
-  - modules/chowdsp_plugin_utils/Presets/**/*
+  - modules/presets/chowdsp_presets/**/*
 
 tests:
   - tests/**/*
