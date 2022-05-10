@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - ci-*
   pull_request:
     branches:
       - master
@@ -40,9 +41,6 @@ jobs:
             cmake_args: "-DCMAKE_BUILD_TYPE=Release"
           - name: "Test"
             os: windows-2019
-          - name: "Test"
-            os: macos-latest
-            cmake_args: "-DCMAKE_BUILD_TYPE=Release"
           - name: "Coverage"
             os: ubuntu-latest
             cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
@@ -62,6 +60,8 @@ jobs:
             live_gui: true
             run_coverage: true
         exclude:
+          - name: "Test" # so we don't break GitHub Actions concurrency limit
+            os: macos-latest
           - name: "Coverage"
             os: windows-2019
           - name: "CodeQL"
