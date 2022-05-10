@@ -24,18 +24,45 @@ add_subdirectory(plugin_tests)
 add_subdirectory(gui_tests)
 add_subdirectory(music_tests)
 
-option(CHOWDSP_RUN_CLANG_TIDY "Run clang-tidy on chowdsp modules" OFF)
-if(CHOWDSP_RUN_CLANG_TIDY)
-    message(STATUS "Configuring clang-tidy target")
+option(CHOWDSP_CODE_QUALITY_CHECKS "Configure code quality checks for chowdsp modules" OFF)
+if(CHOWDSP_CODE_QUALITY_CHECKS)
+    message(STATUS "Configuring clang-tidy target...")
     add_custom_target(chowdsp_utils_clang_tidy
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        COMMAND clang-tidy -p build "modules/dsp/chowdsp_dsp_data_structures/chowdsp_dsp_data_structures.cpp"
-        COMMAND clang-tidy -p build "modules/dsp/chowdsp_dsp_utils/chowdsp_dsp_utils.cpp"
-        COMMAND clang-tidy -p build "modules/dsp/chowdsp_math/chowdsp_math.cpp"
-        COMMAND clang-tidy -p build "modules/gui/chowdsp_gui/chowdsp_gui.cpp"
-        COMMAND clang-tidy -p build "modules/plugin/chowdsp_parameters/chowdsp_parameters.cpp"
-        COMMAND clang-tidy -p build "modules/plugin/chowdsp_plugin_utils/chowdsp_plugin_utils.cpp"
-        COMMAND clang-tidy -p build "modules/plugin/chowdsp_presets/chowdsp_presets.cpp"
-        COMMAND clang-tidy -p build "modules/plugin/chowdsp_version/chowdsp_version.cpp"
+        COMMAND clang-tidy -p build "tests/test_utils/CodeQuality.cpp"
+    )
+
+    message(STATUS "Configuring CodeQL target...")
+    add_library(chowdsp_utils_codeql)
+    target_sources(chowdsp_utils_codeql test_utils/CodeQuality.cpp)
+    target_compile_definitions(chowdsp_utils_codeql PRIVATE
+        JUCE_USE_CURL=0
+        JUCE_WEB_BROWSER=0
+        JUCE_MODAL_LOOPS_PERMITTED=1
+        JUCE_STANDALONE_APPLICATION=0
+    )
+
+    target_link_libraries(chowdsp_utils_codeql PRIVATE
+        juce::juce_dsp
+        chowdsp_core
+        chowdsp_json
+        chowdsp_reflection
+        chowdsp_dsp_data_structures
+        chowdsp_dsp_utils
+        chowdsp_eq
+        chowdsp_filters
+        chowdsp_math
+        chowdsp_reverb
+        chowdsp_simd
+        chowdsp_gui
+        chowdsp_rhythm
+        chowdsp_parameters
+        chowdsp_plugin_base
+        chowdsp_plugins_utils
+        chowdsp_presets
+        chowdsp_version
+        juce::juce_recommended_config_flags
+        juce::juce_recommended_lto_flags
+        juce::juce_recommended_warning_flags
     )
 endif()
