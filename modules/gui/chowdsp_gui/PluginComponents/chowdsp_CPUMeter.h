@@ -7,7 +7,7 @@ class CPUMeter : public juce::Component,
                  private juce::Timer
 {
 public:
-    explicit CPUMeter (juce::AudioProcessLoadMeasurer& loadMeasurer);
+    explicit CPUMeter (const juce::AudioProcessLoadMeasurer& loadMeasurer);
     ~CPUMeter() override;
 
     void colourChanged() override;
@@ -20,7 +20,7 @@ private:
     juce::ProgressBar progress { loadProportion };
     juce::dsp::BallisticsFilter<double> smoother;
 
-    juce::AudioProcessLoadMeasurer& loadMeasurer;
+    const juce::AudioProcessLoadMeasurer& loadMeasurer;
 
     std::unique_ptr<juce::LookAndFeel> cpuMeterLNF;
 
