@@ -39,7 +39,7 @@ public:
     }
 };
 
-CPUMeter::CPUMeter (juce::AudioProcessLoadMeasurer& lm) : loadMeasurer (lm)
+CPUMeter::CPUMeter (const juce::AudioProcessLoadMeasurer& lm) : loadMeasurer (lm)
 {
     cpuMeterLNF = std::make_unique<CPUMeterLNF>();
     setLookAndFeel (cpuMeterLNF.get());
