@@ -60,8 +60,7 @@ public:
 
         std::atomic<bool> thread1Finished { false };
         juce::Thread::launch (
-            [&]
-            {
+            [&] {
                 chowdsp::AtomicRef xFreq { x };
                 for (int i = 0; i < 100000; ++i)
                 {
@@ -74,8 +73,7 @@ public:
 
         std::atomic<bool> thread2Finished { false };
         juce::Thread::launch (
-            [&]
-            {
+            [&] {
                 chowdsp::AtomicRef xFreq { std::as_const (x) };
                 while (xFreq.load() < 90000.0f)
                 {
