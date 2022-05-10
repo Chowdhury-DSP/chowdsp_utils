@@ -58,7 +58,7 @@ if(CHOWDSP_CODE_QUALITY_CHECKS)
         chowdsp_rhythm
         chowdsp_parameters
         chowdsp_plugin_base
-        chowdsp_plugins_utils
+        chowdsp_plugin_utils
         chowdsp_presets
         chowdsp_version
         juce::juce_recommended_config_flags

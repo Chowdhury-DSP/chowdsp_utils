@@ -13,6 +13,6 @@
 #include <chowdsp_rhythm/chowdsp_rhythm.h>
 #include <chowdsp_parameters/chowdsp_parameters.h>
 #include <chowdsp_plugin_base/chowdsp_plugin_base.h>
-#include <chowdsp_plugins_utils/chowdsp_plugins_utils.h>
+#include <chowdsp_plugin_utils/chowdsp_plugin_utils.h>
 #include <chowdsp_presets/chowdsp_presets.h>
 #include <chowdsp_version/chowdsp_version.h>
