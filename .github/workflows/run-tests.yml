@@ -31,7 +31,6 @@ jobs:
         name: [
                 "Test",
                 "Coverage",
-                "Test-ARM",
                 "CodeQL",
               ]
         os: [ubuntu-latest, windows-2019, macos-latest]
@@ -41,9 +40,6 @@ jobs:
             cmake_args: "-DCMAKE_BUILD_TYPE=Release"
           - name: "Test"
             os: windows-2019
-          - name: "Test"
-            os: macos-latest
-            cmake_args: "-DCMAKE_BUILD_TYPE=Release"
           - name: "Coverage"
             os: ubuntu-latest
             cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
@@ -51,12 +47,7 @@ jobs:
           - name: "Coverage"
             os: macos-latest
             cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
-            run_coverage: true
-          - name: "Test-ARM"
-            os: macos-latest
-            tests: "chowdsp_simd_test chowdsp_math_test chowdsp_dsp_utils_test"
-            cmake_args: "-GXcode -DCMAKE_OSX_ARCHITECTURES=arm64"
-            is_arm: true
+            run_coverage: true"
           - name: "CodeQL"
             os: ubuntu-latest
             cmake_args: "-DCMAKE_BUILD_TYPE=Debug"
@@ -68,11 +59,9 @@ jobs:
             live_gui: true
             run_coverage: true
         exclude:
+          - name: "Test" # so we don't break GitHub Actions concurrency limit
+            os: macos-latest
           - name: "Coverage"
-            os: windows-2019
-          - name: "Test-ARM"
-            os: ubuntu-latest
-          - name: "Test-ARM"
             os: windows-2019
           - name: "CodeQL"
             os: macos-latest
@@ -135,7 +124,7 @@ jobs:
         run: cmake --build . --config Release --parallel 4 --target $TEST_TARGETS
 
       - name: "Run Tests: ${{ matrix.tests }}"
-        if: (! matrix.live_gui) && (! matrix.is_arm)
+        if: (! matrix.live_gui) && (! matrix.run_codeql)
         working-directory: ${{env.WORK_DIR}}/build/test-binary
         shell: bash
         run: |

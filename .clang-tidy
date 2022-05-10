@@ -1,4 +1,4 @@
-HeaderFilterRegex: '.*chowdsp_utils/modules/chowdsp_.*chowdsp_).*'
+HeaderFilterRegex: '.*chowdsp_utils/modules/.*/chowdsp_.*chowdsp_.*'
 WarningsAsErrors: '*'
 Checks: '-*,
 bugprone-argument-comment,

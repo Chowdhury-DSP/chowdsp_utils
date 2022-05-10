@@ -21,7 +21,7 @@ struct BaseProgramAdapter
 class PresetsProgramAdapter : public BaseProgramAdapter
 {
 public:
-    PresetsProgramAdapter (std::unique_ptr<PresetManager>& manager) : presetManager (manager) {}
+    explicit PresetsProgramAdapter (std::unique_ptr<PresetManager>& manager) : presetManager (manager) {}
 
     int getNumPrograms() override
     {

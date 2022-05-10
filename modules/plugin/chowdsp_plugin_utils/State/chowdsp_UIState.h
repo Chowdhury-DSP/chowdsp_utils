@@ -13,7 +13,7 @@ public:
     void attachToComponent (juce::AudioProcessorEditor& comp);
 
     /** Returns the previous editor size */
-    juce::Rectangle<int> getLastEditorSize() const;
+    [[nodiscard]] juce::Rectangle<int> getLastEditorSize() const;
 
 private:
     void componentBeingDeleted (juce::Component& component) override;

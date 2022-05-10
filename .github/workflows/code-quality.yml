@@ -1,0 +1,59 @@
+name: Code-Quality
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+  workflow_dispatch:
+
+env:
+  WORK_DIR: ${{github.workspace}}/JUCE_modules/chowdsp_utils
+
+jobs:
+  code_quality_checks:
+    name: Run Code Quality Check ${{ matrix.check }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
+      matrix:
+        check: [clang_tidy]
+
+    steps:
+      - name: Install Linux Deps
+        run: |
+          sudo apt-get update
+          sudo apt install libasound2-dev libcurl4-openssl-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev libsamplerate-dev
+
+      - name: Install clang-tidy
+        if: matrix.check == 'clang_tidy'
+        run: sudo apt install clang-tidy
+
+      - name: Get latest CMake
+        uses: lukka/get-cmake@latest
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          path: ${{env.WORK_DIR}}
+
+      - name: Set up environment
+        working-directory: ${{github.workspace}}
+        run: |
+          git clone --depth 1 --branch 6.1.6 https://github.com/juce-framework/JUCE.git
+          cd JUCE_modules
+          git clone --single-branch --branch chowdsp https://github.com/Chowdhury-DSP/foleys_gui_magic.git
+
+      - name: Configure
+        working-directory: ${{env.WORK_DIR}}
+        shell: bash
+        run: cmake -Bbuild -DCHOWDSP_ENABLE_TESTING=ON -DCHOWDSP_CODE_QUALITY_CHECKS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug
+
+      - name: Run clang-tidy
+        if: matrix.check == 'clang_tidy'
+        working-directory: ${{env.WORK_DIR}}
+        shell: bash
+        run: cmake --build build --parallel 4 --target chowdsp_utils_clang_tidy
