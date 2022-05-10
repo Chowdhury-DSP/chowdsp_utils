@@ -1,0 +1,65 @@
+#pragma once
+
+namespace chowdsp
+{
+namespace AtomicHelpers
+{
+    /** Simplified wrapped of std::atomic<T>::compare_exchange_strong */
+    template <typename T, typename atomic_type = std::atomic<T>>
+    bool compareExchange (atomic_type& atomic_val, T compareVal, T valToSetIfTrue) noexcept
+    {
+        return atomic_val.compare_exchange_strong (compareVal, valToSetIfTrue);
+    }
+
+    /** Simplified version of compareExchange for boolean types */
+    template <typename T = bool, typename atomic_type = std::atomic<T>>
+    bool compareNegate (atomic_type& atomic_val, T compareVal = (T) true) noexcept
+    {
+        return compareExchange (atomic_val, compareVal, ! compareVal);
+    }
+} // namespace AtomicHelpers
+
+/**
+ * std::atomic_ref was introduced in C++20, but for simple atomic types
+ * this implementation should work okay.
+ */
+template <typename T>
+struct AtomicRef
+{
+    static constexpr auto is_non_const = ! std::is_const_v<T>;
+    using atomic_type = std::conditional_t<is_non_const, std::atomic<T>, const std::atomic<std::remove_const_t<T>>>;
+
+    static_assert (atomic_type::is_always_lock_free, "Base atomic type must be lock free.");
+    static_assert (sizeof (T) == sizeof (atomic_type), "Incompatible layout.");
+    static_assert (alignof (T) == alignof (atomic_type), "Incompatible layout.");
+
+    explicit AtomicRef (T& val) : atomic_val (reinterpret_cast<atomic_type&> (val)) {}
+
+    /** Performs std::atomic<T>::store */
+    template <bool non_const = is_non_const>
+    inline std::enable_if_t<non_const, void>
+        store (T val)
+    {
+        atomic_val.store (val);
+    }
+
+    /** Performs std::atomic<T>::load */
+    inline T load() const
+    {
+        return atomic_val.load();
+    }
+
+    /** Performs std::atomic<T>::compare_exchange_strong */
+    template <bool non_const = is_non_const>
+    inline std::enable_if_t<non_const, bool>
+        compare_exchange_strong (T& expected, T desired)
+    {
+        return atomic_val.compare_exchange_strong (expected, desired);
+    }
+
+private:
+    atomic_type& atomic_val;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AtomicRef)
+};
+} // namespace chowdsp
