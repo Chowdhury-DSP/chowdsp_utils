@@ -16,3 +16,6 @@
 #include <chowdsp_plugin_utils/chowdsp_plugin_utils.h>
 #include <chowdsp_presets/chowdsp_presets.h>
 #include <chowdsp_version/chowdsp_version.h>
+
+// Declare template classes so they get compiled
+template class chowdsp::DoubleBuffer<float>;
