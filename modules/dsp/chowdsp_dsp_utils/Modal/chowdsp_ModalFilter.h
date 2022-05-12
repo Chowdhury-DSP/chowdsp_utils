@@ -94,7 +94,7 @@ template <typename FloatType>
 class ModalFilter<juce::dsp::SIMDRegister<FloatType>>
 {
     using VType = juce::dsp::SIMDRegister<FloatType>;
-    using CType = SIMDUtils::SIMDComplex<FloatType>;
+    using CType = xsimd::batch<std::complex<FloatType>>;
 
 public:
     ModalFilter() = default;
@@ -105,11 +105,14 @@ public:
     /** reset filter state */
     virtual inline void reset() noexcept { y1 = CType { (FloatType) 0, (FloatType) 0 }; }
 
-    /** Sets the complex amplitude of the filter */
-    virtual inline void setAmp (VType amp) noexcept { amplitude = amp; }
+    /** Sets the scalar amplitude of the filter */
+    virtual inline void setAmp (VType amp) noexcept { amplitude = CType { xsimd::batch<FloatType> (amp.value), xsimd::batch ((FloatType) 0) }; }
+
+    /** Sets the scalar amplitude of the filter */
+    virtual inline void setAmp (CType amp) noexcept { amplitude = amp; }
 
     /** Sets the amplitude and phase of the filter */
-    virtual inline void setAmp (VType amp, VType phase) noexcept { amplitude = CType::polar (amp, phase); }
+    virtual inline void setAmp (VType amp, VType phase) noexcept { amplitude = SIMDUtils::polar (amp, phase); }
 
     /** Sets the decay characteristic of the filter, in units of T60 */
     virtual inline void setDecay (VType newT60) noexcept
@@ -133,16 +136,16 @@ public:
     /** Process a single sample */
     virtual inline VType processSample (VType x)
     {
-        auto y = filtCoef * y1 + amplitude * x;
+        auto y = filtCoef * y1 + amplitude * xsimd::batch<FloatType> (x.value);
         y1 = y;
-        return y.imag();
+        return juce::dsp::SIMDRegister<FloatType> (y.imag());
     }
 
     /** Process a block of samples */
     virtual void processBlock (VType* buffer, const int numSamples);
 
 protected:
-    inline void updateParams() noexcept { filtCoef = decayFactor * oscCoef; }
+    inline void updateParams() noexcept { filtCoef = xsimd::batch<FloatType> (decayFactor.value) * oscCoef; }
 
     inline VType calcDecayFactor() noexcept
     {
@@ -153,7 +156,7 @@ protected:
     inline CType calcOscCoef() noexcept
     {
         using namespace SIMDUtils;
-        return CType::exp ((freq / fs) * juce::MathConstants<FloatType>::twoPi);
+        return SIMDUtils::polar ((freq / fs) * juce::MathConstants<FloatType>::twoPi);
     }
 
     CType filtCoef { (FloatType) 0, (FloatType) 0 };
