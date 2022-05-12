@@ -10,7 +10,6 @@ target_sources(chowdsp_simd_test PRIVATE
     ${CMAKE_SOURCE_DIR}/tests/test_utils/TestRunner.cpp
 
     SIMDArithmeticTest.cpp
-    SIMDComplexTest.cpp
     SIMDFastMathTest.cpp
     SIMDLogicTest.cpp
     SIMDSmoothedValueTest.cpp
