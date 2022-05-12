@@ -95,11 +95,11 @@ public:
 
     inline void process (float u) noexcept
     {
-        x = pole_corr * x + Complex4 (u, 0.0f);
+        x = pole_corr * x + Complex4 { SIMDScalar<T> (u), SIMDScalar<T> (0) };
     }
 
     Complex4 x {};
-    Complex4 Gcalc { (T) 1, (T) 0 };
+    Complex4 Gcalc { SIMDScalar<T> (1), SIMDScalar<T> (0) };
 
 private:
     Complex4 roots {};
@@ -150,7 +150,7 @@ public:
     inline void process (Complex4 u) noexcept { x = pole_corr * x + u; }
 
     Complex4 x {};
-    Complex4 Gcalc { 1.0f, 0.0f };
+    Complex4 Gcalc { SIMDScalar<T> (1), SIMDScalar<T> (0) };
 
 private:
     Complex4 gCoef {};
