@@ -126,6 +126,25 @@ public:
         expectWithinAbsoluteError (mag, (NumericType) -60.0f, (NumericType) 1.0f, "Incorrect decay time.");
     }
 
+    void initialPhaseTest()
+    {
+        static constexpr auto initialPhase = (NumericType) 0.5f;
+
+        chowdsp::ModalFilter<T> filter;
+        filter.prepare ((NumericType) fs);
+        filter.setAmp ((T) 1.0f, initialPhase);
+        filter.setDecay ((T) 0.5f);
+        filter.setFreq ((T) 100.0f);
+
+        const auto actual = filter.processSample ((T) 1);
+        const auto expected = std::sin (initialPhase);
+
+        if constexpr (chowdsp::SIMDUtils::IsSIMDRegister<T>)
+            expect (chowdsp::SIMDUtils::all (T::equal (actual, expected)), "Incorrect initial phase!");
+        else
+            expectEquals (actual, expected, "Incorrect initial phase");
+    }
+
     void runTestTimed() override
     {
         beginTest ("Resonant Frequency Sine Test");
@@ -136,6 +155,9 @@ public:
 
         beginTest ("Decay Time Test");
         decayTimeTest();
+
+        beginTest ("Initial Phase Test");
+        initialPhaseTest();
     }
 };
 

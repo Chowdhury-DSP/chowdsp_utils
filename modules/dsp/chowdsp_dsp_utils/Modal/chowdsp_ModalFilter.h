@@ -103,7 +103,7 @@ public:
     virtual void prepare (FloatType sampleRate);
 
     /** reset filter state */
-    virtual inline void reset() noexcept { y1 = CType { (FloatType) 0, (FloatType) 0 }; }
+    virtual inline void reset() noexcept { y1 = CType {}; }
 
     /** Sets the scalar amplitude of the filter */
     virtual inline void setAmp (VType amp) noexcept { amplitude = CType { xsimd::batch<FloatType> (amp.value), xsimd::batch ((FloatType) 0) }; }
@@ -159,11 +159,11 @@ protected:
         return SIMDUtils::polar ((freq / fs) * juce::MathConstants<FloatType>::twoPi);
     }
 
-    CType filtCoef { (FloatType) 0, (FloatType) 0 };
+    CType filtCoef {};
     VType decayFactor = 0;
-    CType oscCoef { (FloatType) 0, (FloatType) 0 };
+    CType oscCoef {};
 
-    CType y1 = { (FloatType) 0, (FloatType) 0 }; // filter state
+    CType y1 = {}; // filter state
 
     VType freq = 1;
     VType t60 = 1;

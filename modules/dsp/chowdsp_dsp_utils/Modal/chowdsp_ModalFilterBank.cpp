@@ -61,15 +61,6 @@ void ModalFilterBank<maxNumModes, SampleType>::setModeAmplitudesInternal()
             modeAmps[j] = modeIndex < numModesToProcess ? amplitudeData[modeIndex] * amplitudeNormalizationFactor : (SampleType) 0;
         },
         [&] (auto& mode) { mode.setAmp (xsimd::load_aligned (modeAmps)); });
-
-//    SampleType modeAmps alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[vecSize] {};
-//    SampleType modePhases alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[vecSize] {};
-//    doForModes (
-//        [&] (size_t j, size_t modeIndex) {
-//            modeAmps[j] = modeIndex < numModesToProcess ? std::abs (amplitudeData[modeIndex]) * amplitudeNormalizationFactor : (SampleType) 0;
-//            modePhases[j] = modeIndex < numModesToProcess ? std::arg (amplitudeData[modeIndex]) : (SampleType) 0;
-//        },
-//        [&] (auto& mode) { mode.setAmp (Vec::fromRawArray (modeAmps), Vec::fromRawArray (modePhases)); });
 }
 
 template <size_t maxNumModes, typename SampleType>
