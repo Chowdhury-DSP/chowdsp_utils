@@ -13,6 +13,14 @@ struct ElementType
 };
 
 template <typename T>
+struct ElementType<xsimd::batch<T>, false>
+{
+    using batch_type = xsimd::batch<T>;
+    using Type = typename batch_type::value_type;
+    static constexpr int Size = (int) batch_type::size;
+};
+
+template <typename T>
 struct ElementType<T, false>
 {
     using Type = typename T::value_type;

@@ -117,7 +117,7 @@ public:
     inline std::enable_if_t<! A, float>
         process (float u) noexcept
     {
-        SIMDComplex<float> xOutAccum;
+        SIMDComplex<float> xOutAccum {};
         float yBBD, delta;
         while (tn < Ts)
         {
