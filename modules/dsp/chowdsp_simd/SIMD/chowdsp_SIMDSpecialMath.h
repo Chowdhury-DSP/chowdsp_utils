@@ -279,7 +279,7 @@ inline juce::dsp::SIMDRegister<double>::vMaskType isnanSIMD (juce::dsp::SIMDRegi
 
 /** Returns the maximum value from the SIMD register */
 template <typename T>
-inline T hMaxSIMD (juce::dsp::SIMDRegister<T> x)
+[[deprecated]] inline T hMaxSIMD (juce::dsp::SIMDRegister<T> x)
 {
     constexpr auto vecSize = juce::dsp::SIMDRegister<T>::size();
     T v alignas (CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[vecSize];
@@ -311,7 +311,7 @@ inline T hMaxSIMD (const xsimd::batch<T>& x)
 
 /** Returns the minimum value from the SIMD register */
 template <typename T>
-inline T hMinSIMD (juce::dsp::SIMDRegister<T> x)
+[[deprecated]] inline T hMinSIMD (juce::dsp::SIMDRegister<T> x)
 {
     constexpr auto vecSize = juce::dsp::SIMDRegister<T>::size();
     T v alignas (CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[vecSize];
@@ -343,8 +343,15 @@ inline T hMinSIMD (const xsimd::batch<T>& x)
 
 /** Returns the maximum absolute value from the SIMD register */
 template <typename T>
-inline T hAbsMaxSIMD (juce::dsp::SIMDRegister<T> x)
+[[deprecated]] inline T hAbsMaxSIMD (juce::dsp::SIMDRegister<T> x)
 {
     return hMaxSIMD (juce::dsp::SIMDRegister<T>::abs (x));
+}
+
+/** Returns the maximum absolute value from the SIMD register */
+template <typename T>
+inline T hAbsMaxSIMD (const xsimd::batch<T>& x)
+{
+    return hMaxSIMD (xsimd::abs (x));
 }
 } // namespace chowdsp::SIMDUtils

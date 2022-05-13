@@ -118,12 +118,12 @@ public:
 
         for (int i = 0; i < nIter; ++i)
         {
-            using Vec = juce::dsp::SIMDRegister<T>;
-            std::vector<T> vecData (Vec::size(), (T) 0);
+            using Vec = xsimd::batch<T>;
+            std::vector<T> vecData (Vec::size, (T) 0);
             for (auto& v : vecData)
                 v = (T) (r.nextFloat() * 2.0f - 1.0f);
 
-            auto vec = loadUnaligned (vecData.data());
+            auto vec = xsimd::load_unaligned (vecData.data());
             expectEquals (hMinSIMD (vec), refMin (vecData), "Incorrect minimum value!");
             expectEquals (hMaxSIMD (vec), refMax (vecData), "Incorrect maximum value!");
             expectEquals (hAbsMaxSIMD (vec), refAbsMax (vecData), "Incorrect absolute maximum value!");
