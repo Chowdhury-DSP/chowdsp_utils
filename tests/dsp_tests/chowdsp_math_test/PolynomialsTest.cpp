@@ -34,10 +34,10 @@ public:
     template <typename T>
     void checkError (xsimd::batch<T> actual, xsimd::batch<T> exp, const juce::String& message)
     {
-        T actualData alignas (xsimd::default_arch::alignment())[xsimd::batch<T>::size]{};
+        T actualData alignas (xsimd::default_arch::alignment())[xsimd::batch<T>::size] {};
         xsimd::store_aligned (actualData, actual);
 
-        T expData alignas (xsimd::default_arch::alignment())[xsimd::batch<T>::size]{};
+        T expData alignas (xsimd::default_arch::alignment())[xsimd::batch<T>::size] {};
         xsimd::store_aligned (expData, exp);
 
         checkError (actualData[0], expData[0], message);

@@ -56,8 +56,7 @@ bool BypassProcessor<SampleType, DelayInterpType>::processBlockIn (const chowdsp
         Toss,
     };
 
-    auto doDelayOp = [] (auto& sampleBuffer, auto& delay, DelayOp op)
-    {
+    auto doDelayOp = [] (auto& sampleBuffer, auto& delay, DelayOp op) {
         if (delay.getDelay() == SampleType (0))
             return;
 
@@ -117,8 +116,7 @@ void BypassProcessor<SampleType, DelayInterpType>::processBlockOut (juce::AudioB
 template <typename SampleType, typename DelayInterpType>
 void BypassProcessor<SampleType, DelayInterpType>::processBlockOut (chowdsp::AudioBlock<SampleType>& block, bool onOffParam)
 {
-    auto fadeOutputBuffer = [onOffParam] (auto* blockPtr, const auto* fadePtr, const int startSample, const int numSamples)
-    {
+    auto fadeOutputBuffer = [onOffParam] (auto* blockPtr, const auto* fadePtr, const int startSample, const int numSamples) {
         SampleType startGain = ! onOffParam ? static_cast<SampleType> (1) // fade out
                                             : static_cast<SampleType> (0); // fade in
         SampleType endGain = static_cast<SampleType> (1) - startGain;

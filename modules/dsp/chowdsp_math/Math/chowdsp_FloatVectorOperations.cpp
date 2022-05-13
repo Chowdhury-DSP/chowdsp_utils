@@ -60,17 +60,13 @@ namespace detail
     template <typename T, typename ScalarOp, typename VecOp>
     void unaryOp (T* dest, const T* src, int numValues, ScalarOp&& scalarOp, VecOp&& vecOp)
     {
-        auto loadA = [] (const auto* ptr)
-        { return xsimd::load_aligned (ptr); };
+        auto loadA = [] (const auto* ptr) { return xsimd::load_aligned (ptr); };
 
-        auto loadU = [] (const auto* ptr)
-        { return xsimd::load_unaligned (ptr); };
+        auto loadU = [] (const auto* ptr) { return xsimd::load_unaligned (ptr); };
 
-        auto storeA = [] (auto* ptr, const auto& reg)
-        { xsimd::store_aligned (ptr, reg); };
+        auto storeA = [] (auto* ptr, const auto& reg) { xsimd::store_aligned (ptr, reg); };
 
-        auto storeU = [] (auto* ptr, const auto& reg)
-        { xsimd::store_unaligned (ptr, reg); };
+        auto storeU = [] (auto* ptr, const auto& reg) { xsimd::store_unaligned (ptr, reg); };
 
         if (isAligned (dest))
         {
@@ -132,17 +128,13 @@ namespace detail
     template <typename T, typename ScalarOp, typename VecOp>
     void binaryOp (T* dest, const T* src1, const T* src2, int numValues, ScalarOp&& scalarOp, VecOp&& vecOp)
     {
-        auto loadA = [] (const auto* ptr)
-        { return xsimd::load_aligned (ptr); };
+        auto loadA = [] (const auto* ptr) { return xsimd::load_aligned (ptr); };
 
-        auto loadU = [] (const auto* ptr)
-        { return xsimd::load_unaligned (ptr); };
+        auto loadU = [] (const auto* ptr) { return xsimd::load_unaligned (ptr); };
 
-        auto storeA = [] (auto* ptr, const auto& reg)
-        { xsimd::store_aligned (ptr, reg); };
+        auto storeA = [] (auto* ptr, const auto& reg) { xsimd::store_aligned (ptr, reg); };
 
-        auto storeU = [] (auto* ptr, const auto& reg)
-        { xsimd::store_unaligned (ptr, reg); };
+        auto storeU = [] (auto* ptr, const auto& reg) { xsimd::store_unaligned (ptr, reg); };
 
         if (isAligned (dest))
         {
@@ -550,10 +542,8 @@ void integerPowerT (T* dest, const T* src, int exponent, int numValues) noexcept
                 dest,
                 src,
                 numValues,
-                [exponent] (auto x)
-                { return std::pow (x, (T) exponent); },
-                [exponent] (auto x)
-                { return xsimd::pow (x, xsimd::batch<T> ((T) exponent)); });
+                [exponent] (auto x) { return std::pow (x, (T) exponent); },
+                [exponent] (auto x) { return xsimd::pow (x, xsimd::batch<T> ((T) exponent)); });
             break;
     }
 }

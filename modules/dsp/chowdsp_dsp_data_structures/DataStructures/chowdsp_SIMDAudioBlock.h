@@ -979,46 +979,46 @@ using AudioBlock = std::conditional_t<SampleTypeHelpers::IsSIMDRegister<std::rem
 */
 template <typename ContextSampleType>
 struct ProcessContextReplacing
-    {
-    public:
-        /** The type of a single sample (which may be a vector if multichannel). */
-        using SampleType     = ContextSampleType;
-        /** The type of audio block that this context handles. */
-        using AudioBlockType = AudioBlock<SampleType>;
-        using ConstAudioBlockType = AudioBlock<const SampleType>;
+{
+public:
+    /** The type of a single sample (which may be a vector if multichannel). */
+    using SampleType = ContextSampleType;
+    /** The type of audio block that this context handles. */
+    using AudioBlockType = AudioBlock<SampleType>;
+    using ConstAudioBlockType = AudioBlock<const SampleType>;
 
-        /** Creates a ProcessContextReplacing that uses the given audio block.
+    /** Creates a ProcessContextReplacing that uses the given audio block.
         Note that the caller must not delete the block while it is still in use by this object!
     */
-        explicit ProcessContextReplacing (AudioBlockType& block) noexcept : ioBlock (block) {}
+    explicit ProcessContextReplacing (AudioBlockType& block) noexcept : ioBlock (block) {}
 
-        ProcessContextReplacing (const ProcessContextReplacing&) = default;
-        ProcessContextReplacing (ProcessContextReplacing&&) noexcept = default;
+    ProcessContextReplacing (const ProcessContextReplacing&) = default;
+    ProcessContextReplacing (ProcessContextReplacing&&) noexcept = default;
 
-        /** Returns the audio block to use as the input to a process function. */
-        const ConstAudioBlockType& getInputBlock() const noexcept   { return constBlock; }
+    /** Returns the audio block to use as the input to a process function. */
+    const ConstAudioBlockType& getInputBlock() const noexcept { return constBlock; }
 
-        /** Returns the audio block to use as the output to a process function. */
-        AudioBlockType& getOutputBlock() const noexcept             { return ioBlock; }
+    /** Returns the audio block to use as the output to a process function. */
+    AudioBlockType& getOutputBlock() const noexcept { return ioBlock; }
 
-        /** All process context classes will define this constant method so that templated
+    /** All process context classes will define this constant method so that templated
         code can determine whether the input and output blocks refer to the same buffer,
         or to two different ones.
     */
-        static constexpr bool usesSeparateInputAndOutputBlocks()    { return false; }
+    static constexpr bool usesSeparateInputAndOutputBlocks() { return false; }
 
-        /** If set to true, then a processor's process() method is expected to do whatever
+    /** If set to true, then a processor's process() method is expected to do whatever
         is appropriate for it to be in a bypassed state.
     */
-        bool isBypassed = false;
+    bool isBypassed = false;
 
-    private:
-        AudioBlockType& ioBlock;
-        ConstAudioBlockType constBlock { ioBlock };
-    };
+private:
+    AudioBlockType& ioBlock;
+    ConstAudioBlockType constBlock { ioBlock };
+};
 
-    //==============================================================================
-    /**
+//==============================================================================
+/**
     Contains context information that is passed into an algorithm's process method.
 
     This context is intended for use in situations where two different blocks are being
@@ -1030,49 +1030,49 @@ struct ProcessContextReplacing
 
     @tags{DSP}
 */
-    template <typename ContextSampleType>
-    struct ProcessContextNonReplacing
-    {
-    public:
-        /** The type of a single sample (which may be a vector if multichannel). */
-        using SampleType     = ContextSampleType;
-        /** The type of audio block that this context handles. */
-        using AudioBlockType = AudioBlock<SampleType>;
-        using ConstAudioBlockType = AudioBlock<const SampleType>;
+template <typename ContextSampleType>
+struct ProcessContextNonReplacing
+{
+public:
+    /** The type of a single sample (which may be a vector if multichannel). */
+    using SampleType = ContextSampleType;
+    /** The type of audio block that this context handles. */
+    using AudioBlockType = AudioBlock<SampleType>;
+    using ConstAudioBlockType = AudioBlock<const SampleType>;
 
-        /** Creates a ProcessContextNonReplacing that uses the given input and output blocks.
+    /** Creates a ProcessContextNonReplacing that uses the given input and output blocks.
         Note that the caller must not delete these blocks while they are still in use by this object!
     */
-        ProcessContextNonReplacing (const ConstAudioBlockType& input, AudioBlockType& output) noexcept
-            : inputBlock (input), outputBlock (output)
-        {
-            // If the input and output blocks are the same then you should use
-            // ProcessContextReplacing instead.
-            jassert (input != output);
-        }
+    ProcessContextNonReplacing (const ConstAudioBlockType& input, AudioBlockType& output) noexcept
+        : inputBlock (input), outputBlock (output)
+    {
+        // If the input and output blocks are the same then you should use
+        // ProcessContextReplacing instead.
+        jassert (input != output);
+    }
 
-        ProcessContextNonReplacing (const ProcessContextNonReplacing&) = default;
-        ProcessContextNonReplacing (ProcessContextNonReplacing&&) noexcept = default;
+    ProcessContextNonReplacing (const ProcessContextNonReplacing&) = default;
+    ProcessContextNonReplacing (ProcessContextNonReplacing&&) noexcept = default;
 
-        /** Returns the audio block to use as the input to a process function. */
-        const ConstAudioBlockType& getInputBlock() const noexcept   { return inputBlock; }
+    /** Returns the audio block to use as the input to a process function. */
+    const ConstAudioBlockType& getInputBlock() const noexcept { return inputBlock; }
 
-        /** Returns the audio block to use as the output to a process function. */
-        AudioBlockType& getOutputBlock() const noexcept             { return outputBlock; }
+    /** Returns the audio block to use as the output to a process function. */
+    AudioBlockType& getOutputBlock() const noexcept { return outputBlock; }
 
-        /** All process context classes will define this constant method so that templated
+    /** All process context classes will define this constant method so that templated
         code can determine whether the input and output blocks refer to the same buffer,
         or to two different ones.
     */
-        static constexpr bool usesSeparateInputAndOutputBlocks()    { return true; }
+    static constexpr bool usesSeparateInputAndOutputBlocks() { return true; }
 
-        /** If set to true, then a processor's process() method is expected to do whatever
+    /** If set to true, then a processor's process() method is expected to do whatever
         is appropriate for it to be in a bypassed state.
     */
-        bool isBypassed = false;
+    bool isBypassed = false;
 
-    private:
-        ConstAudioBlockType inputBlock;
-        AudioBlockType& outputBlock;
-    };
+private:
+    ConstAudioBlockType inputBlock;
+    AudioBlockType& outputBlock;
+};
 } // namespace chowdsp

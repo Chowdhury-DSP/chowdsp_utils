@@ -79,9 +79,9 @@ namespace NoiseHelpers
 
         inline T operator() (size_t /*ch*/, juce::Random& r) const noexcept
         {
-            CHOWDSP_USING_XSIMD_STD(sqrt)
-            CHOWDSP_USING_XSIMD_STD(log)
-            CHOWDSP_USING_XSIMD_STD(sin)
+            CHOWDSP_USING_XSIMD_STD (sqrt)
+            CHOWDSP_USING_XSIMD_STD (log)
+            CHOWDSP_USING_XSIMD_STD (sin)
 
             // Box-Muller transform
             T radius = sqrt ((T) -2 * log ((T) 1 - uniform01<T> (r)));
