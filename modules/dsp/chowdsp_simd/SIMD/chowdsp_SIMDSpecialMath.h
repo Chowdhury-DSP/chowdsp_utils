@@ -293,6 +293,22 @@ inline T hMaxSIMD (juce::dsp::SIMDRegister<T> x)
         return juce::jmax (juce::jmax (v[0], v[1], v[2], v[3]), juce::jmax (v[4], v[5], v[6], v[7]));
 }
 
+/** Returns the maximum value from the SIMD register */
+template <typename T>
+inline T hMaxSIMD (const xsimd::batch<T>& x)
+{
+    constexpr auto vecSize = xsimd::batch<T>::size;
+    T v alignas (CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[vecSize];
+    xsimd::store_aligned (v, x);
+
+    if constexpr (vecSize == 2)
+        return juce::jmax (v[0], v[1]);
+    else if constexpr (vecSize == 4)
+        return juce::jmax (v[0], v[1], v[2], v[3]);
+    else
+        return juce::jmax (juce::jmax (v[0], v[1], v[2], v[3]), juce::jmax (v[4], v[5], v[6], v[7]));
+}
+
 /** Returns the minimum value from the SIMD register */
 template <typename T>
 inline T hMinSIMD (juce::dsp::SIMDRegister<T> x)
@@ -300,6 +316,22 @@ inline T hMinSIMD (juce::dsp::SIMDRegister<T> x)
     constexpr auto vecSize = juce::dsp::SIMDRegister<T>::size();
     T v alignas (CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[vecSize];
     x.copyToRawArray (v);
+
+    if constexpr (vecSize == 2)
+        return juce::jmin (v[0], v[1]);
+    else if constexpr (vecSize == 4)
+        return juce::jmin (v[0], v[1], v[2], v[3]);
+    else
+        return juce::jmin (juce::jmin (v[0], v[1], v[2], v[3]), juce::jmin (v[4], v[5], v[6], v[7]));
+}
+
+/** Returns the minimum value from the SIMD register */
+template <typename T>
+inline T hMinSIMD (const xsimd::batch<T>& x)
+{
+    constexpr auto vecSize = xsimd::batch<T>::size;
+    T v alignas (CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[vecSize];
+    xsimd::store_aligned (v, x);
 
     if constexpr (vecSize == 2)
         return juce::jmin (v[0], v[1]);
