@@ -40,7 +40,7 @@ public:
         refOsc.prepare ({ 2.0 * _sampleRate, (juce::uint32) _blockSize, 1 });
         refOsc.setFrequency (testFreq, true);
 
-        chowdsp::SquareWave<juce::dsp::SIMDRegister<float>> testOsc;
+        chowdsp::SquareWave<xsimd::batch<float>> testOsc;
         testOsc.prepare ({ _sampleRate, (juce::uint32) _blockSize, 1 });
         testOsc.setFrequency (testFreq);
         expectEquals (testOsc.getFrequency().get (0), testFreq, "Set frequency is incorrect!");

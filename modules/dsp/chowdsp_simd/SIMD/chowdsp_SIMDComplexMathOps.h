@@ -8,18 +8,16 @@ namespace chowdsp::SIMDUtils
 using namespace SampleTypeHelpers;
 
 template <typename Type>
-inline juce::dsp::SIMDRegister<Type> SIMDComplexMulReal (const xsimd::batch<std::complex<Type>>& a, const xsimd::batch<std::complex<Type>>& b)
+inline xsimd::batch<Type> SIMDComplexMulReal (const xsimd::batch<std::complex<Type>>& a, const xsimd::batch<std::complex<Type>>& b)
 {
-    return juce::dsp::SIMDRegister<Type> ((a.real() * b.real()) - (a.imag() * b.imag()));
+    return (a.real() * b.real()) - (a.imag() * b.imag());
 }
 
 template <typename Type>
-inline juce::dsp::SIMDRegister<Type> SIMDComplexMulImag (const xsimd::batch<std::complex<Type>>& a, const xsimd::batch<std::complex<Type>>& b)
+inline xsimd::batch<Type> SIMDComplexMulImag (const xsimd::batch<std::complex<Type>>& a, const xsimd::batch<std::complex<Type>>& b)
 {
-    return juce::dsp::SIMDRegister<Type> ((a.real() * b.imag()) + (a.imag() * b.real()));
+    return (a.real() * b.imag()) + (a.imag() * b.real());
 }
-
-// xsimd doesn't have these implementations (yet)
 
 /** SIMDComplex implementation of std::pow */
 template <typename BaseType, typename OtherType>
@@ -57,17 +55,16 @@ inline std::enable_if_t<std::is_same_v<NumericType<OtherType>, BaseType>, xsimd:
 }
 
 template <typename BaseType>
-inline xsimd::batch<std::complex<BaseType>> polar (const juce::dsp::SIMDRegister<BaseType>& mag, const juce::dsp::SIMDRegister<BaseType>& angle)
+inline xsimd::batch<std::complex<BaseType>> polar (const xsimd::batch<BaseType>& mag, const xsimd::batch<BaseType>& angle)
 {
-    const auto r = xsimd::batch<BaseType> (mag.value);
-    auto sincosTheta = xsimd::sincos (xsimd::batch<BaseType> (angle.value));
-    return { r * sincosTheta.second, r * sincosTheta.first };
+    auto sincosTheta = xsimd::sincos (angle);
+    return { mag * sincosTheta.second, mag * sincosTheta.first };
 }
 
 template <typename BaseType>
-inline static xsimd::batch<std::complex<BaseType>> polar (const juce::dsp::SIMDRegister<BaseType>& angle)
+inline static xsimd::batch<std::complex<BaseType>> polar (const xsimd::batch<BaseType>& angle)
 {
-    auto sincosTheta = xsimd::sincos (xsimd::batch<BaseType> (angle.value));
+    auto sincosTheta = xsimd::sincos (angle);
     return { sincosTheta.second, sincosTheta.first };
 }
 } // namespace chowdsp::SIMDUtils

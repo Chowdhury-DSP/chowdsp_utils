@@ -89,7 +89,7 @@ public:
             if (evenOn)
             {
                 inputFilter->calcG();
-                buffer[bufferPtr++] = SIMDUtils::SIMDComplexMulReal (inputFilter->Gcalc, inputFilter->x).sum();
+                buffer[bufferPtr++] = xsimd::hadd (SIMDUtils::SIMDComplexMulReal (inputFilter->Gcalc, inputFilter->x));
                 bufferPtr = (bufferPtr <= STAGES) ? bufferPtr : 0;
             }
             else
@@ -124,7 +124,7 @@ public:
             if (evenOn)
             {
                 inputFilter->calcG();
-                buffer[bufferPtr++] = SIMDUtils::SIMDComplexMulReal (inputFilter->Gcalc, inputFilter->x).sum();
+                buffer[bufferPtr++] = xsimd::hadd (SIMDUtils::SIMDComplexMulReal (inputFilter->Gcalc, inputFilter->x));
                 bufferPtr = (bufferPtr <= STAGES) ? bufferPtr : 0;
             }
             else

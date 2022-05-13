@@ -91,9 +91,9 @@ protected:
 //=========================================================================
 /** An implementation of the modal filter parallelised with SIMDComplex. */
 template <typename FloatType>
-class ModalFilter<juce::dsp::SIMDRegister<FloatType>>
+class ModalFilter<xsimd::batch<FloatType>>
 {
-    using VType = juce::dsp::SIMDRegister<FloatType>;
+    using VType = xsimd::batch<FloatType>;
     using CType = xsimd::batch<std::complex<FloatType>>;
 
 public:
@@ -106,7 +106,7 @@ public:
     virtual inline void reset() noexcept { y1 = CType {}; }
 
     /** Sets the scalar amplitude of the filter */
-    virtual inline void setAmp (VType amp) noexcept { amplitude = CType { xsimd::batch<FloatType> (amp.value), xsimd::batch ((FloatType) 0) }; }
+    virtual inline void setAmp (VType amp) noexcept { amplitude = CType { amp, xsimd::batch ((FloatType) 0) }; }
 
     /** Sets the scalar amplitude of the filter */
     virtual inline void setAmp (CType amp) noexcept { amplitude = amp; }
@@ -136,26 +136,25 @@ public:
     /** Process a single sample */
     virtual inline VType processSample (VType x)
     {
-        auto y = filtCoef * y1 + amplitude * xsimd::batch<FloatType> (x.value);
+        auto y = filtCoef * y1 + amplitude * x;
         y1 = y;
-        return juce::dsp::SIMDRegister<FloatType> (y.imag());
+        return y.imag();
     }
 
     /** Process a block of samples */
     virtual void processBlock (VType* buffer, const int numSamples);
 
 protected:
-    inline void updateParams() noexcept { filtCoef = xsimd::batch<FloatType> (decayFactor.value) * oscCoef; }
+    inline void updateParams() noexcept { filtCoef = decayFactor * oscCoef; }
 
     inline VType calcDecayFactor() noexcept
     {
         using namespace SIMDUtils;
-        return powSIMD ((VType) (FloatType) 0.001, (VType) 1 / (t60 * fs));
+        return xsimd::pow ((VType) (FloatType) 0.001, (VType) 1 / (t60 * fs));
     }
 
     inline CType calcOscCoef() noexcept
     {
-        using namespace SIMDUtils;
         return SIMDUtils::polar ((freq / fs) * juce::MathConstants<FloatType>::twoPi);
     }
 

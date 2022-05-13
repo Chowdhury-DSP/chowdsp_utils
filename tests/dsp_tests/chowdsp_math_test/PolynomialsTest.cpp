@@ -51,13 +51,6 @@ public:
         expectWithinAbsoluteError (std::imag (actual), std::imag (exp), maxErr, message);
     }
 
-    template <typename T>
-    void checkError (juce::dsp::SIMDRegister<T> actual, juce::dsp::SIMDRegister<T> exp, const juce::String& message)
-    {
-        auto maxErr = getMaxErr (exp.get (0));
-        expectWithinAbsoluteError (actual.get (0), exp.get (0), maxErr, message);
-    }
-
     template <int ORDER, typename Coeffs, typename Args>
     void hornersMethodTest (const Coeffs& coeffs, const Args& args)
     {

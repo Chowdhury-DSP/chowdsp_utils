@@ -23,7 +23,7 @@ void ModalFilter<T>::processBlock (T* buffer, const int numSamples)
 
 //============================================================
 template <typename FloatType>
-void ModalFilter<juce::dsp::SIMDRegister<FloatType>>::prepare (FloatType sampleRate)
+void ModalFilter<xsimd::batch<FloatType>>::prepare (FloatType sampleRate)
 {
     fs = sampleRate;
 
@@ -35,7 +35,7 @@ void ModalFilter<juce::dsp::SIMDRegister<FloatType>>::prepare (FloatType sampleR
 }
 
 template <typename FloatType>
-void ModalFilter<juce::dsp::SIMDRegister<FloatType>>::processBlock (VType* buffer, const int numSamples)
+void ModalFilter<xsimd::batch<FloatType>>::processBlock (VType* buffer, const int numSamples)
 {
     for (int n = 0; n < numSamples; ++n)
         buffer[n] = processSample (buffer[n]);
@@ -43,7 +43,7 @@ void ModalFilter<juce::dsp::SIMDRegister<FloatType>>::processBlock (VType* buffe
 
 template class ModalFilter<float>;
 template class ModalFilter<double>;
-template class ModalFilter<juce::dsp::SIMDRegister<float>>;
-template class ModalFilter<juce::dsp::SIMDRegister<double>>;
+template class ModalFilter<xsimd::batch<float>>;
+template class ModalFilter<xsimd::batch<double>>;
 
 } // namespace chowdsp

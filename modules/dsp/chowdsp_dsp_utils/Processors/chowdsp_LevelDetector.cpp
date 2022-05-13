@@ -22,7 +22,7 @@ void LevelDetector<SampleType>::prepare (const juce::dsp::ProcessSpec& spec)
     expFactor = -1000.0f / (float) spec.sampleRate;
 
     absBuffer.setSize ((int) spec.numChannels, (int) spec.maximumBlockSize);
-    absBlock = juce::dsp::AudioBlock<SampleType> { absBuffer };
+    absBlock = chowdsp::AudioBlock<SampleType> { absBuffer };
 
     reset();
 }

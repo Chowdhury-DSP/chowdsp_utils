@@ -23,7 +23,7 @@ public:
     void reset();
 
     /** Generates a new block of samples from the source */
-    juce::dsp::AudioBlock<float> process (int numSamples) noexcept;
+    chowdsp::AudioBlock<float> process (int numSamples) noexcept;
 
 protected:
     /** Override this method to prepare the source */
@@ -33,7 +33,7 @@ protected:
     virtual void resetRepitched() {}
 
     /** Override this method to run the process which will be repitched */
-    virtual void processRepitched (juce::dsp::AudioBlock<float>&) = 0;
+    virtual void processRepitched (chowdsp::AudioBlock<float>&) = 0;
 
 private:
     ResamplingProcessor<ResamplingType> resampler;

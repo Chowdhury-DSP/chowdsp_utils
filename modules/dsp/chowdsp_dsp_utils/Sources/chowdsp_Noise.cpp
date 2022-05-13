@@ -5,10 +5,10 @@ void Noise<T>::prepare (const juce::dsp::ProcessSpec& spec) noexcept
 {
     juce::dsp::Gain<NumericType>::prepare (spec);
 
-    randBlock = juce::dsp::AudioBlock<T> (randBlockData, spec.numChannels, spec.maximumBlockSize);
+    randBlock = chowdsp::AudioBlock<T> (randBlockData, spec.numChannels, spec.maximumBlockSize);
     randBlock.clear();
 
-    gainBlock = juce::dsp::AudioBlock<T> (gainBlockData, spec.numChannels, spec.maximumBlockSize);
+    gainBlock = chowdsp::AudioBlock<T> (gainBlockData, spec.numChannels, spec.maximumBlockSize);
     gainBlock.clear();
 
     pink.reset (spec.numChannels);
@@ -17,7 +17,7 @@ void Noise<T>::prepare (const juce::dsp::ProcessSpec& spec) noexcept
 template <typename T>
 void Noise<T>::reset() noexcept
 {
-    juce::dsp::Gain<T>::reset();
+    juce::dsp::Gain<NumericType>::reset();
 }
 
 #ifndef DOXYGEN
@@ -41,24 +41,24 @@ namespace NoiseHelpers
 
     /** Returns a uniform random number in [0, 1) */
     template <>
-    inline vec2 uniform01 (juce::Random& r) noexcept
+    inline xsimd::batch<double> uniform01 (juce::Random& r) noexcept
     {
-        double sample alignas (xsimd::default_arch::alignment())[vec2::size()];
+        double sample alignas (xsimd::default_arch::alignment())[xsimd::batch<double>::size];
         for (auto& x : sample)
             x = r.nextDouble();
 
-        return vec2::fromRawArray (sample);
+        return xsimd::load_aligned (sample);
     }
 
     /** Returns a uniform random number in [0, 1) */
     template <>
-    inline vec4 uniform01 (juce::Random& r) noexcept
+    inline xsimd::batch<float> uniform01 (juce::Random& r) noexcept
     {
-        float sample alignas (xsimd::default_arch::alignment())[vec4::size()];
+        float sample alignas (xsimd::default_arch::alignment())[xsimd::batch<float>::size];
         for (auto& x : sample)
             x = r.nextFloat();
 
-        return vec4::fromRawArray (sample);
+        return xsimd::load_aligned (sample);
     }
 
     /** Generates white noise with a uniform distribution */
@@ -77,25 +77,16 @@ namespace NoiseHelpers
     {
         using NumericType = SampleTypeHelpers::NumericType<T>;
 
-        template <typename C = T>
-        inline std::enable_if_t<std::is_floating_point_v<C>, C>
-            operator() (size_t /*ch*/, juce::Random& r) const noexcept
+        inline T operator() (size_t /*ch*/, juce::Random& r) const noexcept
         {
-            // Box-Muller transform
-            T radius = std::sqrt ((T) -2 * std::log ((T) 1 - uniform01<T> (r)));
-            T theta = juce::MathConstants<NumericType>::twoPi * uniform01<T> (r);
-            T value = radius * std::sin (theta) / juce::MathConstants<NumericType>::sqrt2;
-            return value;
-        }
+            CHOWDSP_USING_XSIMD_STD(sqrt)
+            CHOWDSP_USING_XSIMD_STD(log)
+            CHOWDSP_USING_XSIMD_STD(sin)
 
-        template <typename C = T>
-        inline std::enable_if_t<SampleTypeHelpers::IsSIMDRegister<T>, C>
-            operator() (size_t /*ch*/, juce::Random& r) const noexcept
-        {
             // Box-Muller transform
-            T radius = sqrtSIMD ((T) -2 * logSIMD ((T) 1 - uniform01<T> (r)));
-            T theta = uniform01<T> (r) * juce::MathConstants<NumericType>::twoPi;
-            T value = radius * sinSIMD (theta) / juce::MathConstants<NumericType>::sqrt2;
+            T radius = sqrt ((T) -2 * log ((T) 1 - uniform01<T> (r)));
+            T theta = juce::MathConstants<NumericType>::twoPi * uniform01<T> (r);
+            T value = radius * sin (theta) / juce::MathConstants<NumericType>::sqrt2;
             return value;
         }
     };
@@ -134,7 +125,7 @@ void Noise<T>::process (const ProcessContext& context) noexcept
     auto len = outBlock.getNumSamples();
 
     auto randSubBlock = randBlock.getSubBlock (0, len);
-    juce::dsp::ProcessContextReplacing<T> randContext (randSubBlock);
+    chowdsp::ProcessContextReplacing<T> randContext (randSubBlock);
 
     // generate random block
     if (type == Uniform)
@@ -149,7 +140,7 @@ void Noise<T>::process (const ProcessContext& context) noexcept
 
     // copy input to output if needed
     if (context.usesSeparateInputAndOutputBlocks())
-        AudioBlockHelpers::copyBlocks (outBlock, inBlock);
+        outBlock.copyFrom (inBlock);
 
     // add random to output
     outBlock += randBlock;

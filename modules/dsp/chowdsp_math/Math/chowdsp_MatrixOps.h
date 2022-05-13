@@ -35,7 +35,7 @@ namespace MatrixOps
         {
             NumericType sum = 0;
             for (int i = 0; i < size; ++i)
-                sum += in[i].sum();
+                sum += xsimd::hadd (in[i]);
 
             sum *= multiplier;
 
@@ -96,12 +96,12 @@ namespace MatrixOps
         static inline std::enable_if_t<SampleTypeHelpers::IsSIMDRegister<T> && size == 1, void>
             recursiveUnscaled (FloatType* out, const FloatType* in)
         {
-            constexpr auto VecSize = FloatType::size();
+            constexpr auto VecSize = FloatType::size;
             NumericType arr alignas (xsimd::default_arch::alignment())[VecSize];
 
-            in[0].copyToRawArray (arr);
+            xsimd::store_aligned (arr, in[0]);
             Hadamard<NumericType, VecSize>::recursiveUnscaled (arr, arr);
-            out[0] = FloatType::fromRawArray (arr);
+            out[0] = xsimd::load_aligned (arr);
         }
 
         /** Perform out-of-place Hadamard transformation (scalar types) */

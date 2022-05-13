@@ -20,8 +20,7 @@ void ModalFilterBank<maxNumModes, SampleType>::doForModes (PerModeFunc&& perMode
 template <size_t maxNumModes, typename SampleType>
 typename ModalFilterBank<maxNumModes, SampleType>::Vec ModalFilterBank<maxNumModes, SampleType>::tau2t60 (Vec tau, SampleType originalSampleRate)
 {
-    using namespace SIMDUtils;
-    return Vec ((SampleType) 1) / (logSIMD (expSIMD (originalSampleRate / tau)) / log1000);
+    return Vec ((SampleType) 1) / (xsimd::log (xsimd::exp (originalSampleRate / tau)) / log1000);
 }
 
 template <size_t maxNumModes, typename SampleType>
@@ -72,7 +71,7 @@ void ModalFilterBank<maxNumModes, SampleType>::setModeFrequencies (const SampleT
             auto freq = modeIndex < maxNumModes ? (baseFrequencies[modeIndex] * frequencyMultiplier) : (SampleType) 0;
             modeFreqs[j] = freq > maxFreq ? (SampleType) 0 : freq;
         },
-        [&] (auto& mode) { mode.setFreq (Vec::fromRawArray (modeFreqs)); });
+        [&] (auto& mode) { mode.setFreq (xsimd::load_aligned (modeFreqs)); });
 }
 
 template <size_t maxNumModes, typename SampleType>
@@ -81,7 +80,7 @@ void ModalFilterBank<maxNumModes, SampleType>::setModeDecays (const SampleType (
     SampleType modeTaus alignas (xsimd::default_arch::alignment())[vecSize] {};
     doForModes (
         [&] (size_t j, size_t modeIndex) { modeTaus[j] = modeIndex < maxNumModes ? baseTaus[modeIndex] : (SampleType) 1; },
-        [&] (auto& mode) { mode.setDecay (tau2t60 (Vec::fromRawArray (modeTaus), originalSampleRate) * decayFactor); });
+        [&] (auto& mode) { mode.setDecay (tau2t60 (xsimd::load_aligned (modeTaus), originalSampleRate) * decayFactor); });
 }
 
 template <size_t maxNumModes, typename SampleType>
@@ -90,7 +89,7 @@ void ModalFilterBank<maxNumModes, SampleType>::setModeDecays (const SampleType (
     SampleType modeT60s alignas (xsimd::default_arch::alignment())[vecSize] {};
     doForModes (
         [&] (size_t j, size_t modeIndex) { modeT60s[j] = modeIndex < maxNumModes ? t60s[modeIndex] : (SampleType) 0; },
-        [&] (auto& mode) { mode.setDecay (Vec::fromRawArray (modeT60s)); });
+        [&] (auto& mode) { mode.setDecay (xsimd::load_aligned (modeT60s)); });
 }
 
 template <size_t maxNumModes, typename SampleType>
@@ -126,12 +125,12 @@ void ModalFilterBank<maxNumModes, SampleType>::reset()
 template <size_t maxNumModes, typename SampleType>
 void ModalFilterBank<maxNumModes, SampleType>::process (const juce::AudioBuffer<SampleType>& buffer) noexcept
 {
-    const auto&& block = juce::dsp::AudioBlock<const SampleType> { buffer };
+    const auto&& block = chowdsp::AudioBlock<const SampleType> { buffer };
     process (block);
 }
 
 template <size_t maxNumModes, typename SampleType>
-void ModalFilterBank<maxNumModes, SampleType>::process (const juce::dsp::AudioBlock<const SampleType>& block) noexcept
+void ModalFilterBank<maxNumModes, SampleType>::process (const chowdsp::AudioBlock<const SampleType>& block) noexcept
 {
     const auto numSamples = block.getNumSamples();
 
@@ -144,13 +143,13 @@ void ModalFilterBank<maxNumModes, SampleType>::process (const juce::dsp::AudioBl
     for (size_t modeIdx = 0; modeIdx < numVecModesToProcess; ++modeIdx)
     {
         for (size_t n = 0; n < numSamples; ++n)
-            renderPtr[n] += modes[modeIdx].processSample (blockPtr[n]).sum();
+            renderPtr[n] += xsimd::hadd (modes[modeIdx].processSample (blockPtr[n]));
     }
 }
 
 template <size_t maxNumModes, typename SampleType>
 template <typename Modulator>
-void ModalFilterBank<maxNumModes, SampleType>::processWithModulation (const juce::dsp::AudioBlock<const SampleType>& block, Modulator&& modulator) noexcept
+void ModalFilterBank<maxNumModes, SampleType>::processWithModulation (const chowdsp::AudioBlock<const SampleType>& block, Modulator&& modulator) noexcept
 {
     const auto numSamples = block.getNumSamples();
 
@@ -165,7 +164,7 @@ void ModalFilterBank<maxNumModes, SampleType>::processWithModulation (const juce
         for (size_t n = 0; n < numSamples; ++n)
         {
             modulator (modes[modeIdx], modeIdx, n);
-            renderPtr[n] += modes[modeIdx].processSample (blockPtr[n]).sum();
+            renderPtr[n] += xsimd::hadd (modes[modeIdx].processSample (blockPtr[n]));
         }
     }
 }

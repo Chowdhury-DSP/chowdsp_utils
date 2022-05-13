@@ -38,7 +38,7 @@ public:
 
         shelfFilter.processBlock (block.getChannelPointer (0), numSamples);
 
-        test_utils::blockToBuffer (buffer, block);
+        test_utils::blockToBuffer<T> (buffer, block);
         auto mag = buffer.getRMSLevel (0, 0, numSamples);
 
         expectWithinAbsoluteError (mag / refMag, 2.0f, (float) 1.0e-6, "Incorrect behavior when filter reduces to a simple gain.");
@@ -51,7 +51,7 @@ public:
         shelfFilter.calcCoefs ((T) Constants::lowGain, (T) Constants::highGain, (T) Constants::fc, Constants::fs);
 
         auto testFrequency = [=, &shelfFilter] (float freq, float expGain, const juce::String& message) {
-            auto buffer = test_utils::makeSineWave (freq, Constants::fs, (NumericType) 1);
+            auto buffer = test_utils::makeSineWave<> (freq, Constants::fs, (NumericType) 1);
 
             juce::HeapBlock<char> dataBlock;
             auto block = test_utils::bufferToBlock<T> (dataBlock, buffer);
@@ -59,7 +59,7 @@ public:
             shelfFilter.reset();
             shelfFilter.processBlock (block.getChannelPointer (0), buffer.getNumSamples());
 
-            test_utils::blockToBuffer (buffer, block);
+            test_utils::blockToBuffer<T> (buffer, block);
             auto mag = buffer.getMagnitude (0, buffer.getNumSamples());
             expectWithinAbsoluteError (mag, expGain, Constants::maxError, message);
         };
@@ -75,13 +75,13 @@ public:
         plainGainTest<float>();
 
         beginTest ("Plain Gain SIMD Test");
-        plainGainTest<juce::dsp::SIMDRegister<float>>();
+        plainGainTest<xsimd::batch<float>>();
 
         beginTest ("Boost/Cut Test");
         boostCutTest<float>();
 
         beginTest ("Boost/Cut SIMD Test");
-        boostCutTest<juce::dsp::SIMDRegister<float>>();
+        boostCutTest<xsimd::batch<float>>();
     }
 };
 

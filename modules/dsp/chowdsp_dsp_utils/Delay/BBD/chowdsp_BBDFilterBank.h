@@ -49,11 +49,9 @@ namespace BBDFilterSpec
         { -26276.0f, +59699.0f }
     };
 
-    inline SIMDComplex<float> fast_complex_pow (juce::dsp::SIMDRegister<float> angle, float b)
+    inline SIMDComplex<float> fast_complex_pow (SIMDScalar<float> angle, float b)
     {
-        auto angle_pow = angle * b;
-
-        auto [sinAngle, cosAngle] = xsimd::sincos ((SIMDScalar<float>) angle_pow.value);
+        auto [sinAngle, cosAngle] = xsimd::sincos (angle * b);
         return { cosAngle, sinAngle };
     }
 } // namespace BBDFilterSpec
@@ -76,7 +74,7 @@ public:
         const float freqFactor = freq / BBDFilterSpec::inputFilterOriginalCutoff;
         root_corr = roots * freqFactor;
         pole_corr = xsimd::exp (poles * (freqFactor * Ts));
-        pole_corr_angle = juce::dsp::SIMDRegister<float> (xsimd::arg (pole_corr));
+        pole_corr_angle = xsimd::arg (pole_corr);
 
         gCoef = root_corr * Ts;
     }
@@ -106,7 +104,7 @@ private:
     Complex4 poles {};
     Complex4 root_corr {};
     Complex4 pole_corr {};
-    juce::dsp::SIMDRegister<T> pole_corr_angle {};
+    xsimd::batch<T> pole_corr_angle {};
 
     Complex4 Aplus {};
 
@@ -133,7 +131,7 @@ public:
     {
         const float freqFactor = freq / BBDFilterSpec::outputFilterOriginalCutoff;
         pole_corr = xsimd::exp (poles * (freqFactor * Ts));
-        pole_corr_angle = juce::dsp::SIMDRegister<float> (xsimd::arg (pole_corr));
+        pole_corr_angle = xsimd::arg (pole_corr);
 
         Amult = gCoef * pole_corr;
     }
@@ -156,7 +154,7 @@ private:
     Complex4 gCoef {};
     Complex4 poles {};
     Complex4 pole_corr {};
-    juce::dsp::SIMDRegister<float> pole_corr_angle {};
+    xsimd::batch<float> pole_corr_angle {};
 
     Complex4 Aplus {};
 

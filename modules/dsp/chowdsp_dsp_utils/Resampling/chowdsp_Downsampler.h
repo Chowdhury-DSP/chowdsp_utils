@@ -78,9 +78,9 @@ public:
      * Process a block of data.
      * Note that the block size must be an integer multiple of the downsampling ratio.
      */
-    juce::dsp::AudioBlock<T> process (const juce::dsp::AudioBlock<const T>& block) noexcept
+    chowdsp::AudioBlock<T> process (const chowdsp::AudioBlock<const T>& block) noexcept
     {
-        auto outBlock = juce::dsp::AudioBlock<T> { downsampledBuffer };
+        auto outBlock = chowdsp::AudioBlock<T> { downsampledBuffer };
 
         const auto numChannels = block.getNumChannels();
         const auto numSamples = (int) block.getNumSamples();

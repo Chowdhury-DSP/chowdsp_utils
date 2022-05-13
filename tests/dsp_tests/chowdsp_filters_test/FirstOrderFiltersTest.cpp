@@ -26,7 +26,7 @@ public:
         filter.reset();
         filter.processBlock (block.getChannelPointer (0), buffer.getNumSamples());
 
-        test_utils::blockToBuffer (buffer, block);
+        test_utils::blockToBuffer<T> (buffer, block);
         const auto halfSamples = buffer.getNumSamples() / 2;
         auto magDB = juce::Decibels::gainToDecibels (buffer.getMagnitude (halfSamples, halfSamples));
         expectWithinAbsoluteError (magDB, expGainDB, maxError, message);
@@ -61,16 +61,16 @@ public:
         firstOrderLPFTest<double> (1.0e-2);
 
         beginTest ("First Order LPF SIMD Test");
-        firstOrderLPFTest<juce::dsp::SIMDRegister<float>> (1.0e-2f);
-        firstOrderLPFTest<juce::dsp::SIMDRegister<double>> (1.0e-2);
+        firstOrderLPFTest<xsimd::batch<float>> (1.0e-2f);
+        firstOrderLPFTest<xsimd::batch<double>> (1.0e-2);
 
         beginTest ("First Order HPF Test");
         firstOrderHPFTest<float> (1.0e-2f);
         firstOrderHPFTest<double> (1.0e-2);
 
         beginTest ("First Order HPF SIMD Test");
-        firstOrderHPFTest<juce::dsp::SIMDRegister<float>> (1.0e-2f);
-        firstOrderHPFTest<juce::dsp::SIMDRegister<double>> (1.0e-2);
+        firstOrderHPFTest<xsimd::batch<float>> (1.0e-2f);
+        firstOrderHPFTest<xsimd::batch<double>> (1.0e-2);
     }
 };
 

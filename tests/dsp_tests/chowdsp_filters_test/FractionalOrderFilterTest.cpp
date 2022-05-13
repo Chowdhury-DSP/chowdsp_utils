@@ -24,7 +24,7 @@ public:
         filter.reset();
         filter.processBlock (block.getChannelPointer (0), buffer.getNumSamples());
 
-        test_utils::blockToBuffer (buffer, block);
+        test_utils::blockToBuffer<T> (buffer, block);
         const auto halfSamples = buffer.getNumSamples() / 2;
         auto magDB = juce::Decibels::gainToDecibels (buffer.getMagnitude (halfSamples, halfSamples));
         expectWithinAbsoluteError (magDB, expGainDB, maxError, message);

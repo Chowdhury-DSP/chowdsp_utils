@@ -194,5 +194,4 @@ private:
     VecType step = SmFloatType();
     int stepsToTarget = 0;
 };
-
 } // namespace chowdsp::SIMDUtils

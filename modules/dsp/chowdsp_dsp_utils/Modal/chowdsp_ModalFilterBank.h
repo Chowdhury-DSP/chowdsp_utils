@@ -9,8 +9,8 @@ class ModalFilterBank
 public:
     static_assert (std::is_floating_point_v<SampleType>, "SampleType must be a floating point type!");
 
-    using Vec = juce::dsp::SIMDRegister<SampleType>;
-    static constexpr auto vecSize = Vec::size();
+    using Vec = xsimd::batch<SampleType>;
+    static constexpr auto vecSize = Vec::size;
     static constexpr auto maxNumVecModes = ceiling_divide (maxNumModes, vecSize);
 
     ModalFilterBank() = default;
@@ -59,11 +59,11 @@ public:
     void process (const juce::AudioBuffer<SampleType>& buffer) noexcept;
 
     /** Process an audio block */
-    void process (const juce::dsp::AudioBlock<const SampleType>& block) noexcept;
+    void process (const chowdsp::AudioBlock<const SampleType>& block) noexcept;
 
     /** Process with some user-defined modulator */
     template <typename Modulator>
-    void processWithModulation (const juce::dsp::AudioBlock<const SampleType>& block, Modulator&& modulator) noexcept;
+    void processWithModulation (const chowdsp::AudioBlock<const SampleType>& block, Modulator&& modulator) noexcept;
 
     /** Returns a mono buffer of rendered audio */
     const auto& getRenderBuffer() const noexcept { return renderBuffer; }

@@ -25,10 +25,10 @@ public:
             auto block = test_utils::bufferToBlock<T> (dataBlock, buffer);
 
             filt.reset();
-            juce::dsp::ProcessContextReplacing<T> ctx (block);
+            chowdsp::ProcessContextReplacing<T> ctx (block);
             filt.process (ctx);
 
-            test_utils::blockToBuffer (buffer, block);
+            test_utils::blockToBuffer<T> (buffer, block);
             auto halfBlock = buffer.getNumSamples() / 2;
             auto mag = juce::Decibels::gainToDecibels (buffer.getMagnitude (halfBlock, halfBlock));
             expectWithinAbsoluteError (mag, expGain, err, message);
@@ -88,13 +88,13 @@ public:
         lowpassTest<float>();
 
         beginTest ("Lowpass SIMD");
-        lowpassTest<juce::dsp::SIMDRegister<float>>();
+        lowpassTest<xsimd::batch<float>>();
 
         beginTest ("Highpass");
         highpassTest<float>();
 
         beginTest ("Highpass SIMD");
-        highpassTest<juce::dsp::SIMDRegister<float>>();
+        highpassTest<xsimd::batch<float>>();
 
         beginTest ("Bandpass");
         bandpassTest();

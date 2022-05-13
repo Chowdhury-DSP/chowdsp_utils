@@ -27,7 +27,7 @@ public:
             filt.reset();
             filt.processBlock (block);
 
-            test_utils::blockToBuffer (buffer, block);
+            test_utils::blockToBuffer<float> (buffer, block);
             auto halfBlock = buffer.getNumSamples() / 2;
             auto mag = juce::Decibels::gainToDecibels (buffer.getMagnitude (halfBlock, halfBlock));
 
