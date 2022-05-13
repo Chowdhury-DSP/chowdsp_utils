@@ -952,7 +952,7 @@ private:
     static constexpr size_t elementMask = sizeFactor - 1;
     static constexpr size_t byteMask = (sizeFactor * sizeof (NumericType)) - 1;
 
-    static constexpr size_t defaultAlignment = sizeof (xsimd::batch<NumericType>);
+    static constexpr size_t defaultAlignment = sizeof (xsimd::batch<std::remove_const_t<NumericType>>);
 
     SampleType* const* channels;
     ChannelCountType numChannels = 0;
