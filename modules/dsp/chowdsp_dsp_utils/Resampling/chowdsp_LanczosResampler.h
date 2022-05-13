@@ -111,8 +111,8 @@ private:
     static constexpr size_t tableObs = BUFFER_SIZE * 2;
     static constexpr double dx = 1.0 / (tableObs);
 
-    static float lanczosTable alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[tableObs + 1][filterWidth];
-    static float lanczosTableDX alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[tableObs + 1][filterWidth];
+    static float lanczosTable alignas (xsimd::default_arch::alignment())[tableObs + 1][filterWidth];
+    static float lanczosTableDX alignas (xsimd::default_arch::alignment())[tableObs + 1][filterWidth];
     static bool tablesInitialized;
 
     float state[BUFFER_SIZE * 2] { 0.0f };
@@ -216,10 +216,10 @@ private:
 };
 
 template <size_t BUFFER_SIZE, size_t A>
-float LanczosResampler<BUFFER_SIZE, A>::lanczosTable alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[LanczosResampler::tableObs + 1][LanczosResampler::filterWidth];
+float LanczosResampler<BUFFER_SIZE, A>::lanczosTable alignas (xsimd::default_arch::alignment())[LanczosResampler::tableObs + 1][LanczosResampler::filterWidth];
 
 template <size_t BUFFER_SIZE, size_t A>
-float LanczosResampler<BUFFER_SIZE, A>::lanczosTableDX alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[LanczosResampler::tableObs + 1][LanczosResampler::filterWidth];
+float LanczosResampler<BUFFER_SIZE, A>::lanczosTableDX alignas (xsimd::default_arch::alignment())[LanczosResampler::tableObs + 1][LanczosResampler::filterWidth];
 
 template <size_t BUFFER_SIZE, size_t A>
 bool LanczosResampler<BUFFER_SIZE, A>::tablesInitialized = false;

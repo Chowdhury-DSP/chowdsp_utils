@@ -105,7 +105,7 @@ void ModalReverbPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
                 if (modeScalarIndex + Vec::size() > (size_t) numModesToMod)
                 {
                     const auto numLeftoverModes = (size_t) numModesToMod - modeScalarIndex;
-                    alignas (chowdsp::SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT) float modVec[Vec::size()] {};
+                    alignas (xsimd::default_arch::alignment()) float modVec[Vec::size()] {};
                     std::fill (modVec, modVec + numLeftoverModes, modData[sampleIndex]);
                     modOffset = Vec::fromRawArray (modVec);
                 }

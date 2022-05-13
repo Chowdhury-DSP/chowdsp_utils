@@ -282,7 +282,7 @@ template <typename T>
 [[deprecated]] inline T hMaxSIMD (juce::dsp::SIMDRegister<T> x)
 {
     constexpr auto vecSize = juce::dsp::SIMDRegister<T>::size();
-    T v alignas (CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[vecSize];
+    T v alignas (xsimd::default_arch::alignment())[vecSize];
     x.copyToRawArray (v);
 
     if constexpr (vecSize == 2)
@@ -298,7 +298,7 @@ template <typename T>
 inline T hMaxSIMD (const xsimd::batch<T>& x)
 {
     constexpr auto vecSize = xsimd::batch<T>::size;
-    T v alignas (CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[vecSize];
+    T v alignas (xsimd::default_arch::alignment())[vecSize];
     xsimd::store_aligned (v, x);
 
     if constexpr (vecSize == 2)
@@ -314,7 +314,7 @@ template <typename T>
 [[deprecated]] inline T hMinSIMD (juce::dsp::SIMDRegister<T> x)
 {
     constexpr auto vecSize = juce::dsp::SIMDRegister<T>::size();
-    T v alignas (CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[vecSize];
+    T v alignas (xsimd::default_arch::alignment())[vecSize];
     x.copyToRawArray (v);
 
     if constexpr (vecSize == 2)
@@ -330,7 +330,7 @@ template <typename T>
 inline T hMinSIMD (const xsimd::batch<T>& x)
 {
     constexpr auto vecSize = xsimd::batch<T>::size;
-    T v alignas (CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[vecSize];
+    T v alignas (xsimd::default_arch::alignment())[vecSize];
     xsimd::store_aligned (v, x);
 
     if constexpr (vecSize == 2)

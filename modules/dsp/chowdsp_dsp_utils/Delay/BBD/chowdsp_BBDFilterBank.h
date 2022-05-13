@@ -22,27 +22,27 @@ namespace BBDFilterSpec
     constexpr float inputFilterOriginalCutoff = 9900.0f;
     constexpr float outputFilterOriginalCutoff = 9500.0f;
 
-    constexpr std::complex<float> iFiltRoot alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[] = {
+    constexpr std::complex<float> iFiltRoot alignas (xsimd::default_arch::alignment())[] = {
         { -10329.2715f, -329.848f },
         { -10329.2715f, +329.848f },
         { 366.990557f, -1811.4318f },
         { 366.990557f, +1811.4318f }
     };
 
-    constexpr std::complex<float> iFiltPole alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[] = {
+    constexpr std::complex<float> iFiltPole alignas (xsimd::default_arch::alignment())[] = {
         { -55482.0f, -25082.0f },
         { -55482.0f, +25082.0f },
         { -26292.0f, -59437.0f },
         { -26292.0f, +59437.0f }
     };
 
-    constexpr std::complex<float> oFiltRoot alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[] = {
+    constexpr std::complex<float> oFiltRoot alignas (xsimd::default_arch::alignment())[] = {
         { -11256.0f, -99566.0f },
         { -11256.0f, +99566.0f },
         { -13802.0f, -24606.0f },
         { -13802.0f, +24606.0f }
     };
-    constexpr std::complex<float> oFiltPole alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[] = {
+    constexpr std::complex<float> oFiltPole alignas (xsimd::default_arch::alignment())[] = {
         { -51468.0f, -21437.0f },
         { -51468.0f, +21437.0f },
         { -26276.0f, -59699.0f },

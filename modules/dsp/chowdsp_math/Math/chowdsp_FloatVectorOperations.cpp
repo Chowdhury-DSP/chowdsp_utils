@@ -224,7 +224,7 @@ namespace detail
         }
 
         // Main loop here...
-        T initData alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[vecSize] {};
+        T initData alignas (xsimd::default_arch::alignment())[vecSize] {};
         initData[0] = init;
         auto resultVec = xsimd::load_aligned (initData);
         while (--numVecOps >= 0)
