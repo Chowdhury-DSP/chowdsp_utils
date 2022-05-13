@@ -137,7 +137,7 @@ public:
     template <typename OtherSampleType>
     constexpr bool operator!= (const SIMDAudioBlock<OtherSampleType>& other) const noexcept
     {
-        return *this != other;
+        return ! (*this == other);
     }
 
     //==============================================================================
