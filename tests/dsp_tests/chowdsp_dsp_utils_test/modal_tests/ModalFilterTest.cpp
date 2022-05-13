@@ -18,7 +18,7 @@ template <typename T>
 class ModalFilterTest : public TimedUnitTest
 {
 public:
-    using NumericType = typename juce::dsp::SampleTypeHelpers::ElementType<T>::Type;
+    using NumericType = typename chowdsp::SampleTypeHelpers::ElementType<T>::Type;
 
     ModalFilterTest() : TimedUnitTest ("Modal Filter Test " + getSampleType(), "Modal") {}
 
@@ -28,9 +28,9 @@ public:
             return "Float";
         if (std::is_same_v<T, double>)
             return "Double";
-        if (std::is_same_v<T, juce::dsp::SIMDRegister<float>>)
+        if (std::is_same_v<T, xsimd::batch<float>>)
             return "SIMD Float";
-        if (std::is_same_v<T, juce::dsp::SIMDRegister<double>>)
+        if (std::is_same_v<T, xsimd::batch<double>>)
             return "SIMD Double";
 
         return "Unknown";
@@ -59,14 +59,14 @@ public:
     }
 
     template <typename C = T>
-    static typename std::enable_if<std::is_same<juce::dsp::SIMDRegister<float>, C>::value || std::is_same<juce::dsp::SIMDRegister<double>, C>::value, NumericType>::type
+    static typename std::enable_if<chowdsp::SampleTypeHelpers::IsSIMDRegister<C>, NumericType>::type
         getMagnitude (const std::vector<T>& buffer, int start = 0, int num = -1)
     {
         num = num >= 0 ? num : (int) buffer.size();
 
         auto max = (T) 0;
         for (int i = start; i < start + num; ++i)
-            max = juce::jmax (max, buffer[(size_t) i]);
+            max = xsimd::max (max, buffer[(size_t) i]);
 
         return max.get (0);
     }
@@ -126,6 +126,22 @@ public:
         expectWithinAbsoluteError (mag, (NumericType) -60.0f, (NumericType) 1.0f, "Incorrect decay time.");
     }
 
+    void initialPhaseTest()
+    {
+        static constexpr auto initialPhase = (NumericType) 0.5f;
+
+        chowdsp::ModalFilter<T> filter;
+        filter.prepare ((NumericType) fs);
+        filter.setAmp ((T) 1.0f, initialPhase);
+        filter.setDecay ((T) 0.5f);
+        filter.setFreq ((T) 100.0f);
+
+        const auto actual = filter.processSample ((T) 1);
+        const auto expected = std::sin (initialPhase);
+
+        expect (chowdsp::SIMDUtils::all (actual == expected), "Incorrect initial phase!");
+    }
+
     void runTestTimed() override
     {
         beginTest ("Resonant Frequency Sine Test");
@@ -136,10 +152,13 @@ public:
 
         beginTest ("Decay Time Test");
         decayTimeTest();
+
+        beginTest ("Initial Phase Test");
+        initialPhaseTest();
     }
 };
 
 static ModalFilterTest<float> mfTestFloat;
 static ModalFilterTest<double> mfTestDouble;
-static ModalFilterTest<juce::dsp::SIMDRegister<float>> mfTestSimdFloat;
-static ModalFilterTest<juce::dsp::SIMDRegister<double>> mfTestSimdDouble;
+static ModalFilterTest<xsimd::batch<float>> mfTestSimdFloat;
+static ModalFilterTest<xsimd::batch<double>> mfTestSimdDouble;

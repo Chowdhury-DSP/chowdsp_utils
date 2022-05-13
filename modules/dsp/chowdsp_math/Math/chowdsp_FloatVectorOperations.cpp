@@ -11,13 +11,16 @@ namespace detail
     template <typename T>
     static bool isAligned (const T* p) noexcept
     {
-        return juce::dsp::SIMDRegister<T>::isSIMDAligned (p);
+        static constexpr auto RegisterSize = sizeof (xsimd::batch<T>);
+        uintptr_t bitmask = RegisterSize - 1;
+        return (reinterpret_cast<uintptr_t> (p) & bitmask) == 0;
     }
 
     template <typename T>
     static T* getNextAlignedPtr (T* p) noexcept
     {
-        return juce::dsp::SIMDRegister<T>::getNextSIMDAlignedPtr (p);
+        static constexpr auto RegisterSize = sizeof (xsimd::batch<std::remove_const_t<T>>);
+        return juce::snapPointerToAlignment (p, RegisterSize); // xsimd::batch<std::remove_const_t<T>>::size);
     }
 
     template <typename T, typename Op>
@@ -30,7 +33,7 @@ namespace detail
     template <typename T, typename ScalarOp, typename VecOp, typename LoadOpType, typename StoreOpType>
     void unaryOp (T* dest, const T* src, int numValues, ScalarOp&& scalarOp, VecOp&& vecOp, LoadOpType&& loadOp, StoreOpType&& storeOp)
     {
-        constexpr auto vecSize = (int) juce::dsp::SIMDRegister<T>::size();
+        constexpr auto vecSize = (int) xsimd::batch<T>::size;
         auto numVecOps = numValues / vecSize;
 
         // Fallback: not enough operations to justify vectorizing!
@@ -57,13 +60,17 @@ namespace detail
     template <typename T, typename ScalarOp, typename VecOp>
     void unaryOp (T* dest, const T* src, int numValues, ScalarOp&& scalarOp, VecOp&& vecOp)
     {
-        auto loadA = [] (const auto* ptr) { return juce::dsp::SIMDRegister<T>::fromRawArray (ptr); };
+        auto loadA = [] (const auto* ptr)
+        { return xsimd::load_aligned (ptr); };
 
-        auto loadU = [] (const auto* ptr) { return SIMDUtils::loadUnaligned (ptr); };
+        auto loadU = [] (const auto* ptr)
+        { return xsimd::load_unaligned (ptr); };
 
-        auto storeA = [] (auto* ptr, const auto& reg) { return reg.copyToRawArray (ptr); };
+        auto storeA = [] (auto* ptr, const auto& reg)
+        { xsimd::store_aligned (ptr, reg); };
 
-        auto storeU = [] (auto* ptr, const auto& reg) { return SIMDUtils::storeUnaligned (ptr, reg); };
+        auto storeU = [] (auto* ptr, const auto& reg)
+        { xsimd::store_unaligned (ptr, reg); };
 
         if (isAligned (dest))
         {
@@ -97,7 +104,7 @@ namespace detail
     template <typename T, typename ScalarOp, typename VecOp, typename LoadOp1Type, typename LoadOp2Type, typename StoreOpType>
     void binaryOp (T* dest, const T* src1, const T* src2, int numValues, ScalarOp&& scalarOp, VecOp&& vecOp, LoadOp1Type&& loadOp1, LoadOp2Type&& loadOp2, StoreOpType&& storeOp)
     {
-        constexpr auto vecSize = (int) juce::dsp::SIMDRegister<T>::size();
+        constexpr auto vecSize = (int) xsimd::batch<T>::size;
         auto numVecOps = numValues / vecSize;
 
         // Fallback: not enough operations to justify vectorizing!
@@ -125,13 +132,17 @@ namespace detail
     template <typename T, typename ScalarOp, typename VecOp>
     void binaryOp (T* dest, const T* src1, const T* src2, int numValues, ScalarOp&& scalarOp, VecOp&& vecOp)
     {
-        auto loadA = [] (const auto* ptr) { return juce::dsp::SIMDRegister<T>::fromRawArray (ptr); };
+        auto loadA = [] (const auto* ptr)
+        { return xsimd::load_aligned (ptr); };
 
-        auto loadU = [] (const auto* ptr) { return SIMDUtils::loadUnaligned (ptr); };
+        auto loadU = [] (const auto* ptr)
+        { return xsimd::load_unaligned (ptr); };
 
-        auto storeA = [] (auto* ptr, const auto& reg) { return reg.copyToRawArray (ptr); };
+        auto storeA = [] (auto* ptr, const auto& reg)
+        { xsimd::store_aligned (ptr, reg); };
 
-        auto storeU = [] (auto* ptr, const auto& reg) { return SIMDUtils::storeUnaligned (ptr, reg); };
+        auto storeU = [] (auto* ptr, const auto& reg)
+        { xsimd::store_unaligned (ptr, reg); };
 
         if (isAligned (dest))
         {
@@ -196,7 +207,7 @@ namespace detail
     template <typename T, typename ScalarOp, typename VecOp, typename VecReduceOp>
     T reduce (const T* src, int numValues, T init, ScalarOp&& scalarOp, VecOp&& vecOp, VecReduceOp&& vecReduceOp)
     {
-        constexpr auto vecSize = (int) juce::dsp::SIMDRegister<T>::size();
+        constexpr auto vecSize = (int) xsimd::batch<T>::size;
         auto numVecOps = numValues / vecSize;
 
         // Fallback: not enough operations to justify vectorizing!
@@ -213,11 +224,12 @@ namespace detail
         }
 
         // Main loop here...
-        juce::dsp::SIMDRegister<T> resultVec {};
-        resultVec.set (0, init);
+        T initData alignas (xsimd::default_arch::alignment())[vecSize] {};
+        initData[0] = init;
+        auto resultVec = xsimd::load_aligned (initData);
         while (--numVecOps >= 0)
         {
-            resultVec = vecOp (resultVec, juce::dsp::SIMDRegister<T>::fromRawArray (src));
+            resultVec = vecOp (resultVec, xsimd::load_aligned (src));
             src += vecSize;
         }
 
@@ -234,7 +246,7 @@ namespace detail
     template <typename T, typename ScalarOp, typename VecOp>
     T reduce (const T* src, int numValues, T init, ScalarOp&& scalarOp, VecOp&& vecOp)
     {
-        return reduce (src, numValues, init, scalarOp, vecOp, [] (auto val) { return val.sum(); });
+        return reduce (src, numValues, init, scalarOp, vecOp, [] (auto val) { return xsimd::hadd (val); });
     }
 
     template <typename T, typename ScalarOp>
@@ -246,7 +258,7 @@ namespace detail
     template <typename T, typename ScalarOp, typename VecOp, typename VecReduceOp>
     T reduce (const T* src1, const T* src2, int numValues, T init, ScalarOp&& scalarOp, VecOp&& vecOp, VecReduceOp&& vecReduceOp)
     {
-        constexpr auto vecSize = (int) juce::dsp::SIMDRegister<T>::size();
+        constexpr auto vecSize = (int) xsimd::batch<T>::size;
         auto numVecOps = numValues / vecSize;
 
         // Fallback: not enough operations to justify vectorizing!
@@ -255,7 +267,7 @@ namespace detail
 
         // Main loop here:
         auto vecLoop = [&] (auto&& loadOp1, auto&& loadOp2) {
-            juce::dsp::SIMDRegister<T> resultVec {};
+            xsimd::batch<T> resultVec {};
             while (--numVecOps >= 0)
             {
                 resultVec = vecOp (resultVec, loadOp1 (src1), loadOp2 (src2));
@@ -267,8 +279,8 @@ namespace detail
         };
 
         // define load operations
-        auto loadA = [] (const T* val) { return juce::dsp::SIMDRegister<T>::fromRawArray (val); };
-        auto loadU = [] (const T* val) { return loadUnaligned (val); };
+        auto loadA = [] (const T* val) { return xsimd::load_aligned (val); };
+        auto loadU = [] (const T* val) { return xsimd::load_unaligned (val); };
 
         // select load operations based on data alignment
         const auto isSrc1Aligned = isAligned (src1);
@@ -340,7 +352,6 @@ void divide (double* dest, const double* dividend, const double* divisor, int nu
                       divisor,
                       numValues,
                       [] (auto num, auto den) {
-                          using namespace chowdsp::SIMDUtils;
                           return num / den;
                       });
 #endif
@@ -355,7 +366,6 @@ void divide (float* dest, float dividend, const float* divisor, int numValues) n
                      divisor,
                      numValues,
                      [dividend] (auto x) {
-                         using namespace chowdsp::SIMDUtils;
                          return dividend / x;
                      });
 #endif
@@ -370,7 +380,6 @@ void divide (double* dest, double dividend, const double* divisor, int numValues
                      divisor,
                      numValues,
                      [dividend] (auto x) {
-                         using namespace chowdsp::SIMDUtils;
                          return dividend / x;
                      });
 #endif
@@ -447,7 +456,6 @@ float findAbsoluteMaximum (const float* src, int numValues) noexcept
     vDSP_maxmgv (src, 1, &result, (vDSP_Length) numValues);
     return result;
 #else
-    using Vec = juce::dsp::SIMDRegister<float>;
     return detail::reduce (
         src,
         numValues,
@@ -465,13 +473,12 @@ double findAbsoluteMaximum (const double* src, int numValues) noexcept
     vDSP_maxmgvD (src, 1, &result, (vDSP_Length) numValues);
     return result;
 #else
-    using Vec = juce::dsp::SIMDRegister<double>;
     return detail::reduce (
         src,
         numValues,
         0.0,
         [] (auto a, auto b) { return juce::jmax (a, std::abs (b)); },
-        [] (auto a, auto b) { return Vec::max (a, Vec::abs (b)); },
+        [] (auto a, auto b) { return xsimd::max (a, xsimd::abs (b)); },
         [] (auto x) { return SIMDUtils::hMaxSIMD (x); });
 #endif
 }
@@ -540,7 +547,13 @@ void integerPowerT (T* dest, const T* src, int exponent, int numValues) noexcept
         default:
             // this method will not be as fast for values outside the range [0, 16]
             detail::unaryOp (
-                dest, src, numValues, [exponent] (auto x) { return std::pow (x, (T) exponent); }, [exponent] (auto x) { return SIMDUtils::powSIMD (x, juce::dsp::SIMDRegister<T> ((T) exponent)); });
+                dest,
+                src,
+                numValues,
+                [exponent] (auto x)
+                { return std::pow (x, (T) exponent); },
+                [exponent] (auto x)
+                { return xsimd::pow (x, xsimd::batch<T> ((T) exponent)); });
             break;
     }
 }

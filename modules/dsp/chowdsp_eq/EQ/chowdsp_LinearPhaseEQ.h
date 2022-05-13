@@ -47,7 +47,7 @@ private:
     void hiResTimerCallback() override;
 
     bool attemptIRTransfer();
-    void processBlocksInternal (const juce::dsp::AudioBlock<const float>& inputBlock, juce::dsp::AudioBlock<float>& outputBlock) noexcept;
+    void processBlocksInternal (const chowdsp::AudioBlock<const float>& inputBlock, chowdsp::AudioBlock<float>& outputBlock) noexcept;
 
     PrototypeEQ prototypeEQ;
     EQParams<ProtoEQParams> params;

@@ -44,7 +44,7 @@ private:
     SawtoothWave<T> saw1, saw2;
 
     juce::HeapBlock<char> dataBlock;
-    juce::dsp::AudioBlock<T> interMediateData;
+    chowdsp::AudioBlock<T> interMediateData;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SquareWave)
 };

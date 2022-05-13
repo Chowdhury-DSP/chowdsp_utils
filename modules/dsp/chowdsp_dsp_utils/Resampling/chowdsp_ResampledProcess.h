@@ -77,12 +77,12 @@ public:
      * 
      *  @return the output block of generated samples at the target sample rate
      */
-    juce::dsp::AudioBlock<float> processIn (const juce::dsp::AudioBlock<float>& block) noexcept
+    chowdsp::AudioBlock<float> processIn (const chowdsp::AudioBlock<float>& block) noexcept
     {
         return inputResampler.process (block);
     }
 
-    void processOut (const juce::dsp::AudioBlock<float>& inBlock, juce::dsp::AudioBlock<float>& outputBlock)
+    void processOut (const chowdsp::AudioBlock<float>& inBlock, chowdsp::AudioBlock<float>& outputBlock)
     {
         auto outBlockTemp = outputResampler.process (inBlock);
 

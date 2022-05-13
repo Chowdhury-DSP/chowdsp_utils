@@ -36,8 +36,8 @@ public:
         std::copy (data, data + blockSize, modFilterData);
 
         float* modFilterDataPtr[] = { modFilterData };
-        auto&& modBlock = juce::dsp::AudioBlock<float> { modFilterDataPtr, 1, blockSize };
-        modFilter.process (juce::dsp::ProcessContextReplacing<float> { modBlock });
+        auto&& modBlock = chowdsp::AudioBlock<float> { modFilterDataPtr, 1, blockSize };
+        modFilter.process (chowdsp::ProcessContextReplacing<float> { modBlock });
 
         for (int n = 0; n < blockSize; ++n)
             expectWithinAbsoluteError (modFilterData[n], originalFilterData[n], 1.0e-3f, "Sample " + juce::String (n) + " is incorrect");

@@ -89,7 +89,7 @@ public:
             if (evenOn)
             {
                 inputFilter->calcG();
-                buffer[bufferPtr++] = SIMDComplexMulReal (inputFilter->Gcalc, inputFilter->x).sum();
+                buffer[bufferPtr++] = xsimd::hadd (SIMDUtils::SIMDComplexMulReal (inputFilter->Gcalc, inputFilter->x));
                 bufferPtr = (bufferPtr <= STAGES) ? bufferPtr : 0;
             }
             else
@@ -108,7 +108,7 @@ public:
 
         inputFilter->process (u);
         outputFilter->process (xOutAccum);
-        float sumOut = xOutAccum._r.sum();
+        float sumOut = xsimd::hadd (xOutAccum.real());
         return H0 * yBBD_old + sumOut;
     }
 
@@ -117,14 +117,14 @@ public:
     inline std::enable_if_t<! A, float>
         process (float u) noexcept
     {
-        SIMDComplex<float> xOutAccum;
+        SIMDComplex<float> xOutAccum {};
         float yBBD, delta;
         while (tn < Ts)
         {
             if (evenOn)
             {
                 inputFilter->calcG();
-                buffer[bufferPtr++] = SIMDComplexMulReal (inputFilter->Gcalc, inputFilter->x).sum();
+                buffer[bufferPtr++] = xsimd::hadd (SIMDUtils::SIMDComplexMulReal (inputFilter->Gcalc, inputFilter->x));
                 bufferPtr = (bufferPtr <= STAGES) ? bufferPtr : 0;
             }
             else
@@ -143,7 +143,7 @@ public:
 
         inputFilter->process (u);
         outputFilter->process (xOutAccum);
-        float sumOut = xOutAccum._r.sum();
+        float sumOut = xsimd::hadd (xOutAccum.real());
         return H0 * yBBD_old + sumOut;
     }
 

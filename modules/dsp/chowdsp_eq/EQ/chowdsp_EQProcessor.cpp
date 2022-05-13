@@ -63,9 +63,9 @@ void EQProcessor<FloatType, numBands, EQBandType>::reset()
 }
 
 template <typename FloatType, size_t numBands, typename EQBandType>
-void EQProcessor<FloatType, numBands, EQBandType>::process (juce::dsp::AudioBlock<FloatType> block)
+void EQProcessor<FloatType, numBands, EQBandType>::process (chowdsp::AudioBlock<FloatType> block)
 {
-    auto&& context = juce::dsp::ProcessContextReplacing<FloatType> { block };
+    auto&& context = chowdsp::ProcessContextReplacing<FloatType> { block };
 
     for (size_t i = 0; i < numBands; ++i)
     {

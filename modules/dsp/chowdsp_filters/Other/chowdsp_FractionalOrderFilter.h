@@ -77,7 +77,7 @@ public:
     }
 
     /** Process block of samples */
-    void processBlock (juce::dsp::AudioBlock<FloatType>& block) noexcept
+    void processBlock (chowdsp::AudioBlock<FloatType>& block) noexcept
     {
         for (auto& filt : filters)
             filt.processBlock (block);

@@ -96,7 +96,7 @@ public:
 
         if (context.isBypassed)
         {
-            AudioBlockHelpers::copyBlocks (outputBlock, inputBlock);
+            outputBlock.copyFrom (inputBlock);
             return;
         }
 

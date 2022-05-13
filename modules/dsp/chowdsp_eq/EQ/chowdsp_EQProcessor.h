@@ -55,7 +55,7 @@ public:
     void reset();
 
     /** Processes an audio block */
-    void process (juce::dsp::AudioBlock<FloatType> block);
+    void process (chowdsp::AudioBlock<FloatType> block);
 
 private:
     std::array<EQBandType, numBands> bands;

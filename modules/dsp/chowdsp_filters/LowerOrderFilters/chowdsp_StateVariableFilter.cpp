@@ -12,15 +12,8 @@ StateVariableFilter<SampleType>::StateVariableFilter()
 template <typename SampleType>
 void StateVariableFilter<SampleType>::setCutoffFrequency (SampleType newCutoffFrequencyHz)
 {
-    if constexpr (std::is_floating_point_v<SampleType>)
-    {
-        jassert (juce::isPositiveAndBelow (newCutoffFrequencyHz, static_cast<NumericType> (sampleRate * 0.5)));
-    }
-    else if constexpr (SampleTypeHelpers::IsSIMDRegister<SampleType>)
-    {
-        for (size_t i = 0; i < SampleType::size(); ++i)
-            jassert (juce::isPositiveAndBelow (newCutoffFrequencyHz.get (i), static_cast<NumericType> (sampleRate * 0.5)));
-    }
+    jassert (SIMDUtils::all (newCutoffFrequencyHz >= static_cast<NumericType> (0)));
+    jassert (SIMDUtils::all (newCutoffFrequencyHz < static_cast<NumericType> (sampleRate * 0.5)));
 
     cutoffFrequency = newCutoffFrequencyHz;
     update();
@@ -29,15 +22,7 @@ void StateVariableFilter<SampleType>::setCutoffFrequency (SampleType newCutoffFr
 template <typename SampleType>
 void StateVariableFilter<SampleType>::setResonance (SampleType newResonance)
 {
-    if constexpr (std::is_floating_point_v<SampleType>)
-    {
-        jassert (newResonance > static_cast<NumericType> (0));
-    }
-    else if constexpr (SampleTypeHelpers::IsSIMDRegister<SampleType>)
-    {
-        for (size_t i = 0; i < SampleType::size(); ++i)
-            jassert (newResonance.get (i) > static_cast<NumericType> (0));
-    }
+    SIMDUtils::all (newResonance > static_cast<NumericType> (0));
 
     resonance = newResonance;
     update();
@@ -84,12 +69,8 @@ void StateVariableFilter<SampleType>::snapToZero() noexcept
 template <typename SampleType>
 void StateVariableFilter<SampleType>::update()
 {
-    using namespace SIMDUtils;
-
-    if constexpr (std::is_floating_point_v<SampleType>)
-        g = static_cast<NumericType> (std::tan (juce::MathConstants<NumericType>::pi * cutoffFrequency / sampleRate));
-    else if constexpr (SampleTypeHelpers::IsSIMDRegister<SampleType>)
-        g = tanSIMD (juce::MathConstants<NumericType>::pi * cutoffFrequency / (NumericType) sampleRate);
+    CHOWDSP_USING_XSIMD_STD (tan)
+    g = (SampleType) tan (juce::MathConstants<NumericType>::pi * cutoffFrequency / (NumericType) sampleRate);
 
     R2 = ((NumericType) 1.0 / resonance);
     h = ((NumericType) 1.0 / ((NumericType) 1.0 + R2 * g + g * g));

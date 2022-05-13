@@ -2,21 +2,31 @@
 
 namespace chowdsp::SIMDUtils
 {
+/** Scalar specialization of juce::Decibels::gainToDecibels */
+template <typename T>
+inline T gainToDecibels (T gain, T minusInfinityDB = (T) -100.0)
+{
+    return juce::Decibels::gainToDecibels (gain, minusInfinityDB);
+}
+
+/** Scalar specialization of juce::Decibels::decibelsToGain */
+template <typename T>
+inline T decibelsToGain (T decibels, T minusInfinityDB = (T) -100.0)
+{
+    return juce::Decibels::decibelsToGain (decibels, minusInfinityDB);
+}
+
 /** SIMD specialization of juce::Decibels::gainToDecibels */
 template <typename T>
-inline juce::dsp::SIMDRegister<T> gainToDecibels (const juce::dsp::SIMDRegister<T>& gain, T minusInfinityDB = (T) -100.0)
+inline xsimd::batch<T> gainToDecibels (const xsimd::batch<T>& gain, T minusInfinityDB = (T) -100.0)
 {
-    using Vec = juce::dsp::SIMDRegister<T>;
-    auto gZero = Vec::greaterThan (gain, (T) 0.0);
-    return select (gZero, Vec::max (log10SIMD (gain) * (T) 20.0, minusInfinityDB), (Vec) minusInfinityDB);
+    return xsimd::select (gain > (T) 0, xsimd::max (xsimd::log10 (gain) * (T) 20, minusInfinityDB), minusInfinityDB);
 }
 
 /** SIMD specialization of juce::Decibels::decibelsToGain */
 template <typename T>
-inline juce::dsp::SIMDRegister<T> decibelsToGain (const juce::dsp::SIMDRegister<T>& decibels, T minusInfinityDB = (T) -100.0)
+inline xsimd::batch<T> decibelsToGain (const xsimd::batch<T>& decibels, T minusInfinityDB = (T) -100.0)
 {
-    using Vec = juce::dsp::SIMDRegister<T>;
-    auto gZero = Vec::greaterThan (decibels, minusInfinityDB);
-    return select (gZero, powSIMD ((Vec) (T) 10.0, decibels * (T) 0.05), Vec());
+    return xsimd::select (decibels > minusInfinityDB, xsimd::pow ((xsimd::batch<T>) 10, decibels * (T) 0.05), {});
 }
 } // namespace chowdsp::SIMDUtils

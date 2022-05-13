@@ -91,10 +91,10 @@ protected:
 //=========================================================================
 /** An implementation of the modal filter parallelised with SIMDComplex. */
 template <typename FloatType>
-class ModalFilter<juce::dsp::SIMDRegister<FloatType>>
+class ModalFilter<xsimd::batch<FloatType>>
 {
-    using VType = juce::dsp::SIMDRegister<FloatType>;
-    using CType = SIMDUtils::SIMDComplex<FloatType>;
+    using VType = xsimd::batch<FloatType>;
+    using CType = xsimd::batch<std::complex<FloatType>>;
 
 public:
     ModalFilter() = default;
@@ -103,13 +103,16 @@ public:
     virtual void prepare (FloatType sampleRate);
 
     /** reset filter state */
-    virtual inline void reset() noexcept { y1 = CType { (FloatType) 0, (FloatType) 0 }; }
+    virtual inline void reset() noexcept { y1 = CType {}; }
 
-    /** Sets the complex amplitude of the filter */
-    virtual inline void setAmp (VType amp) noexcept { amplitude = amp; }
+    /** Sets the scalar amplitude of the filter */
+    virtual inline void setAmp (VType amp) noexcept { amplitude = CType { amp, xsimd::batch ((FloatType) 0) }; }
+
+    /** Sets the scalar amplitude of the filter */
+    virtual inline void setAmp (CType amp) noexcept { amplitude = amp; }
 
     /** Sets the amplitude and phase of the filter */
-    virtual inline void setAmp (VType amp, VType phase) noexcept { amplitude = CType::polar (amp, phase); }
+    virtual inline void setAmp (VType amp, VType phase) noexcept { amplitude = SIMDUtils::polar (amp, phase); }
 
     /** Sets the decay characteristic of the filter, in units of T60 */
     virtual inline void setDecay (VType newT60) noexcept
@@ -147,20 +150,19 @@ protected:
     inline VType calcDecayFactor() noexcept
     {
         using namespace SIMDUtils;
-        return powSIMD ((VType) (FloatType) 0.001, (VType) 1 / (t60 * fs));
+        return xsimd::pow ((VType) (FloatType) 0.001, (VType) 1 / (t60 * fs));
     }
 
     inline CType calcOscCoef() noexcept
     {
-        using namespace SIMDUtils;
-        return CType::exp ((freq / fs) * juce::MathConstants<FloatType>::twoPi);
+        return SIMDUtils::polar ((freq / fs) * juce::MathConstants<FloatType>::twoPi);
     }
 
-    CType filtCoef { (FloatType) 0, (FloatType) 0 };
+    CType filtCoef {};
     VType decayFactor = 0;
-    CType oscCoef { (FloatType) 0, (FloatType) 0 };
+    CType oscCoef {};
 
-    CType y1 = { (FloatType) 0, (FloatType) 0 }; // filter state
+    CType y1 = {}; // filter state
 
     VType freq = 1;
     VType t60 = 1;
