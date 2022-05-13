@@ -214,7 +214,8 @@ void EQBand<FloatType, FilterChoices...>::process (const ProcessContext& context
     gainSmooth.process (gainHandle, numSamples);
 
     // the filters will need to do in-place processing anyway, so let's just copy the blocks here
-    AudioBlockHelpers::copyBlocks (block, inputBlock);
+    if (context.usesSeparateInputAndOutputBlocks())
+        block.copyFrom (inputBlock);
 
     if (context.isBypassed)
     {

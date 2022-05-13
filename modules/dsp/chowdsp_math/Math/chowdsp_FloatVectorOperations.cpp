@@ -298,7 +298,7 @@ namespace detail
     template <typename T, typename ScalarOp, typename VecOp>
     T reduce (const T* src1, const T* src2, int numValues, T init, ScalarOp&& scalarOp, VecOp&& vecOp)
     {
-        return reduce (src1, src2, numValues, init, scalarOp, vecOp, [] (auto val) { return val.sum(); });
+        return reduce (src1, src2, numValues, init, scalarOp, vecOp, [] (auto val) { return xsimd::hadd (val); });
     }
 
     template <typename T, typename ScalarOp>
@@ -453,7 +453,7 @@ float findAbsoluteMaximum (const float* src, int numValues) noexcept
         numValues,
         0.0f,
         [] (auto a, auto b) { return juce::jmax (std::abs (a), std::abs (b)); },
-        [] (auto a, auto b) { return Vec::max (Vec::abs (a), Vec::abs (b)); },
+        [] (auto a, auto b) { return xsimd::max (xsimd::abs (a), xsimd::abs (b)); },
         [] (auto x) { return SIMDUtils::hAbsMaxSIMD (x); });
 #endif
 }
