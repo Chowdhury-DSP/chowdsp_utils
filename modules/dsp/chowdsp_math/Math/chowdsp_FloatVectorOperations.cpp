@@ -11,16 +11,16 @@ namespace detail
     template <typename T>
     static bool isAligned (const T* p) noexcept
     {
-        static constexpr auto SIMDRegisterSize = sizeof (xsimd::batch<T>);
-        uintptr_t bitmask = SIMDRegisterSize - 1;
+        static constexpr auto RegisterSize = sizeof (xsimd::batch<T>);
+        uintptr_t bitmask = RegisterSize - 1;
         return (reinterpret_cast<uintptr_t> (p) & bitmask) == 0;
     }
 
     template <typename T>
     static T* getNextAlignedPtr (T* p) noexcept
     {
-        static constexpr auto SIMDRegisterSize = sizeof (xsimd::batch<std::remove_const_t<T>>);
-        return juce::snapPointerToAlignment (p, SIMDRegisterSize); // xsimd::batch<std::remove_const_t<T>>::size);
+        static constexpr auto RegisterSize = sizeof (xsimd::batch<std::remove_const_t<T>>);
+        return juce::snapPointerToAlignment (p, RegisterSize); // xsimd::batch<std::remove_const_t<T>>::size);
     }
 
     template <typename T, typename Op>
@@ -456,7 +456,6 @@ float findAbsoluteMaximum (const float* src, int numValues) noexcept
     vDSP_maxmgv (src, 1, &result, (vDSP_Length) numValues);
     return result;
 #else
-    using Vec = juce::dsp::SIMDRegister<float>;
     return detail::reduce (
         src,
         numValues,
@@ -474,7 +473,6 @@ double findAbsoluteMaximum (const double* src, int numValues) noexcept
     vDSP_maxmgvD (src, 1, &result, (vDSP_Length) numValues);
     return result;
 #else
-    using Vec = juce::dsp::SIMDRegister<double>;
     return detail::reduce (
         src,
         numValues,

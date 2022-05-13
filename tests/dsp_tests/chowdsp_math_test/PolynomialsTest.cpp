@@ -13,7 +13,9 @@ public:
     template <typename T>
     T getMaxErr (T value)
     {
-        return std::abs (value * (T) 0.001);
+        using std::abs;
+        using xsimd::abs;
+        return abs (value * (T) (NumericType<T>) 0.001);
     }
 
     template <typename T>
@@ -27,6 +29,18 @@ public:
     {
         auto maxErr = getMaxErr (exp);
         expectWithinAbsoluteError (actual, exp, maxErr, message);
+    }
+
+    template <typename T>
+    void checkError (xsimd::batch<T> actual, xsimd::batch<T> exp, const juce::String& message)
+    {
+        T actualData alignas (chowdsp::SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[xsimd::batch<T>::size]{};
+        xsimd::store_aligned (actualData, actual);
+
+        T expData alignas (chowdsp::SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[xsimd::batch<T>::size]{};
+        xsimd::store_aligned (expData, exp);
+
+        checkError (actualData[0], expData[0], message);
     }
 
     template <typename T>
@@ -146,9 +160,9 @@ public:
         estrinsMethodTest<4> (double4, testCDoubleVals);
         estrinsMethodTest<7> (cdouble7, testCDoubleVals);
 
-        const juce::dsp::SIMDRegister<float> vfloat4[] = { { 1.0f }, { 0.0f }, { -12.0f }, { 0.5f }, { 3.0f } };
-        const juce::dsp::SIMDRegister<double> vdouble7[] = { { 1.0 }, { 0.0 }, { 12.0 }, { -2.0 }, { 0.2 }, { 0.65 }, { 90.0 }, { -121.0 } };
-        const std::array<juce::dsp::SIMDRegister<double>, 7> testVDoubleVals { 1.0, -1.0, 0.0, 4.0, -5.5, 100.0, -10000.0 };
+        const xsimd::batch<float> vfloat4[] = { xsimd::batch (1.0f), xsimd::batch (0.0f), xsimd::batch (-12.0f), xsimd::batch (0.5f), xsimd::batch (3.0f) };
+        const xsimd::batch<double> vdouble7[] = { xsimd::batch (1.0), xsimd::batch (0.0), xsimd::batch (12.0), xsimd::batch (-2.0), xsimd::batch (0.2), xsimd::batch (0.65), xsimd::batch (90.0), xsimd::batch (-121.0) };
+        const std::array<xsimd::batch<double>, 7> testVDoubleVals { 1.0, -1.0, 0.0, 4.0, -5.5, 100.0, -10000.0 };
 
         beginTest ("Horner's Method Test SIMD (Float/Double)");
         hornersMethodTest<4> (vfloat4, testFloatVals);
