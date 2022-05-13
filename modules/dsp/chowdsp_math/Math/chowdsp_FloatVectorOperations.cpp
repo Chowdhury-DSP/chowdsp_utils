@@ -216,7 +216,7 @@ namespace detail
         }
 
         // Main loop here...
-        T initData alignas (xsimd::default_arch::alignment())[vecSize] {};
+        T initData alignas (xsimd::default_arch::alignment())[(size_t) vecSize] {};
         initData[0] = init;
         auto resultVec = xsimd::load_aligned (initData);
         while (--numVecOps >= 0)

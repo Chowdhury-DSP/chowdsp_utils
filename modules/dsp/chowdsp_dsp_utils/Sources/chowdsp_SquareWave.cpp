@@ -43,16 +43,16 @@ void SquareWave<T>::process (const ProcessContext& context) noexcept
         return;
     }
 
-    auto&& intBlock = interMediateData.getSubBlock (0, outBlock.getNumSamples());
-    saw2.template process<chowdsp::ProcessContextNonReplacing<T>> (chowdsp::ProcessContextNonReplacing<T> { inBlock, intBlock });
+    auto&& intermediateBlock = interMediateData.getSubBlock (0, outBlock.getNumSamples());
+    saw2.template process<chowdsp::ProcessContextNonReplacing<T>> (chowdsp::ProcessContextNonReplacing<T> { inBlock, intermediateBlock });
 
     if (context.usesSeparateInputAndOutputBlocks())
-        outBlock += intBlock;
+        outBlock += intermediateBlock;
     else
-        outBlock.copyFrom (inBlock);
+        outBlock.copyFrom (intermediateBlock);
 
-    intBlock.clear();
-    saw1.template process<chowdsp::ProcessContextReplacing<T>> (chowdsp::ProcessContextReplacing<T> { intBlock });
-    outBlock -= intBlock;
+    intermediateBlock.clear();
+    saw1.template process<chowdsp::ProcessContextReplacing<T>> (chowdsp::ProcessContextReplacing<T> { intermediateBlock });
+    outBlock -= intermediateBlock;
 }
 } // namespace chowdsp

@@ -97,21 +97,21 @@ void ModalReverbPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
             block,
             [modData, numModesToMod, freqMult, modDepth] (auto& mode, size_t vecModeIndex, size_t sampleIndex) {
                 using Vec = decltype (modalFilterBank)::Vec;
-                const auto modeScalarIndex = vecModeIndex * Vec::size();
+                const auto modeScalarIndex = vecModeIndex * Vec::size;
                 if (modeScalarIndex >= (size_t) numModesToMod)
                     return;
 
                 auto modOffset = Vec (modData[sampleIndex]);
-                if (modeScalarIndex + Vec::size() > (size_t) numModesToMod)
+                if (modeScalarIndex + Vec::size > (size_t) numModesToMod)
                 {
                     const auto numLeftoverModes = (size_t) numModesToMod - modeScalarIndex;
-                    alignas (xsimd::default_arch::alignment()) float modVec[Vec::size()] {};
+                    alignas (xsimd::default_arch::alignment()) float modVec[Vec::size] {};
                     std::fill (modVec, modVec + numLeftoverModes, modData[sampleIndex]);
-                    modOffset = Vec::fromRawArray (modVec);
+                    modOffset = xsimd::load_aligned (modVec);
                 }
 
-                const auto freqOffset = chowdsp::SIMDUtils::powSIMD (Vec (2.0f), modOffset) * modDepth;
-                mode.setFreq (Vec::fromRawArray (ModeParams::freqs + vecModeIndex * Vec::size()) * freqMult * freqOffset);
+                const auto freqOffset = xsimd::pow (Vec (2.0f), modOffset) * modDepth;
+                mode.setFreq (xsimd::load_aligned (ModeParams::freqs + vecModeIndex * Vec::size) * freqMult * freqOffset);
             });
     }
 
