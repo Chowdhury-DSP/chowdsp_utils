@@ -18,7 +18,7 @@ constexpr size_t avgNum = 101;
 constexpr size_t negDiff = avgNum / 2;
 constexpr size_t posDiff = negDiff + 1;
 
-using vec4 = juce::dsp::SIMDRegister<float>;
+using vec4 = xsimd::batch<float>;
 } // namespace
 
 /** Unit tests for chowdsp::Noise. Testing frequency domain accuracy for:
@@ -95,7 +95,7 @@ public:
         return std::move (vecs);
     }
 
-    static std::vector<std::vector<float>> getTestVector (const juce::dsp::AudioBlock<vec4> data)
+    static std::vector<std::vector<float>> getTestVector (const chowdsp::AudioBlock<vec4> data)
     {
         const auto numChannels = data.getNumChannels();
         const auto numSamples = data.getNumSamples();
@@ -121,11 +121,11 @@ public:
         noise.setNoiseType (type);
 
         juce::HeapBlock<char> inBlockData;
-        auto inBlock = juce::dsp::AudioBlock<FloatType> (inBlockData, (size_t) nCh, (size_t) nSamples);
+        auto inBlock = chowdsp::AudioBlock<FloatType> (inBlockData, (size_t) nCh, (size_t) nSamples);
         inBlock.clear();
 
         juce::HeapBlock<char> outBlockData;
-        auto outBlock = juce::dsp::AudioBlock<FloatType> (outBlockData, (size_t) nCh, (size_t) nSamples);
+        auto outBlock = chowdsp::AudioBlock<FloatType> (outBlockData, (size_t) nCh, (size_t) nSamples);
         outBlock.clear();
 
         if (replacing)
@@ -133,7 +133,7 @@ public:
             for (int n = 0; n < (int) nSamples; n += (int) blockSize)
             {
                 auto block = outBlock.getSubBlock ((size_t) n, (size_t) blockSize);
-                juce::dsp::ProcessContextReplacing<FloatType> ctx (block);
+                chowdsp::ProcessContextReplacing<FloatType> ctx (block);
                 noise.process (ctx);
             }
         }
@@ -143,7 +143,7 @@ public:
             {
                 auto inSubBlock = inBlock.getSubBlock ((size_t) n, (size_t) blockSize);
                 auto outSubBlock = outBlock.getSubBlock ((size_t) n, (size_t) blockSize);
-                juce::dsp::ProcessContextNonReplacing<FloatType> ctx (inSubBlock, outSubBlock);
+                chowdsp::ProcessContextNonReplacing<FloatType> ctx { inSubBlock, outSubBlock };
                 noise.process (ctx);
             }
         }

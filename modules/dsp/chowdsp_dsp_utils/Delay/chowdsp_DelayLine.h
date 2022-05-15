@@ -56,7 +56,7 @@ public:
         if (numChannels != bufferData.getNumChannels()
             || numSamples != bufferData.getNumSamples())
         {
-            bufferData = juce::dsp::AudioBlock<SampleType> (dataBlock, numChannels, numSamples);
+            bufferData = chowdsp::AudioBlock<SampleType> (dataBlock, numChannels, numSamples);
         }
 
         bufferData.copyFrom (other.bufferData);
@@ -71,7 +71,7 @@ public:
 
 protected:
     juce::HeapBlock<char> dataBlock;
-    juce::dsp::AudioBlock<SampleType> bufferData;
+    chowdsp::AudioBlock<SampleType> bufferData;
     std::vector<SampleType> v;
     std::vector<int> writePos, readPos;
 };

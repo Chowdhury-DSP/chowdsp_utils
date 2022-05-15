@@ -47,4 +47,4 @@ jobs:
         shell: bash
         env:
           TEST_TARGETS: ${{ matrix.tests }}
-        run: cmake --build . --config Release --parallel 4 --target $TEST_TARGETS
+        run: cmake --build . --config Release --parallel 4 --target $TEST_TARGETS | xcpretty

@@ -10,10 +10,7 @@ void SawtoothWave<T>::setFrequency (T newFrequency) noexcept
 
     // scale by zero if freq == 0, to avoid divide by zero issue
     waveformPreservingScale = fs / ((T) 4 * freq);
-    if constexpr (std::is_floating_point_v<T>)
-        waveformPreservingScale = freq == (T) 0 ? (T) 0 : waveformPreservingScale;
-    else if constexpr (SampleTypeHelpers::IsSIMDRegister<T>)
-        waveformPreservingScale = select (T::equal (freq, (T) 0), (T) 0, waveformPreservingScale);
+    waveformPreservingScale = select (freq == (T) 0, (T) 0, waveformPreservingScale);
 }
 
 template <typename T>

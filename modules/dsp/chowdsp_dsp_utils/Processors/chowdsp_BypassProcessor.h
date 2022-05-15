@@ -65,7 +65,7 @@ public:
       * If it returns false, you can safely skip all other
       * processing.
       */
-    bool processBlockIn (const juce::dsp::AudioBlock<SampleType>& block, bool onOffParam);
+    bool processBlockIn (const chowdsp::AudioBlock<SampleType>& block, bool onOffParam);
 
     /**
       * Call this at the end of your processBlock().
@@ -79,7 +79,7 @@ public:
       * It will fade the dry signal back in with the main
       * signal as needed.
       */
-    void processBlockOut (juce::dsp::AudioBlock<SampleType>& block, bool onOffParam);
+    void processBlockOut (chowdsp::AudioBlock<SampleType>& block, bool onOffParam);
 
 private:
     void setLatencySamplesInternal (SampleType delaySamples);
@@ -87,7 +87,7 @@ private:
 
     bool prevOnOffParam = false;
     juce::AudioBuffer<SampleType> fadeBuffer;
-    juce::dsp::AudioBlock<SampleType> fadeBlock;
+    chowdsp::AudioBlock<SampleType> fadeBlock;
 
     DelayLine<SampleType, DelayInterpType> compDelay { 1 << 18 }; // max latency = 2^18 = 262144 samples
     SampleType prevDelay {};

@@ -34,11 +34,11 @@ namespace chowdsp::SIMDUtils
     @tags{Audio}
 */
 template <typename SmFloatType, typename SmoothingType>
-class SIMDSmoothedValue : public juce::SmoothedValueBase<SIMDSmoothedValue<juce::dsp::SIMDRegister<SmFloatType>, SmoothingType>>
+class SIMDSmoothedValue : public juce::SmoothedValueBase<SIMDSmoothedValue<xsimd::batch<SmFloatType>, SmoothingType>>
 {
 public:
     //==============================================================================
-    using VecType = juce::dsp::SIMDRegister<SmFloatType>;
+    using VecType = xsimd::batch<SmFloatType>;
 
     /** Constructor. */
     SIMDSmoothedValue() noexcept
@@ -83,7 +83,7 @@ public:
     */
     void setTargetValue (VecType newValue) noexcept
     {
-        if (newValue == this->target)
+        if (xsimd::all (newValue == this->target))
             return;
 
         if (stepsToTarget <= 0)
@@ -93,7 +93,7 @@ public:
         }
 
         // Multiplicative smoothed values cannot ever reach 0!
-        jassert (! (std::is_same_v<SmoothingType, juce::ValueSmoothingTypes::Multiplicative> && newValue == 0));
+        jassert (! (std::is_same_v<SmoothingType, juce::ValueSmoothingTypes::Multiplicative> && xsimd::any (newValue == (SmFloatType) 0)));
 
         this->target = newValue;
         this->countdown = stepsToTarget;
@@ -161,7 +161,7 @@ private:
     template <typename T = SmoothingType>
     MultiplicativeVoid<T> setStepSize()
     {
-        step = expSIMD ((logSIMD (VecType::abs (this->target)) - logSIMD (VecType::abs (this->currentValue))) / (VecType) (SmFloatType) this->countdown);
+        step = xsimd::exp ((xsimd::log (xsimd::abs (this->target)) - xsimd::log (xsimd::abs (this->currentValue))) / (VecType) (SmFloatType) this->countdown);
     }
 
     //==============================================================================
@@ -187,12 +187,11 @@ private:
     template <typename T = SmoothingType>
     MultiplicativeVoid<T> skipCurrentValue (int numSamples)
     {
-        this->currentValue *= powSIMD (step, (VecType) numSamples);
+        this->currentValue *= xsimd::pow (step, (VecType) numSamples);
     }
 
     //==============================================================================
     VecType step = SmFloatType();
     int stepsToTarget = 0;
 };
-
 } // namespace chowdsp::SIMDUtils

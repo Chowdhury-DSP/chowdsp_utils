@@ -4,6 +4,10 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
+#if JUCE_MODULE_AVAILABLE_chowdsp_dsp_data_structures
+#include <chowdsp_dsp_data_structures/chowdsp_dsp_data_structures.h>
+#endif
+
 namespace test_utils
 {
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wpessimizing-move") // Clang doesn't like std::move
@@ -61,11 +65,12 @@ inline juce::AudioBuffer<float> makeNoise (float sampleRate, float lengthSeconds
     return makeNoise (rand, lengthSamples);
 }
 
+#if JUCE_MODULE_AVAILABLE_chowdsp_dsp_data_structures
 /** Convert from a AudioBuffer to AudioBlock (maybe changing data type...) */
 template <typename T, typename NumericType = typename juce::dsp::SampleTypeHelpers::ElementType<T>::Type>
-inline juce::dsp::AudioBlock<T> bufferToBlock (juce::HeapBlock<char>& dataBlock, const juce::AudioBuffer<NumericType>& buffer)
+inline chowdsp::AudioBlock<T> bufferToBlock (juce::HeapBlock<char>& dataBlock, const juce::AudioBuffer<NumericType>& buffer)
 {
-    juce::dsp::AudioBlock<T> block { dataBlock, 1, (size_t) buffer.getNumSamples() };
+    chowdsp::AudioBlock<T> block { dataBlock, 1, (size_t) buffer.getNumSamples() };
     for (int i = 0; i < buffer.getNumSamples(); ++i)
         block.setSample (0, i, buffer.getSample (0, i));
 
@@ -74,7 +79,7 @@ inline juce::dsp::AudioBlock<T> bufferToBlock (juce::HeapBlock<char>& dataBlock,
 
 /** Convert from a AudioBlock to AudioBuffer (maybe changing data type...) */
 template <typename T, typename NumericType = typename juce::dsp::SampleTypeHelpers::ElementType<T>::Type>
-inline void blockToBuffer (juce::AudioBuffer<NumericType>& buffer, const juce::dsp::AudioBlock<T>& block)
+inline void blockToBuffer (juce::AudioBuffer<NumericType>& buffer, const chowdsp::AudioBlock<T>& block)
 {
     if constexpr (std::is_floating_point<T>::value)
     {
@@ -87,6 +92,8 @@ inline void blockToBuffer (juce::AudioBuffer<NumericType>& buffer, const juce::d
             buffer.setSample (0, i, block.getSample (0, i).get (0));
     }
 }
+#endif // JUCE_MODULE_AVAILABLE_chowdsp_dsp_data_structures
+
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
 struct ScopedFile

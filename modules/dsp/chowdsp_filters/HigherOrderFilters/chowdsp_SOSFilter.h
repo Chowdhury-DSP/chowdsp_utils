@@ -45,7 +45,7 @@ public:
     }
 
     /** Process block of samples */
-    void processBlock (juce::dsp::AudioBlock<FloatType>& block) noexcept
+    void processBlock (chowdsp::AudioBlock<FloatType>& block) noexcept
     {
         for (auto& sos : secondOrderSections)
             sos.processBlock (block);
@@ -53,7 +53,7 @@ public:
 
     /** Process block of samples with a custom modulation callback which is called every sample */
     template <typename Modulator>
-    void processBlockWithModulation (juce::dsp::AudioBlock<FloatType>& block, Modulator&& modulator) noexcept
+    void processBlockWithModulation (chowdsp::AudioBlock<FloatType>& block, Modulator&& modulator) noexcept
     {
         const auto numChannels = block.getNumChannels();
         const auto numSamples = (int) block.getNumSamples();

@@ -73,9 +73,9 @@ public:
     }
 
     /** Process a block of data */
-    juce::dsp::AudioBlock<T> process (const juce::dsp::AudioBlock<const T>& block) noexcept
+    chowdsp::AudioBlock<T> process (const chowdsp::AudioBlock<const T>& block) noexcept
     {
-        auto outBlock = juce::dsp::AudioBlock<T> { upsampledBuffer };
+        auto outBlock = chowdsp::AudioBlock<T> { upsampledBuffer };
 
         const auto numChannels = block.getNumChannels();
         const auto numSamples = (int) block.getNumSamples();

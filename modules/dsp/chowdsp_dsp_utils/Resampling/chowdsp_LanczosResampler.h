@@ -18,7 +18,7 @@ template <size_t BUFFER_SIZE = 4096, size_t A = 4>
 class LanczosResampler : public BaseResampler
 {
 public:
-    static_assert (A % (juce::dsp::SIMDRegister<float>::size() / 2) == 0, "A must be a multiple of half the SIMD register width");
+    static_assert (A % (xsimd::batch<float>::size / 2) == 0, "A must be a multiple of half the SIMD register width");
 
     /** Default constructor */
     LanczosResampler()
@@ -111,8 +111,8 @@ private:
     static constexpr size_t tableObs = BUFFER_SIZE * 2;
     static constexpr double dx = 1.0 / (tableObs);
 
-    static float lanczosTable alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[tableObs + 1][filterWidth];
-    static float lanczosTableDX alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[tableObs + 1][filterWidth];
+    static float lanczosTable alignas (xsimd::default_arch::alignment())[tableObs + 1][filterWidth];
+    static float lanczosTableDX alignas (xsimd::default_arch::alignment())[tableObs + 1][filterWidth];
     static bool tablesInitialized;
 
     float state[BUFFER_SIZE * 2] { 0.0f };
@@ -173,20 +173,20 @@ private:
         int tidx = (int) off0byto;
         double fidx = (off0byto - tidx);
 
-        using SR = juce::dsp::SIMDRegister<float>;
+        using SR = xsimd::batch<float>;
         auto rv = SR (0.0f);
         const auto fl = SR ((float) fidx);
-        for (size_t i = 0; i < filterWidth; i += SR::size())
+        for (size_t i = 0; i < filterWidth; i += SR::size)
         {
-            auto fn = SR::fromRawArray (&lanczosTable[tidx][i]);
-            auto dfn = SR::fromRawArray (&lanczosTableDX[tidx][i]);
+            auto fn = xsimd::load_aligned (&lanczosTable[tidx][i]);
+            auto dfn = xsimd::load_aligned (&lanczosTableDX[tidx][i]);
             fn = fn + (dfn * fl);
 
-            auto dn = SIMDUtils::loadUnaligned (&state[idx0 - (int) A + (int) i]);
+            auto dn = xsimd::load_unaligned (&state[idx0 - (int) A + (int) i]);
             rv += fn * dn;
         }
 
-        return rv.sum();
+        return xsimd::hadd (rv);
     }
 
     size_t populateNext (float* f, size_t max)
@@ -216,10 +216,10 @@ private:
 };
 
 template <size_t BUFFER_SIZE, size_t A>
-float LanczosResampler<BUFFER_SIZE, A>::lanczosTable alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[LanczosResampler::tableObs + 1][LanczosResampler::filterWidth];
+float LanczosResampler<BUFFER_SIZE, A>::lanczosTable alignas (xsimd::default_arch::alignment())[LanczosResampler::tableObs + 1][LanczosResampler::filterWidth];
 
 template <size_t BUFFER_SIZE, size_t A>
-float LanczosResampler<BUFFER_SIZE, A>::lanczosTableDX alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[LanczosResampler::tableObs + 1][LanczosResampler::filterWidth];
+float LanczosResampler<BUFFER_SIZE, A>::lanczosTableDX alignas (xsimd::default_arch::alignment())[LanczosResampler::tableObs + 1][LanczosResampler::filterWidth];
 
 template <size_t BUFFER_SIZE, size_t A>
 bool LanczosResampler<BUFFER_SIZE, A>::tablesInitialized = false;

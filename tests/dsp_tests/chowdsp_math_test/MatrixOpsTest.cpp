@@ -10,8 +10,8 @@ public:
     {
         constexpr size_t size = 8;
 
-        std::array<float, size> data;
-        std::array<float, size> data2;
+        std::array<float, size> data {};
+        std::array<float, size> data2 {};
         std::fill (data.begin(), data.end(), 1.0f);
 
         chowdsp::MatrixOps::HouseHolder<float, size>::outOfPlace (data2.data(), data.data());
@@ -26,22 +26,21 @@ public:
 
     void houseHolderVecTest()
     {
-        using VecType = juce::dsp::SIMDRegister<float>;
-        std::array<VecType, 2> data;
+        using VecType = xsimd::batch<float>;
+        std::array<VecType, 2> data {};
         std::fill (data.begin(), data.end(), 1.0f);
         chowdsp::MatrixOps::HouseHolder<VecType, 2>::inPlace (data.data());
 
         for (auto& x : data)
-            for (size_t i = 0; i < VecType::size(); ++i)
-                expectEquals (x.get (i), -1.0f, "Householder ouput is incorrect!");
+            expect (xsimd::all (x == -1.0f), "Householder ouput is incorrect!");
     }
 
     void hadamardTest()
     {
         constexpr size_t size = 8;
 
-        std::array<float, size> data;
-        std::array<float, size> data2;
+        std::array<float, size> data {};
+        std::array<float, size> data2 {};
         std::fill (data.begin(), data.end(), 1.0f);
 
         chowdsp::MatrixOps::Hadamard<float, size>::outOfPlace (data2.data(), data.data());
@@ -54,18 +53,18 @@ public:
 
     void hadamardVecTest()
     {
-        using VecType = juce::dsp::SIMDRegister<float>;
+        using VecType = xsimd::batch<float>;
         constexpr size_t size = 2;
-        std::array<VecType, size> data;
+        std::array<VecType, size> data {};
         std::fill (data.begin(), data.end(), 1.0f);
         chowdsp::MatrixOps::Hadamard<VecType, size>::inPlace (data.data());
 
-        expectEquals (data[0].get (0), float (size * VecType ::size()) / (float) sqrt (size * VecType::size()), "Hadamard value 0 is incorrect!");
+        expectEquals (data[0].get (0), float (size * VecType ::size) / (float) sqrt (size * VecType::size), "Hadamard value 0 is incorrect!");
         expectEquals (data[0].get (1), 0.0f, "Hadamard output is incorrect!");
         expectEquals (data[0].get (2), 0.0f, "Hadamard output is incorrect!");
         expectEquals (data[0].get (3), 0.0f, "Hadamard output is incorrect!");
         for (size_t i = 1; i < size; ++i)
-            for (size_t j = 0; j < VecType::size(); ++j)
+            for (size_t j = 0; j < VecType::size; ++j)
                 expectEquals (data[i].get (j), 0.0f, "Hadamard ouput is incorrect!");
     }
 
