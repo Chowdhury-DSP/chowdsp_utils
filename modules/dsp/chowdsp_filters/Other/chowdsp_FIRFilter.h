@@ -4,7 +4,6 @@ JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wsign-conversion")
 
 namespace chowdsp
 {
-
 template <typename FloatType>
 class FIRFilter
 {
