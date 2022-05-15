@@ -28,6 +28,22 @@ public:
         expectEquals (chowdsp::ceiling_divide (9, 4), 3, "Ceiling divide 9 / 4 should equal 3");
     }
 
+    void signumTest()
+    {
+        expectEquals (chowdsp::sign (-1), -1, "Signum of negative number is incorrect!");
+        expectEquals (chowdsp::sign (-10), -1, "Signum of negative number is incorrect!");
+        expectEquals (chowdsp::sign (0), 0, "Signum of zero is incorrect!");
+        expectEquals (chowdsp::sign (1), 1, "Signum of positive number is incorrect!");
+        expectEquals (chowdsp::sign (10), 1, "Signum of positive number is incorrect!");
+    }
+
+    void signumSIMDTest()
+    {
+        xsimd::batch<float> x { -2.0f, 0.0f, 1.0f, 10.0f };
+        xsimd::batch<float> expected { -1.0f, 0.0f, 1.0f, 1.0f };
+        expect (xsimd::all (chowdsp::sign (x) == expected), "SIMD signum is incorrect");
+    }
+
     void runTestTimed() override
     {
         beginTest ("Log2 Test");
@@ -35,6 +51,12 @@ public:
 
         beginTest ("Ceiling Divide Test");
         ceilingDivideTest();
+
+        beginTest ("Signum Test");
+        signumTest();
+
+        beginTest ("Signum SIMD Test");
+        signumSIMDTest();
     }
 };
 
