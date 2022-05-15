@@ -62,7 +62,7 @@ public:
 
         auto buffer = test_utils::makeSineWave<float> (2 * fc, fs, 1.0f);
         auto&& block = juce::dsp::AudioBlock<float> { buffer };
-        filters.process (juce::dsp::ProcessContextReplacing<float> { block });
+        filters.process (chowdsp::ProcessContextReplacing<float> { block });
 
         checkBufferLevel (buffer, -48.0f, 0.5f, "NthOrderFilter process() is incorrect!");
     }

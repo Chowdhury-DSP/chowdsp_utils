@@ -100,7 +100,7 @@ void EQBand<FloatType, FilterChoices...>::reset()
 template <typename FloatType, typename... FilterChoices>
 template <typename FilterType, typename T, size_t N>
 std::enable_if_t<std::is_base_of_v<IIRFilter<N, T>, FilterType> || std::is_base_of_v<SOSFilter<N, T>, FilterType>, void>
-    EQBand<FloatType, FilterChoices...>::processFilterChannel (FilterType& filter, juce::dsp::AudioBlock<FloatType>& block)
+    EQBand<FloatType, FilterChoices...>::processFilterChannel (FilterType& filter, chowdsp::AudioBlock<FloatType>& block)
 {
     auto setParams = [&filter, fs = this->fs] (FloatType curFreq, FloatType curQ, FloatType curGain) {
         if constexpr (! FilterType::HasQParameter)
@@ -139,7 +139,7 @@ std::enable_if_t<std::is_base_of_v<IIRFilter<N, T>, FilterType> || std::is_base_
 template <typename FloatType, typename... FilterChoices>
 template <typename FilterType, typename T, size_t N, StateVariableFilterType type>
 std::enable_if_t<std::is_base_of_v<NthOrderFilter<T, N, type>, FilterType>, void>
-    EQBand<FloatType, FilterChoices...>::processFilterChannel (FilterType& filter, juce::dsp::AudioBlock<FloatType>& block)
+    EQBand<FloatType, FilterChoices...>::processFilterChannel (FilterType& filter, chowdsp::AudioBlock<FloatType>& block)
 {
     const auto numChannels = (int) block.getNumChannels();
     const auto numSamples = (int) block.getNumSamples();
@@ -179,7 +179,7 @@ std::enable_if_t<std::is_base_of_v<NthOrderFilter<T, N, type>, FilterType>, void
     {
         filter.setCutoffFrequency (freqSmooth.getCurrentValue());
         filter.setQValue (qSmooth.getCurrentValue());
-        filter.process (juce::dsp::ProcessContextReplacing<FloatType> { block });
+        filter.process (chowdsp::ProcessContextReplacing<FloatType> { block });
     }
 }
 
@@ -214,7 +214,8 @@ void EQBand<FloatType, FilterChoices...>::process (const ProcessContext& context
     gainSmooth.process (gainHandle, numSamples);
 
     // the filters will need to do in-place processing anyway, so let's just copy the blocks here
-    AudioBlockHelpers::copyBlocks (block, inputBlock);
+    if (context.usesSeparateInputAndOutputBlocks())
+        block.copyFrom (inputBlock);
 
     if (context.isBypassed)
     {
@@ -237,7 +238,7 @@ void EQBand<FloatType, FilterChoices...>::process (const ProcessContext& context
             }
             else if ((int) filterIndex == prevFilterType)
             {
-                auto&& fadeBlock = juce::dsp::AudioBlock<FloatType> { fadeBuffer };
+                auto&& fadeBlock = chowdsp::AudioBlock<FloatType> { fadeBuffer };
                 processFilterChannel (filter, fadeBlock);
                 filter.reset();
             }

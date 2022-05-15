@@ -13,7 +13,6 @@ namespace CoefficientCalculators
     void calcFirstOrderLPF (T (&b)[2], T (&a)[2], T fc, NumericType fs)
     {
         using namespace Bilinear;
-        using namespace SIMDUtils;
 
         const auto wc = juce::MathConstants<NumericType>::twoPi * fc;
         const auto K = computeKValue (fc, fs);
@@ -48,7 +47,7 @@ namespace CoefficientCalculators
     void calcFirstOrderShelf (T (&b)[2], T (&a)[2], T lowGain, T highGain, T fc, NumericType fs)
     {
         // reduce to simple gain element
-        if (lowGain == highGain)
+        if (SIMDUtils::all (lowGain == highGain))
         {
             b[0] = lowGain;
             b[1] = (T) 0;
@@ -57,19 +56,11 @@ namespace CoefficientCalculators
             return;
         }
 
-        using namespace SIMDUtils;
+        CHOWDSP_USING_XSIMD_STD (sqrt)
+        CHOWDSP_USING_XSIMD_STD (tan)
 
-        T rho {}, K;
-        if constexpr (std::is_floating_point_v<T>)
-        {
-            rho = std::sqrt (highGain / lowGain);
-            K = (T) 1 / std::tan (juce::MathConstants<NumericType>::pi * fc / fs);
-        }
-        else if constexpr (SampleTypeHelpers::IsSIMDRegister<T>)
-        {
-            rho = sqrtSIMD (highGain / lowGain);
-            K = (T) 1 / tanSIMD (juce::MathConstants<NumericType>::pi * fc / fs);
-        }
+        const auto rho = sqrt (highGain / lowGain);
+        const auto K = (T) 1 / tan (juce::MathConstants<NumericType>::pi * fc / fs);
 
         Bilinear::BilinearTransform<T, 2>::call (b, a, { highGain / rho, lowGain }, { 1.0f / rho, 1.0f }, K);
     }
@@ -167,10 +158,8 @@ namespace CoefficientCalculators
     template <typename T, typename NumericType, typename FilterType>
     void calcCoefsGainDB (FilterType& filter, T fc, T qVal, T gainDB, NumericType fs)
     {
-        if constexpr (std::is_floating_point_v<T>)
-            filter.calcCoefs (fc, qVal, juce::Decibels::decibelsToGain (gainDB), fs);
-        else if constexpr (SampleTypeHelpers::IsSIMDRegister<T>)
-            filter.calcCoefs (fc, qVal, SIMDUtils::decibelsToGain (gainDB), fs);
+        using SIMDUtils::decibelsToGain;
+        filter.calcCoefs (fc, qVal, decibelsToGain (gainDB), fs);
     }
 
     /**
@@ -187,20 +176,11 @@ namespace CoefficientCalculators
         const auto wc = juce::MathConstants<NumericType>::twoPi * fc;
         const auto K = computeKValue (fc, fs);
 
-        auto kSqTerm = (T) 1 / (wc * wc);
-        auto kTerm = (T) 1 / (qVal * wc);
+        const auto kSqTerm = (T) 1 / (wc * wc);
+        const auto kTerm = (T) 1 / (qVal * wc);
 
-        T kNum {}, kDen {};
-        if constexpr (std::is_floating_point_v<T>)
-        {
-            kNum = gain > (T) 1 ? kTerm * gain : kTerm;
-            kDen = gain < (T) 1 ? kTerm / gain : kTerm;
-        }
-        else if constexpr (SampleTypeHelpers::IsSIMDRegister<T>)
-        {
-            kNum = select (T::greaterThan (gain, (T) 1), kTerm * gain, kTerm);
-            kDen = select (T::lessThan (gain, (T) 1), kTerm / gain, kTerm);
-        }
+        const auto kNum = select (gain > (T) 1, kTerm * gain, kTerm);
+        const auto kDen = select (gain < (T) 1, kTerm / gain, kTerm);
 
         BilinearTransform<T, 3>::call (b, a, { kSqTerm, kNum, (T) 1 }, { kSqTerm, kDen, (T) 1 }, K);
     }
@@ -214,22 +194,13 @@ namespace CoefficientCalculators
     void calcLowShelf (T (&b)[3], T (&a)[3], T fc, T qVal, T gain, NumericType fs)
     {
         using namespace Bilinear;
-        using namespace SIMDUtils;
 
         const auto wc = juce::MathConstants<NumericType>::twoPi * fc;
         const auto K = computeKValue (fc, fs);
 
-        T A {}, Aroot {};
-        if constexpr (std::is_floating_point_v<T>)
-        {
-            A = std::sqrt (gain);
-            Aroot = std::sqrt (A);
-        }
-        else if constexpr (SampleTypeHelpers::IsSIMDRegister<T>)
-        {
-            A = sqrtSIMD (gain);
-            Aroot = sqrtSIMD (A);
-        }
+        CHOWDSP_USING_XSIMD_STD (sqrt);
+        const auto A = sqrt (gain);
+        const auto Aroot = sqrt (A);
 
         auto kSqTerm = (T) 1 / (wc * wc);
         auto kTerm = Aroot / (qVal * wc);
@@ -246,22 +217,13 @@ namespace CoefficientCalculators
     void calcHighShelf (T (&b)[3], T (&a)[3], T fc, T qVal, T gain, NumericType fs)
     {
         using namespace Bilinear;
-        using namespace SIMDUtils;
 
         const auto wc = juce::MathConstants<NumericType>::twoPi * fc;
         const auto K = computeKValue (fc, fs);
 
-        T A {}, Aroot {};
-        if constexpr (std::is_floating_point_v<T>)
-        {
-            A = std::sqrt (gain);
-            Aroot = std::sqrt (A);
-        }
-        else if constexpr (SampleTypeHelpers::IsSIMDRegister<T>)
-        {
-            A = sqrtSIMD (gain);
-            Aroot = sqrtSIMD (A);
-        }
+        CHOWDSP_USING_XSIMD_STD (sqrt);
+        const auto A = sqrt (gain);
+        const auto Aroot = sqrt (A);
 
         auto kSqTerm = (T) 1 / (wc * wc);
         auto kTerm = Aroot / (qVal * wc);

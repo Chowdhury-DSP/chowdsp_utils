@@ -66,7 +66,7 @@ void DelayLine<SampleType, InterpolationType>::prepare (const juce::dsp::Process
 {
     jassert (spec.numChannels > 0);
 
-    this->bufferData = juce::dsp::AudioBlock<SampleType> (this->dataBlock, spec.numChannels, 2 * (size_t) totalSize);
+    this->bufferData = chowdsp::AudioBlock<SampleType> (this->dataBlock, spec.numChannels, 2 * (size_t) totalSize);
 
     this->writePos.resize (spec.numChannels);
     this->readPos.resize (spec.numChannels);

@@ -5,7 +5,7 @@ namespace ModeParams
 constexpr int numModes = 209;
 constexpr float analysisFs = 44100.0f;
 
-alignas (chowdsp::SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT) constexpr float freqs[] = {
+alignas (xsimd::default_arch::alignment()) constexpr float freqs[] = {
     42.164877525623f,
     44.17272883636695f,
     46.84986391735889f,

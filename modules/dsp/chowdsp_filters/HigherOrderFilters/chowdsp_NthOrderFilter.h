@@ -49,10 +49,10 @@ public:
     }
 
     /** Processes a block of samples */
-    void process (const juce::dsp::ProcessContextReplacing<T>& context)
+    void process (const chowdsp::ProcessContextReplacing<T>& context)
     {
         for (auto& filt : filters)
-            filt.template process<juce::dsp::ProcessContextReplacing<T>, type> (context);
+            filt.template process<chowdsp::ProcessContextReplacing<T>, type> (context);
     }
 
     /** Processes a single sample */

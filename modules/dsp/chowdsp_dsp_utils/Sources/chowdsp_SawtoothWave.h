@@ -53,10 +53,7 @@ private:
         using namespace SIMDUtils;
 
         phi += deltaPhase;
-        if constexpr (std::is_floating_point_v<T>)
-            phi = phi >= (T) 1 ? phi - (T) 2 : phi;
-        else if constexpr (SampleTypeHelpers::IsSIMDRegister<T>)
-            phi = select (T::greaterThanOrEqual (phi, (T) 1), phi - (T) 2, phi);
+        phi = select (phi >= (T) 1, phi - (T) 2, phi);
     }
 
     T z {};

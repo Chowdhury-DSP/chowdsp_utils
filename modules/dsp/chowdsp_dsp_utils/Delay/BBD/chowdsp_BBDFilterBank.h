@@ -8,7 +8,10 @@
 namespace chowdsp::BBD
 {
 template <typename T>
-using SIMDComplex = SIMDUtils::SIMDComplex<T>;
+using SIMDScalar = xsimd::batch<T>;
+
+template <typename T>
+using SIMDComplex = xsimd::batch<std::complex<T>>;
 
 /**
  * Anti-aliasing/reconstruction filters used by JUNO-60 chorus.
@@ -16,39 +19,39 @@ using SIMDComplex = SIMDUtils::SIMDComplex<T>;
  */
 namespace BBDFilterSpec
 {
-    constexpr size_t N_filt = 4;
     constexpr float inputFilterOriginalCutoff = 9900.0f;
     constexpr float outputFilterOriginalCutoff = 9500.0f;
 
-    constexpr std::complex<float> iFiltRoot[] = { { -10329.2715f, -329.848f },
-                                                  { -10329.2715f, +329.848f },
-                                                  { 366.990557f, -1811.4318f },
-                                                  { 366.990557f, +1811.4318f } };
-    constexpr std::complex<float> iFiltPole[] = {
+    constexpr std::complex<float> iFiltRoot alignas (xsimd::default_arch::alignment())[] = {
+        { -10329.2715f, -329.848f },
+        { -10329.2715f, +329.848f },
+        { 366.990557f, -1811.4318f },
+        { 366.990557f, +1811.4318f }
+    };
+
+    constexpr std::complex<float> iFiltPole alignas (xsimd::default_arch::alignment())[] = {
         { -55482.0f, -25082.0f },
         { -55482.0f, +25082.0f },
         { -26292.0f, -59437.0f },
         { -26292.0f, +59437.0f }
     };
 
-    constexpr std::complex<float> oFiltRoot[] = {
+    constexpr std::complex<float> oFiltRoot alignas (xsimd::default_arch::alignment())[] = {
         { -11256.0f, -99566.0f },
         { -11256.0f, +99566.0f },
         { -13802.0f, -24606.0f },
         { -13802.0f, +24606.0f }
     };
-    constexpr std::complex<float> oFiltPole[] = {
+    constexpr std::complex<float> oFiltPole alignas (xsimd::default_arch::alignment())[] = {
         { -51468.0f, -21437.0f },
         { -51468.0f, +21437.0f },
         { -26276.0f, -59699.0f },
         { -26276.0f, +59699.0f }
     };
 
-    inline SIMDComplex<float> fast_complex_pow (juce::dsp::SIMDRegister<float> angle, float b)
+    inline SIMDComplex<float> fast_complex_pow (SIMDScalar<float> angle, float b)
     {
-        auto angle_pow = angle * b;
-
-        auto [sinAngle, cosAngle] = chowdsp::SIMDUtils::sincosSIMD (angle_pow);
+        auto [sinAngle, cosAngle] = xsimd::sincos (angle * b);
         return { cosAngle, sinAngle };
     }
 } // namespace BBDFilterSpec
@@ -62,35 +65,23 @@ class InputFilterBank
 public:
     explicit InputFilterBank (T sampleTime) : Ts (sampleTime)
     {
-        float root_real alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[Complex4::size()] {};
-        float root_imag alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[Complex4::size()] {};
-        float pole_real alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[Complex4::size()] {};
-        float pole_imag alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[Complex4::size()] {};
-        for (size_t i = 0; i < BBDFilterSpec::N_filt; ++i)
-        {
-            root_real[i] = BBDFilterSpec::iFiltRoot[i].real();
-            root_imag[i] = BBDFilterSpec::iFiltRoot[i].imag();
-
-            pole_real[i] = BBDFilterSpec::iFiltPole[i].real();
-            pole_imag[i] = BBDFilterSpec::iFiltPole[i].imag();
-        }
-        roots = Complex4 (root_real, root_imag);
-        poles = Complex4 (pole_real, pole_imag);
+        roots = xsimd::load_aligned (BBDFilterSpec::iFiltRoot);
+        poles = xsimd::load_aligned (BBDFilterSpec::iFiltPole);
     }
 
     inline void set_freq (float freq)
     {
         const float freqFactor = freq / BBDFilterSpec::inputFilterOriginalCutoff;
         root_corr = roots * freqFactor;
-        pole_corr = chowdsp::SIMDUtils::exp (poles * (freqFactor * Ts));
-        pole_corr_angle = chowdsp::SIMDUtils::arg (pole_corr);
+        pole_corr = xsimd::exp (poles * (freqFactor * Ts));
+        pole_corr_angle = xsimd::arg (pole_corr);
 
         gCoef = root_corr * Ts;
     }
 
     inline void set_time (float tn) noexcept
     {
-        Gcalc = gCoef * chowdsp::SIMDUtils::pow (pole_corr, tn);
+        Gcalc = gCoef * SIMDUtils::pow (pole_corr, SIMDScalar<float> (tn));
     }
 
     inline void set_delta (float delta) noexcept
@@ -102,23 +93,23 @@ public:
 
     inline void process (float u) noexcept
     {
-        x = pole_corr * x + Complex4 (u, 0.0f);
+        x = pole_corr * x + Complex4 { SIMDScalar<T> (u), SIMDScalar<T> (0) };
     }
 
-    Complex4 x;
-    Complex4 Gcalc { (T) 1, (T) 0 };
+    Complex4 x {};
+    Complex4 Gcalc { SIMDScalar<T> (1), SIMDScalar<T> (0) };
 
 private:
-    Complex4 roots;
-    Complex4 poles;
-    Complex4 root_corr;
-    Complex4 pole_corr;
-    juce::dsp::SIMDRegister<T> pole_corr_angle {};
+    Complex4 roots {};
+    Complex4 poles {};
+    Complex4 root_corr {};
+    Complex4 pole_corr {};
+    xsimd::batch<T> pole_corr_angle {};
 
-    Complex4 Aplus;
+    Complex4 Aplus {};
 
     const T Ts;
-    Complex4 gCoef;
+    Complex4 gCoef {};
 };
 
 /** Filter bank for BBD signal output. */
@@ -130,37 +121,24 @@ class OutputFilterBank
 public:
     explicit OutputFilterBank (float sampleTime) : Ts (sampleTime)
     {
-        float gcoefs_real alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[Complex4::size()] {};
-        float gcoefs_imag alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[Complex4::size()] {};
-        float pole_real alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[Complex4::size()] {};
-        float pole_imag alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[Complex4::size()] {};
-        for (size_t i = 0; i < BBDFilterSpec::N_filt; ++i)
-        {
-            auto gVal = BBDFilterSpec::oFiltRoot[i] / BBDFilterSpec::oFiltPole[i];
-            gcoefs_real[i] = gVal.real();
-            gcoefs_imag[i] = gVal.imag();
-
-            pole_real[i] = BBDFilterSpec::oFiltPole[i].real();
-            pole_imag[i] = BBDFilterSpec::oFiltPole[i].imag();
-        }
-        gCoef = Complex4 (gcoefs_real, gcoefs_imag);
-        poles = Complex4 (pole_real, pole_imag);
+        gCoef = xsimd::load_aligned (BBDFilterSpec::oFiltRoot) / xsimd::load_aligned (BBDFilterSpec::oFiltPole);
+        poles = xsimd::load_aligned (BBDFilterSpec::oFiltPole);
     }
 
-    [[nodiscard]] inline float calcH0() const noexcept { return -1.0f * gCoef.real().sum(); }
+    [[nodiscard]] inline float calcH0() const noexcept { return -1.0f * xsimd::hadd (gCoef.real()); }
 
     inline void set_freq (float freq)
     {
         const float freqFactor = freq / BBDFilterSpec::outputFilterOriginalCutoff;
-        pole_corr = chowdsp::SIMDUtils::exp (poles * (freqFactor * Ts));
-        pole_corr_angle = chowdsp::SIMDUtils::arg (pole_corr);
+        pole_corr = xsimd::exp (poles * (freqFactor * Ts));
+        pole_corr_angle = xsimd::arg (pole_corr);
 
         Amult = gCoef * pole_corr;
     }
 
     inline void set_time (float tn) noexcept
     {
-        Gcalc = Amult * chowdsp::SIMDUtils::pow (pole_corr, 1.0f - tn);
+        Gcalc = Amult * SIMDUtils::pow (pole_corr, 1.0f - tn);
     }
 
     inline void set_delta (float delta) noexcept { Aplus = BBDFilterSpec::fast_complex_pow (pole_corr_angle, -delta); }
@@ -169,20 +147,19 @@ public:
 
     inline void process (Complex4 u) noexcept { x = pole_corr * x + u; }
 
-    Complex4 x;
-    Complex4 Gcalc { 1.0f, 0.0f };
+    Complex4 x {};
+    Complex4 Gcalc { SIMDScalar<T> (1), SIMDScalar<T> (0) };
 
 private:
-    Complex4 gCoef;
-    Complex4 poles;
-    Complex4 root_corr;
-    Complex4 pole_corr;
-    juce::dsp::SIMDRegister<float> pole_corr_angle {};
+    Complex4 gCoef {};
+    Complex4 poles {};
+    Complex4 pole_corr {};
+    xsimd::batch<float> pole_corr_angle {};
 
-    Complex4 Aplus;
+    Complex4 Aplus {};
 
     const float Ts;
-    Complex4 Amult;
+    Complex4 Amult {};
 };
 
 } // namespace chowdsp::BBD

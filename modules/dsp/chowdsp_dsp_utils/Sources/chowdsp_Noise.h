@@ -57,15 +57,15 @@ private:
 
     template <typename C = T>
     inline std::enable_if_t<std::is_floating_point_v<C>, void>
-        applyGain (juce::dsp::AudioBlock<T>& block)
+        applyGain (chowdsp::AudioBlock<T>& block)
     {
-        juce::dsp::ProcessContextReplacing<T> context (block);
+        chowdsp::ProcessContextReplacing<T> context (block);
         juce::dsp::Gain<NumericType>::process (context);
     }
 
     template <typename C = T>
     inline std::enable_if_t<SampleTypeHelpers::IsSIMDRegister<C>, void>
-        applyGain (juce::dsp::AudioBlock<T>& block)
+        applyGain (chowdsp::AudioBlock<T>& block)
     {
         if (block.getNumChannels() == 1)
         {
@@ -90,7 +90,6 @@ private:
 
     NoiseType type;
     juce::Random rand;
-    juce::dsp::Gain<T> gain;
 
     /** Based on "The Voss algorithm"
         http://www.firstpr.com.au/dsp/pink-noise/
@@ -141,10 +140,10 @@ private:
     PinkNoiseGenerator<> pink;
 
     juce::HeapBlock<char> randBlockData;
-    juce::dsp::AudioBlock<T> randBlock;
+    chowdsp::AudioBlock<T> randBlock;
 
     juce::HeapBlock<char> gainBlockData;
-    juce::dsp::AudioBlock<T> gainBlock;
+    chowdsp::AudioBlock<T> gainBlock;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Noise)
 };

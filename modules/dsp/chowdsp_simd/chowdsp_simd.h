@@ -42,7 +42,8 @@ JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wcast-align",
                                      "-Wsign-conversion",
                                      "-Wzero-as-null-pointer-constant",
                                      "-Wsign-compare",
-                                     "-Wc++98-compat-extra-semi")
+                                     "-Wc++98-compat-extra-semi",
+                                     "-Wshorten-64-to-32")
 JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4244)
 #include "third_party/xsimd/include/xsimd/xsimd.hpp"
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
@@ -57,10 +58,8 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 #include "SIMD/chowdsp_SampleTypeHelpers.h"
 #include "SIMD/chowdsp_SIMDUtils.h"
 #include "SIMD/chowdsp_SIMDLogic.h"
-#include "SIMD/chowdsp_SIMDArithmetic.h"
 #include "SIMD/chowdsp_SIMDSpecialMath.h"
-#include "SIMD/chowdsp_SIMDFastMath.h"
+//#include "SIMD/chowdsp_SIMDFastMath.h"
 #include "SIMD/chowdsp_SIMDDecibels.h"
 #include "SIMD/chowdsp_SIMDSmoothedValue.h"
-#include "SIMD/chowdsp_SIMDComplex.h"
 #include "SIMD/chowdsp_SIMDComplexMathOps.h"

@@ -9,7 +9,7 @@ class CommonSmoothedValueTests : public TimedUnitTest
 {
 public:
     using SmoothedValueType = SIMDSmoothedValue<FloatType, SmoothType>;
-    using VecType = juce::dsp::SIMDRegister<FloatType>;
+    using VecType = xsimd::batch<FloatType>;
 
     CommonSmoothedValueTests()
         : TimedUnitTest ("Common Smoothed Value Tests: " + juce::String (std::is_same<FloatType, float>::value ? "Float" : "Double"), "SIMD")

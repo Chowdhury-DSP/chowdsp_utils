@@ -63,7 +63,7 @@ public:
      * 
      *  @return the output block of generated samples at the new sample rate
      */
-    juce::dsp::AudioBlock<float> process (const juce::dsp::AudioBlock<float>& block) noexcept
+    chowdsp::AudioBlock<float> process (const chowdsp::AudioBlock<float>& block) noexcept
     {
         const auto numChannels = block.getNumChannels();
         const auto numSamples = block.getNumSamples();
@@ -76,7 +76,7 @@ public:
                                                     numSamples);
         }
 
-        return juce::dsp::AudioBlock<float> (outputBuffer).getSubBlock (0, outNumSamples);
+        return chowdsp::AudioBlock<float> (outputBuffer).getSubBlock (0, outNumSamples);
     }
 
 private:

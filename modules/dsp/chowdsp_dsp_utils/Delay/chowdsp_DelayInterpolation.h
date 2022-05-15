@@ -259,19 +259,19 @@ struct Sinc
     {
         auto sincTableOffset = (size_t) (((T) 1 - delayFrac) * (T) M) * N * 2;
 
-        auto out = juce::dsp::SIMDRegister<T> ((T) 0);
-        for (size_t i = 0; i < N; i += juce::dsp::SIMDRegister<T>::size())
+        auto out = xsimd::batch<T> ((T) 0);
+        for (size_t i = 0; i < N; i += xsimd::batch<T>::size)
         {
-            auto buff_reg = SIMDUtils::loadUnaligned (&buffer[(size_t) delayInt + i]);
-            auto sinc_reg = juce::dsp::SIMDRegister<T>::fromRawArray (&sinctable[sincTableOffset + i]);
+            auto buff_reg = xsimd::load_unaligned (&buffer[(size_t) delayInt + i]);
+            auto sinc_reg = xsimd::load_aligned (&sinctable[sincTableOffset + i]);
             out += buff_reg * sinc_reg;
         }
 
-        return out.sum();
+        return xsimd::hadd (out);
     }
 
     int totalSize = 0;
-    T sinctable alignas (SIMDUtils::CHOWDSP_DEFAULT_SIMD_ALIGNMENT)[(M + 1) * N * 2];
+    T sinctable alignas (xsimd::default_arch::alignment())[(M + 1) * N * 2];
 };
 JUCE_END_IGNORE_WARNINGS_MSVC
 } // namespace chowdsp::DelayLineInterpolationTypes

@@ -1,7 +1,5 @@
 #pragma once
 
-#if JUCE_MODULE_AVAILABLE_chowdsp_dsp
-
 namespace chowdsp
 {
 /** Foley's GUI wrapper for PresetsComp */
@@ -43,5 +41,3 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OversamplingMenuItem)
 };
 } // namespace chowdsp
-
-#endif // JUCE_MODULE_AVAILABLE_chowdsp_dsp

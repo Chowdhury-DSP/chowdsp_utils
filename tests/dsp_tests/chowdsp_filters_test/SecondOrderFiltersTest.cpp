@@ -28,7 +28,7 @@ public:
         filter.reset();
         filter.processBlock (block.getChannelPointer (0), buffer.getNumSamples());
 
-        test_utils::blockToBuffer (buffer, block);
+        test_utils::blockToBuffer<T> (buffer, block);
         const auto halfSamples = buffer.getNumSamples() / 2;
         auto magDB = juce::Decibels::gainToDecibels (buffer.getMagnitude (halfSamples, halfSamples));
         expectWithinAbsoluteError (magDB, expGainDB, maxError, message);
@@ -137,56 +137,56 @@ public:
         secondOrderLPFTest<double> (1.0e-2);
 
         beginTest ("Second Order LPF SIMD Test");
-        secondOrderLPFTest<juce::dsp::SIMDRegister<float>> (1.0e-2f);
-        secondOrderLPFTest<juce::dsp::SIMDRegister<double>> (1.0e-2);
+        secondOrderLPFTest<xsimd::batch<float>> (1.0e-2f);
+        secondOrderLPFTest<xsimd::batch<double>> (1.0e-2);
 
         beginTest ("Second Order HPF Test");
         secondOrderHPFTest<float> (1.0e-2f);
         secondOrderHPFTest<double> (1.0e-2);
 
         beginTest ("Second Order HPF SIMD Test");
-        secondOrderHPFTest<juce::dsp::SIMDRegister<float>> (1.0e-2f);
-        secondOrderHPFTest<juce::dsp::SIMDRegister<double>> (1.0e-2);
+        secondOrderHPFTest<xsimd::batch<float>> (1.0e-2f);
+        secondOrderHPFTest<xsimd::batch<double>> (1.0e-2);
 
         beginTest ("Second Order BPF Test");
         secondOrderBPFTest<float> (1.0e-2f);
         secondOrderBPFTest<double> (1.0e-2);
 
         beginTest ("Second Order BPF SIMD Test");
-        secondOrderBPFTest<juce::dsp::SIMDRegister<float>> (1.0e-2f);
-        secondOrderBPFTest<juce::dsp::SIMDRegister<double>> (1.0e-2);
+        secondOrderBPFTest<xsimd::batch<float>> (1.0e-2f);
+        secondOrderBPFTest<xsimd::batch<double>> (1.0e-2);
 
         beginTest ("Notch Filter Test");
         notchFilterTest<float> (1.0e-2f);
         notchFilterTest<double> (1.0e-3);
 
         beginTest ("Notch Filter SIMD Test");
-        notchFilterTest<juce::dsp::SIMDRegister<float>> (1.0e-2f);
-        notchFilterTest<juce::dsp::SIMDRegister<double>> (1.0e-3);
+        notchFilterTest<xsimd::batch<float>> (1.0e-2f);
+        notchFilterTest<xsimd::batch<double>> (1.0e-3);
 
         beginTest ("Peaking Filter Test");
         peakingFilterTest<float> (1.0e-2f);
         peakingFilterTest<double> (1.0e-3);
 
         beginTest ("Peaking Filter SIMD Test");
-        peakingFilterTest<juce::dsp::SIMDRegister<float>> (1.0e-2f);
-        peakingFilterTest<juce::dsp::SIMDRegister<double>> (1.0e-3);
+        peakingFilterTest<xsimd::batch<float>> (1.0e-2f);
+        peakingFilterTest<xsimd::batch<double>> (1.0e-3);
 
         beginTest ("Low Shelf Filter Test");
         lowShelfFilterTest<float> (1.0e-2f);
         lowShelfFilterTest<double> (1.0e-2);
 
         beginTest ("Low Shelf Filter SIMD Test");
-        lowShelfFilterTest<juce::dsp::SIMDRegister<float>> (1.0e-2f);
-        lowShelfFilterTest<juce::dsp::SIMDRegister<double>> (1.0e-2);
+        lowShelfFilterTest<xsimd::batch<float>> (1.0e-2f);
+        lowShelfFilterTest<xsimd::batch<double>> (1.0e-2);
 
         beginTest ("High Shelf Filter Test");
         highShelfFilterTest<float> (1.0e-2f);
         highShelfFilterTest<double> (1.0e-2);
 
         beginTest ("High Shelf Filter SIMD Test");
-        highShelfFilterTest<juce::dsp::SIMDRegister<float>> (1.0e-2f);
-        highShelfFilterTest<juce::dsp::SIMDRegister<double>> (1.0e-2);
+        highShelfFilterTest<xsimd::batch<float>> (1.0e-2f);
+        highShelfFilterTest<xsimd::batch<double>> (1.0e-2);
     }
 };
 

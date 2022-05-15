@@ -97,23 +97,13 @@ struct BilinearTransform<T, 3>
 
 /** Computes the warping factor "K" so that the frequency fc is matched at sample rate fs */
 template <typename T>
-inline std::enable_if_t<std::is_floating_point_v<T>, T>
-    computeKValue (T fc, T fs)
+inline T computeKValue (T fc, SampleTypeHelpers::NumericType<T> fs)
 {
-    const auto wc = juce::MathConstants<T>::twoPi * fc;
-    return wc / std::tan (wc / ((T) 2 * fs));
-}
-
-/** Computes the warping factor "K" so that the frequency fc is matched at sample rate fs */
-template <typename T>
-inline std::enable_if_t<SampleTypeHelpers::IsSIMDRegister<T>, T>
-    computeKValue (T fc, SampleTypeHelpers::NumericType<T> fs)
-{
-    using namespace SIMDUtils;
     using NumericType = SampleTypeHelpers::NumericType<T>;
+    CHOWDSP_USING_XSIMD_STD (tan);
 
     const auto wc = juce::MathConstants<NumericType>::twoPi * fc;
-    return wc / tanSIMD (wc / ((NumericType) 2 * fs));
+    return wc / tan (wc / ((NumericType) 2 * fs));
 }
 
 /** Calculates a pole frequency from a set of filter coefficients */

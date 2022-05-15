@@ -17,20 +17,14 @@ using P = decltype (T {} * X {});
  * Coefficients should be given in the form { a_n, a_n-1, ..., a_1, a_0 }
  */
 template <int ORDER, typename T, typename X>
-inline constexpr P<T, X> naive (const T (&coeffs)[ORDER + 1], const X x)
+inline constexpr P<T, X> naive (const T (&coeffs)[ORDER + 1], const X& x)
 {
-    P<T, X> sum = coeffs[ORDER];
+    using std::pow;
+    using xsimd::pow;
 
-    if constexpr (SampleTypeHelpers::IsSIMDRegister<X>)
-    {
-        for (int n = 0; n < ORDER; ++n)
-            sum += coeffs[n] * powSIMD (x, X (ORDER - n));
-    }
-    else
-    {
-        for (int n = 0; n < ORDER; ++n)
-            sum += coeffs[n] * std::pow (x, X (ORDER - n));
-    }
+    P<T, X> sum = coeffs[ORDER];
+    for (int n = 0; n < ORDER; ++n)
+        sum += coeffs[n] * pow (x, X (ORDER - n));
 
     return sum;
 }
@@ -41,7 +35,7 @@ inline constexpr P<T, X> naive (const T (&coeffs)[ORDER + 1], const X x)
  * https://en.wikipedia.org/wiki/Horner%27s_method
  */
 template <int ORDER, typename T, typename X>
-inline constexpr P<T, X> horner (const T (&coeffs)[ORDER + 1], const X x)
+inline constexpr P<T, X> horner (const T (&coeffs)[ORDER + 1], const X& x)
 {
     P<T, X> b = coeffs[0];
     for (int n = 1; n <= ORDER; ++n)
@@ -56,7 +50,7 @@ inline constexpr P<T, X> horner (const T (&coeffs)[ORDER + 1], const X x)
  * https://en.wikipedia.org/wiki/Estrin%27s_scheme
  */
 template <int ORDER, typename T, typename X>
-inline constexpr P<T, X> estrin (const T (&coeffs)[ORDER + 1], const X x)
+inline constexpr P<T, X> estrin (const T (&coeffs)[ORDER + 1], const X& x)
 {
     if constexpr (ORDER <= 1) // base case
     {

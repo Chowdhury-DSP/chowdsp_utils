@@ -52,7 +52,7 @@ void ModFilterWrapper<PrototypeFilter>::process (const ProcessContext& context) 
 
     if (context.isBypassed)
     {
-        AudioBlockHelpers::copyBlocks (outputBlock, inputBlock);
+        outputBlock.copyFrom (inputBlock);
         return;
     }
 
@@ -88,7 +88,7 @@ void ModFilterWrapper<PrototypeFilter>::process (const ProcessContext& context, 
 
     if (context.isBypassed)
     {
-        AudioBlockHelpers::copyBlocks (outputBlock, inputBlock);
+        outputBlock.copyFrom (inputBlock);
         return;
     }
 
