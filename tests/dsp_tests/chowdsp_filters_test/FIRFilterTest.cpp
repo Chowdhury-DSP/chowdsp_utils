@@ -44,7 +44,7 @@ public:
         {
             const auto ref = refBuffer.getSample (0, i);
             const auto actual = actualBuffer.getSample (0, i);
-            expectEquals (actual, ref, "Sample at index: " + juce::String (i) + " is incorrect!");
+            expectWithinAbsoluteError (actual, ref, 1.0e-3f, "Sample at index: " + juce::String (i) + " is incorrect!");
         }
     }
 
