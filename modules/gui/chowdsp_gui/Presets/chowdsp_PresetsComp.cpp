@@ -22,6 +22,7 @@ PresetsComp::PresetsComp (PresetManager& presetManager) : manager (presetManager
     manager.addListener (this);
 
     presetBox.setName ("Preset Manager");
+    presetBox.setDescription ("Preset Manager");
     presetBox.setTooltip ("Use this menu to save and load plugin presets");
 
     setColour (backgroundColourID, juce::Colours::grey);
@@ -50,6 +51,7 @@ PresetsComp::PresetsComp (PresetManager& presetManager) : manager (presetManager
     auto setupNextPrevButton = [=] (juce::DrawableButton& button, bool forward) {
         addAndMakeVisible (button);
         button.setWantsKeyboardFocus (false);
+        button.setDescription ("Go to " + juce::String (forward ? "next" : "previous") + " preset");
         button.setColour (juce::ComboBox::outlineColourId, juce::Colours::transparentBlack);
         button.setColour (juce::TextButton::buttonColourId, juce::Colours::transparentBlack);
         button.onClick = [=] { goToNextPreset (forward); };
