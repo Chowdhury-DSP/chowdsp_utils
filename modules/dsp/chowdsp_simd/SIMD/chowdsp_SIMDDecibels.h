@@ -20,7 +20,8 @@ inline T decibelsToGain (T decibels, T minusInfinityDB = (T) -100.0)
 template <typename T>
 inline xsimd::batch<T> gainToDecibels (const xsimd::batch<T>& gain, T minusInfinityDB = (T) -100.0)
 {
-    return xsimd::select (gain > (T) 0, xsimd::max (xsimd::log10 (gain) * (T) 20, minusInfinityDB), minusInfinityDB);
+    using v_type = xsimd::batch<T>;
+    return xsimd::select (gain > (T) 0, xsimd::max (xsimd::log10 (gain) * (T) 20, (v_type) minusInfinityDB), (v_type) minusInfinityDB);
 }
 
 /** SIMD specialization of juce::Decibels::decibelsToGain */
