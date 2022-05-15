@@ -17,6 +17,7 @@ function(setup_benchmark target file)
         chowdsp_simd
         chowdsp_dsp_data_structures
         chowdsp_math
+        chowdsp_filters
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags
