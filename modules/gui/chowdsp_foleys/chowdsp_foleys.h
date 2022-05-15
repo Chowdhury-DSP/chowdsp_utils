@@ -38,9 +38,12 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 
 // LCOV_EXCL_START
 #include "GuiItems/chowdsp_InfoItem.h"
-#include "GuiItems/chowdsp_OversamplingMenuItem.h"
 #include "GuiItems/chowdsp_TitleItem.h"
 #include "GuiItems/chowdsp_TooltipItem.h"
+
+#if JUCE_MODULE_AVAILABLE_chowdsp_dsp_utils
+#include "GuiItems/chowdsp_OversamplingMenuItem.h"
+#endif // JUCE_MODULE_AVAILABLE_chowdsp_dsp_utils
 
 #if JUCE_MODULE_AVAILABLE_chowdsp_presets
 #include "GuiItems/chowdsp_PresetsItem.h"
