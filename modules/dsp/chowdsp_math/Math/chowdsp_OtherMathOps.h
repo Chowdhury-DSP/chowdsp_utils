@@ -25,4 +25,27 @@ constexpr T ceiling_divide (T num, T den)
 {
     return (num + den - 1) / den;
 }
+
+/**
+ * Returns 1 if the input is positive, -1 if the input is negative,
+ * and 0 if the input is zero.
+ */
+template <typename T>
+inline T sign (T val)
+{
+    return (T (0) < val) - (val < T (0));
+}
+
+/**
+ * Returns 1 if the input is positive, -1 if the input is negative,
+ * and 0 if the input is zero.
+ */
+template <typename T>
+inline xsimd::batch<T> sign (xsimd::batch<T> val)
+{
+    using v_type = xsimd::batch<T>;
+    const auto positive = xsimd::select (val > v_type ((T) 0), v_type ((T) 1), v_type ((T) 0));
+    const auto negative = xsimd::select (val < v_type ((T) 0), v_type ((T) 1), v_type ((T) 0));
+    return positive - negative;
+}
 } // namespace chowdsp
