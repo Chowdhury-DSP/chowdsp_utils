@@ -37,6 +37,22 @@ auto makeJUCEFIRChoices()
 
 auto juceFIRChoices = makeJUCEFIRChoices();
 
+auto makeConvolution (int filterOrder)
+{
+    const auto coefsData = bench_utils::makeRandomVector<float> (filterOrder);
+
+    juce::AudioBuffer<float> coeffsBuffer;
+    coeffsBuffer.setSize (1, filterOrder);
+    coeffsBuffer.copyFrom (0, 0, coefsData.data(), filterOrder);
+
+    using juce::dsp::Convolution;
+    auto convolution = std::make_unique<Convolution>();
+    convolution->loadImpulseResponse (std::move (coeffsBuffer), 48000.0, Convolution::Stereo::no, Convolution::Trim::no, Convolution::Normalise::no);
+    convolution->prepare ({ 48000.0, (juce::uint32) blockSize, 1 });
+
+    return std::move (convolution);
+}
+
 auto makeChowFIR (int order)
 {
     const auto coefsData = bench_utils::makeRandomVector<float> (order);
@@ -81,6 +97,17 @@ static void JuceFIR (benchmark::State& state)
     }
 }
 BENCHMARK (JuceFIR)->MinTime (1)->RangeMultiplier (orderMult)->Range (startOrder, endOrder);
+
+static void ConvFIR (benchmark::State& state)
+{
+    auto fir = makeConvolution ((int) state.range (0));
+    for (auto _ : state)
+    {
+        auto&& audioBlock = juce::dsp::AudioBlock<float> { audioBuffer };
+        fir->process (juce::dsp::ProcessContextReplacing<float> { audioBlock });
+    }
+}
+BENCHMARK (ConvFIR)->MinTime (1)->RangeMultiplier (orderMult)->Range (startOrder, endOrder);
 
 static void ChowFIR (benchmark::State& state)
 {

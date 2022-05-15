@@ -13,7 +13,7 @@ public:
     {
         static constexpr double fs = 48000.0;
         static constexpr int blockSize = 512;
-        static constexpr int firOrder = 64;
+        static constexpr int firOrder = 63;
 
         auto&& coeffsBuffer = test_utils::makeNoise (rand, firOrder);
         auto&& refBuffer = test_utils::makeSineWave (100.0f, (float) fs, blockSize);
@@ -35,6 +35,7 @@ public:
         {
             chowdsp::FIRFilter<float> filter { firOrder };
             filter.setCoefficients (coeffsBuffer.getReadPointer (0));
+            expectEquals (filter.getOrder(), firOrder, "Filter order is incorrect!");
 
             auto&& block = juce::dsp::AudioBlock<float> { actualBuffer };
             filter.processBlock (block);
