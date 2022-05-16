@@ -46,9 +46,7 @@ public:
     inline std::enable_if_t<N == 1, FloatType>
         processSample (FloatType x, int ch = 0) noexcept
     {
-        FloatType y = z[ch][1] + x * b[0];
-        z[ch][order] = x * b[order] - y * a[order];
-        return y;
+        return processSample1stOrder (x, z[ch][1]);
     }
 
     /** Optimized processing call for second-order filter */
@@ -56,10 +54,7 @@ public:
     inline std::enable_if_t<N == 2, FloatType>
         processSample (FloatType x, int ch = 0) noexcept
     {
-        FloatType y = z[ch][1] + x * b[0];
-        z[ch][1] = z[ch][2] + x * b[1] - y * a[1];
-        z[ch][order] = x * b[order] - y * a[order];
-        return y;
+        return processSample2ndOrder (x, z[ch][1], z[ch][2]);
     }
 
     /** Generalized processing call for Nth-order filter */
@@ -77,8 +72,31 @@ public:
         return y;
     }
 
+    /** Process block of samples (Optimized for 1st-order filters) */
+    template <int N = order>
+    inline std::enable_if_t<N == 1, void>
+        processBlock (FloatType* block, const int numSamples, const int channel = 0) noexcept
+    {
+        ScopedValue z1 { z[channel][1] };
+        for (int n = 0; n < numSamples; ++n)
+            block[n] = processSample1stOrder (block[n], z1.get());
+    }
+
+    /** Process block of samples (Optimized for 2nd-order filters) */
+    template <int N = order>
+    inline std::enable_if_t<N == 2, void>
+        processBlock (FloatType* block, const int numSamples, const int channel = 0) noexcept
+    {
+        ScopedValue z1 { z[channel][1] };
+        ScopedValue z2 { z[channel][2] };
+        for (int n = 0; n < numSamples; ++n)
+            block[n] = processSample2ndOrder (block[n], z1.get(), z2.get());
+    }
+
     /** Process block of samples */
-    void processBlock (FloatType* block, const int numSamples, const int channel = 0) noexcept
+    template <int N = order>
+    inline std::enable_if_t<(N > 2), void>
+        processBlock (FloatType* block, const int numSamples, const int channel = 0) noexcept
     {
         for (int n = 0; n < numSamples; ++n)
             block[n] = processSample (block[n], channel);
@@ -128,6 +146,21 @@ protected:
     friend class ModFilterWrapper;
 
 private:
+    inline FloatType processSample1stOrder (const FloatType& x, FloatType& z1) noexcept
+    {
+        FloatType y = z1 + x * b[0];
+        z1 = x * b[order] - y * a[order];
+        return y;
+    }
+
+    inline FloatType processSample2ndOrder (const FloatType& x, FloatType& z1, FloatType& z2) noexcept
+    {
+        FloatType y = z1 + x * b[0];
+        z1 = z2 + x * b[1] - y * a[1];
+        z2 = x * b[order] - y * a[order];
+        return y;
+    }
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IIRFilter)
 };
 

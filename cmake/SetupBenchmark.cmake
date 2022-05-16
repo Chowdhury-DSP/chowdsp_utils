@@ -2,6 +2,10 @@
 #
 # Sets up a minimal benchmarking app
 function(setup_benchmark target file)
+    set(extra_modules "${ARGV}")
+    list(REMOVE_AT extra_modules 0 1)
+    message(STATUS "Configuring Benchmark ${target}, with modules: ${extra_modules}")
+
     add_executable(${target})
     target_sources(${target} PRIVATE ${file})
 
@@ -14,10 +18,7 @@ function(setup_benchmark target file)
 
     target_link_libraries(${target} PRIVATE
         juce::juce_dsp
-        chowdsp_simd
-        chowdsp_dsp_data_structures
-        chowdsp_math
-        chowdsp_filters
+        ${extra_modules}
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags
