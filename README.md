@@ -1,7 +1,10 @@
 # chowdsp_utils
 
-![CI](https://github.com/Chowdhury-DSP/chowdsp_utils/workflows/CI/badge.svg)
-[![License](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://opensource.org/licenses/GPL-3.0)
+[![Test](https://github.com/Chowdhury-DSP/chowdsp_utils/actions/workflows/run-tests.yml/badge.svg)](https://github.com/Chowdhury-DSP/chowdsp_utils/actions/workflows/run-tests.yml)
+[![Examples](https://github.com/Chowdhury-DSP/chowdsp_utils/actions/workflows/examples.yml/badge.svg)](https://github.com/Chowdhury-DSP/chowdsp_utils/actions/workflows/examples.yml)
+[![Benchmarks](https://github.com/Chowdhury-DSP/chowdsp_utils/actions/workflows/bench.yml/badge.svg)](https://github.com/Chowdhury-DSP/chowdsp_utils/actions/workflows/bench.yml)
+[![Code-Quality](https://github.com/Chowdhury-DSP/chowdsp_utils/actions/workflows/code-quality.yml/badge.svg)](https://github.com/Chowdhury-DSP/chowdsp_utils/actions/workflows/code-quality.yml)
+[![Docs](https://github.com/Chowdhury-DSP/chowdsp_utils/actions/workflows/docs.yml/badge.svg)](https://ccrma.stanford.edu/~jatin/chowdsp/chowdsp_utils)
 [![codecov](https://codecov.io/gh/Chowdhury-DSP/chowdsp_utils/branch/master/graph/badge.svg?token=84B35MB5QS)](https://codecov.io/gh/Chowdhury-DSP/chowdsp_utils)
 
 This repository contains JUCE modules with utilities for building Chowdhury DSP plugins.
@@ -22,9 +25,9 @@ target_link_libraries(MyTarget PUBLIC
     juce::juce_audio_utils
     juce::juce_dsp
     # other JUCE modules...
-    chowdsp_dsp
-    chowdsp_gui
-    chowdsp_plugin_base
+    chowdsp::chowdsp_dsp
+    chowdsp::chowdsp_gui
+    chowdsp::chowdsp_plugin_base
     # Other modules and libraries...
 )
 ```
@@ -46,6 +49,7 @@ sure to abide by the license of each module, as well as whichever libraries are 
 `chowdsp_core` (BSD)
 - `DoubleBuffer`: A circular buffer which always maintans a contiguous block of data.
 - `TupleHelpers`: Useful methods for working with tuple-like data structures.
+- `AtomicHelpers`: Useful methods for working with atomics.
 
 `chowdsp_json` (BSD)
 - A thin wrapper around [`nlohmann::json`](https://github.com/nlohmann/json) (MIT license, included internally).
@@ -56,7 +60,6 @@ sure to abide by the license of each module, as well as whichever libraries are 
 ### DSP Modules
 
 `chowdsp_dsp_data_structures` (GPLv3)
-- `AudioBlockHelpers`: Useful methods for working with `juce::dsp::AudioBlock`.
 - `COLAProcessor`: A base class for doing Constant Overlap-Add processing.
 - `LookupTableTransform`: Some modifications on `juce::dsp::LookupTableTransform`.
 - `RebufferedProcessor`: A processor which rebuffers the input to have a constant block size.
@@ -82,6 +85,7 @@ sure to abide by the license of each module, as well as whichever libraries are 
 - Some higher-order filters (Butterworth, Chebyshev (Type II), Elliptic).
 - `StateVariableFilter`: A modified version of `juce::dsp::StateVariableTPTFilter`.
 - `ModFilterWrapper`: Turns any biquad filter into a State Variable Filter.
+- `FIRFilter`: An FIR filter with SIMD optimizations. 
 
 `chowdsp_math` (BSD)
 - `FloatVectorOperations`: Some extensions on `juce::FloatVectorOperations`.
@@ -92,8 +96,9 @@ sure to abide by the license of each module, as well as whichever libraries are 
 - Some modular template classes for constructing Feedback Delay Network reverbs.
 
 `chowdsp_simd` (BSD)
-- Depends on [XSIMD](https://github.com/xtensor-stack/xsimd) (BSD, included internally).
-- Some extensions on `juce::dsp::SIMDRegister`.
+- A wrapper around [XSIMD](https://github.com/xtensor-stack/xsimd) (BSD, included internally).
+- `SIMDSmoothedValue`: A SIMD specialization of `juce::SmoothedValue`.
+- A few other extea SIMD math functions.
 
 ## GUI Modules
 
