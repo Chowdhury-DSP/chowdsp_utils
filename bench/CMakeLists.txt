@@ -20,9 +20,8 @@ CPMAddPackage(
   OPTIONS "BENCHMARK_ENABLE_TESTING Off"
 )
 
-setup_benchmark(FloatVectorOperationsBench FloatVectorOperationsBench.cpp)
-setup_benchmark(LookupTableBench LookupTableBench.cpp)
-setup_benchmark(PowerBench PowerBench.cpp)
-
-setup_benchmark(FIRFilterBench FIRFilterBench.cpp)
-
+setup_benchmark(FloatVectorOperationsBench FloatVectorOperationsBench.cpp chowdsp_math)
+setup_benchmark(LookupTableBench LookupTableBench.cpp chowdsp_dsp_data_structures)
+setup_benchmark(PowerBench PowerBench.cpp chowdsp_math)
+setup_benchmark(FIRFilterBench FIRFilterBench.cpp chowdsp_filters)
+setup_benchmark(IIRFilterBench IIRFilterBench.cpp chowdsp_filters)
