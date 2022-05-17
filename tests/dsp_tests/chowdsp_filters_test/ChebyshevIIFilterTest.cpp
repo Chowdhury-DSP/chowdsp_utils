@@ -44,27 +44,53 @@ public:
     template <typename T>
     void lowpassTest()
     {
-        chowdsp::ChebyshevIIFilter<8, FilterType::Lowpass, 60, T> filter;
-        filter.calcCoefs (Constants::fc, (T) 1 / juce::MathConstants<T>::sqrt2, Constants::fs);
+        { // Chebyshev cutoff frequency
+            chowdsp::ChebyshevIIFilter<8, FilterType::Lowpass, 60, false, T> filter;
+            filter.calcCoefs (Constants::fc, (T) 1 / juce::MathConstants<T>::sqrt2, Constants::fs);
 
-        testFilter<T> (filter,
-                       { 100.0f, Constants::fc, 4 * Constants::fc },
-                       { 0.0f, -60.0f, -60.0f },
-                       { 0.005f, 1.0f, -1.0f },
-                       { "passband", "cutoff", "stopband" });
+            testFilter<T> (filter,
+                           { 100.0f, Constants::fc, 4 * Constants::fc },
+                           { 0.0f, -60.0f, -60.0f },
+                           { 0.005f, 1.0f, -1.0f },
+                           { "passband", "cutoff", "stopband" });
+        }
+
+        { // natural cutoff frequency
+            chowdsp::ChebyshevIIFilter<8, FilterType::Lowpass, 60, true, T> filter;
+            filter.calcCoefs (Constants::fc, (T) 1 / juce::MathConstants<T>::sqrt2, Constants::fs);
+
+            testFilter<T> (filter,
+                           { 100.0f, Constants::fc, 2 * Constants::fc },
+                           { 0.0f, -3.0f, -60.0f },
+                           { 0.005f, 0.01f, 1.0f },
+                           { "passband", "cutoff", "stopband" });
+        }
     }
 
     template <typename T>
     void highpassTest()
     {
-        chowdsp::ChebyshevIIFilter<8, FilterType::Highpass, 60, T> filter;
-        filter.calcCoefs (Constants::fc, (T) 1 / juce::MathConstants<T>::sqrt2, Constants::fs);
+        { // Chebyshev cutoff frequency
+            chowdsp::ChebyshevIIFilter<8, FilterType::Highpass, 60, false, T> filter;
+            filter.calcCoefs (Constants::fc, (T) 1 / juce::MathConstants<T>::sqrt2, Constants::fs);
 
-        testFilter<T> (filter,
-                       { 10000.0f, Constants::fc, 0.25f * Constants::fc },
-                       { 0.0f, -60.0f, -60.0f },
-                       { 0.025f, 4.0f, -1.0f },
-                       { "passband", "cutoff", "stopband" });
+            testFilter<T> (filter,
+                           { 10000.0f, Constants::fc, 0.25f * Constants::fc },
+                           { 0.0f, -60.0f, -60.0f },
+                           { 0.025f, 4.0f, -1.0f },
+                           { "passband", "cutoff", "stopband" });
+        }
+
+        { // natural cutoff frequency
+            chowdsp::ChebyshevIIFilter<8, FilterType::Highpass, 60, true, T> filter;
+            filter.calcCoefs (Constants::fc, (T) 1 / juce::MathConstants<T>::sqrt2, Constants::fs);
+
+            testFilter<T> (filter,
+                           { 10000.0f, Constants::fc, 0.5f * Constants::fc },
+                           { 0.0f, -3.0f, -60.0f },
+                           { 0.025f, 0.01f, 1.0f },
+                           { "passband", "cutoff", "stopband" });
+        }
     }
 
     void runTestTimed() override
