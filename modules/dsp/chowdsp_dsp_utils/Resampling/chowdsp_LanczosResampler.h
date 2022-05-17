@@ -3,7 +3,7 @@
 namespace chowdsp::ResamplingTypes
 {
 /** A resampling algorithm using Lanczos interpolation.
- *  This implementation is inspired by the one done by @baconpaul
+ *  This implementation is inspired by the one done by baconpaul
  *  for the Surge Synthesizer.
  * 
  *  `BUFFER_SIZE` determines how large of a table the resampler

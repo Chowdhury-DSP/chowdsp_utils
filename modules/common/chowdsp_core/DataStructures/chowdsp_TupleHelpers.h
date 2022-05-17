@@ -2,8 +2,10 @@
 
 #include <tuple>
 
+namespace chowdsp
+{
 /** Helpers for working with std::tuple */
-namespace chowdsp::TupleHelpers
+namespace TupleHelpers
 {
 /** Do a function for each element in the tuple */
 template <typename Fn, typename Tuple, size_t... Ix>
@@ -21,4 +23,5 @@ constexpr void forEachInTuple (Fn&& fn, Tuple&& tuple) noexcept (noexcept (forEa
 {
     forEachInTuple (std::forward<Fn> (fn), std::forward<Tuple> (tuple), TupleIndexSequence<Tuple> {});
 }
-} // namespace chowdsp::TupleHelpers
+} // namespace TupleHelpers
+} // namespace chowdsp

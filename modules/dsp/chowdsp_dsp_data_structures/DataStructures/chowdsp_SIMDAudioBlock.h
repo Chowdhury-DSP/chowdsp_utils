@@ -12,8 +12,6 @@ namespace chowdsp
     an AudioBuffer which it can refer to, but in all cases the user is
     responsible for making sure that the data doesn't get deleted while there's
     still an AudioBlock using it.
-
-    @tags{DSP}
 */
 template <typename SampleType>
 class SIMDAudioBlock
@@ -974,8 +972,6 @@ using AudioBlock = std::conditional_t<SampleTypeHelpers::IsSIMDRegister<std::rem
     getInputBlock() and getOutputBlock() methods.
 
     @see ProcessContextNonReplacing
-
-    @tags{DSP}
 */
 template <typename ContextSampleType>
 struct ProcessContextReplacing
@@ -1027,8 +1023,6 @@ private:
     getOutputBlock().
 
     @see ProcessContextReplacing
-
-    @tags{DSP}
 */
 template <typename ContextSampleType>
 struct ProcessContextNonReplacing

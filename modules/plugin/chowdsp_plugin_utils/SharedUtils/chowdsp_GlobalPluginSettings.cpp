@@ -1,5 +1,8 @@
 #include "chowdsp_GlobalPluginSettings.h"
 
+// @TODO: Update this class when nlohmann::json supports std::string_view
+// this should be available in version 3.11 (https://github.com/nlohmann/json/issues/1529)
+
 namespace chowdsp
 {
 GlobalPluginSettings::SettingsFileListener::SettingsFileListener (const juce::File& file, int timerSeconds, GlobalPluginSettings& settings)

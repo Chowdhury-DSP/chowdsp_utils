@@ -30,8 +30,6 @@ namespace chowdsp::SIMDUtils
 
     Note that when you are using multiplicative smoothing you cannot ever reach a
     target value of zero!
-
-    @tags{Audio}
 */
 template <typename SmFloatType, typename SmoothingType>
 class SIMDSmoothedValue : public juce::SmoothedValueBase<SIMDSmoothedValue<xsimd::batch<SmFloatType>, SmoothingType>>
