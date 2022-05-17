@@ -68,7 +68,7 @@ template <typename FloatType, typename... FilterChoices>
 void EQBand<FloatType, FilterChoices...>::reset()
 {
     TupleHelpers::forEachInTuple ([] (auto& filter, size_t) { filter.reset(); },
-                                   filters);
+                                  filters);
 
     for (auto* smoother : { &freqSmooth, &qSmooth, &gainSmooth })
         smoother->reset();
