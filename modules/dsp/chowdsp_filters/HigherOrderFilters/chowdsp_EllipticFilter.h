@@ -69,9 +69,9 @@ public:
             this->secondOrderSections[stageOrder].setCoefs (bCoefs, aCoefs);
         };
 
-        calcCoefsForQ (freqOffsets[0], qVals[0] * qVal * juce::MathConstants<NumericType>::sqrt2, lpGains[0], 0);
-        for (size_t i = 1; i < NFilters; ++i)
+        for (size_t i = 0; i < NFilters - 1; ++i)
             calcCoefsForQ (freqOffsets[i], qVals[i], lpGains[i], i);
+        calcCoefsForQ (freqOffsets[NFilters - 1], qVals[NFilters - 1] * qVal * juce::MathConstants<NumericType>::sqrt2, lpGains[NFilters - 1], NFilters - 1);
     }
 
 private:

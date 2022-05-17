@@ -1,26 +1,5 @@
 namespace chowdsp::EQ
 {
-#ifndef DOXYGEN
-namespace eqband_detail
-{
-    /** Functions to do a function for each element in the tuple */
-    template <typename Fn, typename Tuple, size_t... Ix>
-    constexpr void forEachInTuple (Fn&& fn, Tuple&& tuple, std::index_sequence<Ix...>) noexcept (noexcept (std::initializer_list<int> { (fn (std::get<Ix> (tuple), Ix), 0)... }))
-    {
-        (void) std::initializer_list<int> { ((void) fn (std::get<Ix> (tuple), Ix), 0)... };
-    }
-
-    template <typename T>
-    using TupleIndexSequence = std::make_index_sequence<std::tuple_size<std::remove_cv_t<std::remove_reference_t<T>>>::value>;
-
-    template <typename Fn, typename Tuple>
-    constexpr void forEachInTuple (Fn&& fn, Tuple&& tuple) noexcept (noexcept (forEachInTuple (std::forward<Fn> (fn), std::forward<Tuple> (tuple), TupleIndexSequence<Tuple> {})))
-    {
-        forEachInTuple (std::forward<Fn> (fn), std::forward<Tuple> (tuple), TupleIndexSequence<Tuple> {});
-    }
-} // namespace eqband_detail
-#endif
-
 template <typename FloatType, typename... FilterChoices>
 EQBand<FloatType, FilterChoices...>::EQBand() = default;
 
@@ -63,7 +42,7 @@ void EQBand<FloatType, FilterChoices...>::prepare (const juce::dsp::ProcessSpec&
     fadeBuffer.setSize ((int) spec.numChannels, (int) spec.maximumBlockSize);
     fadeBuffer.clear();
 
-    eqband_detail::forEachInTuple (
+    TupleHelpers::forEachInTuple (
         [spec] (auto& filter, size_t) {
             using FilterType = std::remove_reference_t<decltype (filter)>;
 
@@ -88,7 +67,7 @@ void EQBand<FloatType, FilterChoices...>::prepare (const juce::dsp::ProcessSpec&
 template <typename FloatType, typename... FilterChoices>
 void EQBand<FloatType, FilterChoices...>::reset()
 {
-    eqband_detail::forEachInTuple ([] (auto& filter, size_t) { filter.reset(); },
+    TupleHelpers::forEachInTuple ([] (auto& filter, size_t) { filter.reset(); },
                                    filters);
 
     for (auto* smoother : { &freqSmooth, &qSmooth, &gainSmooth })
@@ -230,7 +209,7 @@ void EQBand<FloatType, FilterChoices...>::process (const ProcessContext& context
             fadeBuffer.copyFrom ((int) channel, 0, block.getChannelPointer (channel), numSamples);
     }
 
-    eqband_detail::forEachInTuple (
+    TupleHelpers::forEachInTuple (
         [this, &block] (auto& filter, size_t filterIndex) {
             if ((int) filterIndex == filterType)
             {
