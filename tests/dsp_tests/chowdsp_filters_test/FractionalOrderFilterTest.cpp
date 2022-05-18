@@ -13,7 +13,7 @@ class FractionalOrderFilterTest : public TimedUnitTest
 public:
     FractionalOrderFilterTest() : TimedUnitTest ("Fractional Order Filter Test", "Filters") {}
 
-    template <typename T, typename FilterType, typename NumericType = typename chowdsp::SampleTypeHelpers::ElementType<T>::Type>
+    template <typename T, typename FilterType, typename NumericType = chowdsp::SampleTypeHelpers::NumericType<T>>
     void testFrequency (FilterType& filter, NumericType freq, NumericType expGainDB, NumericType maxError, const juce::String& message)
     {
         auto buffer = test_utils::makeSineWave<NumericType> (freq, Constants::fs, (NumericType) 1);
@@ -30,7 +30,7 @@ public:
         expectWithinAbsoluteError (magDB, expGainDB, maxError, message);
     }
 
-    template <typename T, typename NumericType = typename chowdsp::SampleTypeHelpers::ElementType<T>::Type>
+    template <typename T, typename NumericType = chowdsp::SampleTypeHelpers::NumericType<T>>
     void firstOrderLPFTest (NumericType maxError)
     {
         chowdsp::FractionalOrderFilter<T> lpFilter;

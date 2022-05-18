@@ -1,5 +1,8 @@
 #include "chowdsp_GlobalPluginSettings.h"
 
+// @TODO: Update this class when nlohmann::json supports std::string_view
+// this should be available in version 3.11 (https://github.com/nlohmann/json/issues/1529)
+
 namespace chowdsp
 {
 GlobalPluginSettings::SettingsFileListener::SettingsFileListener (const juce::File& file, int timerSeconds, GlobalPluginSettings& settings)
@@ -183,6 +186,7 @@ void GlobalPluginSettings::writeSettingsToFile()
     JSONUtils::toFile (settingsJson, settingsFile);
 }
 
+#ifndef DOXYGEN
 template void GlobalPluginSettings::setProperty<bool> (SettingID name, bool property);
 template void GlobalPluginSettings::setProperty<int> (SettingID name, int property);
 template void GlobalPluginSettings::setProperty<double> (SettingID name, double property);
@@ -194,4 +198,5 @@ template int GlobalPluginSettings::getProperty<int> (SettingID name);
 template double GlobalPluginSettings::getProperty<double> (SettingID name);
 template juce::String GlobalPluginSettings::getProperty<juce::String> (SettingID name);
 template json GlobalPluginSettings::getProperty<json> (SettingID name);
+#endif // DOXYGEN
 } // namespace chowdsp

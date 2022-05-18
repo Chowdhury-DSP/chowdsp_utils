@@ -2,6 +2,7 @@
 
 namespace chowdsp::Reverb
 {
+/** Default configuration for a feedback delay network */
 template <typename FloatType, int nChannels>
 struct DefaultFDNConfig
 {
@@ -38,6 +39,7 @@ private:
     FloatType fs = 48000.0f;
 };
 
+/** A feedback delay network processor with a customizable configuration */
 template <typename FDNConfig, typename DelayInterpType = chowdsp::DelayLineInterpolationTypes::None>
 class FDN
 {

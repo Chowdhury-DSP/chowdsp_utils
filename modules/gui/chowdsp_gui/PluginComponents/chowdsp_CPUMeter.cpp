@@ -2,6 +2,7 @@
 
 namespace chowdsp
 {
+#ifndef DOXYGEN
 class CPUMeterLNF : public juce::LookAndFeel_V4
 {
 public:
@@ -38,6 +39,7 @@ public:
         }
     }
 };
+#endif // DOXYGEN
 
 CPUMeter::CPUMeter (const juce::AudioProcessLoadMeasurer& lm) : loadMeasurer (lm)
 {

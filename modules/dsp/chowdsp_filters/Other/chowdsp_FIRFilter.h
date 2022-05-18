@@ -51,7 +51,7 @@ public:
         order = newOrder;
 
         static constexpr int batchSize = xsimd::batch<FloatType>::size;
-        paddedOrder = batchSize * chowdsp::ceiling_divide (order, batchSize);
+        paddedOrder = batchSize * Math::ceiling_divide (order, batchSize);
         coefficients.resize (paddedOrder, {});
         prepare ((int) state.size());
     }

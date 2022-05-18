@@ -5,8 +5,6 @@ namespace chowdsp
 /**
  * Utility class to hold plugin settings that should be shared between
  * plugin instances. It should typically be used as a SharedResourcePointer.
- *
- * @TODO: Update this class when nlohmann::json supports std::string_view
  */
 class GlobalPluginSettings
 {
@@ -40,7 +38,7 @@ public:
     T getProperty (SettingID name);
 
     /** Returns true if the given setting already exists */
-    bool hasProperty (SettingID name) const noexcept { return globalProperties.contains (name); }
+    [[nodiscard]] bool hasProperty (SettingID name) const noexcept { return globalProperties.contains (name); }
 
     /**
      * If a property with this name has been added to the plugin settings,
@@ -60,7 +58,7 @@ public:
     void removePropertyListener (Listener* listener);
 
     /** Returns the file be used to store the global settings */
-    juce::File getSettingsFile() const noexcept;
+    [[nodiscard]] juce::File getSettingsFile() const noexcept;
 
 private:
     bool loadSettingsFromFile();

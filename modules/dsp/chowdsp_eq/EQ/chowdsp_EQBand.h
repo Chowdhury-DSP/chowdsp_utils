@@ -2,7 +2,6 @@
 
 #include <tuple>
 
-/** ChowDSP EQ utilities */
 namespace chowdsp::EQ
 {
 /**

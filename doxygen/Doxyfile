@@ -847,8 +847,12 @@ EXCLUDE                = ../docs/ \
                          ../JUCE/ \
                          ../doxygen \
                          ../examples/ \
+                         ../bench/ \
+                         ../cmake/ \
                          ../build/ \
                          ../tests/ \
+                         ../.vscode/ \
+                         ../.idea/ \
                          ../.github/
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
@@ -865,7 +869,8 @@ EXCLUDE_SYMLINKS       = YES
 # Note that the wildcards are matched against the file with absolute path, so to
 # exclude all test directories for example use the pattern */test/*
 
-EXCLUDE_PATTERNS       = *chowdsp_BinaryData*
+EXCLUDE_PATTERNS       = *chowdsp_BinaryData* \
+                         */third_party/*
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the
@@ -2109,7 +2114,40 @@ PREDEFINED             = WIN32=1 \
                          JUCE_COMPILER_SUPPORTS_INITIALIZER_LISTS=1 \
                          JUCE_COMPILER_SUPPORTS_VARIADIC_TEMPLATES=1 \
                          JUCE_COMPILER_SUPPORTS_OVERRIDE_AND_FINAL=1 \
-                         JUCE_MODAL_LOOPS_PERMITTED=1
+                         JUCE_MODAL_LOOPS_PERMITTED=1 \
+                         JUCE_MODULE_AVAILABLE_juce_audio_basics=1 \
+                         JUCE_MODULE_AVAILABLE_juce_audio_devices=1 \
+                         JUCE_MODULE_AVAILABLE_juce_audio_formats=1 \
+                         JUCE_MODULE_AVAILABLE_juce_audio_plugin_client=1 \
+                         JUCE_MODULE_AVAILABLE_juce_audio_processors=1 \
+                         JUCE_MODULE_AVAILABLE_juce_audio_utils=1 \
+                         JUCE_MODULE_AVAILABLE_juce_core=1 \
+                         JUCE_MODULE_AVAILABLE_juce_data_structures=1 \
+                         JUCE_MODULE_AVAILABLE_juce_dsp=1 \
+                         JUCE_MODULE_AVAILABLE_juce_events=1 \
+                         JUCE_MODULE_AVAILABLE_juce_graphics=1 \
+                         JUCE_MODULE_AVAILABLE_juce_gui_basics=1 \
+                         JUCE_MODULE_AVAILABLE_juce_gui_extra=1 \
+                         JUCE_MODULE_AVAILABLE_juce_opengl=1 \
+                         JUCE_MODULE_AVAILABLE_foleys_gui_magic=1 \
+                         JUCE_MODULE_AVAILABLE_chowdsp_core=1 \
+                         JUCE_MODULE_AVAILABLE_chowdsp_json=1 \
+                         JUCE_MODULE_AVAILABLE_chowdsp_reflection=1 \
+                         JUCE_MODULE_AVAILABLE_chowdsp_dsp_data_structures=1 \
+                         JUCE_MODULE_AVAILABLE_chowdsp_dsp_utils=1 \
+                         JUCE_MODULE_AVAILABLE_chowdsp_eq=1 \
+                         JUCE_MODULE_AVAILABLE_chowdsp_filters=1 \
+                         JUCE_MODULE_AVAILABLE_chowdsp_math=1 \
+                         JUCE_MODULE_AVAILABLE_chowdsp_reverb=1 \
+                         JUCE_MODULE_AVAILABLE_chowdsp_simd=1 \
+                         JUCE_MODULE_AVAILABLE_chowdsp_foleys=1 \
+                         JUCE_MODULE_AVAILABLE_chowdsp_gui=1 \
+                         JUCE_MODULE_AVAILABLE_chowdsp_rhythm=1 \
+                         JUCE_MODULE_AVAILABLE_chowdsp_parameters=1 \
+                         JUCE_MODULE_AVAILABLE_chowdsp_plugin_base=1 \
+                         JUCE_MODULE_AVAILABLE_chowdsp_plugin_utils=1 \
+                         JUCE_MODULE_AVAILABLE_chowdsp_presets=1 \
+                         JUCE_MODULE_AVAILABLE_chowdsp_version=1
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The

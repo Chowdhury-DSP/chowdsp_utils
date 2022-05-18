@@ -2,63 +2,68 @@
 
 #include <chowdsp_presets/chowdsp_presets.h>
 
+namespace chowdsp
+{
 /** Classes for adapting the program interface in juce::AudioProcessor */
-namespace chowdsp::ProgramAdapter
+namespace ProgramAdapter
 {
-struct BaseProgramAdapter
-{
-    virtual ~BaseProgramAdapter() = default;
+    /** Base class for interfacing with the juce::AudioProcessor program API */
+    struct BaseProgramAdapter
+    {
+        virtual ~BaseProgramAdapter() = default;
 
-    virtual int getNumPrograms() { return 1; }
-    virtual int getCurrentProgram() { return 0; }
-    virtual void setCurrentProgram (int) {}
+        virtual int getNumPrograms() { return 1; }
+        virtual int getCurrentProgram() { return 0; }
+        virtual void setCurrentProgram (int) {}
 
-    virtual const juce::String getProgramName (int) { return {}; } // NOLINT(readability-const-return-type): Needs to return a const String for override compatibility
-    virtual void changeProgramName (int, const juce::String&) {}
-};
+        virtual const juce::String getProgramName (int) { return {}; } // NOLINT(readability-const-return-type): Needs to return a const String for override compatibility
+        virtual void changeProgramName (int, const juce::String&) {}
+    };
 
 #if JUCE_MODULE_AVAILABLE_chowdsp_presets
-class PresetsProgramAdapter : public BaseProgramAdapter
-{
-public:
-    explicit PresetsProgramAdapter (std::unique_ptr<PresetManager>& manager) : presetManager (manager) {}
-
-    int getNumPrograms() override
+    /** Interface between chowdsp::PresetManager and the juce::AudioProcessor program API */
+    class PresetsProgramAdapter : public BaseProgramAdapter
     {
-        if (presetManager == nullptr)
-            return BaseProgramAdapter::getNumPrograms();
+    public:
+        explicit PresetsProgramAdapter (std::unique_ptr<PresetManager>& manager) : presetManager (manager) {}
 
-        return presetManager->getNumPresets();
-    }
+        int getNumPrograms() override
+        {
+            if (presetManager == nullptr)
+                return BaseProgramAdapter::getNumPrograms();
 
-    int getCurrentProgram() override
-    {
-        if (presetManager == nullptr)
-            return 0;
+            return presetManager->getNumPresets();
+        }
 
-        return presetManager->getCurrentPresetIndex();
-    }
+        int getCurrentProgram() override
+        {
+            if (presetManager == nullptr)
+                return BaseProgramAdapter::getCurrentProgram();
 
-    void setCurrentProgram (int index) override
-    {
-        if (presetManager == nullptr)
-            return;
+            return presetManager->getCurrentPresetIndex();
+        }
 
-        presetManager->loadPresetFromIndex (index);
-    }
+        void setCurrentProgram (int index) override
+        {
+            if (presetManager == nullptr)
+                return BaseProgramAdapter::setCurrentProgram (index);
 
-    const juce::String getProgramName (int index) override // NOLINT(readability-const-return-type): Needs to return a const String for override compatibility
-    {
-        if (presetManager == nullptr)
-            return BaseProgramAdapter::getProgramName (index);
+            presetManager->loadPresetFromIndex (index);
+        }
 
-        return presetManager->getPresetName (index);
-    }
+        const juce::String getProgramName (int index) override // NOLINT(readability-const-return-type): Needs to return a const String for override compatibility
+        {
+            if (presetManager == nullptr)
+                return BaseProgramAdapter::getProgramName (index);
 
-private:
-    std::unique_ptr<chowdsp::PresetManager>& presetManager;
+            return presetManager->getPresetName (index);
+        }
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetsProgramAdapter)
-};
+    private:
+        std::unique_ptr<chowdsp::PresetManager>& presetManager;
+
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetsProgramAdapter)
+    };
 #endif // JUCE_MODULE_AVAILABLE_chowdsp_presets
-} // namespace chowdsp::ProgramAdapter
+} // namespace ProgramAdapter
+} // namespace chowdsp

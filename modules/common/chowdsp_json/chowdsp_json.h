@@ -28,6 +28,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 namespace chowdsp
 {
+/** Alias for nlohmann::json */
 using json = nlohmann::json;
 } // namespace chowdsp
 

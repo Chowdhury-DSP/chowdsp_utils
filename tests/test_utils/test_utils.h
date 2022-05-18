@@ -67,7 +67,7 @@ inline juce::AudioBuffer<float> makeNoise (float sampleRate, float lengthSeconds
 
 #if JUCE_MODULE_AVAILABLE_chowdsp_dsp_data_structures
 /** Convert from a AudioBuffer to AudioBlock (maybe changing data type...) */
-template <typename T, typename NumericType = typename juce::dsp::SampleTypeHelpers::ElementType<T>::Type>
+template <typename T, typename NumericType = chowdsp::SampleTypeHelpers::NumericType<T>>
 inline chowdsp::AudioBlock<T> bufferToBlock (juce::HeapBlock<char>& dataBlock, const juce::AudioBuffer<NumericType>& buffer)
 {
     chowdsp::AudioBlock<T> block { dataBlock, 1, (size_t) buffer.getNumSamples() };
@@ -78,7 +78,7 @@ inline chowdsp::AudioBlock<T> bufferToBlock (juce::HeapBlock<char>& dataBlock, c
 }
 
 /** Convert from a AudioBlock to AudioBuffer (maybe changing data type...) */
-template <typename T, typename NumericType = typename juce::dsp::SampleTypeHelpers::ElementType<T>::Type>
+template <typename T, typename NumericType = chowdsp::SampleTypeHelpers::NumericType<T>>
 inline void blockToBuffer (juce::AudioBuffer<NumericType>& buffer, const chowdsp::AudioBlock<T>& block)
 {
     if constexpr (std::is_floating_point<T>::value)

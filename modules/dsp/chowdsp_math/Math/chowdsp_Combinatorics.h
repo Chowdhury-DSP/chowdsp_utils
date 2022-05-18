@@ -17,7 +17,7 @@ namespace Combinatorics
         return factorial (n) / factorial (n - k);
     }
 
-    /** Computes the combination of n and k (i.e. "n choose k") */
+    /** Computes the combination of n and k ("n choose k") */
     constexpr int combination (int n, int k)
     {
         return permutation (n, k) / factorial (k);
