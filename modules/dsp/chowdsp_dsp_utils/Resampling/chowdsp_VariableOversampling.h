@@ -33,7 +33,6 @@ public:
      * Construct a variable oversampling object with an APVTS
      *
      * @param vts               APVTS that has been initialized with the parameters from `createParameterLayout()`
-     * @param numChannels       Number of channels that may be processed (either 1 or 2)
      * @param useIntegerLatency Set to true to force the oversamplers to use integer latency
      * @param paramPrefix       The same parameter prefix used to create the parameters
      */

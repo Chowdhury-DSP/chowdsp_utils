@@ -1,7 +1,9 @@
 #pragma once
 
+namespace chowdsp
+{
 /** Helper methods for working with impulse responses */
-namespace chowdsp::IRHelpers
+namespace IRHelpers
 {
 /**
  * Transforms an impulse response into a linear phase impulse response
@@ -40,4 +42,6 @@ void makeMinimumPhase (float* minimumPhaseIR, const float* originalIR, int numSa
  * @param fft           A shared FFT object to use for the computation
  */
 void makeHalfMagnitude (float* halfMagIR, const float* originalIR, int numSamples, juce::dsp::FFT& fft);
-} // namespace chowdsp::IRHelpers
+
+} // namespace IRHelpers
+} // namespace chowdsp

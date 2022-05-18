@@ -26,9 +26,7 @@ enum class StateVariableFilterType
     filter classes. However, this class may still require additional smoothing for
     cutoff frequency changes.
 
-    see IIRFilter, SmoothedValue
-
-    @tags{DSP}
+    @see IIRFilter
 */
 template <typename SampleType>
 class StateVariableFilter

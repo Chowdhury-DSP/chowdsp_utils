@@ -11,7 +11,7 @@ public:
 
     using Vec = xsimd::batch<SampleType>;
     static constexpr auto vecSize = Vec::size;
-    static constexpr auto maxNumVecModes = ceiling_divide (maxNumModes, vecSize);
+    static constexpr auto maxNumVecModes = Math::ceiling_divide (maxNumModes, vecSize);
 
     ModalFilterBank() = default;
 

@@ -24,7 +24,7 @@ void LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::prepare (const juce::dsp::Pro
     maxBlockSize = (int) spec.maximumBlockSize;
     irSize = getIRSize (fs);
 
-    const auto fftOrder = chowdsp::log2 (irSize);
+    const auto fftOrder = Math::log2 (irSize);
     fft = std::make_unique<juce::dsp::FFT> (fftOrder);
 
     prototypeEQ.prepare ({ spec.sampleRate, (juce::uint32) irSize, 1 });

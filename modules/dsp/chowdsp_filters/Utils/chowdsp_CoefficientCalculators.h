@@ -35,6 +35,9 @@ namespace CoefficientCalculators
     }
 
     /** Calculates the coefficients for the filter.
+     *
+     * @param b: the filter feed-forward coefficients
+     * @param a: the filter feed-back coefficients
      * @param lowGain: the gain of the filter at low frequencies
      * @param highGain: the gain of the filter at high frequencies
      * @param fc: the transition frequency of the filter

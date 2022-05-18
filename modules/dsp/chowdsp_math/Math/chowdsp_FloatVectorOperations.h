@@ -1,9 +1,11 @@
 #pragma once
 
-/** Extensions of juce::FloatVectorOperations */
-namespace chowdsp::FloatVectorOperations
+namespace chowdsp
 {
-/** Returns true if the library is currently using the Apple vDSP framework */
+/** Extensions of juce::FloatVectorOperations */
+namespace FloatVectorOperations
+{
+/** Returns true if FloatVectorOperations will be performed using the Apple vDSP framework */
 [[maybe_unused]] bool isUsingVDSP();
 
 /** Divides a scalar value by the src vector. */
@@ -30,21 +32,23 @@ namespace chowdsp::FloatVectorOperations
 /** Computes the inner product between the two arrays. */
 [[maybe_unused]] double innerProduct (const double* src1, const double* src2, int numValues) noexcept;
 
-/** Finds the absolute maximum value in the given array */
+/** Finds the absolute maximum value in the given array. */
 [[maybe_unused]] float findAbsoluteMaximum (const float* src, int numValues) noexcept;
 
-/** Finds the absolute maximum value in the given array */
+/** Finds the absolute maximum value in the given array. */
 [[maybe_unused]] double findAbsoluteMaximum (const double* src, int numValues) noexcept;
 
-/** Takes the exponent of each value to an integer power */
+/** Takes the exponent of each value to an integer power. */
 [[maybe_unused]] void integerPower (float* dest, const float* src, int exponent, int numValues) noexcept;
 
-/** Takes the exponent of each value to an integer power */
+/** Takes the exponent of each value to an integer power. */
 [[maybe_unused]] void integerPower (double* dest, const double* src, int exponent, int numValues) noexcept;
 
-/** Computes the Root-Mean-Square average of the input data.. */
+/** Computes the Root-Mean-Square average of the input data. */
 [[maybe_unused]] float computeRMS (const float* src, int numValues) noexcept;
 
-/** Computes the Root-Mean-Square average of the input data.. */
+/** Computes the Root-Mean-Square average of the input data. */
 [[maybe_unused]] double computeRMS (const double* src, int numValues) noexcept;
-} // namespace chowdsp::FloatVectorOperations
+
+} // namespace FloatVectorOperations
+} // namespace chowdsp

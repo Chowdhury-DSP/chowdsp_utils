@@ -1,7 +1,9 @@
 #pragma once
 
+namespace chowdsp
+{
 /** Methods for retreiving information about the target system. */
-namespace chowdsp::SystemInfo
+namespace SystemInfo
 {
 /** Returns the current operating system and bit-depth. */
 constexpr std::string_view getOSDescription()
@@ -39,4 +41,5 @@ constexpr std::string_view getProcArch()
     return "N/A";
 #endif
 }
-} // namespace chowdsp::SystemInfo
+} // namespace SystemInfo
+} // namespace chowdsp

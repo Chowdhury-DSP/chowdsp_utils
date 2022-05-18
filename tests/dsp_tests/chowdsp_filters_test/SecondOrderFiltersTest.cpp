@@ -17,7 +17,7 @@ public:
     {
     }
 
-    template <typename T, typename FilterType, typename NumericType = typename chowdsp::SampleTypeHelpers::ElementType<T>::Type>
+    template <typename T, typename FilterType, typename NumericType = chowdsp::SampleTypeHelpers::NumericType<T>>
     void testFrequency (FilterType& filter, NumericType freq, NumericType expGainDB, NumericType maxError, const juce::String& message)
     {
         auto buffer = test_utils::makeSineWave<NumericType> (freq, Constants::fs, (NumericType) 2);
@@ -34,7 +34,7 @@ public:
         expectWithinAbsoluteError (magDB, expGainDB, maxError, message);
     }
 
-    template <typename T, typename NumericType = typename chowdsp::SampleTypeHelpers::ElementType<T>::Type>
+    template <typename T, typename NumericType = chowdsp::SampleTypeHelpers::NumericType<T>>
     void secondOrderLPFTest (NumericType maxError)
     {
         using namespace Constants;
@@ -47,7 +47,7 @@ public:
         testFrequency<T> (filter, (NumericType) fc * (NumericType) 4, (NumericType) -24.2, (NumericType) 0.1, "Incorrect gain at high frequencies.");
     }
 
-    template <typename T, typename NumericType = typename chowdsp::SampleTypeHelpers::ElementType<T>::Type>
+    template <typename T, typename NumericType = chowdsp::SampleTypeHelpers::NumericType<T>>
     void secondOrderHPFTest (NumericType maxError)
     {
         using namespace Constants;
@@ -60,7 +60,7 @@ public:
         testFrequency<T> (filter, (NumericType) fs * (NumericType) 0.498, (NumericType) 0, maxError, "Incorrect gain at high frequencies.");
     }
 
-    template <typename T, typename NumericType = typename chowdsp::SampleTypeHelpers::ElementType<T>::Type>
+    template <typename T, typename NumericType = chowdsp::SampleTypeHelpers::NumericType<T>>
     void secondOrderBPFTest (NumericType maxError)
     {
         using namespace Constants;
@@ -73,7 +73,7 @@ public:
         testFrequency<T> (filter, (NumericType) fc * (NumericType) 4, (NumericType) -9.1, (NumericType) 0.1, "Incorrect gain at high frequencies.");
     }
 
-    template <typename T, typename NumericType = typename chowdsp::SampleTypeHelpers::ElementType<T>::Type>
+    template <typename T, typename NumericType = chowdsp::SampleTypeHelpers::NumericType<T>>
     void notchFilterTest (NumericType maxError)
     {
         using namespace Constants;
@@ -91,7 +91,7 @@ public:
         testFrequency<T> (filter, (NumericType) fs * (NumericType) 0.498, (NumericType) 0, maxError, "Incorrect gain at high frequencies.");
     }
 
-    template <typename T, typename NumericType = typename chowdsp::SampleTypeHelpers::ElementType<T>::Type>
+    template <typename T, typename NumericType = chowdsp::SampleTypeHelpers::NumericType<T>>
     void peakingFilterTest (NumericType maxError)
     {
         using namespace Constants;
@@ -104,7 +104,7 @@ public:
         testFrequency<T> (filter, (NumericType) fs * (NumericType) 0.498, (NumericType) 0, maxError, "Incorrect gain at high frequencies.");
     }
 
-    template <typename T, typename NumericType = typename chowdsp::SampleTypeHelpers::ElementType<T>::Type>
+    template <typename T, typename NumericType = chowdsp::SampleTypeHelpers::NumericType<T>>
     void lowShelfFilterTest (NumericType maxError)
     {
         using namespace Constants;
@@ -117,7 +117,7 @@ public:
         testFrequency<T> (filter, (NumericType) fs * (NumericType) 0.498, (NumericType) 0, maxError, "Incorrect gain at high frequencies.");
     }
 
-    template <typename T, typename NumericType = typename chowdsp::SampleTypeHelpers::ElementType<T>::Type>
+    template <typename T, typename NumericType = chowdsp::SampleTypeHelpers::NumericType<T>>
     void highShelfFilterTest (NumericType maxError)
     {
         using namespace Constants;

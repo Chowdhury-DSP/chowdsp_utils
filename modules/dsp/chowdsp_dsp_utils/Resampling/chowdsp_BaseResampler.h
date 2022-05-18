@@ -1,7 +1,9 @@
 #pragma once
 
+namespace chowdsp
+{
 /** Various methods for resampling, that may be used with ResamplingProcessor or ResampledProcess */
-namespace chowdsp::ResamplingTypes
+namespace ResamplingTypes
 {
 /** Abstract class which defines the basic methods that all other resampling types must implement */
 class BaseResampler
@@ -34,5 +36,5 @@ public:
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BaseResampler)
 };
-
-} // namespace chowdsp::ResamplingTypes
+} // namespace ResamplingTypes
+} // namespace chowdsp

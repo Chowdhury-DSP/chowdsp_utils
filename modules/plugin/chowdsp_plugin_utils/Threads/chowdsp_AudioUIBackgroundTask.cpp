@@ -2,6 +2,7 @@
 
 namespace chowdsp
 {
+#ifndef DOXYGEN
 namespace detail
 {
     void SingleThreadBackgroundTask::run()
@@ -54,6 +55,7 @@ namespace detail
             timeSliceThreadToUse->stopThread (-1);
     }
 } // namespace detail
+#endif // DOXYGEN
 
 template <typename BackgroundTaskType>
 AudioUIBackgroundTask<BackgroundTaskType>::AudioUIBackgroundTask (const juce::String& name) : BackgroundTaskType (name)

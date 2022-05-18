@@ -1,10 +1,12 @@
 #pragma once
 
+/** Simplified way of `using` the same function from both `std::` and `xsimd::` */
 #define CHOWDSP_USING_XSIMD_STD(func) \
     using std::func;                  \
     using xsimd::func;
 
-/** Useful methds for working with SIMD batches via XSIMD */
-namespace chowdsp::SIMDUtils
+namespace chowdsp
 {
-} // namespace chowdsp::SIMDUtils
+/** Useful methods for working with SIMD batches via XSIMD */
+namespace SIMDUtils {}
+} // namespace chowdsp

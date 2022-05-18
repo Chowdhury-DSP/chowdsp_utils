@@ -5,8 +5,6 @@ namespace chowdsp
 /**
  * Utility class to hold plugin settings that should be shared between
  * plugin instances. It should typically be used as a SharedResourcePointer.
- *
- * @TODO: Update this class when nlohmann::json supports std::string_view
  */
 class GlobalPluginSettings
 {

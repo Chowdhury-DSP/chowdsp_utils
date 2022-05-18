@@ -1,11 +1,13 @@
 #pragma once
 
+namespace chowdsp
+{
 /**
  * Bucket-Bridage Device emulation, as derived by
  * Martin Holters and Julian Parker:
  * http://dafx2018.web.ua.pt/papers/DAFx2018_paper_12.pdf
  */
-namespace chowdsp::BBD
+namespace BBD
 {
 template <typename T>
 using SIMDScalar = xsimd::batch<T>;
@@ -161,5 +163,5 @@ private:
     const float Ts;
     Complex4 Amult {};
 };
-
-} // namespace chowdsp::BBD
+} // namespace BBD
+} // namespace chowdsp

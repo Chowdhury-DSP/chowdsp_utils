@@ -2,8 +2,10 @@
 
 #include <type_traits>
 
+namespace chowdsp
+{
 /** Useful methods for computing the power function for integer exponents in the range [0, 16] */
-namespace chowdsp::Power
+namespace Power
 {
 // Template specialization of exponent methods using
 // Addition-chain exponentiation (https://en.wikipedia.org/wiki/Addition-chain_exponentiation).
@@ -152,4 +154,5 @@ constexpr std::enable_if_t<(exp > 16) && exp % 2 != 0, T>
 {
     return ipow<(exp - 1) / 2> (ipow<2> (a)) * a;
 }
-} // namespace chowdsp::Power
+} // namespace Power
+} // namespace chowdsp
