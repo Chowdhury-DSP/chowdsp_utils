@@ -8,5 +8,7 @@
 namespace chowdsp
 {
 /** Useful methods for working with SIMD batches via XSIMD */
-namespace SIMDUtils {}
+namespace SIMDUtils
+{
+}
 } // namespace chowdsp

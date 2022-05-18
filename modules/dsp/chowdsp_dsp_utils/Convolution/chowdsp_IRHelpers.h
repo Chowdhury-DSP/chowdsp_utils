@@ -5,7 +5,7 @@ namespace chowdsp
 /** Helper methods for working with impulse responses */
 namespace IRHelpers
 {
-/**
+    /**
  * Transforms an impulse response into a linear phase impulse response
  *
  * Note that this method allocates memory, so it should not be called on the audio thread!
@@ -15,9 +15,9 @@ namespace IRHelpers
  * @param numSamples        The length of the impulse response in samples
  * @param fft               A shared FFT object to use for the computation
  */
-void makeLinearPhase (float* linearPhaseIR, const float* originalIR, int numSamples, juce::dsp::FFT& fft);
+    void makeLinearPhase (float* linearPhaseIR, const float* originalIR, int numSamples, juce::dsp::FFT& fft);
 
-/**
+    /**
  * Transforms an impulse response into a minimum phase impulse response
  *
  * Note that this method allocates memory, so it should not be called on the audio thread!
@@ -27,9 +27,9 @@ void makeLinearPhase (float* linearPhaseIR, const float* originalIR, int numSamp
  * @param numSamples        The length of the impulse response in samples
  * @param fft               A shared FFT object to use for the computation
  */
-void makeMinimumPhase (float* minimumPhaseIR, const float* originalIR, int numSamples, juce::dsp::FFT& fft);
+    void makeMinimumPhase (float* minimumPhaseIR, const float* originalIR, int numSamples, juce::dsp::FFT& fft);
 
-/**
+    /**
  * Transforms an impulse response to have exactly half the magnitude response of the original.
  *
  * This can be useful for creating a linear phase IR from a prototype filter. Just run an
@@ -41,7 +41,7 @@ void makeMinimumPhase (float* minimumPhaseIR, const float* originalIR, int numSa
  * @param numSamples    The length of the impulse response in samples
  * @param fft           A shared FFT object to use for the computation
  */
-void makeHalfMagnitude (float* halfMagIR, const float* originalIR, int numSamples, juce::dsp::FFT& fft);
+    void makeHalfMagnitude (float* halfMagIR, const float* originalIR, int numSamples, juce::dsp::FFT& fft);
 
 } // namespace IRHelpers
 } // namespace chowdsp

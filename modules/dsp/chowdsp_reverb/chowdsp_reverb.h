@@ -25,8 +25,10 @@ BEGIN_JUCE_MODULE_DECLARATION
 namespace chowdsp
 {
 /** ChowDSP classes for creating reverb effects */
-namespace Reverb {}
+namespace Reverb
+{
 }
+} // namespace chowdsp
 
 #include "Reverb/chowdsp_Diffuser.h"
 #include "Reverb/chowdsp_FDN.h"

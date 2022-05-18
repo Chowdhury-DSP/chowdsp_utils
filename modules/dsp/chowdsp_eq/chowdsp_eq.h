@@ -26,8 +26,10 @@ BEGIN_JUCE_MODULE_DECLARATION
 namespace chowdsp
 {
 /** ChowDSP EQ utilities */
-namespace EQ {}
+namespace EQ
+{
 }
+} // namespace chowdsp
 
 #include "EQ/chowdsp_EQBand.h"
 #include "EQ/chowdsp_EQProcessor.h"
