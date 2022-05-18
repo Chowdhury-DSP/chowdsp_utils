@@ -1,10 +1,9 @@
 #pragma once
 
-/**
- * nlohmann::json is much easier to use than JUCE's JSON API.
- * Here are some wrappers making it easier to combine the two!
- */
-namespace chowdsp::JSONUtils
+namespace chowdsp
+{
+/** Useful methods for interfacing between JUCE and nlohmann::json */
+namespace JSONUtils
 {
 /** Load a json object from a juce::InputStream */
 inline json fromInputStream (juce::InputStream& stream)
@@ -35,11 +34,12 @@ inline void toFile (const json& j, const juce::File& file)
 }
 
 /**
-     * Check if two json objects have the same type.
-     * Note that all number types are treated as the same.
-     */
+ * Check if two json objects have the same type.
+ * Note that all number types are treated as the same.
+ */
 inline bool isSameType (const json& j1, const json& j2)
 {
     return (j1.is_number() && j2.is_number()) || (j1.type() == j2.type());
 }
-} // namespace chowdsp::JSONUtils
+} // namespace JSONUtils
+} // namespace chowdsp

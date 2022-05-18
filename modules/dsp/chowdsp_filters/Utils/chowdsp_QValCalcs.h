@@ -1,7 +1,9 @@
 #pragma once
 
+namespace chowdsp
+{
 /** Useful methods for computing Q values for filters */
-namespace chowdsp::QValCalcs
+namespace QValCalcs
 {
 /** Computes Q values for a Butterworth filter of order N */
 template <typename T, size_t N>
@@ -21,5 +23,5 @@ std::array<T, N / 2> butterworth_Qs()
 
     return qVals;
 }
-
-} // namespace chowdsp::QValCalcs
+} // namespace QValCalcs
+} // namespace chowdsp

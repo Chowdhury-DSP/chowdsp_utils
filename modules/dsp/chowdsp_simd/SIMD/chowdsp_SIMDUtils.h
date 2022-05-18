@@ -4,7 +4,8 @@
     using std::func;                  \
     using xsimd::func;
 
-/** Useful methds for working with SIMD batches via XSIMD */
-namespace chowdsp::SIMDUtils
+namespace chowdsp
 {
-} // namespace chowdsp::SIMDUtils
+/** Useful methods for working with SIMD batches via XSIMD */
+namespace SIMDUtils {}
+} // namespace chowdsp

@@ -2,8 +2,10 @@
 
 #include <type_traits>
 
+namespace chowdsp
+{
 /** Useful structs for determining the internal data type of SIMD types */
-namespace chowdsp::SampleTypeHelpers
+namespace SampleTypeHelpers
 {
 template <typename T, bool = std::is_floating_point_v<T> || std::is_same_v<T, std::complex<float>> || std::is_same_v<T, std::complex<double>>>
 struct ElementType
@@ -39,4 +41,6 @@ using ProcessorNumericType = typename ProcessorType::NumericType;
 /** Useful template expression for determining if a type is a SIMDRegister */
 template <typename T, typename NumericType = NumericType<T>, typename SIMDType = xsimd::batch<NumericType>>
 inline constexpr bool IsSIMDRegister = std::is_same_v<T, SIMDType>;
-} // namespace chowdsp::SampleTypeHelpers
+
+} // namespace SampleTypeHelpers
+} // namespace chowdsp

@@ -25,8 +25,10 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include <vector>
 #include <juce_core/juce_core.h>
 
+namespace chowdsp
+{
 /** Utilities for managing rhythms in code */
-namespace chowdsp::RhythmUtils
+namespace RhythmUtils
 {
 /** Simple struct representing the rhythm of a note */
 struct Rhythm
@@ -96,4 +98,5 @@ constexpr auto TWO_WHOLE = Rhythm ("Two Whole", "2/1", 8.0);
         WHOLE,
     };
 }
-} // namespace chowdsp::RhythmUtils
+} // namespace RhythmUtils
+} // namespace chowdsp

@@ -2,12 +2,14 @@
 
 #include <cmath>
 
+namespace chowdsp
+{
 /**
  * Utility methods to digitize IIR filters with the bilinear transform.
  * The parameter K an be used to warp the bilinear transform or use K = 2 / T
  * for no warping.
  */
-namespace chowdsp::Bilinear
+namespace Bilinear
 {
 /** Bilinear transform for a (N-1)-order filter */
 template <typename T, int N>
@@ -116,5 +118,5 @@ inline T calcPoleFreq (T a, T b, T c)
 
     return std::sqrt (-radicand) / (2 * a);
 }
-
-} // namespace chowdsp::Bilinear
+} // namespace Bilinear
+} // namespace chowdsp

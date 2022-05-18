@@ -847,6 +847,7 @@ EXCLUDE                = ../docs/ \
                          ../JUCE/ \
                          ../doxygen \
                          ../examples/ \
+                         ../bench/ \
                          ../cmake/ \
                          ../build/ \
                          ../tests/ \

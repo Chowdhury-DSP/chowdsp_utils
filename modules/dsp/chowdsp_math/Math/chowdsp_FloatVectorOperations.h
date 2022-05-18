@@ -1,7 +1,9 @@
 #pragma once
 
+namespace chowdsp
+{
 /** Extensions of juce::FloatVectorOperations */
-namespace chowdsp::FloatVectorOperations
+namespace FloatVectorOperations
 {
 /** Returns true if FloatVectorOperations will be performed using the Apple vDSP framework */
 [[maybe_unused]] bool isUsingVDSP();
@@ -47,4 +49,6 @@ namespace chowdsp::FloatVectorOperations
 
 /** Computes the Root-Mean-Square average of the input data. */
 [[maybe_unused]] double computeRMS (const double* src, int numValues) noexcept;
-} // namespace chowdsp::FloatVectorOperations
+
+} // namespace FloatVectorOperations
+} // namespace chowdsp

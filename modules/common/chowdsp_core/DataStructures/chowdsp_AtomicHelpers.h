@@ -2,6 +2,7 @@
 
 namespace chowdsp
 {
+/** Helpful methods for working with atomic data types */
 namespace AtomicHelpers
 {
     /** Simplified wrapped of std::atomic<T>::compare_exchange_strong */

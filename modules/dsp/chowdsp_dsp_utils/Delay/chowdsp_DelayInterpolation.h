@@ -1,10 +1,12 @@
 #pragma once
 
+namespace chowdsp
+{
 /**
     A collection of structs to pass as the template argument when setting the
     interpolation type for the DelayLine class.
 */
-namespace chowdsp::DelayLineInterpolationTypes
+namespace DelayLineInterpolationTypes
 {
 /**
     No interpolation between successive samples in the delay line will be
@@ -274,4 +276,5 @@ struct Sinc
     T sinctable alignas (xsimd::default_arch::alignment())[(M + 1) * N * 2];
 };
 JUCE_END_IGNORE_WARNINGS_MSVC
-} // namespace chowdsp::DelayLineInterpolationTypes
+} // namespace DelayLineInterpolationTypes
+} // namespace chowdsp

@@ -22,8 +22,10 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 #include <juce_core/juce_core.h>
 
+namespace chowdsp
+{
 /** Tools for working with software versioning. */
-namespace chowdsp::VersionUtils
+namespace VersionUtils
 {
 /** Utility class to manage version strings. */
 class Version
@@ -50,4 +52,5 @@ private:
 
     JUCE_LEAK_DETECTOR (Version)
 };
-} // namespace chowdsp::VersionUtils
+} // namespace VersionUtils
+} // namespace chowdsp

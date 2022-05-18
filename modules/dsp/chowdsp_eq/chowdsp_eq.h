@@ -23,6 +23,12 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include <chowdsp_reflection/chowdsp_reflection.h>
 #include <chowdsp_dsp_utils/chowdsp_dsp_utils.h>
 
+namespace chowdsp
+{
+/** ChowDSP EQ utilities */
+namespace EQ {}
+}
+
 #include "EQ/chowdsp_EQBand.h"
 #include "EQ/chowdsp_EQProcessor.h"
 #include "EQ/chowdsp_EQParams.h"

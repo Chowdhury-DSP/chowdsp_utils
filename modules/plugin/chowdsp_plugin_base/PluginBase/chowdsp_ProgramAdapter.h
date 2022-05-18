@@ -2,8 +2,10 @@
 
 #include <chowdsp_presets/chowdsp_presets.h>
 
+namespace chowdsp
+{
 /** Classes for adapting the program interface in juce::AudioProcessor */
-namespace chowdsp::ProgramAdapter
+namespace ProgramAdapter
 {
 struct BaseProgramAdapter
 {
@@ -61,4 +63,5 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetsProgramAdapter)
 };
 #endif // JUCE_MODULE_AVAILABLE_chowdsp_presets
-} // namespace chowdsp::ProgramAdapter
+} // namespace ProgramAdapter
+} // namespace chowdsp
