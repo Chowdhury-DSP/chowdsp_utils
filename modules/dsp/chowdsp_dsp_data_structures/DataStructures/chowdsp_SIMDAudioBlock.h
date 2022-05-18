@@ -27,7 +27,7 @@ private:
 
 public:
     //==============================================================================
-    using NumericType = typename SampleTypeHelpers::ElementType<SampleType>::Type;
+    using NumericType = SampleTypeHelpers::NumericType<SampleType>;
 
     //==============================================================================
     /** Create a zero-sized AudioBlock. */
@@ -960,6 +960,7 @@ private:
     friend class SIMDAudioBlock;
 };
 
+/** Wrapper of juce::dsp::AudioBlock, that allows AudioBlock<xsimd::batch<T>> to work. */
 template <typename T>
 using AudioBlock = std::conditional_t<SampleTypeHelpers::IsSIMDRegister<std::remove_const_t<T>>, SIMDAudioBlock<T>, juce::dsp::AudioBlock<T>>;
 

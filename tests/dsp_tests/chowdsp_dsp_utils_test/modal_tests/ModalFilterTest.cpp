@@ -18,7 +18,7 @@ template <typename T>
 class ModalFilterTest : public TimedUnitTest
 {
 public:
-    using NumericType = typename chowdsp::SampleTypeHelpers::ElementType<T>::Type;
+    using NumericType = chowdsp::SampleTypeHelpers::NumericType<T>;
 
     ModalFilterTest() : TimedUnitTest ("Modal Filter Test " + getSampleType(), "Modal") {}
 

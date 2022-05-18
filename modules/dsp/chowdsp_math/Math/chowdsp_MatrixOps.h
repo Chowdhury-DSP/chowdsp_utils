@@ -16,7 +16,7 @@ namespace MatrixOps
     {
     private:
         using NumericType = SampleTypeHelpers::NumericType<FloatType>;
-        static constexpr NumericType multiplier = (NumericType) -2 / (NumericType) (size * SampleTypeHelpers::ElementType<FloatType>::Size);
+        static constexpr NumericType multiplier = (NumericType) -2 / (NumericType) (size * SampleTypeHelpers::TypeTraits<FloatType>::Size);
 
     public:
         /** Perform out-of-place Householder transform (scalar types) */
@@ -132,7 +132,7 @@ namespace MatrixOps
     };
 
     template <typename FloatType, int size>
-    const SampleTypeHelpers::NumericType<FloatType> Hadamard<FloatType, size>::scalingFactor = std::sqrt ((NumericType) 1 / NumericType (size * SampleTypeHelpers::ElementType<FloatType>::Size));
+    const SampleTypeHelpers::NumericType<FloatType> Hadamard<FloatType, size>::scalingFactor = std::sqrt ((NumericType) 1 / NumericType (size * SampleTypeHelpers::TypeTraits<FloatType>::Size));
 } // namespace MatrixOps
 
 } // namespace chowdsp

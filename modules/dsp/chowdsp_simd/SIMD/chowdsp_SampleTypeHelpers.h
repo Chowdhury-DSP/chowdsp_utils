@@ -7,32 +7,33 @@ namespace chowdsp
 /** Useful structs for determining the internal data type of SIMD types */
 namespace SampleTypeHelpers
 {
+/** Struct for determining a ample type element's type traits */
 template <typename T, bool = std::is_floating_point_v<T> || std::is_same_v<T, std::complex<float>> || std::is_same_v<T, std::complex<double>>>
-struct ElementType
+struct TypeTraits
 {
-    using Type = T;
+    using ElementType = T;
     static constexpr int Size = 1;
 };
 
 template <typename T>
-struct ElementType<xsimd::batch<T>, false>
+struct TypeTraits<xsimd::batch<T>, false>
 {
     using batch_type = xsimd::batch<T>;
-    using Type = typename batch_type::value_type;
+    using ElementType = typename batch_type::value_type;
     static constexpr int Size = (int) batch_type::size;
 };
 
 template <typename T>
-struct ElementType<const xsimd::batch<T>, false>
+struct TypeTraits<const xsimd::batch<T>, false>
 {
     using batch_type = xsimd::batch<T>;
-    using Type = const typename batch_type::value_type;
+    using ElementType = const typename batch_type::value_type;
     static constexpr int Size = (int) batch_type::size;
 };
 
 /** Type alias for a SIMD numeric type */
 template <typename SampleType>
-using NumericType = typename ElementType<SampleType>::Type;
+using NumericType = typename TypeTraits<SampleType>::ElementType;
 
 /** Type alias for retrieving a SIMD numeric type for a processor that has one defined */
 template <typename ProcessorType>

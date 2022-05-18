@@ -98,7 +98,7 @@ void ModalFilterBank<maxNumModes, SampleType>::setNumModesToProcess (size_t newN
     jassert (newNumModesToProcess <= maxNumModes);
 
     numModesToProcess = newNumModesToProcess;
-    numVecModesToProcess = ceiling_divide (newNumModesToProcess, vecSize);
+    numVecModesToProcess = Math::ceiling_divide (newNumModesToProcess, vecSize);
     setModeAmplitudesInternal();
 
     for (size_t modeIndex = numVecModesToProcess; modeIndex < maxNumVecModes; ++modeIndex)

@@ -2,6 +2,9 @@
 
 namespace chowdsp
 {
+/** A handful of extra maths functions */
+namespace Math
+{
 /**
  * log2 for integer values.
  *
@@ -48,4 +51,5 @@ inline xsimd::batch<T> sign (xsimd::batch<T> val)
     const auto negative = xsimd::select (val < v_type ((T) 0), v_type ((T) 1), v_type ((T) 0));
     return positive - negative;
 }
+} // namespace Math
 } // namespace chowdsp

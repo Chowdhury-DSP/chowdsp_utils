@@ -22,7 +22,7 @@ class ShelfFilterTest : public TimedUnitTest
 public:
     ShelfFilterTest() : TimedUnitTest ("Shelf Filter Test", "Filters") {}
 
-    template <typename T, typename NumericType = typename chowdsp::SampleTypeHelpers::ElementType<T>::Type>
+    template <typename T, typename NumericType = chowdsp::SampleTypeHelpers::NumericType<T>>
     void plainGainTest()
     {
         chowdsp::ShelfFilter<T> shelfFilter;
@@ -44,7 +44,7 @@ public:
         expectWithinAbsoluteError (mag / refMag, 2.0f, (float) 1.0e-6, "Incorrect behavior when filter reduces to a simple gain.");
     }
 
-    template <typename T, typename NumericType = typename chowdsp::SampleTypeHelpers::ElementType<T>::Type>
+    template <typename T, typename NumericType = chowdsp::SampleTypeHelpers::NumericType<T>>
     void boostCutTest()
     {
         chowdsp::ShelfFilter<T> shelfFilter;

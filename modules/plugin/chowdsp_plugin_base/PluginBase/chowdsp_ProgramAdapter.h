@@ -7,6 +7,7 @@ namespace chowdsp
 /** Classes for adapting the program interface in juce::AudioProcessor */
 namespace ProgramAdapter
 {
+/** Base class for interfacing with the juce::AudioProcessor program API */
 struct BaseProgramAdapter
 {
     virtual ~BaseProgramAdapter() = default;
@@ -20,6 +21,7 @@ struct BaseProgramAdapter
 };
 
 #if JUCE_MODULE_AVAILABLE_chowdsp_presets
+/** Interface between chowdsp::PresetManager and the juce::AudioProcessor program API */
 class PresetsProgramAdapter : public BaseProgramAdapter
 {
 public:

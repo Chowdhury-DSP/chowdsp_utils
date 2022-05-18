@@ -17,7 +17,7 @@ struct IRTransfer
     explicit IRTransfer (const ConvolutionEngine& eng) : fftSize (eng.fftSize),
                                                          blockSize (eng.blockSize),
                                                          irNumSamples (eng.irNumSamples),
-                                                         irFFT (std::make_unique<juce::dsp::FFT> (chowdsp::log2 (fftSize)))
+                                                         irFFT (std::make_unique<juce::dsp::FFT> (Math::log2 (fftSize)))
     {
         ConvolutionEngine::updateSegmentsIfNecessary (eng.numSegments, buffersImpulseSegments, fftSize);
     }
