@@ -38,7 +38,7 @@ namespace ProgramAdapter
         int getCurrentProgram() override
         {
             if (presetManager == nullptr)
-                return 0;
+                return BaseProgramAdapter::getCurrentProgram();
 
             return presetManager->getCurrentPresetIndex();
         }
@@ -46,7 +46,7 @@ namespace ProgramAdapter
         void setCurrentProgram (int index) override
         {
             if (presetManager == nullptr)
-                return;
+                return BaseProgramAdapter::setCurrentProgram (index);
 
             presetManager->loadPresetFromIndex (index);
         }

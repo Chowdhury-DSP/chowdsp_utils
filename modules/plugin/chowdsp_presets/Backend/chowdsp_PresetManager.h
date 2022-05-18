@@ -54,22 +54,22 @@ public:
     void setIsDirty (bool shouldBeDirty);
 
     /** Returns the number of presets that are currently available */
-    int getNumPresets() const noexcept { return (int) presetMap.size(); }
+    [[nodiscard]] int getNumPresets() const noexcept { return (int) presetMap.size(); }
 
     /** Returns the index of the currently selected preset */
-    int getCurrentPresetIndex() const noexcept { return getIndexForPreset (*currentPreset); }
+    [[nodiscard]] int getCurrentPresetIndex() const noexcept { return getIndexForPreset (*currentPreset); }
 
     /** Returns the name of the preset at this index */
-    juce::String getPresetName (int index) const noexcept { return getPresetForIndex (index)->getName(); }
+    [[nodiscard]] juce::String getPresetName (int index) const noexcept { return getPresetForIndex (index)->getName(); }
 
     /** Sets a file path to use to store user preset configurations */
     void setUserPresetConfigFile (const juce::String& presetConfigFilePath);
 
     /** Returns the user's preset configuration file */
-    juce::File getUserPresetConfigFile() const;
+    [[nodiscard]] juce::File getUserPresetConfigFile() const;
 
     /** Returns the user's preset directory */
-    juce::File getUserPresetPath() const;
+    [[nodiscard]] juce::File getUserPresetPath() const;
 
     /** Set's the user's preset directory */
     void setUserPresetPath (const juce::File& file);
@@ -78,7 +78,7 @@ public:
     virtual void loadUserPresetsFromFolder (const juce::File& file);
 
     /** Saves the preset manager state to an XML element */
-    std::unique_ptr<juce::XmlElement> saveXmlState() const;
+    [[nodiscard]] std::unique_ptr<juce::XmlElement> saveXmlState() const;
 
     /** Loads the preset manager state from an XML element */
     void loadXmlState (juce::XmlElement* xml);
@@ -86,7 +86,7 @@ public:
     static const juce::Identifier presetStateTag;
 
     /** Returns the map used to store the available presets */
-    const auto& getPresetMap() const { return presetMap; }
+    [[nodiscard]] const auto& getPresetMap() const { return presetMap; }
 
     /** Tell listeners that the preset list has been updated */
     void triggerPresetListUpdate() { listeners.call (&Listener::presetListUpdated); }
@@ -95,10 +95,10 @@ public:
     virtual void setUserPresetName (const juce::String& newName);
 
     /** Returns the name being used for user presets */
-    juce::String getUserPresetName() const noexcept { return userPresetsName; }
+    [[nodiscard]] juce::String getUserPresetName() const noexcept { return userPresetsName; }
 
     /** Returns a vector of all the user-saved presets */
-    std::vector<const Preset*> getUserPresets() const;
+    [[nodiscard]] std::vector<const Preset*> getUserPresets() const;
 
     /** Attempts to load a preset with a custom failure callback, if the preset fails to load. */
     template <typename FailureCallback>
@@ -163,10 +163,10 @@ protected:
 private:
     void parameterChanged (const juce::String& parameterID, float newValue) override;
     std::pair<const int, Preset>& addFactoryPreset (Preset&& preset);
-    const Preset* findPreset (const Preset& preset) const;
+    [[nodiscard]] const Preset* findPreset (const Preset& preset) const;
 
-    int getIndexForPreset (const Preset& preset) const;
-    const Preset* getPresetForIndex (int index) const;
+    [[nodiscard]] int getIndexForPreset (const Preset& preset) const;
+    [[nodiscard]] const Preset* getPresetForIndex (int index) const;
 
     bool isDirty = false;
 

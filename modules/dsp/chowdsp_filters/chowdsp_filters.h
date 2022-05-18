@@ -34,7 +34,6 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "LowerOrderFilters/chowdsp_SecondOrderFilters.h"
 #include "LowerOrderFilters/chowdsp_StateVariableFilter.h"
 #include "LowerOrderFilters/chowdsp_ModFilterWrapper.h"
-#include "LowerOrderFilters/chowdsp_juce_IIRFilter.h"
 
 #include "HigherOrderFilters/chowdsp_NthOrderFilter.h"
 #include "HigherOrderFilters/chowdsp_SOSFilter.h"
