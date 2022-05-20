@@ -41,14 +41,14 @@ public:
      */
     void calcCoefs (FloatType fc, FloatType alpha, NumericType fs)
     {
-        const auto k = Bilinear::computeKValue (fc, fs);
+        const auto k = ConformalMaps::computeKValue (fc, fs);
         auto setFilterCoefs = [k] (auto& filter, FloatType pole, FloatType zero) {
             FloatType a_z[2] {};
             FloatType b_z[2] {};
 
             FloatType a_s[2] = { FloatType (1) / pole, FloatType (-1) };
             FloatType b_s[2] = { FloatType (1) / zero, FloatType (-1) };
-            Bilinear::BilinearTransform<FloatType, 2>::call (b_z, a_z, b_s, a_s, k);
+            ConformalMaps::Transform<FloatType, 2>::bilinear (b_z, a_z, b_s, a_s, k);
 
             filter.setCoefs (b_z, a_z);
         };

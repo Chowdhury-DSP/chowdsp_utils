@@ -24,7 +24,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include <chowdsp_dsp_data_structures/chowdsp_dsp_data_structures.h>
 #include <chowdsp_math/chowdsp_math.h>
 
-#include "Utils/chowdsp_BilinearUtils.h"
+#include "Utils/chowdsp_ConformalMaps.h"
 #include "Utils/chowdsp_CoefficientCalculators.h"
 #include "Utils/chowdsp_FilterChain.h"
 #include "Utils/chowdsp_QValCalcs.h"
