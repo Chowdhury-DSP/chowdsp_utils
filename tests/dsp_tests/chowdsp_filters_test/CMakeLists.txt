@@ -11,7 +11,7 @@ target_link_libraries(chowdsp_filters_test PRIVATE
 target_sources(chowdsp_filters_test PRIVATE
     ${CMAKE_SOURCE_DIR}/tests/test_utils/TestRunner.cpp
 
-    BilinearUtilsTest.cpp
+    ConformalMapsTest.cpp
     FilterChainTest.cpp
     FirstOrderFiltersTest.cpp
     HilbertFilterTest.cpp
