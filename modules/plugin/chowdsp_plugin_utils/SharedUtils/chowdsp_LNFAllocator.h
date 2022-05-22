@@ -37,6 +37,9 @@ public:
     template <typename LookAndFeelSubclass>
     juce::LookAndFeel* addLookAndFeel()
     {
+        if (containsLookAndFeelType<LookAndFeelSubclass>())
+            return getLookAndFeel<LookAndFeelSubclass>();
+
         auto lnfType = getLNFType<LookAndFeelSubclass>();
         lnfs[lnfType] = std::make_unique<LookAndFeelSubclass>();
 
@@ -52,13 +55,13 @@ public:
 
 private:
     template <typename LookAndFeelSubclass>
-    static juce::String getLNFType()
+    static std::type_index getLNFType()
     {
-        return juce::String (typeid (LookAndFeelSubclass).name());
+        return std::type_index (typeid (LookAndFeelSubclass));
     }
 
     using LookAndFeelPtr = std::unique_ptr<juce::LookAndFeel>;
-    std::unordered_map<juce::String, LookAndFeelPtr> lnfs;
+    std::unordered_map<std::type_index, LookAndFeelPtr> lnfs;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LNFAllocator)
 };
