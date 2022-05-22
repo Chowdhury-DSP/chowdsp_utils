@@ -141,10 +141,7 @@ void SimpleEQPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
 void SimpleEQPlugin::parameterChanged (const juce::String& parameterID, float newValue)
 {
     if (parameterID == linPhaseModeTag)
-    {
         setLatencySamples (newValue == 1.0f ? linPhaseEQ.getLatencySamples() : 0);
-        updateHostDisplay (ChangeDetails().withLatencyChanged (true));
-    }
 }
 
 juce::AudioProcessorEditor* SimpleEQPlugin::createEditor()
