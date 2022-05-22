@@ -23,8 +23,10 @@ public:
         chowdsp::LNFAllocator allocator;
         auto* lnf = allocator.addLookAndFeel<chowdsp::ChowLNF>();
         auto* lnf2 = allocator.getLookAndFeel<chowdsp::ChowLNF>();
+        auto* lnf3 = allocator.addLookAndFeel<chowdsp::ChowLNF>();
 
         expect (lnf == lnf2, "Look and feel pointers should be the same!");
+        expect (lnf == lnf3, "Look and feel pointers should be the same!");
     }
 
     void containsLookAndFeelTest()
