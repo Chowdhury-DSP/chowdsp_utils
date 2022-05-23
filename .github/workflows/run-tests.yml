@@ -51,7 +51,7 @@ jobs:
             os: ubuntu-latest
             cmake_args: "-DCMAKE_BUILD_TYPE=Debug"
             run_codeql: true
-          - name: "Static"
+          - name: "StaticTests"
             os: ubuntu-latest
             cmake_args: "-DCHOWDSP_ENABLE_STATIC_TESTS=ON"
             run_static_tests: true
@@ -140,7 +140,7 @@ jobs:
           working-directory: ${{env.WORK_DIR}}/build/test-binary
 
       - name: "Run Static Tests"
-        if: matrix.run_static-tests
+        if: matrix.run_static_tests
         working-directory: ${{env.WORK_DIR}}
         shell: bash
         run: cmake --build build --target chowdsp_utils_static_tests
