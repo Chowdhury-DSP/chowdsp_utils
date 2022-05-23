@@ -67,3 +67,5 @@ if(CHOWDSP_CODE_QUALITY_CHECKS)
         juce::juce_recommended_warning_flags
     )
 endif()
+
+add_subdirectory(static_tests)
