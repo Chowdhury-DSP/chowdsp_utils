@@ -51,7 +51,7 @@ function(create_static_test name)
 endfunction(create_static_test name)
 
 function(add_static_test_check target file_to_check should_pass)
-    set(file_path ${CMAKE_CURRENT_SOURCE_DIR}/${file_to_check}.cpp)
+    set(file_path ${CMAKE_CURRENT_SOURCE_DIR}/${file_to_check})
     add_custom_command(
         OUTPUT ${target}-cmd APPEND
         COMMAND "${CMAKE_COMMAND}" -E echo "Compiling ${file_path}"

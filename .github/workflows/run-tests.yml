@@ -30,7 +30,8 @@ jobs:
               ]
         name: [
                 "Test",
-                "Coverage"
+                "Coverage",
+                "CodeQL",
               ]
         os: [ubuntu-latest, windows-2019, macos-latest]
         include:
@@ -65,6 +66,10 @@ jobs:
           - name: "Test" # so we don't break GitHub Actions concurrency limit
             os: macos-latest
           - name: "Coverage"
+            os: windows-2019
+          - name: "CodeQL"
+            os: macos-latest
+          - name: "CodeQL"
             os: windows-2019
 
     steps:
