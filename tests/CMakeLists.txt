@@ -15,6 +15,7 @@ subproject_version(JUCE juce_version)
 message(STATUS "VERSION for JUCE: ${juce_version}")
 
 include(AddJUCEModules)
+juce_add_module(${CMAKE_SOURCE_DIR}/../foleys_gui_magic)
 
 option(CODE_COVERAGE "Enable coverage reporting" OFF)
 
