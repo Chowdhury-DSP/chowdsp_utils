@@ -34,6 +34,19 @@ target_link_libraries(MyTarget PUBLIC
 
 Alternatively, you may add these modules from the repository directory using the Projucer.
 
+## Examples
+
+ If you would like to build the example plugins included in this repository, you may clone
+the repository, and use the following CMake commands:
+
+```bash
+cmake -Bbuild -DCHOWDSP_ENABLE_EXAMPLES=ON
+cmake --build build --target $EXAMPLE_TARGET
+```
+
+where `$EXAMPLE_TARGET` is the name of the target you'd like to build,
+for example `SimpleEQ_Standalone`.
+
 ## Modules
 
 ### Dependencies
@@ -139,6 +152,40 @@ sure to abide by the license of each module, as well as whichever libraries are 
 
 `chowdsp_version` (BSD)
 - Utilities for managing the version of an app or plugin.
+
+## Development
+
+The development environment for this repository expects the following
+directory structure:
+```
+|- JUCE
+|- modules
+  |- foleys_gui_magic
+  |- chowdsp_utils
+```
+
+### Building Module Tests
+
+To build the module tests, run:
+```bash
+cmake -Bbuild -DCHOWDSP_ENABLE_TESTING=ON
+cmake --build build --target $TEST_TARGET
+```
+
+where `$TEST_TARGET` is the name of the test target you'd like to build.
+
+If you would like to build the tests with flags for analyzing code coverage,
+add `-DCODE_COVERAGE=ON` to the CMake configure step.
+
+### Building Module Benchmarks
+
+Toe build the module benchmarks, run:
+```bash
+cmake -Bbuild -DCMAKE_BUILD_TYPE=Release -DCHOWDSP_ENABLE_BENCHMARKS=ON
+cmake --build build --config Release $BENCH_TARGET
+```
+
+where `$BENCH_TARGET` is the name of the benchmark you would like to build.
 
 ## License
 
