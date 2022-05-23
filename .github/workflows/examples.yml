@@ -10,9 +10,6 @@ on:
 
   workflow_dispatch:
 
-env:
-  WORK_DIR: ${{github.workspace}}/JUCE_modules/chowdsp_utils
-
 jobs:
   build_examples:
     name: "Build Example ${{ matrix.target }} on ${{ matrix.os }}"
@@ -43,24 +40,13 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@v2
-        with:
-          path: ${{env.WORK_DIR}}
-
-      - name: Set up environment
-        working-directory: ${{github.workspace}}
-        run: |
-          git clone --depth 1 --branch 6.1.6 https://github.com/juce-framework/JUCE.git
-          cd JUCE_modules
-          git clone --single-branch --branch chowdsp https://github.com/Chowdhury-DSP/foleys_gui_magic.git
 
       - name: Configure
-        working-directory: ${{env.WORK_DIR}}
         shell: bash
-        run: cmake -Bbuild -DCHOWDSP_ENABLE_EXAMPLES=ON -DCHOWDSP_PATH_TO_JUCE=../../JUCE
+        run: cmake -Bbuild -DCHOWDSP_ENABLE_EXAMPLES=ON
 
       - name: "Build Example: ${{ matrix.target }}"
-        working-directory: ${{env.WORK_DIR}}/build
         shell: bash
         env:
           EXAMPLE_TARGET: ${{ matrix.target }}_Standalone
-        run: cmake --build . --parallel 4 --target $EXAMPLE_TARGET
+        run: cmake --build build --parallel 4 --target $EXAMPLE_TARGET

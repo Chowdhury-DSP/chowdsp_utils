@@ -1,9 +1,11 @@
-if("${CHOWDSP_PATH_TO_JUCE}" STREQUAL "")
-    message(STATUS "No JUCE path provided! Assuming JUCE has already been added.")
-else()
-    message(STATUS "Loading JUCE from: ${CHOWDSP_PATH_TO_JUCE}")
-    add_subdirectory(${CMAKE_SOURCE_DIR}/${CHOWDSP_PATH_TO_JUCE} JUCE)
-endif()
+include(CPM)
+
+# download JUCE
+CPMAddPackage(
+  NAME juce
+  GITHUB_REPOSITORY juce-framework/juce
+  GIT_TAG 6.1.6
+)
 
 include(AddJUCEModules)
 include(SetupExamplePlugin)
