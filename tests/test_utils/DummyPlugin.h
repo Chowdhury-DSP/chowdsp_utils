@@ -22,6 +22,7 @@ public:
 
     void prepareToPlay (double sampleRate, int samplesPerBlock) override
     {
+        setRateAndBufferSizeDetails (sampleRate, samplesPerBlock);
         loadMeasurer.reset (sampleRate, samplesPerBlock);
     }
 

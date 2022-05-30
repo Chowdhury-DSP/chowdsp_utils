@@ -42,4 +42,7 @@ function(setup_juce_test target)
         COMMAND ${CMAKE_COMMAND} -E make_directory test-binary
         COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:${target}>" test-binary
     )
+
+    include(AddDiagnosticInfo)
+    add_diagnostic_info(${target})
 endfunction(setup_juce_test)
