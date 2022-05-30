@@ -3,6 +3,10 @@
 #include <chowdsp_parameters/chowdsp_parameters.h>
 #include "chowdsp_ProgramAdapter.h"
 
+#if HAS_CLAP_JUCE_EXTENSIONS
+#include "clap-juce-extensions/clap-juce-extensions.h"
+#endif
+
 namespace chowdsp
 {
 /**
@@ -14,6 +18,10 @@ namespace chowdsp
 */
 template <class Processor>
 class PluginBase : public juce::AudioProcessor
+#if HAS_CLAP_JUCE_EXTENSIONS
+    ,
+                   protected clap_juce_extensions::clap_properties
+#endif
 {
 public:
     explicit PluginBase (juce::UndoManager* um = nullptr, const juce::AudioProcessor::BusesProperties& layout = getDefaultBusLayout());
@@ -76,6 +84,8 @@ public:
 
     void getStateInformation (juce::MemoryBlock& data) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
+
+    virtual juce::String getWrapperTypeString() const;
 
 protected:
     using Parameters = chowdsp::Parameters;
@@ -236,6 +246,18 @@ void PluginBase<Processor>::setStateInformation (const void* data, int sizeInByt
         if (xmlState->hasTagName (vts.state.getType()))
             vts.replaceState (juce::ValueTree::fromXml (*xmlState));
 #endif
+}
+
+template <class Processor>
+juce::String PluginBase<Processor>::getWrapperTypeString() const
+{
+#if HAS_CLAP_JUCE_EXTENSIONS
+    // Since we are using 'external clap' this is the one JUCE API we can't override
+    if (wrapperType == wrapperType_Undefined && is_clap)
+        return "Clap";
+#endif
+
+    return AudioProcessor::getWrapperTypeDescription (wrapperType);
 }
 
 } // namespace chowdsp
