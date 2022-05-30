@@ -85,7 +85,7 @@ sure to abide by the license of each module, as well as whichever libraries are 
 - Useful classes for modal signal processing.
 - Various classes for integer or non-integer resampling
   - Optionally depends on [libsamplerate](https://github.com/libsndfile/libsamplerate). User must link with libsamplerate externally, and define `CHOWDSP_USE_LIBSAMPLERATE=1`
-- Sources: "magic circle" sine wave oscillator, anti-aliased saw and square oscillators, noise generator.
+- Sources: "magic circle" sine wave oscillator, anti-aliased saw and square wave oscillators, noise generator.
 - A few other useful processors.
 
 `chowdsp_eq` (GPLv3)
@@ -189,5 +189,13 @@ where `$BENCH_TARGET` is the name of the benchmark you would like to build.
 
 ## License
 
-`chowdsp_utils` is open source, and is licensed under the GPLv3.
-Enjoy!
+Each module in this repository has its own unique license. If you would like
+to use code from one of the modules, please check the license of that particular
+module.
+
+If you are making a proprietary or closed source app and would like to use
+code from a module that is under a GPL-style license, please contact
+chowdsp@gmail.com for non-GPL licensing options.
+
+All non-module code in this repository (tests, examples, benchmarks, etc.)
+is licensed under the GPLv3.
