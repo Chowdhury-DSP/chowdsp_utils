@@ -1,4 +1,5 @@
 #include "SimpleEQPlugin.h"
+#include "PluginEditor.h"
 
 namespace
 {
@@ -146,7 +147,7 @@ void SimpleEQPlugin::parameterChanged (const juce::String& parameterID, float ne
 
 juce::AudioProcessorEditor* SimpleEQPlugin::createEditor()
 {
-    return new juce::GenericAudioProcessorEditor (*this);
+    return new PluginEditor (*this); // juce::GenericAudioProcessorEditor (*this);
 }
 
 // This creates new instances of the plugin

@@ -10,4 +10,5 @@ target_sources(SimpleEQ
     PRIVATE
         PrototypeEQ.cpp
         SimpleEQPlugin.cpp
+        PluginEditor.cpp
 )

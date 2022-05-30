@@ -4,7 +4,7 @@ include(CPM)
 CPMAddPackage(
   NAME juce
   GITHUB_REPOSITORY juce-framework/juce
-  GIT_TAG 6.1.6
+  GIT_TAG 6.1.5
 )
 
 include(AddJUCEModules)
