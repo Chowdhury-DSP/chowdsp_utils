@@ -40,3 +40,4 @@ JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
 #include "PluginBase/chowdsp_DummySynthSound.h"
 #include "PluginBase/chowdsp_SynthBase.h"
+#include "PluginBase/chowdsp_PluginDiagnosticInfo.h"
