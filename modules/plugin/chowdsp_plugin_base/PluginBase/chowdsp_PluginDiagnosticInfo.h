@@ -69,13 +69,11 @@ namespace PluginDiagnosticInfo
 
         auto getBlockSizeString = [blockSize = plugin.getBlockSize()]()
         {
-            jassert (blockSize > 0);
             return juce::String (blockSize);
         };
 
         auto getSampleRateString = [sampleRate = plugin.getSampleRate()]()
         {
-            jassert (sampleRate > 0.0);
             return juce::String (sampleRate / 1000.0, 1) + " kHz";
         };
 

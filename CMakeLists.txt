@@ -9,15 +9,15 @@ option(CHOWDSP_ENABLE_EXAMPLES "Enable examples for chowdsp modules" OFF)
 
 if(NOT (CHOWDSP_ENABLE_TESTING OR CHOWDSP_ENABLE_BENCHMARKS OR CHOWDSP_ENABLE_EXAMPLES))
     # Add CMake utils
-    list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+    list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
     include(AddDiagnosticInfo)
     include(SubprojectVersion)
 
     # Add modules here...
     include(AddJUCEModules)
 else()
-    list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
-    list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/test)
+    list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+    list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/test)
 
     if(CHOWDSP_ENABLE_TESTING)
         add_subdirectory(tests)
