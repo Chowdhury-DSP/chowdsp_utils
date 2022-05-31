@@ -20,10 +20,12 @@ public:
 
     juce::AudioProcessorEditor* createEditor() override;
 
+    EQParams getEQParams() const;
+    void loadEQParams (const EQParams& params);
+
 private:
     void parameterChanged (const juce::String& parameterID, float newValue) override;
 
-    PrototypeEQ::Params makeEQParams() const;
     void setEQParams();
 
     std::array<std::atomic<float>*, EQParams::numBands> bandFreqHz {};

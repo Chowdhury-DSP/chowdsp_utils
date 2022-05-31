@@ -2,6 +2,7 @@
 
 namespace chowdsp
 {
+/** Serializer which serializes data into a JSON format */
 class JSONSerializer : public BaseSerializer
 {
 public:

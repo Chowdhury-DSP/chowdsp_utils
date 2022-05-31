@@ -84,38 +84,59 @@ void SimpleEQPlugin::addParameters (Parameters& params)
 
 void SimpleEQPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    const auto&& eqParams = makeEQParams();
+    const auto&& eqParams = getEQParams();
     const auto spec = juce::dsp::ProcessSpec { sampleRate, (juce::uint32) samplesPerBlock, (juce::uint32) getTotalNumInputChannels() };
 
     protoEQ.setParameters (eqParams);
     protoEQ.prepare (spec);
 
-    linPhaseEQ.prepare (spec, makeEQParams()); // prepare the linear phase EQ with some initial parameters
+    linPhaseEQ.prepare (spec, getEQParams()); // prepare the linear phase EQ with some initial parameters
 
     // make sure the reported latency is up-to-date
     parameterChanged (linPhaseModeTag, *linPhaseModeOn);
 }
 
-PrototypeEQ::Params SimpleEQPlugin::makeEQParams() const
+EQParams SimpleEQPlugin::getEQParams() const
 {
     EQParams params {};
     for (size_t i = 0; i < EQParams::numBands; ++i)
     {
-        params.bands[i] = EQParams::BandParams {
+        params.bands[i] = { EQParams::BandParams {
             *bandFreqHz[i],
             *bandQ[i],
             *bandGainDB[i],
             (int) *bandType[i],
             *bandOnOff[i] == 1.0f,
-        };
+        } };
     }
 
     return params;
 }
 
+void SimpleEQPlugin::loadEQParams (const EQParams& params)
+{
+    auto setParameter = [] (auto* param, float newValue)
+    {
+        param->beginChangeGesture();
+        param->setValueNotifyingHost (param->convertTo0to1 (newValue));
+        param->endChangeGesture();
+    };
+
+    for (size_t i = 0; i < EQParams::numBands; ++i)
+    {
+        const auto& bandParams = params.bands[i].params;
+
+        setParameter (vts.getParameter (getTagForBand ((int) i, freqTag)), bandParams.bandFreqHz);
+        setParameter (vts.getParameter (getTagForBand ((int) i, qTag)), bandParams.bandQ);
+        setParameter (vts.getParameter (getTagForBand ((int) i, gainTag)), bandParams.bandGainDB);
+        setParameter (vts.getParameter (getTagForBand ((int) i, typeTag)), (float) bandParams.bandType);
+        setParameter (vts.getParameter (getTagForBand ((int) i, onOffTag)), bandParams.bandOnOff);
+    }
+}
+
 void SimpleEQPlugin::setEQParams()
 {
-    const auto&& eqParams = makeEQParams();
+    const auto&& eqParams = getEQParams();
     protoEQ.setParameters (eqParams);
     linPhaseEQ.setParameters (eqParams);
 }
