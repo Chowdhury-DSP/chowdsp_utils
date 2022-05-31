@@ -13,6 +13,21 @@ public:
         return serial.dump();
     }
 
+    static void toFile (const json& serial, const juce::File& file)
+    {
+        JSONUtils::toFile (serial, file);
+    }
+
+    static SerializedType fromFile (const juce::File& file)
+    {
+        return JSONUtils::fromFile (file);
+    }
+
+    static SerializedType fromBinaryData (const void* data, int dataSize)
+    {
+        return JSONUtils::fromBinaryData (data, dataSize);
+    }
+
     static auto createBaseElement()
     {
         return json::array();

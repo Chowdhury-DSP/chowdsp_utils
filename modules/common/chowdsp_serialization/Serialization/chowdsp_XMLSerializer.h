@@ -19,6 +19,25 @@ public:
         return serial->toString();
     }
 
+    static void toFile (const SerializedType& serial, const juce::File& file)
+    {
+        serial->writeTo (file);
+    }
+
+    static SerializedType fromFile (const juce::File& file)
+    {
+        auto serial = juce::parseXML (file);
+        jassert (serial != nullptr);
+        return serial;
+    }
+
+    static SerializedType fromBinaryData (const void* data, int dataSize)
+    {
+        auto serial = juce::parseXML (juce::String::createStringFromData (data, dataSize));
+        jassert (serial != nullptr);
+        return serial;
+    }
+
     static auto createBaseElement()
     {
         return std::make_unique<juce::XmlElement> (defaultID);
@@ -36,6 +55,9 @@ public:
 
     static int getNumChildElements (DeserializedType serial)
     {
+        if (serial == nullptr)
+            return 0;
+
         return serial->getNumChildElements();
     }
 
@@ -59,6 +81,9 @@ public:
     static std::enable_if_t<std::is_integral_v<T>, T>
         deserializeArithmeticType (DeserializedType serial)
     {
+        if (serial == nullptr)
+            return T {};
+
         return (T) serial->getIntAttribute (defaultID);
     }
 
@@ -66,6 +91,9 @@ public:
     static std::enable_if_t<std::is_floating_point_v<T>, T>
         deserializeArithmeticType (DeserializedType serial)
     {
+        if (serial == nullptr)
+            return T {};
+
         return (T) serial->getDoubleAttribute (defaultID);
     }
 
@@ -81,6 +109,9 @@ public:
     static std::enable_if_t<std::is_same_v<T, std::string>, T>
         deserializeString (DeserializedType serial)
     {
+        if (serial == nullptr)
+            return T {};
+
         return deserializeString<juce::String> (serial).toStdString();
     }
 
@@ -88,6 +119,9 @@ public:
     static std::enable_if_t<std::is_same_v<T, juce::String>, T>
         deserializeString (DeserializedType serial)
     {
+        if (serial == nullptr)
+            return T {};
+
         return serial->getStringAttribute (defaultID);
     }
 

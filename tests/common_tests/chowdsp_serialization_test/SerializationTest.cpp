@@ -1,5 +1,6 @@
 #include <chowdsp_serialization/chowdsp_serialization.h>
 #include <TimedUnitTest.h>
+#include <test_utils.h>
 
 struct CustomTest
 {
@@ -130,6 +131,27 @@ public:
         expect (pfr::eq_fields (test, CustomTest {}), "Serialization/Deserialization is incorrect");
     }
 
+    void fileSerializationTest()
+    {
+        struct Test
+        {
+            int x = 0;
+            float y = 1.0f;
+            double z = -3.0;
+        };
+
+        test_utils::ScopedFile testFile { "serial_test.test" };
+        chowdsp::Serialization::serialize<Serializer> (Test {}, testFile.file);
+
+        const auto ref = Serializer::toString (chowdsp::Serialization::serialize<Serializer> (Test {}));
+
+        Test t2;
+        chowdsp::Serialization::deserialize<Serializer> (testFile.file, t2);
+        const auto actual = Serializer::toString (chowdsp::Serialization::serialize<Serializer> (t2));
+
+        expectEquals (actual, ref, "File Serialization is Incorrect!");
+    }
+
     void runTestTimed() override
     {
         beginTest ("Numeric Test");
@@ -143,6 +165,9 @@ public:
 
         beginTest ("Custom Serialization Test");
         customSerializationTest();
+
+        beginTest ("File Serialization Test");
+        fileSerializationTest();
     }
 };
 
