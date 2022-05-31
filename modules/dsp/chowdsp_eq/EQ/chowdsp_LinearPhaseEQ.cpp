@@ -30,7 +30,7 @@ void LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::prepare (const juce::dsp::Pro
     prototypeEQ.prepare ({ spec.sampleRate, (juce::uint32) irSize, 1 });
 
     irBuffer = juce::AudioBuffer<float> (1, irSize);
-    params = initialParams;
+    params = { initialParams };
     updateParams();
 
     engines.clear();
@@ -65,7 +65,7 @@ void LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::setParameters (const ProtoEQP
         return;
 
     // refresh params
-    params = newParams;
+    params = { newParams };
     irUpdateState.store (IRUpdateState::Needed);
 }
 

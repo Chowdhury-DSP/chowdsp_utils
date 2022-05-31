@@ -22,3 +22,6 @@ add_static_test_check(StaticSoftClipperTest SoftClipperBadOrder_fail.cpp FALSE)
 create_static_test(StaticModFilterTest)
 add_static_test_check(StaticModFilterTest ModFilterLowOrder_pass.cpp TRUE)
 add_static_test_check(StaticModFilterTest ModFilterHighOrder_fail.cpp FALSE)
+
+create_static_test(IsContainerTest)
+add_static_test_check(IsContainerTest CorrectContainers_pass.cpp TRUE)
