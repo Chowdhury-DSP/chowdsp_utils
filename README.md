@@ -70,6 +70,9 @@ sure to abide by the license of each module, as well as whichever libraries are 
 `chowdsp_reflection` (BSD)
 - A thin wrapper around [`boost::pfr`](https://github.com/boostorg/pfr) (Boost license, included internally).
 
+`chowdsp_serialization` (BSD)
+- Tools for serializing/deserializing data, using JSON or XML formats.
+
 ### DSP Modules
 
 `chowdsp_dsp_data_structures` (GPLv3)
