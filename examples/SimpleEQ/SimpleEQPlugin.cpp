@@ -115,8 +115,7 @@ EQParams SimpleEQPlugin::getEQParams() const
 
 void SimpleEQPlugin::loadEQParams (const EQParams& params)
 {
-    auto setParameter = [] (auto* param, float newValue)
-    {
+    auto setParameter = [] (auto* param, float newValue) {
         param->beginChangeGesture();
         param->setValueNotifyingHost (param->convertTo0to1 (newValue));
         param->endChangeGesture();

@@ -14,7 +14,7 @@ namespace serialization_detail
         struct DummySerializer
         {
             using SerializedType = bool;
-            using DeserializedType = const bool &;
+            using DeserializedType = const bool&;
         };
 
         template <typename C>
@@ -31,7 +31,7 @@ namespace serialization_detail
         static constexpr auto custom_serializer_value = sizeof (test_custom_serial<T> (nullptr)) == sizeof (yes);
         static constexpr auto custom_deserializer_value = sizeof (test_custom_deserial<T> (nullptr)) == sizeof (yes);
     };
-}
+} // namespace serialization_detail
 #endif
 
 class BaseSerializer
@@ -180,8 +180,7 @@ public:
     static std::enable_if_t<IsNotDirectlySerializable<T> && ! HasCustomSerialization<T>, SerialType<Serializer>> serialize (const T& object)
     {
         auto serial = Serializer::createBaseElement();
-        pfr::for_each_field (object, [&serial] (const auto& field)
-                             { Serializer::addChildElement (serial, serialize<Serializer> (field)); });
+        pfr::for_each_field (object, [&serial] (const auto& field) { Serializer::addChildElement (serial, serialize<Serializer> (field)); });
 
         return serial;
     }
@@ -191,8 +190,7 @@ public:
     static std::enable_if_t<IsNotDirectlySerializable<T> && ! HasCustomDeserialization<T>, void> deserialize (DeserialType<Serializer> serial, T& object)
     {
         int serialIndex = 0;
-        pfr::for_each_field (object, [&serial, &serialIndex] (auto& field)
-                             { deserialize<Serializer> (Serializer::getChildElement (serial, serialIndex++), field); });
+        pfr::for_each_field (object, [&serial, &serialIndex] (auto& field) { deserialize<Serializer> (Serializer::getChildElement (serial, serialIndex++), field); });
     }
 
     /** Serializer for types with custom serialization behaviour */
@@ -213,4 +211,3 @@ protected:
     BaseSerializer() = default; // static use only
 };
 } // namespace chowdsp
-
