@@ -146,6 +146,7 @@ public:
         if ((int) container.size() != Serializer::getNumChildElements (serial))
         {
             jassertfalse; // the serialized data does not contain the orrect number of elements to fill this array!
+            std::fill (container.begin(), container.end(), T{});
             return;
         }
 

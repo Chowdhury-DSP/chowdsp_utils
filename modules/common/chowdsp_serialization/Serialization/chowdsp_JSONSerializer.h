@@ -21,12 +21,28 @@ public:
 
     static SerializedType fromFile (const juce::File& file)
     {
-        return JSONUtils::fromFile (file);
+        try
+        {
+            return JSONUtils::fromFile (file);
+        }
+        catch (...)
+        {
+            jassertfalse; // unable to load file!
+            return {};
+        }
     }
 
     static SerializedType fromBinaryData (const void* data, int dataSize)
     {
-        return JSONUtils::fromBinaryData (data, dataSize);
+        try
+        {
+            return JSONUtils::fromBinaryData (data, dataSize);
+        }
+        catch (...)
+        {
+            jassertfalse; // unable to load from data!
+            return {};
+        }
     }
 
     static auto createBaseElement()
@@ -41,15 +57,24 @@ public:
 
     static auto getChildElement (const json& parent, int index)
     {
+        if (! juce::isPositiveAndBelow (index, parent.size()))
+        {
+            jassertfalse;
+            return json {};
+        }
+
         return parent[(size_t) index];
     }
 
     static int getNumChildElements (const json& serial)
     {
-        if (serial.is_array())
-            return (int) serial.size();
+        if (! serial.is_array())
+        {
+            jassertfalse;
+            return 0;
+        }
 
-        return 0;
+        return (int) serial.size();
     }
 
     template <typename T>
@@ -61,6 +86,12 @@ public:
     template <typename T>
     static T deserializeArithmeticType (const json& serial)
     {
+        if (! JSONUtils::isSameType (serial, T {}))
+        {
+            jassertfalse;
+            return T {};
+        }
+
         return serial.get<T>();
     }
 
@@ -73,6 +104,12 @@ public:
     template <typename T>
     static T deserializeString (const json& serial)
     {
+        if (! JSONUtils::isSameType (serial, T {}))
+        {
+            jassertfalse;
+            return T {};
+        }
+
         return serial.get<T>();
     }
 

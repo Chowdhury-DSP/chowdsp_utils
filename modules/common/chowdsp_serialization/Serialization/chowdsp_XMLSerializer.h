@@ -28,14 +28,14 @@ public:
     static SerializedType fromFile (const juce::File& file)
     {
         auto serial = juce::parseXML (file);
-        jassert (serial != nullptr);
+        jassert (serial != nullptr); // unable to load from file!
         return serial;
     }
 
     static SerializedType fromBinaryData (const void* data, int dataSize)
     {
         auto serial = juce::parseXML (juce::String::createStringFromData (data, dataSize));
-        jassert (serial != nullptr);
+        jassert (serial != nullptr); // unable to load from binary data!
         return serial;
     }
 
@@ -49,15 +49,24 @@ public:
         parent->addChildElement (newChild.release());
     }
 
-    static auto getChildElement (DeserializedType parent, int index)
+    static juce::XmlElement* getChildElement (DeserializedType parent, int index)
     {
+        if (parent == nullptr || ! juce::isPositiveAndBelow (index, parent->getNumChildElements()))
+        {
+            jassertfalse;
+            return {};
+        }
+
         return parent->getChildElement (index);
     }
 
     static int getNumChildElements (DeserializedType serial)
     {
         if (serial == nullptr)
+        {
+            jassertfalse;
             return 0;
+        }
 
         return serial->getNumChildElements();
     }

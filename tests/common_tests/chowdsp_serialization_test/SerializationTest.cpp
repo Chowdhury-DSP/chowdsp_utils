@@ -2,6 +2,8 @@
 #include <TimedUnitTest.h>
 #include <test_utils.h>
 
+#include "TestSerialBinaryData.h"
+
 struct CustomTest
 {
     juce::StringArray x { "one", "two", "three" };
@@ -153,6 +155,57 @@ public:
         expectEquals (actual, ref, "File Serialization is Incorrect!");
     }
 
+    void badDeserializationTest()
+    {
+        struct Test
+        {
+            int x = 0;
+            float y = 1.0f;
+            double z = -3.0;
+            std::string str = "adsfhajklsdfhdajkl";
+            juce::String jStr = "ajfhasjklfhasdklfhadksfha0";
+            std::array<float, 3> arr { 1.0f, 2.0f, 3.0f };
+            std::vector<size_t> vec { 2, 3, 4 };
+        };
+
+        const auto nullStruct = Test { 0, 0.0f, 0.0, "", "", {}, {} };
+
+        {
+            Test test;
+            chowdsp::Serialization::deserialize<Serializer> (juce::File {}, test);
+
+            expect (pfr::eq_fields (test, nullStruct), "Bad File Deserialization is incorrect");
+        }
+
+        {
+            Test test;
+            chowdsp::Serialization::deserialize<Serializer> (nullptr, 0, test);
+
+            expect (pfr::eq_fields (test, nullStruct), "Bad Binary Data Deserialization is incorrect");
+        }
+    }
+
+    void binaryDataDeserializationTest()
+    {
+        struct Test
+        {
+            int x = 0;
+            float y = 1.0f;
+            double z = -3.0;
+            std::string str;
+        };
+
+        Test expected { 40, -33.3f, 0.55, "test_data" };
+
+        Test actual;
+        if constexpr (std::is_same_v<Serializer, chowdsp::JSONSerializer>)
+            chowdsp::Serialization::deserialize<Serializer> (BinaryData::test_json_json, BinaryData::test_json_jsonSize, actual);
+        else
+            chowdsp::Serialization::deserialize<Serializer> (BinaryData::test_xml_xml, BinaryData::test_xml_xmlSize, actual);
+
+        expect (pfr::eq_fields (expected, actual), "Binary Data Deserialization is incorrect");
+    }
+
     void runTestTimed() override
     {
         beginTest ("Numeric Test");
@@ -169,6 +222,12 @@ public:
 
         beginTest ("File Serialization Test");
         fileSerializationTest();
+
+        beginTest ("Bad Deserialization Test");
+        badDeserializationTest();
+
+        beginTest ("Binary Data Deserialization Test");
+        binaryDataDeserializationTest();
     }
 };
 
