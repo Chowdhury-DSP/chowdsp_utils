@@ -15,16 +15,24 @@ int main()
     };
 
     // these are containers!
-    static_assert (IsContainer<std::array<int, 2>>);
-    static_assert (IsContainer<std::vector<std::string>>);
-    static_assert (IsContainer<std::map<juce::String, float>>);
-    static_assert (IsContainer<juce::OwnedArray<Dummy>>);
-    static_assert (IsContainer<std::string>);
-    static_assert (IsContainer<juce::String>);
+    static_assert (IsIterable<std::array<int, 2>>);
+    static_assert (IsIterable<std::vector<std::string>>);
+    static_assert (IsIterable<std::map<juce::String, float>>);
+    static_assert (IsIterable<juce::OwnedArray<Dummy>>);
+    static_assert (IsIterable<std::string>);
+    static_assert (IsIterable<juce::String>);
 
     // these are NOT containers!
-    static_assert (! IsContainer<int>);
-    static_assert (! IsContainer<Dummy>);
+    static_assert (! IsIterable<int>);
+    static_assert (! IsIterable<Dummy>);
+
+    // these are map-like
+    static_assert (IsMapLike<std::map<int, std::string>>);
+    static_assert (IsMapLike<std::unordered_map<juce::String, Dummy>>);
+
+    // these are not map-like
+    static_assert (! IsMapLike<Dummy>);
+    static_assert (! IsMapLike<std::vector<int>>);
 
     return 0;
 }

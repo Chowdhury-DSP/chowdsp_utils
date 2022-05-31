@@ -26,5 +26,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include <chowdsp_json/chowdsp_json.h>
 #include <chowdsp_reflection/chowdsp_reflection.h>
 
+#include "Serialization/chowdsp_BaseSerializer.h"
 #include "Serialization/chowdsp_Serialization.h"
 #include "Serialization/chowdsp_JSONSerializer.h"
+#include "Serialization/chowdsp_XMLSerializer.h"
