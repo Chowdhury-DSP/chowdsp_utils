@@ -141,6 +141,7 @@ public:
         };
 
         test_utils::ScopedFile testFile { "serial_test.test" };
+        testFile.file.create();
         chowdsp::Serialization::serialize<Serializer> (Test {}, testFile.file);
 
         const auto ref = Serializer::toString (chowdsp::Serialization::serialize<Serializer> (Test {}));

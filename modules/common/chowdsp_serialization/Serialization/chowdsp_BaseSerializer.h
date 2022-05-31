@@ -15,6 +15,17 @@ namespace serialization_detail
         {
             using SerializedType = bool;
             using DeserializedType = const bool&;
+
+            static auto createBaseElement() { return SerializedType{}; }
+            static void addChildElement (SerializedType&, SerializedType&&) {}
+            static auto getChildElement (DeserializedType, int) { return false; }
+            static int getNumChildElements (DeserializedType) { return 0; }
+
+            template <typename Serializer, typename C>
+            static SerializedType serialize (const C&) { return false; }
+
+            template <typename Serializer, typename C>
+            static void deserialize (DeserializedType, C&) {}
         };
 
         template <typename C>
