@@ -19,6 +19,7 @@ target_link_libraries(chowdsp_utils_codeql PRIVATE
     chowdsp_core
     chowdsp_json
     chowdsp_reflection
+    chowdsp_serialization
     chowdsp_dsp_data_structures
     chowdsp_dsp_utils
     chowdsp_eq
