@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## [UNRELEASED]
 - Replaced Bilinear Tranform code with more general conformal maps.
+- Added utilities for serializing/deserializing data.
 - Added `PluginDiagnosticInfo::getDiagnosticsString()`.
 - LNFAllocator:
   - Don't replace existing look and feels

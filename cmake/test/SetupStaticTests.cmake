@@ -15,6 +15,7 @@ target_link_libraries(static_test_dummy_executable PRIVATE
     chowdsp_core
     chowdsp_json
     chowdsp_reflection
+    chowdsp_serialization
     chowdsp_dsp_data_structures
     chowdsp_dsp_utils
     chowdsp_eq
