@@ -2,6 +2,7 @@
 #include <chowdsp_core/chowdsp_core.h>
 #include <chowdsp_json/chowdsp_json.h>
 #include <chowdsp_reflection/chowdsp_reflection.h>
+#include <chowdsp_serialization/chowdsp_serialization.h>
 #include <chowdsp_dsp_data_structures/chowdsp_dsp_data_structures.h>
 #include <chowdsp_dsp_utils/chowdsp_dsp_utils.h>
 #include <chowdsp_eq/chowdsp_eq.h>
