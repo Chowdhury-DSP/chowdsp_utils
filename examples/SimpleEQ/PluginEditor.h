@@ -1,0 +1,21 @@
+#pragma once
+
+#include "SimpleEQPlugin.h"
+
+class PluginEditor : public juce::AudioProcessorEditor
+{
+public:
+    explicit PluginEditor (SimpleEQPlugin& plugin);
+
+    void paint (juce::Graphics& g) override;
+    void resized() override;
+
+private:
+    SimpleEQPlugin& plugin;
+
+    juce::GenericAudioProcessorEditor genericEditor;
+
+    juce::TextButton saveButton { "Save EQ Params" }, loadButton { "Load EQ Params" };
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginEditor)
+};
