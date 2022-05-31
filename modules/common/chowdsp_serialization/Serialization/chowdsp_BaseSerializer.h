@@ -2,6 +2,38 @@
 
 namespace chowdsp
 {
+#ifndef DOXYGEN
+namespace serialization_detail
+{
+    template <typename T>
+    class HasCustomSerializer
+    {
+        typedef char yes;
+        typedef long no;
+
+        struct DummySerializer
+        {
+            using SerializedType = bool;
+            using DeserializedType = const bool &;
+        };
+
+        template <typename C>
+        static yes test_custom_serial (decltype (&C::template serialize<DummySerializer>));
+        template <typename C>
+        static no test_custom_serial (...);
+
+        template <typename C>
+        static yes test_custom_deserial (decltype (&C::template deserialize<DummySerializer>));
+        template <typename C>
+        static no test_custom_deserial (...);
+
+    public:
+        static constexpr auto custom_serializer_value = sizeof (test_custom_serial<T> (nullptr)) == sizeof (yes);
+        static constexpr auto custom_deserializer_value = sizeof (test_custom_deserial<T> (nullptr)) == sizeof (yes);
+    };
+}
+#endif
+
 class BaseSerializer
 {
     template <typename Serializer>
@@ -18,6 +50,12 @@ class BaseSerializer
 
     template <typename T>
     static constexpr auto IsNotDirectlySerializable = ! std::is_arithmetic_v<T> && ! IsString<T> && ! MetaHelpers::IsIterable<T>;
+
+    template <typename T>
+    static constexpr auto HasCustomSerialization = serialization_detail::HasCustomSerializer<T>::custom_serializer_value;
+
+    template <typename T>
+    static constexpr auto HasCustomDeserialization = serialization_detail::HasCustomSerializer<T>::custom_deserializer_value;
 
 public:
     template <typename Serializer>
@@ -139,7 +177,7 @@ public:
 
     /** Serializer for generic aggregate types */
     template <typename Serializer, typename T>
-    static std::enable_if_t<IsNotDirectlySerializable<T>, SerialType<Serializer>> serialize (const T& object)
+    static std::enable_if_t<IsNotDirectlySerializable<T> && ! HasCustomSerialization<T>, SerialType<Serializer>> serialize (const T& object)
     {
         auto serial = Serializer::createBaseElement();
         pfr::for_each_field (object, [&serial] (const auto& field)
@@ -150,11 +188,25 @@ public:
 
     /** Deserializer for generic aggregate types */
     template <typename Serializer, typename T>
-    static std::enable_if_t<IsNotDirectlySerializable<T>, void> deserialize (DeserialType<Serializer> serial, T& object)
+    static std::enable_if_t<IsNotDirectlySerializable<T> && ! HasCustomDeserialization<T>, void> deserialize (DeserialType<Serializer> serial, T& object)
     {
         int serialIndex = 0;
         pfr::for_each_field (object, [&serial, &serialIndex] (auto& field)
                              { deserialize<Serializer> (Serializer::getChildElement (serial, serialIndex++), field); });
+    }
+
+    /** Serializer for types with custom serialization behaviour */
+    template <typename Serializer, typename T>
+    static std::enable_if_t<HasCustomSerialization<T>, SerialType<Serializer>> serialize (const T& object)
+    {
+        return T::template serialize<Serializer> (object);
+    }
+
+    /** Deserializer for types with custom deserialization behaviour */
+    template <typename Serializer, typename T>
+    static std::enable_if_t<HasCustomDeserialization<T>, void> deserialize (DeserialType<Serializer> serial, T& object)
+    {
+        T::template deserialize<Serializer> (serial, object);
     }
 
 protected:

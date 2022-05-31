@@ -2,7 +2,7 @@
 
 namespace chowdsp
 {
-/** Methods for serializing dataa */
+/** Methods for serializing data */
 namespace Serialization
 {
     /** Serialize an object with a given serializer */

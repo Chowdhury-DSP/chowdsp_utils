@@ -1,6 +1,37 @@
 #include <chowdsp_serialization/chowdsp_serialization.h>
 #include <TimedUnitTest.h>
 
+struct CustomTest
+{
+    juce::StringArray x { "one", "two", "three" };
+
+    template <typename Serializer>
+    static typename Serializer::SerializedType serialize (const CustomTest& object)
+    {
+        auto serial = Serializer::createBaseElement();
+        for (auto& val : object.x)
+            Serializer::addChildElement (serial, Serializer::template serialize<Serializer> (val));
+
+        return serial;
+    }
+
+    template <typename Serializer>
+    static void deserialize (typename Serializer::DeserializedType serial, CustomTest& object)
+    {
+        object.x.clear();
+
+        for (int i = 0; i < Serializer::getNumChildElements (serial); ++i)
+        {
+            juce::String newStr {};
+            Serializer::template deserialize<Serializer> (Serializer::getChildElement (serial, i), newStr);
+            object.x.add (std::move (newStr));
+        }
+    }
+
+    static_assert (chowdsp::serialization_detail::HasCustomSerializer<CustomTest>::custom_serializer_value);
+    static_assert (chowdsp::serialization_detail::HasCustomSerializer<CustomTest>::custom_deserializer_value);
+};
+
 template <typename Serializer>
 class SerializationTest : public TimedUnitTest
 {
@@ -33,7 +64,7 @@ public:
         test.z = 5.0;
         chowdsp::Serialization::deserialize<Serializer> (res, test);
 
-        expect (pfr::eq_fields (test, Test {}), "Serialization/Deserilization is incorrect");
+        expect (pfr::eq_fields (test, Test {}), "Serialization/Deserialization is incorrect");
     }
 
     void stringsTest()
@@ -52,7 +83,7 @@ public:
         test.y = "";
         chowdsp::Serialization::deserialize<Serializer> (res, test);
 
-        expect (pfr::eq_fields (test, Test {}), "Serialization/Deserilization is incorrect");
+        expect (pfr::eq_fields (test, Test {}), "Serialization/Deserialization is incorrect");
     }
 
     void containerTest()
@@ -84,7 +115,19 @@ public:
         test.y[0].x = 40;
         chowdsp::Serialization::deserialize<Serializer> (res, test);
 
-        expect (pfr::eq_fields (test, Test {}), "Serialization/Deserilization is incorrect");
+        expect (pfr::eq_fields (test, Test {}), "Serialization/Deserialization is incorrect");
+    }
+
+    void customSerializationTest()
+    {
+        CustomTest test;
+        auto res = chowdsp::Serialization::serialize<Serializer> (test);
+        std::cout << Serializer::toString (res) << std::endl;
+
+        test.x.getReference (0) = "";
+        chowdsp::Serialization::deserialize<Serializer> (res, test);
+
+        expect (pfr::eq_fields (test, CustomTest {}), "Serialization/Deserialization is incorrect");
     }
 
     void runTestTimed() override
@@ -97,6 +140,9 @@ public:
 
         beginTest ("Container Test");
         containerTest();
+
+        beginTest ("Custom Serialization Test");
+        customSerializationTest();
     }
 };
 
