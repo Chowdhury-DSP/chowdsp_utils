@@ -4,7 +4,7 @@
 
 int main()
 {
-    using namespace chowdsp::MetaHelpers;
+    using namespace chowdsp::TypeTraits;
 
     struct Dummy
     {

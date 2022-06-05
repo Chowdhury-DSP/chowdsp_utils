@@ -109,32 +109,10 @@ private:
 
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
+    CHOWDSP_CHECK_HAS_STATIC_METHOD (HasAddParameters, addParameters)
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginBase)
 };
-
-#ifndef DOXYGEN
-/**
- * Class that uses SFINAE to ensure that the
- * processor class has an `addParameters` function
- */
-template <typename T>
-class HasAddParameters
-{
-    typedef char one;
-    typedef long two;
-
-    template <typename C>
-    static one test (decltype (&C::addParameters));
-    template <typename C>
-    static two test (...);
-
-public:
-    enum
-    {
-        value = sizeof (test<T> (nullptr)) == sizeof (char)
-    };
-};
-#endif // DOXYGEN
 
 template <class Processor>
 juce::AudioProcessor::BusesProperties PluginBase<Processor>::getDefaultBusLayout()
@@ -155,8 +133,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginBase<Processor>::creat
 {
     Parameters params;
 
-    static_assert (HasAddParameters<Processor>::value,
-                   "Processor class MUST contain a static addParameters function!");
+    static_assert (HasAddParameters<Processor>, "Processor class MUST contain a static addParameters function!");
     Processor::addParameters (params);
 
     return { params.begin(), params.end() };
