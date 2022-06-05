@@ -36,7 +36,7 @@ static void JuceIIR (benchmark::State& state)
 }
 BENCHMARK (JuceIIR)->MinTime (5);
 
-static void ChowFIR (benchmark::State& state)
+static void ChowIIR (benchmark::State& state)
 {
     chowdsp::SecondOrderLPF<float> filter;
     filter.calcCoefs (100.0f, 1.0f, 48000.0f);
@@ -49,6 +49,6 @@ static void ChowFIR (benchmark::State& state)
             filter.processBlock (audioBlock);
     }
 }
-BENCHMARK (ChowFIR)->MinTime (5);
+BENCHMARK (ChowIIR)->MinTime (5);
 
 BENCHMARK_MAIN();

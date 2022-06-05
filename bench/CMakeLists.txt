@@ -25,3 +25,4 @@ setup_benchmark(LookupTableBench LookupTableBench.cpp chowdsp_dsp_data_structure
 setup_benchmark(PowerBench PowerBench.cpp chowdsp_math)
 setup_benchmark(FIRFilterBench FIRFilterBench.cpp chowdsp_filters)
 setup_benchmark(IIRFilterBench IIRFilterBench.cpp chowdsp_filters)
+setup_benchmark(PolynomialBench PolynomialBench.cpp chowdsp_math)
