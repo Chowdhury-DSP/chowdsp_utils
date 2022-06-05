@@ -31,8 +31,8 @@ struct CustomTest
         }
     }
 
-    static_assert (chowdsp::serialization_detail::HasCustomSerializer<CustomTest>::custom_serializer_value);
-    static_assert (chowdsp::serialization_detail::HasCustomSerializer<CustomTest>::custom_deserializer_value);
+    static_assert (chowdsp::serialization_detail::HasCustomSerializer<CustomTest>);
+    static_assert (chowdsp::serialization_detail::HasCustomDeserializer<CustomTest>);
 };
 
 template <typename Serializer>
