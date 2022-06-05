@@ -24,7 +24,8 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include <algorithm>
 #include <tuple>
 
+#include "DataStructures/chowdsp_AtomicHelpers.h"
 #include "DataStructures/chowdsp_DoubleBuffer.h"
 #include "DataStructures/chowdsp_TupleHelpers.h"
-#include "DataStructures/chowdsp_AtomicHelpers.h"
+#include "DataStructures/chowdsp_TypeTraits.h"
 #include "DataStructures/chowdsp_MetaHelpers.h"
