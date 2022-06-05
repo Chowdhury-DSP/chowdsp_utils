@@ -1,5 +1,7 @@
 #pragma once
 
+// NOLINTBEGIN(bugprone-macro-parentheses)
+
 /**
  * Creates a constexpr bool that checks if a class has the given static method.
  *
@@ -30,7 +32,7 @@
         };                                                                                                                              \
     };                                                                                                                                  \
     template <typename T>                                                                                                               \
-    static constexpr bool (Name) = Test_##Name<T>::value;
+    static constexpr bool Name = Test_##Name<T>::value;
 
 /**
  * Creates a constexpr bool that checks if a class has the given non-static method.
@@ -62,7 +64,9 @@
         };                                                                                                                              \
     };                                                                                                                                  \
     template <typename T>                                                                                                               \
-    static constexpr bool (Name) = Test_##Name<T>::value;
+    static constexpr bool Name = Test_##Name<T>::value;
+
+// NOLINTEND(bugprone-macro-parentheses)
 
 namespace chowdsp
 {
