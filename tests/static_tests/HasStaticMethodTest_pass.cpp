@@ -10,39 +10,71 @@ struct Test
     static int oneArgNonVoidStaticMethod(int) { return 0; }
     static int twoArgNonVoidStaticMethod(int, float) { return 0; }
 
-    CHOWDSP_CHECK_HAS_STATIC_METHOD(HasStaticMethod, Test, staticMethod);
-    CHOWDSP_CHECK_HAS_STATIC_METHOD(HasStaticMethod2, Test, staticMethod2);
-    static_assert(HasStaticMethod, "staticMethod should exist!");
-    static_assert(! HasStaticMethod2, "staticMethod2 should not exist!");
+    CHOWDSP_CHECK_HAS_STATIC_METHOD(HasStaticMethod, staticMethod)
+    CHOWDSP_CHECK_HAS_STATIC_METHOD(HasStaticMethod2, staticMethod2)
+    static_assert(HasStaticMethod<Test>, "staticMethod should exist!");
+    static_assert(! HasStaticMethod2<Test>, "staticMethod2 should not exist!");
 
-    CHOWDSP_CHECK_HAS_STATIC_METHOD(HasOneArgStaticMethod, Test, oneArgStaticMethod);
-    CHOWDSP_CHECK_HAS_STATIC_METHOD(HasOneArgStaticMethod2, Test, oneArgStaticMethod2);
-    static_assert(HasOneArgStaticMethod, "should exist!");
-    static_assert(! HasOneArgStaticMethod2, "should not exist!");
+    CHOWDSP_CHECK_HAS_STATIC_METHOD(HasOneArgStaticMethod, oneArgStaticMethod)
+    CHOWDSP_CHECK_HAS_STATIC_METHOD(HasOneArgStaticMethod2, oneArgStaticMethod2)
+    static_assert(HasOneArgStaticMethod<Test>, "should exist!");
+    static_assert(! HasOneArgStaticMethod2<Test>, "should not exist!");
 
-    CHOWDSP_CHECK_HAS_STATIC_METHOD(HasTwoArgStaticMethod, Test, twoArgStaticMethod);
-    CHOWDSP_CHECK_HAS_STATIC_METHOD(HasTwoArgStaticMethod2, Test, twoArgStaticMethod2);
-    static_assert(HasTwoArgStaticMethod, "should exist!");
-    static_assert(! HasTwoArgStaticMethod2, "should not exist!");
+    CHOWDSP_CHECK_HAS_STATIC_METHOD(HasTwoArgStaticMethod, twoArgStaticMethod)
+    CHOWDSP_CHECK_HAS_STATIC_METHOD(HasTwoArgStaticMethod2, twoArgStaticMethod2)
+    static_assert(HasTwoArgStaticMethod<Test>, "should exist!");
+    static_assert(! HasTwoArgStaticMethod2<Test>, "should not exist!");
 
-    CHOWDSP_CHECK_HAS_STATIC_METHOD(HasNonVoidStaticMethod, Test, nonVoidStaticMethod);
-    CHOWDSP_CHECK_HAS_STATIC_METHOD(HasNonVoidStaticMethod2, Test, nonVoidStaticMethod2);
-    static_assert(HasNonVoidStaticMethod, "should exist!");
-    static_assert(! HasNonVoidStaticMethod2, "should not exist!");
+    CHOWDSP_CHECK_HAS_STATIC_METHOD(HasNonVoidStaticMethod, nonVoidStaticMethod)
+    CHOWDSP_CHECK_HAS_STATIC_METHOD(HasNonVoidStaticMethod2, nonVoidStaticMethod2)
+    static_assert(HasNonVoidStaticMethod<Test>, "should exist!");
+    static_assert(! HasNonVoidStaticMethod2<Test>, "should not exist!");
 
-    CHOWDSP_CHECK_HAS_STATIC_METHOD(HasOneArgNonVoidStaticMethod, Test, oneArgNonVoidStaticMethod);
-    CHOWDSP_CHECK_HAS_STATIC_METHOD(HasOneArgNonVoidStaticMethod2, Test, oneArgNonVoidStaticMethod2);
-    static_assert(HasOneArgNonVoidStaticMethod, "should exist!");
-    static_assert(! HasOneArgNonVoidStaticMethod2, "should not exist!");
+    CHOWDSP_CHECK_HAS_STATIC_METHOD(HasOneArgNonVoidStaticMethod, oneArgNonVoidStaticMethod)
+    CHOWDSP_CHECK_HAS_STATIC_METHOD(HasOneArgNonVoidStaticMethod2, oneArgNonVoidStaticMethod2)
+    static_assert(HasOneArgNonVoidStaticMethod<Test>, "should exist!");
+    static_assert(! HasOneArgNonVoidStaticMethod2<Test>, "should not exist!");
 
-    CHOWDSP_CHECK_HAS_STATIC_METHOD(HasTwoArgNonVoidStaticMethod, Test, twoArgNonVoidStaticMethod);
-    CHOWDSP_CHECK_HAS_STATIC_METHOD(HasTwoArgNonVoidStaticMethod2, Test, twoArgNonVoidStaticMethod2);
-    static_assert(HasTwoArgNonVoidStaticMethod, "should exist!");
-    static_assert(! HasTwoArgNonVoidStaticMethod2, "should not exist!");
+    CHOWDSP_CHECK_HAS_STATIC_METHOD(HasTwoArgNonVoidStaticMethod, twoArgNonVoidStaticMethod)
+    CHOWDSP_CHECK_HAS_STATIC_METHOD(HasTwoArgNonVoidStaticMethod2, twoArgNonVoidStaticMethod2)
+    static_assert(HasTwoArgNonVoidStaticMethod<Test>, "should exist!");
+    static_assert(! HasTwoArgNonVoidStaticMethod2<Test>, "should not exist!");
 };
+
+CHOWDSP_CHECK_HAS_STATIC_METHOD(HasStaticMethod, staticMethod)
+CHOWDSP_CHECK_HAS_STATIC_METHOD(HasStaticMethod2, staticMethod2)
+CHOWDSP_CHECK_HAS_STATIC_METHOD(HasOneArgStaticMethod, oneArgStaticMethod)
+CHOWDSP_CHECK_HAS_STATIC_METHOD(HasOneArgStaticMethod2, oneArgStaticMethod2)
+CHOWDSP_CHECK_HAS_STATIC_METHOD(HasTwoArgStaticMethod, twoArgStaticMethod)
+CHOWDSP_CHECK_HAS_STATIC_METHOD(HasTwoArgStaticMethod2, twoArgStaticMethod2)
+CHOWDSP_CHECK_HAS_STATIC_METHOD(HasNonVoidStaticMethod, nonVoidStaticMethod)
+CHOWDSP_CHECK_HAS_STATIC_METHOD(HasNonVoidStaticMethod2, nonVoidStaticMethod2)
+CHOWDSP_CHECK_HAS_STATIC_METHOD(HasOneArgNonVoidStaticMethod, oneArgNonVoidStaticMethod)
+CHOWDSP_CHECK_HAS_STATIC_METHOD(HasOneArgNonVoidStaticMethod2, oneArgNonVoidStaticMethod2)
+CHOWDSP_CHECK_HAS_STATIC_METHOD(HasTwoArgNonVoidStaticMethod, twoArgNonVoidStaticMethod)
+CHOWDSP_CHECK_HAS_STATIC_METHOD(HasTwoArgNonVoidStaticMethod2, twoArgNonVoidStaticMethod2)
 
 int main()
 {
+    static_assert(HasStaticMethod<Test>, "staticMethod should exist!");
+    static_assert(! HasStaticMethod2<Test>, "staticMethod2 should not exist!");
+
+    static_assert(HasOneArgStaticMethod<Test>, "should exist!");
+    static_assert(! HasOneArgStaticMethod2<Test>, "should not exist!");
+
+
+    static_assert(HasTwoArgStaticMethod<Test>, "should exist!");
+    static_assert(! HasTwoArgStaticMethod2<Test>, "should not exist!");
+
+    static_assert(HasNonVoidStaticMethod<Test>, "should exist!");
+    static_assert(! HasNonVoidStaticMethod2<Test>, "should not exist!");
+
+    static_assert(HasOneArgNonVoidStaticMethod<Test>, "should exist!");
+    static_assert(! HasOneArgNonVoidStaticMethod2<Test>, "should not exist!");
+
+    static_assert(HasTwoArgNonVoidStaticMethod<Test>, "should exist!");
+    static_assert(! HasTwoArgNonVoidStaticMethod2<Test>, "should not exist!");
+
     Test t {};
 
     return 0;

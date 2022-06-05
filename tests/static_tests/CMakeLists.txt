@@ -26,5 +26,8 @@ add_static_test_check(StaticModFilterTest ModFilterHighOrder_fail.cpp FALSE)
 create_static_test(HasStaticMethodTest)
 add_static_test_check(HasStaticMethodTest HasStaticMethodTest_pass.cpp TRUE)
 
+create_static_test(HasMemberMethodTest)
+add_static_test_check(HasMemberMethodTest HasMemberMethodTest_pass.cpp TRUE)
+
 create_static_test(IsContainerTest)
 add_static_test_check(IsContainerTest CorrectContainers_pass.cpp TRUE)
