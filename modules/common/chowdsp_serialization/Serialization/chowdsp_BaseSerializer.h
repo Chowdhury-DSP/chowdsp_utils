@@ -27,8 +27,8 @@ namespace serialization_detail
         }
     };
 
-    CHOWDSP_CHECK_HAS_STATIC_METHOD(HasCustomSerializer, template serialize<DummySerializer>)
-    CHOWDSP_CHECK_HAS_STATIC_METHOD(HasCustomDeserializer, template deserialize<DummySerializer>)
+    CHOWDSP_CHECK_HAS_STATIC_METHOD (HasCustomSerializer, template serialize<DummySerializer>)
+    CHOWDSP_CHECK_HAS_STATIC_METHOD (HasCustomDeserializer, template deserialize<DummySerializer>)
 } // namespace serialization_detail
 #endif
 
