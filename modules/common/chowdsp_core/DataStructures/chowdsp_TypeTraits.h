@@ -72,8 +72,8 @@ namespace TypeTraits
 #ifndef DOXYGEN
     namespace is_iterable_detail
     {
-        CHOWDSP_CHECK_HAS_METHOD (HasBegin, begin)
-        CHOWDSP_CHECK_HAS_METHOD (HasEnd, end)
+        CHOWDSP_CHECK_HAS_METHOD (HasBegin, begin, )
+        CHOWDSP_CHECK_HAS_METHOD (HasEnd, end, )
 
         template <typename T>
         static constexpr auto has_begin_end_v = HasBegin<T>&& HasEnd<T>;
