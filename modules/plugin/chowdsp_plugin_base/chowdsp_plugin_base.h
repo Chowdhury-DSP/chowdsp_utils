@@ -8,7 +8,7 @@ BEGIN_JUCE_MODULE_DECLARATION
    version:       1.0.0
    name:          ChowDSP Plugin Base
    description:   Base classes for ChowDSP plugins
-   dependencies:  chowdsp_parameters
+   dependencies:  chowdsp_core, chowdsp_parameters
 
    website:       https://ccrma.stanford.edu/~jatin/chowdsp
    license:       GPLv3
@@ -21,6 +21,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #pragma once
 
 // JUCE includes
+#include <chowdsp_core/chowdsp_core.h>
 #include <chowdsp_parameters/chowdsp_parameters.h>
 
 #if JUCE_MODULE_AVAILABLE_chowdsp_presets

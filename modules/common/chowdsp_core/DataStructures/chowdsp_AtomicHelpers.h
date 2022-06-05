@@ -35,6 +35,8 @@ struct AtomicRef
     static_assert (alignof (T) == alignof (atomic_type), "Incompatible layout.");
 
     explicit AtomicRef (T& val) : atomic_val (reinterpret_cast<atomic_type&> (val)) {}
+    AtomicRef (const AtomicRef&) = delete;
+    AtomicRef& operator= (const AtomicRef&) = delete;
 
     /** Performs std::atomic<T>::store */
     template <bool non_const = is_non_const>
@@ -60,7 +62,5 @@ struct AtomicRef
 
 private:
     atomic_type& atomic_val;
-
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AtomicRef)
 };
 } // namespace chowdsp
