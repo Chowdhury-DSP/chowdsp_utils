@@ -10,9 +10,6 @@ template <typename ParamsType>
 struct EQParams
 {
     ParamsType params {};
-
-    //    EQParams() = default;
-    //    EQParams (const ParamsType& p) : params (p) {} //NOLINT(google-explicit-constructor) we want to be able to use this constructor implicitly
 };
 
 template <typename ParamsType>
