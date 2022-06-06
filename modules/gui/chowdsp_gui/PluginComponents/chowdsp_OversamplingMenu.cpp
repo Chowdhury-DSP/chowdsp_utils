@@ -6,6 +6,8 @@ namespace chowdsp
 template <typename OSType>
 OversamplingMenu<OSType>::OversamplingMenu (OSType& osMgr, juce::AudioProcessorValueTreeState& vts) : osManager (osMgr)
 {
+    setDescription ("Oversampling Menu");
+
     setColour (backgroundColourID, juce::Colours::transparentBlack);
     setColour (textColourID, juce::Colours::white);
     setColour (outlineColourID, juce::Colours::white);

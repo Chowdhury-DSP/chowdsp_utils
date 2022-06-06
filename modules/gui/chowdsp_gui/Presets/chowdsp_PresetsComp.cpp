@@ -51,7 +51,7 @@ PresetsComp::PresetsComp (PresetManager& presetManager) : manager (presetManager
     auto setupNextPrevButton = [=] (juce::DrawableButton& button, bool forward) {
         addAndMakeVisible (button);
         button.setWantsKeyboardFocus (false);
-        button.setDescription ("Go to " + juce::String (forward ? "next" : "previous") + " preset");
+        button.setTitle ("Go to " + juce::String (forward ? "next" : "previous") + " preset");
         button.setColour (juce::ComboBox::outlineColourId, juce::Colours::transparentBlack);
         button.setColour (juce::TextButton::buttonColourId, juce::Colours::transparentBlack);
         button.onClick = [=] { goToNextPreset (forward); };
