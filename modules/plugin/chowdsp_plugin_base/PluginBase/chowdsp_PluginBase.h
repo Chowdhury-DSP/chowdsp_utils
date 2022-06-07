@@ -233,7 +233,7 @@ juce::String PluginBase<Processor>::getWrapperTypeString() const
 #if HAS_CLAP_JUCE_EXTENSIONS
     // Since we are using 'external clap' this is the one JUCE API we can't override
     if (wrapperType == wrapperType_Undefined && is_clap)
-        return "Clap";
+        return "CLAP";
 #endif
 
     return AudioProcessor::getWrapperTypeDescription (wrapperType);
