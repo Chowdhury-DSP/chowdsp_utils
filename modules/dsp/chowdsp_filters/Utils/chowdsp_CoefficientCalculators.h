@@ -75,9 +75,14 @@ namespace CoefficientCalculators
 
         T matchedWc;
         if constexpr (MatchCutoff)
+        {
+            juce::ignoreUnused (matchedFc);
             matchedWc = wc;
+        }
         else
+        {
             matchedWc = matchedFc > (T) 0 ? (juce::MathConstants<NumericType>::twoPi * matchedFc) : wc;
+        }
 
         const auto K = ConformalMaps::computeKValueAngular (matchedWc, fs);
 
@@ -98,9 +103,14 @@ namespace CoefficientCalculators
 
         T matchedWc;
         if constexpr (MatchCutoff)
+        {
+            juce::ignoreUnused (matchedFc);
             matchedWc = wc;
+        }
         else
+        {
             matchedWc = matchedFc > (T) 0 ? (juce::MathConstants<NumericType>::twoPi * matchedFc) : wc;
+        }
 
         const auto K = ConformalMaps::computeKValueAngular (matchedWc, fs);
 
