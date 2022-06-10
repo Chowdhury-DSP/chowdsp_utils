@@ -13,7 +13,7 @@ namespace CoefficientCalculators
     void calcFirstOrderLPF (T (&b)[2], T (&a)[2], T fc, NumericType fs)
     {
         const auto wc = juce::MathConstants<NumericType>::twoPi * fc;
-        const auto K = ConformalMaps::computeKValue (fc, fs);
+        const auto K = ConformalMaps::computeKValueAngular (wc, fs);
         ConformalMaps::Transform<T, 2>::bilinear (b, a, { (T) 0, (T) 1 }, { (T) 1 / wc, (T) 1 }, K);
     }
 
@@ -25,8 +25,9 @@ namespace CoefficientCalculators
     void calcFirstOrderHPF (T (&b)[2], T (&a)[2], T fc, NumericType fs)
     {
         const auto wc = juce::MathConstants<NumericType>::twoPi * fc;
-        const auto K = ConformalMaps::computeKValue (fc, fs);
-        ConformalMaps::Transform<T, 2>::bilinear (b, a, { (T) 1 / wc, (T) 0 }, { (T) 1 / wc, (T) 1 }, K);
+        const auto K = ConformalMaps::computeKValueAngular (wc, fs);
+        const auto wc_recip = (T) 1 / wc;
+        ConformalMaps::Transform<T, 2>::bilinear (b, a, { wc_recip, (T) 0 }, { wc_recip, (T) 1 }, K);
     }
 
     /** Calculates the coefficients for the filter.
@@ -57,10 +58,10 @@ namespace CoefficientCalculators
         CHOWDSP_USING_XSIMD_STD (sqrt)
         CHOWDSP_USING_XSIMD_STD (tan)
 
-        const auto rho = sqrt (highGain / lowGain);
+        const auto rho_recip = (T) 1 / sqrt (highGain / lowGain);
         const auto K = (T) 1 / tan (juce::MathConstants<NumericType>::pi * fc / fs);
 
-        ConformalMaps::Transform<T, 2>::bilinear (b, a, { highGain / rho, lowGain }, { 1.0f / rho, 1.0f }, K);
+        ConformalMaps::Transform<T, 2>::bilinear (b, a, { highGain * rho_recip, lowGain }, { rho_recip, (T) 1 }, K);
     }
 
     /**
@@ -70,13 +71,15 @@ namespace CoefficientCalculators
     template <typename T, typename NumericType, bool MatchCutoff = true>
     void calcSecondOrderLPF (T (&b)[3], T (&a)[3], T fc, T qVal, NumericType fs, T matchedFc = (T) -1)
     {
-        if constexpr (MatchCutoff)
-            matchedFc = fc;
-        else
-            matchedFc = matchedFc > (T) 0 ? matchedFc : fc;
-
         const auto wc = juce::MathConstants<NumericType>::twoPi * fc;
-        const auto K = ConformalMaps::computeKValue (matchedFc, fs);
+
+        T matchedWc;
+        if constexpr (MatchCutoff)
+            matchedWc = wc;
+        else
+            matchedWc = matchedFc > (T) 0 ? (juce::MathConstants<NumericType>::twoPi * matchedFc) : wc;
+
+        const auto K = ConformalMaps::computeKValueAngular (matchedWc, fs);
 
         auto kSqTerm = (T) 1 / (wc * wc);
         auto kTerm = (T) 1 / (qVal * wc);
@@ -91,13 +94,15 @@ namespace CoefficientCalculators
     template <typename T, typename NumericType, bool MatchCutoff = true>
     void calcSecondOrderHPF (T (&b)[3], T (&a)[3], T fc, T qVal, NumericType fs, T matchedFc = (T) -1)
     {
-        if constexpr (MatchCutoff)
-            matchedFc = fc;
-        else
-            matchedFc = matchedFc > (T) 0 ? matchedFc : fc;
-
         const auto wc = juce::MathConstants<NumericType>::twoPi * fc;
-        const auto K = ConformalMaps::computeKValue (matchedFc, fs);
+
+        T matchedWc;
+        if constexpr (MatchCutoff)
+            matchedWc = wc;
+        else
+            matchedWc = matchedFc > (T) 0 ? (juce::MathConstants<NumericType>::twoPi * matchedFc) : wc;
+
+        const auto K = ConformalMaps::computeKValueAngular (matchedWc, fs);
 
         auto kSqTerm = (T) 1 / (wc * wc);
         auto kTerm = (T) 1 / (qVal * wc);
@@ -113,7 +118,7 @@ namespace CoefficientCalculators
     void calcSecondOrderBPF (T (&b)[3], T (&a)[3], T fc, T qVal, NumericType fs)
     {
         const auto wc = juce::MathConstants<NumericType>::twoPi * fc;
-        const auto K = ConformalMaps::computeKValue (fc, fs);
+        const auto K = ConformalMaps::computeKValueAngular (wc, fs);
 
         auto kSqTerm = (T) 1 / (wc * wc);
         auto kTerm = (T) 1 / (qVal * wc);
@@ -129,7 +134,7 @@ namespace CoefficientCalculators
     void calcNotchFilter (T (&b)[3], T (&a)[3], T fc, T qVal, NumericType fs)
     {
         const auto wc = juce::MathConstants<NumericType>::twoPi * fc;
-        const auto K = ConformalMaps::computeKValue (fc, fs);
+        const auto K = ConformalMaps::computeKValueAngular (wc, fs);
 
         auto kSqTerm = (T) 1 / (wc * wc);
         auto kTerm = (T) 1 / (qVal * wc);
@@ -157,7 +162,7 @@ namespace CoefficientCalculators
     void calcPeakingFilter (T (&b)[3], T (&a)[3], T fc, T qVal, T gain, NumericType fs)
     {
         const auto wc = juce::MathConstants<NumericType>::twoPi * fc;
-        const auto K = ConformalMaps::computeKValue (fc, fs);
+        const auto K = ConformalMaps::computeKValueAngular (wc, fs);
 
         const auto kSqTerm = (T) 1 / (wc * wc);
         const auto kTerm = (T) 1 / (qVal * wc);
@@ -177,7 +182,7 @@ namespace CoefficientCalculators
     void calcLowShelf (T (&b)[3], T (&a)[3], T fc, T qVal, T gain, NumericType fs)
     {
         const auto wc = juce::MathConstants<NumericType>::twoPi * fc;
-        const auto K = ConformalMaps::computeKValue (fc, fs);
+        const auto K = ConformalMaps::computeKValueAngular (wc, fs);
 
         CHOWDSP_USING_XSIMD_STD (sqrt);
         const auto A = sqrt (gain);
@@ -198,7 +203,7 @@ namespace CoefficientCalculators
     void calcHighShelf (T (&b)[3], T (&a)[3], T fc, T qVal, T gain, NumericType fs)
     {
         const auto wc = juce::MathConstants<NumericType>::twoPi * fc;
-        const auto K = ConformalMaps::computeKValue (fc, fs);
+        const auto K = ConformalMaps::computeKValueAngular (wc, fs);
 
         CHOWDSP_USING_XSIMD_STD (sqrt);
         const auto A = sqrt (gain);

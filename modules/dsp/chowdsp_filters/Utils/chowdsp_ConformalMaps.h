@@ -150,15 +150,23 @@ namespace ConformalMaps
         }
     };
 
+    /** Computes the warping factor "K" so that the angular frequency wc is matched at sample rate fs */
+    template <typename T>
+    inline T computeKValueAngular (T wc, SampleTypeHelpers::NumericType<T> fs)
+    {
+        using NumericType = SampleTypeHelpers::NumericType<T>;
+        CHOWDSP_USING_XSIMD_STD (tan)
+
+        return wc / tan (wc / ((NumericType) 2 * fs));
+    }
+
     /** Computes the warping factor "K" so that the frequency fc is matched at sample rate fs */
     template <typename T>
     inline T computeKValue (T fc, SampleTypeHelpers::NumericType<T> fs)
     {
         using NumericType = SampleTypeHelpers::NumericType<T>;
-        CHOWDSP_USING_XSIMD_STD (tan);
-
         const auto wc = juce::MathConstants<NumericType>::twoPi * fc;
-        return wc / tan (wc / ((NumericType) 2 * fs));
+        return computeKValueAngular (wc, fs);
     }
 
     /** Calculates a pole frequency from a set of filter coefficients */
