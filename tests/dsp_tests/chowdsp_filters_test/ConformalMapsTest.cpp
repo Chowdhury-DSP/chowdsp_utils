@@ -13,7 +13,7 @@ public:
     template <int N>
     void testBilinearTransform (const float (&bs)[N], const float (&as)[N], const float (&b_exp)[N], const float (&a_exp)[N], float K)
     {
-        const int M = N - 1;  
+        const int M = N - 1;
         float b[N] {};
         float a[N] {};
         chowdsp::ConformalMaps::Transform<float, M>::bilinear (b, a, bs, as, K);
