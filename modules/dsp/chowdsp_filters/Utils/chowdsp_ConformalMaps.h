@@ -12,14 +12,15 @@ namespace chowdsp
  */
 namespace ConformalMaps
 {
-    /** Transforms for a (N-1)-order filter */
-    template <typename T, int N>
+    /** Transforms for a M order filter */
+    template <typename T, int M>
     struct Transform
     {
+        static constexpr int N = M + 1;
+
         static inline void bilinear (T (&b)[(size_t) N], T (&a)[(size_t) N], const T (&bs)[(size_t) N], const T (&as)[(size_t) N], T K)
         {
             using Combinatorics::combination, Power::ipow;
-            constexpr int M = N - 1;
 
             for (int j = 0; j < N; ++j)
             {
@@ -73,7 +74,7 @@ namespace ConformalMaps
 
     /** Transforms for a first-order filter */
     template <typename T>
-    struct Transform<T, 2>
+    struct Transform<T, 1>
     {
         /** First-order Mobius transform */
         static inline void mobius (T (&b)[2], T (&a)[2], const T (&bs)[2], const T (&as)[2], const MobiusParams<T>& mb)
@@ -102,7 +103,7 @@ namespace ConformalMaps
 
     /** Transforms for a second-order filter */
     template <typename T>
-    struct Transform<T, 3>
+    struct Transform<T, 2>
     {
         /** Second-order Mobius transform */
         static inline void mobius (T (&b)[3], T (&a)[3], const T (&bs)[3], const T (&as)[3], const MobiusParams<T>& mb)

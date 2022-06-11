@@ -48,7 +48,7 @@ public:
 
             FloatType a_s[2] = { FloatType (1) / pole, FloatType (-1) };
             FloatType b_s[2] = { FloatType (1) / zero, FloatType (-1) };
-            ConformalMaps::Transform<FloatType, 2>::bilinear (b_z, a_z, b_s, a_s, k);
+            ConformalMaps::Transform<FloatType, 1>::bilinear (b_z, a_z, b_s, a_s, k);
 
             filter.setCoefs (b_z, a_z);
         };

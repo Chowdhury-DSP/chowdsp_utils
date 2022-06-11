@@ -14,7 +14,7 @@ namespace CoefficientCalculators
     {
         const auto wc = juce::MathConstants<NumericType>::twoPi * fc;
         const auto K = ConformalMaps::computeKValue (fc, fs);
-        ConformalMaps::Transform<T, 2>::bilinear (b, a, { (T) 0, (T) 1 }, { (T) 1 / wc, (T) 1 }, K);
+        ConformalMaps::Transform<T, 1>::bilinear (b, a, { (T) 0, (T) 1 }, { (T) 1 / wc, (T) 1 }, K);
     }
 
     /**
@@ -26,7 +26,7 @@ namespace CoefficientCalculators
     {
         const auto wc = juce::MathConstants<NumericType>::twoPi * fc;
         const auto K = ConformalMaps::computeKValue (fc, fs);
-        ConformalMaps::Transform<T, 2>::bilinear (b, a, { (T) 1 / wc, (T) 0 }, { (T) 1 / wc, (T) 1 }, K);
+        ConformalMaps::Transform<T, 1>::bilinear (b, a, { (T) 1 / wc, (T) 0 }, { (T) 1 / wc, (T) 1 }, K);
     }
 
     /** Calculates the coefficients for the filter.
@@ -60,7 +60,7 @@ namespace CoefficientCalculators
         const auto rho = sqrt (highGain / lowGain);
         const auto K = (T) 1 / tan (juce::MathConstants<NumericType>::pi * fc / fs);
 
-        ConformalMaps::Transform<T, 2>::bilinear (b, a, { highGain / rho, lowGain }, { 1.0f / rho, 1.0f }, K);
+        ConformalMaps::Transform<T, 1>::bilinear (b, a, { highGain / rho, lowGain }, { 1.0f / rho, 1.0f }, K);
     }
 
     /**
@@ -81,7 +81,7 @@ namespace CoefficientCalculators
         auto kSqTerm = (T) 1 / (wc * wc);
         auto kTerm = (T) 1 / (qVal * wc);
 
-        ConformalMaps::Transform<T, 3>::bilinear (b, a, { (T) 0, (T) 0, (T) 1 }, { kSqTerm, kTerm, (T) 1 }, K);
+        ConformalMaps::Transform<T, 2>::bilinear (b, a, { (T) 0, (T) 0, (T) 1 }, { kSqTerm, kTerm, (T) 1 }, K);
     }
 
     /**
@@ -102,7 +102,7 @@ namespace CoefficientCalculators
         auto kSqTerm = (T) 1 / (wc * wc);
         auto kTerm = (T) 1 / (qVal * wc);
 
-        ConformalMaps::Transform<T, 3>::bilinear (b, a, { kSqTerm, (T) 0, (T) 0 }, { kSqTerm, kTerm, (T) 1 }, K);
+        ConformalMaps::Transform<T, 2>::bilinear (b, a, { kSqTerm, (T) 0, (T) 0 }, { kSqTerm, kTerm, (T) 1 }, K);
     }
 
     /**
@@ -118,7 +118,7 @@ namespace CoefficientCalculators
         auto kSqTerm = (T) 1 / (wc * wc);
         auto kTerm = (T) 1 / (qVal * wc);
 
-        ConformalMaps::Transform<T, 3>::bilinear (b, a, { (T) 0, kTerm, (T) 0 }, { kSqTerm, kTerm, (T) 1 }, K);
+        ConformalMaps::Transform<T, 2>::bilinear (b, a, { (T) 0, kTerm, (T) 0 }, { kSqTerm, kTerm, (T) 1 }, K);
     }
 
     /**
@@ -134,7 +134,7 @@ namespace CoefficientCalculators
         auto kSqTerm = (T) 1 / (wc * wc);
         auto kTerm = (T) 1 / (qVal * wc);
 
-        ConformalMaps::Transform<T, 3>::bilinear (b, a, { kSqTerm, (T) 0, (T) 1 }, { kSqTerm, kTerm, (T) 1 }, K);
+        ConformalMaps::Transform<T, 2>::bilinear (b, a, { kSqTerm, (T) 0, (T) 1 }, { kSqTerm, kTerm, (T) 1 }, K);
     }
 
     /**
@@ -165,7 +165,7 @@ namespace CoefficientCalculators
         const auto kNum = SIMDUtils::select (gain > (T) 1, kTerm * gain, kTerm);
         const auto kDen = SIMDUtils::select (gain < (T) 1, kTerm / gain, kTerm);
 
-        ConformalMaps::Transform<T, 3>::bilinear (b, a, { kSqTerm, kNum, (T) 1 }, { kSqTerm, kDen, (T) 1 }, K);
+        ConformalMaps::Transform<T, 2>::bilinear (b, a, { kSqTerm, kNum, (T) 1 }, { kSqTerm, kDen, (T) 1 }, K);
     }
 
     /**
@@ -186,7 +186,7 @@ namespace CoefficientCalculators
         auto kSqTerm = (T) 1 / (wc * wc);
         auto kTerm = Aroot / (qVal * wc);
 
-        ConformalMaps::Transform<T, 3>::bilinear (b, a, { A * kSqTerm, A * kTerm, A * A }, { A * kSqTerm, kTerm, (T) 1 }, K);
+        ConformalMaps::Transform<T, 2>::bilinear (b, a, { A * kSqTerm, A * kTerm, A * A }, { A * kSqTerm, kTerm, (T) 1 }, K);
     }
 
     /**
@@ -207,7 +207,7 @@ namespace CoefficientCalculators
         auto kSqTerm = (T) 1 / (wc * wc);
         auto kTerm = Aroot / (qVal * wc);
 
-        ConformalMaps::Transform<T, 3>::bilinear (b, a, { A * A * kSqTerm, A * kTerm, A }, { kSqTerm, kTerm, (T) A }, K);
+        ConformalMaps::Transform<T, 2>::bilinear (b, a, { A * A * kSqTerm, A * kTerm, A }, { kSqTerm, kTerm, (T) A }, K);
     }
 } // namespace CoefficientCalculators
 } // namespace chowdsp
