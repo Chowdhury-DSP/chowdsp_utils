@@ -34,8 +34,7 @@ void InfoComp<ProcType, InfoProvider>::paint (juce::Graphics& g)
     auto font = g.getCurrentFont();
     auto b = getLocalBounds();
 
-    auto drawText = [=, &g, &b] (const juce::String& text)
-    {
+    auto drawText = [=, &g, &b] (const juce::String& text) {
         auto w = font.getStringWidth (text);
         g.drawFittedText (text, b.removeFromLeft (w), juce::Justification::left, 1);
     };
