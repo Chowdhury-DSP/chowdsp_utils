@@ -1,7 +1,7 @@
 namespace chowdsp
 {
-template <typename InfoProvider, typename ProcType>
-InfoComp<InfoProvider, ProcType>::InfoComp (const ProcType& processor) : proc (processor),
+template <typename ProcType, typename InfoProvider>
+InfoComp<ProcType, InfoProvider>::InfoComp (const ProcType& processor) : proc (processor),
                                                                          linkButton (InfoProvider::getManufacturerString(), InfoProvider::getManufacturerWebsiteURL())
 {
     setColour (text1ColourID, juce::Colours::grey);
@@ -10,8 +10,8 @@ InfoComp<InfoProvider, ProcType>::InfoComp (const ProcType& processor) : proc (p
     addAndMakeVisible (linkButton);
 }
 
-template <typename InfoProvider, typename ProcType>
-void InfoComp<InfoProvider, ProcType>::paint (juce::Graphics& g)
+template <typename ProcType, typename InfoProvider>
+void InfoComp<ProcType, InfoProvider>::paint (juce::Graphics& g)
 {
     auto width = (float) getWidth() - 10.0f;
 
@@ -64,8 +64,8 @@ void InfoComp<InfoProvider, ProcType>::paint (juce::Graphics& g)
     }
 }
 
-template <typename InfoProvider, typename ProcType>
-void InfoComp<InfoProvider, ProcType>::resized()
+template <typename ProcType, typename InfoProvider>
+void InfoComp<ProcType, InfoProvider>::resized()
 {
     linkButton.setBounds (linkX, 0, 100, getHeight());
 }
