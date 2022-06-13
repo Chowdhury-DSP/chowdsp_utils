@@ -36,6 +36,7 @@ public:
     void firstOrderLPFTest (NumericType maxError)
     {
         chowdsp::FirstOrderLPF<T> lpFilter;
+        lpFilter.prepare ({ (double) Constants::fs, 512, 1 });
         lpFilter.calcCoefs ((T) Constants::fc, (NumericType) Constants::fs);
 
         testFrequency<T> (lpFilter, (NumericType) 1, (NumericType) 0, maxError, "Incorrect gain at low frequencies.");
@@ -47,6 +48,7 @@ public:
     void firstOrderHPFTest (NumericType maxError)
     {
         chowdsp::FirstOrderHPF<T> hpFilter;
+        hpFilter.prepare ({ (double) Constants::fs, 512, 1 });
         hpFilter.calcCoefs ((T) Constants::fc, (NumericType) Constants::fs);
 
         testFrequency<T> (hpFilter, (NumericType) Constants::fc / 4, (NumericType) -12.3, (NumericType) 0.1, "Incorrect gain at low frequencies.");
