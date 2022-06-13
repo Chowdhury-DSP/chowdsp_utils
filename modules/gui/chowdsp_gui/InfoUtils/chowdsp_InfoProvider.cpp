@@ -33,9 +33,4 @@ juce::String StandardInfoProvider::getVersionString()
     return juce::String ("No Version");
 #endif
 }
-
-juce::String StandardInfoProvider::getWrapperTypeString (const juce::AudioProcessor& proc)
-{
-    return juce::String { juce::AudioProcessor::getWrapperTypeDescription (proc.wrapperType) };
-}
 } // namespace chowdsp
