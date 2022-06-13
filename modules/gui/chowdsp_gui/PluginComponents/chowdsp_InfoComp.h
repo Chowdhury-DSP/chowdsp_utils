@@ -3,7 +3,7 @@
 namespace chowdsp
 {
 /** A simple component to display the type, version, and manufacturer of a plugin */
-template <typename InfoProvider = StandardInfoProvider, typename ProcType = juce::AudioProcessor>
+template <typename ProcType = juce::AudioProcessor, typename InfoProvider = StandardInfoProvider>
 class InfoComp : public juce::Component
 {
 public:

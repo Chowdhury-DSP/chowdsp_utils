@@ -21,7 +21,14 @@ struct StandardInfoProvider
     static juce::String getVersionString();
 
     /** Returns the plugin wrapper type */
-    static juce::String getWrapperTypeString (const juce::AudioProcessor& proc);
+    template <typename ProcType>
+    static juce::String getWrapperTypeString (const ProcType& proc)
+    {
+        if constexpr (std::is_same_v<ProcType, juce::AudioProcessor>)
+            return juce::String { juce::AudioProcessor::getWrapperTypeDescription (proc.wrapperType) };
+        else
+            return proc.getWrapperTypeString();
+    }
 
     /** Returns true if a "debug" flag should be shown */
     static constexpr bool showDebugFlag()
