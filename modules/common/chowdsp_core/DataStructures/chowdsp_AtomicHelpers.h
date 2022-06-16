@@ -5,7 +5,10 @@ namespace chowdsp
 /** Helpful methods for working with atomic data types */
 namespace AtomicHelpers
 {
-    /** Simplified wrapped of std::atomic<T>::compare_exchange_strong */
+    /**
+     * Compares an atomic variable to some compareVal, and sets the atomic
+     * variable to a new value if the comparison returns true.
+     */
     template <typename T, typename atomic_type = std::atomic<T>>
     bool compareExchange (atomic_type& atomic_val, T compareVal, T valToSetIfTrue) noexcept
     {

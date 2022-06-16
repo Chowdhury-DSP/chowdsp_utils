@@ -28,6 +28,12 @@ public:
     IIRFilter& operator= (IIRFilter&&) noexcept = default;
 
     /** Prepares the filter for processing a new number of channels */
+    void prepare (const juce::dsp::ProcessSpec& spec)
+    {
+        prepare ((int) spec.numChannels);
+    }
+
+    /** Prepares the filter for processing a new number of channels */
     void prepare (int numChannels)
     {
         z.resize (numChannels);
