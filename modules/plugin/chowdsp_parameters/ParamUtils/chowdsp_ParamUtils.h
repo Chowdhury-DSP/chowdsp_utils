@@ -54,6 +54,9 @@ namespace ParamUtils
     /** Helper method for creating percent parameters */
     void createPercentParameter (Parameters& params, const juce::String& id, const juce::String& name, float defaultValue);
 
+    /** Helper method for creating percent parameters */
+    void createBipolarPercentParameter (Parameters& params, const juce::String& id, const juce::String& name, float defaultValue = 0.0f);
+
     /** Helper method for creating gain parameters in Decibels */
     void createGainDBParameter (Parameters& params, const juce::String& id, const juce::String& name, float min, float max, float defaultValue, float centerValue = -1000.0f);
 

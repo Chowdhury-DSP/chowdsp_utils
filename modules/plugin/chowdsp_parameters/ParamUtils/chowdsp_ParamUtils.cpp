@@ -78,6 +78,11 @@ void createPercentParameter (Parameters& params, const juce::String& id, const j
     emplace_param<VTSParam> (params, id, name, juce::String(), juce::NormalisableRange { 0.0f, 1.0f }, defaultValue, &percentValToString, &stringToPercentVal);
 }
 
+void createBipolarPercentParameter (Parameters& params, const juce::String& id, const juce::String& name, float defaultValue)
+{
+    emplace_param<VTSParam> (params, id, name, juce::String(), juce::NormalisableRange { -1.0f, 1.0f }, defaultValue, &percentValToString, &stringToPercentVal);
+}
+
 void createGainDBParameter (Parameters& params, const juce::String& id, const juce::String& name, float min, float max, float defaultValue, float centerValue)
 {
     juce::NormalisableRange<float> range { min, max };
