@@ -49,9 +49,14 @@ public:
     {
         chowdsp::Parameters params;
         createPercentParameter (params, "test", "Test", 0.5f);
+        createBipolarPercentParameter (params, "test_bp", "Test");
 
         expectEquals (params[0]->getText (0.5f, 1024), juce::String ("50%"), "50% value string is incorrect!");
         expectEquals (params[0]->getText (0.0f, 1024), juce::String ("0%"), "0% value string is incorrect!");
+
+        expectEquals (params[1]->getText (0.0f, 1024), juce::String ("-100%"), "-100% value string is incorrect!");
+        expectEquals (params[1]->getText (0.5f, 1024), juce::String ("0%"), "0% value string is incorrect!");
+        expectEquals (params[1]->getText (1.0f, 1024), juce::String ("100%"), "100% value string is incorrect!");
     }
 
     void gainDBParamTest()
@@ -61,6 +66,26 @@ public:
 
         expectEquals (params[0]->getText (0.5f, 1024), juce::String ("-12.00 dB"), "-12 dB value string is incorrect!");
         expectEquals (params[0]->getText (1.0f, 1024), juce::String ("0.00 dB"), "0 dB value string is incorrect!");
+    }
+
+    void timeMsParamTest()
+    {
+        chowdsp::Parameters params;
+        createTimeMsParameter (params, "test", "Test", createNormalisableRange (0.0f, 2000.0f, 200.0f), 0.0f);
+
+        expectEquals (params[0]->getText (0.0f, 1024), juce::String ("0.00 ms"), "0 ms value string is incorrect!");
+        expectEquals (params[0]->getText (0.5f, 1024), juce::String ("200.00 ms"), "200 ms value string is incorrect!");
+        expectEquals (params[0]->getText (1.0f, 1024), juce::String ("2.00 s"), "2 s value string is incorrect!");
+    }
+
+    void ratioParamTest()
+    {
+        chowdsp::Parameters params;
+        createRatioParameter (params, "test", "Test", createNormalisableRange (0.5f, 5.0f, 1.0f), 1.0f);
+
+        expectEquals (params[0]->getText (0.0f, 1024), juce::String ("0.50 : 1"), "0.5 : 1 value string is incorrect!");
+        expectEquals (params[0]->getText (0.5f, 1024), juce::String ("1.00 : 1"), "1 : 1 value string is incorrect!");
+        expectEquals (params[0]->getText (1.0f, 1024), juce::String ("5.00 : 1"), "5 : 1 value string is incorrect!");
     }
 
     void runTestTimed() override
@@ -76,6 +101,12 @@ public:
 
         beginTest ("Create Gain DB Param Test");
         gainDBParamTest();
+
+        beginTest ("Create Time Milliseconds Param Test");
+        timeMsParamTest();
+
+        beginTest ("Create Ratio Param Test");
+        ratioParamTest();
     }
 };
 

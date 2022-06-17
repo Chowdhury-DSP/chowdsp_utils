@@ -92,4 +92,14 @@ void createGainDBParameter (Parameters& params, const juce::String& id, const ju
     emplace_param<VTSParam> (params, id, name, juce::String(), range, defaultValue, &gainValToString, &stringToGainVal);
 }
 
+void createTimeMsParameter (Parameters& params, const juce::String& id, const juce::String& name, const juce::NormalisableRange<float>& range, float defaultValue)
+{
+    emplace_param<VTSParam> (params, id, name, juce::String(), range, defaultValue, &timeMsValToString, &stringToTimeMsVal);
+}
+
+void createRatioParameter (Parameters& params, const juce::String& id, const juce::String& name, const juce::NormalisableRange<float>& range, float defaultValue)
+{
+    emplace_param<VTSParam> (params, id, name, juce::String(), range, defaultValue, &ratioValToString, &stringToRatioVal);
+}
+
 } // namespace chowdsp::ParamUtils

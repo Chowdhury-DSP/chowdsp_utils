@@ -54,12 +54,17 @@ namespace ParamUtils
     /** Helper method for creating percent parameters */
     void createPercentParameter (Parameters& params, const juce::String& id, const juce::String& name, float defaultValue);
 
-    /** Helper method for creating percent parameters */
+    /** Helper method for creating bipolar percent parameters */
     void createBipolarPercentParameter (Parameters& params, const juce::String& id, const juce::String& name, float defaultValue = 0.0f);
 
     /** Helper method for creating gain parameters in Decibels */
     void createGainDBParameter (Parameters& params, const juce::String& id, const juce::String& name, float min, float max, float defaultValue, float centerValue = -1000.0f);
 
+    /** Helper method for creating time parameters in milliseconds */
+    void createTimeMsParameter (Parameters& params, const juce::String& id, const juce::String& name, const juce::NormalisableRange<float>& range, float defaultValue);
+
+    /** Helper method for creating ratio parameters */
+    void createRatioParameter (Parameters& params, const juce::String& id, const juce::String& name, const juce::NormalisableRange<float>& range, float defaultValue = 1.0f);
 } // namespace ParamUtils
 
 } // namespace chowdsp
