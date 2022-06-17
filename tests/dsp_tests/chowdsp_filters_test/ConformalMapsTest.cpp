@@ -13,9 +13,10 @@ public:
     template <int N>
     void testBilinearTransform (const float (&bs)[N], const float (&as)[N], const float (&b_exp)[N], const float (&a_exp)[N], float K)
     {
+        static constexpr int M = N - 1;
         float b[N] {};
         float a[N] {};
-        chowdsp::ConformalMaps::Transform<float, N>::bilinear (b, a, bs, as, K);
+        chowdsp::ConformalMaps::Transform<float, M>::bilinear (b, a, bs, as, K);
 
         for (int i = 0; i < N; ++i)
         {
@@ -34,7 +35,7 @@ public:
         {
             float b[2] {};
             float a[2] {};
-            chowdsp::ConformalMaps::Transform<float, 2>::alpha (b, a, bs, as, 2.0f * fs, 0.0f, fs);
+            chowdsp::ConformalMaps::Transform<float, 1>::alpha (b, a, bs, as, 2.0f * fs, 0.0f, fs);
 
             expectEquals (b[0], -b[1], "BE should map zero at DC to zero at DC");
             expectLessThan (std::abs (a[1]), 0.01f, "BE should map high-frequency pole to near zero");
@@ -44,11 +45,11 @@ public:
         {
             float b[2] {};
             float a[2] {};
-            chowdsp::ConformalMaps::Transform<float, 2>::alpha (b, a, bs, as, 2.0f * fs, 1.0f, fs);
+            chowdsp::ConformalMaps::Transform<float, 1>::alpha (b, a, bs, as, 2.0f * fs, 1.0f, fs);
 
             float b_ref[2] {};
             float a_ref[2] {};
-            chowdsp::ConformalMaps::Transform<float, 2>::bilinear (b_ref, a_ref, bs, as, 2.0f * fs);
+            chowdsp::ConformalMaps::Transform<float, 1>::bilinear (b_ref, a_ref, bs, as, 2.0f * fs);
 
             for (int i = 0; i < 2; ++i)
             {
@@ -68,7 +69,7 @@ public:
         {
             float b[3] {};
             float a[3] {};
-            chowdsp::ConformalMaps::Transform<float, 3>::alpha (b, a, bs, as, 2.0f * fs, 0.0f, fs);
+            chowdsp::ConformalMaps::Transform<float, 2>::alpha (b, a, bs, as, 2.0f * fs, 0.0f, fs);
 
             expectLessThan (std::abs (a[2]), 1.0f, "BE should damp high-frequency pole");
         }
@@ -77,11 +78,11 @@ public:
         {
             float b[3] {};
             float a[3] {};
-            chowdsp::ConformalMaps::Transform<float, 3>::alpha (b, a, bs, as, 2.0f * fs, 1.0f, fs);
+            chowdsp::ConformalMaps::Transform<float, 2>::alpha (b, a, bs, as, 2.0f * fs, 1.0f, fs);
 
             float b_ref[3] {};
             float a_ref[3] {};
-            chowdsp::ConformalMaps::Transform<float, 3>::bilinear (b_ref, a_ref, bs, as, 2.0f * fs);
+            chowdsp::ConformalMaps::Transform<float, 2>::bilinear (b_ref, a_ref, bs, as, 2.0f * fs);
 
             for (int i = 0; i < 3; ++i)
             {
