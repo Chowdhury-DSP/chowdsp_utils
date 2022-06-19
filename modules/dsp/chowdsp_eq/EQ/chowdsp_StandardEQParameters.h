@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chowdsp_parameters/chowdsp_parameters.h>
+
 namespace chowdsp::EQ
 {
 /** Static class for working with standard EQ parameters */
