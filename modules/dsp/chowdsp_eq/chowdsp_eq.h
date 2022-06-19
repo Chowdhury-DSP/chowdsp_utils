@@ -22,6 +22,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 #include <chowdsp_reflection/chowdsp_reflection.h>
 #include <chowdsp_dsp_utils/chowdsp_dsp_utils.h>
+#include <chowdsp_parameters/chowdsp_parameters.h>
 
 namespace chowdsp
 {
@@ -35,3 +36,7 @@ namespace EQ
 #include "EQ/chowdsp_EQProcessor.h"
 #include "EQ/chowdsp_EQParams.h"
 #include "EQ/chowdsp_LinearPhaseEQ.h"
+
+#if JUCE_MODULE_AVAILABLE_chowdsp_parameters
+#include "EQ/chowdsp_StandardEQParameters.h"
+#endif

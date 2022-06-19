@@ -46,7 +46,7 @@ PluginEditor::PluginEditor (SimpleEQPlugin& p) : juce::AudioProcessorEditor (p),
                                       const auto result = fc.getResult();
                                       result.create();
 
-                                      EQParams params {};
+                                      PrototypeEQ::Params params {};
                                       chowdsp::Serialization::deserialize<Serializer> (result, params);
                                       plugin.loadEQParams (params);
                                   });
