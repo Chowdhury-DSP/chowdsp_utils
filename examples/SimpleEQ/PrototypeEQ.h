@@ -2,15 +2,14 @@
 
 #include <chowdsp_eq/chowdsp_eq.h>
 
-#include "EQParams.h"
-
-/** "Prototype" EQ from which the linear phase EQ will be constructed. */
+/** "Prototype" EQ from which both the regular and linear phase EQ will be constructed. */
 class PrototypeEQ
 {
 public:
     PrototypeEQ() = default;
 
-    using Params = EQParams;
+    using EQParams = chowdsp::EQ::StandardEQParameters<3>;
+    using Params = EQParams::Params;
 
     void setParameters (const Params& params);
 
@@ -38,7 +37,7 @@ private:
                                        chowdsp::ButterworthFilter<8, chowdsp::ButterworthFilterType::Lowpass>,
                                        chowdsp::ChebyshevIIFilter<8, chowdsp::ChebyshevFilterType::Lowpass>,
                                        chowdsp::EllipticFilter<12, chowdsp::EllipticFilterType::Lowpass>>;
-    chowdsp::EQ::EQProcessor<float, Params::numBands, EQBand> eq;
+    chowdsp::EQ::EQProcessor<float, EQParams::EQNumBands, EQBand> eq;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PrototypeEQ)
 };

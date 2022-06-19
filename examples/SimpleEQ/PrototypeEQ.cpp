@@ -2,14 +2,7 @@
 
 void PrototypeEQ::setParameters (const Params& params)
 {
-    for (size_t i = 0; i < Params::numBands; ++i)
-    {
-        eq.setCutoffFrequency ((int) i, params.bands[i].params.bandFreqHz);
-        eq.setQValue ((int) i, params.bands[i].params.bandQ);
-        eq.setGainDB ((int) i, params.bands[i].params.bandGainDB);
-        eq.setFilterType ((int) i, params.bands[i].params.bandType);
-        eq.setBandOnOff ((int) i, params.bands[i].params.bandOnOff);
-    }
+    EQParams::setEQParameters (eq, params);
 }
 
 void PrototypeEQ::prepare (const juce::dsp::ProcessSpec& spec)
