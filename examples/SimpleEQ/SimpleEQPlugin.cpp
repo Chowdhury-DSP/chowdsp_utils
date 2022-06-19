@@ -27,7 +27,7 @@ const auto eqTypeChoices = juce::StringArray {
 
 SimpleEQPlugin::SimpleEQPlugin()
 {
-    PrototypeEQ::EQParams::initialiseEQParameters (vts, eqParamsSet);
+    PrototypeEQ::EQParams::initialiseEQParameters (vts, eqParamsHandles);
     linPhaseModeOn = vts.getRawParameterValue (linPhaseModeTag);
 
     linPhaseEQ.updatePrototypeEQParameters = [] (auto& eq, auto& eqParams) { eq.setParameters (eqParams); };
@@ -63,7 +63,7 @@ void SimpleEQPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)
 
 PrototypeEQ::Params SimpleEQPlugin::getEQParams() const
 {
-    return PrototypeEQ::EQParams::getEQParameters (eqParamsSet);
+    return PrototypeEQ::EQParams::getEQParameters (eqParamsHandles);
 }
 
 void SimpleEQPlugin::loadEQParams (const PrototypeEQ::Params& params)

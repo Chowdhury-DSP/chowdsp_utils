@@ -25,8 +25,10 @@ public:
     /** Group of parameter handles for a single band. */
     using EQBandParameterHandles = std::array<std::atomic<float>*, NumBands>;
 
+    static constexpr auto numBandParams = pfr::tuple_size_v<typename Params::BandParams>;
+
     /** Set of parameter handles for the entire EQ. */
-    using EQParameterHandles = std::array<EQBandParameterHandles, pfr::tuple_size_v<typename Params::BandParams>>;
+    using EQParameterHandles = std::array<EQBandParameterHandles, numBandParams>;
 
     /**
      * Default parameter ID prefix for EQ parameters.
@@ -62,7 +64,7 @@ public:
 
 private:
     /** Types of parameters used by each EQ band. */
-    enum class ParameterType
+    enum ParameterType
     {
         FREQ = 0,
         Q,

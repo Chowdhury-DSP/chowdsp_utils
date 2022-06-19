@@ -28,7 +28,7 @@ private:
 
     void setEQParams();
 
-    PrototypeEQ::EQParams::EQParamSet eqParamsSet;
+    PrototypeEQ::EQParams::EQParameterHandles eqParamsHandles;
     std::atomic<float>* linPhaseModeOn = nullptr;
 
     PrototypeEQ protoEQ; // the regular EQ

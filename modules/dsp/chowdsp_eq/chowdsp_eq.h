@@ -22,7 +22,6 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 #include <chowdsp_reflection/chowdsp_reflection.h>
 #include <chowdsp_dsp_utils/chowdsp_dsp_utils.h>
-#include <chowdsp_parameters/chowdsp_parameters.h>
 
 namespace chowdsp
 {
