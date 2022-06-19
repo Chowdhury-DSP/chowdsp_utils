@@ -62,8 +62,7 @@ void StandardEQParameters<NumBands>::addEQParameters (Parameters& params, const 
     // defaultEQBandChoice must be a valid index into eqBandTypeChoices
     jassert (juce::isPositiveAndBelow (defaultEQBandTypeChoice, eqBandTypeChoices.size()));
 
-    auto addQParam = [&params] (const juce::String& tag, const juce::String& name)
-    {
+    auto addQParam = [&params] (const juce::String& tag, const juce::String& name) {
         emplace_param<VTSParam> (params, tag, name, juce::String(), createNormalisableRange (0.1f, 10.0f, 0.7071f), 0.7071f, &floatValToString, &stringToFloatVal);
     };
 
@@ -112,8 +111,7 @@ void StandardEQParameters<NumBands>::setEQParameters (EQType& eq, const Params& 
 template <size_t NumBands>
 void StandardEQParameters<NumBands>::loadEQParameters (const Params& params, juce::AudioProcessorValueTreeState& vts, const juce::String& paramPrefix)
 {
-    auto setParameter = [] (auto* param, float newValue)
-    {
+    auto setParameter = [] (auto* param, float newValue) {
         param->beginChangeGesture();
         param->setValueNotifyingHost (param->convertTo0to1 (newValue));
         param->endChangeGesture();
