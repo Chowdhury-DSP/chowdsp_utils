@@ -20,19 +20,15 @@ public:
 
     juce::AudioProcessorEditor* createEditor() override;
 
-    EQParams getEQParams() const;
-    void loadEQParams (const EQParams& params);
+    PrototypeEQ::Params getEQParams() const;
+    void loadEQParams (const PrototypeEQ::Params& params);
 
 private:
     void parameterChanged (const juce::String& parameterID, float newValue) override;
 
     void setEQParams();
 
-    std::array<std::atomic<float>*, EQParams::numBands> bandFreqHz {};
-    std::array<std::atomic<float>*, EQParams::numBands> bandQ {};
-    std::array<std::atomic<float>*, EQParams::numBands> bandGainDB {};
-    std::array<std::atomic<float>*, EQParams::numBands> bandType {};
-    std::array<std::atomic<float>*, EQParams::numBands> bandOnOff {};
+    PrototypeEQ::EQParams::EQParameterHandles eqParamsHandles;
     std::atomic<float>* linPhaseModeOn = nullptr;
 
     PrototypeEQ protoEQ; // the regular EQ

@@ -35,3 +35,7 @@ namespace EQ
 #include "EQ/chowdsp_EQProcessor.h"
 #include "EQ/chowdsp_EQParams.h"
 #include "EQ/chowdsp_LinearPhaseEQ.h"
+
+#if JUCE_MODULE_AVAILABLE_chowdsp_parameters
+#include "EQ/chowdsp_StandardEQParameters.h"
+#endif
