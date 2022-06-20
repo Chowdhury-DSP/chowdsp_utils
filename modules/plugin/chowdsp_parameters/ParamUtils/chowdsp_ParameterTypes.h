@@ -19,6 +19,8 @@ namespace ParamUtils
         ModParameterMixin() = default;
 
 #if ! HAS_CLAP_JUCE_EXTENSIONS
+        virtual ~ModParameterMixin() = default;
+
         /** Returns true if this parameter supports monophonic modulation. */
         virtual bool supportsMonophonicModulation() { return false; }
 
@@ -35,8 +37,6 @@ namespace ParamUtils
         [[maybe_unused]] virtual void applyPolyphonicModulation (int32_t /*note_id*/, int16_t /*key*/, int16_t /*channel*/, double /*value*/)
         {
         }
-
-        bool nothing = false;
     };
 } // namespace ParamUtils
 
@@ -62,7 +62,10 @@ public:
     void applyMonophonicModulation (double value) override;
 
     /** Returns the current parameter value accounting for any modulation that is currently applied. */
-    float getCurrentValue() const;
+    float getCurrentValue() const noexcept;
+
+    /** Returns the current parameter value accounting for any modulation that is currently applied. */
+    operator float () const noexcept { return getCurrentValue(); };
 
 private:
     const float unsnappedDefault;

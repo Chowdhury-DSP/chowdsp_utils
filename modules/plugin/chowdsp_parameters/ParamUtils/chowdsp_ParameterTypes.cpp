@@ -30,12 +30,12 @@ void FloatParameter::applyMonophonicModulation (double value)
     modulationAmount = (float) value;
 }
 
-float FloatParameter::getCurrentValue() const
+float FloatParameter::getCurrentValue() const noexcept
 {
     return normalisableRange.convertFrom0to1 (juce::jlimit (0.0f, 1.0f, normalisableRange.convertTo0to1 (get()) + modulationAmount));
 }
 #else
 void FloatParameter::applyMonophonicModulation (double) {}
-float FloatParameter::getCurrentValue() const { return get(); }
+float FloatParameter::getCurrentValue() const noexcept { return get(); }
 #endif
 } // namespace chowdsp

@@ -247,13 +247,13 @@ clap_process_status PluginBase<Processor>::clap_direct_process (const clap_proce
             nextEventTime = (currentEvent < numEvents) ? (int) events->get (events, (uint32_t) currentEvent)->time : -1;
         }
 
-        uint32_t outChannels = 0;
-        for (uint32_t idx = 0; idx < process->audio_outputs_count && outChannels < maxBuses; ++idx)
+        uint32_t outputChannels = 0;
+        for (uint32_t idx = 0; idx < process->audio_outputs_count && outputChannels < maxBuses; ++idx)
         {
             for (uint32_t ch = 0; ch < process->audio_outputs[idx].channel_count; ++ch)
             {
-                busses[outChannels] = process->audio_outputs[idx].data32[ch] + n;
-                outChannels++;
+                busses[outputChannels] = process->audio_outputs[idx].data32[ch] + n;
+                outputChannels++;
             }
         }
 
@@ -263,7 +263,7 @@ clap_process_status PluginBase<Processor>::clap_direct_process (const clap_proce
             for (uint32_t ch = 0; ch < process->audio_inputs[idx].channel_count; ++ch)
             {
                 auto* ic = process->audio_inputs[idx].data32[ch] + n;
-                if (inputChannels < outChannels)
+                if (inputChannels < outputChannels)
                 {
                     if (ic == busses[inputChannels])
                     {
@@ -271,7 +271,7 @@ clap_process_status PluginBase<Processor>::clap_direct_process (const clap_proce
                     }
                     else
                     {
-                        juce::FloatVectorOperations::copy (busses[inputChannels], ic, (int) process->frames_count);
+                        juce::FloatVectorOperations::copy (busses[inputChannels], ic, numSamplesToProcess);
                     }
                 }
                 else
@@ -282,8 +282,8 @@ clap_process_status PluginBase<Processor>::clap_direct_process (const clap_proce
             }
         }
 
-        auto totalChans = juce::jmax (inputChannels, inputChannels);
-        juce::AudioBuffer<float> buffer (busses.data(), (int) totalChans, (int) process->frames_count);
+        auto totalChans = juce::jmax (inputChannels, outputChannels);
+        juce::AudioBuffer<float> buffer (busses.data(), (int) totalChans, numSamplesToProcess);
 
         processBlock (buffer, midiBuffer);
 
