@@ -63,13 +63,13 @@ void StandardEQParameters<NumBands>::addEQParameters (Parameters& params, const 
     jassert (juce::isPositiveAndBelow (defaultEQBandTypeChoice, eqBandTypeChoices.size()));
 
     auto addQParam = [&params] (const juce::String& tag, const juce::String& name) {
-        emplace_param<VTSParam> (params, tag, name, juce::String(), createNormalisableRange (0.1f, 10.0f, 0.7071f), 0.7071f, &floatValToString, &stringToFloatVal);
+        emplace_param<FloatParameter> (params, tag, name, createNormalisableRange (0.1f, 10.0f, 0.7071f), 0.7071f, &floatValToString, &stringToFloatVal);
     };
 
     for (int i = 0; i < (int) NumBands; ++i)
     {
-        emplace_param<juce::AudioParameterBool> (params, getTagForBand (paramPrefix, i, eqBandOnOffTag), getNameForBand (i, "On/Off"), false);
-        emplace_param<juce::AudioParameterChoice> (params, getTagForBand (paramPrefix, i, eqBandTypeTag), getNameForBand (i, "Type"), eqBandTypeChoices, defaultEQBandTypeChoice);
+        emplace_param<BoolParameter> (params, getTagForBand (paramPrefix, i, eqBandOnOffTag), getNameForBand (i, "On/Off"), false);
+        emplace_param<ChoiceParameter> (params, getTagForBand (paramPrefix, i, eqBandTypeTag), getNameForBand (i, "Type"), eqBandTypeChoices, defaultEQBandTypeChoice);
         createFreqParameter (params, getTagForBand (paramPrefix, i, eqBandFreqTag), getNameForBand (i, "Freq."), 20.0f, 20000.0f, 2000.0f, 1000.0f);
         addQParam (getTagForBand (paramPrefix, i, eqBandQTag), getNameForBand (i, "Q"));
         createGainDBParameter (params, getTagForBand (paramPrefix, i, eqBandGainTag), getNameForBand (i, "Gain"), -18.0f, 18.0f, 0.0f);
