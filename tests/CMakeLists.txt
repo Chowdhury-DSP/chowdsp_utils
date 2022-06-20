@@ -16,6 +16,7 @@ message(STATUS "VERSION for JUCE: ${juce_version}")
 
 include(AddJUCEModules)
 juce_add_module(${CMAKE_SOURCE_DIR}/../foleys_gui_magic)
+add_subdirectory(${CMAKE_SOURCE_DIR}/../clap-juce-extensions clap_juce_extensions EXCLUDE_FROM_ALL)
 
 option(CODE_COVERAGE "Enable coverage reporting" OFF)
 

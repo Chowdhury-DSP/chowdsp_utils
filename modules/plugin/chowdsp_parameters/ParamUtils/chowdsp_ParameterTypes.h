@@ -1,7 +1,7 @@
 #pragma once
 
 #if HAS_CLAP_JUCE_EXTENSIONS
-JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wunused-parameter")
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wunused-parameter", "-Wextra-semi")
 #include "clap-juce-extensions/clap-juce-extensions.h"
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 #endif
@@ -65,7 +65,7 @@ public:
     float getCurrentValue() const noexcept;
 
     /** Returns the current parameter value accounting for any modulation that is currently applied. */
-    operator float () const noexcept { return getCurrentValue(); };
+    operator float() const noexcept { return getCurrentValue(); }
 
 private:
     const float unsnappedDefault;

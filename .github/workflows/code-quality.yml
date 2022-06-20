@@ -46,6 +46,7 @@ jobs:
           git clone --depth 1 --branch 6.1.6 https://github.com/juce-framework/JUCE.git
           cd JUCE_modules
           git clone --single-branch --branch chowdsp https://github.com/Chowdhury-DSP/foleys_gui_magic.git
+          git clone --single-branch --branch main --recursive https://github.com/free-audio/clap-juce-extensions.git
 
       - name: Configure
         working-directory: ${{env.WORK_DIR}}
