@@ -2,7 +2,6 @@
 
 namespace chowdsp
 {
-
 FloatParameter::FloatParameter (const juce::String& parameterID,
                                 const juce::String& parameterName,
                                 const juce::NormalisableRange<float>& valueRange,
@@ -16,8 +15,7 @@ FloatParameter::FloatParameter (const juce::String& parameterID,
     juce::String(),
     AudioProcessorParameter::genericParameter,
     valueToTextFunction == nullptr ? std::function<juce::String (float v, int)>()
-                                   : [valueToTextFunction] (float v, int)
-        { return valueToTextFunction (v); },
+                                   : [valueToTextFunction] (float v, int) { return valueToTextFunction (v); },
     std::move (textToValueFunction)),
                                                                                                     unsnappedDefault (valueRange.convertTo0to1 (defaultValue)),
                                                                                                     normalisableRange (valueRange)
@@ -35,7 +33,9 @@ float FloatParameter::getCurrentValue() const noexcept
     return normalisableRange.convertFrom0to1 (juce::jlimit (0.0f, 1.0f, normalisableRange.convertTo0to1 (get()) + modulationAmount));
 }
 #else
-void FloatParameter::applyMonophonicModulation (double) {}
+void FloatParameter::applyMonophonicModulation (double)
+{
+}
 float FloatParameter::getCurrentValue() const noexcept { return get(); }
 #endif
 } // namespace chowdsp

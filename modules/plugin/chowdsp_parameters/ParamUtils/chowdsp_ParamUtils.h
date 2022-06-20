@@ -29,7 +29,7 @@ namespace ParamUtils
     template <int NumDecimalPlaces>
     juce::String floatValToStringDecimal (float floatVal)
     {
-            return { floatVal, NumDecimalPlaces, false };
+        return { floatVal, NumDecimalPlaces, false };
     }
     float stringToFloatVal (const juce::String& s);
 

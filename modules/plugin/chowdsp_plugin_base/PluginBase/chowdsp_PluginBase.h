@@ -78,11 +78,17 @@ public:
     virtual void processAudioBlock (juce::AudioBuffer<float>&) = 0;
 
 #if HAS_CLAP_JUCE_EXTENSIONS
-    bool supportsDirectProcess() override { return true; }
+    bool supportsDirectProcess() override
+    {
+        return true;
+    }
     clap_process_status clap_direct_process (const clap_process* process) noexcept override;
 #endif
 
-    bool hasEditor() const override { return true; }
+    bool hasEditor() const override
+    {
+        return true;
+    }
 #if JUCE_MODULE_AVAILABLE_foleys_gui_magic
     juce::AudioProcessorEditor* createEditor() override
     {
@@ -303,7 +309,6 @@ clap_process_status PluginBase<Processor>::clap_direct_process (const clap_proce
 template <class Processor>
 void PluginBase<Processor>::process_clap_event (const clap_event_header_t* event, juce::MidiBuffer& midiBuffer, int sampleOffset)
 {
-
     if (event->space_id != CLAP_CORE_EVENT_SPACE_ID)
         return;
 
@@ -311,27 +316,29 @@ void PluginBase<Processor>::process_clap_event (const clap_event_header_t* event
     {
         case CLAP_EVENT_NOTE_ON:
         {
-            auto noteEvent = reinterpret_cast<const clap_event_note *> (event);
+            auto noteEvent = reinterpret_cast<const clap_event_note*> (event);
 
             midiBuffer.addEvent (juce::MidiMessage::noteOn (noteEvent->channel + 1,
-                                                            noteEvent->key, (float)
-                                                            noteEvent->velocity),
+                                                            noteEvent->key,
+                                                            (float)
+                                                                noteEvent->velocity),
                                  (int) noteEvent->header.time - sampleOffset);
         }
         break;
         case CLAP_EVENT_NOTE_OFF:
         {
-            auto noteEvent = reinterpret_cast<const clap_event_note *> (event);
+            auto noteEvent = reinterpret_cast<const clap_event_note*> (event);
 
             midiBuffer.addEvent (juce::MidiMessage::noteOff (noteEvent->channel + 1,
-                                                            noteEvent->key, (float)
-                                                                noteEvent->velocity),
+                                                             noteEvent->key,
+                                                             (float)
+                                                                 noteEvent->velocity),
                                  (int) noteEvent->header.time - sampleOffset);
         }
         break;
         case CLAP_EVENT_MIDI:
         {
-            auto midiEvent = reinterpret_cast<const clap_event_midi *> (event);
+            auto midiEvent = reinterpret_cast<const clap_event_midi*> (event);
             midiBuffer.addEvent (juce::MidiMessage (midiEvent->data[0],
                                                     midiEvent->data[1],
                                                     midiEvent->data[2],
@@ -357,8 +364,8 @@ void PluginBase<Processor>::process_clap_event (const clap_event_header_t* event
 
             if (paramModEvent->note_id >= 0)
             {
-//                if (modulatableParameter->supportsMonophonicModulation())
-//                    modulatableParameter->applyPolyphonicModulation (paramModEvent->note_id, paramModEvent->key, paramModEvent->channel, paramModEvent->amount);
+                //                if (modulatableParameter->supportsMonophonicModulation())
+                //                    modulatableParameter->applyPolyphonicModulation (paramModEvent->note_id, paramModEvent->key, paramModEvent->channel, paramModEvent->amount);
             }
             else
             {
