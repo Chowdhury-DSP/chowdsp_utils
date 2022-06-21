@@ -65,7 +65,7 @@ public:
     float getCurrentValue() const noexcept;
 
     /** Returns the current parameter value accounting for any modulation that is currently applied. */
-    operator float() const noexcept { return getCurrentValue(); }
+    operator float() const noexcept { return getCurrentValue(); } // NOLINT(google-explicit-constructor): we want to be able to do implicit conversion here
 
 private:
     const float unsnappedDefault;
@@ -92,8 +92,8 @@ class BoolParameter : public juce::AudioParameterBool,
                       public ParamUtils::ModParameterMixin
 {
 public:
-    BoolParameter (const juce::String& parameterID, const juce::String& parameterName, bool defaultValue)
-        : juce::AudioParameterBool (parameterID, parameterName, defaultValue)
+    BoolParameter (const juce::String& parameterID, const juce::String& parameterName, bool defaultBoolValue)
+        : juce::AudioParameterBool (parameterID, parameterName, defaultBoolValue)
     {
     }
 };

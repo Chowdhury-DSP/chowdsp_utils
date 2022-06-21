@@ -8,8 +8,6 @@ using Parameters = std::vector<std::unique_ptr<juce::RangedAudioParameter>>;
 /** Useful methods for creating juce::AudioProcessorParameter's */
 namespace ParamUtils
 {
-    //    using VTSParam = juce::AudioProcessorValueTreeState::Parameter;
-
     juce::String freqValToString (float freqVal);
     float stringToFreqVal (const juce::String& s);
 

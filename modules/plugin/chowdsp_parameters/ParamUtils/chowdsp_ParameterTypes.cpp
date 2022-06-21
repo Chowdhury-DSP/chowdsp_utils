@@ -23,9 +23,9 @@ FloatParameter::FloatParameter (const juce::String& parameterID,
 }
 
 #if HAS_CLAP_JUCE_EXTENSIONS
-void FloatParameter::applyMonophonicModulation (double value)
+void FloatParameter::applyMonophonicModulation (double modulationValue)
 {
-    modulationAmount = (float) value;
+    modulationAmount = (float) modulationValue;
 }
 
 float FloatParameter::getCurrentValue() const noexcept
