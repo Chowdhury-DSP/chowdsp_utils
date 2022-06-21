@@ -6,6 +6,7 @@ namespace chowdsp::ParamUtils
 struct ModParameterMixin : public clap_juce_extensions::clap_param_extensions
 {
     ModParameterMixin() = default;
+    virtual ~ModParameterMixin() = default;
 
     /** Base function for applying monophonic modulation to a parameter. */
     [[maybe_unused]] virtual void applyMonophonicModulation (double /*value*/)

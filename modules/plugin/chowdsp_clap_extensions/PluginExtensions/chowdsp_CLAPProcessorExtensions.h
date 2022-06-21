@@ -6,6 +6,7 @@ class CLAPProcessorExtensions : public clap_juce_extensions::clap_extensions
 {
 public:
     CLAPProcessorExtensions() = default;
+    virtual ~CLAPProcessorExtensions() = default;
 
     void initialise (juce::AudioProcessor& processor);
 

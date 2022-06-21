@@ -29,7 +29,7 @@ static_assert (false, "clap-juce-extensions must be linked to be able to use thi
 #include <juce_audio_processors/juce_audio_processors.h>
 
 // third-party includes
-JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wunused-parameter", "-Wextra-semi")
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wunused-parameter", "-Wextra-semi", "-Wnon-virtual-dtor")
 #include <clap-juce-extensions/clap-juce-extensions.h>
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
