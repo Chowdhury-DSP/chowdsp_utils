@@ -24,6 +24,14 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include <juce_core/juce_core.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
+namespace chowdsp
+{
+/** Useful methods for creating juce::AudioProcessorParameter's */
+namespace ParamUtils
+{
+}
+} // namespace chowdsp
+
 #include "ParamUtils/chowdsp_ParameterTypes.h"
 #include "ParamUtils/chowdsp_ParamUtils.h"
 #include "ParamUtils/chowdsp_ForwardingParameter.h"

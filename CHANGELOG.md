@@ -3,6 +3,7 @@
 All notable changes to this project will be documented in this file.
 
 ## [UNRELEASED]
+- Added extensions for building CLAP plugins with CLAP-specific behaviour.
 - Replaced Bilinear Tranform code with more general conformal maps.
 - Added utilities for serializing/deserializing data.
 - Added `PluginDiagnosticInfo::getDiagnosticsString()`.

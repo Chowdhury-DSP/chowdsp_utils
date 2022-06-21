@@ -34,6 +34,8 @@ target_link_libraries(chowdsp_utils_codeql PRIVATE
     chowdsp_plugin_utils
     chowdsp_presets
     chowdsp_version
+    chowdsp_clap_extensions
+    clap_juce_extensions
     juce::juce_recommended_config_flags
     juce::juce_recommended_lto_flags
     juce::juce_recommended_warning_flags

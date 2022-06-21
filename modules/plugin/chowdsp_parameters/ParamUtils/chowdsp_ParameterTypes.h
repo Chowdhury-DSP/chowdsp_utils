@@ -1,24 +1,19 @@
 #pragma once
 
-#if HAS_CLAP_JUCE_EXTENSIONS
-JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wunused-parameter", "-Wextra-semi")
-#include "clap-juce-extensions/clap-juce-extensions.h"
-JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+#if JUCE_MODULE_AVAILABLE_chowdsp_clap_extensions
+#include <chowdsp_clap_extensions/chowdsp_clap_extensions.h>
 #endif
 
 namespace chowdsp
 {
+#if ! JUCE_MODULE_AVAILABLE_chowdsp_clap_extensions
 namespace ParamUtils
 {
     /** Mixin for parameters that recognize some form of modulation. */
     struct ModParameterMixin
-#if HAS_CLAP_JUCE_EXTENSIONS
-        : public clap_juce_extensions::clap_param_extensions
-#endif
     {
         ModParameterMixin() = default;
 
-#if ! HAS_CLAP_JUCE_EXTENSIONS
         virtual ~ModParameterMixin() = default;
 
         /** Returns true if this parameter supports monophonic modulation. */
@@ -26,7 +21,6 @@ namespace ParamUtils
 
         /** Returns true if this parameter supports polyphonic modulation. */
         virtual bool supportsPolyphonicModulation() { return false; }
-#endif
 
         /** Base function for applying monophonic modulation to a parameter. */
         [[maybe_unused]] virtual void applyMonophonicModulation (double /*value*/)
@@ -39,6 +33,7 @@ namespace ParamUtils
         }
     };
 } // namespace ParamUtils
+#endif
 
 /** Wrapper of juce::AudioParameterFloat that supports monophonic modulation. */
 class FloatParameter : public juce::AudioParameterFloat,

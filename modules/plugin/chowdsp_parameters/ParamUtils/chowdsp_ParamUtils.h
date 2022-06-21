@@ -5,9 +5,10 @@ namespace chowdsp
 /** Type to use for parameters that can be used to initialise a ValueTreeState */
 using Parameters = std::vector<std::unique_ptr<juce::RangedAudioParameter>>;
 
-/** Useful methods for creating juce::AudioProcessorParameter's */
 namespace ParamUtils
 {
+    using VTSParam = juce::AudioProcessorValueTreeState::Parameter;
+
     juce::String freqValToString (float freqVal);
     float stringToFreqVal (const juce::String& s);
 
@@ -83,5 +84,4 @@ namespace ParamUtils
     /** Helper method for creating ratio parameters */
     void createRatioParameter (Parameters& params, const juce::String& id, const juce::String& name, const juce::NormalisableRange<float>& range, float defaultValue = 1.0f);
 } // namespace ParamUtils
-
 } // namespace chowdsp
