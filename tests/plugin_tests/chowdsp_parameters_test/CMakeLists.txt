@@ -5,6 +5,7 @@ target_link_libraries(chowdsp_parameters_test PRIVATE
     chowdsp_parameters
     chowdsp_plugin_base
     chowdsp_rhythm
+    clap_juce_extensions
 )
 
 target_sources(chowdsp_parameters_test PRIVATE
@@ -12,6 +13,7 @@ target_sources(chowdsp_parameters_test PRIVATE
 
     ForwardingParameterTest.cpp
     ParamHelpersTest.cpp
+    ParamModulationTest.cpp
     ParamStringsTest.cpp
     RhythmParameterTest.cpp
 )

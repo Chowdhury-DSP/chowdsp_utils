@@ -31,4 +31,10 @@ function(setup_example_plugin target code)
             juce::juce_recommended_lto_flags
             juce::juce_recommended_warning_flags
     )
+
+    clap_juce_extensions_plugin(
+        TARGET ${target}
+        CLAP_ID "org.chowdsp.${target}"
+        CLAP_FEATURES audio-effect
+    )
 endfunction(setup_example_plugin)

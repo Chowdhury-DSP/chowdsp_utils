@@ -57,12 +57,7 @@ float stringToTimeMsVal (const juce::String& s) { return s.getFloatValue(); }
 
 juce::String floatValToString (float floatVal)
 {
-    return floatValToStringDecimal (floatVal, 2);
-}
-
-juce::String floatValToStringDecimal (float floatVal, int numDecimalPlaces)
-{
-    return { floatVal, numDecimalPlaces, false };
+    return floatValToStringDecimal<2> (floatVal);
 }
 
 float stringToFloatVal (const juce::String& s) { return s.getFloatValue(); }
@@ -70,17 +65,17 @@ float stringToFloatVal (const juce::String& s) { return s.getFloatValue(); }
 void createFreqParameter (Parameters& params, const juce::String& id, const juce::String& name, float min, float max, float centre, float defaultValue)
 {
     auto freqRange = createNormalisableRange (min, max, centre);
-    emplace_param<VTSParam> (params, id, name, juce::String(), freqRange, defaultValue, &freqValToString, &stringToFreqVal);
+    emplace_param<FloatParameter> (params, id, name, freqRange, defaultValue, &freqValToString, &stringToFreqVal);
 }
 
 void createPercentParameter (Parameters& params, const juce::String& id, const juce::String& name, float defaultValue)
 {
-    emplace_param<VTSParam> (params, id, name, juce::String(), juce::NormalisableRange { 0.0f, 1.0f }, defaultValue, &percentValToString, &stringToPercentVal);
+    emplace_param<FloatParameter> (params, id, name, juce::NormalisableRange { 0.0f, 1.0f }, defaultValue, &percentValToString, &stringToPercentVal);
 }
 
 void createBipolarPercentParameter (Parameters& params, const juce::String& id, const juce::String& name, float defaultValue)
 {
-    emplace_param<VTSParam> (params, id, name, juce::String(), juce::NormalisableRange { -1.0f, 1.0f }, defaultValue, &percentValToString, &stringToPercentVal);
+    emplace_param<FloatParameter> (params, id, name, juce::NormalisableRange { -1.0f, 1.0f }, defaultValue, &percentValToString, &stringToPercentVal);
 }
 
 void createGainDBParameter (Parameters& params, const juce::String& id, const juce::String& name, float min, float max, float defaultValue, float centerValue)
@@ -89,17 +84,17 @@ void createGainDBParameter (Parameters& params, const juce::String& id, const ju
     if (centerValue > -1000.0f)
         range.setSkewForCentre (centerValue);
 
-    emplace_param<VTSParam> (params, id, name, juce::String(), range, defaultValue, &gainValToString, &stringToGainVal);
+    emplace_param<FloatParameter> (params, id, name, range, defaultValue, &gainValToString, &stringToGainVal);
 }
 
 void createTimeMsParameter (Parameters& params, const juce::String& id, const juce::String& name, const juce::NormalisableRange<float>& range, float defaultValue)
 {
-    emplace_param<VTSParam> (params, id, name, juce::String(), range, defaultValue, &timeMsValToString, &stringToTimeMsVal);
+    emplace_param<FloatParameter> (params, id, name, range, defaultValue, &timeMsValToString, &stringToTimeMsVal);
 }
 
 void createRatioParameter (Parameters& params, const juce::String& id, const juce::String& name, const juce::NormalisableRange<float>& range, float defaultValue)
 {
-    emplace_param<VTSParam> (params, id, name, juce::String(), range, defaultValue, &ratioValToString, &stringToRatioVal);
+    emplace_param<FloatParameter> (params, id, name, range, defaultValue, &ratioValToString, &stringToRatioVal);
 }
 
 } // namespace chowdsp::ParamUtils

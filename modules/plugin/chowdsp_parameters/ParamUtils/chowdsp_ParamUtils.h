@@ -8,8 +8,6 @@ using Parameters = std::vector<std::unique_ptr<juce::RangedAudioParameter>>;
 /** Useful methods for creating juce::AudioProcessorParameter's */
 namespace ParamUtils
 {
-    using VTSParam = juce::AudioProcessorValueTreeState::Parameter;
-
     juce::String freqValToString (float freqVal);
     float stringToFreqVal (const juce::String& s);
 
@@ -26,8 +24,27 @@ namespace ParamUtils
     float stringToTimeMsVal (const juce::String& s);
 
     juce::String floatValToString (float floatVal);
-    juce::String floatValToStringDecimal (float floatVal, int numDecimalPlaces);
+    template <int NumDecimalPlaces>
+    juce::String floatValToStringDecimal (float floatVal)
+    {
+        return { floatVal, NumDecimalPlaces, false };
+    }
     float stringToFloatVal (const juce::String& s);
+
+    /** Loads a parameter of a given type from the AudioProcessorValueTreeState */
+    template <typename ParameterPointerType>
+    void loadParameterPointer (ParameterPointerType& parameter, juce::AudioProcessorValueTreeState& vts, juce::StringRef parameterID)
+    {
+        static_assert (std::is_base_of_v<juce::RangedAudioParameter, std::remove_pointer_t<ParameterPointerType>>);
+
+        auto* baseParameter = vts.getParameter (parameterID);
+        jassert (baseParameter != nullptr); // parameter was not found in the ValueTreeState!
+
+        auto* typedParameter = dynamic_cast<ParameterPointerType> (baseParameter);
+        jassert (typedParameter != nullptr); // parameter has the incorrect type!
+
+        parameter = typedParameter;
+    }
 
     /**
      * Useful alias for `params.push_back (std::make_unique<ParamType> (args...));`
