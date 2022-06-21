@@ -47,7 +47,7 @@ public:
     void floatParamTest()
     {
         expectEquals (floatValToString (10.0f), juce::String ("10.00"), "Incorrect float string!");
-        expectEquals (floatValToStringDecimal (10.0f, 1), juce::String ("10.0"), "Incorrect float decimal string!");
+        expectEquals (floatValToStringDecimal<1> (10.0f), juce::String ("10.0"), "Incorrect float decimal string!");
         expectEquals (stringToFloatVal ("200"), 200.0f, "Incorrect float value!");
     }
 

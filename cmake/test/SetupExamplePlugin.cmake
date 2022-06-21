@@ -26,9 +26,16 @@ function(setup_example_plugin target code)
         PRIVATE
             juce::juce_audio_utils
             chowdsp_plugin_base
+            chowdsp_clap_extensions
         PUBLIC
             juce::juce_recommended_config_flags
             juce::juce_recommended_lto_flags
             juce::juce_recommended_warning_flags
+    )
+
+    clap_juce_extensions_plugin(
+        TARGET ${target}
+        CLAP_ID "org.chowdsp.${target}"
+        CLAP_FEATURES audio-effect
     )
 endfunction(setup_example_plugin)

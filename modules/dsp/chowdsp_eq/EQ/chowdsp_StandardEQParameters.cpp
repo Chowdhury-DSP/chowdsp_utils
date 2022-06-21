@@ -39,11 +39,12 @@ void StandardEQParameters<NumBands>::initialiseEQParameters (juce::AudioProcesso
     using namespace eqparams_detail;
     for (size_t i = 0; i < NumBands; ++i)
     {
-        params[ParameterType::FREQ][i] = vts.getRawParameterValue (getTagForBand (paramPrefix, (int) i, eqBandFreqTag));
-        params[ParameterType::Q][i] = vts.getRawParameterValue (getTagForBand (paramPrefix, (int) i, eqBandQTag));
-        params[ParameterType::GAIN][i] = vts.getRawParameterValue (getTagForBand (paramPrefix, (int) i, eqBandGainTag));
-        params[ParameterType::TYPE][i] = vts.getRawParameterValue (getTagForBand (paramPrefix, (int) i, eqBandTypeTag));
-        params[ParameterType::ONOFF][i] = vts.getRawParameterValue (getTagForBand (paramPrefix, (int) i, eqBandOnOffTag));
+        using namespace chowdsp::ParamUtils;
+        loadParameterPointer (std::get<FREQ> (params[i]), vts, getTagForBand (paramPrefix, (int) i, eqBandFreqTag));
+        loadParameterPointer (std::get<Q> (params[i]), vts, getTagForBand (paramPrefix, (int) i, eqBandQTag));
+        loadParameterPointer (std::get<GAIN> (params[i]), vts, getTagForBand (paramPrefix, (int) i, eqBandGainTag));
+        loadParameterPointer (std::get<TYPE> (params[i]), vts, getTagForBand (paramPrefix, (int) i, eqBandTypeTag));
+        loadParameterPointer (std::get<ONOFF> (params[i]), vts, getTagForBand (paramPrefix, (int) i, eqBandOnOffTag));
     }
 }
 
@@ -63,13 +64,13 @@ void StandardEQParameters<NumBands>::addEQParameters (Parameters& params, const 
     jassert (juce::isPositiveAndBelow (defaultEQBandTypeChoice, eqBandTypeChoices.size()));
 
     auto addQParam = [&params] (const juce::String& tag, const juce::String& name) {
-        emplace_param<VTSParam> (params, tag, name, juce::String(), createNormalisableRange (0.1f, 10.0f, 0.7071f), 0.7071f, &floatValToString, &stringToFloatVal);
+        emplace_param<FloatParameter> (params, tag, name, createNormalisableRange (0.1f, 10.0f, 0.7071f), 0.7071f, &floatValToString, &stringToFloatVal);
     };
 
     for (int i = 0; i < (int) NumBands; ++i)
     {
-        emplace_param<juce::AudioParameterBool> (params, getTagForBand (paramPrefix, i, eqBandOnOffTag), getNameForBand (i, "On/Off"), false);
-        emplace_param<juce::AudioParameterChoice> (params, getTagForBand (paramPrefix, i, eqBandTypeTag), getNameForBand (i, "Type"), eqBandTypeChoices, defaultEQBandTypeChoice);
+        emplace_param<BoolParameter> (params, getTagForBand (paramPrefix, i, eqBandOnOffTag), getNameForBand (i, "On/Off"), false);
+        emplace_param<ChoiceParameter> (params, getTagForBand (paramPrefix, i, eqBandTypeTag), getNameForBand (i, "Type"), eqBandTypeChoices, defaultEQBandTypeChoice);
         createFreqParameter (params, getTagForBand (paramPrefix, i, eqBandFreqTag), getNameForBand (i, "Freq."), 20.0f, 20000.0f, 2000.0f, 1000.0f);
         addQParam (getTagForBand (paramPrefix, i, eqBandQTag), getNameForBand (i, "Q"));
         createGainDBParameter (params, getTagForBand (paramPrefix, i, eqBandGainTag), getNameForBand (i, "Gain"), -18.0f, 18.0f, 0.0f);
@@ -83,11 +84,11 @@ typename StandardEQParameters<NumBands>::Params StandardEQParameters<NumBands>::
     for (size_t i = 0; i < NumBands; ++i)
     {
         params.bands[i] = { typename Params::BandParams {
-            paramHandles[ParameterType::FREQ][i]->load(),
-            paramHandles[ParameterType::Q][i]->load(),
-            paramHandles[ParameterType::GAIN][i]->load(),
-            (int) paramHandles[ParameterType::TYPE][i]->load(),
-            paramHandles[ParameterType::ONOFF][i]->load() == 1.0f,
+            std::get<ParameterType::FREQ> (paramHandles[i])->getCurrentValue(),
+            std::get<ParameterType::Q> (paramHandles[i])->getCurrentValue(),
+            std::get<ParameterType::GAIN> (paramHandles[i])->getCurrentValue(),
+            std::get<ParameterType::TYPE> (paramHandles[i])->getIndex(),
+            std::get<ParameterType::ONOFF> (paramHandles[i])->get(),
         } };
     }
 

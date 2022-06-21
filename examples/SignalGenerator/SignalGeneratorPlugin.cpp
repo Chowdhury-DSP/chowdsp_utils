@@ -21,8 +21,8 @@ void SignalGeneratorPlugin::addParameters (Parameters& params)
     using namespace chowdsp::ParamUtils;
     createFreqParameter (params, freqTag, "Frequency", 50.0f, 50000.0f, 2500.0f, 1000.0f);
     createGainDBParameter (params, gainTag, "Gain", -45.0f, 6.0f, -24.0f);
-    emplace_param<juce::AudioParameterChoice> (params, typeTag, "Tone Type", juce::StringArray { "Sine", "Saw", "Square" }, 0);
-    emplace_param<juce::AudioParameterChoice> (params, upsampleTag, "Upsample", juce::StringArray { "1x", "2x", "3x", "4x" }, 0);
+    emplace_param<chowdsp::ChoiceParameter> (params, typeTag, "Tone Type", juce::StringArray { "Sine", "Saw", "Square" }, 0);
+    emplace_param<chowdsp::ChoiceParameter> (params, upsampleTag, "Upsample", juce::StringArray { "1x", "2x", "3x", "4x" }, 0);
 }
 
 void SignalGeneratorPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)
