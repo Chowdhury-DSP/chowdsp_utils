@@ -122,11 +122,11 @@ juce::AudioProcessor::BusesProperties PluginBase<Processor>::getDefaultBusLayout
 
 template <class Processor>
 PluginBase<Processor>::PluginBase (juce::UndoManager* um, const juce::AudioProcessor::BusesProperties& layout) : AudioProcessor (layout),
-#if JUCE_MODULE_AVAILABLE_chowdsp_clap_extensions
-                                                                                                                 CLAPExtensions::CLAPProcessorExtensions (*static_cast<juce::AudioProcessor*> (this)),
-#endif
                                                                                                                  vts (*this, um, juce::Identifier ("Parameters"), createParameterLayout())
 {
+#if JUCE_MODULE_AVAILABLE_chowdsp_clap_extensions
+    CLAPExtensions::CLAPProcessorExtensions::initialise (*this);
+#endif
 }
 
 template <class Processor>

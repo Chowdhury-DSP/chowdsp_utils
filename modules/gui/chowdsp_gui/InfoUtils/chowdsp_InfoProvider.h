@@ -34,7 +34,7 @@ struct StandardInfoProvider
     static constexpr bool showDebugFlag()
     {
 #if JUCE_DEBUG
-        return false; // true;
+        return true;
 #else
         return false;
 #endif

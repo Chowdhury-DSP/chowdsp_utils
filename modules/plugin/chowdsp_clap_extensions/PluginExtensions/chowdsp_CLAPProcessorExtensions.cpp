@@ -2,10 +2,16 @@
 
 namespace chowdsp::CLAPExtensions
 {
-CLAPProcessorExtensions::CLAPProcessorExtensions (juce::AudioProcessor& baseProcessor) : processor (baseProcessor)
+void CLAPProcessorExtensions::initialise (juce::AudioProcessor& baseProcessor)
 {
-    // trying to initialize with a nullptr??
-    //    jassert (baseProcessor != nullptr);
+    processor = &baseProcessor;
+    jassert (processor != nullptr); // initialized with a NULL processor?
+
+    for (auto* param : processor->getParameters())
+    {
+        if (auto* modulatableParameter = dynamic_cast<ParamUtils::ModParameterMixin*> (param))
+            modulatableParameters[param] = modulatableParameter;
+    }
 }
 
 clap_process_status CLAPProcessorExtensions::clap_direct_process (const clap_process* process) noexcept
@@ -22,11 +28,11 @@ clap_process_status CLAPProcessorExtensions::clap_direct_process (const clap_pro
         nextEventTime = (int) event->time;
     }
 
-    // We process in place so
+    // We process in place so...
     static constexpr uint32_t maxBuses = 128;
     std::array<float*, maxBuses> busses {};
     busses.fill (nullptr);
-    juce::MidiBuffer midiBuffer; // no midi in this plugin...
+    juce::MidiBuffer midiBuffer;
 
     static constexpr int smallestBlockSize = 64;
     for (int n = 0; n < numSamples;)
@@ -82,7 +88,7 @@ clap_process_status CLAPProcessorExtensions::clap_direct_process (const clap_pro
         juce::AudioBuffer<float> buffer (busses.data(), (int) totalChans, numSamplesToProcess);
 
         // @TODO: call processBlockBypassed when appropriate
-        processor.processBlock (buffer, midiBuffer);
+        processor->processBlock (buffer, midiBuffer);
 
         midiBuffer.clear();
         n += numSamplesToProcess;
@@ -151,7 +157,16 @@ void CLAPProcessorExtensions::process_clap_event (const clap_event_header_t* eve
         case CLAP_EVENT_PARAM_MOD:
         {
             auto paramModEvent = reinterpret_cast<const clap_event_param_mod*> (event);
-            auto modulatableParameter = dynamic_cast<chowdsp::ParamUtils::ModParameterMixin*> (static_cast<juce::AudioProcessorParameter*> (paramModEvent->cookie)); // @TODO: don't dynamic_cast here!
+            auto* baseParameter = static_cast<juce::AudioProcessorParameter*> (paramModEvent->cookie);
+
+#if JUCE_DEBUG
+            {
+                const auto parameterFound = modulatableParameters.find (baseParameter) != modulatableParameters.end();
+                jassert (parameterFound); // parameter was not found in the list of modulatable parameters!
+            }
+#endif
+
+            auto modulatableParameter = modulatableParameters[baseParameter];
             if (paramModEvent->note_id >= 0)
             {
                 if (modulatableParameter->supportsMonophonicModulation())

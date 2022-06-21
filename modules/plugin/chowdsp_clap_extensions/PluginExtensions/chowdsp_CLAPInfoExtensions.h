@@ -4,7 +4,7 @@ namespace chowdsp::CLAPExtensions
 {
 struct CLAPInfoExtensions : protected clap_juce_extensions::clap_properties
 {
-    juce::String getPluginTypeString (juce::AudioProcessor::WrapperType wrapperType) const
+    [[nodiscard]] juce::String getPluginTypeString (juce::AudioProcessor::WrapperType wrapperType) const
     {
         if (wrapperType == juce::AudioProcessor::wrapperType_Undefined && is_clap)
             return "CLAP";
