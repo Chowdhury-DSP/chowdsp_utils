@@ -169,7 +169,7 @@ void CLAPProcessorExtensions::process_clap_event (const clap_event_header_t* eve
             auto modulatableParameter = modulatableParameters[baseParameter];
             if (paramModEvent->note_id >= 0)
             {
-                if (modulatableParameter->supportsMonophonicModulation())
+                if (modulatableParameter->supportsPolyphonicModulation())
                     modulatableParameter->applyPolyphonicModulation (paramModEvent->note_id, paramModEvent->key, paramModEvent->channel, paramModEvent->amount);
             }
             else
