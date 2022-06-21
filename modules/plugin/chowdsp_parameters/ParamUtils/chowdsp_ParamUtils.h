@@ -5,7 +5,6 @@ namespace chowdsp
 /** Type to use for parameters that can be used to initialise a ValueTreeState */
 using Parameters = std::vector<std::unique_ptr<juce::RangedAudioParameter>>;
 
-/** Useful methods for creating juce::AudioProcessorParameter's */
 namespace ParamUtils
 {
     using VTSParam = juce::AudioProcessorValueTreeState::Parameter;
@@ -26,8 +25,27 @@ namespace ParamUtils
     float stringToTimeMsVal (const juce::String& s);
 
     juce::String floatValToString (float floatVal);
-    juce::String floatValToStringDecimal (float floatVal, int numDecimalPlaces);
+    template <int NumDecimalPlaces>
+    juce::String floatValToStringDecimal (float floatVal)
+    {
+        return { floatVal, NumDecimalPlaces, false };
+    }
     float stringToFloatVal (const juce::String& s);
+
+    /** Loads a parameter of a given type from the AudioProcessorValueTreeState */
+    template <typename ParameterPointerType>
+    void loadParameterPointer (ParameterPointerType& parameter, juce::AudioProcessorValueTreeState& vts, juce::StringRef parameterID)
+    {
+        static_assert (std::is_base_of_v<juce::RangedAudioParameter, std::remove_pointer_t<ParameterPointerType>>);
+
+        auto* baseParameter = vts.getParameter (parameterID);
+        jassert (baseParameter != nullptr); // parameter was not found in the ValueTreeState!
+
+        auto* typedParameter = dynamic_cast<ParameterPointerType> (baseParameter);
+        jassert (typedParameter != nullptr); // parameter has the incorrect type!
+
+        parameter = typedParameter;
+    }
 
     /**
      * Useful alias for `params.push_back (std::make_unique<ParamType> (args...));`
@@ -66,5 +84,4 @@ namespace ParamUtils
     /** Helper method for creating ratio parameters */
     void createRatioParameter (Parameters& params, const juce::String& id, const juce::String& name, const juce::NormalisableRange<float>& range, float defaultValue = 1.0f);
 } // namespace ParamUtils
-
 } // namespace chowdsp

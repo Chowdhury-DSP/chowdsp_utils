@@ -7,6 +7,13 @@ CPMAddPackage(
   GIT_TAG 6.1.5
 )
 
+# download CLAP extensions
+CPMAddPackage(
+  NAME clap-juce-extensions
+  GITHUB_REPOSITORY jatinchowdhury18/clap-juce-extensions
+  GIT_TAG 3bc36764a978de4a9ea9b06cca4c91fe1ef4e037
+)
+
 include(AddJUCEModules)
 include(SetupExamplePlugin)
 

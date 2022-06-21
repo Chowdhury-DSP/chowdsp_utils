@@ -17,3 +17,4 @@
 #include <chowdsp_plugin_utils/chowdsp_plugin_utils.h>
 #include <chowdsp_presets/chowdsp_presets.h>
 #include <chowdsp_version/chowdsp_version.h>
+#include <chowdsp_clap_extensions/chowdsp_clap_extensions.h>

@@ -3,12 +3,6 @@
 #include <chowdsp_parameters/chowdsp_parameters.h>
 #include "chowdsp_ProgramAdapter.h"
 
-#if HAS_CLAP_JUCE_EXTENSIONS
-JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wunused-parameter")
-#include "clap-juce-extensions/clap-juce-extensions.h"
-JUCE_END_IGNORE_WARNINGS_GCC_LIKE
-#endif
-
 namespace chowdsp
 {
 /**
@@ -20,9 +14,10 @@ namespace chowdsp
 */
 template <class Processor>
 class PluginBase : public juce::AudioProcessor
-#if HAS_CLAP_JUCE_EXTENSIONS
+#if JUCE_MODULE_AVAILABLE_chowdsp_clap_extensions
     ,
-                   protected clap_juce_extensions::clap_properties
+                   public CLAPExtensions::CLAPProcessorExtensions,
+                   private CLAPExtensions::CLAPInfoExtensions
 #endif
 {
 public:
@@ -76,7 +71,10 @@ public:
     void processBlock (juce::AudioBuffer<double>&, juce::MidiBuffer&) override {}
     virtual void processAudioBlock (juce::AudioBuffer<float>&) = 0;
 
-    bool hasEditor() const override { return true; }
+    bool hasEditor() const override
+    {
+        return true;
+    }
 #if JUCE_MODULE_AVAILABLE_foleys_gui_magic
     juce::AudioProcessorEditor* createEditor() override
     {
@@ -124,6 +122,9 @@ juce::AudioProcessor::BusesProperties PluginBase<Processor>::getDefaultBusLayout
 
 template <class Processor>
 PluginBase<Processor>::PluginBase (juce::UndoManager* um, const juce::AudioProcessor::BusesProperties& layout) : AudioProcessor (layout),
+#if JUCE_MODULE_AVAILABLE_chowdsp_clap_extensions
+                                                                                                                 CLAPExtensions::CLAPProcessorExtensions (*static_cast<juce::AudioProcessor*> (this)),
+#endif
                                                                                                                  vts (*this, um, juce::Identifier ("Parameters"), createParameterLayout())
 {
 }
@@ -230,13 +231,11 @@ void PluginBase<Processor>::setStateInformation (const void* data, int sizeInByt
 template <class Processor>
 juce::String PluginBase<Processor>::getWrapperTypeString() const
 {
-#if HAS_CLAP_JUCE_EXTENSIONS
-    // Since we are using 'external clap' this is the one JUCE API we can't override
-    if (wrapperType == wrapperType_Undefined && is_clap)
-        return "CLAP";
-#endif
-
+#if JUCE_MODULE_AVAILABLE_chowdsp_clap_extensions
+    return CLAPExtensions::CLAPInfoExtensions::getPluginTypeString (wrapperType);
+#else
     return AudioProcessor::getWrapperTypeDescription (wrapperType);
+#endif
 }
 
 } // namespace chowdsp

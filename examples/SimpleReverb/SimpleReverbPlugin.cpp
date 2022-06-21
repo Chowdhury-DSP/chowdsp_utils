@@ -23,10 +23,10 @@ SimpleReverbPlugin::SimpleReverbPlugin()
 void SimpleReverbPlugin::addParameters (Parameters& params)
 {
     using namespace chowdsp::ParamUtils;
-    emplace_param<VTSParam> (params, diffusionTimeTag, "Diffusion Time", juce::String(), createNormalisableRange (10.0f, 1000.0f, 200.0f), 300.0f, &timeMsValToString, &stringToTimeMsVal);
-    emplace_param<VTSParam> (params, fdnDelayMsTag, "FDN Delay Time", juce::String(), createNormalisableRange (10.0f, 1000.0f, 200.0f), 300.0f, &timeMsValToString, &stringToTimeMsVal);
-    emplace_param<VTSParam> (params, fdnT60LowMsTag, "FDN T60 Low", juce::String(), createNormalisableRange (100.0f, 10000.0f, 1000.0f), 300.0f, &timeMsValToString, &stringToTimeMsVal);
-    emplace_param<VTSParam> (params, fdnT60HighMsTag, "FDN T60 High", juce::String(), createNormalisableRange (100.0f, 10000.0f, 1000.0f), 300.0f, &timeMsValToString, &stringToTimeMsVal);
+    createTimeMsParameter (params, diffusionTimeTag, "Diffusion Time", createNormalisableRange (10.0f, 1000.0f, 200.0f), 300.0f);
+    createTimeMsParameter (params, fdnDelayMsTag, "FDN Delay Time", createNormalisableRange (10.0f, 1000.0f, 200.0f), 300.0f);
+    createTimeMsParameter (params, fdnT60LowMsTag, "FDN T60 Low", createNormalisableRange (100.0f, 10000.0f, 1000.0f), 300.0f);
+    createTimeMsParameter (params, fdnT60HighMsTag, "FDN T60 High", createNormalisableRange (100.0f, 10000.0f, 1000.0f), 300.0f);
     createPercentParameter (params, modAmountTag, "Modulation", 0.0f);
     createPercentParameter (params, dryWetTag, "Dry/Wet", 0.25f);
 }

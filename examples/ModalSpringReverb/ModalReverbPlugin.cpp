@@ -28,11 +28,10 @@ void ModalReverbPlugin::addParameters (Parameters& params)
     createPercentParameter (params, pitchTag, "Pitch", 0.5f);
     createPercentParameter (params, decayTag, "Decay", 0.5f);
     createPercentParameter (params, mixTag, "Mix", 0.5f);
-    emplace_param<VTSParam> (
+    emplace_param<chowdsp::FloatParameter> (
         params,
         modModesTag,
         "Mod. Modes",
-        juce::String(),
         createNormalisableRange (0.0f, 200.0f, 20.0f),
         0.0f,
         [] (float x) { return juce::String ((int) x); },

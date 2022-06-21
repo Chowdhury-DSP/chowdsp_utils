@@ -136,6 +136,11 @@ sure to abide by the license of each module, as well as whichever libraries are 
 
 ## Plugin Utility Modules
 
+`chowdsp_clap_extensions` (BSD)
+- `CLAPExtensions::CLAPProcessorExtensions`: implements `clap_direct_process` with parameter modulation.
+- `CLAPExtensions::CLAPInfoExtensions`: implements `getPluginTypeString()`.
+- `ModParameterMixin`: interface for supporting CLAP parameter modulation.
+
 `chowdsp_parameters` (BSD)
 - `ParamUtils`: Useful methods for creating parameters.
 - `ForwardingParameter`: A parameter that forwards on a parameter from another processor.
