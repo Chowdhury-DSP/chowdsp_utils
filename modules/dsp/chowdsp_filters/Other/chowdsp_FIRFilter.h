@@ -62,7 +62,10 @@ public:
     /** Prepares the filter for processing a new number of channels */
     void prepare (int numChannels)
     {
-        state.resize (numChannels, std::vector<FloatType> (2 * order, {}));
+        state.resize (numChannels);
+        for (auto& z : state)
+            z.resize (2 * order, FloatType {});
+
         zPtr = 0;
     }
 
@@ -110,6 +113,31 @@ public:
             processBlock (block.getChannelPointer (channel), numSamples, channel);
     }
 
+    /**
+     * Pushes a block of samples into the filter state without processing.
+     * This can be useful for "bypassing" the filter.
+     */
+    void processBlockBypassed (const float* block, const int numSamples, const int channel = 0) noexcept
+    {
+        auto* z = state[channel].data();
+        chowdsp::ScopedValue<int> zPtrLocal { zPtr };
+
+        for (int n = 0; n < numSamples; ++n)
+            processSampleInternalBypassed (block[n], z, zPtrLocal.get(), order);
+    }
+
+    /**
+     * Pushes a block of samples into the filter state without processing.
+     * This can be useful for "bypassing" the filter.
+     */
+    void processBlockBypassed (const juce::dsp::AudioBlock<const FloatType>& block) noexcept
+    {
+        const auto numChannels = (int) block.getNumChannels();
+        const auto numSamples = (int) block.getNumSamples();
+        for (int channel = 0; channel < numChannels; ++channel)
+            processBlockBypassed (block.getChannelPointer (channel), numSamples, channel);
+    }
+
 private:
     static inline FloatType processSampleInternal (FloatType x, FloatType* z, const FloatType* h, int& zPtr, int order, int paddedOrder) noexcept
     {
@@ -147,6 +175,14 @@ private:
         }
 
         return xsimd::hadd (batch_y);
+    }
+
+    static inline void processSampleInternalBypassed (FloatType x, FloatType* z, int& zPtr, int order) noexcept
+    {
+        // insert input into double-buffered state
+        z[zPtr] = x;
+        z[zPtr + order] = x;
+        zPtr = (zPtr == 0 ? order - 1 : zPtr - 1); // iterate state pointer in reverse
     }
 
     int order = 0;
