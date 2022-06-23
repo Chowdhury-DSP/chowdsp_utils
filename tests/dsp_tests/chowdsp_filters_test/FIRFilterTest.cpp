@@ -84,7 +84,7 @@ public:
             auto&& copyBuffer = juce::AudioBuffer<float> { refBuffer };
             auto&& copyBlock = juce::dsp::AudioBlock<float> { copyBuffer };
             auto&& block = juce::dsp::AudioBlock<float> { actualBuffer };
-            
+
             filter.processBlock (copyBlock);
             filter.reset();
 
