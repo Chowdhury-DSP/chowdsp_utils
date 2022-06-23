@@ -177,7 +177,7 @@ private:
         return xsimd::hadd (batch_y);
     }
 
-    static inline FloatType processSampleInternalBypassed (FloatType x, FloatType* z, int& zPtr, int order) noexcept
+    static inline void processSampleInternalBypassed (FloatType x, FloatType* z, int& zPtr, int order) noexcept
     {
         // insert input into double-buffered state
         z[zPtr] = x;
