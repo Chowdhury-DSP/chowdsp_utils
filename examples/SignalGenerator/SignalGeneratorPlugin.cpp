@@ -10,10 +10,11 @@ const juce::String gainTag = "gain_db";
 
 SignalGeneratorPlugin::SignalGeneratorPlugin()
 {
-    freqHzParam = vts.getRawParameterValue (freqTag);
-    toneTypeParam = vts.getRawParameterValue (typeTag);
-    upSampleParam = vts.getRawParameterValue (upsampleTag);
-    gainDBParam = vts.getRawParameterValue (gainTag);
+    using namespace chowdsp::ParamUtils;
+    loadParameterPointer (freqHzParam, vts, freqTag);
+    loadParameterPointer (toneTypeParam, vts, typeTag);
+    loadParameterPointer (upSampleParam, vts, upsampleTag);
+    loadParameterPointer (gainDBParam, vts, gainTag);
 }
 
 void SignalGeneratorPlugin::addParameters (Parameters& params)
@@ -101,7 +102,7 @@ void SignalGeneratorPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
     auto&& block = juce::dsp::AudioBlock<float> { buffer };
 
     auto processTone = [this, &block, numChannels = buffer.getNumChannels(), numSamples = buffer.getNumSamples()] (auto& tone) {
-        auto targetFrequency = freqHzParam->load();
+        auto targetFrequency = freqHzParam->getCurrentValue();
         if (targetFrequency > 0.48f * (float) getSampleRate())
         {
             tone.reset();
@@ -135,7 +136,7 @@ void SignalGeneratorPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
     else
         jassertfalse; // unknown type!
 
-    gain.setGainDecibels (*gainDBParam);
+    gain.setGainDecibels (gainDBParam->getCurrentValue());
     gain.process (juce::dsp::ProcessContextReplacing<float> { block });
 }
 

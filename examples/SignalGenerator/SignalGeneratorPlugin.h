@@ -20,10 +20,10 @@ private:
     void prepareTones (double sampleRate, int blockSize);
     void setUpSampleChoice();
 
-    std::atomic<float>* freqHzParam = nullptr;
-    std::atomic<float>* toneTypeParam = nullptr;
-    std::atomic<float>* upSampleParam = nullptr;
-    std::atomic<float>* gainDBParam = nullptr;
+    chowdsp::FloatParameter* freqHzParam = nullptr;
+    chowdsp::ChoiceParameter* toneTypeParam = nullptr;
+    chowdsp::ChoiceParameter* upSampleParam = nullptr;
+    chowdsp::FloatParameter* gainDBParam = nullptr;
 
     chowdsp::SineWave<float> sine;
     chowdsp::SawtoothWave<float> saw;

@@ -19,12 +19,12 @@ public:
     juce::AudioProcessorEditor* createEditor() override;
 
 private:
-    std::atomic<float>* pitchParam = nullptr;
-    std::atomic<float>* decayParam = nullptr;
-    std::atomic<float>* mixParam = nullptr;
-    std::atomic<float>* modModesParam = nullptr;
-    std::atomic<float>* modFreqParam = nullptr;
-    std::atomic<float>* modDepthParam = nullptr;
+    chowdsp::FloatParameter* pitchParam = nullptr;
+    chowdsp::FloatParameter* decayParam = nullptr;
+    chowdsp::FloatParameter* mixParam = nullptr;
+    chowdsp::FloatParameter* modModesParam = nullptr;
+    chowdsp::FloatParameter* modFreqParam = nullptr;
+    chowdsp::FloatParameter* modDepthParam = nullptr;
 
     chowdsp::ModalFilterBank<ModeParams::numModes> modalFilterBank;
 
