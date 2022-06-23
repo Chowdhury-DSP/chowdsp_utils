@@ -145,8 +145,10 @@ juce::AudioProcessorEditor* SignalGeneratorPlugin::createEditor()
     return new juce::GenericAudioProcessorEditor (*this);
 }
 
+#if ! CHOWDSP_BUILDING_FORWARDING_TEST_PLUGIN
 // This creates new instances of the plugin
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new SignalGeneratorPlugin();
 }
+#endif
