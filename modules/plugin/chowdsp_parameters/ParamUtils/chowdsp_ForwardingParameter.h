@@ -9,7 +9,8 @@ namespace chowdsp
  * (with permission) from Eyal Amir, and then modified a
  * little bit from there.
  */
-class ForwardingParameter : public juce::RangedAudioParameter
+class ForwardingParameter : public juce::RangedAudioParameter,
+                            public ParamUtils::ModParameterMixin
 {
 public:
     /**
@@ -64,8 +65,14 @@ private:
 
     const juce::NormalisableRange<float>& getNormalisableRange() const override;
 
+    bool supportsMonophonicModulation() override;
+    bool supportsPolyphonicModulation() override;
+    void applyMonophonicModulation (double value) override;
+    void applyPolyphonicModulation (int32_t note_id, int16_t key, int16_t channel, double value) override;
+
     juce::AudioProcessor* processor = nullptr;
     juce::RangedAudioParameter* internalParam = nullptr;
+    ParamUtils::ModParameterMixin* internalParamAsModulatable = nullptr;
 
     std::unique_ptr<ForwardingAttachment> attachment;
     juce::UndoManager* undoManager;

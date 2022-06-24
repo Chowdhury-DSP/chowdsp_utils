@@ -3,7 +3,7 @@
 
 namespace
 {
-constexpr int maxNumForwardingParameters = 20;
+constexpr int maxNumForwardingParameters = 10;
 
 juce::String getForwardParamID (int paramNum)
 {
@@ -13,16 +13,15 @@ juce::String getForwardParamID (int paramNum)
 
 ForwardingTestPlugin::ForwardingTestPlugin()
 {
+    using namespace chowdsp::ParamUtils;
     chowdsp::ParamUtils::loadParameterPointer (processorChoiceParameter, vts, processorChoiceParamID);
 
     for (int i = 0; i < maxNumForwardingParameters; ++i)
     {
-        auto id = getForwardParamID (i);
-        auto forwardedParam = std::make_unique<chowdsp::ForwardingParameter> (id, nullptr, "Blank");
-
+        const auto id = getForwardParamID (i);
+        auto* forwardedParam = dynamic_cast<chowdsp::ForwardingParameter*> (vts.getParameter (id));
         forwardedParam->setProcessor (&vts.processor);
-        forwardedParams.add (forwardedParam.get());
-        vts.processor.addParameter (forwardedParam.release());
+        forwardedParams.add (forwardedParam);
     }
 
     vts.addParameterListener (processorChoiceParamID, this);
@@ -35,7 +34,14 @@ ForwardingTestPlugin::~ForwardingTestPlugin()
 
 void ForwardingTestPlugin::addParameters (Parameters& params)
 {
-    chowdsp::ParamUtils::emplace_param<chowdsp::ChoiceParameter> (params, processorChoiceParamID, "Processor Choice", juce::StringArray { "None", "Tone Generator", "Reverb" }, 0);
+    using namespace chowdsp::ParamUtils;
+    emplace_param<chowdsp::ChoiceParameter> (params, processorChoiceParamID, "Processor Choice", juce::StringArray { "None", "Tone Generator", "Reverb" }, 0);
+
+    for (int i = 0; i < maxNumForwardingParameters; ++i)
+    {
+        const auto id = getForwardParamID (i);
+        emplace_param<chowdsp::ForwardingParameter> (params, id, nullptr, "Blank");
+    }
 }
 
 void ForwardingTestPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)

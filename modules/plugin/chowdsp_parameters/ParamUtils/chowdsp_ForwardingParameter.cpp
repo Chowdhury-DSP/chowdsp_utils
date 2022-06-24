@@ -82,6 +82,7 @@ void ForwardingParameter::setParam (juce::RangedAudioParameter* paramToUse, cons
         attachment.reset();
 
     internalParam = paramToUse;
+    internalParamAsModulatable = dynamic_cast<ParamUtils::ModParameterMixin*> (internalParam);
     customName = newName;
 
     if (processor != nullptr)
@@ -160,6 +161,40 @@ const juce::NormalisableRange<float>& ForwardingParameter::getNormalisableRange(
         return internalParam->getNormalisableRange();
 
     return defaultRange;
+}
+
+bool ForwardingParameter::supportsMonophonicModulation()
+{
+    if (internalParamAsModulatable == nullptr)
+        return false;
+
+    return internalParamAsModulatable->supportsMonophonicModulation();
+}
+
+bool ForwardingParameter::supportsPolyphonicModulation()
+{
+    if (internalParamAsModulatable == nullptr)
+        return false;
+
+    return internalParamAsModulatable->supportsPolyphonicModulation();
+}
+
+void ForwardingParameter::applyMonophonicModulation (double value)
+{
+    // If this is nullptr, then supportsMonophonicModulation() should have
+    // returned false, meaning this method should not have been called!
+    jassert (internalParamAsModulatable != nullptr);
+
+    internalParamAsModulatable->applyMonophonicModulation (value);
+}
+
+void ForwardingParameter::applyPolyphonicModulation (int32_t note_id, int16_t key, int16_t channel, double value)
+{
+    // If this is nullptr, then supportsPolyphonicModulation() should have
+    // returned false, meaning this method should not have been called!
+    jassert (internalParamAsModulatable != nullptr);
+
+    internalParamAsModulatable->applyPolyphonicModulation (note_id, key, channel, value);
 }
 
 void ForwardingParameter::setProcessor (juce::AudioProcessor* processorToUse)
