@@ -181,21 +181,32 @@ bool ForwardingParameter::supportsPolyphonicModulation()
 
 void ForwardingParameter::applyMonophonicModulation (double value)
 {
-    // If this is nullptr, then supportsMonophonicModulation() should have
-    // returned false, meaning this method should not have been called!
-    jassert (internalParamAsModulatable != nullptr);
+    if (internalParamAsModulatable == nullptr)
+    {
+        // If this is nullptr, then supportsMonophonicModulation() should have
+        // returned false, meaning this method should not have been called!
+        jassertfalse;
+        return;
+    }
 
     internalParamAsModulatable->applyMonophonicModulation (value);
 }
 
+// let's re-enable coverage for these lines when we've got some parameters that implement polyphonic modulation
+// LCOV_EXCL_START
 void ForwardingParameter::applyPolyphonicModulation (int32_t note_id, int16_t key, int16_t channel, double value)
 {
-    // If this is nullptr, then supportsPolyphonicModulation() should have
-    // returned false, meaning this method should not have been called!
-    jassert (internalParamAsModulatable != nullptr);
+    if (internalParamAsModulatable == nullptr)
+    {
+        // If this is nullptr, then supportsPolyphonicModulation() should have
+        // returned false, meaning this method should not have been called!
+        jassertfalse;
+        return;
+    }
 
     internalParamAsModulatable->applyPolyphonicModulation (note_id, key, channel, value);
 }
+// LCOV_EXCL_STOP
 
 void ForwardingParameter::setProcessor (juce::AudioProcessor* processorToUse)
 {
