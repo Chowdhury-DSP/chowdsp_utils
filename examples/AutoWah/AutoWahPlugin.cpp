@@ -12,12 +12,13 @@ const juce::String freqModTag = "freq_mod";
 
 AutoWahPlugin::AutoWahPlugin()
 {
-    freqHzParam = vts.getRawParameterValue (freqTag);
-    qValParam = vts.getRawParameterValue (qValTag);
-    gainDBParam = vts.getRawParameterValue (gainTag);
-    attackMsParam = vts.getRawParameterValue (attackTag);
-    releaseMsParam = vts.getRawParameterValue (releaseTag);
-    freqModParam = vts.getRawParameterValue (freqModTag);
+    using namespace chowdsp::ParamUtils;
+    loadParameterPointer (freqHzParam, vts, freqTag);
+    loadParameterPointer (qValParam, vts, qValTag);
+    loadParameterPointer (gainDBParam, vts, gainTag);
+    loadParameterPointer (attackMsParam, vts, attackTag);
+    loadParameterPointer (releaseMsParam, vts, releaseTag);
+    loadParameterPointer (freqModParam, vts, freqModTag);
 }
 
 void AutoWahPlugin::addParameters (Parameters& params)
@@ -56,13 +57,14 @@ void AutoWahPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
     levelDetector.process (juce::dsp::ProcessContextNonReplacing<float> { block, levelBlock });
     const auto* levelData = levelBuffer.getReadPointer (0);
 
-    const auto baseFreqHz = freqHzParam->load();
-    const auto curQVal = qValParam->load();
-    const auto curGain = juce::Decibels::decibelsToGain (gainDBParam->load());
+    const auto baseFreqHz = freqHzParam->getCurrentValue();
+    const auto curQVal = qValParam->getCurrentValue();
+    const auto curGain = juce::Decibels::decibelsToGain (gainDBParam->getCurrentValue());
     const auto curFreqMod = 9.0f * *freqModParam;
     wahFilter.process (
         juce::dsp::ProcessContextReplacing<float> { block },
-        [&] (size_t sampleIndex) {
+        [&] (size_t sampleIndex)
+        {
             const auto curFreqHz = baseFreqHz + baseFreqHz * curFreqMod * levelData[sampleIndex];
             wahFilter.calcCoefs (curFreqHz, curQVal, curGain, fs);
         });

@@ -12,12 +12,13 @@ const juce::String dryWetTag = "dry_wet";
 
 SimpleReverbPlugin::SimpleReverbPlugin()
 {
-    diffusionTimeMsParam = vts.getRawParameterValue (diffusionTimeTag);
-    fdnDelayMsParam = vts.getRawParameterValue (fdnDelayMsTag);
-    fdnT60LowMsParam = vts.getRawParameterValue (fdnT60LowMsTag);
-    fdnT60HighMsParam = vts.getRawParameterValue (fdnT60HighMsTag);
-    modAmountParam = vts.getRawParameterValue (modAmountTag);
-    dryWetParam = vts.getRawParameterValue (dryWetTag);
+    using namespace chowdsp::ParamUtils;
+    loadParameterPointer (diffusionTimeMsParam, vts, diffusionTimeTag);
+    loadParameterPointer (fdnDelayMsParam, vts, fdnDelayMsTag);
+    loadParameterPointer (fdnT60LowMsParam, vts, fdnT60LowMsTag);
+    loadParameterPointer (fdnT60HighMsParam, vts, fdnT60HighMsTag);
+    loadParameterPointer (modAmountParam, vts, modAmountTag);
+    loadParameterPointer (dryWetParam, vts, dryWetTag);
 }
 
 void SimpleReverbPlugin::addParameters (Parameters& params)
@@ -122,8 +123,10 @@ juce::AudioProcessorEditor* SimpleReverbPlugin::createEditor()
     return new juce::GenericAudioProcessorEditor (*this);
 }
 
+#if ! CHOWDSP_BUILDING_FORWARDING_TEST_PLUGIN
 // This creates new instances of the plugin
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new SimpleReverbPlugin();
 }
+#endif

@@ -17,12 +17,12 @@ public:
     juce::AudioProcessorEditor* createEditor() override;
 
 private:
-    std::atomic<float>* freqHzParam = nullptr;
-    std::atomic<float>* qValParam = nullptr;
-    std::atomic<float>* gainDBParam = nullptr;
-    std::atomic<float>* attackMsParam = nullptr;
-    std::atomic<float>* releaseMsParam = nullptr;
-    std::atomic<float>* freqModParam = nullptr;
+    chowdsp::FloatParameter* freqHzParam = nullptr;
+    chowdsp::FloatParameter* qValParam = nullptr;
+    chowdsp::FloatParameter* gainDBParam = nullptr;
+    chowdsp::FloatParameter* attackMsParam = nullptr;
+    chowdsp::FloatParameter* releaseMsParam = nullptr;
+    chowdsp::FloatParameter* freqModParam = nullptr;
 
     chowdsp::LevelDetector<float> levelDetector;
     juce::AudioBuffer<float> levelBuffer;
