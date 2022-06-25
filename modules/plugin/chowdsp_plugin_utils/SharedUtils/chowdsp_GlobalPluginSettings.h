@@ -60,7 +60,6 @@ public:
     /** Returns the file be used to store the global settings */
     [[nodiscard]] juce::File getSettingsFile() const noexcept;
 
-
 private:
     bool loadSettingsFromFile();
     void writeSettingsToFile();
