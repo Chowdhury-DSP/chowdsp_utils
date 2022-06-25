@@ -13,7 +13,7 @@ GlobalPluginSettings::SettingsFileListener::SettingsFileListener (const juce::Fi
 
 void GlobalPluginSettings::SettingsFileListener::listenerFileChanged()
 {
-    const juce::ScopedLock sl (globalSettings.getLock());
+    const juce::ScopedLock sl (globalSettings.lock);
     globalSettings.loadSettingsFromFile();
 }
 

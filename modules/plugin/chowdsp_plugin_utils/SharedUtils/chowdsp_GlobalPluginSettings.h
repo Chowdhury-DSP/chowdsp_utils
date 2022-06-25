@@ -60,7 +60,6 @@ public:
     /** Returns the file be used to store the global settings */
     [[nodiscard]] juce::File getSettingsFile() const noexcept;
 
-    const juce::CriticalSection& getLock() const noexcept { return lock; }
 
 private:
     bool loadSettingsFromFile();
