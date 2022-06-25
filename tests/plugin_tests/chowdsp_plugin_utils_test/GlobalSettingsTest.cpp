@@ -252,7 +252,7 @@ public:
             [&] {
                 chowdsp::GlobalPluginSettings settings;
                 settings.initialise (settingsFile, 1);
-                for (int i = 10; i < 30; ++i)
+                for (int i = 20; i < 40; ++i)
                 {
                     chowdsp::GlobalPluginSettings::SettingProperty prop { std::to_string (i), i };
                     settings.addProperties ({ prop });
@@ -305,9 +305,10 @@ public:
 
         beginTest ("Wreck Settings File Test");
         wreckSettingsFile();
-
+        
         beginTest ("Two Instances Accessing Same File Test");
         twoInstancesAccessingSameFileTest();
+        
     }
 };
 
