@@ -2,7 +2,7 @@
 
 namespace chowdsp::CLAPExtensions
 {
-class CLAPProcessorExtensions : public clap_juce_extensions::clap_extensions
+class CLAPProcessorExtensions : public clap_juce_extensions::clap_juce_audio_processor_capabilities
 {
 public:
     CLAPProcessorExtensions() = default;

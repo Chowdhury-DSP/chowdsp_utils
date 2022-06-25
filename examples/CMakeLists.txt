@@ -11,16 +11,18 @@ CPMAddPackage(
 CPMAddPackage(
   NAME clap-juce-extensions
   GITHUB_REPOSITORY free-audio/clap-juce-extensions
-  GIT_TAG 326c380d1f737ac255a377e5ad7b300b61864b3f
+  GIT_TAG ff12b486caa173db824691f141b34aad0770d750
 )
 
 include(AddJUCEModules)
 include(SetupExamplePlugin)
 
-add_compile_options(
-  $<$<CXX_COMPILER_ID:MSVC>:/WX>
-  $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Werror>
-)
+# Turning this off until clap-juce-extensions
+# gets a little more stable
+#add_compile_options(
+#  $<$<CXX_COMPILER_ID:MSVC>:/WX>
+#  $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Werror>
+#)
 
 add_subdirectory(SimpleEQ)
 add_subdirectory(SimpleReverb)
