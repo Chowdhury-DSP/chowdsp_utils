@@ -239,7 +239,8 @@ public:
                 settings.initialise (settingsFile, 1);
                 for (int i = 0; i < 20; ++i)
                 {
-                    chowdsp::GlobalPluginSettings::SettingProperty prop { std::to_string (i), i };
+                    auto propId = "thread1_" + std::to_string(i);
+                    chowdsp::GlobalPluginSettings::SettingProperty prop { propId, i };
                     settings.addProperties ({ prop });
                     expectEquals (settings.getProperty<int> (prop.first), prop.second.get<int>(), "Property is incorrect within thread 1");
                     juce::Thread::sleep (50);
@@ -254,7 +255,8 @@ public:
                 settings.initialise (settingsFile, 1);
                 for (int i = 20; i < 40; ++i)
                 {
-                    chowdsp::GlobalPluginSettings::SettingProperty prop { std::to_string (i), i };
+                    auto propId = "thread2_" + std::to_string(i);
+                    chowdsp::GlobalPluginSettings::SettingProperty prop { propId, i };
                     settings.addProperties ({ prop });
                     expectEquals (settings.getProperty<int> (prop.first), prop.second.get<int>(), "Property is incorrect within thread 2");
                     juce::Thread::sleep (50);
@@ -305,7 +307,7 @@ public:
 
         beginTest ("Wreck Settings File Test");
         wreckSettingsFile();
-
+        
         beginTest ("Two Instances Accessing Same File Test");
         twoInstancesAccessingSameFileTest();
     }
