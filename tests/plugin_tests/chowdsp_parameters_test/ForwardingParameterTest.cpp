@@ -128,7 +128,6 @@ public:
     void parameterModulationTest()
     {
         auto&& testParam = std::make_unique<chowdsp::ForwardingParameter> ("param", nullptr, "NONE");
-        auto* testParamAsProcessorParam = dynamic_cast<juce::AudioProcessorParameter*> (testParam.get());
         auto* testParamAsModParam = dynamic_cast<chowdsp::ParamUtils::ModParameterMixin*> (testParam.get());
 
         {
