@@ -133,13 +133,13 @@ public:
         {
             static constexpr auto defaultValue = 0.5f;
             static constexpr auto modulationAmount = -0.25f;
-        
+
             auto&& forwardParam = std::make_unique<juce::AudioParameterFloat> ("juce_float_param", "Param", 0.0f, 1.0f, defaultValue);
             testParam->setParam (forwardParam.get());
-        
+
             expect (! testParamAsModParam->supportsMonophonicModulation(), "juce::AudioParameterFloat should not support modulation!");
             expect (! testParamAsModParam->supportsPolyphonicModulation(), "juce::AudioParameterFloat should not support modulation!");
-        
+
             expectEquals (forwardParam->get(), defaultValue, "Parameter has incorrect value before parameter modulation!");
             testParamAsModParam->applyMonophonicModulation ((double) modulationAmount); // should have no effect, since the parameter doesn't support modulation!
             expectEquals (forwardParam->get(), defaultValue, "Parameter has incorrect value after parameter modulation!");
@@ -150,7 +150,7 @@ public:
         {
             auto&& forwardParam = std::make_unique<chowdsp::ChoiceParameter> ("chowdsp_choice_param", "Param", juce::StringArray { "one", "two", "three" }, 0);
             testParam->setParam (forwardParam.get());
-        
+
             expect (! testParamAsModParam->supportsMonophonicModulation(), "chowdsp::ChoiceParameter should not support modulation!");
             expect (! testParamAsModParam->supportsPolyphonicModulation(), "chowdsp::ChoiceParameter should not support modulation!");
 
@@ -167,10 +167,10 @@ public:
                                                                              &chowdsp::ParamUtils::floatValToString,
                                                                              &chowdsp::ParamUtils::stringToFloatVal);
             testParam->setParam (forwardParam.get());
-        
+
             expect (testParamAsModParam->supportsMonophonicModulation(), "chowdsp::FloatParameter should support monophonic modulation!");
             expect (! testParamAsModParam->supportsPolyphonicModulation(), "chowdsp::FloatParameter should not support polyphonic modulation!");
-        
+
             expectEquals (forwardParam->getCurrentValue(), defaultValue, "Parameter has incorrect value before parameter modulation!");
             testParamAsModParam->applyMonophonicModulation ((double) modulationAmount);
             expectEquals (forwardParam->getCurrentValue(), defaultValue + modulationAmount, "Parameter has incorrect value after parameter modulation!");
