@@ -225,7 +225,6 @@ public:
         }
     }
 
-
     /**
      * Kick off thread 1, read and write settings to one instance of GlobalPluginSettings
      * Kick off thread 2 read and write settings to another instance of GlobalPluginSettings
@@ -238,12 +237,12 @@ public:
             [&] {
                 chowdsp::GlobalPluginSettings settings;
                 settings.initialise (settingsFile, 1);
-                for(int i = 0; i < 20; ++i)
+                for (int i = 0; i < 20; ++i)
                 {
-                    chowdsp::GlobalPluginSettings::SettingProperty prop {std::to_string(i), i};
+                    chowdsp::GlobalPluginSettings::SettingProperty prop { std::to_string (i), i };
                     settings.addProperties ({ prop });
                     expectEquals (settings.getProperty<int> (prop.first), prop.second.get<int>(), "Property is incorrect within thread 1");
-                    juce::Thread::sleep (50); 
+                    juce::Thread::sleep (50);
                 }
                 thread1Finished = true;
             });
@@ -253,9 +252,9 @@ public:
             [&] {
                 chowdsp::GlobalPluginSettings settings;
                 settings.initialise (settingsFile, 1);
-                for(int i = 10; i < 30; ++i)
+                for (int i = 10; i < 30; ++i)
                 {
-                    chowdsp::GlobalPluginSettings::SettingProperty prop {std::to_string(i), i};
+                    chowdsp::GlobalPluginSettings::SettingProperty prop { std::to_string (i), i };
                     settings.addProperties ({ prop });
                     expectEquals (settings.getProperty<int> (prop.first), prop.second.get<int>(), "Property is incorrect within thread 2");
                     juce::Thread::sleep (50);
@@ -265,7 +264,7 @@ public:
 
         while (! (thread1Finished && thread2Finished))
             juce::MessageManager::getInstance()->runDispatchLoopUntil (100);
-        
+
         chowdsp::GlobalPluginSettings settings;
         settings.initialise (settingsFile, 1);
         settings.getSettingsFile().deleteFile();
@@ -306,10 +305,9 @@ public:
 
         beginTest ("Wreck Settings File Test");
         wreckSettingsFile();
-        
-        beginTest("Two Instances Accessing Same File Test");
+
+        beginTest ("Two Instances Accessing Same File Test");
         twoInstancesAccessingSameFileTest();
-        
     }
 };
 

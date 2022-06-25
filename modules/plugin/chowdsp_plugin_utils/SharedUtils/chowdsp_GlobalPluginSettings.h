@@ -60,7 +60,7 @@ public:
     /** Returns the file be used to store the global settings */
     [[nodiscard]] juce::File getSettingsFile() const noexcept;
 
-    const juce::CriticalSection& getLock() const noexcept   { return lock; }
+    const juce::CriticalSection& getLock() const noexcept { return lock; }
 
 private:
     bool loadSettingsFromFile();
@@ -82,7 +82,7 @@ private:
     static constexpr SettingID settingsTag = "plugin_settings";
 
     inline static juce::CriticalSection lock;
-    
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GlobalPluginSettings)
 };
 

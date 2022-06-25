@@ -20,7 +20,7 @@ void GlobalPluginSettings::SettingsFileListener::listenerFileChanged()
 void GlobalPluginSettings::initialise (const juce::String& settingsFile, int timerSeconds)
 {
     if (fileListener != nullptr)
-       return; // already initialised!
+        return; // already initialised!
 
     const juce::ScopedLock sl (lock);
     auto settingsDir = juce::File::getSpecialLocation (juce::File::userApplicationDataDirectory);
@@ -178,7 +178,7 @@ void GlobalPluginSettings::writeSettingsToFile()
     if (fileListener == nullptr)
         return;
 
-    const juce::ScopedLock sl (lock);   
+    const juce::ScopedLock sl (lock);
     auto& settingsFile = fileListener->getListenerFile();
 
     json settingsJson;
