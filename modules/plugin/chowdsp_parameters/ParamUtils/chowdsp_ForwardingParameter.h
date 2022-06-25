@@ -22,7 +22,12 @@ public:
      */
     explicit ForwardingParameter (const juce::String& id, juce::UndoManager* um = nullptr, const juce::String& defaultName = "Unused");
 
-    /** Sets a new parameter to be forwarded */
+    /**
+     * Sets a new parameter to be forwarded.
+     * 
+     * Note that the parameter must not be deleted while
+     * it is being held as the forwarding parameter.
+     */
     void setParam (juce::RangedAudioParameter* paramToUse, const juce::String& newName = {});
 
     /** Returns the parameter currently being forwarded */
