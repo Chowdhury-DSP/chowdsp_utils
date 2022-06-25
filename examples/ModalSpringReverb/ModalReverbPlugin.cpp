@@ -14,12 +14,13 @@ ModalReverbPlugin::ModalReverbPlugin()
 {
     modalFilterBank.setModeAmplitudes (ModeParams::amps_real, ModeParams::amps_imag);
 
-    pitchParam = vts.getRawParameterValue (pitchTag);
-    decayParam = vts.getRawParameterValue (decayTag);
-    mixParam = vts.getRawParameterValue (mixTag);
-    modModesParam = vts.getRawParameterValue (modModesTag);
-    modFreqParam = vts.getRawParameterValue (modFreqTag);
-    modDepthParam = vts.getRawParameterValue (modDepthTag);
+    using namespace chowdsp::ParamUtils;
+    loadParameterPointer (pitchParam, vts, pitchTag);
+    loadParameterPointer (decayParam, vts, decayTag);
+    loadParameterPointer (mixParam, vts, mixTag);
+    loadParameterPointer (modModesParam, vts, modModesTag);
+    loadParameterPointer (modFreqParam, vts, modFreqTag);
+    loadParameterPointer (modDepthParam, vts, modDepthTag);
 }
 
 void ModalReverbPlugin::addParameters (Parameters& params)
@@ -80,7 +81,7 @@ void ModalReverbPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
     auto&& modBlock = juce::dsp::AudioBlock<float> { modBuffer };
     modSine.process (juce::dsp::ProcessContextReplacing<float> { modBlock });
 
-    const auto numModesToMod = (int) modModesParam->load();
+    const auto numModesToMod = (int) modModesParam->getCurrentValue();
     if (numModesToMod == 0)
     {
         // process modal filter without modulation
@@ -89,7 +90,7 @@ void ModalReverbPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
     else
     {
         // process modal filter with modulation
-        const auto modDepth = modDepthParam->load();
+        const auto modDepth = modDepthParam->getCurrentValue();
         auto&& block = juce::dsp::AudioBlock<float> { buffer };
         const auto* modData = modBuffer.getReadPointer (0);
         modalFilterBank.processWithModulation (

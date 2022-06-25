@@ -23,6 +23,10 @@ public:
 
         auto& norm = dynamic_cast<juce::RangedAudioParameter*> (testParam.get())->getNormalisableRange();
         expectEquals (norm.interval, 0.01f, "Parameter normalization is incorrect!");
+
+        auto* modulatableTestParam = dynamic_cast<chowdsp::ParamUtils::ModParameterMixin*> (testParam.get());
+        expect (! modulatableTestParam->supportsMonophonicModulation(), "Null parameter should not support modulation!");
+        expect (! modulatableTestParam->supportsPolyphonicModulation(), "Null parameter should not support modulation!");
     }
 
     void nonNullParamTest()
@@ -115,11 +119,59 @@ public:
             expectWithinAbsoluteError (dummyParam->getValue(), value1, error, "Internal param value set from forwarded param is incorrect!");
 
             // do stuff on background thread
-            threadFinished = true;
-        });
+            threadFinished = true; });
 
         while (! threadFinished)
             juce::MessageManager::getInstance()->runDispatchLoopUntil (100);
+    }
+
+    void parameterModulationTest()
+    {
+        auto&& testParam = std::make_unique<chowdsp::ForwardingParameter> ("param", nullptr, "NONE");
+        auto* testParamAsProcessorParam = dynamic_cast<juce::AudioProcessorParameter*> (testParam.get());
+        auto* testParamAsModParam = dynamic_cast<chowdsp::ParamUtils::ModParameterMixin*> (testParam.get());
+
+        {
+            static constexpr auto defaultValue = 0.5f;
+            static constexpr auto modulationAmount = -0.25f;
+
+            auto&& forwardParam = std::make_unique<juce::AudioParameterFloat> ("juce_float_param", "Param", 0.0f, 1.0f, defaultValue);
+            testParam->setParam (forwardParam.get());
+
+            expect (! testParamAsModParam->supportsMonophonicModulation(), "juce::AudioParameterFloat should not support modulation!");
+            expect (! testParamAsModParam->supportsPolyphonicModulation(), "juce::AudioParameterFloat should not support modulation!");
+
+            expectEquals (forwardParam->get(), defaultValue, "Parameter has incorrect value before parameter modulation!");
+            testParamAsModParam->applyMonophonicModulation ((double) modulationAmount); // should have no effect, since the parameter doesn't support modulation!
+            expectEquals (forwardParam->get(), defaultValue, "Parameter has incorrect value after parameter modulation!");
+        }
+
+        {
+            auto&& forwardParam = std::make_unique<chowdsp::ChoiceParameter> ("chowdsp_choice_param", "Param", juce::StringArray { "one", "two", "three" }, 0);
+            testParam->setParam (forwardParam.get());
+
+            expect (! testParamAsModParam->supportsMonophonicModulation(), "chowdsp::ChoiceParameter should not support modulation!");
+            expect (! testParamAsModParam->supportsPolyphonicModulation(), "chowdsp::ChoiceParameter should not support modulation!");
+        }
+
+        {
+            static constexpr auto defaultValue = 0.5f;
+            static constexpr auto modulationAmount = -0.25f;
+            auto&& forwardParam = std::make_unique<chowdsp::FloatParameter> ("chowdsp_float_param",
+                                                                             "Param",
+                                                                             juce::NormalisableRange { 0.0f, 1.0f },
+                                                                             defaultValue,
+                                                                             &chowdsp::ParamUtils::floatValToString,
+                                                                             &chowdsp::ParamUtils::stringToFloatVal);
+            testParam->setParam (forwardParam.get());
+
+            expect (testParamAsModParam->supportsMonophonicModulation(), "chowdsp::FloatParameter should support monophonic modulation!");
+            expect (! testParamAsModParam->supportsPolyphonicModulation(), "chowdsp::FloatParameter should not support polyphonic modulation!");
+
+            expectEquals (forwardParam->getCurrentValue(), defaultValue, "Parameter has incorrect value before parameter modulation!");
+            testParamAsModParam->applyMonophonicModulation ((double) modulationAmount);
+            expectEquals (forwardParam->getCurrentValue(), defaultValue + modulationAmount, "Parameter has incorrect value after parameter modulation!");
+        }
     }
 
     void runTestTimed() override
@@ -132,6 +184,9 @@ public:
 
         beginTest ("Background Thread Test");
         backgroundThreadTest();
+
+        beginTest ("Parameter Modulation Test");
+        parameterModulationTest();
     }
 };
 

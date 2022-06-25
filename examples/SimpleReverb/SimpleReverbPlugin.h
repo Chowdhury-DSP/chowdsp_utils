@@ -17,12 +17,12 @@ public:
     juce::AudioProcessorEditor* createEditor() override;
 
 private:
-    std::atomic<float>* diffusionTimeMsParam = nullptr;
-    std::atomic<float>* fdnDelayMsParam = nullptr;
-    std::atomic<float>* fdnT60LowMsParam = nullptr;
-    std::atomic<float>* fdnT60HighMsParam = nullptr;
-    std::atomic<float>* modAmountParam = nullptr;
-    std::atomic<float>* dryWetParam = nullptr;
+    chowdsp::FloatParameter* diffusionTimeMsParam = nullptr;
+    chowdsp::FloatParameter* fdnDelayMsParam = nullptr;
+    chowdsp::FloatParameter* fdnT60LowMsParam = nullptr;
+    chowdsp::FloatParameter* fdnT60HighMsParam = nullptr;
+    chowdsp::FloatParameter* modAmountParam = nullptr;
+    chowdsp::FloatParameter* dryWetParam = nullptr;
 
     juce::SmoothedValue<float, juce::ValueSmoothingTypes::Multiplicative> diffusionTimeSmoother;
     juce::SmoothedValue<float, juce::ValueSmoothingTypes::Multiplicative> fdnTimeSmoother;

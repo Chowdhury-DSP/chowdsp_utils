@@ -7,3 +7,4 @@ Example plugins to demonstrate how to use these modules in the wild:
 - ModalSpringReverb: A modal reverb generated from the modal response of a spring reverb unit
 - AutoWah: A filter with audio-rate modulation (see `chowdsp::ModFilterWrapper`)
 - AccessiblePlugin: Working example for usage of the JUCE Accessibility API
+- ForwardingTestPlugin: An example plugin demonstrating usage of `chowdsp::ForwardingParameter`
