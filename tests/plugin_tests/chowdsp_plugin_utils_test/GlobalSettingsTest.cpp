@@ -225,6 +225,52 @@ public:
         }
     }
 
+
+    /**
+     * Kick off thread 1, read and write settings to one instance of GlobalPluginSettings
+     * Kick off thread 2 read and write settings to another instance of GlobalPluginSettings
+     * sleep between read/writes to allow for listenerFileChanged callback to be hit, forcing both GlobalPluginSettings instances to read new information from file
+     */
+    void twoInstancesAccessingSameFileTest()
+    {
+        std::atomic<bool> thread1Finished { false };
+        juce::Thread::launch (
+            [&] {
+                chowdsp::GlobalPluginSettings settings;
+                settings.initialise (settingsFile, 1);
+                for(int i = 0; i < 20; ++i)
+                {
+                    chowdsp::GlobalPluginSettings::SettingProperty prop {std::to_string(i), i};
+                    settings.addProperties ({ prop });
+                    expectEquals (settings.getProperty<int> (prop.first), prop.second.get<int>(), "Property is incorrect within thread 1");
+                    juce::Thread::sleep (50); 
+                }
+                thread1Finished = true;
+            });
+
+        std::atomic<bool> thread2Finished { false };
+        juce::Thread::launch (
+            [&] {
+                chowdsp::GlobalPluginSettings settings;
+                settings.initialise (settingsFile, 1);
+                for(int i = 10; i < 30; ++i)
+                {
+                    chowdsp::GlobalPluginSettings::SettingProperty prop {std::to_string(i), i};
+                    settings.addProperties ({ prop });
+                    expectEquals (settings.getProperty<int> (prop.first), prop.second.get<int>(), "Property is incorrect within thread 2");
+                    juce::Thread::sleep (50);
+                }
+                thread2Finished = true;
+            });
+
+        while (! (thread1Finished && thread2Finished))
+            juce::MessageManager::getInstance()->runDispatchLoopUntil (100);
+        
+        chowdsp::GlobalPluginSettings settings;
+        settings.initialise (settingsFile, 1);
+        settings.getSettingsFile().deleteFile();
+    }
+
     void runTestTimed() override
     {
         // clean up just in case last test didn't finish!
@@ -260,6 +306,10 @@ public:
 
         beginTest ("Wreck Settings File Test");
         wreckSettingsFile();
+        
+        beginTest("Two Instances Accessing Same File Test");
+        twoInstancesAccessingSameFileTest();
+        
     }
 };
 
