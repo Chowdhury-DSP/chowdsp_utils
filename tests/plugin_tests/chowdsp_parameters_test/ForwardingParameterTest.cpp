@@ -143,6 +143,8 @@ public:
             expectEquals (forwardParam->get(), defaultValue, "Parameter has incorrect value before parameter modulation!");
             testParamAsModParam->applyMonophonicModulation ((double) modulationAmount); // should have no effect, since the parameter doesn't support modulation!
             expectEquals (forwardParam->get(), defaultValue, "Parameter has incorrect value after parameter modulation!");
+
+            testParam->setParam (nullptr);
         }
 
         {
@@ -151,6 +153,8 @@ public:
 
             expect (! testParamAsModParam->supportsMonophonicModulation(), "chowdsp::ChoiceParameter should not support modulation!");
             expect (! testParamAsModParam->supportsPolyphonicModulation(), "chowdsp::ChoiceParameter should not support modulation!");
+
+            testParam->setParam (nullptr);
         }
 
         {
@@ -170,6 +174,8 @@ public:
             expectEquals (forwardParam->getCurrentValue(), defaultValue, "Parameter has incorrect value before parameter modulation!");
             testParamAsModParam->applyMonophonicModulation ((double) modulationAmount);
             expectEquals (forwardParam->getCurrentValue(), defaultValue + modulationAmount, "Parameter has incorrect value after parameter modulation!");
+
+            testParam->setParam (nullptr);
         }
     }
 
