@@ -2,7 +2,6 @@ add_executable(chowdsp_foleys_test)
 setup_juce_test(chowdsp_foleys_test)
 
 target_link_libraries(chowdsp_foleys_test PRIVATE
-    juce::juce_dsp
     foleys_gui_magic
     chowdsp_foleys
     chowdsp_plugin_base

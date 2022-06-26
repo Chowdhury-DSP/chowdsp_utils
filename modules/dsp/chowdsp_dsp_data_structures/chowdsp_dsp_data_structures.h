@@ -8,7 +8,7 @@ BEGIN_JUCE_MODULE_DECLARATION
    version:       1.0.0
    name:          ChowDSP DSP Data Structures
    description:   DSP data structures for ChowDSP plugins
-   dependencies:  chowdsp_simd
+   dependencies:  juce_dsp, chowdsp_simd
 
    website:       https://ccrma.stanford.edu/~jatin/chowdsp
    license:       GPLv3
@@ -20,6 +20,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 #pragma once
 
+#include <juce_dsp/juce_dsp.h>
 #include <chowdsp_simd/chowdsp_simd.h>
 
 #include "DataStructures/chowdsp_COLAProcessor.h"

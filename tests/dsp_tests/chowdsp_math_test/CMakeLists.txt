@@ -2,7 +2,6 @@ add_executable(chowdsp_math_test)
 setup_juce_test(chowdsp_math_test)
 
 target_link_libraries(chowdsp_math_test PRIVATE
-    juce::juce_dsp
     chowdsp_math
 )
 

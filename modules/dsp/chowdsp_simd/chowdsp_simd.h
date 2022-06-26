@@ -6,9 +6,9 @@ BEGIN_JUCE_MODULE_DECLARATION
    ID:            chowdsp_simd
    vendor:        Chowdhury DSP
    version:       1.0.0
-   name:          ChowDSP DSP Utilities
-   description:   Commonly used DSP utilities for ChowDSP plugins
-   dependencies:  juce_core
+   name:          ChowDSP DSP SIMD
+   description:   JUCE interface for XSIMD, with a few extra useful methods
+   dependencies:  juce_core, juce_audio_basics
 
    website:       https://ccrma.stanford.edu/~jatin/chowdsp
    license:       BSD 3-clause
@@ -20,19 +20,11 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 #pragma once
 
-/** Config: CHOWDSP_USE_CUSTOM_JUCE_DSP
-            Use chowdsp_juce_dsp instead of juce_dsp.
-
-You must ensure that chowdsp_juce_dsp headers are in the include paths.
-*/
-#ifndef CHOWDSP_USE_CUSTOM_JUCE_DSP
-#define CHOWDSP_USE_CUSTOM_JUCE_DSP 0
-#endif
-
 // STL includes
 #include <cassert>
 
 #include <juce_core/juce_core.h>
+#include <juce_audio_basics/juce_audio_basics.h>
 
 // Third-party includes
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wcast-align",
@@ -48,12 +40,6 @@ JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4244)
 #include "third_party/xsimd/include/xsimd/xsimd.hpp"
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 JUCE_END_IGNORE_WARNINGS_MSVC
-
-#if CHOWDSP_USE_CUSTOM_JUCE_DSP
-#include <chowdsp_juce_dsp/chowdsp_juce_dsp.h>
-#else
-#include <juce_dsp/juce_dsp.h>
-#endif
 
 #include "SIMD/chowdsp_SampleTypeHelpers.h"
 #include "SIMD/chowdsp_SIMDUtils.h"

@@ -2,8 +2,6 @@ add_executable(chowdsp_filters_test)
 setup_juce_test(chowdsp_filters_test)
 
 target_link_libraries(chowdsp_filters_test PRIVATE
-    juce::juce_graphics
-    juce::juce_dsp
     chowdsp_filters
     chowdsp_dsp_utils
 )
