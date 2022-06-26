@@ -1,28 +1,10 @@
 #include "ForwardingTestPlugin.h"
 #include "PluginEditor.h"
 
-namespace
-{
-constexpr int maxNumForwardingParameters = 10;
-
-juce::String getForwardParamID (int paramNum)
-{
-    return "forward_param_" + juce::String (paramNum);
-}
-} // namespace
-
-ForwardingTestPlugin::ForwardingTestPlugin()
+ForwardingTestPlugin::ForwardingTestPlugin() : forwardingParameters (vts)
 {
     using namespace chowdsp::ParamUtils;
     chowdsp::ParamUtils::loadParameterPointer (processorChoiceParameter, vts, processorChoiceParamID);
-
-    for (int i = 0; i < maxNumForwardingParameters; ++i)
-    {
-        const auto id = getForwardParamID (i);
-        auto* forwardedParam = dynamic_cast<chowdsp::ForwardingParameter*> (vts.getParameter (id));
-        forwardedParam->setProcessor (&vts.processor);
-        forwardedParams.add (forwardedParam);
-    }
 
     vts.addParameterListener (processorChoiceParamID, this);
 }
@@ -37,11 +19,7 @@ void ForwardingTestPlugin::addParameters (Parameters& params)
     using namespace chowdsp::ParamUtils;
     emplace_param<chowdsp::ChoiceParameter> (params, processorChoiceParamID, "Processor Choice", juce::StringArray { "None", "Tone Generator", "Reverb" }, 0);
 
-    for (int i = 0; i < maxNumForwardingParameters; ++i)
-    {
-        const auto id = getForwardParamID (i);
-        emplace_param<chowdsp::ForwardingParameter> (params, id, nullptr, "Blank");
-    }
+    ForwardingParams::addParameters (params);
 }
 
 void ForwardingTestPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)
@@ -72,16 +50,17 @@ void ForwardingTestPlugin::parameterChanged (const juce::String& parameterID, fl
         return;
     }
 
+    auto& forwardedParams = forwardingParameters.getForwardedParameters();
     for (auto* forwardingParam : forwardedParams)
         forwardingParam->setParam (nullptr);
 
     if (auto* newProcessor = getProcessorForIndex ((int) newValue))
     {
-        int forwardParamIndex = 0;
+        size_t forwardParamIndex = 0;
         auto& processorParameters = newProcessor->getParameters();
         for (auto* param : processorParameters)
         {
-            if (forwardParamIndex >= maxNumForwardingParameters)
+            if (forwardParamIndex >= forwardedParams.size())
             {
                 // this processor has too many parameters!
                 jassertfalse;
