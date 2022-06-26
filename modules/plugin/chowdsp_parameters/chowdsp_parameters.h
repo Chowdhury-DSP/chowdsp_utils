@@ -35,6 +35,7 @@ namespace ParamUtils
 #include "ParamUtils/chowdsp_ParameterTypes.h"
 #include "ParamUtils/chowdsp_ParamUtils.h"
 #include "ParamUtils/chowdsp_ForwardingParameter.h"
+#include "ParamUtils/chowdsp_ForwardingParametersManager.h"
 
 #if JUCE_MODULE_AVAILABLE_chowdsp_rhythm
 #include "ParamUtils/chowdsp_RhythmParameter.h"

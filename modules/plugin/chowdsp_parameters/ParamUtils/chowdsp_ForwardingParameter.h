@@ -21,6 +21,7 @@ public:
      * @param defaultName   Name to use when this parameter is not forwarding another one
      */
     explicit ForwardingParameter (const juce::String& id, juce::UndoManager* um = nullptr, const juce::String& defaultName = "Unused");
+    ~ForwardingParameter() override;
 
     /**
      * Sets a new parameter to be forwarded.
