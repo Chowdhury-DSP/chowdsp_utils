@@ -17,7 +17,6 @@ function(setup_benchmark target file)
     )
 
     target_link_libraries(${target} PRIVATE
-        juce::juce_dsp
         ${extra_modules}
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags

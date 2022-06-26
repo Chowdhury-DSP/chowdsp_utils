@@ -2,7 +2,6 @@ add_executable(chowdsp_plugin_utils_test)
 setup_juce_test(chowdsp_plugin_utils_test)
 
 target_link_libraries(chowdsp_plugin_utils_test PRIVATE
-    juce::juce_dsp
     chowdsp_plugin_utils
     chowdsp_gui
 )

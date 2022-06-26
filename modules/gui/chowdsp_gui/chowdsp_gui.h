@@ -8,7 +8,7 @@
     version:       1.0.0
     name:          ChowDSP GUI Utilities
     description:   Commonly used GUI utilities for ChowDSP plugins
-    dependencies:  juce_core, juce_audio_processors, juce_gui_basics
+    dependencies:  juce_core, juce_audio_processors, juce_gui_basics, juce_dsp
 
     website:       https://ccrma.stanford.edu/~jatin/chowdsp
     license:       GPLv3
@@ -31,18 +31,13 @@
 #include <juce_core/juce_core.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_basics/juce_gui_basics.h>
+#include <juce_dsp/juce_dsp.h>
 
 #if JUCE_MODULE_AVAILABLE_juce_opengl && CHOWDSP_ENABLE_OPEN_GL_CONTEXT
 #define CHOWDSP_OPENGL_IS_AVAILABLE 1
 #include <juce_opengl/juce_opengl.h>
 #else
 #define CHOWDSP_OPENGL_IS_AVAILABLE 0
-#endif
-
-#if CHOWDSP_USE_CUSTOM_JUCE_DSP
-#include <chowdsp_juce_dsp/chowdsp_juce_dsp.h>
-#else
-#include <juce_dsp/juce_dsp.h>
 #endif
 
 #include "Assets/chowdsp_BinaryData.h"
