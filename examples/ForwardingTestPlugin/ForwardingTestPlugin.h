@@ -39,10 +39,8 @@ private:
         {
             return "forward_param_" + juce::String (paramIndex);
         }
-
-        static constexpr int totalNumParameters = 10;
     };
-    using ForwardingParams = chowdsp::ForwardingParametersManager<ParamForwardingProvider>;
+    using ForwardingParams = chowdsp::ForwardingParametersManager<ParamForwardingProvider, 10>;
     ForwardingParams forwardingParameters;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ForwardingTestPlugin)
