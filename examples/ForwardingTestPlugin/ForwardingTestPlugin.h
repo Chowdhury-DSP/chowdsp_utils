@@ -33,7 +33,15 @@ private:
     SignalGeneratorPlugin toneGenerator;
     SimpleReverbPlugin reverb;
 
-    juce::Array<chowdsp::ForwardingParameter*> forwardedParams;
+    struct ParamForwardingProvider
+    {
+        static juce::String getForwardingParameterID (int paramIndex)
+        {
+            return "forward_param_" + juce::String (paramIndex);
+        }
+    };
+    using ForwardingParams = chowdsp::ForwardingParametersManager<ParamForwardingProvider, 10>;
+    ForwardingParams forwardingParameters;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ForwardingTestPlugin)
 };

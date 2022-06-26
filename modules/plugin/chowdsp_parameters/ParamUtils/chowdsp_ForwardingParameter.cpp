@@ -74,6 +74,14 @@ ForwardingParameter::ForwardingParameter (const juce::String& id, juce::UndoMana
 {
 }
 
+ForwardingParameter::~ForwardingParameter()
+{
+    // You must call `setParam (nullptr)` before destroying the ForwardingParameter,
+    // otherwise it's very difficult to control the order of deletion between the
+    // ForwardingParameter and the parameter being forwarded to.
+    jassert (internalParam == nullptr);
+}
+
 void ForwardingParameter::setParam (juce::RangedAudioParameter* paramToUse, const juce::String& newName)
 {
     juce::SpinLock::ScopedLockType sl (paramLock);
