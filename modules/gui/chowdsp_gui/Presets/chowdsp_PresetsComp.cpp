@@ -255,6 +255,8 @@ int PresetsComp::addSharePresetOptions (int optionID)
                                       loadPresetSafe (std::make_unique<Preset> (fc.getResult()));
                                   });
     });
+#else
+    return optionID;
 #endif
 }
 
