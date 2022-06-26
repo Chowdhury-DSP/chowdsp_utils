@@ -43,7 +43,7 @@ public:
 
     /** Returns a flat array of the forwarded parameters */
     [[maybe_unused]] auto& getForwardedParameters() { return forwardedParams; }
-    
+
     /** Returns a flat array of the forwarded parameters */
     [[maybe_unused]] const auto& getForwardedParameters() const { return forwardedParams; }
 
