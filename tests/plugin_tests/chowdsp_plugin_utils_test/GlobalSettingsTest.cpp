@@ -307,7 +307,7 @@ public:
 
         beginTest ("Wreck Settings File Test");
         wreckSettingsFile();
-        
+
         beginTest ("Two Instances Accessing Same File Test");
         twoInstancesAccessingSameFileTest();
     }
