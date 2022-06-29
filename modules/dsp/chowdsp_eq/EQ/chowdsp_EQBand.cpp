@@ -48,7 +48,8 @@ void EQBand<FloatType, FilterChoices...>::prepare (const juce::dsp::ProcessSpec&
 
             if constexpr (std::is_base_of_v<IIRFilter<FilterType::Order, FloatType>, FilterType> || std::is_base_of_v<SOSFilter<FilterType::Order, FloatType>, FilterType>)
                 filter.prepare ((int) spec.numChannels);
-            else if constexpr (std::is_same_v<NthOrderFilter<FloatType, FilterType::Order, FilterType::Type>, FilterType>)
+            else if constexpr (std::is_same_v<StateVariableFilter<FloatType, FilterType::Type>, FilterType>
+                            || std::is_same_v<NthOrderFilter<FloatType, FilterType::Order, FilterType::Type>, FilterType>)
                 filter.prepare (spec);
             else
                 jassertfalse; // unknown filter type!
@@ -116,8 +117,102 @@ std::enable_if_t<std::is_base_of_v<IIRFilter<N, T>, FilterType> || std::is_base_
 }
 
 template <typename FloatType, typename... FilterChoices>
+template <typename FilterType, typename T, StateVariableFilterType type>
+std::enable_if_t<std::is_same_v<StateVariableFilter<T, type>, FilterType>, void>
+    EQBand<FloatType, FilterChoices...>::processFilterChannel (FilterType& filter, chowdsp::AudioBlock<FloatType>& block)
+{
+    const auto numChannels = (int) block.getNumChannels();
+    const auto numSamples = (int) block.getNumSamples();
+
+    const auto* freqHzValues = freqSmooth.getSmoothedBuffer();
+    const auto* qValues = qSmooth.getSmoothedBuffer();
+    const auto* gainValues = gainSmooth.getSmoothedBuffer();
+
+    if (freqSmooth.isSmoothing() && qSmooth.isSmoothing() && gainSmooth.isSmoothing())
+    {
+        for (int n = 0; n < numSamples; ++n)
+        {
+            filter.template setCutoffFrequency<false> (freqHzValues[n]);
+            filter.template setQValue<false> (qValues[n]);
+            filter.template setGain<false> (gainValues[n]);
+            filter.update();
+            for (int ch = 0; ch < numChannels; ++ch)
+                block.setSample (ch, n, filter.processSample (ch, block.getSample (ch, n)));
+        }
+    }
+    else if (freqSmooth.isSmoothing() && qSmooth.isSmoothing())
+    {
+        for (int n = 0; n < numSamples; ++n)
+        {
+            filter.template setCutoffFrequency<false> (freqHzValues[n]);
+            filter.template setQValue<false> (qValues[n]);
+            filter.update();
+            for (int ch = 0; ch < numChannels; ++ch)
+                block.setSample (ch, n, filter.processSample (ch, block.getSample (ch, n)));
+        }
+    }
+    else if (freqSmooth.isSmoothing() && gainSmooth.isSmoothing())
+    {
+        for (int n = 0; n < numSamples; ++n)
+        {
+            filter.template setCutoffFrequency<false> (freqHzValues[n]);
+            filter.template setGain<false> (gainValues[n]);
+            filter.update();
+            for (int ch = 0; ch < numChannels; ++ch)
+                block.setSample (ch, n, filter.processSample (ch, block.getSample (ch, n)));
+        }
+    }
+    else if (qSmooth.isSmoothing() && gainSmooth.isSmoothing())
+    {
+        for (int n = 0; n < numSamples; ++n)
+        {
+            filter.template setQValue<false> (qValues[n]);
+            filter.template setGain<false> (gainValues[n]);
+            filter.update();
+            for (int ch = 0; ch < numChannels; ++ch)
+                block.setSample (ch, n, filter.processSample (ch, block.getSample (ch, n)));
+        }
+    }
+    else if (freqSmooth.isSmoothing())
+    {
+        for (int n = 0; n < numSamples; ++n)
+        {
+            filter.template setCutoffFrequency (freqHzValues[n]);
+            for (int ch = 0; ch < numChannels; ++ch)
+                block.setSample (ch, n, filter.processSample (ch, block.getSample (ch, n)));
+        }
+    }
+    else if (qSmooth.isSmoothing())
+    {
+        for (int n = 0; n < numSamples; ++n)
+        {
+            filter.template setQValue (qValues[n]);
+            for (int ch = 0; ch < numChannels; ++ch)
+                block.setSample (ch, n, filter.processSample (ch, block.getSample (ch, n)));
+        }
+    }
+    else if (gainSmooth.isSmoothing())
+    {
+        for (int n = 0; n < numSamples; ++n)
+        {
+            filter.template setGain (gainValues[n]);
+            for (int ch = 0; ch < numChannels; ++ch)
+                block.setSample (ch, n, filter.processSample (ch, block.getSample (ch, n)));
+        }
+    }
+    else
+    {
+        filter.template setCutoffFrequency<false> (freqSmooth.getCurrentValue());
+        filter.template setQValue<false> (qSmooth.getCurrentValue());
+        filter.template setGain<false> (gainSmooth.getCurrentValue());
+        filter.update();
+        filter.process (chowdsp::ProcessContextReplacing<FloatType> { block });
+    }
+}
+
+template <typename FloatType, typename... FilterChoices>
 template <typename FilterType, typename T, size_t N, StateVariableFilterType type>
-std::enable_if_t<std::is_base_of_v<NthOrderFilter<T, N, type>, FilterType>, void>
+std::enable_if_t<std::is_same_v<NthOrderFilter<T, N, type>, FilterType>, void>
     EQBand<FloatType, FilterChoices...>::processFilterChannel (FilterType& filter, chowdsp::AudioBlock<FloatType>& block)
 {
     const auto numChannels = (int) block.getNumChannels();

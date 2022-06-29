@@ -15,10 +15,15 @@ public:
     static constexpr auto Order = order;
     static constexpr auto Type = type;
 
+    static_assert (type == StateVariableFilterType::Lowpass
+                       || type == StateVariableFilterType::Highpass
+                       || type == StateVariableFilterType::Bandpass,
+                   "NthOrderFilter is not defined for this filter type!");
+
     NthOrderFilter() : butterQVals (QValCalcs::butterworth_Qs<NumericType, order>())
     {
         for (size_t i = 0; i < nFilters; ++i)
-            filters[i].setResonance (butterQVals[i]);
+            filters[i].setQValue (butterQVals[i]);
     }
 
     /** Prepares the filter to process an audio stream */
@@ -45,28 +50,28 @@ public:
     /** Sets the Q-value of the filter */
     void setQValue (T qVal)
     {
-        filters[0].setResonance (butterQVals[0] * qVal * juce::MathConstants<NumericType>::sqrt2);
+        filters[0].setQValue (butterQVals[0] * qVal * juce::MathConstants<NumericType>::sqrt2);
     }
 
     /** Processes a block of samples */
     void process (const chowdsp::ProcessContextReplacing<T>& context)
     {
         for (auto& filt : filters)
-            filt.template process<chowdsp::ProcessContextReplacing<T>, type> (context);
+            filt.process (context);
     }
 
     /** Processes a single sample */
     inline T processSample (int channel, T x) noexcept
     {
         for (auto& filt : filters)
-            x = filt.template processSample<type> (channel, x);
+            x = filt.processSample (channel, x);
         return x;
     }
 
 private:
     static constexpr size_t nFilters = order / 2;
 
-    chowdsp::StateVariableFilter<T> filters[nFilters];
+    chowdsp::StateVariableFilter<T, type> filters[nFilters];
     const std::array<NumericType, nFilters> butterQVals;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NthOrderFilter)

@@ -7,80 +7,99 @@ enum class StateVariableFilterType
 {
     Lowpass,
     Bandpass,
-    Highpass
+    Highpass,
+    Notch,
+    Allpass,
+    Bell,
+    LowShelf,
+    HighShelf,
 };
 
-//==============================================================================
-/** An IIR filter that can perform low, band and high-pass filtering on an audio
-    signal, with 12 dB of attenuation per octave, using a TPT structure, designed
-    for fast modulation (see Vadim Zavalishin's documentation about TPT
-    structures for more information). Its behaviour is based on the analog
-    state variable filter circuit.
-
-    Note: The bandpass here is not the one in the RBJ CookBook as its gain can be
-    higher than 0 dB. For the classic 0 dB bandpass, we need to multiply the
-    result by R2.
-
-    Note 2: Using this class prevents some loud audio artefacts commonly encountered when
-    changing the cutoff frequency using other filter simulation structures and IIR
-    filter classes. However, this class may still require additional smoothing for
-    cutoff frequency changes.
-
-    @see IIRFilter
-*/
-template <typename SampleType>
+/**
+ * A State Variable Filter, as derived by Andy Simper (Cytomic).
+ *
+ * Reference: https://cytomic.com/files/dsp/SvfLinearTrapAllOutputs.pdf
+ */
+template <typename SampleType, StateVariableFilterType type>
 class StateVariableFilter
 {
 public:
-    //==============================================================================
-    using Type = StateVariableFilterType;
+    static constexpr int Order = 2;
+    static constexpr auto Type = type;
+
+    using FilterType = StateVariableFilterType;
     using NumericType = SampleTypeHelpers::NumericType<SampleType>;
 
-    //==============================================================================
     /** Constructor. */
     StateVariableFilter();
 
-    //==============================================================================
-    /** Sets the cutoff frequency of the filter.
-
-        @param newFrequencyHz the new cutoff frequency in Hz.
+    /**
+     * Sets the cutoff frequency of the filter.
+     *
+     * @param newFrequencyHz the new cutoff frequency in Hz.
     */
+    template <bool shouldUpdate = true>
     void setCutoffFrequency (SampleType newFrequencyHz);
 
-    /** Sets the resonance of the filter.
-
-        Note: The bandwidth of the resonance increases with the value of the
-        parameter. To have a standard 12 dB / octave filter, the value must be set
-        at 1 / sqrt(2).
+    /**
+     * Sets the resonance of the filter.
+     *
+     * Note: The bandwidth of the resonance increases with the value of the
+     * parameter. To have a standard 12 dB / octave filter, the value must be set
+     * at 1 / sqrt(2).
     */
-    void setResonance (SampleType newResonance);
+    template <bool shouldUpdate = true>
+    void setQValue (SampleType newResonance);
 
-    //==============================================================================
+    /**
+     * Sets the gain of the filter in units of linear gain.
+     *
+     * Note that for some filter types (Lowpass, Highpass, Bandpass, Allpass)
+     * this control will have no effect.
+     */
+    template <bool shouldUpdate = true>
+    void setGain (SampleType newGainLinear);
+
+    /**
+     * Sets the gain of the filter in units of Decibels.
+     *
+     * Note that for some filter types (Lowpass, Highpass, Bandpass, Allpass)
+     * this control will have no effect.
+     */
+    template <bool shouldUpdate = true>
+    void setGainDecibels (SampleType newGainDecibels);
+
+    /**
+     * Updates the filter coefficients.
+     *
+     * Don't touch this unless you know what you're doing!
+     */
+    void update();
+
     /** Returns the cutoff frequency of the filter. */
     [[nodiscard]] SampleType getCutoffFrequency() const noexcept { return cutoffFrequency; }
 
     /** Returns the resonance of the filter. */
     [[nodiscard]] SampleType getResonance() const noexcept { return resonance; }
 
-    //==============================================================================
+    /** Returns the gain of the filter. */
+    [[nodiscard]] SampleType getGain() const noexcept { return gain; }
+
     /** Initialises the filter. */
     void prepare (const juce::dsp::ProcessSpec& spec);
 
     /** Resets the internal state variables of the filter. */
     void reset();
 
-    /** Resets the internal state variables of the filter to a given value. */
-    void reset (SampleType newValue);
-
-    /** Ensure that the state variables are rounded to zero if the state
-        variables are denormals. This is only needed if you are doing
-        sample by sample processing.
+    /**
+     * Ensure that the state variables are rounded to zero if the state
+     * variables are denormals. This is only needed if you are doing
+     * sample by sample processing.
     */
     void snapToZero() noexcept;
 
-    //==============================================================================
     /** Processes the input and output samples supplied in the processing context. */
-    template <typename ProcessContext, Type type>
+    template <typename ProcessContext>
     void process (const ProcessContext& context) noexcept
     {
         const auto& inputBlock = context.getInputBlock();
@@ -88,7 +107,7 @@ public:
         const auto numChannels = outputBlock.getNumChannels();
         const auto numSamples = outputBlock.getNumSamples();
 
-        jassert (inputBlock.getNumChannels() <= s1.size());
+        jassert (inputBlock.getNumChannels() <= ic1eq.size());
         jassert (inputBlock.getNumChannels() == numChannels);
         jassert (inputBlock.getNumSamples() == numSamples);
 
@@ -103,8 +122,11 @@ public:
             auto* inputSamples = inputBlock.getChannelPointer (channel);
             auto* outputSamples = outputBlock.getChannelPointer (channel);
 
+            ScopedValue s1 { ic1eq[channel] };
+            ScopedValue s2 { ic2eq[channel] };
+
             for (size_t i = 0; i < numSamples; ++i)
-                outputSamples[i] = processSample<type> ((int) channel, inputSamples[i]);
+                outputSamples[i] = processSampleInternal (inputSamples[i], s1.get(), s2.get());
         }
 
 #if JUCE_SNAP_TO_ZERO
@@ -112,46 +134,86 @@ public:
 #endif
     }
 
-    //==============================================================================
     /** Processes one sample at a time on a given channel. */
-    template <Type type>
     inline SampleType processSample (int channel, SampleType inputValue) noexcept
     {
-        auto& ls1 = s1[(size_t) channel];
-        auto& ls2 = s2[(size_t) channel];
-
-        auto yT = (inputValue - ls1 * gpR2 - ls2) * gh;
-        ls1 += yT + yT;
-
-        auto gA = (ls1 - yT) * g;
-        ls2 += gA + gA;
-
-        using namespace SIMDUtils;
-        switch (type)
-        {
-            case Type::Lowpass:
-                return ls2 - gA;
-            case Type::Bandpass:
-                return ls1 - yT;
-            case Type::Highpass:
-                return yT / g;
-            default:
-                return ls2 - gA; // lowpass
-        }
+        return processSampleInternal (inputValue, ic1eq[(size_t) channel], ic2eq[(size_t) channel]);
     }
 
 private:
-    //==============================================================================
-    void update();
+    inline SampleType processSampleInternal (SampleType x, SampleType& s1, SampleType& s2) noexcept
+    {
+        const auto v3 = x - s2;
+        const auto v0 = a1 * v3 - ak * s1;
+        const auto v1 = a2 * v3 + a1 * s1;
+        const auto v2 = a3 * v3 + a2 * s1 + s2;
 
-    //==============================================================================
-    SampleType g, h, R2, gh, gpR2, g2;
-    std::vector<SampleType> s1 { 2 }, s2 { 2 };
+        // update state
+        s1 = (NumericType) 2 * v1 - s1;
+        s2 = (NumericType) 2 * v2 - s2;
+
+        if constexpr (type == FilterType::Lowpass)
+            return v2;
+        else if constexpr (type == FilterType::Bandpass)
+            return v1;
+        else if constexpr (type == FilterType::Highpass)
+            return v0;
+        else if constexpr (type == FilterType::Notch)
+            return v2 + v0; // low + high
+        else if constexpr (type == FilterType::Allpass)
+            return v2 + v0 - k0 * v1; // low + high - k * band
+        else if constexpr (type == FilterType::Bell)
+            return v2 + v0 + k0A * v1; // low + high + k0 * A * band
+        else if constexpr (type == FilterType::LowShelf)
+            return Asq * v2 + k0A * v1 + v0; // Asq * low + k0 * A * band + high
+        else if constexpr (type == FilterType::HighShelf)
+            return Asq * v0 + k0A * v1 + v2; // Asq * high + k0 * A * band + low
+        else
+        {
+            jassertfalse; // unknown filter type!
+            return {};
+        }
+    }
+
+    SampleType cutoffFrequency, resonance, gain; // parameters
+    SampleType g0, k0, A, sqrtA; // parameter intermediate values
+    SampleType a1, a2, a3, ak, k0A, Asq; // coefficients
+    std::vector<SampleType> ic1eq { 2 }, ic2eq { 2 }; // state variables
 
     double sampleRate = 44100.0;
-    SampleType cutoffFrequency = static_cast<NumericType> (1000.0),
-               resonance = static_cast<NumericType> (1.0 / std::sqrt (2.0));
 };
-} //namespace chowdsp
+
+/** Convenient alias for an SVF lowpass filter. */
+template <typename SampleType = float>
+using SVFLowpass = StateVariableFilter<SampleType, StateVariableFilterType::Lowpass>;
+
+/** Convenient alias for an SVF highpass filter. */
+template <typename SampleType = float>
+using SVFHighpass = StateVariableFilter<SampleType, StateVariableFilterType::Highpass>;
+
+/** Convenient alias for an SVF bandpass filter. */
+template <typename SampleType = float>
+using SVFBandpass = StateVariableFilter<SampleType, StateVariableFilterType::Bandpass>;
+
+/** Convenient alias for an SVF allpass filter. */
+template <typename SampleType = float>
+using SVFAllpass = StateVariableFilter<SampleType, StateVariableFilterType::Allpass>;
+
+/** Convenient alias for an SVF notch filter. */
+template <typename SampleType = float>
+using SVFNotch = StateVariableFilter<SampleType, StateVariableFilterType::Notch>;
+
+/** Convenient alias for an SVF bell filter. */
+template <typename SampleType = float>
+using SVFBell = StateVariableFilter<SampleType, StateVariableFilterType::Bell>;
+
+/** Convenient alias for an SVF low-shelf filter. */
+template <typename SampleType = float>
+using SVFLowShelf = StateVariableFilter<SampleType, StateVariableFilterType::LowShelf>;
+
+/** Convenient alias for an SVF high-shelf filter. */
+template <typename SampleType = float>
+using SVFHighShelf = StateVariableFilter<SampleType, StateVariableFilterType::HighShelf>;
+} // namespace chowdsp
 
 #include "chowdsp_StateVariableFilter.cpp"
