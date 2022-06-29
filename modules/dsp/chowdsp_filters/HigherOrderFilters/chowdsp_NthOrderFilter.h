@@ -7,13 +7,18 @@ namespace chowdsp
  * composed of State Variable Filters with Butterworth Q, so
  * the filter can be modulated pretty fast.
  */
-template <typename T, size_t order = 4, StateVariableFilter2Type type = StateVariableFilter2Type::Lowpass>
+template <typename T, size_t order = 4, StateVariableFilterType type = StateVariableFilterType::Lowpass>
 class NthOrderFilter
 {
 public:
     using NumericType = SampleTypeHelpers::NumericType<T>;
     static constexpr auto Order = order;
     static constexpr auto Type = type;
+
+    static_assert (type == StateVariableFilterType::Lowpass
+                       || type == StateVariableFilterType::Highpass
+                       || type == StateVariableFilterType::Bandpass,
+                   "NthOrderFilter is not defined for this filter type!");
 
     NthOrderFilter() : butterQVals (QValCalcs::butterworth_Qs<NumericType, order>())
     {
@@ -66,7 +71,7 @@ public:
 private:
     static constexpr size_t nFilters = order / 2;
 
-    chowdsp::StateVariableFilter2<T, type> filters[nFilters];
+    chowdsp::StateVariableFilter<T, type> filters[nFilters];
     const std::array<NumericType, nFilters> butterQVals;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NthOrderFilter)
