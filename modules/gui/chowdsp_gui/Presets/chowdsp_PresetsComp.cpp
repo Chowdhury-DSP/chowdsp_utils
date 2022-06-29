@@ -211,8 +211,7 @@ int PresetsComp::addSavePresetOptions (int optionID)
     optionID = addPresetMenuItem (menu,
                                   optionID,
                                   "Reset",
-                                  [&]
-                                  {
+                                  [&] {
                                       if (auto* currentPreset = manager.getCurrentPreset())
                                           manager.loadPreset (*currentPreset);
                                   });
@@ -220,8 +219,7 @@ int PresetsComp::addSavePresetOptions (int optionID)
     optionID = addPresetMenuItem (menu,
                                   optionID,
                                   "Save Preset As",
-                                  [&]
-                                  { saveUserPreset(); });
+                                  [&] { saveUserPreset(); });
 
     if (auto* currentPreset = manager.getCurrentPreset())
     {
@@ -231,8 +229,7 @@ int PresetsComp::addSavePresetOptions (int optionID)
             optionID = addPresetMenuItem (menu,
                                           optionID,
                                           "Resave Preset",
-                                          [this]
-                                          {
+                                          [this] {
                                               if (auto* curPreset = manager.getCurrentPreset())
                                                   savePresetFile (curPreset->getPresetFile().getRelativePathFrom (manager.getUserPresetPath()));
                                           });
@@ -243,8 +240,7 @@ int PresetsComp::addSavePresetOptions (int optionID)
             optionID = addPresetMenuItem (menu,
                                           optionID,
                                           "Delete Preset",
-                                          [this]
-                                          {
+                                          [this] {
                                               if (auto* curPreset = manager.getCurrentPreset())
                                               {
                                                   auto presetFile = curPreset->getPresetFile();
