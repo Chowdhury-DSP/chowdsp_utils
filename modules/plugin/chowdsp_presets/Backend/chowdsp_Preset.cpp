@@ -86,6 +86,7 @@ void Preset::initialise (const juce::XmlElement* xml)
 
 void Preset::toFile (const juce::File& presetFile)
 {
+    file = presetFile;
     auto presetXml = toXml();
 
     if (presetXml == nullptr)
@@ -94,8 +95,6 @@ void Preset::toFile (const juce::File& presetFile)
     presetFile.deleteRecursively();
     presetFile.create();
     presetXml->writeTo (presetFile);
-
-    file = presetFile;
 }
 
 std::unique_ptr<juce::XmlElement> Preset::toXml() const

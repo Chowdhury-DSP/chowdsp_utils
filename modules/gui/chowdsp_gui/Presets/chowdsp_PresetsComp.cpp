@@ -211,7 +211,8 @@ int PresetsComp::addSavePresetOptions (int optionID)
     optionID = addPresetMenuItem (menu,
                                   optionID,
                                   "Reset",
-                                  [&] {
+                                  [&]
+                                  {
                                       if (auto* currentPreset = manager.getCurrentPreset())
                                           manager.loadPreset (*currentPreset);
                                   });
@@ -219,45 +220,49 @@ int PresetsComp::addSavePresetOptions (int optionID)
     optionID = addPresetMenuItem (menu,
                                   optionID,
                                   "Save Preset As",
-                                  [&] { saveUserPreset(); });
+                                  [&]
+                                  { saveUserPreset(); });
 
-    // editing should only be allowed for user presets!
-    if (manager.getCurrentPreset()->getVendor() == manager.getUserPresetName() && manager.getCurrentPreset()->getPresetFile().existsAsFile())
+    if (auto* currentPreset = manager.getCurrentPreset())
     {
-        optionID = addPresetMenuItem (menu,
-                                      optionID,
-                                      "Resave Preset",
-                                      [&]
-                                      {
-                                          if (auto* currentPreset = manager.getCurrentPreset())
-                                              savePresetFile (currentPreset->getPresetFile().getRelativePathFrom (manager.getUserPresetPath()));
-                                      });
-    }
-
-    if (manager.getCurrentPreset()->getPresetFile() != juce::File())
-    {
-        optionID = addPresetMenuItem (menu,
-                                      optionID,
-                                      "Delete Preset",
-                                      [&]
-                                      {
-                                          if (auto* currentPreset = manager.getCurrentPreset())
+        // editing should only be allowed for user presets!
+        if (currentPreset->getVendor() == manager.getUserPresetName() && currentPreset->getPresetFile().existsAsFile())
+        {
+            optionID = addPresetMenuItem (menu,
+                                          optionID,
+                                          "Resave Preset",
+                                          [this]
                                           {
-                                              auto presetFile = currentPreset->getPresetFile();
-                                              if (! (presetFile.existsAsFile() && presetFile.hasFileExtension (presetExt)))
-                                              {
-                                                  juce::NativeMessageBox::showMessageBox (juce::MessageBoxIconType::WarningIcon, "Preset Deletion", "Unable to find preset file!");
-                                                  return;
-                                              }
+                                              if (auto* curPreset = manager.getCurrentPreset())
+                                                  savePresetFile (curPreset->getPresetFile().getRelativePathFrom (manager.getUserPresetPath()));
+                                          });
+        }
 
-                                              if (juce::NativeMessageBox::showOkCancelBox (juce::MessageBoxIconType::QuestionIcon, "Preset Deletion", "Are you sure you want to delete this preset? This operation cannot be undone."))
+        if (manager.getCurrentPreset()->getPresetFile() != juce::File())
+        {
+            optionID = addPresetMenuItem (menu,
+                                          optionID,
+                                          "Delete Preset",
+                                          [this]
+                                          {
+                                              if (auto* curPreset = manager.getCurrentPreset())
                                               {
-                                                  presetFile.deleteFile();
-                                                  manager.loadDefaultPreset();
-                                                  manager.loadUserPresetsFromFolder (manager.getUserPresetPath());
+                                                  auto presetFile = curPreset->getPresetFile();
+                                                  if (! (presetFile.existsAsFile() && presetFile.hasFileExtension (presetExt)))
+                                                  {
+                                                      juce::NativeMessageBox::showMessageBox (juce::MessageBoxIconType::WarningIcon, "Preset Deletion", "Unable to find preset file!");
+                                                      return;
+                                                  }
+
+                                                  if (juce::NativeMessageBox::showOkCancelBox (juce::MessageBoxIconType::QuestionIcon, "Preset Deletion", "Are you sure you want to delete this preset? This operation cannot be undone."))
+                                                  {
+                                                      presetFile.deleteFile();
+                                                      manager.loadDefaultPreset();
+                                                      manager.loadUserPresetsFromFolder (manager.getUserPresetPath());
+                                                  }
                                               }
-                                          }
-                                      });
+                                          });
+        }
     }
 
     return optionID;
