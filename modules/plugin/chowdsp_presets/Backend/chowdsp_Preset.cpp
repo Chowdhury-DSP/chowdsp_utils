@@ -5,7 +5,8 @@ namespace chowdsp
 Preset::Preset (const juce::String& thisName,
                 const juce::String& thisVendor,
                 const juce::XmlElement& stateXml,
-                const juce::String& thisCategory) : name (thisName),
+                const juce::String& thisCategory,
+                const juce::File& sourceFile) : name (thisName),
                                                     vendor (thisVendor),
                                                     category (thisCategory),
 #if defined JucePlugin_VersionString
@@ -13,7 +14,8 @@ Preset::Preset (const juce::String& thisName,
 #else
                                                     version (std::make_unique<VersionUtils::Version> ("0.0.0")),
 #endif
-                                                    state (std::make_unique<juce::XmlElement> (stateXml))
+                                                    state (std::make_unique<juce::XmlElement> (stateXml)),
+                                                    file (sourceFile)
 {
 }
 
@@ -68,6 +70,10 @@ void Preset::initialise (const juce::XmlElement* xml)
 
     version = std::make_unique<VersionUtils::Version> (versionStr);
 
+    const auto presetSavedFile = juce::File { xml->getStringAttribute (fileTag) };
+    if (presetSavedFile.existsAsFile())
+        file = presetSavedFile;
+
     if (auto* xmlExtraInfo = xml->getChildByName (extraInfoTag))
         extraInfo = std::move (*xmlExtraInfo);
 
@@ -108,6 +114,7 @@ std::unique_ptr<juce::XmlElement> Preset::toXml() const
     presetXml->setAttribute (vendorTag, vendor);
     presetXml->setAttribute (categoryTag, category);
     presetXml->setAttribute (versionTag, version->getVersionString());
+    presetXml->setAttribute (fileTag, file.getFullPathName());
 
     presetXml->addChildElement (new juce::XmlElement (*state));
     presetXml->addChildElement (new juce::XmlElement (extraInfo));
@@ -148,6 +155,7 @@ const juce::Identifier Preset::pluginTag { "plugin" };
 const juce::Identifier Preset::vendorTag { "vendor" };
 const juce::Identifier Preset::categoryTag { "category" };
 const juce::Identifier Preset::versionTag { "version" };
+const juce::Identifier Preset::fileTag { "preset_file" };
 const juce::Identifier Preset::extraInfoTag { "extra_info" };
 [[maybe_unused]] const juce::Identifier Preset::stateTag { "Parameters" };
 

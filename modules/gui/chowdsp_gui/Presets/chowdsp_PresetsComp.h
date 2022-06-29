@@ -31,7 +31,7 @@ public:
 
     void presetListUpdated() override;
     void presetDirtyStatusChanged() override { updatePresetBoxText(); }
-    void selectedPresetChanged() override { updatePresetBoxText(); }
+    void selectedPresetChanged() override;
 
     void goToNextPreset (bool forward);
     void setNextPrevButton (const juce::Drawable* image, bool isNext);

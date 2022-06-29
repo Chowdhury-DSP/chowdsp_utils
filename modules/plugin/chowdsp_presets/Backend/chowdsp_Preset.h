@@ -8,7 +8,7 @@ namespace chowdsp
 struct Preset
 {
     /** Create a preset from the preset information */
-    Preset (const juce::String& name, const juce::String& vendor, const juce::XmlElement& stateXml, const juce::String& category = {});
+    Preset (const juce::String& name, const juce::String& vendor, const juce::XmlElement& stateXml, const juce::String& category = {}, const juce::File& file = {});
 
     /** Create a preset from a file */
     explicit Preset (const juce::File& presetFile);
@@ -76,6 +76,7 @@ struct Preset
     static const juce::Identifier vendorTag;
     static const juce::Identifier categoryTag;
     static const juce::Identifier versionTag;
+    static const juce::Identifier fileTag;
     static const juce::Identifier extraInfoTag;
     [[maybe_unused]] static const juce::Identifier stateTag;
 
