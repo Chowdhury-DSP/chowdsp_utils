@@ -22,4 +22,5 @@ target_sources(chowdsp_filters_test PRIVATE
     EllipticFilterTest.cpp
     FractionalOrderFilterTest.cpp
     FIRFilterTest.cpp
+    StateVariableFilterTest.cpp
 )
