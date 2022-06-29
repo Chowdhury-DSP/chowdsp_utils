@@ -48,8 +48,7 @@ void EQBand<FloatType, FilterChoices...>::prepare (const juce::dsp::ProcessSpec&
 
             if constexpr (std::is_base_of_v<IIRFilter<FilterType::Order, FloatType>, FilterType> || std::is_base_of_v<SOSFilter<FilterType::Order, FloatType>, FilterType>)
                 filter.prepare ((int) spec.numChannels);
-            else if constexpr (std::is_same_v<StateVariableFilter<FloatType, FilterType::Type>, FilterType>
-                            || std::is_same_v<NthOrderFilter<FloatType, FilterType::Order, FilterType::Type>, FilterType>)
+            else if constexpr (std::is_same_v<StateVariableFilter<FloatType, FilterType::Type>, FilterType> || std::is_same_v<NthOrderFilter<FloatType, FilterType::Order, FilterType::Type>, FilterType>)
                 filter.prepare (spec);
             else
                 jassertfalse; // unknown filter type!
