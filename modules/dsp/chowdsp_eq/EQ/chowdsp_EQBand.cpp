@@ -176,7 +176,7 @@ std::enable_if_t<std::is_same_v<StateVariableFilter<T, type>, FilterType>, void>
     {
         for (int n = 0; n < numSamples; ++n)
         {
-            filter.template setCutoffFrequency (freqHzValues[n]);
+            filter.setCutoffFrequency (freqHzValues[n]);
             for (int ch = 0; ch < numChannels; ++ch)
                 block.setSample (ch, n, filter.processSample (ch, block.getSample (ch, n)));
         }
@@ -185,7 +185,7 @@ std::enable_if_t<std::is_same_v<StateVariableFilter<T, type>, FilterType>, void>
     {
         for (int n = 0; n < numSamples; ++n)
         {
-            filter.template setQValue (qValues[n]);
+            filter.setQValue (qValues[n]);
             for (int ch = 0; ch < numChannels; ++ch)
                 block.setSample (ch, n, filter.processSample (ch, block.getSample (ch, n)));
         }
@@ -194,7 +194,7 @@ std::enable_if_t<std::is_same_v<StateVariableFilter<T, type>, FilterType>, void>
     {
         for (int n = 0; n < numSamples; ++n)
         {
-            filter.template setGain (gainValues[n]);
+            filter.setGain (gainValues[n]);
             for (int ch = 0; ch < numChannels; ++ch)
                 block.setSample (ch, n, filter.processSample (ch, block.getSample (ch, n)));
         }
