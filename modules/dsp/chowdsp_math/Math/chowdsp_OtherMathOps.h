@@ -36,7 +36,7 @@ namespace Math
     template <typename T>
     inline T sign (T val)
     {
-        return (T (0) < val) - (val < T (0));
+        return T ((T (0) < val) - (val < T (0)));
     }
 
     /**

@@ -10,17 +10,17 @@ public:
     {
         using Math::sign;
         this->initialise (
-            [] (T x)
-            { return juce::jlimit ((T) -1, (T) 1, x); },
-            [] (T x)
+            [] (auto x)
+            { return juce::jlimit (-1.0, 1.0, x); },
+            [] (auto x)
             {
-                bool inRange = std::abs (x) <= (T) 1;
-                return inRange ? x * x / (T) 2.0 : x * sign (x) - (T) 0.5;
+                bool inRange = std::abs (x) <= 1.0;
+                return inRange ? x * x / 2.0 : x * sign (x) - 0.5;
             },
-            [] (T x)
+            [] (auto x)
             {
-                bool inRange = std::abs (x) <= (T) 1;
-                return inRange ? x * x * x / (T) 6.0 : ((x * x / (T) 2.0) + T (1.0 / 6.0)) * sign (x) - (x / (T) 2.0);
+                bool inRange = std::abs (x) <= 1.0;
+                return inRange ? x * x * x / 6.0 : ((x * x / 2.0) + (1.0 / 6.0)) * sign (x) - (x / 2.0);
             },
             -range,
             range,

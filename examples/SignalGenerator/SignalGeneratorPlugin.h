@@ -2,6 +2,7 @@
 
 #include <chowdsp_plugin_base/chowdsp_plugin_base.h>
 #include <chowdsp_dsp_utils/chowdsp_dsp_utils.h>
+#include <chowdsp_waveshapers/chowdsp_waveshapers.h>
 
 class SignalGeneratorPlugin : public chowdsp::PluginBase<SignalGeneratorPlugin>
 {

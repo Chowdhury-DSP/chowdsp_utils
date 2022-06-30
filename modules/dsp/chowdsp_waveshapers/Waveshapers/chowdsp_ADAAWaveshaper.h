@@ -5,25 +5,49 @@
 namespace chowdsp
 {
 
-/** Waveshaper using second-order ADAA, with lookup-tables */
+/**
+ * Waveshaper using second-order ADAA, with lookup-tables for speed.
+ *
+ * Note that this processor will always add exactly one sample of latency
+ * to the signal, _even_ when bypassed.
+ */
 template <typename T>
 class ADAAWaveshaper
 {
 public:
     ADAAWaveshaper() = default;
 
+    /**
+     * Initialises the waveshaper with a given waveshaping function,
+     * along with the first two anti-derivatives of that function.
+     * There are also optional arguments which can be used to provide
+     * a range and size to use for the internal lookup tables.
+     */
     template <typename FuncType, typename FuncTypeD1, typename FuncTypeD2>
     void initialise (FuncType&& nlFunc, FuncTypeD1&& nlFuncD1, FuncTypeD2&& nlFuncD2, T minVal = (T) -10, T maxVal = (T) 10, int N = 1 << 18)
     {
         // load lookup tables asynchronously
         lutLoadingFutures.push_back (std::async (std::launch::async, [&, func = std::forward<FuncType> (nlFunc), minVal, maxVal, N]
-                                                 { lut.initialise (func, minVal, maxVal, (size_t) N); }));
+                                                 { lut.initialise ([&func] (auto x)
+                                                                   { return func ((double) x); },
+                                                                   minVal,
+                                                                   maxVal,
+                                                                   (size_t) N); }));
         lutLoadingFutures.push_back (std::async (std::launch::async, [&, funcD1 = std::forward<FuncTypeD1> (nlFuncD1), minVal, maxVal, N]
-                                                 { lut_AD1.initialise (funcD1, 2 * minVal, 2 * maxVal, 4 * (size_t) N); }));
+                                                 { lut_AD1.initialise ([&funcD1] (auto x)
+                                                                       { return funcD1 ((double) x); },
+                                                                       2 * minVal,
+                                                                       2 * maxVal,
+                                                                       4 * (size_t) N); }));
         lutLoadingFutures.push_back (std::async (std::launch::async, [&, funcD2 = std::forward<FuncTypeD2> (nlFuncD2), minVal, maxVal, N]
-                                                 { lut_AD2.initialise (funcD2, 4 * minVal, 4 * maxVal, 16 * (size_t) N); }));
+                                                 { lut_AD2.initialise ([&funcD2] (auto x)
+                                                                       { return funcD2 ((double) x); },
+                                                                       4 * minVal,
+                                                                       4 * maxVal,
+                                                                       16 * (size_t) N); }));
     }
 
+    /** Prepares the waveshaper for a given number of channels. */
     void prepare (int numChannels)
     {
         x1.resize ((size_t) numChannels, 0.0);
@@ -35,6 +59,7 @@ public:
         lutLoadingFutures.clear();
     }
 
+    /** Resets the waveshaper state. */
     void reset()
     {
         std::fill (x1.begin(), x1.end(), 0.0);
@@ -44,6 +69,7 @@ public:
         std::fill (d2.begin(), d2.end(), 0.0);
     }
 
+    /** Processes a block of samples. */
     void process (T* output, const T* input, int numSamples, int channel = 0) noexcept
     {
         chowdsp::ScopedValue<double> _x1 { x1[(size_t) channel] };
@@ -67,6 +93,28 @@ public:
         }
     }
 
+    /** Processes a block of samples in bypassed mode. */
+    void processBypassed (T* output, const T* input, int numSamples, int channel = 0) noexcept
+    {
+        chowdsp::ScopedValue<double> _x1 { x1[(size_t) channel] };
+        chowdsp::ScopedValue<double> _x2 { x2[(size_t) channel] };
+        ad2_x0[(size_t) channel] = 0.0;
+        ad2_x1[(size_t) channel] = 0.0;
+        d2[(size_t) channel] = 0.0;
+
+        for (int n = 0; n < numSamples; ++n)
+        {
+            // add a one-sample delay to the bypassed signal so that everything matches up!
+            const auto x = (double) input[n];
+            output[n] = T (_x1.get());
+
+            // update state
+            _x2.get() = _x1.get();
+            _x1.get() = x;
+        }
+    }
+
+    /** Processes the given processing context */
     template <typename ProcessContext>
     void process (const ProcessContext& context) noexcept
     {
@@ -84,13 +132,9 @@ public:
             auto* outputData = outputBlock.getChannelPointer (ch);
 
             if (context.isBypassed)
-            {
-                if (context.usesSeparateInputAndOutputBlocks())
-                    juce::FloatVectorOperations::copy (outputData, inputData, numSamples);
-                continue;
-            }
-
-            process (outputData, inputData, numSamples, (int) ch);
+                processBypassed (outputData, inputData, numSamples, (int) ch);
+            else
+                process (outputData, inputData, numSamples, (int) ch);
         }
     }
 

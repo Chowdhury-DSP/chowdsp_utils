@@ -1,11 +1,11 @@
 #include <TimedUnitTest.h>
-#include <chowdsp_dsp_utils/chowdsp_dsp_utils.h>
+#include <chowdsp_waveshapers/chowdsp_waveshapers.h>
 
-namespace
+namespace Constants
 {
 constexpr int N = 1000;
 constexpr float maxErr = 1.0e-1f;
-} // namespace
+} // namespace Constants
 
 class ADAAHardClipperTest : public TimedUnitTest
 {
@@ -17,9 +17,9 @@ public:
         chowdsp::ADAAHardClipper<float> clipper;
         clipper.prepare (1);
 
-        juce::AudioBuffer<float> testBuffer (1, N);
-        float expYs[N];
-        for (int i = 0; i < N; ++i)
+        juce::AudioBuffer<float> testBuffer (1, Constants::N);
+        float expYs[Constants::N];
+        for (int i = 0; i < Constants::N; ++i)
         {
             const auto testX = 2.5f * std::sin (juce::MathConstants<float>::twoPi * (float) i * 500.0f / 48000.0f);
             testBuffer.setSample (0, i, testX);
@@ -30,7 +30,7 @@ public:
                 expYs[i] = juce::jlimit (-1.0f, 1.0f, testX);
         }
 
-        juce::AudioBuffer<float> outBuffer (1, N);
+        juce::AudioBuffer<float> outBuffer (1, Constants::N);
         if (inPlace)
         {
             auto&& testBlock = juce::dsp::AudioBlock<float> { testBuffer };
@@ -48,7 +48,7 @@ public:
             clipper.process (context);
         }
 
-        for (int i = 2; i < N; ++i)
+        for (int i = 1; i < Constants::N; ++i)
         {
             float actualY;
             if (inPlace)
@@ -56,7 +56,7 @@ public:
             else
                 actualY = outBuffer.getSample (0, i);
 
-            expectWithinAbsoluteError (actualY, expYs[i - 1], maxErr, "Hard Clipper value is incorrect! " + juce::String (testBuffer.getSample (0, i)));
+            expectWithinAbsoluteError (actualY, expYs[i - 1], Constants::maxErr, "Hard Clipper value is incorrect! " + juce::String (testBuffer.getSample (0, i)));
         }
     }
 

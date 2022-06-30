@@ -32,7 +32,4 @@ target_sources(chowdsp_dsp_utils_test PRIVATE
     resampling_tests/ResamplerTest.cpp
     resampling_tests/UpsampleDownsampleTest.cpp
     resampling_tests/VariableOversamplingTest.cpp
-
-    waveshaper_tests/SoftClipperTest.cpp
-    waveshaper_tests/ADAAHardClipperTest.cpp
 )
