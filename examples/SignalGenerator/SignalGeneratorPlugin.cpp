@@ -6,6 +6,7 @@ const juce::String freqTag = "freq_hz";
 const juce::String typeTag = "tone_type";
 const juce::String upsampleTag = "upsample_tag";
 const juce::String gainTag = "gain_db";
+const juce::String waveshaperTag = "waveshaper";
 } // namespace
 
 SignalGeneratorPlugin::SignalGeneratorPlugin()
@@ -15,6 +16,7 @@ SignalGeneratorPlugin::SignalGeneratorPlugin()
     loadParameterPointer (toneTypeParam, vts, typeTag);
     loadParameterPointer (upSampleParam, vts, upsampleTag);
     loadParameterPointer (gainDBParam, vts, gainTag);
+    loadParameterPointer (waveshaperParam, vts, waveshaperTag);
 }
 
 void SignalGeneratorPlugin::addParameters (Parameters& params)
@@ -24,17 +26,18 @@ void SignalGeneratorPlugin::addParameters (Parameters& params)
     createGainDBParameter (params, gainTag, "Gain", -45.0f, 6.0f, -24.0f);
     emplace_param<chowdsp::ChoiceParameter> (params, typeTag, "Tone Type", juce::StringArray { "Sine", "Saw", "Square" }, 0);
     emplace_param<chowdsp::ChoiceParameter> (params, upsampleTag, "Upsample", juce::StringArray { "1x", "2x", "3x", "4x" }, 0);
+    emplace_param<chowdsp::ChoiceParameter> (params, waveshaperTag, "Waveshaper", juce::StringArray { "None", "Hard Clip" }, 0);
 }
 
 void SignalGeneratorPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     setRateAndBufferSizeDetails (sampleRate, samplesPerBlock);
 
+    gain.setRampDurationSeconds (0.01);
     prepareTones (sampleRate, samplesPerBlock);
 
     const auto spec = juce::dsp::ProcessSpec { sampleRate, (juce::uint32) samplesPerBlock, (juce::uint32) getMainBusNumInputChannels() };
-    gain.prepare (spec);
-    gain.setRampDurationSeconds (0.01);
+    adaaHardClipper.prepare ((int) spec.numChannels);
 
     int resampleRatio = 2;
     for (auto* r : { &resample2, &resample3, &resample4 })
@@ -47,7 +50,7 @@ void SignalGeneratorPlugin::prepareToPlay (double sampleRate, int samplesPerBloc
     }
 
     resampler = nullptr;
-    previousUpSampleChoice = 0;
+    previousUpSampleChoice = -1;
 
     upsampledBuffer.setSize ((int) spec.numChannels, 4 * samplesPerBlock);
 }
@@ -58,6 +61,8 @@ void SignalGeneratorPlugin::prepareTones (double sampleRate, int maxSamplesPerBl
     sine.prepare (spec);
     saw.prepare (spec);
     square.prepare (spec);
+
+    gain.prepare (spec);
 }
 
 void SignalGeneratorPlugin::setUpSampleChoice()
@@ -119,6 +124,18 @@ void SignalGeneratorPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
         auto&& upsampledBlock = juce::dsp::AudioBlock<float> { upsampledBuffer };
         tone.process (juce::dsp::ProcessContextReplacing<float> { upsampledBlock });
 
+        gain.setGainDecibels (gainDBParam->getCurrentValue());
+        gain.process (juce::dsp::ProcessContextReplacing<float> { upsampledBlock });
+
+        if (waveshaperParam->getIndex() == 0)
+        {
+            // no waveshaper
+        }
+        else if (waveshaperParam->getIndex() == 1)
+        {
+            adaaHardClipper.process (juce::dsp::ProcessContextReplacing<float> { upsampledBlock });
+        }
+
         if (resampler == nullptr)
             block.copyFrom (upsampledBlock);
         else
@@ -135,9 +152,6 @@ void SignalGeneratorPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
         processTone (square);
     else
         jassertfalse; // unknown type!
-
-    gain.setGainDecibels (gainDBParam->getCurrentValue());
-    gain.process (juce::dsp::ProcessContextReplacing<float> { block });
 }
 
 juce::AudioProcessorEditor* SignalGeneratorPlugin::createEditor()

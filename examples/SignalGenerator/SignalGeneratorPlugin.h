@@ -24,6 +24,7 @@ private:
     chowdsp::ChoiceParameter* toneTypeParam = nullptr;
     chowdsp::ChoiceParameter* upSampleParam = nullptr;
     chowdsp::FloatParameter* gainDBParam = nullptr;
+    chowdsp::ChoiceParameter* waveshaperParam = nullptr;
 
     chowdsp::SineWave<float> sine;
     chowdsp::SawtoothWave<float> saw;
@@ -37,6 +38,8 @@ private:
 
     chowdsp::Downsampler<float, 12>* resampler = nullptr;
     int previousUpSampleChoice = 0;
+
+    chowdsp::ADAAHardClipper<float> adaaHardClipper;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SignalGeneratorPlugin)
 };

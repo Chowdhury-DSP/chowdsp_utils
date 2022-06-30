@@ -68,13 +68,17 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Resampling/chowdsp_ResampledProcess.h"
 #include "Resampling/chowdsp_VariableOversampling.h"
 
+// waveshapers
+#include "Waveshapers/chowdsp_ADAAWaveshaper.h"
+#include "Waveshapers/chowdsp_ADAAHardClipper.h"
+#include "Waveshapers/chowdsp_SoftClipper.h"
+
 // some other useful processors
 #include "Processors/chowdsp_AudioTimer.h"
 #include "Processors/chowdsp_BypassProcessor.h"
 #include "Processors/chowdsp_GainProcessor.h"
 #include "Processors/chowdsp_LevelDetector.h"
 #include "Processors/chowdsp_Panner.h"
-#include "Processors/chowdsp_SoftClipper.h"
 #include "Processors/chowdsp_TunerProcessor.h"
 
 // sound sources
