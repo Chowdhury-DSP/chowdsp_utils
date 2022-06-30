@@ -2,6 +2,11 @@
 
 namespace chowdsp
 {
+/**
+ * Tanh soft clipper implemented with 2nd-order integrated waveshaping (ADAA).
+ *
+ * Note that this processor adds one sample of latency to the signal.
+ */
 template <typename T>
 class ADAATanhClipper : public ADAAWaveshaper<T>
 {

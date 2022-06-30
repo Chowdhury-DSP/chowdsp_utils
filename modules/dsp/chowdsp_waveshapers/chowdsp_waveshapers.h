@@ -30,5 +30,4 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Waveshapers/chowdsp_ADAAWaveshaper.h"
 #include "Waveshapers/chowdsp_ADAAHardClipper.h"
 #include "Waveshapers/chowdsp_ADAATanhClipper.h"
-#include "Waveshapers/chowdsp_ADAASoftClipper.h"
 #include "Waveshapers/chowdsp_SoftClipper.h"
