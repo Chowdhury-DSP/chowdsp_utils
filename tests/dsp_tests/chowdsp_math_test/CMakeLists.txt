@@ -15,4 +15,5 @@ target_sources(chowdsp_math_test PRIVATE
     PowerTest.cpp
     OtherMathOpsTest.cpp
     JacobiEllipticTest.cpp
+    PolylogarithmTest.cpp
 )
