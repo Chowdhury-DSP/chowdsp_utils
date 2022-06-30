@@ -29,3 +29,4 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Math/chowdsp_Power.h"
 #include "Math/chowdsp_OtherMathOps.h"
 #include "Math/chowdsp_JacobiElliptic.h"
+#include "Math/chowdsp_Polylogarithm.h"
