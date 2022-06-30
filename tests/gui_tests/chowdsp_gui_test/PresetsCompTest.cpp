@@ -106,7 +106,7 @@ public:
         chowdsp::PresetsComp presetsComp { presetMgr };
         const auto* menu = presetsComp.getPresetMenuBox().getRootMenu();
         auto& nameEditor = presetsComp.getPresetNameEditor();
-        auto menuItem = getMenuItem (*menu, "Save Preset");
+        auto menuItem = getMenuItem (*menu, "Save Preset As");
 
         menuItem->action();
         nameEditor.onEscapeKey();
@@ -150,6 +150,64 @@ public:
         menuItem->action();
         juce::MessageManager::getInstance()->runDispatchLoopUntil (75);
         expectEquals (presetsComp.getPresetMenuText(), juce::String ("Test1"), "Loaded preset text is incorrect!");
+
+        auto userPresetConfigFile = presetMgr.getUserPresetConfigFile();
+        userPresetConfigFile.deleteRecursively();
+    }
+
+    void resetPresetTest()
+    {
+        DummyPlugin plugin { true };
+        auto& presetMgr = plugin.getPresetManager();
+        auto param = plugin.getParameters()[0];
+
+        ScopedFile presetPath ("preset_path");
+        presetPath.file.createDirectory();
+
+        presetMgr.setUserPresetConfigFile ("preset_config.txt");
+        presetMgr.setUserPresetPath (presetPath.file);
+
+        ScopedFile presetFile1 ("preset_path/Test1.preset");
+        presetMgr.saveUserPreset (presetFile1.file);
+        const auto initialValue = param->getValue();
+        setParameter (param, initialValue - 0.1f);
+
+        chowdsp::PresetsComp presetsComp { presetMgr };
+        const auto* menu = presetsComp.getPresetMenuBox().getRootMenu();
+        auto resetItem = getMenuItem (*menu, "Reset");
+        resetItem->action();
+
+        expectEquals (param->getValue(), initialValue, "Reset did not correctly reset the parameter value");
+
+        auto userPresetConfigFile = presetMgr.getUserPresetConfigFile();
+        userPresetConfigFile.deleteRecursively();
+    }
+
+    void resavePresetTest()
+    {
+        DummyPlugin plugin { true };
+        auto& presetMgr = plugin.getPresetManager();
+        auto param = plugin.getParameters()[0];
+
+        ScopedFile presetPath ("preset_path");
+        presetPath.file.createDirectory();
+        presetMgr.setUserPresetConfigFile ("preset_config.txt");
+        presetMgr.setUserPresetPath (presetPath.file);
+
+        ScopedFile presetFile1 ("preset_path/Test1.preset");
+        presetMgr.saveUserPreset (presetFile1.file);
+        const auto initialValue = param->getValue();
+        const auto secondaryValue = initialValue - 0.1f;
+        setParameter (param, secondaryValue);
+
+        chowdsp::PresetsComp presetsComp { presetMgr };
+        const auto* menu = presetsComp.getPresetMenuBox().getRootMenu();
+        getMenuItem (*menu, "Resave Preset")->action();
+
+        setParameter (param, initialValue + 0.1f);
+        presetMgr.loadPreset (chowdsp::Preset { presetFile1.file });
+
+        expectWithinAbsoluteError (param->getValue(), secondaryValue, 1.0e-3f, "Resave did not correctly save the same preset");
 
         auto userPresetConfigFile = presetMgr.getUserPresetConfigFile();
         userPresetConfigFile.deleteRecursively();
@@ -213,6 +271,12 @@ public:
 
         beginTest ("Load Preset Test");
         loadPresetTest();
+
+        beginTest ("Reset Preset Test");
+        resetPresetTest();
+
+        beginTest ("Resave Preset Test");
+        resavePresetTest();
 
 #if ! JUCE_WINDOWS
         beginTest ("Background Thread Test");
