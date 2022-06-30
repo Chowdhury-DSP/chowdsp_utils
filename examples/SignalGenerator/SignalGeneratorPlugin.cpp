@@ -26,7 +26,7 @@ void SignalGeneratorPlugin::addParameters (Parameters& params)
     createGainDBParameter (params, gainTag, "Gain", -45.0f, 6.0f, -24.0f);
     emplace_param<chowdsp::ChoiceParameter> (params, typeTag, "Tone Type", juce::StringArray { "Sine", "Saw", "Square" }, 0);
     emplace_param<chowdsp::ChoiceParameter> (params, upsampleTag, "Upsample", juce::StringArray { "1x", "2x", "3x", "4x" }, 0);
-    emplace_param<chowdsp::ChoiceParameter> (params, waveshaperTag, "Waveshaper", juce::StringArray { "None", "Hard Clip" }, 0);
+    emplace_param<chowdsp::ChoiceParameter> (params, waveshaperTag, "Waveshaper", juce::StringArray { "None", "Hard Clip", "Tanh Clip" }, 0);
 }
 
 void SignalGeneratorPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)
@@ -38,6 +38,7 @@ void SignalGeneratorPlugin::prepareToPlay (double sampleRate, int samplesPerBloc
 
     const auto spec = juce::dsp::ProcessSpec { sampleRate, (juce::uint32) samplesPerBlock, (juce::uint32) getMainBusNumInputChannels() };
     adaaHardClipper.prepare ((int) spec.numChannels);
+    adaaTanhClipper.prepare ((int) spec.numChannels);
 
     int resampleRatio = 2;
     for (auto* r : { &resample2, &resample3, &resample4 })
@@ -122,10 +123,11 @@ void SignalGeneratorPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
         upsampledBuffer.clear();
 
         auto&& upsampledBlock = juce::dsp::AudioBlock<float> { upsampledBuffer };
-        tone.process (juce::dsp::ProcessContextReplacing<float> { upsampledBlock });
+        auto&& upsampledContext = juce::dsp::ProcessContextReplacing<float> { upsampledBlock };
+        tone.process (upsampledContext);
 
         gain.setGainDecibels (gainDBParam->getCurrentValue());
-        gain.process (juce::dsp::ProcessContextReplacing<float> { upsampledBlock });
+        gain.process (upsampledContext);
 
         if (waveshaperParam->getIndex() == 0)
         {
@@ -133,7 +135,11 @@ void SignalGeneratorPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
         }
         else if (waveshaperParam->getIndex() == 1)
         {
-            adaaHardClipper.process (juce::dsp::ProcessContextReplacing<float> { upsampledBlock });
+            adaaHardClipper.process (upsampledContext);
+        }
+        else if (waveshaperParam->getIndex() == 2)
+        {
+            adaaTanhClipper.process (upsampledContext);
         }
 
         if (resampler == nullptr)

@@ -41,6 +41,7 @@ private:
     int previousUpSampleChoice = 0;
 
     chowdsp::ADAAHardClipper<float> adaaHardClipper;
+    chowdsp::ADAATanhClipper<float> adaaTanhClipper;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SignalGeneratorPlugin)
 };

@@ -15,8 +15,9 @@ public:
             { return std::log (std::cosh (x)); },
             [] (auto x)
             {
-                bool inRange = std::abs (x) <= 1.0;
-                return inRange ? x * x * x / 6.0 : ((x * x / 2.0) + (1.0 / 6.0)) * sign (x) - (x / 2.0);
+                using Polylogarithm::Li2, Power::ipow;
+                const auto expVal = std::exp (-2.0 * x);
+                return 0.5 * (Li2 (-expVal) - x * (x + 2.0 * std::log (expVal + 1.0) - 2.0 * std::log (std::cosh (x)))) + (ipow<2> (juce::MathConstants<double>::pi) / 24.0);
             },
             -range,
             range,

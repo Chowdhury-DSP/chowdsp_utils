@@ -11,4 +11,5 @@ target_sources(chowdsp_waveshapers_test
         ${CMAKE_SOURCE_DIR}/tests/test_utils/TestRunner.cpp
         SoftClipperTest.cpp
         ADAAHardClipperTest.cpp
+        ADAATanhClipperTest.cpp
 )
