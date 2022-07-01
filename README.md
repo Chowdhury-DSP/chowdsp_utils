@@ -116,6 +116,12 @@ sure to abide by the license of each module, as well as whichever libraries are 
 - `SIMDSmoothedValue`: A SIMD specialization of `juce::SmoothedValue`.
 - A few other extea SIMD math functions.
 
+`chowdsp_waveshapers` (GPLv3)
+- Basic waveshaping processes implemented with integrated waveshaping (ADAA), including:
+  - hard clipper
+  - `tanh` soft clipper
+  - polynomial soft clipper
+
 ## GUI Modules
 
 `chowdsp_gui` (GPLv3)
