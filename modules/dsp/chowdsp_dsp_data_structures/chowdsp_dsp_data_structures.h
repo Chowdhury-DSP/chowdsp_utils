@@ -28,5 +28,5 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "DataStructures/chowdsp_RebufferedProcessor.h"
 #include "DataStructures/chowdsp_ScopedValue.h"
 #include "DataStructures/chowdsp_SmoothedBufferValue.h"
-
 #include "DataStructures/chowdsp_SIMDAudioBlock.h"
+#include "DataStructures/chowdsp_LookupTableCache.h"

@@ -51,6 +51,9 @@ public:
                      FloatType maxInputValueToUse,
                      size_t numPoints);
 
+    /** Returns true if the lookup table has been initialised. */
+    bool hasBeenInitialised() const noexcept { return isInitialised; }
+
     //==============================================================================
     /** Calculates the approximated value for the given input value without range checking.
         Use this if you can guarantee that the input value is within the range specified
@@ -119,6 +122,8 @@ private:
 
     FloatType minInputValue, maxInputValue;
     FloatType scaler, offset;
+
+    std::atomic_bool isInitialised { false };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LookupTableTransform)
 };

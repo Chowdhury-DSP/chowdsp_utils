@@ -15,7 +15,7 @@ class ADAASoftClipper : public ADAAWaveshaper<T>
 public:
     static_assert (degree % 2 == 1 && degree > 2, "Degree must be an odd integer, larger than 2!");
 
-    explicit ADAASoftClipper (T range = (T) 10, int N = 1 << 17)
+    explicit ADAASoftClipper (LookupTableCache* lookupTableCache = nullptr, T range = (T) 10, int N = 1 << 17) : ADAAWaveshaper<T> (lookupTableCache, "soft_clipper_" + std::to_string (degree))
     {
         using Math::sign, Power::ipow;
         static constexpr auto D = (double) degree;
@@ -25,19 +25,22 @@ public:
         static constexpr auto G2 = 1.0 / (6.0 * ipow<3> (normFactor)) - 1.0 / (ipow<3> (normFactor) * D * (D + 1.0) * (D + 2.0));
 
         this->initialise (
-            [] (auto x) {
+            [] (auto x)
+            {
                 if (std::abs (x * normFactor) > 1.0)
                     return sign (x);
                 else
                     return ((x * normFactor) - ipow<degree> (x * normFactor) / D) * invNormFactor;
             },
-            [] (auto x) {
+            [] (auto x)
+            {
                 if (std::abs (x * normFactor) > 1.0)
                     return x * sign (x) + G1 - invNormFactor;
                 else
                     return ((normFactor * ipow<2> (x) / 2.0) - (ipow<degree> (normFactor) * ipow<degree + 1> (x) / (D * (D + 1.0)))) * invNormFactor;
             },
-            [] (auto x) {
+            [] (auto x)
+            {
                 if (std::abs (x * normFactor) > 1.0)
                     return ((ipow<2> (x) / 2.0) + G2 + (1.0 / (2.0 * ipow<2> (normFactor))) - G1 * invNormFactor) * sign (x) + x * (G1 - invNormFactor);
                 else
