@@ -22,6 +22,7 @@ target_link_libraries(static_test_dummy_executable PRIVATE
     chowdsp_math
     chowdsp_reverb
     chowdsp_simd
+    chowdsp_waveshapers
     chowdsp_gui
     chowdsp_rhythm
     chowdsp_parameters

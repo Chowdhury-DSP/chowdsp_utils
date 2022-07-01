@@ -15,7 +15,6 @@ target_sources(chowdsp_dsp_utils_test PRIVATE
     GainTest.cpp
     PannerTest.cpp
     PitchShiftTest.cpp
-    SoftClipperTest.cpp
     TunerTest.cpp
 
     convolution_tests/ConvolutionTest.cpp

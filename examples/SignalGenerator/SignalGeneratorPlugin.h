@@ -2,6 +2,7 @@
 
 #include <chowdsp_plugin_base/chowdsp_plugin_base.h>
 #include <chowdsp_dsp_utils/chowdsp_dsp_utils.h>
+#include <chowdsp_waveshapers/chowdsp_waveshapers.h>
 
 class SignalGeneratorPlugin : public chowdsp::PluginBase<SignalGeneratorPlugin>
 {
@@ -24,6 +25,7 @@ private:
     chowdsp::ChoiceParameter* toneTypeParam = nullptr;
     chowdsp::ChoiceParameter* upSampleParam = nullptr;
     chowdsp::FloatParameter* gainDBParam = nullptr;
+    chowdsp::ChoiceParameter* waveshaperParam = nullptr;
 
     chowdsp::SineWave<float> sine;
     chowdsp::SawtoothWave<float> saw;
@@ -37,6 +39,11 @@ private:
 
     chowdsp::Downsampler<float, 12>* resampler = nullptr;
     int previousUpSampleChoice = 0;
+
+    chowdsp::ADAAHardClipper<float> adaaHardClipper;
+    chowdsp::ADAATanhClipper<float> adaaTanhClipper;
+    chowdsp::ADAASoftClipper<float> adaaCubicClipper;
+    chowdsp::ADAASoftClipper<float, 9> adaa9thOrderClipper;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SignalGeneratorPlugin)
 };

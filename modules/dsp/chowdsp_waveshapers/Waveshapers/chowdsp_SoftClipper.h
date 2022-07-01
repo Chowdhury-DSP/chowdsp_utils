@@ -5,7 +5,8 @@ namespace chowdsp
 /**
  * A normalized polynomial soft clipper. The soft clipper will
  * have a slope of 1 through the origin, and will have max/min
- * clipping values of +/- 1.
+ * clipping values of +/- 1. Note that this clipper does not implement
+ * any anti-aliasing!
  *
  * @tparam degree   The degree of the polynomial. Use a higher degree to get closer to a hard-clipper. Note that that the degree must be an odd integer.
  * @tparam T        The data type to process. Must be float/double (for now)
