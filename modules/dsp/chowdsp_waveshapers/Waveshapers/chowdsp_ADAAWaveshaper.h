@@ -14,7 +14,25 @@ template <typename T>
 class ADAAWaveshaper
 {
 public:
-    ADAAWaveshaper() = default;
+    explicit ADAAWaveshaper (LookupTableCache* lutCache = nullptr, const std::string& lutBaseID = {}) : lookupTableCache (lutCache)
+    {
+        if (lookupTableCache != nullptr)
+        {
+            jassert (! lutBaseID.empty()); // lookup table ID must not be empty when using the lookup table cache!
+            lut = &lookupTableCache->addLookupTable<double> (lutBaseID + "_lut");
+            lut_AD1 = &lookupTableCache->addLookupTable<double> (lutBaseID + "_lut_ad1");
+            lut_AD2 = &lookupTableCache->addLookupTable<double> (lutBaseID + "_lut_ad2");
+        }
+        else
+        {
+            lut_owned = std::make_unique<LookupTableTransform<double>>();
+            lut = lut_owned.get();
+            lut_AD1_owned = std::make_unique<LookupTableTransform<double>>();
+            lut_AD1 = lut_AD1_owned.get();
+            lut_AD2_owned = std::make_unique<LookupTableTransform<double>>();
+            lut_AD2 = lut_AD2_owned.get();
+        }
+    }
 
     /**
      * Initialises the waveshaper with a given waveshaping function,
@@ -26,18 +44,29 @@ public:
     void initialise (FuncType&& nlFunc, FuncTypeD1&& nlFuncD1, FuncTypeD2&& nlFuncD2, T minVal = (T) -10, T maxVal = (T) 10, int N = 1 << 18)
     {
         // load lookup tables asynchronously
-        lutLoadingFutures.push_back (std::async (std::launch::async, [&, func = std::forward<FuncType> (nlFunc), minVal, maxVal, N] { lut.initialise ([&func] (auto x) { return func ((double) x); },
-                                                                                                                                                      minVal,
-                                                                                                                                                      maxVal,
-                                                                                                                                                      (size_t) N); }));
-        lutLoadingFutures.push_back (std::async (std::launch::async, [&, funcD1 = std::forward<FuncTypeD1> (nlFuncD1), minVal, maxVal, N] { lut_AD1.initialise ([&funcD1] (auto x) { return funcD1 ((double) x); },
-                                                                                                                                                                2 * minVal,
-                                                                                                                                                                2 * maxVal,
-                                                                                                                                                                4 * (size_t) N); }));
-        lutLoadingFutures.push_back (std::async (std::launch::async, [&, funcD2 = std::forward<FuncTypeD2> (nlFuncD2), minVal, maxVal, N] { lut_AD2.initialise ([&funcD2] (auto x) { return funcD2 ((double) x); },
-                                                                                                                                                                4 * minVal,
-                                                                                                                                                                4 * maxVal,
-                                                                                                                                                                16 * (size_t) N); }));
+        if (! lut->hasBeenInitialised())
+            lutLoadingFutures.push_back (std::async (std::launch::async, [&, func = std::forward<FuncType> (nlFunc), minVal, maxVal, N]
+                                                     { lut->initialise ([&func] (auto x)
+                                                                        { return func ((double) x); },
+                                                                        minVal,
+                                                                        maxVal,
+                                                                        (size_t) N); }));
+
+        if (! lut_AD1->hasBeenInitialised())
+            lutLoadingFutures.push_back (std::async (std::launch::async, [&, funcD1 = std::forward<FuncTypeD1> (nlFuncD1), minVal, maxVal, N]
+                                                     { lut_AD1->initialise ([&funcD1] (auto x)
+                                                                            { return funcD1 ((double) x); },
+                                                                            2 * minVal,
+                                                                            2 * maxVal,
+                                                                            4 * (size_t) N); }));
+
+        if (! lut_AD2->hasBeenInitialised())
+            lutLoadingFutures.push_back (std::async (std::launch::async, [&, funcD2 = std::forward<FuncTypeD2> (nlFuncD2), minVal, maxVal, N]
+                                                     { lut_AD2->initialise ([&funcD2] (auto x)
+                                                                            { return funcD2 ((double) x); },
+                                                                            4 * minVal,
+                                                                            4 * maxVal,
+                                                                            16 * (size_t) N); }));
     }
 
     /** Prepares the waveshaper for a given number of channels. */
@@ -65,11 +94,11 @@ public:
     /** Processes a block of samples. */
     void process (T* output, const T* input, int numSamples, int channel = 0) noexcept
     {
-        chowdsp::ScopedValue<double> _x1 { x1[(size_t) channel] };
-        chowdsp::ScopedValue<double> _x2 { x2[(size_t) channel] };
-        chowdsp::ScopedValue<double> _ad2_x0 { ad2_x0[(size_t) channel] };
-        chowdsp::ScopedValue<double> _ad2_x1 { ad2_x1[(size_t) channel] };
-        chowdsp::ScopedValue<double> _d2 { d2[(size_t) channel] };
+        ScopedValue<double> _x1 { x1[(size_t) channel] };
+        ScopedValue<double> _x2 { x2[(size_t) channel] };
+        ScopedValue<double> _ad2_x0 { ad2_x0[(size_t) channel] };
+        ScopedValue<double> _ad2_x1 { ad2_x1[(size_t) channel] };
+        ScopedValue<double> _d2 { d2[(size_t) channel] };
 
         for (int n = 0; n < numSamples; ++n)
         {
@@ -89,8 +118,8 @@ public:
     /** Processes a block of samples in bypassed mode. */
     void processBypassed (T* output, const T* input, int numSamples, int channel = 0) noexcept
     {
-        chowdsp::ScopedValue<double> _x1 { x1[(size_t) channel] };
-        chowdsp::ScopedValue<double> _x2 { x2[(size_t) channel] };
+        ScopedValue<double> _x1 { x1[(size_t) channel] };
+        ScopedValue<double> _x2 { x2[(size_t) channel] };
         ad2_x0[(size_t) channel] = 0.0;
         ad2_x1[(size_t) channel] = 0.0;
         d2[(size_t) channel] = 0.0;
@@ -133,9 +162,9 @@ public:
 
 private:
     // @TODO: are there situations when we can safely use processSampleUnchecked()?
-    [[nodiscard]] inline double nlFunc (double x) const noexcept { return lut.processSample (x); }
-    [[nodiscard]] inline double nlFunc_AD1 (double x) const noexcept { return lut_AD1.processSample (x); }
-    [[nodiscard]] inline double nlFunc_AD2 (double x) const noexcept { return lut_AD2.processSample (x); }
+    [[nodiscard]] inline double nlFunc (double x) const noexcept { return lut->processSample (x); }
+    [[nodiscard]] inline double nlFunc_AD1 (double x) const noexcept { return lut_AD1->processSample (x); }
+    [[nodiscard]] inline double nlFunc_AD2 (double x) const noexcept { return lut_AD2->processSample (x); }
 
     inline double calcD1 (double x0, const double& _x1, double& _ad2_x0, const double& _ad2_x1) noexcept
     {
@@ -152,9 +181,9 @@ private:
         return illCondition ? nlFunc (0.5 * (xBar + _x1)) : (2.0 / delta) * (nlFunc_AD1 (xBar) + (_ad2_x1 - nlFunc_AD2 (xBar)) / delta);
     }
 
-    chowdsp::LookupTableTransform<double> lut;
-    chowdsp::LookupTableTransform<double> lut_AD1;
-    chowdsp::LookupTableTransform<double> lut_AD2;
+    LookupTableTransform<double>* lut = nullptr;
+    LookupTableTransform<double>* lut_AD1 = nullptr;
+    LookupTableTransform<double>* lut_AD2 = nullptr;
 
     // state
     std::vector<double> x1;
@@ -166,6 +195,11 @@ private:
     static constexpr auto TOL = 1.0e-2;
 
     std::vector<std::future<void>> lutLoadingFutures;
+
+    LookupTableCache* lookupTableCache = nullptr;
+    std::unique_ptr<LookupTableTransform<double>> lut_owned;
+    std::unique_ptr<LookupTableTransform<double>> lut_AD1_owned;
+    std::unique_ptr<LookupTableTransform<double>> lut_AD2_owned;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ADAAWaveshaper)
 };

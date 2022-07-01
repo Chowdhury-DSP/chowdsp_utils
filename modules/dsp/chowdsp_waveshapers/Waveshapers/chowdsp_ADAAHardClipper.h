@@ -11,16 +11,19 @@ template <typename T>
 class ADAAHardClipper : public ADAAWaveshaper<T>
 {
 public:
-    explicit ADAAHardClipper (T range = (T) 10, int N = 1 << 17)
+    explicit ADAAHardClipper (LookupTableCache* lookupTableCache = nullptr, T range = (T) 10, int N = 1 << 17) : ADAAWaveshaper<T> (lookupTableCache, "hard_clipper")
     {
         using Math::sign;
         this->initialise (
-            [] (auto x) { return juce::jlimit (-1.0, 1.0, x); },
-            [] (auto x) {
+            [] (auto x)
+            { return juce::jlimit (-1.0, 1.0, x); },
+            [] (auto x)
+            {
                 bool inRange = std::abs (x) <= 1.0;
                 return inRange ? x * x / 2.0 : x * sign (x) - 0.5;
             },
-            [] (auto x) {
+            [] (auto x)
+            {
                 bool inRange = std::abs (x) <= 1.0;
                 return inRange ? x * x * x / 6.0 : ((x * x / 2.0) + (1.0 / 6.0)) * sign (x) - (x / 2.0);
             },
