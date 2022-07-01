@@ -12,10 +12,15 @@ class ADAASoftClipperTest : public TimedUnitTest
 public:
     ADAASoftClipperTest() : TimedUnitTest ("ADAA Soft Clipper Test") {}
 
+    void shutdown() override
+    {
+        lutCache->clearCache();
+    }
+
     template <int degree>
     void processTest (bool inPlace, bool isBypassed = false)
     {
-        chowdsp::ADAASoftClipper<float, degree> clipper;
+        chowdsp::ADAASoftClipper<float, degree> clipper { &lutCache.get() };
         clipper.prepare (1);
 
         juce::AudioBuffer<float> testBuffer (1, Constants::N);
@@ -65,9 +70,13 @@ public:
     {
         beginTest ("Process Test");
         processTest<3> (true);
-        processTest<5> (false);
+        processTest<3> (false); // helpful for testing the LookupTableCache
+        processTest<5> (true);
         processTest<9> (false);
     }
+
+private:
+    chowdsp::SharedLookupTableCache lutCache;
 };
 
 static ADAASoftClipperTest adaaSoftClipperTest;

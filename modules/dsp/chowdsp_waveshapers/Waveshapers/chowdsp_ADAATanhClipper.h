@@ -11,7 +11,7 @@ template <typename T>
 class ADAATanhClipper : public ADAAWaveshaper<T>
 {
 public:
-    explicit ADAATanhClipper (T range = (T) 10, int N = 1 << 18)
+    explicit ADAATanhClipper (LookupTableCache* lookupTableCache = nullptr, T range = (T) 10, int N = 1 << 18) : ADAAWaveshaper<T> (lookupTableCache, "tanh_clipper")
     {
         this->initialise (
             [] (auto x) { return std::tanh (x); },

@@ -40,10 +40,11 @@ private:
     chowdsp::Downsampler<float, 12>* resampler = nullptr;
     int previousUpSampleChoice = 0;
 
-    chowdsp::ADAAHardClipper<float> adaaHardClipper;
-    chowdsp::ADAATanhClipper<float> adaaTanhClipper;
-    chowdsp::ADAASoftClipper<float> adaaCubicClipper;
-    chowdsp::ADAASoftClipper<float, 9> adaa9thOrderClipper;
+    chowdsp::SharedLookupTableCache lookupTableCache;
+    chowdsp::ADAAHardClipper<float> adaaHardClipper { &lookupTableCache.get() };
+    chowdsp::ADAATanhClipper<float> adaaTanhClipper { &lookupTableCache.get() };
+    chowdsp::ADAASoftClipper<float> adaaCubicClipper { &lookupTableCache.get() };
+    chowdsp::ADAASoftClipper<float, 9> adaa9thOrderClipper { &lookupTableCache.get() };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SignalGeneratorPlugin)
 };

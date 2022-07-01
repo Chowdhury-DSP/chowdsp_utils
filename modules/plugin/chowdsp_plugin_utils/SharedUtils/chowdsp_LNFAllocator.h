@@ -57,7 +57,7 @@ private:
     template <typename LookAndFeelSubclass>
     static std::type_index getLNFType()
     {
-        return std::type_index (typeid (LookAndFeelSubclass));
+        return typeid (LookAndFeelSubclass);
     }
 
     using LookAndFeelPtr = std::unique_ptr<juce::LookAndFeel>;

@@ -10,6 +10,8 @@ void LookupTableTransform<FloatType>::initialise (const std::function<FloatType 
 {
     jassert (maxInputValueToUse > minInputValueToUse);
 
+    isInitialised = true;
+
     minInputValue = minInputValueToUse;
     maxInputValue = maxInputValueToUse;
     scaler = FloatType (numPoints - 1) / (maxInputValueToUse - minInputValueToUse);
