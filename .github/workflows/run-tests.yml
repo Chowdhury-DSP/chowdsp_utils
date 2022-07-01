@@ -109,7 +109,7 @@ jobs:
 
       - name: Initialize CodeQL
         if: matrix.run_codeql
-        uses: github/codeql-action/init@v1
+        uses: github/codeql-action/init@v2
         with:
          source-root: ${{env.WORK_DIR}}
          languages: cpp
@@ -173,4 +173,4 @@ jobs:
 
       - name: Perform CodeQL Analysis
         if: matrix.run_codeql
-        uses: github/codeql-action/analyze@v1
+        uses: github/codeql-action/analyze@v2
