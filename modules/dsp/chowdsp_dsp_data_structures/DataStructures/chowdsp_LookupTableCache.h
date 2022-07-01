@@ -51,5 +51,6 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LookupTableCache)
 };
 
-using SharedLookupTableCache = juce::SharedResourcePointer<chowdsp::LookupTableCache>;
+/** Helpful alias for creating a SharedResourcePointer<LookupTableCache> */
+using SharedLookupTableCache = juce::SharedResourcePointer<LookupTableCache>;
 } // namespace chowdsp

@@ -52,7 +52,7 @@ public:
                      size_t numPoints);
 
     /** Returns true if the lookup table has been initialised. */
-    bool hasBeenInitialised() const noexcept { return isInitialised; }
+    [[nodiscard]] bool hasBeenInitialised() const noexcept { return isInitialised; }
 
     //==============================================================================
     /** Calculates the approximated value for the given input value without range checking.
