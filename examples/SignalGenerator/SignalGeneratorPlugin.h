@@ -42,6 +42,8 @@ private:
 
     chowdsp::ADAAHardClipper<float> adaaHardClipper;
     chowdsp::ADAATanhClipper<float> adaaTanhClipper;
+    chowdsp::ADAASoftClipper<float> adaaCubicClipper;
+    chowdsp::ADAASoftClipper<float, 9> adaa9thOrderClipper;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SignalGeneratorPlugin)
 };

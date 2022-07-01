@@ -12,4 +12,5 @@ target_sources(chowdsp_waveshapers_test
         SoftClipperTest.cpp
         ADAAHardClipperTest.cpp
         ADAATanhClipperTest.cpp
+        ADAASoftClipperTest.cpp
 )

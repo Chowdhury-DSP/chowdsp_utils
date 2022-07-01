@@ -26,7 +26,7 @@ void SignalGeneratorPlugin::addParameters (Parameters& params)
     createGainDBParameter (params, gainTag, "Gain", -45.0f, 6.0f, -24.0f);
     emplace_param<chowdsp::ChoiceParameter> (params, typeTag, "Tone Type", juce::StringArray { "Sine", "Saw", "Square" }, 0);
     emplace_param<chowdsp::ChoiceParameter> (params, upsampleTag, "Upsample", juce::StringArray { "1x", "2x", "3x", "4x" }, 0);
-    emplace_param<chowdsp::ChoiceParameter> (params, waveshaperTag, "Waveshaper", juce::StringArray { "None", "Hard Clip", "Tanh Clip" }, 0);
+    emplace_param<chowdsp::ChoiceParameter> (params, waveshaperTag, "Waveshaper", juce::StringArray { "None", "Hard Clip", "Tanh Clip", "Cubic Clip", "9th-Order Clip" }, 0);
 }
 
 void SignalGeneratorPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)
@@ -39,6 +39,8 @@ void SignalGeneratorPlugin::prepareToPlay (double sampleRate, int samplesPerBloc
     const auto spec = juce::dsp::ProcessSpec { sampleRate, (juce::uint32) samplesPerBlock, (juce::uint32) getMainBusNumInputChannels() };
     adaaHardClipper.prepare ((int) spec.numChannels);
     adaaTanhClipper.prepare ((int) spec.numChannels);
+    adaaCubicClipper.prepare ((int) spec.numChannels);
+    adaa9thOrderClipper.prepare ((int) spec.numChannels);
 
     int resampleRatio = 2;
     for (auto* r : { &resample2, &resample3, &resample4 })
@@ -140,6 +142,14 @@ void SignalGeneratorPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
         else if (waveshaperParam->getIndex() == 2)
         {
             adaaTanhClipper.process (upsampledContext);
+        }
+        else if (waveshaperParam->getIndex() == 3)
+        {
+            adaaCubicClipper.process (upsampledContext);
+        }
+        else if (waveshaperParam->getIndex() == 4)
+        {
+            adaa9thOrderClipper.process (upsampledContext);
         }
 
         if (resampler == nullptr)
