@@ -10,8 +10,8 @@ public:
 
     void initialise (juce::AudioProcessor& processor);
 
-    bool supportsDirectProcess() override { return true; }
-    clap_process_status clap_direct_process (const clap_process* process) noexcept override;
+    bool supportsDirectEvent (uint16_t space_id, uint16_t type) override;
+    void handleEventDirect (const clap_event_header_t* event, int sampleOffset) override;
 
 private:
     void process_clap_event (const clap_event_header_t* event, juce::MidiBuffer& midiBuffer, int sampleOffset);
