@@ -13,6 +13,7 @@ GlobalPluginSettings::SettingsFileListener::SettingsFileListener (const juce::Fi
 
 void GlobalPluginSettings::SettingsFileListener::listenerFileChanged()
 {
+    const juce::ScopedLock sl (globalSettings.lock);
     globalSettings.loadSettingsFromFile();
 }
 
@@ -21,6 +22,7 @@ void GlobalPluginSettings::initialise (const juce::String& settingsFile, int tim
     if (fileListener != nullptr)
         return; // already initialised!
 
+    const juce::ScopedLock sl (lock);
     auto settingsDir = juce::File::getSpecialLocation (juce::File::userApplicationDataDirectory);
     fileListener = std::make_unique<SettingsFileListener> (settingsDir.getChildFile (settingsFile), timerSeconds, *this);
     if (! loadSettingsFromFile())
@@ -30,6 +32,7 @@ void GlobalPluginSettings::initialise (const juce::String& settingsFile, int tim
 void GlobalPluginSettings::addProperties (std::initializer_list<SettingProperty> properties, Listener* listener)
 {
     jassert (fileListener != nullptr); // Trying to add properties before initalizing? Don't do that!
+    const juce::ScopedLock sl (lock);
 
     for (auto& [name, value] : properties)
     {
@@ -37,13 +40,13 @@ void GlobalPluginSettings::addProperties (std::initializer_list<SettingProperty>
             globalProperties[name.data()] = std::move (value);
         addPropertyListener (name, listener);
     }
-
     writeSettingsToFile();
 }
 
 template <typename T>
 T GlobalPluginSettings::getProperty (SettingID name)
 {
+    const juce::ScopedLock sl (lock);
     try
     {
         return globalProperties[name.data()].get<T>();
@@ -60,6 +63,7 @@ T GlobalPluginSettings::getProperty (SettingID name)
 template <typename T>
 void GlobalPluginSettings::setProperty (SettingID name, T property)
 {
+    const juce::ScopedLock sl (lock);
     if (! globalProperties.contains (name))
     {
         // property must be added before it can be set!
@@ -109,6 +113,7 @@ void GlobalPluginSettings::removePropertyListener (Listener* listener)
 
 juce::File GlobalPluginSettings::getSettingsFile() const noexcept
 {
+    const juce::ScopedLock sl (lock);
     if (fileListener == nullptr)
         return {};
 
@@ -120,6 +125,7 @@ bool GlobalPluginSettings::loadSettingsFromFile()
     // this method should not be used before initialise()
     jassert (fileListener != nullptr);
 
+    const juce::ScopedLock sl (lock);
     auto& settingsFile = fileListener->getListenerFile();
     if (! settingsFile.existsAsFile())
         return false;
@@ -152,6 +158,7 @@ bool GlobalPluginSettings::loadSettingsFromFile()
         if (! JSONUtils::isSameType (value, newProperty))
         {
             // new property does not have the same type as the original!
+            // also hit when listenerFileChanged callback is hit and our properties are different then the settings file
             jassertfalse;
 
             newProperty = value;
@@ -163,7 +170,6 @@ bool GlobalPluginSettings::loadSettingsFromFile()
                 l->globalSettingChanged (name);
         }
     }
-
     return true;
 }
 
@@ -172,6 +178,7 @@ void GlobalPluginSettings::writeSettingsToFile()
     if (fileListener == nullptr)
         return;
 
+    const juce::ScopedLock sl (lock);
     auto& settingsFile = fileListener->getListenerFile();
 
     json settingsJson;
