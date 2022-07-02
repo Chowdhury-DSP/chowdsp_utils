@@ -79,7 +79,7 @@ private:
 
     static constexpr SettingID settingsTag = "plugin_settings";
 
-    inline static juce::CriticalSection lock;
+    juce::CriticalSection lock;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GlobalPluginSettings)
 };
