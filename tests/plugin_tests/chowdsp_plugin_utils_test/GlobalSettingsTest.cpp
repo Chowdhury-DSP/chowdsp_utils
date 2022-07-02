@@ -270,7 +270,7 @@ public:
             juce::MessageManager::getInstance()->runDispatchLoopUntil (100);
 
         // Check settings were properly written to file
-        for(int i = 0; i < 400; ++i)
+        for (int i = 0; i < 400; ++i)
         {
             auto thread1PropId = "thread1_" + std::to_string (i);
             chowdsp::GlobalPluginSettings::SettingProperty thread1Prop { thread1PropId, i };
