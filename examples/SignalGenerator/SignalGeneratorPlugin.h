@@ -21,7 +21,7 @@ private:
     void prepareTones (double sampleRate, int blockSize);
     void setUpSampleChoice();
 
-    chowdsp::FloatParameter* freqHzParam = nullptr;
+    chowdsp::SmoothedBufferValue<float, juce::ValueSmoothingTypes::Multiplicative> freqHzParamSmoothed;
     chowdsp::ChoiceParameter* toneTypeParam = nullptr;
     chowdsp::ChoiceParameter* upSampleParam = nullptr;
     chowdsp::FloatParameter* gainDBParam = nullptr;

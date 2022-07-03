@@ -10,8 +10,8 @@ CPMAddPackage(
 # download CLAP extensions
 CPMAddPackage(
   NAME clap-juce-extensions
-  GITHUB_REPOSITORY free-audio/clap-juce-extensions
-  GIT_TAG ff12b486caa173db824691f141b34aad0770d750
+  GITHUB_REPOSITORY jatinchowdhury18/clap-juce-extensions
+  GIT_TAG c8daec07377050b75c9813dc71a85f4d3b669a93
 )
 
 include(AddJUCEModules)
