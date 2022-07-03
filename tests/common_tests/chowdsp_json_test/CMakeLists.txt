@@ -6,6 +6,5 @@ target_link_libraries(chowdsp_json_test PRIVATE
 )
 
 target_sources(chowdsp_json_test PRIVATE
-    ${CMAKE_SOURCE_DIR}/tests/test_utils/TestRunner.cpp
     JSONTest.cpp
 )

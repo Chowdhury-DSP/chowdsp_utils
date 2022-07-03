@@ -1,6 +1,7 @@
 include(SubprojectVersion)
 include(EnableCoverageFlags)
 include(SetupJuceTest)
+include(SetupCatchTest)
 
 message(STATUS "Configuring tests for chowdsp_utils")
 

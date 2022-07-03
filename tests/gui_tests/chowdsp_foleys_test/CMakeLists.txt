@@ -9,6 +9,5 @@ target_link_libraries(chowdsp_foleys_test PRIVATE
 )
 
 target_sources(chowdsp_foleys_test PRIVATE
-    ${CMAKE_SOURCE_DIR}/tests/test_utils/TestRunner.cpp
     FoleysTest.cpp
 )

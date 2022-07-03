@@ -1,28 +1,23 @@
-# setup_juce_test(<target-name>)
+# setup_catch_test(<target-name>)
 #
-# Configures a JUCE unit test app
-function(setup_juce_test target)
-    target_compile_definitions(${target} PRIVATE
-        JucePlugin_Name="DummyPlugin"
-        JucePlugin_Manufacturer="chowdsp"
-        JucePlugin_VersionString="9.9.9"
-        JUCE_USE_CURL=0
-        JUCE_WEB_BROWSER=0
-        JUCE_MODAL_LOOPS_PERMITTED=1
-        JUCE_STANDALONE_APPLICATION=1
-    )
+# Configures a Catch unit test
+function(setup_catch_test target)
+    add_executable(${target})
 
-    target_sources(${target} PRIVATE ${CMAKE_SOURCE_DIR}/tests/test_utils/JUCETestRunner.cpp)
+    target_sources(${target} PRIVATE ${CMAKE_SOURCE_DIR}/tests/test_utils/CatchTestRunner.cpp)
 
     target_link_libraries(${target} PRIVATE
-        juce::juce_events
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags
     )
 
+    set(CHOWDSP_MODULES_DIR ${CMAKE_SOURCE_DIR}/modules)
+
     target_include_directories(${target} PRIVATE
         ${CMAKE_SOURCE_DIR}/tests/test_utils
+        ${CHOWDSP_MODULES_DIR}/common
+        ${CHOWDSP_MODULES_DIR}/dsp
     )
 
     add_test(NAME ${target} COMMAND $<TARGET_FILE:${target}>)
@@ -47,4 +42,4 @@ function(setup_juce_test target)
 
     include(AddDiagnosticInfo)
     add_diagnostic_info(${target})
-endfunction(setup_juce_test)
+endfunction(setup_catch_test)
