@@ -8,6 +8,11 @@ FileListener::FileListener (const juce::File& file, int timerSeconds) : fileToLi
     startTimer (timerSeconds * 1000);
 }
 
+FileListener::~FileListener()
+{
+    stopTimer();
+}
+
 void FileListener::timerCallback()
 {
     auto newModificationTime = fileToListenTo.getLastModificationTime().toMilliseconds();

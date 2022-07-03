@@ -225,6 +225,65 @@ public:
         }
     }
 
+    /**
+     * Primarily tests that the ScopedLock's within GlobalPluginSettings are working as they should
+     * Without the ScopedLock's in GlobalPluginSettings this test should have some random failing tests or cause a segmentation fault
+     */
+    void twoInstancesAccessingSameFileTest()
+    {
+        chowdsp::SharedPluginSettings pluginSettings;
+        pluginSettings->initialise (settingsFile, 1);
+
+        std::atomic<bool> thread1Finished { false };
+        juce::Thread::launch (
+            [&] {
+                chowdsp::SharedPluginSettings thread1Settings;
+                thread1Settings->initialise (settingsFile, 1);
+                for (int i = 0; i < 400; ++i)
+                {
+                    auto propId = "thread1_" + std::to_string (i);
+                    chowdsp::GlobalPluginSettings::SettingProperty prop { propId, i };
+                    thread1Settings->addProperties ({ prop });
+                    expectEquals (thread1Settings->getProperty<int> (prop.first), prop.second.get<int>(), "Property is incorrect within thread 1");
+                    juce::Thread::sleep (2); // allow thread 2 to get caught up so both threads are writing/reading at the same time
+                }
+                thread1Finished = true;
+            });
+
+        std::atomic<bool> thread2Finished { false };
+        juce::Thread::launch (
+            [&] {
+                chowdsp::SharedPluginSettings thread2Settings;
+                thread2Settings->initialise (settingsFile, 1);
+                for (int i = 0; i < 400; ++i)
+                {
+                    auto propId = "thread2_" + std::to_string (i);
+                    chowdsp::GlobalPluginSettings::SettingProperty prop { propId, i };
+                    thread2Settings->addProperties ({ prop });
+                    expectEquals (thread2Settings->getProperty<int> (prop.first), prop.second.get<int>(), "Property is incorrect within thread 2");
+                    juce::Thread::sleep (1);
+                }
+                thread2Finished = true;
+            });
+
+        while (! (thread1Finished && thread2Finished))
+            juce::MessageManager::getInstance()->runDispatchLoopUntil (100);
+
+        // Check settings were properly written to file
+        for (int i = 0; i < 400; ++i)
+        {
+            auto thread1PropId = "thread1_" + std::to_string (i);
+            chowdsp::GlobalPluginSettings::SettingProperty thread1Prop { thread1PropId, i };
+            expectEquals (pluginSettings->getProperty<int> (thread1Prop.first), thread1Prop.second.get<int>(), "Property is incorrect within final check");
+
+            auto thread2PropId = "thread2_" + std::to_string (i);
+            chowdsp::GlobalPluginSettings::SettingProperty thread2Prop { thread2PropId, i };
+            expectEquals (pluginSettings->getProperty<int> (thread2Prop.first), thread2Prop.second.get<int>(), "Property is incorrect within final check");
+        }
+
+        pluginSettings->getSettingsFile().deleteFile();
+    }
+
     void runTestTimed() override
     {
         // clean up just in case last test didn't finish!
@@ -260,6 +319,9 @@ public:
 
         beginTest ("Wreck Settings File Test");
         wreckSettingsFile();
+
+        beginTest ("Two Instances Accessing Same File Test");
+        twoInstancesAccessingSameFileTest();
     }
 };
 

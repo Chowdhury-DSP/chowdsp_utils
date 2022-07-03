@@ -9,6 +9,8 @@ public:
     /** Initialize this FileListener for a given file and update time. */
     FileListener (const juce::File& file, int timerSeconds);
 
+    ~FileListener() override;
+
     /** Override this class to do something when the file has changed. */
     virtual void listenerFileChanged() = 0;
 
