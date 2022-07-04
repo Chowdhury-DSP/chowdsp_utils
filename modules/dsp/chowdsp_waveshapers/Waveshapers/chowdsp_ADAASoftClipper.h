@@ -25,8 +25,7 @@ public:
         static constexpr auto G2 = 1.0 / (6.0 * ipow<3> (normFactor)) - 1.0 / (ipow<3> (normFactor) * D * (D + 1.0) * (D + 2.0));
 
         this->initialise (
-            [] (auto x)
-            {
+            [] (auto x) {
                 if (std::abs (x * normFactor) > 1.0)
                     return sign (x);
                 else
