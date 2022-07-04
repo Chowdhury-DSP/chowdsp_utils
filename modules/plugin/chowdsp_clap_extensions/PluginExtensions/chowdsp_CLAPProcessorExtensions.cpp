@@ -23,7 +23,7 @@ bool CLAPProcessorExtensions::supportsDirectEvent (uint16_t space_id, uint16_t t
     return type == CLAP_EVENT_PARAM_MOD;
 }
 
-void CLAPProcessorExtensions::handleEventDirect (const clap_event_header_t* event, int /*sampleOffset*/)
+void CLAPProcessorExtensions::handleDirectEvent (const clap_event_header_t* event, int /*sampleOffset*/)
 {
     if (event->space_id != CLAP_CORE_EVENT_SPACE_ID || event->type != CLAP_EVENT_PARAM_MOD)
     {
