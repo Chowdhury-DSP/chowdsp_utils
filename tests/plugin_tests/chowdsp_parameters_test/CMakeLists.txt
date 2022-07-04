@@ -3,6 +3,7 @@ setup_juce_test(chowdsp_parameters_test)
 
 target_link_libraries(chowdsp_parameters_test PRIVATE
     chowdsp_parameters
+    chowdsp_dsp_data_structures
     chowdsp_plugin_base
     chowdsp_rhythm
     clap_juce_extensions

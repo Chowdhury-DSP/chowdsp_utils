@@ -75,7 +75,7 @@ void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::process (int numSample
 #endif
     else
     {
-        // you set a parameter handle that is not nullpt using setParameterHandle
+        // you must set a parameter handle that is not nullptr using setParameterHandle
         // before calling the method!
         jassertfalse;
     }

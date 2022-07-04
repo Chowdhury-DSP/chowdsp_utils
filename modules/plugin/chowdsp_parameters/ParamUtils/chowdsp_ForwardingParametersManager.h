@@ -54,7 +54,7 @@ public:
     [[maybe_unused]] const auto& getForwardedParameters() const { return forwardedParams; }
 
 protected:
-    std::array<ForwardingParameter*, totalNumForwardingParameters> forwardedParams;
+    std::array<ForwardingParameter*, (size_t) totalNumForwardingParameters> forwardedParams;
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ForwardingParametersManager)
