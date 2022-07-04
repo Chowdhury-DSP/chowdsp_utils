@@ -2,7 +2,7 @@
 
 namespace chowdsp
 {
-FloatParameter::FloatParameter (const juce::ParameterID& parameterID,
+FloatParameter::FloatParameter (const ParameterID& parameterID,
                                 const juce::String& parameterName,
                                 const juce::NormalisableRange<float>& valueRange,
                                 float defaultFloatValue,
