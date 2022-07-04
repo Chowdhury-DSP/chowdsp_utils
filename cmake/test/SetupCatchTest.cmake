@@ -12,13 +12,20 @@ function(setup_catch_test target)
         juce::juce_recommended_warning_flags
     )
 
-    set(CHOWDSP_MODULES_DIR ${CMAKE_SOURCE_DIR}/modules)
-
     target_include_directories(${target} PRIVATE
         ${CMAKE_SOURCE_DIR}/tests/test_utils
-        ${CHOWDSP_MODULES_DIR}/common
-        ${CHOWDSP_MODULES_DIR}/dsp
+        ${CMAKE_SOURCE_DIR}/modules/common
+        ${CMAKE_SOURCE_DIR}/modules/dsp
     )
+
+    target_compile_definitions(${target}
+        PUBLIC
+            $<IF:$<CONFIG:DEBUG>,DEBUG=1 _DEBUG=1,NDEBUG=1 _NDEBUG=1>
+    )
+
+    if(APPLE)
+        target_link_libraries(${target} PUBLIC "-framework Accelerate")
+    endif()
 
     add_test(NAME ${target} COMMAND $<TARGET_FILE:${target}>)
 

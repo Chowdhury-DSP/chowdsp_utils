@@ -21,8 +21,9 @@ BEGIN_JUCE_MODULE_DECLARATION
 #pragma once
 
 // STL includes
-#include <atomic>
 #include <algorithm>
+#include <atomic>
+#include <cmath>
 #include <tuple>
 
 #include "DataStructures/chowdsp_AtomicHelpers.h"
@@ -30,3 +31,24 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "DataStructures/chowdsp_TupleHelpers.h"
 #include "Memory/chowdsp_MemoryAliasing.h"
 #include "Types/chowdsp_TypeTraits.h"
+
+#ifndef DOXYGEN
+
+#if JUCE_MODULE_AVAILABLE_juce_core
+#define CHOWDSP_USING_JUCE 1
+#else
+#define CHOWDSP_USING_JUCE 0
+#endif
+
+#if ! CHOWDSP_USING_JUCE
+#define JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED 0
+#include "JUCEHelpers/juce_TargetPlatform.h"
+#include "JUCEHelpers/juce_CompilerWarnings.h"
+#include "JUCEHelpers/juce_ExtraDefinitions.h"
+#include "JUCEHelpers/juce_MathsFunctions.h"
+#include "JUCEHelpers/juce_FloatVectorOperations.h"
+#include "JUCEHelpers/juce_Decibels.h"
+#include "JUCEHelpers/juce_SmoothedValue.h"
+#endif // CHOWDSP_USING_JUCE
+
+#endif // DOXYGEN

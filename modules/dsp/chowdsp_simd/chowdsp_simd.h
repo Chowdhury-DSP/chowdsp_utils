@@ -8,7 +8,7 @@ BEGIN_JUCE_MODULE_DECLARATION
    version:       1.0.0
    name:          ChowDSP DSP SIMD
    description:   JUCE interface for XSIMD, with a few extra useful methods
-   dependencies:  juce_core, juce_audio_basics
+   dependencies:  chowdsp_core
 
    website:       https://ccrma.stanford.edu/~jatin/chowdsp
    license:       BSD 3-clause
@@ -23,8 +23,9 @@ BEGIN_JUCE_MODULE_DECLARATION
 // STL includes
 #include <cassert>
 
-#include <juce_core/juce_core.h>
-#include <juce_audio_basics/juce_audio_basics.h>
+//#include <juce_core/juce_core.h>
+//#include <juce_audio_basics/juce_audio_basics.h>
+#include <chowdsp_core/chowdsp_core.h>
 
 // Third-party includes
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wcast-align",
