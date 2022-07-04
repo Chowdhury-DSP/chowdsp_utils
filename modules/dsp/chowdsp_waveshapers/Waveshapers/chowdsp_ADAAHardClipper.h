@@ -11,7 +11,7 @@ template <typename T>
 class ADAAHardClipper : public ADAAWaveshaper<T>
 {
 public:
-    explicit ADAAHardClipper (LookupTableCache* lookupTableCache = nullptr, T range = (T) 10, int N = 1 << 17) : ADAAWaveshaper<T> (lookupTableCache, "hard_clipper")
+    explicit ADAAHardClipper (LookupTableCache* lutCache = nullptr, T range = (T) 10, int N = 1 << 17) : ADAAWaveshaper<T> (lutCache, "hard_clipper")
     {
         using Math::sign;
         this->initialise (

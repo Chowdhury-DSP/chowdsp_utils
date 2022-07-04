@@ -5,9 +5,24 @@ namespace chowdsp
 template <typename FloatType, typename ValueSmoothingTypes>
 void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::setParameterHandle (std::atomic<float>* handle)
 {
+#if JUCE_MODULE_AVAILABLE_chowdsp_parameters
+    modulatableParameterHandle = nullptr;
+#endif
+
     parameterHandle = handle;
-    reset (*parameterHandle);
+    reset (parameterHandle->load());
 }
+
+#if JUCE_MODULE_AVAILABLE_chowdsp_parameters
+template <typename FloatType, typename ValueSmoothingTypes>
+void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::setParameterHandle (FloatParameter* handle)
+{
+    parameterHandle = nullptr;
+
+    modulatableParameterHandle = handle;
+    reset (modulatableParameterHandle->getCurrentValue());
+}
+#endif
 
 template <typename FloatType, typename ValueSmoothingTypes>
 void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::prepare (double fs, int samplesPerBlock)
@@ -16,7 +31,11 @@ void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::prepare (double fs, in
     buffer.setSize (1, samplesPerBlock);
 
     if (parameterHandle != nullptr)
-        reset (*parameterHandle);
+        reset (parameterHandle->load());
+#if JUCE_MODULE_AVAILABLE_chowdsp_parameters
+    else if (modulatableParameterHandle != nullptr)
+        reset (modulatableParameterHandle->getCurrentValue());
+#endif
     else
         reset();
 }
@@ -44,8 +63,22 @@ void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::setRampLength (double 
 template <typename FloatType, typename ValueSmoothingTypes>
 void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::process (int numSamples)
 {
-    jassert (parameterHandle != nullptr);
-    process ((FloatType) *parameterHandle, numSamples);
+    if (parameterHandle != nullptr)
+    {
+        process ((FloatType) parameterHandle->load(), numSamples);
+    }
+#if JUCE_MODULE_AVAILABLE_chowdsp_parameters
+    else if (modulatableParameterHandle != nullptr)
+    {
+        process ((FloatType) modulatableParameterHandle->getCurrentValue(), numSamples);
+    }
+#endif
+    else
+    {
+        // you must set a parameter handle that is not nullptr using setParameterHandle
+        // before calling the method!
+        jassertfalse;
+    }
 }
 
 template <typename FloatType, typename ValueSmoothingTypes>

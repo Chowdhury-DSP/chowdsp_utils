@@ -152,6 +152,7 @@ private:
         s1 = (NumericType) 2 * v1 - s1;
         s2 = (NumericType) 2 * v2 - s2;
 
+        juce::ignoreUnused (v0);
         if constexpr (type == FilterType::Lowpass)
             return v2;
         else if constexpr (type == FilterType::Bandpass)

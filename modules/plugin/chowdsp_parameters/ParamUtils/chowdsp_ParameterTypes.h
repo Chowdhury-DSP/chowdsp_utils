@@ -50,7 +50,7 @@ public:
     /** Returns the default value for the parameter. */
     float getDefaultValue() const override { return unsnappedDefault; }
 
-    /** TRUE */
+    /** TRUE! */
     bool supportsMonophonicModulation() override { return true; }
 
     /** Applies monphonic modulation to this parameter. */
