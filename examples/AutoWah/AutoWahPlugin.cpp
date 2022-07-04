@@ -26,7 +26,7 @@ void AutoWahPlugin::addParameters (Parameters& params)
     using namespace chowdsp::ParamUtils;
 
     createFreqParameter (params, { freqTag, 100 }, "Frequency", 200.0f, 2000.0f, 500.0f, 500.0f);
-    emplace_param<chowdsp::FloatParameter> (params, juce::ParameterID { qValTag, 100 }, "Q", createNormalisableRange (1.0f, 15.0f, 5.0f), 5.0f, &floatValToString, &stringToFloatVal);
+    emplace_param<chowdsp::FloatParameter> (params, chowdsp::ParameterID { qValTag, 100 }, "Q", createNormalisableRange (1.0f, 15.0f, 5.0f), 5.0f, &floatValToString, &stringToFloatVal);
     createGainDBParameter (params, { gainTag, 100 }, "Gain", 0.0f, 12.0f, 0.0f);
 
     createTimeMsParameter (params, { attackTag, 100 }, "Attack", createNormalisableRange (0.1f, 10.0f, 1.0f), 1.0f);
