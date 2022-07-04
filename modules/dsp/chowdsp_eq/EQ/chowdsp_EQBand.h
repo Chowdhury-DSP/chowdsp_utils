@@ -94,16 +94,16 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EQBand)
 };
 
-template <typename FloatType>
+template <typename FloatType = float>
 using DefaultEQBand = EQBand<FloatType,
                              FirstOrderHPF<FloatType>,
-                             SecondOrderHPF<FloatType>,
-                             LowShelfFilter<FloatType>,
-                             PeakingFilter<FloatType>,
-                             NotchFilter<FloatType>,
-                             HighShelfFilter<FloatType>,
+                             SVFHighpass<FloatType>,
+                             SVFLowShelf<FloatType>,
+                             SVFBell<FloatType>,
+                             SVFNotch<FloatType>,
+                             SVFHighShelf<FloatType>,
                              FirstOrderLPF<FloatType>,
-                             SecondOrderLPF<FloatType>>;
+                             SVFLowpass<FloatType>>;
 
 } // namespace chowdsp::EQ
 

@@ -99,14 +99,7 @@ template <size_t NumBands>
 template <typename EQType>
 void StandardEQParameters<NumBands>::setEQParameters (EQType& eq, const Params& params)
 {
-    for (size_t i = 0; i < NumBands; ++i)
-    {
-        eq.setCutoffFrequency ((int) i, params.bands[i].params.bandFreqHz);
-        eq.setQValue ((int) i, params.bands[i].params.bandQ);
-        eq.setGainDB ((int) i, params.bands[i].params.bandGainDB);
-        eq.setFilterType ((int) i, params.bands[i].params.bandType);
-        eq.setBandOnOff ((int) i, params.bands[i].params.bandOnOff);
-    }
+    Params::setEQParameters (eq, params);
 }
 
 template <size_t NumBands>
