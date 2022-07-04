@@ -12,6 +12,20 @@ struct EQParams
     ParamsType params {};
 };
 
+/** Basic parameters to determine the EQ behaviour */
+template <size_t NumBands>
+struct BasicEQParams
+{
+    struct BandParams
+    {
+        float bandFreqHz, bandQ, bandGainDB;
+        int bandType;
+        bool bandOnOff;
+    };
+
+    std::array<EQParams<BandParams>, NumBands> bands {};
+};
+
 template <typename ParamsType>
 inline bool operator== (const EQParams<ParamsType>& x, const EQParams<ParamsType>& y)
 {

@@ -12,17 +12,7 @@ public:
     static constexpr auto EQNumBands = NumBands;
 
     /** Parameters to determine the EQ behaviour */
-    struct Params
-    {
-        struct BandParams
-        {
-            float bandFreqHz, bandQ, bandGainDB;
-            int bandType;
-            bool bandOnOff;
-        };
-
-        std::array<chowdsp::EQ::EQParams<BandParams>, NumBands> bands;
-    };
+    using Params = BasicEQParams<NumBands>;
 
     /** Group of parameter handles for a single band. */
     using EQBandParameterHandles = std::tuple<FloatParameter*, FloatParameter*, FloatParameter*, ChoiceParameter*, BoolParameter*>;
