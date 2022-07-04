@@ -25,14 +25,14 @@ void AutoWahPlugin::addParameters (Parameters& params)
 {
     using namespace chowdsp::ParamUtils;
 
-    createFreqParameter (params, freqTag, "Frequency", 200.0f, 2000.0f, 500.0f, 500.0f);
-    emplace_param<chowdsp::FloatParameter> (params, qValTag, "Q", createNormalisableRange (1.0f, 15.0f, 5.0f), 5.0f, &floatValToString, &stringToFloatVal);
-    createGainDBParameter (params, gainTag, "Gain", 0.0f, 12.0f, 0.0f);
+    createFreqParameter (params, { freqTag, 100 }, "Frequency", 200.0f, 2000.0f, 500.0f, 500.0f);
+    emplace_param<chowdsp::FloatParameter> (params, juce::ParameterID { qValTag, 100 }, "Q", createNormalisableRange (1.0f, 15.0f, 5.0f), 5.0f, &floatValToString, &stringToFloatVal);
+    createGainDBParameter (params, { gainTag, 100 }, "Gain", 0.0f, 12.0f, 0.0f);
 
-    createTimeMsParameter (params, attackTag, "Attack", createNormalisableRange (0.1f, 10.0f, 1.0f), 1.0f);
-    createTimeMsParameter (params, releaseTag, "Release", createNormalisableRange (2.5f, 250.0f, 50.0f), 50.0f);
+    createTimeMsParameter (params, { attackTag, 100 }, "Attack", createNormalisableRange (0.1f, 10.0f, 1.0f), 1.0f);
+    createTimeMsParameter (params, { releaseTag, 100 }, "Release", createNormalisableRange (2.5f, 250.0f, 50.0f), 50.0f);
 
-    createPercentParameter (params, freqModTag, "Freq. Mod", 0.5f);
+    createPercentParameter (params, { freqModTag, 100 }, "Freq. Mod", 0.5f);
 }
 
 void AutoWahPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)

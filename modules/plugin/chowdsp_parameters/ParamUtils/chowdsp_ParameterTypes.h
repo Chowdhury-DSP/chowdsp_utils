@@ -35,12 +35,22 @@ namespace ParamUtils
 } // namespace ParamUtils
 #endif
 
+#if JUCE_VERSION < 0x070000
+#ifndef DOXYGEN
+namespace juce
+{
+    // JUCE 6 doesn't have the new juce::ParameterID class, so this is a little workaround.
+    using ParameterID = ::juce::String;
+} // namespace juce
+#endif
+#endif
+
 /** Wrapper of juce::AudioParameterFloat that supports monophonic modulation. */
 class FloatParameter : public juce::AudioParameterFloat,
                        public ParamUtils::ModParameterMixin
 {
 public:
-    FloatParameter (const juce::String& parameterID,
+    FloatParameter (const juce::ParameterID& parameterID,
                     const juce::String& parameterName,
                     const juce::NormalisableRange<float>& valueRange,
                     float defaultValue,
@@ -76,7 +86,7 @@ class ChoiceParameter : public juce::AudioParameterChoice,
                         public ParamUtils::ModParameterMixin
 {
 public:
-    ChoiceParameter (const juce::String& parameterID, const juce::String& parameterName, const juce::StringArray& parameterChoices, int defaultItemIndex)
+    ChoiceParameter (const juce::ParameterID& parameterID, const juce::String& parameterName, const juce::StringArray& parameterChoices, int defaultItemIndex)
         : juce::AudioParameterChoice (parameterID, parameterName, parameterChoices, defaultItemIndex)
     {
     }
@@ -87,7 +97,7 @@ class BoolParameter : public juce::AudioParameterBool,
                       public ParamUtils::ModParameterMixin
 {
 public:
-    BoolParameter (const juce::String& parameterID, const juce::String& parameterName, bool defaultBoolValue)
+    BoolParameter (const juce::ParameterID& parameterID, const juce::String& parameterName, bool defaultBoolValue)
         : juce::AudioParameterBool (parameterID, parameterName, defaultBoolValue)
     {
     }

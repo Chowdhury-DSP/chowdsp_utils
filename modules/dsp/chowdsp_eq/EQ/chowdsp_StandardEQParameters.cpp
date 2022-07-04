@@ -3,10 +3,23 @@ namespace chowdsp::EQ
 #ifndef DOXYGEN
 namespace eqparams_detail
 {
-    inline juce::String getTagForBand (const juce::String& paramPrefix, int bandIndex, const juce::String& tag)
+    inline auto getTagForBand (const juce::String& paramPrefix, int bandIndex, const juce::String& tag)
     {
         return paramPrefix + "band" + juce::String (bandIndex) + "_" + tag;
     }
+
+#if JUCE_VERSION < 0x070000
+    inline auto getParamIDForBand (const juce::String& paramPrefix, int bandIndex, const juce::String& tag, int versionHint)
+    {
+        juce::ignoreUnused (versionHint);
+        return getTagForBand (paramPrefix, bandIndex, tag);
+    }
+#else
+    inline auto getParamIDForBand (const juce::String& paramPrefix, int bandIndex, const juce::String& tag, int versionHint)
+    {
+        return juce::ParameterID { getTagForBand (paramPrefix, bandIndex, tag), versionHint };
+    }
+#endif
 
     inline juce::String getNameForBand (int bandIndex, const juce::String& name)
     {
@@ -49,7 +62,7 @@ void StandardEQParameters<NumBands>::initialiseEQParameters (juce::AudioProcesso
 }
 
 template <size_t NumBands>
-void StandardEQParameters<NumBands>::addEQParameters (Parameters& params, const juce::String& paramPrefix, juce::StringArray eqBandTypeChoices, int defaultEQBandTypeChoice)
+void StandardEQParameters<NumBands>::addEQParameters (Parameters& params, const juce::String& paramPrefix, juce::StringArray eqBandTypeChoices, int defaultEQBandTypeChoice, int versionHint)
 {
     using namespace eqparams_detail;
     using namespace chowdsp::ParamUtils;
@@ -63,17 +76,18 @@ void StandardEQParameters<NumBands>::addEQParameters (Parameters& params, const 
     // defaultEQBandChoice must be a valid index into eqBandTypeChoices
     jassert (juce::isPositiveAndBelow (defaultEQBandTypeChoice, eqBandTypeChoices.size()));
 
-    auto addQParam = [&params] (const juce::String& tag, const juce::String& name) {
-        emplace_param<FloatParameter> (params, tag, name, createNormalisableRange (0.1f, 10.0f, 0.7071f), 0.7071f, &floatValToString, &stringToFloatVal);
+    auto addQParam = [&params] (const juce::ParameterID& paramID, const juce::String& name)
+    {
+        emplace_param<FloatParameter> (params, paramID, name, createNormalisableRange (0.1f, 10.0f, 0.7071f), 0.7071f, &floatValToString, &stringToFloatVal);
     };
 
     for (int i = 0; i < (int) NumBands; ++i)
     {
-        emplace_param<BoolParameter> (params, getTagForBand (paramPrefix, i, eqBandOnOffTag), getNameForBand (i, "On/Off"), false);
-        emplace_param<ChoiceParameter> (params, getTagForBand (paramPrefix, i, eqBandTypeTag), getNameForBand (i, "Type"), eqBandTypeChoices, defaultEQBandTypeChoice);
-        createFreqParameter (params, getTagForBand (paramPrefix, i, eqBandFreqTag), getNameForBand (i, "Freq."), 20.0f, 20000.0f, 2000.0f, 1000.0f);
-        addQParam (getTagForBand (paramPrefix, i, eqBandQTag), getNameForBand (i, "Q"));
-        createGainDBParameter (params, getTagForBand (paramPrefix, i, eqBandGainTag), getNameForBand (i, "Gain"), -18.0f, 18.0f, 0.0f);
+        emplace_param<BoolParameter> (params, getParamIDForBand (paramPrefix, i, eqBandOnOffTag, versionHint), getNameForBand (i, "On/Off"), false);
+        emplace_param<ChoiceParameter> (params, getParamIDForBand (paramPrefix, i, eqBandTypeTag, versionHint), getNameForBand (i, "Type"), eqBandTypeChoices, defaultEQBandTypeChoice);
+        createFreqParameter (params, getParamIDForBand (paramPrefix, i, eqBandFreqTag, versionHint), getNameForBand (i, "Freq."), 20.0f, 20000.0f, 2000.0f, 1000.0f);
+        addQParam (getParamIDForBand (paramPrefix, i, eqBandQTag, versionHint), getNameForBand (i, "Q"));
+        createGainDBParameter (params, getParamIDForBand (paramPrefix, i, eqBandGainTag, versionHint), getNameForBand (i, "Gain"), -18.0f, 18.0f, 0.0f);
     }
 }
 

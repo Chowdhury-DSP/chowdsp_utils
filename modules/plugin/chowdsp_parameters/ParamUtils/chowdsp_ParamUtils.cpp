@@ -62,23 +62,23 @@ juce::String floatValToString (float floatVal)
 
 float stringToFloatVal (const juce::String& s) { return s.getFloatValue(); }
 
-void createFreqParameter (Parameters& params, const juce::String& id, const juce::String& name, float min, float max, float centre, float defaultValue)
+void createFreqParameter (Parameters& params, const juce::ParameterID& id, const juce::String& name, float min, float max, float centre, float defaultValue)
 {
     auto freqRange = createNormalisableRange (min, max, centre);
     emplace_param<FloatParameter> (params, id, name, freqRange, defaultValue, &freqValToString, &stringToFreqVal);
 }
 
-void createPercentParameter (Parameters& params, const juce::String& id, const juce::String& name, float defaultValue)
+void createPercentParameter (Parameters& params, const juce::ParameterID& id, const juce::String& name, float defaultValue)
 {
     emplace_param<FloatParameter> (params, id, name, juce::NormalisableRange { 0.0f, 1.0f }, defaultValue, &percentValToString, &stringToPercentVal);
 }
 
-void createBipolarPercentParameter (Parameters& params, const juce::String& id, const juce::String& name, float defaultValue)
+void createBipolarPercentParameter (Parameters& params, const juce::ParameterID& id, const juce::String& name, float defaultValue)
 {
     emplace_param<FloatParameter> (params, id, name, juce::NormalisableRange { -1.0f, 1.0f }, defaultValue, &percentValToString, &stringToPercentVal);
 }
 
-void createGainDBParameter (Parameters& params, const juce::String& id, const juce::String& name, float min, float max, float defaultValue, float centerValue)
+void createGainDBParameter (Parameters& params, const juce::ParameterID& id, const juce::String& name, float min, float max, float defaultValue, float centerValue)
 {
     juce::NormalisableRange<float> range { min, max };
     if (centerValue > -1000.0f)
@@ -87,12 +87,12 @@ void createGainDBParameter (Parameters& params, const juce::String& id, const ju
     emplace_param<FloatParameter> (params, id, name, range, defaultValue, &gainValToString, &stringToGainVal);
 }
 
-void createTimeMsParameter (Parameters& params, const juce::String& id, const juce::String& name, const juce::NormalisableRange<float>& range, float defaultValue)
+void createTimeMsParameter (Parameters& params, const juce::ParameterID& id, const juce::String& name, const juce::NormalisableRange<float>& range, float defaultValue)
 {
     emplace_param<FloatParameter> (params, id, name, range, defaultValue, &timeMsValToString, &stringToTimeMsVal);
 }
 
-void createRatioParameter (Parameters& params, const juce::String& id, const juce::String& name, const juce::NormalisableRange<float>& range, float defaultValue)
+void createRatioParameter (Parameters& params, const juce::ParameterID& id, const juce::String& name, const juce::NormalisableRange<float>& range, float defaultValue)
 {
     emplace_param<FloatParameter> (params, id, name, range, defaultValue, &ratioValToString, &stringToRatioVal);
 }
