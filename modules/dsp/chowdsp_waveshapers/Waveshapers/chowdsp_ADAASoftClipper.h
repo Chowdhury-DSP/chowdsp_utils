@@ -23,6 +23,7 @@ public:
         static constexpr auto invNormFactor = 1.0 / normFactor;
         static constexpr auto G1 = 1.0 / (2.0 * ipow<2> (normFactor)) - 1.0 / (ipow<2> (normFactor) * D * (D + 1.0));
         static constexpr auto G2 = 1.0 / (6.0 * ipow<3> (normFactor)) - 1.0 / (ipow<3> (normFactor) * D * (D + 1.0) * (D + 2.0));
+        juce::ignoreUnused (G2);
 
         this->initialise (
             [] (auto x) {
