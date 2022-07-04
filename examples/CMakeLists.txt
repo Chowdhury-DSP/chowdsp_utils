@@ -4,7 +4,7 @@ include(CPM)
 CPMAddPackage(
   NAME juce
   GITHUB_REPOSITORY juce-framework/juce
-  GIT_TAG 7.0.0
+  GIT_TAG 7.0.1
 )
 
 # download CLAP extensions
