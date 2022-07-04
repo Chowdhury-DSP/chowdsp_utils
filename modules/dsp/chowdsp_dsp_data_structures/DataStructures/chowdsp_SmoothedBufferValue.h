@@ -1,5 +1,9 @@
 #pragma once
 
+#if JUCE_MODULE_AVAILABLE_chowdsp_parameters
+#include <chowdsp_parameters/chowdsp_parameters.h>
+#endif
+
 namespace chowdsp
 {
 /**
@@ -20,6 +24,16 @@ public:
      * @param handle A parameter handle to use for smoothing
      */
     void setParameterHandle (std::atomic<float>* handle);
+
+#if JUCE_MODULE_AVAILABLE_chowdsp_parameters
+    /**
+     * Sets a parameter handle for this buffer to use for smoothing.
+     * Note that the parameter handle must not be deleted before this object!
+     *
+     * @param handle A parameter handle to use for smoothing
+     */
+    void setParameterHandle (FloatParameter* handle);
+#endif
 
     /** Prepare the smoother to process samples with a given sample rate and block size. */
     void prepare (double sampleRate, int samplesPerBlock);
@@ -67,6 +81,10 @@ private:
     juce::SmoothedValue<FloatType, ValueSmoothingType> smoother;
 
     std::atomic<float>* parameterHandle = nullptr;
+
+#if JUCE_MODULE_AVAILABLE_chowdsp_parameters
+    FloatParameter* modulatableParameterHandle = nullptr;
+#endif
 
     double sampleRate = 48000.0;
     double rampLengthInSeconds = 0.05;

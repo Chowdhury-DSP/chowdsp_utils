@@ -12,7 +12,7 @@ const juce::String waveshaperTag = "waveshaper";
 SignalGeneratorPlugin::SignalGeneratorPlugin()
 {
     using namespace chowdsp::ParamUtils;
-    loadParameterPointer (freqHzParam, vts, freqTag);
+    freqHzParamSmoothed.setParameterHandle (dynamic_cast<chowdsp::FloatParameter*> (vts.getParameter (freqTag)));
     loadParameterPointer (toneTypeParam, vts, typeTag);
     loadParameterPointer (upSampleParam, vts, upsampleTag);
     loadParameterPointer (gainDBParam, vts, gainTag);
@@ -66,6 +66,12 @@ void SignalGeneratorPlugin::prepareTones (double sampleRate, int maxSamplesPerBl
     square.prepare (spec);
 
     gain.prepare (spec);
+
+    freqHzParamSmoothed.prepare (sampleRate, maxSamplesPerBlock);
+    freqHzParamSmoothed.setRampLength (0.05);
+    freqHzParamSmoothed.mappingFunction = [fs = (float) sampleRate] (auto targetFrequency) {
+        return juce::jmin (targetFrequency, 0.48f * fs);
+    };
 }
 
 void SignalGeneratorPlugin::setUpSampleChoice()
@@ -110,14 +116,6 @@ void SignalGeneratorPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
     auto&& block = juce::dsp::AudioBlock<float> { buffer };
 
     auto processTone = [this, &block, numChannels = buffer.getNumChannels(), numSamples = buffer.getNumSamples()] (auto& tone) {
-        auto targetFrequency = freqHzParam->getCurrentValue();
-        if (targetFrequency > 0.48f * (float) getSampleRate())
-        {
-            tone.reset();
-            targetFrequency = 0.0f;
-        }
-        tone.setFrequency (targetFrequency);
-
         if (resampler == nullptr)
             upsampledBuffer.setSize (numChannels, numSamples);
         else
@@ -126,7 +124,29 @@ void SignalGeneratorPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
 
         auto&& upsampledBlock = juce::dsp::AudioBlock<float> { upsampledBuffer };
         auto&& upsampledContext = juce::dsp::ProcessContextReplacing<float> { upsampledBlock };
-        tone.process (upsampledContext);
+
+        freqHzParamSmoothed.process (upsampledBuffer.getNumSamples());
+        if (! freqHzParamSmoothed.isSmoothing())
+        {
+            auto targetFrequency = freqHzParamSmoothed.getCurrentValue();
+            tone.setFrequency (targetFrequency);
+            tone.process (upsampledContext);
+        }
+        else
+        {
+            const auto osNumSamples = upsampledBuffer.getNumSamples();
+            const auto* freqHzData = freqHzParamSmoothed.getSmoothedBuffer();
+            auto* data = upsampledBuffer.getWritePointer (0);
+
+            for (int n = 0; n < osNumSamples; ++n)
+            {
+                tone.setFrequency (freqHzData[n]);
+                data[n] = tone.processSample();
+            }
+
+            for (int ch = 1; ch < upsampledBuffer.getNumChannels(); ++ch)
+                upsampledBuffer.copyFrom (ch, 0, upsampledBuffer, 0, 0, osNumSamples);
+        }
 
         gain.setGainDecibels (gainDBParam->getCurrentValue());
         gain.process (upsampledContext);
