@@ -69,8 +69,7 @@ void SignalGeneratorPlugin::prepareTones (double sampleRate, int maxSamplesPerBl
 
     freqHzParamSmoothed.prepare (sampleRate, maxSamplesPerBlock);
     freqHzParamSmoothed.setRampLength (0.05);
-    freqHzParamSmoothed.mappingFunction = [fs = (float) sampleRate] (auto targetFrequency)
-    {
+    freqHzParamSmoothed.mappingFunction = [fs = (float) sampleRate] (auto targetFrequency) {
         return juce::jmin (targetFrequency, 0.48f * fs);
     };
 }
@@ -116,8 +115,7 @@ void SignalGeneratorPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
     buffer.clear();
     auto&& block = juce::dsp::AudioBlock<float> { buffer };
 
-    auto processTone = [this, &block, numChannels = buffer.getNumChannels(), numSamples = buffer.getNumSamples()] (auto& tone)
-    {
+    auto processTone = [this, &block, numChannels = buffer.getNumChannels(), numSamples = buffer.getNumSamples()] (auto& tone) {
         if (resampler == nullptr)
             upsampledBuffer.setSize (numChannels, numSamples);
         else
