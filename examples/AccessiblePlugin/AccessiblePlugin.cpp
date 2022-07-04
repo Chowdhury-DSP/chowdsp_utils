@@ -6,7 +6,7 @@ AccessiblePlugin::AccessiblePlugin() = default;
 void AccessiblePlugin::addParameters (Parameters& params)
 {
     using namespace chowdsp::ParamUtils;
-    createPercentParameter (params, "dummy", "Dummy", 0.5f);
+    createPercentParameter (params, { "dummy", 100 }, "Dummy", 0.5f);
 }
 
 juce::AudioProcessorEditor* AccessiblePlugin::createEditor()

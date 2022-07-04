@@ -26,19 +26,20 @@ ModalReverbPlugin::ModalReverbPlugin()
 void ModalReverbPlugin::addParameters (Parameters& params)
 {
     using namespace chowdsp::ParamUtils;
-    createPercentParameter (params, pitchTag, "Pitch", 0.5f);
-    createPercentParameter (params, decayTag, "Decay", 0.5f);
-    createPercentParameter (params, mixTag, "Mix", 0.5f);
+    createPercentParameter (params, { pitchTag, 100 }, "Pitch", 0.5f);
+    createPercentParameter (params, { decayTag, 100 }, "Decay", 0.5f);
+    createPercentParameter (params, { mixTag, 100 }, "Mix", 0.5f);
     emplace_param<chowdsp::FloatParameter> (
         params,
-        modModesTag,
+        chowdsp::ParameterID { modModesTag, 100 },
         "Mod. Modes",
         createNormalisableRange (0.0f, 200.0f, 20.0f),
         0.0f,
-        [] (float x) { return juce::String ((int) x); },
+        [] (float x)
+        { return juce::String ((int) x); },
         &stringToFloatVal);
-    createFreqParameter (params, modFreqTag, "Mod. Freq", 0.5f, 10.0f, 2.0f, 1.0f);
-    createPercentParameter (params, modDepthTag, "Mod. Depth", 0.5f);
+    createFreqParameter (params, { modFreqTag, 100 }, "Mod. Freq", 0.5f, 10.0f, 2.0f, 1.0f);
+    createPercentParameter (params, { modDepthTag, 100 }, "Mod. Depth", 0.5f);
 }
 
 void ModalReverbPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)

@@ -40,7 +40,11 @@ public:
      * custom arguments for eqBandTypeChoices and defaultEQBandTypeChoice
      * must be provided.
      */
-    static void addEQParameters (Parameters& params, const juce::String& paramPrefix = defaultEQParamPrefix, juce::StringArray eqBandTypeChoices = {}, int defaultEQBandTypeChoice = -1);
+    static void addEQParameters (Parameters& params,
+                                 const juce::String& paramPrefix = defaultEQParamPrefix,
+                                 juce::StringArray eqBandTypeChoices = {},
+                                 int defaultEQBandTypeChoice = -1,
+                                 int versionHint = 100);
 
     /** Returns a struct of EQ parameters based on the given set of parameter handles. */
     static Params getEQParameters (const EQParameterHandles& paramHandles);

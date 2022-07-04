@@ -22,11 +22,11 @@ SignalGeneratorPlugin::SignalGeneratorPlugin()
 void SignalGeneratorPlugin::addParameters (Parameters& params)
 {
     using namespace chowdsp::ParamUtils;
-    createFreqParameter (params, freqTag, "Frequency", 50.0f, 50000.0f, 2500.0f, 1000.0f);
-    createGainDBParameter (params, gainTag, "Gain", -45.0f, 6.0f, -24.0f);
-    emplace_param<chowdsp::ChoiceParameter> (params, typeTag, "Tone Type", juce::StringArray { "Sine", "Saw", "Square" }, 0);
-    emplace_param<chowdsp::ChoiceParameter> (params, upsampleTag, "Upsample", juce::StringArray { "1x", "2x", "3x", "4x" }, 0);
-    emplace_param<chowdsp::ChoiceParameter> (params, waveshaperTag, "Waveshaper", juce::StringArray { "None", "Hard Clip", "Tanh Clip", "Cubic Clip", "9th-Order Clip" }, 0);
+    createFreqParameter (params, { freqTag, 100 }, "Frequency", 50.0f, 50000.0f, 2500.0f, 1000.0f);
+    createGainDBParameter (params, { gainTag, 100 }, "Gain", -45.0f, 6.0f, -24.0f);
+    emplace_param<chowdsp::ChoiceParameter> (params, chowdsp::ParameterID { typeTag, 100 }, "Tone Type", juce::StringArray { "Sine", "Saw", "Square" }, 0);
+    emplace_param<chowdsp::ChoiceParameter> (params, chowdsp::ParameterID { upsampleTag, 100 }, "Upsample", juce::StringArray { "1x", "2x", "3x", "4x" }, 0);
+    emplace_param<chowdsp::ChoiceParameter> (params, chowdsp::ParameterID { waveshaperTag, 100 }, "Waveshaper", juce::StringArray { "None", "Hard Clip", "Tanh Clip", "Cubic Clip", "9th-Order Clip" }, 0);
 }
 
 void SignalGeneratorPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)

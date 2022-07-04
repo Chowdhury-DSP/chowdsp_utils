@@ -17,7 +17,7 @@ ForwardingTestPlugin::~ForwardingTestPlugin()
 void ForwardingTestPlugin::addParameters (Parameters& params)
 {
     using namespace chowdsp::ParamUtils;
-    emplace_param<chowdsp::ChoiceParameter> (params, processorChoiceParamID, "Processor Choice", juce::StringArray { "None", "Tone Generator", "Reverb" }, 0);
+    emplace_param<chowdsp::ChoiceParameter> (params, chowdsp::ParameterID { processorChoiceParamID, 100 }, "Processor Choice", juce::StringArray { "None", "Tone Generator", "Reverb" }, 0);
 
     ForwardingParams::addParameters (params);
 }
