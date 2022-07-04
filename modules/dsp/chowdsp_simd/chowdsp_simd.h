@@ -23,8 +23,6 @@ BEGIN_JUCE_MODULE_DECLARATION
 // STL includes
 #include <cassert>
 
-//#include <juce_core/juce_core.h>
-//#include <juce_audio_basics/juce_audio_basics.h>
 #include <chowdsp_core/chowdsp_core.h>
 
 // Third-party includes

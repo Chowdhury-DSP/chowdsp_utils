@@ -1,4 +1,4 @@
-#include <TimedUnitTest.h>
+#include <CatchUtils.h>
 #include <chowdsp_math/chowdsp_math.h>
 
 using namespace chowdsp::Power;
@@ -10,89 +10,88 @@ constexpr float maxErrFloat = 1.0e-6f;
 constexpr double maxErrDouble = 1.0e-12;
 } // namespace
 
-class PowerTest : TimedUnitTest
+template <int exponent>
+void scalarPowerTest()
 {
-public:
-    PowerTest() : TimedUnitTest ("Power Test")
+    std::random_device rd;
+    std::mt19937 mt (rd());
+    std::uniform_real_distribution<float> floatRand (0.0f, 1.0f);
+    std::uniform_real_distribution<double> doubleRand (0.0, 1.0);
+
+    for (int n = 0; n < N; ++n)
     {
+        const auto testFloat = floatRand (mt);
+        const auto expFloat = std::pow (testFloat, (float) exponent);
+        const auto actualFloat = ipow<exponent> (testFloat);
+        REQUIRE_MESSAGE (actualFloat == Approx (expFloat).margin (maxErrFloat), "Float power is incorrect for exponent: " << std::to_string (exponent));
+
+        const auto testDouble = doubleRand (mt);
+        const auto expDouble = std::pow (testDouble, (double) exponent);
+        const auto actualDouble = ipow<exponent> (testDouble);
+        REQUIRE_MESSAGE (actualDouble == Approx (expDouble).margin (maxErrDouble), "Double power is incorrect for exponent: " << std::to_string (exponent));
+    }
+}
+
+TEST_CASE ("Power Test")
+{
+    SECTION ("Scalar Power Test")
+    {
+        scalarPowerTest<0>();
+        scalarPowerTest<1>();
+        scalarPowerTest<2>();
+        scalarPowerTest<3>();
+        scalarPowerTest<4>();
+        scalarPowerTest<5>();
+        scalarPowerTest<6>();
+        scalarPowerTest<7>();
+        scalarPowerTest<8>();
+        scalarPowerTest<9>();
+        scalarPowerTest<10>();
+        scalarPowerTest<11>();
+        scalarPowerTest<12>();
+        scalarPowerTest<13>();
+        scalarPowerTest<14>();
+        scalarPowerTest<15>();
+        scalarPowerTest<16>();
+        scalarPowerTest<17>();
+        scalarPowerTest<18>();
     }
 
-    template <int exponent>
-    void scalarPowerTest (juce::Random& r)
+    SECTION ("Vector Power Test")
     {
-        for (int n = 0; n < N; ++n)
-        {
-            const auto testFloat = r.nextFloat();
-            const auto expFloat = std::pow (testFloat, (float) exponent);
-            const auto actualFloat = ipow<exponent> (testFloat);
-            expectWithinAbsoluteError (actualFloat, expFloat, maxErrFloat, "Float power is incorrect for exponent: " + juce::String (exponent));
+        std::random_device rd;
+        std::mt19937 mt (rd());
+        std::uniform_real_distribution<float> floatRand (0.0f, 1.0f);
+        std::uniform_real_distribution<double> doubleRand (0.0, 1.0);
 
-            const auto testDouble = r.nextDouble();
-            const auto expDouble = std::pow (testDouble, (double) exponent);
-            const auto actualDouble = ipow<exponent> (testDouble);
-            expectWithinAbsoluteError (actualDouble, expDouble, maxErrDouble, "Double power is incorrect for exponent: " + juce::String (exponent));
+        for (int exponent = 0; exponent < 19; ++exponent)
+        {
+            float testFloats[N] {};
+            double testDoubles[N] {};
+
+            float expFloats[N] {};
+            double expDoubles[N] {};
+
+            float actualFloats[N] {};
+            double actualDoubles[N] {};
+
+            for (int n = 0; n < N; ++n)
+            {
+                testFloats[n] = floatRand (mt);
+                expFloats[n] = std::pow (testFloats[n], (float) exponent);
+
+                testDoubles[n] = doubleRand (mt);
+                expDoubles[n] = std::pow (testDoubles[n], (double) exponent);
+            }
+
+            chowdsp::FloatVectorOperations::integerPower (actualFloats, testFloats, exponent, N);
+            chowdsp::FloatVectorOperations::integerPower (actualDoubles, testDoubles, exponent, N);
+
+            for (int n = 0; n < N; ++n)
+            {
+                REQUIRE_MESSAGE (actualFloats[n] == Approx (expFloats[n]).margin (maxErrFloat), "Float power is incorrect for exponent: " << std::to_string (exponent));
+                REQUIRE_MESSAGE (actualDoubles[n] == Approx (expDoubles[n]).margin (maxErrDouble), "Double power is incorrect for exponent: " << std::to_string (exponent));
+            }
         }
     }
-
-    void vectorPowerTest (juce::Random& r, int exponent)
-    {
-        float testFloats[N] {};
-        double testDoubles[N] {};
-
-        float expFloats[N] {};
-        double expDoubles[N] {};
-
-        float actualFloats[N] {};
-        double actualDoubles[N] {};
-
-        for (int n = 0; n < N; ++n)
-        {
-            testFloats[n] = r.nextFloat();
-            expFloats[n] = std::pow (testFloats[n], (float) exponent);
-
-            testDoubles[n] = r.nextDouble();
-            expDoubles[n] = std::pow (testDoubles[n], (double) exponent);
-        }
-
-        chowdsp::FloatVectorOperations::integerPower (actualFloats, testFloats, exponent, N);
-        chowdsp::FloatVectorOperations::integerPower (actualDoubles, testDoubles, exponent, N);
-
-        for (int n = 0; n < N; ++n)
-        {
-            expectWithinAbsoluteError (actualFloats[n], expFloats[n], maxErrFloat, "Float power is incorrect for exponent: " + juce::String (exponent));
-            expectWithinAbsoluteError (actualDoubles[n], expDoubles[n], maxErrDouble, "Double power is incorrect for exponent: " + juce::String (exponent));
-        }
-    }
-
-    void runTestTimed() override
-    {
-        auto&& rand = getRandom();
-
-        beginTest ("Scalar Power Test");
-        scalarPowerTest<0> (rand);
-        scalarPowerTest<1> (rand);
-        scalarPowerTest<2> (rand);
-        scalarPowerTest<3> (rand);
-        scalarPowerTest<4> (rand);
-        scalarPowerTest<5> (rand);
-        scalarPowerTest<6> (rand);
-        scalarPowerTest<7> (rand);
-        scalarPowerTest<8> (rand);
-        scalarPowerTest<9> (rand);
-        scalarPowerTest<10> (rand);
-        scalarPowerTest<11> (rand);
-        scalarPowerTest<12> (rand);
-        scalarPowerTest<13> (rand);
-        scalarPowerTest<14> (rand);
-        scalarPowerTest<15> (rand);
-        scalarPowerTest<16> (rand);
-        scalarPowerTest<17> (rand);
-        scalarPowerTest<18> (rand);
-
-        beginTest ("Vector Power Test");
-        for (int exp = 0; exp < 19; ++exp)
-            vectorPowerTest (rand, exp);
-    }
-};
-
-static PowerTest powerTest;
+}

@@ -4,13 +4,9 @@
  * This file contains custom overrides of some JUCE macros.
  */
 
-#if JUCE_DEBUG
-#define jassert(expression) assert (expression)
-#define jassertfalse assert (false)
-#else
+// @TODO: figure out a way to re-implement jassert...
 #define jassert(expression)
 #define jassertfalse
-#endif
 
 /** This macro defines the C calling convention used as the standard for JUCE calls. */
 #if JUCE_WINDOWS
