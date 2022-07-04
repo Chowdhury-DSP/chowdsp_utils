@@ -35,8 +35,7 @@ void ModalReverbPlugin::addParameters (Parameters& params)
         "Mod. Modes",
         createNormalisableRange (0.0f, 200.0f, 20.0f),
         0.0f,
-        [] (float x)
-        { return juce::String ((int) x); },
+        [] (float x) { return juce::String ((int) x); },
         &stringToFloatVal);
     createFreqParameter (params, { modFreqTag, 100 }, "Mod. Freq", 0.5f, 10.0f, 2.0f, 1.0f);
     createPercentParameter (params, { modDepthTag, 100 }, "Mod. Depth", 0.5f);

@@ -76,8 +76,7 @@ void StandardEQParameters<NumBands>::addEQParameters (Parameters& params, const 
     // defaultEQBandChoice must be a valid index into eqBandTypeChoices
     jassert (juce::isPositiveAndBelow (defaultEQBandTypeChoice, eqBandTypeChoices.size()));
 
-    auto addQParam = [&params] (const juce::ParameterID& paramID, const juce::String& name)
-    {
+    auto addQParam = [&params] (const juce::ParameterID& paramID, const juce::String& name) {
         emplace_param<FloatParameter> (params, paramID, name, createNormalisableRange (0.1f, 10.0f, 0.7071f), 0.7071f, &floatValToString, &stringToFloatVal);
     };
 
