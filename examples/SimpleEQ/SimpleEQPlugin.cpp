@@ -44,7 +44,7 @@ void SimpleEQPlugin::addParameters (Parameters& params)
 {
     using namespace chowdsp::ParamUtils;
     PrototypeEQ::EQParams::addEQParameters (params, PrototypeEQ::EQParams::defaultEQParamPrefix, eqTypeChoices, 7);
-    emplace_param<juce::AudioParameterBool> (params, linPhaseModeTag, "Linear Phase", false);
+    emplace_param<chowdsp::BoolParameter> (params, chowdsp::ParameterID { linPhaseModeTag, 100 }, "Linear Phase", false);
 }
 
 void SimpleEQPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)
