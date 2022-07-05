@@ -25,6 +25,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include <atomic>
 #include <cmath>
 #include <tuple>
+#include <cstring>
 
 #ifndef DOXYGEN
 

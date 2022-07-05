@@ -42,6 +42,9 @@ namespace juce
 {
 namespace FloatVectorHelpers
 {
+    /** Fills a block of memory with zeros. */
+    inline void zeromem (void* memory, size_t numBytes) noexcept { memset (memory, 0, numBytes); }
+
 #define JUCE_INCREMENT_SRC_DEST    \
     dest += (16 / sizeof (*dest)); \
     src += (16 / sizeof (*dest));
