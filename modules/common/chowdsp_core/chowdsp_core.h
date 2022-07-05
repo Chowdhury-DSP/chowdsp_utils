@@ -28,7 +28,6 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include <cstring>
 
 #ifndef DOXYGEN
-
 #if JUCE_MODULE_AVAILABLE_juce_core
 #define CHOWDSP_USING_JUCE 1
 #include <juce_core/juce_core.h>
@@ -46,7 +45,6 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "JUCEHelpers/juce_Decibels.h"
 #include "JUCEHelpers/juce_SmoothedValue.h"
 #endif // CHOWDSP_USING_JUCE
-
 #endif // DOXYGEN
 
 #include "DataStructures/chowdsp_AtomicHelpers.h"
