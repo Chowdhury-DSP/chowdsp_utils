@@ -8,7 +8,7 @@ BEGIN_JUCE_MODULE_DECLARATION
    version:       1.0.0
    name:          ChowDSP Reflection Utilities
    description:   JUCE interface for boost::pfr
-   dependencies:  juce_core
+   dependencies:  chowdsp_core
 
    website:       https://ccrma.stanford.edu/~jatin/chowdsp
    license:       BSD 3-Clause
@@ -21,7 +21,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #pragma once
 
 // JUCE includes
-#include <juce_core/juce_core.h>
+#include <chowdsp_core/chowdsp_core.h>
 
 // third party includes
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wzero-as-null-pointer-constant")

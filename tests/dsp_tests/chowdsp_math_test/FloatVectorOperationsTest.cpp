@@ -1,325 +1,298 @@
-#include <TimedUnitTest.h>
+#include <CatchUtils.h>
 #include <chowdsp_math/chowdsp_math.h>
+#include <numeric>
 
-class FloatVectorOperationsTest : public TimedUnitTest
+template <typename T, typename VectorOp, typename ReferenceOp>
+void testReduce1dOp (std::vector<T>& in, VectorOp&& vectorOp, ReferenceOp&& referenceOp, T maxError)
 {
-public:
-    FloatVectorOperationsTest() : TimedUnitTest ("FloatVectorOperations Test")
+    const int numValues = (int) in.size();
+
     {
+        auto actual = vectorOp (in.data(), numValues);
+        auto expected = referenceOp (in.data(), numValues);
+        REQUIRE_MESSAGE (actual == Approx (expected).margin (maxError), "Aligned result is incorrect!");
     }
 
-    template <typename T, typename VectorOp, typename ReferenceOp>
-    void testReduce1dOp (std::vector<T>& in, VectorOp&& vectorOp, ReferenceOp&& referenceOp, T maxError)
     {
-        const int numValues = (int) in.size();
+        auto actual = vectorOp (in.data() + 1, numValues - 1);
+        auto expected = referenceOp (in.data() + 1, numValues - 1);
+        REQUIRE_MESSAGE (actual == Approx (expected).margin (maxError), "Unaligned result is incorrect!");
+    }
+}
 
-        {
-            auto actual = vectorOp (in.data(), numValues);
-            auto expected = referenceOp (in.data(), numValues);
-            expectWithinAbsoluteError (actual, expected, maxError, "Aligned result is incorrect!");
-        }
+template <typename T, typename VectorOp, typename ReferenceOp>
+void testReduce2dOp (std::vector<T>& in1, std::vector<T> in2, VectorOp&& vectorOp, ReferenceOp&& referenceOp, T maxError)
+{
+    const int numValues = (int) in1.size();
 
-        {
-            auto actual = vectorOp (in.data() + 1, numValues - 1);
-            auto expected = referenceOp (in.data() + 1, numValues - 1);
-            expectWithinAbsoluteError (actual, expected, maxError, "Unaligned result is incorrect!");
-        }
+    {
+        auto actual = vectorOp (in1.data(), in2.data(), numValues);
+        auto expected = referenceOp (in1.data(), in2.data(), numValues);
+        REQUIRE_MESSAGE (actual == Approx (expected).margin (maxError), "Aligned result is incorrect!");
     }
 
-    template <typename T, typename VectorOp, typename ReferenceOp>
-    void testReduce2dOp (std::vector<T>& in1, std::vector<T> in2, VectorOp&& vectorOp, ReferenceOp&& referenceOp, T maxError)
     {
-        const int numValues = (int) in1.size();
-
-        {
-            auto actual = vectorOp (in1.data(), in2.data(), numValues);
-            auto expected = referenceOp (in1.data(), in2.data(), numValues);
-            expectWithinAbsoluteError (actual, expected, maxError, "Aligned result is incorrect!");
-        }
-
-        {
-            auto actual = vectorOp (in1.data() + 1, in2.data(), numValues - 1);
-            auto expected = referenceOp (in1.data() + 1, in2.data(), numValues - 1);
-            expectWithinAbsoluteError (actual, expected, maxError, "Unaligned/Aligned result is incorrect!");
-        }
-
-        {
-            auto actual = vectorOp (in1.data(), in2.data() + 1, numValues - 1);
-            auto expected = referenceOp (in1.data(), in2.data() + 1, numValues - 1);
-            expectWithinAbsoluteError (actual, expected, maxError, "Aligned/Unaligned result is incorrect!");
-        }
-
-        {
-            auto actual = vectorOp (in1.data() + 1, in2.data() + 1, numValues - 1);
-            auto expected = referenceOp (in1.data() + 1, in2.data() + 1, numValues - 1);
-            expectWithinAbsoluteError (actual, expected, maxError, "Unaligned result is incorrect!");
-        }
+        auto actual = vectorOp (in1.data() + 1, in2.data(), numValues - 1);
+        auto expected = referenceOp (in1.data() + 1, in2.data(), numValues - 1);
+        REQUIRE_MESSAGE (actual == Approx (expected).margin (maxError), "Unaligned/Aligned result is incorrect!");
     }
 
-    template <typename T, typename VectorOp, typename ReferenceOp>
-    void testUnaryOp (std::vector<T>& in, VectorOp&& vectorOp, ReferenceOp&& referenceOp, T maxError)
     {
-        std::vector<T> actual (in.size());
-        const int numValues = (int) in.size();
+        auto actual = vectorOp (in1.data(), in2.data() + 1, numValues - 1);
+        auto expected = referenceOp (in1.data(), in2.data() + 1, numValues - 1);
+        REQUIRE_MESSAGE (actual == Approx (expected).margin (maxError), "Aligned/Unaligned result is incorrect!");
+    }
+
+    {
+        auto actual = vectorOp (in1.data() + 1, in2.data() + 1, numValues - 1);
+        auto expected = referenceOp (in1.data() + 1, in2.data() + 1, numValues - 1);
+        REQUIRE_MESSAGE (actual == Approx (expected).margin (maxError), "Unaligned result is incorrect!");
+    }
+}
+
+template <typename T, typename VectorOp, typename ReferenceOp>
+void testUnaryOp (std::vector<T>& in, VectorOp&& vectorOp, ReferenceOp&& referenceOp, T maxError)
+{
+    std::vector<T> actual (in.size());
+    const int numValues = (int) in.size();
+
+    {
+        vectorOp (actual.data(), in.data(), numValues);
+        for (size_t i = 0; i < (size_t) numValues; ++i)
+            REQUIRE_MESSAGE (actual[i] == Approx (referenceOp (in[i])).margin (maxError), "Result with aligned inputs and ouputs is incorrect!");
+    }
+
+    {
+        vectorOp (actual.data(), in.data() + 1, numValues - 1);
+        for (size_t i = 1; i < (size_t) numValues; ++i)
+            REQUIRE_MESSAGE (actual[i - 1] == Approx (referenceOp (in[i])).margin (maxError), "Result with unaligned input is incorrect!");
+    }
+
+    {
+        vectorOp (actual.data() + 1, in.data(), numValues - 1);
+        for (size_t i = 1; i < (size_t) numValues; ++i)
+            REQUIRE_MESSAGE (actual[i] == Approx (referenceOp (in[i - 1])).margin (maxError), "Result with unaligned output is incorrect!");
+    }
+
+    {
+        vectorOp (actual.data() + 1, in.data() + 1, numValues - 1);
+        for (size_t i = 1; i < (size_t) numValues; ++i)
+            REQUIRE_MESSAGE (actual[i] == Approx (referenceOp (in[i])).margin (maxError), "Result with unaligned input and output is incorrect!");
+    }
+}
+
+template <typename T, typename VectorOp, typename ReferenceOp>
+void testBinaryOp (std::vector<T>& in1, std::vector<T>& in2, VectorOp&& vectorOp, ReferenceOp&& referenceOp, T maxError)
+{
+    std::vector<T> actual (in1.size() + 1);
+    const int numValues = (int) in1.size();
+
+    for (int resultOffset = 0; resultOffset < 2; ++resultOffset)
+    {
+        std::string outputStr = (resultOffset == 0) ? "Aligned Output: " : "Unaligned Output: ";
+        auto* actualPtr = actual.data() + resultOffset;
 
         {
-            vectorOp (actual.data(), in.data(), numValues);
+            vectorOp (actualPtr, in1.data(), in2.data(), numValues);
             for (size_t i = 0; i < (size_t) numValues; ++i)
-                expectWithinAbsoluteError (actual[i], referenceOp (in[i]), maxError, "Result with aligned inputs and ouputs is incorrect!");
+                REQUIRE_MESSAGE (actualPtr[i] == Approx (referenceOp (in1[i], in2[i])).margin (maxError), outputStr << "Result with aligned inputs is incorrect!");
         }
 
         {
-            vectorOp (actual.data(), in.data() + 1, numValues - 1);
+            vectorOp (actualPtr, in1.data() + 1, in2.data(), numValues - 1);
             for (size_t i = 1; i < (size_t) numValues; ++i)
-                expectWithinAbsoluteError (actual[i - 1], referenceOp (in[i]), maxError, "Result with unaligned input is incorrect!");
+                REQUIRE_MESSAGE (actualPtr[i - 1] == Approx (referenceOp (in1[i], in2[i - 1])).margin (maxError), outputStr << "Result with first unaligned input is incorrect!");
         }
 
         {
-            vectorOp (actual.data() + 1, in.data(), numValues - 1);
+            vectorOp (actualPtr, in1.data(), in2.data() + 1, numValues - 1);
             for (size_t i = 1; i < (size_t) numValues; ++i)
-                expectWithinAbsoluteError (actual[i], referenceOp (in[i - 1]), maxError, "Result with unaligned output is incorrect!");
+                REQUIRE_MESSAGE (actualPtr[i - 1] == Approx (referenceOp (in1[i - 1], in2[i])).margin (maxError), outputStr << "Result with second unaligned input is incorrect!");
         }
 
         {
-            vectorOp (actual.data() + 1, in.data() + 1, numValues - 1);
+            vectorOp (actualPtr, in1.data() + 1, in2.data() + 1, numValues - 1);
             for (size_t i = 1; i < (size_t) numValues; ++i)
-                expectWithinAbsoluteError (actual[i], referenceOp (in[i]), maxError, "Result with unaligned input and output is incorrect!");
+                REQUIRE_MESSAGE (actualPtr[i - 1] == Approx (referenceOp (in1[i], in2[i])).margin (maxError), outputStr << "Result with both unaligned inputs is incorrect!");
         }
     }
+}
 
-    template <typename T, typename VectorOp, typename ReferenceOp>
-    void testBinaryOp (std::vector<T>& in1, std::vector<T>& in2, VectorOp&& vectorOp, ReferenceOp&& referenceOp, T maxError)
+TEMPLATE_TEST_CASE ("FloatVectorOperations Test", "", float, double)
+{
+    if (chowdsp::FloatVectorOperations::isUsingVDSP())
+        INFO ("chowdsp::FloatVectorOperations: using vDSP")
+    else
+        INFO ("chowdsp::FloatVectorOperations: not using vDSP")
+
+    std::random_device rd;
+    std::mt19937 mt (rd());
+
+    std::vector<std::pair<int, int>> testRanges {
+        { 2, 6 },
+        { 100, 200 },
+        { 113, 114 }
+    };
+
+    SECTION ("Divide Scalar Test")
     {
-        std::vector<T> actual (in1.size() + 1);
-        const int numValues = (int) in1.size();
-
-        for (int resultOffset = 0; resultOffset < 2; ++resultOffset)
+        for (auto& range : testRanges)
         {
-            juce::String outputStr = (resultOffset == 0) ? "Aligned Output: " : "Unaligned Output: ";
-            auto* actualPtr = actual.data() + resultOffset;
+            std::uniform_int_distribution<int> rand (range.first, range.second);
+            const auto numValues = rand (mt);
+            std::vector<TestType> divisor ((size_t) numValues, (TestType) 0);
 
-            {
-                vectorOp (actualPtr, in1.data(), in2.data(), numValues);
-                for (size_t i = 0; i < (size_t) numValues; ++i)
-                    expectWithinAbsoluteError (actualPtr[i], referenceOp (in1[i], in2[i]), maxError, outputStr + "Result with aligned inputs is incorrect!");
-            }
-
-            {
-                vectorOp (actualPtr, in1.data() + 1, in2.data(), numValues - 1);
-                for (size_t i = 1; i < (size_t) numValues; ++i)
-                    expectWithinAbsoluteError (actualPtr[i - 1], referenceOp (in1[i], in2[i - 1]), maxError, outputStr + "Result with first unaligned input is incorrect!");
-            }
-
-            {
-                vectorOp (actualPtr, in1.data(), in2.data() + 1, numValues - 1);
-                for (size_t i = 1; i < (size_t) numValues; ++i)
-                    expectWithinAbsoluteError (actualPtr[i - 1], referenceOp (in1[i - 1], in2[i]), maxError, outputStr + "Result with second unaligned input is incorrect!");
-            }
-
-            {
-                vectorOp (actualPtr, in1.data() + 1, in2.data() + 1, numValues - 1);
-                for (size_t i = 1; i < (size_t) numValues; ++i)
-                    expectWithinAbsoluteError (actualPtr[i - 1], referenceOp (in1[i], in2[i]), maxError, outputStr + "Result with both unaligned inputs is incorrect!");
-            }
-        }
-    }
-
-    template <typename T>
-    void divideScalarTest (juce::Random& r, juce::Range<int> range)
-    {
-        auto numValues = r.nextInt (range);
-        std::vector<T> divisor ((size_t) numValues, (T) 0);
-
-        for (auto& v : divisor)
-            v = (T) (r.nextFloat() + 1.0f);
-
-        testUnaryOp (
-            divisor,
-            [] (auto* dest, auto* src, int N) { chowdsp::FloatVectorOperations::divide (dest, (T) 1, src, N); },
-            [] (auto x) { return (T) 1 / x; },
-            (T) 1.0e-3);
-    }
-
-    template <typename T>
-    void divideVectorTest (juce::Random& r, juce::Range<int> range)
-    {
-        auto numValues = r.nextInt (range);
-        std::vector<T> dividend ((size_t) numValues, (T) 0);
-        std::vector<T> divisor ((size_t) numValues, (T) 0);
-
-        for (auto& v : dividend)
-            v = (T) (r.nextFloat() * 2.0f - 1.0f);
-
-        for (auto& v : divisor)
-            v = (T) (r.nextFloat() + 1.0f);
-
-        testBinaryOp (
-            dividend,
-            divisor,
-            [] (auto* dest, auto* src1, auto* src2, int N) { chowdsp::FloatVectorOperations::divide (dest, src1, src2, N); },
-            [] (auto num, auto den) { return num / den; },
-            (T) 1.0e-3);
-    }
-
-    template <typename T>
-    void accumulateTest (juce::Random& r, juce::Range<int> range)
-    {
-        auto numValues = r.nextInt (range);
-        std::vector<T> values ((size_t) numValues, (T) 0);
-
-        for (auto& v : values)
-            v = (T) (r.nextFloat() * 2.0f - 1.0f);
-
-        testReduce1dOp (
-            values,
-            [] (auto* src, int N) { return chowdsp::FloatVectorOperations::accumulate (src, N); },
-            [] (auto* src, int N) { return std::accumulate (src, src + N, (T) 0); },
-            (T) 1.0e-3);
-    }
-
-    template <typename T>
-    void innerProdTest (juce::Random& r, juce::Range<int> range)
-    {
-        auto numValues = r.nextInt (range);
-        std::vector<T> values1 ((size_t) numValues, (T) 0);
-        std::vector<T> values2 ((size_t) numValues, (T) 0);
-
-        for (auto& v : values1)
-            v = (T) (r.nextFloat() * 2.0f - 1.0f);
-
-        for (auto& v : values2)
-            v = (T) (r.nextFloat() * 2.0f - 1.0f);
-
-        testReduce2dOp (
-            values1,
-            values2,
-            [] (auto* src1, auto* src2, int N) { return chowdsp::FloatVectorOperations::innerProduct (src1, src2, N); },
-            [] (auto* src1, auto* src2, int N) { return std::inner_product (src1, src1 + N, src2, (T) 0); },
-            (T) 1.0e-3);
-    }
-
-    template <typename T>
-    void absMaxTest (juce::Random& r, juce::Range<int> range)
-    {
-        auto refAbsMax = [] (const auto& begin, const auto end) { return std::abs (*std::max_element (begin, end, [] (auto a, auto b) { return std::abs (a) < std::abs (b); })); };
-
-        auto numValues = r.nextInt (range);
-        std::vector<T> values ((size_t) numValues, (T) 0);
-
-        for (auto& v : values)
-            v = (T) (r.nextFloat() * 2.0f - 1.0f);
-
-        testReduce1dOp (
-            values,
-            [] (auto* src, int N) { return chowdsp::FloatVectorOperations::findAbsoluteMaximum (src, N); },
-            [&] (auto* src, int N) { return refAbsMax (src, src + N); },
-            (T) 1.0e-3);
-    }
-
-    template <typename T>
-    void integerPowerTest (juce::Random& r, juce::Range<int> range)
-    {
-        for (int exponent = 0; exponent < 19; ++exponent)
-        {
-            auto numValues = r.nextInt (range);
-            std::vector<T> inValues ((size_t) numValues, (T) 0);
-
-            for (auto& v : inValues)
-                v = (T) (r.nextFloat() * 2.0f - 1.0f);
+            std::uniform_real_distribution<TestType> floatRand ((TestType) 1, (TestType) 2);
+            for (auto& v : divisor)
+                v = floatRand (mt);
 
             testUnaryOp (
-                inValues,
-                [exponent] (auto* dest, auto* src, int N) { chowdsp::FloatVectorOperations::integerPower (dest, src, exponent, N); },
-                [exponent] (auto x) { return std::pow (x, (T) exponent); },
-                (T) 1.0e-6);
+                divisor,
+                [] (auto* dest, auto* src, int N) { chowdsp::FloatVectorOperations::divide (dest, (TestType) 1, src, N); },
+                [] (auto x) { return (TestType) 1 / x; },
+                (TestType) 1.0e-3);
         }
     }
 
-    template <typename T>
-    void computeRMSTest (juce::Random& r, juce::Range<int> range)
+    SECTION ("Divide Vector Test")
     {
-        auto idealRMS = [] (const auto* data, int numSamples) {
-            T squareSum = (T) 0;
-            for (int i = 0; i < numSamples; ++i)
-                squareSum += data[i] * data[i];
-            return std::sqrt (squareSum / (T) numSamples);
-        };
+        for (auto& range : testRanges)
+        {
+            std::uniform_int_distribution<int> rand (range.first, range.second);
+            const auto numValues = rand (mt);
+            std::vector<TestType> dividend ((size_t) numValues, (TestType) 0);
+            std::vector<TestType> divisor ((size_t) numValues, (TestType) 0);
 
-        auto numValues = r.nextInt (range);
-        std::vector<T> values ((size_t) numValues, (T) 0);
+            std::uniform_real_distribution<TestType> floatRand ((TestType) 0, (TestType) 1);
+            for (auto& v : dividend)
+                v = floatRand (mt) * (TestType) 2 - (TestType) 1;
 
-        for (auto& v : values)
-            v = (T) (r.nextFloat() * 2.0f - 1.0f);
+            for (auto& v : divisor)
+                v = floatRand (mt) + (TestType) 1;
 
-        testReduce1dOp (
-            values,
-            [] (auto* src, int N) { return chowdsp::FloatVectorOperations::computeRMS (src, N); },
-            [&] (auto* src, int N) { return idealRMS (src, N); },
-            (T) 1.0e-3);
+            testBinaryOp (
+                dividend,
+                divisor,
+                [] (auto* dest, auto* src1, auto* src2, int N) { chowdsp::FloatVectorOperations::divide (dest, src1, src2, N); },
+                [] (auto num, auto den) { return num / den; },
+                (TestType) 1.0e-3);
+        }
     }
 
-    void runTestTimed() override
+    SECTION ("Accumulate Test")
     {
-        if (chowdsp::FloatVectorOperations::isUsingVDSP())
-            std::cout << "chowdsp::FloatVectorOperations: using vDSP" << std::endl;
-        else
-            std::cout << "chowdsp::FloatVectorOperations: not using vDSP" << std::endl;
+        for (auto& range : testRanges)
+        {
+            std::uniform_int_distribution<int> rand (range.first, range.second);
+            const auto numValues = rand (mt);
+            std::vector<TestType> values ((size_t) numValues, (TestType) 0);
 
-        auto rand = getRandom();
+            std::uniform_real_distribution<TestType> floatRand ((TestType) -1, (TestType) 1);
+            for (auto& v : values)
+                v = floatRand (mt);
 
-        std::vector<juce::Range<int>> floatTestRanges {
-            { 2, 6 },
-            { 100, 200 },
-            { 113, 114 }
-        };
-        std::vector<juce::Range<int>> doubleTestRanges {
-            { 2, 4 },
-            { 100, 200 },
-            { 113, 114 }
-        };
-
-        beginTest ("Divide Scalar Test");
-        for (const auto& range : floatTestRanges)
-            divideScalarTest<float> (rand, range);
-        for (const auto& range : doubleTestRanges)
-            divideScalarTest<double> (rand, range);
-
-        beginTest ("Divide Vector Test");
-        for (const auto& range : floatTestRanges)
-            divideVectorTest<float> (rand, range);
-        for (const auto& range : doubleTestRanges)
-            divideVectorTest<double> (rand, range);
-
-        beginTest ("Accumulate Test");
-        for (const auto& range : floatTestRanges)
-            accumulateTest<float> (rand, range);
-        for (const auto& range : doubleTestRanges)
-            accumulateTest<double> (rand, range);
-
-        beginTest ("Inner Product Test");
-        for (const auto& range : floatTestRanges)
-            innerProdTest<float> (rand, range);
-        for (const auto& range : doubleTestRanges)
-            innerProdTest<double> (rand, range);
-
-        beginTest ("Absolute Maximum Test");
-        for (const auto& range : floatTestRanges)
-            absMaxTest<float> (rand, range);
-        for (const auto& range : doubleTestRanges)
-            absMaxTest<double> (rand, range);
-
-        beginTest ("Integer Power Test");
-        for (const auto& range : floatTestRanges)
-            integerPowerTest<float> (rand, range);
-        for (const auto& range : doubleTestRanges)
-            integerPowerTest<double> (rand, range);
-
-        beginTest ("RMS Test");
-        for (const auto& range : floatTestRanges)
-            computeRMSTest<float> (rand, range);
-        for (const auto& range : doubleTestRanges)
-            computeRMSTest<double> (rand, range);
+            testReduce1dOp (
+                values,
+                [] (auto* src, int N) { return chowdsp::FloatVectorOperations::accumulate (src, N); },
+                [] (auto* src, int N) { return std::accumulate (src, src + N, (TestType) 0); },
+                (TestType) 1.0e-3);
+        }
     }
-};
 
-static FloatVectorOperationsTest floatVectorOperationsTest;
+    SECTION ("Inner Product Test")
+    {
+        for (auto& range : testRanges)
+        {
+            std::uniform_int_distribution<int> rand (range.first, range.second);
+            const auto numValues = rand (mt);
+            std::vector<TestType> values1 ((size_t) numValues, (TestType) 0);
+            std::vector<TestType> values2 ((size_t) numValues, (TestType) 0);
+
+            std::uniform_real_distribution<TestType> floatRand ((TestType) -1, (TestType) 1);
+            for (auto& v : values1)
+                v = floatRand (mt);
+
+            for (auto& v : values2)
+                v = floatRand (mt);
+
+            testReduce2dOp (
+                values1,
+                values2,
+                [] (auto* src1, auto* src2, int N) { return chowdsp::FloatVectorOperations::innerProduct (src1, src2, N); },
+                [] (auto* src1, auto* src2, int N) { return std::inner_product (src1, src1 + N, src2, (TestType) 0); },
+                (TestType) 1.0e-3);
+        }
+    }
+
+    SECTION ("Absolute Maximum Test")
+    {
+        for (auto& range : testRanges)
+        {
+            auto refAbsMax = [] (const auto& begin, const auto end) { return std::abs (*std::max_element (begin, end, [] (auto a, auto b) { return std::abs (a) < std::abs (b); })); };
+
+            std::uniform_int_distribution<int> rand (range.first, range.second);
+            const auto numValues = rand (mt);
+            std::vector<TestType> values ((size_t) numValues, {});
+
+            std::uniform_real_distribution<TestType> floatRand ((TestType) -1, (TestType) 1);
+            for (auto& v : values)
+                v = floatRand (mt);
+
+            testReduce1dOp (
+                values,
+                [] (auto* src, int N) { return chowdsp::FloatVectorOperations::findAbsoluteMaximum (src, N); },
+                [&] (auto* src, int N) { return refAbsMax (src, src + N); },
+                (TestType) 1.0e-3);
+        }
+    }
+
+    SECTION ("Integer Power Test")
+    {
+        for (auto& range : testRanges)
+        {
+            for (int exponent = 0; exponent < 19; ++exponent)
+            {
+                std::uniform_int_distribution<int> rand (range.first, range.second);
+                const auto numValues = rand (mt);
+                std::vector<TestType> inValues ((size_t) numValues, {});
+
+                std::uniform_real_distribution<TestType> floatRand ((TestType) -1, (TestType) 1);
+                for (auto& v : inValues)
+                    v = floatRand (mt);
+
+                testUnaryOp (
+                    inValues,
+                    [exponent] (auto* dest, auto* src, int N) { chowdsp::FloatVectorOperations::integerPower (dest, src, exponent, N); },
+                    [exponent] (auto x) { return std::pow (x, (TestType) exponent); },
+                    (TestType) 1.0e-6);
+            }
+        }
+    }
+
+    SECTION ("RMS Test")
+    {
+        for (auto& range : testRanges)
+        {
+            auto idealRMS = [] (const auto* data, int numSamples) {
+                auto squareSum = (TestType) 0;
+                for (int i = 0; i < numSamples; ++i)
+                    squareSum += data[i] * data[i];
+                return std::sqrt (squareSum / (TestType) numSamples);
+            };
+
+            std::uniform_int_distribution<int> rand (range.first, range.second);
+            const auto numValues = rand (mt);
+            std::vector<TestType> values ((size_t) numValues, {});
+
+            std::uniform_real_distribution<TestType> floatRand ((TestType) -1, (TestType) 1);
+            for (auto& v : values)
+                v = floatRand (mt);
+
+            testReduce1dOp (
+                values,
+                [] (auto* src, int N) { return chowdsp::FloatVectorOperations::computeRMS (src, N); },
+                [&] (auto* src, int N) { return idealRMS (src, N); },
+                (TestType) 1.0e-3);
+        }
+    }
+}
