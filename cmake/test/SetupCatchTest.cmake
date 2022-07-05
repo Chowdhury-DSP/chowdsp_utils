@@ -5,6 +5,9 @@ function(setup_catch_test target)
     add_executable(${target})
     add_test(NAME ${target} COMMAND $<TARGET_FILE:${target}>)
 
+    setup_chowdsp_lib(${target}_lib ${ARGV})
+    target_link_libraries(${target} PRIVATE ${target}_lib)
+
     target_sources(${target} PRIVATE ${CMAKE_SOURCE_DIR}/tests/test_utils/CatchTestRunner.cpp)
     target_include_directories(${target} PRIVATE ${CMAKE_SOURCE_DIR}/tests/test_utils)
     target_link_libraries(${target} PRIVATE
@@ -16,6 +19,7 @@ function(setup_catch_test target)
     # set coverage flags if needed
     if(CODE_COVERAGE)
         enable_coverage_flags(${target})
+        enable_coverage_flags(${target}_lib)
     endif()
 
     add_custom_command(TARGET ${target}
