@@ -16,16 +16,19 @@ TEST_CASE ("Memory Aliasing Test")
 
     SECTION ("C-Style Array Test")
     {
-        int x[10];
-        int y[20];
+        int x[10] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+        int y[20] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 };
+
+        INFO ("Don't optimize away... " << std::to_string (x[5]) << " -- " << std::to_string (y[10]));
         REQUIRE (doesMemoryAlias (x, x));
         REQUIRE (! doesMemoryAlias (x, y));
     }
 
     SECTION ("std::array Test")
     {
-        std::array<int, 10> x {};
-        std::array<int, 20> y {};
+        std::array<int, 10> x { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+        std::array<int, 20> y { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 };
+        INFO ("Don't optimize away... " << std::to_string (x[5]) << " -- " << std::to_string (y[10]));
         REQUIRE (doesMemoryAlias (x, x));
         REQUIRE (! doesMemoryAlias (x, y));
     }
