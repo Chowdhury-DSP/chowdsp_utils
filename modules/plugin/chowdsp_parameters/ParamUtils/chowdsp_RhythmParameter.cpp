@@ -2,7 +2,7 @@
 
 namespace chowdsp
 {
-RhythmParameter::RhythmParameter (const juce::String& parameterID,
+RhythmParameter::RhythmParameter (const ParameterID& parameterID,
                                   const juce::String& paramName,
                                   const std::vector<RhythmUtils::Rhythm>& rhythms,
                                   const RhythmUtils::Rhythm& defaultRhythm) : juce::AudioParameterChoice (parameterID,

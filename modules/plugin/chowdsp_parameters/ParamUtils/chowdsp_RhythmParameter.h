@@ -12,7 +12,7 @@ namespace chowdsp
 class RhythmParameter : public juce::AudioParameterChoice
 {
 public:
-    RhythmParameter (const juce::String& paramID,
+    RhythmParameter (const ParameterID& paramID,
                      const juce::String& paramName,
                      const std::vector<RhythmUtils::Rhythm>& rhythms = RhythmUtils::getDefaultRhythms(),
                      const RhythmUtils::Rhythm& defaultRhythm = RhythmUtils::QUARTER);
