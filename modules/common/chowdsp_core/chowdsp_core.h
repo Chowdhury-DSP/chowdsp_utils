@@ -26,16 +26,11 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include <cmath>
 #include <tuple>
 
-#include "DataStructures/chowdsp_AtomicHelpers.h"
-#include "DataStructures/chowdsp_DoubleBuffer.h"
-#include "DataStructures/chowdsp_TupleHelpers.h"
-#include "Memory/chowdsp_MemoryAliasing.h"
-#include "Types/chowdsp_TypeTraits.h"
-
 #ifndef DOXYGEN
 
 #if JUCE_MODULE_AVAILABLE_juce_core
 #define CHOWDSP_USING_JUCE 1
+#include <juce_core/juce_core.h>
 #else
 #define CHOWDSP_USING_JUCE 0
 #endif
@@ -52,3 +47,9 @@ BEGIN_JUCE_MODULE_DECLARATION
 #endif // CHOWDSP_USING_JUCE
 
 #endif // DOXYGEN
+
+#include "DataStructures/chowdsp_AtomicHelpers.h"
+#include "DataStructures/chowdsp_DoubleBuffer.h"
+#include "DataStructures/chowdsp_TupleHelpers.h"
+#include "Memory/chowdsp_MemoryAliasing.h"
+#include "Types/chowdsp_TypeTraits.h"
