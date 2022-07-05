@@ -9,7 +9,6 @@ target_link_libraries(chowdsp_plugin_base_test PRIVATE
 )
 
 target_sources(chowdsp_plugin_base_test PRIVATE
-    ${CMAKE_SOURCE_DIR}/tests/test_utils/TestRunner.cpp
     PluginBaseTest.cpp
     PluginDiagnosticInfoTest.cpp
 )

@@ -139,8 +139,10 @@ public:
     }
 
 private:
+#if CHOWDSP_USING_JUCE
     /** Hiding this function since applyGain is ill-defined for SIMD types */
     void applyGain (juce::AudioBuffer<SmFloatType>& /*buffer*/, int /*numSamples*/) noexcept {}
+#endif
 
     //==============================================================================
     template <typename T>

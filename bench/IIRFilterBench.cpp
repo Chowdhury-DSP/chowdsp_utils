@@ -9,7 +9,7 @@
 constexpr int blockSize = 512;
 constexpr int numSecondOrderSections = 10;
 
-auto makeAudioBuffer()
+static auto makeAudioBuffer()
 {
     auto bufferData = bench_utils::makeRandomVector<float> (blockSize);
 

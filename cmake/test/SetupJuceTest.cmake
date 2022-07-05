@@ -12,6 +12,10 @@ function(setup_juce_test target)
         JUCE_STANDALONE_APPLICATION=1
     )
 
+    if (${target} NOT STREQUAL "live_gui_test")
+        target_sources(${target} PRIVATE ${CMAKE_SOURCE_DIR}/tests/test_utils/JUCETestRunner.cpp)
+    endif()
+
     target_link_libraries(${target} PRIVATE
         juce::juce_events
         juce::juce_recommended_config_flags

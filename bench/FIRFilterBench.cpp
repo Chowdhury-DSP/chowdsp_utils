@@ -11,7 +11,7 @@ constexpr int startOrder = 16;
 constexpr int endOrder = 1024;
 constexpr int orderMult = 4;
 
-auto makeJUCEFIR (int filterOrder)
+static auto makeJUCEFIR (int filterOrder)
 {
     const auto coefsData = bench_utils::makeRandomVector<float> (filterOrder);
 
@@ -22,22 +22,22 @@ auto makeJUCEFIR (int filterOrder)
 
     filter.prepare ({ 48000.0, (juce::uint32) blockSize, 1 });
 
-    return std::move (filter);
+    return filter;
 }
 
-auto makeJUCEFIRChoices()
+static auto makeJUCEFIRChoices()
 {
     std::unordered_map<int, juce::dsp::FIR::Filter<float>> choices;
 
     for (int order = startOrder; order <= endOrder; order *= orderMult)
         choices.emplace (std::make_pair (order, makeJUCEFIR (order)));
 
-    return std::move (choices);
+    return choices;
 }
 
 auto juceFIRChoices = makeJUCEFIRChoices();
 
-auto makeConvolution (int filterOrder)
+static auto makeConvolution (int filterOrder)
 {
     const auto coefsData = bench_utils::makeRandomVector<float> (filterOrder);
 
@@ -50,32 +50,32 @@ auto makeConvolution (int filterOrder)
     convolution->loadImpulseResponse (std::move (coeffsBuffer), 48000.0, Convolution::Stereo::no, Convolution::Trim::no, Convolution::Normalise::no);
     convolution->prepare ({ 48000.0, (juce::uint32) blockSize, 1 });
 
-    return std::move (convolution);
+    return convolution;
 }
 
-auto makeChowFIR (int order)
+static auto makeChowFIR (int order)
 {
     const auto coefsData = bench_utils::makeRandomVector<float> (order);
 
     chowdsp::FIRFilter<float> filter { order };
     filter.setCoefficients (coefsData.data());
 
-    return std::move (filter);
+    return filter;
 }
 
-auto makeChowFIRChoices()
+static auto makeChowFIRChoices()
 {
     std::unordered_map<int, chowdsp::FIRFilter<float>> choices;
 
     for (int order = startOrder; order <= endOrder; order *= orderMult)
         choices.emplace (std::make_pair (order, makeChowFIR (order)));
 
-    return std::move (choices);
+    return choices;
 }
 
 auto chowFIRChoices = makeChowFIRChoices();
 
-auto makeAudioBuffer()
+static auto makeAudioBuffer()
 {
     auto bufferData = bench_utils::makeRandomVector<float> (blockSize);
 

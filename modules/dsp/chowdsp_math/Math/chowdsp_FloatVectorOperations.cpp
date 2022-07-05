@@ -3,8 +3,6 @@
 
 namespace chowdsp::FloatVectorOperations
 {
-using namespace SIMDUtils;
-
 #ifndef DOXYGEN
 namespace detail
 {
@@ -16,11 +14,19 @@ namespace detail
         return (reinterpret_cast<uintptr_t> (p) & bitmask) == 0;
     }
 
+    /** A handy function to round up a pointer to the nearest multiple of a given number of bytes.
+    alignmentBytes must be a power of two. */
+    template <typename Type, typename IntegerType>
+    inline Type* snapPointerToAlignment (Type* basePointer, IntegerType alignmentBytes) noexcept
+    {
+        return (Type*) ((((size_t) basePointer) + (alignmentBytes - 1)) & ~(alignmentBytes - 1));
+    }
+
     template <typename T>
     static T* getNextAlignedPtr (T* p) noexcept
     {
         static constexpr auto RegisterSize = sizeof (xsimd::batch<std::remove_const_t<T>>);
-        return juce::snapPointerToAlignment (p, RegisterSize); // xsimd::batch<std::remove_const_t<T>>::size);
+        return snapPointerToAlignment (p, RegisterSize);
     }
 
     template <typename T, typename Op>
