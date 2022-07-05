@@ -1,5 +1,6 @@
 #include <CatchUtils.h>
 #include <chowdsp_math/chowdsp_math.h>
+#include <algorithm>
 
 template <typename T, typename VectorOp, typename ReferenceOp>
 void testReduce1dOp (std::vector<T>& in, VectorOp&& vectorOp, ReferenceOp&& referenceOp, T maxError)

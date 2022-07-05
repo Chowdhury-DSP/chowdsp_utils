@@ -24,8 +24,8 @@ TEST_CASE ("Memory Aliasing Test")
 
     SECTION ("std::array Test")
     {
-        std::array<int, 10> x;
-        std::array<int, 20> y;
+        std::array<int, 10> x {};
+        std::array<int, 20> y {};
         REQUIRE (doesMemoryAlias (x, x));
         REQUIRE (! doesMemoryAlias (x, y));
     }

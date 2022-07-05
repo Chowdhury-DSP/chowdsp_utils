@@ -1,5 +1,11 @@
 set(CHOWDSP_MODULES_DIR "${PROJECT_SOURCE_DIR}/modules")
 
+if (UNIX AND NOT APPLE)
+    # We need to link to pthread explicitly on Linux/GCC
+    set(THREADS_PREFER_PTHREAD_FLAG ON)
+    find_package(Threads REQUIRED)
+endif()
+
 function(setup_chowdsp_lib lib_name)
     set(multiValueArgs MODULES)
     cmake_parse_arguments(CHOWDSPLIB "" "" "${multiValueArgs}" ${ARGN})
@@ -35,5 +41,7 @@ function(setup_chowdsp_lib lib_name)
 
     if(APPLE)
         target_link_libraries(${lib_name} PUBLIC "-framework Accelerate")
+    elseif(UNIX)
+        target_link_libraries(${lib_name} PUBLIC Threads::Threads)
     endif()
 endfunction(setup_chowdsp_lib)
