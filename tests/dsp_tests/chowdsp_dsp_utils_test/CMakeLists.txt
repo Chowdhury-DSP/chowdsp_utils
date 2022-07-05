@@ -7,8 +7,6 @@ target_link_libraries(chowdsp_dsp_utils_test PRIVATE
 )
 
 target_sources(chowdsp_dsp_utils_test PRIVATE
-    ${CMAKE_SOURCE_DIR}/tests/test_utils/TestRunner.cpp
-
     AudioTimerTest.cpp
     BBDTest.cpp
     BypassTest.cpp

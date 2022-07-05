@@ -6,6 +6,5 @@ target_link_libraries(chowdsp_version_test PRIVATE
 )
 
 target_sources(chowdsp_version_test PRIVATE
-    ${CMAKE_SOURCE_DIR}/tests/test_utils/TestRunner.cpp
     VersionUtilsTest.cpp
 )
