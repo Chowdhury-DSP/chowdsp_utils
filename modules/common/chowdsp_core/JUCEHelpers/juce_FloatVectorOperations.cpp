@@ -20,7 +20,7 @@
   ==============================================================================
 */
 
-#if JUCE_MINGW && ! defined (alloca)
+#if JUCE_MINGW && ! defined(alloca)
 #define alloca __builtin_alloca
 #endif
 
@@ -40,14 +40,18 @@
 
 namespace juce
 {
-
 namespace FloatVectorHelpers
 {
-    #define JUCE_INCREMENT_SRC_DEST         dest += (16 / sizeof (*dest)); src += (16 / sizeof (*dest));
-    #define JUCE_INCREMENT_SRC1_SRC2_DEST   dest += (16 / sizeof (*dest)); src1 += (16 / sizeof (*dest)); src2 += (16 / sizeof (*dest));
-    #define JUCE_INCREMENT_DEST             dest += (16 / sizeof (*dest));
+#define JUCE_INCREMENT_SRC_DEST    \
+    dest += (16 / sizeof (*dest)); \
+    src += (16 / sizeof (*dest));
+#define JUCE_INCREMENT_SRC1_SRC2_DEST \
+    dest += (16 / sizeof (*dest));    \
+    src1 += (16 / sizeof (*dest));    \
+    src2 += (16 / sizeof (*dest));
+#define JUCE_INCREMENT_DEST dest += (16 / sizeof (*dest));
 
-   #if JUCE_USE_SSE_INTRINSICS
+#if JUCE_USE_SSE_INTRINSICS
     static bool isAligned (const void* p) noexcept
     {
         return (((pointer_sized_int) p) & 15) == 0;
@@ -57,197 +61,264 @@ namespace FloatVectorHelpers
     {
         using Type = float;
         using ParallelType = __m128;
-        using IntegerType  = __m128;
-        enum { numParallel = 4 };
+        using IntegerType = __m128;
+        enum
+        {
+            numParallel = 4
+        };
 
         // Integer and parallel types are the same for SSE. On neon they have different types
-        static forcedinline IntegerType toint (ParallelType v) noexcept                 { return v; }
-        static forcedinline ParallelType toflt (IntegerType v) noexcept                 { return v; }
+        static forcedinline IntegerType toint (ParallelType v) noexcept { return v; }
+        static forcedinline ParallelType toflt (IntegerType v) noexcept { return v; }
 
-        static forcedinline ParallelType load1 (Type v) noexcept                        { return _mm_load1_ps (&v); }
-        static forcedinline ParallelType loadA (const Type* v) noexcept                 { return _mm_load_ps (v); }
-        static forcedinline ParallelType loadU (const Type* v) noexcept                 { return _mm_loadu_ps (v); }
-        static forcedinline void storeA (Type* dest, ParallelType a) noexcept           { _mm_store_ps (dest, a); }
-        static forcedinline void storeU (Type* dest, ParallelType a) noexcept           { _mm_storeu_ps (dest, a); }
+        static forcedinline ParallelType load1 (Type v) noexcept { return _mm_load1_ps (&v); }
+        static forcedinline ParallelType loadA (const Type* v) noexcept { return _mm_load_ps (v); }
+        static forcedinline ParallelType loadU (const Type* v) noexcept { return _mm_loadu_ps (v); }
+        static forcedinline void storeA (Type* dest, ParallelType a) noexcept { _mm_store_ps (dest, a); }
+        static forcedinline void storeU (Type* dest, ParallelType a) noexcept { _mm_storeu_ps (dest, a); }
 
-        static forcedinline ParallelType add (ParallelType a, ParallelType b) noexcept  { return _mm_add_ps (a, b); }
-        static forcedinline ParallelType sub (ParallelType a, ParallelType b) noexcept  { return _mm_sub_ps (a, b); }
-        static forcedinline ParallelType mul (ParallelType a, ParallelType b) noexcept  { return _mm_mul_ps (a, b); }
-        static forcedinline ParallelType max (ParallelType a, ParallelType b) noexcept  { return _mm_max_ps (a, b); }
-        static forcedinline ParallelType min (ParallelType a, ParallelType b) noexcept  { return _mm_min_ps (a, b); }
+        static forcedinline ParallelType add (ParallelType a, ParallelType b) noexcept { return _mm_add_ps (a, b); }
+        static forcedinline ParallelType sub (ParallelType a, ParallelType b) noexcept { return _mm_sub_ps (a, b); }
+        static forcedinline ParallelType mul (ParallelType a, ParallelType b) noexcept { return _mm_mul_ps (a, b); }
+        static forcedinline ParallelType max (ParallelType a, ParallelType b) noexcept { return _mm_max_ps (a, b); }
+        static forcedinline ParallelType min (ParallelType a, ParallelType b) noexcept { return _mm_min_ps (a, b); }
 
-        static forcedinline ParallelType bit_and (ParallelType a, ParallelType b) noexcept  { return _mm_and_ps (a, b); }
-        static forcedinline ParallelType bit_not (ParallelType a, ParallelType b) noexcept  { return _mm_andnot_ps (a, b); }
-        static forcedinline ParallelType bit_or  (ParallelType a, ParallelType b) noexcept  { return _mm_or_ps (a, b); }
-        static forcedinline ParallelType bit_xor (ParallelType a, ParallelType b) noexcept  { return _mm_xor_ps (a, b); }
+        static forcedinline ParallelType bit_and (ParallelType a, ParallelType b) noexcept { return _mm_and_ps (a, b); }
+        static forcedinline ParallelType bit_not (ParallelType a, ParallelType b) noexcept { return _mm_andnot_ps (a, b); }
+        static forcedinline ParallelType bit_or (ParallelType a, ParallelType b) noexcept { return _mm_or_ps (a, b); }
+        static forcedinline ParallelType bit_xor (ParallelType a, ParallelType b) noexcept { return _mm_xor_ps (a, b); }
 
-        static forcedinline Type max (ParallelType a) noexcept { Type v[numParallel]; storeU (v, a); return jmax (v[0], v[1], v[2], v[3]); }
-        static forcedinline Type min (ParallelType a) noexcept { Type v[numParallel]; storeU (v, a); return jmin (v[0], v[1], v[2], v[3]); }
+        static forcedinline Type max (ParallelType a) noexcept
+        {
+            Type v[numParallel];
+            storeU (v, a);
+            return jmax (v[0], v[1], v[2], v[3]);
+        }
+        static forcedinline Type min (ParallelType a) noexcept
+        {
+            Type v[numParallel];
+            storeU (v, a);
+            return jmin (v[0], v[1], v[2], v[3]);
+        }
     };
 
     struct BasicOps64
     {
         using Type = double;
         using ParallelType = __m128d;
-        using IntegerType  = __m128d;
-        enum { numParallel = 2 };
+        using IntegerType = __m128d;
+        enum
+        {
+            numParallel = 2
+        };
 
         // Integer and parallel types are the same for SSE. On neon they have different types
-        static forcedinline IntegerType toint (ParallelType v) noexcept                 { return v; }
-        static forcedinline ParallelType toflt (IntegerType v) noexcept                 { return v; }
+        static forcedinline IntegerType toint (ParallelType v) noexcept { return v; }
+        static forcedinline ParallelType toflt (IntegerType v) noexcept { return v; }
 
-        static forcedinline ParallelType load1 (Type v) noexcept                        { return _mm_load1_pd (&v); }
-        static forcedinline ParallelType loadA (const Type* v) noexcept                 { return _mm_load_pd (v); }
-        static forcedinline ParallelType loadU (const Type* v) noexcept                 { return _mm_loadu_pd (v); }
-        static forcedinline void storeA (Type* dest, ParallelType a) noexcept           { _mm_store_pd (dest, a); }
-        static forcedinline void storeU (Type* dest, ParallelType a) noexcept           { _mm_storeu_pd (dest, a); }
+        static forcedinline ParallelType load1 (Type v) noexcept { return _mm_load1_pd (&v); }
+        static forcedinline ParallelType loadA (const Type* v) noexcept { return _mm_load_pd (v); }
+        static forcedinline ParallelType loadU (const Type* v) noexcept { return _mm_loadu_pd (v); }
+        static forcedinline void storeA (Type* dest, ParallelType a) noexcept { _mm_store_pd (dest, a); }
+        static forcedinline void storeU (Type* dest, ParallelType a) noexcept { _mm_storeu_pd (dest, a); }
 
-        static forcedinline ParallelType add (ParallelType a, ParallelType b) noexcept  { return _mm_add_pd (a, b); }
-        static forcedinline ParallelType sub (ParallelType a, ParallelType b) noexcept  { return _mm_sub_pd (a, b); }
-        static forcedinline ParallelType mul (ParallelType a, ParallelType b) noexcept  { return _mm_mul_pd (a, b); }
-        static forcedinline ParallelType max (ParallelType a, ParallelType b) noexcept  { return _mm_max_pd (a, b); }
-        static forcedinline ParallelType min (ParallelType a, ParallelType b) noexcept  { return _mm_min_pd (a, b); }
+        static forcedinline ParallelType add (ParallelType a, ParallelType b) noexcept { return _mm_add_pd (a, b); }
+        static forcedinline ParallelType sub (ParallelType a, ParallelType b) noexcept { return _mm_sub_pd (a, b); }
+        static forcedinline ParallelType mul (ParallelType a, ParallelType b) noexcept { return _mm_mul_pd (a, b); }
+        static forcedinline ParallelType max (ParallelType a, ParallelType b) noexcept { return _mm_max_pd (a, b); }
+        static forcedinline ParallelType min (ParallelType a, ParallelType b) noexcept { return _mm_min_pd (a, b); }
 
-        static forcedinline ParallelType bit_and (ParallelType a, ParallelType b) noexcept  { return _mm_and_pd (a, b); }
-        static forcedinline ParallelType bit_not (ParallelType a, ParallelType b) noexcept  { return _mm_andnot_pd (a, b); }
-        static forcedinline ParallelType bit_or  (ParallelType a, ParallelType b) noexcept  { return _mm_or_pd (a, b); }
-        static forcedinline ParallelType bit_xor (ParallelType a, ParallelType b) noexcept  { return _mm_xor_pd (a, b); }
+        static forcedinline ParallelType bit_and (ParallelType a, ParallelType b) noexcept { return _mm_and_pd (a, b); }
+        static forcedinline ParallelType bit_not (ParallelType a, ParallelType b) noexcept { return _mm_andnot_pd (a, b); }
+        static forcedinline ParallelType bit_or (ParallelType a, ParallelType b) noexcept { return _mm_or_pd (a, b); }
+        static forcedinline ParallelType bit_xor (ParallelType a, ParallelType b) noexcept { return _mm_xor_pd (a, b); }
 
-        static forcedinline Type max (ParallelType a) noexcept  { Type v[numParallel]; storeU (v, a); return jmax (v[0], v[1]); }
-        static forcedinline Type min (ParallelType a) noexcept  { Type v[numParallel]; storeU (v, a); return jmin (v[0], v[1]); }
+        static forcedinline Type max (ParallelType a) noexcept
+        {
+            Type v[numParallel];
+            storeU (v, a);
+            return jmax (v[0], v[1]);
+        }
+        static forcedinline Type min (ParallelType a) noexcept
+        {
+            Type v[numParallel];
+            storeU (v, a);
+            return jmin (v[0], v[1]);
+        }
     };
 
+#define JUCE_BEGIN_VEC_OP                                            \
+    using Mode = FloatVectorHelpers::ModeType<sizeof (*dest)>::Mode; \
+    {                                                                \
+        const auto numLongOps = num / Mode::numParallel;
 
+#define JUCE_FINISH_VEC_OP(normalOp)                \
+    num &= (Mode::numParallel - 1);                 \
+    if (num == 0)                                   \
+        return;                                     \
+    }                                               \
+    for (auto i = (decltype (num)) 0; i < num; ++i) \
+        normalOp;
 
-    #define JUCE_BEGIN_VEC_OP \
-        using Mode = FloatVectorHelpers::ModeType<sizeof(*dest)>::Mode; \
-        { \
-            const auto numLongOps = num / Mode::numParallel;
-
-    #define JUCE_FINISH_VEC_OP(normalOp) \
-            num &= (Mode::numParallel - 1); \
-            if (num == 0) return; \
-        } \
-        for (auto i = (decltype (num)) 0; i < num; ++i) normalOp;
-
-    #define JUCE_PERFORM_VEC_OP_DEST(normalOp, vecOp, locals, setupOp) \
-        JUCE_BEGIN_VEC_OP \
-        setupOp \
-        if (FloatVectorHelpers::isAligned (dest))   JUCE_VEC_LOOP (vecOp, dummy, Mode::loadA, Mode::storeA, locals, JUCE_INCREMENT_DEST) \
-        else                                        JUCE_VEC_LOOP (vecOp, dummy, Mode::loadU, Mode::storeU, locals, JUCE_INCREMENT_DEST) \
+#define JUCE_PERFORM_VEC_OP_DEST(normalOp, vecOp, locals, setupOp)                                                                                                                                                                   \
+    JUCE_BEGIN_VEC_OP                                                                                                                                                                                                                \
+    setupOp if (FloatVectorHelpers::isAligned (dest)) JUCE_VEC_LOOP (vecOp, dummy, Mode::loadA, Mode::storeA, locals, JUCE_INCREMENT_DEST) else JUCE_VEC_LOOP (vecOp, dummy, Mode::loadU, Mode::storeU, locals, JUCE_INCREMENT_DEST) \
         JUCE_FINISH_VEC_OP (normalOp)
 
-    #define JUCE_PERFORM_VEC_OP_SRC_DEST(normalOp, vecOp, locals, increment, setupOp) \
-        JUCE_BEGIN_VEC_OP \
-        setupOp \
-        if (FloatVectorHelpers::isAligned (dest)) \
-        { \
-            if (FloatVectorHelpers::isAligned (src)) JUCE_VEC_LOOP (vecOp, Mode::loadA, Mode::loadA, Mode::storeA, locals, increment) \
-            else                                     JUCE_VEC_LOOP (vecOp, Mode::loadU, Mode::loadA, Mode::storeA, locals, increment) \
-        }\
-        else \
-        { \
-            if (FloatVectorHelpers::isAligned (src)) JUCE_VEC_LOOP (vecOp, Mode::loadA, Mode::loadU, Mode::storeU, locals, increment) \
-            else                                     JUCE_VEC_LOOP (vecOp, Mode::loadU, Mode::loadU, Mode::storeU, locals, increment) \
-        } \
-        JUCE_FINISH_VEC_OP (normalOp)
+#define JUCE_PERFORM_VEC_OP_SRC_DEST(normalOp, vecOp, locals, increment, setupOp)            \
+    JUCE_BEGIN_VEC_OP                                                                        \
+    setupOp if (FloatVectorHelpers::isAligned (dest))                                        \
+    {                                                                                        \
+        if (FloatVectorHelpers::isAligned (src))                                             \
+            JUCE_VEC_LOOP (vecOp, Mode::loadA, Mode::loadA, Mode::storeA, locals, increment) \
+        else                                                                                 \
+            JUCE_VEC_LOOP (vecOp, Mode::loadU, Mode::loadA, Mode::storeA, locals, increment) \
+    }                                                                                        \
+    else                                                                                     \
+    {                                                                                        \
+        if (FloatVectorHelpers::isAligned (src))                                             \
+            JUCE_VEC_LOOP (vecOp, Mode::loadA, Mode::loadU, Mode::storeU, locals, increment) \
+        else                                                                                 \
+            JUCE_VEC_LOOP (vecOp, Mode::loadU, Mode::loadU, Mode::storeU, locals, increment) \
+    }                                                                                        \
+    JUCE_FINISH_VEC_OP (normalOp)
 
-    #define JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST(normalOp, vecOp, locals, increment, setupOp) \
-        JUCE_BEGIN_VEC_OP \
-        setupOp \
-        if (FloatVectorHelpers::isAligned (dest)) \
-        { \
-            if (FloatVectorHelpers::isAligned (src1)) \
-            { \
-                if (FloatVectorHelpers::isAligned (src2))   JUCE_VEC_LOOP_TWO_SOURCES (vecOp, Mode::loadA, Mode::loadA, Mode::storeA, locals, increment) \
-                else                                        JUCE_VEC_LOOP_TWO_SOURCES (vecOp, Mode::loadA, Mode::loadU, Mode::storeA, locals, increment) \
-            } \
-            else \
-            { \
-                if (FloatVectorHelpers::isAligned (src2))   JUCE_VEC_LOOP_TWO_SOURCES (vecOp, Mode::loadU, Mode::loadA, Mode::storeA, locals, increment) \
-                else                                        JUCE_VEC_LOOP_TWO_SOURCES (vecOp, Mode::loadU, Mode::loadU, Mode::storeA, locals, increment) \
-            } \
-        } \
-        else \
-        { \
-            if (FloatVectorHelpers::isAligned (src1)) \
-            { \
-                if (FloatVectorHelpers::isAligned (src2))   JUCE_VEC_LOOP_TWO_SOURCES (vecOp, Mode::loadA, Mode::loadA, Mode::storeU, locals, increment) \
-                else                                        JUCE_VEC_LOOP_TWO_SOURCES (vecOp, Mode::loadA, Mode::loadU, Mode::storeU, locals, increment) \
-            } \
-            else \
-            { \
-                if (FloatVectorHelpers::isAligned (src2))   JUCE_VEC_LOOP_TWO_SOURCES (vecOp, Mode::loadU, Mode::loadA, Mode::storeU, locals, increment) \
-                else                                        JUCE_VEC_LOOP_TWO_SOURCES (vecOp, Mode::loadU, Mode::loadU, Mode::storeU, locals, increment) \
-            } \
-        } \
-        JUCE_FINISH_VEC_OP (normalOp)
+#define JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST(normalOp, vecOp, locals, increment, setupOp)                      \
+    JUCE_BEGIN_VEC_OP                                                                                        \
+    setupOp if (FloatVectorHelpers::isAligned (dest))                                                        \
+    {                                                                                                        \
+        if (FloatVectorHelpers::isAligned (src1))                                                            \
+        {                                                                                                    \
+            if (FloatVectorHelpers::isAligned (src2))                                                        \
+                JUCE_VEC_LOOP_TWO_SOURCES (vecOp, Mode::loadA, Mode::loadA, Mode::storeA, locals, increment) \
+            else                                                                                             \
+                JUCE_VEC_LOOP_TWO_SOURCES (vecOp, Mode::loadA, Mode::loadU, Mode::storeA, locals, increment) \
+        }                                                                                                    \
+        else                                                                                                 \
+        {                                                                                                    \
+            if (FloatVectorHelpers::isAligned (src2))                                                        \
+                JUCE_VEC_LOOP_TWO_SOURCES (vecOp, Mode::loadU, Mode::loadA, Mode::storeA, locals, increment) \
+            else                                                                                             \
+                JUCE_VEC_LOOP_TWO_SOURCES (vecOp, Mode::loadU, Mode::loadU, Mode::storeA, locals, increment) \
+        }                                                                                                    \
+    }                                                                                                        \
+    else                                                                                                     \
+    {                                                                                                        \
+        if (FloatVectorHelpers::isAligned (src1))                                                            \
+        {                                                                                                    \
+            if (FloatVectorHelpers::isAligned (src2))                                                        \
+                JUCE_VEC_LOOP_TWO_SOURCES (vecOp, Mode::loadA, Mode::loadA, Mode::storeU, locals, increment) \
+            else                                                                                             \
+                JUCE_VEC_LOOP_TWO_SOURCES (vecOp, Mode::loadA, Mode::loadU, Mode::storeU, locals, increment) \
+        }                                                                                                    \
+        else                                                                                                 \
+        {                                                                                                    \
+            if (FloatVectorHelpers::isAligned (src2))                                                        \
+                JUCE_VEC_LOOP_TWO_SOURCES (vecOp, Mode::loadU, Mode::loadA, Mode::storeU, locals, increment) \
+            else                                                                                             \
+                JUCE_VEC_LOOP_TWO_SOURCES (vecOp, Mode::loadU, Mode::loadU, Mode::storeU, locals, increment) \
+        }                                                                                                    \
+    }                                                                                                        \
+    JUCE_FINISH_VEC_OP (normalOp)
 
-    #define JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST_DEST(normalOp, vecOp, locals, increment, setupOp) \
-        JUCE_BEGIN_VEC_OP \
-        setupOp \
-        if (FloatVectorHelpers::isAligned (dest)) \
-        { \
-            if (FloatVectorHelpers::isAligned (src1)) \
-            { \
-                if (FloatVectorHelpers::isAligned (src2))   JUCE_VEC_LOOP_TWO_SOURCES_WITH_DEST_LOAD (vecOp, Mode::loadA, Mode::loadA, Mode::loadA, Mode::storeA, locals, increment) \
-                else                                        JUCE_VEC_LOOP_TWO_SOURCES_WITH_DEST_LOAD (vecOp, Mode::loadA, Mode::loadU, Mode::loadA, Mode::storeA, locals, increment) \
-            } \
-            else \
-            { \
-                if (FloatVectorHelpers::isAligned (src2))   JUCE_VEC_LOOP_TWO_SOURCES_WITH_DEST_LOAD (vecOp, Mode::loadU, Mode::loadA, Mode::loadA, Mode::storeA, locals, increment) \
-                else                                        JUCE_VEC_LOOP_TWO_SOURCES_WITH_DEST_LOAD (vecOp, Mode::loadU, Mode::loadU, Mode::loadA, Mode::storeA, locals, increment) \
-            } \
-        } \
-        else \
-        { \
-            if (FloatVectorHelpers::isAligned (src1)) \
-            { \
-                if (FloatVectorHelpers::isAligned (src2))   JUCE_VEC_LOOP_TWO_SOURCES_WITH_DEST_LOAD (vecOp, Mode::loadA, Mode::loadA, Mode::loadU, Mode::storeU, locals, increment) \
-                else                                        JUCE_VEC_LOOP_TWO_SOURCES_WITH_DEST_LOAD (vecOp, Mode::loadA, Mode::loadU, Mode::loadU, Mode::storeU, locals, increment) \
-            } \
-            else \
-            { \
-                if (FloatVectorHelpers::isAligned (src2))   JUCE_VEC_LOOP_TWO_SOURCES_WITH_DEST_LOAD (vecOp, Mode::loadU, Mode::loadA, Mode::loadU, Mode::storeU, locals, increment) \
-                else                                        JUCE_VEC_LOOP_TWO_SOURCES_WITH_DEST_LOAD (vecOp, Mode::loadU, Mode::loadU, Mode::loadU, Mode::storeU, locals, increment) \
-            } \
-        } \
-        JUCE_FINISH_VEC_OP (normalOp)
-
+#define JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST_DEST(normalOp, vecOp, locals, increment, setupOp)                                             \
+    JUCE_BEGIN_VEC_OP                                                                                                                    \
+    setupOp if (FloatVectorHelpers::isAligned (dest))                                                                                    \
+    {                                                                                                                                    \
+        if (FloatVectorHelpers::isAligned (src1))                                                                                        \
+        {                                                                                                                                \
+            if (FloatVectorHelpers::isAligned (src2))                                                                                    \
+                JUCE_VEC_LOOP_TWO_SOURCES_WITH_DEST_LOAD (vecOp, Mode::loadA, Mode::loadA, Mode::loadA, Mode::storeA, locals, increment) \
+            else                                                                                                                         \
+                JUCE_VEC_LOOP_TWO_SOURCES_WITH_DEST_LOAD (vecOp, Mode::loadA, Mode::loadU, Mode::loadA, Mode::storeA, locals, increment) \
+        }                                                                                                                                \
+        else                                                                                                                             \
+        {                                                                                                                                \
+            if (FloatVectorHelpers::isAligned (src2))                                                                                    \
+                JUCE_VEC_LOOP_TWO_SOURCES_WITH_DEST_LOAD (vecOp, Mode::loadU, Mode::loadA, Mode::loadA, Mode::storeA, locals, increment) \
+            else                                                                                                                         \
+                JUCE_VEC_LOOP_TWO_SOURCES_WITH_DEST_LOAD (vecOp, Mode::loadU, Mode::loadU, Mode::loadA, Mode::storeA, locals, increment) \
+        }                                                                                                                                \
+    }                                                                                                                                    \
+    else                                                                                                                                 \
+    {                                                                                                                                    \
+        if (FloatVectorHelpers::isAligned (src1))                                                                                        \
+        {                                                                                                                                \
+            if (FloatVectorHelpers::isAligned (src2))                                                                                    \
+                JUCE_VEC_LOOP_TWO_SOURCES_WITH_DEST_LOAD (vecOp, Mode::loadA, Mode::loadA, Mode::loadU, Mode::storeU, locals, increment) \
+            else                                                                                                                         \
+                JUCE_VEC_LOOP_TWO_SOURCES_WITH_DEST_LOAD (vecOp, Mode::loadA, Mode::loadU, Mode::loadU, Mode::storeU, locals, increment) \
+        }                                                                                                                                \
+        else                                                                                                                             \
+        {                                                                                                                                \
+            if (FloatVectorHelpers::isAligned (src2))                                                                                    \
+                JUCE_VEC_LOOP_TWO_SOURCES_WITH_DEST_LOAD (vecOp, Mode::loadU, Mode::loadA, Mode::loadU, Mode::storeU, locals, increment) \
+            else                                                                                                                         \
+                JUCE_VEC_LOOP_TWO_SOURCES_WITH_DEST_LOAD (vecOp, Mode::loadU, Mode::loadU, Mode::loadU, Mode::storeU, locals, increment) \
+        }                                                                                                                                \
+    }                                                                                                                                    \
+    JUCE_FINISH_VEC_OP (normalOp)
 
     //==============================================================================
-   #elif JUCE_USE_ARM_NEON
+#elif JUCE_USE_ARM_NEON
 
     struct BasicOps32
     {
         using Type = float;
         using ParallelType = float32x4_t;
         using IntegerType = uint32x4_t;
-        union signMaskUnion { ParallelType f; IntegerType i; };
-        enum { numParallel = 4 };
+        union signMaskUnion
+        {
+            ParallelType f;
+            IntegerType i;
+        };
+        enum
+        {
+            numParallel = 4
+        };
 
-        static forcedinline IntegerType toint (ParallelType v) noexcept                 { signMaskUnion u; u.f = v; return u.i; }
-        static forcedinline ParallelType toflt (IntegerType v) noexcept                 { signMaskUnion u; u.i = v; return u.f; }
+        static forcedinline IntegerType toint (ParallelType v) noexcept
+        {
+            signMaskUnion u;
+            u.f = v;
+            return u.i;
+        }
+        static forcedinline ParallelType toflt (IntegerType v) noexcept
+        {
+            signMaskUnion u;
+            u.i = v;
+            return u.f;
+        }
 
-        static forcedinline ParallelType load1 (Type v) noexcept                        { return vld1q_dup_f32 (&v); }
-        static forcedinline ParallelType loadA (const Type* v) noexcept                 { return vld1q_f32 (v); }
-        static forcedinline ParallelType loadU (const Type* v) noexcept                 { return vld1q_f32 (v); }
-        static forcedinline void storeA (Type* dest, ParallelType a) noexcept           { vst1q_f32 (dest, a); }
-        static forcedinline void storeU (Type* dest, ParallelType a) noexcept           { vst1q_f32 (dest, a); }
+        static forcedinline ParallelType load1 (Type v) noexcept { return vld1q_dup_f32 (&v); }
+        static forcedinline ParallelType loadA (const Type* v) noexcept { return vld1q_f32 (v); }
+        static forcedinline ParallelType loadU (const Type* v) noexcept { return vld1q_f32 (v); }
+        static forcedinline void storeA (Type* dest, ParallelType a) noexcept { vst1q_f32 (dest, a); }
+        static forcedinline void storeU (Type* dest, ParallelType a) noexcept { vst1q_f32 (dest, a); }
 
-        static forcedinline ParallelType add (ParallelType a, ParallelType b) noexcept  { return vaddq_f32 (a, b); }
-        static forcedinline ParallelType sub (ParallelType a, ParallelType b) noexcept  { return vsubq_f32 (a, b); }
-        static forcedinline ParallelType mul (ParallelType a, ParallelType b) noexcept  { return vmulq_f32 (a, b); }
-        static forcedinline ParallelType max (ParallelType a, ParallelType b) noexcept  { return vmaxq_f32 (a, b); }
-        static forcedinline ParallelType min (ParallelType a, ParallelType b) noexcept  { return vminq_f32 (a, b); }
+        static forcedinline ParallelType add (ParallelType a, ParallelType b) noexcept { return vaddq_f32 (a, b); }
+        static forcedinline ParallelType sub (ParallelType a, ParallelType b) noexcept { return vsubq_f32 (a, b); }
+        static forcedinline ParallelType mul (ParallelType a, ParallelType b) noexcept { return vmulq_f32 (a, b); }
+        static forcedinline ParallelType max (ParallelType a, ParallelType b) noexcept { return vmaxq_f32 (a, b); }
+        static forcedinline ParallelType min (ParallelType a, ParallelType b) noexcept { return vminq_f32 (a, b); }
 
-        static forcedinline ParallelType bit_and (ParallelType a, ParallelType b) noexcept  {  return toflt (vandq_u32 (toint (a), toint (b))); }
-        static forcedinline ParallelType bit_not (ParallelType a, ParallelType b) noexcept  {  return toflt (vbicq_u32 (toint (a), toint (b))); }
-        static forcedinline ParallelType bit_or  (ParallelType a, ParallelType b) noexcept  {  return toflt (vorrq_u32 (toint (a), toint (b))); }
-        static forcedinline ParallelType bit_xor (ParallelType a, ParallelType b) noexcept  {  return toflt (veorq_u32 (toint (a), toint (b))); }
+        static forcedinline ParallelType bit_and (ParallelType a, ParallelType b) noexcept { return toflt (vandq_u32 (toint (a), toint (b))); }
+        static forcedinline ParallelType bit_not (ParallelType a, ParallelType b) noexcept { return toflt (vbicq_u32 (toint (a), toint (b))); }
+        static forcedinline ParallelType bit_or (ParallelType a, ParallelType b) noexcept { return toflt (vorrq_u32 (toint (a), toint (b))); }
+        static forcedinline ParallelType bit_xor (ParallelType a, ParallelType b) noexcept { return toflt (veorq_u32 (toint (a), toint (b))); }
 
-        static forcedinline Type max (ParallelType a) noexcept { Type v[numParallel]; storeU (v, a); return jmax (v[0], v[1], v[2], v[3]); }
-        static forcedinline Type min (ParallelType a) noexcept { Type v[numParallel]; storeU (v, a); return jmin (v[0], v[1], v[2], v[3]); }
+        static forcedinline Type max (ParallelType a) noexcept
+        {
+            Type v[numParallel];
+            storeU (v, a);
+            return jmax (v[0], v[1], v[2], v[3]);
+        }
+        static forcedinline Type min (ParallelType a) noexcept
+        {
+            Type v[numParallel];
+            storeU (v, a);
+            return jmin (v[0], v[1], v[2], v[3]);
+        }
     };
 
     struct BasicOps64
@@ -255,124 +326,162 @@ namespace FloatVectorHelpers
         using Type = double;
         using ParallelType = double;
         using IntegerType = uint64;
-        union signMaskUnion { ParallelType f; IntegerType i; };
-        enum { numParallel = 1 };
+        union signMaskUnion
+        {
+            ParallelType f;
+            IntegerType i;
+        };
+        enum
+        {
+            numParallel = 1
+        };
 
-        static forcedinline IntegerType toint (ParallelType v) noexcept                 { signMaskUnion u; u.f = v; return u.i; }
-        static forcedinline ParallelType toflt (IntegerType v) noexcept                 { signMaskUnion u; u.i = v; return u.f; }
+        static forcedinline IntegerType toint (ParallelType v) noexcept
+        {
+            signMaskUnion u;
+            u.f = v;
+            return u.i;
+        }
+        static forcedinline ParallelType toflt (IntegerType v) noexcept
+        {
+            signMaskUnion u;
+            u.i = v;
+            return u.f;
+        }
 
-        static forcedinline ParallelType load1 (Type v) noexcept                        { return v; }
-        static forcedinline ParallelType loadA (const Type* v) noexcept                 { return *v; }
-        static forcedinline ParallelType loadU (const Type* v) noexcept                 { return *v; }
-        static forcedinline void storeA (Type* dest, ParallelType a) noexcept           { *dest = a; }
-        static forcedinline void storeU (Type* dest, ParallelType a) noexcept           { *dest = a; }
+        static forcedinline ParallelType load1 (Type v) noexcept { return v; }
+        static forcedinline ParallelType loadA (const Type* v) noexcept { return *v; }
+        static forcedinline ParallelType loadU (const Type* v) noexcept { return *v; }
+        static forcedinline void storeA (Type* dest, ParallelType a) noexcept { *dest = a; }
+        static forcedinline void storeU (Type* dest, ParallelType a) noexcept { *dest = a; }
 
-        static forcedinline ParallelType add (ParallelType a, ParallelType b) noexcept  { return a + b; }
-        static forcedinline ParallelType sub (ParallelType a, ParallelType b) noexcept  { return a - b; }
-        static forcedinline ParallelType mul (ParallelType a, ParallelType b) noexcept  { return a * b; }
-        static forcedinline ParallelType max (ParallelType a, ParallelType b) noexcept  { return jmax (a, b); }
-        static forcedinline ParallelType min (ParallelType a, ParallelType b) noexcept  { return jmin (a, b); }
+        static forcedinline ParallelType add (ParallelType a, ParallelType b) noexcept { return a + b; }
+        static forcedinline ParallelType sub (ParallelType a, ParallelType b) noexcept { return a - b; }
+        static forcedinline ParallelType mul (ParallelType a, ParallelType b) noexcept { return a * b; }
+        static forcedinline ParallelType max (ParallelType a, ParallelType b) noexcept { return jmax (a, b); }
+        static forcedinline ParallelType min (ParallelType a, ParallelType b) noexcept { return jmin (a, b); }
 
-        static forcedinline ParallelType bit_and (ParallelType a, ParallelType b) noexcept  {  return toflt (toint (a) & toint (b)); }
-        static forcedinline ParallelType bit_not (ParallelType a, ParallelType b) noexcept  {  return toflt ((~toint (a)) & toint (b)); }
-        static forcedinline ParallelType bit_or  (ParallelType a, ParallelType b) noexcept  {  return toflt (toint (a) | toint (b)); }
-        static forcedinline ParallelType bit_xor (ParallelType a, ParallelType b) noexcept  {  return toflt (toint (a) ^ toint (b)); }
+        static forcedinline ParallelType bit_and (ParallelType a, ParallelType b) noexcept { return toflt (toint (a) & toint (b)); }
+        static forcedinline ParallelType bit_not (ParallelType a, ParallelType b) noexcept { return toflt ((~toint (a)) & toint (b)); }
+        static forcedinline ParallelType bit_or (ParallelType a, ParallelType b) noexcept { return toflt (toint (a) | toint (b)); }
+        static forcedinline ParallelType bit_xor (ParallelType a, ParallelType b) noexcept { return toflt (toint (a) ^ toint (b)); }
 
-        static forcedinline Type max (ParallelType a) noexcept  { return a; }
-        static forcedinline Type min (ParallelType a) noexcept  { return a; }
+        static forcedinline Type max (ParallelType a) noexcept { return a; }
+        static forcedinline Type min (ParallelType a) noexcept { return a; }
     };
 
-    #define JUCE_BEGIN_VEC_OP \
-        using Mode = FloatVectorHelpers::ModeType<sizeof(*dest)>::Mode; \
-        if (Mode::numParallel > 1) \
-        { \
-            const auto numLongOps = num / Mode::numParallel;
+#define JUCE_BEGIN_VEC_OP                                            \
+    using Mode = FloatVectorHelpers::ModeType<sizeof (*dest)>::Mode; \
+    if (Mode::numParallel > 1)                                       \
+    {                                                                \
+        const auto numLongOps = num / Mode::numParallel;
 
-    #define JUCE_FINISH_VEC_OP(normalOp) \
-            num &= (Mode::numParallel - 1); \
-            if (num == 0) return; \
-        } \
-        for (auto i = (decltype (num)) 0; i < num; ++i) normalOp;
+#define JUCE_FINISH_VEC_OP(normalOp)                \
+    num &= (Mode::numParallel - 1);                 \
+    if (num == 0)                                   \
+        return;                                     \
+    }                                               \
+    for (auto i = (decltype (num)) 0; i < num; ++i) \
+        normalOp;
 
-    #define JUCE_PERFORM_VEC_OP_DEST(normalOp, vecOp, locals, setupOp) \
-        JUCE_BEGIN_VEC_OP \
-        setupOp \
+#define JUCE_PERFORM_VEC_OP_DEST(normalOp, vecOp, locals, setupOp)                           \
+    JUCE_BEGIN_VEC_OP                                                                        \
+    setupOp                                                                                  \
         JUCE_VEC_LOOP (vecOp, dummy, Mode::loadU, Mode::storeU, locals, JUCE_INCREMENT_DEST) \
-        JUCE_FINISH_VEC_OP (normalOp)
+            JUCE_FINISH_VEC_OP (normalOp)
 
-    #define JUCE_PERFORM_VEC_OP_SRC_DEST(normalOp, vecOp, locals, increment, setupOp) \
-        JUCE_BEGIN_VEC_OP \
-        setupOp \
+#define JUCE_PERFORM_VEC_OP_SRC_DEST(normalOp, vecOp, locals, increment, setupOp)        \
+    JUCE_BEGIN_VEC_OP                                                                    \
+    setupOp                                                                              \
         JUCE_VEC_LOOP (vecOp, Mode::loadU, Mode::loadU, Mode::storeU, locals, increment) \
-        JUCE_FINISH_VEC_OP (normalOp)
+            JUCE_FINISH_VEC_OP (normalOp)
 
-    #define JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST(normalOp, vecOp, locals, increment, setupOp) \
-        JUCE_BEGIN_VEC_OP \
-        setupOp \
+#define JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST(normalOp, vecOp, locals, increment, setupOp)              \
+    JUCE_BEGIN_VEC_OP                                                                                \
+    setupOp                                                                                          \
         JUCE_VEC_LOOP_TWO_SOURCES (vecOp, Mode::loadU, Mode::loadU, Mode::storeU, locals, increment) \
-        JUCE_FINISH_VEC_OP (normalOp)
+            JUCE_FINISH_VEC_OP (normalOp)
 
-    #define JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST_DEST(normalOp, vecOp, locals, increment, setupOp) \
-        JUCE_BEGIN_VEC_OP \
-        setupOp \
+#define JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST_DEST(normalOp, vecOp, locals, increment, setupOp)                                     \
+    JUCE_BEGIN_VEC_OP                                                                                                            \
+    setupOp                                                                                                                      \
         JUCE_VEC_LOOP_TWO_SOURCES_WITH_DEST_LOAD (vecOp, Mode::loadU, Mode::loadU, Mode::loadU, Mode::storeU, locals, increment) \
-        JUCE_FINISH_VEC_OP (normalOp)
-
-
-    //==============================================================================
-   #else
-    #define JUCE_PERFORM_VEC_OP_DEST(normalOp, vecOp, locals, setupOp) \
-        for (auto i = (decltype (num)) 0; i < num; ++i) normalOp;
-
-    #define JUCE_PERFORM_VEC_OP_SRC_DEST(normalOp, vecOp, locals, increment, setupOp) \
-        for (auto i = (decltype (num)) 0; i < num; ++i) normalOp;
-
-    #define JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST(normalOp, vecOp, locals, increment, setupOp) \
-        for (auto i = (decltype (num)) 0; i < num; ++i) normalOp;
-
-    #define JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST_DEST(normalOp, vecOp, locals, increment, setupOp) \
-        for (auto i = (decltype (num)) 0; i < num; ++i) normalOp;
-
-   #endif
+            JUCE_FINISH_VEC_OP (normalOp)
 
     //==============================================================================
-    #define JUCE_VEC_LOOP(vecOp, srcLoad, dstLoad, dstStore, locals, increment) \
-        for (auto i = (decltype (numLongOps)) 0; i < numLongOps; ++i) \
-        { \
-            locals (srcLoad, dstLoad); \
-            dstStore (dest, vecOp); \
-            increment; \
-        }
+#else
+#define JUCE_PERFORM_VEC_OP_DEST(normalOp, vecOp, locals, setupOp) \
+    for (auto i = (decltype (num)) 0; i < num; ++i)                \
+        normalOp;
 
-    #define JUCE_VEC_LOOP_TWO_SOURCES(vecOp, src1Load, src2Load, dstStore, locals, increment) \
-        for (auto i = (decltype (numLongOps)) 0; i < numLongOps; ++i) \
-        { \
-            locals (src1Load, src2Load); \
-            dstStore (dest, vecOp); \
-            increment; \
-        }
+#define JUCE_PERFORM_VEC_OP_SRC_DEST(normalOp, vecOp, locals, increment, setupOp) \
+    for (auto i = (decltype (num)) 0; i < num; ++i)                               \
+        normalOp;
 
-    #define JUCE_VEC_LOOP_TWO_SOURCES_WITH_DEST_LOAD(vecOp, src1Load, src2Load, dstLoad, dstStore, locals, increment) \
-        for (auto i = (decltype (numLongOps)) 0; i < numLongOps; ++i) \
-        { \
-            locals (src1Load, src2Load, dstLoad); \
-            dstStore (dest, vecOp); \
-            increment; \
-        }
+#define JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST(normalOp, vecOp, locals, increment, setupOp) \
+    for (auto i = (decltype (num)) 0; i < num; ++i)                                     \
+        normalOp;
 
-    #define JUCE_LOAD_NONE(srcLoad, dstLoad)
-    #define JUCE_LOAD_DEST(srcLoad, dstLoad)                        const Mode::ParallelType d = dstLoad (dest);
-    #define JUCE_LOAD_SRC(srcLoad, dstLoad)                         const Mode::ParallelType s = srcLoad (src);
-    #define JUCE_LOAD_SRC1_SRC2(src1Load, src2Load)                 const Mode::ParallelType s1 = src1Load (src1), s2 = src2Load (src2);
-    #define JUCE_LOAD_SRC1_SRC2_DEST(src1Load, src2Load, dstLoad)   const Mode::ParallelType d = dstLoad (dest), s1 = src1Load (src1), s2 = src2Load (src2);
-    #define JUCE_LOAD_SRC_DEST(srcLoad, dstLoad)                    const Mode::ParallelType d = dstLoad (dest), s = srcLoad (src);
+#define JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST_DEST(normalOp, vecOp, locals, increment, setupOp) \
+    for (auto i = (decltype (num)) 0; i < num; ++i)                                          \
+        normalOp;
 
-    union signMask32 { float  f; uint32_t i; };
-    union signMask64 { double d; uint64_t i; };
+#endif
 
-   #if JUCE_USE_SSE_INTRINSICS || JUCE_USE_ARM_NEON
-    template <int typeSize> struct ModeType    { using Mode = BasicOps32; };
-    template <>             struct ModeType<8> { using Mode = BasicOps64; };
+//==============================================================================
+#define JUCE_VEC_LOOP(vecOp, srcLoad, dstLoad, dstStore, locals, increment) \
+    for (auto i = (decltype (numLongOps)) 0; i < numLongOps; ++i)           \
+    {                                                                       \
+        locals (srcLoad, dstLoad);                                          \
+        dstStore (dest, vecOp);                                             \
+        increment;                                                          \
+    }
+
+#define JUCE_VEC_LOOP_TWO_SOURCES(vecOp, src1Load, src2Load, dstStore, locals, increment) \
+    for (auto i = (decltype (numLongOps)) 0; i < numLongOps; ++i)                         \
+    {                                                                                     \
+        locals (src1Load, src2Load);                                                      \
+        dstStore (dest, vecOp);                                                           \
+        increment;                                                                        \
+    }
+
+#define JUCE_VEC_LOOP_TWO_SOURCES_WITH_DEST_LOAD(vecOp, src1Load, src2Load, dstLoad, dstStore, locals, increment) \
+    for (auto i = (decltype (numLongOps)) 0; i < numLongOps; ++i)                                                 \
+    {                                                                                                             \
+        locals (src1Load, src2Load, dstLoad);                                                                     \
+        dstStore (dest, vecOp);                                                                                   \
+        increment;                                                                                                \
+    }
+
+#define JUCE_LOAD_NONE(srcLoad, dstLoad)
+#define JUCE_LOAD_DEST(srcLoad, dstLoad) const Mode::ParallelType d = dstLoad (dest);
+#define JUCE_LOAD_SRC(srcLoad, dstLoad) const Mode::ParallelType s = srcLoad (src);
+#define JUCE_LOAD_SRC1_SRC2(src1Load, src2Load) const Mode::ParallelType s1 = src1Load (src1), s2 = src2Load (src2);
+#define JUCE_LOAD_SRC1_SRC2_DEST(src1Load, src2Load, dstLoad) const Mode::ParallelType d = dstLoad (dest), s1 = src1Load (src1), s2 = src2Load (src2);
+#define JUCE_LOAD_SRC_DEST(srcLoad, dstLoad) const Mode::ParallelType d = dstLoad (dest), s = srcLoad (src);
+
+    union signMask32
+    {
+        float f;
+        uint32_t i;
+    };
+    union signMask64
+    {
+        double d;
+        uint64_t i;
+    };
+
+#if JUCE_USE_SSE_INTRINSICS || JUCE_USE_ARM_NEON
+    template <int typeSize>
+    struct ModeType
+    {
+        using Mode = BasicOps32;
+    };
+    template <>
+    struct ModeType<8>
+    {
+        using Mode = BasicOps64;
+    };
 
     template <typename Mode>
     struct MinMax
@@ -389,7 +498,7 @@ namespace FloatVectorHelpers
             {
                 ParallelType val;
 
-               #if ! JUCE_USE_ARM_NEON
+#if ! JUCE_USE_ARM_NEON
                 if (isAligned (src))
                 {
                     val = Mode::loadA (src);
@@ -412,7 +521,7 @@ namespace FloatVectorHelpers
                     }
                 }
                 else
-               #endif
+#endif
                 {
                     val = Mode::loadU (src);
 
@@ -454,743 +563,743 @@ namespace FloatVectorHelpers
                              : *std::max_element (src, src + num);
         }
 
-//        template <typename Size>
-//        static Range<Type> findMinAndMax (const Type* src, Size num) noexcept
-//        {
-//            auto numLongOps = num / Mode::numParallel;
-//
-//            if (numLongOps > 1)
-//            {
-//                ParallelType mn, mx;
-//
-//               #if ! JUCE_USE_ARM_NEON
-//                if (isAligned (src))
-//                {
-//                    mn = Mode::loadA (src);
-//                    mx = mn;
-//
-//                    while (--numLongOps > 0)
-//                    {
-//                        src += Mode::numParallel;
-//                        const ParallelType v = Mode::loadA (src);
-//                        mn = Mode::min (mn, v);
-//                        mx = Mode::max (mx, v);
-//                    }
-//                }
-//                else
-//               #endif
-//                {
-//                    mn = Mode::loadU (src);
-//                    mx = mn;
-//
-//                    while (--numLongOps > 0)
-//                    {
-//                        src += Mode::numParallel;
-//                        const ParallelType v = Mode::loadU (src);
-//                        mn = Mode::min (mn, v);
-//                        mx = Mode::max (mx, v);
-//                    }
-//                }
-//
-//                Range<Type> result (Mode::min (mn),
-//                                    Mode::max (mx));
-//
-//                num &= (Mode::numParallel - 1);
-//                src += Mode::numParallel;
-//
-//                for (auto i = (decltype (num)) 0; i < num; ++i)
-//                    result = result.getUnionWith (src[i]);
-//
-//                return result;
-//            }
-//
-//            return Range<Type>::findMinAndMax (src, num);
-//        }
+        //        template <typename Size>
+        //        static Range<Type> findMinAndMax (const Type* src, Size num) noexcept
+        //        {
+        //            auto numLongOps = num / Mode::numParallel;
+        //
+        //            if (numLongOps > 1)
+        //            {
+        //                ParallelType mn, mx;
+        //
+        //               #if ! JUCE_USE_ARM_NEON
+        //                if (isAligned (src))
+        //                {
+        //                    mn = Mode::loadA (src);
+        //                    mx = mn;
+        //
+        //                    while (--numLongOps > 0)
+        //                    {
+        //                        src += Mode::numParallel;
+        //                        const ParallelType v = Mode::loadA (src);
+        //                        mn = Mode::min (mn, v);
+        //                        mx = Mode::max (mx, v);
+        //                    }
+        //                }
+        //                else
+        //               #endif
+        //                {
+        //                    mn = Mode::loadU (src);
+        //                    mx = mn;
+        //
+        //                    while (--numLongOps > 0)
+        //                    {
+        //                        src += Mode::numParallel;
+        //                        const ParallelType v = Mode::loadU (src);
+        //                        mn = Mode::min (mn, v);
+        //                        mx = Mode::max (mx, v);
+        //                    }
+        //                }
+        //
+        //                Range<Type> result (Mode::min (mn),
+        //                                    Mode::max (mx));
+        //
+        //                num &= (Mode::numParallel - 1);
+        //                src += Mode::numParallel;
+        //
+        //                for (auto i = (decltype (num)) 0; i < num; ++i)
+        //                    result = result.getUnionWith (src[i]);
+        //
+        //                return result;
+        //            }
+        //
+        //            return Range<Type>::findMinAndMax (src, num);
+        //        }
     };
-   #endif
+#endif
 
-//==============================================================================
-namespace
-{
-    template <typename Size>
-    void clear (float* dest, Size num) noexcept
+    //==============================================================================
+    namespace
     {
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vclr (dest, 1, (vDSP_Length) num);
-       #else
-        zeromem (dest, (size_t) num * sizeof (float));
-       #endif
-    }
+        template <typename Size>
+        void clear (float* dest, Size num) noexcept
+        {
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vclr (dest, 1, (vDSP_Length) num);
+#else
+            zeromem (dest, (size_t) num * sizeof (float));
+#endif
+        }
 
-    template <typename Size>
-    void clear (double* dest, Size num) noexcept
-    {
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vclrD (dest, 1, (vDSP_Length) num);
-       #else
-        zeromem (dest, (size_t) num * sizeof (double));
-       #endif
-    }
+        template <typename Size>
+        void clear (double* dest, Size num) noexcept
+        {
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vclrD (dest, 1, (vDSP_Length) num);
+#else
+            zeromem (dest, (size_t) num * sizeof (double));
+#endif
+        }
 
-    template <typename Size>
-    void fill (float* dest, float valueToFill, Size num) noexcept
-    {
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vfill (&valueToFill, dest, 1, (vDSP_Length) num);
-       #else
-        JUCE_PERFORM_VEC_OP_DEST (dest[i] = valueToFill,
-                                  val,
-                                  JUCE_LOAD_NONE,
-                                  const Mode::ParallelType val = Mode::load1 (valueToFill);)
-       #endif
-    }
-
-    template <typename Size>
-    void fill (double* dest, double valueToFill, Size num) noexcept
-    {
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vfillD (&valueToFill, dest, 1, (vDSP_Length) num);
-       #else
-        JUCE_PERFORM_VEC_OP_DEST (dest[i] = valueToFill,
-                                  val,
-                                  JUCE_LOAD_NONE,
-                                  const Mode::ParallelType val = Mode::load1 (valueToFill);)
-       #endif
-    }
-
-    template <typename Size>
-    void copyWithMultiply (float* dest, const float* src, float multiplier, Size num) noexcept
-    {
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vsmul (src, 1, &multiplier, dest, 1, (vDSP_Length) num);
-       #else
-        JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = src[i] * multiplier,
-                                      Mode::mul (mult, s),
-                                      JUCE_LOAD_SRC,
-                                      JUCE_INCREMENT_SRC_DEST,
-                                      const Mode::ParallelType mult = Mode::load1 (multiplier);)
-       #endif
-    }
-
-    template <typename Size>
-    void copyWithMultiply (double* dest, const double* src, double multiplier, Size num) noexcept
-    {
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vsmulD (src, 1, &multiplier, dest, 1, (vDSP_Length) num);
-       #else
-        JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = src[i] * multiplier,
-                                      Mode::mul (mult, s),
-                                      JUCE_LOAD_SRC,
-                                      JUCE_INCREMENT_SRC_DEST,
-                                      const Mode::ParallelType mult = Mode::load1 (multiplier);)
-       #endif
-    }
-
-    template <typename Size>
-    void add (float* dest, float amount, Size num) noexcept
-    {
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vsadd (dest, 1, &amount, dest, 1, (vDSP_Length) num);
-       #else
-        JUCE_PERFORM_VEC_OP_DEST (dest[i] += amount,
-                                  Mode::add (d, amountToAdd),
-                                  JUCE_LOAD_DEST,
-                                  const Mode::ParallelType amountToAdd = Mode::load1 (amount);)
-       #endif
-    }
-
-    template <typename Size>
-    void add (double* dest, double amount, Size num) noexcept
-    {
-        JUCE_PERFORM_VEC_OP_DEST (dest[i] += amount,
-                                  Mode::add (d, amountToAdd),
-                                  JUCE_LOAD_DEST,
-                                  const Mode::ParallelType amountToAdd = Mode::load1 (amount);)
-    }
-
-    template <typename Size>
-    void add (float* dest, const float* src, float amount, Size num) noexcept
-    {
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vsadd (src, 1, &amount, dest, 1, (vDSP_Length) num);
-       #else
-        JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = src[i] + amount,
-                                      Mode::add (am, s),
-                                      JUCE_LOAD_SRC,
-                                      JUCE_INCREMENT_SRC_DEST,
-                                      const Mode::ParallelType am = Mode::load1 (amount);)
-       #endif
-    }
-
-    template <typename Size>
-    void add (double* dest, const double* src, double amount, Size num) noexcept
-    {
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vsaddD (src, 1, &amount, dest, 1, (vDSP_Length) num);
-       #else
-        JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = src[i] + amount,
-                                      Mode::add (am, s),
-                                      JUCE_LOAD_SRC,
-                                      JUCE_INCREMENT_SRC_DEST,
-                                      const Mode::ParallelType am = Mode::load1 (amount);)
-       #endif
-    }
-
-    template <typename Size>
-    void add (float* dest, const float* src, Size num) noexcept
-    {
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vadd (src, 1, dest, 1, dest, 1, (vDSP_Length) num);
-       #else
-        JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] += src[i],
-                                      Mode::add (d, s),
-                                      JUCE_LOAD_SRC_DEST,
-                                      JUCE_INCREMENT_SRC_DEST, )
-       #endif
-    }
-
-    template <typename Size>
-    void add (double* dest, const double* src, Size num) noexcept
-    {
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vaddD (src, 1, dest, 1, dest, 1, (vDSP_Length) num);
-       #else
-        JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] += src[i],
-                                      Mode::add (d, s),
-                                      JUCE_LOAD_SRC_DEST,
-                                      JUCE_INCREMENT_SRC_DEST, )
-       #endif
-    }
-
-    template <typename Size>
-    void add (float* dest, const float* src1, const float* src2, Size num) noexcept
-    {
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vadd (src1, 1, src2, 1, dest, 1, (vDSP_Length) num);
-       #else
-        JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = src1[i] + src2[i],
-                                            Mode::add (s1, s2),
-                                            JUCE_LOAD_SRC1_SRC2,
-                                            JUCE_INCREMENT_SRC1_SRC2_DEST, )
-       #endif
-    }
-
-    template <typename Size>
-    void add (double* dest, const double* src1, const double* src2, Size num) noexcept
-    {
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vaddD (src1, 1, src2, 1, dest, 1, (vDSP_Length) num);
-       #else
-        JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = src1[i] + src2[i],
-                                            Mode::add (s1, s2),
-                                            JUCE_LOAD_SRC1_SRC2,
-                                            JUCE_INCREMENT_SRC1_SRC2_DEST, )
-       #endif
-    }
-
-    template <typename Size>
-    void subtract (float* dest, const float* src, Size num) noexcept
-    {
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vsub (src, 1, dest, 1, dest, 1, (vDSP_Length) num);
-       #else
-        JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] -= src[i],
-                                      Mode::sub (d, s),
-                                      JUCE_LOAD_SRC_DEST,
-                                      JUCE_INCREMENT_SRC_DEST, )
-       #endif
-    }
-
-    template <typename Size>
-    void subtract (double* dest, const double* src, Size num) noexcept
-    {
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vsubD (src, 1, dest, 1, dest, 1, (vDSP_Length) num);
-       #else
-        JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] -= src[i],
-                                      Mode::sub (d, s),
-                                      JUCE_LOAD_SRC_DEST,
-                                      JUCE_INCREMENT_SRC_DEST, )
-       #endif
-    }
-
-    template <typename Size>
-    void subtract (float* dest, const float* src1, const float* src2, Size num) noexcept
-    {
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vsub (src2, 1, src1, 1, dest, 1, (vDSP_Length) num);
-       #else
-        JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = src1[i] - src2[i],
-                                            Mode::sub (s1, s2),
-                                            JUCE_LOAD_SRC1_SRC2,
-                                            JUCE_INCREMENT_SRC1_SRC2_DEST, )
-       #endif
-    }
-
-    template <typename Size>
-    void subtract (double* dest, const double* src1, const double* src2, Size num) noexcept
-    {
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vsubD (src2, 1, src1, 1, dest, 1, (vDSP_Length) num);
-       #else
-        JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = src1[i] - src2[i],
-                                            Mode::sub (s1, s2),
-                                            JUCE_LOAD_SRC1_SRC2,
-                                            JUCE_INCREMENT_SRC1_SRC2_DEST, )
-       #endif
-    }
-
-    template <typename Size>
-    void addWithMultiply (float* dest, const float* src, float multiplier, Size num) noexcept
-    {
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vsma (src, 1, &multiplier, dest, 1, dest, 1, (vDSP_Length) num);
-       #else
-        JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] += src[i] * multiplier,
-                                      Mode::add (d, Mode::mul (mult, s)),
-                                      JUCE_LOAD_SRC_DEST,
-                                      JUCE_INCREMENT_SRC_DEST,
-                                      const Mode::ParallelType mult = Mode::load1 (multiplier);)
-       #endif
-    }
-
-    template <typename Size>
-    void addWithMultiply (double* dest, const double* src, double multiplier, Size num) noexcept
-    {
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vsmaD (src, 1, &multiplier, dest, 1, dest, 1, (vDSP_Length) num);
-       #else
-        JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] += src[i] * multiplier,
-                                      Mode::add (d, Mode::mul (mult, s)),
-                                      JUCE_LOAD_SRC_DEST,
-                                      JUCE_INCREMENT_SRC_DEST,
-                                      const Mode::ParallelType mult = Mode::load1 (multiplier);)
-       #endif
-    }
-
-    template <typename Size>
-    void addWithMultiply (float* dest, const float* src1, const float* src2, Size num) noexcept
-    {
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vma ((float*) src1, 1, (float*) src2, 1, dest, 1, dest, 1, (vDSP_Length) num);
-       #else
-        JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST_DEST (dest[i] += src1[i] * src2[i],
-                                                 Mode::add (d, Mode::mul (s1, s2)),
-                                                 JUCE_LOAD_SRC1_SRC2_DEST,
-                                                 JUCE_INCREMENT_SRC1_SRC2_DEST, )
-       #endif
-    }
-
-    template <typename Size>
-    void addWithMultiply (double* dest, const double* src1, const double* src2, Size num) noexcept
-    {
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vmaD ((double*) src1, 1, (double*) src2, 1, dest, 1, dest, 1, (vDSP_Length) num);
-       #else
-        JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST_DEST (dest[i] += src1[i] * src2[i],
-                                                 Mode::add (d, Mode::mul (s1, s2)),
-                                                 JUCE_LOAD_SRC1_SRC2_DEST,
-                                                 JUCE_INCREMENT_SRC1_SRC2_DEST, )
-       #endif
-    }
-
-    template <typename Size>
-    void subtractWithMultiply (float* dest, const float* src, float multiplier, Size num) noexcept
-    {
-        JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] -= src[i] * multiplier,
-                                      Mode::sub (d, Mode::mul (mult, s)),
-                                      JUCE_LOAD_SRC_DEST,
-                                      JUCE_INCREMENT_SRC_DEST,
-                                      const Mode::ParallelType mult = Mode::load1 (multiplier);)
-    }
-
-    template <typename Size>
-    void subtractWithMultiply (double* dest, const double* src, double multiplier, Size num) noexcept
-    {
-        JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] -= src[i] * multiplier,
-                                      Mode::sub (d, Mode::mul (mult, s)),
-                                      JUCE_LOAD_SRC_DEST,
-                                      JUCE_INCREMENT_SRC_DEST,
-                                      const Mode::ParallelType mult = Mode::load1 (multiplier);)
-    }
-
-    template <typename Size>
-    void subtractWithMultiply (float* dest, const float* src1, const float* src2, Size num) noexcept
-    {
-        JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST_DEST (dest[i] -= src1[i] * src2[i],
-                                                 Mode::sub (d, Mode::mul (s1, s2)),
-                                                 JUCE_LOAD_SRC1_SRC2_DEST,
-                                                 JUCE_INCREMENT_SRC1_SRC2_DEST, )
-    }
-
-    template <typename Size>
-    void subtractWithMultiply (double* dest, const double* src1, const double* src2, Size num) noexcept
-    {
-        JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST_DEST (dest[i] -= src1[i] * src2[i],
-                                                 Mode::sub (d, Mode::mul (s1, s2)),
-                                                 JUCE_LOAD_SRC1_SRC2_DEST,
-                                                 JUCE_INCREMENT_SRC1_SRC2_DEST, )
-    }
-
-    template <typename Size>
-    void multiply (float* dest, const float* src, Size num) noexcept
-    {
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vmul (src, 1, dest, 1, dest, 1, (vDSP_Length) num);
-       #else
-        JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] *= src[i],
-                                      Mode::mul (d, s),
-                                      JUCE_LOAD_SRC_DEST,
-                                      JUCE_INCREMENT_SRC_DEST, )
-       #endif
-    }
-
-    template <typename Size>
-    void multiply (double* dest, const double* src, Size num) noexcept
-    {
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vmulD (src, 1, dest, 1, dest, 1, (vDSP_Length) num);
-       #else
-        JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] *= src[i],
-                                      Mode::mul (d, s),
-                                      JUCE_LOAD_SRC_DEST,
-                                      JUCE_INCREMENT_SRC_DEST, )
-       #endif
-    }
-
-    template <typename Size>
-    void multiply (float* dest, const float* src1, const float* src2, Size num) noexcept
-    {
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vmul (src1, 1, src2, 1, dest, 1, (vDSP_Length) num);
-       #else
-        JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = src1[i] * src2[i],
-                                            Mode::mul (s1, s2),
-                                            JUCE_LOAD_SRC1_SRC2,
-                                            JUCE_INCREMENT_SRC1_SRC2_DEST, )
-       #endif
-    }
-
-    template <typename Size>
-    void multiply (double* dest, const double* src1, const double* src2, Size num) noexcept
-    {
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vmulD (src1, 1, src2, 1, dest, 1, (vDSP_Length) num);
-       #else
-        JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = src1[i] * src2[i],
-                                            Mode::mul (s1, s2),
-                                            JUCE_LOAD_SRC1_SRC2,
-                                            JUCE_INCREMENT_SRC1_SRC2_DEST, )
-       #endif
-    }
-
-    template <typename Size>
-    void multiply (float* dest, float multiplier, Size num) noexcept
-    {
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vsmul (dest, 1, &multiplier, dest, 1, (vDSP_Length) num);
-       #else
-        JUCE_PERFORM_VEC_OP_DEST (dest[i] *= multiplier,
-                                  Mode::mul (d, mult),
-                                  JUCE_LOAD_DEST,
-                                  const Mode::ParallelType mult = Mode::load1 (multiplier);)
-       #endif
-    }
-
-    template <typename Size>
-    void multiply (double* dest, double multiplier, Size num) noexcept
-    {
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vsmulD (dest, 1, &multiplier, dest, 1, (vDSP_Length) num);
-       #else
-        JUCE_PERFORM_VEC_OP_DEST (dest[i] *= multiplier,
-                                  Mode::mul (d, mult),
-                                  JUCE_LOAD_DEST,
-                                  const Mode::ParallelType mult = Mode::load1 (multiplier);)
-       #endif
-    }
-
-    template <typename Size>
-    void multiply (float* dest, const float* src, float multiplier, Size num) noexcept
-    {
-        JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = src[i] * multiplier,
-                                      Mode::mul (mult, s),
-                                      JUCE_LOAD_SRC,
-                                      JUCE_INCREMENT_SRC_DEST,
-                                      const Mode::ParallelType mult = Mode::load1 (multiplier);)
-    }
-
-    template <typename Size>
-    void multiply (double* dest, const double* src, double multiplier, Size num) noexcept
-    {
-        JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = src[i] * multiplier,
-                                      Mode::mul (mult, s),
-                                      JUCE_LOAD_SRC,
-                                      JUCE_INCREMENT_SRC_DEST,
-                                      const Mode::ParallelType mult = Mode::load1 (multiplier);)
-    }
-
-    template <typename Size>
-    void negate (float* dest, const float* src, Size num) noexcept
-    {
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vneg ((float*) src, 1, dest, 1, (vDSP_Length) num);
-       #else
-        copyWithMultiply (dest, src, -1.0f, num);
-       #endif
-    }
-
-    template <typename Size>
-    void negate (double* dest, const double* src, Size num) noexcept
-    {
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vnegD ((double*) src, 1, dest, 1, (vDSP_Length) num);
-       #else
-        copyWithMultiply (dest, src, -1.0f, num);
-       #endif
-    }
-
-    template <typename Size>
-    void abs (float* dest, const float* src, Size num) noexcept
-    {
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vabs ((float*) src, 1, dest, 1, (vDSP_Length) num);
-       #else
-        FloatVectorHelpers::signMask32 signMask;
-        signMask.i = 0x7fffffffUL;
-        JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = std::abs (src[i]),
-                                      Mode::bit_and (s, mask),
-                                      JUCE_LOAD_SRC,
-                                      JUCE_INCREMENT_SRC_DEST,
-                                      const Mode::ParallelType mask = Mode::load1 (signMask.f);)
-
-        ignoreUnused (signMask);
-       #endif
-    }
-
-    template <typename Size>
-    void abs (double* dest, const double* src, Size num) noexcept
-    {
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vabsD ((double*) src, 1, dest, 1, (vDSP_Length) num);
-       #else
-        FloatVectorHelpers::signMask64 signMask;
-        signMask.i = 0x7fffffffffffffffULL;
-
-        JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = std::abs (src[i]),
-                                      Mode::bit_and (s, mask),
-                                      JUCE_LOAD_SRC,
-                                      JUCE_INCREMENT_SRC_DEST,
-                                      const Mode::ParallelType mask = Mode::load1 (signMask.d);)
-
-        ignoreUnused (signMask);
-       #endif
-    }
-
-    template <typename Size>
-    void min (float* dest, const float* src, float comp, Size num) noexcept
-    {
-        JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = jmin (src[i], comp),
-                                      Mode::min (s, cmp),
-                                      JUCE_LOAD_SRC,
-                                      JUCE_INCREMENT_SRC_DEST,
-                                      const Mode::ParallelType cmp = Mode::load1 (comp);)
-    }
-
-    template <typename Size>
-    void min (double* dest, const double* src, double comp, Size num) noexcept
-    {
-        JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = jmin (src[i], comp),
-                                      Mode::min (s, cmp),
-                                      JUCE_LOAD_SRC,
-                                      JUCE_INCREMENT_SRC_DEST,
-                                      const Mode::ParallelType cmp = Mode::load1 (comp);)
-    }
-
-    template <typename Size>
-    void min (float* dest, const float* src1, const float* src2, Size num) noexcept
-    {
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vmin ((float*) src1, 1, (float*) src2, 1, dest, 1, (vDSP_Length) num);
-       #else
-        JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = jmin (src1[i], src2[i]),
-                                            Mode::min (s1, s2),
-                                            JUCE_LOAD_SRC1_SRC2,
-                                            JUCE_INCREMENT_SRC1_SRC2_DEST, )
-       #endif
-    }
-
-    template <typename Size>
-    void min (double* dest, const double* src1, const double* src2, Size num) noexcept
-    {
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vminD ((double*) src1, 1, (double*) src2, 1, dest, 1, (vDSP_Length) num);
-       #else
-        JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = jmin (src1[i], src2[i]),
-                                            Mode::min (s1, s2),
-                                            JUCE_LOAD_SRC1_SRC2,
-                                            JUCE_INCREMENT_SRC1_SRC2_DEST, )
-       #endif
-    }
-
-    template <typename Size>
-    void max (float* dest, const float* src, float comp, Size num) noexcept
-    {
-        JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = jmax (src[i], comp),
-                                      Mode::max (s, cmp),
-                                      JUCE_LOAD_SRC,
-                                      JUCE_INCREMENT_SRC_DEST,
-                                      const Mode::ParallelType cmp = Mode::load1 (comp);)
-    }
-
-    template <typename Size>
-    void max (double* dest, const double* src, double comp, Size num) noexcept
-    {
-        JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = jmax (src[i], comp),
-                                      Mode::max (s, cmp),
-                                      JUCE_LOAD_SRC,
-                                      JUCE_INCREMENT_SRC_DEST,
-                                      const Mode::ParallelType cmp = Mode::load1 (comp);)
-    }
-
-    template <typename Size>
-    void max (float* dest, const float* src1, const float* src2, Size num) noexcept
-    {
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vmax ((float*) src1, 1, (float*) src2, 1, dest, 1, (vDSP_Length) num);
-       #else
-        JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = jmax (src1[i], src2[i]),
-                                            Mode::max (s1, s2),
-                                            JUCE_LOAD_SRC1_SRC2,
-                                            JUCE_INCREMENT_SRC1_SRC2_DEST, )
-       #endif
-    }
-
-    template <typename Size>
-    void max (double* dest, const double* src1, const double* src2, Size num) noexcept
-    {
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vmaxD ((double*) src1, 1, (double*) src2, 1, dest, 1, (vDSP_Length) num);
-       #else
-        JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = jmax (src1[i], src2[i]),
-                                            Mode::max (s1, s2),
-                                            JUCE_LOAD_SRC1_SRC2,
-                                            JUCE_INCREMENT_SRC1_SRC2_DEST, )
-       #endif
-    }
-
-    template <typename Size>
-    void clip (float* dest, const float* src, float low, float high, Size num) noexcept
-    {
-        jassert (high >= low);
-
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vclip ((float*) src, 1, &low, &high, dest, 1, (vDSP_Length) num);
-       #else
-        JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = jmax (jmin (src[i], high), low),
-                                      Mode::max (Mode::min (s, hi), lo),
-                                      JUCE_LOAD_SRC,
-                                      JUCE_INCREMENT_SRC_DEST,
-                                      const Mode::ParallelType lo = Mode::load1 (low);
-                                      const Mode::ParallelType hi = Mode::load1 (high);)
-       #endif
-    }
-
-    template <typename Size>
-    void clip (double* dest, const double* src, double low, double high, Size num) noexcept
-    {
-        jassert (high >= low);
-
-       #if JUCE_USE_VDSP_FRAMEWORK
-        vDSP_vclipD ((double*) src, 1, &low, &high, dest, 1, (vDSP_Length) num);
-       #else
-        JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = jmax (jmin (src[i], high), low),
-                                      Mode::max (Mode::min (s, hi), lo),
-                                      JUCE_LOAD_SRC,
-                                      JUCE_INCREMENT_SRC_DEST,
-                                      const Mode::ParallelType lo = Mode::load1 (low);
-                                      const Mode::ParallelType hi = Mode::load1 (high);)
-       #endif
-    }
-
-//    template <typename Size>
-//    Range<float> findMinAndMax (const float* src, Size num) noexcept
-//    {
-//       #if JUCE_USE_SSE_INTRINSICS || JUCE_USE_ARM_NEON
-//        return FloatVectorHelpers::MinMax<FloatVectorHelpers::BasicOps32>::findMinAndMax (src, num);
-//       #else
-//        return Range<float>::findMinAndMax (src, num);
-//       #endif
-//    }
-//
-//    template <typename Size>
-//    Range<double> findMinAndMax (const double* src, Size num) noexcept
-//    {
-//       #if JUCE_USE_SSE_INTRINSICS || JUCE_USE_ARM_NEON
-//        return FloatVectorHelpers::MinMax<FloatVectorHelpers::BasicOps64>::findMinAndMax (src, num);
-//       #else
-//        return Range<double>::findMinAndMax (src, num);
-//       #endif
-//    }
-
-    template <typename Size>
-    float findMinimum (const float* src, Size num) noexcept
-    {
-       #if JUCE_USE_SSE_INTRINSICS || JUCE_USE_ARM_NEON
-        return FloatVectorHelpers::MinMax<FloatVectorHelpers::BasicOps32>::findMinOrMax (src, num, true);
-       #else
-        return juce::findMinimum (src, num);
-       #endif
-    }
-
-    template <typename Size>
-    double findMinimum (const double* src, Size num) noexcept
-    {
-       #if JUCE_USE_SSE_INTRINSICS || JUCE_USE_ARM_NEON
-        return FloatVectorHelpers::MinMax<FloatVectorHelpers::BasicOps64>::findMinOrMax (src, num, true);
-       #else
-        return juce::findMinimum (src, num);
-       #endif
-    }
-
-    template <typename Size>
-    float findMaximum (const float* src, Size num) noexcept
-    {
-       #if JUCE_USE_SSE_INTRINSICS || JUCE_USE_ARM_NEON
-        return FloatVectorHelpers::MinMax<FloatVectorHelpers::BasicOps32>::findMinOrMax (src, num, false);
-       #else
-        return juce::findMaximum (src, num);
-       #endif
-    }
-
-    template <typename Size>
-    double findMaximum (const double* src, Size num) noexcept
-    {
-       #if JUCE_USE_SSE_INTRINSICS || JUCE_USE_ARM_NEON
-        return FloatVectorHelpers::MinMax<FloatVectorHelpers::BasicOps64>::findMinOrMax (src, num, false);
-       #else
-        return juce::findMaximum (src, num);
-       #endif
-    }
-
-    template <typename Size>
-    void convertFixedToFloat (float* dest, const int* src, float multiplier, Size num) noexcept
-    {
-       #if JUCE_USE_ARM_NEON
-        JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = (float) src[i] * multiplier,
-                                  vmulq_n_f32 (vcvtq_f32_s32 (vld1q_s32 (src)), multiplier),
-                                  JUCE_LOAD_NONE,
-                                  JUCE_INCREMENT_SRC_DEST, )
-       #else
-        JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = (float) src[i] * multiplier,
-                                      Mode::mul (mult, _mm_cvtepi32_ps (_mm_loadu_si128 (reinterpret_cast<const __m128i*> (src)))),
+        template <typename Size>
+        void fill (float* dest, float valueToFill, Size num) noexcept
+        {
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vfill (&valueToFill, dest, 1, (vDSP_Length) num);
+#else
+            JUCE_PERFORM_VEC_OP_DEST (dest[i] = valueToFill,
+                                      val,
                                       JUCE_LOAD_NONE,
-                                      JUCE_INCREMENT_SRC_DEST,
-                                      const Mode::ParallelType mult = Mode::load1 (multiplier);)
-       #endif
-    }
+                                      const Mode::ParallelType val = Mode::load1 (valueToFill);)
+#endif
+        }
 
-} // namespace
+        template <typename Size>
+        void fill (double* dest, double valueToFill, Size num) noexcept
+        {
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vfillD (&valueToFill, dest, 1, (vDSP_Length) num);
+#else
+            JUCE_PERFORM_VEC_OP_DEST (dest[i] = valueToFill,
+                                      val,
+                                      JUCE_LOAD_NONE,
+                                      const Mode::ParallelType val = Mode::load1 (valueToFill);)
+#endif
+        }
+
+        template <typename Size>
+        void copyWithMultiply (float* dest, const float* src, float multiplier, Size num) noexcept
+        {
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vsmul (src, 1, &multiplier, dest, 1, (vDSP_Length) num);
+#else
+            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = src[i] * multiplier,
+                                          Mode::mul (mult, s),
+                                          JUCE_LOAD_SRC,
+                                          JUCE_INCREMENT_SRC_DEST,
+                                          const Mode::ParallelType mult = Mode::load1 (multiplier);)
+#endif
+        }
+
+        template <typename Size>
+        void copyWithMultiply (double* dest, const double* src, double multiplier, Size num) noexcept
+        {
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vsmulD (src, 1, &multiplier, dest, 1, (vDSP_Length) num);
+#else
+            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = src[i] * multiplier,
+                                          Mode::mul (mult, s),
+                                          JUCE_LOAD_SRC,
+                                          JUCE_INCREMENT_SRC_DEST,
+                                          const Mode::ParallelType mult = Mode::load1 (multiplier);)
+#endif
+        }
+
+        template <typename Size>
+        void add (float* dest, float amount, Size num) noexcept
+        {
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vsadd (dest, 1, &amount, dest, 1, (vDSP_Length) num);
+#else
+            JUCE_PERFORM_VEC_OP_DEST (dest[i] += amount,
+                                      Mode::add (d, amountToAdd),
+                                      JUCE_LOAD_DEST,
+                                      const Mode::ParallelType amountToAdd = Mode::load1 (amount);)
+#endif
+        }
+
+        template <typename Size>
+        void add (double* dest, double amount, Size num) noexcept
+        {
+            JUCE_PERFORM_VEC_OP_DEST (dest[i] += amount,
+                                      Mode::add (d, amountToAdd),
+                                      JUCE_LOAD_DEST,
+                                      const Mode::ParallelType amountToAdd = Mode::load1 (amount);)
+        }
+
+        template <typename Size>
+        void add (float* dest, const float* src, float amount, Size num) noexcept
+        {
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vsadd (src, 1, &amount, dest, 1, (vDSP_Length) num);
+#else
+            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = src[i] + amount,
+                                          Mode::add (am, s),
+                                          JUCE_LOAD_SRC,
+                                          JUCE_INCREMENT_SRC_DEST,
+                                          const Mode::ParallelType am = Mode::load1 (amount);)
+#endif
+        }
+
+        template <typename Size>
+        void add (double* dest, const double* src, double amount, Size num) noexcept
+        {
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vsaddD (src, 1, &amount, dest, 1, (vDSP_Length) num);
+#else
+            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = src[i] + amount,
+                                          Mode::add (am, s),
+                                          JUCE_LOAD_SRC,
+                                          JUCE_INCREMENT_SRC_DEST,
+                                          const Mode::ParallelType am = Mode::load1 (amount);)
+#endif
+        }
+
+        template <typename Size>
+        void add (float* dest, const float* src, Size num) noexcept
+        {
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vadd (src, 1, dest, 1, dest, 1, (vDSP_Length) num);
+#else
+            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] += src[i],
+                                          Mode::add (d, s),
+                                          JUCE_LOAD_SRC_DEST,
+                                          JUCE_INCREMENT_SRC_DEST, )
+#endif
+        }
+
+        template <typename Size>
+        void add (double* dest, const double* src, Size num) noexcept
+        {
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vaddD (src, 1, dest, 1, dest, 1, (vDSP_Length) num);
+#else
+            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] += src[i],
+                                          Mode::add (d, s),
+                                          JUCE_LOAD_SRC_DEST,
+                                          JUCE_INCREMENT_SRC_DEST, )
+#endif
+        }
+
+        template <typename Size>
+        void add (float* dest, const float* src1, const float* src2, Size num) noexcept
+        {
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vadd (src1, 1, src2, 1, dest, 1, (vDSP_Length) num);
+#else
+            JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = src1[i] + src2[i],
+                                                Mode::add (s1, s2),
+                                                JUCE_LOAD_SRC1_SRC2,
+                                                JUCE_INCREMENT_SRC1_SRC2_DEST, )
+#endif
+        }
+
+        template <typename Size>
+        void add (double* dest, const double* src1, const double* src2, Size num) noexcept
+        {
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vaddD (src1, 1, src2, 1, dest, 1, (vDSP_Length) num);
+#else
+            JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = src1[i] + src2[i],
+                                                Mode::add (s1, s2),
+                                                JUCE_LOAD_SRC1_SRC2,
+                                                JUCE_INCREMENT_SRC1_SRC2_DEST, )
+#endif
+        }
+
+        template <typename Size>
+        void subtract (float* dest, const float* src, Size num) noexcept
+        {
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vsub (src, 1, dest, 1, dest, 1, (vDSP_Length) num);
+#else
+            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] -= src[i],
+                                          Mode::sub (d, s),
+                                          JUCE_LOAD_SRC_DEST,
+                                          JUCE_INCREMENT_SRC_DEST, )
+#endif
+        }
+
+        template <typename Size>
+        void subtract (double* dest, const double* src, Size num) noexcept
+        {
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vsubD (src, 1, dest, 1, dest, 1, (vDSP_Length) num);
+#else
+            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] -= src[i],
+                                          Mode::sub (d, s),
+                                          JUCE_LOAD_SRC_DEST,
+                                          JUCE_INCREMENT_SRC_DEST, )
+#endif
+        }
+
+        template <typename Size>
+        void subtract (float* dest, const float* src1, const float* src2, Size num) noexcept
+        {
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vsub (src2, 1, src1, 1, dest, 1, (vDSP_Length) num);
+#else
+            JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = src1[i] - src2[i],
+                                                Mode::sub (s1, s2),
+                                                JUCE_LOAD_SRC1_SRC2,
+                                                JUCE_INCREMENT_SRC1_SRC2_DEST, )
+#endif
+        }
+
+        template <typename Size>
+        void subtract (double* dest, const double* src1, const double* src2, Size num) noexcept
+        {
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vsubD (src2, 1, src1, 1, dest, 1, (vDSP_Length) num);
+#else
+            JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = src1[i] - src2[i],
+                                                Mode::sub (s1, s2),
+                                                JUCE_LOAD_SRC1_SRC2,
+                                                JUCE_INCREMENT_SRC1_SRC2_DEST, )
+#endif
+        }
+
+        template <typename Size>
+        void addWithMultiply (float* dest, const float* src, float multiplier, Size num) noexcept
+        {
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vsma (src, 1, &multiplier, dest, 1, dest, 1, (vDSP_Length) num);
+#else
+            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] += src[i] * multiplier,
+                                          Mode::add (d, Mode::mul (mult, s)),
+                                          JUCE_LOAD_SRC_DEST,
+                                          JUCE_INCREMENT_SRC_DEST,
+                                          const Mode::ParallelType mult = Mode::load1 (multiplier);)
+#endif
+        }
+
+        template <typename Size>
+        void addWithMultiply (double* dest, const double* src, double multiplier, Size num) noexcept
+        {
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vsmaD (src, 1, &multiplier, dest, 1, dest, 1, (vDSP_Length) num);
+#else
+            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] += src[i] * multiplier,
+                                          Mode::add (d, Mode::mul (mult, s)),
+                                          JUCE_LOAD_SRC_DEST,
+                                          JUCE_INCREMENT_SRC_DEST,
+                                          const Mode::ParallelType mult = Mode::load1 (multiplier);)
+#endif
+        }
+
+        template <typename Size>
+        void addWithMultiply (float* dest, const float* src1, const float* src2, Size num) noexcept
+        {
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vma ((float*) src1, 1, (float*) src2, 1, dest, 1, dest, 1, (vDSP_Length) num);
+#else
+            JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST_DEST (dest[i] += src1[i] * src2[i],
+                                                     Mode::add (d, Mode::mul (s1, s2)),
+                                                     JUCE_LOAD_SRC1_SRC2_DEST,
+                                                     JUCE_INCREMENT_SRC1_SRC2_DEST, )
+#endif
+        }
+
+        template <typename Size>
+        void addWithMultiply (double* dest, const double* src1, const double* src2, Size num) noexcept
+        {
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vmaD ((double*) src1, 1, (double*) src2, 1, dest, 1, dest, 1, (vDSP_Length) num);
+#else
+            JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST_DEST (dest[i] += src1[i] * src2[i],
+                                                     Mode::add (d, Mode::mul (s1, s2)),
+                                                     JUCE_LOAD_SRC1_SRC2_DEST,
+                                                     JUCE_INCREMENT_SRC1_SRC2_DEST, )
+#endif
+        }
+
+        template <typename Size>
+        void subtractWithMultiply (float* dest, const float* src, float multiplier, Size num) noexcept
+        {
+            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] -= src[i] * multiplier,
+                                          Mode::sub (d, Mode::mul (mult, s)),
+                                          JUCE_LOAD_SRC_DEST,
+                                          JUCE_INCREMENT_SRC_DEST,
+                                          const Mode::ParallelType mult = Mode::load1 (multiplier);)
+        }
+
+        template <typename Size>
+        void subtractWithMultiply (double* dest, const double* src, double multiplier, Size num) noexcept
+        {
+            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] -= src[i] * multiplier,
+                                          Mode::sub (d, Mode::mul (mult, s)),
+                                          JUCE_LOAD_SRC_DEST,
+                                          JUCE_INCREMENT_SRC_DEST,
+                                          const Mode::ParallelType mult = Mode::load1 (multiplier);)
+        }
+
+        template <typename Size>
+        void subtractWithMultiply (float* dest, const float* src1, const float* src2, Size num) noexcept
+        {
+            JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST_DEST (dest[i] -= src1[i] * src2[i],
+                                                     Mode::sub (d, Mode::mul (s1, s2)),
+                                                     JUCE_LOAD_SRC1_SRC2_DEST,
+                                                     JUCE_INCREMENT_SRC1_SRC2_DEST, )
+        }
+
+        template <typename Size>
+        void subtractWithMultiply (double* dest, const double* src1, const double* src2, Size num) noexcept
+        {
+            JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST_DEST (dest[i] -= src1[i] * src2[i],
+                                                     Mode::sub (d, Mode::mul (s1, s2)),
+                                                     JUCE_LOAD_SRC1_SRC2_DEST,
+                                                     JUCE_INCREMENT_SRC1_SRC2_DEST, )
+        }
+
+        template <typename Size>
+        void multiply (float* dest, const float* src, Size num) noexcept
+        {
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vmul (src, 1, dest, 1, dest, 1, (vDSP_Length) num);
+#else
+            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] *= src[i],
+                                          Mode::mul (d, s),
+                                          JUCE_LOAD_SRC_DEST,
+                                          JUCE_INCREMENT_SRC_DEST, )
+#endif
+        }
+
+        template <typename Size>
+        void multiply (double* dest, const double* src, Size num) noexcept
+        {
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vmulD (src, 1, dest, 1, dest, 1, (vDSP_Length) num);
+#else
+            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] *= src[i],
+                                          Mode::mul (d, s),
+                                          JUCE_LOAD_SRC_DEST,
+                                          JUCE_INCREMENT_SRC_DEST, )
+#endif
+        }
+
+        template <typename Size>
+        void multiply (float* dest, const float* src1, const float* src2, Size num) noexcept
+        {
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vmul (src1, 1, src2, 1, dest, 1, (vDSP_Length) num);
+#else
+            JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = src1[i] * src2[i],
+                                                Mode::mul (s1, s2),
+                                                JUCE_LOAD_SRC1_SRC2,
+                                                JUCE_INCREMENT_SRC1_SRC2_DEST, )
+#endif
+        }
+
+        template <typename Size>
+        void multiply (double* dest, const double* src1, const double* src2, Size num) noexcept
+        {
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vmulD (src1, 1, src2, 1, dest, 1, (vDSP_Length) num);
+#else
+            JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = src1[i] * src2[i],
+                                                Mode::mul (s1, s2),
+                                                JUCE_LOAD_SRC1_SRC2,
+                                                JUCE_INCREMENT_SRC1_SRC2_DEST, )
+#endif
+        }
+
+        template <typename Size>
+        void multiply (float* dest, float multiplier, Size num) noexcept
+        {
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vsmul (dest, 1, &multiplier, dest, 1, (vDSP_Length) num);
+#else
+            JUCE_PERFORM_VEC_OP_DEST (dest[i] *= multiplier,
+                                      Mode::mul (d, mult),
+                                      JUCE_LOAD_DEST,
+                                      const Mode::ParallelType mult = Mode::load1 (multiplier);)
+#endif
+        }
+
+        template <typename Size>
+        void multiply (double* dest, double multiplier, Size num) noexcept
+        {
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vsmulD (dest, 1, &multiplier, dest, 1, (vDSP_Length) num);
+#else
+            JUCE_PERFORM_VEC_OP_DEST (dest[i] *= multiplier,
+                                      Mode::mul (d, mult),
+                                      JUCE_LOAD_DEST,
+                                      const Mode::ParallelType mult = Mode::load1 (multiplier);)
+#endif
+        }
+
+        template <typename Size>
+        void multiply (float* dest, const float* src, float multiplier, Size num) noexcept
+        {
+            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = src[i] * multiplier,
+                                          Mode::mul (mult, s),
+                                          JUCE_LOAD_SRC,
+                                          JUCE_INCREMENT_SRC_DEST,
+                                          const Mode::ParallelType mult = Mode::load1 (multiplier);)
+        }
+
+        template <typename Size>
+        void multiply (double* dest, const double* src, double multiplier, Size num) noexcept
+        {
+            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = src[i] * multiplier,
+                                          Mode::mul (mult, s),
+                                          JUCE_LOAD_SRC,
+                                          JUCE_INCREMENT_SRC_DEST,
+                                          const Mode::ParallelType mult = Mode::load1 (multiplier);)
+        }
+
+        template <typename Size>
+        void negate (float* dest, const float* src, Size num) noexcept
+        {
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vneg ((float*) src, 1, dest, 1, (vDSP_Length) num);
+#else
+            copyWithMultiply (dest, src, -1.0f, num);
+#endif
+        }
+
+        template <typename Size>
+        void negate (double* dest, const double* src, Size num) noexcept
+        {
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vnegD ((double*) src, 1, dest, 1, (vDSP_Length) num);
+#else
+            copyWithMultiply (dest, src, -1.0f, num);
+#endif
+        }
+
+        template <typename Size>
+        void abs (float* dest, const float* src, Size num) noexcept
+        {
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vabs ((float*) src, 1, dest, 1, (vDSP_Length) num);
+#else
+            FloatVectorHelpers::signMask32 signMask;
+            signMask.i = 0x7fffffffUL;
+            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = std::abs (src[i]),
+                                          Mode::bit_and (s, mask),
+                                          JUCE_LOAD_SRC,
+                                          JUCE_INCREMENT_SRC_DEST,
+                                          const Mode::ParallelType mask = Mode::load1 (signMask.f);)
+
+            ignoreUnused (signMask);
+#endif
+        }
+
+        template <typename Size>
+        void abs (double* dest, const double* src, Size num) noexcept
+        {
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vabsD ((double*) src, 1, dest, 1, (vDSP_Length) num);
+#else
+            FloatVectorHelpers::signMask64 signMask;
+            signMask.i = 0x7fffffffffffffffULL;
+
+            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = std::abs (src[i]),
+                                          Mode::bit_and (s, mask),
+                                          JUCE_LOAD_SRC,
+                                          JUCE_INCREMENT_SRC_DEST,
+                                          const Mode::ParallelType mask = Mode::load1 (signMask.d);)
+
+            ignoreUnused (signMask);
+#endif
+        }
+
+        template <typename Size>
+        void min (float* dest, const float* src, float comp, Size num) noexcept
+        {
+            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = jmin (src[i], comp),
+                                          Mode::min (s, cmp),
+                                          JUCE_LOAD_SRC,
+                                          JUCE_INCREMENT_SRC_DEST,
+                                          const Mode::ParallelType cmp = Mode::load1 (comp);)
+        }
+
+        template <typename Size>
+        void min (double* dest, const double* src, double comp, Size num) noexcept
+        {
+            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = jmin (src[i], comp),
+                                          Mode::min (s, cmp),
+                                          JUCE_LOAD_SRC,
+                                          JUCE_INCREMENT_SRC_DEST,
+                                          const Mode::ParallelType cmp = Mode::load1 (comp);)
+        }
+
+        template <typename Size>
+        void min (float* dest, const float* src1, const float* src2, Size num) noexcept
+        {
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vmin ((float*) src1, 1, (float*) src2, 1, dest, 1, (vDSP_Length) num);
+#else
+            JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = jmin (src1[i], src2[i]),
+                                                Mode::min (s1, s2),
+                                                JUCE_LOAD_SRC1_SRC2,
+                                                JUCE_INCREMENT_SRC1_SRC2_DEST, )
+#endif
+        }
+
+        template <typename Size>
+        void min (double* dest, const double* src1, const double* src2, Size num) noexcept
+        {
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vminD ((double*) src1, 1, (double*) src2, 1, dest, 1, (vDSP_Length) num);
+#else
+            JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = jmin (src1[i], src2[i]),
+                                                Mode::min (s1, s2),
+                                                JUCE_LOAD_SRC1_SRC2,
+                                                JUCE_INCREMENT_SRC1_SRC2_DEST, )
+#endif
+        }
+
+        template <typename Size>
+        void max (float* dest, const float* src, float comp, Size num) noexcept
+        {
+            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = jmax (src[i], comp),
+                                          Mode::max (s, cmp),
+                                          JUCE_LOAD_SRC,
+                                          JUCE_INCREMENT_SRC_DEST,
+                                          const Mode::ParallelType cmp = Mode::load1 (comp);)
+        }
+
+        template <typename Size>
+        void max (double* dest, const double* src, double comp, Size num) noexcept
+        {
+            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = jmax (src[i], comp),
+                                          Mode::max (s, cmp),
+                                          JUCE_LOAD_SRC,
+                                          JUCE_INCREMENT_SRC_DEST,
+                                          const Mode::ParallelType cmp = Mode::load1 (comp);)
+        }
+
+        template <typename Size>
+        void max (float* dest, const float* src1, const float* src2, Size num) noexcept
+        {
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vmax ((float*) src1, 1, (float*) src2, 1, dest, 1, (vDSP_Length) num);
+#else
+            JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = jmax (src1[i], src2[i]),
+                                                Mode::max (s1, s2),
+                                                JUCE_LOAD_SRC1_SRC2,
+                                                JUCE_INCREMENT_SRC1_SRC2_DEST, )
+#endif
+        }
+
+        template <typename Size>
+        void max (double* dest, const double* src1, const double* src2, Size num) noexcept
+        {
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vmaxD ((double*) src1, 1, (double*) src2, 1, dest, 1, (vDSP_Length) num);
+#else
+            JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = jmax (src1[i], src2[i]),
+                                                Mode::max (s1, s2),
+                                                JUCE_LOAD_SRC1_SRC2,
+                                                JUCE_INCREMENT_SRC1_SRC2_DEST, )
+#endif
+        }
+
+        template <typename Size>
+        void clip (float* dest, const float* src, float low, float high, Size num) noexcept
+        {
+            jassert (high >= low);
+
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vclip ((float*) src, 1, &low, &high, dest, 1, (vDSP_Length) num);
+#else
+            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = jmax (jmin (src[i], high), low),
+                                          Mode::max (Mode::min (s, hi), lo),
+                                          JUCE_LOAD_SRC,
+                                          JUCE_INCREMENT_SRC_DEST,
+                                          const Mode::ParallelType lo = Mode::load1 (low);
+                                          const Mode::ParallelType hi = Mode::load1 (high);)
+#endif
+        }
+
+        template <typename Size>
+        void clip (double* dest, const double* src, double low, double high, Size num) noexcept
+        {
+            jassert (high >= low);
+
+#if JUCE_USE_VDSP_FRAMEWORK
+            vDSP_vclipD ((double*) src, 1, &low, &high, dest, 1, (vDSP_Length) num);
+#else
+            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = jmax (jmin (src[i], high), low),
+                                          Mode::max (Mode::min (s, hi), lo),
+                                          JUCE_LOAD_SRC,
+                                          JUCE_INCREMENT_SRC_DEST,
+                                          const Mode::ParallelType lo = Mode::load1 (low);
+                                          const Mode::ParallelType hi = Mode::load1 (high);)
+#endif
+        }
+
+        //    template <typename Size>
+        //    Range<float> findMinAndMax (const float* src, Size num) noexcept
+        //    {
+        //       #if JUCE_USE_SSE_INTRINSICS || JUCE_USE_ARM_NEON
+        //        return FloatVectorHelpers::MinMax<FloatVectorHelpers::BasicOps32>::findMinAndMax (src, num);
+        //       #else
+        //        return Range<float>::findMinAndMax (src, num);
+        //       #endif
+        //    }
+        //
+        //    template <typename Size>
+        //    Range<double> findMinAndMax (const double* src, Size num) noexcept
+        //    {
+        //       #if JUCE_USE_SSE_INTRINSICS || JUCE_USE_ARM_NEON
+        //        return FloatVectorHelpers::MinMax<FloatVectorHelpers::BasicOps64>::findMinAndMax (src, num);
+        //       #else
+        //        return Range<double>::findMinAndMax (src, num);
+        //       #endif
+        //    }
+
+        template <typename Size>
+        float findMinimum (const float* src, Size num) noexcept
+        {
+#if JUCE_USE_SSE_INTRINSICS || JUCE_USE_ARM_NEON
+            return FloatVectorHelpers::MinMax<FloatVectorHelpers::BasicOps32>::findMinOrMax (src, num, true);
+#else
+            return juce::findMinimum (src, num);
+#endif
+        }
+
+        template <typename Size>
+        double findMinimum (const double* src, Size num) noexcept
+        {
+#if JUCE_USE_SSE_INTRINSICS || JUCE_USE_ARM_NEON
+            return FloatVectorHelpers::MinMax<FloatVectorHelpers::BasicOps64>::findMinOrMax (src, num, true);
+#else
+            return juce::findMinimum (src, num);
+#endif
+        }
+
+        template <typename Size>
+        float findMaximum (const float* src, Size num) noexcept
+        {
+#if JUCE_USE_SSE_INTRINSICS || JUCE_USE_ARM_NEON
+            return FloatVectorHelpers::MinMax<FloatVectorHelpers::BasicOps32>::findMinOrMax (src, num, false);
+#else
+            return juce::findMaximum (src, num);
+#endif
+        }
+
+        template <typename Size>
+        double findMaximum (const double* src, Size num) noexcept
+        {
+#if JUCE_USE_SSE_INTRINSICS || JUCE_USE_ARM_NEON
+            return FloatVectorHelpers::MinMax<FloatVectorHelpers::BasicOps64>::findMinOrMax (src, num, false);
+#else
+            return juce::findMaximum (src, num);
+#endif
+        }
+
+        template <typename Size>
+        void convertFixedToFloat (float* dest, const int* src, float multiplier, Size num) noexcept
+        {
+#if JUCE_USE_ARM_NEON
+            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = (float) src[i] * multiplier,
+                                          vmulq_n_f32 (vcvtq_f32_s32 (vld1q_s32 (src)), multiplier),
+                                          JUCE_LOAD_NONE,
+                                          JUCE_INCREMENT_SRC_DEST, )
+#else
+            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = (float) src[i] * multiplier,
+                                          Mode::mul (mult, _mm_cvtepi32_ps (_mm_loadu_si128 (reinterpret_cast<const __m128i*> (src)))),
+                                          JUCE_LOAD_NONE,
+                                          JUCE_INCREMENT_SRC_DEST,
+                                          const Mode::ParallelType mult = Mode::load1 (multiplier);)
+#endif
+        }
+
+    } // namespace
 } // namespace FloatVectorHelpers
 
 //==============================================================================
@@ -1437,7 +1546,7 @@ template struct detail::FloatVectorOperationsBase<double, size_t>;
 
 void JUCE_CALLTYPE FloatVectorOperations::convertFixedToFloat (float* dest, const int* src, float multiplier, size_t num) noexcept
 {
-   FloatVectorHelpers::convertFixedToFloat (dest, src, multiplier, num);
+    FloatVectorHelpers::convertFixedToFloat (dest, src, multiplier, num);
 }
 
 void JUCE_CALLTYPE FloatVectorOperations::convertFixedToFloat (float* dest, const int* src, float multiplier, int num) noexcept
@@ -1448,133 +1557,133 @@ void JUCE_CALLTYPE FloatVectorOperations::convertFixedToFloat (float* dest, cons
 intptr_t JUCE_CALLTYPE FloatVectorOperations::getFpStatusRegister() noexcept
 {
     intptr_t fpsr = 0;
-  #if JUCE_INTEL && JUCE_USE_SSE_INTRINSICS
+#if JUCE_INTEL && JUCE_USE_SSE_INTRINSICS
     fpsr = static_cast<intptr_t> (_mm_getcsr());
-  #elif defined(__arm64__) || defined(__aarch64__) || JUCE_USE_ARM_NEON
-   #if defined(__arm64__) || defined(__aarch64__)
+#elif defined(__arm64__) || defined(__aarch64__) || JUCE_USE_ARM_NEON
+#if defined(__arm64__) || defined(__aarch64__)
     asm volatile("mrs %0, fpcr"
                  : "=r"(fpsr));
-   #elif JUCE_USE_ARM_NEON
+#elif JUCE_USE_ARM_NEON
     asm volatile("vmrs %0, fpscr"
                  : "=r"(fpsr));
-   #endif
-  #else
-   #if ! (defined(JUCE_INTEL) || defined(JUCE_ARM))
+#endif
+#else
+#if ! (defined(JUCE_INTEL) || defined(JUCE_ARM))
     jassertfalse; // No support for getting the floating point status register for your platform
-   #endif
-  #endif
+#endif
+#endif
 
     return fpsr;
 }
 
 void JUCE_CALLTYPE FloatVectorOperations::setFpStatusRegister (intptr_t fpsr) noexcept
 {
-  #if JUCE_INTEL && JUCE_USE_SSE_INTRINSICS
+#if JUCE_INTEL && JUCE_USE_SSE_INTRINSICS
     // the volatile keyword here is needed to workaround a bug in AppleClang 13.0
     // which aggressively optimises away the variable otherwise
     volatile auto fpsr_w = static_cast<uint32_t> (fpsr);
     _mm_setcsr (fpsr_w);
-  #elif defined(__arm64__) || defined(__aarch64__) || JUCE_USE_ARM_NEON
-   #if defined(__arm64__) || defined(__aarch64__)
+#elif defined(__arm64__) || defined(__aarch64__) || JUCE_USE_ARM_NEON
+#if defined(__arm64__) || defined(__aarch64__)
     asm volatile("msr fpcr, %0"
                  :
                  : "ri"(fpsr));
-   #elif JUCE_USE_ARM_NEON
+#elif JUCE_USE_ARM_NEON
     asm volatile("vmsr fpscr, %0"
                  :
                  : "ri"(fpsr));
-   #endif
-  #else
-   #if ! (defined(JUCE_INTEL) || defined(JUCE_ARM))
+#endif
+#else
+#if ! (defined(JUCE_INTEL) || defined(JUCE_ARM))
     jassertfalse; // No support for getting the floating point status register for your platform
-   #endif
+#endif
     ignoreUnused (fpsr);
-  #endif
+#endif
 }
 
 void JUCE_CALLTYPE FloatVectorOperations::enableFlushToZeroMode (bool shouldEnable) noexcept
 {
-  #if JUCE_USE_SSE_INTRINSICS || (JUCE_USE_ARM_NEON || defined(__arm64__) || defined(__aarch64__))
-   #if JUCE_USE_SSE_INTRINSICS
+#if JUCE_USE_SSE_INTRINSICS || (JUCE_USE_ARM_NEON || defined(__arm64__) || defined(__aarch64__))
+#if JUCE_USE_SSE_INTRINSICS
     intptr_t mask = _MM_FLUSH_ZERO_MASK;
-   #else /*JUCE_USE_ARM_NEON*/
+#else /*JUCE_USE_ARM_NEON*/
     intptr_t mask = (1 << 24 /* FZ */);
-   #endif
+#endif
     setFpStatusRegister ((getFpStatusRegister() & (~mask)) | (shouldEnable ? mask : 0));
-  #else
-   #if ! (defined(JUCE_INTEL) || defined(JUCE_ARM))
+#else
+#if ! (defined(JUCE_INTEL) || defined(JUCE_ARM))
     jassertfalse; // No support for flush to zero mode on your platform
-   #endif
+#endif
     ignoreUnused (shouldEnable);
-  #endif
+#endif
 }
 
 void JUCE_CALLTYPE FloatVectorOperations::disableDenormalisedNumberSupport (bool shouldDisable) noexcept
 {
-  #if JUCE_USE_SSE_INTRINSICS || (JUCE_USE_ARM_NEON || defined(__arm64__) || defined(__aarch64__))
-   #if JUCE_USE_SSE_INTRINSICS
+#if JUCE_USE_SSE_INTRINSICS || (JUCE_USE_ARM_NEON || defined(__arm64__) || defined(__aarch64__))
+#if JUCE_USE_SSE_INTRINSICS
     intptr_t mask = 0x8040;
-   #else /*JUCE_USE_ARM_NEON*/
+#else /*JUCE_USE_ARM_NEON*/
     intptr_t mask = (1 << 24 /* FZ */);
-   #endif
+#endif
 
     setFpStatusRegister ((getFpStatusRegister() & (~mask)) | (shouldDisable ? mask : 0));
-  #else
+#else
     ignoreUnused (shouldDisable);
 
-   #if ! (defined(JUCE_INTEL) || defined(JUCE_ARM))
+#if ! (defined(JUCE_INTEL) || defined(JUCE_ARM))
     jassertfalse; // No support for disable denormals mode on your platform
-   #endif
-  #endif
+#endif
+#endif
 }
 
 bool JUCE_CALLTYPE FloatVectorOperations::areDenormalsDisabled() noexcept
 {
-  #if JUCE_USE_SSE_INTRINSICS || (JUCE_USE_ARM_NEON || defined(__arm64__) || defined(__aarch64__))
-   #if JUCE_USE_SSE_INTRINSICS
+#if JUCE_USE_SSE_INTRINSICS || (JUCE_USE_ARM_NEON || defined(__arm64__) || defined(__aarch64__))
+#if JUCE_USE_SSE_INTRINSICS
     intptr_t mask = 0x8040;
-   #else /*JUCE_USE_ARM_NEON*/
+#else /*JUCE_USE_ARM_NEON*/
     intptr_t mask = (1 << 24 /* FZ */);
-   #endif
+#endif
 
     return ((getFpStatusRegister() & mask) == mask);
-  #else
+#else
     return false;
-  #endif
+#endif
 }
 
 ScopedNoDenormals::ScopedNoDenormals() noexcept
 {
-  #if JUCE_USE_SSE_INTRINSICS || (JUCE_USE_ARM_NEON || defined(__arm64__) || defined(__aarch64__))
-   #if JUCE_USE_SSE_INTRINSICS
+#if JUCE_USE_SSE_INTRINSICS || (JUCE_USE_ARM_NEON || defined(__arm64__) || defined(__aarch64__))
+#if JUCE_USE_SSE_INTRINSICS
     intptr_t mask = 0x8040;
-   #else /*JUCE_USE_ARM_NEON*/
+#else /*JUCE_USE_ARM_NEON*/
     intptr_t mask = (1 << 24 /* FZ */);
-   #endif
+#endif
 
     fpsr = FloatVectorOperations::getFpStatusRegister();
     FloatVectorOperations::setFpStatusRegister (fpsr | mask);
-  #endif
+#endif
 }
 
 ScopedNoDenormals::~ScopedNoDenormals() noexcept
 {
-   #if JUCE_USE_SSE_INTRINSICS || (JUCE_USE_ARM_NEON || defined(__arm64__) || defined(__aarch64__))
+#if JUCE_USE_SSE_INTRINSICS || (JUCE_USE_ARM_NEON || defined(__arm64__) || defined(__aarch64__))
     FloatVectorOperations::setFpStatusRegister (fpsr);
-   #endif
+#endif
 }
-
 
 //==============================================================================
 //==============================================================================
 #if JUCE_UNIT_TESTS
 
-class FloatVectorOperationsTests  : public UnitTest
+class FloatVectorOperationsTests : public UnitTest
 {
 public:
     FloatVectorOperationsTests()
         : UnitTest ("FloatVectorOperations", UnitTestCategories::audio)
-    {}
+    {
+    }
 
     template <typename ValueType>
     struct TestRunner
@@ -1587,17 +1696,17 @@ public:
             HeapBlock<ValueType> buffer1 (num + 16), buffer2 (num + 16);
             HeapBlock<int> buffer3 (num + 16);
 
-           #if JUCE_ARM
+#if JUCE_ARM
             ValueType* const data1 = buffer1;
             ValueType* const data2 = buffer2;
             int* const int1 = buffer3;
-           #else
+#else
             // These tests deliberately operate on misaligned memory and will be flagged up by
             // checks for undefined behavior!
             ValueType* const data1 = addBytesToPointer (buffer1.get(), random.nextInt (16));
             ValueType* const data2 = addBytesToPointer (buffer2.get(), random.nextInt (16));
             int* const int1 = addBytesToPointer (buffer3.get(), random.nextInt (16));
-           #endif
+#endif
 
             fillRandomly (random, data1, num);
             fillRandomly (random, data2, num);

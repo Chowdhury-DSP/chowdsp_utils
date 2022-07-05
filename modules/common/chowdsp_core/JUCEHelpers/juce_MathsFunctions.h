@@ -22,7 +22,6 @@
 
 namespace juce
 {
-
 //==============================================================================
 /*
     This file sets up some handy mathematical typdefs and functions.
@@ -32,58 +31,58 @@ namespace juce
 // Definitions for the int8, int16, int32, int64 and pointer_sized_int types.
 
 /** A platform-independent 8-bit signed integer type. */
-using int8      = signed char;
+using int8 = signed char;
 /** A platform-independent 8-bit unsigned integer type. */
-using uint8     = unsigned char;
+using uint8 = unsigned char;
 /** A platform-independent 16-bit signed integer type. */
-using int16     = signed short;
+using int16 = signed short;
 /** A platform-independent 16-bit unsigned integer type. */
-using uint16    = unsigned short;
+using uint16 = unsigned short;
 /** A platform-independent 32-bit signed integer type. */
-using int32     = signed int;
+using int32 = signed int;
 /** A platform-independent 32-bit unsigned integer type. */
-using uint32    = unsigned int;
+using uint32 = unsigned int;
 
 #if JUCE_MSVC
-  /** A platform-independent 64-bit integer type. */
-  using int64  = __int64;
-  /** A platform-independent 64-bit unsigned integer type. */
-  using uint64 = unsigned __int64;
+/** A platform-independent 64-bit integer type. */
+using int64 = __int64;
+/** A platform-independent 64-bit unsigned integer type. */
+using uint64 = unsigned __int64;
 #else
-  /** A platform-independent 64-bit integer type. */
-  using int64  = long long;
-  /** A platform-independent 64-bit unsigned integer type. */
-  using uint64 = unsigned long long;
+/** A platform-independent 64-bit integer type. */
+using int64 = long long;
+/** A platform-independent 64-bit unsigned integer type. */
+using uint64 = unsigned long long;
 #endif
 
 #ifndef DOXYGEN
- /** A macro for creating 64-bit literals.
+/** A macro for creating 64-bit literals.
      Historically, this was needed to support portability with MSVC6, and is kept here
      so that old code will still compile, but nowadays every compiler will support the
      LL and ULL suffixes, so you should use those in preference to this macro.
  */
- #define literal64bit(longLiteral)     (longLiteral##LL)
+#define literal64bit(longLiteral) (longLiteral##LL)
 #endif
 
 #if JUCE_64BIT
-  /** A signed integer type that's guaranteed to be large enough to hold a pointer without truncating it. */
-  using pointer_sized_int  = int64;
-  /** An unsigned integer type that's guaranteed to be large enough to hold a pointer without truncating it. */
-  using pointer_sized_uint = uint64;
+/** A signed integer type that's guaranteed to be large enough to hold a pointer without truncating it. */
+using pointer_sized_int = int64;
+/** An unsigned integer type that's guaranteed to be large enough to hold a pointer without truncating it. */
+using pointer_sized_uint = uint64;
 #elif JUCE_MSVC
-  /** A signed integer type that's guaranteed to be large enough to hold a pointer without truncating it. */
-  using pointer_sized_int  = _W64 int;
-  /** An unsigned integer type that's guaranteed to be large enough to hold a pointer without truncating it. */
-  using pointer_sized_uint = _W64 unsigned int;
+/** A signed integer type that's guaranteed to be large enough to hold a pointer without truncating it. */
+using pointer_sized_int = _W64 int;
+/** An unsigned integer type that's guaranteed to be large enough to hold a pointer without truncating it. */
+using pointer_sized_uint = _W64 unsigned int;
 #else
-  /** A signed integer type that's guaranteed to be large enough to hold a pointer without truncating it. */
-  using pointer_sized_int  = int;
-  /** An unsigned integer type that's guaranteed to be large enough to hold a pointer without truncating it. */
-  using pointer_sized_uint = unsigned int;
+/** A signed integer type that's guaranteed to be large enough to hold a pointer without truncating it. */
+using pointer_sized_int = int;
+/** An unsigned integer type that's guaranteed to be large enough to hold a pointer without truncating it. */
+using pointer_sized_uint = unsigned int;
 #endif
 
 #if JUCE_WINDOWS && ! JUCE_MINGW
-  using ssize_t = pointer_sized_int;
+using ssize_t = pointer_sized_int;
 #endif
 
 //==============================================================================
@@ -91,27 +90,45 @@ using uint32    = unsigned int;
 
 /** Returns the larger of two values. */
 template <typename Type>
-constexpr Type jmax (Type a, Type b)                                   { return a < b ? b : a; }
+constexpr Type jmax (Type a, Type b)
+{
+    return a < b ? b : a;
+}
 
 /** Returns the larger of three values. */
 template <typename Type>
-constexpr Type jmax (Type a, Type b, Type c)                           { return a < b ? (b < c ? c : b) : (a < c ? c : a); }
+constexpr Type jmax (Type a, Type b, Type c)
+{
+    return a < b ? (b < c ? c : b) : (a < c ? c : a);
+}
 
 /** Returns the larger of four values. */
 template <typename Type>
-constexpr Type jmax (Type a, Type b, Type c, Type d)                   { return jmax (a, jmax (b, c, d)); }
+constexpr Type jmax (Type a, Type b, Type c, Type d)
+{
+    return jmax (a, jmax (b, c, d));
+}
 
 /** Returns the smaller of two values. */
 template <typename Type>
-constexpr Type jmin (Type a, Type b)                                   { return b < a ? b : a; }
+constexpr Type jmin (Type a, Type b)
+{
+    return b < a ? b : a;
+}
 
 /** Returns the smaller of three values. */
 template <typename Type>
-constexpr Type jmin (Type a, Type b, Type c)                           { return b < a ? (c < b ? c : b) : (c < a ? c : a); }
+constexpr Type jmin (Type a, Type b, Type c)
+{
+    return b < a ? (c < b ? c : b) : (c < a ? c : a);
+}
 
 /** Returns the smaller of four values. */
 template <typename Type>
-constexpr Type jmin (Type a, Type b, Type c, Type d)                   { return jmin (a, jmin (b, c, d)); }
+constexpr Type jmin (Type a, Type b, Type c, Type d)
+{
+    return jmin (a, jmin (b, c, d));
+}
 
 /** Remaps a normalised value (between 0 and 1) to a target range.
     This effectively returns (targetRangeMin + value0To1 * (targetRangeMax - targetRangeMin)).
@@ -232,8 +249,10 @@ void findMinAndMax (const Type* values, int numValues, Type& lowest, Type& highe
         {
             auto v = *values++;
 
-            if (mx < v)  mx = v;
-            if (v < mn)  mn = v;
+            if (mx < v)
+                mx = v;
+            if (v < mn)
+                mn = v;
         }
 
         lowest = mn;
@@ -324,13 +343,15 @@ template <typename Type>
 bool approximatelyEqual (Type a, Type b) noexcept
 {
     return std::abs (a - b) <= (std::numeric_limits<Type>::epsilon() * std::max (a, b))
-            || std::abs (a - b) < std::numeric_limits<Type>::min();
+           || std::abs (a - b) < std::numeric_limits<Type>::min();
 }
 
 //==============================================================================
 /** Handy function for avoiding unused variables warning. */
 template <typename... Types>
-void ignoreUnused (Types&&...) noexcept {}
+void ignoreUnused (Types&&...) noexcept
+{
+}
 
 /** Handy function for getting the number of elements in a simple const C array.
     E.g.
@@ -341,7 +362,10 @@ void ignoreUnused (Types&&...) noexcept {}
     @endcode
 */
 template <typename Type, size_t N>
-constexpr int numElementsInArray (Type (&)[N]) noexcept     { return N; }
+constexpr int numElementsInArray (Type (&)[N]) noexcept
+{
+    return N;
+}
 
 //==============================================================================
 // Some useful maths functions that aren't always present with all compilers and build settings.
@@ -351,22 +375,22 @@ constexpr int numElementsInArray (Type (&)[N]) noexcept     { return N; }
 template <typename Type>
 Type juce_hypot (Type a, Type b) noexcept
 {
-   #if JUCE_MSVC
+#if JUCE_MSVC
     return static_cast<Type> (_hypot (a, b));
-   #else
+#else
     return static_cast<Type> (hypot (a, b));
-   #endif
+#endif
 }
 
 #ifndef DOXYGEN
 template <>
 inline float juce_hypot (float a, float b) noexcept
 {
-   #if JUCE_MSVC
+#if JUCE_MSVC
     return _hypotf (a, b);
-   #else
+#else
     return hypotf (a, b);
-   #endif
+#endif
 }
 #endif
 
@@ -396,22 +420,25 @@ struct MathConstants
 
 #ifndef DOXYGEN
 /** A double-precision constant for pi. */
-[[deprecated ("This is deprecated in favour of MathConstants<double>::pi.")]]
-const constexpr double  double_Pi  = MathConstants<double>::pi;
+[[deprecated ("This is deprecated in favour of MathConstants<double>::pi.")]] const constexpr double double_Pi = MathConstants<double>::pi;
 
 /** A single-precision constant for pi. */
-[[deprecated ("This is deprecated in favour of MathConstants<float>::pi.")]]
-const constexpr float   float_Pi   = MathConstants<float>::pi;
+[[deprecated ("This is deprecated in favour of MathConstants<float>::pi.")]] const constexpr float float_Pi = MathConstants<float>::pi;
 #endif
 
 /** Converts an angle in degrees to radians. */
 template <typename FloatType>
-constexpr FloatType degreesToRadians (FloatType degrees) noexcept     { return degrees * (MathConstants<FloatType>::pi / FloatType (180)); }
+constexpr FloatType degreesToRadians (FloatType degrees) noexcept
+{
+    return degrees * (MathConstants<FloatType>::pi / FloatType (180));
+}
 
 /** Converts an angle in radians to degrees. */
 template <typename FloatType>
-constexpr FloatType radiansToDegrees (FloatType radians) noexcept     { return radians * (FloatType (180) / MathConstants<FloatType>::pi); }
-
+constexpr FloatType radiansToDegrees (FloatType radians) noexcept
+{
+    return radians * (FloatType (180) / MathConstants<FloatType>::pi);
+}
 
 //==============================================================================
 /** The isfinite() method seems to vary between platforms, so this is a
@@ -426,29 +453,29 @@ bool juce_isfinite (NumericType) noexcept
 template <>
 inline bool juce_isfinite (float value) noexcept
 {
-   #if JUCE_WINDOWS && ! JUCE_MINGW
+#if JUCE_WINDOWS && ! JUCE_MINGW
     return _finite (value) != 0;
-   #else
+#else
     return std::isfinite (value);
-   #endif
+#endif
 }
 
 template <>
 inline bool juce_isfinite (double value) noexcept
 {
-   #if JUCE_WINDOWS && ! JUCE_MINGW
+#if JUCE_WINDOWS && ! JUCE_MINGW
     return _finite (value) != 0;
-   #else
+#else
     return std::isfinite (value);
-   #endif
+#endif
 }
 
 //==============================================================================
 #if JUCE_MSVC
- #pragma optimize ("t", off)
- #ifndef __INTEL_COMPILER
-  #pragma float_control (precise, on, push)
- #endif
+#pragma optimize("t", off)
+#ifndef __INTEL_COMPILER
+#pragma float_control(precise, on, push)
+#endif
 #endif
 
 /** Fast floating-point-to-integer conversion.
@@ -464,18 +491,22 @@ inline bool juce_isfinite (double value) noexcept
 template <typename FloatType>
 int roundToInt (const FloatType value) noexcept
 {
-  #ifdef __INTEL_COMPILER
-   #pragma float_control (precise, on, push)
-  #endif
+#ifdef __INTEL_COMPILER
+#pragma float_control(precise, on, push)
+#endif
 
-    union { int asInt[2]; double asDouble; } n;
+    union
+    {
+        int asInt[2];
+        double asDouble;
+    } n;
     n.asDouble = ((double) value) + 6755399441055744.0;
 
-   #if JUCE_BIG_ENDIAN
-    return n.asInt [1];
-   #else
-    return n.asInt [0];
-   #endif
+#if JUCE_BIG_ENDIAN
+    return n.asInt[1];
+#else
+    return n.asInt[0];
+#endif
 }
 
 inline int roundToInt (int value) noexcept
@@ -484,10 +515,10 @@ inline int roundToInt (int value) noexcept
 }
 
 #if JUCE_MSVC
- #ifndef __INTEL_COMPILER
-  #pragma float_control (pop)
- #endif
- #pragma optimize ("", on)  // resets optimisations to the project defaults
+#ifndef __INTEL_COMPILER
+#pragma float_control(pop)
+#endif
+#pragma optimize("", on) // resets optimisations to the project defaults
 #endif
 
 /** Fast floating-point-to-integer conversion.
@@ -497,9 +528,9 @@ inline int roundToInt (int value) noexcept
 */
 inline int roundToIntAccurate (double value) noexcept
 {
-   #ifdef __INTEL_COMPILER
-    #pragma float_control (pop)
-   #endif
+#ifdef __INTEL_COMPILER
+#pragma float_control(pop)
+#endif
 
     return roundToInt (value + 1.5e-8);
 }
@@ -526,7 +557,7 @@ unsigned int truncatePositiveToUnsignedInt (FloatType value) noexcept
 template <typename IntegerType>
 constexpr bool isPowerOfTwo (IntegerType value)
 {
-   return (value & (value - 1)) == 0;
+    return (value & (value - 1)) == 0;
 }
 
 /** Returns the smallest power-of-two which is equal to or greater than the given integer. */
@@ -551,8 +582,8 @@ int findHighestSetBit (uint32 n) noexcept;
 inline int countNumberOfBits (uint32 n) noexcept
 {
     n -= ((n >> 1) & 0x55555555);
-    n =  (((n >> 2) & 0x33333333) + (n & 0x33333333));
-    n =  (((n >> 4) + n) & 0x0f0f0f0f);
+    n = (((n >> 2) & 0x33333333) + (n & 0x33333333));
+    n = (((n >> 4) + n) & 0x0f0f0f0f);
     n += (n >> 8);
     n += (n >> 16);
     return (int) (n & 0x3f);
@@ -601,16 +632,19 @@ void writeLittleEndianBitsInBuffer (void* targetBuffer, uint32 startBit, uint32 
 */
 uint32 readLittleEndianBitsInBuffer (const void* sourceBuffer, uint32 startBit, uint32 numBits) noexcept;
 
-
 //==============================================================================
 #if JUCE_INTEL || DOXYGEN
- /** This macro can be applied to a float variable to check whether it contains a denormalised
+/** This macro can be applied to a float variable to check whether it contains a denormalised
      value, and to normalise it if necessary.
      On CPUs that aren't vulnerable to denormalisation problems, this will have no effect.
  */
- #define JUCE_UNDENORMALISE(x)   { (x) += 0.1f; (x) -= 0.1f; }
+#define JUCE_UNDENORMALISE(x) \
+    {                         \
+        (x) += 0.1f;          \
+        (x) -= 0.1f;          \
+    }
 #else
- #define JUCE_UNDENORMALISE(x)
+#define JUCE_UNDENORMALISE(x)
 #endif
 
 //==============================================================================
@@ -629,57 +663,151 @@ namespace TypeHelpers
 
         @tags{Core}
     */
-    template <typename Type> struct ParameterType                   { using type = const Type&; };
+    template <typename Type>
+    struct ParameterType
+    {
+        using type = const Type&;
+    };
 
-   #ifndef DOXYGEN
-    template <typename Type> struct ParameterType <Type&>           { using type = Type&; };
-    template <typename Type> struct ParameterType <Type*>           { using type = Type*; };
-    template <>              struct ParameterType <char>            { using type = char; };
-    template <>              struct ParameterType <unsigned char>   { using type = unsigned char; };
-    template <>              struct ParameterType <short>           { using type = short; };
-    template <>              struct ParameterType <unsigned short>  { using type = unsigned short; };
-    template <>              struct ParameterType <int>             { using type = int; };
-    template <>              struct ParameterType <unsigned int>    { using type = unsigned int; };
-    template <>              struct ParameterType <long>            { using type = long; };
-    template <>              struct ParameterType <unsigned long>   { using type = unsigned long; };
-    template <>              struct ParameterType <int64>           { using type = int64; };
-    template <>              struct ParameterType <uint64>          { using type = uint64; };
-    template <>              struct ParameterType <bool>            { using type = bool; };
-    template <>              struct ParameterType <float>           { using type = float; };
-    template <>              struct ParameterType <double>          { using type = double; };
-   #endif
+#ifndef DOXYGEN
+    template <typename Type>
+    struct ParameterType<Type&>
+    {
+        using type = Type&;
+    };
+    template <typename Type>
+    struct ParameterType<Type*>
+    {
+        using type = Type*;
+    };
+    template <>
+    struct ParameterType<char>
+    {
+        using type = char;
+    };
+    template <>
+    struct ParameterType<unsigned char>
+    {
+        using type = unsigned char;
+    };
+    template <>
+    struct ParameterType<short>
+    {
+        using type = short;
+    };
+    template <>
+    struct ParameterType<unsigned short>
+    {
+        using type = unsigned short;
+    };
+    template <>
+    struct ParameterType<int>
+    {
+        using type = int;
+    };
+    template <>
+    struct ParameterType<unsigned int>
+    {
+        using type = unsigned int;
+    };
+    template <>
+    struct ParameterType<long>
+    {
+        using type = long;
+    };
+    template <>
+    struct ParameterType<unsigned long>
+    {
+        using type = unsigned long;
+    };
+    template <>
+    struct ParameterType<int64>
+    {
+        using type = int64;
+    };
+    template <>
+    struct ParameterType<uint64>
+    {
+        using type = uint64;
+    };
+    template <>
+    struct ParameterType<bool>
+    {
+        using type = bool;
+    };
+    template <>
+    struct ParameterType<float>
+    {
+        using type = float;
+    };
+    template <>
+    struct ParameterType<double>
+    {
+        using type = double;
+    };
+#endif
 
     /** These templates are designed to take a type, and if it's a double, they return a double
         type; for anything else, they return a float type.
 
         @tags{Core}
     */
-    template <typename Type> struct SmallestFloatType               { using type = float; };
+    template <typename Type>
+    struct SmallestFloatType
+    {
+        using type = float;
+    };
 
-   #ifndef DOXYGEN
-    template <>              struct SmallestFloatType <double>      { using type = double; };
-   #endif
+#ifndef DOXYGEN
+    template <>
+    struct SmallestFloatType<double>
+    {
+        using type = double;
+    };
+#endif
 
     /** These templates are designed to take an integer type, and return an unsigned int
         version with the same size.
 
         @tags{Core}
     */
-    template <int bytes>     struct UnsignedTypeWithSize            {};
+    template <int bytes>
+    struct UnsignedTypeWithSize
+    {
+    };
 
-   #ifndef DOXYGEN
-    template <>              struct UnsignedTypeWithSize<1>         { using type = uint8; };
-    template <>              struct UnsignedTypeWithSize<2>         { using type = uint16; };
-    template <>              struct UnsignedTypeWithSize<4>         { using type = uint32; };
-    template <>              struct UnsignedTypeWithSize<8>         { using type = uint64; };
-   #endif
-}
+#ifndef DOXYGEN
+    template <>
+    struct UnsignedTypeWithSize<1>
+    {
+        using type = uint8;
+    };
+    template <>
+    struct UnsignedTypeWithSize<2>
+    {
+        using type = uint16;
+    };
+    template <>
+    struct UnsignedTypeWithSize<4>
+    {
+        using type = uint32;
+    };
+    template <>
+    struct UnsignedTypeWithSize<8>
+    {
+        using type = uint64;
+    };
+#endif
+} // namespace TypeHelpers
 
 //==============================================================================
 #ifndef DOXYGEN
- [[deprecated ("Use roundToInt instead.")]] inline int roundDoubleToInt (double value) noexcept  { return roundToInt (value); }
- [[deprecated ("Use roundToInt instead.")]] inline int roundFloatToInt  (float  value) noexcept  { return roundToInt (value); }
- [[deprecated ("Use std::abs() instead.")]] inline int64 abs64 (int64 n) noexcept                { return std::abs (n); }
+[[deprecated ("Use roundToInt instead.")]] inline int roundDoubleToInt (double value) noexcept
+{
+    return roundToInt (value);
+}
+[[deprecated ("Use roundToInt instead.")]] inline int roundFloatToInt (float value) noexcept { return roundToInt (value); }
+[[deprecated ("Use std::abs() instead.")]] inline int64 abs64 (int64 n) noexcept { return std::abs (n); }
 #endif
 
 } // namespace juce

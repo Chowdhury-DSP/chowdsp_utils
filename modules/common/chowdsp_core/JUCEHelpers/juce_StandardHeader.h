@@ -27,9 +27,9 @@
 
     See also SystemStats::getJUCEVersion() for a string version.
 */
-#define JUCE_MAJOR_VERSION      6
-#define JUCE_MINOR_VERSION      1
-#define JUCE_BUILDNUMBER        6
+#define JUCE_MAJOR_VERSION 6
+#define JUCE_MINOR_VERSION 1
+#define JUCE_BUILDNUMBER 6
 
 /** Current JUCE version number.
 
@@ -39,8 +39,7 @@
 
     See also SystemStats::getJUCEVersion() for a string version.
 */
-#define JUCE_VERSION   ((JUCE_MAJOR_VERSION << 16) + (JUCE_MINOR_VERSION << 8) + JUCE_BUILDNUMBER)
-
+#define JUCE_VERSION ((JUCE_MAJOR_VERSION << 16) + (JUCE_MINOR_VERSION << 8) + JUCE_BUILDNUMBER)
 
 //==============================================================================
 #include <algorithm>
@@ -77,43 +76,42 @@
 JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4514 4245 4100)
 
 #if JUCE_MSVC
- #include <intrin.h>
+#include <intrin.h>
 #endif
 
-
 #if JUCE_MAC || JUCE_IOS
- #include <libkern/OSAtomic.h>
- #include <xlocale.h>
- #include <signal.h>
+#include <libkern/OSAtomic.h>
+#include <xlocale.h>
+#include <signal.h>
 #endif
 
 #if JUCE_LINUX || JUCE_BSD
- #include <cstring>
- #include <signal.h>
+#include <cstring>
+#include <signal.h>
 
- #if __INTEL_COMPILER
-  #if __ia64__
-   #include <ia64intrin.h>
-  #else
-   #include <ia32intrin.h>
-  #endif
- #endif
+#if __INTEL_COMPILER
+#if __ia64__
+#include <ia64intrin.h>
+#else
+#include <ia32intrin.h>
+#endif
+#endif
 #endif
 
 #if JUCE_MSVC && JUCE_DEBUG
- #include <crtdbg.h>
+#include <crtdbg.h>
 #endif
 
 JUCE_END_IGNORE_WARNINGS_MSVC
 
 #if JUCE_MINGW
- #include <cstring>
- #include <sys/types.h>
+#include <cstring>
+#include <sys/types.h>
 #endif
 
 #if JUCE_ANDROID
- #include <cstring>
- #include <byteswap.h>
+#include <cstring>
+#include <byteswap.h>
 #endif
 
 // undef symbols that are sometimes set by misguided 3rd-party headers..
@@ -127,34 +125,37 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 //==============================================================================
 // DLL building settings on Windows
 #if JUCE_MSVC
- #ifdef JUCE_DLL_BUILD
-  #define JUCE_API __declspec (dllexport)
-  #pragma warning (disable: 4251)
- #elif defined (JUCE_DLL)
-  #define JUCE_API __declspec (dllimport)
-  #pragma warning (disable: 4251)
- #endif
- #ifdef __INTEL_COMPILER
-  #pragma warning (disable: 1125) // (virtual override warning)
- #endif
-#elif defined (JUCE_DLL) || defined (JUCE_DLL_BUILD)
- #define JUCE_API __attribute__ ((visibility("default")))
+#ifdef JUCE_DLL_BUILD
+#define JUCE_API __declspec(dllexport)
+#pragma warning(disable : 4251)
+#elif defined(JUCE_DLL)
+#define JUCE_API __declspec(dllimport)
+#pragma warning(disable : 4251)
+#endif
+#ifdef __INTEL_COMPILER
+#pragma warning(disable : 1125) // (virtual override warning)
+#endif
+#elif defined(JUCE_DLL) || defined(JUCE_DLL_BUILD)
+#define JUCE_API __attribute__ ((visibility ("default")))
 #endif
 
 //==============================================================================
 #ifndef JUCE_API
- #define JUCE_API   /**< This macro is added to all JUCE public class declarations. */
+#define JUCE_API /**< This macro is added to all JUCE public class declarations. */
 #endif
 
 #if JUCE_MSVC && JUCE_DLL_BUILD
- #define JUCE_PUBLIC_IN_DLL_BUILD(declaration)  public: declaration; private:
+#define JUCE_PUBLIC_IN_DLL_BUILD(declaration) \
+public:                                       \
+    declaration;                              \
+private:
 #else
- #define JUCE_PUBLIC_IN_DLL_BUILD(declaration)  declaration;
+#define JUCE_PUBLIC_IN_DLL_BUILD(declaration) declaration;
 #endif
 
 /** This macro is added to all JUCE public function declarations. */
-#define JUCE_PUBLIC_FUNCTION        JUCE_API JUCE_CALLTYPE
+#define JUCE_PUBLIC_FUNCTION JUCE_API JUCE_CALLTYPE
 
 #ifndef DOXYGEN
- #define JUCE_NAMESPACE juce  // This old macro is deprecated: you should just use the juce namespace directly.
+#define JUCE_NAMESPACE juce // This old macro is deprecated: you should just use the juce namespace directly.
 #endif

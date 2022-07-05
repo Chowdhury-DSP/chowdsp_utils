@@ -22,7 +22,6 @@
 
 namespace juce
 {
-
 //==============================================================================
 /**
     A base class for the smoothed value classes.
@@ -37,16 +36,17 @@ class SmoothedValueBase
 {
 private:
     //==============================================================================
-    template <typename T> struct FloatTypeHelper;
+    template <typename T>
+    struct FloatTypeHelper;
 
     template <template <typename> class SmoothedValueClass, typename FloatType>
-    struct FloatTypeHelper <SmoothedValueClass <FloatType>>
+    struct FloatTypeHelper<SmoothedValueClass<FloatType>>
     {
         using Type = FloatType;
     };
 
     template <template <typename, typename> class SmoothedValueClass, typename FloatType, typename SmoothingType>
-    struct FloatTypeHelper <SmoothedValueClass <FloatType, SmoothingType>>
+    struct FloatTypeHelper<SmoothedValueClass<FloatType, SmoothingType>>
     {
         using Type = FloatType;
     };
@@ -60,14 +60,14 @@ public:
 
     //==============================================================================
     /** Returns true if the current value is currently being interpolated. */
-    bool isSmoothing() const noexcept                    { return countdown > 0; }
+    bool isSmoothing() const noexcept { return countdown > 0; }
 
     /** Returns the current value of the ramp. */
-    FloatType getCurrentValue() const noexcept           { return currentValue; }
+    FloatType getCurrentValue() const noexcept { return currentValue; }
 
     //==============================================================================
     /** Returns the target value towards which the smoothed value is currently moving. */
-    FloatType getTargetValue() const noexcept            { return target; }
+    FloatType getTargetValue() const noexcept { return target; }
 
     /** Sets the current value and the target value.
         @param newValue    the new value to take
@@ -121,41 +121,41 @@ public:
     }
 
     /** Applies a smoothed gain to a buffer */
-//    void applyGain (AudioBuffer<FloatType>& buffer, int numSamples) noexcept
-//    {
-//        jassert (numSamples >= 0);
-//
-//        if (isSmoothing())
-//        {
-//            if (buffer.getNumChannels() == 1)
-//            {
-//                auto* samples = buffer.getWritePointer (0);
-//
-//                for (int i = 0; i < numSamples; ++i)
-//                    samples[i] *= getNextSmoothedValue();
-//            }
-//            else
-//            {
-//                for (auto i = 0; i < numSamples; ++i)
-//                {
-//                    auto gain = getNextSmoothedValue();
-//
-//                    for (int channel = 0; channel < buffer.getNumChannels(); channel++)
-//                        buffer.setSample (channel, i, buffer.getSample (channel, i) * gain);
-//                }
-//            }
-//        }
-//        else
-//        {
-//            buffer.applyGain (0, numSamples, target);
-//        }
-//    }
+    //    void applyGain (AudioBuffer<FloatType>& buffer, int numSamples) noexcept
+    //    {
+    //        jassert (numSamples >= 0);
+    //
+    //        if (isSmoothing())
+    //        {
+    //            if (buffer.getNumChannels() == 1)
+    //            {
+    //                auto* samples = buffer.getWritePointer (0);
+    //
+    //                for (int i = 0; i < numSamples; ++i)
+    //                    samples[i] *= getNextSmoothedValue();
+    //            }
+    //            else
+    //            {
+    //                for (auto i = 0; i < numSamples; ++i)
+    //                {
+    //                    auto gain = getNextSmoothedValue();
+    //
+    //                    for (int channel = 0; channel < buffer.getNumChannels(); channel++)
+    //                        buffer.setSample (channel, i, buffer.getSample (channel, i) * gain);
+    //                }
+    //            }
+    //        }
+    //        else
+    //        {
+    //            buffer.applyGain (0, numSamples, target);
+    //        }
+    //    }
 
 private:
     //==============================================================================
     FloatType getNextSmoothedValue() noexcept
     {
-        return static_cast <SmoothedValueType*> (this)->getNextValue();
+        return static_cast<SmoothedValueType*> (this)->getNextValue();
     }
 
 protected:
@@ -182,15 +182,19 @@ namespace ValueSmoothingTypes
 
         @tags{Audio}
     */
-    struct Linear {};
+    struct Linear
+    {
+    };
 
     /**
         Used to indicate a smoothing between multiplicative values.
 
         @tags{Audio}
     */
-    struct Multiplicative {};
-}
+    struct Multiplicative
+    {
+    };
+} // namespace ValueSmoothingTypes
 
 //==============================================================================
 /**
@@ -223,7 +227,7 @@ namespace ValueSmoothingTypes
     @tags{Audio}
 */
 template <typename FloatType, typename SmoothingType = ValueSmoothingTypes::Linear>
-class SmoothedValue   : public SmoothedValueBase <SmoothedValue <FloatType, SmoothingType>>
+class SmoothedValue : public SmoothedValueBase<SmoothedValue<FloatType, SmoothingType>>
 {
 public:
     //==============================================================================
@@ -328,7 +332,7 @@ public:
     }
 
     //==============================================================================
-   #ifndef DOXYGEN
+#ifndef DOXYGEN
     /** Using the new methods:
 
         lsv.setValue (x, false); -> lsv.setTargetValue (x);
@@ -337,8 +341,7 @@ public:
         @param newValue     The new target value
         @param force        If true, the value will be set immediately, bypassing the ramp
     */
-    [[deprecated ("Use setTargetValue and setCurrentAndTargetValue instead.")]]
-    void setValue (FloatType newValue, bool force = false) noexcept
+    [[deprecated ("Use setTargetValue and setCurrentAndTargetValue instead.")]] void setValue (FloatType newValue, bool force = false) noexcept
     {
         if (force)
         {
@@ -348,15 +351,15 @@ public:
 
         setTargetValue (newValue);
     }
-   #endif
+#endif
 
 private:
     //==============================================================================
     template <typename T>
-    using LinearVoid = typename std::enable_if <std::is_same <T, ValueSmoothingTypes::Linear>::value, void>::type;
+    using LinearVoid = typename std::enable_if<std::is_same<T, ValueSmoothingTypes::Linear>::value, void>::type;
 
     template <typename T>
-    using MultiplicativeVoid = typename std::enable_if <std::is_same <T, ValueSmoothingTypes::Multiplicative>::value, void>::type;
+    using MultiplicativeVoid = typename std::enable_if<std::is_same<T, ValueSmoothingTypes::Multiplicative>::value, void>::type;
 
     //==============================================================================
     template <typename T = SmoothingType>
@@ -403,6 +406,6 @@ private:
 };
 
 template <typename FloatType>
-using LinearSmoothedValue = SmoothedValue <FloatType, ValueSmoothingTypes::Linear>;
+using LinearSmoothedValue = SmoothedValue<FloatType, ValueSmoothingTypes::Linear>;
 
 } // namespace juce
