@@ -13,8 +13,13 @@ if(NOT (CHOWDSP_ENABLE_TESTING OR CHOWDSP_ENABLE_BENCHMARKS OR CHOWDSP_ENABLE_EX
     include(AddDiagnosticInfo)
     include(SubprojectVersion)
 
-    # Add modules here...
-    include(AddJUCEModules)
+    if(JUCE_MODULES_DIR STREQUAL "")
+        message(STATUS "Using ChowDSP modules outside of JUCE...")
+        include(SetupChowdspLib)
+    else()
+        message(STATUS "Adding ChowDSP JUCE modules...")
+        include(AddJUCEModules)
+    endif()
 else()
     list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
     list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/test)
