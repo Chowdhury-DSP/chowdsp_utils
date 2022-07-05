@@ -34,7 +34,7 @@ namespace ParamUtils
 
     /** Loads a parameter of a given type from the AudioProcessorValueTreeState */
     template <typename ParameterPointerType>
-    void loadParameterPointer (ParameterPointerType& parameter, juce::AudioProcessorValueTreeState& vts, juce::StringRef parameterID)
+    void loadParameterPointer (ParameterPointerType& parameter, const juce::AudioProcessorValueTreeState& vts, juce::StringRef parameterID)
     {
         static_assert (std::is_base_of_v<juce::RangedAudioParameter, std::remove_pointer_t<ParameterPointerType>>);
 
