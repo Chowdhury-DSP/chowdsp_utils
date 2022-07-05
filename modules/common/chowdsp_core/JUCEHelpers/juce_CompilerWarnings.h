@@ -33,82 +33,120 @@
 
 #define JUCE_EACH_00_(FN)
 #define JUCE_EACH_01_(FN, X) FN (X)
-#define JUCE_EACH_02_(FN, X, ...) FN (X) \
-JUCE_EACH_01_ (FN, __VA_ARGS__)
-#define JUCE_EACH_03_(FN, X, ...) FN (X) \
-JUCE_EACH_02_ (FN, __VA_ARGS__)
-#define JUCE_EACH_04_(FN, X, ...) FN (X) \
-JUCE_EACH_03_ (FN, __VA_ARGS__)
-#define JUCE_EACH_05_(FN, X, ...) FN (X) \
-JUCE_EACH_04_ (FN, __VA_ARGS__)
-#define JUCE_EACH_06_(FN, X, ...) FN (X) \
-JUCE_EACH_05_ (FN, __VA_ARGS__)
-#define JUCE_EACH_07_(FN, X, ...) FN (X) \
-JUCE_EACH_06_ (FN, __VA_ARGS__)
-#define JUCE_EACH_08_(FN, X, ...) FN (X) \
-JUCE_EACH_07_ (FN, __VA_ARGS__)
-#define JUCE_EACH_09_(FN, X, ...) FN (X) \
-JUCE_EACH_08_ (FN, __VA_ARGS__)
-#define JUCE_EACH_10_(FN, X, ...) FN (X) \
-JUCE_EACH_09_ (FN, __VA_ARGS__)
-#define JUCE_EACH_11_(FN, X, ...) FN (X) \
-JUCE_EACH_10_ (FN, __VA_ARGS__)
-#define JUCE_EACH_12_(FN, X, ...) FN (X) \
-JUCE_EACH_11_ (FN, __VA_ARGS__)
-#define JUCE_EACH_13_(FN, X, ...) FN (X) \
-JUCE_EACH_12_ (FN, __VA_ARGS__)
-#define JUCE_EACH_14_(FN, X, ...) FN (X) \
-JUCE_EACH_13_ (FN, __VA_ARGS__)
-#define JUCE_EACH_15_(FN, X, ...) FN (X) \
-JUCE_EACH_14_ (FN, __VA_ARGS__)
-#define JUCE_EACH_16_(FN, X, ...) FN (X) \
-JUCE_EACH_15_ (FN, __VA_ARGS__)
-#define JUCE_EACH_17_(FN, X, ...) FN (X) \
-JUCE_EACH_16_ (FN, __VA_ARGS__)
-#define JUCE_EACH_18_(FN, X, ...) FN (X) \
-JUCE_EACH_17_ (FN, __VA_ARGS__)
-#define JUCE_EACH_19_(FN, X, ...) FN (X) \
-JUCE_EACH_18_ (FN, __VA_ARGS__)
-#define JUCE_EACH_20_(FN, X, ...) FN (X) \
-JUCE_EACH_19_ (FN, __VA_ARGS__)
-#define JUCE_EACH_21_(FN, X, ...) FN (X) \
-JUCE_EACH_20_ (FN, __VA_ARGS__)
-#define JUCE_EACH_22_(FN, X, ...) FN (X) \
-JUCE_EACH_21_ (FN, __VA_ARGS__)
-#define JUCE_EACH_23_(FN, X, ...) FN (X) \
-JUCE_EACH_22_ (FN, __VA_ARGS__)
-#define JUCE_EACH_24_(FN, X, ...) FN (X) \
-JUCE_EACH_23_ (FN, __VA_ARGS__)
-#define JUCE_EACH_25_(FN, X, ...) FN (X) \
-JUCE_EACH_24_ (FN, __VA_ARGS__)
-#define JUCE_EACH_26_(FN, X, ...) FN (X) \
-JUCE_EACH_25_ (FN, __VA_ARGS__)
-#define JUCE_EACH_27_(FN, X, ...) FN (X) \
-JUCE_EACH_26_ (FN, __VA_ARGS__)
-#define JUCE_EACH_28_(FN, X, ...) FN (X) \
-JUCE_EACH_27_ (FN, __VA_ARGS__)
-#define JUCE_EACH_29_(FN, X, ...) FN (X) \
-JUCE_EACH_28_ (FN, __VA_ARGS__)
-#define JUCE_EACH_30_(FN, X, ...) FN (X) \
-JUCE_EACH_29_ (FN, __VA_ARGS__)
-#define JUCE_EACH_31_(FN, X, ...) FN (X) \
-JUCE_EACH_30_ (FN, __VA_ARGS__)
-#define JUCE_EACH_32_(FN, X, ...) FN (X) \
-JUCE_EACH_31_ (FN, __VA_ARGS__)
-#define JUCE_EACH_33_(FN, X, ...) FN (X) \
-JUCE_EACH_32_ (FN, __VA_ARGS__)
-#define JUCE_EACH_34_(FN, X, ...) FN (X) \
-JUCE_EACH_33_ (FN, __VA_ARGS__)
-#define JUCE_EACH_35_(FN, X, ...) FN (X) \
-JUCE_EACH_34_ (FN, __VA_ARGS__)
-#define JUCE_EACH_36_(FN, X, ...) FN (X) \
-JUCE_EACH_35_ (FN, __VA_ARGS__)
-#define JUCE_EACH_37_(FN, X, ...) FN (X) \
-JUCE_EACH_36_ (FN, __VA_ARGS__)
-#define JUCE_EACH_38_(FN, X, ...) FN (X) \
-JUCE_EACH_37_ (FN, __VA_ARGS__)
-#define JUCE_EACH_39_(FN, X, ...) FN (X) \
-JUCE_EACH_38_ (FN, __VA_ARGS__)
+#define JUCE_EACH_02_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_01_ (FN, __VA_ARGS__)
+#define JUCE_EACH_03_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_02_ (FN, __VA_ARGS__)
+#define JUCE_EACH_04_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_03_ (FN, __VA_ARGS__)
+#define JUCE_EACH_05_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_04_ (FN, __VA_ARGS__)
+#define JUCE_EACH_06_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_05_ (FN, __VA_ARGS__)
+#define JUCE_EACH_07_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_06_ (FN, __VA_ARGS__)
+#define JUCE_EACH_08_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_07_ (FN, __VA_ARGS__)
+#define JUCE_EACH_09_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_08_ (FN, __VA_ARGS__)
+#define JUCE_EACH_10_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_09_ (FN, __VA_ARGS__)
+#define JUCE_EACH_11_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_10_ (FN, __VA_ARGS__)
+#define JUCE_EACH_12_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_11_ (FN, __VA_ARGS__)
+#define JUCE_EACH_13_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_12_ (FN, __VA_ARGS__)
+#define JUCE_EACH_14_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_13_ (FN, __VA_ARGS__)
+#define JUCE_EACH_15_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_14_ (FN, __VA_ARGS__)
+#define JUCE_EACH_16_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_15_ (FN, __VA_ARGS__)
+#define JUCE_EACH_17_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_16_ (FN, __VA_ARGS__)
+#define JUCE_EACH_18_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_17_ (FN, __VA_ARGS__)
+#define JUCE_EACH_19_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_18_ (FN, __VA_ARGS__)
+#define JUCE_EACH_20_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_19_ (FN, __VA_ARGS__)
+#define JUCE_EACH_21_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_20_ (FN, __VA_ARGS__)
+#define JUCE_EACH_22_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_21_ (FN, __VA_ARGS__)
+#define JUCE_EACH_23_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_22_ (FN, __VA_ARGS__)
+#define JUCE_EACH_24_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_23_ (FN, __VA_ARGS__)
+#define JUCE_EACH_25_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_24_ (FN, __VA_ARGS__)
+#define JUCE_EACH_26_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_25_ (FN, __VA_ARGS__)
+#define JUCE_EACH_27_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_26_ (FN, __VA_ARGS__)
+#define JUCE_EACH_28_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_27_ (FN, __VA_ARGS__)
+#define JUCE_EACH_29_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_28_ (FN, __VA_ARGS__)
+#define JUCE_EACH_30_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_29_ (FN, __VA_ARGS__)
+#define JUCE_EACH_31_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_30_ (FN, __VA_ARGS__)
+#define JUCE_EACH_32_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_31_ (FN, __VA_ARGS__)
+#define JUCE_EACH_33_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_32_ (FN, __VA_ARGS__)
+#define JUCE_EACH_34_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_33_ (FN, __VA_ARGS__)
+#define JUCE_EACH_35_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_34_ (FN, __VA_ARGS__)
+#define JUCE_EACH_36_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_35_ (FN, __VA_ARGS__)
+#define JUCE_EACH_37_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_36_ (FN, __VA_ARGS__)
+#define JUCE_EACH_38_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_37_ (FN, __VA_ARGS__)
+#define JUCE_EACH_39_(FN, X, ...) \
+    FN (X)                        \
+    JUCE_EACH_38_ (FN, __VA_ARGS__)
 
 /** Apply the macro FN to each of the other arguments. */
 #define JUCE_EACH(FN, ...)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                \
