@@ -69,7 +69,7 @@ void ForwardingParameter::ForwardingAttachment::parameterGestureChanged (int, bo
 }
 
 //=================================================================================
-ForwardingParameter::ForwardingParameter (const juce::String& id, juce::UndoManager* um, const juce::String& thisDefaultName)
+ForwardingParameter::ForwardingParameter (const ParameterID& id, juce::UndoManager* um, const juce::String& thisDefaultName)
     : juce::RangedAudioParameter (id, thisDefaultName), undoManager (um), defaultName (thisDefaultName)
 {
 }

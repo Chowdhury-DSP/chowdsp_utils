@@ -19,7 +19,11 @@ public:
         for (int i = 0; i < totalNumForwardingParameters; ++i)
         {
             const auto id = Provider::getForwardingParameterID (i);
+#if JUCE_VERSION < 0x070000
             auto* vtsParameter = vts.getParameter (id);
+#else
+            auto* vtsParameter = vts.getParameter (id.getParamID());
+#endif
 
             // this parameter was not initialized properly!
             jassert (vtsParameter != nullptr);

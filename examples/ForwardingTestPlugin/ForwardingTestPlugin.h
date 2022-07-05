@@ -35,9 +35,9 @@ private:
 
     struct ParamForwardingProvider
     {
-        static juce::String getForwardingParameterID (int paramIndex)
+        static chowdsp::ParameterID getForwardingParameterID (int paramIndex)
         {
-            return "forward_param_" + juce::String (paramIndex);
+            return { "forward_param_" + juce::String (paramIndex), 100 };
         }
     };
     using ForwardingParams = chowdsp::ForwardingParametersManager<ParamForwardingProvider, 10>;
