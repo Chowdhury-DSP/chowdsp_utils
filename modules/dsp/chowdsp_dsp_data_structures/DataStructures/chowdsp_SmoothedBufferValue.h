@@ -4,6 +4,13 @@
 #include <chowdsp_parameters/chowdsp_parameters.h>
 #endif
 
+#if ! CHOWDSP_USING_JUCE
+namespace juce
+{
+
+}
+#endif
+
 namespace chowdsp
 {
 /**
@@ -14,6 +21,9 @@ template <typename FloatType, typename ValueSmoothingType = juce::ValueSmoothing
 class SmoothedBufferValue
 {
 public:
+    using NumericType = FloatType;
+    using SmoothingType = ValueSmoothingType;
+
     /** Default constructor */
     SmoothedBufferValue() = default;
 
@@ -66,7 +76,7 @@ public:
     void process (FloatType value, int numSamples);
 
     /** Returns a pointer to the current smoothed buffer. */
-    [[nodiscard]] const FloatType* getSmoothedBuffer() const { return buffer.getReadPointer (0); }
+    [[nodiscard]] const FloatType* getSmoothedBuffer() const { return buffer.data(); }
 
     /**
      * Optional mapping function to map from the set value to the smoothed value.
@@ -77,7 +87,7 @@ public:
     std::function<FloatType (FloatType)> mappingFunction = [] (auto x) { return x; };
 
 private:
-    juce::AudioBuffer<FloatType> buffer;
+    std::vector<FloatType> buffer;
     juce::SmoothedValue<FloatType, ValueSmoothingType> smoother;
 
     std::atomic<float>* parameterHandle = nullptr;

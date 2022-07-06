@@ -28,7 +28,7 @@ template <typename FloatType, typename ValueSmoothingTypes>
 void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::prepare (double fs, int samplesPerBlock)
 {
     sampleRate = fs;
-    buffer.setSize (1, samplesPerBlock);
+    buffer.resize ((size_t) samplesPerBlock, {});
 
     if (parameterHandle != nullptr)
         reset (parameterHandle->load());
@@ -87,7 +87,7 @@ void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::process (FloatType val
     const auto mappedValue = mappingFunction (value);
     smoother.setTargetValue (mappedValue);
 
-    auto* bufferData = buffer.getWritePointer (0);
+    auto* bufferData = buffer.data();
     if (! smoother.isSmoothing())
     {
         juce::FloatVectorOperations::fill (bufferData, mappedValue, numSamples);

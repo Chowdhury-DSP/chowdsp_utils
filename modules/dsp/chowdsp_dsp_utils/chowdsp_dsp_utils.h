@@ -8,7 +8,7 @@ BEGIN_JUCE_MODULE_DECLARATION
    version:       1.0.0
    name:          ChowDSP DSP Utilities
    description:   Commonly used DSP utilities for ChowDSP plugins
-   dependencies:  juce_audio_processors, chowdsp_filters
+   dependencies:  juce_audio_processors, juce_dsp, chowdsp_filters
 
    website:       https://ccrma.stanford.edu/~jatin/chowdsp
    license:       GPLv3
@@ -35,6 +35,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 // JUCE includes
 #include <juce_audio_processors/juce_audio_processors.h>
+#include <juce_dsp/juce_dsp.h>
 #include <chowdsp_filters/chowdsp_filters.h>
 
 #if CHOWDSP_USE_LIBSAMPLERATE
