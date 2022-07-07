@@ -14,7 +14,7 @@ float stringToFreqVal (const juce::String& s)
 {
     auto freqVal = s.getFloatValue();
 
-    if (s.getLastCharacter() == 'k')
+    if (s.getLastCharacter() == 'k' || s.endsWith ("kHz") || s.endsWith ("khz"))
         freqVal *= 1000.0f;
 
     return freqVal;
