@@ -20,10 +20,12 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 #pragma once
 
+#include <array>
+
 #include <chowdsp_simd/chowdsp_simd.h>
 
 #include "DataStructures/chowdsp_ScopedValue.h"
-//#include "DataStructures/chowdsp_Buffer.h"
+#include "DataStructures/chowdsp_Buffer.h"
 #include "DataStructures/chowdsp_SmoothedBufferValue.h"
 
 #if CHOWDSP_USING_JUCE

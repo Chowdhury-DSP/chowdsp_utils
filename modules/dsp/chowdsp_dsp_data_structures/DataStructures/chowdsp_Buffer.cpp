@@ -17,12 +17,12 @@ void Buffer<SampleType>::setMaxSize (int numChannels, int numSamples)
     jassert (juce::isPositiveAndBelow (numChannels, maxNumChannels));
     jassert (numSamples > 0);
 
-    rawData.resize (numChannels, ChannelData (numSamples, SampleType {}));
+    rawData.resize ((size_t) numChannels, ChannelData ((size_t) numSamples, SampleType {}));
     hasBeenCleared = true;
 
     for (int ch = 0; ch < numChannels; ++ch)
     {
-        channelPointers[ch] = rawData[(size_t) ch].data();
+        channelPointers[(size_t) ch] = rawData[(size_t) ch].data();
     }
 
     setCurrentSize (numChannels, numSamples);
@@ -38,7 +38,7 @@ void Buffer<SampleType>::setCurrentSize (int numChannels, int numSamples) noexce
         clearInternal (0, currentNumChannels, currentNumSamples, numSamples);
 
     if (increasingNumChannels)
-        clearInternal (numChannels, currentNumChannels, 0, numSamples);
+        clearInternal (currentNumChannels, numChannels, 0, numSamples);
 
     currentNumChannels = numChannels;
     currentNumSamples = numSamples;
@@ -58,7 +58,7 @@ const SampleType* Buffer<SampleType>::getReadPointer (int channel) const noexcep
 }
 
 template <typename SampleType>
-SampleType** Buffer<SampleType>::getArrayofWritePointers() noexcept
+SampleType** Buffer<SampleType>::getArrayOfWritePointers() noexcept
 {
     hasBeenCleared = false;
     return channelPointers.data();
@@ -67,7 +67,7 @@ SampleType** Buffer<SampleType>::getArrayofWritePointers() noexcept
 template <typename SampleType>
 const SampleType** Buffer<SampleType>::getArrayOfReadPointers() const noexcept
 {
-    return channelPointers.data();
+    return const_cast<const SampleType**> (channelPointers.data());
 }
 
 template <typename SampleType>
@@ -97,4 +97,9 @@ std::enable_if_t<SampleTypeHelpers::IsSIMDRegister<T>, void>
     for (int ch = startChannel; ch < endChannel; ++ch)
         std::fill (channelPointers[(size_t) ch] + startSample, channelPointers[(size_t) ch] + endSample, SampleType{});
 }
+
+template class Buffer<float>;
+template class Buffer<double>;
+template class Buffer<xsimd::batch<float>>;
+template class Buffer<xsimd::batch<double>>;
 } // namespace chowdsp

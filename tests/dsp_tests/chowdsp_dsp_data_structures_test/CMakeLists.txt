@@ -23,6 +23,7 @@ setup_catch_test(chowdsp_dsp_data_structures_test_no_juce
 
 target_sources(chowdsp_dsp_data_structures_test_no_juce
     PRIVATE
+        BufferTest.cpp
         SmoothedBufferValueTest.cpp
         ScopedValueTest.cpp
 )

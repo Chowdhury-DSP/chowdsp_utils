@@ -32,7 +32,7 @@ public:
     SampleType* getWritePointer (int channel) noexcept;
     const SampleType* getReadPointer (int channel) const noexcept;
 
-    SampleType** getArrayofWritePointers() noexcept;
+    SampleType** getArrayOfWritePointers() noexcept;
     const SampleType** getArrayOfReadPointers() const noexcept;
 
 private:
