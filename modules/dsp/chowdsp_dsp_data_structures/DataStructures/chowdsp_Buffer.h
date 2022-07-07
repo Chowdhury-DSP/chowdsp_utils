@@ -2,6 +2,27 @@
 
 namespace chowdsp
 {
+#ifndef DOXYGEN
+namespace buffer_detail
+{
+    template <typename SampleType>
+    std::enable_if_t<std::is_floating_point_v<SampleType>, void>
+        clear (SampleType** channelData, int startChannel, int endChannel, int startSample, int endSample) noexcept
+    {
+        for (int ch = startChannel; ch < endChannel; ++ch)
+            juce::FloatVectorOperations::clear (channelData[(size_t) ch] + startSample, endSample - startSample);
+    }
+
+    template <typename SampleType>
+    std::enable_if_t<SampleTypeHelpers::IsSIMDRegister<SampleType>, void>
+        clear (SampleType** channelData, int startChannel, int endChannel, int startSample, int endSample) noexcept
+    {
+        for (int ch = startChannel; ch < endChannel; ++ch)
+            std::fill (channelData[(size_t) ch] + startSample, channelData[(size_t) ch] + endSample, SampleType{});
+    }
+}
+#endif
+
 /**
  * An audio sample buffer that allocates its own memory.
  */
@@ -36,14 +57,6 @@ public:
     const SampleType** getArrayOfReadPointers() const noexcept;
 
 private:
-    template <typename T = SampleType>
-    std::enable_if_t<std::is_floating_point_v<T>, void>
-        clearInternal (int startChannel, int endChannel, int startSample, int endSample) noexcept;
-
-    template <typename T = SampleType>
-    std::enable_if_t<SampleTypeHelpers::IsSIMDRegister<T>, void>
-        clearInternal (int startChannel, int endChannel, int startSample, int endSample) noexcept;
-
     using Allocator = xsimd::default_allocator<SampleType>;
     using ChannelData = std::vector<SampleType, Allocator>;
     std::vector<ChannelData> rawData;

@@ -35,10 +35,10 @@ void Buffer<SampleType>::setCurrentSize (int numChannels, int numSamples) noexce
     const auto increasingNumSamples = numSamples > currentNumSamples;
 
     if (increasingNumSamples)
-        clearInternal (0, currentNumChannels, currentNumSamples, numSamples);
+        buffer_detail::clear (channelPointers.data(), 0, currentNumChannels, currentNumSamples, numSamples);
 
     if (increasingNumChannels)
-        clearInternal (currentNumChannels, numChannels, 0, numSamples);
+        buffer_detail::clear (channelPointers.data(), currentNumChannels, numChannels, 0, numSamples);
 
     currentNumChannels = numChannels;
     currentNumSamples = numSamples;
@@ -76,26 +76,8 @@ void Buffer<SampleType>::clear() noexcept
     if (hasBeenCleared)
         return;
 
-    clearInternal (0, currentNumChannels, 0, currentNumSamples);
+    buffer_detail::clear (channelPointers.data(), 0, currentNumChannels, 0, currentNumSamples);
     hasBeenCleared = true;
-}
-
-template <typename SampleType>
-template <typename T>
-std::enable_if_t<std::is_floating_point_v<T>, void>
-    Buffer<SampleType>::clearInternal (int startChannel, int endChannel, int startSample, int endSample) noexcept
-{
-    for (int ch = startChannel; ch < endChannel; ++ch)
-        juce::FloatVectorOperations::clear (channelPointers[(size_t) ch] + startSample, endSample - startSample);
-}
-
-template <typename SampleType>
-template <typename T>
-std::enable_if_t<SampleTypeHelpers::IsSIMDRegister<T>, void>
-    Buffer<SampleType>::clearInternal (int startChannel, int endChannel, int startSample, int endSample) noexcept
-{
-    for (int ch = startChannel; ch < endChannel; ++ch)
-        std::fill (channelPointers[(size_t) ch] + startSample, channelPointers[(size_t) ch] + endSample, SampleType{});
 }
 
 template class Buffer<float>;

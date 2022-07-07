@@ -24,13 +24,17 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 #include <chowdsp_simd/chowdsp_simd.h>
 
-#include "DataStructures/chowdsp_ScopedValue.h"
-#include "DataStructures/chowdsp_Buffer.h"
-#include "DataStructures/chowdsp_SmoothedBufferValue.h"
-
 #if CHOWDSP_USING_JUCE
 #include <juce_dsp/juce_dsp.h>
 #include "DataStructures/chowdsp_SIMDAudioBlock.h"
+#endif
+
+#include "DataStructures/chowdsp_ScopedValue.h"
+#include "DataStructures/chowdsp_Buffer.h"
+#include "DataStructures/chowdsp_BufferView.h"
+#include "DataStructures/chowdsp_SmoothedBufferValue.h"
+
+#if CHOWDSP_USING_JUCE
 #include "DataStructures/chowdsp_COLAProcessor.h" // JUCE only
 #include "DataStructures/chowdsp_LookupTableTransform.h" // relies on JUCE lookup table...
 #include "DataStructures/chowdsp_RebufferedProcessor.h" // re-write to use BufferView

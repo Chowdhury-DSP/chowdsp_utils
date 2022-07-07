@@ -14,6 +14,7 @@ target_sources(chowdsp_dsp_data_structures_test
         LookupTableTest.cpp
         RebufferProcessorTest.cpp
         SmoothedBufferValueTestJUCE.cpp
+        BufferViewTestJUCE.cpp
 )
 
 # Testing without JUCE
@@ -24,6 +25,7 @@ setup_catch_test(chowdsp_dsp_data_structures_test_no_juce
 target_sources(chowdsp_dsp_data_structures_test_no_juce
     PRIVATE
         BufferTest.cpp
+        BufferViewTest.cpp
         SmoothedBufferValueTest.cpp
         ScopedValueTest.cpp
 )
