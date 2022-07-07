@@ -30,6 +30,9 @@ template <typename SampleType>
 class Buffer
 {
 public:
+    /** The sample type used by the buffer */
+    using Type = SampleType;
+
     /** Default Constructor */
     Buffer();
 

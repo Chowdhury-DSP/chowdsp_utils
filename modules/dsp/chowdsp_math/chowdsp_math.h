@@ -20,6 +20,8 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 #pragma once
 
+#include <numeric>
+
 #include <chowdsp_simd/chowdsp_simd.h>
 
 #include "Math/chowdsp_Combinatorics.h"
@@ -30,3 +32,4 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Math/chowdsp_OtherMathOps.h"
 #include "Math/chowdsp_JacobiElliptic.h"
 #include "Math/chowdsp_Polylogarithm.h"
+#include "Math/chowdsp_BufferMath.h"

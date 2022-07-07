@@ -27,17 +27,18 @@ public:
     IIRFilter (IIRFilter&&) noexcept = default;
     IIRFilter& operator= (IIRFilter&&) noexcept = default;
 
+#if CHOWDSP_USING_JUCE
     /** Prepares the filter for processing a new number of channels */
     void prepare (const juce::dsp::ProcessSpec& spec)
     {
         prepare ((int) spec.numChannels);
     }
+#endif
 
     /** Prepares the filter for processing a new number of channels */
     void prepare (int numChannels)
     {
         z.resize (numChannels);
-        channelPointers.resize (numChannels);
     }
 
     /** Reset filter state */
@@ -109,24 +110,22 @@ public:
     }
 
     /** Process block of samples */
-    void processBlock (chowdsp::AudioBlock<FloatType>& block) noexcept
+    void processBlock (const chowdsp::BufferView<FloatType>& block) noexcept
     {
         const auto numChannels = (int) block.getNumChannels();
         const auto numSamples = (int) block.getNumSamples();
         for (int channel = 0; channel < numChannels; ++channel)
-            processBlock (block.getChannelPointer (channel), numSamples, channel);
+            processBlock (block.getWritePointer (channel), numSamples, channel);
     }
 
     /** Process block of samples with a custom modulation callback which is called every sample */
     template <typename Modulator>
-    void processBlockWithModulation (chowdsp::AudioBlock<FloatType>& block, Modulator&& modulator) noexcept
+    void processBlockWithModulation (const chowdsp::BufferView<FloatType>& block, Modulator&& modulator) noexcept
     {
         const auto numChannels = (int) block.getNumChannels();
         const auto numSamples = (int) block.getNumSamples();
 
-        for (int channel = 0; channel < numChannels; ++channel)
-            channelPointers[channel] = block.getChannelPointer (channel);
-
+        auto* channelPointers = block.getArrayOfWritePointers();
         for (int n = 0; n < numSamples; ++n)
         {
             modulator (n);
@@ -146,7 +145,6 @@ protected:
     FloatType a[order + 1];
     FloatType b[order + 1];
     std::vector<std::array<FloatType, order + 1>> z;
-    std::vector<FloatType*> channelPointers = std::vector<FloatType*> (1);
 
     template <typename PrototypeFilter>
     friend class ModFilterWrapper;

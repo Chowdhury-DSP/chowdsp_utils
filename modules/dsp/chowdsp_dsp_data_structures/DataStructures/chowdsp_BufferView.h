@@ -6,6 +6,9 @@ template <typename SampleType>
 class BufferView
 {
 public:
+    /** The sample type used by the buffer */
+    using Type = SampleType;
+    
     BufferView (SampleType** data, int dataNumChannels, int dataNumSamples, int sampleOffset = 0) : numChannels (dataNumChannels),
                                                                                                     numSamples (dataNumSamples)
     {

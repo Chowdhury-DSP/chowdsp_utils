@@ -23,14 +23,12 @@ function(setup_chowdsp_lib lib_name)
             REQUIRED
         )
 
-
         get_filename_component(module_parent_path ${module_path} DIRECTORY)
         target_include_directories(${lib_name} PUBLIC ${module_parent_path})
-#        message(STATUS "Adding module: ${module}, with path ${module_path}, from parent ${module_parent_path}")
+        target_compile_definitions(${lib_name} PUBLIC JUCE_MODULE_AVAILABLE_${module})
 
         if(EXISTS "${module_path}/${module}.cpp")
             target_sources(${lib_name} PRIVATE "${module_path}/${module}.cpp")
-#            message(STATUS "Adding source ${module_path}/${module}.cpp")
         endif()
     endforeach()
 
