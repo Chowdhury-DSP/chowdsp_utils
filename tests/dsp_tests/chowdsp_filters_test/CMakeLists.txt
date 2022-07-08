@@ -7,6 +7,14 @@ target_sources(chowdsp_filters_test
         ConformalMapsTest.cpp
         FirstOrderFiltersTest.cpp
         ShelfFilterTest.cpp
+        SecondOrderFiltersTest.cpp
+        StateVariableFilterTest.cpp
+        ModFilterWrapperTest.cpp
+        FilterChainTest.cpp
+        NthOrderFilterTest.cpp
+        ButterworthFilterTest.cpp
+        ChebyshevIIFilterTest.cpp
+        EllipticFilterTest.cpp
 )
 
 #add_executable(chowdsp_filters_test)
@@ -18,17 +26,7 @@ target_sources(chowdsp_filters_test
 #)
 #
 #target_sources(chowdsp_filters_test PRIVATE
-#    FilterChainTest.cpp
-#    FirstOrderFiltersTest.cpp
 #    HilbertFilterTest.cpp
-#    NthOrderFilterTest.cpp
-#    SecondOrderFiltersTest.cpp
-#    ShelfFilterTest.cpp
-#    ModFilterWrapperTest.cpp
-#    ButterworthFilterTest.cpp
-#    ChebyshevIIFilterTest.cpp
-#    EllipticFilterTest.cpp
 #    FractionalOrderFilterTest.cpp
 #    FIRFilterTest.cpp
-#    StateVariableFilterTest.cpp
 #)

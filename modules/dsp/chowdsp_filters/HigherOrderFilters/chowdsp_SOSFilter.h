@@ -18,8 +18,6 @@ public:
     {
         for (auto& sos : secondOrderSections)
             sos.prepare (numChannels);
-
-        channelPointers.resize ((size_t) numChannels);
     }
 
     /** Resets the filter state */
@@ -45,7 +43,7 @@ public:
     }
 
     /** Process block of samples */
-    void processBlock (chowdsp::AudioBlock<FloatType>& block) noexcept
+    void processBlock (const chowdsp::BufferView<FloatType>& block) noexcept
     {
         for (auto& sos : secondOrderSections)
             sos.processBlock (block);
@@ -53,14 +51,12 @@ public:
 
     /** Process block of samples with a custom modulation callback which is called every sample */
     template <typename Modulator>
-    void processBlockWithModulation (chowdsp::AudioBlock<FloatType>& block, Modulator&& modulator) noexcept
+    void processBlockWithModulation (const chowdsp::BufferView<FloatType>& block, Modulator&& modulator) noexcept
     {
         const auto numChannels = block.getNumChannels();
         const auto numSamples = (int) block.getNumSamples();
 
-        for (size_t channel = 0; channel < numChannels; ++channel)
-            channelPointers[channel] = block.getChannelPointer (channel);
-
+        auto* channelPointers = block.getArrayOfWritePointers();
         for (int n = 0; n < numSamples; ++n)
         {
             modulator (n);
@@ -71,9 +67,6 @@ public:
 
 protected:
     std::array<IIRFilter<2, FloatType>, (size_t) order / 2> secondOrderSections;
-
-private:
-    std::vector<FloatType*> channelPointers = std::vector<FloatType*> (1);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SOSFilter)
 };

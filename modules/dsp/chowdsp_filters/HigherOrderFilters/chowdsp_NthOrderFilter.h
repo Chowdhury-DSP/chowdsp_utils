@@ -54,11 +54,20 @@ public:
     }
 
     /** Processes a block of samples */
+    void processBlock (const chowdsp::BufferView<T>& buffer)
+    {
+        for (auto& filt : filters)
+            filt.processBlock (buffer);
+    }
+
+#if CHOWDSP_USING_JUCE
+    /** Processes a block of samples */
     void process (const chowdsp::ProcessContextReplacing<T>& context)
     {
         for (auto& filt : filters)
             filt.process (context);
     }
+#endif
 
     /** Processes a single sample */
     inline T processSample (int channel, T x) noexcept

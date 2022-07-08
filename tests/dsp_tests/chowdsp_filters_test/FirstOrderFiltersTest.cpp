@@ -16,7 +16,6 @@ void testFrequency (FilterType& filter, NumericType freq, NumericType expGainDB,
     filter.processBlock (buffer);
 
     using namespace chowdsp::SIMDUtils;
-
     const auto halfSamples = buffer.getNumSamples() / 2;
     const auto magDB = gainToDecibels (chowdsp::BufferMath::getMagnitude (buffer, halfSamples, halfSamples));
 

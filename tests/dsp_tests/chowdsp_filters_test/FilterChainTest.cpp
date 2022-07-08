@@ -1,5 +1,4 @@
-#include <test_utils.h>
-#include <TimedUnitTest.h>
+#include <CatchUtils.h>
 #include <chowdsp_filters/chowdsp_filters.h>
 
 namespace Constants
@@ -9,24 +8,18 @@ constexpr float fc = 500.0f;
 constexpr float Qval = 0.7071f;
 } // namespace Constants
 
-class FilterChainTest : public TimedUnitTest
+static void checkBufferLevel (const chowdsp::Buffer<float>& buffer, float expGainDB, float maxError, const std::string& message)
 {
-public:
-    FilterChainTest() : TimedUnitTest ("Filter Chain Test", "Filters")
-    {
-    }
+    const auto halfSamples = buffer.getNumSamples() / 2;
+    auto magDB = juce::Decibels::gainToDecibels (chowdsp::BufferMath::getMagnitude (buffer, halfSamples, halfSamples));
+    REQUIRE_MESSAGE (magDB == Approx (expGainDB).margin (maxError), message);
+}
 
-    void checkBufferLevel (const juce::AudioBuffer<float>& buffer, float expGainDB, float maxError, const juce::String& message)
-    {
-        const auto halfSamples = buffer.getNumSamples() / 2;
-        auto magDB = juce::Decibels::gainToDecibels (buffer.getMagnitude (halfSamples, halfSamples));
-        expectWithinAbsoluteError (magDB, expGainDB, maxError, message);
-    }
-
-    void secondOrderFilterTest()
+TEST_CASE ("Filter Chain Test")
+{
+    SECTION ("Second Order Filter Test")
     {
         using namespace Constants;
-
         using FilterType = chowdsp::SecondOrderLPF<float>;
         chowdsp::FilterChain<FilterType, FilterType> filters;
         filters.reset();
@@ -49,10 +42,9 @@ public:
         }
     }
 
-    void nthOrderFilterTest()
+    SECTION ("Nth Order Filter Test")
     {
         using namespace Constants;
-
         using FilterType = chowdsp::NthOrderFilter<float, 4>;
         chowdsp::FilterChain<FilterType, FilterType> filters;
 
@@ -61,20 +53,8 @@ public:
                                          filt.setCutoffFrequency (fc); });
 
         auto buffer = test_utils::makeSineWave<float> (2 * fc, fs, 1.0f);
-        auto&& block = juce::dsp::AudioBlock<float> { buffer };
-        filters.process (chowdsp::ProcessContextReplacing<float> { block });
+        filters.processBlock<float> (buffer);
 
         checkBufferLevel (buffer, -48.0f, 0.5f, "NthOrderFilter process() is incorrect!");
     }
-
-    void runTestTimed() override
-    {
-        beginTest ("Second Order Filter Test");
-        secondOrderFilterTest();
-
-        beginTest ("Nth Order Filter Test");
-        nthOrderFilterTest();
-    }
-};
-
-static FilterChainTest filterChainTest;
+}
