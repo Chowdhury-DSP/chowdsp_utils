@@ -77,7 +77,7 @@ public:
     }
 
     /** Process block of samples */
-    void processBlock (chowdsp::AudioBlock<FloatType>& block) noexcept
+    void processBlock (const chowdsp::BufferView<FloatType>& block) noexcept
     {
         for (auto& filt : filters)
             filt.processBlock (block);

@@ -15,18 +15,12 @@ target_sources(chowdsp_filters_test
         ButterworthFilterTest.cpp
         ChebyshevIIFilterTest.cpp
         EllipticFilterTest.cpp
+        FIRFilterTest.cpp # needs JUCE
+        FractionalOrderFilterTest.cpp
+        HilbertFilterTest.cpp # needs chowdsp_dsp_utils
 )
 
-#add_executable(chowdsp_filters_test)
-#setup_juce_test(chowdsp_filters_test)
-#
-#target_link_libraries(chowdsp_filters_test PRIVATE
-#    chowdsp_filters
-#    chowdsp_dsp_utils
-#)
-#
-#target_sources(chowdsp_filters_test PRIVATE
-#    HilbertFilterTest.cpp
-#    FractionalOrderFilterTest.cpp
-#    FIRFilterTest.cpp
-#)
+target_link_libraries(chowdsp_filters_test_lib
+    PUBLIC
+        chowdsp::chowdsp_dsp_utils
+)

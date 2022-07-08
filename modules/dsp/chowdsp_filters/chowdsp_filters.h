@@ -41,6 +41,6 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "HigherOrderFilters/chowdsp_ChebyshevIIFilter.h"
 #include "HigherOrderFilters/chowdsp_EllipticFilter.h"
 
-//#include "Other/chowdsp_FractionalOrderFilter.h"
-//#include "Other/chowdsp_HilbertFilter.h"
-//#include "Other/chowdsp_FIRFilter.h"
+#include "Other/chowdsp_FractionalOrderFilter.h"
+#include "Other/chowdsp_HilbertFilter.h"
+#include "Other/chowdsp_FIRFilter.h"
