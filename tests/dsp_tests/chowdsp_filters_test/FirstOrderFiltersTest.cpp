@@ -18,15 +18,9 @@ void testFrequency (FilterType& filter, NumericType freq, NumericType expGainDB,
     using namespace chowdsp::SIMDUtils;
 
     const auto halfSamples = buffer.getNumSamples() / 2;
-    auto magDB = gainToDecibels (chowdsp::BufferMath::getMagnitude (buffer, halfSamples, halfSamples));
+    const auto magDB = gainToDecibels (chowdsp::BufferMath::getMagnitude (buffer, halfSamples, halfSamples));
 
-    NumericType magDBReduced;
-    if constexpr (std::is_floating_point_v<T>)
-        magDBReduced = magDB;
-    else if constexpr (chowdsp::SampleTypeHelpers::IsSIMDRegister<T>)
-        magDBReduced = magDB.get (0);
-
-    REQUIRE_MESSAGE (all (magDBReduced == Approx (expGainDB).margin (maxError)), message << " " << std::to_string (magDBReduced));
+    REQUIRE_MESSAGE (magDB == SIMDApprox<T> ((T) expGainDB).margin (maxError), message);
 }
 
 TEMPLATE_TEST_CASE ("First Order Filters Test", "Filters", float, double, xsimd::batch<float>, xsimd::batch<double>)

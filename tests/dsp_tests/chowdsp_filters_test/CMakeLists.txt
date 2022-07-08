@@ -4,7 +4,9 @@ setup_catch_test(chowdsp_filters_test
 
 target_sources(chowdsp_filters_test
     PRIVATE
+        ConformalMapsTest.cpp
         FirstOrderFiltersTest.cpp
+        ShelfFilterTest.cpp
 )
 
 #add_executable(chowdsp_filters_test)
@@ -16,7 +18,6 @@ target_sources(chowdsp_filters_test
 #)
 #
 #target_sources(chowdsp_filters_test PRIVATE
-#    ConformalMapsTest.cpp
 #    FilterChainTest.cpp
 #    FirstOrderFiltersTest.cpp
 #    HilbertFilterTest.cpp
