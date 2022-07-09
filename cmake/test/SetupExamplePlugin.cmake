@@ -38,5 +38,6 @@ function(setup_example_plugin target code)
         CLAP_ID "org.chowdsp.${target}"
         CLAP_FEATURES audio-effect
         CLAP_PROCESS_EVENTS_RESOLUTION_SAMPLES 64
+        CLAP_USE_JUCE_PARAMETER_RANGES DISCRETE
     )
 endfunction(setup_example_plugin)

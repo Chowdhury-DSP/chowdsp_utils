@@ -34,7 +34,7 @@ void CLAPProcessorExtensions::handleDirectEvent (const clap_event_header_t* even
 
     // handle parameter modulation here...
     auto paramModEvent = reinterpret_cast<const clap_event_param_mod*> (event);
-    auto* baseParameter = static_cast<juce::AudioProcessorParameter*> (paramModEvent->cookie);
+    auto* baseParameter = static_cast<JUCEParameterVariant*> (paramModEvent->cookie)->processorParam;
 
 #if JUCE_DEBUG
     {
