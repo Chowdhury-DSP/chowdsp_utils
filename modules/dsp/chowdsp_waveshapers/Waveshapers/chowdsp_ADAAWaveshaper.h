@@ -130,6 +130,38 @@ public:
         }
     }
 
+    /** Process a block of samples. */
+    void processBlock (const BufferView<T>& buffer) noexcept
+    {
+        const auto numChannels = buffer.getNumChannels();
+        const auto numSamples = buffer.getNumSamples();
+        jassert ((int) x1.size() <= numChannels);
+
+        for (int ch = 0; ch < numChannels; ++ch)
+        {
+            const auto* inputData = buffer.getReadPointer (ch);
+            auto* outputData = buffer.getWritePointer (ch);
+
+            process (outputData, inputData, numSamples, ch);
+        }
+    }
+
+    /** Process a block of samples (bypassed). */
+    void processBlockBypassed (const BufferView<T>& buffer) noexcept
+    {
+        const auto numChannels = buffer.getNumChannels();
+        const auto numSamples = buffer.getNumSamples();
+        jassert ((int) x1.size() <= numChannels);
+
+        for (int ch = 0; ch < numChannels; ++ch)
+        {
+            const auto* inputData = buffer.getReadPointer (ch);
+            auto* outputData = buffer.getWritePointer (ch);
+
+            processBypassed (outputData, inputData, numSamples, ch);
+        }
+    }
+
     /** Processes the given processing context */
     template <typename ProcessContext>
     void process (const ProcessContext& context) noexcept

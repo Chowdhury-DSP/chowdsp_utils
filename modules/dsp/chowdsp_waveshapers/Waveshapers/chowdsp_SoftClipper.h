@@ -33,6 +33,27 @@ public:
         return x * invNormFactor;
     }
 
+    /** Process a block of samples. */
+    void processBlock (const BufferView<T>& buffer) noexcept
+    {
+        const auto numChannels = buffer.getNumChannels();
+        const auto numSamples = buffer.getNumSamples();
+
+        for (int ch = 0; ch < numChannels; ++ch)
+        {
+            auto* channelData = buffer.getWritePointer (ch);
+
+            juce::FloatVectorOperations::multiply (channelData, normFactor, numSamples);
+            juce::FloatVectorOperations::clip (channelData, channelData, (T) -1, (T) 1, numSamples);
+
+            FloatVectorOperations::integerPower (exponentData.data(), channelData, degree, numSamples);
+            juce::FloatVectorOperations::multiply (exponentData.data(), oneOverDeg, numSamples);
+            juce::FloatVectorOperations::subtract (channelData, exponentData.data(), numSamples);
+
+            juce::FloatVectorOperations::multiply (channelData, invNormFactor, numSamples);
+        }
+    }
+
     /** Process a block the given processing context. */
     template <typename ProcessContext>
     void process (const ProcessContext& context) noexcept
