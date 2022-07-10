@@ -21,8 +21,7 @@ void LevelDetector<SampleType>::prepare (const juce::dsp::ProcessSpec& spec)
 {
     expFactor = -1000.0f / (float) spec.sampleRate;
 
-    absBuffer.setSize ((int) spec.numChannels, (int) spec.maximumBlockSize);
-    absBlock = chowdsp::AudioBlock<SampleType> { absBuffer };
+    absBuffer.setMaxSize ((int) spec.numChannels, (int) spec.maximumBlockSize);
 
     reset();
 }
@@ -47,25 +46,26 @@ void LevelDetector<SampleType>::process (const ProcessContext& context) noexcept
 
     // take absolute value and sum to mono
     auto* levelPtr = outputBlock.getChannelPointer (0);
-    absBlock.copyFrom (inputBlock);
+    absBuffer.setCurrentSize ((int) numInputChannels, (int) numSamples);
+    BufferMath::copyBufferData (BufferView<SampleType> { inputBlock }, absBuffer);
 
     if (numInputChannels == 1)
     {
-        auto* absPtr = absBlock.getChannelPointer (0);
+        auto* absPtr = absBuffer.getWritePointer (0);
         juce::FloatVectorOperations::abs (absPtr, absPtr, (int) numSamples);
-        outputBlock.copyFrom (absBlock);
+        BufferMath::copyBufferData (absBuffer, BufferView<SampleType> { outputBlock });
     }
     else // sum to mono
     {
         const auto gain = (SampleType) 1.0 / (SampleType) numInputChannels;
 
-        auto* basePtr = absBlock.getChannelPointer (0);
+        auto* basePtr = absBuffer.getWritePointer (0);
         juce::FloatVectorOperations::abs (basePtr, basePtr, (int) numSamples);
         juce::FloatVectorOperations::copyWithMultiply (levelPtr, basePtr, gain, (int) numSamples);
 
         for (size_t ch = 1; ch < numInputChannels; ch++)
         {
-            auto* otherPtr = absBlock.getChannelPointer (ch);
+            auto* otherPtr = absBuffer.getWritePointer (ch);
             juce::FloatVectorOperations::abs (otherPtr, otherPtr, (int) numSamples);
             juce::FloatVectorOperations::addWithMultiply (levelPtr, otherPtr, gain, (int) numSamples);
         }

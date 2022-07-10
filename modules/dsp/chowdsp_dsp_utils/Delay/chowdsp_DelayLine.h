@@ -56,10 +56,10 @@ public:
         if (numChannels != bufferData.getNumChannels()
             || numSamples != bufferData.getNumSamples())
         {
-            bufferData = chowdsp::AudioBlock<SampleType> (dataBlock, numChannels, numSamples);
+            bufferData.setMaxSize (numChannels, numSamples);
         }
 
-        bufferData.copyFrom (other.bufferData);
+        chowdsp::BufferMath::copyBufferData (other.bufferData, bufferData);
 
         if (v.empty() || other.v.empty()) // nothing to copy!
             return;
@@ -70,8 +70,7 @@ public:
     }
 
 protected:
-    juce::HeapBlock<char> dataBlock;
-    chowdsp::AudioBlock<SampleType> bufferData;
+    chowdsp::Buffer<SampleType> bufferData;
     std::vector<SampleType> v;
     std::vector<int> writePos, readPos;
 };

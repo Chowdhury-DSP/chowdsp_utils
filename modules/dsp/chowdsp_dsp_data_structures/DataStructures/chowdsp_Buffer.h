@@ -45,18 +45,44 @@ public:
     /** Move assignment */
     Buffer<SampleType>& operator= (Buffer<SampleType>&&) noexcept = default;
 
+    /**
+     * Sets the maximum size that this buffer can have, and sets the current size as well.
+     *
+     * This method allocate memory!
+     */
     void setMaxSize (int numChannels, int numSamples);
+
+    /**
+     * Sets the current size of the buffer. Make sure the requested size
+     * is not larger than the maximum size of the buffer!
+     *
+     * If the requested size is larger than the previous size, any "new" memory
+     * will be cleared. Any memory that was previously part of the buffer will
+     * not be cleared.
+     *
+     * This method will never allocate memory!
+     */
     void setCurrentSize (int numChannels, int numSamples) noexcept;
 
+    /** Clears memory within the "current size" of the buffer. */
     void clear() noexcept;
 
+    /** Returns the current number of channels in the buffer. */
     [[nodiscard]] int getNumChannels() const noexcept { return currentNumChannels; }
+
+    /** Returns the current number of samples in the buffer. */
     [[nodiscard]] int getNumSamples() const noexcept { return currentNumSamples; }
 
+    /** Returns a pointer which can be used to write to a single channel of the buffer. */
     SampleType* getWritePointer (int channel) noexcept;
+
+    /** Returns a pointer which can be used to read from a single channel of the buffer. */
     const SampleType* getReadPointer (int channel) const noexcept;
 
+    /** Returns the entire buffer as an array of pointers to each channel's data. */
     SampleType** getArrayOfWritePointers() noexcept;
+
+    /** Returns the entire buffer as an array of pointers to each channel's data. */
     const SampleType** getArrayOfReadPointers() const noexcept;
 
 private:

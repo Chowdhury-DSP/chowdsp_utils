@@ -54,22 +54,25 @@ namespace test_utils
 {
 #if JUCE_MODULE_AVAILABLE_chowdsp_dsp_data_structures
 template <typename FloatType = float, typename NumericType = chowdsp::SampleTypeHelpers::NumericType<FloatType>>
-inline auto makeSineWave (NumericType frequency, NumericType sampleRate, int lengthSamples)
+inline auto makeSineWave (NumericType frequency, NumericType sampleRate, int lengthSamples, int numChannels = 1)
 {
-    chowdsp::Buffer<FloatType> sineBuffer (1, lengthSamples);
+    chowdsp::Buffer<FloatType> sineBuffer (numChannels, lengthSamples);
 
     auto* x = sineBuffer.getWritePointer (0);
     for (int n = 0; n < lengthSamples; ++n)
         x[n] = std::sin (juce::MathConstants<NumericType>::twoPi * frequency * (NumericType) n / sampleRate);
 
+    for (int ch = 1; ch < numChannels; ++ch)
+        chowdsp::BufferMath::copyBufferChannels (sineBuffer, sineBuffer, 0, ch);
+
     return std::move (sineBuffer);
 }
 
 template <typename FloatType = float, typename NumericType = chowdsp::SampleTypeHelpers::NumericType<FloatType>>
-inline auto makeSineWave (NumericType frequency, NumericType sampleRate, NumericType lengthSeconds)
+inline auto makeSineWave (NumericType frequency, NumericType sampleRate, NumericType lengthSeconds, int numChannels = 1)
 {
     const int lengthSamples = int (lengthSeconds * sampleRate);
-    return makeSineWave<FloatType> (frequency, sampleRate, lengthSamples);
+    return makeSineWave<FloatType> (frequency, sampleRate, lengthSamples, numChannels);
 }
 
 template <typename FloatType = float, typename NumericType = chowdsp::SampleTypeHelpers::NumericType<FloatType>>

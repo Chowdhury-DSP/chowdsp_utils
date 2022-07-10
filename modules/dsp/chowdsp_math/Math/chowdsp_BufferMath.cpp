@@ -105,6 +105,27 @@ namespace chowdsp::BufferMath
         }
     }
 
+    template <typename BufferType1, typename BufferType2>
+    static void copyBufferChannels (const BufferType1& bufferSrc, BufferType2& bufferDest, int srcChannel, int destChannel) noexcept
+    {
+        using SampleType = typename BufferType1::Type;
+
+        jassert (bufferSrc.getNumSamples() == bufferDest.getNumSamples());
+        const auto numSamples = bufferSrc.getNumSamples();
+
+        const auto* srcData = bufferSrc.getReadPointer (srcChannel);
+        auto* destData = bufferDest.getWritePointer (destChannel);
+
+        if constexpr (std::is_floating_point_v<SampleType>)
+        {
+            juce::FloatVectorOperations::copy (destData, srcData, numSamples);
+        }
+        else if constexpr (SampleTypeHelpers::IsSIMDRegister<SampleType>)
+        {
+            std::copy (srcData , srcData + numSamples, destData);
+        }
+    }
+
     template <typename BufferType, typename FloatType>
     void applyGain (BufferType& buffer, FloatType gain)
     {
@@ -125,6 +146,28 @@ namespace chowdsp::BufferMath
             {
                 std::transform (data, data + numSamples, data, [gain](const auto& x) { return x * gain; });
             }
+        }
+    }
+
+    template <typename BufferType, typename SmoothedValueType>
+    static void applyGainSmoothed (BufferType& buffer, SmoothedValueType& gain)
+    {
+        if (! gain.isSmoothing())
+        {
+            applyGain (buffer, gain.getCurrentValue());
+            return;
+        }
+
+        const auto numChannels = buffer.getNumChannels();
+        const auto numSamples = buffer.getNumSamples();
+
+        auto data = buffer.getArrayOfWritePointers();
+        for (int n = 0; n < numSamples; ++n)
+        {
+            const auto sampleGain = gain.getNextValue();
+
+            for (int ch = 0; ch < numChannels; ++ch)
+                data[ch][n] *= sampleGain;
         }
     }
 } // namespace chowdsp

@@ -25,7 +25,7 @@ void PitchShifter<SampleType, InterpolationType>::prepare (const juce::dsp::Proc
 {
     jassert (spec.numChannels > 0);
 
-    bufferData.setSize ((int) spec.numChannels, 2 * totalSize, false, false, true);
+    bufferData.setMaxSize ((int) spec.numChannels, 2 * totalSize);
     bufferPtrs = bufferData.getArrayOfWritePointers();
     jassert (bufferPtrs != nullptr);
 
