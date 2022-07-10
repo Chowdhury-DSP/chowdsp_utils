@@ -16,7 +16,6 @@ template <class Processor>
 class PluginBase : public juce::AudioProcessor
 #if JUCE_MODULE_AVAILABLE_chowdsp_clap_extensions
     ,
-                   public CLAPExtensions::CLAPProcessorExtensions,
                    private CLAPExtensions::CLAPInfoExtensions
 #endif
 {
@@ -124,9 +123,6 @@ template <class Processor>
 PluginBase<Processor>::PluginBase (juce::UndoManager* um, const juce::AudioProcessor::BusesProperties& layout) : AudioProcessor (layout),
                                                                                                                  vts (*this, um, juce::Identifier ("Parameters"), createParameterLayout())
 {
-#if JUCE_MODULE_AVAILABLE_chowdsp_clap_extensions
-    CLAPExtensions::CLAPProcessorExtensions::initialise (*this);
-#endif
 }
 
 template <class Processor>
