@@ -4,14 +4,15 @@ namespace chowdsp::CLAPExtensions
 {
 void CLAPProcessorExtensions::initialise (juce::AudioProcessor& baseProcessor)
 {
-    processor = &baseProcessor;
-    jassert (processor != nullptr); // initialized with a NULL processor?
-
-    for (auto* param : processor->getParameters())
-    {
-        if (auto* modulatableParameter = dynamic_cast<ParamUtils::ModParameterMixin*> (param))
-            modulatableParameters[param] = modulatableParameter;
-    }
+    juce::ignoreUnused (baseProcessor);
+    //    processor = &baseProcessor;
+    //    jassert (processor != nullptr); // initialized with a NULL processor?
+    //
+    //    for (auto* param : processor->getParameters())
+    //    {
+    //        if (auto* modulatableParameter = dynamic_cast<ParamUtils::ModParameterMixin*> (param))
+    //            modulatableParameters[param] = modulatableParameter;
+    //    }
 }
 
 bool CLAPProcessorExtensions::supportsDirectEvent (uint16_t space_id, uint16_t type)
@@ -34,39 +35,34 @@ void CLAPProcessorExtensions::handleDirectEvent (const clap_event_header_t* even
 
     // handle parameter modulation here...
     auto paramModEvent = reinterpret_cast<const clap_event_param_mod*> (event);
-    auto* baseParameter = static_cast<JUCEParameterVariant*> (paramModEvent->cookie)->processorParam;
+    auto* paramVariant = static_cast<JUCEParameterVariant*> (paramModEvent->cookie);
 
-#if JUCE_DEBUG
+    if (auto* modulatableParameter = paramVariant->clapExtParameter)
     {
-        const auto parameterFound = modulatableParameters.find (baseParameter) != modulatableParameters.end();
-        jassert (parameterFound); // parameter was not found in the list of modulatable parameters!
-    }
-#endif
-
-    auto modulatableParameter = modulatableParameters[baseParameter];
-    if (paramModEvent->note_id >= 0)
-    {
-        if (! modulatableParameter->supportsPolyphonicModulation())
+        if (paramModEvent->note_id >= 0)
         {
-            // The host is misbehaving: it should know this parameter doesn't support
-            // mono modulation and not have sent this event in the first place!
-            jassertfalse;
-            return;
-        }
+            if (! modulatableParameter->supportsPolyphonicModulation())
+            {
+                // The host is misbehaving: it should know this parameter doesn't support
+                // mono modulation and not have sent this event in the first place!
+                jassertfalse;
+                return;
+            }
 
-        modulatableParameter->applyPolyphonicModulation (paramModEvent->note_id, paramModEvent->key, paramModEvent->channel, paramModEvent->amount);
-    }
-    else
-    {
-        if (! modulatableParameter->supportsMonophonicModulation())
+            modulatableParameter->applyPolyphonicModulation (paramModEvent->note_id, paramModEvent->port_index, paramModEvent->channel, paramModEvent->key, paramModEvent->amount);
+        }
+        else
         {
-            // The host is misbehaving: it should know this parameter doesn't support
-            // poly modulation and not have sent this event in the first place!
-            jassertfalse;
-            return;
-        }
+            if (! modulatableParameter->supportsMonophonicModulation())
+            {
+                // The host is misbehaving: it should know this parameter doesn't support
+                // poly modulation and not have sent this event in the first place!
+                jassertfalse;
+                return;
+            }
 
-        modulatableParameter->applyMonophonicModulation (paramModEvent->amount);
+            modulatableParameter->applyMonophonicModulation (paramModEvent->amount);
+        }
     }
 }
 } // namespace chowdsp::CLAPExtensions

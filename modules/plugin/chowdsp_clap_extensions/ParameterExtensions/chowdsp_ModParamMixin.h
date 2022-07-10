@@ -9,12 +9,12 @@ struct ModParameterMixin : public clap_juce_extensions::clap_juce_parameter_capa
     virtual ~ModParameterMixin() = default;
 
     /** Base function for applying monophonic modulation to a parameter. */
-    [[maybe_unused]] virtual void applyMonophonicModulation (double /*value*/)
+    [[maybe_unused]] void applyMonophonicModulation (double /*value*/) override
     {
     }
 
     /** Base function for applying polyphonic modulation to a parameter. */
-    [[maybe_unused]] virtual void applyPolyphonicModulation (int32_t /*note_id*/, int16_t /*key*/, int16_t /*channel*/, double /*value*/)
+    [[maybe_unused]] void applyPolyphonicModulation (int32_t /*note_id*/, int16_t /*port_index*/, int16_t /*channel*/, int16_t /*key*/, double /*value*/) override
     {
     }
 };

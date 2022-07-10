@@ -74,7 +74,7 @@ private:
     bool supportsMonophonicModulation() override;
     bool supportsPolyphonicModulation() override;
     void applyMonophonicModulation (double value) override;
-    void applyPolyphonicModulation (int32_t note_id, int16_t key, int16_t channel, double value) override;
+    void applyPolyphonicModulation (int32_t note_id, int16_t port_index, int16_t channel, int16_t key, double value) override;
 
     juce::AudioProcessor* processor = nullptr;
     juce::RangedAudioParameter* internalParam = nullptr;

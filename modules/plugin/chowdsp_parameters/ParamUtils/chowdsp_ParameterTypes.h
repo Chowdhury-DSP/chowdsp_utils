@@ -28,7 +28,7 @@ namespace ParamUtils
         }
 
         /** Base function for applying polyphonic modulation to a parameter. */
-        [[maybe_unused]] virtual void applyPolyphonicModulation (int32_t /*note_id*/, int16_t /*key*/, int16_t /*channel*/, double /*value*/)
+        [[maybe_unused]] virtual void applyPolyphonicModulation (int32_t /*note_id*/, int16_t /*port_index*/, int16_t /*channel*/, int16_t /*key*/, double /*value*/)
         {
         }
     };

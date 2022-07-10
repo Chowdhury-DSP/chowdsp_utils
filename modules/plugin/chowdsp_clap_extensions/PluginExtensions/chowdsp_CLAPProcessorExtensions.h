@@ -14,9 +14,9 @@ public:
     void handleDirectEvent (const clap_event_header_t* event, int sampleOffset) override;
 
 private:
-    juce::AudioProcessor* processor = nullptr;
-
-    std::unordered_map<juce::AudioProcessorParameter*, ParamUtils::ModParameterMixin*> modulatableParameters;
+    //    juce::AudioProcessor* processor = nullptr;
+    //
+    //    std::unordered_map<juce::AudioProcessorParameter*, ParamUtils::ModParameterMixin*> modulatableParameters;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CLAPProcessorExtensions)
 };
