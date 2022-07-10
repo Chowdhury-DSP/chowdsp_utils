@@ -39,14 +39,16 @@ public:
     /** Processes a block of samples. */
     void processBlock (const BufferView<T>& buffer) noexcept;
 
+#if JUCE_MODULE_AVAILABLE_juce_dsp
     /** Processes the input and output buffers supplied in the processing context. */
     template <typename ProcessContext>
     void process (const ProcessContext& context) noexcept;
+#endif
 
 private:
     SawtoothWave<T> saw1, saw2;
 
-#if CHOWDSP_USING_JUCE
+#if JUCE_MODULE_AVAILABLE_juce_dsp
     juce::HeapBlock<char> dataBlock;
     chowdsp::AudioBlock<T> interMediateData;
 #endif

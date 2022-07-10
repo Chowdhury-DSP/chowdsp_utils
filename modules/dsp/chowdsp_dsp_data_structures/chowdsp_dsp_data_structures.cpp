@@ -5,6 +5,6 @@
 #include "DataStructures/chowdsp_RebufferedProcessor.cpp"
 #include "DataStructures/chowdsp_LookupTableTransform.cpp"
 
-#if CHOWDSP_USING_JUCE
+#if JUCE_MODULE_AVAILABLE_juce_dsp
 #include "DataStructures/chowdsp_COLAProcessor.cpp"
 #endif

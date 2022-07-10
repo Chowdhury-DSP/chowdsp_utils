@@ -10,7 +10,7 @@ void SquareWave<T>::setFrequency (T newFrequency) noexcept
 template <typename T>
 void SquareWave<T>::prepare (const juce::dsp::ProcessSpec& spec) noexcept
 {
-#if CHOWDSP_USING_JUCE
+#if JUCE_MODULE_AVAILABLE_juce_dsp
     interMediateData = chowdsp::AudioBlock<T> (dataBlock, spec.numChannels, spec.maximumBlockSize);
 #endif
     intermediateBuffer.setMaxSize ((int) spec.numChannels, (int) spec.maximumBlockSize);
@@ -56,7 +56,7 @@ void SquareWave<T>::processBlock (const BufferView<T>& buffer) noexcept
     }
 }
 
-#if CHOWDSP_USING_JUCE
+#if JUCE_MODULE_AVAILABLE_juce_dsp
 template <typename T>
 template <typename ProcessContext>
 void SquareWave<T>::process (const ProcessContext& context) noexcept

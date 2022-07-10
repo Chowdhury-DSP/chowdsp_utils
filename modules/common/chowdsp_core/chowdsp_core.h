@@ -44,9 +44,12 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "JUCEHelpers/juce_FloatVectorOperations.h"
 #include "JUCEHelpers/juce_Decibels.h"
 #include "JUCEHelpers/juce_SmoothedValue.h"
+#endif // CHOWDSP_USING_JUCE
+
+#if ! CHOWDSP_USING_JUCE || ! JUCE_MODULE_AVAILABLE_juce_dsp
 #include "JUCEHelpers/dsp/juce_ProcessSpec.h"
 #include "JUCEHelpers/dsp/juce_LookupTable.h"
-#endif // CHOWDSP_USING_JUCE
+#endif
 #endif // DOXYGEN
 
 #include "DataStructures/chowdsp_AtomicHelpers.h"

@@ -60,7 +60,7 @@ public:
             filt.processBlock (buffer);
     }
 
-#if CHOWDSP_USING_JUCE
+#if JUCE_MODULE_AVAILABLE_juce_dsp
     /** Processes a block of samples */
     void process (const chowdsp::ProcessContextReplacing<T>& context)
     {

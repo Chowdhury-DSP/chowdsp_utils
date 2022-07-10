@@ -26,7 +26,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include <chowdsp_simd/chowdsp_simd.h>
 #include <chowdsp_math/chowdsp_math.h>
 
-#if CHOWDSP_USING_JUCE
+#if JUCE_MODULE_AVAILABLE_juce_dsp
 #include <juce_dsp/juce_dsp.h>
 #include "DataStructures/chowdsp_SIMDAudioBlock.h"
 #endif
@@ -39,6 +39,6 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "DataStructures/chowdsp_LookupTableTransform.h"
 #include "DataStructures/chowdsp_LookupTableCache.h"
 
-#if CHOWDSP_USING_JUCE
-#include "DataStructures/chowdsp_COLAProcessor.h" // JUCE only (for now)
+#if JUCE_MODULE_AVAILABLE_juce_dsp
+#include "DataStructures/chowdsp_COLAProcessor.h"
 #endif

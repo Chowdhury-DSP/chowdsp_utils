@@ -9,7 +9,6 @@ BEGIN_JUCE_MODULE_DECLARATION
    name:          ChowDSP DSP Utilities
    description:   Commonly used DSP utilities for ChowDSP plugins
    dependencies:  chowdsp_filters
-   olddddd:  juce_audio_processors, juce_dsp, chowdsp_filters
 
    website:       https://ccrma.stanford.edu/~jatin/chowdsp
    license:       GPLv3
@@ -67,6 +66,8 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 #if CHOWDSP_USING_JUCE
 #include <juce_audio_processors/juce_audio_processors.h>
+
+#if JUCE_MODULE_AVAILABLE_juce_dsp
 #include <juce_dsp/juce_dsp.h>
 
 // convolution
@@ -84,10 +85,12 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Resampling/chowdsp_ResampledProcess.h"
 #include "Resampling/chowdsp_VariableOversampling.h"
 
-// some other useful processors
-#include "Processors/chowdsp_GainProcessor.h"
-
 // sound sources
 #include "Sources/chowdsp_Noise.h"
 #include "Sources/chowdsp_RepitchedSource.h"
+#endif
+
+// some other useful processors
+#include "Processors/chowdsp_GainProcessor.h"
+
 #endif

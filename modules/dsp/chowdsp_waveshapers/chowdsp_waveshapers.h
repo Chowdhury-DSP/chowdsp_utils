@@ -23,7 +23,6 @@ BEGIN_JUCE_MODULE_DECLARATION
 // STL includes
 #include <future>
 
-// JUCE includes
 #include <chowdsp_math/chowdsp_math.h>
 #include <chowdsp_dsp_data_structures/chowdsp_dsp_data_structures.h>
 
