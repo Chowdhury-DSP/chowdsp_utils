@@ -10,12 +10,12 @@ namespace chowdsp::Reverb
 struct DefaultDiffuserConfig
 {
     /** Chooses random delay multipliers in equally spaced regions */
-    static double getDelayMult (int channelIndex, int nChannels);
+    static double getDelayMult (int channelIndex, int nChannels, std::mt19937& mt);
 
     /** Chooses polarity multipliers randomly */
-    static double getPolarityMultiplier (int channelIndex, int nChannels);
+    static double getPolarityMultiplier (int channelIndex, int nChannels, std::mt19937& mt);
 
-    static void fillChannelSwapIndexes (size_t* indexes, int numChannels);
+    static void fillChannelSwapIndexes (size_t* indexes, int numChannels, std::mt19937& mt);
 };
 
 /**
