@@ -6,6 +6,53 @@ if (UNIX AND NOT APPLE)
     find_package(Threads REQUIRED)
 endif()
 
+function(_chowdsp_find_module_dependencies module_header module_deps)
+    file(STRINGS "${module_header}" dependencies_raw REGEX "[ \t]*dependencies:")
+    string(STRIP ${dependencies_raw} dependencies_raw)
+    string(SUBSTRING ${dependencies_raw} 13 -1 dependencies_raw)
+
+    if("${dependencies_raw}" STREQUAL "")
+        # No dependencies here! Let's move on...
+        set (${module_deps} "" PARENT_SCOPE)
+        return()
+    endif()
+
+    string(STRIP ${dependencies_raw} dependencies_raw)
+    string(REPLACE ", " ";" dependencies_list ${dependencies_raw})
+    set (${module_deps} ${dependencies_list} PARENT_SCOPE)
+endfunction(_chowdsp_find_module_dependencies)
+
+function(_chowdsp_load_module module)
+#    message(STATUS "Loading module: ${module}")
+
+    unset(module_path)
+    find_path(module_path
+        NAMES "${module}.h"
+        PATHS "${CHOWDSP_MODULES_DIR}/common" "${CHOWDSP_MODULES_DIR}/dsp"
+        PATH_SUFFIXES "${module}"
+        NO_CACHE
+        REQUIRED
+    )
+
+    # Load any modules that this one depends on:
+    _chowdsp_find_module_dependencies(${module_path}/${module}.h module_dependencies)
+    foreach(module_dep IN LISTS module_dependencies)
+        get_target_property(_lib_compile_defs ${lib_name} COMPILE_DEFINITIONS)
+        if("JUCE_MODULE_AVAILABLE_${module_dep}" IN_LIST _lib_compile_defs)
+            continue() # we've already loaded this module, so continue...
+        endif()
+        _chowdsp_load_module(${module_dep})
+    endforeach()
+
+    get_filename_component(module_parent_path ${module_path} DIRECTORY)
+    target_include_directories(${lib_name} PUBLIC ${module_parent_path})
+    target_compile_definitions(${lib_name} PUBLIC JUCE_MODULE_AVAILABLE_${module})
+
+    if(EXISTS "${module_path}/${module}.cpp")
+        target_sources(${lib_name} PRIVATE "${module_path}/${module}.cpp")
+    endif()
+endfunction(_chowdsp_load_module)
+
 function(setup_chowdsp_lib lib_name)
     set(multiValueArgs MODULES)
     cmake_parse_arguments(CHOWDSPLIB "" "" "${multiValueArgs}" ${ARGN})
@@ -14,22 +61,7 @@ function(setup_chowdsp_lib lib_name)
     add_library(${lib_name} STATIC)
 
     foreach(module IN LISTS CHOWDSPLIB_MODULES)
-        unset(module_path)
-        find_path(module_path
-            NAMES "${module}.h"
-            PATHS "${CHOWDSP_MODULES_DIR}/common" "${CHOWDSP_MODULES_DIR}/dsp"
-            PATH_SUFFIXES "${module}"
-            NO_CACHE
-            REQUIRED
-        )
-
-        get_filename_component(module_parent_path ${module_path} DIRECTORY)
-        target_include_directories(${lib_name} PUBLIC ${module_parent_path})
-        target_compile_definitions(${lib_name} PUBLIC JUCE_MODULE_AVAILABLE_${module})
-
-        if(EXISTS "${module_path}/${module}.cpp")
-            target_sources(${lib_name} PRIVATE "${module_path}/${module}.cpp")
-        endif()
+        _chowdsp_load_module(${module})
     endforeach()
 
     target_compile_definitions(${lib_name}

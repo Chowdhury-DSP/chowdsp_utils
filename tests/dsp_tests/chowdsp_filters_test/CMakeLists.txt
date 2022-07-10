@@ -1,6 +1,4 @@
-setup_catch_test(chowdsp_filters_test
-    MODULES chowdsp_core chowdsp_simd chowdsp_math chowdsp_dsp_data_structures chowdsp_filters
-)
+setup_catch_test(chowdsp_filters_test MODULES chowdsp_filters)
 
 target_sources(chowdsp_filters_test
     PRIVATE
