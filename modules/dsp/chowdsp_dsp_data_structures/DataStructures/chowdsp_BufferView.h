@@ -8,17 +8,18 @@ class BufferView
 public:
     /** The sample type used by the buffer */
     using Type = SampleType;
-    
-    BufferView (SampleType** data, int dataNumChannels, int dataNumSamples, int sampleOffset = 0) : numChannels (dataNumChannels),
-                                                                                                    numSamples (dataNumSamples)
+
+    BufferView (SampleType* const* data, int dataNumChannels, int dataNumSamples, int sampleOffset = 0) : numChannels (dataNumChannels),
+                                                                                                          numSamples (dataNumSamples)
     {
         initialise (data, sampleOffset);
     }
 
-    BufferView (Buffer<SampleType>& buffer, int sampleOffset = 0) // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
+    BufferView (Buffer<SampleType>& buffer, int sampleOffset = 0, int bufferNumSamples = -1) // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
         : numChannels (buffer.getNumChannels()),
-          numSamples (buffer.getNumSamples() - sampleOffset)
+          numSamples (bufferNumSamples < 0 ? (buffer.getNumSamples() - sampleOffset) : bufferNumSamples)
     {
+        jassert (buffer.getNumSamples() >= sampleOffset + numSamples);
         initialise (buffer.getArrayOfWritePointers(), sampleOffset);
     }
 
@@ -56,7 +57,7 @@ public:
     const SampleType** getArrayOfReadPointers() const noexcept { return const_cast<const SampleType**> (channelPointers.data()); }
 
 private:
-    void initialise (SampleType** data, int sampleOffset)
+    void initialise (SampleType* const* data, int sampleOffset)
     {
         for (size_t ch = 0; ch < (size_t) numChannels; ++ch)
             channelPointers[ch] = data[ch] + sampleOffset;

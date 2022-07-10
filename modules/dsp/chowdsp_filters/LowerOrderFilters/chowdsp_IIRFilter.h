@@ -27,13 +27,11 @@ public:
     IIRFilter (IIRFilter&&) noexcept = default;
     IIRFilter& operator= (IIRFilter&&) noexcept = default;
 
-#if CHOWDSP_USING_JUCE
     /** Prepares the filter for processing a new number of channels */
     void prepare (const juce::dsp::ProcessSpec& spec)
     {
         prepare ((int) spec.numChannels);
     }
-#endif
 
     /** Prepares the filter for processing a new number of channels */
     void prepare (int numChannels)

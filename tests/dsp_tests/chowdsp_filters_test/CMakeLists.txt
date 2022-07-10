@@ -15,9 +15,8 @@ target_sources(chowdsp_filters_test
         ButterworthFilterTest.cpp
         ChebyshevIIFilterTest.cpp
         EllipticFilterTest.cpp
-        FIRFilterTest.cpp # needs JUCE
         FractionalOrderFilterTest.cpp
-        HilbertFilterTest.cpp # needs chowdsp_dsp_utils
+        HilbertFilterTest.cpp # needs chowdsp_dsp_utils (remove JUCE dep once chowdsp::DelayLine has been de-juced)
 )
 
 target_link_libraries(chowdsp_filters_test_lib

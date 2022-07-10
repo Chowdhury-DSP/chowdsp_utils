@@ -8,7 +8,7 @@ BEGIN_JUCE_MODULE_DECLARATION
    version:       1.0.0
    name:          ChowDSP DSP Data Structures
    description:   DSP data structures for ChowDSP plugins
-   dependencies:  chowdsp_simd
+   dependencies:  chowdsp_simd, chowdsp_math
 
    website:       https://ccrma.stanford.edu/~jatin/chowdsp
    license:       GPLv3
@@ -21,8 +21,10 @@ BEGIN_JUCE_MODULE_DECLARATION
 #pragma once
 
 #include <array>
+#include <unordered_map>
 
 #include <chowdsp_simd/chowdsp_simd.h>
+#include <chowdsp_math/chowdsp_math.h>
 
 #if CHOWDSP_USING_JUCE
 #include <juce_dsp/juce_dsp.h>
@@ -33,10 +35,10 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "DataStructures/chowdsp_Buffer.h"
 #include "DataStructures/chowdsp_BufferView.h"
 #include "DataStructures/chowdsp_SmoothedBufferValue.h"
+#include "DataStructures/chowdsp_RebufferedProcessor.h"
+#include "DataStructures/chowdsp_LookupTableTransform.h"
+#include "DataStructures/chowdsp_LookupTableCache.h"
 
 #if CHOWDSP_USING_JUCE
-#include "DataStructures/chowdsp_COLAProcessor.h" // JUCE only
-#include "DataStructures/chowdsp_LookupTableTransform.h" // relies on JUCE lookup table...
-#include "DataStructures/chowdsp_RebufferedProcessor.h" // re-write to use BufferView
-#include "DataStructures/chowdsp_LookupTableCache.h" // relies on lookup table...
+#include "DataStructures/chowdsp_COLAProcessor.h" // JUCE only (for now)
 #endif

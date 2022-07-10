@@ -42,7 +42,7 @@ TEMPLATE_TEST_CASE ("First Order Filters Test", "Filters", float, double, xsimd:
     SECTION ("First Order HPF Test")
     {
         chowdsp::FirstOrderHPF<T> hpFilter;
-        hpFilter.prepare (1);
+        hpFilter.prepare ({ Constants::fs, 128, 1 });
         hpFilter.calcCoefs ((T) Constants::fc, (NumericType) Constants::fs);
 
         testFrequency<T> (hpFilter, (NumericType) Constants::fc / 4, (NumericType) -12.3, (NumericType) 0.1, "Incorrect gain at low frequencies.");
