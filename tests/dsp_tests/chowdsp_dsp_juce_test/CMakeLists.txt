@@ -13,9 +13,9 @@ target_link_libraries(chowdsp_dsp_juce_test
 target_sources(chowdsp_dsp_juce_test
     PRIVATE
         # Data Structures Tests
-        COLAProcessorTest.cpp
-        SmoothedBufferValueTest.cpp
-        BufferViewTest.cpp
+        data_structures_tests/COLAProcessorTest.cpp
+        data_structures_tests/SmoothedBufferValueTest.cpp
+        data_structures_tests/BufferViewTest.cpp
 
         # Filters Tests
         FIRFilterTest.cpp
@@ -25,4 +25,17 @@ target_sources(chowdsp_dsp_juce_test
 
         # Reverb Tests
         DiffuserTest.cpp
+
+        # Convolution Tests
+        convolution_tests/ConvolutionTest.cpp
+        convolution_tests/IRHelpersTest.cpp
+
+        # Sources Tests
+        source_tests/NoiseTest.cpp
+        source_tests/RepitchedSourceTest.cpp
+
+        # Resampling Tests
+        resampling_tests/ResamplerTest.cpp
+        resampling_tests/UpsampleDownsampleTest.cpp
+        resampling_tests/VariableOversamplingTest.cpp
 )

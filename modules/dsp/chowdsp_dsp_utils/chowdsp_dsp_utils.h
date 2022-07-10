@@ -49,12 +49,21 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Delay/BBD/chowdsp_BBDDelayLine.h"
 #include "Delay/BBD/chowdsp_BBDDelayWrapper.h"
 
+// modal tools
+#include "Modal/chowdsp_ModalFilter.h"
+#include "Modal/chowdsp_ModalFilterBank.h"
+
 // some other useful processors
 #include "Processors/chowdsp_AudioTimer.h"
 #include "Processors/chowdsp_BypassProcessor.h"
 #include "Processors/chowdsp_LevelDetector.h"
 #include "Processors/chowdsp_Panner.h"
 #include "Processors/chowdsp_TunerProcessor.h"
+
+// sound sources
+#include "Sources/chowdsp_SawtoothWave.h"
+#include "Sources/chowdsp_SineWave.h"
+#include "Sources/chowdsp_SquareWave.h"
 
 #if CHOWDSP_USING_JUCE
 #include <juce_audio_processors/juce_audio_processors.h>
@@ -64,10 +73,6 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Convolution/chowdsp_ConvolutionEngine.h"
 #include "Convolution/chowdsp_IRTransfer.h"
 #include "Convolution/chowdsp_IRHelpers.h"
-
-// modal tools
-#include "Modal/chowdsp_ModalFilter.h"
-#include "Modal/chowdsp_ModalFilterBank.h"
 
 // resamplers
 #include "Resampling/chowdsp_Upsampler.h"
@@ -84,8 +89,5 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 // sound sources
 #include "Sources/chowdsp_Noise.h"
-#include "Sources/chowdsp_SawtoothWave.h"
-#include "Sources/chowdsp_SineWave.h"
-#include "Sources/chowdsp_SquareWave.h"
 #include "Sources/chowdsp_RepitchedSource.h"
 #endif

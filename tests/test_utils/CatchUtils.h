@@ -93,5 +93,16 @@ inline auto makeNoise (int numSamples, int numChannels = 1)
 
     return std::move (noiseBuffer);
 }
+
+inline chowdsp::Buffer<float> makeImpulse (float amplitude, float sampleRate, float lengthSeconds)
+{
+    const int lengthSamples = int (lengthSeconds * sampleRate);
+    chowdsp::Buffer<float> impBuffer (1, lengthSamples);
+    impBuffer.clear();
+
+    impBuffer.getWritePointer (0)[0] = amplitude;
+
+    return impBuffer;
+}
 #endif
 } // namespace test_utils

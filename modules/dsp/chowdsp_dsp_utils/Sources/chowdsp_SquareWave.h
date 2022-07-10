@@ -36,6 +36,9 @@ public:
         return saw2.processSample() - saw1.processSample();
     }
 
+    /** Processes a block of samples. */
+    void processBlock (const BufferView<T>& buffer) noexcept;
+
     /** Processes the input and output buffers supplied in the processing context. */
     template <typename ProcessContext>
     void process (const ProcessContext& context) noexcept;
@@ -43,8 +46,11 @@ public:
 private:
     SawtoothWave<T> saw1, saw2;
 
+#if CHOWDSP_USING_JUCE
     juce::HeapBlock<char> dataBlock;
     chowdsp::AudioBlock<T> interMediateData;
+#endif
+    chowdsp::Buffer<T> intermediateBuffer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SquareWave)
 };
