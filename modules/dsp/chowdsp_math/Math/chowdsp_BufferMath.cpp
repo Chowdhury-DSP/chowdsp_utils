@@ -72,7 +72,6 @@ namespace chowdsp::BufferMath
     void copyBufferData (const BufferType1& bufferSrc, BufferType2& bufferDest, int srcStartSample, int destStartSample, int numSamples, int startChannel, int numChannels) noexcept
     {
         using SampleType = typename BufferType1::Type;
-        static_assert (std::is_same_v<SampleType, typename BufferType2::Type>, "Buffers do not have the same underlying type!");
 
         if (numSamples < 0)
         {

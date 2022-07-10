@@ -146,7 +146,7 @@ void ModalFilterBank<maxNumModes, SampleType>::processWithModulation (const chow
 {
     const auto numSamples = block.getNumSamples();
 
-    renderBuffer.setSize (1, (int) numSamples, false, false, true);
+    renderBuffer.setCurrentSize (1, numSamples);
     renderBuffer.clear();
 
     const auto* blockPtr = block.getReadPointer (0);

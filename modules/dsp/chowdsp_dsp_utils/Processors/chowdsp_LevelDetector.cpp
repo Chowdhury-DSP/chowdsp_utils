@@ -47,13 +47,16 @@ void LevelDetector<SampleType>::process (const ProcessContext& context) noexcept
     // take absolute value and sum to mono
     auto* levelPtr = outputBlock.getChannelPointer (0);
     absBuffer.setCurrentSize ((int) numInputChannels, (int) numSamples);
-    BufferMath::copyBufferData (BufferView<SampleType> { inputBlock }, absBuffer);
+    for (int ch = 0; ch < (int) numInputChannels; ++ch)
+        juce::FloatVectorOperations::copy (absBuffer.getWritePointer (ch), inputBlock.getChannelPointer ((size_t) ch), numSamples);
 
     if (numInputChannels == 1)
     {
         auto* absPtr = absBuffer.getWritePointer (0);
         juce::FloatVectorOperations::abs (absPtr, absPtr, (int) numSamples);
-        BufferMath::copyBufferData (absBuffer, BufferView<SampleType> { outputBlock });
+
+        auto&& outBufferView = BufferView<SampleType> { outputBlock };
+        BufferMath::copyBufferData (absBuffer, outBufferView);
     }
     else // sum to mono
     {
@@ -63,7 +66,7 @@ void LevelDetector<SampleType>::process (const ProcessContext& context) noexcept
         juce::FloatVectorOperations::abs (basePtr, basePtr, (int) numSamples);
         juce::FloatVectorOperations::copyWithMultiply (levelPtr, basePtr, gain, (int) numSamples);
 
-        for (size_t ch = 1; ch < numInputChannels; ch++)
+        for (int ch = 1; ch < (int) numInputChannels; ch++)
         {
             auto* otherPtr = absBuffer.getWritePointer (ch);
             juce::FloatVectorOperations::abs (otherPtr, otherPtr, (int) numSamples);
