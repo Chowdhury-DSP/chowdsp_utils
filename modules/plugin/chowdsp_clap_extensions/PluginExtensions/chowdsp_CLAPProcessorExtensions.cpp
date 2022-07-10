@@ -46,13 +46,27 @@ void CLAPProcessorExtensions::handleDirectEvent (const clap_event_header_t* even
     auto modulatableParameter = modulatableParameters[baseParameter];
     if (paramModEvent->note_id >= 0)
     {
-        if (modulatableParameter->supportsPolyphonicModulation())
-            modulatableParameter->applyPolyphonicModulation (paramModEvent->note_id, paramModEvent->key, paramModEvent->channel, paramModEvent->amount);
+        if (! modulatableParameter->supportsPolyphonicModulation())
+        {
+            // The host is misbehaving: it should know this parameter doesn't support
+            // mono modulation and not have sent this event in the first place!
+            jassertfalse;
+            return;
+        }
+
+        modulatableParameter->applyPolyphonicModulation (paramModEvent->note_id, paramModEvent->key, paramModEvent->channel, paramModEvent->amount);
     }
     else
     {
-        if (modulatableParameter->supportsMonophonicModulation())
-            modulatableParameter->applyMonophonicModulation (paramModEvent->amount);
+        if (! modulatableParameter->supportsMonophonicModulation())
+        {
+            // The host is misbehaving: it should know this parameter doesn't support
+            // poly modulation and not have sent this event in the first place!
+            jassertfalse;
+            return;
+        }
+
+        modulatableParameter->applyMonophonicModulation (paramModEvent->amount);
     }
 }
 } // namespace chowdsp::CLAPExtensions
