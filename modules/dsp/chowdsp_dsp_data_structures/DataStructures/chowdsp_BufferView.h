@@ -47,20 +47,28 @@ public:
     }
 
 #if CHOWDSP_USING_JUCE
-    BufferView (juce::AudioBuffer<SampleType>& buffer, int sampleOffset = 0) // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
-        : numChannels (buffer.getNumChannels()),
-          numSamples (buffer.getNumSamples() - sampleOffset)
+    BufferView (juce::AudioBuffer<SampleType>& buffer, // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
+                int sampleOffset = 0,
+                int bufferNumSamples = -1,
+                int startChannel = 0,
+                int bufferNumChannels = -1)
+        : numChannels (bufferNumChannels < 0 ? (buffer.getNumChannels() - startChannel) : bufferNumChannels),
+          numSamples (bufferNumSamples < 0 ? (buffer.getNumSamples() - sampleOffset) : bufferNumSamples)
     {
-        initialise (buffer.getArrayOfWritePointers(), sampleOffset);
+        initialise (buffer.getArrayOfWritePointers(), sampleOffset, startChannel);
     }
 
 #if JUCE_MODULE_AVAILABLE_juce_dsp
-    BufferView (chowdsp::AudioBlock<SampleType>& block, int sampleOffset = 0) // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
-        : numChannels ((int) block.getNumChannels()),
-          numSamples ((int) block.getNumSamples() - sampleOffset)
+    BufferView (juce::dsp::AudioBlock<SampleType>& block, // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
+                int sampleOffset = 0,
+                int bufferNumSamples = -1,
+                int startChannel = 0,
+                int bufferNumChannels = -1)
+        : numChannels (bufferNumChannels < 0 ? ((int) block.getNumChannels() - startChannel) : bufferNumChannels),
+          numSamples (bufferNumSamples < 0 ? ((int) block.getNumSamples() - sampleOffset) : bufferNumSamples)
     {
         for (size_t ch = 0; ch < (size_t) numChannels; ++ch)
-            channelPointers[ch] = block.getChannelPointer (ch) + sampleOffset;
+            channelPointers[ch] = block.getChannelPointer (ch + (size_t) startChannel) + sampleOffset;
     }
 #endif
 #endif

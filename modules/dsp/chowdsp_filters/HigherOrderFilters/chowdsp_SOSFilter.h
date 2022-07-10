@@ -54,13 +54,13 @@ public:
     void processBlockWithModulation (const chowdsp::BufferView<FloatType>& block, Modulator&& modulator) noexcept
     {
         const auto numChannels = block.getNumChannels();
-        const auto numSamples = (int) block.getNumSamples();
+        const auto numSamples = block.getNumSamples();
 
         auto* channelPointers = block.getArrayOfWritePointers();
         for (int n = 0; n < numSamples; ++n)
         {
             modulator (n);
-            for (size_t channel = 0; channel < numChannels; ++channel)
+            for (int channel = 0; channel < numChannels; ++channel)
                 channelPointers[channel][n] = processSample (channelPointers[channel][n], (int) channel);
         }
     }

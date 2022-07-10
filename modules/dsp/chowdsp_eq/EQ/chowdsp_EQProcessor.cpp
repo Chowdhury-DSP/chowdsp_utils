@@ -63,16 +63,14 @@ void EQProcessor<FloatType, numBands, EQBandType>::reset()
 }
 
 template <typename FloatType, size_t numBands, typename EQBandType>
-void EQProcessor<FloatType, numBands, EQBandType>::process (chowdsp::AudioBlock<FloatType> block)
+void EQProcessor<FloatType, numBands, EQBandType>::processBlock (const chowdsp::BufferView<FloatType> block) noexcept
 {
-    auto&& context = chowdsp::ProcessContextReplacing<FloatType> { block };
-
     for (size_t i = 0; i < numBands; ++i)
     {
         if (! bypasses[i].processBlockIn (block, onOffs[i]))
             continue;
 
-        bands[i].process (context);
+        bands[i].processBlock (block);
 
         bypasses[i].processBlockOut (block, onOffs[i]);
     }
