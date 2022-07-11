@@ -23,10 +23,10 @@
   ==============================================================================
 */
 
-namespace juce::dsp
+namespace chowdsp_juce::dsp
 {
 
-    /**
+/**
     Class for efficiently approximating expensive arithmetic operations.
 
     The approximation is based on linear interpolation between pre-calculated values.
@@ -46,28 +46,28 @@ namespace juce::dsp
 
     @tags{DSP}
 */
-    template <typename FloatType>
-    class LookupTable
-    {
-    public:
-        /** Creates an uninitialised LookupTable object.
+template <typename FloatType>
+class LookupTable
+{
+public:
+    /** Creates an uninitialised LookupTable object.
 
         You need to call initialise() before using the object. Prefer using the
         non-default constructor instead.
 
         @see initialise
     */
-        LookupTable();
+    LookupTable();
 
-        /** Creates and initialises a LookupTable object.
+    /** Creates and initialises a LookupTable object.
 
         @param functionToApproximate The function to be approximated. This should be a
                                      mapping from the integer range [0, numPointsToUse - 1].
         @param numPointsToUse        The number of pre-calculated values stored.
     */
-        LookupTable (const std::function<FloatType (size_t)>& functionToApproximate, size_t numPointsToUse);
+    LookupTable (const std::function<FloatType (size_t)>& functionToApproximate, size_t numPointsToUse);
 
-        /** Initialises or changes the parameters of a LookupTable object.
+    /** Initialises or changes the parameters of a LookupTable object.
 
         This function can be used to change what function is approximated by an already
         constructed LookupTable along with the number of data points used. If the function
@@ -77,10 +77,10 @@ namespace juce::dsp
                                      mapping from the integer range [0, numPointsToUse - 1].
         @param numPointsToUse        The number of pre-calculated values stored.
     */
-        void initialise (const std::function<FloatType (size_t)>& functionToApproximate, size_t numPointsToUse);
+    void initialise (const std::function<FloatType (size_t)>& functionToApproximate, size_t numPointsToUse);
 
-        //==============================================================================
-        /** Calculates the approximated value for the given index without range checking.
+    //==============================================================================
+    /** Calculates the approximated value for the given index without range checking.
 
         Use this if you can guarantee that the index is non-negative and less than numPoints.
         Otherwise use get().
@@ -90,23 +90,23 @@ namespace juce::dsp
 
         @see get, operator[]
     */
-        FloatType getUnchecked (FloatType index) const noexcept
-        {
-            jassert (isInitialised()); // Use the non-default constructor or call initialise() before first use
-            jassert (isPositiveAndBelow (index, FloatType (getNumPoints())));
+    FloatType getUnchecked (FloatType index) const noexcept
+    {
+        jassert (isInitialised()); // Use the non-default constructor or call initialise() before first use
+        jassert (isPositiveAndBelow (index, FloatType (getNumPoints())));
 
-            auto i = truncatePositiveToUnsignedInt (index);
-            auto f = index - FloatType (i);
-            jassert (isPositiveAndBelow (f, FloatType (1)));
+        auto i = ::juce::truncatePositiveToUnsignedInt (index);
+        auto f = index - FloatType (i);
+        jassert (isPositiveAndBelow (f, FloatType (1)));
 
-            auto x0 = data[i];
-            auto x1 = data[i + 1];
+        auto x0 = data[i];
+        auto x1 = data[i + 1];
 
-            return jmap (f, x0, x1);
-        }
+        return ::juce::jmap (f, x0, x1);
+    }
 
-        //==============================================================================
-        /** Calculates the approximated value for the given index with range checking.
+    //==============================================================================
+    /** Calculates the approximated value for the given index with range checking.
 
         This can be called with any input indices. If the provided index is out-of-range
         either the bottom or the top element of the LookupTable is returned.
@@ -118,39 +118,39 @@ namespace juce::dsp
 
         @see getUnchecked, operator[]
     */
-        FloatType get (FloatType index) const noexcept
-        {
-            if (index >= (FloatType) getNumPoints())
-                index = static_cast<FloatType> (getGuardIndex());
-            else if (index < 0)
-                index = {};
+    FloatType get (FloatType index) const noexcept
+    {
+        if (index >= (FloatType) getNumPoints())
+            index = static_cast<FloatType> (getGuardIndex());
+        else if (index < 0)
+            index = {};
 
-            return getUnchecked (index);
-        }
-
-        //==============================================================================
-        /** @see getUnchecked */
-        FloatType operator[] (FloatType index) const noexcept { return getUnchecked (index); }
-
-        /** Returns the size of the LookupTable, i.e., the number of pre-calculated data points. */
-        [[nodiscard]] size_t getNumPoints() const noexcept { return static_cast<size_t> (data.size()) - 1; }
-
-        /** Returns true if the LookupTable is initialised and ready to be used. */
-        [[nodiscard]] bool isInitialised() const noexcept { return data.size() > 1; }
-
-    private:
-        //==============================================================================
-        std::vector<FloatType> data;
-
-        void prepare() noexcept;
-        static size_t getRequiredBufferSize (size_t numPointsToUse) noexcept { return numPointsToUse + 1; }
-        [[nodiscard]] size_t getGuardIndex() const noexcept { return getRequiredBufferSize (getNumPoints()) - 1; }
-
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LookupTable)
-    };
+        return getUnchecked (index);
+    }
 
     //==============================================================================
-    /** Class for approximating expensive arithmetic operations.
+    /** @see getUnchecked */
+    FloatType operator[] (FloatType index) const noexcept { return getUnchecked (index); }
+
+    /** Returns the size of the LookupTable, i.e., the number of pre-calculated data points. */
+    [[nodiscard]] size_t getNumPoints() const noexcept { return static_cast<size_t> (data.size()) - 1; }
+
+    /** Returns true if the LookupTable is initialised and ready to be used. */
+    [[nodiscard]] bool isInitialised() const noexcept { return data.size() > 1; }
+
+private:
+    //==============================================================================
+    std::vector<FloatType> data;
+
+    void prepare() noexcept;
+    static size_t getRequiredBufferSize (size_t numPointsToUse) noexcept { return numPointsToUse + 1; }
+    [[nodiscard]] size_t getGuardIndex() const noexcept { return getRequiredBufferSize (getNumPoints()) - 1; }
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LookupTable)
+};
+
+//==============================================================================
+/** Class for approximating expensive arithmetic operations.
 
     Once initialised, this class can be used just like the function it approximates
     via operator().
@@ -167,41 +167,22 @@ namespace juce::dsp
 
     @tags{DSP}
 */
-    template <typename FloatType>
-    class LookupTableTransform
-    {
-    public:
-        //==============================================================================
-        /** Creates an uninitialised LookupTableTransform object.
+template <typename FloatType>
+class LookupTableTransform
+{
+public:
+    //==============================================================================
+    /** Creates an uninitialised LookupTableTransform object.
 
         You need to call initialise() before using the object. Prefer using the
         non-default constructor instead.
 
         @see initialise
     */
-        LookupTableTransform() = default;
+    LookupTableTransform() = default;
 
-        //==============================================================================
-        /** Creates and initialises a LookupTableTransform object.
-
-        @param functionToApproximate The function to be approximated. This should be a
-                                     mapping from a FloatType to FloatType.
-        @param minInputValueToUse    The lowest input value used. The approximation will
-                                     fail for values lower than this.
-        @param maxInputValueToUse    The highest input value used. The approximation will
-                                     fail for values higher than this.
-        @param numPoints             The number of pre-calculated values stored.
-    */
-        LookupTableTransform (const std::function<FloatType (FloatType)>& functionToApproximate,
-                              FloatType minInputValueToUse,
-                              FloatType maxInputValueToUse,
-                              size_t numPoints)
-        {
-            initialise (functionToApproximate, minInputValueToUse, maxInputValueToUse, numPoints);
-        }
-
-        //==============================================================================
-        /** Initialises or changes the parameters of a LookupTableTransform object.
+    //==============================================================================
+    /** Creates and initialises a LookupTableTransform object.
 
         @param functionToApproximate The function to be approximated. This should be a
                                      mapping from a FloatType to FloatType.
@@ -211,13 +192,32 @@ namespace juce::dsp
                                      fail for values higher than this.
         @param numPoints             The number of pre-calculated values stored.
     */
-        void initialise (const std::function<FloatType (FloatType)>& functionToApproximate,
-                         FloatType minInputValueToUse,
-                         FloatType maxInputValueToUse,
-                         size_t numPoints);
+    LookupTableTransform (const std::function<FloatType (FloatType)>& functionToApproximate,
+                          FloatType minInputValueToUse,
+                          FloatType maxInputValueToUse,
+                          size_t numPoints)
+    {
+        initialise (functionToApproximate, minInputValueToUse, maxInputValueToUse, numPoints);
+    }
 
-        //==============================================================================
-        /** Calculates the approximated value for the given input value without range checking.
+    //==============================================================================
+    /** Initialises or changes the parameters of a LookupTableTransform object.
+
+        @param functionToApproximate The function to be approximated. This should be a
+                                     mapping from a FloatType to FloatType.
+        @param minInputValueToUse    The lowest input value used. The approximation will
+                                     fail for values lower than this.
+        @param maxInputValueToUse    The highest input value used. The approximation will
+                                     fail for values higher than this.
+        @param numPoints             The number of pre-calculated values stored.
+    */
+    void initialise (const std::function<FloatType (FloatType)>& functionToApproximate,
+                     FloatType minInputValueToUse,
+                     FloatType maxInputValueToUse,
+                     size_t numPoints);
+
+    //==============================================================================
+    /** Calculates the approximated value for the given input value without range checking.
 
         Use this if you can guarantee that the input value is within the range specified
         in the constructor or initialise(), otherwise use processSample().
@@ -227,14 +227,14 @@ namespace juce::dsp
 
         @see processSample, operator(), operator[]
     */
-        FloatType processSampleUnchecked (FloatType value) const noexcept
-        {
-            jassert (value >= minInputValue && value <= maxInputValue);
-            return lookupTable[scaler * value + offset];
-        }
+    FloatType processSampleUnchecked (FloatType value) const noexcept
+    {
+        jassert (value >= minInputValue && value <= maxInputValue);
+        return lookupTable[scaler * value + offset];
+    }
 
-        //==============================================================================
-        /** Calculates the approximated value for the given input value with range checking.
+    //==============================================================================
+    /** Calculates the approximated value for the given input value with range checking.
 
         This can be called with any input values. Out-of-range input values will be
         clipped to the specified input range.
@@ -247,43 +247,43 @@ namespace juce::dsp
 
         @see processSampleUnchecked, operator(), operator[]
     */
-        FloatType processSample (FloatType value) const noexcept
-        {
-            auto index = scaler * jlimit (minInputValue, maxInputValue, value) + offset;
-            jassert (isPositiveAndBelow (index, FloatType (lookupTable.getNumPoints())));
+    FloatType processSample (FloatType value) const noexcept
+    {
+        auto index = scaler * ::juce::jlimit (minInputValue, maxInputValue, value) + offset;
+        jassert (isPositiveAndBelow (index, FloatType (lookupTable.getNumPoints())));
 
-            return lookupTable[index];
-        }
+        return lookupTable[index];
+    }
 
-        //==============================================================================
-        /** @see processSampleUnchecked */
-        FloatType operator[] (FloatType index) const noexcept { return processSampleUnchecked (index); }
+    //==============================================================================
+    /** @see processSampleUnchecked */
+    FloatType operator[] (FloatType index) const noexcept { return processSampleUnchecked (index); }
 
-        /** @see processSample */
-        FloatType operator() (FloatType index) const noexcept { return processSample (index); }
+    /** @see processSample */
+    FloatType operator() (FloatType index) const noexcept { return processSample (index); }
 
-        //==============================================================================
-        /** Processes an array of input values without range checking
+    //==============================================================================
+    /** Processes an array of input values without range checking
         @see process
     */
-        void processUnchecked (const FloatType* input, FloatType* output, size_t numSamples) const noexcept
-        {
-            for (size_t i = 0; i < numSamples; ++i)
-                output[i] = processSampleUnchecked (input[i]);
-        }
+    void processUnchecked (const FloatType* input, FloatType* output, size_t numSamples) const noexcept
+    {
+        for (size_t i = 0; i < numSamples; ++i)
+            output[i] = processSampleUnchecked (input[i]);
+    }
 
-        //==============================================================================
-        /** Processes an array of input values with range checking
+    //==============================================================================
+    /** Processes an array of input values with range checking
         @see processUnchecked
     */
-        void process (const FloatType* input, FloatType* output, size_t numSamples) const noexcept
-        {
-            for (size_t i = 0; i < numSamples; ++i)
-                output[i] = processSample (input[i]);
-        }
+    void process (const FloatType* input, FloatType* output, size_t numSamples) const noexcept
+    {
+        for (size_t i = 0; i < numSamples; ++i)
+            output[i] = processSample (input[i]);
+    }
 
-        //==============================================================================
-        /** Calculates the maximum relative error of the approximation for the specified
+    //==============================================================================
+    /** Calculates the maximum relative error of the approximation for the specified
         parameter set.
 
         The closer the returned value is to zero the more accurate the approximation
@@ -305,23 +305,32 @@ namespace juce::dsp
                                      accuracy of the error calculation. If it's zero
                                      then 100 * numPoints will be used.
     */
-        [[maybe_unused]] static double calculateMaxRelativeError (const std::function<FloatType (FloatType)>& functionToApproximate,
-                                                                  FloatType minInputValue,
-                                                                  FloatType maxInputValue,
-                                                                  size_t numPoints,
-                                                                  size_t numTestPoints = 0);
+    [[maybe_unused]] static double calculateMaxRelativeError (const std::function<FloatType (FloatType)>& functionToApproximate,
+                                                              FloatType minInputValue,
+                                                              FloatType maxInputValue,
+                                                              size_t numPoints,
+                                                              size_t numTestPoints = 0);
 
-    private:
-        //==============================================================================
-        static double calculateRelativeDifference (double, double) noexcept;
+private:
+    //==============================================================================
+    static double calculateRelativeDifference (double, double) noexcept;
 
-        //==============================================================================
-        LookupTable<FloatType> lookupTable;
+    //==============================================================================
+    LookupTable<FloatType> lookupTable;
 
-        FloatType minInputValue, maxInputValue;
-        FloatType scaler, offset;
+    FloatType minInputValue, maxInputValue;
+    FloatType scaler, offset;
 
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LookupTableTransform)
-    };
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LookupTableTransform)
+};
 
-} // namespace juce
+} // namespace chowdsp_juce::dsp
+
+namespace juce::dsp
+{
+template <typename FloatType>
+using LookupTable = chowdsp_juce::dsp::LookupTable<FloatType>;
+
+template <typename FloatType>
+using LookupTableTransform = chowdsp_juce::dsp::LookupTableTransform<FloatType>;
+} // namespace juce::dsp

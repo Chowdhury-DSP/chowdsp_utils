@@ -23,38 +23,38 @@
   ==============================================================================
 */
 
-namespace juce
+namespace chowdsp_juce
 {
 namespace dsp
 {
 
-template <typename FloatType>
-LookupTable<FloatType>::LookupTable()
-{
-    data.resize (1);
-}
-
-template <typename FloatType>
-LookupTable<FloatType>::LookupTable (const std::function<FloatType (size_t)>& functionToApproximate,
-                                     size_t numPointsToUse)
-{
-    initialise (functionToApproximate, numPointsToUse);
-}
-
-//==============================================================================
-template <typename FloatType>
-void LookupTable<FloatType>::initialise (const std::function<FloatType (size_t)>& functionToApproximate,
-                                         size_t numPointsToUse)
-{
-    data.resize (getRequiredBufferSize (numPointsToUse));
-
-    for (size_t i = 0; i < numPointsToUse; ++i)
+    template <typename FloatType>
+    LookupTable<FloatType>::LookupTable()
     {
-        auto value = functionToApproximate (i);
+        data.resize (1);
+    }
 
-        jassert (! std::isnan (value));
-        jassert (! std::isinf (value));
-        // Make sure functionToApproximate returns a sensible value for the entire specified range.
+    template <typename FloatType>
+    LookupTable<FloatType>::LookupTable (const std::function<FloatType (size_t)>& functionToApproximate,
+                                         size_t numPointsToUse)
+    {
+        initialise (functionToApproximate, numPointsToUse);
+    }
+
+    //==============================================================================
+    template <typename FloatType>
+    void LookupTable<FloatType>::initialise (const std::function<FloatType (size_t)>& functionToApproximate,
+                                             size_t numPointsToUse)
+    {
+        data.resize (getRequiredBufferSize (numPointsToUse));
+
+        for (size_t i = 0; i < numPointsToUse; ++i)
+        {
+            auto value = functionToApproximate (i);
+
+            jassert (! std::isnan (value));
+            jassert (! std::isinf (value));
+            // Make sure functionToApproximate returns a sensible value for the entire specified range.
         // E.g., this won't work for zero:  [] (size_t i) { return 1.0f / i; }
 
         data[i] = value;
@@ -86,10 +86,8 @@ void LookupTableTransform<FloatType>::initialise (const std::function<FloatType 
     const auto initFn = [functionToApproximate, minInputValueToUse, maxInputValueToUse, numPoints] (size_t i)
     {
         return functionToApproximate (
-            jlimit (
-                minInputValueToUse, maxInputValueToUse,
-                jmap (FloatType (i), FloatType (0), FloatType (numPoints - 1), minInputValueToUse, maxInputValueToUse))
-            );
+            ::juce::jlimit (
+                minInputValueToUse, maxInputValueToUse, ::juce::jmap (FloatType (i), FloatType (0), FloatType (numPoints - 1), minInputValueToUse, maxInputValueToUse)));
     };
 
     lookupTable.initialise (initFn, numPoints);
@@ -114,11 +112,11 @@ template <typename FloatType>
 
     for (size_t i = 0; i < numTestPoints; ++i)
     {
-        auto inputValue = jmap (FloatType (i), FloatType (0), FloatType (numTestPoints - 1), minInputValue, maxInputValue);
+        auto inputValue = ::juce::jmap (FloatType (i), FloatType (0), FloatType (numTestPoints - 1), minInputValue, maxInputValue);
         auto approximatedOutputValue = transform.processSample (inputValue);
         auto referenceOutputValue = functionToApproximate (inputValue);
 
-        maxError = jmax (maxError, calculateRelativeDifference ((double) referenceOutputValue, (double) approximatedOutputValue));
+        maxError = ::juce::jmax (maxError, calculateRelativeDifference ((double) referenceOutputValue, (double) approximatedOutputValue));
     }
 
     return maxError;

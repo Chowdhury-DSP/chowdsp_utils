@@ -1,4 +1,4 @@
-set(CHOWDSP_MODULES_DIR "${PROJECT_SOURCE_DIR}/modules")
+set(CHOWDSP_MODULES_DIR "${PROJECT_SOURCE_DIR}/modules" CACHE INTERNAL "Source directory for ChowDSP modules")
 
 if (UNIX AND NOT APPLE)
     # We need to link to pthread explicitly on Linux/GCC
