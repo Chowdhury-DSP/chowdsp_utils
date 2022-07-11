@@ -13,7 +13,7 @@ namespace Polylogarithm
     template <typename T>
     T Li2 (T x) noexcept
     {
-        static constexpr auto PI = juce::MathConstants<T>::pi;
+        static constexpr auto PI_ = juce::MathConstants<T>::pi;
         static constexpr T P[] = {
             (T) 0.9999999999999999502e+0,
             (T) -2.6883926818565423430e+0,
@@ -39,12 +39,12 @@ namespace Polylogarithm
         {
             const auto l = std::log ((T) 1 - x);
             y = (T) 1 / ((T) 1 - x);
-            r = -PI * PI / (T) 6 + l * ((T) 0.5 * l - std::log (-x));
+            r = -PI_ * PI_ / (T) 6 + l * ((T) 0.5 * l - std::log (-x));
             s = (T) 1;
         }
         else if (x == (T) -1)
         {
-            return -PI * PI / (T) 12;
+            return -PI_ * PI_ / (T) 12;
         }
         else if (x < (T) 0)
         {
@@ -66,25 +66,25 @@ namespace Polylogarithm
         else if (x < (T) 1)
         {
             y = (T) 1 - x;
-            r = PI * PI / (T) 6 - std::log (x) * std::log (y);
+            r = PI_ * PI_ / (T) 6 - std::log (x) * std::log (y);
             s = (T) -1;
         }
         else if (x == (T) 1)
         {
-            return PI * PI / (T) 6;
+            return PI_ * PI_ / (T) 6;
         }
         else if (x < (T) 2)
         {
             const auto l = std::log (x);
             y = (T) 1 - (T) 1 / x;
-            r = PI * PI / (T) 6 - l * (std::log (y) + (T) 0.5 * l);
+            r = PI_ * PI_ / (T) 6 - l * (std::log (y) + (T) 0.5 * l);
             s = (T) 1;
         }
         else
         {
             const double l = std::log (x);
             y = (T) 1 / x;
-            r = PI * PI / (T) 3 - (T) 0.5 * l * l;
+            r = PI_ * PI_ / (T) 3 - (T) 0.5 * l * l;
             s = (T) -1;
         }
 
