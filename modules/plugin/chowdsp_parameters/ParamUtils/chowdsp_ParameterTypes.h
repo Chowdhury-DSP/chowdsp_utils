@@ -12,8 +12,6 @@ namespace ParamUtils
     /** Mixin for parameters that recognize some form of modulation. */
     struct ModParameterMixin
     {
-        ModParameterMixin() = default;
-
         virtual ~ModParameterMixin() = default;
 
         /** Returns true if this parameter supports monophonic modulation. */

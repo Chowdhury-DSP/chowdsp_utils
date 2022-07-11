@@ -5,8 +5,7 @@ namespace chowdsp::ParamUtils
 /** Mixin for parameters that recognize some form of modulation. */
 struct ModParameterMixin : public clap_juce_extensions::clap_juce_parameter_capabilities
 {
-    ModParameterMixin() = default;
-    virtual ~ModParameterMixin() = default;
+    ~ModParameterMixin() override = default;
 
     /** Base function for applying monophonic modulation to a parameter. */
     [[maybe_unused]] void applyMonophonicModulation (double /*value*/) override
