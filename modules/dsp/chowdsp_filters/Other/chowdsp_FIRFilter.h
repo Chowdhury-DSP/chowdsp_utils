@@ -66,7 +66,7 @@ public:
         for (auto& z : state)
             z.resize (2 * order, FloatType {});
 
-        zPtr = 0;
+        zPtr.resize (numChannels, 0);
     }
 
     /** Reset filter state */
@@ -74,7 +74,7 @@ public:
     {
         for (auto& channelState : state)
             std::fill (channelState.begin(), channelState.end(), 0.0f);
-        zPtr = 0;
+        std::fill (zPtr.begin(), zPtr.end(), 0);
     }
 
     /**
@@ -98,7 +98,7 @@ public:
     {
         auto* z = state[channel].data();
         const auto* h = coefficients.data();
-        chowdsp::ScopedValue<int> zPtrLocal { zPtr };
+        chowdsp::ScopedValue<int> zPtrLocal { zPtr[channel] };
 
         for (int n = 0; n < numSamples; ++n)
             block[n] = processSampleInternal (block[n], z, h, zPtrLocal.get(), order, paddedOrder);
@@ -120,7 +120,7 @@ public:
     void processBlockBypassed (const float* block, const int numSamples, const int channel = 0) noexcept
     {
         auto* z = state[channel].data();
-        chowdsp::ScopedValue<int> zPtrLocal { zPtr };
+        chowdsp::ScopedValue<int> zPtrLocal { zPtr[channel] };
 
         for (int n = 0; n < numSamples; ++n)
             processSampleInternalBypassed (block[n], z, zPtrLocal.get(), order);
@@ -187,7 +187,7 @@ private:
 
     int order = 0;
     int paddedOrder = 0;
-    int zPtr = 0;
+    std::vector<int> zPtr;
 
     std::vector<FloatType, xsimd::default_allocator<FloatType>> coefficients;
     std::vector<std::vector<FloatType>> state;
