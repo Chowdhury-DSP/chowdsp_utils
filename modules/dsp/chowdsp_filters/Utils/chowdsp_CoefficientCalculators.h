@@ -5,6 +5,10 @@ namespace chowdsp
 /** Methods for computing coefficients for canonical filter forms */
 namespace CoefficientCalculators
 {
+    /** Q value to use for maximally flat passband gain */
+    template <typename T>
+    constexpr auto butterworthQ = (T)1 / juce::MathConstants<T>::sqrt2;
+    
     /**
      * Calculates the filter coefficients for a given cutoff frequency and sample rate.
      * The analog prototype transfer function is: \f$ H(s) = \frac{1}{s + 1} \f$
