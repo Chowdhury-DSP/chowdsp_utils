@@ -43,6 +43,5 @@ namespace CLAPExtensions
 
 // LCOV_EXCL_START
 #include "ParameterExtensions/chowdsp_ModParamMixin.h"
-#include "PluginExtensions/chowdsp_CLAPProcessorExtensions.h"
 #include "PluginExtensions/chowdsp_CLAPInfoExtensions.h"
 // LCOV_EXCL_END

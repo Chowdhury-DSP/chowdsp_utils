@@ -11,7 +11,7 @@ CPMAddPackage(
 CPMAddPackage(
   NAME clap-juce-extensions
   GITHUB_REPOSITORY free-audio/clap-juce-extensions
-  GIT_TAG 56b1917b3ffa712095d2900befb26c9b0f9f2185
+  GIT_TAG 61749181678ebc368795447477e831469360679a
 )
 
 include(AddJUCEModules)

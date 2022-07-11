@@ -202,7 +202,7 @@ void ForwardingParameter::applyMonophonicModulation (double value)
 
 // let's re-enable coverage for these lines when we've got some parameters that implement polyphonic modulation
 // LCOV_EXCL_START
-void ForwardingParameter::applyPolyphonicModulation (int32_t note_id, int16_t key, int16_t channel, double value)
+void ForwardingParameter::applyPolyphonicModulation (int32_t note_id, int16_t port_index, int16_t channel, int16_t key, double value)
 {
     if (internalParamAsModulatable == nullptr)
     {
@@ -212,7 +212,7 @@ void ForwardingParameter::applyPolyphonicModulation (int32_t note_id, int16_t ke
         return;
     }
 
-    internalParamAsModulatable->applyPolyphonicModulation (note_id, key, channel, value);
+    internalParamAsModulatable->applyPolyphonicModulation (note_id, port_index, channel, key, value);
 }
 // LCOV_EXCL_STOP
 
