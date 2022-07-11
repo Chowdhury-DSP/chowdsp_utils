@@ -1068,7 +1068,7 @@ namespace FloatVectorHelpers
 #if JUCE_USE_VDSP_FRAMEWORK
             vDSP_vabs ((float*) src, 1, dest, 1, (vDSP_Length) num);
 #else
-            FloatVectorHelpers::signMask32 signMask;
+            FloatVectorHelpers::signMask32 signMask {};
             signMask.i = 0x7fffffffUL;
             JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = std::abs (src[i]),
                                           Mode::bit_and (s, mask),
@@ -1076,7 +1076,7 @@ namespace FloatVectorHelpers
                                           JUCE_INCREMENT_SRC_DEST,
                                           const Mode::ParallelType mask = Mode::load1 (signMask.f);)
 
-            ignoreUnused (signMask);
+            ::juce::ignoreUnused (signMask);
 #endif
         }
 
@@ -1086,7 +1086,7 @@ namespace FloatVectorHelpers
 #if JUCE_USE_VDSP_FRAMEWORK
             vDSP_vabsD ((double*) src, 1, dest, 1, (vDSP_Length) num);
 #else
-            FloatVectorHelpers::signMask64 signMask;
+            FloatVectorHelpers::signMask64 signMask {};
             signMask.i = 0x7fffffffffffffffULL;
 
             JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = std::abs (src[i]),
@@ -1095,7 +1095,7 @@ namespace FloatVectorHelpers
                                           JUCE_INCREMENT_SRC_DEST,
                                           const Mode::ParallelType mask = Mode::load1 (signMask.d);)
 
-            ignoreUnused (signMask);
+            ::juce::ignoreUnused (signMask);
 #endif
         }
 
@@ -1125,7 +1125,7 @@ namespace FloatVectorHelpers
 #if JUCE_USE_VDSP_FRAMEWORK
             vDSP_vmin ((float*) src1, 1, (float*) src2, 1, dest, 1, (vDSP_Length) num);
 #else
-            JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = jmin (src1[i], src2[i]),
+            JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = ::juce::jmin (src1[i], src2[i]),
                                                 Mode::min (s1, s2),
                                                 JUCE_LOAD_SRC1_SRC2,
                                                 JUCE_INCREMENT_SRC1_SRC2_DEST, )
@@ -1138,7 +1138,7 @@ namespace FloatVectorHelpers
 #if JUCE_USE_VDSP_FRAMEWORK
             vDSP_vminD ((double*) src1, 1, (double*) src2, 1, dest, 1, (vDSP_Length) num);
 #else
-            JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = jmin (src1[i], src2[i]),
+            JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = ::juce::jmin (src1[i], src2[i]),
                                                 Mode::min (s1, s2),
                                                 JUCE_LOAD_SRC1_SRC2,
                                                 JUCE_INCREMENT_SRC1_SRC2_DEST, )
@@ -1171,7 +1171,7 @@ namespace FloatVectorHelpers
 #if JUCE_USE_VDSP_FRAMEWORK
             vDSP_vmax ((float*) src1, 1, (float*) src2, 1, dest, 1, (vDSP_Length) num);
 #else
-            JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = jmax (src1[i], src2[i]),
+            JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = ::juce::jmax (src1[i], src2[i]),
                                                 Mode::max (s1, s2),
                                                 JUCE_LOAD_SRC1_SRC2,
                                                 JUCE_INCREMENT_SRC1_SRC2_DEST, )
@@ -1184,7 +1184,7 @@ namespace FloatVectorHelpers
 #if JUCE_USE_VDSP_FRAMEWORK
             vDSP_vmaxD ((double*) src1, 1, (double*) src2, 1, dest, 1, (vDSP_Length) num);
 #else
-            JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = jmax (src1[i], src2[i]),
+            JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = ::juce::jmax (src1[i], src2[i]),
                                                 Mode::max (s1, s2),
                                                 JUCE_LOAD_SRC1_SRC2,
                                                 JUCE_INCREMENT_SRC1_SRC2_DEST, )
@@ -1199,7 +1199,7 @@ namespace FloatVectorHelpers
 #if JUCE_USE_VDSP_FRAMEWORK
             vDSP_vclip ((float*) src, 1, &low, &high, dest, 1, (vDSP_Length) num);
 #else
-            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = jmax (jmin (src[i], high), low),
+            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = ::juce::jmax (::juce::jmin (src[i], high), low),
                                           Mode::max (Mode::min (s, hi), lo),
                                           JUCE_LOAD_SRC,
                                           JUCE_INCREMENT_SRC_DEST,
@@ -1216,7 +1216,7 @@ namespace FloatVectorHelpers
 #if JUCE_USE_VDSP_FRAMEWORK
             vDSP_vclipD ((double*) src, 1, &low, &high, dest, 1, (vDSP_Length) num);
 #else
-            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = jmax (jmin (src[i], high), low),
+            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = ::juce::jmax (::juce::jmin (src[i], high), low),
                                           Mode::max (Mode::min (s, hi), lo),
                                           JUCE_LOAD_SRC,
                                           JUCE_INCREMENT_SRC_DEST,

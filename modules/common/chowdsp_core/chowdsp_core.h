@@ -24,6 +24,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include <algorithm>
 #include <atomic>
 #include <cmath>
+#include <functional>
 #include <tuple>
 #include <cstring>
 
