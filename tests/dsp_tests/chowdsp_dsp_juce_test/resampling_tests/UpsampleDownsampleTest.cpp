@@ -55,7 +55,7 @@ public:
     }
 
     template <typename ProcType>
-    static juce::AudioBuffer<float> processInSubBlocks (ProcType& proc, const juce::AudioBuffer<float>& inBuffer, int subBlockSize = blockSize / 8)
+    static juce::AudioBuffer<float> processInSubBlocks (ProcType& proc, juce::AudioBuffer<float>& inBuffer, int subBlockSize = blockSize / 8)
     {
         juce::AudioBuffer<float> outBuffer (inBuffer);
         int outBufferPtr = 0;
@@ -63,27 +63,24 @@ public:
         juce::dsp::AudioBlock<const float> inBlock { inBuffer };
         for (int i = 0; i < inBuffer.getNumSamples(); i += subBlockSize)
         {
-            auto outBlock = proc.process (inBlock.getSubBlock ((size_t) i, (size_t) subBlockSize));
+            auto outBlock = proc.process (chowdsp::BufferView<float> { inBuffer, i, subBlockSize });
 
             auto numOutSamples = (int) outBlock.getNumSamples();
             if (outBufferPtr + numOutSamples > outBuffer.getNumSamples())
                 outBuffer.setSize (1, outBufferPtr + numOutSamples, true);
 
-            outBuffer.copyFrom (0, outBufferPtr, outBlock.getChannelPointer (0), numOutSamples);
+            outBuffer.copyFrom (0, outBufferPtr, outBlock.getReadPointer (0), numOutSamples);
             outBufferPtr += numOutSamples;
         }
 
         outBuffer.setSize (1, outBufferPtr, true);
-
-        JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wpessimizing-move") // Clang doesn't like std::move
-        return std::move (outBuffer);
-        JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+        return outBuffer;
     }
 
-    template <int FilterOrd = 4>
+    template <typename FilterType>
     void upsampleQualityTest (int upsampleRatio)
     {
-        chowdsp::Upsampler<float, FilterOrd> upsampler;
+        chowdsp::Upsampler<float, FilterType> upsampler;
         upsampler.prepare ({ _sampleRate, (juce::uint32) blockSize, 1 }, upsampleRatio);
 
         constexpr float testFreq = 10000.0f;
@@ -96,10 +93,10 @@ public:
         expectGreaterThan (snr, 60.0f, "Signal to noise ratio is too low!");
     }
 
-    template <int FilterOrd = 8>
+    template <typename FilterType>
     void downsampleQualityTest (int downsampleRatio)
     {
-        chowdsp::Downsampler<float, FilterOrd> downsampler;
+        chowdsp::Downsampler<float, FilterType> downsampler;
         downsampler.prepare ({ (double) downsampleRatio * _sampleRate, (juce::uint32) downsampleRatio * (juce::uint32) blockSize, 1 }, downsampleRatio);
 
         constexpr float testFreq = 42000.0f;
@@ -120,16 +117,28 @@ public:
     void runTestTimed() override
     {
         beginTest ("Upsample 2x Quality Test");
-        upsampleQualityTest (2);
+        upsampleQualityTest<chowdsp::ButterworthFilter<4>> (2);
 
         beginTest ("Upsample 3x Quality Test");
-        upsampleQualityTest<8> (3);
+        upsampleQualityTest<chowdsp::ButterworthFilter<8>> (3);
+
+        beginTest ("Upsample 3x Chebyshev Quality Test");
+        upsampleQualityTest<chowdsp::ChebyshevIIFilter<12>> (3);
+
+        beginTest ("Upsample 4x Elliptic Quality Test");
+        upsampleQualityTest<chowdsp::EllipticFilter<12>> (4);
 
         beginTest ("Downsample 2x Quality Test");
-        downsampleQualityTest (2);
+        downsampleQualityTest<chowdsp::ButterworthFilter<4>> (2);
 
         beginTest ("Downsample 3x Quality Test");
-        downsampleQualityTest<16> (3);
+        downsampleQualityTest<chowdsp::ButterworthFilter<16>> (3);
+
+        beginTest ("Downsample 3x Chebyshev Quality Test");
+        downsampleQualityTest<chowdsp::ChebyshevIIFilter<12>> (3);
+        
+        beginTest ("Downsample 4x Elliptic Quality Test");
+        downsampleQualityTest<chowdsp::EllipticFilter<12>> (4);
     }
 };
 

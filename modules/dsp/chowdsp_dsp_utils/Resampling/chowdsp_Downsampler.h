@@ -7,10 +7,10 @@ namespace chowdsp
  * Note that the downsampler must be used to process block sizes
  * that are an integer multiple of the downsampling ratio.
  *
- * @tparam T            Data type to process
- * @tparam FilterOrder  Filter order to use for anti-aliasing filter (this should be an even number)
+ * @tparam T                        Data type to process
+ * @tparam AntiAliasingFilterType   Filter type to use for an anti-aliasing filter, for example chowdsp::ButterworthFilter<8>
  */
-template <typename T, int FilterOrder = 4>
+template <typename T, typename AntiAliasingFilterType>
 class Downsampler
 {
 public:
@@ -20,19 +20,12 @@ public:
     void prepare (juce::dsp::ProcessSpec spec, int downsampleRatio)
     {
         ratio = downsampleRatio;
-        downsampledBuffer.setSize ((int) spec.numChannels, (int) spec.maximumBlockSize / ratio);
+        downsampledBuffer.setMaxSize ((int) spec.numChannels, (int) spec.maximumBlockSize / ratio);
 
-        aaFilters.clear();
-        aaFilters.resize (spec.numChannels);
+        aaFilter.prepare ((int) spec.numChannels);
 
         auto fc = T (0.995 * ((spec.sampleRate / ratio) * 0.5));
-        auto Qs = QValCalcs::butterworth_Qs<T, FilterOrder>();
-        for (size_t ch = 0; ch < spec.numChannels; ++ch)
-        {
-            aaFilters[ch].resize (FilterOrder / 2);
-            for (int i = 0; i < FilterOrder / 2; ++i)
-                aaFilters[ch][(size_t) i].calcCoefs (fc, Qs[(size_t) i], (T) spec.sampleRate);
-        }
+        aaFilter.calcCoefs (fc, CoefficientCalculators::butterworthQ<T>, (T) spec.sampleRate);
 
         reset();
     }
@@ -40,10 +33,7 @@ public:
     /** Resets the downsampler state */
     void reset()
     {
-        for (auto& channelFilters : aaFilters)
-            for (auto& filt : channelFilters)
-                filt.reset();
-
+        aaFilter.reset();
         downsampledBuffer.clear();
     }
 
@@ -66,10 +56,7 @@ public:
         {
             int startSample = n / ratio;
 
-            auto y = data[n];
-            for (auto& filt : aaFilters[(size_t) channel])
-                y = filt.processSample (y);
-
+            auto y = aaFilter.processSample (data[n], channel);
             downsampledData[startSample] = y;
         }
     }
@@ -78,27 +65,25 @@ public:
      * Process a block of data.
      * Note that the block size must be an integer multiple of the downsampling ratio.
      */
-    chowdsp::AudioBlock<T> process (const chowdsp::AudioBlock<const T>& block) noexcept
+    BufferView<T> process (const BufferView<T>& block) noexcept
     {
-        auto outBlock = chowdsp::AudioBlock<T> { downsampledBuffer };
-
         const auto numChannels = block.getNumChannels();
-        const auto numSamples = (int) block.getNumSamples();
+        const auto numSamples = block.getNumSamples();
 
         // Downsampler must be used on blocks with sizes that are integer multiples of the downsampling ratio!
         jassert (numSamples % ratio == 0);
 
-        for (size_t ch = 0; ch < numChannels; ++ch)
-            process (block.getChannelPointer (ch), outBlock.getChannelPointer (ch), (int) ch, numSamples);
+        for (int ch = 0; ch < numChannels; ++ch)
+            process (block.getReadPointer (ch), downsampledBuffer.getWritePointer (ch), ch, numSamples);
 
-        return outBlock.getSubBlock (0, size_t (numSamples / ratio));
+        return BufferView { downsampledBuffer, 0, numSamples / ratio };
     }
 
 private:
     int ratio = 1;
-    std::vector<std::vector<SecondOrderLPF<T>>> aaFilters; // anti-aliasing filters
+    AntiAliasingFilterType aaFilter;
 
-    juce::AudioBuffer<T> downsampledBuffer;
+    Buffer<T> downsampledBuffer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Downsampler)
 };

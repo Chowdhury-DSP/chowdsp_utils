@@ -5,10 +5,10 @@ namespace chowdsp
 /**
  * Utility class for upsampling a signal by an integer ratio
  *
- * @tparam T            Data type to process
- * @tparam FilterOrder  Filter order to use for anti-imaging filter (this should be an even number)
+ * @tparam T                        Data type to process
+ * @tparam AntiImagingFilterType    Filter type to use for an anti-imaging filter, for example chowdsp::ButterworthFilter<8>
  */
-template <typename T, int FilterOrder = 4>
+template <typename T, typename AntiImagingFilterType>
 class Upsampler
 {
 public:
@@ -18,19 +18,12 @@ public:
     void prepare (juce::dsp::ProcessSpec spec, int upsampleRatio)
     {
         ratio = upsampleRatio;
-        upsampledBuffer.setSize ((int) spec.numChannels, (int) spec.maximumBlockSize * ratio);
+        upsampledBuffer.setMaxSize ((int) spec.numChannels, (int) spec.maximumBlockSize * ratio);
 
-        aiFilters.clear();
-        aiFilters.resize (spec.numChannels);
+        aiFilter.prepare ((int) spec.numChannels);
 
         auto fc = T (0.995 * (spec.sampleRate * 0.5));
-        auto Qs = QValCalcs::butterworth_Qs<T, FilterOrder>();
-        for (size_t ch = 0; ch < spec.numChannels; ++ch)
-        {
-            aiFilters[ch].resize (FilterOrder / 2);
-            for (int i = 0; i < FilterOrder / 2; ++i)
-                aiFilters[ch][(size_t) i].calcCoefs (fc, Qs[(size_t) i], ratio * (T) spec.sampleRate);
-        }
+        aiFilter.calcCoefs (fc, CoefficientCalculators::butterworthQ<T>, ratio * (T) spec.sampleRate);
 
         reset();
     }
@@ -38,10 +31,7 @@ public:
     /** Resets the upsampler state */
     void reset()
     {
-        for (auto& channelFilters : aiFilters)
-            for (auto& filt : channelFilters)
-                filt.reset();
-
+        aiFilter.reset();
         upsampledBuffer.clear();
     }
 
@@ -66,31 +56,27 @@ public:
                 upsampledData[i] = (T) 0;
         }
 
-        for (auto& filt : aiFilters[(size_t) channel])
-            filt.processBlock (upsampledData, numSamples * ratio);
-
+        aiFilter.processBlock (upsampledData, numSamples * ratio, channel);
         juce::FloatVectorOperations::multiply (upsampledData, (T) ratio, numSamples * ratio);
     }
 
     /** Process a block of data */
-    chowdsp::AudioBlock<T> process (const chowdsp::AudioBlock<const T>& block) noexcept
+    BufferView<T> process (const BufferView<T>& block) noexcept
     {
-        auto outBlock = chowdsp::AudioBlock<T> { upsampledBuffer };
-
         const auto numChannels = block.getNumChannels();
-        const auto numSamples = (int) block.getNumSamples();
+        const auto numSamples = block.getNumSamples();
 
-        for (size_t ch = 0; ch < numChannels; ++ch)
-            process (block.getChannelPointer (ch), outBlock.getChannelPointer (ch), (int) ch, numSamples);
+        for (int ch = 0; ch < numChannels; ++ch)
+            process (block.getReadPointer (ch), upsampledBuffer.getWritePointer (ch), ch, numSamples);
 
-        return outBlock.getSubBlock (0, size_t (numSamples * ratio));
+        return BufferView { upsampledBuffer, 0, numSamples * ratio };
     }
 
 private:
     int ratio = 1;
-    std::vector<std::vector<SecondOrderLPF<T>>> aiFilters; // anti-imaging filters
+    AntiImagingFilterType aiFilter; // anti-imaging filter
 
-    juce::AudioBuffer<T> upsampledBuffer;
+    Buffer<T> upsampledBuffer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Upsampler)
 };
