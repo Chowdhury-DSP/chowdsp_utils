@@ -9,9 +9,11 @@ struct ProcessSpec
     double sampleRate;
 
     /** The maximum number of samples that will be in the blocks sent to process() method. */
-    size_t maximumBlockSize;
+    uint32_t maximumBlockSize;
 
     /** The number of channels that the process() method will be expected to handle. */
-    size_t numChannels;
+    uint32_t numChannels;
+
+    // Note: I'd prefer to use `int` for the integer types, but we need `uint32_t` for compatibility with JUCE.
 };
 } // namespace juce::dsp

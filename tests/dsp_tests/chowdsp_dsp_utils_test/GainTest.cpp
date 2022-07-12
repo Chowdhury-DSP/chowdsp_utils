@@ -33,7 +33,7 @@ TEMPLATE_TEST_CASE ("Gain Test", "", float, double, xsimd::batch<float>, xsimd::
     {
         chowdsp::Gain<T> gain;
         gain.setGainLinear ((NumericType) 0);
-        gain.prepare ({ (double) fs, (size_t) blockSize, 1 });
+        gain.prepare ({ (double) fs, (uint32_t) blockSize, 1 });
         gain.setRampDurationSeconds (0.1);
 
         juce::SmoothedValue<NumericType, juce::ValueSmoothingTypes::Linear> refGain;
