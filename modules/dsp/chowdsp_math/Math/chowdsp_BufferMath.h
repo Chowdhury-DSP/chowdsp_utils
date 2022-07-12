@@ -30,6 +30,10 @@ namespace BufferMath
     /** Applies a linear gain to a buffer. */
     template <typename BufferType, typename SmoothedValueType>
     static void applyGainSmoothed (BufferType& buffer, SmoothedValueType& gain);
+
+    /** Applies a linear gain to a buffer. */
+    template <typename BufferType, typename SmoothedBufferType>
+    static void applyGainSmoothedBuffer (BufferType& buffer, SmoothedBufferType& gain);
 } // namespace BufferMath
 } // namespace chowdsp
 

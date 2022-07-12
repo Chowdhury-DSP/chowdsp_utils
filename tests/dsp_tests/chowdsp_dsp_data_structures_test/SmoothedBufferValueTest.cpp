@@ -33,9 +33,10 @@ TEMPLATE_PRODUCT_TEST_CASE ("Smoothed Buffer Value Test", "", chowdsp::SmoothedB
                     REQUIRE_MESSAGE (smoothData[n] == ref.getNextValue(), "SmoothedValue was inaccurate!");
 
                 REQUIRE_MESSAGE (comp.getCurrentValue() == ref.getCurrentValue(), "Current value is innacurate!");
-            }
 
-            REQUIRE_MESSAGE (comp.isSmoothing() == ref.isSmoothing(), "SmoothedBufferValue is not smoothing correctly!");
+                const auto isActuallySmoothing = smoothData[0] != smoothData[maxBlockSize - 1];
+                REQUIRE_MESSAGE (comp.isSmoothing() == isActuallySmoothing, "SmoothedBufferValue is not smoothing correctly!");
+            }
         };
 
         chowdsp::SmoothedBufferValue<FloatType, SmoothingType> compSmooth;

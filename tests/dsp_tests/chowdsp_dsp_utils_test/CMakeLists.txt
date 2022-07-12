@@ -4,6 +4,7 @@ target_sources(chowdsp_dsp_utils_test
     PRIVATE
         AudioTimerTest.cpp
         BypassTest.cpp
+        GainTest.cpp
         PannerTest.cpp
         TunerTest.cpp
 

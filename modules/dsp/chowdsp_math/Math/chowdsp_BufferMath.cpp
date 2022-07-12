@@ -169,4 +169,30 @@ namespace chowdsp::BufferMath
                 data[ch][n] *= sampleGain;
         }
     }
+
+    template <typename BufferType, typename SmoothedBufferType>
+    static void applyGainSmoothedBuffer (BufferType& buffer, SmoothedBufferType& gain)
+    {
+        using SampleType = typename BufferType::Type;
+
+        if (! gain.isSmoothing())
+        {
+            applyGain (buffer, gain.getCurrentValue());
+            return;
+        }
+
+        const auto numChannels = buffer.getNumChannels();
+        const auto numSamples = buffer.getNumSamples();
+
+        auto audioData = buffer.getArrayOfWritePointers();
+        const auto gainData = gain.getSmoothedBuffer();
+
+        for (int ch = 0; ch < numChannels; ++ch)
+        {
+            if constexpr (std::is_floating_point_v<SampleType>)
+                juce::FloatVectorOperations::multiply (audioData[ch], gainData, numSamples);
+            else if constexpr (SampleTypeHelpers::IsSIMDRegister<SampleType>)
+                std::transform (audioData[ch], audioData[ch] + numSamples, gainData, audioData[ch], [](const auto& x, const auto& g) { return x * g; });
+        }
+    }
 } // namespace chowdsp

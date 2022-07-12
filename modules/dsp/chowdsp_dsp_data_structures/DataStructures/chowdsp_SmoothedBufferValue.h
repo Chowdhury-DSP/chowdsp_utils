@@ -57,8 +57,11 @@ public:
     /** Sets the ramp length to use for smoothing. */
     void setRampLength (double rampLengthSeconds);
 
-    /** Returns true if the value is currently being smoothed */
-    [[nodiscard]] bool isSmoothing() const noexcept { return smoother.isSmoothing(); }
+    /**
+     * Returns true if the value has been smoothed over the most recently
+     * processed buffer.
+     */
+    [[nodiscard]] bool isSmoothing() const noexcept { return isCurrentlySmoothing; }
 
     /** Returns the current smoothed value */
     [[nodiscard]] FloatType getCurrentValue() const noexcept { return smoother.getCurrentValue(); }
@@ -87,8 +90,9 @@ public:
     std::function<FloatType (FloatType)> mappingFunction = [] (auto x) { return x; };
 
 private:
-    std::vector<FloatType> buffer;
+    std::vector<FloatType, xsimd::default_allocator<FloatType>> buffer;
     juce::SmoothedValue<FloatType, ValueSmoothingType> smoother;
+    bool isCurrentlySmoothing = false;
 
     std::atomic<float>* parameterHandle = nullptr;
 

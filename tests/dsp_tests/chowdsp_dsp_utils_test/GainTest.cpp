@@ -1,45 +1,66 @@
-#include <test_utils.h>
-#include <TimedUnitTest.h>
+#include <CatchUtils.h>
 #include <chowdsp_dsp_utils/chowdsp_dsp_utils.h>
 
 namespace
 {
 constexpr float fs = 44100.0f;
+constexpr int blockSize = 512;
+constexpr auto maxErr = 0.01;
 }
 
-/** Unit tests for chowdsp::Gain */
-class GainTest : public TimedUnitTest
+TEMPLATE_TEST_CASE ("Gain Test", "", float, double, xsimd::batch<float>, xsimd::batch<double>)
 {
-public:
-    GainTest() : TimedUnitTest ("Gain Test") {}
+    using T = TestType;
+    using NumericType = chowdsp::SampleTypeHelpers::NumericType<T>;
 
-    void gainTest (float gain)
+    SECTION ("Parameter Checks")
     {
-        chowdsp::GainProcessor gainProc;
-        gainProc.setGain (gain);
-        gainProc.reset();
+        chowdsp::Gain<T> gain;
 
-        auto buffer = test_utils::makeNoise (fs, 0.25f);
-        const int numSamples = buffer.getNumSamples();
-        auto refMag = buffer.getMagnitude (0, numSamples);
+        gain.setGainLinear ((NumericType) 2);
+        REQUIRE_MESSAGE (gain.getGainLinear() == (NumericType) 2, "Set linear gain is incorrect!");
+        REQUIRE_MESSAGE (gain.getGainDecibels() == Approx ((NumericType) 6).margin (0.03), "Get Decibels gain is incorrect!");
 
-        gainProc.processBlock (buffer);
-        auto mag = buffer.getMagnitude (0, numSamples);
+        gain.setGainDecibels ((NumericType) -6);
+        REQUIRE_MESSAGE (gain.getGainDecibels() == Approx ((NumericType) -6).margin (1.0e-6), "Set Decibels gain is incorrect!");
+        REQUIRE_MESSAGE (gain.getGainLinear() == Approx ((NumericType) 0.5).margin (0.02), "Get linear gain is incorrect!");
 
-        expectWithinAbsoluteError (mag / refMag, gain, (float) 1.0e-6, "Incorrect gain!");
+        gain.setRampDurationSeconds (0.05);
+        REQUIRE_MESSAGE (gain.getRampDurationSeconds() == 0.05, "Set ramp duration is incorrect!");
     }
 
-    void runTestTimed() override
+    SECTION ("Smooth Gain Test")
     {
-        beginTest ("Flat Test");
-        gainTest (1.0f);
+        chowdsp::Gain<T> gain;
+        gain.setGainLinear ((NumericType) 0);
+        gain.prepare ({ (double) fs, (size_t) blockSize, 1 });
+        gain.setRampDurationSeconds (0.1);
 
-        beginTest ("Boost Test");
-        gainTest (2.0f);
+        juce::SmoothedValue<NumericType, juce::ValueSmoothingTypes::Linear> refGain;
+        refGain.setCurrentAndTargetValue ((NumericType) 0);
+        refGain.reset (0.1, (double) fs);
 
-        beginTest ("Cut Test");
-        gainTest (0.5f);
+        chowdsp::Buffer<T> buffer (1, blockSize);
+        auto* bufferData = buffer.getWritePointer (0);
+
+        std::transform (bufferData, bufferData + blockSize, bufferData, [](auto) { return (T) 1; });
+        gain.process (buffer);
+        for (int i = 0; i < blockSize; ++i)
+            REQUIRE_MESSAGE (bufferData[i] == SIMDApprox<T> ((T) refGain.getNextValue()).margin ((NumericType) maxErr), "Unsmoothed gain is incorrect!");
+
+        gain.setGainLinear ((NumericType) 2);
+        refGain.setTargetValue ((NumericType) 2);
+        std::transform (bufferData, bufferData + blockSize, bufferData, [](auto) { return (T) 1; });
+        gain.process (buffer);
+        for (int i = 0; i < blockSize; ++i)
+            REQUIRE_MESSAGE (bufferData[i] == SIMDApprox<T> ((T) refGain.getNextValue()).margin ((NumericType) maxErr), "Smoothed gain is incorrect!");
+        REQUIRE_MESSAGE (gain.isSmoothing() == refGain.isSmoothing(), "isSmoothing() is incorrect!");
+
+        gain.reset();
+        refGain.reset (0.1, (double) fs);
+        std::transform (bufferData, bufferData + blockSize, bufferData, [](auto) { return (T) 1; });
+        gain.process (buffer);
+        for (int i = 0; i < blockSize; ++i)
+            REQUIRE_MESSAGE (bufferData[i] == SIMDApprox<T> ((T) refGain.getNextValue()).margin ((NumericType) maxErr), "Gain after reset is incorrect!");
     }
-};
-
-static GainTest gainTest;
+}
