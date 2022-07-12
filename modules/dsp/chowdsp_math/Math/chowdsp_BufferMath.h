@@ -2,8 +2,6 @@
 
 namespace chowdsp
 {
-// @TODO: write tests for all of these:
-
 /** Math operations for working with audio buffers */
 namespace BufferMath
 {
