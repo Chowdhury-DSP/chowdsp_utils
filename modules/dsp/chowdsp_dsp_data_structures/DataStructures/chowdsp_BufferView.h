@@ -70,6 +70,11 @@ public:
         for (size_t ch = 0; ch < (size_t) numChannels; ++ch)
             channelPointers[ch] = block.getChannelPointer (ch + (size_t) startChannel) + sampleOffset;
     }
+
+    chowdsp::AudioBlock<SampleType> toAudioBlock() const noexcept
+    {
+        return chowdsp::AudioBlock<SampleType> { channelPointers.data(), (size_t) numChannels, (size_t) numSamples };
+    }
 #endif
 #endif
 

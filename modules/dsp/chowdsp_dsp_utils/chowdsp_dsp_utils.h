@@ -52,6 +52,15 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Modal/chowdsp_ModalFilter.h"
 #include "Modal/chowdsp_ModalFilterBank.h"
 
+// resamplers
+#include "Resampling/chowdsp_Upsampler.h"
+#include "Resampling/chowdsp_Downsampler.h"
+#include "Resampling/chowdsp_BaseResampler.h"
+#include "Resampling/chowdsp_LanczosResampler.h"
+#include "Resampling/chowdsp_ResamplingProcessor.h"
+#include "Resampling/chowdsp_SRCResampler.h"
+#include "Resampling/chowdsp_ResampledProcess.h"
+
 // some other useful processors
 #include "Processors/chowdsp_AudioTimer.h"
 #include "Processors/chowdsp_BypassProcessor.h"
@@ -76,13 +85,6 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Convolution/chowdsp_IRHelpers.h"
 
 // resamplers
-#include "Resampling/chowdsp_Upsampler.h"
-#include "Resampling/chowdsp_Downsampler.h"
-#include "Resampling/chowdsp_BaseResampler.h"
-#include "Resampling/chowdsp_LanczosResampler.h"
-#include "Resampling/chowdsp_ResamplingProcessor.h"
-#include "Resampling/chowdsp_SRCResampler.h"
-#include "Resampling/chowdsp_ResampledProcess.h"
 #include "Resampling/chowdsp_VariableOversampling.h"
 
 // sound sources

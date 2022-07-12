@@ -7,9 +7,11 @@
 #include "Processors/chowdsp_AudioTimer.cpp"
 #include "Processors/chowdsp_Panner.cpp"
 
-#if CHOWDSP_USING_JUCE
 // resamplers
 #include "Resampling/chowdsp_SRCResampler.cpp"
+
+#if CHOWDSP_USING_JUCE
+// resamplers
 #include "Resampling/chowdsp_VariableOversampling.cpp"
 
 // convolution

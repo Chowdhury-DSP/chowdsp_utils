@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - Added utilities for serializing/deserializing data.
 - Added `PluginDiagnosticInfo::getDiagnosticsString()`.
 - Math: Added a dilogarithm implementation.
+- `chowdsp::Upsampler` and `chowdsp::Downsampler` use template arguments for filter type instead of filter order.
 - LNFAllocator:
   - Fixed bug where existing LookAndFeel classes would be replaced
   - Inproved type-checking by using `type_info` instead of string

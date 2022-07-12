@@ -42,6 +42,6 @@ chowdsp::AudioBlock<float> RepitchedSource<ResamplingType>::process (int numSamp
 
     auto&& block = chowdsp::AudioBlock<float> { resampledBuffer };
     processRepitched (block);
-    return resampler.process (block);
+    return resampler.process (block).toAudioBlock();
 }
 } // namespace chowdsp

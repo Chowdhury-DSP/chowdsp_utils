@@ -35,7 +35,5 @@ target_sources(chowdsp_dsp_juce_test
         source_tests/RepitchedSourceTest.cpp
 
         # Resampling Tests
-        resampling_tests/ResamplerTest.cpp
-        resampling_tests/UpsampleDownsampleTest.cpp
         resampling_tests/VariableOversamplingTest.cpp
 )
