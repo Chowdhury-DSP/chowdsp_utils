@@ -34,7 +34,7 @@ public:
     using Type = SampleType;
 
     /** Default Constructor */
-    Buffer();
+    Buffer() = default;
 
     /** Constructs the buffer with a given size. */
     Buffer (int numChannels, int numSamples);

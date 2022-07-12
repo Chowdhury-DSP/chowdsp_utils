@@ -3,9 +3,6 @@
 namespace chowdsp
 {
 template <typename SampleType>
-Buffer<SampleType>::Buffer() = default;
-
-template <typename SampleType>
 Buffer<SampleType>::Buffer (int numChannels, int numSamples)
 {
     setMaxSize (numChannels, numSamples);

@@ -28,7 +28,7 @@ namespace chowdsp
 //==============================================================================
 template <typename SampleType, typename InterpolationType>
 DelayLine<SampleType, InterpolationType>::DelayLine()
-    : DelayLine (0)
+    : DelayLine (1 << 18)
 {
 }
 
