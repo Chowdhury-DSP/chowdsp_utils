@@ -240,7 +240,7 @@ private:
     inline void incrementWritePointer (int channel) noexcept
     {
         auto newWritePtr = this->writePos[(size_t) channel] + totalSize - 1;
-        newWritePtr = newWritePtr > totalSize ? newWritePtr - totalSize : newWritePtr;
+        newWritePtr = newWritePtr >= totalSize ? newWritePtr - totalSize : newWritePtr;
         this->writePos[(size_t) channel] = newWritePtr;
     }
 
