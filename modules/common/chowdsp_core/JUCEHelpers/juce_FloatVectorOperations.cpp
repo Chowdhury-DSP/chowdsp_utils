@@ -38,7 +38,7 @@
 #include <arm_neon.h>
 #endif
 
-namespace juce
+namespace chowdsp_juce
 {
 namespace FloatVectorHelpers
 {
@@ -57,7 +57,7 @@ namespace FloatVectorHelpers
 #if JUCE_USE_SSE_INTRINSICS
     static bool isAligned (const void* p) noexcept
     {
-        return (((pointer_sized_int) p) & 15) == 0;
+        return (((::juce::pointer_sized_int) p) & 15) == 0;
     }
 
     struct BasicOps32
@@ -95,13 +95,13 @@ namespace FloatVectorHelpers
         {
             Type v[numParallel];
             storeU (v, a);
-            return jmax (v[0], v[1], v[2], v[3]);
+            return ::juce::jmax (v[0], v[1], v[2], v[3]);
         }
         static forcedinline Type min (ParallelType a) noexcept
         {
             Type v[numParallel];
             storeU (v, a);
-            return jmin (v[0], v[1], v[2], v[3]);
+            return ::juce::jmin (v[0], v[1], v[2], v[3]);
         }
     };
 
@@ -140,13 +140,13 @@ namespace FloatVectorHelpers
         {
             Type v[numParallel];
             storeU (v, a);
-            return jmax (v[0], v[1]);
+            return ::juce::jmax (v[0], v[1]);
         }
         static forcedinline Type min (ParallelType a) noexcept
         {
             Type v[numParallel];
             storeU (v, a);
-            return jmin (v[0], v[1]);
+            return ::juce::jmin (v[0], v[1]);
         }
     };
 
@@ -553,8 +553,8 @@ namespace FloatVectorHelpers
                 src += Mode::numParallel;
 
                 for (auto i = (decltype (num)) 0; i < num; ++i)
-                    result = isMinimum ? jmin (result, src[i])
-                                       : jmax (result, src[i]);
+                    result = isMinimum ? ::juce::jmin (result, src[i])
+                                       : ::juce::jmax (result, src[i]);
 
                 return result;
             }
@@ -1068,7 +1068,7 @@ namespace FloatVectorHelpers
 #if JUCE_USE_VDSP_FRAMEWORK
             vDSP_vabs ((float*) src, 1, dest, 1, (vDSP_Length) num);
 #else
-            FloatVectorHelpers::signMask32 signMask;
+            FloatVectorHelpers::signMask32 signMask {};
             signMask.i = 0x7fffffffUL;
             JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = std::abs (src[i]),
                                           Mode::bit_and (s, mask),
@@ -1076,7 +1076,7 @@ namespace FloatVectorHelpers
                                           JUCE_INCREMENT_SRC_DEST,
                                           const Mode::ParallelType mask = Mode::load1 (signMask.f);)
 
-            ignoreUnused (signMask);
+            ::juce::ignoreUnused (signMask);
 #endif
         }
 
@@ -1086,7 +1086,7 @@ namespace FloatVectorHelpers
 #if JUCE_USE_VDSP_FRAMEWORK
             vDSP_vabsD ((double*) src, 1, dest, 1, (vDSP_Length) num);
 #else
-            FloatVectorHelpers::signMask64 signMask;
+            FloatVectorHelpers::signMask64 signMask {};
             signMask.i = 0x7fffffffffffffffULL;
 
             JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = std::abs (src[i]),
@@ -1095,14 +1095,14 @@ namespace FloatVectorHelpers
                                           JUCE_INCREMENT_SRC_DEST,
                                           const Mode::ParallelType mask = Mode::load1 (signMask.d);)
 
-            ignoreUnused (signMask);
+            ::juce::ignoreUnused (signMask);
 #endif
         }
 
         template <typename Size>
         void min (float* dest, const float* src, float comp, Size num) noexcept
         {
-            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = jmin (src[i], comp),
+            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = ::juce::jmin (src[i], comp),
                                           Mode::min (s, cmp),
                                           JUCE_LOAD_SRC,
                                           JUCE_INCREMENT_SRC_DEST,
@@ -1112,7 +1112,7 @@ namespace FloatVectorHelpers
         template <typename Size>
         void min (double* dest, const double* src, double comp, Size num) noexcept
         {
-            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = jmin (src[i], comp),
+            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = ::juce::jmin (src[i], comp),
                                           Mode::min (s, cmp),
                                           JUCE_LOAD_SRC,
                                           JUCE_INCREMENT_SRC_DEST,
@@ -1125,7 +1125,7 @@ namespace FloatVectorHelpers
 #if JUCE_USE_VDSP_FRAMEWORK
             vDSP_vmin ((float*) src1, 1, (float*) src2, 1, dest, 1, (vDSP_Length) num);
 #else
-            JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = jmin (src1[i], src2[i]),
+            JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = ::juce::jmin (src1[i], src2[i]),
                                                 Mode::min (s1, s2),
                                                 JUCE_LOAD_SRC1_SRC2,
                                                 JUCE_INCREMENT_SRC1_SRC2_DEST, )
@@ -1138,7 +1138,7 @@ namespace FloatVectorHelpers
 #if JUCE_USE_VDSP_FRAMEWORK
             vDSP_vminD ((double*) src1, 1, (double*) src2, 1, dest, 1, (vDSP_Length) num);
 #else
-            JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = jmin (src1[i], src2[i]),
+            JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = ::juce::jmin (src1[i], src2[i]),
                                                 Mode::min (s1, s2),
                                                 JUCE_LOAD_SRC1_SRC2,
                                                 JUCE_INCREMENT_SRC1_SRC2_DEST, )
@@ -1148,7 +1148,7 @@ namespace FloatVectorHelpers
         template <typename Size>
         void max (float* dest, const float* src, float comp, Size num) noexcept
         {
-            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = jmax (src[i], comp),
+            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = ::juce::jmax (src[i], comp),
                                           Mode::max (s, cmp),
                                           JUCE_LOAD_SRC,
                                           JUCE_INCREMENT_SRC_DEST,
@@ -1158,7 +1158,7 @@ namespace FloatVectorHelpers
         template <typename Size>
         void max (double* dest, const double* src, double comp, Size num) noexcept
         {
-            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = jmax (src[i], comp),
+            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = ::juce::jmax (src[i], comp),
                                           Mode::max (s, cmp),
                                           JUCE_LOAD_SRC,
                                           JUCE_INCREMENT_SRC_DEST,
@@ -1171,7 +1171,7 @@ namespace FloatVectorHelpers
 #if JUCE_USE_VDSP_FRAMEWORK
             vDSP_vmax ((float*) src1, 1, (float*) src2, 1, dest, 1, (vDSP_Length) num);
 #else
-            JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = jmax (src1[i], src2[i]),
+            JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = ::juce::jmax (src1[i], src2[i]),
                                                 Mode::max (s1, s2),
                                                 JUCE_LOAD_SRC1_SRC2,
                                                 JUCE_INCREMENT_SRC1_SRC2_DEST, )
@@ -1184,7 +1184,7 @@ namespace FloatVectorHelpers
 #if JUCE_USE_VDSP_FRAMEWORK
             vDSP_vmaxD ((double*) src1, 1, (double*) src2, 1, dest, 1, (vDSP_Length) num);
 #else
-            JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = jmax (src1[i], src2[i]),
+            JUCE_PERFORM_VEC_OP_SRC1_SRC2_DEST (dest[i] = ::juce::jmax (src1[i], src2[i]),
                                                 Mode::max (s1, s2),
                                                 JUCE_LOAD_SRC1_SRC2,
                                                 JUCE_INCREMENT_SRC1_SRC2_DEST, )
@@ -1199,7 +1199,7 @@ namespace FloatVectorHelpers
 #if JUCE_USE_VDSP_FRAMEWORK
             vDSP_vclip ((float*) src, 1, &low, &high, dest, 1, (vDSP_Length) num);
 #else
-            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = jmax (jmin (src[i], high), low),
+            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = ::juce::jmax (::juce::jmin (src[i], high), low),
                                           Mode::max (Mode::min (s, hi), lo),
                                           JUCE_LOAD_SRC,
                                           JUCE_INCREMENT_SRC_DEST,
@@ -1216,7 +1216,7 @@ namespace FloatVectorHelpers
 #if JUCE_USE_VDSP_FRAMEWORK
             vDSP_vclipD ((double*) src, 1, &low, &high, dest, 1, (vDSP_Length) num);
 #else
-            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = jmax (jmin (src[i], high), low),
+            JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = ::juce::jmax (::juce::jmin (src[i], high), low),
                                           Mode::max (Mode::min (s, hi), lo),
                                           JUCE_LOAD_SRC,
                                           JUCE_INCREMENT_SRC_DEST,
@@ -1675,168 +1675,4 @@ ScopedNoDenormals::~ScopedNoDenormals() noexcept
     FloatVectorOperations::setFpStatusRegister (fpsr);
 #endif
 }
-
-//==============================================================================
-//==============================================================================
-#if JUCE_UNIT_TESTS
-
-class FloatVectorOperationsTests : public UnitTest
-{
-public:
-    FloatVectorOperationsTests()
-        : UnitTest ("FloatVectorOperations", UnitTestCategories::audio)
-    {
-    }
-
-    template <typename ValueType>
-    struct TestRunner
-    {
-        static void runTest (UnitTest& u, Random random)
-        {
-            const int range = random.nextBool() ? 500 : 10;
-            const int num = random.nextInt (range) + 1;
-
-            HeapBlock<ValueType> buffer1 (num + 16), buffer2 (num + 16);
-            HeapBlock<int> buffer3 (num + 16);
-
-#if JUCE_ARM
-            ValueType* const data1 = buffer1;
-            ValueType* const data2 = buffer2;
-            int* const int1 = buffer3;
-#else
-            // These tests deliberately operate on misaligned memory and will be flagged up by
-            // checks for undefined behavior!
-            ValueType* const data1 = addBytesToPointer (buffer1.get(), random.nextInt (16));
-            ValueType* const data2 = addBytesToPointer (buffer2.get(), random.nextInt (16));
-            int* const int1 = addBytesToPointer (buffer3.get(), random.nextInt (16));
-#endif
-
-            fillRandomly (random, data1, num);
-            fillRandomly (random, data2, num);
-
-            Range<ValueType> minMax1 (FloatVectorOperations::findMinAndMax (data1, num));
-            Range<ValueType> minMax2 (Range<ValueType>::findMinAndMax (data1, num));
-            u.expect (minMax1 == minMax2);
-
-            u.expect (valuesMatch (FloatVectorOperations::findMinimum (data1, num), juce::findMinimum (data1, num)));
-            u.expect (valuesMatch (FloatVectorOperations::findMaximum (data1, num), juce::findMaximum (data1, num)));
-
-            u.expect (valuesMatch (FloatVectorOperations::findMinimum (data2, num), juce::findMinimum (data2, num)));
-            u.expect (valuesMatch (FloatVectorOperations::findMaximum (data2, num), juce::findMaximum (data2, num)));
-
-            FloatVectorOperations::clear (data1, num);
-            u.expect (areAllValuesEqual (data1, num, 0));
-
-            FloatVectorOperations::fill (data1, (ValueType) 2, num);
-            u.expect (areAllValuesEqual (data1, num, (ValueType) 2));
-
-            FloatVectorOperations::add (data1, (ValueType) 2, num);
-            u.expect (areAllValuesEqual (data1, num, (ValueType) 4));
-
-            FloatVectorOperations::copy (data2, data1, num);
-            u.expect (areAllValuesEqual (data2, num, (ValueType) 4));
-
-            FloatVectorOperations::add (data2, data1, num);
-            u.expect (areAllValuesEqual (data2, num, (ValueType) 8));
-
-            FloatVectorOperations::copyWithMultiply (data2, data1, (ValueType) 4, num);
-            u.expect (areAllValuesEqual (data2, num, (ValueType) 16));
-
-            FloatVectorOperations::addWithMultiply (data2, data1, (ValueType) 4, num);
-            u.expect (areAllValuesEqual (data2, num, (ValueType) 32));
-
-            FloatVectorOperations::multiply (data1, (ValueType) 2, num);
-            u.expect (areAllValuesEqual (data1, num, (ValueType) 8));
-
-            FloatVectorOperations::multiply (data1, data2, num);
-            u.expect (areAllValuesEqual (data1, num, (ValueType) 256));
-
-            FloatVectorOperations::negate (data2, data1, num);
-            u.expect (areAllValuesEqual (data2, num, (ValueType) -256));
-
-            FloatVectorOperations::subtract (data1, data2, num);
-            u.expect (areAllValuesEqual (data1, num, (ValueType) 512));
-
-            FloatVectorOperations::abs (data1, data2, num);
-            u.expect (areAllValuesEqual (data1, num, (ValueType) 256));
-
-            FloatVectorOperations::abs (data2, data1, num);
-            u.expect (areAllValuesEqual (data2, num, (ValueType) 256));
-
-            fillRandomly (random, int1, num);
-            doConversionTest (u, data1, data2, int1, num);
-
-            FloatVectorOperations::fill (data1, (ValueType) 2, num);
-            FloatVectorOperations::fill (data2, (ValueType) 3, num);
-            FloatVectorOperations::addWithMultiply (data1, data1, data2, num);
-            u.expect (areAllValuesEqual (data1, num, (ValueType) 8));
-        }
-
-        static void doConversionTest (UnitTest& u, float* data1, float* data2, int* const int1, int num)
-        {
-            FloatVectorOperations::convertFixedToFloat (data1, int1, 2.0f, num);
-            convertFixed (data2, int1, 2.0f, num);
-            u.expect (buffersMatch (data1, data2, num));
-        }
-
-        static void doConversionTest (UnitTest&, double*, double*, int*, int) {}
-
-        static void fillRandomly (Random& random, ValueType* d, int num)
-        {
-            while (--num >= 0)
-                *d++ = (ValueType) (random.nextDouble() * 1000.0);
-        }
-
-        static void fillRandomly (Random& random, int* d, int num)
-        {
-            while (--num >= 0)
-                *d++ = random.nextInt();
-        }
-
-        static void convertFixed (float* d, const int* s, ValueType multiplier, int num)
-        {
-            while (--num >= 0)
-                *d++ = (float) *s++ * multiplier;
-        }
-
-        static bool areAllValuesEqual (const ValueType* d, int num, ValueType target)
-        {
-            while (--num >= 0)
-                if (*d++ != target)
-                    return false;
-
-            return true;
-        }
-
-        static bool buffersMatch (const ValueType* d1, const ValueType* d2, int num)
-        {
-            while (--num >= 0)
-                if (! valuesMatch (*d1++, *d2++))
-                    return false;
-
-            return true;
-        }
-
-        static bool valuesMatch (ValueType v1, ValueType v2)
-        {
-            return std::abs (v1 - v2) < std::numeric_limits<ValueType>::epsilon();
-        }
-    };
-
-    void runTest() override
-    {
-        beginTest ("FloatVectorOperations");
-
-        for (int i = 1000; --i >= 0;)
-        {
-            TestRunner<float>::runTest (*this, getRandom());
-            TestRunner<double>::runTest (*this, getRandom());
-        }
-    }
-};
-
-static FloatVectorOperationsTests vectorOpTests;
-
-#endif
-
-} // namespace juce
+} // namespace chowdsp_juce

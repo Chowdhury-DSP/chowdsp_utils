@@ -4,6 +4,12 @@
 #include <chowdsp_parameters/chowdsp_parameters.h>
 #endif
 
+#if ! CHOWDSP_USING_JUCE
+namespace juce
+{
+}
+#endif
+
 namespace chowdsp
 {
 /**
@@ -14,6 +20,9 @@ template <typename FloatType, typename ValueSmoothingType = juce::ValueSmoothing
 class SmoothedBufferValue
 {
 public:
+    using NumericType = FloatType;
+    using SmoothingType = ValueSmoothingType;
+
     /** Default constructor */
     SmoothedBufferValue() = default;
 
@@ -47,8 +56,11 @@ public:
     /** Sets the ramp length to use for smoothing. */
     void setRampLength (double rampLengthSeconds);
 
-    /** Returns true if the value is currently being smoothed */
-    [[nodiscard]] bool isSmoothing() const noexcept { return smoother.isSmoothing(); }
+    /**
+     * Returns true if the value has been smoothed over the most recently
+     * processed buffer.
+     */
+    [[nodiscard]] bool isSmoothing() const noexcept { return isCurrentlySmoothing; }
 
     /** Returns the current smoothed value */
     [[nodiscard]] FloatType getCurrentValue() const noexcept { return smoother.getCurrentValue(); }
@@ -66,7 +78,7 @@ public:
     void process (FloatType value, int numSamples);
 
     /** Returns a pointer to the current smoothed buffer. */
-    [[nodiscard]] const FloatType* getSmoothedBuffer() const { return buffer.getReadPointer (0); }
+    [[nodiscard]] const FloatType* getSmoothedBuffer() const { return buffer.data(); }
 
     /**
      * Optional mapping function to map from the set value to the smoothed value.
@@ -77,8 +89,9 @@ public:
     std::function<FloatType (FloatType)> mappingFunction = [] (auto x) { return x; };
 
 private:
-    juce::AudioBuffer<FloatType> buffer;
+    std::vector<FloatType, xsimd::default_allocator<FloatType>> buffer;
     juce::SmoothedValue<FloatType, ValueSmoothingType> smoother;
+    bool isCurrentlySmoothing = false;
 
     std::atomic<float>* parameterHandle = nullptr;
 

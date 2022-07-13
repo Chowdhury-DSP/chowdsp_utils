@@ -1,4 +1,4 @@
-#include <TimedUnitTest.h>
+#include <CatchUtils.h>
 #include <chowdsp_filters/chowdsp_filters.h>
 #include <chowdsp_dsp_utils/chowdsp_dsp_utils.h>
 
@@ -9,12 +9,9 @@ constexpr auto sineFreq = 1000.0;
 constexpr int N = 140;
 } // namespace Constants
 
-class HilbertFilterTest : public TimedUnitTest
+TEST_CASE ("Hilbert Filter Test")
 {
-public:
-    HilbertFilterTest() : TimedUnitTest ("Hilbert Filter Test") {}
-
-    void phaseShiftTest()
+    SECTION ("Phase Shift Test")
     {
         using namespace Constants;
 
@@ -42,16 +39,8 @@ public:
             if (n > 64)
             {
                 const auto error = std::abs (out - outCorr) / (1.0 + std::abs (out));
-                expectLessThan (error, 0.1, "Phase shift error is too high!");
+                REQUIRE_MESSAGE (error < 0.1, "Phase shift error is too high!");
             }
         }
     }
-
-    void runTestTimed() override
-    {
-        beginTest ("Phase Shift Test");
-        phaseShiftTest();
-    }
-};
-
-static HilbertFilterTest hilbertFilterTest;
+}

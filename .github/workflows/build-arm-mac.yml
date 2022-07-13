@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
       matrix:
-        tests: ["chowdsp_dsp_data_structures_test chowdsp_dsp_utils_test chowdsp_math_test chowdsp_simd_test chowdsp_eq_test chowdsp_filters_test chowdsp_reverb_test chowdsp_waveshapers_test"]
+        tests: ["chowdsp_dsp_data_structures_test chowdsp_dsp_juce_test chowdsp_dsp_utils_test chowdsp_math_test chowdsp_simd_test chowdsp_filters_test chowdsp_waveshapers_test"]
         os: [macos-latest]
 
     steps:

@@ -32,6 +32,27 @@ void SawtoothWave<T>::reset (T phase) noexcept
 }
 
 template <typename T>
+void SawtoothWave<T>::processBlock (const BufferView<T>& buffer) noexcept
+{
+    const auto numChannels = buffer.getNumChannels();
+    const auto numSamples = buffer.getNumSamples();
+
+    T z_temp = z;
+    T phi_temp = phi;
+
+    for (int ch = 0; ch < numChannels; ++ch)
+    {
+        z = z_temp;
+        phi = phi_temp;
+
+        auto* data = buffer.getWritePointer (ch);
+
+        for (int i = 0; i < numSamples; ++i)
+            data[i] += processSample();
+    }
+}
+
+template <typename T>
 template <typename ProcessContext>
 void SawtoothWave<T>::process (const ProcessContext& context) noexcept
 {

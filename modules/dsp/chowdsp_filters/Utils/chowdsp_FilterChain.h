@@ -65,6 +65,13 @@ public:
         doForEachFilter ([&] (auto& f) { f.processBlock (x, numSamples); });
     }
 
+    /** Processes a block of samples through the filter chain */
+    template <typename T>
+    void processBlock (const chowdsp::BufferView<T>& buffer)
+    {
+        doForEachFilter ([&] (auto& f) { f.processBlock (buffer); });
+    }
+
     /** Processes a buffer or processing context through the filter chain */
     template <typename... Args>
     void process (Args... args)

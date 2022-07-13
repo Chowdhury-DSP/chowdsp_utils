@@ -95,7 +95,7 @@ void ModalReverbPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
         const auto* modData = modBuffer.getReadPointer (0);
         modalFilterBank.processWithModulation (
             block,
-            [modData, numModesToMod, freqMult, modDepth] (auto& mode, size_t vecModeIndex, size_t sampleIndex) {
+            [modData, numModesToMod, freqMult, modDepth] (auto& mode, size_t vecModeIndex, int sampleIndex) {
                 using Vec = decltype (modalFilterBank)::Vec;
                 const auto modeScalarIndex = vecModeIndex * Vec::size;
                 if (modeScalarIndex >= (size_t) numModesToMod)
@@ -118,7 +118,7 @@ void ModalReverbPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
     // split out of mono
     const auto& renderBuffer = modalFilterBank.getRenderBuffer();
     for (int ch = 0; ch < numChannels; ++ch)
-        buffer.copyFrom (ch, 0, renderBuffer, 0, 0, numSamples);
+        chowdsp::BufferMath::copyBufferChannels (renderBuffer, buffer, 0, ch);
     buffer.applyGain (juce::Decibels::decibelsToGain (-120.0f, -1000.0f));
 
     // mix dry/wet buffer

@@ -6,8 +6,7 @@ template <typename SampleType, typename DelayInterpType>
 void BypassProcessor<SampleType, DelayInterpType>::prepare (const juce::dsp::ProcessSpec& spec, bool onOffParam)
 {
     prevOnOffParam = onOffParam;
-    fadeBuffer.setSize ((int) spec.numChannels, (int) spec.maximumBlockSize);
-    fadeBlock = chowdsp::AudioBlock<SampleType> (fadeBuffer);
+    fadeBuffer.setMaxSize ((int) spec.numChannels, (int) spec.maximumBlockSize);
 
     compDelay.prepare (spec); // sample rate does not matter
 }
@@ -40,14 +39,7 @@ void BypassProcessor<SampleType, DelayInterpType>::setLatencySamplesInternal (Sa
 }
 
 template <typename SampleType, typename DelayInterpType>
-bool BypassProcessor<SampleType, DelayInterpType>::processBlockIn (juce::AudioBuffer<SampleType>& buffer, bool onOffParam)
-{
-    chowdsp::AudioBlock<float> block (buffer);
-    return processBlockIn (block, onOffParam);
-}
-
-template <typename SampleType, typename DelayInterpType>
-bool BypassProcessor<SampleType, DelayInterpType>::processBlockIn (const chowdsp::AudioBlock<SampleType>& block, bool onOffParam)
+bool BypassProcessor<SampleType, DelayInterpType>::processBlockIn (const chowdsp::BufferView<SampleType>& block, bool onOffParam)
 {
     enum class DelayOp
     {
@@ -60,23 +52,23 @@ bool BypassProcessor<SampleType, DelayInterpType>::processBlockIn (const chowdsp
         if (delay.getDelay() == SampleType (0))
             return;
 
-        for (int ch = 0; ch < (int) sampleBuffer.getNumChannels(); ++ch)
+        for (int ch = 0; ch < sampleBuffer.getNumChannels(); ++ch)
         {
             if (op == DelayOp::Push)
             {
-                auto* x = sampleBuffer.getChannelPointer ((size_t) ch);
-                for (int n = 0; n < (int) sampleBuffer.getNumSamples(); ++n)
+                auto* x = sampleBuffer.getReadPointer (ch);
+                for (int n = 0; n < sampleBuffer.getNumSamples(); ++n)
                     delay.pushSample (ch, x[n]);
             }
             else if (op == DelayOp::Pop)
             {
-                auto* x = sampleBuffer.getChannelPointer ((size_t) ch);
-                for (int n = 0; n < (int) sampleBuffer.getNumSamples(); ++n)
+                auto* x = sampleBuffer.getWritePointer (ch);
+                for (int n = 0; n < sampleBuffer.getNumSamples(); ++n)
                     x[n] = delay.popSample (ch);
             }
             else if (op == DelayOp::Toss)
             {
-                for (int n = 0; n < (int) sampleBuffer.getNumSamples(); ++n)
+                for (int n = 0; n < sampleBuffer.getNumSamples(); ++n)
                     delay.incrementReadPointer (ch);
             }
         }
@@ -92,8 +84,9 @@ bool BypassProcessor<SampleType, DelayInterpType>::processBlockIn (const chowdsp
 
     if (onOffParam != prevOnOffParam)
     {
-        fadeBlock.copyFrom (block);
-        doDelayOp (fadeBlock, compDelay, DelayOp::Pop);
+        fadeBuffer.setCurrentSize (block.getNumChannels(), block.getNumSamples());
+        BufferMath::copyBufferData (block, fadeBuffer);
+        doDelayOp (fadeBuffer, compDelay, DelayOp::Pop);
 
         if (onOffParam && latencySampleCount < 0)
             latencySampleCount = (int) compDelay.getDelay();
@@ -107,14 +100,7 @@ bool BypassProcessor<SampleType, DelayInterpType>::processBlockIn (const chowdsp
 }
 
 template <typename SampleType, typename DelayInterpType>
-void BypassProcessor<SampleType, DelayInterpType>::processBlockOut (juce::AudioBuffer<SampleType>& buffer, bool onOffParam)
-{
-    chowdsp::AudioBlock<float> block { buffer };
-    processBlockOut (block, onOffParam);
-}
-
-template <typename SampleType, typename DelayInterpType>
-void BypassProcessor<SampleType, DelayInterpType>::processBlockOut (chowdsp::AudioBlock<SampleType>& block, bool onOffParam)
+void BypassProcessor<SampleType, DelayInterpType>::processBlockOut (const chowdsp::BufferView<SampleType>& block, bool onOffParam)
 {
     auto fadeOutputBuffer = [onOffParam] (auto* blockPtr, const auto* fadePtr, const int startSample, const int numSamples) {
         SampleType startGain = ! onOffParam ? static_cast<SampleType> (1) // fade out
@@ -141,13 +127,13 @@ void BypassProcessor<SampleType, DelayInterpType>::processBlockOut (chowdsp::Aud
     }
 
     const auto numChannels = block.getNumChannels();
-    const auto numSamples = (int) block.getNumSamples();
+    const auto numSamples = block.getNumSamples();
     const auto startSample = getFadeStartSample (numSamples);
 
-    for (size_t ch = 0; ch < numChannels; ++ch)
+    for (int ch = 0; ch < numChannels; ++ch)
     {
-        auto* blockPtr = block.getChannelPointer (ch);
-        auto* fadePtr = fadeBlock.getChannelPointer (ch);
+        auto* blockPtr = block.getWritePointer (ch);
+        const auto* fadePtr = fadeBuffer.getReadPointer (ch);
 
         fadeOutputBuffer (blockPtr, fadePtr, startSample, numSamples);
     }

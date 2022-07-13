@@ -83,6 +83,19 @@ public:
         return y;
     }
 
+    /** Processes a block of samples. */
+    void processBlock (const BufferView<SampleType>& buffer) noexcept
+    {
+        const auto numChannels = buffer.getNumChannels();
+        const auto numSamples = buffer.getNumSamples();
+        for (size_t channel = 0; channel < (size_t) numChannels; ++channel)
+        {
+            auto* samplesData = buffer.getWritePointer ((int) channel);
+            for (int i = 0; i < numSamples; ++i)
+                samplesData[i] = processSample (channel, samplesData[i]);
+        }
+    }
+
     /** Processes the input and output samples supplied in the processing context. */
     template <typename ProcessContext>
     void process (const ProcessContext& context) noexcept
@@ -121,7 +134,7 @@ private:
         return interpolator.call (bufferPtrs[channel], delayInt, delayFrac, v[channel]);
     }
 
-    juce::AudioBuffer<SampleType> bufferData; // Ring buffer for storing data
+    chowdsp::Buffer<SampleType> bufferData; // Ring buffer for storing data
     SampleType** bufferPtrs = nullptr; // pointers to data buffer
     std::vector<SampleType> v; // State needed for Thiran interpolator
     InterpolationType interpolator;

@@ -1,62 +1,58 @@
-#include <test_utils.h>
-#include <TimedUnitTest.h>
+#include <CatchUtils.h>
 #include <chowdsp_dsp_utils/chowdsp_dsp_utils.h>
 
-class BBDTest : public TimedUnitTest
+static void processDelay (double fs, float delaySamples, float* samples, int numSamples)
 {
-public:
-    BBDTest() : TimedUnitTest ("BBD Test") {}
+    chowdsp::BBD::BBDDelayWrapper<8192> delay;
+    delay.prepare ({ fs, (juce::uint32) numSamples, 1 });
+    delay.setDelay (delaySamples);
 
-    static void processDelay (double fs, float delaySamples, float* samples, int numSamples)
+    for (int i = 0; i < numSamples; ++i)
     {
-        chowdsp::BBD::BBDDelayWrapper<8192> delay;
-        delay.prepare ({ fs, (juce::uint32) numSamples, 1 });
-        delay.setDelay (delaySamples);
+        delay.setFilterFreq (10000.0f);
+        delay.pushSample (0, samples[i]);
+        samples[i] = delay.popSample (0);
+    }
+}
 
-        for (int i = 0; i < numSamples; ++i)
+static int findFirstNonZero (const float* bufferPtr, const int numSamples)
+{
+    int firstNonZero = -1;
+    for (int i = 0; i < numSamples; ++i)
+    {
+        if (std::abs (bufferPtr[i]) > 1.0e-6f)
         {
-            delay.setFilterFreq (10000.0f);
-            delay.pushSample (0, samples[i]);
-            samples[i] = delay.popSample (0);
+            firstNonZero = i;
+            break;
         }
     }
 
-    static int findFirstNonZero (const float* bufferPtr, const int numSamples)
-    {
-        int firstNonZero = -1;
-        for (int i = 0; i < numSamples; ++i)
-        {
-            if (std::abs (bufferPtr[i]) > 1.0e-6f)
-            {
-                firstNonZero = i;
-                break;
-            }
-        }
+    return firstNonZero;
+}
 
-        return firstNonZero;
-    }
-
-    void preDelayTest()
+TEST_CASE ("BBD Test")
+{
+    SECTION ("Pre-Delay Test")
     {
         constexpr double fs = 48000.0;
         constexpr int numSamples = 400;
 
-        juce::AudioBuffer<float> buffer (1, numSamples);
+        chowdsp::Buffer<float> buffer (1, numSamples);
         auto bufferPtr = buffer.getWritePointer (0);
         juce::FloatVectorOperations::fill (bufferPtr, 1.0f, numSamples);
 
         processDelay (fs, (float) numSamples / 2.0f, bufferPtr, numSamples);
 
         auto firstNonZero = findFirstNonZero (bufferPtr, numSamples);
-        expectEquals (firstNonZero, numSamples / 2, "First non-zero sample is incorrect!");
+        REQUIRE_MESSAGE (firstNonZero == numSamples / 2, "First non-zero sample is incorrect!");
     }
 
-    void postDelayTest()
+    SECTION ("Post-Delay Test")
     {
         constexpr double fs = 48000.0;
         constexpr int numSamples = 2048;
 
-        juce::AudioBuffer<float> buffer (1, numSamples);
+        chowdsp::Buffer<float> buffer (1, numSamples);
         auto bufferPtr = buffer.getWritePointer (0);
         juce::FloatVectorOperations::fill (bufferPtr, 1.0f, numSamples);
 
@@ -69,10 +65,10 @@ public:
             maxErr = juce::jmax (err, maxErr);
         }
 
-        expectLessThan (maxErr, 0.001f, "Maximum error too large!");
+        REQUIRE_MESSAGE (maxErr < 0.001f, "Maximum error too large!");
     }
 
-    void aaFilterTest()
+    SECTION ("AA-Filter Test")
     {
         constexpr double fs = 48000.0;
         constexpr int numSamples = 2048;
@@ -98,45 +94,28 @@ public:
         runBuffer (1000.0f, lowBuffer);
         runBuffer (1000.0f, highBuffer);
 
-        auto lowMag = lowBuffer.getMagnitude (0, numSamples);
-        auto highMag = highBuffer.getMagnitude (0, numSamples);
+        auto lowMag = chowdsp::BufferMath::getMagnitude (lowBuffer);
+        auto highMag = chowdsp::BufferMath::getMagnitude (highBuffer);
 
         auto lowErr = std::abs (juce::Decibels::gainToDecibels (lowMag));
         auto highErr = std::abs (juce::Decibels::gainToDecibels (highMag) + 17.0f);
 
-        expectLessThan (lowErr, 0.5f, "Low band too much error!");
-        expectLessThan (highErr, 0.5f, "High band too much error!");
+        REQUIRE_MESSAGE (lowErr < 0.5f, "Low band too much error!");
+        REQUIRE_MESSAGE (highErr < 0.5f, "High band too much error!");
     }
 
-    void zeroDelayTest()
+    SECTION ("Zero-Delay Test")
     {
         constexpr double fs = 48000.0;
         constexpr int numSamples = 200;
 
-        juce::AudioBuffer<float> buffer (1, numSamples);
+        chowdsp::Buffer<float> buffer (1, numSamples);
         auto bufferPtr = buffer.getWritePointer (0);
         juce::FloatVectorOperations::fill (bufferPtr, 1.0f, numSamples);
 
         processDelay (fs, 0.0f, bufferPtr, numSamples);
 
         auto firstNonZero = findFirstNonZero (bufferPtr, numSamples);
-        expectLessThan (firstNonZero, 170, "First non-zero sample should be less than 170!");
+        REQUIRE_MESSAGE (firstNonZero < 170, "First non-zero sample should be less than 170!");
     }
-
-    void runTestTimed() override
-    {
-        beginTest ("Pre-Delay Test");
-        preDelayTest();
-
-        beginTest ("Post-Delay Test");
-        postDelayTest();
-
-        beginTest ("AA-Filter Test");
-        aaFilterTest();
-
-        beginTest ("Zero-Delay Test");
-        zeroDelayTest();
-    }
-};
-
-static BBDTest bbdTest;
+}

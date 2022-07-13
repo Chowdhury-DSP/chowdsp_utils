@@ -46,7 +46,7 @@ public:
     }
 
     /** Sets the ratio of target sample rate over input sample rate
-     * 
+     *
      *  @param ratio    The resampling ratio. Must be in [0.1, 10.0]
      */
     void setResampleRatio (float ratio)
@@ -74,20 +74,20 @@ public:
     }
 
     /** Processes an input block of samples
-     * 
+     *
      *  @return the output block of generated samples at the target sample rate
      */
-    chowdsp::AudioBlock<float> processIn (const chowdsp::AudioBlock<float>& block) noexcept
+    BufferView<float> processIn (const BufferView<float>& block) noexcept
     {
         return inputResampler.process (block);
     }
 
-    void processOut (const chowdsp::AudioBlock<float>& inBlock, chowdsp::AudioBlock<float>& outputBlock)
+    void processOut (const BufferView<float>& inBlock, BufferView<float>& outputBlock)
     {
         auto outBlockTemp = outputResampler.process (inBlock);
 
-        const auto availableSamples = (int) outBlockTemp.getNumSamples();
-        auto expectedSamples = (int) outputBlock.getNumSamples();
+        const auto availableSamples = outBlockTemp.getNumSamples();
+        auto expectedSamples = outputBlock.getNumSamples();
         int destStart = 0;
 
         if (std::abs (availableSamples - expectedSamples) > 1)
@@ -103,9 +103,9 @@ public:
 
         if (leftoverAvailable) // pop leftover samples
         {
-            for (int ch = 0; ch < (int) outputBlock.getNumChannels(); ++ch)
+            for (int ch = 0; ch < outputBlock.getNumChannels(); ++ch)
             {
-                auto* destData = outputBlock.getChannelPointer ((size_t) ch);
+                auto* destData = outputBlock.getWritePointer (ch);
                 destData[0] = leftoverBuffer[(size_t) ch];
             }
 
@@ -117,10 +117,10 @@ public:
         // do we have exactly the right number of samples to fill the output buffer?
         if (availableSamples == expectedSamples)
         {
-            for (int ch = 0; ch < (int) outputBlock.getNumChannels(); ++ch)
+            for (int ch = 0; ch < outputBlock.getNumChannels(); ++ch)
             {
-                const auto* srcData = outBlockTemp.getChannelPointer ((size_t) ch);
-                auto* destData = outputBlock.getChannelPointer ((size_t) ch);
+                const auto* srcData = outBlockTemp.getReadPointer (ch);
+                auto* destData = outputBlock.getWritePointer (ch);
                 juce::FloatVectorOperations::copy (destData + destStart, srcData, availableSamples);
             }
             return;
@@ -129,10 +129,10 @@ public:
         // we have some extra samples after the buffer is filled!
         if (availableSamples > expectedSamples)
         {
-            for (int ch = 0; ch < (int) outputBlock.getNumChannels(); ++ch)
+            for (int ch = 0; ch < outputBlock.getNumChannels(); ++ch)
             {
-                const auto* srcData = outBlockTemp.getChannelPointer ((size_t) ch);
-                auto* destData = outputBlock.getChannelPointer ((size_t) ch);
+                const auto* srcData = outBlockTemp.getReadPointer (ch);
+                auto* destData = outputBlock.getWritePointer (ch);
                 juce::FloatVectorOperations::copy (destData + destStart, srcData, expectedSamples);
 
                 leftoverBuffer[(size_t) ch] = srcData[availableSamples - 1];

@@ -55,7 +55,7 @@ public:
     void reset();
 
     /** Processes an audio block */
-    void process (chowdsp::AudioBlock<FloatType> block);
+    void processBlock (const chowdsp::BufferView<FloatType> block) noexcept;
 
 private:
     std::array<EQBandType, numBands> bands;

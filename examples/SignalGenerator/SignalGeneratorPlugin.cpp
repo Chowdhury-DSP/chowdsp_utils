@@ -149,7 +149,7 @@ void SignalGeneratorPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
         }
 
         gain.setGainDecibels (gainDBParam->getCurrentValue());
-        gain.process (upsampledContext);
+        gain.process (upsampledBuffer);
 
         if (waveshaperParam->getIndex() == 0)
         {
@@ -173,9 +173,15 @@ void SignalGeneratorPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
         }
 
         if (resampler == nullptr)
+        {
             block.copyFrom (upsampledBlock);
+        }
         else
-            block.copyFrom (resampler->process (upsampledBlock));
+        {
+            auto&& bufferView = chowdsp::BufferView<float> { block };
+            chowdsp::BufferMath::copyBufferData (resampler->process (upsampledBlock), bufferView);
+        }
+        //            block.copyFrom (resampler->process (upsampledBlock));
     };
 
     setUpSampleChoice();

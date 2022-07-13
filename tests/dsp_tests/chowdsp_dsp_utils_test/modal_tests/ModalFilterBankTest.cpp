@@ -1,4 +1,4 @@
-#include <TimedUnitTest.h>
+#include <CatchUtils.h>
 #include <chowdsp_dsp_utils/chowdsp_dsp_utils.h>
 
 namespace
@@ -13,11 +13,10 @@ float tau2T60 (float tau)
 }
 
 template <typename FilterBank, typename RefModes>
-void testImpulse (juce::UnitTest* ut, FilterBank& filterbank, RefModes& refModes)
+void testImpulse (FilterBank& filterbank, RefModes& refModes)
 {
-    juce::AudioBuffer<float> buffer (1, modalBlockSize);
-    buffer.clear();
-    buffer.setSample (0, 0, 1.0f);
+    chowdsp::Buffer<float> buffer (1, modalBlockSize);
+    buffer.getWritePointer (0)[0] = 1.0f;
 
     filterbank.process (buffer);
     auto actualOut = filterbank.getRenderBuffer().getReadPointer (0);
@@ -29,17 +28,14 @@ void testImpulse (juce::UnitTest* ut, FilterBank& filterbank, RefModes& refModes
         for (auto& mode : refModes)
             y += mode.processSample (bufferPtr[n]);
 
-        ut->expectWithinAbsoluteError (actualOut[n], y, 1.0e-6f, "Modal filterbank output is incorrect!");
+        REQUIRE_MESSAGE (actualOut[n] == Approx (y).margin (1.0e-6f), "Modal filterbank output is incorrect!");
     }
 }
 } // namespace
 
-class ModalFilterBankTest : public TimedUnitTest
+TEST_CASE ("Modal FilterBank Test", "[Modal]")
 {
-public:
-    ModalFilterBankTest() : TimedUnitTest ("Modal FilterBank Test", "Modal") {}
-
-    void realImagTauTest()
+    SECTION ("Real/Imag-Tau Test")
     {
         constexpr float freqs[] = { 50.0f, 110.0f, 210.0f, 390.0f };
         constexpr float taus[] = { 2000.0f, 1000.0f, 500.0f, 60.0f };
@@ -61,14 +57,14 @@ public:
         filterbank.setModeFrequencies (freqs);
         filterbank.setModeDecays (taus, analysisFs);
 
-        testImpulse (this, filterbank, refModes);
+        testImpulse (filterbank, refModes);
         filterbank.reset();
         for (auto& mode : refModes)
             mode.reset();
-        testImpulse (this, filterbank, refModes);
+        testImpulse (filterbank, refModes);
     }
 
-    void complexT60Test()
+    SECTION ("Complex-T60 Test")
     {
         constexpr float freqs[] = { 500.0f, 1005.0f, 2010.0f, 3700.0f, 16004.0f };
         constexpr float t60s[] = { 1.0f, 0.5f, 0.4f, 0.3f, 0.2f };
@@ -90,17 +86,6 @@ public:
         filterbank.setModeFrequencies (freqs);
         filterbank.setModeDecays (t60s);
 
-        testImpulse (this, filterbank, refModes);
+        testImpulse (filterbank, refModes);
     }
-
-    void runTestTimed() override
-    {
-        beginTest ("Real/Imag-Tau Test");
-        realImagTauTest();
-
-        beginTest ("Complex-T60 Test");
-        complexT60Test();
-    }
-};
-
-static ModalFilterBankTest modalFilterBankTest;
+}

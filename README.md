@@ -34,6 +34,20 @@ target_link_libraries(MyTarget PUBLIC
 
 Alternatively, you may add these modules from the repository directory using the Projucer.
 
+If you are using a non-JUCE CMake project, it is possible to create your own static library
+from the DSP modules in this repository:
+```cmake
+add_subdirectory(chowdsp_utils)
+
+# create static library based on these modules
+setup_chowdsp_lib(chowdsp_lib               # Name of the static library
+    MODULES chowdsp_math chowdsp_dsp_utils  # DSP modules that should be included in the library...
+)
+
+# link the static library to your project
+target_link_libraries(MyCoolProject PRIVATE chowdsp_lib)
+```
+
 ## Examples
 
  If you would like to build the example plugins included in this repository, you may clone
@@ -51,7 +65,8 @@ for example `SimpleEQ_Standalone`.
 
 ### Dependencies
 
-The modules in this repository are mostly dependent on C++17 or later, as well as JUCE version 6 or later.
+The modules in this repository are mostly dependent on C++17 or later. Modules not
+in the "Common" or "DSP" categories also depend on JUCE 6 or later.
 
 There are a few other dependencies as well, some of which are bundled internally within
 the repository, and others which must be managed externally. In either case, you must be
@@ -76,10 +91,10 @@ sure to abide by the license of each module, as well as whichever libraries are 
 ### DSP Modules
 
 `chowdsp_dsp_data_structures` (GPLv3)
-- `COLAProcessor`: A base class for doing Constant Overlap-Add processing.
 - `LookupTableTransform`: Some modifications on `juce::dsp::LookupTableTransform`.
 - `RebufferedProcessor`: A processor which rebuffers the input to have a constant block size.
 - `SmoothedBufferValue`: A buffered version of `juce::SmoothedValue`.
+- `COLAProcessor`: A base class for doing Constant Overlap-Add processing.
 
 `chowdsp_dsp_utils` (GPLv3)
 - Utilities for working with convolution and impulse responses.
@@ -99,7 +114,7 @@ sure to abide by the license of each module, as well as whichever libraries are 
 `chowdsp_filters` (GPLv3)
 - Basic first and second order filters (HPF/LPF/BPF, shelving filters, peaking filters, notch filters).
 - Some higher-order filters (Butterworth, Chebyshev (Type II), Elliptic).
-- `StateVariableFilter`: A modified version of `juce::dsp::StateVariableTPTFilter`.
+- `StateVariableFilter`: A modified version of `juce::dsp::StateVariableTPTFilter` with more filter types and better performance.
 - `ModFilterWrapper`: Turns any biquad filter into a State Variable Filter.
 - `FIRFilter`: An FIR filter with SIMD optimizations. 
 

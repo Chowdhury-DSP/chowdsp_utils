@@ -24,6 +24,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include <algorithm>
 #include <atomic>
 #include <cmath>
+#include <functional>
 #include <tuple>
 #include <cstring>
 
@@ -44,6 +45,11 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "JUCEHelpers/juce_FloatVectorOperations.h"
 #include "JUCEHelpers/juce_Decibels.h"
 #include "JUCEHelpers/juce_SmoothedValue.h"
+
+#if ! JUCE_MODULE_AVAILABLE_juce_dsp
+#include "JUCEHelpers/dsp/juce_ProcessSpec.h"
+#include "JUCEHelpers/dsp/juce_LookupTable.h"
+#endif
 #endif // CHOWDSP_USING_JUCE
 #endif // DOXYGEN
 

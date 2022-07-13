@@ -13,7 +13,7 @@ if(NOT (CHOWDSP_ENABLE_TESTING OR CHOWDSP_ENABLE_BENCHMARKS OR CHOWDSP_ENABLE_EX
     include(AddDiagnosticInfo)
     include(SubprojectVersion)
 
-    if(JUCE_MODULES_DIR STREQUAL "")
+    if("${JUCE_MODULES_DIR}" STREQUAL "")
         message(STATUS "Using ChowDSP modules outside of JUCE...")
         include(SetupChowdspLib)
     else()

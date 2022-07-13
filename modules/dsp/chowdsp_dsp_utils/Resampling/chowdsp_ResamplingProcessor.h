@@ -2,7 +2,8 @@
 
 namespace chowdsp
 {
-/** A resampler using an internal resampling type
+/**
+ *  A resampler using an internal resampling type
  *  as defined in the ResamplingTypes namespace.
  * 
  *  Note that the number of samples returned from the resampler
@@ -31,8 +32,8 @@ public:
         for (auto& r : resamplers)
             r.prepare (spec.sampleRate, startRatio);
 
-        outputBuffer.setSize ((int) spec.numChannels,
-                              (int) spec.maximumBlockSize * 20);
+        outputBuffer.setMaxSize ((int) spec.numChannels,
+                                 (int) spec.maximumBlockSize * 20);
     }
 
     /** Resets the state of the resampler */
@@ -63,25 +64,25 @@ public:
      * 
      *  @return the output block of generated samples at the new sample rate
      */
-    chowdsp::AudioBlock<float> process (const chowdsp::AudioBlock<float>& block) noexcept
+    BufferView<float> process (const BufferView<float>& block) noexcept
     {
         const auto numChannels = block.getNumChannels();
         const auto numSamples = block.getNumSamples();
 
         size_t outNumSamples = 0;
-        for (size_t ch = 0; ch < numChannels; ++ch)
+        for (int ch = 0; ch < numChannels; ++ch)
         {
-            outNumSamples = resamplers[ch].process (block.getChannelPointer (ch),
-                                                    outputBuffer.getWritePointer ((int) ch),
-                                                    numSamples);
+            outNumSamples = resamplers[(size_t) ch].process (block.getReadPointer (ch),
+                                                             outputBuffer.getWritePointer (ch),
+                                                             (size_t) numSamples);
         }
 
-        return chowdsp::AudioBlock<float> (outputBuffer).getSubBlock (0, outNumSamples);
+        return BufferView { outputBuffer, 0, (int) outNumSamples };
     }
 
 private:
     std::vector<ResamplerType> resamplers;
-    juce::AudioBuffer<float> outputBuffer;
+    Buffer<float> outputBuffer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ResamplingProcessor)
 };

@@ -8,7 +8,7 @@ namespace chowdsp
  * 
  * @deprecated prefer juce::dsp::Gain<T>
  */
-class GainProcessor
+class [[deprecated]] GainProcessor
 {
 public:
     GainProcessor() = default;

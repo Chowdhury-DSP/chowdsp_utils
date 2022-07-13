@@ -1,5 +1,4 @@
-#include <TimedUnitTest.h>
-#include <test_utils.h>
+#include <CatchUtils.h>
 #include <chowdsp_filters/chowdsp_filters.h>
 
 namespace Constants
@@ -8,30 +7,28 @@ constexpr float fs = 48000.0f;
 constexpr float fc = 1000.0f;
 } // namespace Constants
 
-class FractionalOrderFilterTest : public TimedUnitTest
+template <typename T, typename FilterType, typename NumericType = chowdsp::SampleTypeHelpers::NumericType<T>>
+void testFrequency (FilterType& filter, NumericType freq, NumericType expGainDB, NumericType maxError, const std::string& message)
 {
-public:
-    FractionalOrderFilterTest() : TimedUnitTest ("Fractional Order Filter Test", "Filters") {}
+    auto buffer = test_utils::makeSineWave<T> (freq, (NumericType) Constants::fs, (NumericType) 1);
 
-    template <typename T, typename FilterType, typename NumericType = chowdsp::SampleTypeHelpers::NumericType<T>>
-    void testFrequency (FilterType& filter, NumericType freq, NumericType expGainDB, NumericType maxError, const juce::String& message)
-    {
-        auto buffer = test_utils::makeSineWave<NumericType> (freq, Constants::fs, (NumericType) 1);
+    filter.reset();
+    filter.processBlock (buffer);
 
-        juce::HeapBlock<char> dataBlock;
-        auto block = test_utils::bufferToBlock<T> (dataBlock, buffer);
+    using namespace chowdsp::SIMDUtils;
+    const auto halfSamples = buffer.getNumSamples() / 2;
+    const auto magDB = gainToDecibels (chowdsp::BufferMath::getMagnitude (buffer, halfSamples, halfSamples));
 
-        filter.reset();
-        filter.processBlock (block.getChannelPointer (0), buffer.getNumSamples());
+    REQUIRE_MESSAGE (magDB == SIMDApprox<T> ((T) expGainDB).margin (maxError), message);
+}
 
-        test_utils::blockToBuffer<T> (buffer, block);
-        const auto halfSamples = buffer.getNumSamples() / 2;
-        auto magDB = juce::Decibels::gainToDecibels (buffer.getMagnitude (halfSamples, halfSamples));
-        expectWithinAbsoluteError (magDB, expGainDB, maxError, message);
-    }
+TEMPLATE_TEST_CASE ("Fractional Order Filter Test", "", float, double)
+{
+    using T = TestType;
+    using NumericType = chowdsp::SampleTypeHelpers::NumericType<T>;
+    static constexpr auto maxError = (NumericType) 1.0e-2;
 
-    template <typename T, typename NumericType = chowdsp::SampleTypeHelpers::NumericType<T>>
-    void firstOrderLPFTest (NumericType maxError)
+    SECTION ("Fractional-Order LPF Test")
     {
         chowdsp::FractionalOrderFilter<T> lpFilter;
         lpFilter.prepare ((double) Constants::fs, 1);
@@ -41,13 +38,4 @@ public:
         testFrequency<T> (lpFilter, (NumericType) Constants::fc, (NumericType) -1.46, maxError, "Incorrect gain at cutoff frequency.");
         testFrequency<T> (lpFilter, Constants::fc * (NumericType) 4, (NumericType) -6.1, (NumericType) 0.1, "Incorrect gain at high frequencies.");
     }
-
-    void runTestTimed() override
-    {
-        beginTest ("Fractional-Order LPF Test");
-        firstOrderLPFTest<float> (1.0e-2f);
-        firstOrderLPFTest<double> (1.0e-2);
-    }
-};
-
-static FractionalOrderFilterTest fractionalOrderFilterTest;
+}

@@ -18,7 +18,9 @@ void DefaultFDNConfig<FloatType, nChannels>::reset()
 template <typename FloatType, int nChannels>
 double DefaultFDNConfig<FloatType, nChannels>::getDelayMult (int channelIndex)
 {
-    return DefaultDiffuserConfig::getDelayMult (channelIndex, nChannels);
+    std::random_device rd;
+    std::mt19937 randGenerator (rd());
+    return DefaultDiffuserConfig::getDelayMult (channelIndex, nChannels, randGenerator);
 }
 
 template <typename FloatType, int nChannels>

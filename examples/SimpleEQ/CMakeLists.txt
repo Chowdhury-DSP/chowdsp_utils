@@ -2,8 +2,9 @@ setup_example_plugin(SimpleEQ linP)
 
 target_link_libraries(SimpleEQ
     PRIVATE
-        chowdsp_serialization
-        chowdsp_eq
+        juce::juce_dsp
+        chowdsp::chowdsp_serialization
+        chowdsp::chowdsp_eq
 )
 
 target_sources(SimpleEQ

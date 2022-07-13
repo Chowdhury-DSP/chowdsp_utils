@@ -43,6 +43,9 @@ public:
         return waveformPreservingScale * y;
     }
 
+    /** Processes a block of samples. */
+    void processBlock (const BufferView<T>& buffer) noexcept;
+
     /** Processes the input and output buffers supplied in the processing context. */
     template <typename ProcessContext>
     void process (const ProcessContext& context) noexcept;

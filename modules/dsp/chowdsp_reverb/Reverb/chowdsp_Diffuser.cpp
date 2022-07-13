@@ -2,25 +2,25 @@
 
 namespace chowdsp::Reverb
 {
-inline double DefaultDiffuserConfig::getDelayMult (int channelIndex, int nChannels)
+inline double DefaultDiffuserConfig::getDelayMult (int channelIndex, int nChannels, std::mt19937& mt)
 {
     const auto rangeLow = (double) channelIndex / (double) nChannels;
     const auto rangeHigh = double (channelIndex + 1) / (double) nChannels;
-    return rangeLow + juce::Random::getSystemRandom().nextDouble() * (rangeHigh - rangeLow);
+
+    auto&& dist = std::uniform_real_distribution<> (rangeLow, rangeHigh);
+    return dist (mt);
 }
 
-inline double DefaultDiffuserConfig::getPolarityMultiplier (int /*channelIndex*/, int /*nChannels*/)
+inline double DefaultDiffuserConfig::getPolarityMultiplier (int /*channelIndex*/, int /*nChannels*/, std::mt19937& mt)
 {
-    return juce::Random::getSystemRandom().nextBool() ? 1.0 : -1.0;
+    auto&& dist = std::uniform_int_distribution<> (0, 1);
+    return dist (mt) == 0 ? 1.0 : -1.0;
 }
 
-inline void DefaultDiffuserConfig::fillChannelSwapIndexes (size_t* indexes, int numChannels)
+inline void DefaultDiffuserConfig::fillChannelSwapIndexes (size_t* indexes, int numChannels, std::mt19937& mt)
 {
-    std::random_device rd;
-    std::mt19937 g (rd());
-
     std::iota (indexes, indexes + numChannels, 0);
-    std::shuffle (indexes, indexes + numChannels, g);
+    std::shuffle (indexes, indexes + numChannels, mt);
 }
 
 //======================================================================
@@ -30,13 +30,16 @@ void Diffuser<FloatType, nChannels, DelayInterpType>::prepare (double sampleRate
 {
     fs = (FloatType) sampleRate;
 
-    DiffuserConfig::fillChannelSwapIndexes (channelSwapIndexes.data(), nChannels);
+    std::random_device rd;
+    std::mt19937 randGenerator (rd());
+
+    DiffuserConfig::fillChannelSwapIndexes (channelSwapIndexes.data(), nChannels, randGenerator);
 
     for (size_t i = 0; i < (size_t) nChannels; ++i)
     {
         delays[i].prepare ({ sampleRate, 128, 1 });
-        delayRelativeMults[i] = (FloatType) DiffuserConfig::getDelayMult ((int) i, nChannels);
-        polarityMultipliers[i] = (FloatType) DiffuserConfig::getPolarityMultiplier ((int) i, nChannels);
+        delayRelativeMults[i] = (FloatType) DiffuserConfig::getDelayMult ((int) i, nChannels, randGenerator);
+        polarityMultipliers[i] = (FloatType) DiffuserConfig::getPolarityMultiplier ((int) i, nChannels, randGenerator);
     }
 }
 

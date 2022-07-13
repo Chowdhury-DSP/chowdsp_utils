@@ -69,7 +69,21 @@ public:
     /** Resets the internal state variables of the processor. */
     void reset();
 
-    //==============================================================================
+    void processBlock (const BufferView<SampleType>& buffer) noexcept
+    {
+        const auto numChannels = buffer.getNumChannels();
+        const auto numSamples = buffer.getNumSamples();
+
+        jassert (numChannels == 2);
+        juce::ignoreUnused (numChannels);
+
+        BufferView<SampleType> leftChannelBuffer { buffer, 0, numSamples, 0, 1 };
+        BufferView<SampleType> rightChannelBuffer { buffer, 0, numSamples, 1, 1 };
+
+        BufferMath::applyGainSmoothed (leftChannelBuffer, leftVolume);
+        BufferMath::applyGainSmoothed (rightChannelBuffer, rightVolume);
+    }
+
     /** Processes the input and output samples supplied in the processing context. */
     template <typename ProcessContext>
     void process (const ProcessContext& context) noexcept

@@ -20,7 +20,7 @@
   ==============================================================================
 */
 
-namespace juce
+namespace chowdsp_juce
 {
 #ifndef JUCE_SNAP_TO_ZERO
 #if JUCE_INTEL
@@ -192,4 +192,9 @@ private:
 #endif
 };
 
-} // namespace juce
+} // namespace chowdsp_juce
+
+namespace juce
+{
+using FloatVectorOperations = chowdsp_juce::FloatVectorOperations;
+}

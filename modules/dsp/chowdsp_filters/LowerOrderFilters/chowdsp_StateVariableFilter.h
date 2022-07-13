@@ -98,6 +98,27 @@ public:
     */
     void snapToZero() noexcept;
 
+    /** Process block of samples */
+    void processBlock (const chowdsp::BufferView<SampleType>& block) noexcept
+    {
+        const auto numChannels = (int) block.getNumChannels();
+        const auto numSamples = (int) block.getNumSamples();
+
+        for (int channel = 0; channel < numChannels; ++channel)
+        {
+            auto* sampleData = block.getWritePointer (channel);
+            ScopedValue s1 { ic1eq[(size_t) channel] };
+            ScopedValue s2 { ic2eq[(size_t) channel] };
+
+            for (int i = 0; i < numSamples; ++i)
+                sampleData[i] = processSampleInternal (sampleData[i], s1.get(), s2.get());
+        }
+
+#if JUCE_SNAP_TO_ZERO
+        snapToZero();
+#endif
+    }
+
     /** Processes the input and output samples supplied in the processing context. */
     template <typename ProcessContext>
     void process (const ProcessContext& context) noexcept

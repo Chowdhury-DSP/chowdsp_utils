@@ -5,12 +5,17 @@ namespace chowdsp
 /** Helpful methods for workign with tuning information */
 namespace TuningHelpers
 {
+    [[maybe_unused]] inline double getMidiNoteInHertz (const int noteNumber, const double frequencyOfA = 440.0) noexcept
+    {
+        return frequencyOfA * std::pow (2.0, (noteNumber - 69) / 12.0);
+    }
+
     /** Converts a frequency in Hz to the corresponding MIDI note number, and cents away from that note's correct frequency */
     [[maybe_unused]] inline std::pair<int, double> frequencyHzToNoteAndCents (double freq) noexcept
     {
         const int noteNum = juce::roundToIntAccurate (12.0 * std::log2 ((freq / 440.0)) + 69.0);
 
-        const auto idealFreq = juce::MidiMessage::getMidiNoteInHertz (noteNum);
+        const auto idealFreq = getMidiNoteInHertz (noteNum);
         double cents = 1200.0 * std::log2 (freq / idealFreq);
 
         return std::make_pair (noteNum, cents);

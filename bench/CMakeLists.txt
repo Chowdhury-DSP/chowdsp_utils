@@ -21,8 +21,8 @@ CPMAddPackage(
 )
 
 setup_benchmark(FloatVectorOperationsBench FloatVectorOperationsBench.cpp chowdsp_math juce_dsp)
-setup_benchmark(LookupTableBench LookupTableBench.cpp chowdsp_dsp_data_structures)
+setup_benchmark(LookupTableBench LookupTableBench.cpp chowdsp_dsp_data_structures juce_dsp)
 setup_benchmark(PowerBench PowerBench.cpp chowdsp_math juce_dsp)
-setup_benchmark(FIRFilterBench FIRFilterBench.cpp chowdsp_filters)
-setup_benchmark(IIRFilterBench IIRFilterBench.cpp chowdsp_filters)
+setup_benchmark(FIRFilterBench FIRFilterBench.cpp chowdsp_filters juce_dsp)
+setup_benchmark(IIRFilterBench IIRFilterBench.cpp chowdsp_filters juce_dsp)
 setup_benchmark(PolynomialBench PolynomialBench.cpp chowdsp_math juce_dsp)

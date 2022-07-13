@@ -10,7 +10,10 @@ void SquareWave<T>::setFrequency (T newFrequency) noexcept
 template <typename T>
 void SquareWave<T>::prepare (const juce::dsp::ProcessSpec& spec) noexcept
 {
+#if JUCE_MODULE_AVAILABLE_juce_dsp
     interMediateData = chowdsp::AudioBlock<T> (dataBlock, spec.numChannels, spec.maximumBlockSize);
+#endif
+    intermediateBuffer.setMaxSize ((int) spec.numChannels, (int) spec.maximumBlockSize);
 
     saw1.prepare (spec);
     saw2.prepare (spec);
@@ -24,6 +27,36 @@ void SquareWave<T>::reset (T phase) noexcept
     saw2.reset (phase + (T) 1);
 }
 
+template <typename T>
+void SquareWave<T>::processBlock (const BufferView<T>& buffer) noexcept
+{
+    const auto numChannels = buffer.getNumChannels();
+    const auto numSamples = buffer.getNumSamples();
+
+    intermediateBuffer.setCurrentSize (numChannels, numSamples);
+    intermediateBuffer.clear();
+
+    saw2.processBlock (intermediateBuffer);
+
+    for (int ch = 0; ch < numChannels; ++ch)
+    {
+        const auto* intermediateChannelData = intermediateBuffer.getReadPointer (ch);
+        auto* outputData = buffer.getWritePointer (ch);
+        juce::FloatVectorOperations::add (outputData, intermediateChannelData, numSamples);
+    }
+
+    intermediateBuffer.clear();
+    saw1.processBlock (intermediateBuffer);
+
+    for (int ch = 0; ch < numChannels; ++ch)
+    {
+        const auto* intermediateChannelData = intermediateBuffer.getReadPointer (ch);
+        auto* outputData = buffer.getWritePointer (ch);
+        juce::FloatVectorOperations::subtract (outputData, intermediateChannelData, numSamples);
+    }
+}
+
+#if JUCE_MODULE_AVAILABLE_juce_dsp
 template <typename T>
 template <typename ProcessContext>
 void SquareWave<T>::process (const ProcessContext& context) noexcept
@@ -55,4 +88,5 @@ void SquareWave<T>::process (const ProcessContext& context) noexcept
     saw1.template process<chowdsp::ProcessContextReplacing<T>> (chowdsp::ProcessContextReplacing<T> { intermediateBlock });
     outBlock -= intermediateBlock;
 }
+#endif
 } // namespace chowdsp

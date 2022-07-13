@@ -19,7 +19,7 @@ public:
     void reset();
 
     /** Processes a block of audio data */
-    void processBlock (juce::AudioBuffer<FloatType>& buffer) noexcept;
+    void processBlock (const BufferView<FloatType>& buffer) noexcept;
 
     /** Returns the latency (samples) introduced by this processor */
     [[nodiscard]] virtual int getLatencySamples() const noexcept { return rebufferSize; }
@@ -33,17 +33,17 @@ protected:
     virtual int prepareRebuffering (const juce::dsp::ProcessSpec& spec) = 0;
 
     /** Child classes should implement this method to perform the rebuffered processing */
-    virtual void processRebufferedBlock (juce::AudioBuffer<FloatType>& buffer) = 0;
+    virtual void processRebufferedBlock (const BufferView<FloatType>& buffer) = 0;
 
 private:
-    void processInternal (juce::AudioBuffer<FloatType>& buffer);
-    void pullOutputSignal (juce::AudioBuffer<FloatType>& buffer, int startSample, int samplesToRead) const;
-    void pushInputSignal (const juce::AudioBuffer<FloatType>& buffer, int startSample, int samplesToWrite);
+    void processInternal (const BufferView<FloatType>& buffer);
+    void pullOutputSignal (const BufferView<FloatType>& buffer, int startSample, int samplesToRead) const;
+    void pushInputSignal (const BufferView<FloatType>& buffer, int startSample, int samplesToWrite);
 
     int rebufferSize = 0;
     int numChannelsAllocated = 0;
 
-    juce::AudioBuffer<FloatType> reBuffers[2];
+    Buffer<FloatType> reBuffers[2];
     int bufferCount = 0;
     int writeBufferIndex = 0;
 
