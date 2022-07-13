@@ -25,7 +25,6 @@
 
 namespace chowdsp_juce::dsp
 {
-
 /**
     Class for efficiently approximating expensive arithmetic operations.
 

@@ -137,7 +137,7 @@ std::enable_if_t<std::is_same_v<StateVariableFilter<T, type>, FilterType>, void>
             filter.template setGain<false> (gainValues[n]);
             filter.update();
             for (int ch = 0; ch < numChannels; ++ch)
-                blockData[ch][n] =  filter.processSample (ch, blockData[ch][n]);
+                blockData[ch][n] = filter.processSample (ch, blockData[ch][n]);
         }
     }
     else if (freqSmooth.isSmoothing() && qSmooth.isSmoothing())
@@ -148,7 +148,7 @@ std::enable_if_t<std::is_same_v<StateVariableFilter<T, type>, FilterType>, void>
             filter.template setQValue<false> (qValues[n]);
             filter.update();
             for (int ch = 0; ch < numChannels; ++ch)
-                blockData[ch][n] =  filter.processSample (ch, blockData[ch][n]);
+                blockData[ch][n] = filter.processSample (ch, blockData[ch][n]);
         }
     }
     else if (freqSmooth.isSmoothing() && gainSmooth.isSmoothing())
@@ -159,7 +159,7 @@ std::enable_if_t<std::is_same_v<StateVariableFilter<T, type>, FilterType>, void>
             filter.template setGain<false> (gainValues[n]);
             filter.update();
             for (int ch = 0; ch < numChannels; ++ch)
-                blockData[ch][n] =  filter.processSample (ch, blockData[ch][n]);
+                blockData[ch][n] = filter.processSample (ch, blockData[ch][n]);
         }
     }
     else if (qSmooth.isSmoothing() && gainSmooth.isSmoothing())
@@ -170,7 +170,7 @@ std::enable_if_t<std::is_same_v<StateVariableFilter<T, type>, FilterType>, void>
             filter.template setGain<false> (gainValues[n]);
             filter.update();
             for (int ch = 0; ch < numChannels; ++ch)
-                blockData[ch][n] =  filter.processSample (ch, blockData[ch][n]);
+                blockData[ch][n] = filter.processSample (ch, blockData[ch][n]);
         }
     }
     else if (freqSmooth.isSmoothing())
@@ -179,7 +179,7 @@ std::enable_if_t<std::is_same_v<StateVariableFilter<T, type>, FilterType>, void>
         {
             filter.setCutoffFrequency (freqHzValues[n]);
             for (int ch = 0; ch < numChannels; ++ch)
-                blockData[ch][n] =  filter.processSample (ch, blockData[ch][n]);
+                blockData[ch][n] = filter.processSample (ch, blockData[ch][n]);
         }
     }
     else if (qSmooth.isSmoothing())
@@ -188,7 +188,7 @@ std::enable_if_t<std::is_same_v<StateVariableFilter<T, type>, FilterType>, void>
         {
             filter.setQValue (qValues[n]);
             for (int ch = 0; ch < numChannels; ++ch)
-                blockData[ch][n] =  filter.processSample (ch, blockData[ch][n]);
+                blockData[ch][n] = filter.processSample (ch, blockData[ch][n]);
         }
     }
     else if (gainSmooth.isSmoothing())
@@ -197,7 +197,7 @@ std::enable_if_t<std::is_same_v<StateVariableFilter<T, type>, FilterType>, void>
         {
             filter.setGain (gainValues[n]);
             for (int ch = 0; ch < numChannels; ++ch)
-                blockData[ch][n] =  filter.processSample (ch, blockData[ch][n]);
+                blockData[ch][n] = filter.processSample (ch, blockData[ch][n]);
         }
     }
     else
@@ -229,8 +229,7 @@ std::enable_if_t<std::is_same_v<NthOrderFilter<T, N, type>, FilterType>, void>
             filter.setCutoffFrequency (freqHzValues[n]);
             filter.setQValue (qValues[n]);
             for (int ch = 0; ch < numChannels; ++ch)
-                blockData[ch][n] =  filter.processSample (ch, blockData[ch][n]);
-
+                blockData[ch][n] = filter.processSample (ch, blockData[ch][n]);
         }
     }
     else if (freqSmooth.isSmoothing())
@@ -239,8 +238,7 @@ std::enable_if_t<std::is_same_v<NthOrderFilter<T, N, type>, FilterType>, void>
         {
             filter.setCutoffFrequency (freqHzValues[n]);
             for (int ch = 0; ch < numChannels; ++ch)
-                blockData[ch][n] =  filter.processSample (ch, blockData[ch][n]);
-
+                blockData[ch][n] = filter.processSample (ch, blockData[ch][n]);
         }
     }
     else if (qSmooth.isSmoothing())
@@ -249,8 +247,7 @@ std::enable_if_t<std::is_same_v<NthOrderFilter<T, N, type>, FilterType>, void>
         {
             filter.setQValue (qValues[n]);
             for (int ch = 0; ch < numChannels; ++ch)
-                blockData[ch][n] =  filter.processSample (ch, blockData[ch][n]);
-
+                blockData[ch][n] = filter.processSample (ch, blockData[ch][n]);
         }
     }
     else

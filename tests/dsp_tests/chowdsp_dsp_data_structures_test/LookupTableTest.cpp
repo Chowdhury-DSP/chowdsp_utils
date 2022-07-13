@@ -6,13 +6,11 @@ static constexpr float maxVal = 10.0f;
 static constexpr int N = 1 << 17;
 static constexpr int TestN = 1000;
 
-const juce::dsp::LookupTableTransform<float> juceLUT { [] (auto x)
-                                                       { return std::tanh (x); },
+const juce::dsp::LookupTableTransform<float> juceLUT { [] (auto x) { return std::tanh (x); },
                                                        minVal,
                                                        maxVal,
                                                        N };
-const chowdsp::LookupTableTransform<float> chowLUT { [] (auto x)
-                                                     { return std::tanh (x); },
+const chowdsp::LookupTableTransform<float> chowLUT { [] (auto x) { return std::tanh (x); },
                                                      minVal,
                                                      maxVal,
                                                      N };
@@ -38,7 +36,7 @@ TEST_CASE ("Lookup Table Test")
     {
         for (int i = 0; i < TestN; ++i)
         {
-            const auto testVal = minus1To1 (mt ) * 10.0f;
+            const auto testVal = minus1To1 (mt) * 10.0f;
             const auto actualVal = chowLUT[testVal];
             const auto expVal = juceLUT[testVal];
             REQUIRE_MESSAGE (actualVal == Approx (expVal).margin (1.0e-18f), "Lookup Table value incorrect!");

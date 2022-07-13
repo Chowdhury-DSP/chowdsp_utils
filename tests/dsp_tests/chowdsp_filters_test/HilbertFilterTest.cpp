@@ -39,7 +39,7 @@ TEST_CASE ("Hilbert Filter Test")
             if (n > 64)
             {
                 const auto error = std::abs (out - outCorr) / (1.0 + std::abs (out));
-                REQUIRE_MESSAGE  (error < 0.1, "Phase shift error is too high!");
+                REQUIRE_MESSAGE (error < 0.1, "Phase shift error is too high!");
             }
         }
     }

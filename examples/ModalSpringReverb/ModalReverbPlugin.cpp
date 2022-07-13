@@ -95,8 +95,7 @@ void ModalReverbPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
         const auto* modData = modBuffer.getReadPointer (0);
         modalFilterBank.processWithModulation (
             block,
-            [modData, numModesToMod, freqMult, modDepth] (auto& mode, size_t vecModeIndex, int sampleIndex)
-            {
+            [modData, numModesToMod, freqMult, modDepth] (auto& mode, size_t vecModeIndex, int sampleIndex) {
                 using Vec = decltype (modalFilterBank)::Vec;
                 const auto modeScalarIndex = vecModeIndex * Vec::size;
                 if (modeScalarIndex >= (size_t) numModesToMod)

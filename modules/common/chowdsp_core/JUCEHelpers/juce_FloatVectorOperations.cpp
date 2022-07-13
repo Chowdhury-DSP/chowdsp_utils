@@ -1675,4 +1675,4 @@ ScopedNoDenormals::~ScopedNoDenormals() noexcept
     FloatVectorOperations::setFpStatusRegister (fpsr);
 #endif
 }
-} // namespace juce
+} // namespace chowdsp_juce

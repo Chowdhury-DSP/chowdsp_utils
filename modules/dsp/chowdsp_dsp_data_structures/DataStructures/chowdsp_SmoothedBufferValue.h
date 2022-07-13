@@ -7,7 +7,6 @@
 #if ! CHOWDSP_USING_JUCE
 namespace juce
 {
-
 }
 #endif
 

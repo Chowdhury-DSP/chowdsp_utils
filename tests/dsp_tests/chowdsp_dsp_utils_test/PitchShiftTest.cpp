@@ -85,7 +85,7 @@ static void runPitchShiftTest (bool shouldUseBuffers, bool shouldShift, bool sho
     const auto actualFrequency = tunerTest (buffer);
     REQUIRE_MESSAGE (actualFrequency == Approx (freqExpected).margin (freqExpected * 0.01f), "Shifted frequency is incorrect!");
 
-//    REQUIRE_MESSAGE (snr >= minSNR, "SNR too low!");
+    //    REQUIRE_MESSAGE (snr >= minSNR, "SNR too low!");
 }
 
 /** Unit tests for chowdsp::PitchShifter. Tests play a sine wave through

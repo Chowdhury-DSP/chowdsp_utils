@@ -69,42 +69,42 @@ TEST_CASE ("Sine Test")
         }
     }
 
-//    SECTION ("Channel Layouts Test")
-//    {
-//        constexpr float errF = 1.0e-3f;
-//        chowdsp::SineWave<float> chowSine;
-//
-//        constexpr int blockSize = (int) fs;
-//        constexpr int numChannels1 = 1;
-//        constexpr int numChannels2 = 2;
-//        juce::dsp::ProcessSpec spec { fs, blockSize, numChannels2 };
-//        chowSine.prepare (spec);
-//        chowSine.setFrequency (1.0f);
-//
-//        juce::AudioBuffer<float> buffer1 (numChannels1, blockSize);
-//        juce::AudioBuffer<float> buffer2 (numChannels2, blockSize);
-//
-//        buffer1.clear();
-//        buffer2.clear();
-//
-//        // initial run
-//        {
-//            juce::dsp::AudioBlock<float> block (buffer1);
-//            juce::dsp::ProcessContextReplacing<float> context (block);
-//            chowSine.process (context);
-//            expectWithinAbsoluteError (buffer1.getMagnitude (0, blockSize), 1.0f, errF, "Filling original buffer incorrect!");
-//        }
-//
-//        // 2 channels -> 4 channels
-//        {
-//            juce::dsp::AudioBlock<float> block1 (buffer1);
-//            juce::dsp::AudioBlock<float> block2 (buffer2);
-//            juce::dsp::ProcessContextNonReplacing<float> context (block1, block2);
-//            chowSine.process (context);
-//
-//            expectWithinAbsoluteError (buffer1.getMagnitude (0, blockSize), 1.0f, errF, "Out-of-place processing incorrect (original buffer)!");
-//            expectWithinAbsoluteError (buffer2.getMagnitude (0, 0, blockSize), 2.0f, errF, "Adding to original data incorrect!");
-//            expectWithinAbsoluteError (buffer2.getMagnitude (1, 0, blockSize), 1.0f, errF, "Filling new data incorrect!");
-//        }
-//    }
+    //    SECTION ("Channel Layouts Test")
+    //    {
+    //        constexpr float errF = 1.0e-3f;
+    //        chowdsp::SineWave<float> chowSine;
+    //
+    //        constexpr int blockSize = (int) fs;
+    //        constexpr int numChannels1 = 1;
+    //        constexpr int numChannels2 = 2;
+    //        juce::dsp::ProcessSpec spec { fs, blockSize, numChannels2 };
+    //        chowSine.prepare (spec);
+    //        chowSine.setFrequency (1.0f);
+    //
+    //        juce::AudioBuffer<float> buffer1 (numChannels1, blockSize);
+    //        juce::AudioBuffer<float> buffer2 (numChannels2, blockSize);
+    //
+    //        buffer1.clear();
+    //        buffer2.clear();
+    //
+    //        // initial run
+    //        {
+    //            juce::dsp::AudioBlock<float> block (buffer1);
+    //            juce::dsp::ProcessContextReplacing<float> context (block);
+    //            chowSine.process (context);
+    //            expectWithinAbsoluteError (buffer1.getMagnitude (0, blockSize), 1.0f, errF, "Filling original buffer incorrect!");
+    //        }
+    //
+    //        // 2 channels -> 4 channels
+    //        {
+    //            juce::dsp::AudioBlock<float> block1 (buffer1);
+    //            juce::dsp::AudioBlock<float> block2 (buffer2);
+    //            juce::dsp::ProcessContextNonReplacing<float> context (block1, block2);
+    //            chowSine.process (context);
+    //
+    //            expectWithinAbsoluteError (buffer1.getMagnitude (0, blockSize), 1.0f, errF, "Out-of-place processing incorrect (original buffer)!");
+    //            expectWithinAbsoluteError (buffer2.getMagnitude (0, 0, blockSize), 2.0f, errF, "Adding to original data incorrect!");
+    //            expectWithinAbsoluteError (buffer2.getMagnitude (1, 0, blockSize), 1.0f, errF, "Filling new data incorrect!");
+    //        }
+    //    }
 }

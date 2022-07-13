@@ -18,9 +18,9 @@ namespace buffer_detail
         clear (SampleType** channelData, int startChannel, int endChannel, int startSample, int endSample) noexcept
     {
         for (int ch = startChannel; ch < endChannel; ++ch)
-            std::fill (channelData[(size_t) ch] + startSample, channelData[(size_t) ch] + endSample, SampleType{});
+            std::fill (channelData[(size_t) ch] + startSample, channelData[(size_t) ch] + endSample, SampleType {});
     }
-}
+} // namespace buffer_detail
 #endif
 
 /**
@@ -40,7 +40,7 @@ public:
     Buffer (int numChannels, int numSamples);
 
     /** Move constructor */
-    Buffer(Buffer<SampleType>&&) noexcept = default;
+    Buffer (Buffer<SampleType>&&) noexcept = default;
 
     /** Move assignment */
     Buffer<SampleType>& operator= (Buffer<SampleType>&&) noexcept = default;
