@@ -14,6 +14,7 @@ void Buffer<SampleType>::setMaxSize (int numChannels, int numSamples)
     jassert (juce::isPositiveAndBelow (numChannels, maxNumChannels));
     jassert (numSamples > 0);
 
+    rawData.clear();
     rawData.resize ((size_t) numChannels, ChannelData ((size_t) numSamples, SampleType {}));
     hasBeenCleared = true;
 
