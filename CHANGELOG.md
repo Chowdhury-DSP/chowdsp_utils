@@ -3,6 +3,7 @@
 All notable changes to this project will be documented in this file.
 
 ## [UNRELEASED]
+- Removed dependency on JUCE for most DSP modules.
 - Added extensions for building CLAP plugins with CLAP-specific behaviour.
 - Added improved State Variable Filter with more filter types.
 - Added `chowdsp_waveshapers` module, including anti-aliased waveshapers.

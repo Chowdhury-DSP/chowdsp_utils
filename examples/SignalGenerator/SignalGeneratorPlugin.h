@@ -30,14 +30,15 @@ private:
     chowdsp::SineWave<float> sine;
     chowdsp::SawtoothWave<float> saw;
     chowdsp::SquareWave<float> square;
-    juce::dsp::Gain<float> gain;
+    chowdsp::Gain<float> gain;
 
+    using AAFilter = chowdsp::ButterworthFilter<12>;
     juce::AudioBuffer<float> upsampledBuffer;
-    chowdsp::Downsampler<float, 12> resample2;
-    chowdsp::Downsampler<float, 12> resample3;
-    chowdsp::Downsampler<float, 12> resample4;
+    chowdsp::Downsampler<float, AAFilter> resample2;
+    chowdsp::Downsampler<float, AAFilter> resample3;
+    chowdsp::Downsampler<float, AAFilter> resample4;
 
-    chowdsp::Downsampler<float, 12>* resampler = nullptr;
+    chowdsp::Downsampler<float, AAFilter>* resampler = nullptr;
     int previousUpSampleChoice = 0;
 
     chowdsp::SharedLookupTableCache lookupTableCache;
