@@ -34,6 +34,9 @@ public:
     template <typename... Args>
     void calcCoefs (Args&&... args);
 
+    /** Process block of samples */
+    void processBlock (const chowdsp::BufferView<SampleType>& block) noexcept;
+
     /** Process a block  */
     template <typename ProcessContext>
     void process (const ProcessContext& context) noexcept;

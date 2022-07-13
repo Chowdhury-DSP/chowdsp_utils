@@ -92,9 +92,11 @@ void StateVariableFilter<SampleType, type>::reset()
 template <typename SampleType, StateVariableFilterType type>
 void StateVariableFilter<SampleType, type>::snapToZero() noexcept
 {
+#if JUCE_SNAP_TO_ZERO
     for (auto v : { &ic1eq, &ic2eq })
         for (auto& element : *v)
             juce::dsp::util::snapToZero (element);
+#endif
 }
 
 template <typename SampleType, StateVariableFilterType type>

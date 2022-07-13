@@ -1,4 +1,4 @@
-#include <TimedUnitTest.h>
+#include <CatchUtils.h>
 #include <chowdsp_dsp_utils/chowdsp_dsp_utils.h>
 
 namespace
@@ -9,121 +9,92 @@ constexpr int pulseSpace = 100;
 constexpr float delaySamp = 5.0f;
 } // namespace
 
-class BypassTest : public TimedUnitTest
+template <typename BypassType>
+void processFunc (const chowdsp::BufferView<float>& buffer, BypassType& bypass, std::atomic<float>* onOffParam, const std::function<float (float)>& sampleFunc)
 {
-public:
-    BypassTest() : TimedUnitTest ("Bypass Test") {}
+    auto onOff = bypass.toBool (onOffParam);
+    if (! bypass.processBlockIn (buffer, onOff))
+        return;
 
-    [[maybe_unused]] static float* getBufferPtr (juce::AudioBuffer<float>& buffer)
+    auto* x = buffer.getWritePointer (0);
+    for (int n = 0; n < nSamples; ++n)
+        x[n] = sampleFunc (x[n]);
+
+    bypass.processBlockOut (buffer, onOff);
+}
+
+static void checkForClicks (const float* buffer, const int numSamples, float thresh, const std::string& message)
+{
+    float prevSample = 0.0f;
+    float maxDiff = 0.0f;
+    for (int n = 0; n < numSamples; ++n)
     {
-        return buffer.getWritePointer (0);
+        auto diff = std::abs (buffer[n] - prevSample);
+        maxDiff = juce::jmax (maxDiff, diff);
+        prevSample = buffer[n];
     }
 
-    static float* getBufferPtr (juce::dsp::AudioBlock<float>& block)
+    REQUIRE_MESSAGE (maxDiff < thresh, message);
+}
+
+static void createPulseTrain (float* buffer, const int numSamples, int spacingSamples)
+{
+    for (int n = 0; n < numSamples; n += spacingSamples)
+        buffer[n] = 1.0f;
+}
+
+static void checkPulseSpacing (const float* buffer, const int numSamples, int spacingSamples)
+{
+    int lastPulseIdx = (int) delaySamp;
+    int numBadPulses = 0;
+    int numGoodPulses = 0;
+    for (int n = lastPulseIdx + 1; n < numSamples; ++n)
     {
-        return block.getChannelPointer (0);
-    }
-
-    template <typename AudioContainerType, typename BypassType>
-    void processFunc (AudioContainerType& bufferOrBlock, BypassType& bypass, std::atomic<float>* onOffParam, const std::function<float (float)>& sampleFunc)
-    {
-        auto onOff = bypass.toBool (onOffParam);
-        if (! bypass.processBlockIn (bufferOrBlock, onOff))
-            return;
-
-        auto* x = getBufferPtr (bufferOrBlock);
-        for (int n = 0; n < nSamples; ++n)
-            x[n] = sampleFunc (x[n]);
-
-        bypass.processBlockOut (bufferOrBlock, onOff);
-    }
-
-    void checkForClicks (const float* buffer, const int numSamples, float thresh, const juce::String& message)
-    {
-        float prevSample = 0.0f;
-        float maxDiff = 0.0f;
-        for (int n = 0; n < numSamples; ++n)
+        if (buffer[n] > 0.9f)
         {
-            auto diff = std::abs (buffer[n] - prevSample);
-            maxDiff = juce::jmax (maxDiff, diff);
-            prevSample = buffer[n];
-        }
-
-        expectLessThan (maxDiff, thresh, message);
-    }
-
-    static void createPulseTrain (float* buffer, const int numSamples, int spacingSamples)
-    {
-        for (int n = 0; n < numSamples; n += spacingSamples)
-            buffer[n] = 1.0f;
-    }
-
-    void checkPulseSpacing (const float* buffer, const int numSamples, int spacingSamples)
-    {
-        int lastPulseIdx = (int) delaySamp;
-        int numBadPulses = 0;
-        int numGoodPulses = 0;
-        for (int n = lastPulseIdx + 1; n < numSamples; ++n)
-        {
-            if (buffer[n] > 0.9f)
+            auto space = n - lastPulseIdx;
+            if (space != spacingSamples)
             {
-                auto space = n - lastPulseIdx;
-                if (space != spacingSamples)
-                {
-                    std::cout << "Incorrect spacing found! Start: " << lastPulseIdx << ", Length: " << space << std::endl;
-                    numBadPulses++;
-                }
-                else
-                {
-                    // std::cout << "Correct spacing found! Start: " << lastPulseIdx << ", Length: " << space << std::endl;
-                    numGoodPulses++;
-                }
-                lastPulseIdx = n;
+                INFO ("Incorrect spacing found! Start: " << lastPulseIdx << ", Length: " << space)
+                numBadPulses++;
             }
+            else
+            {
+                // std::cout << "Correct spacing found! Start: " << lastPulseIdx << ", Length: " << space << std::endl;
+                numGoodPulses++;
+            }
+            lastPulseIdx = n;
         }
-
-        expect (numBadPulses == 0, "Incorrect pulse spacing detected!");
-        expectEquals (numGoodPulses, numSamples / spacingSamples, "Incorrect number of correct pulses!");
     }
 
-    void audioBufferTest (int nIter)
+    REQUIRE_MESSAGE (numBadPulses == 0, "Incorrect pulse spacing detected!");
+    REQUIRE_MESSAGE (numGoodPulses == numSamples / spacingSamples, "Incorrect number of correct pulses!");
+}
+
+TEST_CASE ("Bypass Test")
+{
+    static constexpr int bufferTestNIters = 5;
+    SECTION ("Audio Buffer Test")
     {
         chowdsp::BypassProcessor<float> bypass;
         std::atomic<float> onOffParam { 0.0f };
         bypass.prepare ({ fs, (juce::uint32) nSamples, 1 }, bypass.toBool (&onOffParam));
 
-        juce::AudioBuffer<float> buffer (1, nIter * nSamples);
+        chowdsp::Buffer<float> buffer (1, bufferTestNIters * nSamples);
         buffer.clear();
-        for (int i = 0; i < nIter; ++i)
+        for (int i = 0; i < bufferTestNIters; ++i)
         {
-            juce::AudioBuffer<float> subBuffer (buffer.getArrayOfWritePointers(), 1, i * nSamples, nSamples);
-            processFunc (subBuffer, bypass, &onOffParam, [] (float x) { return x + 1.0f; });
+            chowdsp::BufferView<float> subBuffer { buffer, i * nSamples, nSamples };
+            processFunc (subBuffer, bypass, &onOffParam, [] (float x)
+                         { return x + 1.0f; });
             onOffParam.store (1.0f - onOffParam.load());
         }
 
-        checkForClicks (buffer.getReadPointer (0), nIter * nSamples, 0.005f, "Audio Buffer has clicks!");
+        checkForClicks (buffer.getReadPointer (0), bufferTestNIters * nSamples, 0.005f, "Audio Buffer has clicks!");
     }
 
-    void audioBlockTest (int nIter)
-    {
-        chowdsp::BypassProcessor<float> bypass;
-        std::atomic<float> onOffParam { 0.0f };
-        bypass.prepare ({ fs, (juce::uint32) nSamples, 1 }, bypass.toBool (&onOffParam));
-
-        juce::AudioBuffer<float> buffer (1, nIter * nSamples);
-        buffer.clear();
-        juce::dsp::AudioBlock<float> block (buffer);
-        for (int i = 0; i < nIter; ++i)
-        {
-            auto subBlock = block.getSubBlock ((size_t) i * (size_t) nSamples, (size_t) nSamples);
-            processFunc (subBlock, bypass, &onOffParam, [] (float x) { return x + 1.0f; });
-            onOffParam.store (1.0f - onOffParam.load());
-        }
-
-        checkForClicks (buffer.getReadPointer (0), nIter * nSamples, 0.005f, "Audio Block has clicks!");
-    }
-
-    void bufferDelayTest (int nIter)
+    static constexpr int delayTestNIters = 8;
+    SECTION ("Audio Buffer Delay Test")
     {
         chowdsp::BypassProcessor<float, chowdsp::DelayLineInterpolationTypes::Linear> bypass;
         std::atomic<float> onOffParam { 0.0f };
@@ -134,13 +105,13 @@ public:
         delay.prepare ({ fs, (juce::uint32) nSamples, 1 });
         delay.setDelay (delaySamp);
 
-        juce::AudioBuffer<float> buffer (1, nIter * nSamples);
-        buffer.clear();
-        createPulseTrain (buffer.getWritePointer (0), nIter * nSamples, pulseSpace);
-        for (int i = 0; i < nIter; ++i)
+        chowdsp::Buffer<float> buffer (1, delayTestNIters * nSamples);
+        createPulseTrain (buffer.getWritePointer (0), delayTestNIters * nSamples, pulseSpace);
+        for (int i = 0; i < delayTestNIters; ++i)
         {
-            juce::AudioBuffer<float> subBuffer (buffer.getArrayOfWritePointers(), 1, i * nSamples, nSamples);
-            processFunc (subBuffer, bypass, &onOffParam, [&] (float x) {
+            chowdsp::BufferView<float> subBuffer { buffer, i * nSamples, nSamples };
+            processFunc (subBuffer, bypass, &onOffParam, [&] (float x)
+                         {
                 delay.pushSample (0, x);
                 return delay.popSample (0); });
 
@@ -148,52 +119,6 @@ public:
                 onOffParam.store (1.0f - onOffParam.load());
         }
 
-        checkPulseSpacing (buffer.getReadPointer (0), nIter * nSamples, pulseSpace);
+        checkPulseSpacing (buffer.getReadPointer (0), delayTestNIters * nSamples, pulseSpace);
     }
-
-    void blockDelayTest (int nIter)
-    {
-        chowdsp::BypassProcessor<float> bypass;
-        std::atomic<float> onOffParam { 0.0f };
-        bypass.prepare ({ fs, (juce::uint32) nSamples, 1 }, bypass.toBool (&onOffParam));
-        bypass.setLatencySamples ((int) delaySamp);
-
-        chowdsp::DelayLine<float> delay { 2048 };
-        delay.prepare ({ fs, (juce::uint32) nSamples, 1 });
-        delay.setDelay (delaySamp);
-
-        juce::AudioBuffer<float> buffer (1, nIter * nSamples);
-        buffer.clear();
-        createPulseTrain (buffer.getWritePointer (0), nIter * nSamples, pulseSpace);
-        juce::dsp::AudioBlock<float> block (buffer);
-        for (int i = 0; i < nIter; ++i)
-        {
-            auto subBlock = block.getSubBlock ((size_t) i * (size_t) nSamples, (size_t) nSamples);
-            processFunc (subBlock, bypass, &onOffParam, [&] (float x) {
-                delay.pushSample (0, x);
-                return delay.popSample (0); });
-
-            if (i % 2 != 0)
-                onOffParam.store (1.0f - onOffParam.load());
-        }
-
-        checkPulseSpacing (buffer.getReadPointer (0), nIter * nSamples, pulseSpace);
-    }
-
-    void runTestTimed() override
-    {
-        beginTest ("Audio Buffer Test");
-        audioBufferTest (5);
-
-        beginTest ("Audio Block Test");
-        audioBlockTest (5);
-
-        beginTest ("Audio Buffer Delay Test");
-        bufferDelayTest (8);
-
-        beginTest ("Audio Block Delay Test");
-        blockDelayTest (8);
-    }
-};
-
-static BypassTest bypassTest;
+}

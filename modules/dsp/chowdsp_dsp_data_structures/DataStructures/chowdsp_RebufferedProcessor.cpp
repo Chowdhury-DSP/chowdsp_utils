@@ -10,7 +10,7 @@ void RebufferedProcessor<FloatType>::prepare (const juce::dsp::ProcessSpec& spec
     numChannelsAllocated = (int) spec.numChannels;
 
     for (auto& buffer : reBuffers)
-        buffer.setSize (numChannelsAllocated, rebufferSize);
+        buffer.setMaxSize (numChannelsAllocated, rebufferSize);
 
     reset();
 }
@@ -26,7 +26,7 @@ void RebufferedProcessor<FloatType>::reset()
 }
 
 template <typename FloatType>
-void RebufferedProcessor<FloatType>::processBlock (juce::AudioBuffer<FloatType>& buffer) noexcept
+void RebufferedProcessor<FloatType>::processBlock (const BufferView<FloatType>& buffer) noexcept
 {
     const auto numChannels = buffer.getNumChannels();
     const auto numSamples = buffer.getNumSamples();
@@ -35,25 +35,25 @@ void RebufferedProcessor<FloatType>::processBlock (juce::AudioBuffer<FloatType>&
 
     // Just in case we're prepared for 2 channels, but the caller only wants 1 channel
     for (auto& b : reBuffers)
-        b.setSize (numChannels, rebufferSize, true, false, true);
+        b.setCurrentSize (numChannels, rebufferSize);
 
     // buffer size is small enough to process all at once
     if (numSamples <= rebufferSize)
         return processInternal (buffer);
 
     // buffer needs to be processed in smaller parts
-    juce::AudioBuffer<FloatType> shortBuffer (buffer.getArrayOfWritePointers(), numChannels, 0, rebufferSize);
+    BufferView<FloatType> shortBuffer (buffer.getArrayOfWritePointers(), numChannels, rebufferSize, 0);
     processInternal (shortBuffer);
 
-    juce::AudioBuffer<FloatType> leftoverBuffer (buffer.getArrayOfWritePointers(),
-                                                 numChannels,
-                                                 rebufferSize,
-                                                 numSamples - rebufferSize);
+    BufferView<FloatType> leftoverBuffer (buffer.getArrayOfWritePointers(),
+                                          numChannels,
+                                          numSamples - rebufferSize,
+                                          rebufferSize);
     processBlock (leftoverBuffer);
 }
 
 template <typename FloatType>
-void RebufferedProcessor<FloatType>::processInternal (juce::AudioBuffer<FloatType>& buffer)
+void RebufferedProcessor<FloatType>::processInternal (const BufferView<FloatType>& buffer)
 {
     const auto numSamples = buffer.getNumSamples();
     jassert (numSamples <= rebufferSize);
@@ -79,19 +79,17 @@ void RebufferedProcessor<FloatType>::processInternal (juce::AudioBuffer<FloatTyp
 }
 
 template <typename FloatType>
-void RebufferedProcessor<FloatType>::pullOutputSignal (juce::AudioBuffer<FloatType>& buffer, int startSample, int samplesToRead) const
+void RebufferedProcessor<FloatType>::pullOutputSignal (const BufferView<FloatType>& buffer, int startSample, int samplesToRead) const
 {
     const auto& readBuffer = reBuffers[1 - writeBufferIndex];
-    for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
-        buffer.copyFrom (ch, startSample, readBuffer, ch, bufferCount, samplesToRead);
+    BufferMath::copyBufferData (readBuffer, buffer, bufferCount, startSample, samplesToRead);
 }
 
 template <typename FloatType>
-void RebufferedProcessor<FloatType>::pushInputSignal (const juce::AudioBuffer<FloatType>& buffer, int startSample, int samplesToWrite)
+void RebufferedProcessor<FloatType>::pushInputSignal (const BufferView<FloatType>& buffer, int startSample, int samplesToWrite)
 {
     auto& writeBuffer = reBuffers[writeBufferIndex];
-    for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
-        writeBuffer.copyFrom (ch, bufferCount, buffer, ch, startSample, samplesToWrite);
+    BufferMath::copyBufferData (buffer, writeBuffer, startSample, bufferCount, samplesToWrite);
 }
 
 //==============================================================================

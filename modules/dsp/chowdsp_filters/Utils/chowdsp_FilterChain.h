@@ -54,7 +54,8 @@ public:
     template <typename T>
     T processSample (T x)
     {
-        doForEachFilter ([&] (auto& f) { x = f.processSample (x); });
+        doForEachFilter ([&] (auto& f)
+                         { x = f.processSample (x); });
         return x;
     }
 
@@ -62,14 +63,24 @@ public:
     template <typename T>
     void processBlock (T* x, int numSamples)
     {
-        doForEachFilter ([&] (auto& f) { f.processBlock (x, numSamples); });
+        doForEachFilter ([&] (auto& f)
+                         { f.processBlock (x, numSamples); });
+    }
+
+    /** Processes a block of samples through the filter chain */
+    template <typename T>
+    void processBlock (const chowdsp::BufferView<T>& buffer)
+    {
+        doForEachFilter ([&] (auto& f)
+                         { f.processBlock (buffer); });
     }
 
     /** Processes a buffer or processing context through the filter chain */
     template <typename... Args>
     void process (Args... args)
     {
-        doForEachFilter ([&] (auto& f) { f.process (std::forward<Args> (args)...); });
+        doForEachFilter ([&] (auto& f)
+                         { f.process (std::forward<Args> (args)...); });
     }
 
 private:

@@ -15,7 +15,7 @@ enum class ChebyshevFilterType
  * @tparam order The filter order (must be even)
  * @tparam type  The filter type
  * @tparam stopBandAttenuationDB    The attenuation in the stop-band of the filter (should be given as a positive number)
- * @tparam useNaturalCutoff         True if the cutoff frequency should refer to the -3dB point. Otherwise the cotuff frequency will refer to the start of the stop-band region.
+ * @tparam useNaturalCutoff         True if the cutoff frequency should refer to the -3dB point. Otherwise the cutoff frequency will refer to the start of the stop-band region.
  * @tparam FloatType    The floating point type to use
  */
 template <int order, ChebyshevFilterType type = ChebyshevFilterType::Lowpass, int stopBandAttenuationDB = 60, bool useNaturalCutoff = true, typename FloatType = float>

@@ -105,12 +105,12 @@ public:
     }
 
     /** Process block of samples */
-    void processBlock (juce::dsp::AudioBlock<FloatType>& block) noexcept
+    void processBlock (const chowdsp::BufferView<FloatType>& block) noexcept
     {
         const auto numChannels = (int) block.getNumChannels();
         const auto numSamples = (int) block.getNumSamples();
         for (int channel = 0; channel < numChannels; ++channel)
-            processBlock (block.getChannelPointer (channel), numSamples, channel);
+            processBlock (block.getWritePointer (channel), numSamples, channel);
     }
 
     /**
@@ -130,12 +130,12 @@ public:
      * Pushes a block of samples into the filter state without processing.
      * This can be useful for "bypassing" the filter.
      */
-    void processBlockBypassed (const juce::dsp::AudioBlock<const FloatType>& block) noexcept
+    void processBlockBypassed (const chowdsp::BufferView<FloatType>& block) noexcept
     {
         const auto numChannels = (int) block.getNumChannels();
         const auto numSamples = (int) block.getNumSamples();
         for (int channel = 0; channel < numChannels; ++channel)
-            processBlockBypassed (block.getChannelPointer (channel), numSamples, channel);
+            processBlockBypassed (block.getReadPointer (channel), numSamples, channel);
     }
 
 private:

@@ -18,5 +18,5 @@ void PrototypeEQ::reset()
 void PrototypeEQ::processBlock (juce::AudioBuffer<float>& buffer)
 {
     auto&& block = juce::dsp::AudioBlock<float> { buffer };
-    eq.process (block);
+    eq.processBlock (block);
 }

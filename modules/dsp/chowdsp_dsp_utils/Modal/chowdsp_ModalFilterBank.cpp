@@ -109,7 +109,7 @@ template <size_t maxNumModes, typename SampleType>
 void ModalFilterBank<maxNumModes, SampleType>::prepare (double sampleRate, int samplesPerBlock)
 {
     maxFreq = SampleType (0.495 * sampleRate);
-    renderBuffer.setSize (1, samplesPerBlock);
+    renderBuffer.setMaxSize (1, samplesPerBlock);
 
     for (auto& mode : modes)
         mode.prepare ((SampleType) sampleRate);
@@ -123,45 +123,38 @@ void ModalFilterBank<maxNumModes, SampleType>::reset()
 }
 
 template <size_t maxNumModes, typename SampleType>
-void ModalFilterBank<maxNumModes, SampleType>::process (const juce::AudioBuffer<SampleType>& buffer) noexcept
-{
-    const auto&& block = chowdsp::AudioBlock<const SampleType> { buffer };
-    process (block);
-}
-
-template <size_t maxNumModes, typename SampleType>
-void ModalFilterBank<maxNumModes, SampleType>::process (const chowdsp::AudioBlock<const SampleType>& block) noexcept
+void ModalFilterBank<maxNumModes, SampleType>::process (const chowdsp::BufferView<SampleType>& block) noexcept
 {
     const auto numSamples = block.getNumSamples();
 
-    renderBuffer.setSize (1, (int) numSamples, false, false, true);
+    renderBuffer.setCurrentSize (1, numSamples);
     renderBuffer.clear();
 
-    const auto* blockPtr = block.getChannelPointer (0);
+    const auto* blockPtr = block.getReadPointer (0);
     auto* renderPtr = renderBuffer.getWritePointer (0);
 
     for (size_t modeIdx = 0; modeIdx < numVecModesToProcess; ++modeIdx)
     {
-        for (size_t n = 0; n < numSamples; ++n)
+        for (int n = 0; n < numSamples; ++n)
             renderPtr[n] += xsimd::hadd (modes[modeIdx].processSample (blockPtr[n]));
     }
 }
 
 template <size_t maxNumModes, typename SampleType>
 template <typename Modulator>
-void ModalFilterBank<maxNumModes, SampleType>::processWithModulation (const chowdsp::AudioBlock<const SampleType>& block, Modulator&& modulator) noexcept
+void ModalFilterBank<maxNumModes, SampleType>::processWithModulation (const chowdsp::BufferView<SampleType>& block, Modulator&& modulator) noexcept
 {
     const auto numSamples = block.getNumSamples();
 
-    renderBuffer.setSize (1, (int) numSamples, false, false, true);
+    renderBuffer.setCurrentSize (1, numSamples);
     renderBuffer.clear();
 
-    const auto* blockPtr = block.getChannelPointer (0);
+    const auto* blockPtr = block.getReadPointer (0);
     auto* renderPtr = renderBuffer.getWritePointer (0);
 
     for (size_t modeIdx = 0; modeIdx < numVecModesToProcess; ++modeIdx)
     {
-        for (size_t n = 0; n < numSamples; ++n)
+        for (int n = 0; n < numSamples; ++n)
         {
             modulator (modes[modeIdx], modeIdx, n);
             renderPtr[n] += xsimd::hadd (modes[modeIdx].processSample (blockPtr[n]));

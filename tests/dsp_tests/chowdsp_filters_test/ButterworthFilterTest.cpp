@@ -1,5 +1,4 @@
-#include <test_utils.h>
-#include <TimedUnitTest.h>
+#include <CatchUtils.h>
 #include <chowdsp_filters/chowdsp_filters.h>
 
 namespace Constants
@@ -8,37 +7,30 @@ constexpr float fs = 48000.0f;
 constexpr float fc = 1000.0f;
 } // namespace Constants
 
-class ButterworthFilterTest : public TimedUnitTest
+template <typename T, typename Filter>
+void testFilter (Filter& filt, std::vector<float> freqs, std::vector<float> mags, std::vector<float> errs, const std::vector<std::string>& messages)
 {
-public:
-    ButterworthFilterTest() : TimedUnitTest ("Butterworth Filter Test", "Filters") {}
+    auto testFrequency = [&filt] (float freq, float expGain, float err, const std::string& message) {
+        auto buffer = test_utils::makeSineWave<T> (freq, Constants::fs, 1.0f);
 
+        filt.reset();
+        filt.processBlock (buffer);
+
+        const auto halfSamples = buffer.getNumSamples() / 2;
+        auto mag = chowdsp::SIMDUtils::gainToDecibels (chowdsp::BufferMath::getMagnitude (buffer, halfSamples, halfSamples));
+        REQUIRE_MESSAGE (mag == SIMDApprox<T> ((T) expGain).margin (err), message);
+    };
+
+    for (size_t i = 0; i < freqs.size(); ++i)
+        testFrequency (freqs[i], mags[i], errs[i], "Incorrect gain at " + messages[i] + " frequency.");
+}
+
+TEMPLATE_TEST_CASE ("Butterworth Filter Test", "", float)
+{
+    using T = TestType;
     using FilterType = chowdsp::ButterworthFilterType;
 
-    template <typename T, typename Filter>
-    void testFilter (Filter& filt, std::vector<float> freqs, std::vector<float> mags, std::vector<float> errs, const juce::StringArray& messages)
-    {
-        auto testFrequency = [=, &filt] (float freq, float expGain, float err, const juce::String& message) {
-            auto buffer = test_utils::makeSineWave (freq, Constants::fs, 1.0f);
-
-            juce::HeapBlock<char> dataBlock;
-            auto block = test_utils::bufferToBlock<T> (dataBlock, buffer);
-
-            filt.reset();
-            filt.processBlock (block);
-
-            test_utils::blockToBuffer<float> (buffer, block);
-            auto halfBlock = buffer.getNumSamples() / 2;
-            auto mag = juce::Decibels::gainToDecibels (buffer.getMagnitude (halfBlock, halfBlock));
-            expectWithinAbsoluteError (mag, expGain, err, message);
-        };
-
-        for (size_t i = 0; i < freqs.size(); ++i)
-            testFrequency (freqs[i], mags[i], errs[i], "Incorrect gain at " + messages[(int) i] + " frequency.");
-    }
-
-    template <typename T>
-    void lowpassTest()
+    SECTION ("LPF Test")
     {
         chowdsp::ButterworthFilter<4, FilterType::Lowpass, T> filter;
         filter.calcCoefs (Constants::fc, (T) 1 / juce::MathConstants<T>::sqrt2, Constants::fs);
@@ -50,8 +42,7 @@ public:
                        { "passband", "cutoff", "stopband" });
     }
 
-    template <typename T>
-    void highpassTest()
+    SECTION ("HPF Test")
     {
         chowdsp::ButterworthFilter<4, FilterType::Highpass, T> filter;
         filter.calcCoefs (Constants::fc, (T) 1 / juce::MathConstants<T>::sqrt2, Constants::fs);
@@ -62,15 +53,4 @@ public:
                        { 0.01f, 0.01f, 0.5f },
                        { "passband", "cutoff", "stopband" });
     }
-
-    void runTestTimed() override
-    {
-        beginTest ("Lowpass");
-        lowpassTest<float>();
-
-        beginTest ("Highpass");
-        highpassTest<float>();
-    }
-};
-
-static ButterworthFilterTest butterworthFilterTest;
+}

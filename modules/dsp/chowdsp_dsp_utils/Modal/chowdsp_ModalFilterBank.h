@@ -56,14 +56,11 @@ public:
     }
 
     /** Process an audio buffer */
-    void process (const juce::AudioBuffer<SampleType>& buffer) noexcept;
-
-    /** Process an audio block */
-    void process (const chowdsp::AudioBlock<const SampleType>& block) noexcept;
+    void process (const chowdsp::BufferView<SampleType>& buffer) noexcept;
 
     /** Process with some user-defined modulator */
     template <typename Modulator>
-    void processWithModulation (const chowdsp::AudioBlock<const SampleType>& block, Modulator&& modulator) noexcept;
+    void processWithModulation (const chowdsp::BufferView<SampleType>& block, Modulator&& modulator) noexcept;
 
     /** Returns a mono buffer of rendered audio */
     const auto& getRenderBuffer() const noexcept { return renderBuffer; }
@@ -81,7 +78,7 @@ private:
     std::array<std::complex<SampleType>, maxNumModes> amplitudeData;
     SampleType amplitudeNormalizationFactor = (SampleType) 1;
 
-    juce::AudioBuffer<SampleType> renderBuffer;
+    chowdsp::Buffer<SampleType> renderBuffer;
     SampleType maxFreq = (SampleType) 0;
     size_t numModesToProcess = maxNumModes;
     size_t numVecModesToProcess = maxNumVecModes;

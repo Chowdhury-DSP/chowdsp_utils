@@ -1,5 +1,4 @@
-#include <test_utils.h>
-#include <TimedUnitTest.h>
+#include <CatchUtils.h>
 #include <chowdsp_dsp_utils/chowdsp_dsp_utils.h>
 
 namespace
@@ -10,12 +9,9 @@ constexpr int nSamples = 512;
 constexpr float lenSeconds = (float) nSamples / fs;
 } // namespace
 
-class PannerTest : public TimedUnitTest
+TEST_CASE ("Panner Test")
 {
-public:
-    PannerTest() : TimedUnitTest ("Panner Test") {}
-
-    void bufferTest()
+    SECTION ("Buffer Test")
     {
         // set up panners
         chowdsp::Panner<float> panner;
@@ -24,21 +20,18 @@ public:
         panner.prepare ({ (double) fs, (juce::uint32) nSamples, 1 });
 
         // set up buffers
-        auto inBuffer = test_utils::makeSineWave (freq, fs, lenSeconds);
-        juce::dsp::AudioBlock<float> inBlock (inBuffer);
-        juce::AudioBuffer<float> outBuffer (2, inBuffer.getNumSamples());
-        juce::dsp::AudioBlock<float> outBlock (outBuffer);
+        auto buffer = test_utils::makeSineWave (freq, fs, lenSeconds, 2);
 
         // process
-        panner.process<juce::dsp::ProcessContextNonReplacing<float>> ({ inBlock, outBlock });
-        auto leftMag = outBuffer.getMagnitude (0, 0, nSamples);
-        auto rightMag = outBuffer.getMagnitude (1, 0, nSamples);
+        panner.processBlock (buffer);
+        auto leftMag = chowdsp::BufferMath::getMagnitude (buffer, 0, nSamples, 0);
+        auto rightMag = chowdsp::BufferMath::getMagnitude (buffer, 0, nSamples, 1);
 
-        expectEquals (leftMag, 2.0f); // expect both channels summed into left channel
-        expectEquals (rightMag, 0.0f); // expect silenSecondsce on right channel
+        REQUIRE (leftMag == 2.0f); // expect both channels summed into left channel
+        REQUIRE (rightMag == 0.0f); // expect silence on right channel
     }
 
-    void singleSampleTest()
+    SECTION ("Single-sample Test")
     {
         // set up panners
         chowdsp::Panner<float> panner;
@@ -47,24 +40,23 @@ public:
         panner.prepare ({ (double) fs, (juce::uint32) nSamples, 1 });
 
         // set up buffers
-        auto inBuffer = test_utils::makeSineWave (freq, fs, lenSeconds);
-        juce::AudioBuffer<float> outBuffer (2, inBuffer.getNumSamples());
+        auto buffer = test_utils::makeSineWave (freq, fs, lenSeconds, 2);
 
         // process
-        auto* input = inBuffer.getReadPointer (0);
-        auto* left = outBuffer.getWritePointer (0);
-        auto* right = outBuffer.getWritePointer (1);
+        auto* input = buffer.getReadPointer (0);
+        auto* left = buffer.getWritePointer (0);
+        auto* right = buffer.getWritePointer (1);
 
         for (int i = 0; i < nSamples; ++i)
             std::tie (left[i], right[i]) = panner.processSample (input[i]);
-        auto leftMag = outBuffer.getMagnitude (0, 0, nSamples);
-        auto rightMag = outBuffer.getMagnitude (1, 0, nSamples);
+        auto leftMag = chowdsp::BufferMath::getMagnitude (buffer, 0, nSamples, 0);
+        auto rightMag = chowdsp::BufferMath::getMagnitude (buffer, 0, nSamples, 1);
 
-        expectEquals (leftMag, 0.0f); // expect silenSecondsce on left channel
-        expectEquals (rightMag, 2.0f); // expect both channels summed to right channel
+        REQUIRE (leftMag == 0.0f); // expect silenSecondsce on left channel
+        REQUIRE (rightMag == 2.0f); // expect both channels summed to right channel
     }
 
-    void centerTest()
+    SECTION ("Center Test")
     {
         // set up panners
         chowdsp::Panner<float> panner;
@@ -73,31 +65,14 @@ public:
         panner.prepare ({ (double) fs, (juce::uint32) nSamples, 1 });
 
         // set up buffers
-        auto inBuffer = test_utils::makeSineWave (freq, fs, lenSeconds);
-        juce::dsp::AudioBlock<float> inBlock (inBuffer);
-        juce::AudioBuffer<float> outBuffer (2, inBuffer.getNumSamples());
-        juce::dsp::AudioBlock<float> outBlock (outBuffer);
+        auto buffer = test_utils::makeSineWave (freq, fs, lenSeconds, 2);
 
         // process
-        panner.process<juce::dsp::ProcessContextNonReplacing<float>> ({ inBlock, outBlock });
-        auto leftMag = outBuffer.getMagnitude (0, 0, nSamples);
-        auto rightMag = outBuffer.getMagnitude (1, 0, nSamples);
+        panner.processBlock (buffer);
+        auto leftMag = chowdsp::BufferMath::getMagnitude (buffer, 0, nSamples, 0);
+        auto rightMag = chowdsp::BufferMath::getMagnitude (buffer, 0, nSamples, 1);
 
-        expectWithinAbsoluteError (leftMag, 1.0f, 1.0e-3f);
-        expectWithinAbsoluteError (rightMag, 1.0f, 1.0e-3f);
+        REQUIRE (leftMag == Approx (1.0f).margin (1.0e-3f));
+        REQUIRE (rightMag == Approx (1.0f).margin (1.0e-3f));
     }
-
-    void runTestTimed() override
-    {
-        beginTest ("Buffer Test");
-        bufferTest();
-
-        beginTest ("Single-sample Test");
-        singleSampleTest();
-
-        beginTest ("Center Test");
-        centerTest();
-    }
-};
-
-static PannerTest pannerTest;
+}

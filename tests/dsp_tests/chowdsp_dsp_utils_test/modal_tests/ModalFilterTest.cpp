@@ -1,5 +1,4 @@
-#include <test_utils.h>
-#include <TimedUnitTest.h>
+#include <CatchUtils.h>
 #include <chowdsp_dsp_utils/chowdsp_dsp_utils.h>
 
 namespace
@@ -9,72 +8,57 @@ constexpr float modeDecay = 0.01f;
 constexpr float modeAmp = 0.1f;
 } // namespace
 
+template <typename T>
+static std::vector<T> getTestVector (const chowdsp::Buffer<float>& buffer)
+{
+    using NumericType = chowdsp::SampleTypeHelpers::NumericType<T>;
+    std::vector<T> vector ((size_t) buffer.getNumSamples(), (T) 0);
+    for (int i = 0; i < buffer.getNumSamples(); ++i)
+        vector[(size_t) i] = (T) (NumericType) buffer.getReadPointer (0)[i];
+
+    return vector;
+}
+
+template <typename T>
+static typename std::enable_if_t<std::is_floating_point_v<T>, T>
+    getMagnitude (const std::vector<T>& buffer, int start = 0, int num = -1)
+{
+    num = num >= 0 ? num : (int) buffer.size();
+
+    auto max = (T) 0;
+    for (int i = start; i < start + num; ++i)
+        max = juce::jmax (max, buffer[(size_t) i]);
+
+    return max;
+}
+
+template <typename T>
+static typename std::enable_if_t<chowdsp::SampleTypeHelpers::IsSIMDRegister<T>, chowdsp::SampleTypeHelpers::NumericType<T>>
+    getMagnitude (const std::vector<T>& buffer, int start = 0, int num = -1)
+{
+    num = num >= 0 ? num : (int) buffer.size();
+
+    auto max = (T) 0;
+    for (int i = start; i < start + num; ++i)
+        max = xsimd::max (max, buffer[(size_t) i]);
+
+    return max.get (0);
+}
+
 /** Unit tests for chowdsp::ModalFilter. Tests include:
  *   - Check that filter resonates at center frequency
  *   - Check that filter damps frequencies other than center frequency
  *   - Check that filter has correct decay time
  */
-template <typename T>
-class ModalFilterTest : public TimedUnitTest
+TEMPLATE_TEST_CASE ("Modal Filter Test", "[Modal]", float, double, xsimd::batch<float>, xsimd::batch<double>)
 {
-public:
+    using T = TestType;
     using NumericType = chowdsp::SampleTypeHelpers::NumericType<T>;
 
-    ModalFilterTest() : TimedUnitTest ("Modal Filter Test " + getSampleType(), "Modal") {}
-
-    static juce::String getSampleType()
-    {
-        if (std::is_same_v<T, float>)
-            return "Float";
-        if (std::is_same_v<T, double>)
-            return "Double";
-        if (std::is_same_v<T, xsimd::batch<float>>)
-            return "SIMD Float";
-        if (std::is_same_v<T, xsimd::batch<double>>)
-            return "SIMD Double";
-
-        return "Unknown";
-    }
-
-    static std::vector<T> getTestVector (juce::AudioBuffer<float> buffer)
-    {
-        std::vector<T> vector ((size_t) buffer.getNumSamples(), (T) 0);
-        for (int i = 0; i < buffer.getNumSamples(); ++i)
-            vector[(size_t) i] = (T) (NumericType) buffer.getSample (0, i);
-
-        return vector;
-    }
-
-    template <typename C = T>
-    static typename std::enable_if<std::is_same<float, C>::value || std::is_same<double, C>::value, T>::type
-        getMagnitude (const std::vector<T>& buffer, int start = 0, int num = -1)
-    {
-        num = num >= 0 ? num : (int) buffer.size();
-
-        auto max = (T) 0;
-        for (int i = start; i < start + num; ++i)
-            max = juce::jmax (max, buffer[(size_t) i]);
-
-        return max;
-    }
-
-    template <typename C = T>
-    static typename std::enable_if<chowdsp::SampleTypeHelpers::IsSIMDRegister<C>, NumericType>::type
-        getMagnitude (const std::vector<T>& buffer, int start = 0, int num = -1)
-    {
-        num = num >= 0 ? num : (int) buffer.size();
-
-        auto max = (T) 0;
-        for (int i = start; i < start + num; ++i)
-            max = xsimd::max (max, buffer[(size_t) i]);
-
-        return max.get (0);
-    }
-
-    void onFreqSineTest()
+    SECTION ("Resonant Frequency Sine Test")
     {
         constexpr float testFreq = 100.0f;
-        auto buffer = getTestVector (test_utils::makeSineWave (testFreq, fs, 1.0f));
+        auto buffer = getTestVector<T> (test_utils::makeSineWave (testFreq, fs, 1.0f));
         auto refMag = juce::Decibels::gainToDecibels (getMagnitude (buffer));
 
         chowdsp::ModalFilter<T> filter;
@@ -85,14 +69,14 @@ public:
         filter.processBlock (buffer.data(), (int) buffer.size());
 
         auto mag = juce::Decibels::gainToDecibels (getMagnitude (buffer));
-        expectGreaterThan (mag - refMag, (NumericType) 6.0f, "Modal filter is not resonating at correct frequency.");
+        REQUIRE_MESSAGE ((mag - refMag) > (NumericType) 6.0f, "Modal filter is not resonating at correct frequency.");
     }
 
-    void offFreqSineTest()
+    SECTION ("Damped Frequency Sine Test")
     {
         constexpr float testFreq1 = 100.0f;
         constexpr float testFreq2 = 10000.0f;
-        auto buffer = getTestVector (test_utils::makeSineWave (testFreq1, fs, 1.0f));
+        auto buffer = getTestVector<T> (test_utils::makeSineWave (testFreq1, fs, 1.0f));
         auto refMag = juce::Decibels::gainToDecibels (getMagnitude (buffer));
 
         chowdsp::ModalFilter<T> filter;
@@ -103,17 +87,17 @@ public:
         filter.processBlock (buffer.data(), (int) buffer.size());
 
         if constexpr (std::is_floating_point_v<T>)
-            expectEquals (filter.getFreq(), (NumericType) testFreq2, "Modal filter frequency is incorrect");
+            REQUIRE_MESSAGE (filter.getFreq() == (NumericType) testFreq2, "Modal filter frequency is incorrect");
         else
-            expectEquals (filter.getFreq().get (0), (NumericType) testFreq2, "Modal filter frequency is incorrect");
+            REQUIRE_MESSAGE (filter.getFreq().get (0) == (NumericType) testFreq2, "Modal filter frequency is incorrect");
 
         auto mag = juce::Decibels::gainToDecibels (getMagnitude (buffer));
-        expectLessThan (mag - refMag, (NumericType) -24.0f, "Modal filter is resonating at an incorrect frequency.");
+        REQUIRE_MESSAGE ((mag - refMag) < (NumericType) -24.0f, "Modal filter is resonating at an incorrect frequency.");
     }
 
-    void decayTimeTest()
+    SECTION ("Decay Time Test")
     {
-        auto buffer = getTestVector (test_utils::makeImpulse (1.0f, fs, 1.0f));
+        auto buffer = getTestVector<T> (test_utils::makeImpulse (1.0f, fs, 1.0f));
 
         chowdsp::ModalFilter<T> filter;
         filter.prepare ((NumericType) fs);
@@ -123,10 +107,10 @@ public:
         filter.processBlock (buffer.data(), (int) buffer.size());
 
         auto mag = juce::Decibels::gainToDecibels (getMagnitude (buffer, int (fs * 0.5f), int (fs * 0.1f)));
-        expectWithinAbsoluteError (mag, (NumericType) -60.0f, (NumericType) 1.0f, "Incorrect decay time.");
+        REQUIRE_MESSAGE (mag == Approx ((NumericType) -60.0f).margin ((NumericType) 1.0f), "Incorrect decay time.");
     }
 
-    void initialPhaseTest()
+    SECTION ("Initial Phase Test")
     {
         static constexpr auto initialPhase = (NumericType) 0.5f;
 
@@ -139,26 +123,6 @@ public:
         const auto actual = filter.processSample ((T) 1);
         const auto expected = std::sin (initialPhase);
 
-        expect (chowdsp::SIMDUtils::all (actual == expected), "Incorrect initial phase!");
+        REQUIRE_MESSAGE (chowdsp::SIMDUtils::all (actual == expected), "Incorrect initial phase!");
     }
-
-    void runTestTimed() override
-    {
-        beginTest ("Resonant Frequency Sine Test");
-        onFreqSineTest();
-
-        beginTest ("Damped Frequency Sine Test");
-        offFreqSineTest();
-
-        beginTest ("Decay Time Test");
-        decayTimeTest();
-
-        beginTest ("Initial Phase Test");
-        initialPhaseTest();
-    }
-};
-
-static ModalFilterTest<float> mfTestFloat;
-static ModalFilterTest<double> mfTestDouble;
-static ModalFilterTest<xsimd::batch<float>> mfTestSimdFloat;
-static ModalFilterTest<xsimd::batch<double>> mfTestSimdDouble;
+}

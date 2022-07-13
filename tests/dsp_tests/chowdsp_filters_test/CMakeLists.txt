@@ -1,24 +1,18 @@
-add_executable(chowdsp_filters_test)
-setup_juce_test(chowdsp_filters_test)
+setup_catch_test(chowdsp_filters_test MODULES chowdsp_filters)
 
-target_link_libraries(chowdsp_filters_test PRIVATE
-    chowdsp_filters
-    chowdsp_dsp_utils
-)
-
-target_sources(chowdsp_filters_test PRIVATE
-    ConformalMapsTest.cpp
-    FilterChainTest.cpp
-    FirstOrderFiltersTest.cpp
-    HilbertFilterTest.cpp
-    NthOrderFilterTest.cpp
-    SecondOrderFiltersTest.cpp
-    ShelfFilterTest.cpp
-    ModFilterWrapperTest.cpp
-    ButterworthFilterTest.cpp
-    ChebyshevIIFilterTest.cpp
-    EllipticFilterTest.cpp
-    FractionalOrderFilterTest.cpp
-    FIRFilterTest.cpp
-    StateVariableFilterTest.cpp
+target_sources(chowdsp_filters_test
+    PRIVATE
+        ConformalMapsTest.cpp
+        FirstOrderFiltersTest.cpp
+        ShelfFilterTest.cpp
+        SecondOrderFiltersTest.cpp
+        StateVariableFilterTest.cpp
+        ModFilterWrapperTest.cpp
+        FilterChainTest.cpp
+        NthOrderFilterTest.cpp
+        ButterworthFilterTest.cpp
+        ChebyshevIIFilterTest.cpp
+        EllipticFilterTest.cpp
+        FractionalOrderFilterTest.cpp
+        HilbertFilterTest.cpp
 )

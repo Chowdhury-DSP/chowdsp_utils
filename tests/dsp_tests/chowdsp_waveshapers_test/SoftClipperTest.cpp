@@ -1,15 +1,10 @@
-#include "TimedUnitTest.h"
+#include <CatchUtils.h>
 #include <chowdsp_waveshapers/chowdsp_waveshapers.h>
 
 namespace
 {
 constexpr int N = 1000;
 constexpr float maxErr = 1.0e-6f;
-
-float getRandValue (juce::Random& r)
-{
-    return (r.nextFloat() - 0.5f) * 20.0f;
-}
 
 float idealSoftClipper (float x, int degree)
 {
@@ -25,90 +20,60 @@ float idealSoftClipper (float x, int degree)
 }
 } // namespace
 
-class SoftClipperTest : public TimedUnitTest
+template <int degree>
+void scalarProcessTest()
 {
-public:
-    SoftClipperTest() : TimedUnitTest ("Soft Clipper Test")
+    std::random_device rd;
+    std::mt19937 mt (rd());
+    std::uniform_real_distribution minus1To1 (-10.0f, 10.0f);
+
+    for (int i = 0; i < N; ++i)
     {
+        const auto testX = minus1To1 (mt);
+        const auto expY = idealSoftClipper (testX, degree);
+        const auto actualY = chowdsp::SoftClipper<degree>::processSample (testX);
+        REQUIRE_MESSAGE (actualY == Approx (expY).margin (maxErr), "Soft Clipper value at degree " << std::to_string (degree) << " is incorrect!");
+    }
+}
+
+template <int degree>
+void vectorProcessTest()
+{
+    std::random_device rd;
+    std::mt19937 mt (rd());
+    std::uniform_real_distribution minus1To1 (-10.0f, 10.0f);
+
+    chowdsp::Buffer<float> testBuffer (1, N);
+    float expYs[N];
+    for (int i = 0; i < N; ++i)
+    {
+        const auto testX = minus1To1 (mt);
+        testBuffer.getWritePointer (0)[i] = testX;
+        expYs[i] = idealSoftClipper (testX, degree);
     }
 
-    template <int degree>
-    void scalarProcessTest (juce::Random& r)
+    chowdsp::SoftClipper<degree> clipper;
+    clipper.prepare ({ 48000.0, (juce::uint32) N, 1 });
+    clipper.processBlock (testBuffer);
+
+    for (int i = 0; i < N; ++i)
     {
-        for (int i = 0; i < N; ++i)
-        {
-            const auto testX = getRandValue (r);
-            const auto expY = idealSoftClipper (testX, degree);
-            const auto actualY = chowdsp::SoftClipper<degree>::processSample (testX);
-            expectWithinAbsoluteError (actualY, expY, maxErr, "Soft Clipper value at degree " + juce::String (degree) + " is incorrect!");
-        }
+        float actualY = testBuffer.getReadPointer (0)[i];
+        REQUIRE_MESSAGE (actualY == Approx (expYs[i]).margin (maxErr), "Soft Clipper value at degree " << std::to_string (degree) << " is incorrect!");
+    }
+}
+
+TEST_CASE ("Soft Clipper Test")
+{
+    SECTION ("Scalar Process Test")
+    {
+        scalarProcessTest<5>();
+        scalarProcessTest<11>();
     }
 
-    template <int degree>
-    void vectorProcessTest (juce::Random& r, bool inPlace, bool isBypassed = false)
+    SECTION ("Vector Process Test")
     {
-        juce::AudioBuffer<float> testBuffer (1, N);
-        float expYs[N];
-        for (int i = 0; i < N; ++i)
-        {
-            const auto testX = getRandValue (r);
-            testBuffer.setSample (0, i, testX);
-
-            if (isBypassed)
-                expYs[i] = testX;
-            else
-                expYs[i] = idealSoftClipper (testX, degree);
-        }
-
-        chowdsp::SoftClipper<degree> clipper;
-        clipper.prepare ({ 48000.0, (juce::uint32) N, 1 });
-
-        juce::AudioBuffer<float> outBuffer (1, N);
-        if (inPlace)
-        {
-            auto&& testBlock = juce::dsp::AudioBlock<float> { testBuffer };
-            auto&& context = juce::dsp::ProcessContextReplacing<float> { testBlock };
-            context.isBypassed = isBypassed;
-            clipper.process (context);
-        }
-        else
-        {
-            auto&& testBlock = juce::dsp::AudioBlock<float> { testBuffer };
-            auto&& outBlock = juce::dsp::AudioBlock<float> { outBuffer };
-
-            auto&& context = juce::dsp::ProcessContextNonReplacing<float> { testBlock, outBlock };
-            context.isBypassed = isBypassed;
-            clipper.process (context);
-        }
-
-        for (int i = 0; i < N; ++i)
-        {
-            float actualY;
-            if (inPlace)
-                actualY = testBuffer.getSample (0, i);
-            else
-                actualY = outBuffer.getSample (0, i);
-
-            expectWithinAbsoluteError (actualY, expYs[i], maxErr, "Soft Clipper value at degree " + juce::String (degree) + " is incorrect!");
-        }
+        vectorProcessTest<5>();
+        vectorProcessTest<11>();
     }
-
-    void runTestTimed() override
-    {
-        auto&& rand = getRandom();
-
-        beginTest ("Scalar Process Test");
-        scalarProcessTest<5> (rand);
-        scalarProcessTest<11> (rand);
-
-        beginTest ("Vector Process Test");
-        vectorProcessTest<5> (rand, false);
-        vectorProcessTest<11> (rand, true);
-
-        beginTest ("Bypassed Test");
-        vectorProcessTest<5> (rand, false, true);
-        vectorProcessTest<11> (rand, true, true);
-    }
-};
-
-static SoftClipperTest softClipperTest;
+}

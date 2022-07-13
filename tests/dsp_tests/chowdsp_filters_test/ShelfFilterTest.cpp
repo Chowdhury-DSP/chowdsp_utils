@@ -1,5 +1,4 @@
-#include <test_utils.h>
-#include <TimedUnitTest.h>
+#include <CatchUtils.h>
 #include <chowdsp_filters/chowdsp_filters.h>
 
 namespace Constants
@@ -17,72 +16,45 @@ constexpr float maxError = 0.1f;
  *   - High frequencies boosted by +6 dB
  *   - Transition frequency, stable at +0 dB
  */
-class ShelfFilterTest : public TimedUnitTest
+TEMPLATE_TEST_CASE ("Shelf Filter Test", "", float, xsimd::batch<float>)
 {
-public:
-    ShelfFilterTest() : TimedUnitTest ("Shelf Filter Test", "Filters") {}
+    using T = TestType;
+    using NumericType = chowdsp::SampleTypeHelpers::NumericType<T>;
 
-    template <typename T, typename NumericType = chowdsp::SampleTypeHelpers::NumericType<T>>
-    void plainGainTest()
+    SECTION ("Plain Gain Test")
     {
         chowdsp::ShelfFilter<T> shelfFilter;
         shelfFilter.reset();
         shelfFilter.calcCoefs ((T) 2, (T) 2, (T) Constants::fc, Constants::fs);
 
-        auto buffer = test_utils::makeNoise (Constants::fs, (NumericType) 1);
-        const int numSamples = buffer.getNumSamples();
-        auto refMag = buffer.getRMSLevel (0, 0, numSamples);
+        auto buffer = test_utils::makeNoise<T> ((int) Constants::fs);
+        const auto refMag = chowdsp::BufferMath::getRMSLevel (buffer, 0);
 
-        juce::HeapBlock<char> dataBlock;
-        auto block = test_utils::bufferToBlock<T> (dataBlock, buffer);
+        shelfFilter.processBlock (buffer);
 
-        shelfFilter.processBlock (block.getChannelPointer (0), numSamples);
+        const auto mag = chowdsp::BufferMath::getRMSLevel (buffer, 0);
 
-        test_utils::blockToBuffer<T> (buffer, block);
-        auto mag = buffer.getRMSLevel (0, 0, numSamples);
-
-        expectWithinAbsoluteError (mag / refMag, 2.0f, (float) 1.0e-6, "Incorrect behavior when filter reduces to a simple gain.");
+        REQUIRE_MESSAGE (mag / refMag == SIMDApprox<T> ((T) 2.0f).margin (1.0e-6f), "Incorrect behavior when filter reduces to a simple gain.");
     }
 
-    template <typename T, typename NumericType = chowdsp::SampleTypeHelpers::NumericType<T>>
-    void boostCutTest()
+    SECTION ("Boost/Cut Test")
     {
         chowdsp::ShelfFilter<T> shelfFilter;
         shelfFilter.calcCoefs ((T) Constants::lowGain, (T) Constants::highGain, (T) Constants::fc, Constants::fs);
 
-        auto testFrequency = [=, &shelfFilter] (float freq, float expGain, const juce::String& message) {
-            auto buffer = test_utils::makeSineWave<> (freq, Constants::fs, (NumericType) 1);
-
-            juce::HeapBlock<char> dataBlock;
-            auto block = test_utils::bufferToBlock<T> (dataBlock, buffer);
+        auto testFrequency = [=, &shelfFilter] (float freq, float expGain, const std::string& message)
+        {
+            auto buffer = test_utils::makeSineWave<T> (freq, Constants::fs, (NumericType) 1);
 
             shelfFilter.reset();
-            shelfFilter.processBlock (block.getChannelPointer (0), buffer.getNumSamples());
+            shelfFilter.processBlock (buffer);
 
-            test_utils::blockToBuffer<T> (buffer, block);
-            auto mag = buffer.getMagnitude (0, buffer.getNumSamples());
-            expectWithinAbsoluteError (mag, expGain, Constants::maxError, message);
+            auto mag = chowdsp::BufferMath::getMagnitude (buffer, 0, buffer.getNumSamples());
+            REQUIRE_MESSAGE (mag == SIMDApprox<T> ((T) expGain).margin (Constants::maxError), message);
         };
 
         testFrequency (10.0f, Constants::lowGain, "Incorrect gain at low frequencies.");
         testFrequency (Constants::fc, 1.0f, "Incorrect gain at transition frequency.");
         testFrequency (20000.0f, Constants::highGain, "Incorrect gain at high frequencies.");
     }
-
-    void runTestTimed() override
-    {
-        beginTest ("Plain Gain Test");
-        plainGainTest<float>();
-
-        beginTest ("Plain Gain SIMD Test");
-        plainGainTest<xsimd::batch<float>>();
-
-        beginTest ("Boost/Cut Test");
-        boostCutTest<float>();
-
-        beginTest ("Boost/Cut SIMD Test");
-        boostCutTest<xsimd::batch<float>>();
-    }
-};
-
-static ShelfFilterTest sfTest;
+}

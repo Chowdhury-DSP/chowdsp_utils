@@ -28,7 +28,7 @@ namespace chowdsp
 //==============================================================================
 template <typename SampleType, typename InterpolationType>
 DelayLine<SampleType, InterpolationType>::DelayLine()
-    : DelayLine (0)
+    : DelayLine (1 << 18)
 {
 }
 
@@ -66,7 +66,7 @@ void DelayLine<SampleType, InterpolationType>::prepare (const juce::dsp::Process
 {
     jassert (spec.numChannels > 0);
 
-    this->bufferData = chowdsp::AudioBlock<SampleType> (this->dataBlock, spec.numChannels, 2 * (size_t) totalSize);
+    this->bufferData.setMaxSize ((int) spec.numChannels, 2 * totalSize);
 
     this->writePos.resize (spec.numChannels);
     this->readPos.resize (spec.numChannels);
@@ -77,8 +77,8 @@ void DelayLine<SampleType, InterpolationType>::prepare (const juce::dsp::Process
     reset();
 
     bufferPtrs.resize (spec.numChannels);
-    for (size_t ch = 0; ch < spec.numChannels; ++ch)
-        bufferPtrs[ch] = this->bufferData.getChannelPointer (ch);
+    for (int ch = 0; ch < (int) spec.numChannels; ++ch)
+        bufferPtrs[(size_t) ch] = this->bufferData.getWritePointer (ch);
 }
 
 template <typename SampleType, typename InterpolationType>

@@ -24,9 +24,11 @@ void ModFilterWrapper<PrototypeFilter>::reset()
 template <typename PrototypeFilter>
 void ModFilterWrapper<PrototypeFilter>::snapToZero() noexcept
 {
+#if JUCE_SNAP_TO_ZERO
     for (auto v : { &s1, &s2 })
         for (auto& element : *v)
             juce::dsp::util::snapToZero (element);
+#endif
 }
 
 template <typename PrototypeFilter>
@@ -35,6 +37,27 @@ void ModFilterWrapper<PrototypeFilter>::calcCoefs (Args&&... args)
 {
     prototypeFilter.calcCoefs (std::forward<Args> (args)...);
     update();
+}
+
+template <typename PrototypeFilter>
+void ModFilterWrapper<PrototypeFilter>::processBlock (const chowdsp::BufferView<SampleType>& block) noexcept
+{
+    const auto numChannels = (int) block.getNumChannels();
+    const auto numSamples = (int) block.getNumSamples();
+
+    for (int channel = 0; channel < numChannels; ++channel)
+    {
+        auto* sampleData = block.getWritePointer (channel);
+        ScopedValue<SampleType> m1 { s1[(size_t) channel] };
+        ScopedValue<SampleType> m2 { s2[(size_t) channel] };
+
+        for (int i = 0; i < numSamples; ++i)
+            sampleData[i] = processSample (sampleData[i], m1.get(), m2.get());
+    }
+
+#if JUCE_SNAP_TO_ZERO
+    snapToZero();
+#endif
 }
 
 template <typename PrototypeFilter>

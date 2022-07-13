@@ -57,7 +57,7 @@
 #include "PluginComponents/chowdsp_TooltipComp.h"
 #include "PluginComponents/chowdsp_WindowInPlugin.h"
 
-#if JUCE_MODULE_AVAILABLE_chowdsp_dsp_utils
+#if CHOWDSP_USING_JUCE && JUCE_MODULE_AVAILABLE_chowdsp_dsp_utils
 #include "PluginComponents/chowdsp_OversamplingMenu.h"
 #endif
 
