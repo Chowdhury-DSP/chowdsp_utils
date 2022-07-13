@@ -59,7 +59,7 @@ public:
     }
 
 #if JUCE_MODULE_AVAILABLE_juce_dsp
-    BufferView (juce::dsp::AudioBlock<SampleType>& block, // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
+    BufferView (const juce::dsp::AudioBlock<SampleType>& block, // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
                 int sampleOffset = 0,
                 int bufferNumSamples = -1,
                 int startChannel = 0,
