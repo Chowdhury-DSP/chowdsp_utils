@@ -74,16 +74,16 @@ public:
     [[nodiscard]] int getNumSamples() const noexcept { return currentNumSamples; }
 
     /** Returns a pointer which can be used to write to a single channel of the buffer. */
-    SampleType* getWritePointer (int channel) noexcept;
+    [[nodiscard]] SampleType* getWritePointer (int channel) noexcept;
 
     /** Returns a pointer which can be used to read from a single channel of the buffer. */
-    const SampleType* getReadPointer (int channel) const noexcept;
+    [[nodiscard]] const SampleType* getReadPointer (int channel) const noexcept;
 
     /** Returns the entire buffer as an array of pointers to each channel's data. */
-    SampleType** getArrayOfWritePointers() noexcept;
+    [[nodiscard]] SampleType** getArrayOfWritePointers() noexcept;
 
     /** Returns the entire buffer as an array of pointers to each channel's data. */
-    const SampleType** getArrayOfReadPointers() const noexcept;
+    [[nodiscard]] const SampleType** getArrayOfReadPointers() const noexcept;
 
 private:
     using Allocator = xsimd::default_allocator<SampleType>;

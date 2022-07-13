@@ -71,7 +71,7 @@ public:
             channelPointers[ch] = block.getChannelPointer (ch + (size_t) startChannel) + sampleOffset;
     }
 
-    chowdsp::AudioBlock<SampleType> toAudioBlock() const noexcept
+    [[nodiscard]] chowdsp::AudioBlock<SampleType> toAudioBlock() const noexcept
     {
         return chowdsp::AudioBlock<SampleType> { channelPointers.data(), (size_t) numChannels, (size_t) numSamples };
     }
@@ -91,16 +91,16 @@ public:
     [[nodiscard]] int getNumSamples() const noexcept { return numSamples; }
 
     /** Returns a pointer which can be used to write to a single channel of the buffer view. */
-    SampleType* getWritePointer (int channel) const noexcept { return channelPointers[(size_t) channel]; }
+    [[nodiscard]] SampleType* getWritePointer (int channel) const noexcept { return channelPointers[(size_t) channel]; }
 
     /** Returns a pointer which can be used to read from a single channel of the buffer view. */
-    const SampleType* getReadPointer (int channel) const noexcept { return channelPointers[(size_t) channel]; }
+    [[nodiscard]] const SampleType* getReadPointer (int channel) const noexcept { return channelPointers[(size_t) channel]; }
 
     /** Returns the entire buffer view as an array of pointers to each channel's data. */
-    SampleType* const* getArrayOfWritePointers() const noexcept { return channelPointers.data(); }
+    [[nodiscard]] SampleType* const* getArrayOfWritePointers() const noexcept { return channelPointers.data(); }
 
     /** Returns the entire buffer view as an array of pointers to each channel's data. */
-    const SampleType** getArrayOfReadPointers() const noexcept { return const_cast<const SampleType**> (channelPointers.data()); }
+    [[nodiscard]] const SampleType** getArrayOfReadPointers() const noexcept { return const_cast<const SampleType**> (channelPointers.data()); }
 
 private:
     void initialise (SampleType* const* data, int sampleOffset, int startChannel = 0)

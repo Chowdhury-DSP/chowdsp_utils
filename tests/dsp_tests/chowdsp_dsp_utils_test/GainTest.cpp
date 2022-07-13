@@ -1,5 +1,6 @@
 #include <CatchUtils.h>
 #include <chowdsp_dsp_utils/chowdsp_dsp_utils.h>
+#include <algorithm>
 
 namespace
 {

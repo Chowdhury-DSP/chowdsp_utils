@@ -9,7 +9,7 @@ class Gain
     using NumericType = SampleTypeHelpers::NumericType<FloatType>;
 
 public:
-    Gain() noexcept = default;
+    Gain() = default;
 
     /** Applies a new gain as a linear value. */
     void setGainLinear (NumericType newGain) noexcept { gainTargetLinear = newGain; }
