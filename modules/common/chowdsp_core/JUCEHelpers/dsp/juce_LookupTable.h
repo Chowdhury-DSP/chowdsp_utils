@@ -93,11 +93,11 @@ public:
     FloatType getUnchecked (FloatType index) const noexcept
     {
         jassert (isInitialised()); // Use the non-default constructor or call initialise() before first use
-        jassert (isPositiveAndBelow (index, FloatType (getNumPoints())));
+        jassert (::juce::isPositiveAndBelow (index, FloatType (getNumPoints())));
 
         auto i = ::juce::truncatePositiveToUnsignedInt (index);
         auto f = index - FloatType (i);
-        jassert (isPositiveAndBelow (f, FloatType (1)));
+        jassert (::juce::isPositiveAndBelow (f, FloatType (1)));
 
         auto x0 = data[i];
         auto x1 = data[i + 1];
@@ -250,7 +250,7 @@ public:
     FloatType processSample (FloatType value) const noexcept
     {
         auto index = scaler * ::juce::jlimit (minInputValue, maxInputValue, value) + offset;
-        jassert (isPositiveAndBelow (index, FloatType (lookupTable.getNumPoints())));
+        jassert (::juce::isPositiveAndBelow (index, FloatType (lookupTable.getNumPoints())));
 
         return lookupTable[index];
     }
