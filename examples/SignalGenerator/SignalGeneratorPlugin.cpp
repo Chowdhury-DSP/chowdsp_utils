@@ -179,7 +179,7 @@ void SignalGeneratorPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
         else
         {
             auto&& bufferView = chowdsp::BufferView<float> { block };
-            chowdsp::BufferMath::copyBufferData (chowdsp::BufferView<float> { resampler->process (upsampledBlock) }, bufferView);
+            chowdsp::BufferMath::copyBufferData (resampler->process (upsampledBlock), bufferView);
         }
         //            block.copyFrom (resampler->process (upsampledBlock));
     };
