@@ -56,7 +56,7 @@ void LevelDetector<SampleType>::process (const ProcessContext& context) noexcept
         juce::FloatVectorOperations::abs (absPtr, absPtr, (int) numSamples);
 
         auto&& outBufferView = BufferView<SampleType> { outputBlock };
-        BufferMath::copyBufferData (absBuffer, outBufferView);
+        BufferMath::copyBufferData (absBuffer, outBufferView, 0, 0, numSamples);
     }
     else // sum to mono
     {
