@@ -13,6 +13,7 @@ enum class StateVariableFilterType
     Bell,
     LowShelf,
     HighShelf,
+    MultiMode, /**< Allows the filter to be interpolated between lowpass, bandpass, and highpass */
 };
 
 /**
@@ -68,6 +69,13 @@ public:
      */
     template <bool shouldUpdate = true>
     void setGainDecibels (SampleType newGainDecibels);
+
+    /**
+     * Sets the Mode of a multi-mode filter. The mode parameter is expected to be in [0, 1],
+     * where 0 corresponds to a LPF, 0.5 corresponds to a BPF, and 1 corresponds to a HPF.
+     */
+    template <FilterType M = type>
+    std::enable_if_t<M == FilterType::MultiMode, void> setMode (NumericType mode);
 
     /**
      * Updates the filter coefficients.
@@ -190,6 +198,8 @@ private:
             return Asq * v2 + k0A * v1 + v0; // Asq * low + k0 * A * band + high
         else if constexpr (type == FilterType::HighShelf)
             return Asq * v0 + k0A * v1 + v2; // Asq * high + k0 * A * band + low
+        else if constexpr (type == FilterType::MultiMode)
+            return lowpassMult * v2 + bandpassMult * v1 + highpassMult * v0;
         else
         {
             jassertfalse; // unknown filter type!
@@ -201,6 +211,8 @@ private:
     SampleType g0, k0, A, sqrtA; // parameter intermediate values
     SampleType a1, a2, a3, ak, k0A, Asq; // coefficients
     std::vector<SampleType> ic1eq { 2 }, ic2eq { 2 }; // state variables
+
+    NumericType lowpassMult { 0 }, bandpassMult { 0 }, highpassMult { 0 };
 
     double sampleRate = 44100.0;
 };
@@ -236,6 +248,10 @@ using SVFLowShelf = StateVariableFilter<SampleType, StateVariableFilterType::Low
 /** Convenient alias for an SVF high-shelf filter. */
 template <typename SampleType = float>
 using SVFHighShelf = StateVariableFilter<SampleType, StateVariableFilterType::HighShelf>;
+
+/** Convenient alias for an SVF multi-mode filter. */
+template <typename SampleType = float>
+using SVFMultiMode = StateVariableFilter<SampleType, StateVariableFilterType::MultiMode>;
 } // namespace chowdsp
 
 #include "chowdsp_StateVariableFilter.cpp"
