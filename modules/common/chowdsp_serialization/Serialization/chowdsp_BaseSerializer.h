@@ -2,6 +2,36 @@
 
 namespace chowdsp
 {
+#ifndef DOXYGEN
+namespace serialization_detail
+{
+    struct DummySerializer
+    {
+        using SerializedType = bool;
+        using DeserializedType = const bool&;
+
+        static auto createBaseElement() { return SerializedType {}; }
+        static void addChildElement (SerializedType&, SerializedType&&) {}
+        static auto getChildElement (DeserializedType, int) { return false; }
+        static int getNumChildElements (DeserializedType) { return 0; }
+
+        template <typename Serializer, typename C>
+        static SerializedType serialize (const C&)
+        {
+            return false;
+        }
+
+        template <typename Serializer, typename C>
+        static void deserialize (DeserializedType, C&)
+        {
+        }
+    };
+
+    // The reason we need this "detail" namespace is so that we can define these static method
+    // checkers for determining if a class has custom methods for serialization/deserialization.
+    CHOWDSP_CHECK_HAS_STATIC_METHOD (HasCustomSerializer, template serialize<DummySerializer>)
+    CHOWDSP_CHECK_HAS_STATIC_METHOD (HasCustomDeserializer, template deserialize<DummySerializer>)
+} // namespace serialization_detail
 /**
  * Base class for Serializer objects. If you would like to create
  * a serializer for a particular serialization format, the new serializer
