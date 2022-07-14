@@ -85,8 +85,7 @@ TEMPLATE_TEST_CASE ("Nth Order Filter Test", "", float, xsimd::batch<float>)
         chowdsp::NthOrderFilter<T, Order, chowdsp::StateVariableFilterType::MultiMode> testFilter;
         testFilter.prepare ({ Constants::fs, (uint32_t) 128, 1 });
 
-        auto testCompare = [&] (auto& compareFilter, NumericType mode, NumericType freq, NumericType Q, NumericType gainComp = 1.0f)
-        {
+        auto testCompare = [&] (auto& compareFilter, NumericType mode, NumericType freq, NumericType Q, NumericType gainComp = 1.0f) {
             testFilter.reset();
             testFilter.setCutoffFrequency (freq);
             testFilter.setQValue (Q);
