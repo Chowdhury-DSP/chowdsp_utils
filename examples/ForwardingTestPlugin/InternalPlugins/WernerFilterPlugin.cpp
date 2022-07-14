@@ -32,22 +32,6 @@ void WernerFilterPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)
     filter.prepare (spec);
 }
 
-template <chowdsp::WernerFilterType type>
-static void processFilter (juce::AudioBuffer<float>& buffer, chowdsp::WernerFilter& filter)
-{
-    const auto numChannels = buffer.getNumChannels();
-    const auto numSamples = buffer.getNumSamples();
-
-    for (int ch = 0; ch < numChannels; ++ch)
-    {
-        auto* x = buffer.getWritePointer (ch);
-        for (int n = 0; n < numSamples; ++n)
-        {
-            x[n] = filter.processSample<type> (ch, x[n]);
-        }
-    }
-}
-
 void WernerFilterPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
 {
     filter.calcCoeffs (*freqParam, *dampingParam, *resonanceParam);
@@ -55,11 +39,11 @@ void WernerFilterPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
     using Type = chowdsp::WernerFilterType;
     const auto mode = modeParam->getIndex();
     if (mode == 0)
-        processFilter<Type::Lowpass2> (buffer, filter);
+        filter.processBlock<Type::Lowpass2> (buffer);
     else if (mode == 1)
-        processFilter<Type::Bandpass2> (buffer, filter);
+        filter.processBlock<Type::Bandpass2> (buffer);
     else if (mode == 2)
-        processFilter<Type::Highpass2> (buffer, filter);
+        filter.processBlock<Type::Highpass2> (buffer);
     else if (mode == 3)
-        processFilter<Type::Lowpass4> (buffer, filter);
+        filter.processBlock<Type::Lowpass4> (buffer);
 }

@@ -22,33 +22,45 @@ class WernerFilter
 public:
     WernerFilter() = default;
 
+    /** Prepares the filter to process a stream of audio */
     void prepare (const juce::dsp::ProcessSpec& spec)
     {
         state.resize (spec.numChannels, {});
         fs = (float) spec.sampleRate;
     }
 
+    /** Rests the filter state */
     void reset()
     {
         std::fill (state.begin(), state.end(), xsimd::batch<float> {});
     }
 
-    void calcCoeffs (float fc, float r, float kHat)
+    /**
+     * Recomputes the filter coefficients.
+     *
+     * @param fc        The filter cutoff frequency. Expected to be in the range [20, 0.49 * sampleRate].
+     * @param damping   The filter "damping" factor. Expected to be in the range [0, 1]
+     * @param resonance The filter resonance. Expected to be in the range [0, 1]
+     */
+    void calcCoeffs (float fc, float damping, float resonance)
     {
         const auto g = std::tan (juce::MathConstants<float>::pi * fc / fs);
+        const auto r = 0.25f + damping; // variable "r" from the reference paper
+        const auto kh = 0.95f * resonance; // variable "k-hat" from the reference paper
+
         const auto gSq = g * g;
         const auto gCb = g * gSq;
         const auto rSq = r * r;
         two_r = 2.0f * r;
-        kh = kHat;
+        kh4rSq = kh * (two_r* two_r);
         const auto two_gr = g * two_r;
         const auto four_gr = 2 * g * two_r;
-        const auto gSq_oneplus_fourkhrSq = gSq * (1 + 4 * kh * rSq);
+        const auto gSq_oneplus_fourkhrSq = gSq * (1 + kh4rSq);
         const auto fourgSqr_plus_fourgrSq = four_gr * (g + r);
         const auto gsum1 = -g * (g + two_r + fourgSqr_plus_fourgrSq + g * gSq_oneplus_fourkhrSq);
 
         const auto D1 = 1 / (1 + g * (4 * r + g * (2 + gSq + four_gr + 4 * (1 + gSq * kh) * rSq)));
-        const auto D2 = 1 / (1 + four_gr + 4 * gCb * r + gSq * (2 + 4 * rSq) + gSq * gSq_oneplus_fourkhrSq);
+        const auto D2 = 1 / (1 + four_gr + gSq * (four_gr + (2 + 4 * rSq) + gSq_oneplus_fourkhrSq));
 
         float vinCoefsArr alignas (xsimd::default_arch::alignment())[xsimd::batch<float>::size] {};
         float f1CoefsArr alignas (xsimd::default_arch::alignment())[xsimd::batch<float>::size] {};
@@ -87,6 +99,24 @@ public:
         s2Coefs = xsimd::load_aligned (s2CoefsArr);
     }
 
+    /** Process a block of samples. */
+    template <WernerFilterType type = WernerFilterType::Lowpass4>
+    void processBlock (const BufferView<float>& buffer) noexcept
+    {
+        const auto numChannels = buffer.getNumChannels();
+        const auto numSamples = buffer.getNumSamples();
+
+        for (int ch = 0; ch < numChannels; ++ch)
+        {
+            ScopedValue s { state[(size_t) ch] };
+
+            auto* x = buffer.getWritePointer (ch);
+            for (int n = 0; n < numSamples; ++n)
+                x[n] = processSampleInternal<type> (x[n], s.get());
+        }
+    }
+
+    /** Process a single sample */
     template <WernerFilterType type = WernerFilterType::Lowpass4>
     inline float processSample (int channel, float vin) noexcept
     {
@@ -116,7 +146,7 @@ private:
         }
         else if constexpr (type == WernerFilterType::Highpass2)
         {
-            const auto vg0 = -kh * (two_r * two_r) * (sArr[TS2] + tValsArr[TS2]) + vin;
+            const auto vg0 = -kh4rSq * (sArr[TS2] + tValsArr[TS2]) + vin;
             y = -sArr[TF2] - two_r * (sArr[TF1] + tValsArr[TF1]) - tValsArr[TF2] + vg0; // 2nd-order highpass output (vf0)
         }
         else if constexpr (type == WernerFilterType::Lowpass4)
@@ -143,7 +173,7 @@ private:
     xsimd::batch<float> f2Coefs {};
     xsimd::batch<float> s1Coefs {};
     xsimd::batch<float> s2Coefs {};
-    float two_r = 0.0f, kh = 0.0f;
+    float two_r = 0.0f, kh4rSq = 0.0f;
 
     // state
     std::vector<xsimd::batch<float>> state;
