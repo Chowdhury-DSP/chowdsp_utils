@@ -52,7 +52,7 @@ public:
         const auto gCb = g * gSq;
         const auto rSq = r * r;
         two_r = 2.0f * r;
-        kh4rSq = kh * (two_r* two_r);
+        kh4rSq = kh * (two_r * two_r);
         const auto two_gr = g * two_r;
         const auto four_gr = 2 * g * two_r;
         const auto gSq_oneplus_fourkhrSq = gSq * (1 + kh4rSq);
