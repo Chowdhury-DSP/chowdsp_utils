@@ -54,8 +54,13 @@ public:
         filters[0].setQValue (butterQVals[0] * qVal * juce::MathConstants<NumericType>::sqrt2);
     }
 
-    std::enable_if_t<type == StateVariableFilterType::MultiMode, void>
-    setMode (NumericType mode)
+    /**
+     * Sets the Mode of a multi-mode filter. The mode parameter is expected to be in [0, 1],
+     * where 0 corresponds to a LPF, 0.5 corresponds to a BPF, and 1 corresponds to a HPF.
+     */
+    template <StateVariableFilterType M = type>
+    std::enable_if_t<M == StateVariableFilterType::MultiMode, void>
+        setMode (NumericType mode)
     {
         for (auto& filt : filters)
             filt.setMode (mode);

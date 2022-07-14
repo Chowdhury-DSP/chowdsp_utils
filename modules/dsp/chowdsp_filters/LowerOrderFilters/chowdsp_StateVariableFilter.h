@@ -71,26 +71,11 @@ public:
     void setGainDecibels (SampleType newGainDecibels);
 
     /**
-     * 0 = lowpass
-     * 0.5 = bandpass
-     * 1 = highpass
+     * Sets the Mode of a multi-mode filter. The mode parameter is expected to be in [0, 1],
+     * where 0 corresponds to a LPF, 0.5 corresponds to a BPF, and 1 corresponds to a HPF.
      */
-    template <FilterType T = type>
-    std::enable_if_t<T == FilterType::MultiMode, void>
-    setMode (NumericType mode)
-    {
-        lowpassMult = (NumericType) 1 - (NumericType) 2 * juce::jmin ((NumericType) 0.5, mode);
-        bandpassMult = (NumericType) 1 - std::abs ((NumericType) 2 * (mode - (NumericType) 0.5)); // * juce::MathConstants<NumericType>::sqrt2;
-        highpassMult = (NumericType) 2 * juce::jmax ((NumericType) 0.5, mode) - (NumericType) 1;
-
-        // use sin3db power law for mixing
-        lowpassMult = std::sin (juce::MathConstants<NumericType>::halfPi * lowpassMult);
-        bandpassMult = std::sin (juce::MathConstants<NumericType>::halfPi * bandpassMult);
-        highpassMult = std::sin (juce::MathConstants<NumericType>::halfPi * highpassMult);
-
-        // the BPF is a little bit quieter by design, so let's compensate here for a smooth transition
-        bandpassMult *= juce::MathConstants<NumericType>::sqrt2;
-    }
+    template <FilterType M = type>
+    std::enable_if_t<M == FilterType::MultiMode, void> setMode (NumericType mode);
 
     /**
      * Updates the filter coefficients.
