@@ -28,6 +28,7 @@ void testFilter (Filter& filt, std::vector<float> freqs, std::vector<float> mags
 TEMPLATE_TEST_CASE ("Nth Order Filter Test", "", float, xsimd::batch<float>)
 {
     using T = TestType;
+    using NumericType = chowdsp::SampleTypeHelpers::NumericType<T>;
     using FilterType = chowdsp::StateVariableFilterType;
 
     SECTION ("LPF Test")
@@ -70,5 +71,46 @@ TEMPLATE_TEST_CASE ("Nth Order Filter Test", "", float, xsimd::batch<float>)
         //             { 0.0f, -3.0f, -3.0f },
         //             { 0.0001f, 0.01f, 0.01f },
         //             { "passband", "high cutoff", "low cutoff" });
+    }
+
+    SECTION ("Multi-Mode Test")
+    {
+        static constexpr int Order = 6;
+        static constexpr NumericType maxErr = 1.0e-1f;
+
+        std::random_device rd;
+        std::mt19937 mt (rd());
+        std::uniform_real_distribution<NumericType> minus1To1 ((NumericType) -1, (NumericType) 1);
+
+        chowdsp::NthOrderFilter<T, Order, chowdsp::StateVariableFilterType::MultiMode> testFilter;
+        testFilter.prepare ({ Constants::fs, (uint32_t) 128, 1 });
+
+        auto testCompare = [&] (auto& compareFilter, NumericType mode, NumericType freq, NumericType Q, NumericType gainComp = 1.0f) {
+            testFilter.reset();
+            testFilter.setCutoffFrequency (freq);
+            testFilter.setQValue (Q);
+            testFilter.setMode (mode);
+
+            compareFilter.prepare ({ Constants::fs, (uint32_t) 128, 1 });
+            compareFilter.setCutoffFrequency (freq);
+            compareFilter.setQValue (Q);
+
+            for (int i = 0; i < 1000; ++i)
+            {
+                const auto x = (T) minus1To1 (mt);
+                const auto actualY = testFilter.processSample (0, x);
+                const auto expY = compareFilter.processSample (0, x) * gainComp;
+                REQUIRE (actualY == SIMDApprox<T> (expY).margin (maxErr));
+            }
+        };
+
+        chowdsp::NthOrderFilter<T, Order, chowdsp::StateVariableFilterType::Lowpass> lpf;
+        chowdsp::NthOrderFilter<T, Order, chowdsp::StateVariableFilterType::Bandpass> bpf;
+        chowdsp::NthOrderFilter<T, Order, chowdsp::StateVariableFilterType::Highpass> hpf;
+        const auto bpfGainComp = std::pow (juce::MathConstants<NumericType>::sqrt2, NumericType (Order) / 2);
+
+        testCompare (lpf, (NumericType) 0.0, (NumericType) 1000.0, (NumericType) 2.0);
+        testCompare (bpf, (NumericType) 0.5, (NumericType) 500.0, (NumericType) 0.5, bpfGainComp);
+        testCompare (hpf, (NumericType) 1.0, (NumericType) 750.0, (NumericType) 1.0);
     }
 }
