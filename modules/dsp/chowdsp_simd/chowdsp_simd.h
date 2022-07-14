@@ -5,7 +5,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_simd
    vendor:        Chowdhury DSP
-   version:       1.0.0
+   version:       1.1.0
    name:          ChowDSP DSP SIMD
    description:   JUCE interface for XSIMD, with a few extra useful methods
    dependencies:  chowdsp_core

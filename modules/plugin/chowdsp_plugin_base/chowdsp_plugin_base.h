@@ -5,7 +5,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_plugin_base
    vendor:        Chowdhury DSP
-   version:       1.0.0
+   version:       1.1.0
    name:          ChowDSP Plugin Base
    description:   Base classes for ChowDSP plugins
    dependencies:  chowdsp_core, chowdsp_parameters

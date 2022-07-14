@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [UNRELEASED]
+## [1.1.0] 2022-07-14
 - Removed dependency on JUCE for most DSP modules.
 - Added extensions for building CLAP plugins with CLAP-specific behaviour.
 - Added improved State Variable Filter with more filter types.

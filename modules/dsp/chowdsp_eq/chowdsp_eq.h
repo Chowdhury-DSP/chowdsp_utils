@@ -5,7 +5,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_eq
    vendor:        Chowdhury DSP
-   version:       1.0.0
+   version:       1.1.0
    name:          ChowDSP EQ
    description:   EQ utilities for ChowDSP plugins
    dependencies:  chowdsp_reflection, chowdsp_dsp_utils

@@ -5,7 +5,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_clap_extensions
    vendor:        Chowdhury DSP
-   version:       1.0.0
+   version:       1.1.0
    name:          ChowDSP CLAP Extensions
    description:   Extensions for building CLAP plugins
    dependencies:  juce_core, juce_audio_processors

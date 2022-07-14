@@ -850,6 +850,9 @@ EXCLUDE                = ../docs/ \
                          ../bench/ \
                          ../cmake/ \
                          ../build/ \
+                         ../build-bench/ \
+                         ../build-codequal/ \
+                         ../build-examples/ \
                          ../tests/ \
                          ../.vscode/ \
                          ../.idea/ \
@@ -870,7 +873,8 @@ EXCLUDE_SYMLINKS       = YES
 # exclude all test directories for example use the pattern */test/*
 
 EXCLUDE_PATTERNS       = *chowdsp_BinaryData* \
-                         */third_party/*
+                         */third_party/* \
+                         */JUCEHelpers/*
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the

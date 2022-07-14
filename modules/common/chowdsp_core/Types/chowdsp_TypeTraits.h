@@ -6,7 +6,7 @@
  * Usage:
  * @code {.cpp}
  * CHOWDSP_CHECK_HAS_STATIC_METHOD(HasToString, toString)
- * static_assert(HasToString<MyClass>, "MyClass must have a static toStringMethod!");
+ * static_assert(HasToString<MyClass>, "MyClass must have a static toString method!");
  * @endcode
  */
 #define CHOWDSP_CHECK_HAS_STATIC_METHOD(Name, Method)                                                                                   \

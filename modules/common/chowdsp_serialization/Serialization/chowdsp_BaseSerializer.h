@@ -27,11 +27,18 @@ namespace serialization_detail
         }
     };
 
+    // The reason we need this "detail" namespace is so that we can define these static method
+    // checkers for determining if a class has custom methods for serialization/deserialization.
     CHOWDSP_CHECK_HAS_STATIC_METHOD (HasCustomSerializer, template serialize<DummySerializer>)
     CHOWDSP_CHECK_HAS_STATIC_METHOD (HasCustomDeserializer, template deserialize<DummySerializer>)
 } // namespace serialization_detail
 #endif
 
+/**
+ * Base class for Serializer objects. If you would like to create
+ * a serializer for a particular serialization format, the new serializer
+ * should be derived from BaseSerializer.
+ */
 class BaseSerializer
 {
     template <typename Serializer>
@@ -56,6 +63,7 @@ class BaseSerializer
     static constexpr auto HasCustomDeserialization = serialization_detail::HasCustomDeserializer<T>;
 
 public:
+    /** Converts a SerialType object into its corresponding DeserialType */
     template <typename Serializer>
     static DeserialType<Serializer> getDeserial (const SerialType<Serializer>& serial)
     {
