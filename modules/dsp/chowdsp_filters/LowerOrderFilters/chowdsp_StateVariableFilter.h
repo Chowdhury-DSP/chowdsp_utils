@@ -13,6 +13,7 @@ enum class StateVariableFilterType
     Bell,
     LowShelf,
     HighShelf,
+    MultiMode, /**< Allows the filter to be interpolated between lowpass, bandpass, and highpass */
 };
 
 /**
@@ -68,6 +69,28 @@ public:
      */
     template <bool shouldUpdate = true>
     void setGainDecibels (SampleType newGainDecibels);
+
+    /**
+     * 0 = lowpass
+     * 0.5 = bandpass
+     * 1 = highpass
+     */
+    template <FilterType T = type>
+    std::enable_if_t<T == FilterType::MultiMode, void>
+    setMode (NumericType mode)
+    {
+        lowpassMult = (NumericType) 1 - (NumericType) 2 * juce::jmin ((NumericType) 0.5, mode);
+        bandpassMult = (NumericType) 1 - std::abs ((NumericType) 2 * (mode - (NumericType) 0.5)); // * juce::MathConstants<NumericType>::sqrt2;
+        highpassMult = (NumericType) 2 * juce::jmax ((NumericType) 0.5, mode) - (NumericType) 1;
+
+        // use sin3db power law for mixing
+        lowpassMult = std::sin (juce::MathConstants<NumericType>::halfPi * lowpassMult);
+        bandpassMult = std::sin (juce::MathConstants<NumericType>::halfPi * bandpassMult);
+        highpassMult = std::sin (juce::MathConstants<NumericType>::halfPi * highpassMult);
+
+        // the BPF is a little bit quieter by design, so let's compensate here for a smooth transition
+        bandpassMult *= juce::MathConstants<NumericType>::sqrt2;
+    }
 
     /**
      * Updates the filter coefficients.
@@ -190,6 +213,8 @@ private:
             return Asq * v2 + k0A * v1 + v0; // Asq * low + k0 * A * band + high
         else if constexpr (type == FilterType::HighShelf)
             return Asq * v0 + k0A * v1 + v2; // Asq * high + k0 * A * band + low
+        else if constexpr (type == FilterType::MultiMode)
+            return lowpassMult * v2 + bandpassMult * v1 + highpassMult * v0;
         else
         {
             jassertfalse; // unknown filter type!
@@ -201,6 +226,8 @@ private:
     SampleType g0, k0, A, sqrtA; // parameter intermediate values
     SampleType a1, a2, a3, ak, k0A, Asq; // coefficients
     std::vector<SampleType> ic1eq { 2 }, ic2eq { 2 }; // state variables
+
+    NumericType lowpassMult { 0 }, bandpassMult { 0 }, highpassMult { 0 };
 
     double sampleRate = 44100.0;
 };
@@ -236,6 +263,10 @@ using SVFLowShelf = StateVariableFilter<SampleType, StateVariableFilterType::Low
 /** Convenient alias for an SVF high-shelf filter. */
 template <typename SampleType = float>
 using SVFHighShelf = StateVariableFilter<SampleType, StateVariableFilterType::HighShelf>;
+
+/** Convenient alias for an SVF multi-mode filter. */
+template <typename SampleType = float>
+using SVFMultiMode = StateVariableFilter<SampleType, StateVariableFilterType::MultiMode>;
 } // namespace chowdsp
 
 #include "chowdsp_StateVariableFilter.cpp"

@@ -17,7 +17,8 @@ public:
 
     static_assert (type == StateVariableFilterType::Lowpass
                        || type == StateVariableFilterType::Highpass
-                       || type == StateVariableFilterType::Bandpass,
+                       || type == StateVariableFilterType::Bandpass
+                       || type == StateVariableFilterType::MultiMode,
                    "NthOrderFilter is not defined for this filter type!");
 
     NthOrderFilter() : butterQVals (QValCalcs::butterworth_Qs<NumericType, order>())
@@ -51,6 +52,13 @@ public:
     void setQValue (T qVal)
     {
         filters[0].setQValue (butterQVals[0] * qVal * juce::MathConstants<NumericType>::sqrt2);
+    }
+
+    std::enable_if_t<type == StateVariableFilterType::MultiMode, void>
+    setMode (NumericType mode)
+    {
+        for (auto& filt : filters)
+            filt.setMode (mode);
     }
 
     /** Processes a block of samples */
