@@ -32,6 +32,8 @@ namespace serialization_detail
     CHOWDSP_CHECK_HAS_STATIC_METHOD (HasCustomSerializer, template serialize<DummySerializer>)
     CHOWDSP_CHECK_HAS_STATIC_METHOD (HasCustomDeserializer, template deserialize<DummySerializer>)
 } // namespace serialization_detail
+#endif
+
 /**
  * Base class for Serializer objects. If you would like to create
  * a serializer for a particular serialization format, the new serializer
