@@ -44,3 +44,4 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Other/chowdsp_FractionalOrderFilter.h"
 #include "Other/chowdsp_HilbertFilter.h"
 #include "Other/chowdsp_FIRFilter.h"
+#include "Other/chowdsp_WernerFilter.h"
