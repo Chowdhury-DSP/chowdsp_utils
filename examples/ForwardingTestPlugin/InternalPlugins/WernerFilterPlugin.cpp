@@ -21,8 +21,8 @@ void WernerFilterPlugin::addParameters (Parameters& params)
 {
     using namespace chowdsp::ParamUtils;
     createFreqParameter (params, freqTag, "Frequency", 20.0f, 20000.0f, 2000.0f, 1000.0f);
-    emplace_param<chowdsp::FloatParameter> (params, resonanceTag, "Resonance", createNormalisableRange (0.0f, 0.95f, 0.7071f), 0.7071f, &floatValToString, &stringToFloatVal);
-    emplace_param<chowdsp::FloatParameter> (params, dampingTag, "Damping", createNormalisableRange (0.3f, 1.25f, 0.7071f), 0.7071f, &floatValToString, &stringToFloatVal);
+    createPercentParameter (params, resonanceTag, "Resonance", 0.5f);
+    createPercentParameter (params, dampingTag, "Damping", 0.5f);
     emplace_param<chowdsp::ChoiceParameter> (params, modeTag, "Mode", juce::StringArray ("LPF2", "BPF2", "HPF2", "LPF4"), 3);
 }
 

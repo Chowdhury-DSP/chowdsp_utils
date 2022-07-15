@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [UNRELEASED]
+- Added implentation of Kurt Werner's generalized SVF.
+
 ## [1.1.0] 2022-07-14
 - Removed dependency on JUCE for most DSP modules.
 - Added extensions for building CLAP plugins with CLAP-specific behaviour.
@@ -14,7 +17,7 @@ All notable changes to this project will be documented in this file.
 - `chowdsp::Upsampler` and `chowdsp::Downsampler` use template arguments for filter type instead of filter order.
 - LNFAllocator:
   - Fixed bug where existing LookAndFeel classes would be replaced
-  - Inproved type-checking by using `type_info` instead of string
+  - Improved type-checking by using `type_info` instead of string
 
 ## [1.0.0] 2022-05-19
 - Initial release.
