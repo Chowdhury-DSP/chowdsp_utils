@@ -63,7 +63,7 @@ void EQProcessor<FloatType, numBands, EQBandType>::reset()
 }
 
 template <typename FloatType, size_t numBands, typename EQBandType>
-void EQProcessor<FloatType, numBands, EQBandType>::processBlock (const chowdsp::BufferView<FloatType> block) noexcept
+void EQProcessor<FloatType, numBands, EQBandType>::processBlock (const chowdsp::BufferView<FloatType>& block) noexcept
 {
     for (size_t i = 0; i < numBands; ++i)
     {
