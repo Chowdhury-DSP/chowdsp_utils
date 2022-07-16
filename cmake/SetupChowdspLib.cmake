@@ -25,7 +25,7 @@ endfunction(_chowdsp_find_module_dependencies)
 function(_chowdsp_load_module module)
 #    message(STATUS "Loading module: ${module}")
 
-    unset(module_path)
+    unset(module_path CACHE)
     find_path(module_path
         NAMES "${module}.h"
         PATHS "${CHOWDSP_MODULES_DIR}/common" "${CHOWDSP_MODULES_DIR}/dsp"
@@ -33,6 +33,15 @@ function(_chowdsp_load_module module)
         NO_CACHE
         REQUIRED
     )
+
+    get_filename_component(module_parent_path ${module_path} DIRECTORY)
+    target_include_directories(${lib_name} PUBLIC ${module_parent_path})
+    target_compile_definitions(${lib_name} PUBLIC JUCE_MODULE_AVAILABLE_${module})
+
+    if(EXISTS "${module_path}/${module}.cpp")
+#        message(STATUS "Adding source file: ${module_path}/${module}.cpp")
+        target_sources(${lib_name} PRIVATE "${module_path}/${module}.cpp")
+    endif()
 
     # Load any modules that this one depends on:
     _chowdsp_find_module_dependencies(${module_path}/${module}.h module_dependencies)
@@ -43,14 +52,6 @@ function(_chowdsp_load_module module)
         endif()
         _chowdsp_load_module(${module_dep})
     endforeach()
-
-    get_filename_component(module_parent_path ${module_path} DIRECTORY)
-    target_include_directories(${lib_name} PUBLIC ${module_parent_path})
-    target_compile_definitions(${lib_name} PUBLIC JUCE_MODULE_AVAILABLE_${module})
-
-    if(EXISTS "${module_path}/${module}.cpp")
-        target_sources(${lib_name} PRIVATE "${module_path}/${module}.cpp")
-    endif()
 endfunction(_chowdsp_load_module)
 
 function(setup_chowdsp_lib lib_name)
