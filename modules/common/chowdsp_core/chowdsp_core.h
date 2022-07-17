@@ -27,6 +27,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include <functional>
 #include <tuple>
 #include <cstring>
+#include <cstdint>
 
 #ifndef DOXYGEN
 #if JUCE_MODULE_AVAILABLE_juce_core
