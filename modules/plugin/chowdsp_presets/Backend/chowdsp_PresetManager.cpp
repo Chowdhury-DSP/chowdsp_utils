@@ -139,8 +139,11 @@ void PresetManager::setIsDirty (bool shouldBeDirty)
 
 void PresetManager::loadPreset (const Preset& preset)
 {
-    loadPresetState (preset.getState());
+    // we need to set current preset before loading its state,
+    // since `loadPresetState()` might need to know the name
+    // of the current preset that it's loading, or something like that.
     currentPreset = &preset;
+    loadPresetState (preset.getState());
 
     setIsDirty (false);
     listeners.call (&Listener::selectedPresetChanged);
@@ -169,6 +172,12 @@ std::unique_ptr<juce::XmlElement> PresetManager::savePresetState()
 
 void PresetManager::loadPresetState (const juce::XmlElement* xml)
 {
+    if (auto* curPreset = getCurrentPreset())
+    {
+        const auto newPresetName = curPreset->getName();
+        DBG ("Loading preset: " + newPresetName);
+    }
+
     auto newState = juce::ValueTree::fromXml (*xml);
     vts.replaceState (newState);
 }
@@ -246,7 +255,8 @@ std::vector<const Preset*> PresetManager::getUserPresets() const
 {
     std::vector<const Preset*> userPresets;
 
-    doForAllPresetsForUser (userIDMap.at (userPresetsName), presetMap, [&userPresets] (auto& presetMapIter) { userPresets.push_back (&presetMapIter->second); });
+    doForAllPresetsForUser (userIDMap.at (userPresetsName), presetMap, [&userPresets] (auto& presetMapIter)
+                            { userPresets.push_back (&presetMapIter->second); });
 
     JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wpessimizing-move")
     return std::move (userPresets);
@@ -266,7 +276,8 @@ void PresetManager::setUserPresetName (const juce::String& newName)
         doForAllPresetsForUser (
             userIDMapIter->second,
             presetMap,
-            [&newName] (auto presetMapIter) {
+            [&newName] (auto presetMapIter)
+            {
                 auto& preset = presetMapIter->second;
                 preset.setVendor (newName);
 
@@ -289,7 +300,8 @@ void PresetManager::loadUserPresetsFromFolder (const juce::File& file)
         presets.push_back (loadUserPresetFromFile (f));
 
     // delete old user presets
-    doForAllPresetsForUser (userIDMap[userPresetsName], presetMap, [this] (auto& presetMapIter) { presetMap.erase (presetMapIter); });
+    doForAllPresetsForUser (userIDMap[userPresetsName], presetMap, [this] (auto& presetMapIter)
+                            { presetMap.erase (presetMapIter); });
 
     addPresets (presets);
 }
