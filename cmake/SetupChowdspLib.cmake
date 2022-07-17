@@ -1,11 +1,5 @@
 set(CHOWDSP_MODULES_DIR "${PROJECT_SOURCE_DIR}/modules" CACHE INTERNAL "Source directory for ChowDSP modules")
 
-if (UNIX AND NOT APPLE)
-    # We need to link to pthread explicitly on Linux/GCC
-    set(THREADS_PREFER_PTHREAD_FLAG ON)
-    find_package(Threads REQUIRED)
-endif()
-
 function(_chowdsp_find_module_dependencies module_header module_deps)
     file(STRINGS "${module_header}" dependencies_raw REGEX "[ \t]*dependencies:")
     string(STRIP ${dependencies_raw} dependencies_raw)
@@ -72,6 +66,9 @@ function(setup_chowdsp_lib lib_name)
     if(APPLE)
         target_link_libraries(${lib_name} PUBLIC "-framework Accelerate")
     elseif(UNIX)
+        # We need to link to pthread explicitly on Linux/GCC
+        set(THREADS_PREFER_PTHREAD_FLAG ON)
+        find_package(Threads REQUIRED)
         target_link_libraries(${lib_name} PUBLIC Threads::Threads)
     endif()
 endfunction(setup_chowdsp_lib)
