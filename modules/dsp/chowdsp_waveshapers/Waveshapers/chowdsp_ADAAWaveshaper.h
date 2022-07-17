@@ -85,6 +85,25 @@ public:
         std::fill (d2.begin(), d2.end(), 0.0);
     }
 
+    /** Process a single sample */
+    inline T processSample (T input, int channel = 0) noexcept
+    {
+        const auto ch = (size_t) channel;
+        const auto x = (double) input;
+
+        bool illCondition = std::abs (x - x2[ch]) < TOL;
+        const auto d1 = calcD1 (x, x1[ch], ad2_x0[ch], ad2_x1[ch]);
+        const auto y = T (illCondition ? fallback (x, x1[ch], x2[ch], ad2_x1[ch]) : (2.0 / (x - x2[ch])) * (d1 - d2[ch]));
+
+        // update state
+        d2[ch] = d1;
+        x2[ch] = x1[ch];
+        x1[ch] = x;
+        ad2_x1[ch] = ad2_x0[ch];
+
+        return y;
+    }
+
     /** Processes a block of samples. */
     void process (T* output, const T* input, int numSamples, int channel = 0) noexcept
     {
