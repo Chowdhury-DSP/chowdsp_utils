@@ -23,28 +23,27 @@ function(_chowdsp_find_module_dependencies module_header module_deps)
 endfunction(_chowdsp_find_module_dependencies)
 
 function(_chowdsp_load_module module)
-#    message(STATUS "Loading module: ${module}")
+    # message(STATUS "Loading module: ${module}")
 
-    unset(module_path CACHE)
-    find_path(module_path
+    find_path(chowdsp_module_path
         NAMES "${module}.h"
         PATHS "${CHOWDSP_MODULES_DIR}/common" "${CHOWDSP_MODULES_DIR}/dsp"
         PATH_SUFFIXES "${module}"
-        NO_CACHE
         REQUIRED
     )
 
-    get_filename_component(module_parent_path ${module_path} DIRECTORY)
+    get_filename_component(module_parent_path ${chowdsp_module_path} DIRECTORY)
     target_include_directories(${lib_name} PUBLIC ${module_parent_path})
     target_compile_definitions(${lib_name} PUBLIC JUCE_MODULE_AVAILABLE_${module})
 
-    if(EXISTS "${module_path}/${module}.cpp")
-#        message(STATUS "Adding source file: ${module_path}/${module}.cpp")
-        target_sources(${lib_name} PRIVATE "${module_path}/${module}.cpp")
+    if(EXISTS "${chowdsp_module_path}/${module}.cpp")
+        # message(STATUS "Adding source file: ${chowdsp_module_path}/${module}.cpp")
+        target_sources(${lib_name} PRIVATE "${chowdsp_module_path}/${module}.cpp")
     endif()
 
     # Load any modules that this one depends on:
-    _chowdsp_find_module_dependencies(${module_path}/${module}.h module_dependencies)
+    _chowdsp_find_module_dependencies(${chowdsp_module_path}/${module}.h module_dependencies)
+    unset(chowdsp_module_path CACHE)
     foreach(module_dep IN LISTS module_dependencies)
         get_target_property(_lib_compile_defs ${lib_name} COMPILE_DEFINITIONS)
         if("JUCE_MODULE_AVAILABLE_${module_dep}" IN_LIST _lib_compile_defs)
