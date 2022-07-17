@@ -139,8 +139,11 @@ void PresetManager::setIsDirty (bool shouldBeDirty)
 
 void PresetManager::loadPreset (const Preset& preset)
 {
-    loadPresetState (preset.getState());
+    // we need to set current preset before loading its state,
+    // since `loadPresetState()` might need to know the name
+    // of the current preset that it's loading, or something like that.
     currentPreset = &preset;
+    loadPresetState (preset.getState());
 
     setIsDirty (false);
     listeners.call (&Listener::selectedPresetChanged);
@@ -169,6 +172,12 @@ std::unique_ptr<juce::XmlElement> PresetManager::savePresetState()
 
 void PresetManager::loadPresetState (const juce::XmlElement* xml)
 {
+    if (auto* curPreset = getCurrentPreset())
+    {
+        const auto newPresetName = curPreset->getName();
+        DBG ("Loading preset: " + newPresetName);
+    }
+
     auto newState = juce::ValueTree::fromXml (*xml);
     vts.replaceState (newState);
 }
