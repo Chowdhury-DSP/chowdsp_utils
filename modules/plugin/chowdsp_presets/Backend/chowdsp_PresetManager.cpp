@@ -140,7 +140,7 @@ void PresetManager::setIsDirty (bool shouldBeDirty)
 void PresetManager::loadPreset (const Preset& preset)
 {
     // we need to set current preset before loading its state,
-    // since `loadPresetState might need to know the name
+    // since `loadPresetState()` might need to know the name
     // of the current preset that it's loading, or something like that.
     currentPreset = &preset;
     loadPresetState (preset.getState());
