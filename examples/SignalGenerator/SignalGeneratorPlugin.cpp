@@ -26,7 +26,7 @@ void SignalGeneratorPlugin::addParameters (Parameters& params)
     createGainDBParameter (params, { gainTag, 100 }, "Gain", -45.0f, 6.0f, -24.0f);
     emplace_param<chowdsp::ChoiceParameter> (params, chowdsp::ParameterID { typeTag, 100 }, "Tone Type", juce::StringArray { "Sine", "Saw", "Square" }, 0);
     emplace_param<chowdsp::ChoiceParameter> (params, chowdsp::ParameterID { upsampleTag, 100 }, "Upsample", juce::StringArray { "1x", "2x", "3x", "4x" }, 0);
-    emplace_param<chowdsp::ChoiceParameter> (params, chowdsp::ParameterID { waveshaperTag, 100 }, "Waveshaper", juce::StringArray { "None", "Hard Clip", "Tanh Clip", "Cubic Clip", "9th-Order Clip" }, 0);
+    emplace_param<chowdsp::ChoiceParameter> (params, chowdsp::ParameterID { waveshaperTag, 100 }, "Waveshaper", juce::StringArray { "None", "Hard Clip", "Tanh Clip", "Cubic Clip", "9th-Order Clip", "West Coast" }, 0);
 }
 
 void SignalGeneratorPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)
@@ -41,6 +41,7 @@ void SignalGeneratorPlugin::prepareToPlay (double sampleRate, int samplesPerBloc
     adaaTanhClipper.prepare ((int) spec.numChannels);
     adaaCubicClipper.prepare ((int) spec.numChannels);
     adaa9thOrderClipper.prepare ((int) spec.numChannels);
+    westCoastFolder.prepare ((int) spec.numChannels);
 
     int resampleRatio = 2;
     for (auto* r : { &resample2, &resample3, &resample4 })
@@ -170,6 +171,10 @@ void SignalGeneratorPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
         else if (waveshaperParam->getIndex() == 4)
         {
             adaa9thOrderClipper.process (upsampledContext);
+        }
+        else if (waveshaperParam->getIndex() == 5)
+        {
+            westCoastFolder.process (upsampledContext);
         }
 
         if (resampler == nullptr)

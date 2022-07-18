@@ -46,6 +46,7 @@ private:
     chowdsp::ADAATanhClipper<float> adaaTanhClipper { &lookupTableCache.get() };
     chowdsp::ADAASoftClipper<float> adaaCubicClipper { &lookupTableCache.get() };
     chowdsp::ADAASoftClipper<float, 9> adaa9thOrderClipper { &lookupTableCache.get() };
+    chowdsp::WestCoastWavefolder<float> westCoastFolder { &lookupTableCache.get() };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SignalGeneratorPlugin)
 };
