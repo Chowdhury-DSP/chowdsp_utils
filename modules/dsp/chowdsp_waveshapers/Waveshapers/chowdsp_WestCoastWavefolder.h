@@ -28,6 +28,7 @@ public:
             FolderCell { 0.5743, 1.0338, 1.8, 17.647 },
             FolderCell { 0.2673, 1.0907, 4.08, 36.363 },
         };
+        juce::ignoreUnused (cells);
 
         static constexpr auto xMix = 5.0;
 
@@ -58,10 +59,10 @@ public:
 private:
     struct FolderCell
     {
-        const double G; // folder cell "gain"
-        const double B; // folder cell "bias"
-        const double thresh; // folder cell "threshold"
-        const double mix; // folder cell mixing factor
+        const double G = 0.0; // folder cell "gain"
+        const double B = 0.0; // folder cell "bias"
+        const double thresh = 0.0; // folder cell "threshold"
+        const double mix = 0.0; // folder cell mixing factor
 
         const double Bp = 0.5 * G * Power::ipow<2> (thresh) - B * thresh;
         static constexpr auto oneSixth = 1.0 / 6.0;
