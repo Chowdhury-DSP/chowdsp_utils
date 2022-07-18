@@ -6,4 +6,5 @@ target_sources(chowdsp_waveshapers_test
         ADAAHardClipperTest.cpp
         ADAATanhClipperTest.cpp
         ADAASoftClipperTest.cpp
+        WestCoastFolderTest.cpp
 )
