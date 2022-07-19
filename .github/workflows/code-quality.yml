@@ -128,6 +128,7 @@ jobs:
         run: build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} cmake --build build --parallel 4 --target chowdsp_utils_codeql
 
       - name: Run sonar-scanner
+        working-directory: ${{env.WORK_DIR}}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}
