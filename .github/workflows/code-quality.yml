@@ -136,6 +136,7 @@ jobs:
   code_ql:
     name: "Run Code Quality Check: CodeQL"
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' }}
 
     steps:
       - name: Install Linux Deps
