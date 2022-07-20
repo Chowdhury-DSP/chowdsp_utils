@@ -14,13 +14,9 @@ env:
   WORK_DIR: ${{github.workspace}}/JUCE_modules/chowdsp_utils
 
 jobs:
-  code_quality_checks:
-    name: Run Code Quality Check ${{ matrix.check }}
+  clang_tidy:
+    name: "Run Code Quality Check: clang-tidy"
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
-      matrix:
-        check: [clang_tidy]
 
     steps:
       - name: Install Linux Deps
@@ -29,7 +25,6 @@ jobs:
           sudo apt install libasound2-dev libcurl4-openssl-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev libsamplerate-dev
 
       - name: Install clang-tidy
-        if: matrix.check == 'clang_tidy'
         run: sudo apt install clang-tidy
 
       - name: Get latest CMake
@@ -54,7 +49,86 @@ jobs:
         run: cmake -Bbuild -DCHOWDSP_ENABLE_TESTING=ON -DCHOWDSP_CODE_QUALITY_CHECKS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug
 
       - name: Run clang-tidy
-        if: matrix.check == 'clang_tidy'
         working-directory: ${{env.WORK_DIR}}
         shell: bash
         run: cmake --build build --parallel 4 --target chowdsp_utils_clang_tidy
+
+  sonar_scan:
+    name: "Run Code Quality Check: sonar-scan"
+    runs-on: ubuntu-latest
+    env:
+      SONAR_SCANNER_VERSION: 4.6.1.2450 # Find the latest version in the "Linux" link on this page:
+                                        # https://docs.sonarcloud.io/advanced-setup/ci-based-analysis/sonarscanner-cli/
+      SONAR_SERVER_URL: "https://sonarcloud.io"
+      BUILD_WRAPPER_OUT_DIR: build_wrapper_output_directory # Directory where build-wrapper output will be placed
+
+    steps:
+      - name: Install Linux Deps
+        run: |
+          sudo apt-get update
+          sudo apt install libasound2-dev libcurl4-openssl-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev libsamplerate-dev
+
+      - name: Get latest CMake
+        uses: lukka/get-cmake@latest
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          path: ${{env.WORK_DIR}}
+          fetch-depth: 0
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Download and set up sonar-scanner
+        env:
+          SONAR_SCANNER_DOWNLOAD_URL: https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${{ env.SONAR_SCANNER_VERSION }}-linux.zip
+        run: |
+          mkdir -p $HOME/.sonar
+          curl -sSLo $HOME/.sonar/sonar-scanner.zip ${{ env.SONAR_SCANNER_DOWNLOAD_URL }} 
+          unzip -o $HOME/.sonar/sonar-scanner.zip -d $HOME/.sonar/
+          echo "$HOME/.sonar/sonar-scanner-${{ env.SONAR_SCANNER_VERSION }}-linux/bin" >> $GITHUB_PATH
+
+      - name: Download and set up build-wrapper
+        env:
+          BUILD_WRAPPER_DOWNLOAD_URL: ${{ env.SONAR_SERVER_URL }}/static/cpp/build-wrapper-linux-x86.zip
+        run: |
+          curl -sSLo $HOME/.sonar/build-wrapper-linux-x86.zip ${{ env.BUILD_WRAPPER_DOWNLOAD_URL }}
+          unzip -o $HOME/.sonar/build-wrapper-linux-x86.zip -d $HOME/.sonar/
+          echo "$HOME/.sonar/build-wrapper-linux-x86" >> $GITHUB_PATH
+
+      - name: Set up environment
+        working-directory: ${{github.workspace}}
+        run: |
+          git clone --depth 1 --branch 7.0.1 https://github.com/juce-framework/JUCE.git
+          cd JUCE_modules
+          git clone --single-branch --branch chowdsp https://github.com/Chowdhury-DSP/foleys_gui_magic.git
+          git clone --single-branch --branch main --recursive https://github.com/free-audio/clap-juce-extensions.git
+
+      - name: Configure
+        working-directory: ${{env.WORK_DIR}}
+        shell: bash
+        run: cmake -Bbuild -DCHOWDSP_ENABLE_TESTING=ON -DCHOWDSP_CODE_QUALITY_CHECKS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        working-directory: ${{env.WORK_DIR}}
+        shell: bash
+        run: build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} cmake --build build --parallel 4 --target chowdsp_utils_codeql
+
+      - name: Run sonar-scanner
+        working-directory: ${{env.WORK_DIR}}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          sonar-scanner --define sonar.host.url="${{ env.SONAR_SERVER_URL }}" --define sonar.cfamily.build-wrapper-output="${{ env.BUILD_WRAPPER_OUT_DIR }}"
+
