@@ -183,7 +183,7 @@ public:
     }
 
 private:
-    static std::tuple<float, float, float> calcMixingConstants (float mix) const noexcept
+    static std::tuple<float, float, float> calcMixingConstants (float mix) noexcept
     {
         // linear mixing coefficients
         auto lowpassMult = 1.0f - 2.0f * juce::jmin (0.5f, mix);
@@ -199,7 +199,11 @@ private:
     }
 
     template <WernerFilterType type = WernerFilterType::Lowpass4>
-    inline float processSampleInternal (float vin, xsimd::batch<float>& s, float lpfMult = 0.0f, float bpfMult = 0.0f, float hpfMult = 0.0f) noexcept
+    inline float processSampleInternal (float vin,
+                                        xsimd::batch<float>& s,
+                                        float lpfMult = 0.0f,
+                                        float bpfMult = 0.0f,
+                                        float hpfMult = 0.0f) const noexcept
     {
         float sArr alignas (xsimd::default_arch::alignment())[xsimd::batch<float>::size] {};
         s.store_aligned (sArr);
