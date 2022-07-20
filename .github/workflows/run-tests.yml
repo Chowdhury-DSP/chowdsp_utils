@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - ci*
   pull_request:
     branches:
       - master
@@ -21,17 +22,16 @@ jobs:
       fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
       matrix:
         tests: [
-                "chowdsp_core_test chowdsp_json_test chowdsp_rhythm_test chowdsp_dsp_utils_test",
+                "chowdsp_core_test chowdsp_json_test chowdsp_rhythm_test chowdsp_dsp_utils_test chowdsp_plugin_base_test",
                 "chowdsp_dsp_data_structures_test chowdsp_dsp_juce_test",
                 "chowdsp_math_test chowdsp_simd_test chowdsp_filters_test chowdsp_parameters_test",
                 "chowdsp_foleys_test chowdsp_presets_test",
                 "chowdsp_plugin_utils_test chowdsp_version_test chowdsp_serialization_test",
-                "chowdsp_gui_test chowdsp_plugin_base_test chowdsp_waveshapers_test",
+                "chowdsp_gui_test chowdsp_waveshapers_test",
               ]
         name: [
                 "Test",
                 "Coverage",
-                "CodeQL",
               ]
         os: [ubuntu-latest, windows-2019, macos-latest]
         include:
@@ -47,11 +47,7 @@ jobs:
           - name: "Coverage"
             os: macos-latest
             cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
-            run_coverage: true"
-          - name: "CodeQL"
-            os: ubuntu-latest
-            cmake_args: "-DCMAKE_BUILD_TYPE=Debug"
-            run_codeql: true
+            run_coverage: true
           - name: "StaticTests"
             os: ubuntu-latest
             cmake_args: "-DCHOWDSP_ENABLE_STATIC_TESTS=ON"
@@ -66,10 +62,6 @@ jobs:
           - name: "Test" # so we don't break GitHub Actions concurrency limit
             os: macos-latest
           - name: "Coverage"
-            os: windows-2019
-          - name: "CodeQL"
-            os: macos-latest
-          - name: "CodeQL"
             os: windows-2019
 
     steps:
@@ -107,13 +99,6 @@ jobs:
           git clone --single-branch --branch chowdsp https://github.com/Chowdhury-DSP/foleys_gui_magic.git
           git clone --single-branch --branch main --recursive https://github.com/free-audio/clap-juce-extensions.git
 
-      - name: Initialize CodeQL
-        if: matrix.run_codeql
-        uses: github/codeql-action/init@v2
-        with:
-         source-root: ${{env.WORK_DIR}}
-         languages: cpp
-
       - name: Configure
         working-directory: ${{env.WORK_DIR}}
         env:
@@ -130,7 +115,7 @@ jobs:
         run: cmake --build . --config Release --parallel 4 --target $TEST_TARGETS
 
       - name: "Run Tests: ${{ matrix.tests }}"
-        if: (! matrix.live_gui) && (! matrix.run_codeql) && (! matrix.run_static_tests)
+        if: (! matrix.live_gui) && (! matrix.run_static_tests)
         working-directory: ${{env.WORK_DIR}}/build/test-binary
         shell: bash
         run: |
@@ -170,7 +155,3 @@ jobs:
         working-directory: ${{env.WORK_DIR}}
         shell: bash
         run: bash <(curl -s https://codecov.io/bash) -f coverage.info || echo "Codecov did not collect coverage reports"
-
-      - name: Perform CodeQL Analysis
-        if: matrix.run_codeql
-        uses: github/codeql-action/analyze@v2
