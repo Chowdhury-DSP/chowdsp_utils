@@ -20,7 +20,7 @@ void StateVariableFilter<SampleType, type>::setCutoffFrequency (SampleType newCu
     cutoffFrequency = newCutoffFrequencyHz;
     const auto w = juce::MathConstants<NumericType>::pi * cutoffFrequency / (NumericType) sampleRate;
 
-    CHOWDSP_USING_XSIMD_STD (tan)
+    CHOWDSP_USING_XSIMD_STD (tan);
     g0 = tan (w);
 
     if constexpr (shouldUpdate)
@@ -49,7 +49,7 @@ void StateVariableFilter<SampleType, type>::setGain (SampleType newGainLinear)
 
     gain = newGainLinear;
 
-    CHOWDSP_USING_XSIMD_STD (sqrt)
+    CHOWDSP_USING_XSIMD_STD (sqrt);
     A = sqrt (gain);
     sqrtA = sqrt (A);
     Asq = A * A;
