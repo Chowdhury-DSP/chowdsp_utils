@@ -72,7 +72,7 @@ std::enable_if_t<M == StateVariableFilterType::MultiMode, void>
     StateVariableFilter<SampleType, type>::setMode (NumericType mode)
 {
     lowpassMult = (NumericType) 1 - (NumericType) 2 * juce::jmin ((NumericType) 0.5, mode);
-    bandpassMult = (NumericType) 1 - std::abs ((NumericType) 2 * (mode - (NumericType) 0.5)); // * juce::MathConstants<NumericType>::sqrt2;
+    bandpassMult = (NumericType) 1 - std::abs ((NumericType) 2 * (mode - (NumericType) 0.5));
     highpassMult = (NumericType) 2 * juce::jmax ((NumericType) 0.5, mode) - (NumericType) 1;
 
     // use sin3db power law for mixing

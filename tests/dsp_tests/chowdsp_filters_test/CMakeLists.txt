@@ -15,4 +15,5 @@ target_sources(chowdsp_filters_test
         EllipticFilterTest.cpp
         FractionalOrderFilterTest.cpp
         HilbertFilterTest.cpp
+        WernerFilterTest.cpp
 )
