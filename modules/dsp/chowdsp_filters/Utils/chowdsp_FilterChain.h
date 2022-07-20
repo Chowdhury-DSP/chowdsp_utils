@@ -76,8 +76,7 @@ public:
     template <typename... Args>
     void process (Args&&... args)
     {
-        doForEachFilter ([&] (auto& f)
-                         { f.process (std::forward<Args> (args)...); });
+        doForEachFilter ([&] (auto& f) { f.process (std::forward<Args> (args)...); });
     }
 
 private:
