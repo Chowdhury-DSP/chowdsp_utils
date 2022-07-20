@@ -59,8 +59,8 @@ namespace CoefficientCalculators
             return;
         }
 
-        CHOWDSP_USING_XSIMD_STD (sqrt)
-        CHOWDSP_USING_XSIMD_STD (tan)
+        CHOWDSP_USING_XSIMD_STD (sqrt);
+        CHOWDSP_USING_XSIMD_STD (tan);
 
         const auto rho_recip = (T) 1 / sqrt (highGain / lowGain);
         const auto K = (T) 1 / tan (juce::MathConstants<NumericType>::pi * fc / fs);

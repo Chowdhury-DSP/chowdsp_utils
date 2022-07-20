@@ -156,7 +156,7 @@ namespace ConformalMaps
     inline T computeKValueAngular (T wc, SampleTypeHelpers::NumericType<T> fs)
     {
         using NumericType = SampleTypeHelpers::NumericType<T>;
-        CHOWDSP_USING_XSIMD_STD (tan)
+        CHOWDSP_USING_XSIMD_STD (tan);
 
         return wc / tan (wc / ((NumericType) 2 * fs));
     }

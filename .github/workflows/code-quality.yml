@@ -132,3 +132,49 @@ jobs:
         run: |
           sonar-scanner --define sonar.host.url="${{ env.SONAR_SERVER_URL }}" --define sonar.cfamily.build-wrapper-output="${{ env.BUILD_WRAPPER_OUT_DIR }}"
 
+  code_ql:
+    name: "Run Code Quality Check: CodeQL"
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' }}
+
+    steps:
+      - name: Install Linux Deps
+        run: |
+          sudo apt-get update
+          sudo apt install libasound2-dev libcurl4-openssl-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev libsamplerate-dev
+
+      - name: Get latest CMake
+        uses: lukka/get-cmake@latest
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          path: ${{env.WORK_DIR}}
+          fetch-depth: 0
+
+      - name: Set up environment
+        working-directory: ${{github.workspace}}
+        run: |
+          git clone --depth 1 --branch 7.0.1 https://github.com/juce-framework/JUCE.git
+          cd JUCE_modules
+          git clone --single-branch --branch chowdsp https://github.com/Chowdhury-DSP/foleys_gui_magic.git
+          git clone --single-branch --branch main --recursive https://github.com/free-audio/clap-juce-extensions.git
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          source-root: ${{env.WORK_DIR}}
+          languages: cpp
+
+      - name: Configure
+        working-directory: ${{env.WORK_DIR}}
+        shell: bash
+        run: cmake -Bbuild -DCHOWDSP_ENABLE_TESTING=ON -DCHOWDSP_CODE_QUALITY_CHECKS=ON -DCMAKE_BUILD_TYPE=Debug
+
+      - name: Build
+        working-directory: ${{env.WORK_DIR}}
+        shell: bash
+        run: cmake --build build --config Debug --parallel 4 --target chowdsp_utils_codeql
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
