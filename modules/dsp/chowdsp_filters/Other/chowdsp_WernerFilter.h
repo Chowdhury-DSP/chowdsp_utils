@@ -103,7 +103,7 @@ public:
     /** Process a block of samples. */
     template <WernerFilterType type = WernerFilterType::Lowpass4>
     std::enable_if_t<type != WernerFilterType::MultiMode, void>
-    processBlock (const BufferView<float>& buffer) noexcept
+        processBlock (const BufferView<float>& buffer) noexcept
     {
         const auto numChannels = buffer.getNumChannels();
         const auto numSamples = buffer.getNumSamples();
@@ -125,7 +125,7 @@ public:
      */
     template <WernerFilterType type = WernerFilterType::Lowpass4>
     std::enable_if_t<type == WernerFilterType::MultiMode, void>
-    processBlock (const BufferView<float>& buffer, float mix) noexcept
+        processBlock (const BufferView<float>& buffer, float mix) noexcept
     {
         const auto numChannels = buffer.getNumChannels();
         const auto numSamples = buffer.getNumSamples();
@@ -165,7 +165,7 @@ public:
     /** Process a single sample. */
     template <WernerFilterType type = WernerFilterType::Lowpass4>
     inline std::enable_if_t<type != WernerFilterType::MultiMode, float>
-    processSample (int channel, float vin) noexcept
+        processSample (int channel, float vin) noexcept
     {
         return processSampleInternal<type> (vin, state[(size_t) channel]);
     }
