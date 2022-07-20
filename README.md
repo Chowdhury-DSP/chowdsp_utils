@@ -6,6 +6,7 @@
 [![Code-Quality](https://github.com/Chowdhury-DSP/chowdsp_utils/actions/workflows/code-quality.yml/badge.svg)](https://github.com/Chowdhury-DSP/chowdsp_utils/actions/workflows/code-quality.yml)
 [![Docs](https://github.com/Chowdhury-DSP/chowdsp_utils/actions/workflows/docs.yml/badge.svg)](https://ccrma.stanford.edu/~jatin/chowdsp/chowdsp_utils)
 [![codecov](https://codecov.io/gh/Chowdhury-DSP/chowdsp_utils/branch/master/graph/badge.svg?token=84B35MB5QS)](https://codecov.io/gh/Chowdhury-DSP/chowdsp_utils)
+[![sonarscan](https://sonarcloud.io/api/project_badges/measure?project=Chowdhury-DSP_chowdsp_utils&metric=alert_status)](https://sonarcloud.io/dashboard?id=Chowdhury-DSP_chowdsp_utils)
 
 This repository contains JUCE modules with utilities for building Chowdhury DSP plugins.
 
