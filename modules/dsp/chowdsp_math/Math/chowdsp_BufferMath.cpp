@@ -55,6 +55,8 @@ auto getRMSLevel (const BufferType& buffer, int channel, int startSample, int nu
     }
     else if constexpr (SampleTypeHelpers::IsSIMDRegister<SampleType>)
     {
+        using NumericType = SampleTypeHelpers::NumericType<SampleType>;
+
         auto sum = SampleType (0);
         for (int i = 0; i < numSamples; ++i)
         {
@@ -62,7 +64,7 @@ auto getRMSLevel (const BufferType& buffer, int channel, int startSample, int nu
             sum += sample * sample;
         }
 
-        return xsimd::sqrt (sum / (SampleType) numSamples);
+        return xsimd::sqrt (sum / (NumericType) numSamples);
     }
 }
 

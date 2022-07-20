@@ -50,6 +50,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #if ! JUCE_MODULE_AVAILABLE_juce_dsp
 #include "JUCEHelpers/dsp/juce_ProcessSpec.h"
 #include "JUCEHelpers/dsp/juce_LookupTable.h"
+#include "JUCEHelpers/dsp/juce_FastMathApproximations.h"
 #endif
 #endif // CHOWDSP_USING_JUCE
 #endif // DOXYGEN
