@@ -161,7 +161,6 @@ jobs:
           git clone --single-branch --branch main --recursive https://github.com/free-audio/clap-juce-extensions.git
 
       - name: Initialize CodeQL
-        if: matrix.run_codeql
         uses: github/codeql-action/init@v2
         with:
           source-root: ${{env.WORK_DIR}}
@@ -178,5 +177,4 @@ jobs:
         run: cmake --build build --config Debug --parallel 4 --target chowdsp_utils_codeql
 
       - name: Perform CodeQL Analysis
-        if: matrix.run_codeql
         uses: github/codeql-action/analyze@v2
