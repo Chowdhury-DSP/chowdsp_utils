@@ -43,7 +43,6 @@ TEST_CASE ("Conformal Maps Test")
 
     SECTION ("First-Order Alpha Transform")
     {
-        static constexpr auto fs = 48000.0f;
         const float bs[2] { 1.0f, 0.0 }; // zero at DC
         const float as[2] { 1.0f, -1.0e10f }; // pole at very high frequency
 
@@ -77,7 +76,6 @@ TEST_CASE ("Conformal Maps Test")
 
     SECTION ("Second-Order Alpha Transform")
     {
-        static constexpr auto fs = 48000.0f;
         const float bs[3] { 1.0f, 0.0, 0.0f }; // zero at DC
         const float as[3] { 1.0f, 0.0f, 1.0e10f }; // pole at very high frequency
 

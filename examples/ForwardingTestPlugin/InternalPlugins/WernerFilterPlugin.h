@@ -21,6 +21,7 @@ private:
     chowdsp::FloatParameter* freqParam = nullptr;
     chowdsp::FloatParameter* resonanceParam = nullptr;
     chowdsp::FloatParameter* dampingParam = nullptr;
+    chowdsp::SmoothedBufferValue<float> morphParam;
     chowdsp::ChoiceParameter* modeParam = nullptr;
 
     chowdsp::WernerFilter filter;
