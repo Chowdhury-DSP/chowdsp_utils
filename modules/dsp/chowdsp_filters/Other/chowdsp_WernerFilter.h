@@ -8,6 +8,7 @@ enum class WernerFilterType
     Bandpass2,
     Highpass2,
     Lowpass4,
+    MultiMode, /**< Allows the filter to be interpolated between lowpass, bandpass, and highpass */
 };
 
 /**
@@ -101,7 +102,8 @@ public:
 
     /** Process a block of samples. */
     template <WernerFilterType type = WernerFilterType::Lowpass4>
-    void processBlock (const BufferView<float>& buffer) noexcept
+    std::enable_if_t<type != WernerFilterType::MultiMode, void>
+    processBlock (const BufferView<float>& buffer) noexcept
     {
         const auto numChannels = buffer.getNumChannels();
         const auto numSamples = buffer.getNumSamples();
@@ -116,16 +118,88 @@ public:
         }
     }
 
-    /** Process a single sample */
+    /**
+     * Process a block of samples in multi-mode. The user should supply
+     * the mix parameter [0,1], as a scalar value to morph between the
+     * different modes.
+     */
     template <WernerFilterType type = WernerFilterType::Lowpass4>
-    inline float processSample (int channel, float vin) noexcept
+    std::enable_if_t<type == WernerFilterType::MultiMode, void>
+    processBlock (const BufferView<float>& buffer, float mix) noexcept
+    {
+        const auto numChannels = buffer.getNumChannels();
+        const auto numSamples = buffer.getNumSamples();
+
+        const auto [lpfMult, bpfMult, hpfMult] = calcMixingConstants (mix);
+        for (int ch = 0; ch < numChannels; ++ch)
+        {
+            ScopedValue s { state[(size_t) ch] };
+
+            auto* x = buffer.getWritePointer (ch);
+            for (int n = 0; n < numSamples; ++n)
+                x[n] = processSampleInternal<type> (x[n], s.get(), lpfMult, bpfMult, hpfMult);
+        }
+    }
+
+    /**
+     * Process a block of samples in multi-mode. The user should supply
+     * the mix parameter [0,1], as an array of value to morph
+     * between the different modes.
+     */
+    template <WernerFilterType type = WernerFilterType::Lowpass4>
+    std::enable_if_t<type == WernerFilterType::MultiMode, void>
+        processBlock (const BufferView<float>& buffer, const float* mix) noexcept
+    {
+        const auto numChannels = buffer.getNumChannels();
+        const auto numSamples = buffer.getNumSamples();
+
+        auto* x = buffer.getArrayOfWritePointers();
+        for (int n = 0; n < numSamples; ++n)
+        {
+            const auto [lpfMult, bpfMult, hpfMult] = calcMixingConstants (mix[n]);
+            for (int ch = 0; ch < numChannels; ++ch)
+                x[ch][n] = processSampleInternal<type> (x[ch][n], state[(size_t) ch], lpfMult, bpfMult, hpfMult);
+        }
+    }
+
+    /** Process a single sample. */
+    template <WernerFilterType type = WernerFilterType::Lowpass4>
+    inline std::enable_if_t<type != WernerFilterType::MultiMode, float>
+    processSample (int channel, float vin) noexcept
     {
         return processSampleInternal<type> (vin, state[(size_t) channel]);
     }
 
+    /**
+     * Process a single sample in multi-mode. The mix parameter [0,1] can
+     * be used to morph between the different modes.
+     */
+    template <WernerFilterType type>
+    inline std::enable_if_t<type == WernerFilterType::MultiMode, float>
+        processSample (int channel, float vin, float mix) noexcept
+    {
+        const auto [lpfMult, bpfMult, hpfMult] = calcMixingConstants (mix);
+        return processSampleInternal<type> (vin, state[(size_t) channel], lpfMult, bpfMult, hpfMult);
+    }
+
 private:
+    auto calcMixingConstants (float mix)
+    {
+        // linear mixing coefficients
+        auto lowpassMult = 1.0f - 2.0f * juce::jmin (0.5f, mix);
+        auto bandpassMult = 1.0f - std::abs (2.0f * (mix - 0.5f));
+        auto highpassMult = 2.0f * juce::jmax (0.5f, mix) - 1.0f;
+
+        // use sin3db power law for mixing
+        lowpassMult = juce::dsp::FastMathApproximations::sin (juce::MathConstants<float>::halfPi * lowpassMult);
+        bandpassMult = juce::dsp::FastMathApproximations::sin (juce::MathConstants<float>::halfPi * bandpassMult);
+        highpassMult = juce::dsp::FastMathApproximations::sin (juce::MathConstants<float>::halfPi * highpassMult);
+
+        return std::make_tuple (lowpassMult, bandpassMult, highpassMult);
+    }
+
     template <WernerFilterType type = WernerFilterType::Lowpass4>
-    inline float processSampleInternal (float vin, xsimd::batch<float>& s) noexcept
+    inline float processSampleInternal (float vin, xsimd::batch<float>& s, float lpfMult = 0.0f, float bpfMult = 0.0f, float hpfMult = 0.0f) noexcept
     {
         float sArr alignas (xsimd::default_arch::alignment())[xsimd::batch<float>::size] {};
         s.store_aligned (sArr);
@@ -134,6 +208,8 @@ private:
 
         float tValsArr alignas (xsimd::default_arch::alignment())[xsimd::batch<float>::size] {};
         tVals.store_aligned (tValsArr);
+
+        juce::ignoreUnused (lpfMult, bpfMult, hpfMult);
 
         float y = 0.0f;
         if constexpr (type == WernerFilterType::Lowpass2)
@@ -148,6 +224,17 @@ private:
         {
             const auto vg0 = -kh4rSq * (sArr[TS2] + tValsArr[TS2]) + vin;
             y = -sArr[TF2] - two_r * (sArr[TF1] + tValsArr[TF1]) - tValsArr[TF2] + vg0; // 2nd-order highpass output (vf0)
+        }
+        else if constexpr (type == WernerFilterType::MultiMode)
+        {
+            // get multi-mode outputs
+            const auto vf2 = sArr[TF2] + tValsArr[TF2]; // 2nd-order lowpass output (vf2)
+            const auto vf1 = sArr[TF1] + tValsArr[TF1]; // 2nd-order bandpass output (vf1)
+
+            const auto vg0 = -kh4rSq * (sArr[TS2] + tValsArr[TS2]) + vin;
+            const auto vf0 = -sArr[TF2] - two_r * (sArr[TF1] + tValsArr[TF1]) - tValsArr[TF2] + vg0; // 2nd-order highpass output (vf0)
+
+            y = lpfMult * vf2 + bpfMult * vf1 + hpfMult * vf0;
         }
         else if constexpr (type == WernerFilterType::Lowpass4)
         {
