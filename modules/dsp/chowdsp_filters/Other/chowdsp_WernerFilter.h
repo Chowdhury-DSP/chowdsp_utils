@@ -183,7 +183,7 @@ public:
     }
 
 private:
-    static std::tuple<float, float, float> calcMixingConstants (float mix) noexcept
+    static std::tuple<float, float, float> calcMixingConstants (float mix) const noexcept
     {
         // linear mixing coefficients
         auto lowpassMult = 1.0f - 2.0f * juce::jmin (0.5f, mix);
