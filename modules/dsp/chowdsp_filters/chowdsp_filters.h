@@ -20,6 +20,15 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 #pragma once
 
+#if defined(__APPLE_CPP__) || defined(__APPLE_CC__)
+// include <Accelerate> on Apple devices so we can use vDSP_dotpr
+#define Point CarbonDummyPointName
+#define Component CarbonDummyCompName
+#include <Accelerate/Accelerate.h>
+#undef Component
+#undef Point
+#endif
+
 #include <chowdsp_core/chowdsp_core.h>
 #include <chowdsp_dsp_data_structures/chowdsp_dsp_data_structures.h>
 #include <chowdsp_math/chowdsp_math.h>
