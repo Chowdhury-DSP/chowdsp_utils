@@ -101,6 +101,7 @@ sure to abide by the license of each module, as well as whichever libraries are 
 - `SmoothedBufferValue`: A buffered version of `juce::SmoothedValue`.
 - `COLAProcessor`: A base class for doing Constant Overlap-Add processing.
 - `RebufferedProcessor`: A processor which rebuffers the input to have a constant block size.
+- Wrappers around `moodycamel`'s [lock-free queues](https://github.com/cameron314/readerwriterqueue) (modified BSD)
 
 `chowdsp_dsp_utils` (GPLv3)
 - Utilities for working with convolution and impulse responses.
