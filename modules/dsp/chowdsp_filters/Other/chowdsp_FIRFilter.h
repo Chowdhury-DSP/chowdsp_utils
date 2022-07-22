@@ -1,14 +1,5 @@
 #pragma once
 
-// include <Accelerate> on Apple devices so we can use vDSP_dotpr
-#if JUCE_MAC || JUCE_IOS
-#define Point CarbonDummyPointName
-#define Component CarbonDummyCompName
-#include <Accelerate/Accelerate.h>
-#undef Point
-#undef Component
-#endif
-
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wsign-conversion")
 
 namespace chowdsp
