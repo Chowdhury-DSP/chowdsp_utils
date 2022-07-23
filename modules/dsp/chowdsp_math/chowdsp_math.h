@@ -33,3 +33,4 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Math/chowdsp_JacobiElliptic.h"
 #include "Math/chowdsp_Polylogarithm.h"
 #include "Math/chowdsp_BufferMath.h"
+#include "Math/chowdsp_TanhIntegrals.h"
