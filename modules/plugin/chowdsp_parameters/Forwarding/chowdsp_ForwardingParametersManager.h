@@ -36,8 +36,7 @@ public:
 
     ~ForwardingParametersManager()
     {
-        for (auto* param : forwardedParams)
-            param->setParam (nullptr);
+        clearParameterRange (0, (int) forwardedParams.size());
     }
 
     /** Returns a flat array of the forwarded parameters */
@@ -46,14 +45,22 @@ public:
     /** Returns a flat array of the forwarded parameters */
     [[maybe_unused]] const auto& getForwardedParameters() const { return forwardedParams; }
 
+    /**
+     * Sets a range of parameters.
+     *
+     * @param startIndex            The start of the range to set.
+     * @param endIndex              The end (exclusive) of the range to set.
+     * @param paramInfoProvider     A function which can be used to fill in the parameter information for the parameter at a given index.
+     * @param deferHostNotification If this is true, `updateHostDisplay()` will be deferred until all the parameter have been updated.
+     */
     void setParameterRange (int startIndex,
                             int endIndex,
-                            std::function<ParameterForwardingInfo (int)>&& paramCreator,
+                            std::function<ParameterForwardingInfo (int)>&& paramInfoProvider,
                             bool deferHostNotification = true)
     {
         for (int i = startIndex; i < endIndex; ++i)
         {
-            auto [param, paramName] = paramCreator (i);
+            auto [param, paramName] = paramInfoProvider (i);
             forwardedParams[(size_t) i]->setParam (param, paramName, deferHostNotification);
         }
 
@@ -61,6 +68,13 @@ public:
             ForwardingParameter::reportParameterInfoChange (&processor);
     }
 
+    /**
+     * Clears a range of parameters to nullptr.
+     *
+     * @param startIndex            The start of the range to set.
+     * @param endIndex              The end (exclusive) of the range to set.
+     * @param deferHostNotification If this is true, `updateHostDisplay()` will be deferred until all the parameter have been updated.
+     */
     void clearParameterRange (int startIndex, int endIndex, bool deferHostNotification = true)
     {
         setParameterRange (
