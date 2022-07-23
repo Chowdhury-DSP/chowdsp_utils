@@ -15,12 +15,9 @@ public:
     {
         using namespace TanhIntegrals;
         this->initialise (
-            [] (auto x)
-            { return std::tanh (x); },
-            [] (auto x)
-            { return tanhAD1 (x); },
-            [] (auto x)
-            { return tanhAD2 (x); },
+            [] (auto x) { return std::tanh (x); },
+            [] (auto x) { return tanhAD1 (x); },
+            [] (auto x) { return tanhAD2 (x); },
             -range,
             range,
             N);
