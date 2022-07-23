@@ -29,13 +29,16 @@ public:
      * Note that the parameter must not be deleted while
      * it is being held as the forwarding parameter.
      */
-    void setParam (juce::RangedAudioParameter* paramToUse, const juce::String& newName = {});
+    void setParam (juce::RangedAudioParameter* paramToUse, const juce::String& newName = {}, bool deferHostNotification = false);
 
     /** Returns the parameter currently being forwarded */
     const auto* getParam() const noexcept { return internalParam; }
 
     /** Sets a new processor to forward to */
     void setProcessor (juce::AudioProcessor* processorToUse);
+
+    /** Reports to the host that the processor's parameter info has changed */
+    static void reportParameterInfoChange (juce::AudioProcessor* processor);
 
 private:
     struct ForwardingAttachment : private juce::AudioProcessorParameter::Listener,
@@ -86,5 +89,7 @@ private:
 
     const juce::String defaultName;
     juce::String customName = {};
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ForwardingParameter)
 };
 } // namespace chowdsp

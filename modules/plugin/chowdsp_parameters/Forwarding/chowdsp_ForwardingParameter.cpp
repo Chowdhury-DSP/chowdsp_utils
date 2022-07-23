@@ -82,7 +82,16 @@ ForwardingParameter::~ForwardingParameter()
     jassert (internalParam == nullptr);
 }
 
-void ForwardingParameter::setParam (juce::RangedAudioParameter* paramToUse, const juce::String& newName)
+void ForwardingParameter::reportParameterInfoChange (juce::AudioProcessor* processor)
+{
+#if JUCE_VERSION > 0x60007
+    processor->updateHostDisplay (juce::AudioProcessorListener::ChangeDetails().withParameterInfoChanged (true));
+#else
+    processor->updateHostDisplay();
+#endif
+}
+
+void ForwardingParameter::setParam (juce::RangedAudioParameter* paramToUse, const juce::String& newName, bool deferHostNotification)
 {
     juce::SpinLock::ScopedLockType sl (paramLock);
 
@@ -93,12 +102,10 @@ void ForwardingParameter::setParam (juce::RangedAudioParameter* paramToUse, cons
     internalParamAsModulatable = dynamic_cast<ParamUtils::ModParameterMixin*> (internalParam);
     customName = newName;
 
-    if (processor != nullptr)
-#if JUCE_VERSION > 0x60007
-        processor->updateHostDisplay (juce::AudioProcessorListener::ChangeDetails().withParameterInfoChanged (true));
-#else
-        processor->updateHostDisplay();
-#endif
+    if (processor != nullptr && ! deferHostNotification)
+    {
+        reportParameterInfoChange (processor);
+    }
 
     if (internalParam != nullptr)
     {

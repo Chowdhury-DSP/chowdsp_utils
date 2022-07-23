@@ -10,6 +10,7 @@ public:
     ~PluginEditor() override;
 
     void resized() override;
+    void paint (juce::Graphics& g) override;
 
 private:
     void updateProcessorEditor (int processorIndex);

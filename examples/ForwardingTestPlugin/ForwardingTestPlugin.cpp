@@ -18,8 +18,6 @@ void ForwardingTestPlugin::addParameters (Parameters& params)
 {
     using namespace chowdsp::ParamUtils;
     emplace_param<chowdsp::ChoiceParameter> (params, chowdsp::ParameterID { processorChoiceParamID, 100 }, "Processor Choice", juce::StringArray { "None", "Tone Generator", "Reverb", "Filter" }, 0);
-
-    ForwardingParams::addParameters (params);
 }
 
 void ForwardingTestPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)
@@ -51,26 +49,22 @@ void ForwardingTestPlugin::parameterChanged (const juce::String& parameterID, fl
         return;
     }
 
-    auto& forwardedParams = forwardingParameters.getForwardedParameters();
-    for (auto* forwardingParam : forwardedParams)
-        forwardingParam->setParam (nullptr);
-
     if (auto* newProcessor = getProcessorForIndex ((int) newValue))
     {
-        size_t forwardParamIndex = 0;
         auto& processorParameters = newProcessor->getParameters();
-        for (auto* param : processorParameters)
-        {
-            if (forwardParamIndex >= forwardedParams.size())
-            {
-                // this processor has too many parameters!
-                jassertfalse;
-                break;
-            }
+        forwardingParameters.setParameterRange (0,
+                                                numForwardParameters,
+                                                [&processorParameters] (int i) -> chowdsp::ParameterForwardingInfo
+                                                {
+                                                    if (auto* paramCast = dynamic_cast<juce::RangedAudioParameter*> (processorParameters[i]))
+                                                        return { paramCast, paramCast->name };
 
-            if (auto* paramCast = dynamic_cast<juce::RangedAudioParameter*> (param))
-                forwardedParams[forwardParamIndex++]->setParam (paramCast, paramCast->name);
-        }
+                                                    return {};
+                                                });
+    }
+    else
+    {
+        forwardingParameters.clearParameterRange (0, numForwardParameters);
     }
 }
 
