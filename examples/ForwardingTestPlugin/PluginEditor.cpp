@@ -42,6 +42,11 @@ void PluginEditor::updateProcessorEditor (int processorIndex)
     }
 }
 
+void PluginEditor::paint (juce::Graphics& g)
+{
+    g.fillAll (juce::Colours::black);
+}
+
 void PluginEditor::resized()
 {
     auto bounds = getLocalBounds();
