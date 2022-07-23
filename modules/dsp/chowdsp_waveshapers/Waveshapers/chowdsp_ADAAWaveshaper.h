@@ -14,8 +14,27 @@ template <typename T>
 class ADAAWaveshaper
 {
 public:
-    explicit ADAAWaveshaper (LookupTableCache* lutCache = nullptr, const std::string& lutBaseID = {}) : lookupTableCache (lutCache)
+    /** Constructs the waveshaper optionally using a lookup table cache */
+    explicit ADAAWaveshaper (LookupTableCache* lutCache = nullptr, const std::string& lutBaseID = {})
     {
+        setupLookupTableCache (lutCache, lutBaseID);
+    }
+
+    /**
+     * Set up the waveshaper to use a lookup table cache.
+     *
+     * If you don't want the waveshaper to use a lookup table cache, you
+     * can pass nullptr for the first argument.
+     *
+     * If the cache in non-null, then you must provide a base ID for
+     * the lookup table cache to use when storing the lookup tables.
+     *
+     * N.B: This function must be called _before_ `initialise()`!
+     */
+    void setupLookupTableCache (LookupTableCache* lutCache, const std::string& lutBaseID = {})
+    {
+        lookupTableCache = lutCache;
+
         if (lookupTableCache != nullptr)
         {
             jassert (! lutBaseID.empty()); // lookup table ID must not be empty when using the lookup table cache!
