@@ -91,6 +91,7 @@ private:
 
             static constexpr auto D = 2.45;
             static constexpr auto B = 1.0 - 2 * 0.02;
+            juce::ignoreUnused (D, B);
 
             using namespace TanhIntegrals;
             using Power::ipow;
