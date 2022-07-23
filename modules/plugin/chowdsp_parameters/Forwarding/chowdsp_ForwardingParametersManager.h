@@ -50,12 +50,13 @@ public:
      *
      * @param startIndex            The start of the range to set.
      * @param endIndex              The end (exclusive) of the range to set.
-     * @param paramInfoProvider     A function which can be used to fill in the parameter information for the parameter at a given index.
+     * @param paramInfoProvider     A lambda which accepts the parameter index, and returns the corresponding ParameterForwardingInfo.
      * @param deferHostNotification If this is true, `updateHostDisplay()` will be deferred until all the parameter have been updated.
      */
+    template <typename ParamInfoProvider>
     void setParameterRange (int startIndex,
                             int endIndex,
-                            std::function<ParameterForwardingInfo (int)>&& paramInfoProvider,
+                            const ParamInfoProvider& paramInfoProvider,
                             bool deferHostNotification = true)
     {
         for (int i = startIndex; i < endIndex; ++i)

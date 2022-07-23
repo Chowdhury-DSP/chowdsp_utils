@@ -2,7 +2,7 @@
 
 namespace
 {
-const juce::NormalisableRange<float> defaultRange { 0.0f, 1.0f, 0.01f, 1.0f };
+const juce::NormalisableRange defaultRange { 0.0f, 1.0f, 0.01f, 1.0f };
 } // namespace
 
 namespace chowdsp
@@ -48,7 +48,7 @@ void ForwardingParameter::ForwardingAttachment::setNewValue (float value)
 
 void ForwardingParameter::ForwardingAttachment::handleAsyncUpdate()
 {
-    const juce::ScopedValueSetter<bool> svs (ignoreCallbacks, true);
+    const juce::ScopedValueSetter svs (ignoreCallbacks, true);
     internalParam.setValueNotifyingHost (newValue);
 }
 
@@ -128,11 +128,8 @@ void ForwardingParameter::setValue (float newValue)
     if (! stl.isLocked())
         return;
 
-    if (internalParam != nullptr)
-    {
-        if (newValue != internalParam->getValue())
-            attachment->setNewValue (newValue);
-    }
+    if (internalParam != nullptr && internalParam->getValue() != newValue)
+        attachment->setNewValue (newValue);
 }
 
 float ForwardingParameter::getDefaultValue() const
