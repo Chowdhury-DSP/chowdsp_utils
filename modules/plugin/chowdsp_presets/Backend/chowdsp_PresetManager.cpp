@@ -21,7 +21,7 @@ PresetManager::PresetManager (juce::AudioProcessorValueTreeState& vtState) : vts
 {
     for (auto* param : processor.getParameters())
     {
-        if (auto* paramCast = dynamic_cast<juce::RangedAudioParameter*> (param))
+        if (const auto* paramCast = dynamic_cast<juce::RangedAudioParameter*> (param))
             vts.addParameterListener (paramCast->paramID, this);
     }
 
@@ -32,7 +32,7 @@ PresetManager::~PresetManager()
 {
     for (auto* param : processor.getParameters())
     {
-        if (auto* paramCast = dynamic_cast<juce::RangedAudioParameter*> (param))
+        if (const auto* paramCast = dynamic_cast<juce::RangedAudioParameter*> (param))
             vts.removeParameterListener (paramCast->paramID, this);
     }
 }
@@ -318,7 +318,7 @@ std::unique_ptr<juce::XmlElement> PresetManager::saveXmlState() const
     JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 }
 
-void PresetManager::loadXmlState (juce::XmlElement* xml)
+void PresetManager::loadXmlState (const juce::XmlElement* xml)
 {
     if (xml == nullptr)
     {

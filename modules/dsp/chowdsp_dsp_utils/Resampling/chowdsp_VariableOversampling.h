@@ -36,7 +36,7 @@ public:
      * @param useIntegerLatency Set to true to force the oversamplers to use integer latency
      * @param paramPrefix       The same parameter prefix used to create the parameters
      */
-    explicit VariableOversampling (juce::AudioProcessorValueTreeState& vts, bool useIntegerLatency = false, const juce::String& paramPrefix = "os");
+    explicit VariableOversampling (const juce::AudioProcessorValueTreeState& vts, bool useIntegerLatency = false, const juce::String& paramPrefix = "os");
 
     /**
      * Creates a parameter layout for variable oversampling,
@@ -83,7 +83,7 @@ public:
     bool updateOSFactor();
 
     /** Get the index of a given oversampler */
-    int getOSIndex (int osFactor, int osMode) { return osFactor + (numOSChoices * osMode); }
+    int getOSIndex (int osFactor, int osMode) const noexcept { return osFactor + (numOSChoices * osMode); }
 
     /** Returns the samples of latency introduced by the oversampling process */
     [[nodiscard]] float getLatencySamples() const noexcept;

@@ -30,6 +30,7 @@ private:
     chowdsp::SineWave<float> sine;
     chowdsp::SawtoothWave<float> saw;
     chowdsp::SquareWave<float> square;
+    chowdsp::TriangleWave<float> triangle;
     chowdsp::Gain<float> gain;
 
     using AAFilter = chowdsp::ButterworthFilter<12>;
@@ -46,6 +47,7 @@ private:
     chowdsp::ADAATanhClipper<float> adaaTanhClipper { &lookupTableCache.get() };
     chowdsp::ADAASoftClipper<float> adaaCubicClipper { &lookupTableCache.get() };
     chowdsp::ADAASoftClipper<float, 9> adaa9thOrderClipper { &lookupTableCache.get() };
+    chowdsp::ADAAFullWaveRectifier<float> fullWaveRectifier { &lookupTableCache.get() };
     chowdsp::WestCoastWavefolder<float> westCoastFolder { &lookupTableCache.get() };
     chowdsp::WaveMultiplier<float, 6> waveMultiplyFolder { &lookupTableCache.get() };
 

@@ -11,6 +11,7 @@ class RebufferedProcessor
 {
 public:
     RebufferedProcessor() = default;
+    virtual ~RebufferedProcessor() = default;
 
     /** Initialises the processor. */
     void prepare (const juce::dsp::ProcessSpec& spec);

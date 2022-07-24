@@ -3,7 +3,7 @@
 namespace chowdsp::IRHelpers
 {
 template <typename TransformFunc>
-void transformIRFreqDomain (float* targetIR, const float* originalIR, int numSamples, juce::dsp::FFT& fft, TransformFunc&& transformer, bool removeDCBias, bool normalizeRMS)
+void transformIRFreqDomain (float* targetIR, const float* originalIR, int numSamples, const juce::dsp::FFT& fft, TransformFunc&& transformer, bool removeDCBias, bool normalizeRMS)
 {
     // The FFT object is initialized for the wrong size IR!
     jassert (fft.getSize() == numSamples);
@@ -38,7 +38,7 @@ void transformIRFreqDomain (float* targetIR, const float* originalIR, int numSam
     }
 }
 
-void makeLinearPhase (float* linearPhaseIR, const float* originalIR, int numSamples, juce::dsp::FFT& fft)
+void makeLinearPhase (float* linearPhaseIR, const float* originalIR, int numSamples, const juce::dsp::FFT& fft)
 {
     // @TODO: make sure all four types are handled correctly (even/symmetric, odd/symmetric, even/asym, odd/asym), plus add options for symmetric
 
@@ -47,7 +47,8 @@ void makeLinearPhase (float* linearPhaseIR, const float* originalIR, int numSamp
         originalIR,
         numSamples,
         fft,
-        [numSamples] (auto& freqDomainData) {
+        [numSamples] (auto& freqDomainData)
+        {
             // compute delay kernels
             std::vector<std::complex<float>> delayKernels ((size_t) numSamples, std::complex<float> {});
             const auto phaseIncrement = juce::MathConstants<float>::twoPi / float (numSamples - 1);
@@ -69,15 +70,17 @@ void makeLinearPhase (float* linearPhaseIR, const float* originalIR, int numSamp
         true);
 }
 
-void makeMinimumPhase (float* minimumPhaseIR, const float* originalIR, int numSamples, juce::dsp::FFT& fft)
+void makeMinimumPhase (float* minimumPhaseIR, const float* originalIR, int numSamples, const juce::dsp::FFT& fft)
 {
     transformIRFreqDomain (
         minimumPhaseIR,
         originalIR,
         numSamples,
         fft,
-        [numSamples, &fft] (auto& freqDomainData) {
-            auto hilbert = [&fft] (std::complex<float>* output, const std::complex<float>* input, int nSamples) {
+        [numSamples, &fft] (auto& freqDomainData)
+        {
+            auto hilbert = [&fft] (std::complex<float>* output, const std::complex<float>* input, int nSamples)
+            {
                 std::vector<std::complex<float>> H ((size_t) nSamples, std::complex<float> {});
                 fft.perform (input, H.data(), false);
 
@@ -135,19 +138,21 @@ void makeMinimumPhase (float* minimumPhaseIR, const float* originalIR, int numSa
         false);
 }
 
-void makeHalfMagnitude (float* halfMagIR, const float* originalIR, int numSamples, juce::dsp::FFT& fft)
+void makeHalfMagnitude (float* halfMagIR, const float* originalIR, int numSamples, const juce::dsp::FFT& fft)
 {
     transformIRFreqDomain (
         halfMagIR,
         originalIR,
         numSamples,
         fft,
-        [] (auto& freqDomainData) {
+        [] (auto& freqDomainData)
+        {
             std::transform (
                 freqDomainData.begin(),
                 freqDomainData.end(),
                 freqDomainData.begin(),
-                [] (auto H) {
+                [] (auto H)
+                {
                     using namespace std::complex_literals;
                     return std::sqrt (std::abs (H)) * std::exp (1.0if * std::arg (H));
                 });

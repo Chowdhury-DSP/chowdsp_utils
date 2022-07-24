@@ -22,7 +22,7 @@ void ModFilterWrapper<PrototypeFilter>::reset()
 }
 
 template <typename PrototypeFilter>
-void ModFilterWrapper<PrototypeFilter>::snapToZero() noexcept
+void ModFilterWrapper<PrototypeFilter>::snapToZero() noexcept // NOSONAR (cannot be const)
 {
 #if JUCE_SNAP_TO_ZERO
     for (auto v : { &s1, &s2 })

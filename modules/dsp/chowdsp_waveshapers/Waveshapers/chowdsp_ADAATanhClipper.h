@@ -11,13 +11,16 @@ template <typename T>
 class ADAATanhClipper : public ADAAWaveshaper<T>
 {
 public:
-    explicit ADAATanhClipper (LookupTableCache* lutCache = nullptr, T range = (T) 10, int N = 1 << 18) : ADAAWaveshaper<T> (lutCache, "tanh_clipper")
+    explicit ADAATanhClipper (LookupTableCache* lutCache = nullptr, T range = (T) 10, int N = 1 << 18) : ADAAWaveshaper<T> (lutCache, "chowdsp_tanh_clipper")
     {
         using namespace TanhIntegrals;
         this->initialise (
-            [] (auto x) { return std::tanh (x); },
-            [] (auto x) { return tanhAD1 (x); },
-            [] (auto x) { return tanhAD2 (x); },
+            [] (auto x)
+            { return std::tanh (x); },
+            [] (auto x)
+            { return tanhAD1 (x); },
+            [] (auto x)
+            { return tanhAD2 (x); },
             -range,
             range,
             N);

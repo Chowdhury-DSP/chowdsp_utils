@@ -18,9 +18,7 @@ namespace DelayLineInterpolationTypes
         void reset (int newTotalSize) { totalSize = newTotalSize; }
 
         template <typename T>
-        void updateInternalVariables (int& /*delayIntOffset*/, T& /*delayFrac*/)
-        {
-        }
+        void updateInternalVariables (int& /*delayIntOffset*/, T& /*delayFrac*/) {} // NOSONAR (template compatibility)
 
         template <typename SampleType, typename NumericType>
         inline SampleType call (const SampleType* buffer, int delayInt, NumericType /*delayFrac*/, const SampleType& /*state*/)
@@ -42,9 +40,7 @@ namespace DelayLineInterpolationTypes
         void reset (int newTotalSize) { totalSize = newTotalSize; }
 
         template <typename T>
-        void updateInternalVariables (int& /*delayIntOffset*/, T& /*delayFrac*/)
-        {
-        }
+        void updateInternalVariables (int& /*delayIntOffset*/, T& /*delayFrac*/) {} // NOSONAR (template compatibility)
 
         template <typename SampleType, typename NumericType>
         inline SampleType call (const SampleType* buffer, int delayInt, NumericType delayFrac, const SampleType& /*state*/)
@@ -72,7 +68,7 @@ namespace DelayLineInterpolationTypes
         void reset (int newTotalSize) { totalSize = newTotalSize; }
 
         template <typename T>
-        void updateInternalVariables (int& delayIntOffset, T& delayFrac)
+        void updateInternalVariables (int& delayIntOffset, T& delayFrac) // NOSONAR (template compatibility)
         {
             if (delayIntOffset >= 1)
             {
@@ -119,7 +115,7 @@ namespace DelayLineInterpolationTypes
         void reset (int newTotalSize) { totalSize = newTotalSize; }
 
         template <typename T>
-        void updateInternalVariables (int& delayIntOffset, T& delayFrac)
+        void updateInternalVariables (int& delayIntOffset, T& delayFrac) // NOSONAR (template compatibility)
         {
             if (delayIntOffset >= 2)
             {
@@ -255,7 +251,7 @@ namespace DelayLineInterpolationTypes
 
         void reset (int newTotalSize) { totalSize = newTotalSize; }
 
-        void updateInternalVariables (int& /*delayIntOffset*/, T& /*delayFrac*/) {}
+        void updateInternalVariables (int& /*delayIntOffset*/, T& /*delayFrac*/) {} // NOSONAR (template compatibility)
 
         inline T call (const T* buffer, int delayInt, T delayFrac, const T& /*state*/)
         {

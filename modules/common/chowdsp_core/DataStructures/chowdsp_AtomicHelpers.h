@@ -37,7 +37,7 @@ struct AtomicRef
     static_assert (sizeof (T) == sizeof (atomic_type), "Incompatible layout.");
     static_assert (alignof (T) == alignof (atomic_type), "Incompatible layout.");
 
-    explicit AtomicRef (T& val) : atomic_val (reinterpret_cast<atomic_type&> (val)) {}
+    explicit AtomicRef (T& val) : atomic_val (reinterpret_cast<atomic_type&> (val)) {} // NOSONAR (if the above static_assert's pass, then reinterpret_cast should be safe)
     AtomicRef (const AtomicRef&) = delete;
     AtomicRef& operator= (const AtomicRef&) = delete;
 

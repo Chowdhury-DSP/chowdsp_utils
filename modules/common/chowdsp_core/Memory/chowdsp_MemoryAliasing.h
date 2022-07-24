@@ -21,24 +21,17 @@ namespace MemoryUtils
     template <typename T, typename IntType>
     bool doesMemoryAlias (const T* const x1, IntType x1Num, const T* const x2, IntType x2Num)
     {
-        return doesMemoryAlias (reinterpret_cast<std::uintptr_t> (x1),
-                                reinterpret_cast<std::uintptr_t> (x1 + x1Num),
-                                reinterpret_cast<std::uintptr_t> (x2),
-                                reinterpret_cast<std::uintptr_t> (x2 + x2Num));
-    }
-
-    /** Returns true if the memory stored in the two arrays aliases. */
-    template <typename T, size_t N1, size_t N2>
-    bool doesMemoryAlias (const T (&x1)[N1], const T (&x2)[N2])
-    {
-        return doesMemoryAlias (x1, N1, x2, N2);
+        return doesMemoryAlias (reinterpret_cast<std::uintptr_t> (x1), // NOSONAR (casting to uintptr_t should be safe here)
+                                reinterpret_cast<std::uintptr_t> (x1 + x1Num), // NOSONAR
+                                reinterpret_cast<std::uintptr_t> (x2), // NOSONAR
+                                reinterpret_cast<std::uintptr_t> (x2 + x2Num)); // NOSONAR
     }
 
     /** Returns true if the memory stored in the two containers aliases. */
     template <typename ContainerType1, typename ContainerType2>
     bool doesMemoryAlias (const ContainerType1& x1, const ContainerType2& x2)
     {
-        return doesMemoryAlias (x1.data(), x1.size(), x2.data(), x2.size());
+        return doesMemoryAlias (std::data (x1), std::size (x1), std::data (x2), std::size (x2));
     }
 
     /**

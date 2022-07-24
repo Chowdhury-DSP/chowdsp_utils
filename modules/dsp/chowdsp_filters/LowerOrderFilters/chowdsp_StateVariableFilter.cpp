@@ -108,7 +108,7 @@ void StateVariableFilter<SampleType, type>::reset()
 }
 
 template <typename SampleType, StateVariableFilterType type>
-void StateVariableFilter<SampleType, type>::snapToZero() noexcept
+void StateVariableFilter<SampleType, type>::snapToZero() noexcept // NOSONAR (cannot be const)
 {
 #if JUCE_SNAP_TO_ZERO
     for (auto v : { &ic1eq, &ic2eq })

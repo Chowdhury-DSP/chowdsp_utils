@@ -73,6 +73,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Sources/chowdsp_SawtoothWave.h"
 #include "Sources/chowdsp_SineWave.h"
 #include "Sources/chowdsp_SquareWave.h"
+#include "Sources/chowdsp_TriangleWave.h"
 
 #if CHOWDSP_USING_JUCE
 #include <juce_audio_processors/juce_audio_processors.h>

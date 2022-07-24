@@ -63,19 +63,19 @@ public:
     void initialise (FuncType&& nlFunc, FuncTypeD1&& nlFuncD1, FuncTypeD2&& nlFuncD2, T minVal = (T) -10, T maxVal = (T) 10, int N = 1 << 18)
     {
         // load lookup tables asynchronously
-        if (! lut->hasBeenInitialised())
+        if (lut->initialiseIfNotAlreadyInitialised())
             lutLoadingFutures.push_back (std::async (std::launch::async, [&, func = std::forward<FuncType> (nlFunc), minVal, maxVal, N] { lut->initialise ([&func] (auto x) { return func ((double) x); },
                                                                                                                                                            minVal,
                                                                                                                                                            maxVal,
                                                                                                                                                            (size_t) N); }));
 
-        if (! lut_AD1->hasBeenInitialised())
+        if (lut_AD1->initialiseIfNotAlreadyInitialised())
             lutLoadingFutures.push_back (std::async (std::launch::async, [&, funcD1 = std::forward<FuncTypeD1> (nlFuncD1), minVal, maxVal, N] { lut_AD1->initialise ([&funcD1] (auto x) { return funcD1 ((double) x); },
                                                                                                                                                                      2 * minVal,
                                                                                                                                                                      2 * maxVal,
                                                                                                                                                                      4 * (size_t) N); }));
 
-        if (! lut_AD2->hasBeenInitialised())
+        if (lut_AD2->initialiseIfNotAlreadyInitialised())
             lutLoadingFutures.push_back (std::async (std::launch::async, [&, funcD2 = std::forward<FuncTypeD2> (nlFuncD2), minVal, maxVal, N] { lut_AD2->initialise ([&funcD2] (auto x) { return funcD2 ((double) x); },
                                                                                                                                                                      4 * minVal,
                                                                                                                                                                      4 * maxVal,

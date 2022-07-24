@@ -15,12 +15,12 @@ void COLAProcessor<FloatType, Window>::prepare (const juce::dsp::ProcessSpec& sp
     window = std::vector<FloatType> ((size_t) fftSize, (FloatType) 0);
     createWindow();
 
-    const int bufferSize = (int) spec.maximumBlockSize;
+    const auto bufferSize = (int) spec.maximumBlockSize;
 
     notYetUsedAudioData.setSize ((int) spec.numChannels, fftSize - 1);
     frameBuffer.setSize ((int) spec.numChannels, fftSize);
 
-    const int k = (int) std::floor (1.0f + (FloatType (bufferSize - 1)) / (FloatType) hopSize);
+    const auto k = (int) std::floor (1.0f + (FloatType (bufferSize - 1)) / (FloatType) hopSize);
     const int M = k * hopSize + (fftSize - hopSize);
 
     outputBuffer.setSize ((int) spec.numChannels, M + bufferSize - 1);
