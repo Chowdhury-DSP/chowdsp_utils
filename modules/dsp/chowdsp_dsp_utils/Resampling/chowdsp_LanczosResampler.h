@@ -109,7 +109,7 @@ public:
 private:
     static constexpr size_t filterWidth = A * 2;
     static constexpr size_t tableObs = BUFFER_SIZE * 2;
-    static constexpr double dx = 1.0 / (tableObs);
+    static constexpr double dx = 1.0 / (double) tableObs;
 
     static float lanczosTable alignas (xsimd::default_arch::alignment())[tableObs + 1][filterWidth];
     static float lanczosTableDX alignas (xsimd::default_arch::alignment())[tableObs + 1][filterWidth];
@@ -120,7 +120,7 @@ private:
     double phaseI = 0.0, phaseO = 0.0, dPhaseI = 0.0, dPhaseO = 0.0;
     double ratio = 1.0;
 
-    inline double kernel (double x)
+    [[nodiscard]] inline double kernel (double x) const
     {
         if (fabs (x) < 1e-7)
             return 1;
@@ -140,7 +140,7 @@ private:
     [[nodiscard]] inline float readZOH (double xBack) const
     {
         double p0 = wp - xBack;
-        int idx0 = (int) p0;
+        auto idx0 = (int) p0;
         idx0 = (idx0 + (int) BUFFER_SIZE) & ((int) BUFFER_SIZE - 1);
         if (idx0 <= (int) A)
             idx0 += BUFFER_SIZE;
@@ -151,7 +151,7 @@ private:
     [[nodiscard]] inline float readLin (double xBack) const
     {
         double p0 = wp - xBack;
-        int idx0 = (int) p0;
+        auto idx0 = (int) p0;
         auto frac = float (p0 - idx0);
         idx0 = (idx0 + (int) BUFFER_SIZE) & ((int) BUFFER_SIZE - 1);
         if (idx0 <= (int) A)
@@ -163,14 +163,14 @@ private:
     [[nodiscard]] inline float read (double xBack) const
     {
         double p0 = wp - xBack;
-        int idx0 = (int) floor (p0);
+        auto idx0 = (int) floor (p0);
         double off0 = 1.0 - (p0 - idx0);
 
         idx0 = (idx0 + (int) BUFFER_SIZE) & ((int) BUFFER_SIZE - 1);
-        idx0 += (idx0 <= (int) A) * (int) BUFFER_SIZE;
+        idx0 += int (idx0 <= (int) A) * (int) BUFFER_SIZE;
 
         double off0byto = off0 * tableObs;
-        int tidx = (int) off0byto;
+        auto tidx = (int) off0byto;
         double fidx = (off0byto - tidx);
 
         using SR = xsimd::batch<float>;

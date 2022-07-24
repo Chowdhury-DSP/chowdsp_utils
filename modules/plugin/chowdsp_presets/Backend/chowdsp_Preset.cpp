@@ -9,19 +9,13 @@ Preset::Preset (const juce::String& thisName,
                 const juce::File& sourceFile) : name (thisName),
                                                 vendor (thisVendor),
                                                 category (thisCategory),
-#if defined JucePlugin_VersionString
-                                                version (std::make_unique<VersionUtils::Version> (JucePlugin_VersionString)),
-#else
-                                                version (std::make_unique<VersionUtils::Version> ("0.0.0")),
-#endif
                                                 state (std::make_unique<juce::XmlElement> (stateXml)),
                                                 file (sourceFile)
 {
 }
 
-Preset::Preset (const juce::File& presetFile)
+Preset::Preset (const juce::File& presetFile) : file (presetFile)
 {
-    file = presetFile;
     auto xml = juce::XmlDocument::parse (presetFile);
     initialise (xml.get());
 }
@@ -31,7 +25,7 @@ Preset::Preset (const juce::XmlElement* presetXml)
     initialise (presetXml);
 }
 
-Preset::Preset (const void* presetData, size_t presetDataSize)
+Preset::Preset (const void* presetData, size_t presetDataSize) // NOSONAR (JUCE BinaryData uses void*)
 {
     auto xmlText = juce::String::createStringFromData (presetData, (int) presetDataSize);
 

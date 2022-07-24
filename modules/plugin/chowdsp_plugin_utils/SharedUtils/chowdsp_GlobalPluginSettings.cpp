@@ -172,7 +172,7 @@ bool GlobalPluginSettings::loadSettingsFromFile()
     return true;
 }
 
-void GlobalPluginSettings::writeSettingsToFile()
+void GlobalPluginSettings::writeSettingsToFile() const
 {
     if (fileListener == nullptr)
         return;

@@ -54,7 +54,7 @@ void TooltipComponent::getTipFor (juce::Component& c, juce::String& newTip, juce
 
 void TooltipComponent::timerCallback()
 {
-    auto& desktop = juce::Desktop::getInstance();
+    const auto& desktop = juce::Desktop::getInstance();
     auto mouseSource = desktop.getMainMouseSource();
 
     auto* newComp = mouseSource.isTouch() ? nullptr : mouseSource.getComponentUnderMouse();

@@ -14,6 +14,7 @@ target_sources(chowdsp_dsp_utils_test
         source_tests/SineTest.cpp
         source_tests/SawtoothTest.cpp
         source_tests/SquareTest.cpp
+        source_tests/TriangleTest.cpp
 
         modal_tests/ModalFilterTest.cpp
         modal_tests/ModalFilterBankTest.cpp

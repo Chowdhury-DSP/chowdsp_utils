@@ -10,8 +10,6 @@ void LookupTableTransform<FloatType>::initialise (const std::function<FloatType 
 {
     jassert (maxInputValueToUse > minInputValueToUse);
 
-    isInitialised = true;
-
     minInputValue = minInputValueToUse;
     maxInputValue = maxInputValueToUse;
     scaler = FloatType (numPoints - 1) / (maxInputValueToUse - minInputValueToUse);
@@ -24,6 +22,12 @@ void LookupTableTransform<FloatType>::initialise (const std::function<FloatType 
     };
 
     lookupTable.initialise (initFn, numPoints);
+}
+
+template <typename FloatType>
+bool LookupTableTransform<FloatType>::initialiseIfNotAlreadyInitialised() noexcept
+{
+    return AtomicHelpers::compareNegate (isInitialised, false);
 }
 
 //==============================================================================

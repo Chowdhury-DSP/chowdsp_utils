@@ -13,7 +13,7 @@ namespace TuningHelpers
     /** Converts a frequency in Hz to the corresponding MIDI note number, and cents away from that note's correct frequency */
     [[maybe_unused]] inline std::pair<int, double> frequencyHzToNoteAndCents (double freq) noexcept
     {
-        const int noteNum = juce::roundToIntAccurate (12.0 * std::log2 ((freq / 440.0)) + 69.0);
+        const int noteNum = juce::roundToIntAccurate (12.0 * std::log2 (freq / 440.0) + 69.0);
 
         const auto idealFreq = getMidiNoteInHertz (noteNum);
         double cents = 1200.0 * std::log2 (freq / idealFreq);

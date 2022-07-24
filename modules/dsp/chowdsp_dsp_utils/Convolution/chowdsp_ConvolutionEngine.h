@@ -46,6 +46,8 @@ struct ConvolutionEngine
      */
     ConvolutionEngine (size_t numSamples, size_t maxBlockSize, const float* initialIR = nullptr);
 
+    ~ConvolutionEngine() = default;
+
     /** Move constructor */
     ConvolutionEngine (ConvolutionEngine&&) noexcept;
 

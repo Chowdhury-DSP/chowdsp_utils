@@ -17,6 +17,7 @@ class ModalFilter
 {
 public:
     ModalFilter() = default;
+    virtual ~ModalFilter() = default;
 
     /** Prepare the filter to process the audio at a given sample rate */
     virtual void prepare (T sampleRate);
@@ -98,6 +99,7 @@ class ModalFilter<xsimd::batch<FloatType>>
 
 public:
     ModalFilter() = default;
+    virtual ~ModalFilter() = default;
 
     /** Prepare the filter to process the audio at a given sample rate */
     virtual void prepare (FloatType sampleRate);

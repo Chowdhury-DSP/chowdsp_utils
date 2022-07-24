@@ -67,7 +67,7 @@ public:
     float getCurrentValue() const noexcept;
 
     /** Returns the current parameter value accounting for any modulation that is currently applied. */
-    operator float() const noexcept { return getCurrentValue(); } // NOLINT(google-explicit-constructor): we want to be able to do implicit conversion here
+    operator float() const noexcept { return getCurrentValue(); } // NOSONAR, NOLINT(google-explicit-constructor): we want to be able to do implicit conversion here
 
 private:
     const float unsnappedDefault;

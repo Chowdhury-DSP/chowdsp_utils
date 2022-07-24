@@ -13,7 +13,7 @@ class WindowInPlugin : public juce::DocumentWindow,
 {
 public:
     /** Check that the owned component is a juce::Component */
-    static_assert (std::is_base_of<Component, OwnedCompType>::value, "Owned Component must be derived from juce::Component");
+    static_assert (std::is_base_of_v<Component, OwnedCompType>, "Owned Component must be derived from juce::Component");
 
     /** Create a window for a component with a default constructor */
     explicit WindowInPlugin (Component& creatorComponent) : DocumentWindow (juce::String(), juce::Colours::black, closeButton, false),

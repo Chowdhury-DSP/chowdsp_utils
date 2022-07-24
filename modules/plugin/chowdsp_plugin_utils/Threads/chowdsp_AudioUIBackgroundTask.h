@@ -84,7 +84,7 @@ public:
 
     /** Assigns this task to use a custom TimeSliceThread, rather than the default shared TimeSliceThread */
     template <typename Type = BackgroundTaskType>
-    typename std::enable_if<std::is_same<Type, detail::TimeSliceBackgroundTask>::value, void>::type
+    typename std::enable_if_t<std::is_same_v<Type, detail::TimeSliceBackgroundTask>, void>
         setTimeSliceThreadToUse (juce::TimeSliceThread* thread)
     {
         detail::TimeSliceBackgroundTask::setTimeSliceThreadToUse (thread);

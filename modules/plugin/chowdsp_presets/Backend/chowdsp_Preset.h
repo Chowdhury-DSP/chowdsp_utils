@@ -84,7 +84,13 @@ private:
     juce::String name;
     juce::String vendor;
     juce::String category;
-    std::unique_ptr<VersionUtils::Version> version;
+
+#if defined JucePlugin_VersionString
+    std::unique_ptr<VersionUtils::Version> version = std::make_unique<VersionUtils::Version> (JucePlugin_VersionString);
+#else
+    std::unique_ptr<VersionUtils::Version> version = std::make_unique<VersionUtils::Version> ("0.0.0");
+#endif
+
     std::unique_ptr<juce::XmlElement> state;
 
     juce::File file;
