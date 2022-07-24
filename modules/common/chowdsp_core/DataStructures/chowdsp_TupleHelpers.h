@@ -11,7 +11,7 @@ namespace TupleHelpers
     template <typename Fn, typename Tuple, size_t... Ix>
     constexpr void forEachInTuple (Fn&& fn, Tuple&& tuple, std::index_sequence<Ix...>) noexcept (noexcept (std::initializer_list<int> { (fn (std::get<Ix> (tuple), Ix), 0)... }))
     {
-        (void) std::initializer_list<int> { ((void) fn (std::get<Ix> (tuple), Ix), 0)... };
+        (void) std::initializer_list<int> { ((void) fn (std::get<Ix> (std::forward<Tuple> (tuple)), Ix), 0)... };
     }
 
     template <typename T>
