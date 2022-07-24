@@ -17,14 +17,19 @@ ForwardingTestPlugin::~ForwardingTestPlugin()
 void ForwardingTestPlugin::addParameters (Parameters& params)
 {
     using namespace chowdsp::ParamUtils;
-    emplace_param<chowdsp::ChoiceParameter> (params, chowdsp::ParameterID { processorChoiceParamID, 100 }, "Processor Choice", juce::StringArray { "None", "Tone Generator", "Reverb", "Filter" }, 0);
+    emplace_param<chowdsp::ChoiceParameter> (params,
+                                             chowdsp::ParameterID { processorChoiceParamID, 100 },
+                                             "Processor Choice",
+                                             juce::StringArray { "None", "Tone Generator", "Reverb", "Werner Filter", "ARP Filter" },
+                                             0);
 }
 
 void ForwardingTestPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     toneGenerator.prepareToPlay (sampleRate, samplesPerBlock);
     reverb.prepareToPlay (sampleRate, samplesPerBlock);
-    filter.prepareToPlay (sampleRate, samplesPerBlock);
+    wernerFilter.prepareToPlay (sampleRate, samplesPerBlock);
+    arpFilter.prepareToPlay (sampleRate, samplesPerBlock);
 }
 
 void ForwardingTestPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
@@ -76,7 +81,10 @@ juce::AudioProcessor* ForwardingTestPlugin::getProcessorForIndex (int index)
         return &reverb;
 
     if (index == 3)
-        return &filter;
+        return &wernerFilter;
+
+    if (index == 4)
+        return &arpFilter;
 
     return nullptr;
 }
