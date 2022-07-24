@@ -120,7 +120,7 @@ private:
     double phaseI = 0.0, phaseO = 0.0, dPhaseI = 0.0, dPhaseO = 0.0;
     double ratio = 1.0;
 
-    inline double kernel (double x) const
+    [[nodiscard]] inline double kernel (double x) const
     {
         if (fabs (x) < 1e-7)
             return 1;

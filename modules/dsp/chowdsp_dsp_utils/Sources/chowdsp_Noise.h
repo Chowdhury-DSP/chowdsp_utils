@@ -134,9 +134,10 @@ private:
                 sum += values[ch][i];
             }
 
-            static constexpr auto oneOverEight = static_cast<T> (1.0 / 8.0);
             return sum * oneOverEight;
         }
+        
+        static const auto oneOverEight = static_cast<T> (1.0 / 8.0);
     };
 
     PinkNoiseGenerator<> pink;

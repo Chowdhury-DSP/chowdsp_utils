@@ -83,7 +83,7 @@ public:
     bool updateOSFactor();
 
     /** Get the index of a given oversampler */
-    int getOSIndex (int osFactor, int osMode) const noexcept { return osFactor + (numOSChoices * osMode); }
+    [[nodiscard]] int getOSIndex (int osFactor, int osMode) const noexcept { return osFactor + (numOSChoices * osMode); }
 
     /** Returns the samples of latency introduced by the oversampling process */
     [[nodiscard]] float getLatencySamples() const noexcept;
