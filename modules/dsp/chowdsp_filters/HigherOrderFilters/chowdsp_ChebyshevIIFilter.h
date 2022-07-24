@@ -48,7 +48,8 @@ public:
         juce::ignoreUnused (qVal);
 
         FloatType bCoefs[3], bOppCoefs[3], aCoefs[3];
-        auto calcCoefsForQ = [&] (FloatType stageFreqOff, FloatType stageQ, FloatType stageLPGain, size_t stageOrder) {
+        auto calcBaseCoefficients = [&] (FloatType stageFreqOff, FloatType stageQ)
+        {
             switch (type)
             {
                 case ChebyshevFilterType::Lowpass:
@@ -60,6 +61,11 @@ public:
                     CoefficientCalculators::calcSecondOrderHPF<FloatType, NumericType, false> (bCoefs, aCoefs, fc / stageFreqOff, stageQ, fs, fc);
                     break;
             }
+        };
+
+        auto calcCoefsForQ = [&] (FloatType stageFreqOff, FloatType stageQ, FloatType stageLPGain, size_t stageOrder)
+        {
+            calcBaseCoefficients (stageFreqOff, stageQ);
 
             for (size_t i = 0; i < 3; ++i)
                 bCoefs[i] = bOppCoefs[i] + stageLPGain * bCoefs[i];
@@ -94,7 +100,8 @@ private:
         const auto fn = juce::MathConstants<NumericType>::pi / NumericType (2 * order);
 
         size_t k = 1;
-        for (int i = order / 2; --i >= 0; k += 2)
+        int i = order / 2;
+        while (i - 1 >= 0)
         {
             const auto a = sinh_mu * std::cos (NumericType ((int) k - order) * fn);
             const auto b = cosh_mu * std::sin (NumericType ((int) k - order) * fn);
@@ -103,6 +110,9 @@ private:
 
             poles[(k - 1) / 2] = std::complex { a / d2, b / d2 };
             zeros[(k - 1) / 2] = std::complex { (NumericType) 0, im };
+
+            --i;
+            k += 2;
         }
     }
 
