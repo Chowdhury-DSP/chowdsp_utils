@@ -25,7 +25,7 @@ public:
     explicit PluginLogger (LoggerParams loggerParams);
     ~PluginLogger();
 
-    const juce::File& getLogFile() { return fileLogger->getLogFile(); }
+    [[nodiscard]] const juce::File& getLogFile() const { return fileLogger->getLogFile(); }
     static void handleCrashWithSignal (int signal);
 
 private:

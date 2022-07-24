@@ -80,7 +80,7 @@ namespace logger_detail
         juce::Logger::setCurrentLogger (nullptr);
     }
 
-    void signalHandler (void*)
+    void signalHandler (void*) // NOSONAR (void* is needed here)
     {
         juce::Logger::writeToLog ("Interrupt signal received!");
         juce::Logger::writeToLog ("Stack Trace:");

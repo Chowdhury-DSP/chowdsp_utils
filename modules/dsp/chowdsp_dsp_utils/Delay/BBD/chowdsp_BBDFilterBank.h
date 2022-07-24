@@ -147,7 +147,7 @@ namespace BBD
 
         inline void calcG() noexcept { Gcalc = Aplus * Gcalc; }
 
-        inline void process (Complex4 u) noexcept { x = pole_corr * x + u; }
+        inline void process (const Complex4& u) noexcept { x = pole_corr * x + u; }
 
         Complex4 x {};
         Complex4 Gcalc { SIMDScalar<T> (1), SIMDScalar<T> (0) };

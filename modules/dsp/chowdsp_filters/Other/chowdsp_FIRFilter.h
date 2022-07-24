@@ -89,7 +89,7 @@ public:
     {
         auto* z = state[channel].data();
         const auto* h = coefficients.data();
-        chowdsp::ScopedValue<int> zPtrLocal { zPtr[channel] };
+        chowdsp::ScopedValue zPtrLocal { zPtr[channel] };
 
         for (int n = 0; n < numSamples; ++n)
             block[n] = processSampleInternal (block[n], z, h, zPtrLocal.get(), order, paddedOrder);
@@ -111,7 +111,7 @@ public:
     void processBlockBypassed (const float* block, const int numSamples, const int channel = 0) noexcept
     {
         auto* z = state[channel].data();
-        chowdsp::ScopedValue<int> zPtrLocal { zPtr[channel] };
+        chowdsp::ScopedValue zPtrLocal { zPtr[channel] };
 
         for (int n = 0; n < numSamples; ++n)
             processSampleInternalBypassed (block[n], z, zPtrLocal.get(), order);

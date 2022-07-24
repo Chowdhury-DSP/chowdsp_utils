@@ -8,7 +8,7 @@ namespace chowdsp
  * 
  * @deprecated prefer juce::dsp::Gain<T>
  */
-class [[deprecated]] GainProcessor
+class [[deprecated ("Prefer juce::dsp::Gain or chowdsp::Gain")]] GainProcessor
 {
 public:
     GainProcessor() = default;
@@ -20,7 +20,7 @@ public:
     }
 
     /** Processes a buffer of samples */
-    void processBlock (juce::AudioBuffer<float>& buffer)
+    void processBlock (juce::AudioBuffer<float> & buffer)
     {
         if (curGain != oldGain)
         {

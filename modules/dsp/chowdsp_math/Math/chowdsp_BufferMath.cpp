@@ -3,7 +3,7 @@
 namespace chowdsp::BufferMath
 {
 template <typename BufferType>
-auto getMagnitude (const BufferType& buffer, int startSample, int numSamples, int channel) noexcept
+static auto getMagnitude (const BufferType& buffer, int startSample, int numSamples, int channel) noexcept
 {
     if (numSamples < 0)
         numSamples = buffer.getNumSamples() - startSample;
@@ -38,7 +38,7 @@ auto getMagnitude (const BufferType& buffer, int startSample, int numSamples, in
 }
 
 template <typename BufferType>
-auto getRMSLevel (const BufferType& buffer, int channel, int startSample, int numSamples) noexcept
+static auto getRMSLevel (const BufferType& buffer, int channel, int startSample, int numSamples) noexcept
 {
     using SampleType = typename BufferType::Type;
 
@@ -69,7 +69,7 @@ auto getRMSLevel (const BufferType& buffer, int channel, int startSample, int nu
 }
 
 template <typename BufferType1, typename BufferType2>
-void copyBufferData (const BufferType1& bufferSrc, BufferType2& bufferDest, int srcStartSample, int destStartSample, int numSamples, int startChannel, int numChannels) noexcept
+static void copyBufferData (const BufferType1& bufferSrc, BufferType2& bufferDest, int srcStartSample, int destStartSample, int numSamples, int startChannel, int numChannels) noexcept
 {
     using SampleType = typename BufferType1::Type;
 
@@ -126,7 +126,7 @@ static void copyBufferChannels (const BufferType1& bufferSrc, BufferType2& buffe
 }
 
 template <typename BufferType, typename FloatType>
-void applyGain (BufferType& buffer, FloatType gain)
+static void applyGain (BufferType& buffer, FloatType gain)
 {
     using SampleType = typename BufferType::Type;
 

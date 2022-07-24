@@ -65,7 +65,7 @@ SampleType** Buffer<SampleType>::getArrayOfWritePointers() noexcept
 template <typename SampleType>
 const SampleType** Buffer<SampleType>::getArrayOfReadPointers() const noexcept
 {
-    return const_cast<const SampleType**> (channelPointers.data());
+    return const_cast<const SampleType**> (channelPointers.data()); // NOSONAR (using const_cast to be more strict)
 }
 
 template <typename SampleType>

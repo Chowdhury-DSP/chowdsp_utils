@@ -28,17 +28,17 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 #if JUCE_MODULE_AVAILABLE_juce_dsp
 #include <juce_dsp/juce_dsp.h>
-#include "DataStructures/chowdsp_SIMDAudioBlock.h"
+#include "chowdsp_dsp_data_structures/Buffers/chowdsp_SIMDAudioBlock.h"
 #endif
 
-#include "DataStructures/chowdsp_ScopedValue.h"
-#include "DataStructures/chowdsp_Buffer.h"
-#include "DataStructures/chowdsp_BufferView.h"
-#include "DataStructures/chowdsp_SmoothedBufferValue.h"
-#include "DataStructures/chowdsp_RebufferedProcessor.h"
-#include "DataStructures/chowdsp_LookupTableTransform.h"
-#include "DataStructures/chowdsp_LookupTableCache.h"
+#include "Other/chowdsp_ScopedValue.h"
+#include "Buffers/chowdsp_Buffer.h"
+#include "Buffers/chowdsp_BufferView.h"
+#include "Other/chowdsp_SmoothedBufferValue.h"
+#include "Processors/chowdsp_RebufferedProcessor.h"
+#include "LookupTables/chowdsp_LookupTableTransform.h"
+#include "LookupTables/chowdsp_LookupTableCache.h"
 
 #if JUCE_MODULE_AVAILABLE_juce_dsp
-#include "DataStructures/chowdsp_COLAProcessor.h"
+#include "Processors/chowdsp_COLAProcessor.h"
 #endif

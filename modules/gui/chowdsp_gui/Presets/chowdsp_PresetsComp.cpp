@@ -190,11 +190,11 @@ int PresetsComp::createPresetsMenu (int optionID)
     for (auto& [vendorName, vendorCollection] : presetMapItems)
     {
         juce::PopupMenu vendorMenu;
-        for (auto& [category, categoryMenu] : vendorCollection.categoryPresetMenus)
+        for (const auto& [category, categoryMenu] : vendorCollection.categoryPresetMenus)
             vendorMenu.addSubMenu (category, categoryMenu);
 
         std::sort (vendorCollection.nonCategoryItems.begin(), vendorCollection.nonCategoryItems.end(), [] (auto& item1, auto& item2) { return item1.text < item2.text; });
-        for (auto& extraItem : vendorCollection.nonCategoryItems)
+        for (const auto& extraItem : vendorCollection.nonCategoryItems)
             vendorMenu.addItem (extraItem);
 
         presetBox.getRootMenu()->addSubMenu (vendorName, vendorMenu);

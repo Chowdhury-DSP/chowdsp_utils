@@ -3,7 +3,7 @@
 namespace chowdsp::IRHelpers
 {
 template <typename TransformFunc>
-void transformIRFreqDomain (float* targetIR, const float* originalIR, int numSamples, juce::dsp::FFT& fft, TransformFunc&& transformer, bool removeDCBias, bool normalizeRMS)
+void transformIRFreqDomain (float* targetIR, const float* originalIR, int numSamples, const juce::dsp::FFT& fft, TransformFunc&& transformer, bool removeDCBias, bool normalizeRMS)
 {
     // The FFT object is initialized for the wrong size IR!
     jassert (fft.getSize() == numSamples);
@@ -38,7 +38,7 @@ void transformIRFreqDomain (float* targetIR, const float* originalIR, int numSam
     }
 }
 
-void makeLinearPhase (float* linearPhaseIR, const float* originalIR, int numSamples, juce::dsp::FFT& fft)
+void makeLinearPhase (float* linearPhaseIR, const float* originalIR, int numSamples, const juce::dsp::FFT& fft)
 {
     // @TODO: make sure all four types are handled correctly (even/symmetric, odd/symmetric, even/asym, odd/asym), plus add options for symmetric
 
@@ -69,7 +69,7 @@ void makeLinearPhase (float* linearPhaseIR, const float* originalIR, int numSamp
         true);
 }
 
-void makeMinimumPhase (float* minimumPhaseIR, const float* originalIR, int numSamples, juce::dsp::FFT& fft)
+void makeMinimumPhase (float* minimumPhaseIR, const float* originalIR, int numSamples, const juce::dsp::FFT& fft)
 {
     transformIRFreqDomain (
         minimumPhaseIR,
@@ -135,7 +135,7 @@ void makeMinimumPhase (float* minimumPhaseIR, const float* originalIR, int numSa
         false);
 }
 
-void makeHalfMagnitude (float* halfMagIR, const float* originalIR, int numSamples, juce::dsp::FFT& fft)
+void makeHalfMagnitude (float* halfMagIR, const float* originalIR, int numSamples, const juce::dsp::FFT& fft)
 {
     transformIRFreqDomain (
         halfMagIR,

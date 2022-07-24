@@ -12,7 +12,7 @@ namespace JSONUtils
     }
 
     /** Load a json object from binary data */
-    inline json fromBinaryData (const void* data, int dataSize)
+    inline json fromBinaryData (const void* data, int dataSize) // NOSONAR (needs void* to be compatible with JUCE BinaryData)
     {
         juce::MemoryInputStream jsonInputStream { data, (size_t) dataSize, false };
         return fromInputStream (jsonInputStream);

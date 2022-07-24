@@ -23,7 +23,7 @@ public:
     /** Returns a reference to the value */
     inline T& get() { return value; }
 
-protected:
+private:
     T value;
     T& ref;
 

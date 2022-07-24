@@ -50,6 +50,8 @@ public:
     {
         for (auto& stage : stages)
             x = stage.processSample (x, channel);
+
+        return x;
     }
 
     /** Process a block of samples. */
@@ -73,7 +75,7 @@ private:
 
         void initialise (LookupTableCache* lutCache, T range, int N)
         {
-            ADAAWaveshaper<T>::setupLookupTableCache (lutCache, "wave_multiplier_folder_cell");
+            ADAAWaveshaper<T>::setupLookupTableCache (lutCache, "chowdsp_wave_multiplier_folder_cell");
 
             // So here's the rough derivation: In the original Serge circuit, the output of one folder cell
             // can be computed as:

@@ -65,7 +65,7 @@ inline auto makeSineWave (NumericType frequency, NumericType sampleRate, int len
     for (int ch = 1; ch < numChannels; ++ch)
         chowdsp::BufferMath::copyBufferChannels (sineBuffer, sineBuffer, 0, ch);
 
-    return std::move (sineBuffer);
+    return sineBuffer;
 }
 
 template <typename FloatType = float, typename NumericType = chowdsp::SampleTypeHelpers::NumericType<FloatType>>
