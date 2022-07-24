@@ -47,8 +47,7 @@ void makeLinearPhase (float* linearPhaseIR, const float* originalIR, int numSamp
         originalIR,
         numSamples,
         fft,
-        [numSamples] (auto& freqDomainData)
-        {
+        [numSamples] (auto& freqDomainData) {
             // compute delay kernels
             std::vector<std::complex<float>> delayKernels ((size_t) numSamples, std::complex<float> {});
             const auto phaseIncrement = juce::MathConstants<float>::twoPi / float (numSamples - 1);
@@ -77,10 +76,8 @@ void makeMinimumPhase (float* minimumPhaseIR, const float* originalIR, int numSa
         originalIR,
         numSamples,
         fft,
-        [numSamples, &fft] (auto& freqDomainData)
-        {
-            auto hilbert = [&fft] (std::complex<float>* output, const std::complex<float>* input, int nSamples)
-            {
+        [numSamples, &fft] (auto& freqDomainData) {
+            auto hilbert = [&fft] (std::complex<float>* output, const std::complex<float>* input, int nSamples) {
                 std::vector<std::complex<float>> H ((size_t) nSamples, std::complex<float> {});
                 fft.perform (input, H.data(), false);
 
@@ -145,14 +142,12 @@ void makeHalfMagnitude (float* halfMagIR, const float* originalIR, int numSample
         originalIR,
         numSamples,
         fft,
-        [] (auto& freqDomainData)
-        {
+        [] (auto& freqDomainData) {
             std::transform (
                 freqDomainData.begin(),
                 freqDomainData.end(),
                 freqDomainData.begin(),
-                [] (auto H)
-                {
+                [] (auto H) {
                     using namespace std::complex_literals;
                     return std::sqrt (std::abs (H)) * std::exp (1.0if * std::arg (H));
                 });

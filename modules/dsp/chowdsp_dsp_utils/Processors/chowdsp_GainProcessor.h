@@ -20,7 +20,7 @@ public:
     }
 
     /** Processes a buffer of samples */
-    void processBlock (juce::AudioBuffer<float>& buffer)
+    void processBlock (juce::AudioBuffer<float> & buffer)
     {
         if (curGain != oldGain)
         {
