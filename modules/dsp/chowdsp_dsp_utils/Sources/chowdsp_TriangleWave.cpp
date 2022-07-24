@@ -38,17 +38,20 @@ void TriangleWave<T>::processBlock (const BufferView<T>& buffer) noexcept
     const auto numChannels = buffer.getNumChannels();
     const auto numSamples = buffer.getNumSamples();
 
+    T z_temp = z;
+    T phi_temp = phi;
+
+    for (int ch = 0; ch < numChannels; ++ch)
     {
-        auto* data = buffer.getWritePointer (0);
+        z = z_temp;
+        phi = phi_temp;
 
         ScopedValue _z { z };
         ScopedValue _phi { phi };
 
+        auto* data = buffer.getWritePointer (ch);
         for (int i = 0; i < numSamples; ++i)
             data[i] += processSampleInternal (_z.get(), _phi.get());
     }
-
-    for (int ch = 1; ch < numChannels; ++ch)
-        BufferMath::copyBufferChannels (buffer, buffer, 0, ch);
 }
 } // namespace chowdsp
