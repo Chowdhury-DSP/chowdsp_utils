@@ -5,6 +5,7 @@
 #include "../SignalGenerator/SignalGeneratorPlugin.h"
 #include "../SimpleReverb/SimpleReverbPlugin.h"
 #include "InternalPlugins/WernerFilterPlugin.h"
+#include "InternalPlugins/ARPFilterPlugin.h"
 
 class ForwardingTestPlugin : public chowdsp::PluginBase<ForwardingTestPlugin>,
                              private juce::AudioProcessorValueTreeState::Listener
@@ -33,7 +34,8 @@ private:
 
     SignalGeneratorPlugin toneGenerator;
     SimpleReverbPlugin reverb;
-    WernerFilterPlugin filter;
+    WernerFilterPlugin wernerFilter;
+    ARPFilterPlugin arpFilter;
 
     struct ParamForwardingProvider
     {

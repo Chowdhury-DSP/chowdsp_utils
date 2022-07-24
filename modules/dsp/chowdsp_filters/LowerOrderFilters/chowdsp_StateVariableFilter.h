@@ -88,7 +88,7 @@ public:
     [[nodiscard]] SampleType getCutoffFrequency() const noexcept { return cutoffFrequency; }
 
     /** Returns the resonance of the filter. */
-    [[nodiscard]] SampleType getResonance() const noexcept { return resonance; }
+    [[nodiscard]] SampleType getQValue() const noexcept { return resonance; }
 
     /** Returns the gain of the filter. */
     [[nodiscard]] SampleType getGain() const noexcept { return gain; }
@@ -172,14 +172,7 @@ public:
 private:
     inline SampleType processSampleInternal (SampleType x, SampleType& s1, SampleType& s2) noexcept
     {
-        const auto v3 = x - s2;
-        const auto v0 = a1 * v3 - ak * s1;
-        const auto v1 = a2 * v3 + a1 * s1;
-        const auto v2 = a3 * v3 + a2 * s1 + s2;
-
-        // update state
-        s1 = (NumericType) 2 * v1 - s1;
-        s2 = (NumericType) 2 * v2 - s2;
+        const auto [v0, v1, v2] = processCore (x, s1, s2);
 
         juce::ignoreUnused (v0);
         if constexpr (type == FilterType::Lowpass)
@@ -207,6 +200,20 @@ private:
         }
     }
 
+    inline auto processCore (SampleType x, SampleType& s1, SampleType& s2) noexcept
+    {
+        const auto v3 = x - s2;
+        const auto v0 = a1 * v3 - ak * s1;
+        const auto v1 = a2 * v3 + a1 * s1;
+        const auto v2 = a3 * v3 + a2 * s1 + s2;
+
+        // update state
+        s1 = (NumericType) 2 * v1 - s1;
+        s2 = (NumericType) 2 * v2 - s2;
+
+        return std::make_tuple (v0, v1, v2);
+    }
+
     SampleType cutoffFrequency, resonance, gain; // parameters
     SampleType g0, k0, A, sqrtA; // parameter intermediate values
     SampleType a1, a2, a3, ak, k0A, Asq; // coefficients
@@ -215,6 +222,11 @@ private:
     NumericType lowpassMult { 0 }, bandpassMult { 0 }, highpassMult { 0 };
 
     double sampleRate = 44100.0;
+
+    template <typename>
+    friend class ARPFilter;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StateVariableFilter)
 };
 
 /** Convenient alias for an SVF lowpass filter. */

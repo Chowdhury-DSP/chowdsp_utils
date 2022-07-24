@@ -15,6 +15,7 @@ target_sources(ForwardingTestPlugin
         ../SimpleReverb/SimpleReverbPlugin.cpp
 
         InternalPlugins/WernerFilterPlugin.cpp
+        InternalPlugins/ARPFilterPlugin.cpp
 )
 
 target_compile_definitions(ForwardingTestPlugin
