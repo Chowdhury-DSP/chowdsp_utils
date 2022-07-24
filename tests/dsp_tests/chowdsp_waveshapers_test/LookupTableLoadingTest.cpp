@@ -7,18 +7,15 @@ struct SlowWaveshaper : public chowdsp::ADAAWaveshaper<float>
     {
         using namespace std::chrono_literals;
         this->initialise (
-            [] (double x)
-            {
+            [] (double x) {
                 std::this_thread::sleep_for (1ns);
                 return x;
             },
-            [] (double x)
-            {
+            [] (double x) {
                 std::this_thread::sleep_for (1ns);
                 return x;
             },
-            [] (double x)
-            {
+            [] (double x) {
                 std::this_thread::sleep_for (1ns);
                 return x;
             });
@@ -33,7 +30,7 @@ TEST_CASE ("Lookup Table Loading Test")
     std::vector<std::unique_ptr<SlowWaveshaper>> waveshapers;
     for (int i = 0; i < numInstances; ++i)
         waveshapers.push_back (std::make_unique<SlowWaveshaper> (&lutCache));
-    
+
     for (auto& shaper : waveshapers)
     {
         shaper->prepare (1);
