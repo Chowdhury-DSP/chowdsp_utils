@@ -136,7 +136,7 @@ private:
 
             return sum * oneOverEight;
         }
-        
+
         static const auto oneOverEight = static_cast<T> (1.0 / 8.0);
     };
 
