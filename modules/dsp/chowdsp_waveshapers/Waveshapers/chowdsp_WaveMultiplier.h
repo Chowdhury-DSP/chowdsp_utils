@@ -50,6 +50,8 @@ public:
     {
         for (auto& stage : stages)
             x = stage.processSample (x, channel);
+
+        return x;
     }
 
     /** Process a block of samples. */
