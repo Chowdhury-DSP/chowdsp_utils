@@ -24,7 +24,7 @@ void SignalGeneratorPlugin::addParameters (Parameters& params)
     using namespace chowdsp::ParamUtils;
     createFreqParameter (params, { freqTag, 100 }, "Frequency", 50.0f, 50000.0f, 2500.0f, 1000.0f);
     createGainDBParameter (params, { gainTag, 100 }, "Gain", -45.0f, 12.0f, -24.0f);
-    emplace_param<chowdsp::ChoiceParameter> (params, chowdsp::ParameterID { typeTag, 100 }, "Tone Type", juce::StringArray { "Sine", "Saw", "Square" }, 0);
+    emplace_param<chowdsp::ChoiceParameter> (params, chowdsp::ParameterID { typeTag, 100 }, "Tone Type", juce::StringArray { "Sine", "Saw", "Square", "Triangle" }, 0);
     emplace_param<chowdsp::ChoiceParameter> (params, chowdsp::ParameterID { upsampleTag, 100 }, "Upsample", juce::StringArray { "1x", "2x", "3x", "4x" }, 0);
 
     juce::StringArray waveshapeOptions { "None", "Hard Clip", "Tanh Clip", "Cubic Clip", "9th-Order Clip", "West Coast", "Wave Multiply" };
@@ -68,6 +68,7 @@ void SignalGeneratorPlugin::prepareTones (double sampleRate, int maxSamplesPerBl
     sine.prepare (spec);
     saw.prepare (spec);
     square.prepare (spec);
+    triangle.prepare (spec);
 
     gain.prepare (spec);
 
@@ -134,7 +135,7 @@ void SignalGeneratorPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
         {
             auto targetFrequency = freqHzParamSmoothed.getCurrentValue();
             tone.setFrequency (targetFrequency);
-            tone.process (upsampledContext);
+            tone.processBlock (upsampledBuffer);
         }
         else
         {
@@ -193,7 +194,6 @@ void SignalGeneratorPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
             auto&& bufferView = chowdsp::BufferView<float> { block };
             chowdsp::BufferMath::copyBufferData (resampler->process (upsampledBlock), bufferView);
         }
-        //            block.copyFrom (resampler->process (upsampledBlock));
     };
 
     setUpSampleChoice();
@@ -204,6 +204,8 @@ void SignalGeneratorPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
         processTone (saw);
     else if (typeChoice == 2)
         processTone (square);
+    else if (typeChoice == 3)
+        processTone (triangle);
     else
         jassertfalse; // unknown type!
 }

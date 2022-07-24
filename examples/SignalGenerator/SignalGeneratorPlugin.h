@@ -30,6 +30,7 @@ private:
     chowdsp::SineWave<float> sine;
     chowdsp::SawtoothWave<float> saw;
     chowdsp::SquareWave<float> square;
+    chowdsp::TriangleWave<float> triangle;
     chowdsp::Gain<float> gain;
 
     using AAFilter = chowdsp::ButterworthFilter<12>;
