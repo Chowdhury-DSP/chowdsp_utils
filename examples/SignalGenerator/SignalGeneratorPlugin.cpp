@@ -27,7 +27,7 @@ void SignalGeneratorPlugin::addParameters (Parameters& params)
     emplace_param<chowdsp::ChoiceParameter> (params, chowdsp::ParameterID { typeTag, 100 }, "Tone Type", juce::StringArray { "Sine", "Saw", "Square", "Triangle" }, 0);
     emplace_param<chowdsp::ChoiceParameter> (params, chowdsp::ParameterID { upsampleTag, 100 }, "Upsample", juce::StringArray { "1x", "2x", "3x", "4x" }, 0);
 
-    juce::StringArray waveshapeOptions { "None", "Hard Clip", "Tanh Clip", "Cubic Clip", "9th-Order Clip", "West Coast", "Wave Multiply" };
+    juce::StringArray waveshapeOptions { "None", "Hard Clip", "Tanh Clip", "Cubic Clip", "9th-Order Clip", "Full Wave Rectify", "West Coast", "Wave Multiply" };
     emplace_param<chowdsp::ChoiceParameter> (params, chowdsp::ParameterID { waveshaperTag, 100 }, "Waveshaper", waveshapeOptions, 0);
 }
 
@@ -43,6 +43,7 @@ void SignalGeneratorPlugin::prepareToPlay (double sampleRate, int samplesPerBloc
     adaaTanhClipper.prepare ((int) spec.numChannels);
     adaaCubicClipper.prepare ((int) spec.numChannels);
     adaa9thOrderClipper.prepare ((int) spec.numChannels);
+    fullWaveRectifier.prepare ((int) spec.numChannels);
     westCoastFolder.prepare ((int) spec.numChannels);
     waveMultiplyFolder.prepare ((int) spec.numChannels);
 
@@ -178,9 +179,13 @@ void SignalGeneratorPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
         }
         else if (waveshaperParam->getIndex() == 5)
         {
-            westCoastFolder.process (upsampledContext);
+            fullWaveRectifier.process (upsampledContext);
         }
         else if (waveshaperParam->getIndex() == 6)
+        {
+            westCoastFolder.process (upsampledContext);
+        }
+        else if (waveshaperParam->getIndex() == 7)
         {
             waveMultiplyFolder.processBlock (upsampledBuffer);
         }

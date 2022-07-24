@@ -54,6 +54,16 @@ public:
     /** Returns true if the lookup table has been initialised. */
     [[nodiscard]] bool hasBeenInitialised() const noexcept { return isInitialised; }
 
+    /**
+     * If you'd like to initialize this lookup table, you should call this method first!
+     *
+     * If the table is already initialized, this will return false. Otherwise, this will
+     * return true, and all future calls to `hasBeenInitialized()` will return true, so
+     * the class expects that the user will take care of initializing the table ASAP after
+     * this method returns true.
+     */
+    [[nodiscard]] bool initialiseIfNotAlreadyInitialised() noexcept;
+
     //==============================================================================
     /** Calculates the approximated value for the given input value without range checking.
         Use this if you can guarantee that the input value is within the range specified
