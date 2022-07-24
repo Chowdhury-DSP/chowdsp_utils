@@ -21,7 +21,7 @@ public:
 
 private:
     const ProcType& proc;
-    juce::HyperlinkButton linkButton;
+    juce::HyperlinkButton linkButton { InfoProvider::getManufacturerString(), InfoProvider::getManufacturerWebsiteURL() };
 
     int linkX = 0;
 

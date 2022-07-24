@@ -80,7 +80,7 @@ void checkOpenGLStats (juce::OpenGLContext& ctx, int& openGLMajorVersion, int& o
 
 namespace chowdsp
 {
-OpenGLHelper::OpenGLHelper() //NOLINT(modernize-use-equals-default): can only be default if compiling without OpenGL
+OpenGLHelper::OpenGLHelper() // NOSONAR, NOLINT(modernize-use-equals-default): can only be default if compiling without OpenGL
 {
 #if CHOWDSP_OPENGL_IS_AVAILABLE
     checkOpenGLStats (openglContext, openGLMajorVersion, openGLMinorVersion);
