@@ -20,7 +20,7 @@ void ChowLNF::drawRotarySlider (juce::Graphics& g, int x, int y, int width, int 
     if (diameter < 16)
         return;
 
-    juce::Point<float> centre ((float) x + std::floor ((float) width * 0.5f + 0.5f), (float) y + std::floor ((float) height * 0.5f + 0.5f));
+    juce::Point centre ((float) x + std::floor ((float) width * 0.5f + 0.5f), (float) y + std::floor ((float) height * 0.5f + 0.5f));
     diameter -= (diameter % 2) ? 9 : 8;
     float radius = (float) diameter * 0.5f;
     x = int (centre.x - radius);
@@ -183,11 +183,11 @@ void ChowLNF::drawLinearSlider (juce::Graphics& g, int x, int y, int width, int 
 {
     auto trackWidth = juce::jmin (6.0f, slider.isHorizontal() ? (float) height * 0.25f : (float) width * 0.25f);
 
-    juce::Point<float> startPoint (slider.isHorizontal() ? (float) x : (float) x + (float) width * 0.5f,
-                                   slider.isHorizontal() ? (float) y + (float) height * 0.5f : (float) (height + y));
+    juce::Point startPoint (slider.isHorizontal() ? (float) x : (float) x + (float) width * 0.5f,
+                            slider.isHorizontal() ? (float) y + (float) height * 0.5f : (float) (height + y));
 
-    juce::Point<float> endPoint (slider.isHorizontal() ? (float) (width + x) : startPoint.x,
-                                 slider.isHorizontal() ? startPoint.y : (float) y);
+    juce::Point endPoint (slider.isHorizontal() ? (float) (width + x) : startPoint.x,
+                          slider.isHorizontal() ? startPoint.y : (float) y);
 
     juce::Path backgroundTrack;
     backgroundTrack.startNewSubPath (startPoint);
@@ -245,7 +245,7 @@ juce::Label* ChowLNF::createSliderTextBox (juce::Slider& slider)
     return l;
 }
 
-juce::Component* ChowLNF::getParentComponentForMenuOptions (const juce::PopupMenu::Options& options)
+juce::Component* ChowLNF::getParentComponentForMenuOptions (const juce::PopupMenu::Options& options) // NOSONAR
 {
 #if JUCE_IOS
     if (juce::PluginHostType::getPluginLoadedAs() == juce::AudioProcessor::wrapperType_AudioUnitv3)

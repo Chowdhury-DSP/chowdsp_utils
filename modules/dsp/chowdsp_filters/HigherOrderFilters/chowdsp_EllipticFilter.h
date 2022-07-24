@@ -44,7 +44,7 @@ public:
         juce::ignoreUnused (qVal);
 
         FloatType bCoefs[3], bOppCoefs[3], aCoefs[3];
-        auto calcCoefsForQ = [&] (FloatType stageFreqOff, FloatType stageQ, FloatType stageLPGain, size_t stageOrder) {
+        auto calcBaseCoefficients = [&] (FloatType stageFreqOff, FloatType stageQ) {
             switch (type)
             {
                 case EllipticFilterType::Lowpass:
@@ -56,6 +56,10 @@ public:
                     CoefficientCalculators::calcSecondOrderHPF<FloatType, NumericType, false> (bCoefs, aCoefs, fc / stageFreqOff, stageQ, fs, fc);
                     break;
             }
+        };
+
+        auto calcCoefsForQ = [&] (FloatType stageFreqOff, FloatType stageQ, FloatType stageLPGain, size_t stageOrder) {
+            calcBaseCoefficients (stageFreqOff, stageQ);
 
             for (size_t i = 0; i < 3; ++i)
                 bCoefs[i] = bOppCoefs[i] + stageLPGain * bCoefs[i];
@@ -220,7 +224,7 @@ private:
         const auto capk = ellipticK (std::sqrt (m));
 
         std::array<double, NFilters> j {};
-        for (size_t i = 0; i < j.size(); ++i)
+        for (size_t i = 0; i < j.size(); ++i) // NOSONAR (this loop is simple enough)
             j[i] = double (i * 2 + 1);
 
         std::array<double, NFilters> s {}, c {}, d {};

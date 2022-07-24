@@ -20,7 +20,7 @@ public:
     ~PopupMenuHelper() override;
 
     /** You can assign a lambda to this callback object to fill in the popup menu about to be shown */
-    std::function<void (juce::PopupMenu&, juce::PopupMenu::Options&)> popupMenuCallback = [] (juce::PopupMenu&, juce::PopupMenu::Options&) {};
+    std::function<void (juce::PopupMenu&, juce::PopupMenu::Options&)> popupMenuCallback = [] (juce::PopupMenu&, juce::PopupMenu::Options&) {}; // NOSONAR
 
     /** Sets a component to listen for mouse actions on, or nullptr to not listen for mouse actions */
     void setAssociatedComponent (juce::Component* comp);

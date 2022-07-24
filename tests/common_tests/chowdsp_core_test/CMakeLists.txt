@@ -5,4 +5,5 @@ target_sources(chowdsp_core_test
         DoubleBufferTest.cpp
         AtomicHelpersTest.cpp
         MemoryAliasingTest.cpp
+        TupleHelpersTest.cpp
 )

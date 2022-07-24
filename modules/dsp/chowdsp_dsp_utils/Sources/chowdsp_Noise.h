@@ -116,8 +116,6 @@ private:
         /** Generates pink noise (-3dB / octave) */
         inline T operator() (size_t ch, juce::Random& r) noexcept
         {
-            using namespace SIMDUtils;
-
             int lastFrame = frame[ch];
             frame[ch]++;
             if (frame[ch] >= (1 << QUALITY))
