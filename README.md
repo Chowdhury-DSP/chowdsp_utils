@@ -79,6 +79,8 @@ sure to abide by the license of each module, as well as whichever libraries are 
 - `DoubleBuffer`: A circular buffer which always maintans a contiguous block of data.
 - `TupleHelpers`: Useful methods for working with tuple-like data structures.
 - `AtomicHelpers`: Useful methods for working with atomics.
+- `MemoryUtils`: Helpful methods to check if blocks of memory alias with each other.
+- `TypeTraits`: Type traits for checking is a class has a given method, if a type is a container, and so on.
 
 `chowdsp_json` (BSD)
 - A thin wrapper around [`nlohmann::json`](https://github.com/nlohmann/json) (MIT license, included internally).
@@ -92,10 +94,13 @@ sure to abide by the license of each module, as well as whichever libraries are 
 ### DSP Modules
 
 `chowdsp_dsp_data_structures` (GPLv3)
+- `Buffer`/`BufferView`: Basic data structures for storing audio.
 - `LookupTableTransform`: Some modifications on `juce::dsp::LookupTableTransform`.
-- `RebufferedProcessor`: A processor which rebuffers the input to have a constant block size.
+- `LookupTableCache`: A cache for storing lookup tables, so they don't need to be re-computed.
+- `ScopedValue`: A stack value that writes its value back to a more permanent variable when it goes out of scope.
 - `SmoothedBufferValue`: A buffered version of `juce::SmoothedValue`.
 - `COLAProcessor`: A base class for doing Constant Overlap-Add processing.
+- `RebufferedProcessor`: A processor which rebuffers the input to have a constant block size.
 
 `chowdsp_dsp_utils` (GPLv3)
 - Utilities for working with convolution and impulse responses.
@@ -104,7 +109,7 @@ sure to abide by the license of each module, as well as whichever libraries are 
 - Useful classes for modal signal processing.
 - Various classes for integer or non-integer resampling
   - Optionally depends on [libsamplerate](https://github.com/libsndfile/libsamplerate). User must link with libsamplerate externally, and define `CHOWDSP_USE_LIBSAMPLERATE=1`
-- Sources: "magic circle" sine wave oscillator, anti-aliased saw and square wave oscillators, noise generator.
+- Sources: "magic circle" sine wave oscillator, anti-aliased saw, triangle, and square wave oscillators, noise generator.
 - A few other useful processors.
 
 `chowdsp_eq` (GPLv3)
@@ -117,11 +122,18 @@ sure to abide by the license of each module, as well as whichever libraries are 
 - Some higher-order filters (Butterworth, Chebyshev (Type II), Elliptic).
 - `StateVariableFilter`: A modified version of `juce::dsp::StateVariableTPTFilter` with more filter types and better performance.
 - `ModFilterWrapper`: Turns any biquad filter into a State Variable Filter.
-- `FIRFilter`: An FIR filter with SIMD optimizations. 
+- `FIRFilter`: An FIR filter with SIMD optimizations.
+- `WernerFilter`: Emulation of a generalized Octave-CAT-style SVF, as proposed by Kurt Werner.
+- `ARPFilter`: Emulation of the ARP 1047 multi-mode filter.
+- `FractionalOrderFilter`: A filter with a slope between 0-3 dB / octave.
+- `ConformalMaps`: Conformal maps to use for designing filters, including the bilinear and alpha transforms.
+- `FilterChain`: Utility template class for chaining multiple similar filters in series.
 
 `chowdsp_math` (BSD)
 - `FloatVectorOperations`: Some extensions on `juce::FloatVectorOperations`.
+- `BufferMath`: Math operations which can be applied to audio buffers.
 - `Polynomials`: Methods for evaluating polynomials with Horner's method or Estrin's scheme.
+- `Power`: Fast integer exponential operations.
 - A few other useful math operations.
 
 `chowdsp_reverb` (GPLv3)
@@ -130,13 +142,16 @@ sure to abide by the license of each module, as well as whichever libraries are 
 `chowdsp_simd` (BSD)
 - A wrapper around [XSIMD](https://github.com/xtensor-stack/xsimd) (BSD, included internally).
 - `SIMDSmoothedValue`: A SIMD specialization of `juce::SmoothedValue`.
-- A few other extea SIMD math functions.
+- A few other extra SIMD math functions.
 
 `chowdsp_waveshapers` (GPLv3)
 - Basic waveshaping processes implemented with integrated waveshaping (ADAA), including:
-  - hard clipper
-  - `tanh` soft clipper
-  - polynomial soft clipper
+  - `ADAAHardClipper`
+  - `ADAATanhClipper`
+  - `ADAASoftClipper`: A polynomial soft clipper
+  - `ADAAFullWaveRectifier`
+- `WestCoastFolder`: An emulation of the wavefolding circuit found from the Buchla 259
+- `WaveMultiplier`: An emulation of Serge Tcherepin's Wave Multiplier circuit
 
 ## GUI Modules
 
