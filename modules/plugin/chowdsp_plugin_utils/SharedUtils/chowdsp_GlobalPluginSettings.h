@@ -62,7 +62,7 @@ public:
 
 private:
     bool loadSettingsFromFile();
-    void writeSettingsToFile();
+    void writeSettingsToFile() const;
 
     struct SettingsFileListener : public FileListener
     {

@@ -41,7 +41,7 @@ public:
      * Sets the cutoff frequency of the input anti-imaging
      * filter used by the bucket-brigade device
      */
-    void setInputFilterFreq (float freqHz = BBDFilterSpec::inputFilterOriginalCutoff)
+    void setInputFilterFreq (float freqHz = BBDFilterSpec::inputFilterOriginalCutoff) const
     {
         inputFilter->set_freq (ALIEN ? freqHz * 0.2f : freqHz);
         inputFilter->set_time (tn);
@@ -51,7 +51,7 @@ public:
      * Sets the cutoff frequency of the output anti-aliasing
      * filter used by the bucket-brigade device
      */
-    void setOutputFilterFreq (float freqHz = BBDFilterSpec::outputFilterOriginalCutoff)
+    void setOutputFilterFreq (float freqHz = BBDFilterSpec::outputFilterOriginalCutoff) const
     {
         outputFilter->set_freq (ALIEN ? freqHz * 0.2f : freqHz);
         outputFilter->set_time (tn);

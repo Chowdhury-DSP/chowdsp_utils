@@ -52,7 +52,7 @@ private:
     /** An optimized one-multiply second-order allpass filter, */
     struct AllpassStage
     {
-        AllpassStage (T alpha) : alphaSq (alpha * alpha) {} // NOLINT
+        AllpassStage (T alpha) : alphaSq (alpha * alpha) {} // NOLINT NOSONAR (don't want this to be explicit so we can construct the array below)
 
         void reset()
         {

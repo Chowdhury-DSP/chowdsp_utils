@@ -22,7 +22,7 @@ float stringToFreqVal (const juce::String& s)
 
 juce::String percentValToString (float percentVal)
 {
-    juce::String percentStr = juce::String (int (percentVal * 100.0f));
+    auto percentStr = juce::String (int (percentVal * 100.0f));
     return percentStr + "%";
 }
 
@@ -30,7 +30,7 @@ float stringToPercentVal (const juce::String& s) { return s.getFloatValue() / 10
 
 juce::String gainValToString (float gainVal)
 {
-    juce::String gainStr = juce::String (gainVal, 2, false);
+    auto gainStr = juce::String (gainVal, 2, false);
     return gainStr + " dB";
 }
 
@@ -38,7 +38,7 @@ float stringToGainVal (const juce::String& s) { return s.getFloatValue(); }
 
 juce::String ratioValToString (float ratioVal)
 {
-    juce::String ratioStr = juce::String (ratioVal, 2, false);
+    auto ratioStr = juce::String (ratioVal, 2, false);
     return ratioStr + " : 1";
 }
 
@@ -49,7 +49,7 @@ juce::String timeMsValToString (float timeMsVal)
     if (timeMsVal < 1000.0f)
         return juce::String (timeMsVal, 2, false) + " ms";
 
-    juce::String timeSecStr = juce::String (timeMsVal / 1000.0f, 2, false);
+    auto timeSecStr = juce::String (timeMsVal / 1000.0f, 2, false);
     return timeSecStr + " s";
 }
 
@@ -80,7 +80,7 @@ void createBipolarPercentParameter (Parameters& params, const ParameterID& id, c
 
 void createGainDBParameter (Parameters& params, const ParameterID& id, const juce::String& name, float min, float max, float defaultValue, float centerValue)
 {
-    juce::NormalisableRange<float> range { min, max };
+    juce::NormalisableRange range { min, max };
     if (centerValue > -1000.0f)
         range.setSkewForCentre (centerValue);
 

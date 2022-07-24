@@ -38,7 +38,7 @@ namespace ParamUtils
     {
         static_assert (std::is_base_of_v<juce::RangedAudioParameter, std::remove_pointer_t<ParameterPointerType>>);
 
-        auto* baseParameter = vts.getParameter (parameterID);
+        const auto* baseParameter = vts.getParameter (parameterID);
         jassert (baseParameter != nullptr); // parameter was not found in the ValueTreeState!
 
         auto* typedParameter = dynamic_cast<ParameterPointerType> (baseParameter);

@@ -124,7 +124,7 @@ private:
                 frame[ch] = 0;
             int diff = lastFrame ^ frame[ch];
 
-            T sum = (T) 0;
+            auto sum = (T) 0;
             for (size_t i = 0; i < QUALITY; i++)
             {
                 if (diff & (1 << i))
@@ -133,7 +133,9 @@ private:
                 }
                 sum += values[ch][i];
             }
-            return sum / static_cast<T> (8);
+
+            static constexpr auto oneOverEight = static_cast<T> (1.0 / 8.0);
+            return sum * oneOverEight;
         }
     };
 

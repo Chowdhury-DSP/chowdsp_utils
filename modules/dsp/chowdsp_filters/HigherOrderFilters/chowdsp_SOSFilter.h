@@ -61,7 +61,7 @@ public:
         {
             modulator (n);
             for (int channel = 0; channel < numChannels; ++channel)
-                channelPointers[channel][n] = processSample (channelPointers[channel][n], (int) channel);
+                channelPointers[channel][n] = processSample (channelPointers[channel][n], channel);
         }
     }
 

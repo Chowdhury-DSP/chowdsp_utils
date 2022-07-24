@@ -81,7 +81,7 @@ public:
     [[nodiscard]] std::unique_ptr<juce::XmlElement> saveXmlState() const;
 
     /** Loads the preset manager state from an XML element */
-    void loadXmlState (juce::XmlElement* xml);
+    void loadXmlState (const juce::XmlElement* xml);
 
     static const juce::Identifier presetStateTag;
 

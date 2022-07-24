@@ -24,9 +24,9 @@ namespace ConformalMaps
 
             for (int j = 0; j < N; ++j)
             {
-                T val_b {};
-                T val_a {};
-                T k_val = (T) 1;
+                auto val_b = T {};
+                auto val_a = T {};
+                auto k_val = (T) 1;
 
                 for (int i = 0; i < N; ++i)
                 {
