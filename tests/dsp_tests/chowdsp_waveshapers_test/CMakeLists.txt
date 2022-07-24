@@ -9,4 +9,5 @@ target_sources(chowdsp_waveshapers_test
         ADAASoftClipperTest.cpp
         WaveMultiplierTest.cpp
         WestCoastFolderTest.cpp
+        LookupTableLoadingTest.cpp
 )
