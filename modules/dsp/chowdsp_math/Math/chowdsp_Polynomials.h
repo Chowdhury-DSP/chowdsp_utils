@@ -6,8 +6,6 @@ JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wsign-conversion",
 /** Useful methods for working with and evaluating polynomials */
 namespace chowdsp::Polynomials
 {
-using namespace SIMDUtils;
-
 /** Useful template type representing the product of two other types. */
 template <typename T, typename X>
 using P = decltype (T {} * X {});
@@ -19,8 +17,7 @@ using P = decltype (T {} * X {});
 template <int ORDER, typename T, typename X>
 constexpr P<T, X> naive (const T (&coeffs)[ORDER + 1], const X& x)
 {
-    using std::pow;
-    using xsimd::pow;
+    CHOWDSP_USING_XSIMD_STD (pow);
 
     P<T, X> sum = coeffs[ORDER];
     for (int n = 0; n < ORDER; ++n)

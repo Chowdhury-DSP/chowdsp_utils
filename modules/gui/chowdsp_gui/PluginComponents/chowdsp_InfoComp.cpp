@@ -1,8 +1,7 @@
 namespace chowdsp
 {
 template <typename ProcType, typename InfoProvider>
-InfoComp<ProcType, InfoProvider>::InfoComp (const ProcType& processor) : proc (processor),
-                                                                         linkButton (InfoProvider::getManufacturerString(), InfoProvider::getManufacturerWebsiteURL())
+InfoComp<ProcType, InfoProvider>::InfoComp (const ProcType& processor) : proc (processor)
 {
     setColour (text1ColourID, juce::Colours::grey);
     setColour (text2ColourID, juce::Colours::white);
