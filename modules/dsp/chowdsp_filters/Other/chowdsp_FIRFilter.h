@@ -19,7 +19,7 @@ public:
     FIRFilter();
 
     /** Constructs a filter with a given order */
-    explicit FIRFilter (int filterOrder) : order (filterOrder);
+    explicit FIRFilter (int filterOrder);
 
     FIRFilter (FIRFilter&&) noexcept = default;
     FIRFilter& operator= (FIRFilter&&) noexcept = default;
