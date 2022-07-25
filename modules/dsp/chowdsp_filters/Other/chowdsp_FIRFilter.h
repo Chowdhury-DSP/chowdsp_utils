@@ -16,17 +16,10 @@ class FIRFilter
 {
 public:
     /** Default constructor */
-    FIRFilter()
-    {
-        prepare (1);
-    }
+    FIRFilter();
 
     /** Constructs a filter with a given order */
-    explicit FIRFilter (int filterOrder) : order (filterOrder)
-    {
-        prepare (1);
-        setOrder (filterOrder);
-    }
+    explicit FIRFilter (int filterOrder) : order (filterOrder);
 
     FIRFilter (FIRFilter&&) noexcept = default;
     FIRFilter& operator= (FIRFilter&&) noexcept = default;
@@ -37,46 +30,23 @@ public:
      * Note that this will clear any coefficients which
      * had previously been loaded.
      */
-    void setOrder (int newOrder)
-    {
-        order = newOrder;
-
-        static constexpr int batchSize = xsimd::batch<FloatType>::size;
-        paddedOrder = batchSize * Math::ceiling_divide (order, batchSize);
-        coefficients.resize (paddedOrder, {});
-        prepare ((int) state.size());
-    }
+    void setOrder (int newOrder);
 
     /** Returns the current filter order */
     [[nodiscard]] int getOrder() const noexcept { return order; }
 
     /** Prepares the filter for processing a new number of channels */
-    void prepare (int numChannels)
-    {
-        state.resize (numChannels);
-        for (auto& z : state)
-            z.resize (2 * order, FloatType {});
-
-        zPtr.resize (numChannels, 0);
-    }
+    void prepare (int numChannels);
 
     /** Reset filter state */
-    void reset()
-    {
-        for (auto& channelState : state)
-            std::fill (channelState.begin(), channelState.end(), 0.0f);
-        std::fill (zPtr.begin(), zPtr.end(), 0);
-    }
+    void reset() noexcept;
 
     /**
      * Copies a new set of coefficients to use for the filter.
      * The length of data pointed to by the incoming data,
      * must be exactly the same as the filter order.
      */
-    void setCoefficients (const FloatType* coeffsData)
-    {
-        std::copy (coeffsData, coeffsData + order, coefficients.begin());
-    }
+    void setCoefficients (const FloatType* coeffsData);
 
     /** Process a single sample */
     inline FloatType processSample (FloatType x, int channel = 0) noexcept
@@ -147,7 +117,7 @@ private:
         return y;
     }
 
-    static FloatType simdInnerProduct (const FloatType* z, const FloatType* h, int N)
+    static inline FloatType simdInnerProduct (const FloatType* z, const FloatType* h, int N)
     {
         using b_type = xsimd::batch<FloatType>;
         static constexpr int inc = b_type::size;
