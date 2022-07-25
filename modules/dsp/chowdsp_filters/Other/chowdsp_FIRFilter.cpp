@@ -59,6 +59,6 @@ void FIRFilter<T>::setCoefficients (const FloatType* coeffsData)
 
 template class FIRFilter<float>;
 template class FIRFilter<double>;
-}
+} // namespace chowdsp
 
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
