@@ -51,7 +51,7 @@ public:
     /** Process a single sample */
     inline FloatType processSample (FloatType x, int channel = 0) noexcept
     {
-        return processSampleInternal (x, state[channel].data(), coefficients.data(), zPtr, order, paddedOrder);
+        return processSampleInternal (x, state[channel].data(), coefficients.data(), zPtr[channel], order, paddedOrder);
     }
 
     /** Process block of samples */
@@ -78,7 +78,7 @@ public:
      * Pushes a block of samples into the filter state without processing.
      * This can be useful for "bypassing" the filter.
      */
-    void processBlockBypassed (const float* block, const int numSamples, const int channel = 0) noexcept
+    void processBlockBypassed (const FloatType* block, const int numSamples, const int channel = 0) noexcept
     {
         auto* z = state[channel].data();
         chowdsp::ScopedValue zPtrLocal { zPtr[channel] };

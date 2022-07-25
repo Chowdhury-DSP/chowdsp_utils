@@ -9,21 +9,21 @@ JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wsign-conversion")
 
 namespace chowdsp
 {
-template <typename T>
-FIRFilter<T>::FIRFilter()
+template <typename FloatType>
+FIRFilter<FloatType>::FIRFilter()
 {
     prepare (1);
 }
 
-template <typename T>
-FIRFilter<T>::FIRFilter (int filterOrder) : order (filterOrder)
+template <typename FloatType>
+FIRFilter<FloatType>::FIRFilter (int filterOrder) : order (filterOrder)
 {
     prepare (1);
     setOrder (filterOrder);
 }
 
-template <typename T>
-void FIRFilter<T>::setOrder (int newOrder)
+template <typename FloatType>
+void FIRFilter<FloatType>::setOrder (int newOrder)
 {
     order = newOrder;
 
@@ -33,8 +33,8 @@ void FIRFilter<T>::setOrder (int newOrder)
     prepare ((int) state.size());
 }
 
-template <typename T>
-void FIRFilter<T>::prepare (int numChannels)
+template <typename FloatType>
+void FIRFilter<FloatType>::prepare (int numChannels)
 {
     state.resize (numChannels);
     for (auto& z : state)
@@ -43,16 +43,16 @@ void FIRFilter<T>::prepare (int numChannels)
     zPtr.resize (numChannels, 0);
 }
 
-template <typename T>
-void FIRFilter<T>::reset() noexcept
+template <typename FloatType>
+void FIRFilter<FloatType>::reset() noexcept
 {
     for (auto& channelState : state)
         std::fill (channelState.begin(), channelState.end(), 0.0f);
     std::fill (zPtr.begin(), zPtr.end(), 0);
 }
 
-template <typename T>
-void FIRFilter<T>::setCoefficients (const FloatType* coeffsData)
+template <typename FloatType>
+void FIRFilter<FloatType>::setCoefficients (const FloatType* coeffsData)
 {
     std::copy (coeffsData, coeffsData + order, coefficients.begin());
 }
