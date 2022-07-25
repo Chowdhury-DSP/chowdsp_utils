@@ -20,9 +20,11 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 #pragma once
 
+//STL includes
 #include <array>
 #include <unordered_map>
 
+//JUCE includes
 #include <chowdsp_simd/chowdsp_simd.h>
 #include <chowdsp_math/chowdsp_math.h>
 
@@ -31,10 +33,14 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "chowdsp_dsp_data_structures/Buffers/chowdsp_SIMDAudioBlock.h"
 #endif
 
+// third-party includes
+#include "third_party/moodycamel/readerwriterqueue.h"
+
 #include "Other/chowdsp_ScopedValue.h"
+#include "Other/chowdsp_SmoothedBufferValue.h"
+
 #include "Buffers/chowdsp_Buffer.h"
 #include "Buffers/chowdsp_BufferView.h"
-#include "Other/chowdsp_SmoothedBufferValue.h"
 #include "Processors/chowdsp_RebufferedProcessor.h"
 #include "LookupTables/chowdsp_LookupTableTransform.h"
 #include "LookupTables/chowdsp_LookupTableCache.h"

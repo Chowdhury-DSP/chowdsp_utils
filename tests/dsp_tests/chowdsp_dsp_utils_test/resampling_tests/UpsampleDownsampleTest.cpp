@@ -2,6 +2,7 @@
 #include <chowdsp_dsp_utils/chowdsp_dsp_utils.h>
 
 #if JUCE_MAC
+#include <Accelerate/Accelerate.h>
 
 struct AppleFFT
 {
