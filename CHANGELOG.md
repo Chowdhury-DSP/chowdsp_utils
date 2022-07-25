@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - Added filters: Kurt Werner's generalized SVF, ARP 1047 filter.
 - Added waveshapers: Buchla wavefolder, Serge Wave Multiplier, full wave rectifier.
 - Added triangle wave oscillator.
+- Added wrapper for `moodycamel::ReaderWriterQueue`.
 - Added methods for setting/clearing groups of parameters in `ForwardingParametersManager`.
 - Fixed out-of-order preset swapping in `PresetManager`.
 
