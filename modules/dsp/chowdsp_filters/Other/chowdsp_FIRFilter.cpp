@@ -1,5 +1,10 @@
 #include "chowdsp_FIRFilter.h"
 
+#if defined(__APPLE_CPP__) || defined(__APPLE_CC__)
+// include <Accelerate> on Apple devices so we can use vDSP_dotpr
+#include <Accelerate/Accelerate.h>
+#endif
+
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wsign-conversion")
 
 namespace chowdsp
