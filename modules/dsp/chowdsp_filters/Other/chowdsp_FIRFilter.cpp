@@ -65,8 +65,13 @@ inline FloatType FIRFilter<FloatType>::processSampleInternal (FloatType x, Float
     z[zPtr + order] = x;
 
 #if JUCE_MAC || JUCE_IOS
-    auto y = 0.0f;
-    vDSP_dotpr (z + zPtr, 1, h, 1, &y, paddedOrder); // use Acclerate inner product (if available)
+    auto y = (FloatType) 0;
+
+    // use Acclerate inner product (if available)
+    if constexpr (std::is_same_v<FloatType, float>)
+        vDSP_dotpr (z + zPtr, 1, h, 1, &y, paddedOrder);
+    else
+        vDSP_dotprD (z + zPtr, 1, h, 1, &y, paddedOrder);
 #else
     auto y = simdInnerProduct (z + zPtr, h, paddedOrder); // compute inner product
 #endif
