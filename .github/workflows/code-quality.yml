@@ -53,10 +53,6 @@ jobs:
         shell: bash
         run: cmake -Bbuild -DCHOWDSP_ENABLE_TESTING=ON -DCHOWDSP_CODE_QUALITY_CHECKS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug
 
-      - name: Setup debug session
-        if: always()
-        uses: mxschmitt/action-tmate@v3
-
       - name: Run clang-tidy
         working-directory: ${{env.WORK_DIR}}
         shell: bash
