@@ -29,8 +29,8 @@ jobs:
           wget https://apt.llvm.org/llvm.sh
           chmod +x llvm.sh
           sudo ./llvm.sh 14
-          sudo apt-get install clang-format-14
-          clang-format-14 --version
+          sudo apt-get install clang-tidy-14
+          clang-tidy-14 --version
 
       - name: Get latest CMake
         uses: lukka/get-cmake@latest
