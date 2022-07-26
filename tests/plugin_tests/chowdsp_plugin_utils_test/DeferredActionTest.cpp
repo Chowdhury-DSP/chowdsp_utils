@@ -26,23 +26,25 @@ public:
 
         chowdsp::DeferredAction action;
         Counter counter { *this };
-        std::atomic<int> refCounter;
+        std::atomic<int> refCounter { 0 };
 
         juce::Thread::launch (
             [&] {
                 for (int i = 0; i < 100; ++i)
                 {
-                    action.call ([&counter] { counter.increment(); },
+                    action.call ([&counter]
+                                 { counter.increment(); },
                                  fakeAudioThread);
-                    refCounter++;
+                    refCounter.fetch_add (1);
                     juce::Thread::sleep (5);
                 }
             });
 
         for (int i = 0; i < 100; ++i)
         {
-            action.call ([&counter] { counter.increment(); });
-            refCounter++;
+            action.call ([&counter]
+                         { counter.increment(); });
+            refCounter.fetch_add (1);
             juce::MessageManager::getInstance()->runDispatchLoopUntil (5);
         }
 
