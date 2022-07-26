@@ -25,7 +25,12 @@ jobs:
           sudo apt install libasound2-dev libcurl4-openssl-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev libsamplerate-dev
 
       - name: Install clang-tidy
-        run: sudo apt install clang-tidy
+        run: |
+          wget https://apt.llvm.org/llvm.sh
+          chmod +x llvm.sh
+          sudo ./llvm.sh 14
+          sudo apt-get install clang-format-14
+          clang-format-14 --version
 
       - name: Get latest CMake
         uses: lukka/get-cmake@latest
