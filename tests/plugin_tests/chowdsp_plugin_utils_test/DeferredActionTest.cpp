@@ -29,12 +29,10 @@ public:
         std::atomic<int> refCounter;
 
         juce::Thread::launch (
-            [&]
-            {
+            [&] {
                 for (int i = 0; i < 100; ++i)
                 {
-                    action.call ([&counter]
-                                 { counter.increment(); },
+                    action.call ([&counter] { counter.increment(); },
                                  fakeAudioThread);
                     refCounter++;
                     juce::Thread::sleep (5);
@@ -43,8 +41,7 @@ public:
 
         for (int i = 0; i < 100; ++i)
         {
-            action.call ([&counter]
-                         { counter.increment(); });
+            action.call ([&counter] { counter.increment(); });
             refCounter++;
             juce::MessageManager::getInstance()->runDispatchLoopUntil (5);
         }
