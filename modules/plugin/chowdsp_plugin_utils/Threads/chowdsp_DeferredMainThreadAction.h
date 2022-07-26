@@ -2,9 +2,9 @@
 
 #include <juce_dsp/juce_dsp.h>
 
-// NOLINTBEGIN(*)
+// NOLINTBEGIN(.*)
 #include "../../../dsp/chowdsp_dsp_data_structures/third_party/moodycamel/concurrentqueue.h"
-// NOLINTEND(*)
+// NOLINTEND(.*)
 
 namespace chowdsp
 {
