@@ -35,6 +35,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 // third-party includes
 #include "third_party/moodycamel/readerwriterqueue.h"
+#include "third_party/moodycamel/concurrentqueue.h"
 
 #include "Other/chowdsp_ScopedValue.h"
 #include "Other/chowdsp_SmoothedBufferValue.h"
