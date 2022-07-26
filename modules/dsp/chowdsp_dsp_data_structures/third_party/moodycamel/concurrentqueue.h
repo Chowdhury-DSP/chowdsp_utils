@@ -29,8 +29,6 @@
 
 // Also dual-licensed under the Boost Software License (see LICENSE.md)
 
-// NOLINTBEGIN
-
 #pragma once
 
 #if defined(__GNUC__) && ! defined(__INTEL_COMPILER)
@@ -4215,5 +4213,3 @@ inline void swap (typename ConcurrentQueue<T, Traits>::ImplicitProducerKVP& a, t
 #if defined(__GNUC__) && ! defined(__INTEL_COMPILER)
 #pragma GCC diagnostic pop
 #endif
-
-// NOLINTEND
