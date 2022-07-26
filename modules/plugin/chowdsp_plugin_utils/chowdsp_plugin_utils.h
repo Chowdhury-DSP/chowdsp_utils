@@ -44,3 +44,7 @@
 #include "State/chowdsp_UIState.h"
 
 #include "Threads/chowdsp_AudioUIBackgroundTask.h"
+
+#if JUCE_MODULE_AVAILABLE_juce_dsp
+#include "Threads/chowdsp_DeferredMainThreadAction.h"
+#endif
