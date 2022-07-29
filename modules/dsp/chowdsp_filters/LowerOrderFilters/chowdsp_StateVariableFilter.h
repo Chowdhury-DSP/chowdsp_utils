@@ -217,7 +217,7 @@ private:
     SampleType cutoffFrequency, resonance, gain; // parameters
     SampleType g0, k0, A, sqrtA; // parameter intermediate values
     SampleType a1, a2, a3, ak, k0A, Asq; // coefficients
-    std::vector<SampleType> ic1eq { 2 }, ic2eq { 2 }; // state variables
+    std::vector<SampleType> ic1eq, ic2eq; // state variables
 
     NumericType lowpassMult { 0 }, bandpassMult { 0 }, highpassMult { 0 };
 
