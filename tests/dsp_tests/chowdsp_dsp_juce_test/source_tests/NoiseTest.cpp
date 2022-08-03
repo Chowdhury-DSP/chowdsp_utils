@@ -1,6 +1,6 @@
 #include <TimedUnitTest.h>
 #include <algorithm>
-#include <chowdsp_dsp_utils/chowdsp_dsp_utils.h>
+#include <chowdsp_sources/chowdsp_sources.h>
 
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wpessimizing-move")
 

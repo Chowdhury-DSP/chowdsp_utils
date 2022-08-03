@@ -57,60 +57,6 @@ void FIRFilter<FloatType>::setCoefficients (const FloatType* coeffsData)
     std::copy (coeffsData, coeffsData + order, coefficients.begin());
 }
 
-template <typename FloatType>
-inline FloatType FIRFilter<FloatType>::processSampleInternal (FloatType x, FloatType* z, const FloatType* h, int& zPtr, int order, int paddedOrder) noexcept
-{
-    // insert input into double-buffered state
-    z[zPtr] = x;
-    z[zPtr + order] = x;
-
-#if JUCE_MAC || JUCE_IOS
-    auto y = (FloatType) 0;
-
-    // use Acclerate inner product (if available)
-    if constexpr (std::is_same_v<FloatType, float>)
-        vDSP_dotpr (z + zPtr, 1, h, 1, &y, paddedOrder);
-    else
-        vDSP_dotprD (z + zPtr, 1, h, 1, &y, paddedOrder);
-#else
-    auto y = simdInnerProduct (z + zPtr, h, paddedOrder); // compute inner product
-#endif
-
-    zPtr = (zPtr == 0 ? order - 1 : zPtr - 1); // iterate state pointer in reverse
-    return y;
-}
-
-template <typename FloatType>
-inline FloatType FIRFilter<FloatType>::simdInnerProduct (const FloatType* z, const FloatType* h, int N)
-{
-    using b_type = xsimd::batch<FloatType>;
-    static constexpr int inc = b_type::size;
-
-    // since the size of the coefficients vector is padded, we can vectorize
-    // the whole loop, and don't have to worry about leftover samples.
-    jassert (N % inc == 0); // something is wrong with the padding...
-
-    b_type batch_y {};
-    for (int i = 0; i < N; i += inc)
-    {
-        b_type hReg = xsimd::load_aligned (&h[i]); // coefficients should always be aligned!
-        b_type zReg = xsimd::load_unaligned (&z[i]); // state probably won't be aligned
-
-        batch_y += hReg * zReg;
-    }
-
-    return xsimd::hadd (batch_y);
-}
-
-template <typename FloatType>
-inline void FIRFilter<FloatType>::processSampleInternalBypassed (FloatType x, FloatType* z, int& zPtr, int order) noexcept
-{
-    // insert input into double-buffered state
-    z[zPtr] = x;
-    z[zPtr + order] = x;
-    zPtr = (zPtr == 0 ? order - 1 : zPtr - 1); // iterate state pointer in reverse
-}
-
 template class FIRFilter<float>;
 template class FIRFilter<double>;
 } // namespace chowdsp
