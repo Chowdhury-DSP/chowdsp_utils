@@ -6,6 +6,7 @@
 #include "../SimpleReverb/SimpleReverbPlugin.h"
 #include "InternalPlugins/WernerFilterPlugin.h"
 #include "InternalPlugins/ARPFilterPlugin.h"
+#include "InternalPlugins/PolygonalOscPlugin.h"
 
 class ForwardingTestPlugin : public chowdsp::PluginBase<ForwardingTestPlugin>,
                              private juce::AudioProcessorValueTreeState::Listener
@@ -36,6 +37,7 @@ private:
     SimpleReverbPlugin reverb;
     WernerFilterPlugin wernerFilter;
     ARPFilterPlugin arpFilter;
+    PolygonalOscPlugin polygonalOsc;
 
     struct ParamForwardingProvider
     {

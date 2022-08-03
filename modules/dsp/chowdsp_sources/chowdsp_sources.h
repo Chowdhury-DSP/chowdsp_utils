@@ -27,6 +27,8 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Oscillators/chowdsp_SquareWave.h"
 #include "Oscillators/chowdsp_TriangleWave.h"
 
+#include "Oscillators/chowdsp_PolygonalOscillator.h"
+
 #if CHOWDSP_USING_JUCE
 #if JUCE_MODULE_AVAILABLE_juce_dsp
 #include "Other/chowdsp_Noise.h"
