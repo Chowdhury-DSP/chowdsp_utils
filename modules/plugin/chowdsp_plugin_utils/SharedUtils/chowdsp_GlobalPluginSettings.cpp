@@ -1,8 +1,5 @@
 #include "chowdsp_GlobalPluginSettings.h"
 
-// @TODO: Update this class when nlohmann::json supports std::string_view
-// this should be available in version 3.11 (https://github.com/nlohmann/json/issues/1529)
-
 namespace chowdsp
 {
 GlobalPluginSettings::SettingsFileListener::SettingsFileListener (const juce::File& file, int timerSeconds, GlobalPluginSettings& settings)
@@ -30,13 +27,13 @@ void GlobalPluginSettings::initialise (const juce::String& settingsFile, int tim
 
 void GlobalPluginSettings::addProperties (std::initializer_list<SettingProperty> properties, Listener* listener)
 {
-    jassert (fileListener != nullptr); // Trying to add properties before initalizing? Don't do that!
+    jassert (fileListener != nullptr); // Trying to add properties before initializing? Don't do that!
     const juce::ScopedLock sl (lock);
 
-    for (auto& [name, value] : properties)
+    for (const auto& [name, value] : properties)
     {
         if (! globalProperties.contains (name))
-            globalProperties[name.data()] = std::move (value);
+            globalProperties[name] = value; // we have to copy here because you can't "move" out of std::initializer_list
         addPropertyListener (name, listener);
     }
     writeSettingsToFile();
@@ -48,7 +45,7 @@ T GlobalPluginSettings::getProperty (SettingID name)
     const juce::ScopedLock sl (lock);
     try
     {
-        return globalProperties[name.data()].get<T>();
+        return globalProperties[name].get<T>();
     }
     catch (...)
     {
@@ -70,14 +67,14 @@ void GlobalPluginSettings::setProperty (SettingID name, T property)
         return;
     }
 
-    if (! JSONUtils::isSameType (json (T {}), globalProperties[name.data()]))
+    if (! JSONUtils::isSameType (json (T {}), globalProperties[name]))
     {
         // new property must have the same type as the original!
         jassertfalse;
         return;
     }
 
-    globalProperties[name.data()] = property;
+    globalProperties[name] = property;
     writeSettingsToFile();
 
     for (auto* l : listeners[name])
@@ -141,7 +138,7 @@ bool GlobalPluginSettings::loadSettingsFromFile()
         return false;
     }
 
-    if (! settingsJson.contains (settingsTag.data()))
+    if (! settingsJson.contains (settingsTag))
     {
         // invalid settings!
         settingsFile.deleteRecursively();
@@ -149,11 +146,11 @@ bool GlobalPluginSettings::loadSettingsFromFile()
     }
 
     const auto oldProperties = globalProperties;
-    globalProperties = settingsJson[settingsTag.data()];
+    globalProperties = settingsJson[settingsTag];
 
     for (const auto& [name, value] : oldProperties.items())
     {
-        auto& newProperty = globalProperties[name.data()];
+        auto& newProperty = globalProperties[name];
         if (! JSONUtils::isSameType (value, newProperty))
         {
             // new property does not have the same type as the original!
@@ -181,7 +178,7 @@ void GlobalPluginSettings::writeSettingsToFile() const
     auto& settingsFile = fileListener->getListenerFile();
 
     json settingsJson;
-    settingsJson[settingsTag.data()] = globalProperties;
+    settingsJson[settingsTag] = globalProperties;
 
     if (! settingsFile.existsAsFile())
     {
