@@ -54,7 +54,7 @@ void PolygonalOscillator<FloatType>::processBlock (const BufferView<FloatType>& 
     for (int ch = 0; ch < numChannels; ++ch)
     {
         phase = initialPhase;
-        
+
         auto* x = buffer.getWritePointer (ch);
         for (int n = 0; n < numSamples; ++n)
             x[n] += processSample();
