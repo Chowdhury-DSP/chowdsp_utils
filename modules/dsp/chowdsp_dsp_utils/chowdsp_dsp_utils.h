@@ -69,12 +69,6 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Processors/chowdsp_Panner.h"
 #include "Processors/chowdsp_TunerProcessor.h"
 
-// sound sources
-#include "Sources/chowdsp_SawtoothWave.h"
-#include "Sources/chowdsp_SineWave.h"
-#include "Sources/chowdsp_SquareWave.h"
-#include "Sources/chowdsp_TriangleWave.h"
-
 #if CHOWDSP_USING_JUCE
 #include <juce_audio_processors/juce_audio_processors.h>
 
@@ -88,10 +82,6 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 // resamplers
 #include "Resampling/chowdsp_VariableOversampling.h"
-
-// sound sources
-#include "Sources/chowdsp_Noise.h"
-#include "Sources/chowdsp_RepitchedSource.h"
 #endif
 
 // some other useful processors

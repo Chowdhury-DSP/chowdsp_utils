@@ -1,5 +1,5 @@
-#include <CatchUtils.h>
-#include <chowdsp_dsp_utils/chowdsp_dsp_utils.h>
+#include "CatchUtils.h"
+#include <chowdsp_sources/chowdsp_sources.h>
 
 namespace
 {
@@ -8,15 +8,15 @@ constexpr auto _blockSize = 512;
 constexpr auto testFreq = 100.0f;
 } // namespace
 
-TEST_CASE ("Triangle Test")
+TEST_CASE ("Square Test")
 {
     SECTION ("Reference Test")
     {
         // our osc has 1/2 sample delay so, run the reference osc at 2x sample rate, and check every other.
+        float phase = 0.0f;
         const auto phaseIncrement = juce::MathConstants<float>::twoPi * testFreq / float (2.0 * _sampleRate);
-        auto refOsc = [phase = 0.0f, phaseIncrement]() mutable {
-            const auto x = (phase - juce::MathConstants<float>::pi) / juce::MathConstants<float>::pi;
-            const auto y = 2.0f * std::abs (x) - 1.0f;
+        auto refOsc = [&phase, phaseIncrement]() mutable {
+            const auto y = (phase - juce::MathConstants<float>::pi) < 0.0f ? 1.0f : -1.0f;
             phase += phaseIncrement;
 
             while (phase >= juce::MathConstants<float>::twoPi)
@@ -25,12 +25,12 @@ TEST_CASE ("Triangle Test")
             return y;
         };
 
-        chowdsp::TriangleWave<float> testOsc;
+        chowdsp::SquareWave<float> testOsc;
         testOsc.prepare ({ _sampleRate, (juce::uint32) _blockSize, 1 });
         testOsc.setFrequency (testFreq);
         REQUIRE_MESSAGE (testOsc.getFrequency() == testFreq, "Set frequency is incorrect!");
 
-        testOsc.processSample(); // for half-sample delay?
+        testOsc.processSample(); // for half-sample delay
         for (int i = 0; i < 20; ++i)
         {
             refOsc();
@@ -41,10 +41,10 @@ TEST_CASE ("Triangle Test")
     SECTION ("SIMD Reference Test")
     {
         // our osc has 1/2 sample delay so, run the reference osc at 2x sample rate, and check every other.
+        float phase = 0.0f;
         const auto phaseIncrement = juce::MathConstants<float>::twoPi * testFreq / float (2.0 * _sampleRate);
-        auto refOsc = [phase = 0.0f, phaseIncrement]() mutable {
-            const auto x = (phase - juce::MathConstants<float>::pi) / juce::MathConstants<float>::pi;
-            const auto y = 2.0f * std::abs (x) - 1.0f;
+        auto refOsc = [&phase, phaseIncrement]() mutable {
+            const auto y = (phase - juce::MathConstants<float>::pi) < 0.0f ? 1.0f : -1.0f;
             phase += phaseIncrement;
 
             while (phase >= juce::MathConstants<float>::twoPi)
@@ -53,7 +53,7 @@ TEST_CASE ("Triangle Test")
             return y;
         };
 
-        chowdsp::TriangleWave<xsimd::batch<float>> testOsc;
+        chowdsp::SquareWave<xsimd::batch<float>> testOsc;
         testOsc.prepare ({ _sampleRate, (juce::uint32) _blockSize, 1 });
         testOsc.setFrequency (testFreq);
         REQUIRE_MESSAGE (testOsc.getFrequency().get (0) == testFreq, "Set frequency is incorrect!");
@@ -72,10 +72,10 @@ TEST_CASE ("Triangle Test")
 
     SECTION ("Process Replacing Test")
     {
+        float phase = 0.0f;
         const auto phaseIncrement = juce::MathConstants<float>::twoPi * testFreq / float (2.0 * _sampleRate);
-        auto refOsc = [phase = 0.0f, phaseIncrement] (float input) mutable {
-            const auto x = (phase - juce::MathConstants<float>::pi) / juce::MathConstants<float>::pi;
-            const auto y = 2.0f * std::abs (x) - 1.0f;
+        auto refOsc = [&phase, phaseIncrement] (float input) mutable {
+            const auto y = (phase - juce::MathConstants<float>::pi) < 0.0f ? 1.0f : -1.0f;
             phase += phaseIncrement;
 
             while (phase >= juce::MathConstants<float>::twoPi)
@@ -84,7 +84,7 @@ TEST_CASE ("Triangle Test")
             return y + input;
         };
 
-        chowdsp::TriangleWave<float> testOsc;
+        chowdsp::SquareWave<float> testOsc;
         testOsc.prepare ({ _sampleRate, (juce::uint32) _blockSize, 1 });
         testOsc.setFrequency (testFreq);
 
@@ -103,7 +103,7 @@ TEST_CASE ("Triangle Test")
 
     SECTION ("Zero Hz Test")
     {
-        chowdsp::TriangleWave<float> testOsc;
+        chowdsp::SquareWave<float> testOsc;
         testOsc.prepare ({ _sampleRate, (juce::uint32) _blockSize, 1 });
         testOsc.setFrequency (0.0f);
 

@@ -1,5 +1,5 @@
 #include <TimedUnitTest.h>
-#include <chowdsp_dsp_utils/chowdsp_dsp_utils.h>
+#include <chowdsp_sources/chowdsp_sources.h>
 
 /** @TODO: figure out why this test is flaky on Linux */
 #if ! JUCE_LINUX

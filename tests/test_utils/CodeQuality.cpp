@@ -10,6 +10,7 @@
 #include <chowdsp_math/chowdsp_math.h>
 #include <chowdsp_reverb/chowdsp_reverb.h>
 #include <chowdsp_simd/chowdsp_simd.h>
+#include <chowdsp_sources/chowdsp_sources.h>
 #include <chowdsp_waveshapers/chowdsp_waveshapers.h>
 #include <chowdsp_gui/chowdsp_gui.h>
 #include <chowdsp_rhythm/chowdsp_rhythm.h>
