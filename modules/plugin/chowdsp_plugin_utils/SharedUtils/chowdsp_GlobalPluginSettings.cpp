@@ -27,13 +27,13 @@ void GlobalPluginSettings::initialise (const juce::String& settingsFile, int tim
 
 void GlobalPluginSettings::addProperties (std::initializer_list<SettingProperty> properties, Listener* listener)
 {
-    jassert (fileListener != nullptr); // Trying to add properties before initalizing? Don't do that!
+    jassert (fileListener != nullptr); // Trying to add properties before initializing? Don't do that!
     const juce::ScopedLock sl (lock);
 
-    for (auto& [name, value] : properties)
+    for (const auto& [name, value] : properties)
     {
         if (! globalProperties.contains (name))
-            globalProperties[name] = std::move (value);
+            globalProperties[name] = value; // we have to copy here because you can't "move" out of std::initializer_list
         addPropertyListener (name, listener);
     }
     writeSettingsToFile();
