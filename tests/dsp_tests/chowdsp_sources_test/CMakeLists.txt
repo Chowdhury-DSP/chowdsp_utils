@@ -6,4 +6,5 @@ target_sources(chowdsp_sources_test
         SawtoothTest.cpp
         SquareTest.cpp
         TriangleTest.cpp
+        PolygonalTest.cpp
 )

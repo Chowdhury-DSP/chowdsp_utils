@@ -3,7 +3,7 @@
 namespace chowdsp
 {
 /**
- * Oscillator based on continuous-ordered polygons.
+ * Oscillator based on continuous-ordered polygons. Still a little bit of a WIP.
  *
  * Reference: https://quod.lib.umich.edu/cgi/p/pod/dod-idx/continuous-order-polygonalwaveform-synthesis.pdf?c=icmc;idno=bbp2372.2016.104;format=pdf
  */
@@ -53,7 +53,7 @@ public:
         // @TODO: implement some form of aliasing suppression, maybe polyBLAMP?
         // @TODO: optimize! (magic circle?)
         auto y = cosPiOverOrder * sin (phase);
-        y /= cos (rOrder * fmod (phase * order, twoPi) - juce::MathConstants<NumericType>::pi * rOrder + teeth);
+        y /= cos (rOrder * fmod (phase * order, static_cast<FloatType> (twoPi)) - juce::MathConstants<NumericType>::pi * rOrder + teeth);
 
         phase += deltaPhase;
         phase = SIMDUtils::select (phase >= twoPi, phase - twoPi, phase);
