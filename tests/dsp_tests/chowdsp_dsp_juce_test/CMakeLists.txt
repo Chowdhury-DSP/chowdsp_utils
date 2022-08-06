@@ -7,6 +7,7 @@ target_link_libraries(chowdsp_dsp_juce_test
         chowdsp_dsp_data_structures
         chowdsp_eq
         chowdsp_reverb
+        chowdsp_sources
         chowdsp_plugin_base
 )
 

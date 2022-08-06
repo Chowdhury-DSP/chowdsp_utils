@@ -100,9 +100,9 @@ public:
     }
 
 private:
-    static inline FloatType processSampleInternal (FloatType x, FloatType* z, const FloatType* h, int& zPtr, int order, int paddedOrder) noexcept;
-    static inline FloatType simdInnerProduct (const FloatType* z, const FloatType* h, int N);
-    static inline void processSampleInternalBypassed (FloatType x, FloatType* z, int& zPtr, int order) noexcept;
+    static FloatType processSampleInternal (FloatType x, FloatType* z, const FloatType* h, int& zPtr, int order, int paddedOrder) noexcept;
+    static FloatType simdInnerProduct (const FloatType* z, const FloatType* h, int N);
+    static void processSampleInternalBypassed (FloatType x, FloatType* z, int& zPtr, int order) noexcept;
 
     int order = 0;
     int paddedOrder = 0;

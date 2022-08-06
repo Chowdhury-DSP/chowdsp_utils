@@ -4,6 +4,7 @@ target_link_libraries(ForwardingTestPlugin
     PRIVATE
         juce::juce_dsp
         chowdsp_reverb
+        chowdsp_sources
 )
 
 target_sources(ForwardingTestPlugin
@@ -16,6 +17,7 @@ target_sources(ForwardingTestPlugin
 
         InternalPlugins/WernerFilterPlugin.cpp
         InternalPlugins/ARPFilterPlugin.cpp
+        InternalPlugins/PolygonalOscPlugin.cpp
 )
 
 target_compile_definitions(ForwardingTestPlugin

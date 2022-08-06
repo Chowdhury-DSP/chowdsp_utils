@@ -26,6 +26,7 @@ target_link_libraries(chowdsp_utils_codeql PRIVATE
     chowdsp_math
     chowdsp_reverb
     chowdsp_simd
+    chowdsp_sources
     chowdsp_waveshapers
     chowdsp_gui
     chowdsp_rhythm

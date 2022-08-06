@@ -1,39 +1,50 @@
-#include <CatchUtils.h>
-#include <chowdsp_dsp_utils/chowdsp_dsp_utils.h>
+#include "CatchUtils.h"
+#include <chowdsp_sources/chowdsp_sources.h>
 
 namespace
 {
 constexpr auto _sampleRate = 1000.0;
 constexpr auto _blockSize = 512;
+
 constexpr auto testFreq = 100.0f;
+constexpr auto polygonOrder = 2.5f;
+constexpr auto polygonTeeth = 1.25f;
 } // namespace
 
-TEST_CASE ("Triangle Test")
+float polygonalCore (float phase, float order, float teeth)
+{
+    static constexpr auto pi = juce::MathConstants<float>::pi;
+    const auto p = std::cos (pi / order) / std::cos ((1.0f / order) * std::fmod (phase * order, 2.0f * pi) - pi / order + teeth);
+    return std::sin (phase) * p;
+}
+
+TEST_CASE ("Polygonal Test")
 {
     SECTION ("Reference Test")
     {
-        // our osc has 1/2 sample delay so, run the reference osc at 2x sample rate, and check every other.
-        const auto phaseIncrement = juce::MathConstants<float>::twoPi * testFreq / float (2.0 * _sampleRate);
-        auto refOsc = [phase = 0.0f, phaseIncrement]() mutable {
-            const auto x = (phase - juce::MathConstants<float>::pi) / juce::MathConstants<float>::pi;
-            const auto y = 2.0f * std::abs (x) - 1.0f;
-            phase += phaseIncrement;
+        float phase = 0.0f;
+        const auto phaseIncrement = juce::MathConstants<float>::twoPi * testFreq / float (_sampleRate);
+        auto refOsc = [&phase, phaseIncrement]() mutable {
+            const auto y = polygonalCore (phase, polygonOrder, polygonTeeth);
 
+            phase += phaseIncrement;
             while (phase >= juce::MathConstants<float>::twoPi)
                 phase -= juce::MathConstants<float>::twoPi;
 
             return y;
         };
 
-        chowdsp::TriangleWave<float> testOsc;
+        chowdsp::PolygonalOscillator<float> testOsc;
         testOsc.prepare ({ _sampleRate, (juce::uint32) _blockSize, 1 });
         testOsc.setFrequency (testFreq);
+        testOsc.setOrder (polygonOrder);
+        testOsc.setTeeth (polygonTeeth);
         REQUIRE_MESSAGE (testOsc.getFrequency() == testFreq, "Set frequency is incorrect!");
+        REQUIRE_MESSAGE (testOsc.getOrder() == polygonOrder, "Set Order is incorrect!");
+        REQUIRE_MESSAGE (testOsc.getTeeth() == polygonTeeth, "Set Teeth is incorrect!");
 
-        testOsc.processSample(); // for half-sample delay?
         for (int i = 0; i < 20; ++i)
         {
-            refOsc();
             REQUIRE_MESSAGE (testOsc.processSample() == Approx (refOsc()).margin (0.01f), "Generated sample is incorrect!");
         }
     }
@@ -41,28 +52,29 @@ TEST_CASE ("Triangle Test")
     SECTION ("SIMD Reference Test")
     {
         // our osc has 1/2 sample delay so, run the reference osc at 2x sample rate, and check every other.
-        const auto phaseIncrement = juce::MathConstants<float>::twoPi * testFreq / float (2.0 * _sampleRate);
-        auto refOsc = [phase = 0.0f, phaseIncrement]() mutable {
-            const auto x = (phase - juce::MathConstants<float>::pi) / juce::MathConstants<float>::pi;
-            const auto y = 2.0f * std::abs (x) - 1.0f;
-            phase += phaseIncrement;
+        float phase = 0.0f;
+        const auto phaseIncrement = juce::MathConstants<float>::twoPi * testFreq / float (_sampleRate);
+        auto refOsc = [&phase, phaseIncrement]() mutable {
+            const auto y = polygonalCore (phase, polygonOrder, polygonTeeth);
 
+            phase += phaseIncrement;
             while (phase >= juce::MathConstants<float>::twoPi)
                 phase -= juce::MathConstants<float>::twoPi;
 
             return y;
         };
 
-        chowdsp::TriangleWave<xsimd::batch<float>> testOsc;
+        chowdsp::PolygonalOscillator<xsimd::batch<float>> testOsc;
         testOsc.prepare ({ _sampleRate, (juce::uint32) _blockSize, 1 });
         testOsc.setFrequency (testFreq);
+        testOsc.setOrder (polygonOrder);
+        testOsc.setTeeth (polygonTeeth);
         REQUIRE_MESSAGE (testOsc.getFrequency().get (0) == testFreq, "Set frequency is incorrect!");
+        REQUIRE_MESSAGE (testOsc.getOrder().get (0) == polygonOrder, "Set Order is incorrect!");
+        REQUIRE_MESSAGE (testOsc.getTeeth().get (0) == polygonTeeth, "Set Teeth is incorrect!");
 
-        testOsc.processSample(); // for half-sample delay
         for (int i = 0; i < 20; ++i)
         {
-            refOsc();
-
             auto expOut = refOsc();
             auto testOut = testOsc.processSample();
             REQUIRE_MESSAGE (testOut.get (0) == Approx (expOut).margin (0.01f), "Generated sample is incorrect!");
@@ -72,21 +84,23 @@ TEST_CASE ("Triangle Test")
 
     SECTION ("Process Replacing Test")
     {
-        const auto phaseIncrement = juce::MathConstants<float>::twoPi * testFreq / float (2.0 * _sampleRate);
-        auto refOsc = [phase = 0.0f, phaseIncrement] (float input) mutable {
-            const auto x = (phase - juce::MathConstants<float>::pi) / juce::MathConstants<float>::pi;
-            const auto y = 2.0f * std::abs (x) - 1.0f;
-            phase += phaseIncrement;
+        float phase = 0.0f;
+        const auto phaseIncrement = juce::MathConstants<float>::twoPi * testFreq / float (_sampleRate);
+        auto refOsc = [&phase, phaseIncrement] (float input) mutable {
+            const auto y = polygonalCore (phase, polygonOrder, polygonTeeth);
 
+            phase += phaseIncrement;
             while (phase >= juce::MathConstants<float>::twoPi)
                 phase -= juce::MathConstants<float>::twoPi;
 
             return y + input;
         };
 
-        chowdsp::TriangleWave<float> testOsc;
+        chowdsp::PolygonalOscillator<float> testOsc;
         testOsc.prepare ({ _sampleRate, (juce::uint32) _blockSize, 1 });
         testOsc.setFrequency (testFreq);
+        testOsc.setOrder (polygonOrder);
+        testOsc.setTeeth (polygonTeeth);
 
         chowdsp::Buffer<float> testBuffer (1, 21);
         juce::FloatVectorOperations::fill (testBuffer.getWritePointer (0), 1.0f, 21);
@@ -94,16 +108,15 @@ TEST_CASE ("Triangle Test")
 
         for (int i = 0; i < 19; ++i)
         {
-            refOsc (1.0f);
             auto expOut = refOsc (1.0f);
-            auto actualOut = testBuffer.getReadPointer (0)[i + 1];
+            auto actualOut = testBuffer.getReadPointer (0)[i];
             REQUIRE_MESSAGE (actualOut == Approx (expOut).margin (0.01f), "Generated sample is incorrect!");
         }
     }
 
     SECTION ("Zero Hz Test")
     {
-        chowdsp::TriangleWave<float> testOsc;
+        chowdsp::PolygonalOscillator<float> testOsc;
         testOsc.prepare ({ _sampleRate, (juce::uint32) _blockSize, 1 });
         testOsc.setFrequency (0.0f);
 

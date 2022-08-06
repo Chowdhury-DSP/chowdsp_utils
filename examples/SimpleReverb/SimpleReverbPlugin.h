@@ -2,6 +2,7 @@
 
 #include <chowdsp_plugin_base/chowdsp_plugin_base.h>
 #include <chowdsp_reverb/chowdsp_reverb.h>
+#include <chowdsp_sources/chowdsp_sources.h>
 
 class SimpleReverbPlugin : public chowdsp::PluginBase<SimpleReverbPlugin>
 {
