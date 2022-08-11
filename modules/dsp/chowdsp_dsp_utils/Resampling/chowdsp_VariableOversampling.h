@@ -6,7 +6,7 @@ namespace chowdsp
  * Let's say you've got a plugin that should have oversampling options.
  * This class can be used to create a set of oversamplers connected to
  * parameters that manage the oversampling factor and mode, and may also
- * be used to manage a separate oversampling mode for offline renderring.
+ * be used to manage a separate oversampling mode for offline rendering.
  */
 template <typename FloatType = float>
 class VariableOversampling
@@ -133,7 +133,6 @@ private:
     const juce::AudioProcessor& proc;
 
     const bool usingIntegerLatency;
-    const juce::String paramPrefix;
 
     juce::ListenerList<Listener> listeners;
 
