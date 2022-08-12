@@ -95,7 +95,8 @@ VariableOversampling<FloatType>::VariableOversampling (const juce::AudioProcesso
         using ParamType = std::remove_reference_t<decltype (param)>;
         param = dynamic_cast<ParamType> (vts.getParameter (prefix + paramSuffix));
 
-        jassert (param != nullptr); // either createParameterLayout was not called, or paramPrefix is incorrect!
+        if (paramSuffix == factorSuffix || paramSuffix == modeSuffix)
+            jassert (param != nullptr); // either createParameterLayout was not called, or paramPrefix is incorrect!
     };
 
     loadParamPointer (osParam, factorSuffix);

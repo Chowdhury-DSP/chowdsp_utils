@@ -32,7 +32,7 @@ struct TestPlugin3 : public chowdsp::PluginBase<TestPlugin3>
     {
         using OSFactor = chowdsp::VariableOversampling<float>::OSFactor;
         using OSMode = chowdsp::VariableOversampling<float>::OSMode;
-        decltype (oversampling)::createParameterLayout (params, OSFactor::TwoX, OSMode::MinPhase, false);
+        decltype (oversampling)::createParameterLayout (params, OSFactor::TwoX, OSMode::MinPhase, 100, false);
     }
 
     void prepareToPlay (double sampleRate, int samplesPerBlock) override { oversampling.prepareToPlay (sampleRate, samplesPerBlock, 2); }
