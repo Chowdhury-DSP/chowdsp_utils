@@ -6,7 +6,7 @@ namespace chowdsp
  * Let's say you've got a plugin that should have oversampling options.
  * This class can be used to create a set of oversamplers connected to
  * parameters that manage the oversampling factor and mode, and may also
- * be used to manage a separate oversampling mode for offline renderring.
+ * be used to manage a separate oversampling mode for offline rendering.
  */
 template <typename FloatType = float>
 class VariableOversampling
@@ -44,13 +44,15 @@ public:
      *
      * @param params                Vector of parameters to add to
      * @param defaultFactor         Default oversampling factor
-     * @param defaultMode           Default oversamplign mode
-     * @param includeRenderOptions  Set to true to include parameters for oversampling when doing offline renderring
+     * @param defaultMode           Default oversampling mode
+     * @param versionHint           For JUCE7+, use this argument to set a version hint for the parameters
+     * @param includeRenderOptions  Set to true to include parameters for oversampling when doing offline rendering
      * @param paramPrefix           Parameter prefix to use for parameter IDs
      */
     static void createParameterLayout (std::vector<std::unique_ptr<juce::RangedAudioParameter>>& params,
                                        OSFactor defaultFactor,
                                        OSMode defaultMode,
+                                       int versionHint = 0,
                                        bool includeRenderOptions = true,
                                        const juce::String& paramPrefix = "os");
 
@@ -64,6 +66,7 @@ public:
                                        std::initializer_list<OSMode> osModes,
                                        OSFactor defaultFactor,
                                        OSMode defaultMode,
+                                       int versionHint = 0,
                                        bool includeRenderOptions = true,
                                        const juce::String& paramPrefix = "os");
 
@@ -133,7 +136,6 @@ private:
     const juce::AudioProcessor& proc;
 
     const bool usingIntegerLatency;
-    const juce::String paramPrefix;
 
     juce::ListenerList<Listener> listeners;
 
