@@ -112,6 +112,7 @@ template <typename FloatType>
 void VariableOversampling<FloatType>::createParameterLayout (std::vector<std::unique_ptr<juce::RangedAudioParameter>>& params,
                                                              OSFactor defaultFactor,
                                                              OSMode defaultMode,
+                                                             int versionHint,
                                                              bool includeRenderOptions,
                                                              const juce::String& paramPrefix)
 {
@@ -120,6 +121,7 @@ void VariableOversampling<FloatType>::createParameterLayout (std::vector<std::un
                            { OSMode::MinPhase, OSMode::LinPhase },
                            defaultFactor,
                            defaultMode,
+                           versionHint,
                            includeRenderOptions,
                            paramPrefix);
 }
@@ -130,6 +132,7 @@ void VariableOversampling<FloatType>::createParameterLayout (std::vector<std::un
                                                              std::initializer_list<OSMode> osModes,
                                                              OSFactor defaultFactor,
                                                              OSMode defaultMode,
+                                                             int versionHint,
                                                              bool includeRenderOptions,
                                                              const juce::String& paramPrefix)
 {
@@ -153,14 +156,24 @@ void VariableOversampling<FloatType>::createParameterLayout (std::vector<std::un
         osModeChoices.add (osModeToString (mode));
     }
 
-    params.push_back (std::make_unique<juce::AudioParameterChoice> (paramPrefix + factorSuffix, "Oversampling Factor", osFactorChoices, defaultOSFactor));
-    params.push_back (std::make_unique<juce::AudioParameterChoice> (paramPrefix + modeSuffix, "Oversampling Mode", osModeChoices, defaultOSMode));
+    auto getParamID = [&paramPrefix, versionHint] (const juce::String& paramSuffix)
+    {
+#if JUCE_VERSION < 0x070000
+        juce::ignoreUnused (versionHint);
+        return paramPrefix + paramSuffix;
+#else
+        return juce::ParameterID { paramPrefix + paramSuffix, versionHint };
+#endif
+    };
+
+    params.push_back (std::make_unique<juce::AudioParameterChoice> (getParamID (factorSuffix), "Oversampling Factor", osFactorChoices, defaultOSFactor));
+    params.push_back (std::make_unique<juce::AudioParameterChoice> (getParamID (modeSuffix), "Oversampling Mode", osModeChoices, defaultOSMode));
 
     if (includeRenderOptions)
     {
-        params.push_back (std::make_unique<juce::AudioParameterChoice> (paramPrefix + renderFactorSuffix, "Oversampling Factor (render)", osFactorChoices, defaultOSFactor));
-        params.push_back (std::make_unique<juce::AudioParameterChoice> (paramPrefix + renderModeSuffix, "Oversampling Mode (render)", osModeChoices, defaultOSMode));
-        params.push_back (std::make_unique<juce::AudioParameterBool> (paramPrefix + renderLikeRealtimeSuffix, "Oversampling (render like real-time)", true));
+        params.push_back (std::make_unique<juce::AudioParameterChoice> (getParamID (renderFactorSuffix), "Oversampling Factor (render)", osFactorChoices, defaultOSFactor));
+        params.push_back (std::make_unique<juce::AudioParameterChoice> (getParamID (renderModeSuffix), "Oversampling Mode (render)", osModeChoices, defaultOSMode));
+        params.push_back (std::make_unique<juce::AudioParameterBool> (getParamID (renderLikeRealtimeSuffix), "Oversampling (render like real-time)", true));
     }
 }
 
