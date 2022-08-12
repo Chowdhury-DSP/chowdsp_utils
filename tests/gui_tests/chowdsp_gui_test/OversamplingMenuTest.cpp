@@ -71,7 +71,7 @@ public:
         chowdsp::OversamplingMenu<chowdsp::VariableOversampling<float>> menu (plugin.oversampling, plugin.getVTS());
         menu.updateColours();
 
-        expectEquals (menu.getRootMenu()->getNumItems(), 10, "Menu has the inccorect number of items!");
+        expectEquals (menu.getRootMenu()->getNumItems(), 10, "Menu has the incorrect number of items!");
     }
 
     void beforePrepareTest()
@@ -80,7 +80,7 @@ public:
         chowdsp::OversamplingMenu<chowdsp::VariableOversampling<float>> menu (plugin.oversampling, plugin.getVTS());
         menu.updateColours();
 
-        expectEquals (menu.getRootMenu()->getNumItems(), 0, "Menu has the inccorect number of items!");
+        expectEquals (menu.getRootMenu()->getNumItems(), 0, "Menu has the incorrect number of items!");
     }
 
     void runTestTimed() override
