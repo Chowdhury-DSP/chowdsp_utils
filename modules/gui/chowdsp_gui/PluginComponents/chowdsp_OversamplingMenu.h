@@ -26,8 +26,6 @@ protected:
     virtual void generateComboBoxMenu();
 
 private:
-    //    void sampleRateOrBlockSizeChanged() override { generateComboBoxMenu(); }
-
     juce::Colour accentColour;
 
     std::unique_ptr<juce::ParameterAttachment> attachments[5];
