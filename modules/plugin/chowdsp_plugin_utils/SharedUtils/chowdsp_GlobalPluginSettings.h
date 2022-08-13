@@ -22,18 +22,7 @@ public:
     void initialise (const juce::String& settingsFile, int timerSeconds = 5);
 
     /** Adds a set of properties to the plugin settings */
-    void addProperties (std::initializer_list<SettingProperty> properties)
-    {
-        jassert (fileListener != nullptr); // Trying to add properties before initializing? Don't do that!
-        const juce::ScopedLock sl (lock);
-
-        for (const auto& [name, value] : properties)
-        {
-            if (! globalProperties.contains (name))
-                globalProperties[name] = value; // we have to copy here because you can't "move" out of std::initializer_list
-        }
-        writeSettingsToFile();
-    }
+    void addProperties (std::initializer_list<SettingProperty> properties);
 
     /** Adds a set of properties to the plugin settings, and adds a listener for those properties */
     template <auto ListenerFunc, typename Listener>
