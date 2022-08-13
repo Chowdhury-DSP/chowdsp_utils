@@ -1,11 +1,12 @@
 #pragma once
 
+#include <chowdsp_listeners/chowdsp_listeners.h>
+
 namespace chowdsp
 {
 /** Menu that can be used as an interface for chowdsp::VariableOversampling */
 template <typename OSType>
-class OversamplingMenu : public juce::ComboBox,
-                         private OSType::Listener
+class OversamplingMenu : public juce::ComboBox
 {
 public:
     enum ColourIDs
@@ -18,7 +19,6 @@ public:
 
     /** Constructor with fields for the oversampling object, and APVTS */
     OversamplingMenu (OSType& osManager, juce::AudioProcessorValueTreeState& vts);
-    ~OversamplingMenu() override;
 
     void updateColours();
 
@@ -26,7 +26,7 @@ protected:
     virtual void generateComboBoxMenu();
 
 private:
-    void sampleRateOrBlockSizeChanged() override { generateComboBoxMenu(); }
+    //    void sampleRateOrBlockSizeChanged() override { generateComboBoxMenu(); }
 
     juce::Colour accentColour;
 
@@ -44,6 +44,8 @@ private:
 
     OSType& osManager;
     bool offlineParamsAvailable = false;
+
+    ScopedCallback sampleRateOrBlockSizeChangedCallback;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OversamplingMenu)
 };

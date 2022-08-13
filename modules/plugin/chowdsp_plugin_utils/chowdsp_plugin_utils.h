@@ -9,7 +9,7 @@
     name:          ChowDSP Plugin Utilities
     description:   Utilities for creating ChowDSP plugins
     dependencies:  juce_events, juce_audio_basics, juce_audio_formats,
-                   juce_gui_basics, juce_audio_processors, chowdsp_core, chowdsp_json
+                   juce_gui_basics, juce_audio_processors, chowdsp_core, chowdsp_json, chowdsp_listeners
 
     website:       https://ccrma.stanford.edu/~jatin/chowdsp
     license:       GPLv3
@@ -32,6 +32,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <chowdsp_core/chowdsp_core.h>
 #include <chowdsp_json/chowdsp_json.h>
+#include <chowdsp_listeners/chowdsp_listeners.h>
 
 #include "Files/chowdsp_AudioFileSaveLoadHelper.h"
 #include "Files/chowdsp_FileListener.h"

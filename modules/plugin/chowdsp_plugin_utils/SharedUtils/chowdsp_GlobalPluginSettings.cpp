@@ -25,19 +25,7 @@ void GlobalPluginSettings::initialise (const juce::String& settingsFile, int tim
         writeSettingsToFile();
 }
 
-void GlobalPluginSettings::addProperties (std::initializer_list<SettingProperty> properties, Listener* listener)
-{
-    jassert (fileListener != nullptr); // Trying to add properties before initializing? Don't do that!
-    const juce::ScopedLock sl (lock);
 
-    for (const auto& [name, value] : properties)
-    {
-        if (! globalProperties.contains (name))
-            globalProperties[name] = value; // we have to copy here because you can't "move" out of std::initializer_list
-        addPropertyListener (name, listener);
-    }
-    writeSettingsToFile();
-}
 
 template <typename T>
 T GlobalPluginSettings::getProperty (SettingID name)
@@ -77,35 +65,10 @@ void GlobalPluginSettings::setProperty (SettingID name, T property)
     globalProperties[name] = property;
     writeSettingsToFile();
 
-    for (auto* l : listeners[name])
-        l->globalSettingChanged (name);
+    globalSettingChangedBroadcaster (name);
 }
 
-void GlobalPluginSettings::addPropertyListener (SettingID id, Listener* listener)
-{
-    if (listener == nullptr)
-        return;
 
-    listeners[id].addIfNotAlreadyThere (listener);
-}
-
-void GlobalPluginSettings::removePropertyListener (SettingID id, Listener* listener)
-{
-    const auto listenersForIDIter = listeners.find (id);
-    if (listenersForIDIter == listeners.end())
-    {
-        jassertfalse; // this property does not have any listeners!
-        return;
-    }
-
-    listenersForIDIter->second.removeAllInstancesOf (listener);
-}
-
-void GlobalPluginSettings::removePropertyListener (Listener* listener)
-{
-    for (auto& [_, propListeners] : listeners)
-        propListeners.removeAllInstancesOf (listener);
-}
 
 juce::File GlobalPluginSettings::getSettingsFile() const noexcept
 {
@@ -154,17 +117,14 @@ bool GlobalPluginSettings::loadSettingsFromFile()
         if (! JSONUtils::isSameType (value, newProperty))
         {
             // new property does not have the same type as the original!
-            // also hit when listenerFileChanged callback is hit and our properties are different then the settings file
+            // also hit when listenerFileChanged callback is hit and our properties are different than the settings file
             jassertfalse;
 
             newProperty = value;
         }
 
         if (value != newProperty)
-        {
-            for (auto* l : listeners[name])
-                l->globalSettingChanged (name);
-        }
+            globalSettingChangedBroadcaster (name);
     }
     return true;
 }

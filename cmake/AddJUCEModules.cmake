@@ -3,6 +3,7 @@ juce_add_modules(
 
     ${PROJECT_SOURCE_DIR}/modules/common/chowdsp_core
     ${PROJECT_SOURCE_DIR}/modules/common/chowdsp_json
+    ${PROJECT_SOURCE_DIR}/modules/common/chowdsp_listeners
     ${PROJECT_SOURCE_DIR}/modules/common/chowdsp_reflection
     ${PROJECT_SOURCE_DIR}/modules/common/chowdsp_serialization
 
