@@ -6,7 +6,25 @@ TEST_CASE ("Matrix Ops Test")
 {
     SECTION ("Householder Scalar Test")
     {
-        constexpr size_t size = 8;
+        static constexpr size_t size = 8;
+
+        std::array<float, size> data {};
+        std::array<float, size> data2 {};
+        std::fill (data.begin(), data.end(), 1.0f);
+
+        chowdsp::MatrixOps::HouseHolder<float, size>::outOfPlace (data2.data(), data.data());
+        chowdsp::MatrixOps::HouseHolder<float, size>::inPlace (data.data());
+
+        for (auto& x : data)
+            REQUIRE_MESSAGE (x == -1.0f, "Householder ouput is incorrect!");
+
+        for (auto& x : data2)
+            REQUIRE_MESSAGE (x == -1.0f, "Householder out-of-place ouput is incorrect!");
+    }
+
+    SECTION ("Householder Scalar Odd Test")
+    {
+        static constexpr size_t size = 7;
 
         std::array<float, size> data {};
         std::array<float, size> data2 {};
@@ -35,24 +53,50 @@ TEST_CASE ("Matrix Ops Test")
 
     SECTION ("Hadamard Scalar Test")
     {
-        constexpr size_t size = 8;
+        static constexpr size_t size = 8;
 
         std::array<float, size> data {};
-        std::array<float, size> data2 {};
         std::fill (data.begin(), data.end(), 1.0f);
 
-        chowdsp::MatrixOps::Hadamard<float, size>::outOfPlace (data2.data(), data.data());
         chowdsp::MatrixOps::Hadamard<float, size>::inPlace (data.data());
 
         REQUIRE_MESSAGE (data[0] == (float) size / (float) sqrt (size), "Hadamard value 0 is incorrect!");
         for (size_t i = 1; i < size; ++i)
-            REQUIRE_MESSAGE (data[i] == 0.0f, "Hadamard ouput is incorrect!");
+            REQUIRE_MESSAGE (data[i] == 0.0f, "Hadamard output is incorrect!");
+    }
+
+    SECTION ("Hadamard Scalar Test Small")
+    {
+        static constexpr size_t size = 4;
+
+        std::array<float, size> data {};
+        std::fill (data.begin(), data.end(), 1.0f);
+
+        chowdsp::MatrixOps::Hadamard<float, size>::inPlace (data.data());
+
+        REQUIRE_MESSAGE (data[0] == (float) size / (float) sqrt (size), "Hadamard value 0 is incorrect!");
+        for (size_t i = 1; i < size; ++i)
+            REQUIRE_MESSAGE (data[i] == 0.0f, "Hadamard output is incorrect!");
+    }
+
+    SECTION ("Hadamard Scalar Test Large")
+    {
+        static constexpr size_t size = 16;
+
+        std::array<float, size> data {};
+        std::fill (data.begin(), data.end(), 1.0f);
+
+        chowdsp::MatrixOps::Hadamard<float, size>::inPlace (data.data());
+
+        REQUIRE_MESSAGE (data[0] == (float) size / (float) sqrt (size), "Hadamard value 0 is incorrect!");
+        for (size_t i = 1; i < size; ++i)
+            REQUIRE_MESSAGE (data[i] == 0.0f, "Hadamard output is incorrect!");
     }
 
     SECTION ("Hadamard Vector Test")
     {
         using VecType = xsimd::batch<float>;
-        constexpr size_t size = 2;
+        static constexpr size_t size = 2;
         std::array<VecType, size> data {};
         std::fill (data.begin(), data.end(), 1.0f);
         chowdsp::MatrixOps::Hadamard<VecType, size>::inPlace (data.data());
@@ -63,6 +107,6 @@ TEST_CASE ("Matrix Ops Test")
         REQUIRE_MESSAGE (data[0].get (3) == 0.0f, "Hadamard output is incorrect!");
         for (size_t i = 1; i < size; ++i)
             for (size_t j = 0; j < VecType::size; ++j)
-                REQUIRE_MESSAGE (data[i].get (j) == 0.0f, "Hadamard ouput is incorrect!");
+                REQUIRE_MESSAGE (data[i].get (j) == 0.0f, "Hadamard output is incorrect!");
     }
 }
