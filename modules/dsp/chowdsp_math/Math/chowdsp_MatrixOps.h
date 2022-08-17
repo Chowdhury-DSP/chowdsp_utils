@@ -7,7 +7,7 @@ namespace chowdsp
 /** Useful matrix operations */
 namespace MatrixOps
 {
-    #ifndef DOXYGEN
+#ifndef DOXYGEN
     namespace detail
     {
         template <typename T>
@@ -22,8 +22,8 @@ namespace MatrixOps
         {
             return (n & (n - 1)) == 0;
         }
-    }
-    #endif
+    } // namespace detail
+#endif
 
     /**
      * Methods for implementing a Householder mixing matrix.
@@ -111,7 +111,7 @@ namespace MatrixOps
     private:
         using NumericType = SampleTypeHelpers::NumericType<FloatType>;
         static constexpr NumericType scalingFactor = gcem::sqrt ((NumericType) 1 / NumericType (size * SampleTypeHelpers::TypeTraits<FloatType>::Size));
-        static_assert(detail::isPowerOfTwo (size * SampleTypeHelpers::TypeTraits<FloatType>::Size), "Hadamard matrix dimension must be a power of 2!");
+        static_assert (detail::isPowerOfTwo (size * SampleTypeHelpers::TypeTraits<FloatType>::Size), "Hadamard matrix dimension must be a power of 2!");
 
     public:
         /** Perform unscaled Hadamard transformation using recursion */
