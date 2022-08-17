@@ -56,14 +56,41 @@ TEST_CASE ("Matrix Ops Test")
         static constexpr size_t size = 8;
 
         std::array<float, size> data {};
-        std::array<float, size> data2 {};
         std::fill (data.begin(), data.end(), 1.0f);
 
         chowdsp::MatrixOps::Hadamard<float, size>::inPlace (data.data());
 
         REQUIRE_MESSAGE (data[0] == (float) size / (float) sqrt (size), "Hadamard value 0 is incorrect!");
         for (size_t i = 1; i < size; ++i)
-            REQUIRE_MESSAGE (data[i] == 0.0f, "Hadamard ouput is incorrect!");
+            REQUIRE_MESSAGE (data[i] == 0.0f, "Hadamard output is incorrect!");
+    }
+
+    SECTION ("Hadamard Scalar Test Small")
+    {
+        static constexpr size_t size = 4;
+
+        std::array<float, size> data {};
+        std::fill (data.begin(), data.end(), 1.0f);
+
+        chowdsp::MatrixOps::Hadamard<float, size>::inPlace (data.data());
+
+        REQUIRE_MESSAGE (data[0] == (float) size / (float) sqrt (size), "Hadamard value 0 is incorrect!");
+        for (size_t i = 1; i < size; ++i)
+            REQUIRE_MESSAGE (data[i] == 0.0f, "Hadamard output is incorrect!");
+    }
+
+    SECTION ("Hadamard Scalar Test Large")
+    {
+        static constexpr size_t size = 16;
+
+        std::array<float, size> data {};
+        std::fill (data.begin(), data.end(), 1.0f);
+
+        chowdsp::MatrixOps::Hadamard<float, size>::inPlace (data.data());
+
+        REQUIRE_MESSAGE (data[0] == (float) size / (float) sqrt (size), "Hadamard value 0 is incorrect!");
+        for (size_t i = 1; i < size; ++i)
+            REQUIRE_MESSAGE (data[i] == 0.0f, "Hadamard output is incorrect!");
     }
 
     SECTION ("Hadamard Vector Test")
@@ -80,6 +107,6 @@ TEST_CASE ("Matrix Ops Test")
         REQUIRE_MESSAGE (data[0].get (3) == 0.0f, "Hadamard output is incorrect!");
         for (size_t i = 1; i < size; ++i)
             for (size_t j = 0; j < VecType::size; ++j)
-                REQUIRE_MESSAGE (data[i].get (j) == 0.0f, "Hadamard ouput is incorrect!");
+                REQUIRE_MESSAGE (data[i].get (j) == 0.0f, "Hadamard output is incorrect!");
     }
 }

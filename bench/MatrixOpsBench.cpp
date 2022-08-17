@@ -38,7 +38,7 @@ class Hadamard
 public:
     static inline void recursiveUnscaled (Sample* data)
     {
-        if (size <= 1)
+        if constexpr (size <= 1)
             return;
         constexpr int hSize = size / 2;
 

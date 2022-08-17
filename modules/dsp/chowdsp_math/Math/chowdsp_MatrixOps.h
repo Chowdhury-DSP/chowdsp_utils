@@ -119,55 +119,34 @@ namespace MatrixOps
         static inline std::enable_if_t<std::is_floating_point_v<T> || (size > 1), void>
             recursiveUnscaled (FloatType* out, const FloatType* in)
         {
-            if constexpr (size <= 1)
+            static constexpr int hSize = size / 2;
+
+            if constexpr (size == 2) // base case
             {
-                juce::ignoreUnused (out, in);
-                return;
+                if constexpr (SampleTypeHelpers::IsSIMDRegister<T>)
+                {
+                    Hadamard<FloatType, hSize>::recursiveUnscaled (out, in);
+                    Hadamard<FloatType, hSize>::recursiveUnscaled (out + hSize, in + hSize);
+                }
+
+                const auto a_plus_b = in[0] + in[1];
+                const auto a_minus_b = in[0] - in[1];
+                out[0] = a_plus_b;
+                out[1] = a_minus_b;
             }
             else
             {
-                static constexpr int hSize = size / 2;
-
                 // Two (unscaled) Hadamards of half the size
                 Hadamard<FloatType, hSize>::recursiveUnscaled (out, in);
                 Hadamard<FloatType, hSize>::recursiveUnscaled (out + hSize, in + hSize);
 
                 // Combine the two halves using sum/difference
-                if constexpr (SampleTypeHelpers::IsSIMDRegister<T>)
+                for (int i = 0; i < hSize; ++i)
                 {
-                    for (int i = 0; i < hSize; ++i)
-                    {
-                        FloatType a = in[i];
-                        FloatType b = in[i + hSize];
-                        out[i] = a + b;
-                        out[i + hSize] = a - b;
-                    }
-                }
-                else if constexpr (hSize < (int) xsimd::batch<T>::size)
-                {
-                    for (int i = 0; i < hSize; ++i)
-                    {
-                        FloatType a = in[i];
-                        FloatType b = in[i + hSize];
-                        out[i] = a + b;
-                        out[i + hSize] = a - b;
-                    }
-                }
-                else
-                {
-                    using Vec = xsimd::batch<T>;
-                    static constexpr auto vec_size = (int) Vec::size;
-                    static constexpr auto vec_loop_hsize = hSize - hSize % vec_size;
-
-                    int i = 0;
-                    for (; i < vec_loop_hsize; i += vec_size)
-                    {
-                        const auto a = xsimd::load_aligned (in + i);
-                        const auto b = xsimd::load_aligned (in + hSize + i);
-
-                        xsimd::store_aligned (out + i, a + b);
-                        xsimd::store_aligned (out + hSize + i, a - b);
-                    }
+                    FloatType a = in[i];
+                    FloatType b = in[i + hSize];
+                    out[i] = a + b;
+                    out[i + hSize] = a - b;
                 }
             }
         }
@@ -185,7 +164,7 @@ namespace MatrixOps
             out[0] = xsimd::load_aligned (arr);
         }
 
-        /** Perform out-of-place Hadamard transformation (scalar types) */
+        /** Perform in-place Hadamard transformation (scalar types) */
         template <typename T = FloatType>
         static inline std::enable_if_t<std::is_floating_point_v<T>, void>
             inPlace (FloatType* arr)
@@ -193,22 +172,31 @@ namespace MatrixOps
             // must be used with aligned data!
             jassert (detail::isAligned (arr));
 
-            recursiveUnscaled (arr, arr);
-
-            // multiply by scaling factor
             using Vec = xsimd::batch<T>;
             static constexpr auto vec_size = (int) Vec::size;
-            static constexpr auto vec_loop_size = size - size % vec_size;
 
-            int i = 0;
-            for (; i < vec_loop_size; i += vec_size)
+            if constexpr (size <= vec_size)
             {
-                auto x = xsimd::load_aligned (arr + i) * scalingFactor;
-                xsimd::store_aligned (arr + i, x);
+                recursiveUnscaled (arr, arr);
+
+                for (int i = 0; i < size; ++i)
+                    arr[i] *= scalingFactor;
+            }
+            else
+            {
+                Vec arrVec[size / vec_size] {};
+                for (int i = 0; i < size; i += vec_size)
+                    arrVec[i / vec_size] = xsimd::load_aligned (arr + i);
+
+                Hadamard<Vec, size / vec_size>::recursiveUnscaled (arrVec, arrVec);
+
+                // multiply by scaling factor
+                for (int i = 0; i < size; i += vec_size)
+                    xsimd::store_aligned (arr + i, arrVec[i / vec_size] * scalingFactor);
             }
         }
 
-        /** Perform out-of-place Hadamard transformation (SIMD types) */
+        /** Perform in-place Hadamard transformation (SIMD types) */
         template <typename T = FloatType>
         static inline std::enable_if_t<SampleTypeHelpers::IsSIMDRegister<T>, void>
             inPlace (FloatType* arr)
