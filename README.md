@@ -131,6 +131,7 @@ sure to abide by the license of each module, as well as whichever libraries are 
 - `FilterChain`: Utility template class for chaining multiple similar filters in series.
 
 `chowdsp_math` (BSD)
+- Internally includes [gcem](https://github.com/kthohr/gcem) (Apache 2.0)
 - `FloatVectorOperations`: Some extensions on `juce::FloatVectorOperations`.
 - `BufferMath`: Math operations which can be applied to audio buffers.
 - `Polynomials`: Methods for evaluating polynomials with Horner's method or Estrin's scheme.

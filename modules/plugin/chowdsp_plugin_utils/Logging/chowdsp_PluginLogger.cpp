@@ -24,7 +24,7 @@ namespace logger_detail
     };
 
     using FileArray = juce::Array<juce::File>;
-    FileArray getLogFilesSorted (const PluginLogger::LoggerParams& params)
+    static FileArray getLogFilesSorted (const PluginLogger::LoggerParams& params)
     {
         const juce::String logFileWildcard = "*" + params.logFileExtension;
         FileArray logFiles;
@@ -44,7 +44,7 @@ namespace logger_detail
     }
 
     // delete old log files to keep the total number of log files below the max!
-    void pruneOldLogFiles (FileArray& logFiles, const PluginLogger::LoggerParams& params)
+    static void pruneOldLogFiles (FileArray& logFiles, const PluginLogger::LoggerParams& params)
     {
         if (logFiles.size() <= params.maxNumLogFiles)
             return;
@@ -57,7 +57,7 @@ namespace logger_detail
         }
     }
 
-    void checkLogFilesForCrashes (const FileArray& logFiles, const PluginLogger::LoggerParams& params)
+    static void checkLogFilesForCrashes (const FileArray& logFiles, const PluginLogger::LoggerParams& params)
     {
         for (auto& logFile : logFiles)
         {
@@ -74,13 +74,13 @@ namespace logger_detail
         }
     }
 
-    void shutdownLogger (int signal = 0)
+    static void shutdownLogger (int signal = 0)
     {
         juce::Logger::writeToLog (signal == 0 ? exitString : crashString);
         juce::Logger::setCurrentLogger (nullptr);
     }
 
-    void signalHandler (void*) // NOSONAR (void* is needed here)
+    static void signalHandler (void*) // NOSONAR (void* is needed here)
     {
         juce::Logger::writeToLog ("Interrupt signal received!");
         juce::Logger::writeToLog ("Stack Trace:");
