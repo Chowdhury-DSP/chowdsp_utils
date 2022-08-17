@@ -27,33 +27,33 @@
 
 int main()
 {
-    print_begin("erf");
+    print_begin ("erf");
 
     //
 
-    GCEM_TEST_COMPARE_VALS(gcem::erf, std::erf, -3.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::erf, std::erf, -2.5L);
-    GCEM_TEST_COMPARE_VALS(gcem::erf, std::erf, -2.11L);
-    GCEM_TEST_COMPARE_VALS(gcem::erf, std::erf, -2.099L);
-    GCEM_TEST_COMPARE_VALS(gcem::erf, std::erf, -2.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::erf, std::erf, -1.3L);
-    GCEM_TEST_COMPARE_VALS(gcem::erf, std::erf,  0.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::erf, std::erf,  1.3L);
-    GCEM_TEST_COMPARE_VALS(gcem::erf, std::erf,  2.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::erf, std::erf,  2.099L);
-    GCEM_TEST_COMPARE_VALS(gcem::erf, std::erf,  2.11L);
-    GCEM_TEST_COMPARE_VALS(gcem::erf, std::erf,  2.5L);
-    GCEM_TEST_COMPARE_VALS(gcem::erf, std::erf,  3.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::erf, std::erf, -3.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::erf, std::erf, -2.5L);
+    GCEM_TEST_COMPARE_VALS (gcem::erf, std::erf, -2.11L);
+    GCEM_TEST_COMPARE_VALS (gcem::erf, std::erf, -2.099L);
+    GCEM_TEST_COMPARE_VALS (gcem::erf, std::erf, -2.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::erf, std::erf, -1.3L);
+    GCEM_TEST_COMPARE_VALS (gcem::erf, std::erf, 0.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::erf, std::erf, 1.3L);
+    GCEM_TEST_COMPARE_VALS (gcem::erf, std::erf, 2.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::erf, std::erf, 2.099L);
+    GCEM_TEST_COMPARE_VALS (gcem::erf, std::erf, 2.11L);
+    GCEM_TEST_COMPARE_VALS (gcem::erf, std::erf, 2.5L);
+    GCEM_TEST_COMPARE_VALS (gcem::erf, std::erf, 3.0L);
 
     //
 
-    GCEM_TEST_COMPARE_VALS(gcem::erf, std::erf, TEST_NAN);
-    GCEM_TEST_COMPARE_VALS(gcem::erf, std::erf, TEST_POSINF);
-    GCEM_TEST_COMPARE_VALS(gcem::erf, std::erf, TEST_NEGINF);
+    GCEM_TEST_COMPARE_VALS (gcem::erf, std::erf, TEST_NAN);
+    GCEM_TEST_COMPARE_VALS (gcem::erf, std::erf, TEST_POSINF);
+    GCEM_TEST_COMPARE_VALS (gcem::erf, std::erf, TEST_NEGINF);
 
     //
 
-    print_final("erf");
+    print_final ("erf");
 
     return 0;
 }

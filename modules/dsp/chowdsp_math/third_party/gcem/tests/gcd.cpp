@@ -24,17 +24,17 @@
 
 int main()
 {
-    print_begin("gcd");
+    print_begin ("gcd");
 
     //
 
-    GCEM_TEST_EXPECTED_VAL(gcem::gcd,6,12,18);
-    GCEM_TEST_EXPECTED_VAL(gcem::gcd,2,-4,14);
-    GCEM_TEST_EXPECTED_VAL(gcem::gcd,14,42,56);
+    GCEM_TEST_EXPECTED_VAL (gcem::gcd, 6, 12, 18);
+    GCEM_TEST_EXPECTED_VAL (gcem::gcd, 2, -4, 14);
+    GCEM_TEST_EXPECTED_VAL (gcem::gcd, 14, 42, 56);
 
     //
 
-    print_final("gcd");
+    print_final ("gcd");
 
     return 0;
 }

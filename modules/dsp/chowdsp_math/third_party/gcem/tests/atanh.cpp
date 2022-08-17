@@ -25,22 +25,22 @@
 
 int main()
 {
-    print_begin("atanh");
+    print_begin ("atanh");
 
     //
 
-    GCEM_TEST_COMPARE_VALS(gcem::atanh,std::atanh,-0.99L);
-    GCEM_TEST_COMPARE_VALS(gcem::atanh,std::atanh,0.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::atanh,std::atanh,0.001L);
-    GCEM_TEST_COMPARE_VALS(gcem::atanh,std::atanh,1.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::atanh,std::atanh,-1.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::atanh,std::atanh,1.1L);
+    GCEM_TEST_COMPARE_VALS (gcem::atanh, std::atanh, -0.99L);
+    GCEM_TEST_COMPARE_VALS (gcem::atanh, std::atanh, 0.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::atanh, std::atanh, 0.001L);
+    GCEM_TEST_COMPARE_VALS (gcem::atanh, std::atanh, 1.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::atanh, std::atanh, -1.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::atanh, std::atanh, 1.1L);
 
-    GCEM_TEST_COMPARE_VALS(gcem::atanh,std::atanh,TEST_NAN);
+    GCEM_TEST_COMPARE_VALS (gcem::atanh, std::atanh, TEST_NAN);
 
     //
 
-    print_final("atanh");
+    print_final ("atanh");
 
     return 0;
 }

@@ -22,22 +22,22 @@
 
 int main()
 {
-    print_begin("log_binomial_coef");
+    print_begin ("log_binomial_coef");
 
     //
 
-    GCEM_TEST_EXPECTED_VAL(gcem::log_binomial_coef,               0,  0,  0);
-    GCEM_TEST_EXPECTED_VAL(gcem::log_binomial_coef,     TEST_NEGINF,  0,  1);
-    GCEM_TEST_EXPECTED_VAL(gcem::log_binomial_coef,               0,  1,  0);
-    GCEM_TEST_EXPECTED_VAL(gcem::log_binomial_coef,               0,  1,  1);
-    GCEM_TEST_EXPECTED_VAL(gcem::log_binomial_coef, std::log(10.0L),  5,  2);
-    GCEM_TEST_EXPECTED_VAL(gcem::log_binomial_coef, std::log(45.0L), 10,  8);
-    GCEM_TEST_EXPECTED_VAL(gcem::log_binomial_coef, std::log(10.0L), 10,  9);
-    GCEM_TEST_EXPECTED_VAL(gcem::log_binomial_coef,               0, 10, 10);
+    GCEM_TEST_EXPECTED_VAL (gcem::log_binomial_coef, 0, 0, 0);
+    GCEM_TEST_EXPECTED_VAL (gcem::log_binomial_coef, TEST_NEGINF, 0, 1);
+    GCEM_TEST_EXPECTED_VAL (gcem::log_binomial_coef, 0, 1, 0);
+    GCEM_TEST_EXPECTED_VAL (gcem::log_binomial_coef, 0, 1, 1);
+    GCEM_TEST_EXPECTED_VAL (gcem::log_binomial_coef, std::log (10.0L), 5, 2);
+    GCEM_TEST_EXPECTED_VAL (gcem::log_binomial_coef, std::log (45.0L), 10, 8);
+    GCEM_TEST_EXPECTED_VAL (gcem::log_binomial_coef, std::log (10.0L), 10, 9);
+    GCEM_TEST_EXPECTED_VAL (gcem::log_binomial_coef, 0, 10, 10);
 
     //
 
-    print_final("log_binomial_coef");
+    print_final ("log_binomial_coef");
 
     return 0;
 }

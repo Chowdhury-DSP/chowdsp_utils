@@ -25,24 +25,24 @@
 
 int main()
 {
-    print_begin("sin");
+    print_begin ("sin");
 
     //
 
-    GCEM_TEST_COMPARE_VALS(gcem::sin,std::sin,-1.5L);
-    GCEM_TEST_COMPARE_VALS(gcem::sin,std::sin,0.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::sin,std::sin,0.001L);
-    GCEM_TEST_COMPARE_VALS(gcem::sin,std::sin,1.001L);
-    GCEM_TEST_COMPARE_VALS(gcem::sin,std::sin,1.5L);
-    GCEM_TEST_COMPARE_VALS(gcem::sin,std::sin,11.1L);
-    GCEM_TEST_COMPARE_VALS(gcem::sin,std::sin,50.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::sin,std::sin,150.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::sin, std::sin, -1.5L);
+    GCEM_TEST_COMPARE_VALS (gcem::sin, std::sin, 0.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::sin, std::sin, 0.001L);
+    GCEM_TEST_COMPARE_VALS (gcem::sin, std::sin, 1.001L);
+    GCEM_TEST_COMPARE_VALS (gcem::sin, std::sin, 1.5L);
+    GCEM_TEST_COMPARE_VALS (gcem::sin, std::sin, 11.1L);
+    GCEM_TEST_COMPARE_VALS (gcem::sin, std::sin, 50.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::sin, std::sin, 150.0L);
 
-    GCEM_TEST_COMPARE_VALS(gcem::sin,std::sin,TEST_NAN);
+    GCEM_TEST_COMPARE_VALS (gcem::sin, std::sin, TEST_NAN);
 
     //
 
-    print_final("sin");
+    print_final ("sin");
 
     return 0;
 }

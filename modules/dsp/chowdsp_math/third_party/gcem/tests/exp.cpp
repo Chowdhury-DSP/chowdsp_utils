@@ -25,26 +25,26 @@
 
 int main()
 {
-    print_begin("exp");
+    print_begin ("exp");
 
     //
 
-    GCEM_TEST_COMPARE_VALS(gcem::exp,std::exp, -40.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::exp,std::exp, -4.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::exp,std::exp,  0.0001L);
-    GCEM_TEST_COMPARE_VALS(gcem::exp,std::exp,  1.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::exp,std::exp,  1.75L);
-    GCEM_TEST_COMPARE_VALS(gcem::exp,std::exp,  1.9991L);
-    GCEM_TEST_COMPARE_VALS(gcem::exp,std::exp,  2.1L);
-    GCEM_TEST_COMPARE_VALS(gcem::exp,std::exp,  4.0L);
-    
-    GCEM_TEST_COMPARE_VALS(gcem::exp,std::exp, -std::numeric_limits<long double>::infinity());
-    GCEM_TEST_COMPARE_VALS(gcem::exp,std::exp,  std::numeric_limits<long double>::infinity());
-    GCEM_TEST_COMPARE_VALS(gcem::exp,std::exp,  std::numeric_limits<long double>::quiet_NaN());
+    GCEM_TEST_COMPARE_VALS (gcem::exp, std::exp, -40.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::exp, std::exp, -4.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::exp, std::exp, 0.0001L);
+    GCEM_TEST_COMPARE_VALS (gcem::exp, std::exp, 1.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::exp, std::exp, 1.75L);
+    GCEM_TEST_COMPARE_VALS (gcem::exp, std::exp, 1.9991L);
+    GCEM_TEST_COMPARE_VALS (gcem::exp, std::exp, 2.1L);
+    GCEM_TEST_COMPARE_VALS (gcem::exp, std::exp, 4.0L);
+
+    GCEM_TEST_COMPARE_VALS (gcem::exp, std::exp, -std::numeric_limits<long double>::infinity());
+    GCEM_TEST_COMPARE_VALS (gcem::exp, std::exp, std::numeric_limits<long double>::infinity());
+    GCEM_TEST_COMPARE_VALS (gcem::exp, std::exp, std::numeric_limits<long double>::quiet_NaN());
 
     //
 
-    print_final("exp");
+    print_final ("exp");
 
     return 0;
 }

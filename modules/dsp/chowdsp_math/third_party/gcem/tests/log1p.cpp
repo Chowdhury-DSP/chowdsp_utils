@@ -25,25 +25,25 @@
 
 int main()
 {
-    print_begin("log1p");
+    print_begin ("log1p");
 
     //
 
-    GCEM_TEST_COMPARE_VALS(gcem::log1p,std::log1p,1.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::log1p,std::log1p,0.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::log1p,std::log1p,1e-04L);
-    GCEM_TEST_COMPARE_VALS(gcem::log1p,std::log1p,-1e-04L);
-    GCEM_TEST_COMPARE_VALS(gcem::log1p,std::log1p,1e-05L);
-    GCEM_TEST_COMPARE_VALS(gcem::log1p,std::log1p,1e-06L);
-    GCEM_TEST_COMPARE_VALS(gcem::log1p,std::log1p,1e-22L);
-    
-    GCEM_TEST_COMPARE_VALS(gcem::log1p,std::log1p, -std::numeric_limits<long double>::infinity());
-    GCEM_TEST_COMPARE_VALS(gcem::log1p,std::log1p,  std::numeric_limits<long double>::infinity());
-    GCEM_TEST_COMPARE_VALS(gcem::log1p,std::log1p,  std::numeric_limits<long double>::quiet_NaN());
+    GCEM_TEST_COMPARE_VALS (gcem::log1p, std::log1p, 1.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::log1p, std::log1p, 0.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::log1p, std::log1p, 1e-04L);
+    GCEM_TEST_COMPARE_VALS (gcem::log1p, std::log1p, -1e-04L);
+    GCEM_TEST_COMPARE_VALS (gcem::log1p, std::log1p, 1e-05L);
+    GCEM_TEST_COMPARE_VALS (gcem::log1p, std::log1p, 1e-06L);
+    GCEM_TEST_COMPARE_VALS (gcem::log1p, std::log1p, 1e-22L);
+
+    GCEM_TEST_COMPARE_VALS (gcem::log1p, std::log1p, -std::numeric_limits<long double>::infinity());
+    GCEM_TEST_COMPARE_VALS (gcem::log1p, std::log1p, std::numeric_limits<long double>::infinity());
+    GCEM_TEST_COMPARE_VALS (gcem::log1p, std::log1p, std::numeric_limits<long double>::quiet_NaN());
 
     //
 
-    print_final("log1p");
+    print_final ("log1p");
 
     return 0;
 }

@@ -25,30 +25,30 @@
 
 int main()
 {
-    print_begin("pow");
+    print_begin ("pow");
 
     //
 
-    GCEM_TEST_COMPARE_VALS(gcem::pow,std::pow, 0.199900000000000208L, 3.5L);
-    GCEM_TEST_COMPARE_VALS(gcem::pow,std::pow, 0.5L,  2.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::pow,std::pow, 1.5L,  0.99L);
-    GCEM_TEST_COMPARE_VALS(gcem::pow,std::pow, 2.0L,  1.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::pow,std::pow, 41.5L, 7.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::pow, std::pow, 0.199900000000000208L, 3.5L);
+    GCEM_TEST_COMPARE_VALS (gcem::pow, std::pow, 0.5L, 2.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::pow, std::pow, 1.5L, 0.99L);
+    GCEM_TEST_COMPARE_VALS (gcem::pow, std::pow, 2.0L, 1.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::pow, std::pow, 41.5L, 7.0L);
 
     // int versions
-    GCEM_TEST_COMPARE_VALS(gcem::pow,std::pow, 0.5L,  2L);
-    GCEM_TEST_COMPARE_VALS(gcem::pow,std::pow, 41.5L, 7L);
-    
-    GCEM_TEST_COMPARE_VALS(gcem::pow,std::pow,  std::numeric_limits<long double>::quiet_NaN(), 2);
-    GCEM_TEST_COMPARE_VALS(gcem::pow,std::pow,  2, std::numeric_limits<long double>::quiet_NaN());
+    GCEM_TEST_COMPARE_VALS (gcem::pow, std::pow, 0.5L, 2L);
+    GCEM_TEST_COMPARE_VALS (gcem::pow, std::pow, 41.5L, 7L);
 
-    GCEM_TEST_COMPARE_VALS(gcem::pow,std::pow, std::numeric_limits<long double>::infinity(), 2);
-    GCEM_TEST_COMPARE_VALS(gcem::pow,std::pow, std::numeric_limits<long double>::infinity(), - 2);
-    GCEM_TEST_COMPARE_VALS(gcem::pow,std::pow, std::numeric_limits<long double>::infinity(), 0);
+    GCEM_TEST_COMPARE_VALS (gcem::pow, std::pow, std::numeric_limits<long double>::quiet_NaN(), 2);
+    GCEM_TEST_COMPARE_VALS (gcem::pow, std::pow, 2, std::numeric_limits<long double>::quiet_NaN());
+
+    GCEM_TEST_COMPARE_VALS (gcem::pow, std::pow, std::numeric_limits<long double>::infinity(), 2);
+    GCEM_TEST_COMPARE_VALS (gcem::pow, std::pow, std::numeric_limits<long double>::infinity(), -2);
+    GCEM_TEST_COMPARE_VALS (gcem::pow, std::pow, std::numeric_limits<long double>::infinity(), 0);
 
     //
 
-    print_final("pow");
+    print_final ("pow");
 
     return 0;
 }

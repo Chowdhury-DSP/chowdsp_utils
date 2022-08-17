@@ -23,33 +23,32 @@
 
 #include "gcem_tests.hpp"
 
-template<typename T>
-constexpr
-int
-std_test_fn(const T x)
+template <typename T>
+constexpr int
+    std_test_fn (const T x)
 {
-    return static_cast<int>(std::signbit(x));
+    return static_cast<int> (std::signbit (x));
 }
 
 int main()
 {
-    print_begin("signbit");
+    print_begin ("signbit");
 
     //
 
-    GCEM_TEST_COMPARE_VALS(gcem::signbit,std_test_fn,  1.0);
-    GCEM_TEST_COMPARE_VALS(gcem::signbit,std_test_fn, -1.0);
+    GCEM_TEST_COMPARE_VALS (gcem::signbit, std_test_fn, 1.0);
+    GCEM_TEST_COMPARE_VALS (gcem::signbit, std_test_fn, -1.0);
 
-    GCEM_TEST_COMPARE_VALS(gcem::signbit,std_test_fn,  0.0);
-    GCEM_TEST_COMPARE_VALS(gcem::signbit,std_test_fn, -0.0);
-    
-    GCEM_TEST_COMPARE_VALS(gcem::signbit,std_test_fn, TEST_POSINF);
-    GCEM_TEST_COMPARE_VALS(gcem::signbit,std_test_fn, TEST_NEGINF);
-    GCEM_TEST_COMPARE_VALS(gcem::signbit,std_test_fn, TEST_NAN);
+    GCEM_TEST_COMPARE_VALS (gcem::signbit, std_test_fn, 0.0);
+    GCEM_TEST_COMPARE_VALS (gcem::signbit, std_test_fn, -0.0);
+
+    GCEM_TEST_COMPARE_VALS (gcem::signbit, std_test_fn, TEST_POSINF);
+    GCEM_TEST_COMPARE_VALS (gcem::signbit, std_test_fn, TEST_NEGINF);
+    GCEM_TEST_COMPARE_VALS (gcem::signbit, std_test_fn, TEST_NAN);
 
     //
 
-    print_final("signbit");
+    print_final ("signbit");
 
     return 0;
 }

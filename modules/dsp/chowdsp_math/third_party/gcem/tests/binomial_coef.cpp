@@ -22,18 +22,18 @@
 
 int main()
 {
-    print_begin("binomial_coef");
+    print_begin ("binomial_coef");
 
     //
 
-    GCEM_TEST_EXPECTED_VAL(gcem::binomial_coef,  1,  0,  0);
-    GCEM_TEST_EXPECTED_VAL(gcem::binomial_coef,  0,  0,  1);
-    GCEM_TEST_EXPECTED_VAL(gcem::binomial_coef,  1,  1,  0);
-    GCEM_TEST_EXPECTED_VAL(gcem::binomial_coef,  1,  1,  1);
-    GCEM_TEST_EXPECTED_VAL(gcem::binomial_coef, 10,  5,  2);
-    GCEM_TEST_EXPECTED_VAL(gcem::binomial_coef, 45, 10,  8);
-    GCEM_TEST_EXPECTED_VAL(gcem::binomial_coef, 10, 10,  9);
-    GCEM_TEST_EXPECTED_VAL(gcem::binomial_coef,  1, 10, 10);
+    GCEM_TEST_EXPECTED_VAL (gcem::binomial_coef, 1, 0, 0);
+    GCEM_TEST_EXPECTED_VAL (gcem::binomial_coef, 0, 0, 1);
+    GCEM_TEST_EXPECTED_VAL (gcem::binomial_coef, 1, 1, 0);
+    GCEM_TEST_EXPECTED_VAL (gcem::binomial_coef, 1, 1, 1);
+    GCEM_TEST_EXPECTED_VAL (gcem::binomial_coef, 10, 5, 2);
+    GCEM_TEST_EXPECTED_VAL (gcem::binomial_coef, 45, 10, 8);
+    GCEM_TEST_EXPECTED_VAL (gcem::binomial_coef, 10, 10, 9);
+    GCEM_TEST_EXPECTED_VAL (gcem::binomial_coef, 1, 10, 10);
 
     //
 
@@ -43,7 +43,7 @@ int main()
 
     //
 
-    print_final("binomial_coef");
+    print_final ("binomial_coef");
 
     return 0;
 }

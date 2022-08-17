@@ -25,23 +25,23 @@
 
 int main()
 {
-    print_begin("cosh");
+    print_begin ("cosh");
 
     //
 
-    GCEM_TEST_COMPARE_VALS(gcem::cosh,std::cosh,0.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::cosh,std::cosh,0.001L);
-    GCEM_TEST_COMPARE_VALS(gcem::cosh,std::cosh,0.5L);
-    GCEM_TEST_COMPARE_VALS(gcem::cosh,std::cosh,-0.5L);
-    GCEM_TEST_COMPARE_VALS(gcem::cosh,std::cosh,0.7568025L);
-    GCEM_TEST_COMPARE_VALS(gcem::cosh,std::cosh,1.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::cosh,std::cosh,5.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::cosh, std::cosh, 0.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::cosh, std::cosh, 0.001L);
+    GCEM_TEST_COMPARE_VALS (gcem::cosh, std::cosh, 0.5L);
+    GCEM_TEST_COMPARE_VALS (gcem::cosh, std::cosh, -0.5L);
+    GCEM_TEST_COMPARE_VALS (gcem::cosh, std::cosh, 0.7568025L);
+    GCEM_TEST_COMPARE_VALS (gcem::cosh, std::cosh, 1.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::cosh, std::cosh, 5.0L);
 
-    GCEM_TEST_COMPARE_VALS(gcem::cosh,std::cosh,TEST_NAN);
+    GCEM_TEST_COMPARE_VALS (gcem::cosh, std::cosh, TEST_NAN);
 
     //
 
-    print_final("cosh");
+    print_final ("cosh");
 
     return 0;
 }

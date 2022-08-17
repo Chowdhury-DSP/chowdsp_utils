@@ -24,17 +24,17 @@
 
 int main()
 {
-    print_begin("lcm");
+    print_begin ("lcm");
 
     //
 
-    GCEM_TEST_EXPECTED_VAL(gcem::lcm,12,3,4);
-    GCEM_TEST_EXPECTED_VAL(gcem::lcm,60,12,15);
-    GCEM_TEST_EXPECTED_VAL(gcem::lcm,1377,17,81);
+    GCEM_TEST_EXPECTED_VAL (gcem::lcm, 12, 3, 4);
+    GCEM_TEST_EXPECTED_VAL (gcem::lcm, 60, 12, 15);
+    GCEM_TEST_EXPECTED_VAL (gcem::lcm, 1377, 17, 81);
 
     //
 
-    print_final("lcm");
+    print_final ("lcm");
 
     return 0;
 }

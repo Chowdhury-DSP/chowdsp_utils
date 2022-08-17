@@ -25,28 +25,28 @@
 
 int main()
 {
-    print_begin("abs");
+    print_begin ("abs");
 
     //
 
-    GCEM_TEST_COMPARE_VALS(gcem::abs,std::abs, 0.0);
-    GCEM_TEST_COMPARE_VALS(gcem::abs,std::abs,-0.0);
-    GCEM_TEST_COMPARE_VALS(gcem::abs,std::abs, 1.0);
-    GCEM_TEST_COMPARE_VALS(gcem::abs,std::abs,-1.0);
-    GCEM_TEST_COMPARE_VALS(gcem::abs,std::abs, 0);
-    GCEM_TEST_COMPARE_VALS(gcem::abs,std::abs, 1);
-    GCEM_TEST_COMPARE_VALS(gcem::abs,std::abs,-1);
+    GCEM_TEST_COMPARE_VALS (gcem::abs, std::abs, 0.0);
+    GCEM_TEST_COMPARE_VALS (gcem::abs, std::abs, -0.0);
+    GCEM_TEST_COMPARE_VALS (gcem::abs, std::abs, 1.0);
+    GCEM_TEST_COMPARE_VALS (gcem::abs, std::abs, -1.0);
+    GCEM_TEST_COMPARE_VALS (gcem::abs, std::abs, 0);
+    GCEM_TEST_COMPARE_VALS (gcem::abs, std::abs, 1);
+    GCEM_TEST_COMPARE_VALS (gcem::abs, std::abs, -1);
 
-    GCEM_TEST_COMPARE_VALS(gcem::abs,std::abs, INT64_MIN);
-    GCEM_TEST_COMPARE_VALS(gcem::abs,std::abs, INT64_MAX);
+    GCEM_TEST_COMPARE_VALS (gcem::abs, std::abs, INT64_MIN);
+    GCEM_TEST_COMPARE_VALS (gcem::abs, std::abs, INT64_MAX);
 
-    GCEM_TEST_COMPARE_VALS(gcem::abs,std::abs, TEST_NAN);
-    GCEM_TEST_COMPARE_VALS(gcem::abs,std::abs, TEST_NEGINF);
-    GCEM_TEST_COMPARE_VALS(gcem::abs,std::abs, TEST_POSINF);
+    GCEM_TEST_COMPARE_VALS (gcem::abs, std::abs, TEST_NAN);
+    GCEM_TEST_COMPARE_VALS (gcem::abs, std::abs, TEST_NEGINF);
+    GCEM_TEST_COMPARE_VALS (gcem::abs, std::abs, TEST_POSINF);
 
     //
 
-    print_final("abs");
+    print_final ("abs");
 
     return 0;
 }

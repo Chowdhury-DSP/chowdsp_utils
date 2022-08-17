@@ -27,25 +27,25 @@
 
 int main()
 {
-    print_begin("sqrt");
+    print_begin ("sqrt");
 
     //
 
-    GCEM_TEST_COMPARE_VALS(gcem::sqrt,std::sqrt,  0.5L);
-    GCEM_TEST_COMPARE_VALS(gcem::sqrt,std::sqrt,  0.00199900000000000208L);
-    GCEM_TEST_COMPARE_VALS(gcem::sqrt,std::sqrt,  1.5L);
-    GCEM_TEST_COMPARE_VALS(gcem::sqrt,std::sqrt,  2.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::sqrt,std::sqrt,  41.5L);
-    GCEM_TEST_COMPARE_VALS(gcem::sqrt,std::sqrt,  0.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::sqrt,std::sqrt, -1.0L);
-    
-    GCEM_TEST_COMPARE_VALS(gcem::sqrt,std::sqrt, -std::numeric_limits<long double>::infinity());
-    GCEM_TEST_COMPARE_VALS(gcem::sqrt,std::sqrt,  std::numeric_limits<long double>::infinity());
-    GCEM_TEST_COMPARE_VALS(gcem::sqrt,std::sqrt,  std::numeric_limits<long double>::quiet_NaN());
+    GCEM_TEST_COMPARE_VALS (gcem::sqrt, std::sqrt, 0.5L);
+    GCEM_TEST_COMPARE_VALS (gcem::sqrt, std::sqrt, 0.00199900000000000208L);
+    GCEM_TEST_COMPARE_VALS (gcem::sqrt, std::sqrt, 1.5L);
+    GCEM_TEST_COMPARE_VALS (gcem::sqrt, std::sqrt, 2.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::sqrt, std::sqrt, 41.5L);
+    GCEM_TEST_COMPARE_VALS (gcem::sqrt, std::sqrt, 0.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::sqrt, std::sqrt, -1.0L);
+
+    GCEM_TEST_COMPARE_VALS (gcem::sqrt, std::sqrt, -std::numeric_limits<long double>::infinity());
+    GCEM_TEST_COMPARE_VALS (gcem::sqrt, std::sqrt, std::numeric_limits<long double>::infinity());
+    GCEM_TEST_COMPARE_VALS (gcem::sqrt, std::sqrt, std::numeric_limits<long double>::quiet_NaN());
 
     //
 
-    print_final("sqrt");
+    print_final ("sqrt");
 
     return 0;
 }

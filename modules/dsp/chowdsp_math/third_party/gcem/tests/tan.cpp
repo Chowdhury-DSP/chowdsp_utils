@@ -25,26 +25,26 @@
 
 int main()
 {
-    print_begin("tan");
+    print_begin ("tan");
 
     //
 
     // static constexpr long double lrgval = std::numeric_limits<int>::max()*100.0L;
 
-    GCEM_TEST_COMPARE_VALS(gcem::tan,std::tan, 0.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::tan,std::tan, 0.001L);
-    GCEM_TEST_COMPARE_VALS(gcem::tan,std::tan, 1.001L);
-    GCEM_TEST_COMPARE_VALS(gcem::tan,std::tan, 1.5L);
-    GCEM_TEST_COMPARE_VALS(gcem::tan,std::tan, 11.1L);
-    GCEM_TEST_COMPARE_VALS(gcem::tan,std::tan, 50.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::tan,std::tan, -1.5L);
+    GCEM_TEST_COMPARE_VALS (gcem::tan, std::tan, 0.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::tan, std::tan, 0.001L);
+    GCEM_TEST_COMPARE_VALS (gcem::tan, std::tan, 1.001L);
+    GCEM_TEST_COMPARE_VALS (gcem::tan, std::tan, 1.5L);
+    GCEM_TEST_COMPARE_VALS (gcem::tan, std::tan, 11.1L);
+    GCEM_TEST_COMPARE_VALS (gcem::tan, std::tan, 50.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::tan, std::tan, -1.5L);
     // GCEM_TEST_COMPARE_VALS(gcem::tan,std::tan, lrgval);
 
-    GCEM_TEST_COMPARE_VALS(gcem::tan,std::tan, TEST_NAN);
+    GCEM_TEST_COMPARE_VALS (gcem::tan, std::tan, TEST_NAN);
 
     //
 
-    print_final("tan");
+    print_final ("tan");
 
     return 0;
 }

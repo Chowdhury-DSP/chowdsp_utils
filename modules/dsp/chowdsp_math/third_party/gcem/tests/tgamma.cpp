@@ -25,34 +25,34 @@
 
 int main()
 {
-    print_begin("tgamma");
+    print_begin ("tgamma");
 
     //
 
-    GCEM_TEST_COMPARE_VALS(gcem::tgamma,std::tgamma,  1.5L);
-    GCEM_TEST_COMPARE_VALS(gcem::tgamma,std::tgamma,  2.7L);
-    GCEM_TEST_COMPARE_VALS(gcem::tgamma,std::tgamma,  3.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::tgamma,std::tgamma,  4.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::tgamma,std::tgamma,  5.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::tgamma, std::tgamma, 1.5L);
+    GCEM_TEST_COMPARE_VALS (gcem::tgamma, std::tgamma, 2.7L);
+    GCEM_TEST_COMPARE_VALS (gcem::tgamma, std::tgamma, 3.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::tgamma, std::tgamma, 4.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::tgamma, std::tgamma, 5.0L);
 
-    GCEM_TEST_COMPARE_VALS(gcem::tgamma,std::tgamma, TEST_NAN);
-    GCEM_TEST_COMPARE_VALS(gcem::tgamma,std::tgamma, 1.0);
+    GCEM_TEST_COMPARE_VALS (gcem::tgamma, std::tgamma, TEST_NAN);
+    GCEM_TEST_COMPARE_VALS (gcem::tgamma, std::tgamma, 1.0);
 
-    GCEM_TEST_COMPARE_VALS(gcem::tgamma,std::tgamma, 0.9);
-    GCEM_TEST_COMPARE_VALS(gcem::tgamma,std::tgamma, 0.1);
-    GCEM_TEST_COMPARE_VALS(gcem::tgamma,std::tgamma, 0.001);
-    GCEM_TEST_COMPARE_VALS(gcem::tgamma,std::tgamma, 0.0);
+    GCEM_TEST_COMPARE_VALS (gcem::tgamma, std::tgamma, 0.9);
+    GCEM_TEST_COMPARE_VALS (gcem::tgamma, std::tgamma, 0.1);
+    GCEM_TEST_COMPARE_VALS (gcem::tgamma, std::tgamma, 0.001);
+    GCEM_TEST_COMPARE_VALS (gcem::tgamma, std::tgamma, 0.0);
 
-    GCEM_TEST_COMPARE_VALS(gcem::tgamma,std::tgamma, -0.1);
-    GCEM_TEST_COMPARE_VALS(gcem::tgamma,std::tgamma, -1);
-    GCEM_TEST_COMPARE_VALS(gcem::tgamma,std::tgamma, -1.1);
-    GCEM_TEST_COMPARE_VALS(gcem::tgamma,std::tgamma, -2);
-    GCEM_TEST_COMPARE_VALS(gcem::tgamma,std::tgamma, -3);
-    GCEM_TEST_COMPARE_VALS(gcem::tgamma,std::tgamma, -4);
+    GCEM_TEST_COMPARE_VALS (gcem::tgamma, std::tgamma, -0.1);
+    GCEM_TEST_COMPARE_VALS (gcem::tgamma, std::tgamma, -1);
+    GCEM_TEST_COMPARE_VALS (gcem::tgamma, std::tgamma, -1.1);
+    GCEM_TEST_COMPARE_VALS (gcem::tgamma, std::tgamma, -2);
+    GCEM_TEST_COMPARE_VALS (gcem::tgamma, std::tgamma, -3);
+    GCEM_TEST_COMPARE_VALS (gcem::tgamma, std::tgamma, -4);
 
     //
 
-    print_final("tgamma");
+    print_final ("tgamma");
 
     return 0;
 }

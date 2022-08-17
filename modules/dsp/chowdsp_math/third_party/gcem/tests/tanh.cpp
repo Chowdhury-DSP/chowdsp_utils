@@ -25,23 +25,23 @@
 
 int main()
 {
-    print_begin("tanh");
+    print_begin ("tanh");
 
     //
 
-    GCEM_TEST_COMPARE_VALS(gcem::tanh,std::tanh,  0.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::tanh,std::tanh,  0.001L);
-    GCEM_TEST_COMPARE_VALS(gcem::tanh,std::tanh,  0.5L);
-    GCEM_TEST_COMPARE_VALS(gcem::tanh,std::tanh, -0.5L);
-    GCEM_TEST_COMPARE_VALS(gcem::tanh,std::tanh,  0.7568025L);
-    GCEM_TEST_COMPARE_VALS(gcem::tanh,std::tanh,  1.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::tanh,std::tanh,  5.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::tanh, std::tanh, 0.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::tanh, std::tanh, 0.001L);
+    GCEM_TEST_COMPARE_VALS (gcem::tanh, std::tanh, 0.5L);
+    GCEM_TEST_COMPARE_VALS (gcem::tanh, std::tanh, -0.5L);
+    GCEM_TEST_COMPARE_VALS (gcem::tanh, std::tanh, 0.7568025L);
+    GCEM_TEST_COMPARE_VALS (gcem::tanh, std::tanh, 1.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::tanh, std::tanh, 5.0L);
 
-    GCEM_TEST_COMPARE_VALS(gcem::tanh,std::tanh, TEST_NAN);
+    GCEM_TEST_COMPARE_VALS (gcem::tanh, std::tanh, TEST_NAN);
 
     //
 
-    print_final("tanh");
+    print_final ("tanh");
 
     return 0;
 }

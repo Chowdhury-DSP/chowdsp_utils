@@ -27,34 +27,34 @@
 
 int main()
 {
-    print_begin("erf_inv");
+    print_begin ("erf_inv");
 
     //
 
-    GCEM_TEST_EXPECTED_VAL(gcem::erf_inv, -3.0L,  -0.999977909503001415L);
-    GCEM_TEST_EXPECTED_VAL(gcem::erf_inv, -2.5L,  -0.999593047982555041L);
-    GCEM_TEST_EXPECTED_VAL(gcem::erf_inv, -2.11L, -0.997154845031177802L);
-    GCEM_TEST_EXPECTED_VAL(gcem::erf_inv, -2.05L, -0.996258096044456873L);
-    GCEM_TEST_EXPECTED_VAL(gcem::erf_inv, -1.3L,  -0.934007944940652437L);
-    GCEM_TEST_EXPECTED_VAL(gcem::erf_inv,  0.0L,   0.0L);
-    GCEM_TEST_EXPECTED_VAL(gcem::erf_inv,  1.3L,   0.934007944940652437L);
-    GCEM_TEST_EXPECTED_VAL(gcem::erf_inv,  2.05L,  0.996258096044456873L);
-    GCEM_TEST_EXPECTED_VAL(gcem::erf_inv,  2.11L,  0.997154845031177802L);
-    GCEM_TEST_EXPECTED_VAL(gcem::erf_inv,  2.5L,   0.999593047982555041L);
-    GCEM_TEST_EXPECTED_VAL(gcem::erf_inv,  3.0L,   0.999977909503001415L);
+    GCEM_TEST_EXPECTED_VAL (gcem::erf_inv, -3.0L, -0.999977909503001415L);
+    GCEM_TEST_EXPECTED_VAL (gcem::erf_inv, -2.5L, -0.999593047982555041L);
+    GCEM_TEST_EXPECTED_VAL (gcem::erf_inv, -2.11L, -0.997154845031177802L);
+    GCEM_TEST_EXPECTED_VAL (gcem::erf_inv, -2.05L, -0.996258096044456873L);
+    GCEM_TEST_EXPECTED_VAL (gcem::erf_inv, -1.3L, -0.934007944940652437L);
+    GCEM_TEST_EXPECTED_VAL (gcem::erf_inv, 0.0L, 0.0L);
+    GCEM_TEST_EXPECTED_VAL (gcem::erf_inv, 1.3L, 0.934007944940652437L);
+    GCEM_TEST_EXPECTED_VAL (gcem::erf_inv, 2.05L, 0.996258096044456873L);
+    GCEM_TEST_EXPECTED_VAL (gcem::erf_inv, 2.11L, 0.997154845031177802L);
+    GCEM_TEST_EXPECTED_VAL (gcem::erf_inv, 2.5L, 0.999593047982555041L);
+    GCEM_TEST_EXPECTED_VAL (gcem::erf_inv, 3.0L, 0.999977909503001415L);
 
     //
 
-    GCEM_TEST_EXPECTED_VAL(gcem::erf_inv, TEST_NAN, TEST_NAN);
-    GCEM_TEST_EXPECTED_VAL(gcem::erf_inv, TEST_NAN, -1.1);
-    GCEM_TEST_EXPECTED_VAL(gcem::erf_inv, TEST_NAN,  1.1);
+    GCEM_TEST_EXPECTED_VAL (gcem::erf_inv, TEST_NAN, TEST_NAN);
+    GCEM_TEST_EXPECTED_VAL (gcem::erf_inv, TEST_NAN, -1.1);
+    GCEM_TEST_EXPECTED_VAL (gcem::erf_inv, TEST_NAN, 1.1);
 
-    GCEM_TEST_EXPECTED_VAL(gcem::erf_inv, TEST_POSINF, 1);
-    GCEM_TEST_EXPECTED_VAL(gcem::erf_inv, TEST_NEGINF, -1);
+    GCEM_TEST_EXPECTED_VAL (gcem::erf_inv, TEST_POSINF, 1);
+    GCEM_TEST_EXPECTED_VAL (gcem::erf_inv, TEST_NEGINF, -1);
 
     //
 
-    print_final("erf_inv");
+    print_final ("erf_inv");
 
     return 0;
 }

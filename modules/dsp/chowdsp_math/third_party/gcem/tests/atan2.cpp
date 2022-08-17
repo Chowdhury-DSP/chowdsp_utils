@@ -25,43 +25,43 @@
 
 int main()
 {
-    print_begin("atan2");
+    print_begin ("atan2");
 
     //
 
-    GCEM_TEST_COMPARE_VALS(gcem::atan2,std::atan2,      0.0L,           0.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::atan2,std::atan2,     -0.0L,           0.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::atan2,std::atan2,      0.0L,          -0.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::atan2,std::atan2,     -0.0L,          -0.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::atan2, std::atan2, 0.0L, 0.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::atan2, std::atan2, -0.0L, 0.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::atan2, std::atan2, 0.0L, -0.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::atan2, std::atan2, -0.0L, -0.0L);
 
-    GCEM_TEST_COMPARE_VALS(gcem::atan2,std::atan2,      0.2L,           0.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::atan2,std::atan2,     -0.2L,           0.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::atan2,std::atan2,      0.001L,         0.001L);
-    GCEM_TEST_COMPARE_VALS(gcem::atan2,std::atan2,      0.49L,          0.49L);
+    GCEM_TEST_COMPARE_VALS (gcem::atan2, std::atan2, 0.2L, 0.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::atan2, std::atan2, -0.2L, 0.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::atan2, std::atan2, 0.001L, 0.001L);
+    GCEM_TEST_COMPARE_VALS (gcem::atan2, std::atan2, 0.49L, 0.49L);
 
-    GCEM_TEST_COMPARE_VALS(gcem::atan2,std::atan2,     -0.5L,          -0.5L);
-    GCEM_TEST_COMPARE_VALS(gcem::atan2,std::atan2,      0.5L,          -0.5L);
-    GCEM_TEST_COMPARE_VALS(gcem::atan2,std::atan2,     -0.5L,           0.5L);
+    GCEM_TEST_COMPARE_VALS (gcem::atan2, std::atan2, -0.5L, -0.5L);
+    GCEM_TEST_COMPARE_VALS (gcem::atan2, std::atan2, 0.5L, -0.5L);
+    GCEM_TEST_COMPARE_VALS (gcem::atan2, std::atan2, -0.5L, 0.5L);
 
-    GCEM_TEST_COMPARE_VALS(gcem::atan2,std::atan2,      9.6L,           8.4L);
-    GCEM_TEST_COMPARE_VALS(gcem::atan2,std::atan2,      1.0L,           0.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::atan2,std::atan2,      0.0L,           1.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::atan2,std::atan2,     -1.0L,           0.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::atan2,std::atan2,      0.0L,          -1.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::atan2,std::atan2,      1.0L,           3.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::atan2,std::atan2,     -5.0L,           2.5L);
-    GCEM_TEST_COMPARE_VALS(gcem::atan2,std::atan2,  -1000.0L,          -0.001L);
-    GCEM_TEST_COMPARE_VALS(gcem::atan2,std::atan2,      0.1337L,  -123456.0L);
-
-    //
-
-    GCEM_TEST_COMPARE_VALS(gcem::atan2,std::atan2, TEST_NAN,     1.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::atan2,std::atan2,     1.0L, TEST_NAN);
-    GCEM_TEST_COMPARE_VALS(gcem::atan2,std::atan2, TEST_NAN, TEST_NAN);
+    GCEM_TEST_COMPARE_VALS (gcem::atan2, std::atan2, 9.6L, 8.4L);
+    GCEM_TEST_COMPARE_VALS (gcem::atan2, std::atan2, 1.0L, 0.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::atan2, std::atan2, 0.0L, 1.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::atan2, std::atan2, -1.0L, 0.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::atan2, std::atan2, 0.0L, -1.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::atan2, std::atan2, 1.0L, 3.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::atan2, std::atan2, -5.0L, 2.5L);
+    GCEM_TEST_COMPARE_VALS (gcem::atan2, std::atan2, -1000.0L, -0.001L);
+    GCEM_TEST_COMPARE_VALS (gcem::atan2, std::atan2, 0.1337L, -123456.0L);
 
     //
 
-    print_final("atan2");
+    GCEM_TEST_COMPARE_VALS (gcem::atan2, std::atan2, TEST_NAN, 1.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::atan2, std::atan2, 1.0L, TEST_NAN);
+    GCEM_TEST_COMPARE_VALS (gcem::atan2, std::atan2, TEST_NAN, TEST_NAN);
+
+    //
+
+    print_final ("atan2");
 
     return 0;
 }

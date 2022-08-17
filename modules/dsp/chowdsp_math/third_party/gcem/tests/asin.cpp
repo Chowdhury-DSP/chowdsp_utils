@@ -25,23 +25,23 @@
 
 int main()
 {
-    print_begin("asin");
+    print_begin ("asin");
 
     //
 
-    GCEM_TEST_COMPARE_VALS(gcem::asin,std::asin,0.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::asin,std::asin,0.001L);
-    GCEM_TEST_COMPARE_VALS(gcem::asin,std::asin,0.5L);
-    GCEM_TEST_COMPARE_VALS(gcem::asin,std::asin,-0.5L);
-    GCEM_TEST_COMPARE_VALS(gcem::asin,std::asin,0.7568025L);
-    GCEM_TEST_COMPARE_VALS(gcem::asin,std::asin,1.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::asin,std::asin,5.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::asin, std::asin, 0.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::asin, std::asin, 0.001L);
+    GCEM_TEST_COMPARE_VALS (gcem::asin, std::asin, 0.5L);
+    GCEM_TEST_COMPARE_VALS (gcem::asin, std::asin, -0.5L);
+    GCEM_TEST_COMPARE_VALS (gcem::asin, std::asin, 0.7568025L);
+    GCEM_TEST_COMPARE_VALS (gcem::asin, std::asin, 1.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::asin, std::asin, 5.0L);
 
-    GCEM_TEST_COMPARE_VALS(gcem::asin,std::asin,TEST_NAN);
+    GCEM_TEST_COMPARE_VALS (gcem::asin, std::asin, TEST_NAN);
 
     //
 
-    print_final("asin");
+    print_final ("asin");
 
     return 0;
 }

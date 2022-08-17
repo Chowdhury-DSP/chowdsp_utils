@@ -22,27 +22,29 @@
 
 int main()
 {
-    std::cout << "\n*** begin is_odd test ***\n" << std::endl;
+    std::cout << "\n*** begin is_odd test ***\n"
+              << std::endl;
 
     //
 
     int run_val = 0;
 
-    run_val += gcem::internal::is_odd(1);
-    run_val += gcem::internal::is_odd(3);
-    run_val += gcem::internal::is_odd(-5);
-    run_val += gcem::internal::is_even(10UL);
-    run_val += gcem::internal::is_odd(-400009L);
-    run_val += gcem::internal::is_even(100000000L);
+    run_val += gcem::internal::is_odd (1);
+    run_val += gcem::internal::is_odd (3);
+    run_val += gcem::internal::is_odd (-5);
+    run_val += gcem::internal::is_even (10UL);
+    run_val += gcem::internal::is_odd (-400009L);
+    run_val += gcem::internal::is_even (100000000L);
 
     if (run_val == 6)
         std::cout << "\033[32m All OK.\033[0m" << std::endl;
     else
-        throw std::runtime_error("test fail");
+        throw std::runtime_error ("test fail");
 
     //
 
-    std::cout << "\n*** end is_odd test ***\n" << std::endl;
+    std::cout << "\n*** end is_odd test ***\n"
+              << std::endl;
 
     return 0;
 }

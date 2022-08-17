@@ -25,23 +25,23 @@
 
 int main()
 {
-    print_begin("acos");
+    print_begin ("acos");
 
     //
 
-    GCEM_TEST_COMPARE_VALS(gcem::acos,std::acos, 0.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::acos,std::acos, 0.001L);
-    GCEM_TEST_COMPARE_VALS(gcem::acos,std::acos, 0.5L);
-    GCEM_TEST_COMPARE_VALS(gcem::acos,std::acos,-0.5L);
-    GCEM_TEST_COMPARE_VALS(gcem::acos,std::acos, 0.7568025L);
-    GCEM_TEST_COMPARE_VALS(gcem::acos,std::acos, 1.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::acos,std::acos, 5.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::acos, std::acos, 0.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::acos, std::acos, 0.001L);
+    GCEM_TEST_COMPARE_VALS (gcem::acos, std::acos, 0.5L);
+    GCEM_TEST_COMPARE_VALS (gcem::acos, std::acos, -0.5L);
+    GCEM_TEST_COMPARE_VALS (gcem::acos, std::acos, 0.7568025L);
+    GCEM_TEST_COMPARE_VALS (gcem::acos, std::acos, 1.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::acos, std::acos, 5.0L);
 
-    GCEM_TEST_COMPARE_VALS(gcem::acos,std::acos, TEST_NAN);
+    GCEM_TEST_COMPARE_VALS (gcem::acos, std::acos, TEST_NAN);
 
     //
 
-    print_final("acos");
+    print_final ("acos");
 
     return 0;
 }

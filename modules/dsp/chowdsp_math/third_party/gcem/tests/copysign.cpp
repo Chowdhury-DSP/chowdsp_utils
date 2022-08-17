@@ -25,35 +25,35 @@
 
 int main()
 {
-    print_begin("copysign");
+    print_begin ("copysign");
 
     //
 
-    GCEM_TEST_COMPARE_VALS(gcem::copysign,std::copysign,  1.0,  1.0);
-    GCEM_TEST_COMPARE_VALS(gcem::copysign,std::copysign, -1.0,  1.0);
-    GCEM_TEST_COMPARE_VALS(gcem::copysign,std::copysign,  1.0, -1.0);
-    GCEM_TEST_COMPARE_VALS(gcem::copysign,std::copysign, -1.0, -1.0);
+    GCEM_TEST_COMPARE_VALS (gcem::copysign, std::copysign, 1.0, 1.0);
+    GCEM_TEST_COMPARE_VALS (gcem::copysign, std::copysign, -1.0, 1.0);
+    GCEM_TEST_COMPARE_VALS (gcem::copysign, std::copysign, 1.0, -1.0);
+    GCEM_TEST_COMPARE_VALS (gcem::copysign, std::copysign, -1.0, -1.0);
 
-    GCEM_TEST_COMPARE_VALS(gcem::copysign,std::copysign,  1.0,  0.0);
-    GCEM_TEST_COMPARE_VALS(gcem::copysign,std::copysign, -1.0,  0.0);
-    GCEM_TEST_COMPARE_VALS(gcem::copysign,std::copysign,  1.0, -0.0);
-    GCEM_TEST_COMPARE_VALS(gcem::copysign,std::copysign, -1.0, -0.0);
+    GCEM_TEST_COMPARE_VALS (gcem::copysign, std::copysign, 1.0, 0.0);
+    GCEM_TEST_COMPARE_VALS (gcem::copysign, std::copysign, -1.0, 0.0);
+    GCEM_TEST_COMPARE_VALS (gcem::copysign, std::copysign, 1.0, -0.0);
+    GCEM_TEST_COMPARE_VALS (gcem::copysign, std::copysign, -1.0, -0.0);
 
-    GCEM_TEST_COMPARE_VALS(gcem::copysign,std::copysign,  0.0,  0.0);
-    GCEM_TEST_COMPARE_VALS(gcem::copysign,std::copysign, -0.0,  0.0);
-    GCEM_TEST_COMPARE_VALS(gcem::copysign,std::copysign,  0.0, -0.0);
-    GCEM_TEST_COMPARE_VALS(gcem::copysign,std::copysign, -0.0, -0.0);
-    
-    GCEM_TEST_COMPARE_VALS(gcem::copysign,std::copysign, TEST_POSINF, TEST_POSINF);
-    GCEM_TEST_COMPARE_VALS(gcem::copysign,std::copysign, TEST_NEGINF, TEST_POSINF);
-    GCEM_TEST_COMPARE_VALS(gcem::copysign,std::copysign, TEST_POSINF, TEST_NEGINF);
-    GCEM_TEST_COMPARE_VALS(gcem::copysign,std::copysign, TEST_NEGINF, TEST_NEGINF);
+    GCEM_TEST_COMPARE_VALS (gcem::copysign, std::copysign, 0.0, 0.0);
+    GCEM_TEST_COMPARE_VALS (gcem::copysign, std::copysign, -0.0, 0.0);
+    GCEM_TEST_COMPARE_VALS (gcem::copysign, std::copysign, 0.0, -0.0);
+    GCEM_TEST_COMPARE_VALS (gcem::copysign, std::copysign, -0.0, -0.0);
 
-    GCEM_TEST_COMPARE_VALS(gcem::copysign,std::copysign, TEST_NAN, TEST_NAN);
+    GCEM_TEST_COMPARE_VALS (gcem::copysign, std::copysign, TEST_POSINF, TEST_POSINF);
+    GCEM_TEST_COMPARE_VALS (gcem::copysign, std::copysign, TEST_NEGINF, TEST_POSINF);
+    GCEM_TEST_COMPARE_VALS (gcem::copysign, std::copysign, TEST_POSINF, TEST_NEGINF);
+    GCEM_TEST_COMPARE_VALS (gcem::copysign, std::copysign, TEST_NEGINF, TEST_NEGINF);
+
+    GCEM_TEST_COMPARE_VALS (gcem::copysign, std::copysign, TEST_NAN, TEST_NAN);
 
     //
 
-    print_final("copysign");
+    print_final ("copysign");
 
     return 0;
 }

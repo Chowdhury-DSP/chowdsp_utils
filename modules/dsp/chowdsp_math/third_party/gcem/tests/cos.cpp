@@ -25,24 +25,24 @@
 
 int main()
 {
-    print_begin("cos");
+    print_begin ("cos");
 
     //
 
-    GCEM_TEST_COMPARE_VALS(gcem::cos,std::cos,-1.5L);
-    GCEM_TEST_COMPARE_VALS(gcem::cos,std::cos,0.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::cos,std::cos,0.001L);
-    GCEM_TEST_COMPARE_VALS(gcem::cos,std::cos,1.001L);
-    GCEM_TEST_COMPARE_VALS(gcem::cos,std::cos,1.5L);
-    GCEM_TEST_COMPARE_VALS(gcem::cos,std::cos,11.1L);
-    GCEM_TEST_COMPARE_VALS(gcem::cos,std::cos,50.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::cos,std::cos,150.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::cos, std::cos, -1.5L);
+    GCEM_TEST_COMPARE_VALS (gcem::cos, std::cos, 0.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::cos, std::cos, 0.001L);
+    GCEM_TEST_COMPARE_VALS (gcem::cos, std::cos, 1.001L);
+    GCEM_TEST_COMPARE_VALS (gcem::cos, std::cos, 1.5L);
+    GCEM_TEST_COMPARE_VALS (gcem::cos, std::cos, 11.1L);
+    GCEM_TEST_COMPARE_VALS (gcem::cos, std::cos, 50.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::cos, std::cos, 150.0L);
 
-    GCEM_TEST_COMPARE_VALS(gcem::cos,std::cos,TEST_NAN);
+    GCEM_TEST_COMPARE_VALS (gcem::cos, std::cos, TEST_NAN);
 
     //
 
-    print_final("cos");
+    print_final ("cos");
 
     return 0;
 }

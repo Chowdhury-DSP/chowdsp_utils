@@ -25,21 +25,21 @@
 
 int main()
 {
-    print_begin("acosh");
+    print_begin ("acosh");
 
     //
 
-    GCEM_TEST_COMPARE_VALS(gcem::acosh,std::acosh,1.001L);
-    GCEM_TEST_COMPARE_VALS(gcem::acosh,std::acosh,1.5L);
-    GCEM_TEST_COMPARE_VALS(gcem::acosh,std::acosh,11.1L);
-    GCEM_TEST_COMPARE_VALS(gcem::acosh,std::acosh,50.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::acosh,std::acosh,0.5L);
+    GCEM_TEST_COMPARE_VALS (gcem::acosh, std::acosh, 1.001L);
+    GCEM_TEST_COMPARE_VALS (gcem::acosh, std::acosh, 1.5L);
+    GCEM_TEST_COMPARE_VALS (gcem::acosh, std::acosh, 11.1L);
+    GCEM_TEST_COMPARE_VALS (gcem::acosh, std::acosh, 50.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::acosh, std::acosh, 0.5L);
 
-    GCEM_TEST_COMPARE_VALS(gcem::acosh,std::acosh,TEST_NAN);
+    GCEM_TEST_COMPARE_VALS (gcem::acosh, std::acosh, TEST_NAN);
 
     //
 
-    print_final("acosh");
+    print_final ("acosh");
 
     return 0;
 }

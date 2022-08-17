@@ -25,26 +25,26 @@
 
 int main()
 {
-    print_begin("log10");
+    print_begin ("log10");
 
     //
 
-    GCEM_TEST_COMPARE_VALS(gcem::log10, std::log10,  0.5L);
-    GCEM_TEST_COMPARE_VALS(gcem::log10, std::log10,  0.00199900000000000208L);
-    GCEM_TEST_COMPARE_VALS(gcem::log10, std::log10,  1.5L);
-    GCEM_TEST_COMPARE_VALS(gcem::log10, std::log10,  41.5L);
-    GCEM_TEST_COMPARE_VALS(gcem::log10, std::log10,  0.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::log10, std::log10, -1.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::log10, std::log10,  1e-500L);
-    GCEM_TEST_COMPARE_VALS(gcem::log10, std::log10,  std::numeric_limits<long double>::min());
-    
-    GCEM_TEST_COMPARE_VALS(gcem::log10, std::log10, -std::numeric_limits<long double>::infinity());
-    GCEM_TEST_COMPARE_VALS(gcem::log10, std::log10,  std::numeric_limits<long double>::infinity());
-    GCEM_TEST_COMPARE_VALS(gcem::log10, std::log10,  std::numeric_limits<long double>::quiet_NaN());
+    GCEM_TEST_COMPARE_VALS (gcem::log10, std::log10, 0.5L);
+    GCEM_TEST_COMPARE_VALS (gcem::log10, std::log10, 0.00199900000000000208L);
+    GCEM_TEST_COMPARE_VALS (gcem::log10, std::log10, 1.5L);
+    GCEM_TEST_COMPARE_VALS (gcem::log10, std::log10, 41.5L);
+    GCEM_TEST_COMPARE_VALS (gcem::log10, std::log10, 0.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::log10, std::log10, -1.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::log10, std::log10, 1e-500L);
+    GCEM_TEST_COMPARE_VALS (gcem::log10, std::log10, std::numeric_limits<long double>::min());
+
+    GCEM_TEST_COMPARE_VALS (gcem::log10, std::log10, -std::numeric_limits<long double>::infinity());
+    GCEM_TEST_COMPARE_VALS (gcem::log10, std::log10, std::numeric_limits<long double>::infinity());
+    GCEM_TEST_COMPARE_VALS (gcem::log10, std::log10, std::numeric_limits<long double>::quiet_NaN());
 
     //
 
-    print_final("log10");
+    print_final ("log10");
 
     return 0;
 }

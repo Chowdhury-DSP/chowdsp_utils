@@ -23,35 +23,34 @@
 
 #include "gcem_tests.hpp"
 
-template<typename T>
-constexpr
-T
-std_test_fn(const T x)
+template <typename T>
+constexpr T
+    std_test_fn (const T x)
 {
-    return T(1) / std::sqrt(x);
+    return T (1) / std::sqrt (x);
 }
 
 int main()
 {
-    print_begin("sqrt");
+    print_begin ("sqrt");
 
     //
 
-    GCEM_TEST_COMPARE_VALS(gcem::inv_sqrt, std_test_fn,  0.5L);
-    GCEM_TEST_COMPARE_VALS(gcem::inv_sqrt, std_test_fn,  0.00199900000000000208L);
-    GCEM_TEST_COMPARE_VALS(gcem::inv_sqrt, std_test_fn,  1.5L);
-    GCEM_TEST_COMPARE_VALS(gcem::inv_sqrt, std_test_fn,  2.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::inv_sqrt, std_test_fn,  41.5L);
-    GCEM_TEST_COMPARE_VALS(gcem::inv_sqrt, std_test_fn,  0.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::inv_sqrt, std_test_fn, -1.0L);
-    
-    GCEM_TEST_COMPARE_VALS(gcem::inv_sqrt, std_test_fn, -std::numeric_limits<long double>::infinity());
-    GCEM_TEST_COMPARE_VALS(gcem::inv_sqrt, std_test_fn,  std::numeric_limits<long double>::infinity());
-    GCEM_TEST_COMPARE_VALS(gcem::inv_sqrt, std_test_fn,  std::numeric_limits<long double>::quiet_NaN());
+    GCEM_TEST_COMPARE_VALS (gcem::inv_sqrt, std_test_fn, 0.5L);
+    GCEM_TEST_COMPARE_VALS (gcem::inv_sqrt, std_test_fn, 0.00199900000000000208L);
+    GCEM_TEST_COMPARE_VALS (gcem::inv_sqrt, std_test_fn, 1.5L);
+    GCEM_TEST_COMPARE_VALS (gcem::inv_sqrt, std_test_fn, 2.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::inv_sqrt, std_test_fn, 41.5L);
+    GCEM_TEST_COMPARE_VALS (gcem::inv_sqrt, std_test_fn, 0.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::inv_sqrt, std_test_fn, -1.0L);
+
+    GCEM_TEST_COMPARE_VALS (gcem::inv_sqrt, std_test_fn, -std::numeric_limits<long double>::infinity());
+    GCEM_TEST_COMPARE_VALS (gcem::inv_sqrt, std_test_fn, std::numeric_limits<long double>::infinity());
+    GCEM_TEST_COMPARE_VALS (gcem::inv_sqrt, std_test_fn, std::numeric_limits<long double>::quiet_NaN());
 
     //
 
-    print_final("sqrt");
+    print_final ("sqrt");
 
     return 0;
 }

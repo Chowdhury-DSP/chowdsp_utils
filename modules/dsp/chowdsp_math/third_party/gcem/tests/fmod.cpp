@@ -25,46 +25,46 @@
 
 int main()
 {
-    print_begin("fmod");
+    print_begin ("fmod");
 
     //
 
-    GCEM_TEST_COMPARE_VALS(gcem::fmod,std::fmod,   0.0,   0.0);
-    GCEM_TEST_COMPARE_VALS(gcem::fmod,std::fmod,  -0.0,   0.0);
-    GCEM_TEST_COMPARE_VALS(gcem::fmod,std::fmod,   0.0,  -0.0);
-    GCEM_TEST_COMPARE_VALS(gcem::fmod,std::fmod,   5.3,   2.0);
-    GCEM_TEST_COMPARE_VALS(gcem::fmod,std::fmod,  -5.3,   2.0);
-    GCEM_TEST_COMPARE_VALS(gcem::fmod,std::fmod,   5.3,  -2.0);
-    GCEM_TEST_COMPARE_VALS(gcem::fmod,std::fmod,  -5.3,  -2.0);
-    GCEM_TEST_COMPARE_VALS(gcem::fmod,std::fmod,  18.5,   4.2);
-    GCEM_TEST_COMPARE_VALS(gcem::fmod,std::fmod, -18.5,   4.2);
-    GCEM_TEST_COMPARE_VALS(gcem::fmod,std::fmod,  18.5,  -4.2);
-    GCEM_TEST_COMPARE_VALS(gcem::fmod,std::fmod, -18.5,  -4.2);
+    GCEM_TEST_COMPARE_VALS (gcem::fmod, std::fmod, 0.0, 0.0);
+    GCEM_TEST_COMPARE_VALS (gcem::fmod, std::fmod, -0.0, 0.0);
+    GCEM_TEST_COMPARE_VALS (gcem::fmod, std::fmod, 0.0, -0.0);
+    GCEM_TEST_COMPARE_VALS (gcem::fmod, std::fmod, 5.3, 2.0);
+    GCEM_TEST_COMPARE_VALS (gcem::fmod, std::fmod, -5.3, 2.0);
+    GCEM_TEST_COMPARE_VALS (gcem::fmod, std::fmod, 5.3, -2.0);
+    GCEM_TEST_COMPARE_VALS (gcem::fmod, std::fmod, -5.3, -2.0);
+    GCEM_TEST_COMPARE_VALS (gcem::fmod, std::fmod, 18.5, 4.2);
+    GCEM_TEST_COMPARE_VALS (gcem::fmod, std::fmod, -18.5, 4.2);
+    GCEM_TEST_COMPARE_VALS (gcem::fmod, std::fmod, 18.5, -4.2);
+    GCEM_TEST_COMPARE_VALS (gcem::fmod, std::fmod, -18.5, -4.2);
 
-    GCEM_TEST_COMPARE_VALS(gcem::fmod,std::fmod, -std::numeric_limits<long double>::infinity(),  0.0);
-    GCEM_TEST_COMPARE_VALS(gcem::fmod,std::fmod, -std::numeric_limits<long double>::infinity(), -1.0);
-    GCEM_TEST_COMPARE_VALS(gcem::fmod,std::fmod, -std::numeric_limits<long double>::infinity(),  1.0);
-    GCEM_TEST_COMPARE_VALS(gcem::fmod,std::fmod, -std::numeric_limits<long double>::infinity(),  std::numeric_limits<long double>::infinity());
-    GCEM_TEST_COMPARE_VALS(gcem::fmod,std::fmod, -std::numeric_limits<long double>::infinity(), -std::numeric_limits<long double>::infinity());
-    GCEM_TEST_COMPARE_VALS(gcem::fmod,std::fmod, -std::numeric_limits<long double>::infinity(),  std::numeric_limits<long double>::quiet_NaN());
+    GCEM_TEST_COMPARE_VALS (gcem::fmod, std::fmod, -std::numeric_limits<long double>::infinity(), 0.0);
+    GCEM_TEST_COMPARE_VALS (gcem::fmod, std::fmod, -std::numeric_limits<long double>::infinity(), -1.0);
+    GCEM_TEST_COMPARE_VALS (gcem::fmod, std::fmod, -std::numeric_limits<long double>::infinity(), 1.0);
+    GCEM_TEST_COMPARE_VALS (gcem::fmod, std::fmod, -std::numeric_limits<long double>::infinity(), std::numeric_limits<long double>::infinity());
+    GCEM_TEST_COMPARE_VALS (gcem::fmod, std::fmod, -std::numeric_limits<long double>::infinity(), -std::numeric_limits<long double>::infinity());
+    GCEM_TEST_COMPARE_VALS (gcem::fmod, std::fmod, -std::numeric_limits<long double>::infinity(), std::numeric_limits<long double>::quiet_NaN());
 
-    GCEM_TEST_COMPARE_VALS(gcem::fmod,std::fmod, std::numeric_limits<long double>::infinity(),  0.0);
-    GCEM_TEST_COMPARE_VALS(gcem::fmod,std::fmod, std::numeric_limits<long double>::infinity(), -1.0);
-    GCEM_TEST_COMPARE_VALS(gcem::fmod,std::fmod, std::numeric_limits<long double>::infinity(),  1.0);
-    GCEM_TEST_COMPARE_VALS(gcem::fmod,std::fmod, std::numeric_limits<long double>::infinity(),  std::numeric_limits<long double>::infinity());
-    GCEM_TEST_COMPARE_VALS(gcem::fmod,std::fmod, std::numeric_limits<long double>::infinity(), -std::numeric_limits<long double>::infinity());
-    GCEM_TEST_COMPARE_VALS(gcem::fmod,std::fmod, std::numeric_limits<long double>::infinity(),  std::numeric_limits<long double>::quiet_NaN());
+    GCEM_TEST_COMPARE_VALS (gcem::fmod, std::fmod, std::numeric_limits<long double>::infinity(), 0.0);
+    GCEM_TEST_COMPARE_VALS (gcem::fmod, std::fmod, std::numeric_limits<long double>::infinity(), -1.0);
+    GCEM_TEST_COMPARE_VALS (gcem::fmod, std::fmod, std::numeric_limits<long double>::infinity(), 1.0);
+    GCEM_TEST_COMPARE_VALS (gcem::fmod, std::fmod, std::numeric_limits<long double>::infinity(), std::numeric_limits<long double>::infinity());
+    GCEM_TEST_COMPARE_VALS (gcem::fmod, std::fmod, std::numeric_limits<long double>::infinity(), -std::numeric_limits<long double>::infinity());
+    GCEM_TEST_COMPARE_VALS (gcem::fmod, std::fmod, std::numeric_limits<long double>::infinity(), std::numeric_limits<long double>::quiet_NaN());
 
-    GCEM_TEST_COMPARE_VALS(gcem::fmod,std::fmod, std::numeric_limits<long double>::quiet_NaN(),  0.0);
-    GCEM_TEST_COMPARE_VALS(gcem::fmod,std::fmod, std::numeric_limits<long double>::quiet_NaN(), -1.0);
-    GCEM_TEST_COMPARE_VALS(gcem::fmod,std::fmod, std::numeric_limits<long double>::quiet_NaN(),  1.0);
-    GCEM_TEST_COMPARE_VALS(gcem::fmod,std::fmod, std::numeric_limits<long double>::quiet_NaN(),  std::numeric_limits<long double>::infinity());
-    GCEM_TEST_COMPARE_VALS(gcem::fmod,std::fmod, std::numeric_limits<long double>::quiet_NaN(), -std::numeric_limits<long double>::infinity());
-    GCEM_TEST_COMPARE_VALS(gcem::fmod,std::fmod, std::numeric_limits<long double>::quiet_NaN(),  std::numeric_limits<long double>::quiet_NaN());
+    GCEM_TEST_COMPARE_VALS (gcem::fmod, std::fmod, std::numeric_limits<long double>::quiet_NaN(), 0.0);
+    GCEM_TEST_COMPARE_VALS (gcem::fmod, std::fmod, std::numeric_limits<long double>::quiet_NaN(), -1.0);
+    GCEM_TEST_COMPARE_VALS (gcem::fmod, std::fmod, std::numeric_limits<long double>::quiet_NaN(), 1.0);
+    GCEM_TEST_COMPARE_VALS (gcem::fmod, std::fmod, std::numeric_limits<long double>::quiet_NaN(), std::numeric_limits<long double>::infinity());
+    GCEM_TEST_COMPARE_VALS (gcem::fmod, std::fmod, std::numeric_limits<long double>::quiet_NaN(), -std::numeric_limits<long double>::infinity());
+    GCEM_TEST_COMPARE_VALS (gcem::fmod, std::fmod, std::numeric_limits<long double>::quiet_NaN(), std::numeric_limits<long double>::quiet_NaN());
 
     //
 
-    print_final("fmod");
+    print_final ("fmod");
 
     return 0;
 }

@@ -26,32 +26,32 @@
 
 int main()
 {
-    print_begin("factorial");
+    print_begin ("factorial");
 
-    std::function<long double (long double)> std_fn  = [] (long double x) -> long double { return std::tgamma(x+1); };
+    std::function<long double (long double)> std_fn = [] (long double x) -> long double { return std::tgamma (x + 1); };
 
     //
 
     // using long doubles -> tgamma
-    GCEM_TEST_COMPARE_VALS(gcem::factorial,std_fn, 3.1L);
-    GCEM_TEST_COMPARE_VALS(gcem::factorial,std_fn, 7.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::factorial,std_fn, 10.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::factorial,std_fn, 12.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::factorial,std_fn, 14.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::factorial,std_fn, 15.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::factorial, std_fn, 3.1L);
+    GCEM_TEST_COMPARE_VALS (gcem::factorial, std_fn, 7.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::factorial, std_fn, 10.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::factorial, std_fn, 12.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::factorial, std_fn, 14.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::factorial, std_fn, 15.0L);
 
     // using long ints
-    GCEM_TEST_COMPARE_VALS(gcem::factorial,std_fn, 5L);
-    GCEM_TEST_COMPARE_VALS(gcem::factorial,std_fn, 9L);
-    GCEM_TEST_COMPARE_VALS(gcem::factorial,std_fn, 11L);
+    GCEM_TEST_COMPARE_VALS (gcem::factorial, std_fn, 5L);
+    GCEM_TEST_COMPARE_VALS (gcem::factorial, std_fn, 9L);
+    GCEM_TEST_COMPARE_VALS (gcem::factorial, std_fn, 11L);
 #ifndef _WIN32
-    GCEM_TEST_COMPARE_VALS(gcem::factorial,std_fn, 13L);
-    GCEM_TEST_COMPARE_VALS(gcem::factorial,std_fn, 16L);
+    GCEM_TEST_COMPARE_VALS (gcem::factorial, std_fn, 13L);
+    GCEM_TEST_COMPARE_VALS (gcem::factorial, std_fn, 16L);
 #endif
 
     //
 
-    print_final("factorial");
+    print_final ("factorial");
 
     return 0;
 }

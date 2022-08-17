@@ -25,23 +25,23 @@
 
 int main()
 {
-    print_begin("sinh");
+    print_begin ("sinh");
 
     //
 
-    GCEM_TEST_COMPARE_VALS(gcem::sinh,std::sinh,0.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::sinh,std::sinh,0.001L);
-    GCEM_TEST_COMPARE_VALS(gcem::sinh,std::sinh,0.5L);
-    GCEM_TEST_COMPARE_VALS(gcem::sinh,std::sinh,-0.5L);
-    GCEM_TEST_COMPARE_VALS(gcem::sinh,std::sinh,0.7568025L);
-    GCEM_TEST_COMPARE_VALS(gcem::sinh,std::sinh,1.0L);
-    GCEM_TEST_COMPARE_VALS(gcem::sinh,std::sinh,5.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::sinh, std::sinh, 0.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::sinh, std::sinh, 0.001L);
+    GCEM_TEST_COMPARE_VALS (gcem::sinh, std::sinh, 0.5L);
+    GCEM_TEST_COMPARE_VALS (gcem::sinh, std::sinh, -0.5L);
+    GCEM_TEST_COMPARE_VALS (gcem::sinh, std::sinh, 0.7568025L);
+    GCEM_TEST_COMPARE_VALS (gcem::sinh, std::sinh, 1.0L);
+    GCEM_TEST_COMPARE_VALS (gcem::sinh, std::sinh, 5.0L);
 
-    GCEM_TEST_COMPARE_VALS(gcem::sinh,std::sinh,TEST_NAN);
+    GCEM_TEST_COMPARE_VALS (gcem::sinh, std::sinh, TEST_NAN);
 
     //
 
-    print_final("sinh");
+    print_final ("sinh");
 
     return 0;
 }
