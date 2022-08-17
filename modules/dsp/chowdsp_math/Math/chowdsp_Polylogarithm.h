@@ -11,10 +11,10 @@ namespace Polylogarithm
 {
     /** real polylogarithm with n=2 (dilogarithm). */
     template <typename T>
-    T Li2 (T x) noexcept
+    constexpr T Li2 (T x) noexcept
     {
-        static constexpr auto PI_ = juce::MathConstants<T>::pi;
-        static constexpr T P[] = {
+        constexpr auto PI_ = juce::MathConstants<T>::pi;
+        constexpr T P[] = {
             (T) 0.9999999999999999502e+0,
             (T) -2.6883926818565423430e+0,
             (T) 2.6477222699473109692e+0,
@@ -22,7 +22,7 @@ namespace Polylogarithm
             (T) 2.0886077795020607837e-1,
             (T) -1.0859777134152463084e-2
         };
-        static constexpr T Q[] = {
+        constexpr T Q[] = {
             (T) 1.0000000000000000000e+0,
             (T) -2.9383926818565635485e+0,
             (T) 3.2712093293018635389e+0,
@@ -37,9 +37,9 @@ namespace Polylogarithm
         // transform to [0, 1/2]
         if (x < (T) -1)
         {
-            const auto l = std::log ((T) 1 - x);
+            const auto l = gcem::log ((T) 1 - x);
             y = (T) 1 / ((T) 1 - x);
-            r = -PI_ * PI_ / (T) 6 + l * ((T) 0.5 * l - std::log (-x));
+            r = -PI_ * PI_ / (T) 6 + l * ((T) 0.5 * l - gcem::log (-x));
             s = (T) 1;
         }
         else if (x == (T) -1)
@@ -48,7 +48,7 @@ namespace Polylogarithm
         }
         else if (x < (T) 0)
         {
-            const auto l = std::log1p (-x);
+            const auto l = gcem::log1p (-x);
             y = x / (x - (T) 1);
             r = (T) -0.5 * l * l;
             s = (T) -1;
@@ -66,7 +66,7 @@ namespace Polylogarithm
         else if (x < (T) 1)
         {
             y = (T) 1 - x;
-            r = PI_ * PI_ / (T) 6 - std::log (x) * std::log (y);
+            r = PI_ * PI_ / (T) 6 - gcem::log (x) * gcem::log (y);
             s = (T) -1;
         }
         else if (x == (T) 1)
@@ -75,23 +75,23 @@ namespace Polylogarithm
         }
         else if (x < (T) 2)
         {
-            const auto l = std::log (x);
+            const auto l = gcem::log (x);
             y = (T) 1 - (T) 1 / x;
-            r = PI_ * PI_ / (T) 6 - l * (std::log (y) + (T) 0.5 * l);
+            r = PI_ * PI_ / (T) 6 - l * (gcem::log (y) + (T) 0.5 * l);
             s = (T) 1;
         }
         else
         {
-            const double l = std::log (x);
+            const auto l = gcem::log (x);
             y = (T) 1 / x;
             r = PI_ * PI_ / (T) 3 - (T) 0.5 * l * l;
             s = (T) -1;
         }
 
-        const double y2 = y * y;
-        const double y4 = y2 * y2;
-        const double p = P[0] + y * P[1] + y2 * (P[2] + y * P[3]) + y4 * (P[4] + y * P[5]);
-        const double q = Q[0] + y * Q[1] + y2 * (Q[2] + y * Q[3]) + y4 * (Q[4] + y * Q[5] + y2 * Q[6]);
+        const auto y2 = y * y;
+        const auto y4 = y2 * y2;
+        const auto p = P[0] + y * P[1] + y2 * (P[2] + y * P[3]) + y4 * (P[4] + y * P[5]);
+        const auto q = Q[0] + y * Q[1] + y2 * (Q[2] + y * Q[3]) + y4 * (Q[4] + y * Q[5] + y2 * Q[6]);
 
         return r + s * y * p / q;
     }
