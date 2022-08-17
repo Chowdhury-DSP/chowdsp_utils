@@ -184,7 +184,7 @@ namespace MatrixOps
             }
             else
             {
-                Vec arrVec[size / vec_size] {};
+                Vec arrVec[size_t (size / vec_size)] {};
                 for (int i = 0; i < size; i += vec_size)
                     arrVec[i / vec_size] = xsimd::load_aligned (arr + i);
 
