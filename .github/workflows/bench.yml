@@ -66,5 +66,6 @@ jobs:
         shell: bash
         run: |
           for exe in *; do
+            echo "RUNNING BENCHMARK: $exe"
             ./$exe;
           done

@@ -119,6 +119,7 @@ jobs:
         shell: bash
         run: |
           for exe in *; do
+            echo "RUNNING TEST: $exe"
             ./$exe;
           done
 
