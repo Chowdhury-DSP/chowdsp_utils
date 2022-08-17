@@ -6,9 +6,14 @@ All notable changes to this project will be documented in this file.
 - Added filters: Kurt Werner's generalized SVF, ARP 1047 filter.
 - Added waveshapers: Buchla wavefolder, Serge Wave Multiplier, full wave rectifier.
 - Added triangle wave oscillator.
-- Added wrapper for `moodycamel::ReaderWriterQueue`.
+- Added `DeferredAction` for running any action on the message thread without locking.
+- Added wrapper for `moodycamel::ReaderWriterQueue` and `moodycamel::ConcurrentQueue`.
+- Added compile-time maths functions with GCEM.
 - Added methods for setting/clearing groups of parameters in `ForwardingParametersManager`.
 - Fixed out-of-order preset swapping in `PresetManager`.
+- Fixed `StateVariableFilter` vector initialization bug.
+- Updated `nlohmann::json` to version 3.11.1.
+- Updated `VariableOversampling` to be compatible with JUCE 7 parameter version hints.
 
 ## [1.1.0] 2022-07-14
 - Removed dependency on JUCE for most DSP modules.
