@@ -24,6 +24,8 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 #include <chowdsp_simd/chowdsp_simd.h>
 
+#include "third_party/gcem/include/gcem.hpp"
+
 #include "Math/chowdsp_Combinatorics.h"
 #include "Math/chowdsp_FloatVectorOperations.h"
 #include "Math/chowdsp_MatrixOps.h"

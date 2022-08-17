@@ -31,3 +31,6 @@ add_static_test_check(HasMemberMethodTest HasMemberMethodTest_pass.cpp TRUE)
 
 create_static_test(IsContainerTest)
 add_static_test_check(IsContainerTest CorrectContainers_pass.cpp TRUE)
+
+create_static_test(ConstexprMathTest)
+add_static_test_check(ConstexprMathTest ConstexprMath_pass.cpp TRUE)
