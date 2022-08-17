@@ -6,7 +6,25 @@ TEST_CASE ("Matrix Ops Test")
 {
     SECTION ("Householder Scalar Test")
     {
-        constexpr size_t size = 8;
+        static constexpr size_t size = 8;
+
+        std::array<float, size> data {};
+        std::array<float, size> data2 {};
+        std::fill (data.begin(), data.end(), 1.0f);
+
+        chowdsp::MatrixOps::HouseHolder<float, size>::outOfPlace (data2.data(), data.data());
+        chowdsp::MatrixOps::HouseHolder<float, size>::inPlace (data.data());
+
+        for (auto& x : data)
+            REQUIRE_MESSAGE (x == -1.0f, "Householder ouput is incorrect!");
+
+        for (auto& x : data2)
+            REQUIRE_MESSAGE (x == -1.0f, "Householder out-of-place ouput is incorrect!");
+    }
+
+    SECTION ("Householder Scalar Odd Test")
+    {
+        static constexpr size_t size = 7;
 
         std::array<float, size> data {};
         std::array<float, size> data2 {};
@@ -35,13 +53,12 @@ TEST_CASE ("Matrix Ops Test")
 
     SECTION ("Hadamard Scalar Test")
     {
-        constexpr size_t size = 8;
+        static constexpr size_t size = 8;
 
         std::array<float, size> data {};
         std::array<float, size> data2 {};
         std::fill (data.begin(), data.end(), 1.0f);
 
-        chowdsp::MatrixOps::Hadamard<float, size>::outOfPlace (data2.data(), data.data());
         chowdsp::MatrixOps::Hadamard<float, size>::inPlace (data.data());
 
         REQUIRE_MESSAGE (data[0] == (float) size / (float) sqrt (size), "Hadamard value 0 is incorrect!");
@@ -52,7 +69,7 @@ TEST_CASE ("Matrix Ops Test")
     SECTION ("Hadamard Vector Test")
     {
         using VecType = xsimd::batch<float>;
-        constexpr size_t size = 2;
+        static constexpr size_t size = 2;
         std::array<VecType, size> data {};
         std::fill (data.begin(), data.end(), 1.0f);
         chowdsp::MatrixOps::Hadamard<VecType, size>::inPlace (data.data());
