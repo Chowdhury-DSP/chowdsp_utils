@@ -11,7 +11,7 @@ namespace detail
     {
         static constexpr auto RegisterSize = sizeof (xsimd::batch<T>);
         uintptr_t bitmask = RegisterSize - 1;
-        return (reinterpret_cast<uintptr_t> (p) & bitmask) == 0;
+        return ((uintptr_t) p & bitmask) == 0;
     }
 
     /** A handy function to round up a pointer to the nearest multiple of a given number of bytes.
@@ -45,7 +45,7 @@ namespace detail
         // Fallback: not enough operations to justify vectorizing!
         if (numVecOps < 2)
         {
-            unaryOpFallback (dest, src, numValues, scalarOp);
+            unaryOpFallback (dest, src, numValues, std::forward<ScalarOp> (scalarOp));
             return;
         }
 
@@ -60,7 +60,7 @@ namespace detail
         // leftover values that can't be vectorized...
         auto leftoverValues = numValues % vecSize;
         if (leftoverValues > 0)
-            unaryOpFallback (dest, src, leftoverValues, scalarOp);
+            unaryOpFallback (dest, src, leftoverValues, std::forward<ScalarOp> (scalarOp));
     }
 
     template <typename T, typename ScalarOp, typename VecOp>
@@ -77,23 +77,23 @@ namespace detail
         if (isAligned (dest))
         {
             if (isAligned (src))
-                unaryOp (dest, src, numValues, scalarOp, vecOp, loadA, storeA);
+                unaryOp (dest, src, numValues, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), loadA, storeA);
             else
-                unaryOp (dest, src, numValues, scalarOp, vecOp, loadU, storeA);
+                unaryOp (dest, src, numValues, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), loadU, storeA);
         }
         else
         {
             if (isAligned (src))
-                unaryOp (dest, src, numValues, scalarOp, vecOp, loadA, storeU);
+                unaryOp (dest, src, numValues, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), loadA, storeU);
             else
-                unaryOp (dest, src, numValues, scalarOp, vecOp, loadU, storeU);
+                unaryOp (dest, src, numValues, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), loadU, storeU);
         }
     }
 
     template <typename T, typename Op>
     void unaryOp (T* dest, const T* src, int numValues, Op&& op)
     {
-        unaryOp (dest, src, numValues, op, op);
+        unaryOp (dest, src, numValues, std::forward<Op> (op), std::forward<Op> (op));
     }
 
     template <typename T, typename Op>
@@ -104,7 +104,7 @@ namespace detail
     }
 
     template <typename T, typename ScalarOp, typename VecOp, typename LoadOp1Type, typename LoadOp2Type, typename StoreOpType>
-    void binaryOp (T* dest, const T* src1, const T* src2, int numValues, ScalarOp&& scalarOp, VecOp&& vecOp, LoadOp1Type&& loadOp1, LoadOp2Type&& loadOp2, StoreOpType&& storeOp)
+    void binaryOp (T* dest, const T* src1, const T* src2, int numValues, ScalarOp&& scalarOp, VecOp&& vecOp, LoadOp1Type&& loadOp1, LoadOp2Type&& loadOp2, StoreOpType&& storeOp) // NOSONAR (too many parameters)
     {
         constexpr auto vecSize = (int) xsimd::batch<T>::size;
         auto numVecOps = numValues / vecSize;
@@ -112,7 +112,7 @@ namespace detail
         // Fallback: not enough operations to justify vectorizing!
         if (numVecOps < 2)
         {
-            binaryOpFallback (dest, src1, src2, numValues, scalarOp);
+            binaryOpFallback (dest, src1, src2, numValues, std::forward<ScalarOp> (scalarOp));
             return;
         }
 
@@ -128,7 +128,7 @@ namespace detail
         // leftover values that can't be vectorized...
         auto leftoverValues = numValues % vecSize;
         if (leftoverValues > 0)
-            binaryOpFallback (dest, src1, src2, leftoverValues, scalarOp);
+            binaryOpFallback (dest, src1, src2, leftoverValues, std::forward<ScalarOp> (scalarOp));
     }
 
     template <typename T, typename ScalarOp, typename VecOp>
@@ -147,16 +147,16 @@ namespace detail
             if (isAligned (src1))
             {
                 if (isAligned (src2))
-                    binaryOp (dest, src1, src2, numValues, scalarOp, vecOp, loadA, loadA, storeA);
+                    binaryOp (dest, src1, src2, numValues, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), loadA, loadA, storeA);
                 else
-                    binaryOp (dest, src1, src2, numValues, scalarOp, vecOp, loadA, loadU, storeA);
+                    binaryOp (dest, src1, src2, numValues, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), loadA, loadU, storeA);
             }
             else
             {
                 if (isAligned (src2))
-                    binaryOp (dest, src1, src2, numValues, scalarOp, vecOp, loadU, loadA, storeA);
+                    binaryOp (dest, src1, src2, numValues, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), loadU, loadA, storeA);
                 else
-                    binaryOp (dest, src1, src2, numValues, scalarOp, vecOp, loadU, loadU, storeA);
+                    binaryOp (dest, src1, src2, numValues, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), loadU, loadU, storeA);
             }
         }
         else
@@ -164,16 +164,16 @@ namespace detail
             if (isAligned (src1))
             {
                 if (isAligned (src2))
-                    binaryOp (dest, src1, src2, numValues, scalarOp, vecOp, loadA, loadA, storeU);
+                    binaryOp (dest, src1, src2, numValues, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), loadA, loadA, storeU);
                 else
-                    binaryOp (dest, src1, src2, numValues, scalarOp, vecOp, loadA, loadU, storeU);
+                    binaryOp (dest, src1, src2, numValues, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), loadA, loadU, storeU);
             }
             else
             {
                 if (isAligned (src2))
-                    binaryOp (dest, src1, src2, numValues, scalarOp, vecOp, loadU, loadA, storeU);
+                    binaryOp (dest, src1, src2, numValues, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), loadU, loadA, storeU);
                 else
-                    binaryOp (dest, src1, src2, numValues, scalarOp, vecOp, loadU, loadU, storeU);
+                    binaryOp (dest, src1, src2, numValues, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), loadU, loadU, storeU);
             }
         }
     }
@@ -181,7 +181,7 @@ namespace detail
     template <typename T, typename Op>
     void binaryOp (T* dest, const T* src1, const T* src2, int numValues, Op&& op)
     {
-        binaryOp (dest, src1, src2, numValues, op, op);
+        binaryOp (dest, src1, src2, numValues, std::forward<Op> (op), std::forward<Op> (op));
     }
 
     template <typename T, typename Op>
@@ -210,15 +210,15 @@ namespace detail
 
         // Fallback: not enough operations to justify vectorizing!
         if (numVecOps < 2)
-            return reduceFallback (src, numValues, init, scalarOp);
+            return reduceFallback (src, numValues, init, std::forward<ScalarOp> (scalarOp));
 
         // Fallback: starting pointer is not aligned!
         if (! isAligned (src))
         {
             auto* nextAlignedPtr = getNextAlignedPtr (src);
             auto diff = int (nextAlignedPtr - src);
-            auto initResult = reduceFallback (src, diff, init, scalarOp);
-            return reduce (nextAlignedPtr, numValues - diff, initResult, scalarOp, vecOp, vecReduceOp);
+            auto initResult = reduceFallback (src, diff, init, std::forward<ScalarOp> (scalarOp));
+            return reduce (nextAlignedPtr, numValues - diff, initResult, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), std::forward<VecReduceOp> (vecReduceOp));
         }
 
         // Main loop here...
@@ -236,7 +236,7 @@ namespace detail
         // leftover values that can't be vectorized...
         auto leftoverValues = numValues % vecSize;
         if (leftoverValues > 0)
-            result = reduceFallback (src, leftoverValues, result, scalarOp);
+            result = reduceFallback (src, leftoverValues, result, std::forward<ScalarOp> (scalarOp));
 
         return result;
     }
@@ -244,13 +244,13 @@ namespace detail
     template <typename T, typename ScalarOp, typename VecOp>
     T reduce (const T* src, int numValues, T init, ScalarOp&& scalarOp, VecOp&& vecOp)
     {
-        return reduce (src, numValues, init, scalarOp, vecOp, [] (auto val) { return xsimd::hadd (val); });
+        return reduce (src, numValues, init, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), [] (auto val) { return xsimd::hadd (val); });
     }
 
-    template <typename T, typename ScalarOp>
-    T reduce (const T* src, int numValues, T init, ScalarOp&& scalarOp)
+    template <typename T, typename Op>
+    T reduce (const T* src, int numValues, T init, Op&& op)
     {
-        return reduce (src, numValues, init, scalarOp, scalarOp);
+        return reduce (src, numValues, init, std::forward<Op> (op), std::forward<Op> (op));
     }
 
     template <typename T, typename ScalarOp, typename VecOp, typename VecReduceOp>
@@ -261,7 +261,7 @@ namespace detail
 
         // Fallback: not enough operations to justify vectorizing!
         if (numVecOps < 2)
-            return reduceFallback (src1, src2, numValues, init, scalarOp);
+            return reduceFallback (src1, src2, numValues, init, std::forward<ScalarOp> (scalarOp));
 
         // Main loop here:
         auto vecLoop = [&] (auto&& loadOp1, auto&& loadOp2) {
@@ -296,7 +296,7 @@ namespace detail
         // leftover values that can't be vectorized...
         auto leftoverValues = numValues % vecSize;
         if (leftoverValues > 0)
-            result = reduceFallback (src1, src2, leftoverValues, result, scalarOp);
+            result = reduceFallback (src1, src2, leftoverValues, result, std::forward<ScalarOp> (scalarOp));
 
         return result;
     }
@@ -304,13 +304,13 @@ namespace detail
     template <typename T, typename ScalarOp, typename VecOp>
     T reduce (const T* src1, const T* src2, int numValues, T init, ScalarOp&& scalarOp, VecOp&& vecOp)
     {
-        return reduce (src1, src2, numValues, init, scalarOp, vecOp, [] (auto val) { return xsimd::hadd (val); });
+        return reduce (src1, src2, numValues, init, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), [] (auto val) { return xsimd::hadd (val); });
     }
 
-    template <typename T, typename ScalarOp>
-    T reduce (const T* src1, const T* src2, int numValues, T init, ScalarOp&& scalarOp)
+    template <typename T, typename Op>
+    T reduce (const T* src1, const T* src2, int numValues, T init, Op&& op)
     {
-        return reduce (src1, src2, numValues, init, scalarOp, scalarOp);
+        return reduce (src1, src2, numValues, init, std::forward<Op> (op), std::forward<Op> (op));
     }
 } // namespace detail
 #endif
@@ -383,11 +383,9 @@ void divide (double* dest, double dividend, const double* divisor, int numValues
 #endif
 }
 
-// @TODO: Figure out why vDSP_sve is failing unit tests in CI?
-
 float accumulate (const float* src, int numValues) noexcept
 {
-#if 0 // JUCE_USE_VDSP_FRAMEWORK
+#if JUCE_USE_VDSP_FRAMEWORK
     float result = 0.0f;
     vDSP_sve (src, 1, &result, (vDSP_Length) numValues);
     return result;
@@ -402,7 +400,7 @@ float accumulate (const float* src, int numValues) noexcept
 
 double accumulate (const double* src, int numValues) noexcept
 {
-#if 0 // JUCE_USE_VDSP_FRAMEWORK
+#if JUCE_USE_VDSP_FRAMEWORK
     double result = 0.0;
     vDSP_sveD (src, 1, &result, (vDSP_Length) numValues);
     return result;

@@ -30,7 +30,7 @@ public:
 
         juce::Thread::launch (
             [&] {
-                for (int i = 0; i < 100; ++i)
+                for (int i = 0; i < 50; ++i)
                 {
                     action.call ([&counter] { counter.increment(); },
                                  fakeAudioThread);
@@ -39,7 +39,7 @@ public:
                 }
             });
 
-        for (int i = 0; i < 100; ++i)
+        for (int i = 0; i < 50; ++i)
         {
             action.call ([&counter] { counter.increment(); });
             refCounter.fetch_add (1);
