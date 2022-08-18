@@ -8,6 +8,7 @@ const juce::String linPhaseModeTag = "linear_phase_mode";
 const auto eqTypeChoices = juce::StringArray {
     "1-Pole HPF",
     "2-Pole HPF",
+    "3-Pole HPF",
     "4-Pole HPF",
     "8-Pole HPF",
     "8-Pole Cheby. HPF",
@@ -18,6 +19,7 @@ const auto eqTypeChoices = juce::StringArray {
     "High-Shelf",
     "1-Pole LPF",
     "2-Pole LPF",
+    "3-Pole LPF",
     "4-Pole LPF",
     "8-Pole LPF",
     "8-Pole Cheby. LPF",

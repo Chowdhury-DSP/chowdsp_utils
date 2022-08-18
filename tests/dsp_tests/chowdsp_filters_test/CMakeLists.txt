@@ -16,4 +16,5 @@ target_sources(chowdsp_filters_test
         FractionalOrderFilterTest.cpp
         HilbertFilterTest.cpp
         WernerFilterTest.cpp
+        ButterQsTest.cpp
 )

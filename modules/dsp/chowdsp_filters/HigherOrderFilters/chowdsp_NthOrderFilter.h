@@ -94,7 +94,7 @@ private:
     static constexpr size_t nFilters = order / 2;
 
     chowdsp::StateVariableFilter<T, type> filters[nFilters];
-    const std::array<NumericType, nFilters> butterQVals = QValCalcs::butterworth_Qs<NumericType, order>();
+    static constexpr std::array<NumericType, nFilters> butterQVals = QValCalcs::butterworth_Qs<NumericType, order>();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NthOrderFilter)
 };
