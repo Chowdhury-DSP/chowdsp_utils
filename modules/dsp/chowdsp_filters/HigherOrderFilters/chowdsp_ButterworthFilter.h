@@ -29,6 +29,12 @@ public:
     /** Calculates the coefficients for a higher-order Butterworth filter */
     void calcCoefs (FloatType fc, FloatType qVal, NumericType fs)
     {
+        calcCoefs (fc, qVal, fs, this->secondOrderSections, butterQVals);
+    }
+
+    /** Calculates the coefficients for a higher-order Butterworth filter */
+    static void calcCoefs (FloatType fc, FloatType qVal, NumericType fs, std::array<IIRFilter<2, FloatType>, NFilters>& sections, const std::array<NumericType, NFilters>& butterQs)
+    {
         FloatType bCoefs[3], aCoefs[3];
         auto calcCoefsForQ = [&] (FloatType stageQ, size_t stageOrder) {
             switch (type)
@@ -41,12 +47,12 @@ public:
                     break;
             }
 
-            this->secondOrderSections[stageOrder].setCoefs (bCoefs, aCoefs);
+            sections[stageOrder].setCoefs (bCoefs, aCoefs);
         };
 
-        calcCoefsForQ (butterQVals[0] * qVal * juce::MathConstants<NumericType>::sqrt2, 0);
+        calcCoefsForQ (butterQs[0] * qVal * juce::MathConstants<NumericType>::sqrt2, 0);
         for (size_t i = 1; i < NFilters; ++i)
-            calcCoefsForQ (butterQVals[i], i);
+            calcCoefsForQ (butterQs[i], i);
     }
 
 private:
@@ -72,24 +78,7 @@ public:
     /** Calculates the coefficients for a higher-order Butterworth filter */
     void calcCoefs (FloatType fc, FloatType qVal, NumericType fs)
     {
-        FloatType bCoefs[3], aCoefs[3];
-        auto calcCoefsForQ = [&] (FloatType stageQ, size_t stageOrder) {
-            switch (type)
-            {
-                case ButterworthFilterType::Lowpass:
-                    CoefficientCalculators::calcSecondOrderLPF (bCoefs, aCoefs, fc, stageQ, fs);
-                    break;
-                case ButterworthFilterType::Highpass:
-                    CoefficientCalculators::calcSecondOrderHPF (bCoefs, aCoefs, fc, stageQ, fs);
-                    break;
-            }
-
-            this->secondOrderSections[stageOrder].setCoefs (bCoefs, aCoefs);
-        };
-
-        calcCoefsForQ (butterQVals[0] * qVal * juce::MathConstants<NumericType>::sqrt2, 0);
-        for (size_t i = 1; i < NFilters; ++i)
-            calcCoefsForQ (butterQVals[i], i);
+        ButterworthFilter<order - 1, type, FloatType>::calcCoefs (fc, qVal, fs, this->secondOrderSections, butterQVals);
 
         FloatType bCoefs1[2], aCoefs1[2];
         switch (type)
@@ -108,24 +97,21 @@ public:
     /** Prepares the filter to process a new stream of audio */
     void prepare (int numChannels)
     {
-        for (auto& sos : this->secondOrderSections)
-            sos.prepare (numChannels);
+        SOSFilter<order - 1, FloatType>::prepare (numChannels);
         firstOrderSection.prepare (numChannels);
     }
 
     /** Resets the filter state */
     void reset()
     {
-        for (auto& sos : this->secondOrderSections)
-            sos.reset();
+        SOSFilter<order - 1, FloatType>::reset();
         firstOrderSection.reset();
     }
 
     /** Process a single sample */
     inline FloatType processSample (FloatType x, int channel = 0) noexcept
     {
-        for (auto& sos : this->secondOrderSections)
-            x = sos.processSample (x, channel);
+        x = SOSFilter<order - 1, FloatType>::processSample (x, channel);
         x = firstOrderSection.processSample (x, channel);
         return x;
     }
@@ -133,16 +119,14 @@ public:
     /** Process block of samples */
     void processBlock (FloatType* block, const int numSamples, const int channel = 0) noexcept
     {
-        for (auto& sos : this->secondOrderSections)
-            sos.processBlock (block, numSamples, channel);
+        SOSFilter<order - 1, FloatType>::processBlock (block, numSamples, channel);
         firstOrderSection.processBlock (block, numSamples, channel);
     }
 
     /** Process block of samples */
     void processBlock (const chowdsp::BufferView<FloatType>& block) noexcept
     {
-        for (auto& sos : this->secondOrderSections)
-            sos.processBlock (block);
+        SOSFilter<order - 1, FloatType>::processBlock (block);
         firstOrderSection.processBlock (block);
     }
 
