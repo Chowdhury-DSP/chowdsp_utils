@@ -49,7 +49,7 @@ template <typename Signature>
 using ThreadSafeBroadcaster = rocket::thread_safe_signal<Signature>;
 
 /** Alias for rocket::trackable */
-using TrackedByBroadcasters = rocket::trackable; // @TODO: test this, maybe with global settings?
+using TrackedByBroadcasters = rocket::trackable;
 
 /** Alias for rocket::scoped_connection */
 using Callback = rocket::connection;
