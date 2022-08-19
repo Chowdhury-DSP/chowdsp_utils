@@ -30,7 +30,7 @@ public:
 
         juce::Thread::launch (
             [&] {
-                for (int i = 0; i < 50; ++i)
+                for (int i = 0; i < 25; ++i)
                 {
                     action.call ([&counter] { counter.increment(); },
                                  fakeAudioThread);
@@ -39,14 +39,14 @@ public:
                 }
             });
 
-        for (int i = 0; i < 50; ++i)
+        for (int i = 0; i < 25; ++i)
         {
             action.call ([&counter] { counter.increment(); });
             refCounter.fetch_add (1);
             juce::MessageManager::getInstance()->runDispatchLoopUntil (5);
         }
 
-        juce::MessageManager::getInstance()->runDispatchLoopUntil (200); // clear up any remaining async updates
+        juce::MessageManager::getInstance()->runDispatchLoopUntil (100); // clear up any remaining async updates
 
         expectEquals (counter.count, refCounter.load(), "Final count is incorrect!");
     }
