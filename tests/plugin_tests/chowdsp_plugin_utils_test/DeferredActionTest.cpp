@@ -46,7 +46,7 @@ public:
             juce::MessageManager::getInstance()->runDispatchLoopUntil (5);
         }
 
-        juce::MessageManager::getInstance()->runDispatchLoopUntil (100); // clear up any remaining async updates
+        juce::MessageManager::getInstance()->runDispatchLoopUntil (200); // clear up any remaining async updates
 
         expectEquals (counter.count, refCounter.load(), "Final count is incorrect!");
     }
