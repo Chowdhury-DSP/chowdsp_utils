@@ -17,6 +17,7 @@ target_compile_definitions(chowdsp_utils_codeql PRIVATE
 target_link_libraries(chowdsp_utils_codeql PRIVATE
     chowdsp_core
     chowdsp_json
+    chowdsp_listeners
     chowdsp_reflection
     chowdsp_serialization
     chowdsp_dsp_data_structures

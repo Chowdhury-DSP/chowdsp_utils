@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chowdsp_listeners/chowdsp_listeners.h>
+
 namespace chowdsp
 {
 /**
@@ -106,14 +108,8 @@ public:
     /** Returns the set of parameters used by the oversamplers */
     auto getParameters() { return std::tie (osParam, osModeParam, osOfflineParam, osOfflineModeParam, osOfflineSameParam); }
 
-    struct Listener
-    {
-        virtual ~Listener() = default;
-        virtual void sampleRateOrBlockSizeChanged() {}
-    };
-
-    void addListener (Listener* l) { listeners.add (l); }
-    void removeListener (Listener* l) { listeners.remove (l); }
+    /** Broadcaster that is triggered when the sample rate or block size changes */
+    Broadcaster<void()> sampleRateOrBlockSizeChangedBroadcaster;
 
 private:
     static OSFactor stringToOSFactor (const juce::String& factorStr);
@@ -136,8 +132,6 @@ private:
     const juce::AudioProcessor& proc;
 
     const bool usingIntegerLatency;
-
-    juce::ListenerList<Listener> listeners;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (VariableOversampling)
 };

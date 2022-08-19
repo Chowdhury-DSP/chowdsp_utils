@@ -85,6 +85,9 @@ sure to abide by the license of each module, as well as whichever libraries are 
 `chowdsp_json` (BSD)
 - A thin wrapper around [`nlohmann::json`](https://github.com/nlohmann/json) (MIT license, included internally).
 
+`chowdsp_listeners` (BSD)
+- A thin wrapper around [`rocket`]https://github.com/tripleslash/rocket) (Public Domain, included internally).
+
 `chowdsp_reflection` (BSD)
 - A thin wrapper around [`boost::pfr`](https://github.com/boostorg/pfr) (Boost license, included internally).
 
