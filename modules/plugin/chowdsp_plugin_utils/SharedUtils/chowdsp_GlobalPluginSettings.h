@@ -21,17 +21,18 @@ public:
     /** Initialise this settings object for a given file, and update time */
     void initialise (const juce::String& settingsFile, int timerSeconds = 5);
 
-    /** Derive from this class to listen for changes to settings properties */
-    struct Listener
-    {
-        virtual ~Listener() = default;
-
-        /** This method will be called when a property has changed */
-        virtual void globalSettingChanged (SettingID) = 0;
-    };
+    /** Adds a set of properties to the plugin settings */
+    void addProperties (std::initializer_list<SettingProperty> properties);
 
     /** Adds a set of properties to the plugin settings, and adds a listener for those properties */
-    void addProperties (std::initializer_list<SettingProperty> properties, Listener* listener = nullptr);
+    template <auto ListenerFunc, typename Listener>
+    void addProperties (std::initializer_list<SettingProperty> properties, Listener& listener)
+    {
+        addProperties (properties);
+
+        for (const auto& [name, _] : properties)
+            addPropertyListener<ListenerFunc> (name, listener);
+    }
 
     /** Returns the settings property with a give name */
     template <typename T>
@@ -49,13 +50,33 @@ public:
     void setProperty (SettingID name, T property);
 
     /** Adds a listener for a given property */
-    void addPropertyListener (SettingID id, Listener* listener);
+    template <auto ListenerFunc, typename Listener>
+    void addPropertyListener (SettingID id, Listener& listener)
+    {
+        callbacks[id].emplace_front (&listener, globalSettingChangedBroadcaster.connect<ListenerFunc> (&listener));
+    }
 
     /** Removes a listener for a given property */
-    void removePropertyListener (SettingID id, Listener* listener);
+    template <typename Listener>
+    void removePropertyListener (SettingID id, Listener& listener)
+    {
+        const auto callbacksForIDIter = callbacks.find (id);
+        if (callbacksForIDIter == callbacks.end())
+        {
+            jassertfalse; // this property does not have any listeners!
+            return;
+        }
+
+        callbacksForIDIter->second.remove_if ([&listener] (auto& pair) { return pair.first == &listener; });
+    }
 
     /** Removes a listener from all its properties */
-    void removePropertyListener (Listener* listener);
+    template <typename Listener>
+    void removePropertyListener (Listener& listener)
+    {
+        for (auto& [_, propCallbacks] : callbacks)
+            propCallbacks.remove_if ([&listener] (auto& pair) { return pair.first == &listener; });
+    }
 
     /** Returns the file be used to store the global settings */
     [[nodiscard]] juce::File getSettingsFile() const noexcept;
@@ -75,7 +96,8 @@ private:
     std::unique_ptr<SettingsFileListener> fileListener;
     json globalProperties;
 
-    std::unordered_map<SettingID, juce::Array<Listener*>> listeners;
+    Broadcaster<void (SettingID)> globalSettingChangedBroadcaster;
+    std::unordered_map<SettingID, std::forward_list<std::pair<void*, ScopedCallback>>> callbacks;
 
     static constexpr SettingID settingsTag = "plugin_settings";
 

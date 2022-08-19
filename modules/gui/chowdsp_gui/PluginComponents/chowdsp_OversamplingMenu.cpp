@@ -40,13 +40,7 @@ OversamplingMenu<OSType>::OversamplingMenu (OSType& osMgr, juce::AudioProcessorV
         count += 1;
     }
 
-    osManager.addListener (this);
-}
-
-template <typename OSType>
-OversamplingMenu<OSType>::~OversamplingMenu()
-{
-    osManager.removeListener (this);
+    sampleRateOrBlockSizeChangedCallback = osManager.sampleRateOrBlockSizeChangedBroadcaster.connect ([this] { generateComboBoxMenu(); });
 }
 
 template <typename OSType>

@@ -118,13 +118,13 @@ public:
 
     void settingsListenerTest()
     {
-        struct TestListener : chowdsp::GlobalPluginSettings::Listener
+        struct TestListener
         {
             chowdsp::GlobalPluginSettings* settings = nullptr;
             int test1Value = 0;
             juce::String test2Value {};
 
-            void globalSettingChanged (chowdsp::GlobalPluginSettings::SettingID id) override
+            void globalSettingChanged (chowdsp::GlobalPluginSettings::SettingID id)
             {
                 if (id == test1.first)
                     test1Value = settings->getProperty<int> (id);
@@ -137,7 +137,7 @@ public:
         testListener.settings = &settings;
 
         settings.initialise (settingsFile, 1);
-        settings.addProperties ({ test1, test2 }, &testListener);
+        settings.addProperties<&TestListener::globalSettingChanged> ({ test1, test2 }, testListener);
 
         auto setSettingsVal = [&] (std::string_view name, const auto& val) {
             auto settingsJson = fromFile (settings.getSettingsFile());
@@ -155,12 +155,12 @@ public:
         expectEquals (testListener.test1Value, testVal1, "Listener value should not be set with wrong data type!");
 
         constexpr int testVal2 = 80;
-        settings.removePropertyListener (&testListener);
+        settings.removePropertyListener (testListener);
         setSettingsVal (test1.first, testVal2);
         expectEquals (testListener.test1Value, testVal1, "Listener value should not be set after listener removed!");
 
         const juce::String testStr1 = "RRRRR";
-        settings.addPropertyListener (test2.first, &testListener);
+        settings.addPropertyListener<&TestListener::globalSettingChanged> (test2.first, testListener);
         settings.setProperty (test2.first, testStr1);
         expectEquals (testListener.test2Value, testStr1, "Listener value not set!");
 
@@ -168,8 +168,8 @@ public:
         expectEquals (testListener.test2Value, testStr1, "Listener value should not be set when set with the wrong data type!");
 
         const juce::String testStr2 = "BBBBB";
-        settings.removePropertyListener (test2.first, &testListener);
-        settings.removePropertyListener ("NOT_A_PROPERTY", &testListener);
+        settings.removePropertyListener (test2.first, testListener);
+        settings.removePropertyListener ("NOT_A_PROPERTY", testListener);
         settings.setProperty (test2.first, testStr2);
         settings.setProperty ("NOT_A_PROPERTY", testStr2);
         expectEquals (testListener.test2Value, testStr1, "Listener value should not be set after listener removed!");

@@ -219,7 +219,7 @@ void VariableOversampling<FloatType>::prepareToPlay (double sr, int samplesPerBl
     curOS = getOSIndex (*osParam, *osModeParam);
     prevOS = curOS;
 
-    listeners.call (&Listener::sampleRateOrBlockSizeChanged);
+    sampleRateOrBlockSizeChangedBroadcaster();
 }
 
 template <typename FloatType>
