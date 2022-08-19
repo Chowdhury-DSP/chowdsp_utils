@@ -67,8 +67,7 @@ public:
             return;
         }
 
-        callbacksForIDIter->second.remove_if ([&listener] (auto& pair)
-                                              { return pair.first == &listener; });
+        callbacksForIDIter->second.remove_if ([&listener] (auto& pair) { return pair.first == &listener; });
     }
 
     /** Removes a listener from all its properties */
@@ -76,8 +75,7 @@ public:
     void removePropertyListener (Listener& listener)
     {
         for (auto& [_, propCallbacks] : callbacks)
-            propCallbacks.remove_if ([&listener] (auto& pair)
-                                     { return pair.first == &listener; });
+            propCallbacks.remove_if ([&listener] (auto& pair) { return pair.first == &listener; });
     }
 
     /** Returns the file be used to store the global settings */

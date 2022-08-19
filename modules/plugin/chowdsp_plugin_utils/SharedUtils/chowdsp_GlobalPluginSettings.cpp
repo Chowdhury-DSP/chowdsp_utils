@@ -79,8 +79,6 @@ void GlobalPluginSettings::setProperty (SettingID name, T property)
     globalSettingChangedBroadcaster (name);
 }
 
-
-
 juce::File GlobalPluginSettings::getSettingsFile() const noexcept
 {
     const juce::ScopedLock sl (lock);
