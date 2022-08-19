@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 - Added triangle wave oscillator.
 - Added `DeferredAction` for running any action on the message thread without locking.
 - Added wrapper for `moodycamel::ReaderWriterQueue` and `moodycamel::ConcurrentQueue`.
+- Added wrapper for `rocket` library for listeners/broadcasters.
 - Added compile-time maths functions with GCEM.
 - Added methods for setting/clearing groups of parameters in `ForwardingParametersManager`.
 - Fixed out-of-order preset swapping in `PresetManager`.
