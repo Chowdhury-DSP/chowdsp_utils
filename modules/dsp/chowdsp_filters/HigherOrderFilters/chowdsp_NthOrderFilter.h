@@ -11,6 +11,8 @@ template <typename T, size_t order = 4, StateVariableFilterType type = StateVari
 class NthOrderFilter
 {
 public:
+    static_assert (order % 2 == 0, "NthOrderFilter currently only supports even-ordered filters");
+
     using NumericType = SampleTypeHelpers::NumericType<T>;
     static constexpr auto Order = order;
     static constexpr auto Type = type;

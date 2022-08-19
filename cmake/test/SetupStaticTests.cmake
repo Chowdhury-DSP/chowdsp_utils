@@ -59,15 +59,16 @@ function(add_static_test_check target file_to_check should_pass)
         COMMAND "${CMAKE_COMMAND}" -E echo "Compiling ${file_path}"
         COMMAND "${CMAKE_COMMAND}" -E copy ${file_path} ${STATIC_TEST_FILE}
     )
+
     if(should_pass)
         add_custom_command(
             OUTPUT ${target}-cmd APPEND
-            COMMAND cmake --build build --parallel --target static_test_dummy_executable || ("${CMAKE_COMMAND}" -E echo "Error: Compiler should have succeeded!" && exit 1)
+            COMMAND ${CMAKE_COMMAND} -DSHOULD_PASS=ON -P ${CMAKE_SOURCE_DIR}/cmake/test/StaticTest.cmake
         )
     else()
         add_custom_command(
             OUTPUT ${target}-cmd APPEND
-            COMMAND cmake --build build --parallel --target static_test_dummy_executable && ("${CMAKE_COMMAND}" -E echo "Error: Compiler should have failed!" && exit 1) || "${CMAKE_COMMAND}" -E echo "Compiler failed as expected!"
+            COMMAND ${CMAKE_COMMAND} -DSHOULD_PASS=OFF -P ${CMAKE_SOURCE_DIR}/cmake/test/StaticTest.cmake
         )
     endif()
 endfunction(add_static_test_check)
