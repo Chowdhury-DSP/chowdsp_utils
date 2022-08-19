@@ -462,19 +462,19 @@ int main() {
 #include <optional>
 #endif
 
-#if __cplusplus >= 202002L && __has_cpp_attribute(likely)
+#if __has_cpp_attribute(likely)
 #define ROCKET_LIKELY [[likely]]
 #else
 #define ROCKET_LIKELY
 #endif
 
-#if __cplusplus >= 202002L && __has_cpp_attribute(unlikely)
+#if __has_cpp_attribute(unlikely)
 #define ROCKET_UNLIKELY [[unlikely]]
 #else
 #define ROCKET_UNLIKELY
 #endif
 
-#if __cplusplus >= 202002L && __has_cpp_attribute(no_unique_address)
+#if __has_cpp_attribute(no_unique_address)
 #define ROCKET_NO_UNIQUE_ADDRESS [[no_unique_address]]
 #else
 #define ROCKET_NO_UNIQUE_ADDRESS
@@ -2129,7 +2129,7 @@ namespace detail
                 // leave the next link alive so we can still traverse through the connections
                 // if the slot gets disconnected during signal emit.
                 auto& prev_cast = static_cast<intrusive_ptr<connection_base> volatile&> (prev);
-                prev_cast = nullptr;
+                (intrusive_ptr<connection_base>&) prev_cast = nullptr;
             }
         }
 
@@ -2204,8 +2204,8 @@ namespace detail
 
     struct connection_scope final
     {
-        connection_scope (void* base, thread_local_data* _th) ROCKET_NOEXCEPT
-            : th { _th },
+        connection_scope (void* base, thread_local_data* th) ROCKET_NOEXCEPT
+            : th { th },
               prev { th->current_connection }
         {
             th->current_connection = base;
@@ -2222,8 +2222,8 @@ namespace detail
 
     struct abort_scope final
     {
-        abort_scope (thread_local_data* _th) ROCKET_NOEXCEPT
-            : th { _th },
+        abort_scope (thread_local_data* th) ROCKET_NOEXCEPT
+            : th { th },
               prev { th->emission_aborted }
         {
             th->emission_aborted = false;
@@ -2241,8 +2241,8 @@ namespace detail
     template <class Instance, class Class, class R, class... Args>
     struct weak_mem_fn final
     {
-        explicit weak_mem_fn (std::weak_ptr<Instance> c, R (Class::*_method) (Args...))
-            : weak { std::move (c) }, method { _method }
+        explicit weak_mem_fn (std::weak_ptr<Instance> c, R (Class::*method) (Args...))
+            : weak { std::move (c) }, method { method }
         {
         }
 
@@ -2277,8 +2277,8 @@ namespace detail
     template <class Instance, class Class, class R, class... Args>
     struct shared_mem_fn final
     {
-        explicit shared_mem_fn (std::shared_ptr<Instance> c, R (Class::*_method) (Args...))
-            : shared { std::move (c) }, method { _method }
+        explicit shared_mem_fn (std::shared_ptr<Instance> c, R (Class::*method) (Args...))
+            : shared { std::move (c) }, method { method }
         {
         }
 
@@ -2337,8 +2337,8 @@ struct connection
         addref();
     }
 
-    explicit connection (void* _base) ROCKET_NOEXCEPT
-        : base { _base }
+    explicit connection (void* base) ROCKET_NOEXCEPT
+        : base { base }
     {
         addref();
     }
@@ -3652,13 +3652,13 @@ struct signal<R (Args...), Collector, ThreadingPolicy> final
                                         std::packaged_task<void()> task ([current, args = detail::make_tuple (args...)]
                                                                          {
                                         if (current->is_connected()) ROCKET_LIKELY {
-                                            detail::thread_local_data* _th{ detail::get_thread_local_data() };
-                                            detail::connection_scope _cscope{ current, _th };
+                                            detail::thread_local_data* th{ detail::get_thread_local_data() };
+                                            detail::connection_scope cscope{ current, th };
 
-                                            functional_connection* _conn = static_cast<
+                                            functional_connection* conn = static_cast<
                                                 functional_connection*>(static_cast<void*>(current));
 
-                                            std::apply(_conn->slot, args);
+                                            std::apply(conn->slot, args);
                                         } });
 
                                         detail::get_call_queue()->put (current->get_tid(), std::move (task));
@@ -3670,13 +3670,13 @@ struct signal<R (Args...), Collector, ThreadingPolicy> final
                                         std::packaged_task<void()> task ([current, &collector, args = std::forward_as_tuple (args...)]
                                                                          {
                                         if (current->is_connected()) ROCKET_LIKELY {
-                                            detail::thread_local_data* _th{ detail::get_thread_local_data() };
-                                            detail::connection_scope _cscope{ current, _th };
+                                            detail::thread_local_data* th{ detail::get_thread_local_data() };
+                                            detail::connection_scope cscope{ current, th };
 
-                                            functional_connection* _conn = static_cast<
+                                            functional_connection* conn = static_cast<
                                                 functional_connection*>(static_cast<void*>(current));
 
-                                            collector(std::apply(_conn->slot, args));
+                                            collector(std::apply(conn->slot, args));
                                         } });
 
                                         std::future<void> future { task.get_future() };

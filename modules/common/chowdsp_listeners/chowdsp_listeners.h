@@ -27,7 +27,10 @@ BEGIN_JUCE_MODULE_DECLARATION
 #define ROCKET_NO_EXCEPTIONS 1
 #define ROCKET_NO_TIMERS 1
 JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4100)
-JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wunused-parameter")
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wunused-parameter",
+                                     "-Wshadow-field-in-constructor",
+                                     "-Wshadow-uncaptured-local",
+                                     "-Wc++20-extensions")
 #include "third_party/rocket.hpp"
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 JUCE_END_IGNORE_WARNINGS_MSVC
