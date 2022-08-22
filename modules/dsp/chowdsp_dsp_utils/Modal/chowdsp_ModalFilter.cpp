@@ -44,6 +44,7 @@ void ModalFilter<xsimd::batch<FloatType>>::processBlock (VType* buffer, const in
 template class ModalFilter<float>;
 template class ModalFilter<double>;
 template class ModalFilter<xsimd::batch<float>>;
+#if ! JUCE_TEENSY
 template class ModalFilter<xsimd::batch<double>>;
-
+#endif
 } // namespace chowdsp

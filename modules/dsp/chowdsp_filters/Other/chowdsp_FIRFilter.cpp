@@ -112,7 +112,9 @@ inline void FIRFilter<FloatType>::processSampleInternalBypassed (FloatType x, Fl
 }
 
 template class FIRFilter<float>;
+#if ! JUCE_TEENSY
 template class FIRFilter<double>;
+#endif
 } // namespace chowdsp
 
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
