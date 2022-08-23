@@ -68,11 +68,18 @@ namespace CoefficientCalculators
         ConformalMaps::Transform<T, 1>::bilinear (b, a, { highGain * rho_recip, lowGain }, { rho_recip, (T) 1 }, K);
     }
 
+    /** Type to specify the method to use for calculating the filter coefficients */
+    enum class CoefficientCalculationType
+    {
+        Standard, /**< Standard coefficient calculation based on the bilinear transform */
+        Decramped, /**< Decramped coefficient calculation using Martin Vicanek's method (https://www.vicanek.de/articles/BiquadFits.pdf) */
+    };
+
     /**
      * Calculates the filter coefficients for a given cutoff frequency, Q value, and sample rate.
      * The analog prototype transfer function is: \f$ H(s) = \frac{1}{s^2 + s/Q + 1} \f$
      */
-    template <typename T, typename NumericType, bool MatchCutoff = true>
+    template <typename T, typename NumericType, bool MatchCutoff = true, CoefficientCalculationType mode = CoefficientCalculationType::Standard>
     void calcSecondOrderLPF (T (&b)[3], T (&a)[3], T fc, T qVal, NumericType fs, T matchedFc = (T) -1)
     {
         const auto wc = juce::MathConstants<NumericType>::twoPi * fc;
@@ -88,19 +95,41 @@ namespace CoefficientCalculators
             matchedWc = matchedFc > (T) 0 ? (juce::MathConstants<NumericType>::twoPi * matchedFc) : wc;
         }
 
-        const auto K = ConformalMaps::computeKValueAngular (matchedWc, fs);
+        if constexpr (mode == CoefficientCalculationType::Standard)
+        {
+            const auto K = ConformalMaps::computeKValueAngular (matchedWc, fs);
+            auto kSqTerm = (T) 1 / (wc * wc);
+            auto kTerm = (T) 1 / (qVal * wc);
+            ConformalMaps::Transform<T, 2>::bilinear (b, a, { (T) 0, (T) 0, (T) 1 }, { kSqTerm, kTerm, (T) 1 }, K);
+        }
+        else if constexpr (mode == CoefficientCalculationType::Decramped)
+        {
+            ConformalMaps::clampQVicanek (qVal);
+            if (SIMDUtils::any (fc < (T) 1000))
+            {
+                calcSecondOrderLPF<T, NumericType, MatchCutoff, CoefficientCalculationType::Standard> (b, a, fc, qVal, fs, matchedFc);
+                return;
+            }
 
-        auto kSqTerm = (T) 1 / (wc * wc);
-        auto kTerm = (T) 1 / (qVal * wc);
+            const auto [p0, p1, p2, A0, A1, A2] = ConformalMaps::computeVicanekPolesAngular (matchedWc, qVal, fs, a);
+            const auto R1 = (A0 * p0 + A1 * p1 + A2 * p2) * Power::ipow<2> (qVal);
+            const auto B0 = A0;
+            const auto B1 = (R1 - B0 * p0) / p1;
 
-        ConformalMaps::Transform<T, 2>::bilinear (b, a, { (T) 0, (T) 0, (T) 1 }, { kSqTerm, kTerm, (T) 1 }, K);
+            CHOWDSP_USING_XSIMD_STD (sqrt);
+            const auto sqrtB0 = sqrt (B0);
+            const auto sqrtB1 = sqrt (B1);
+            b[0] = (T) 0.5 * (sqrtB0 + sqrtB1);
+            b[1] = sqrtB0 - b[0];
+            b[2] = (T) 0;
+        }
     }
 
     /**
      * Calculates the filter coefficients for a given cutoff frequency, Q value, and sample rate.
      * The analog prototype transfer function is: \f$ H(s) = \frac{s^2}{s^2 + s/Q + 1} \f$
      */
-    template <typename T, typename NumericType, bool MatchCutoff = true>
+    template <typename T, typename NumericType, bool MatchCutoff = true, CoefficientCalculationType mode = CoefficientCalculationType::Standard>
     void calcSecondOrderHPF (T (&b)[3], T (&a)[3], T fc, T qVal, NumericType fs, T matchedFc = (T) -1)
     {
         const auto wc = juce::MathConstants<NumericType>::twoPi * fc;
@@ -116,12 +145,29 @@ namespace CoefficientCalculators
             matchedWc = matchedFc > (T) 0 ? (juce::MathConstants<NumericType>::twoPi * matchedFc) : wc;
         }
 
-        const auto K = ConformalMaps::computeKValueAngular (matchedWc, fs);
+        if constexpr (mode == CoefficientCalculationType::Standard)
+        {
+            const auto K = ConformalMaps::computeKValueAngular (matchedWc, fs);
+            auto kSqTerm = (T) 1 / (wc * wc);
+            auto kTerm = (T) 1 / (qVal * wc);
+            ConformalMaps::Transform<T, 2>::bilinear (b, a, { kSqTerm, (T) 0, (T) 0 }, { kSqTerm, kTerm, (T) 1 }, K);
+        }
+        else if constexpr (mode == CoefficientCalculationType::Decramped)
+        {
+            ConformalMaps::clampQVicanek (qVal);
+            if (SIMDUtils::any (fc < (T) 1000))
+            {
+                calcSecondOrderHPF<T, NumericType, MatchCutoff, CoefficientCalculationType::Standard> (b, a, fc, qVal, fs, matchedFc);
+                return;
+            }
 
-        auto kSqTerm = (T) 1 / (wc * wc);
-        auto kTerm = (T) 1 / (qVal * wc);
+            const auto [p0, p1, p2, A0, A1, A2] = ConformalMaps::computeVicanekPolesAngular (matchedWc, qVal, fs, a);
 
-        ConformalMaps::Transform<T, 2>::bilinear (b, a, { kSqTerm, (T) 0, (T) 0 }, { kSqTerm, kTerm, (T) 1 }, K);
+            CHOWDSP_USING_XSIMD_STD (sqrt);
+            b[0] = sqrt (A0 * p0 + A1 * p1 + A2 * p2) * qVal / ((T) 4 * p1);
+            b[1] = -(T) 2 * b[0];
+            b[2] = b[0];
+        }
     }
 
     /**
@@ -160,7 +206,7 @@ namespace CoefficientCalculators
      * Forwards a parameters to a coefficient calculator meant to be used for linear gain units
      * instead of Decibel gain units.
      */
-    template <typename T, typename NumericType, typename FilterType>
+    template <typename T, typename NumericType, typename FilterType, CoefficientCalculationType mode = CoefficientCalculationType::Standard>
     void calcCoefsGainDB (FilterType& filter, T fc, T qVal, T gainDB, NumericType fs)
     {
         using SIMDUtils::decibelsToGain;
@@ -172,19 +218,47 @@ namespace CoefficientCalculators
      * Note that the gain should be in units of linear gain, NOT Decibels.
      * The analog prototype transfer function is: \f$ H(s) = \frac{s^2 + G s/Q + 1}{s^2 + s/Q + 1} \f$
      */
-    template <typename T, typename NumericType>
+    template <typename T, typename NumericType, CoefficientCalculationType mode = CoefficientCalculationType::Standard>
     void calcPeakingFilter (T (&b)[3], T (&a)[3], T fc, T qVal, T gain, NumericType fs)
     {
         const auto wc = juce::MathConstants<NumericType>::twoPi * fc;
-        const auto K = ConformalMaps::computeKValueAngular (wc, fs);
 
-        const auto kSqTerm = (T) 1 / (wc * wc);
-        const auto kTerm = (T) 1 / (qVal * wc);
+        if constexpr (mode == CoefficientCalculationType::Standard)
+        {
+            const auto K = ConformalMaps::computeKValueAngular (wc, fs);
+            const auto kSqTerm = (T) 1 / (wc * wc);
+            const auto kTerm = (T) 1 / (qVal * wc);
 
-        const auto kNum = SIMDUtils::select (gain > (T) 1, kTerm * gain, kTerm);
-        const auto kDen = SIMDUtils::select (gain < (T) 1, kTerm / gain, kTerm);
+            const auto kNum = SIMDUtils::select (gain > (T) 1, kTerm * gain, kTerm);
+            const auto kDen = SIMDUtils::select (gain < (T) 1, kTerm / gain, kTerm);
+            ConformalMaps::Transform<T, 2>::bilinear (b, a, { kSqTerm, kNum, (T) 1 }, { kSqTerm, kDen, (T) 1 }, K);
+        }
+        else if constexpr (mode == CoefficientCalculationType::Decramped)
+        {
+            ConformalMaps::clampQVicanek (qVal);
+            if (SIMDUtils::any (fc < (T) 1000))
+            {
+                calcPeakingFilter<T, NumericType, CoefficientCalculationType::Standard> (b, a, fc, qVal, gain, fs);
+                return;
+            }
 
-        ConformalMaps::Transform<T, 2>::bilinear (b, a, { kSqTerm, kNum, (T) 1 }, { kSqTerm, kDen, (T) 1 }, K);
+            const auto [p0, p1, p2, A0, A1, A2] = ConformalMaps::computeVicanekPolesAngular (wc, qVal, fs, a);
+
+            const auto G2 = Power::ipow<2> (gain);
+            const auto R1 = (A0 * p0 + A1 * p1 + A2 * p2) * G2;
+            const auto R2 = (-A0 + A1 + (T) 4 * (p0 - p1) * A2) * G2;
+            const auto B0 = A0;
+            const auto B2 = (R1 - R2 * p1 - B0) / ((T) 4 * p1 * p1);
+            const auto B1 = R2 + B0 + (T) 4 * (p1 - p0) * B2;
+
+            CHOWDSP_USING_XSIMD_STD (sqrt);
+            const auto sqrtB0 = sqrt (B0);
+            const auto sqrtB1 = sqrt (B1);
+            const auto W = (T) 0.5 * (sqrtB0 + sqrtB1);
+            b[0] = (T) 0.5 * (W + sqrt (W * W + B2));
+            b[1] = (T) 0.5 * (sqrtB0 - sqrtB1);
+            b[2] = -B2 / ((T) 4 * b[0]);
+        }
     }
 
     /**

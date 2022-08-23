@@ -5,7 +5,7 @@
 namespace chowdsp
 {
 /** Second-order lowpass filter. */
-template <typename T>
+template <typename T, CoefficientCalculators::CoefficientCalculationType mode = CoefficientCalculators::CoefficientCalculationType::Standard>
 class SecondOrderLPF final : public chowdsp::IIRFilter<2, T>
 {
 public:
@@ -21,7 +21,7 @@ public:
      */
     void calcCoefs (T fc, T qVal, NumericType fs)
     {
-        CoefficientCalculators::calcSecondOrderLPF (this->b, this->a, fc, qVal, fs);
+        CoefficientCalculators::calcSecondOrderLPF<T, NumericType, true, mode> (this->b, this->a, fc, qVal, fs);
     }
 
 private:
@@ -29,7 +29,7 @@ private:
 };
 
 /** Second-order highpass filter. */
-template <typename T>
+template <typename T, CoefficientCalculators::CoefficientCalculationType mode = CoefficientCalculators::CoefficientCalculationType::Standard>
 class SecondOrderHPF final : public chowdsp::IIRFilter<2, T>
 {
 public:
@@ -45,7 +45,7 @@ public:
      */
     void calcCoefs (T fc, T qVal, NumericType fs)
     {
-        CoefficientCalculators::calcSecondOrderHPF (this->b, this->a, fc, qVal, fs);
+        CoefficientCalculators::calcSecondOrderHPF<T, NumericType, true, mode> (this->b, this->a, fc, qVal, fs);
     }
 
 private:
@@ -101,7 +101,7 @@ private:
 };
 
 /** Second-order peaking filter. */
-template <typename T>
+template <typename T, CoefficientCalculators::CoefficientCalculationType mode = CoefficientCalculators::CoefficientCalculationType::Standard>
 class PeakingFilter final : public chowdsp::IIRFilter<2, T>
 {
 public:
@@ -119,7 +119,7 @@ public:
      */
     void calcCoefs (T fc, T qVal, T gain, NumericType fs)
     {
-        CoefficientCalculators::calcPeakingFilter (this->b, this->a, fc, qVal, gain, fs);
+        CoefficientCalculators::calcPeakingFilter<T, NumericType, mode> (this->b, this->a, fc, qVal, gain, fs);
     }
 
     /**
@@ -128,7 +128,7 @@ public:
      */
     void calcCoefsDB (T fc, T qVal, T gainDB, NumericType fs)
     {
-        CoefficientCalculators::calcCoefsGainDB (*this, fc, qVal, gainDB, fs);
+        CoefficientCalculators::calcCoefsGainDB<T, NumericType, PeakingFilter, mode> (*this, fc, qVal, gainDB, fs);
     }
 
 private:
