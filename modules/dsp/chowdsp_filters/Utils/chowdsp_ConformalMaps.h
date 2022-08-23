@@ -169,45 +169,73 @@ namespace ConformalMaps
 
     /** Clamps a Q-value into the range where Vicanek's method is numerically robust */
     template <typename T>
-    [[maybe_unused]] inline void clampQVicanek (T& qVal)
+    [[maybe_unused]] inline T clampQVicanek (T qVal)
     {
         CHOWDSP_USING_XSIMD_STD (max);
         CHOWDSP_USING_XSIMD_STD (min);
 
-        // Vicanek method has numerical problems for Q-values outside of range [0.5, 5]
-        jassert (SIMDUtils::all (qVal >= (T) 0.5));
+        // Vicanek method has numerical problems for Q-values outside of range [0.55, 4.95]
+        // @TODO: can we make this range looser when using double-precision?
+        jassert (SIMDUtils::all (qVal >= (T) 0.55));
         jassert (SIMDUtils::all (qVal < (T) 4.95));
-        qVal = min ((T) 4.95, max ((T) 0.5, qVal));
+        return min ((T) 4.95, max ((T) 0.55, qVal));
     }
 
-    /** Computes pole info using Vicanek's method */
-    template <typename T, typename NumericType>
-    [[maybe_unused]] inline auto computeVicanekPolesAngular (T wc, T& qVal, NumericType fs, T (&a)[3])
+    /** Computes denominator coefficients using Vicanek's method. Using w0 = 2 * pi * fc / fs */
+    template <typename T>
+    [[maybe_unused]] inline void computeVicanekDenominator (T w0, T qVal, T (&a)[3])
     {
         CHOWDSP_USING_XSIMD_STD (sqrt);
         CHOWDSP_USING_XSIMD_STD (exp);
-        CHOWDSP_USING_XSIMD_STD (sin);
         CHOWDSP_USING_XSIMD_STD (cos);
         CHOWDSP_USING_XSIMD_STD (cosh);
         using Power::ipow;
 
         const auto inv2Q = (T) 0.5 / qVal;
-        const auto w0 = wc / fs;
 
         const auto expmqw = exp (-inv2Q * w0);
         const auto cos_arg = sqrt ((T) 1 - ipow<2> (inv2Q)) * w0;
         a[0] = (T) 1;
         a[1] = -(T) 2 * expmqw * SIMDUtils::select (inv2Q <= (T) 1, cos (cos_arg), cosh (-cos_arg));
         a[2] = ipow<2> (expmqw);
+    }
+
+    /** Computes the phi values used by Vicanek's method. Using w0 = 2 * pi * fc / fs */
+    template <typename T>
+    [[maybe_unused]] inline auto computeVicanekPhiVals (T w0)
+    {
+        CHOWDSP_USING_XSIMD_STD (sin);
+        using Power::ipow;
 
         const auto sinpd2 = sin ((T) 0.5 * w0);
         const auto p1 = ipow<2> (sinpd2);
         const auto p0 = (T) 1 - p1;
         const auto p2 = (T) 4 * p0 * p1;
 
+        return std::make_tuple (p0, p1, p2);
+    }
+
+    /** Computes the "A" values used by Vicanek's method. */
+    template <typename T>
+    [[maybe_unused]] inline auto computeVicanekAVals (const T (&a)[3])
+    {
+        using Power::ipow;
         const auto A0 = ipow<2> ((T) 1 + a[1] + a[2]);
         const auto A1 = ipow<2> ((T) 1 - a[1] + a[2]);
         const auto A2 = (T) -4 * a[2];
+
+        return std::make_tuple (A0, A1, A2);
+    }
+
+    /** Computes pole info using Vicanek's method */
+    template <typename T, typename NumericType>
+    [[maybe_unused]] inline auto computeVicanekPolesAngular (T wc, T qVal, NumericType fs, T (&a)[3])
+    {
+        const auto w0 = wc / fs;
+        computeVicanekDenominator (w0, qVal, a);
+
+        const auto [p0, p1, p2] = computeVicanekPhiVals (w0);
+        const auto [A0, A1, A2] = computeVicanekAVals (a);
 
         return std::make_tuple (p0, p1, p2, A0, A1, A2);
     }

@@ -5,7 +5,7 @@
 namespace chowdsp
 {
 /** Second-order lowpass filter. */
-template <typename T, CoefficientCalculators::CoefficientCalculationType mode = CoefficientCalculators::CoefficientCalculationType::Standard>
+template <typename T, CoefficientCalculators::CoefficientCalculationMode mode = CoefficientCalculators::CoefficientCalculationMode::Standard>
 class SecondOrderLPF final : public chowdsp::IIRFilter<2, T>
 {
 public:
@@ -29,7 +29,7 @@ private:
 };
 
 /** Second-order highpass filter. */
-template <typename T, CoefficientCalculators::CoefficientCalculationType mode = CoefficientCalculators::CoefficientCalculationType::Standard>
+template <typename T, CoefficientCalculators::CoefficientCalculationMode mode = CoefficientCalculators::CoefficientCalculationMode::Standard>
 class SecondOrderHPF final : public chowdsp::IIRFilter<2, T>
 {
 public:
@@ -53,7 +53,7 @@ private:
 };
 
 /** Second-order bandpass filter. */
-template <typename T>
+template <typename T, CoefficientCalculators::CoefficientCalculationMode mode = CoefficientCalculators::CoefficientCalculationMode::Standard>
 class SecondOrderBPF final : public chowdsp::IIRFilter<2, T>
 {
 public:
@@ -69,7 +69,7 @@ public:
      */
     void calcCoefs (T fc, T qVal, NumericType fs)
     {
-        CoefficientCalculators::calcSecondOrderBPF (this->b, this->a, fc, qVal, fs);
+        CoefficientCalculators::calcSecondOrderBPF<T, NumericType, mode> (this->b, this->a, fc, qVal, fs);
     }
 
 private:
@@ -77,7 +77,7 @@ private:
 };
 
 /** Second-order notch filter. */
-template <typename T>
+template <typename T, CoefficientCalculators::CoefficientCalculationMode mode = CoefficientCalculators::CoefficientCalculationMode::Standard>
 class NotchFilter final : public chowdsp::IIRFilter<2, T>
 {
 public:
@@ -93,7 +93,7 @@ public:
      */
     void calcCoefs (T fc, T qVal, NumericType fs)
     {
-        CoefficientCalculators::calcNotchFilter (this->b, this->a, fc, qVal, fs);
+        CoefficientCalculators::calcNotchFilter<T, NumericType, mode> (this->b, this->a, fc, qVal, fs);
     }
 
 private:
@@ -101,7 +101,7 @@ private:
 };
 
 /** Second-order peaking filter. */
-template <typename T, CoefficientCalculators::CoefficientCalculationType mode = CoefficientCalculators::CoefficientCalculationType::Standard>
+template <typename T, CoefficientCalculators::CoefficientCalculationMode mode = CoefficientCalculators::CoefficientCalculationMode::Standard>
 class PeakingFilter final : public chowdsp::IIRFilter<2, T>
 {
 public:
@@ -128,7 +128,7 @@ public:
      */
     void calcCoefsDB (T fc, T qVal, T gainDB, NumericType fs)
     {
-        CoefficientCalculators::calcCoefsGainDB<T, NumericType, PeakingFilter, mode> (*this, fc, qVal, gainDB, fs);
+        CoefficientCalculators::calcCoefsGainDB (*this, fc, qVal, gainDB, fs);
     }
 
 private:
@@ -136,7 +136,7 @@ private:
 };
 
 /** Second-order low-shelf filter. */
-template <typename T>
+template <typename T, CoefficientCalculators::CoefficientCalculationMode mode = CoefficientCalculators::CoefficientCalculationMode::Standard>
 class LowShelfFilter final : public chowdsp::IIRFilter<2, T>
 {
 public:
@@ -154,7 +154,7 @@ public:
      */
     void calcCoefs (T fc, T qVal, T gain, NumericType fs)
     {
-        CoefficientCalculators::calcLowShelf (this->b, this->a, fc, qVal, gain, fs);
+        CoefficientCalculators::calcLowShelf<T, NumericType, mode> (this->b, this->a, fc, qVal, gain, fs);
     }
 
     /**
@@ -171,7 +171,7 @@ private:
 };
 
 /** Second-order high-shelf filter. */
-template <typename T>
+template <typename T, CoefficientCalculators::CoefficientCalculationMode mode = CoefficientCalculators::CoefficientCalculationMode::Standard>
 class HighShelfFilter final : public chowdsp::IIRFilter<2, T>
 {
 public:
@@ -189,7 +189,7 @@ public:
      */
     void calcCoefs (T fc, T qVal, T gain, NumericType fs)
     {
-        CoefficientCalculators::calcHighShelf (this->b, this->a, fc, qVal, gain, fs);
+        CoefficientCalculators::calcHighShelf<T, NumericType, mode> (this->b, this->a, fc, qVal, gain, fs);
     }
 
     /**
