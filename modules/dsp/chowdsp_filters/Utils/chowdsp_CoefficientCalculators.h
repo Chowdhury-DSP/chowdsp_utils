@@ -104,14 +104,14 @@ namespace CoefficientCalculators
         }
         else if constexpr (mode == CoefficientCalculationMode::Decramped)
         {
-            qVal = ConformalMaps::clampQVicanek (qVal);
+            qVal = VicanekHelpers::clampQVicanek (qVal);
             if (SIMDUtils::any (fc < (T) 1000))
             {
                 calcSecondOrderLPF<T, NumericType, MatchCutoff, CoefficientCalculationMode::Standard> (b, a, fc, qVal, fs, matchedFc);
                 return;
             }
 
-            const auto [p0, p1, p2, A0, A1, A2] = ConformalMaps::computeVicanekPolesAngular (matchedWc, qVal, fs, a);
+            const auto [p0, p1, p2, A0, A1, A2] = VicanekHelpers::computeVicanekPolesAngular (matchedWc, qVal, fs, a);
             const auto R1 = (A0 * p0 + A1 * p1 + A2 * p2) * Power::ipow<2> (qVal);
             const auto B0 = A0;
             const auto B1 = (R1 - B0 * p0) / p1;
@@ -154,14 +154,14 @@ namespace CoefficientCalculators
         }
         else if constexpr (mode == CoefficientCalculationMode::Decramped)
         {
-            qVal = ConformalMaps::clampQVicanek (qVal);
+            qVal = VicanekHelpers::clampQVicanek (qVal);
             if (SIMDUtils::any (fc < (T) 1000))
             {
                 calcSecondOrderHPF<T, NumericType, MatchCutoff, CoefficientCalculationMode::Standard> (b, a, fc, qVal, fs, matchedFc);
                 return;
             }
 
-            const auto [p0, p1, p2, A0, A1, A2] = ConformalMaps::computeVicanekPolesAngular (matchedWc, qVal, fs, a);
+            const auto [p0, p1, p2, A0, A1, A2] = VicanekHelpers::computeVicanekPolesAngular (matchedWc, qVal, fs, a);
 
             CHOWDSP_USING_XSIMD_STD (sqrt);
             b[0] = sqrt (A0 * p0 + A1 * p1 + A2 * p2) * qVal / ((T) 4 * p1);
@@ -187,14 +187,14 @@ namespace CoefficientCalculators
         }
         else if constexpr (mode == CoefficientCalculationMode::Decramped)
         {
-            qVal = ConformalMaps::clampQVicanek (qVal);
+            qVal = VicanekHelpers::clampQVicanek (qVal);
             if (SIMDUtils::any (fc < (T) 1000))
             {
                 calcSecondOrderBPF<T, NumericType, CoefficientCalculationMode::Standard> (b, a, fc, qVal, fs);
                 return;
             }
 
-            const auto [p0, p1, p2, A0, A1, A2] = ConformalMaps::computeVicanekPolesAngular (wc, qVal, fs, a);
+            const auto [p0, p1, p2, A0, A1, A2] = VicanekHelpers::computeVicanekPolesAngular (wc, qVal, fs, a);
 
             CHOWDSP_USING_XSIMD_STD (sqrt);
             const auto R1 = A0 * p0 + A1 * p1 + A2 * p2;
@@ -224,7 +224,7 @@ namespace CoefficientCalculators
         }
         else if constexpr (mode == CoefficientCalculationMode::Decramped)
         {
-            qVal = ConformalMaps::clampQVicanek (qVal);
+            qVal = VicanekHelpers::clampQVicanek (qVal);
             if (SIMDUtils::any (fc < (T) 1000))
             {
                 calcNotchFilter<T, NumericType, CoefficientCalculationMode::Standard> (b, a, fc, qVal, fs);
@@ -232,19 +232,11 @@ namespace CoefficientCalculators
             }
 
             CHOWDSP_USING_XSIMD_STD (sqrt);
-            CHOWDSP_USING_XSIMD_STD (exp);
             CHOWDSP_USING_XSIMD_STD (cos);
-            CHOWDSP_USING_XSIMD_STD (cosh);
             using Power::ipow;
 
-            const auto inv2Q = (T) 0.5 / qVal;
             const auto w0 = wc / fs;
-
-            const auto expmqw = exp (-inv2Q * w0);
-            const auto cos_arg = sqrt ((T) 1 - ipow<2> (inv2Q)) * w0;
-            a[0] = (T) 1;
-            a[1] = -(T) 2 * expmqw * SIMDUtils::select (inv2Q <= (T) 1, cos (cos_arg), cosh (-cos_arg));
-            a[2] = ipow<2> (expmqw);
+            VicanekHelpers::computeVicanekDenominator (w0, qVal, a);
 
             const auto A0 = ipow<2> ((T) 1 + a[1] + a[2]);
             const auto b1_unscaled = (T) -2 * cos (w0);
@@ -288,14 +280,14 @@ namespace CoefficientCalculators
         }
         else if constexpr (mode == CoefficientCalculationMode::Decramped)
         {
-            qVal = ConformalMaps::clampQVicanek (qVal);
+            qVal = VicanekHelpers::clampQVicanek (qVal);
             if (SIMDUtils::any (fc < (T) 1000))
             {
                 calcPeakingFilter<T, NumericType, CoefficientCalculationMode::Standard> (b, a, fc, qVal, gain, fs);
                 return;
             }
 
-            const auto [p0, p1, p2, A0, A1, A2] = ConformalMaps::computeVicanekPolesAngular (wc, qVal, fs, a);
+            const auto [p0, p1, p2, A0, A1, A2] = VicanekHelpers::computeVicanekPolesAngular (wc, qVal, fs, a);
 
             const auto G2 = Power::ipow<2> (gain);
             const auto R1 = (A0 * p0 + A1 * p1 + A2 * p2) * G2;
@@ -304,13 +296,7 @@ namespace CoefficientCalculators
             const auto B2 = (R1 - R2 * p1 - B0) / ((T) 4 * p1 * p1);
             const auto B1 = R2 + B0 + (T) 4 * (p1 - p0) * B2;
 
-            CHOWDSP_USING_XSIMD_STD (sqrt);
-            const auto sqrtB0 = sqrt (B0);
-            const auto sqrtB1 = sqrt (B1);
-            const auto W = (T) 0.5 * (sqrtB0 + sqrtB1);
-            b[0] = (T) 0.5 * (W + sqrt (W * W + B2));
-            b[1] = (T) 0.5 * (sqrtB0 - sqrtB1);
-            b[2] = -B2 / ((T) 4 * b[0]);
+            VicanekHelpers::computeVicanekBiquadNumerator (B0, B1, B2, b);
         }
     }
 
@@ -337,7 +323,7 @@ namespace CoefficientCalculators
         }
         else if constexpr (mode == CoefficientCalculationMode::Decramped)
         {
-            qVal = ConformalMaps::clampQVicanek (qVal);
+            qVal = VicanekHelpers::clampQVicanek (qVal);
             if (SIMDUtils::any (fc < (T) 1000))
             {
                 calcLowShelf<T, NumericType, CoefficientCalculationMode::Standard> (b, a, fc, qVal, gain, fs);
@@ -370,20 +356,15 @@ namespace CoefficientCalculators
             const auto C = ipow<2> (Beta * f0); // = (2*Beta)^2 w_N^2
             const auto G2 = gain * (ipow<2> (Alpha - w_N_Sq) + C) / (ipow<2> (1 - Alpha * w_N_Sq) + C);
 
-            const auto [p0, p1, p2] = ConformalMaps::computeVicanekPhiVals (w0);
-            const auto [A0, A1, A2] = ConformalMaps::computeVicanekAVals (a);
+            const auto [p0, p1, p2] = VicanekHelpers::computeVicanekPhiVals (w0);
+            const auto [A0, A1, A2] = VicanekHelpers::computeVicanekAVals (a);
 
             const auto R1 = (A0 * p0 + A1 * p1 + A2 * p2) * gain;
             const auto B0 = A0 * ipow<2> (gain);
             const auto B1 = A1 * G2;
             const auto B2 = (R1 - B0 * p0 - B1 * p1) / p2;
 
-            const auto sqrtB0 = sqrt (B0);
-            const auto sqrtB1 = sqrt (B1);
-            const auto W = (T) 0.5 * (sqrtB0 + sqrtB1);
-            b[0] = (T) 0.5 * (W + sqrt (W * W + B2));
-            b[1] = (T) 0.5 * (sqrtB0 - sqrtB1);
-            b[2] = -B2 / ((T) 4 * b[0]);
+            VicanekHelpers::computeVicanekBiquadNumerator (B0, B1, B2, b);
         }
     }
 
@@ -412,7 +393,7 @@ namespace CoefficientCalculators
         }
         else if constexpr (mode == CoefficientCalculationMode::Decramped)
         {
-            qVal = ConformalMaps::clampQVicanek (qVal);
+            qVal = VicanekHelpers::clampQVicanek (qVal);
             if (SIMDUtils::any (fc < (T) 1000))
             {
                 calcHighShelf<T, NumericType, CoefficientCalculationMode::Standard> (b, a, fc, qVal, gain, fs);
@@ -449,20 +430,15 @@ namespace CoefficientCalculators
             const auto C = ipow<2> (Beta * f0); // = (2*Beta)^2 w_N^2
             const auto G2 = gain * (ipow<2> (1 - Alpha * w_N_Sq) + C) / (ipow<2> (Alpha - w_N_Sq) + C);
 
-            const auto [p0, p1, p2] = ConformalMaps::computeVicanekPhiVals (w0);
-            const auto [A0, A1, A2] = ConformalMaps::computeVicanekAVals (a);
+            const auto [p0, p1, p2] = VicanekHelpers::computeVicanekPhiVals (w0);
+            const auto [A0, A1, A2] = VicanekHelpers::computeVicanekAVals (a);
 
             const auto R1 = (A0 * p0 + A1 * p1 + A2 * p2) * gain;
             const auto B0 = A0;
             const auto B1 = A1 * G2;
             const auto B2 = (R1 - B0 * p0 - B1 * p1) / p2;
 
-            const auto sqrtB0 = sqrt (B0);
-            const auto sqrtB1 = sqrt (B1);
-            const auto W = (T) 0.5 * (sqrtB0 + sqrtB1);
-            b[0] = (T) 0.5 * (W + sqrt (W * W + B2));
-            b[1] = (T) 0.5 * (sqrtB0 - sqrtB1);
-            b[2] = -B2 / ((T) 4 * b[0]);
+            VicanekHelpers::computeVicanekBiquadNumerator (B0, B1, B2, b);
         }
     }
 } // namespace CoefficientCalculators
