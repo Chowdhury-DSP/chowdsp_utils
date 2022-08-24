@@ -25,6 +25,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include <chowdsp_math/chowdsp_math.h>
 
 #include "Utils/chowdsp_ConformalMaps.h"
+#include "Utils/chowdsp_VicanekHelpers.h"
 #include "Utils/chowdsp_CoefficientCalculators.h"
 #include "Utils/chowdsp_FilterChain.h"
 #include "Utils/chowdsp_QValCalcs.h"
