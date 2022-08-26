@@ -11,7 +11,7 @@ namespace Polylogarithm
 {
     /** real polylogarithm with n=2 (dilogarithm). */
     template <typename T>
-    constexpr T Li2 (T x) noexcept
+    inline T Li2 (T x) noexcept
     {
         constexpr auto PI_ = juce::MathConstants<T>::pi;
         constexpr T P[] = {
@@ -37,9 +37,9 @@ namespace Polylogarithm
         // transform to [0, 1/2]
         if (x < (T) -1)
         {
-            const auto l = gcem::log ((T) 1 - x);
+            const auto l = std::log ((T) 1 - x);
             y = (T) 1 / ((T) 1 - x);
-            r = -PI_ * PI_ / (T) 6 + l * ((T) 0.5 * l - gcem::log (-x));
+            r = -PI_ * PI_ / (T) 6 + l * ((T) 0.5 * l - std::log (-x));
             s = (T) 1;
         }
         else if (x == (T) -1)
@@ -48,7 +48,7 @@ namespace Polylogarithm
         }
         else if (x < (T) 0)
         {
-            const auto l = gcem::log1p (-x);
+            const auto l = std::log1p (-x);
             y = x / (x - (T) 1);
             r = (T) -0.5 * l * l;
             s = (T) -1;
@@ -66,7 +66,7 @@ namespace Polylogarithm
         else if (x < (T) 1)
         {
             y = (T) 1 - x;
-            r = PI_ * PI_ / (T) 6 - gcem::log (x) * gcem::log (y);
+            r = PI_ * PI_ / (T) 6 - std::log (x) * std::log (y);
             s = (T) -1;
         }
         else if (x == (T) 1)
@@ -75,14 +75,14 @@ namespace Polylogarithm
         }
         else if (x < (T) 2)
         {
-            const auto l = gcem::log (x);
+            const auto l = std::log (x);
             y = (T) 1 - (T) 1 / x;
-            r = PI_ * PI_ / (T) 6 - l * (gcem::log (y) + (T) 0.5 * l);
+            r = PI_ * PI_ / (T) 6 - l * (std::log (y) + (T) 0.5 * l);
             s = (T) 1;
         }
         else
         {
-            const auto l = gcem::log (x);
+            const auto l = std::log (x);
             y = (T) 1 / x;
             r = PI_ * PI_ / (T) 3 - (T) 0.5 * l * l;
             s = (T) -1;
