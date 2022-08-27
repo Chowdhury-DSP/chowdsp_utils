@@ -9,7 +9,8 @@ static auto getMagnitude (const BufferType& buffer, int startSample, int numSamp
         numSamples = buffer.getNumSamples() - startSample;
 
     using SampleType = typename BufferType::Type;
-    auto getChannelMagnitude = [&buffer, startSample, numSamples] (int ch) {
+    auto getChannelMagnitude = [&buffer, startSample, numSamples] (int ch)
+    {
         const auto* channelData = buffer.getReadPointer (ch);
         if constexpr (std::is_floating_point_v<SampleType>)
         {
@@ -20,7 +21,8 @@ static auto getMagnitude (const BufferType& buffer, int startSample, int numSamp
             return std::accumulate (channelData + startSample,
                                     channelData + startSample + numSamples,
                                     SampleType {},
-                                    [] (const auto& prev, const auto& next) {
+                                    [] (const auto& prev, const auto& next)
+                                    {
                                         return xsimd::max (prev, xsimd::abs (next));
                                     });
         }
@@ -125,6 +127,74 @@ static void copyBufferChannels (const BufferType1& bufferSrc, BufferType2& buffe
     }
 }
 
+template <typename BufferType1, typename BufferType2>
+static void addBufferData (const BufferType1& bufferSrc, BufferType2& bufferDest, int srcStartSample, int destStartSample, int numSamples, int startChannel, int numChannels) noexcept
+{
+    using SampleType = typename BufferType1::Type;
+
+    if (numSamples < 0)
+    {
+        jassert (bufferSrc.getNumSamples() == bufferDest.getNumSamples());
+        numSamples = bufferDest.getNumSamples();
+    }
+
+    if (numChannels < 0)
+    {
+        jassert (bufferSrc.getNumChannels() == bufferDest.getNumChannels());
+        numChannels = bufferDest.getNumChannels();
+    }
+
+    jassert (srcStartSample + numSamples <= bufferSrc.getNumSamples());
+    jassert (destStartSample + numSamples <= bufferDest.getNumSamples());
+
+    for (int ch = startChannel; ch < startChannel + numChannels; ++ch)
+    {
+        const auto* srcData = bufferSrc.getReadPointer (ch);
+        auto* destData = bufferDest.getWritePointer (ch);
+
+        if constexpr (std::is_floating_point_v<SampleType>)
+        {
+            juce::FloatVectorOperations::add (destData + destStartSample, srcData + srcStartSample, numSamples);
+        }
+        else if constexpr (SampleTypeHelpers::IsSIMDRegister<SampleType>)
+        {
+            std::transform (srcData + srcStartSample,
+                            srcData + srcStartSample + numSamples,
+                            destData + destStartSample,
+                            destData + destStartSample,
+                            [] (const auto& a, const auto& b)
+                            { return a + b; });
+        }
+    }
+}
+
+/** Adds channels from one buffer into another. */
+template <typename BufferType1, typename BufferType2>
+static void addBufferChannels (const BufferType1& bufferSrc, BufferType2& bufferDest, int srcChannel, int destChannel) noexcept
+{
+    using SampleType = typename BufferType1::Type;
+
+    jassert (bufferSrc.getNumSamples() == bufferDest.getNumSamples());
+    const auto numSamples = bufferSrc.getNumSamples();
+
+    const auto* srcData = bufferSrc.getReadPointer (srcChannel);
+    auto* destData = bufferDest.getWritePointer (destChannel);
+
+    if constexpr (std::is_floating_point_v<SampleType>)
+    {
+        juce::FloatVectorOperations::add (destData, srcData, numSamples);
+    }
+    else if constexpr (SampleTypeHelpers::IsSIMDRegister<SampleType>)
+    {
+        std::transform (srcData,
+                        srcData + numSamples,
+                        destData,
+                        destData,
+                        [] (const auto& a, const auto& b)
+                        { return a + b; });
+    }
+}
+
 template <typename BufferType, typename FloatType>
 static void applyGain (BufferType& buffer, FloatType gain)
 {
@@ -143,7 +213,8 @@ static void applyGain (BufferType& buffer, FloatType gain)
         }
         else if constexpr (SampleTypeHelpers::IsSIMDRegister<SampleType>)
         {
-            std::transform (data, data + numSamples, data, [gain] (const auto& x) { return x * gain; });
+            std::transform (data, data + numSamples, data, [gain] (const auto& x)
+                            { return x * gain; });
         }
     }
 }
@@ -192,7 +263,8 @@ static void applyGainSmoothedBuffer (BufferType& buffer, SmoothedBufferType& gai
         if constexpr (std::is_floating_point_v<SampleType>)
             juce::FloatVectorOperations::multiply (audioData[ch], gainData, numSamples);
         else if constexpr (SampleTypeHelpers::IsSIMDRegister<SampleType>)
-            std::transform (audioData[ch], audioData[ch] + numSamples, gainData, audioData[ch], [] (const auto& x, const auto& g) { return x * g; });
+            std::transform (audioData[ch], audioData[ch] + numSamples, gainData, audioData[ch], [] (const auto& x, const auto& g)
+                            { return x * g; });
     }
 }
 } // namespace chowdsp::BufferMath

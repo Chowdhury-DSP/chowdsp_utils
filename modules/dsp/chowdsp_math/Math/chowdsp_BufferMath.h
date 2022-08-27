@@ -21,6 +21,14 @@ namespace BufferMath
     template <typename BufferType1, typename BufferType2 = BufferType1>
     static void copyBufferChannels (const BufferType1& bufferSrc, BufferType2& bufferDest, int srcChannel, int destChannel) noexcept;
 
+    /** Adds data from one buffer into another. */
+    template <typename BufferType1, typename BufferType2 = BufferType1>
+    static void addBufferData (const BufferType1& bufferSrc, BufferType2& bufferDest, int srcStartSample = 0, int destStartSample = 0, int numSamples = -1, int startChannel = 0, int numChannels = -1) noexcept;
+
+    /** Adds channels from one buffer into another. */
+    template <typename BufferType1, typename BufferType2 = BufferType1>
+    static void addBufferChannels (const BufferType1& bufferSrc, BufferType2& bufferDest, int srcChannel, int destChannel) noexcept;
+
     /** Applies a linear gain to a buffer. */
     template <typename BufferType, typename FloatType = typename BufferType::Type>
     static void applyGain (BufferType& buffer, FloatType gain);
