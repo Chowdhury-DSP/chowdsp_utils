@@ -1,5 +1,6 @@
 #pragma once
 
+#include <complex>
 #include <type_traits>
 
 namespace chowdsp
@@ -15,6 +16,7 @@ namespace SampleTypeHelpers
         static constexpr int Size = 1;
     };
 
+#if ! NO_XSIMD
     template <typename T>
     struct TypeTraits<xsimd::batch<T>, false>
     {
@@ -30,6 +32,7 @@ namespace SampleTypeHelpers
         using ElementType = const typename batch_type::value_type;
         static constexpr int Size = (int) batch_type::size;
     };
+#endif // ! CORE_TEENSY
 
     /** Type alias for a SIMD numeric type */
     template <typename SampleType>
@@ -39,9 +42,15 @@ namespace SampleTypeHelpers
     template <typename ProcessorType>
     using ProcessorNumericType = typename ProcessorType::NumericType;
 
+#if ! NO_XSIMD
     /** Useful template expression for determining if a type is a SIMDRegister */
     template <typename T, typename NumericType = NumericType<T>, typename SIMDType = xsimd::batch<NumericType>>
     inline constexpr bool IsSIMDRegister = std::is_same_v<T, SIMDType>;
+#else
+    /** Useful template expression for determining if a type is a SIMDRegister */
+    template <typename>
+    inline constexpr bool IsSIMDRegister = false;
+#endif
 
 } // namespace SampleTypeHelpers
 } // namespace chowdsp

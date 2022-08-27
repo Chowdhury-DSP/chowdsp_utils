@@ -86,7 +86,11 @@ public:
     [[nodiscard]] const SampleType** getArrayOfReadPointers() const noexcept;
 
 private:
+#if ! NO_XSIMD
     using Allocator = xsimd::default_allocator<SampleType>;
+#else
+    using Allocator = std::allocator<SampleType>;
+#endif
     using ChannelData = std::vector<SampleType, Allocator>;
     std::vector<ChannelData> rawData;
 

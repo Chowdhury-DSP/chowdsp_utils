@@ -86,10 +86,15 @@ public:
      * If using a custom mapping function, make sure this is set properly before calling
      * `prepare()` or `reset()`.
      */
-    std::function<FloatType (FloatType)> mappingFunction = [] (auto x) { return x; };
+    std::function<FloatType (FloatType)> mappingFunction = [] (auto x)
+    { return x; };
 
 private:
+#if ! NO_XSIMD
     std::vector<FloatType, xsimd::default_allocator<FloatType>> buffer;
+#else
+    std::vector<FloatType> buffer;
+#endif
     juce::SmoothedValue<FloatType, ValueSmoothingType> smoother;
     bool isCurrentlySmoothing = false;
 

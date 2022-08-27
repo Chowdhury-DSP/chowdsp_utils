@@ -39,6 +39,7 @@ namespace Math
         return T ((T (0) < val) - (val < T (0)));
     }
 
+#if ! NO_XSIMD
     /**
      * Returns 1 if the input is positive, -1 if the input is negative,
      * and 0 if the input is zero.
@@ -51,5 +52,6 @@ namespace Math
         const auto negative = xsimd::select (val < v_type ((T) 0), v_type ((T) 1), v_type ((T) 0));
         return positive - negative;
     }
+#endif
 } // namespace Math
 } // namespace chowdsp

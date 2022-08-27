@@ -1,3 +1,5 @@
+#if ! NO_XSIMD
+
 #include "chowdsp_FIRFilter.h"
 
 #if defined(__APPLE_CPP__) || defined(__APPLE_CC__)
@@ -112,9 +114,9 @@ inline void FIRFilter<FloatType>::processSampleInternalBypassed (FloatType x, Fl
 }
 
 template class FIRFilter<float>;
-#if ! JUCE_TEENSY
 template class FIRFilter<double>;
-#endif
 } // namespace chowdsp
 
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+
+#endif // ! NO_XSIMD

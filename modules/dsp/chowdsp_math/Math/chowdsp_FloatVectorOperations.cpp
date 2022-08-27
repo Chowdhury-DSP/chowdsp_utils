@@ -3,6 +3,7 @@
 
 namespace chowdsp::FloatVectorOperations
 {
+#if ! NO_XSIMD
 #ifndef DOXYGEN
 namespace detail
 {
@@ -326,7 +327,8 @@ namespace detail
         return reduce (src1, src2, numValues, init, std::forward<Op> (op), std::forward<Op> (op));
     }
 } // namespace detail
-#endif
+#endif // DOXYGEN
+#endif // ! NO_XSIMD
 
 bool isUsingVDSP()
 {
@@ -341,12 +343,16 @@ void divide (float* dest, const float* dividend, const float* divisor, int numVa
 {
 #if JUCE_USE_VDSP_FRAMEWORK
     vDSP_vdiv (divisor, 1, dividend, 1, dest, 1, (vDSP_Length) numValues);
+#elif NO_XSIMD
+    std::transform (dividend, dividend + numValues, divisor, dest, [] (auto a, auto b)
+                    { return a / b; });
 #else
     detail::binaryOp (dest,
                       dividend,
                       divisor,
                       numValues,
-                      [] (auto num, auto den) {
+                      [] (auto num, auto den)
+                      {
                           using namespace chowdsp::SIMDUtils;
                           return num / den;
                       });
@@ -357,14 +363,16 @@ void divide (double* dest, const double* dividend, const double* divisor, int nu
 {
 #if JUCE_USE_VDSP_FRAMEWORK
     vDSP_vdivD (divisor, 1, dividend, 1, dest, 1, (vDSP_Length) numValues);
-#elif JUCE_TEENSY
-    std::transform (dividend, dividend + numValues, divisor, dest, [] (auto a, auto b) { return a / b; });
+#elif NO_XSIMD
+    std::transform (dividend, dividend + numValues, divisor, dest, [] (auto a, auto b)
+                    { return a / b; });
 #else
     detail::binaryOp (dest,
                       dividend,
                       divisor,
                       numValues,
-                      [] (auto num, auto den) {
+                      [] (auto num, auto den)
+                      {
                           return num / den;
                       });
 #endif
@@ -374,6 +382,9 @@ void divide (float* dest, float dividend, const float* divisor, int numValues) n
 {
 #if JUCE_USE_VDSP_FRAMEWORK
     vDSP_svdiv (&dividend, divisor, 1, dest, 1, (vDSP_Length) numValues);
+#elif NO_XSIMD
+    std::transform (divisor, divisor + numValues, dest, [dividend] (auto x)
+                    { return dividend / x; });
 #else
     detail::unaryOp (dest,
                      divisor,
@@ -389,8 +400,9 @@ void divide (double* dest, double dividend, const double* divisor, int numValues
 {
 #if JUCE_USE_VDSP_FRAMEWORK
     vDSP_svdivD (&dividend, divisor, 1, dest, 1, (vDSP_Length) numValues);
-#elif JUCE_TEENSY
-    std::transform (divisor, divisor + numValues, dest, [dividend] (auto x) { return dividend / x; });
+#elif NO_XSIMD
+    std::transform (divisor, divisor + numValues, dest, [dividend] (auto x)
+                    { return dividend / x; });
 #else
     detail::unaryOp (dest,
                      divisor,
@@ -408,12 +420,15 @@ float accumulate (const float* src, int numValues) noexcept
     float result = 0.0f;
     vDSP_sve (src, 1, &result, (vDSP_Length) numValues);
     return result;
+#elif NO_XSIMD
+    return std::accumulate (src, src + numValues, 0.0f);
 #else
     return detail::reduce (
         src,
         numValues,
         0.0f,
-        [] (auto prev, auto next) { return prev + next; });
+        [] (auto prev, auto next)
+        { return prev + next; });
 #endif
 }
 
@@ -423,14 +438,15 @@ double accumulate (const double* src, int numValues) noexcept
     double result = 0.0;
     vDSP_sveD (src, 1, &result, (vDSP_Length) numValues);
     return result;
-#elif JUCE_TEENSY
+#elif NO_XSIMD
     return std::accumulate (src, src + numValues, 0.0);
 #else
     return detail::reduce (
         src,
         numValues,
         0.0,
-        [] (auto prev, auto next) { return prev + next; });
+        [] (auto prev, auto next)
+        { return prev + next; });
 #endif
 }
 
@@ -440,13 +456,16 @@ float innerProduct (const float* src1, const float* src2, int numValues) noexcep
     float result = 0.0f;
     vDSP_dotpr (src1, 1, src2, 1, &result, (vDSP_Length) numValues);
     return result;
+#elif NO_XSIMD
+    return std::inner_product (src1, src1 + numValues, src2, 0.0f);
 #else
     return detail::reduce (
         src1,
         src2,
         numValues,
         0.0f,
-        [] (auto prev, auto next1, auto next2) { return prev + next1 * next2; });
+        [] (auto prev, auto next1, auto next2)
+        { return prev + next1 * next2; });
 #endif
 }
 
@@ -456,7 +475,7 @@ double innerProduct (const double* src1, const double* src2, int numValues) noex
     double result = 0.0;
     vDSP_dotprD (src1, 1, src2, 1, &result, (vDSP_Length) numValues);
     return result;
-#elif JUCE_TEENSY
+#elif NO_XSIMD
     return std::inner_product (src1, src1 + numValues, src2, 0.0);
 #else
     return detail::reduce (
@@ -464,7 +483,8 @@ double innerProduct (const double* src1, const double* src2, int numValues) noex
         src2,
         numValues,
         0.0,
-        [] (auto prev, auto next1, auto next2) { return prev + next1 * next2; });
+        [] (auto prev, auto next1, auto next2)
+        { return prev + next1 * next2; });
 #endif
 }
 
@@ -474,14 +494,21 @@ float findAbsoluteMaximum (const float* src, int numValues) noexcept
     float result = 0.0f;
     vDSP_maxmgv (src, 1, &result, (vDSP_Length) numValues);
     return result;
+#elif NO_XSIMD
+    return [] (const auto& begin, const auto end) -> float
+    { return std::abs (*std::max_element (begin, end, [] (auto a, auto b)
+                                          { return std::abs (a) < std::abs (b); })); }(src, src + numValues);
 #else
     return detail::reduce (
         src,
         numValues,
         0.0f,
-        [] (auto a, auto b) { return juce::jmax (std::abs (a), std::abs (b)); },
-        [] (auto a, auto b) { return xsimd::max (xsimd::abs (a), xsimd::abs (b)); },
-        [] (auto x) { return SIMDUtils::hAbsMaxSIMD (x); });
+        [] (auto a, auto b)
+        { return juce::jmax (std::abs (a), std::abs (b)); },
+        [] (auto a, auto b)
+        { return xsimd::max (xsimd::abs (a), xsimd::abs (b)); },
+        [] (auto x)
+        { return SIMDUtils::hAbsMaxSIMD (x); });
 #endif
 }
 
@@ -491,7 +518,7 @@ double findAbsoluteMaximum (const double* src, int numValues) noexcept
     double result = 0.0;
     vDSP_maxmgvD (src, 1, &result, (vDSP_Length) numValues);
     return result;
-#elif JUCE_TEENSY
+#elif NO_XSIMD
     return [] (const auto& begin, const auto end) -> double
     { return std::abs (*std::max_element (begin, end, [] (auto a, auto b)
                                           { return std::abs (a) < std::abs (b); })); }(src, src + numValues);
@@ -500,12 +527,16 @@ double findAbsoluteMaximum (const double* src, int numValues) noexcept
         src,
         numValues,
         0.0,
-        [] (auto a, auto b) { return juce::jmax (a, std::abs (b)); },
-        [] (auto a, auto b) { return xsimd::max (a, xsimd::abs (b)); },
-        [] (auto x) { return SIMDUtils::hMaxSIMD (x); });
+        [] (auto a, auto b)
+        { return juce::jmax (a, std::abs (b)); },
+        [] (auto a, auto b)
+        { return xsimd::max (a, xsimd::abs (b)); },
+        [] (auto x)
+        { return SIMDUtils::hMaxSIMD (x); });
 #endif
 }
 
+#if ! NO_XSIMD
 template <typename T>
 void integerPowerT (T* dest, const T* src, int exponent, int numValues) noexcept
 {
@@ -593,15 +624,21 @@ void integerPowerT (T* dest, const T* src, int exponent, int numValues) noexcept
             break;
     }
 }
+#endif // ! NO_XSIMD
 
 void integerPower (float* dest, const float* src, int exponent, int numValues) noexcept
 {
+#if NO_XSIMD
+    for (int i = 0; i < numValues; ++i)
+        dest[i] = std::pow (src[i], (float) exponent);
+#else
     integerPowerT (dest, src, exponent, numValues);
+#endif
 }
 
 void integerPower (double* dest, const double* src, int exponent, int numValues) noexcept
 {
-#if JUCE_TEENSY
+#if NO_XSIMD
     for (int i = 0; i < numValues; ++i)
         dest[i] = std::pow (src[i], (double) exponent);
 #else
@@ -615,6 +652,14 @@ float computeRMS (const float* src, int numValues) noexcept
     float result = 0.0f;
     vDSP_rmsqv (src, 1, &result, (vDSP_Length) numValues);
     return result;
+#elif NO_XSIMD
+    return [] (const float* data, int numSamples) -> float
+    {
+        auto squareSum = 0.0;
+        for (int i = 0; i < numSamples; ++i)
+            squareSum += data[i] * data[i];
+        return std::sqrt (squareSum / (float) numSamples);
+    }(src, numValues);
 #else
     const auto squareSum = detail::reduce (src,
                                            numValues,
@@ -631,7 +676,7 @@ double computeRMS (const double* src, int numValues) noexcept
     double result = 0.0;
     vDSP_rmsqvD (src, 1, &result, (vDSP_Length) numValues);
     return result;
-#elif JUCE_TEENSY
+#elif NO_XSIMD
     return [] (const double* data, int numSamples) -> double
     {
         auto squareSum = 0.0;

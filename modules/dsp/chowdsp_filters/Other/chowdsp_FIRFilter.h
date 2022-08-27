@@ -1,3 +1,5 @@
+#if ! NO_XSIMD
+
 #pragma once
 
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wsign-conversion")
@@ -116,3 +118,5 @@ private:
 } // namespace chowdsp
 
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+
+#endif // ! NO_XSIMD

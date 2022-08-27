@@ -25,6 +25,8 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 #include <chowdsp_core/chowdsp_core.h>
 
+#if ! NO_XSIMD
+
 // Third-party includes
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wcast-align",
                                      "-Wimplicit-int-conversion",
@@ -47,3 +49,12 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 #include "SIMD/chowdsp_SIMDDecibels.h"
 #include "SIMD/chowdsp_SIMDSmoothedValue.h"
 #include "SIMD/chowdsp_SIMDComplexMathOps.h"
+
+#else
+// Stuff that can be used on Teensy
+#include "SIMD/chowdsp_SampleTypeHelpers.h"
+#include "SIMD/chowdsp_SIMDUtils.h"
+#include "SIMD/chowdsp_SIMDLogic.h"
+#include "SIMD/chowdsp_SIMDDecibels.h"
+
+#endif
