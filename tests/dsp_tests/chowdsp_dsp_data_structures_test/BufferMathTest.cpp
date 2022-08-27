@@ -63,6 +63,47 @@ TEMPLATE_TEST_CASE ("Buffer Math Test", "", float, double, xsimd::batch<float>, 
         }
     }
 
+    SECTION ("Add Buffer Test")
+    {
+        auto&& srcBuffer = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 48000, (NumericType) 1);
+
+        chowdsp::Buffer<T> destBuffer { srcBuffer.getNumChannels(), srcBuffer.getNumSamples() };
+        for (int i = 0; i < destBuffer.getNumSamples(); ++i)
+            destBuffer.getWritePointer (0)[i] = (NumericType) 1;
+        addBufferData (srcBuffer, destBuffer);
+
+        for (int i = 0; i < destBuffer.getNumSamples(); ++i)
+        {
+            const auto actualVal = destBuffer.getReadPointer (0)[i];
+            const auto expVal = srcBuffer.getReadPointer (0)[i];
+            REQUIRE_MESSAGE (actualVal == SIMDApprox<T> (expVal + (NumericType) 1).margin ((NumericType) maxErr), "Copied value is incorrect!");
+        }
+    }
+
+    SECTION ("Copy Buffer Channel Test")
+    {
+        std::random_device rd;
+        std::mt19937 mt (rd());
+        std::uniform_real_distribution<NumericType> minu1To1 ((NumericType) -10, (NumericType) 10);
+
+        chowdsp::Buffer<T> buffer { 2, 128 };
+        for (int i = 0; i < buffer.getNumSamples(); ++i)
+        {
+            const auto x = (T) minu1To1 (mt);
+            buffer.getWritePointer (0)[i] = x;
+            buffer.getWritePointer (1)[i] = x;
+        }
+
+        addBufferChannels (buffer, buffer, 0, 1);
+
+        for (int i = 0; i < buffer.getNumSamples(); ++i)
+        {
+            const auto actualVal = buffer.getReadPointer (1)[i];
+            const auto expVal = buffer.getReadPointer (0)[i];
+            REQUIRE_MESSAGE (actualVal == SIMDApprox<T> ((NumericType) 2 * expVal).margin ((NumericType) maxErr), "Copied value is incorrect!");
+        }
+    }
+
     SECTION ("Apply Gain Test")
     {
         auto&& sineBuffer1 = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 48000, (NumericType) 1);
