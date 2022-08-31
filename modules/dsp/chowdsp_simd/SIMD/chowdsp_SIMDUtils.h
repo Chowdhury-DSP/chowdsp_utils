@@ -1,6 +1,6 @@
 #pragma once
 
-#if ! NO_XSIMD
+#if ! CHOWDSP_NO_XSIMD
 /** Simplified way of `using` the same function from both `std::` and `xsimd::` */
 #define CHOWDSP_USING_XSIMD_STD(func) \
     using std::func;                  \

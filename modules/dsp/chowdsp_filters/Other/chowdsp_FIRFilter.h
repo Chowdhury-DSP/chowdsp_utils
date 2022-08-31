@@ -1,4 +1,4 @@
-#if ! NO_XSIMD
+#if ! CHOWDSP_NO_XSIMD
 
 #pragma once
 
@@ -119,4 +119,4 @@ private:
 
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
-#endif // ! NO_XSIMD
+#endif // ! CHOWDSP_NO_XSIMD

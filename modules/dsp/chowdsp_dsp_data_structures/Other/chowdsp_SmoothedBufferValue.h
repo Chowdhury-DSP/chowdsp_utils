@@ -90,7 +90,7 @@ public:
     { return x; };
 
 private:
-#if ! NO_XSIMD
+#if ! CHOWDSP_NO_XSIMD
     std::vector<FloatType, xsimd::default_allocator<FloatType>> buffer;
 #else
     std::vector<FloatType> buffer;

@@ -1,4 +1,4 @@
-#if ! NO_XSIMD
+#if ! CHOWDSP_NO_XSIMD
 
 #pragma once
 
@@ -277,4 +277,4 @@ private:
 };
 } // namespace chowdsp
 
-#endif // ! NO_XSIMD
+#endif // ! CHOWDSP_NO_XSIMD

@@ -1,4 +1,4 @@
-#if ! NO_XSIMD
+#if ! CHOWDSP_NO_XSIMD
 
 #include "chowdsp_FIRFilter.h"
 
@@ -119,4 +119,4 @@ template class FIRFilter<double>;
 
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
-#endif // ! NO_XSIMD
+#endif // ! CHOWDSP_NO_XSIMD

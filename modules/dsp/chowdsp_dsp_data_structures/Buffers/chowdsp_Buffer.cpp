@@ -80,7 +80,7 @@ void Buffer<SampleType>::clear() noexcept
 
 template class Buffer<float>;
 template class Buffer<double>;
-#if ! NO_XSIMD
+#if ! CHOWDSP_NO_XSIMD
 template class Buffer<xsimd::batch<float>>;
 template class Buffer<xsimd::batch<double>>;
 #endif

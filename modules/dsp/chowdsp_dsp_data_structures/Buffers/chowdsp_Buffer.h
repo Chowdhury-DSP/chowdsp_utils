@@ -86,7 +86,7 @@ public:
     [[nodiscard]] const SampleType** getArrayOfReadPointers() const noexcept;
 
 private:
-#if ! NO_XSIMD
+#if ! CHOWDSP_NO_XSIMD
     using Allocator = xsimd::default_allocator<SampleType>;
 #else
     using Allocator = std::allocator<SampleType>;

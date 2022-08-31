@@ -16,7 +16,7 @@ namespace SampleTypeHelpers
         static constexpr int Size = 1;
     };
 
-#if ! NO_XSIMD
+#if ! CHOWDSP_NO_XSIMD
     template <typename T>
     struct TypeTraits<xsimd::batch<T>, false>
     {
@@ -42,7 +42,7 @@ namespace SampleTypeHelpers
     template <typename ProcessorType>
     using ProcessorNumericType = typename ProcessorType::NumericType;
 
-#if ! NO_XSIMD
+#if ! CHOWDSP_NO_XSIMD
     /** Useful template expression for determining if a type is a SIMDRegister */
     template <typename T, typename NumericType = NumericType<T>, typename SIMDType = xsimd::batch<NumericType>>
     inline constexpr bool IsSIMDRegister = std::is_same_v<T, SIMDType>;

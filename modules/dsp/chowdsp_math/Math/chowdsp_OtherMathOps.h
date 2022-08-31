@@ -39,7 +39,7 @@ namespace Math
         return T ((T (0) < val) - (val < T (0)));
     }
 
-#if ! NO_XSIMD
+#if ! CHOWDSP_NO_XSIMD
     /**
      * Returns 1 if the input is positive, -1 if the input is negative,
      * and 0 if the input is zero.

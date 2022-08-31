@@ -2,7 +2,7 @@
 
 namespace chowdsp::SIMDUtils
 {
-#if ! NO_XSIMD
+#if ! CHOWDSP_NO_XSIMD
 /** Returns true if any of the registers in the mask are true */
 template <typename VecBoolType>
 inline bool any (VecBoolType b)

@@ -1,4 +1,4 @@
-#if ! NO_XSIMD
+#if ! CHOWDSP_NO_XSIMD
 
 #pragma once
 
@@ -213,4 +213,4 @@ namespace MatrixOps
 
 } // namespace chowdsp
 
-#endif // ! NO_XSIMD
+#endif // ! CHOWDSP_NO_XSIMD

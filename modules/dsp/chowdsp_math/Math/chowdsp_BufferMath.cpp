@@ -16,7 +16,7 @@ static auto getMagnitude (const BufferType& buffer, int startSample, int numSamp
         {
             return FloatVectorOperations::findAbsoluteMaximum (channelData + startSample, numSamples);
         }
-#if ! NO_XSIMD
+#if ! CHOWDSP_NO_XSIMD
         else if constexpr (SampleTypeHelpers::IsSIMDRegister<SampleType>)
         {
             return std::accumulate (channelData + startSample,
@@ -57,7 +57,7 @@ static auto getRMSLevel (const BufferType& buffer, int channel, int startSample,
     {
         return chowdsp::FloatVectorOperations::computeRMS (data, numSamples);
     }
-#if ! NO_XSIMD
+#if ! CHOWDSP_NO_XSIMD
     else if constexpr (SampleTypeHelpers::IsSIMDRegister<SampleType>)
     {
         using NumericType = SampleTypeHelpers::NumericType<SampleType>;
