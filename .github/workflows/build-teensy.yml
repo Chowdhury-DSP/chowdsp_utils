@@ -15,13 +15,8 @@ env:
 
 jobs:
   build:
-    name: "Build ${{ matrix.tests }} on Teensy"
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
-      matrix:
-        tests: ["chowdsp_dsp_data_structures_test chowdsp_dsp_juce_test chowdsp_dsp_utils_test chowdsp_sources_test chowdsp_math_test chowdsp_simd_test chowdsp_filters_test chowdsp_waveshapers_test"]
-        os: [ubuntu-latest]
+    name: "Build library on Teensy"
+    runs-on: ubuntu-latest
 
     steps:
       - name: Get latest CMake
@@ -59,7 +54,10 @@ jobs:
           echo "[env:myenv]" > platformio.ini
           pio pkg install --tool "platformio/toolchain-gccarmnoneeabi@1.70201.0"
 
-      - name:
+      - name: Setup upterm session
+        uses: lhotari/action-upterm@v1
+
+      - name: Build
         run: |
           cc=~/.platformio/packages/toolchain-gccarmnoneeabi@1.70201.0/bin/arm-none-eabi-g++
           $cc -DCORE_TEENSY=1 --std=c++17 --specs=nosys.specs -Imodules/common -Imodules/dsp -c modules/common/chowdsp_core/chowdsp_core.cpp
