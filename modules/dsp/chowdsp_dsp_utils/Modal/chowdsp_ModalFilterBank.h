@@ -1,5 +1,6 @@
 #pragma once
 
+#if ! CHOWDSP_NO_XSIMD
 namespace chowdsp
 {
 /** A parallel bank of modal filters, with SIMD vectorization */
@@ -90,3 +91,4 @@ private:
 } // namespace chowdsp
 
 #include "chowdsp_ModalFilterBank.cpp"
+#endif // ! CHOWDSP_NO_XSIMD

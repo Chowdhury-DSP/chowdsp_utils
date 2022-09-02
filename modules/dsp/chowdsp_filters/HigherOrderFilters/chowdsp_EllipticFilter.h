@@ -182,7 +182,7 @@ private:
             const auto knext = ks[i + 1];
 
             const auto wn = wns.back();
-            const auto wnext = (2.0 * wn / ((1.0 + knext) * (1.0 + complement (kn * wn))));
+            const auto wnext = ((double) 2 * wn / ((1.0 + knext) * (1.0 + complement (kn * wn))));
             wns.push_back (wnext);
         }
 
@@ -200,7 +200,7 @@ private:
      */
     static double arc_jac_sc1 (double w, double m)
     {
-        const auto zcomplex = arc_jac_sn (std::complex { 0.0, w }, m);
+        const auto zcomplex = arc_jac_sn (std::complex<double> { 0.0, w }, m);
         jassert (zcomplex.real() <= 1e-14); // ill-formed result
         return zcomplex.imag();
     }

@@ -89,7 +89,11 @@ public:
     std::function<FloatType (FloatType)> mappingFunction = [] (auto x) { return x; };
 
 private:
+#if ! CHOWDSP_NO_XSIMD
     std::vector<FloatType, xsimd::default_allocator<FloatType>> buffer;
+#else
+    std::vector<FloatType> buffer;
+#endif
     juce::SmoothedValue<FloatType, ValueSmoothingType> smoother;
     bool isCurrentlySmoothing = false;
 

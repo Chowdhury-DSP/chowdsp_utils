@@ -1,3 +1,5 @@
+#if ! CHOWDSP_NO_XSIMD
+
 #pragma once
 
 #include <type_traits>
@@ -210,3 +212,5 @@ namespace MatrixOps
 } // namespace MatrixOps
 
 } // namespace chowdsp
+
+#endif // ! CHOWDSP_NO_XSIMD

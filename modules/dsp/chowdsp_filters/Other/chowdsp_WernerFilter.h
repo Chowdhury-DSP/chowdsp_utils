@@ -1,3 +1,5 @@
+#if ! CHOWDSP_NO_XSIMD
+
 #pragma once
 
 namespace chowdsp
@@ -274,3 +276,5 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WernerFilter)
 };
 } // namespace chowdsp
+
+#endif // ! CHOWDSP_NO_XSIMD

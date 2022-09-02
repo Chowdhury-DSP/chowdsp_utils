@@ -1600,7 +1600,7 @@ void JUCE_CALLTYPE FloatVectorOperations::setFpStatusRegister (intptr_t fpsr) no
 #if ! (defined(JUCE_INTEL) || defined(JUCE_ARM))
     jassertfalse; // No support for getting the floating point status register for your platform
 #endif
-    ignoreUnused (fpsr);
+    juce::ignoreUnused (fpsr);
 #endif
 }
 
@@ -1617,7 +1617,7 @@ void JUCE_CALLTYPE FloatVectorOperations::enableFlushToZeroMode (bool shouldEnab
 #if ! (defined(JUCE_INTEL) || defined(JUCE_ARM))
     jassertfalse; // No support for flush to zero mode on your platform
 #endif
-    ignoreUnused (shouldEnable);
+    juce::ignoreUnused (shouldEnable);
 #endif
 }
 
@@ -1632,7 +1632,7 @@ void JUCE_CALLTYPE FloatVectorOperations::disableDenormalisedNumberSupport (bool
 
     setFpStatusRegister ((getFpStatusRegister() & (~mask)) | (shouldDisable ? mask : 0));
 #else
-    ignoreUnused (shouldDisable);
+    juce::ignoreUnused (shouldDisable);
 
 #if ! (defined(JUCE_INTEL) || defined(JUCE_ARM))
     jassertfalse; // No support for disable denormals mode on your platform

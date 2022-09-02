@@ -1,0 +1,61 @@
+name: Build Teensy
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: "Build library on Teensy"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get latest CMake
+        uses: lukka/get-cmake@latest
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-teensy-pip-
+
+      - name: Cache PlatformIO
+        uses: actions/cache@v2
+        with:
+          path: ~/.platformio
+          key: ${{ runner.os }}-teensy-${{ hashFiles('**/lockfiles') }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+
+      - name: Install PlatformIO
+        run: |
+          python -m pip install --upgrade pip
+          pip install --upgrade platformio
+
+      - name: Install Toolchain
+        run: |
+          echo "[env:myenv]" > platformio.ini
+          pio pkg install --tool "platformio/toolchain-gccarmnoneeabi@1.70201.0"
+
+#      - name: Setup upterm session
+#        uses: lhotari/action-upterm@v1
+
+      - name: Build
+        run: |
+          cc=~/.platformio/packages/toolchain-gccarmnoneeabi/bin/arm-none-eabi-g++
+          $cc -DCORE_TEENSY=1 --std=c++17 -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 --specs=nosys.specs -Imodules/common -Imodules/dsp -c modules/common/chowdsp_core/chowdsp_core.cpp
+          $cc -DCORE_TEENSY=1 --std=c++17 -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 --specs=nosys.specs -Imodules/common -Imodules/dsp -c modules/dsp/chowdsp_dsp_data_structures/chowdsp_dsp_data_structures.cpp
+          $cc -DCORE_TEENSY=1 --std=c++17 -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 --specs=nosys.specs -Imodules/common -Imodules/dsp -c modules/dsp/chowdsp_dsp_utils/chowdsp_dsp_utils.cpp
+          $cc -DCORE_TEENSY=1 --std=c++17 -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16 --specs=nosys.specs -Imodules/common -Imodules/dsp -c modules/dsp/chowdsp_math/chowdsp_math.cpp

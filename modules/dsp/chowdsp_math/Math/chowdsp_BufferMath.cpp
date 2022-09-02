@@ -15,6 +15,7 @@ static auto getMagnitude (const BufferType& buffer, int startSample, int numSamp
         {
             return FloatVectorOperations::findAbsoluteMaximum (channelData + startSample, numSamples);
         }
+#if ! CHOWDSP_NO_XSIMD
         else if constexpr (SampleTypeHelpers::IsSIMDRegister<SampleType>)
         {
             return std::accumulate (channelData + startSample,
@@ -24,6 +25,7 @@ static auto getMagnitude (const BufferType& buffer, int startSample, int numSamp
                                         return xsimd::max (prev, xsimd::abs (next));
                                     });
         }
+#endif
     };
 
     if (channel >= 0)
@@ -53,6 +55,7 @@ static auto getRMSLevel (const BufferType& buffer, int channel, int startSample,
     {
         return chowdsp::FloatVectorOperations::computeRMS (data, numSamples);
     }
+#if ! CHOWDSP_NO_XSIMD
     else if constexpr (SampleTypeHelpers::IsSIMDRegister<SampleType>)
     {
         using NumericType = SampleTypeHelpers::NumericType<SampleType>;
@@ -66,6 +69,7 @@ static auto getRMSLevel (const BufferType& buffer, int channel, int startSample,
 
         return xsimd::sqrt (sum / (NumericType) numSamples);
     }
+#endif
 }
 
 template <typename BufferType1, typename BufferType2>
