@@ -32,7 +32,7 @@ namespace SampleTypeHelpers
         using ElementType = const typename batch_type::value_type;
         static constexpr int Size = (int) batch_type::size;
     };
-#endif // ! CORE_TEENSY
+#endif // ! CHOWDSP_NO_XSIMD
 
     /** Type alias for a SIMD numeric type */
     template <typename SampleType>
