@@ -16,6 +16,7 @@ inline T decibelsToGain (T decibels, T minusInfinityDB = (T) -100.0)
     return juce::Decibels::decibelsToGain (decibels, minusInfinityDB);
 }
 
+#if ! CHOWDSP_NO_XSIMD
 /** SIMD specialization of juce::Decibels::gainToDecibels */
 template <typename T>
 inline xsimd::batch<T> gainToDecibels (const xsimd::batch<T>& gain, T minusInfinityDB = (T) -100.0)
@@ -30,4 +31,5 @@ inline xsimd::batch<T> decibelsToGain (const xsimd::batch<T>& decibels, T minusI
 {
     return xsimd::select (decibels > minusInfinityDB, xsimd::pow ((xsimd::batch<T>) 10, decibels * (T) 0.05), {});
 }
+#endif
 } // namespace chowdsp::SIMDUtils

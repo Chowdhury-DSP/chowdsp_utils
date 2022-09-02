@@ -210,6 +210,7 @@ namespace DelayLineInterpolationTypes
     JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324) // MSVC doesn't like other variables hiding class members
 #endif
 
+#if ! CHOWDSP_NO_XSIMD
     /**
     Successive samples in the delay line will be interpolated using Sinc
     interpolation. This method is somewhat less efficient than the others,
@@ -275,6 +276,7 @@ namespace DelayLineInterpolationTypes
         int totalSize = 0;
         T sinctable alignas (xsimd::default_arch::alignment())[(M + 1) * N * 2];
     };
+#endif // ! CHOWDSP_NO_XSIMD
     JUCE_END_IGNORE_WARNINGS_MSVC
 } // namespace DelayLineInterpolationTypes
 } // namespace chowdsp

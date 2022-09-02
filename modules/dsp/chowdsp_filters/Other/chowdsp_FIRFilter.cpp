@@ -1,3 +1,5 @@
+#if ! CHOWDSP_NO_XSIMD
+
 #include "chowdsp_FIRFilter.h"
 
 #if defined(__APPLE_CPP__) || defined(__APPLE_CC__)
@@ -116,3 +118,5 @@ template class FIRFilter<double>;
 } // namespace chowdsp
 
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+
+#endif // ! CHOWDSP_NO_XSIMD

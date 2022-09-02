@@ -25,6 +25,19 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 #include <chowdsp_core/chowdsp_core.h>
 
+/** Config: CHOWDSP_NO_XSIMD
+    Enable this flag to skip including XSIMD headers.
+*/
+#ifndef CHOWDSP_NO_XSIMD
+#if JUCE_TEENSY
+#define CHOWDSP_NO_XSIMD 1
+#else
+#define CHOWDSP_NO_XSIMD 0
+#endif
+#endif
+
+#if ! CHOWDSP_NO_XSIMD
+
 // Third-party includes
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wcast-align",
                                      "-Wimplicit-int-conversion",
@@ -47,3 +60,12 @@ JUCE_END_IGNORE_WARNINGS_MSVC
 #include "SIMD/chowdsp_SIMDDecibels.h"
 #include "SIMD/chowdsp_SIMDSmoothedValue.h"
 #include "SIMD/chowdsp_SIMDComplexMathOps.h"
+
+#else
+// Stuff that can still be used without XSIMD
+#include "SIMD/chowdsp_SampleTypeHelpers.h"
+#include "SIMD/chowdsp_SIMDUtils.h"
+#include "SIMD/chowdsp_SIMDLogic.h"
+#include "SIMD/chowdsp_SIMDDecibels.h"
+
+#endif

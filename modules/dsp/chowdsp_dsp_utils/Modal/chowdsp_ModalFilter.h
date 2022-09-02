@@ -89,6 +89,7 @@ protected:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ModalFilter)
 };
 
+#if ! CHOWDSP_NO_XSIMD
 //=========================================================================
 /** An implementation of the modal filter parallelised with SIMDComplex. */
 template <typename FloatType>
@@ -173,5 +174,6 @@ protected:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ModalFilter)
 };
+#endif // ! CHOWDSP_NO_XSIMD
 
 } // namespace chowdsp
