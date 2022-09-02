@@ -79,7 +79,7 @@
 #endif
 #elif defined(__wasm__)
 #define JUCE_WASM 1
-#elif defined (CORE_TEENSY)
+#elif defined(CORE_TEENSY)
 #define JUCE_TEENSY 1
 #else
 #error "Unknown platform!"

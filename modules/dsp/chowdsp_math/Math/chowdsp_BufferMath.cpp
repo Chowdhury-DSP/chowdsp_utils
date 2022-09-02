@@ -9,8 +9,7 @@ static auto getMagnitude (const BufferType& buffer, int startSample, int numSamp
         numSamples = buffer.getNumSamples() - startSample;
 
     using SampleType = typename BufferType::Type;
-    auto getChannelMagnitude = [&buffer, startSample, numSamples] (int ch)
-    {
+    auto getChannelMagnitude = [&buffer, startSample, numSamples] (int ch) {
         const auto* channelData = buffer.getReadPointer (ch);
         if constexpr (std::is_floating_point_v<SampleType>)
         {
@@ -22,8 +21,7 @@ static auto getMagnitude (const BufferType& buffer, int startSample, int numSamp
             return std::accumulate (channelData + startSample,
                                     channelData + startSample + numSamples,
                                     SampleType {},
-                                    [] (const auto& prev, const auto& next)
-                                    {
+                                    [] (const auto& prev, const auto& next) {
                                         return xsimd::max (prev, xsimd::abs (next));
                                     });
         }
@@ -215,8 +213,7 @@ static void applyGain (BufferType& buffer, FloatType gain)
         }
         else if constexpr (SampleTypeHelpers::IsSIMDRegister<SampleType>)
         {
-            std::transform (data, data + numSamples, data, [gain] (const auto& x)
-                            { return x * gain; });
+            std::transform (data, data + numSamples, data, [gain] (const auto& x) { return x * gain; });
         }
     }
 }
@@ -265,8 +262,7 @@ static void applyGainSmoothedBuffer (BufferType& buffer, SmoothedBufferType& gai
         if constexpr (std::is_floating_point_v<SampleType>)
             juce::FloatVectorOperations::multiply (audioData[ch], gainData, numSamples);
         else if constexpr (SampleTypeHelpers::IsSIMDRegister<SampleType>)
-            std::transform (audioData[ch], audioData[ch] + numSamples, gainData, audioData[ch], [] (const auto& x, const auto& g)
-                            { return x * g; });
+            std::transform (audioData[ch], audioData[ch] + numSamples, gainData, audioData[ch], [] (const auto& x, const auto& g) { return x * g; });
     }
 }
 } // namespace chowdsp::BufferMath
