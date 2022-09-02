@@ -10,9 +10,6 @@ on:
 
   workflow_dispatch:
 
-env:
-  WORK_DIR: ${{github.workspace}}/JUCE_modules/chowdsp_utils
-
 jobs:
   build:
     name: "Build library on Teensy"
@@ -24,8 +21,6 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@v2
-        with:
-          path: ${{env.WORK_DIR}}
 
       - name: Cache pip
         uses: actions/cache@v2
@@ -54,12 +49,12 @@ jobs:
           echo "[env:myenv]" > platformio.ini
           pio pkg install --tool "platformio/toolchain-gccarmnoneeabi@1.70201.0"
 
-      - name: Setup upterm session
-        uses: lhotari/action-upterm@v1
+#      - name: Setup upterm session
+#        uses: lhotari/action-upterm@v1
 
       - name: Build
         run: |
-          cc=~/.platformio/packages/toolchain-gccarmnoneeabi@1.70201.0/bin/arm-none-eabi-g++
+          cc=~/.platformio/packages/toolchain-gccarmnoneeabi/bin/arm-none-eabi-g++
           $cc -DCORE_TEENSY=1 --std=c++17 --specs=nosys.specs -Imodules/common -Imodules/dsp -c modules/common/chowdsp_core/chowdsp_core.cpp
           $cc -DCORE_TEENSY=1 --std=c++17 --specs=nosys.specs -Imodules/common -Imodules/dsp -c modules/common/chowdsp_dsp_data_structures/chowdsp_dsp_data_structures.cpp
           $cc -DCORE_TEENSY=1 --std=c++17 --specs=nosys.specs -Imodules/common -Imodules/dsp -c modules/common/chowdsp_dsp_utils/chowdsp_dsp_utils.cpp
