@@ -76,17 +76,17 @@ sure to abide by the license of each module, as well as whichever libraries are 
 ### Common Modules
 
 `chowdsp_core` (BSD)
-- `DoubleBuffer`: A circular buffer which always maintans a contiguous block of data.
+- `DoubleBuffer`: A circular buffer which always maintains a contiguous block of data.
 - `TupleHelpers`: Useful methods for working with tuple-like data structures.
 - `AtomicHelpers`: Useful methods for working with atomics.
 - `MemoryUtils`: Helpful methods to check if blocks of memory alias with each other.
-- `TypeTraits`: Type traits for checking is a class has a given method, if a type is a container, and so on.
+- `TypeTraits`: Type traits for checking if a class has a given method, if a type is a container, and so on.
 
 `chowdsp_json` (BSD)
 - A thin wrapper around [`nlohmann::json`](https://github.com/nlohmann/json) (MIT license, included internally).
 
 `chowdsp_listeners` (BSD)
-- A thin wrapper around [`rocket`]https://github.com/tripleslash/rocket) (Public Domain, included internally).
+- A thin wrapper around [`rocket`](https://github.com/tripleslash/rocket) (Public Domain, included internally).
 
 `chowdsp_reflection` (BSD)
 - A thin wrapper around [`boost::pfr`](https://github.com/boostorg/pfr) (Boost license, included internally).
@@ -113,17 +113,16 @@ sure to abide by the license of each module, as well as whichever libraries are 
 - Useful classes for modal signal processing.
 - Various classes for integer or non-integer resampling
   - Optionally depends on [libsamplerate](https://github.com/libsndfile/libsamplerate). User must link with libsamplerate externally, and define `CHOWDSP_USE_LIBSAMPLERATE=1`
-- Sources: "magic circle" sine wave oscillator, anti-aliased saw, triangle, and square wave oscillators, noise generator.
 - A few other useful processors.
 
 `chowdsp_eq` (GPLv3)
 - `EQBand`: A single EQ band.
 - `EQProcessor`: A collection of EQ bands.
-- `LinearPhaseEQ`: Constructs a linear phase EQ from a give prototype EQ.
+- `LinearPhaseEQ`: Constructs a linear phase EQ from a given prototype EQ.
 
 `chowdsp_filters` (GPLv3)
 - Basic first and second order filters (HPF/LPF/BPF, shelving filters, peaking filters, notch filters).
-- Some higher-order filters (Butterworth, Chebyshev (Type II), Elliptic).
+- Higher-order filters (Butterworth, Chebyshev (Type II), Elliptic).
 - `StateVariableFilter`: A modified version of `juce::dsp::StateVariableTPTFilter` with more filter types and better performance.
 - `ModFilterWrapper`: Turns any biquad filter into a State Variable Filter.
 - `FIRFilter`: An FIR filter with SIMD optimizations.
@@ -148,6 +147,14 @@ sure to abide by the license of each module, as well as whichever libraries are 
 - A wrapper around [XSIMD](https://github.com/xtensor-stack/xsimd) (BSD, included internally).
 - `SIMDSmoothedValue`: A SIMD specialization of `juce::SmoothedValue`.
 - A few other extra SIMD math functions.
+
+`chowdsp_sources` (GPLv3)
+- `SineWave`: a "magic circle" sine wave oscillator.
+- Other basic oscillators implemented with aliasing suppression:
+  - `SawtoothWave`
+  - `SquareWave`
+  - `TriangleWave`
+- `Noise`: a noise generator with options for Guassian (normal), uniform, and pink noise.
 
 `chowdsp_waveshapers` (GPLv3)
 - Basic waveshaping processes implemented with integrated waveshaping (ADAA), including:
@@ -179,7 +186,7 @@ sure to abide by the license of each module, as well as whichever libraries are 
 ## Plugin Utility Modules
 
 `chowdsp_clap_extensions` (BSD)
-- `CLAPExtensions::CLAPProcessorExtensions`: implements `clap_direct_process` with parameter modulation.
+- Helper classes for implementing features specific to the CLAP plugin format.
 - `CLAPExtensions::CLAPInfoExtensions`: implements `getPluginTypeString()`.
 - `ModParameterMixin`: interface for supporting CLAP parameter modulation.
 
@@ -188,14 +195,15 @@ sure to abide by the license of each module, as well as whichever libraries are 
 - `ForwardingParameter`: A parameter that forwards on a parameter from another processor.
 
 `chowdsp_plugin_base` (GPLv3)
-- Bass classes for creating audio effect or synthesizer plugins.
+- Base classes for creating audio effect or synthesizer plugins.
 
 `chowdsp_plugin_utils` (GPLv3)
 - `FileListener`: A listener which triggers a callback whenever a file is changed.
 - `PluginLogger`: A logging system which can be used within a plugin.
-- `SharedPluginSettings`: A shared object for managing settings which apply ot all instances of a plugin.
+- `SharedPluginSettings`: A shared object for managing settings which apply to all instances of a plugin.
 - `SharedLNFAllocator`: A shared object for managing `juce::LookAndFeel` classes.
 - `AudioUIBackgroundThread`: A thread class which accepts data from the audio thread, and performs a background task (often useful for creating meters).
+- `DeferredAction`: A helper class for queueing an action to be run on the main thread (real-time safe).
 
 `chowdsp_presets` (BSD)
 - A system for managing plugin presets.
