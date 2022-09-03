@@ -5,7 +5,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_parameters
    vendor:        Chowdhury DSP
-   version:       1.1.0
+   version:       1.2.0
    name:          ChowDSP Parameters
    description:   Parameter utilities for ChowDSP plugins
    dependencies:  juce_core, juce_audio_processors
