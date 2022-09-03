@@ -1,6 +1,6 @@
 #pragma once
 
-namespace chowdsp
+namespace chowdsp::experimental
 {
 /**
  * Oscillator based on continuous-ordered polygons. Still a little bit of a WIP.
