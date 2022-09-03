@@ -3,7 +3,7 @@
 namespace chowdsp::BufferMath
 {
 template <typename BufferType>
-static auto getMagnitude (const BufferType& buffer, int startSample, int numSamples, int channel) noexcept
+auto getMagnitude (const BufferType& buffer, int startSample, int numSamples, int channel) noexcept
 {
     if (numSamples < 0)
         numSamples = buffer.getNumSamples() - startSample;
@@ -40,7 +40,7 @@ static auto getMagnitude (const BufferType& buffer, int startSample, int numSamp
 }
 
 template <typename BufferType>
-static auto getRMSLevel (const BufferType& buffer, int channel, int startSample, int numSamples) noexcept
+auto getRMSLevel (const BufferType& buffer, int channel, int startSample, int numSamples) noexcept
 {
     using SampleType = typename BufferType::Type;
 
@@ -73,7 +73,7 @@ static auto getRMSLevel (const BufferType& buffer, int channel, int startSample,
 }
 
 template <typename BufferType1, typename BufferType2>
-static void copyBufferData (const BufferType1& bufferSrc, BufferType2& bufferDest, int srcStartSample, int destStartSample, int numSamples, int startChannel, int numChannels) noexcept
+void copyBufferData (const BufferType1& bufferSrc, BufferType2& bufferDest, int srcStartSample, int destStartSample, int numSamples, int startChannel, int numChannels) noexcept
 {
     using SampleType = typename BufferType1::Type;
 
@@ -109,7 +109,7 @@ static void copyBufferData (const BufferType1& bufferSrc, BufferType2& bufferDes
 }
 
 template <typename BufferType1, typename BufferType2>
-static void copyBufferChannels (const BufferType1& bufferSrc, BufferType2& bufferDest, int srcChannel, int destChannel) noexcept
+void copyBufferChannels (const BufferType1& bufferSrc, BufferType2& bufferDest, int srcChannel, int destChannel) noexcept
 {
     using SampleType = typename BufferType1::Type;
 
@@ -130,7 +130,7 @@ static void copyBufferChannels (const BufferType1& bufferSrc, BufferType2& buffe
 }
 
 template <typename BufferType1, typename BufferType2>
-static void addBufferData (const BufferType1& bufferSrc, BufferType2& bufferDest, int srcStartSample, int destStartSample, int numSamples, int startChannel, int numChannels) noexcept
+void addBufferData (const BufferType1& bufferSrc, BufferType2& bufferDest, int srcStartSample, int destStartSample, int numSamples, int startChannel, int numChannels) noexcept
 {
     using SampleType = typename BufferType1::Type;
 
@@ -171,7 +171,7 @@ static void addBufferData (const BufferType1& bufferSrc, BufferType2& bufferDest
 
 /** Adds channels from one buffer into another. */
 template <typename BufferType1, typename BufferType2>
-static void addBufferChannels (const BufferType1& bufferSrc, BufferType2& bufferDest, int srcChannel, int destChannel) noexcept
+void addBufferChannels (const BufferType1& bufferSrc, BufferType2& bufferDest, int srcChannel, int destChannel) noexcept
 {
     using SampleType = typename BufferType1::Type;
 
@@ -196,7 +196,7 @@ static void addBufferChannels (const BufferType1& bufferSrc, BufferType2& buffer
 }
 
 template <typename BufferType, typename FloatType>
-static void applyGain (BufferType& buffer, FloatType gain)
+void applyGain (BufferType& buffer, FloatType gain)
 {
     using SampleType = typename BufferType::Type;
 
@@ -219,7 +219,7 @@ static void applyGain (BufferType& buffer, FloatType gain)
 }
 
 template <typename BufferType, typename SmoothedValueType>
-static void applyGainSmoothed (BufferType& buffer, SmoothedValueType& gain)
+void applyGainSmoothed (BufferType& buffer, SmoothedValueType& gain)
 {
     if (! gain.isSmoothing())
     {
@@ -241,7 +241,7 @@ static void applyGainSmoothed (BufferType& buffer, SmoothedValueType& gain)
 }
 
 template <typename BufferType, typename SmoothedBufferType>
-static void applyGainSmoothedBuffer (BufferType& buffer, SmoothedBufferType& gain)
+void applyGainSmoothedBuffer (BufferType& buffer, SmoothedBufferType& gain)
 {
     using SampleType = typename BufferType::Type;
 
