@@ -5,7 +5,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_filters
    vendor:        Chowdhury DSP
-   version:       1.1.0
+   version:       1.2.0
    name:          ChowDSP Filters
    description:   Filter classes for ChowDSP plugins
    dependencies:  chowdsp_core, chowdsp_dsp_data_structures, chowdsp_math

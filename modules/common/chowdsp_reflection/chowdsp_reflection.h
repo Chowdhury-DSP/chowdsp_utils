@@ -5,7 +5,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_reflection
    vendor:        Chowdhury DSP
-   version:       1.1.0
+   version:       1.2.0
    name:          ChowDSP Reflection Utilities
    description:   JUCE interface for boost::pfr
    dependencies:  chowdsp_core

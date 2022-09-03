@@ -72,7 +72,7 @@ namespace CoefficientCalculators
     enum class CoefficientCalculationMode
     {
         Standard, /**< Standard coefficient calculation based on the bilinear transform */
-        Decramped, /**< Decramped coefficient calculation using Martin Vicanek's method (https://www.vicanek.de/articles/BiquadFits.pdf) */
+        Decramped, /**< Decramped coefficient calculation using <a href="https://www.vicanek.de/articles/BiquadFits.pdf">Martin Vicanek's method</a>. */
     };
 
     /**
