@@ -60,4 +60,4 @@ void PolygonalOscillator<FloatType>::processBlock (const BufferView<FloatType>& 
             x[n] += processSample();
     }
 }
-} // namespace chowdsp
+} // namespace chowdsp::experimental

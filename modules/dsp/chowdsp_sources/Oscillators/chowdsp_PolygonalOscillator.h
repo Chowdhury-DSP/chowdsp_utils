@@ -78,6 +78,6 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PolygonalOscillator)
 };
-} // namespace chowdsp
+} // namespace chowdsp::experimental
 
 #include "chowdsp_PolygonalOscillator.cpp"
