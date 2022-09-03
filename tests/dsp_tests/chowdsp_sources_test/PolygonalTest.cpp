@@ -34,7 +34,7 @@ TEST_CASE ("Polygonal Test")
             return y;
         };
 
-        chowdsp::PolygonalOscillator<float> testOsc;
+        chowdsp::experimental::PolygonalOscillator<float> testOsc;
         testOsc.prepare ({ _sampleRate, (juce::uint32) _blockSize, 1 });
         testOsc.setFrequency (testFreq);
         testOsc.setOrder (polygonOrder);
@@ -64,7 +64,7 @@ TEST_CASE ("Polygonal Test")
             return y;
         };
 
-        chowdsp::PolygonalOscillator<xsimd::batch<float>> testOsc;
+        chowdsp::experimental::PolygonalOscillator<xsimd::batch<float>> testOsc;
         testOsc.prepare ({ _sampleRate, (juce::uint32) _blockSize, 1 });
         testOsc.setFrequency (testFreq);
         testOsc.setOrder (polygonOrder);
@@ -96,7 +96,7 @@ TEST_CASE ("Polygonal Test")
             return y + input;
         };
 
-        chowdsp::PolygonalOscillator<float> testOsc;
+        chowdsp::experimental::PolygonalOscillator<float> testOsc;
         testOsc.prepare ({ _sampleRate, (juce::uint32) _blockSize, 1 });
         testOsc.setFrequency (testFreq);
         testOsc.setOrder (polygonOrder);
@@ -116,7 +116,7 @@ TEST_CASE ("Polygonal Test")
 
     SECTION ("Zero Hz Test")
     {
-        chowdsp::PolygonalOscillator<float> testOsc;
+        chowdsp::experimental::PolygonalOscillator<float> testOsc;
         testOsc.prepare ({ _sampleRate, (juce::uint32) _blockSize, 1 });
         testOsc.setFrequency (0.0f);
 
