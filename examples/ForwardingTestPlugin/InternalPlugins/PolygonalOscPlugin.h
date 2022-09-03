@@ -23,7 +23,7 @@ private:
     chowdsp::FloatParameter* orderParam = nullptr;
     chowdsp::FloatParameter* teethParam = nullptr;
 
-    chowdsp::PolygonalOscillator<float> oscillator;
+    chowdsp::experimental::PolygonalOscillator<float> oscillator;
     chowdsp::Gain<float> gain;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PolygonalOscPlugin)

@@ -1,4 +1,4 @@
-namespace chowdsp
+namespace chowdsp::experimental
 {
 template <typename FloatType>
 void PolygonalOscillator<FloatType>::setFrequency (FloatType newFrequency) noexcept
