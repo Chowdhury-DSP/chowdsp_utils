@@ -284,7 +284,7 @@ void EQBand<FloatType, FilterChoices...>::processBlock (const chowdsp::BufferVie
 
     const auto needsFade = filterType != prevFilterType;
     if (needsFade)
-        BufferMath::copyBufferData (buffer, fadeBuffer, 0, numSamples, 0, numChannels);
+        BufferMath::copyBufferData (buffer, fadeBuffer, 0, numSamples, 0, 0, numChannels);
 
     TupleHelpers::forEachInTuple (
         [this, &buffer] (auto& filter, size_t filterIndex) {
