@@ -93,11 +93,10 @@ static void copyBufferData (const BufferType1& bufferSrc, BufferType2& bufferDes
         const auto* srcData = bufferSrc.getReadPointer (ch);
         auto* destData = bufferDest.getWritePointer (ch);
 
+        // If you're here, check that you're calling this function correctly,
+        // the channel is probably out of bounds. 
         jassert(destData != nullptr);
         jassert(srcData != nullptr);
-        if (!destData || !srcData) {
-            continue;
-        }
 
         if constexpr (std::is_floating_point_v<SampleType>)
         {
