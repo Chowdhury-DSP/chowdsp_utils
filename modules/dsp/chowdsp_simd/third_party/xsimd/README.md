@@ -31,10 +31,10 @@ The following SIMD instruction set extensions are supported:
 
 Architecture | Instruction set extensions
 -------------|-----------------------------------------------------
-x86          | SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, AVX, FMA3, AVX2
-x86          | AVX512 (gcc7 and higher)
-x86 AMD      | same as above + SSE4A, FMA4, XOP
-ARM          | ARMv7, ARMv8
+x86          | SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, AVX, AVX2, FMA3+SSE, FMA3+AVX, FMA3+AVX2
+x86          | AVX512BW, AVX512CD, AVX512DQ, AVX512F (gcc7 and higher)
+x86 AMD      | FMA4
+ARM          | NEON, NEON64, SVE128/256 (fixed vector size)
 
 ## Installation
 
@@ -77,6 +77,7 @@ http://xsimd.readthedocs.io/
 | `xsimd` | `xtl` (optional) |
 |---------|------------------|
 |  master |     ^0.7.0       |
+|  9.x    |     ^0.7.0       |
 |  8.x    |     ^0.7.0       |
 |  7.x    |     ^0.7.0       |
 
@@ -99,8 +100,8 @@ namespace xs = xsimd;
 
 int main(int argc, char* argv[])
 {
-    xs::batch<double, xs::avx2> a(1.5, 2.5, 3.5, 4.5);
-    xs::batch<double, xs::avx2> b(2.5, 3.5, 4.5, 5.5);
+    xs::batch<double, xs::avx2> a = {1.5, 2.5, 3.5, 4.5};
+    xs::batch<double, xs::avx2> b = {2.5, 3.5, 4.5, 5.5};
     auto mean = (a + b) / 2;
     std::cout << mean << std::endl;
     return 0;

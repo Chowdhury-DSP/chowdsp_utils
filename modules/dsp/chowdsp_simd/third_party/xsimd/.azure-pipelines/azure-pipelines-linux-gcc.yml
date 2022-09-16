@@ -29,6 +29,12 @@ jobs:
     variables:
       CC: gcc-$(gcc_version)
       CXX: g++-$(gcc_version)
+      cross_compile: 0
+      avx: 0
+      avx512: 0
+      i686: 0
+      enable_xtl_complex: 0
+      force_no_instr_set: 0
     timeoutInMinutes: 30
     steps:
 
@@ -44,7 +50,7 @@ jobs:
               sudo apt-get --no-install-suggests --no-install-recommends install qemu qemu-system-aarch64
             fi
           fi
-          if [[ $(i686) ]]; then
+          if [[ $(i686) == 1 ]]; then
             sudo dpkg --add-architecture i386
             sudo add-apt-repository ppa:ubuntu-toolchain-r/test
             sudo apt-get update

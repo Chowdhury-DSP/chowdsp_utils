@@ -45,7 +45,8 @@ protected:
         {
             array_type expected;
             std::transform(input.cbegin(), input.cend(), expected.begin(),
-                           [this](const value_type& v) { return std::ldexp(v, exponent); });
+                           [this](const value_type& v)
+                           { return std::ldexp(v, exponent); });
             batch_type res = xsimd::ldexp(batch_input(), bexp);
             EXPECT_BATCH_EQ(res, expected) << print_function_name("ldexp");
         }
@@ -53,7 +54,8 @@ protected:
         {
             array_type expected;
             std::transform(input.cbegin(), input.cend(), expected.begin(),
-                           [](const value_type& v) { int tmp; return std::frexp(v, &tmp); });
+                           [](const value_type& v)
+                           { int tmp; return std::frexp(v, &tmp); });
             batch_type res = xsimd::frexp(batch_input(), bexp);
             EXPECT_BATCH_EQ(res, expected) << print_function_name("frexp");
         }

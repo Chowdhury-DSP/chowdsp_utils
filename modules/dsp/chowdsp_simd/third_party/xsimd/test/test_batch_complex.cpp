@@ -123,6 +123,18 @@ protected:
         std::fill(tmp.begin(), tmp.end(), xtl_value_type(2, 3));
         batch_type b0(xtl_value_type(2, 3));
         EXPECT_EQ(b0, tmp) << print_function_name("batch(value_type)");
+
+        batch_type b1 = xsimd::load_as<xtl_value_type>(tmp.data(), xsimd::aligned_mode());
+        EXPECT_EQ(b1, tmp) << print_function_name("load_as<value_type> aligned");
+
+        batch_type b2 = xsimd::load_as<xtl_value_type>(tmp.data(), xsimd::unaligned_mode());
+        EXPECT_EQ(b2, tmp) << print_function_name("load_as<value_type> unaligned");
+
+        xsimd::store_as(tmp.data(), b1, xsimd::aligned_mode());
+        EXPECT_EQ(b1, tmp) << print_function_name("store_as<value_type> aligned");
+
+        xsimd::store_as(tmp.data(), b2, xsimd::unaligned_mode());
+        EXPECT_EQ(b2, tmp) << print_function_name("store_as<value_type> unaligned");
     }
 #endif
 
@@ -130,8 +142,11 @@ protected:
     {
         array_type tmp;
         std::fill(tmp.begin(), tmp.end(), value_type(2, 3));
-        batch_type b0(value_type(2, 3));
-        EXPECT_EQ(b0, tmp) << print_function_name("batch(value_type)");
+        batch_type b0a(value_type(2, 3));
+        EXPECT_EQ(b0a, tmp) << print_function_name("batch(value_type)");
+
+        batch_type b0b(value_type(2, 3));
+        EXPECT_EQ(b0b, tmp) << print_function_name("batch{value_type}");
 
         std::fill(tmp.begin(), tmp.end(), value_type(real_scalar));
         batch_type b1(real_scalar);
@@ -191,7 +206,8 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return l + r.real(); });
+                           [](const value_type& l, const value_type& r)
+                           { return l + r.real(); });
             batch_type lres = batch_lhs() + batch_rhs().real();
             EXPECT_BATCH_EQ(lres, expected) << print_function_name("batch + real_batch");
             batch_type rres = batch_rhs().real() + batch_lhs();
@@ -227,11 +243,13 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return l - r.real(); });
+                           [](const value_type& l, const value_type& r)
+                           { return l - r.real(); });
             batch_type lres = batch_lhs() - batch_rhs().real();
             EXPECT_BATCH_EQ(lres, expected) << print_function_name("batch - real_batch");
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return r.real() - l; });
+                           [](const value_type& l, const value_type& r)
+                           { return r.real() - l; });
             batch_type rres = batch_rhs().real() - batch_lhs();
             EXPECT_BATCH_EQ(rres, expected) << print_function_name("real_batch - batch");
         }
@@ -265,7 +283,8 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return l * r.real(); });
+                           [](const value_type& l, const value_type& r)
+                           { return l * r.real(); });
             batch_type lres = batch_lhs() * batch_rhs().real();
             EXPECT_BATCH_EQ(lres, expected) << print_function_name("batch * real_batch");
             batch_type rres = batch_rhs().real() * batch_lhs();
@@ -301,11 +320,13 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return l / r.real(); });
+                           [](const value_type& l, const value_type& r)
+                           { return l / r.real(); });
             batch_type lres = batch_lhs() / batch_rhs().real();
             EXPECT_BATCH_EQ(lres, expected) << print_function_name("batch / real_batch");
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return r.real() / l; });
+                           [](const value_type& l, const value_type& r)
+                           { return r.real() / l; });
             batch_type rres = batch_rhs().real() / batch_lhs();
             EXPECT_BATCH_EQ(rres, expected) << print_function_name("real_batch / batch");
         }
@@ -344,7 +365,8 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return l + r.real(); });
+                           [](const value_type& l, const value_type& r)
+                           { return l + r.real(); });
             batch_type res = batch_lhs();
             res += batch_rhs().real();
             EXPECT_BATCH_EQ(res, expected) << print_function_name("batch += real_batch");
@@ -377,7 +399,8 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return l - r.real(); });
+                           [](const value_type& l, const value_type& r)
+                           { return l - r.real(); });
             batch_type res = batch_lhs();
             res -= batch_rhs().real();
             EXPECT_BATCH_EQ(res, expected) << print_function_name("batch -= real_batch");
@@ -410,7 +433,8 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return l * r.real(); });
+                           [](const value_type& l, const value_type& r)
+                           { return l * r.real(); });
             batch_type res = batch_lhs();
             res *= batch_rhs().real();
             EXPECT_BATCH_EQ(res, expected) << print_function_name("batch *= real_batch");
@@ -443,7 +467,8 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return l / r.real(); });
+                           [](const value_type& l, const value_type& r)
+                           { return l / r.real(); });
             batch_type res = batch_lhs();
             res /= batch_rhs().real();
             EXPECT_BATCH_EQ(res, expected) << print_function_name("batch /= real_batch");
@@ -464,7 +489,8 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [](const value_type& v) { using std::conj; return conj(v); });
+                           [](const value_type& v)
+                           { using std::conj; return conj(v); });
             batch_type res = conj(batch_lhs());
             EXPECT_BATCH_EQ(res, expected) << print_function_name("conj");
         }
@@ -472,7 +498,8 @@ protected:
         {
             real_array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [](const value_type& v) { using std::norm; return norm(v); });
+                           [](const value_type& v)
+                           { using std::norm; return norm(v); });
             real_batch_type res = norm(batch_lhs());
             EXPECT_BATCH_EQ(res, expected) << print_function_name("norm");
         }
@@ -480,7 +507,8 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [](const value_type& v) { using std::proj; return proj(v); });
+                           [](const value_type& v)
+                           { using std::proj; return proj(v); });
             batch_type res = proj(batch_lhs());
             EXPECT_BATCH_EQ(res, expected) << print_function_name("proj");
         }
@@ -492,7 +520,8 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [](const value_type& v) { return std::conj(std::real(v)); });
+                           [](const value_type& v)
+                           { return std::conj(std::real(v)); });
             batch_type res = conj(real(batch_lhs()));
             EXPECT_BATCH_EQ(res, expected) << print_function_name("conj(real batch)");
         }
@@ -500,7 +529,8 @@ protected:
         {
             real_array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [](const value_type& v) { return std::norm(std::real(v)); });
+                           [](const value_type& v)
+                           { return std::norm(std::real(v)); });
             real_batch_type res = norm(real(batch_lhs()));
             EXPECT_BATCH_EQ(res, expected) << print_function_name("norm(real_batch)");
         }
@@ -508,19 +538,33 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [](const value_type& v) { return std::proj(std::real(v)); });
+                           [](const value_type& v)
+                           { return std::proj(std::real(v)); });
             batch_type res = proj(real(batch_lhs()));
             EXPECT_BATCH_EQ(res, expected) << print_function_name("proj(real_batch)");
         }
     }
 
+    void test_polar() const
+    {
+        // polar w/ magnitude/phase
+        {
+            array_type expected;
+            std::transform(lhs.cbegin(), lhs.cend(), rhs.begin(), expected.begin(),
+                           [](const value_type& v_lhs, const value_type& v_rhs)
+                           { return std::polar(std::real(v_lhs), std::real(v_rhs)); });
+            batch_type res = polar(real(batch_lhs()), real(batch_rhs()));
+            EXPECT_BATCH_EQ(res, expected) << print_function_name("polar");
+        }
+    }
+
     void test_horizontal_operations() const
     {
-        // hadd
+        // reduce_add
         {
             value_type expected = std::accumulate(lhs.cbegin(), lhs.cend(), value_type(0));
-            value_type res = hadd(batch_lhs());
-            EXPECT_SCALAR_EQ(res, expected) << print_function_name("hadd");
+            value_type res = reduce_add(batch_lhs());
+            EXPECT_SCALAR_EQ(res, expected) << print_function_name("reduce_add");
         }
     }
 
@@ -530,7 +574,8 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.begin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return l * r + r; });
+                           [](const value_type& l, const value_type& r)
+                           { return l * r + r; });
             batch_type res = xsimd::fma(batch_lhs(), batch_rhs(), batch_rhs());
             EXPECT_BATCH_EQ(res, expected) << print_function_name("fma");
         }
@@ -538,7 +583,8 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.begin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return l * r - r; });
+                           [](const value_type& l, const value_type& r)
+                           { return l * r - r; });
             batch_type res = fms(batch_lhs(), batch_rhs(), batch_rhs());
             EXPECT_BATCH_EQ(res, expected) << print_function_name("fms");
         }
@@ -547,7 +593,8 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.begin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return -l * r + r; });
+                           [](const value_type& l, const value_type& r)
+                           { return -l * r + r; });
             batch_type res = fnma(batch_lhs(), batch_rhs(), batch_rhs());
             EXPECT_BATCH_EQ(res, expected) << print_function_name("fnma");
         }
@@ -555,7 +602,8 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.begin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return -l * r - r; });
+                           [](const value_type& l, const value_type& r)
+                           { return -l * r - r; });
             batch_type res = fnms(batch_lhs(), batch_rhs(), batch_rhs());
             EXPECT_BATCH_EQ(res, expected) << print_function_name("fnms");
         }
@@ -567,7 +615,8 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [](const value_type& l) { return l == value_type(0); });
+                           [](const value_type& l)
+                           { return l == value_type(0); });
             batch_type res = (batch_type)!batch_lhs();
             EXPECT_BATCH_EQ(res, expected) << print_function_name("!batch");
         }
@@ -578,7 +627,8 @@ protected:
         {
             bool_array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [](const value_type& l) { return std::isnan(l.real()) || std::isnan(l.imag()); });
+                           [](const value_type& l)
+                           { return std::isnan(l.real()) || std::isnan(l.imag()); });
             typename batch_type::batch_bool_type res = isnan(batch_lhs());
             EXPECT_BATCH_EQ(res, expected) << print_function_name("isnan");
         }
@@ -640,6 +690,11 @@ TYPED_TEST(batch_complex_test, conj_norm_proj)
 TYPED_TEST(batch_complex_test, conj_norm_proj_real)
 {
     this->test_conj_norm_proj_real();
+}
+
+TYPED_TEST(batch_complex_test, polar)
+{
+    this->test_polar();
 }
 
 TYPED_TEST(batch_complex_test, horizontal_operations)

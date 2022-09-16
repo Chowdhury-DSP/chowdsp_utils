@@ -89,7 +89,7 @@ public:
             if (evenOn)
             {
                 inputFilter->calcG();
-                buffer[bufferPtr++] = xsimd::hadd (SIMDUtils::SIMDComplexMulReal (inputFilter->Gcalc, inputFilter->x));
+                buffer[bufferPtr++] = xsimd::reduce_add (SIMDUtils::SIMDComplexMulReal (inputFilter->Gcalc, inputFilter->x));
                 bufferPtr = (bufferPtr <= STAGES) ? bufferPtr : 0;
             }
             else
@@ -108,7 +108,7 @@ public:
 
         inputFilter->process (u);
         outputFilter->process (xOutAccum);
-        float sumOut = xsimd::hadd (xOutAccum.real());
+        float sumOut = xsimd::reduce_add (xOutAccum.real());
         return H0 * yBBD_old + sumOut;
     }
 
@@ -124,7 +124,7 @@ public:
             if (evenOn)
             {
                 inputFilter->calcG();
-                buffer[bufferPtr++] = xsimd::hadd (SIMDUtils::SIMDComplexMulReal (inputFilter->Gcalc, inputFilter->x));
+                buffer[bufferPtr++] = xsimd::reduce_add (SIMDUtils::SIMDComplexMulReal (inputFilter->Gcalc, inputFilter->x));
                 bufferPtr = (bufferPtr <= STAGES) ? bufferPtr : 0;
             }
             else
@@ -143,7 +143,7 @@ public:
 
         inputFilter->process (u);
         outputFilter->process (xOutAccum);
-        float sumOut = xsimd::hadd (xOutAccum.real());
+        float sumOut = xsimd::reduce_add (xOutAccum.real());
         return H0 * yBBD_old + sumOut;
     }
 

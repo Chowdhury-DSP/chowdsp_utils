@@ -57,7 +57,7 @@ namespace MatrixOps
             for (; i < vec_loop_size; i += vec_size)
                 vecAccumulator += xsimd::load_aligned (in + i);
 
-            T scalarAccumulator = xsimd::hadd (vecAccumulator);
+            T scalarAccumulator = xsimd::reduce_add (vecAccumulator);
             if constexpr (size % vec_size != 0)
             {
                 for (; i < size; ++i)
@@ -86,11 +86,11 @@ namespace MatrixOps
         static inline std::enable_if_t<SampleTypeHelpers::IsSIMDRegister<T>, void>
             outOfPlace (FloatType* out, const FloatType* in)
         {
-            NumericType sum = 0;
+            FloatType vecSum {};
             for (int i = 0; i < size; ++i)
-                sum += xsimd::hadd (in[i]);
+                vecSum += in[i];
 
-            sum *= multiplier;
+            const auto sum = multiplier * xsimd::reduce_add (vecSum);
 
             for (int i = 0; i < size; ++i)
                 out[i] += sum;

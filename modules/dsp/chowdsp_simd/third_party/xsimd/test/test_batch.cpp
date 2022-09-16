@@ -76,8 +76,11 @@ protected:
     {
         array_type tmp;
         std::fill(tmp.begin(), tmp.end(), value_type(2));
-        batch_type b0(2);
-        EXPECT_EQ(b0, tmp) << print_function_name("batch(value_type)");
+        batch_type b0a(2);
+        EXPECT_EQ(b0a, tmp) << print_function_name("batch(value_type)");
+
+        batch_type b0b { 2 };
+        EXPECT_EQ(b0b, tmp) << print_function_name("batch{value_type}");
 
         batch_type b1 = batch_type::load_unaligned(lhs.data());
         EXPECT_EQ(b1, lhs) << print_function_name("batch(value_type*)");
@@ -212,7 +215,8 @@ protected:
         // batch + scalar
         {
             array_type expected;
-            std::transform(lhs.cbegin(), lhs.cend(), expected.begin(), [this](value_type x) { return xsimd::sadd(x, scalar); });
+            std::transform(lhs.cbegin(), lhs.cend(), expected.begin(), [this](value_type x)
+                           { return xsimd::sadd(x, scalar); });
             batch_type lres = xsimd::sadd(batch_lhs(), scalar);
             EXPECT_BATCH_EQ(lres, expected) << print_function_name("sadd(batch, scalar)");
             batch_type rres = xsimd::sadd(scalar, batch_lhs());
@@ -221,17 +225,20 @@ protected:
         // batch - batch
         {
             array_type expected;
-            std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(), [](value_type x, value_type y) { return xsimd::ssub(x, y); });
+            std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(), [](value_type x, value_type y)
+                           { return xsimd::ssub(x, y); });
             batch_type res = xsimd::ssub(batch_lhs(), batch_rhs());
             EXPECT_BATCH_EQ(res, expected) << print_function_name("ssub(batch, batch)");
         }
         // batch - scalar
         {
             array_type expected;
-            std::transform(lhs.cbegin(), lhs.cend(), expected.begin(), [this](value_type x) { return xsimd::ssub(x, scalar); });
+            std::transform(lhs.cbegin(), lhs.cend(), expected.begin(), [this](value_type x)
+                           { return xsimd::ssub(x, scalar); });
             batch_type lres = xsimd::ssub(batch_lhs(), scalar);
             EXPECT_BATCH_EQ(lres, expected) << print_function_name("ssub(batch, scalar)");
-            std::transform(lhs.cbegin(), lhs.cend(), expected.begin(), [this](value_type x) { return xsimd::ssub(scalar, x); });
+            std::transform(lhs.cbegin(), lhs.cend(), expected.begin(), [this](value_type x)
+                           { return xsimd::ssub(scalar, x); });
             batch_type rres = xsimd::ssub(scalar, batch_lhs());
             EXPECT_BATCH_EQ(rres, expected) << print_function_name("ssub(scalar, batch)");
         }
@@ -313,7 +320,8 @@ protected:
         {
             bool_array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return l == r; });
+                           [](const value_type& l, const value_type& r)
+                           { return l == r; });
             auto res = batch_lhs() == batch_rhs();
             EXPECT_BATCH_EQ(res, expected) << print_function_name("batch == batch");
         }
@@ -321,7 +329,8 @@ protected:
         {
             bool_array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [this](const value_type& l) { return l == scalar; });
+                           [this](const value_type& l)
+                           { return l == scalar; });
             auto res = batch_lhs() == scalar;
             EXPECT_BATCH_EQ(res, expected) << print_function_name("batch == scalar");
         }
@@ -329,7 +338,8 @@ protected:
         {
             bool_array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return l != r; });
+                           [](const value_type& l, const value_type& r)
+                           { return l != r; });
             auto res = batch_lhs() != batch_rhs();
             EXPECT_BATCH_EQ(res, expected) << print_function_name("batch != batch");
         }
@@ -337,7 +347,8 @@ protected:
         {
             bool_array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [this](const value_type& l) { return l != scalar; });
+                           [this](const value_type& l)
+                           { return l != scalar; });
             auto res = batch_lhs() != scalar;
             EXPECT_BATCH_EQ(res, expected) << print_function_name("batch != scalar");
         }
@@ -345,7 +356,8 @@ protected:
         {
             bool_array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return l < r; });
+                           [](const value_type& l, const value_type& r)
+                           { return l < r; });
             auto res = batch_lhs() < batch_rhs();
             EXPECT_BATCH_EQ(res, expected) << print_function_name("batch < batch");
         }
@@ -353,7 +365,8 @@ protected:
         {
             bool_array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [this](const value_type& l) { return l < scalar; });
+                           [this](const value_type& l)
+                           { return l < scalar; });
             auto res = batch_lhs() < scalar;
             EXPECT_BATCH_EQ(res, expected) << print_function_name("batch < scalar");
         }
@@ -362,7 +375,8 @@ protected:
         {
             bool_array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return l <= r; });
+                           [](const value_type& l, const value_type& r)
+                           { return l <= r; });
             auto res = batch_lhs() <= batch_rhs();
             EXPECT_BATCH_EQ(res, expected) << print_function_name("batch <= batch");
         }
@@ -370,7 +384,8 @@ protected:
         {
             bool_array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [this](const value_type& l) { return l <= scalar; });
+                           [this](const value_type& l)
+                           { return l <= scalar; });
             auto res = batch_lhs() <= scalar;
             EXPECT_BATCH_EQ(res, expected) << print_function_name("batch <= scalar");
         }
@@ -379,7 +394,8 @@ protected:
         {
             bool_array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return l > r; });
+                           [](const value_type& l, const value_type& r)
+                           { return l > r; });
             auto res = batch_lhs() > batch_rhs();
             EXPECT_BATCH_EQ(res, expected) << print_function_name("batch > batch");
         }
@@ -387,7 +403,8 @@ protected:
         {
             bool_array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [this](const value_type& l) { return l > scalar; });
+                           [this](const value_type& l)
+                           { return l > scalar; });
             auto res = batch_lhs() > scalar;
             EXPECT_BATCH_EQ(res, expected) << print_function_name("batch > scalar");
         }
@@ -395,7 +412,8 @@ protected:
         {
             bool_array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return l >= r; });
+                           [](const value_type& l, const value_type& r)
+                           { return l >= r; });
             auto res = batch_lhs() >= batch_rhs();
             EXPECT_BATCH_EQ(res, expected) << print_function_name("batch >= batch");
         }
@@ -403,7 +421,8 @@ protected:
         {
             bool_array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [this](const value_type& l) { return l >= scalar; });
+                           [this](const value_type& l)
+                           { return l >= scalar; });
             auto res = batch_lhs() >= scalar;
             EXPECT_BATCH_EQ(res, expected) << print_function_name("batch >= scalar");
         }
@@ -451,7 +470,8 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return std::min(l, r); });
+                           [](const value_type& l, const value_type& r)
+                           { return std::min(l, r); });
             batch_type res = min(batch_lhs(), batch_rhs());
             EXPECT_BATCH_EQ(res, expected) << print_function_name("min");
         }
@@ -459,7 +479,8 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type&, const value_type& r) { return std::min(std::numeric_limits<value_type>::min(), r); });
+                           [](const value_type&, const value_type& r)
+                           { return std::min(std::numeric_limits<value_type>::min(), r); });
             batch_type res = xsimd::min(batch_type(std::numeric_limits<value_type>::min()), batch_rhs());
             EXPECT_BATCH_EQ(res, expected) << print_function_name("min limit");
         }
@@ -467,7 +488,8 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return std::fmin(l, r); });
+                           [](const value_type& l, const value_type& r)
+                           { return std::fmin(l, r); });
             batch_type res = min(batch_lhs(), batch_rhs());
             EXPECT_BATCH_EQ(res, expected) << print_function_name("fmin");
         }
@@ -475,7 +497,8 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return std::max(l, r); });
+                           [](const value_type& l, const value_type& r)
+                           { return std::max(l, r); });
             batch_type res = max(batch_lhs(), batch_rhs());
             EXPECT_BATCH_EQ(res, expected) << print_function_name("max");
         }
@@ -483,7 +506,8 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type&, const value_type& r) { return std::max(std::numeric_limits<value_type>::max(), r); });
+                           [](const value_type&, const value_type& r)
+                           { return std::max(std::numeric_limits<value_type>::max(), r); });
             batch_type res = xsimd::max(batch_type(std::numeric_limits<value_type>::max()), batch_rhs());
             EXPECT_BATCH_EQ(res, expected) << print_function_name("max limit");
         }
@@ -491,7 +515,8 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return std::fmax(l, r); });
+                           [](const value_type& l, const value_type& r)
+                           { return std::fmax(l, r); });
             batch_type res = fmax(batch_lhs(), batch_rhs());
             EXPECT_BATCH_EQ(res, expected) << print_function_name("fmax");
         }
@@ -503,7 +528,8 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.begin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return l * r + r; });
+                           [](const value_type& l, const value_type& r)
+                           { return l * r + r; });
             // Warning: ADL seems to not work correctly on Windows, thus the full qualified call
             batch_type res = xsimd::fma(batch_lhs(), batch_rhs(), batch_rhs());
             EXPECT_BATCH_EQ(res, expected) << print_function_name("fma");
@@ -512,7 +538,8 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.begin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return l * r - r; });
+                           [](const value_type& l, const value_type& r)
+                           { return l * r - r; });
             batch_type res = fms(batch_lhs(), batch_rhs(), batch_rhs());
             EXPECT_BATCH_EQ(res, expected) << print_function_name("fms");
         }
@@ -520,7 +547,8 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.begin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return -l * r + r; });
+                           [](const value_type& l, const value_type& r)
+                           { return -l * r + r; });
             batch_type res = fnma(batch_lhs(), batch_rhs(), batch_rhs());
             EXPECT_BATCH_EQ(res, expected) << print_function_name("fnma");
         }
@@ -528,7 +556,8 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.begin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return -l * r - r; });
+                           [](const value_type& l, const value_type& r)
+                           { return -l * r - r; });
             batch_type res = fnms(batch_lhs(), batch_rhs(), batch_rhs());
             EXPECT_BATCH_EQ(res, expected) << print_function_name("fnms");
         }
@@ -540,7 +569,8 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [](const value_type& l) { return ::detail::uabs(l); });
+                           [](const value_type& l)
+                           { return ::detail::uabs(l); });
             batch_type res = abs(batch_lhs());
             EXPECT_BATCH_EQ(res, expected) << print_function_name("abs");
         }
@@ -548,7 +578,8 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [](const value_type& l) { return std::fabs(l); });
+                           [](const value_type& l)
+                           { return std::fabs(l); });
             batch_type res = fabs(batch_lhs());
             EXPECT_BATCH_EQ(res, expected) << print_function_name("fabs");
         }
@@ -556,11 +587,23 @@ protected:
 
     void test_horizontal_operations() const
     {
-        // hadd
+        // reduce_add
         {
             value_type expected = std::accumulate(lhs.cbegin(), lhs.cend(), value_type(0));
-            value_type res = hadd(batch_lhs());
-            EXPECT_SCALAR_EQ(res, expected) << print_function_name("hadd");
+            value_type res = reduce_add(batch_lhs());
+            EXPECT_SCALAR_EQ(res, expected) << print_function_name("reduce_add");
+        }
+        // reduce_max
+        {
+            value_type expected = *std::max_element(lhs.cbegin(), lhs.cend());
+            value_type res = reduce_max(batch_lhs());
+            EXPECT_SCALAR_EQ(res, expected) << print_function_name("reduce_max");
+        }
+        // reduce_min
+        {
+            value_type expected = *std::min_element(lhs.cbegin(), lhs.cend());
+            value_type res = reduce_min(batch_lhs());
+            EXPECT_SCALAR_EQ(res, expected) << print_function_name("reduce_min");
         }
     }
 
@@ -585,7 +628,8 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [](const value_type& l) { return !l; });
+                           [](const value_type& l)
+                           { return !l; });
             batch_type res = (batch_type)!batch_lhs();
             EXPECT_BATCH_EQ(res, expected) << print_function_name("!batch");
         }
