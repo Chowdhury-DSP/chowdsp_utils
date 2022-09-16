@@ -12,6 +12,7 @@
 #ifndef XSIMD_BENCHMARK_HPP
 #define XSIMD_BENCHMARK_HPP
 
+#include "xsimd/arch/xsimd_scalar.hpp"
 #include "xsimd/xsimd.hpp"
 #include <chrono>
 #include <iostream>
@@ -20,22 +21,6 @@
 
 namespace xsimd
 {
-    template <class T>
-    std::string batch_name();
-
-    template <>
-    inline std::string batch_name<batch<float, 4>>() { return "sse/neon float"; }
-    template <>
-    inline std::string batch_name<batch<double, 2>>() { return "sse/neon double"; }
-    template <>
-    inline std::string batch_name<batch<float, 8>>() { return "avx float"; }
-    template <>
-    inline std::string batch_name<batch<double, 4>>() { return "avx double"; }
-    template <>
-    inline std::string batch_name<batch<float, 7>>() { return "fallback float"; }
-    template <>
-    inline std::string batch_name<batch<double, 3>>() { return "fallback double"; }
-
     using duration_type = std::chrono::duration<double, std::milli>;
 
     template <class T>
@@ -64,8 +49,8 @@ namespace xsimd
         for (size_t i = 0; i < size; ++i)
         {
             op0[i] = T(0.5) + std::sqrt(T(i)) * T(9.) / T(size);
-            op1[i] = T(10.2) / T(i + 2) + T(0.25);
-            op2[i] = T(20.1) / T(i + 5) + T(0.65);
+            op1[i] = T(10.2) / T(i + 3) + T(0.25);
+            op2[i] = T(20.1) / T(i + 2) + T(0.65);
         }
     }
 
@@ -155,7 +140,7 @@ namespace xsimd
             auto start = std::chrono::steady_clock::now();
             for (std::size_t i = 0; i <= (s - B::size); i += B::size)
             {
-                B blhs(&lhs[i], aligned_mode());
+                B blhs = B::load_aligned(&lhs[i]);
                 B bres = f(blhs);
                 bres.store_aligned(&res[i]);
             }
@@ -180,8 +165,10 @@ namespace xsimd
                 size_t j = i + B::size;
                 size_t k = j + B::size;
                 size_t l = k + B::size;
-                B blhs(&lhs[i], aligned_mode()), blhs2(&lhs[j], aligned_mode()),
-                    blhs3(&lhs[k], aligned_mode()), blhs4(&lhs[l], aligned_mode());
+                B blhs = B::load_aligned(&lhs[i]),
+                  blhs2 = B::load_aligned(&lhs[j]),
+                  blhs3 = B::load_aligned(&lhs[k]),
+                  blhs4 = B::load_aligned(&lhs[l]);
                 B bres = f(blhs);
                 B bres2 = f(blhs2);
                 B bres3 = f(blhs3);
@@ -208,7 +195,8 @@ namespace xsimd
             auto start = std::chrono::steady_clock::now();
             for (std::size_t i = 0; i <= (s - B::size); i += B::size)
             {
-                B blhs(&lhs[i], aligned_mode()), brhs(&rhs[i], aligned_mode());
+                B blhs = B::load_aligned(&lhs[i]),
+                  brhs = B::load_aligned(&rhs[i]);
                 B bres = f(blhs, brhs);
                 bres.store_aligned(&res[i]);
             }
@@ -233,10 +221,14 @@ namespace xsimd
                 size_t j = i + B::size;
                 size_t k = j + B::size;
                 size_t l = k + B::size;
-                B blhs(&lhs[i], aligned_mode()), brhs(&rhs[i], aligned_mode()),
-                    blhs2(&lhs[j], aligned_mode()), brhs2(&rhs[j], aligned_mode());
-                B blhs3(&lhs[k], aligned_mode()), brhs3(&rhs[k], aligned_mode()),
-                    blhs4(&lhs[l], aligned_mode()), brhs4(&rhs[l], aligned_mode());
+                B blhs = B::load_aligned(&lhs[i]),
+                  brhs = B::load_aligned(&rhs[i]),
+                  blhs2 = B::load_aligned(&lhs[j]),
+                  brhs2 = B::load_aligned(&rhs[j]);
+                B blhs3 = B::load_aligned(&lhs[k]),
+                  brhs3 = B::load_aligned(&rhs[k]),
+                  blhs4 = B::load_aligned(&lhs[l]),
+                  brhs4 = B::load_aligned(&rhs[l]);
                 B bres = f(blhs, brhs);
                 B bres2 = f(blhs2, brhs2);
                 B bres3 = f(blhs3, brhs3);
@@ -263,9 +255,9 @@ namespace xsimd
             auto start = std::chrono::steady_clock::now();
             for (std::size_t i = 0; i <= (s - B::size); i += B::size)
             {
-                B bop0(&op0[i], aligned_mode()),
-                    bop1(&op1[i], aligned_mode()),
-                    bop2(&op2[i], aligned_mode());
+                B bop0 = B::load_aligned(&op0[i]),
+                  bop1 = B::load_aligned(&op1[i]),
+                  bop2 = B::load_aligned(&op2[i]);
                 B bres = f(bop0, bop1, bop2);
                 bres.store_aligned(&res[i]);
             }
@@ -290,10 +282,18 @@ namespace xsimd
                 size_t j = i + B::size;
                 size_t k = j + B::size;
                 size_t l = k + B::size;
-                B bop0_i(&op0[i], aligned_mode()), bop1_i(&op1[i], aligned_mode()), bop2_i(&op2[i], aligned_mode());
-                B bop0_j(&op0[j], aligned_mode()), bop1_j(&op1[j], aligned_mode()), bop2_j(&op2[j], aligned_mode());
-                B bop0_k(&op0[k], aligned_mode()), bop1_k(&op1[k], aligned_mode()), bop2_k(&op2[k], aligned_mode());
-                B bop0_l(&op0[l], aligned_mode()), bop1_l(&op1[l], aligned_mode()), bop2_l(&op2[l], aligned_mode());
+                B bop0_i = B::load_aligned(&op0[i]),
+                  bop1_i = B::load_aligned(&op1[i]),
+                  bop2_i = B::load_aligned(&op2[i]);
+                B bop0_j = B::load_aligned(&op0[j]),
+                  bop1_j = B::load_aligned(&op1[j]),
+                  bop2_j = B::load_aligned(&op2[j]);
+                B bop0_k = B::load_aligned(&op0[k]),
+                  bop1_k = B::load_aligned(&op1[k]),
+                  bop2_k = B::load_aligned(&op2[k]);
+                B bop0_l = B::load_aligned(&op0[l]),
+                  bop1_l = B::load_aligned(&op1[l]),
+                  bop2_l = B::load_aligned(&op2[l]);
                 B bres_i = f(bop0_i, bop1_i, bop2_i);
                 B bres_j = f(bop0_j, bop1_j, bop2_j);
                 B bres_k = f(bop0_k, bop1_k, bop2_k);
@@ -337,70 +337,27 @@ namespace xsimd
         duration_type t_double_scalar = benchmark_scalar(f, d_lhs, d_res, iter);
 #endif
 
-#if XSIMD_X86_INSTR_SET >= XSIMD_X86_SSE2_VERSION
-        duration_type t_float_sse = benchmark_simd<batch<float, 4>>(f, f_lhs, f_res, iter);
-        duration_type t_float_sse_u = benchmark_simd_unrolled<batch<float, 4>>(f, f_lhs, f_res, iter);
-        duration_type t_double_sse = benchmark_simd<batch<double, 2>>(f, d_lhs, d_res, iter);
-        duration_type t_double_sse_u = benchmark_simd_unrolled<batch<double, 2>>(f, d_lhs, d_res, iter);
-#endif
-#if XSIMD_X86_INSTR_SET >= XSIMD_X86_AVX_VERSION
-        duration_type t_float_avx = benchmark_simd<batch<float, 8>>(f, f_lhs, f_res, iter);
-        duration_type t_float_avx_u = benchmark_simd_unrolled<batch<float, 8>>(f, f_lhs, f_res, iter);
-        duration_type t_double_avx = benchmark_simd<batch<double, 4>>(f, d_lhs, d_res, iter);
-        duration_type t_double_avx_u = benchmark_simd_unrolled<batch<double, 4>>(f, d_lhs, d_res, iter);
-#endif
-#if defined(XSIMD_ARM_INSTR_SET)
-        duration_type t_float_neon = benchmark_simd<batch<float, 4>>(f, f_lhs, f_res, iter);
-        duration_type t_float_neon_u = benchmark_simd_unrolled<batch<float, 4>>(f, f_lhs, f_res, iter);
-        duration_type t_double_neon = benchmark_simd<batch<double, 2>>(f, d_lhs, d_res, iter);
-        duration_type t_double_neon_u = benchmark_simd_unrolled<batch<double, 2>>(f, d_lhs, d_res, iter);
-#endif
-#if defined(XSIMD_ENABLE_FALLBACK)
-        duration_type t_float_fallback = benchmark_simd<batch<float, 7>>(f, f_lhs, f_res, iter);
-        duration_type t_float_fallback_u = benchmark_simd_unrolled<batch<float, 7>>(f, f_lhs, f_res, iter);
-        duration_type t_double_fallback = benchmark_simd<batch<double, 3>>(f, d_lhs, d_res, iter);
-        duration_type t_double_fallback_u = benchmark_simd_unrolled<batch<double, 3>>(f, d_lhs, d_res, iter);
+        duration_type t_float_vector = benchmark_simd<batch<float>>(f, f_lhs, f_res, iter);
+        duration_type t_float_vector_u = benchmark_simd_unrolled<batch<float>>(f, f_lhs, f_res, iter);
+#if !XSIMD_WITH_NEON || XSIMD_WITH_NEON64
+        duration_type t_double_vector = benchmark_simd<batch<double>>(f, d_lhs, d_res, iter);
+        duration_type t_double_vector_u = benchmark_simd_unrolled<batch<double>>(f, d_lhs, d_res, iter);
 #endif
 
         out << "============================" << std::endl;
         out << f.name() << std::endl;
 #ifndef XSIMD_POLY_BENCHMARKS
-        out << "scalar float   : " << t_float_scalar.count() << "ms" << std::endl;
+        out << "scalar float      : " << t_float_scalar.count() << "ms" << std::endl;
 #endif
-#if XSIMD_X86_INSTR_SET >= XSIMD_X86_SSE2_VERSION
-        out << "sse float      : " << t_float_sse.count() << "ms" << std::endl;
-        out << "sse float unr  : " << t_float_sse_u.count() << "ms" << std::endl;
-#endif
-#if XSIMD_X86_INSTR_SET >= XSIMD_X86_AVX_VERSION
-        out << "avx float      : " << t_float_avx.count() << "ms" << std::endl;
-        out << "avx float unr  : " << t_float_avx_u.count() << "ms" << std::endl;
-#endif
-#if defined(XSIMD_ARM_INSTR_SET)
-        out << "neon float     : " << t_float_neon.count() << "ms" << std::endl;
-        out << "neon float unr : " << t_float_neon_u.count() << "ms" << std::endl;
-#endif
-#if defined(XSIMD_ENABLE_FALLBACK)
-        out << "flbk float     : " << t_float_fallback.count() << "ms" << std::endl;
-        out << "flbk float unr : " << t_float_fallback_u.count() << "ms" << std::endl;
-#endif
+        out << "vector float      : " << t_float_vector.count() << "ms" << std::endl;
+        out << "vector float unr  : " << t_float_vector_u.count() << "ms" << std::endl;
+
 #ifndef XSIMD_POLY_BENCHMARKS
-        out << "scalar double  : " << t_double_scalar.count() << "ms" << std::endl;
+        out << "scalar double     : " << t_double_scalar.count() << "ms" << std::endl;
 #endif
-#if XSIMD_X86_INSTR_SET >= XSIMD_X86_SSE2_VERSION
-        out << "sse double     : " << t_double_sse.count() << "ms" << std::endl;
-        out << "sse double unr : " << t_double_sse_u.count() << "ms" << std::endl;
-#endif
-#if XSIMD_X86_INSTR_SET >= XSIMD_X86_AVX_VERSION
-        out << "avx double     : " << t_double_avx.count() << "ms" << std::endl;
-        out << "avx double unr : " << t_double_avx_u.count() << "ms" << std::endl;
-#endif
-#if defined(XSIMD_ARM_INSTR_SET)
-        out << "neon double    : " << t_double_neon.count() << "ms" << std::endl;
-        out << "neon double unr: " << t_double_neon_u.count() << "ms" << std::endl;
-#endif
-#if defined(XSIMD_ENABLE_FALLBACK)
-        out << "flbk double    : " << t_double_fallback.count() << "ms" << std::endl;
-        out << "flbk double unr: " << t_double_fallback_u.count() << "ms" << std::endl;
+#if !XSIMD_WITH_NEON || XSIMD_WITH_NEON64
+        out << "vector double     : " << t_double_vector.count() << "ms" << std::endl;
+        out << "vector double unr : " << t_double_vector_u.count() << "ms" << std::endl;
 #endif
         out << "============================" << std::endl;
     }
@@ -415,71 +372,24 @@ namespace xsimd
         init_benchmark(d_lhs, d_rhs, d_res, size);
 
         duration_type t_float_scalar = benchmark_scalar(f, f_lhs, f_rhs, f_res, iter);
-#if XSIMD_X86_INSTR_SET >= XSIMD_X86_SSE2_VERSION
-        duration_type t_float_sse = benchmark_simd<batch<float, 4>>(f, f_lhs, f_rhs, f_res, iter);
-        duration_type t_float_sse_u = benchmark_simd_unrolled<batch<float, 4>>(f, f_lhs, f_rhs, f_res, iter);
-#endif
-#if XSIMD_X86_INSTR_SET >= XSIMD_X86_AVX_VERSION
-        duration_type t_float_avx = benchmark_simd<batch<float, 8>>(f, f_lhs, f_rhs, f_res, iter);
-        duration_type t_float_avx_u = benchmark_simd_unrolled<batch<float, 8>>(f, f_lhs, f_rhs, f_res, iter);
-#endif
+        duration_type t_float_vector = benchmark_simd<batch<float>>(f, f_lhs, f_rhs, f_res, iter);
+        duration_type t_float_vector_u = benchmark_simd_unrolled<batch<float>>(f, f_lhs, f_rhs, f_res, iter);
+
         duration_type t_double_scalar = benchmark_scalar(f, d_lhs, d_rhs, d_res, iter);
-#if XSIMD_X86_INSTR_SET >= XSIMD_X86_SSE2_VERSION
-        duration_type t_double_sse = benchmark_simd<batch<double, 2>>(f, d_lhs, d_rhs, d_res, iter);
-        duration_type t_double_sse_u = benchmark_simd_unrolled<batch<double, 2>>(f, d_lhs, d_rhs, d_res, iter);
-#endif
-#if XSIMD_X86_INSTR_SET >= XSIMD_X86_AVX_VERSION
-        duration_type t_double_avx = benchmark_simd<batch<double, 4>>(f, d_lhs, d_rhs, d_res, iter);
-        duration_type t_double_avx_u = benchmark_simd_unrolled<batch<double, 4>>(f, d_lhs, d_rhs, d_res, iter);
-#endif
-#if defined(XSIMD_ARM_INSTR_SET)
-        duration_type t_float_neon = benchmark_simd<batch<float, 4>>(f, f_lhs, f_rhs, f_res, iter);
-        duration_type t_float_neon_u = benchmark_simd_unrolled<batch<float, 4>>(f, f_lhs, f_rhs, f_res, iter);
-        duration_type t_double_neon = benchmark_simd<batch<double, 2>>(f, d_lhs, d_rhs, d_res, iter);
-        duration_type t_double_neon_u = benchmark_simd_unrolled<batch<double, 2>>(f, d_lhs, d_rhs, d_res, iter);
-#endif
-#if defined(XSIMD_ENABLE_FALLBACK)
-        duration_type t_float_fallback = benchmark_simd<batch<float, 7>>(f, f_lhs, f_rhs, f_res, iter);
-        duration_type t_float_fallback_u = benchmark_simd_unrolled<batch<float, 7>>(f, f_lhs, f_rhs, f_res, iter);
-        duration_type t_double_fallback = benchmark_simd<batch<double, 3>>(f, d_lhs, d_rhs, d_res, iter);
-        duration_type t_double_fallback_u = benchmark_simd_unrolled<batch<double, 3>>(f, d_lhs, d_rhs, d_res, iter);
+#if !XSIMD_WITH_NEON || XSIMD_WITH_NEON64
+        duration_type t_double_vector = benchmark_simd<batch<double>>(f, d_lhs, d_rhs, d_res, iter);
+        duration_type t_double_vector_u = benchmark_simd_unrolled<batch<double>>(f, d_lhs, d_rhs, d_res, iter);
 #endif
 
         out << "============================" << std::endl;
-        out << f.name() << std::endl;
-        out << "scalar float   : " << t_float_scalar.count() << "ms" << std::endl;
-#if XSIMD_X86_INSTR_SET >= XSIMD_X86_SSE2_VERSION
-        out << "sse float      : " << t_float_sse.count() << "ms" << std::endl;
-        out << "sse float unr  : " << t_float_sse_u.count() << "ms" << std::endl;
-#endif
-#if XSIMD_X86_INSTR_SET >= XSIMD_X86_AVX_VERSION
-        out << "avx float      : " << t_float_avx.count() << "ms" << std::endl;
-        out << "avx float unr  : " << t_float_avx_u.count() << "ms" << std::endl;
-#endif
-#if defined(XSIMD_ARM_INSTR_SET)
-        out << "neon float     : " << t_float_neon.count() << "ms" << std::endl;
-        out << "neon float unr : " << t_float_neon_u.count() << "ms" << std::endl;
-#endif
-#if defined(XSIMD_ENABLE_FALLBACK)
-        out << "flbk float     : " << t_float_fallback.count() << "ms" << std::endl;
-        out << "flbk float unr : " << t_float_fallback_u.count() << "ms" << std::endl;
-#endif
-        out << "scalar double  : " << t_double_scalar.count() << "ms" << std::endl;
-#if XSIMD_X86_INSTR_SET >= XSIMD_X86_SSE2_VERSION
-        out << "sse double     : " << t_double_sse.count() << "ms" << std::endl;
-        out << "sse double unr : " << t_double_sse_u.count() << "ms" << std::endl;
-#endif
-#if XSIMD_X86_INSTR_SET >= XSIMD_X86_AVX_VERSION
-        out << "avx double     : " << t_double_avx.count() << "ms" << std::endl;
-        out << "avx double unr : " << t_double_avx_u.count() << "ms" << std::endl;
-#endif
-#if defined(XSIMD_ARM_INSTR_SET)
-        out << "neon double    : " << t_double_neon.count() << "ms" << std::endl;
-        out << "neon double unr: " << t_double_neon_u.count() << "ms" << std::endl;
-#endif
-#if defined(XSIMD_ENABLE_FALLBACK)
-        out << "flbk double    : " << t_double_fallback.count() << "ms" << std::endl;
-        out << "flbk double unr: " << t_double_fallback_u.count() << "ms" << std::endl;
+        out << default_arch::name() << std::endl;
+        out << "scalar float      : " << t_float_scalar.count() << "ms" << std::endl;
+        out << "vector float      : " << t_float_vector.count() << "ms" << std::endl;
+        out << "vector float unr  : " << t_float_vector_u.count() << "ms" << std::endl;
+        out << "scalar double     : " << t_double_scalar.count() << "ms" << std::endl;
+#if !XSIMD_WITH_NEON || XSIMD_WITH_NEON64
+        out << "vector double     : " << t_double_vector.count() << "ms" << std::endl;
+        out << "vector double unr : " << t_double_vector_u.count() << "ms" << std::endl;
 #endif
         out << "============================" << std::endl;
     }
@@ -494,105 +404,69 @@ namespace xsimd
         init_benchmark(d_op0, d_op1, d_op2, d_res, size);
 
         duration_type t_float_scalar = benchmark_scalar(f, f_op0, f_op1, f_op2, f_res, iter);
-#if XSIMD_X86_INSTR_SET >= XSIMD_X86_SSE2_VERSION
-        duration_type t_float_sse = benchmark_simd<batch<float, 4>>(f, f_op0, f_op1, f_op2, f_res, iter);
-        duration_type t_float_sse_u = benchmark_simd_unrolled<batch<float, 4>>(f, f_op0, f_op1, f_op2, f_res, iter);
-#endif
-#if XSIMD_X86_INSTR_SET >= XSIMD_X86_AVX_VERSION
-        duration_type t_float_avx = benchmark_simd<batch<float, 8>>(f, f_op0, f_op1, f_op2, f_res, iter);
-        duration_type t_float_avx_u = benchmark_simd_unrolled<batch<float, 8>>(f, f_op0, f_op1, f_op2, f_res, iter);
-#endif
+        duration_type t_float_vector = benchmark_simd<batch<float>>(f, f_op0, f_op1, f_op2, f_res, iter);
+        duration_type t_float_vector_u = benchmark_simd_unrolled<batch<float>>(f, f_op0, f_op1, f_op2, f_res, iter);
         duration_type t_double_scalar = benchmark_scalar(f, d_op0, d_op1, d_op2, d_res, iter);
-#if XSIMD_X86_INSTR_SET >= XSIMD_X86_SSE2_VERSION
-        duration_type t_double_sse = benchmark_simd<batch<double, 2>>(f, d_op0, d_op1, d_op2, d_res, iter);
-        duration_type t_double_sse_u = benchmark_simd_unrolled<batch<double, 2>>(f, d_op0, d_op1, d_op2, d_res, iter);
-#endif
-#if XSIMD_X86_INSTR_SET >= XSIMD_X86_AVX_VERSION
-        duration_type t_double_avx = benchmark_simd<batch<double, 4>>(f, d_op0, d_op1, d_op2, d_res, iter);
-        duration_type t_double_avx_u = benchmark_simd_unrolled<batch<double, 4>>(f, d_op0, d_op1, d_op2, d_res, iter);
-#endif
-#if defined(XSIMD_ARM_INSTR_SET)
-        duration_type t_float_neon = benchmark_simd<batch<float, 4>>(f, f_op0, f_op1, f_op2, f_res, iter);
-        duration_type t_float_neon_u = benchmark_simd_unrolled<batch<float, 4>>(f, f_op0, f_op1, f_op2, f_res, iter);
-        duration_type t_double_neon = benchmark_simd<batch<double, 2>>(f, d_op0, d_op1, d_op2, d_res, iter);
-        duration_type t_double_neon_u = benchmark_simd_unrolled<batch<double, 2>>(f, d_op0, d_op1, d_op2, d_res, iter);
-#endif
-#if defined(XSIMD_ENABLE_FALLBACK)
-        duration_type t_float_fallback = benchmark_simd<batch<float, 7>>(f, f_op0, f_op1, f_op2, f_res, iter);
-        duration_type t_float_fallback_u = benchmark_simd_unrolled<batch<float, 7>>(f, f_op0, f_op1, f_op2, f_res, iter);
-        duration_type t_double_fallback = benchmark_simd<batch<double, 3>>(f, d_op0, d_op1, d_op2, d_res, iter);
-        duration_type t_double_fallback_u = benchmark_simd_unrolled<batch<double, 3>>(f, d_op0, d_op1, d_op2, d_res, iter);
+#if !XSIMD_WITH_NEON || XSIMD_WITH_NEON64
+        duration_type t_double_vector = benchmark_simd<batch<double>>(f, d_op0, d_op1, d_op2, d_res, iter);
+        duration_type t_double_vector_u = benchmark_simd_unrolled<batch<double>>(f, d_op0, d_op1, d_op2, d_res, iter);
 #endif
 
         out << "============================" << std::endl;
-        out << f.name() << std::endl;
-        out << "scalar float   : " << t_float_scalar.count() << "ms" << std::endl;
-#if XSIMD_X86_INSTR_SET >= XSIMD_X86_SSE2_VERSION
-        out << "sse float      : " << t_float_sse.count() << "ms" << std::endl;
-        out << "sse float unr  : " << t_float_sse_u.count() << "ms" << std::endl;
-#endif
-#if XSIMD_X86_INSTR_SET >= XSIMD_X86_AVX_VERSION
-        out << "avx float      : " << t_float_avx.count() << "ms" << std::endl;
-        out << "avx float unr  : " << t_float_avx_u.count() << "ms" << std::endl;
-#endif
-#if defined(XSIMD_ARM_INSTR_SET)
-        out << "neon float     : " << t_float_neon.count() << "ms" << std::endl;
-        out << "neon float unr : " << t_float_neon_u.count() << "ms" << std::endl;
-#endif
-#if defined(XSIMD_ENABLE_FALLBACK)
-        out << "flbk float     : " << t_float_fallback.count() << "ms" << std::endl;
-        out << "flbk float unr : " << t_float_fallback_u.count() << "ms" << std::endl;
-#endif
-        out << "scalar double  : " << t_double_scalar.count() << "ms" << std::endl;
-#if XSIMD_X86_INSTR_SET >= XSIMD_X86_SSE2_VERSION
-        out << "sse double     : " << t_double_sse.count() << "ms" << std::endl;
-        out << "sse double unr : " << t_double_sse_u.count() << "ms" << std::endl;
-#endif
-#if XSIMD_X86_INSTR_SET >= XSIMD_X86_AVX_VERSION
-        out << "avx double     : " << t_double_avx.count() << "ms" << std::endl;
-        out << "avx double unr : " << t_double_avx_u.count() << "ms" << std::endl;
-#endif
-#if defined(XSIMD_ARM_INSTR_SET)
-        out << "neon double    : " << t_double_neon.count() << "ms" << std::endl;
-        out << "neon double unr: " << t_double_neon_u.count() << "ms" << std::endl;
-#endif
-#if defined(XSIMD_ENABLE_FALLBACK)
-        out << "flbk double    : " << t_double_fallback.count() << "ms" << std::endl;
-        out << "flbk double unr: " << t_double_fallback_u.count() << "ms" << std::endl;
+        out << default_arch::name() << std::endl;
+        out << "scalar float      : " << t_float_scalar.count() << "ms" << std::endl;
+        out << "vector float      : " << t_float_vector.count() << "ms" << std::endl;
+        out << "vector float unr  : " << t_float_vector_u.count() << "ms" << std::endl;
+        out << "scalar double     : " << t_double_scalar.count() << "ms" << std::endl;
+#if !XSIMD_WITH_NEON || XSIMD_WITH_NEON64
+        out << "vector double     : " << t_double_vector.count() << "ms" << std::endl;
+        out << "vector double unr : " << t_double_vector_u.count() << "ms" << std::endl;
 #endif
         out << "============================" << std::endl;
     }
 
-#define DEFINE_OP_FUNCTOR_2OP(OP, NAME)                                              \
-    struct NAME##_fn                                                                 \
-    {                                                                                \
-        template <class T>                                                           \
-        inline T operator()(const T& lhs, const T& rhs) const { return lhs OP rhs; } \
-        inline std::string name() const { return #NAME; }                            \
+#define DEFINE_OP_FUNCTOR_2OP(OP, NAME)                       \
+    struct NAME##_fn                                          \
+    {                                                         \
+        template <class T>                                    \
+        inline T operator()(const T& lhs, const T& rhs) const \
+        {                                                     \
+            return lhs OP rhs;                                \
+        }                                                     \
+        inline std::string name() const                       \
+        {                                                     \
+            return #NAME;                                     \
+        }                                                     \
     }
 
-#define DEFINE_FUNCTOR_1OP(FN)                          \
-    struct FN##_fn                                      \
-    {                                                   \
-        template <class T>                              \
-        inline T operator()(const T& x) const           \
-        {                                               \
-            using xsimd::FN;                            \
-            return FN(x);                               \
-        }                                               \
-        inline std::string name() const { return #FN; } \
+#define DEFINE_FUNCTOR_1OP(FN)                \
+    struct FN##_fn                            \
+    {                                         \
+        template <class T>                    \
+        inline T operator()(const T& x) const \
+        {                                     \
+            using xsimd::FN;                  \
+            return FN(x);                     \
+        }                                     \
+        inline std::string name() const       \
+        {                                     \
+            return #FN;                       \
+        }                                     \
     }
 
-#define DEFINE_FUNCTOR_1OP_TEMPLATE(FN, N, ...)                \
-    struct FN##_##N##_fn                                       \
-    {                                                          \
-        template <class T>                                     \
-        inline T operator()(const T& x) const                  \
-        {                                                      \
-            using xsimd::FN;                                   \
-            return FN<T, __VA_ARGS__>(x);                      \
-        }                                                      \
-        inline std::string name() const { return #FN " " #N; } \
+#define DEFINE_FUNCTOR_1OP_TEMPLATE(NAME, FN, N, ...) \
+    struct NAME##_##N##_fn                            \
+    {                                                 \
+        template <class T>                            \
+        inline T operator()(const T& x) const         \
+        {                                             \
+            using xsimd::FN;                          \
+            return FN<T, __VA_ARGS__>(x);             \
+        }                                             \
+        inline std::string name() const               \
+        {                                             \
+            return #FN " " #N;                        \
+        }                                             \
     }
 
 #define DEFINE_FUNCTOR_2OP(FN)                                \
@@ -604,7 +478,10 @@ namespace xsimd
             using xsimd::FN;                                  \
             return FN(lhs, rhs);                              \
         }                                                     \
-        inline std::string name() const { return #FN; }       \
+        inline std::string name() const                       \
+        {                                                     \
+            return #FN;                                       \
+        }                                                     \
     }
 
 #define DEFINE_FUNCTOR_3OP(FN)                                              \
@@ -616,7 +493,10 @@ namespace xsimd
             using xsimd::FN;                                                \
             return FN(op0, op1, op2);                                       \
         }                                                                   \
-        inline std::string name() const { return #FN; }                     \
+        inline std::string name() const                                     \
+        {                                                                   \
+            return #FN;                                                     \
+        }                                                                   \
     }
 
     DEFINE_OP_FUNCTOR_2OP(+, add);
@@ -670,19 +550,16 @@ DEFINE_FUNCTOR_1OP(is_odd);
 DEFINE_FUNCTOR_1OP(is_even);
 #endif
 
-#ifdef XSIMD_POLY_BENCHMARKS
-    DEFINE_FUNCTOR_1OP_TEMPLATE(horner, 5, 1, 2, 3, 4, 5);
-    DEFINE_FUNCTOR_1OP_TEMPLATE(estrin, 5, 1, 2, 3, 4, 5);
-    DEFINE_FUNCTOR_1OP_TEMPLATE(horner, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
-    DEFINE_FUNCTOR_1OP_TEMPLATE(estrin, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
-    DEFINE_FUNCTOR_1OP_TEMPLATE(horner, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);
-    DEFINE_FUNCTOR_1OP_TEMPLATE(estrin, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);
-    DEFINE_FUNCTOR_1OP_TEMPLATE(horner, 14, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14);
-    DEFINE_FUNCTOR_1OP_TEMPLATE(estrin, 14, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14);
-    DEFINE_FUNCTOR_1OP_TEMPLATE(horner, 16, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
-    DEFINE_FUNCTOR_1OP_TEMPLATE(estrin, 16, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
-#endif
+    DEFINE_FUNCTOR_1OP_TEMPLATE(horner, kernel::horner, 5, 1, 2, 3, 4, 5);
+    DEFINE_FUNCTOR_1OP_TEMPLATE(estrin, kernel::estrin, 5, 1, 2, 3, 4, 5);
+    DEFINE_FUNCTOR_1OP_TEMPLATE(horner, kernel::horner, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+    DEFINE_FUNCTOR_1OP_TEMPLATE(estrin, kernel::estrin, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+    DEFINE_FUNCTOR_1OP_TEMPLATE(horner, kernel::horner, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);
+    DEFINE_FUNCTOR_1OP_TEMPLATE(estrin, kernel::estrin, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);
+    DEFINE_FUNCTOR_1OP_TEMPLATE(horner, kernel::horner, 14, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14);
+    DEFINE_FUNCTOR_1OP_TEMPLATE(estrin, kernel::estrin, 14, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14);
+    DEFINE_FUNCTOR_1OP_TEMPLATE(horner, kernel::horner, 16, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+    DEFINE_FUNCTOR_1OP_TEMPLATE(estrin, kernel::estrin, 16, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
 
 }
-
 #endif

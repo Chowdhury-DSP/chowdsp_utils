@@ -3,7 +3,7 @@ jobs:
   # Configure, build, install, and test job
   - job: 'Windows_clangcl'
     pool:
-      vmImage: 'vs2017-win2016'
+        vmImage: 'windows-latest'
     timeoutInMinutes: 360
     steps:
 
@@ -41,44 +41,30 @@ jobs:
           conda list
         displayName: "Install conda packages"
 
-      # Install LLVM
-      # Note: LLVM distributed by conda is too old
-      - script: |
-          choco install llvm --yes
-          set PATH=C:\Program Files\LLVM\bin;%PATH%
-          echo '##vso[task.setvariable variable=PATH]%PATH%'
-          clang-cl --version
-        displayName: "Install LLVM"
-
       # Configure
       - script: |
           setlocal EnableDelayedExpansion
-          call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64
           mkdir build & cd build
-          cmake -G Ninja ^
-                -DCMAKE_BUILD_TYPE=Release ^
-                -DCMAKE_C_COMPILER=clang-cl ^
-                -DCMAKE_CXX_COMPILER=clang-cl ^
+          cmake -DCMAKE_BUILD_TYPE=Release ^
                 -DDOWNLOAD_GTEST=ON ^
                 -DXSIMD_REFACTORING=ON ^
+                -T ClangCL ^
                 $(Build.SourcesDirectory)
         displayName: "Configure xsimd"
         workingDirectory: $(Build.BinariesDirectory)
 
       # Build
       - script: |
-          call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64
           cmake --build . ^
-                --config Release ^
-                --target test_xsimd ^
-                -- -v
+                --config release ^
+                --target test_xsimd
         displayName: "Build xsimd"
         workingDirectory: $(Build.BinariesDirectory)/build
 
       # Test
       - script: |
-          setlocal EnableDelayedExpansion
-          cd test
-          .\test_xsimd
+          cmake --build . ^
+                --config Release ^
+                --target xtest
         displayName: "Test xsimd"
-        workingDirectory: $(Build.BinariesDirectory)/build/test
+        workingDirectory: $(Build.BinariesDirectory)/build

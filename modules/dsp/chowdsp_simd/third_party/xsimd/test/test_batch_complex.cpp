@@ -123,6 +123,18 @@ protected:
         std::fill(tmp.begin(), tmp.end(), xtl_value_type(2, 3));
         batch_type b0(xtl_value_type(2, 3));
         EXPECT_EQ(b0, tmp) << print_function_name("batch(value_type)");
+
+        batch_type b1 = xsimd::load_as<xtl_value_type>(tmp.data(), xsimd::aligned_mode());
+        EXPECT_EQ(b1, tmp) << print_function_name("load_as<value_type> aligned");
+
+        batch_type b2 = xsimd::load_as<xtl_value_type>(tmp.data(), xsimd::unaligned_mode());
+        EXPECT_EQ(b2, tmp) << print_function_name("load_as<value_type> unaligned");
+
+        xsimd::store_as(tmp.data(), b1, xsimd::aligned_mode());
+        EXPECT_EQ(b1, tmp) << print_function_name("store_as<value_type> aligned");
+
+        xsimd::store_as(tmp.data(), b2, xsimd::unaligned_mode());
+        EXPECT_EQ(b2, tmp) << print_function_name("store_as<value_type> unaligned");
     }
 #endif
 
@@ -130,8 +142,11 @@ protected:
     {
         array_type tmp;
         std::fill(tmp.begin(), tmp.end(), value_type(2, 3));
-        batch_type b0(value_type(2, 3));
-        EXPECT_EQ(b0, tmp) << print_function_name("batch(value_type)");
+        batch_type b0a(value_type(2, 3));
+        EXPECT_EQ(b0a, tmp) << print_function_name("batch(value_type)");
+
+        batch_type b0b(value_type(2, 3));
+        EXPECT_EQ(b0b, tmp) << print_function_name("batch{value_type}");
 
         std::fill(tmp.begin(), tmp.end(), value_type(real_scalar));
         batch_type b1(real_scalar);
@@ -514,13 +529,25 @@ protected:
         }
     }
 
+    void test_polar() const
+    {
+        // polar w/ magnitude/phase
+        {
+            array_type expected;
+            std::transform(lhs.cbegin(), lhs.cend(), rhs.begin(), expected.begin(),
+                           [](const value_type& v_lhs, const value_type& v_rhs) { return std::polar(std::real(v_lhs), std::real(v_rhs)); });
+            batch_type res = polar(real(batch_lhs()), real(batch_rhs()));
+            EXPECT_BATCH_EQ(res, expected) << print_function_name("polar");
+        }
+    }
+
     void test_horizontal_operations() const
     {
-        // hadd
+        // reduce_add
         {
             value_type expected = std::accumulate(lhs.cbegin(), lhs.cend(), value_type(0));
-            value_type res = hadd(batch_lhs());
-            EXPECT_SCALAR_EQ(res, expected) << print_function_name("hadd");
+            value_type res = reduce_add(batch_lhs());
+            EXPECT_SCALAR_EQ(res, expected) << print_function_name("reduce_add");
         }
     }
 
@@ -640,6 +667,11 @@ TYPED_TEST(batch_complex_test, conj_norm_proj)
 TYPED_TEST(batch_complex_test, conj_norm_proj_real)
 {
     this->test_conj_norm_proj_real();
+}
+
+TYPED_TEST(batch_complex_test, polar)
+{
+    this->test_polar();
 }
 
 TYPED_TEST(batch_complex_test, horizontal_operations)

@@ -60,7 +60,7 @@ public:
 private:
     std::array<EQBandType, numBands> bands;
     std::array<BypassProcessor<FloatType>, numBands> bypasses;
-    std::array<bool, numBands> onOffs = {false};
+    std::array<bool, numBands> onOffs = { false };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EQProcessor)
 };

@@ -14,7 +14,9 @@
 
 #include <numeric>
 #include <random>
+#include <type_traits>
 
+#include "test_sum.hpp"
 #include "test_utils.hpp"
 
 static_assert(xsimd::default_arch::supported(), "default arch must be supported");
@@ -68,23 +70,6 @@ TEST(arch, arch_list_alignment)
                   "two architectures");
 }
 
-struct sum
-{
-    template <class Arch, class T>
-    T operator()(Arch, T const* data, unsigned size)
-    {
-        using batch = xsimd::batch<T, Arch>;
-        batch acc(static_cast<T>(0));
-        const unsigned n = size / batch::size * batch::size;
-        for (unsigned i = 0; i != n; i += batch::size)
-            acc += batch::load_unaligned(data + i);
-        T star_acc = xsimd::hadd(acc);
-        for (unsigned i = n; i < size; ++i)
-            star_acc += data[i];
-        return star_acc;
-    }
-};
-
 struct get_arch_version
 {
     template <class Arch>
@@ -106,20 +91,66 @@ TEST(arch, dispatcher)
 #if XSIMD_WITH_AVX && XSIMD_WITH_SSE2
     static_assert(xsimd::supported_architectures::contains<xsimd::avx>() && xsimd::supported_architectures::contains<xsimd::sse2>(), "consistent supported architectures");
     {
-        auto dispatched = xsimd::dispatch<sum, xsimd::arch_list<xsimd::avx, xsimd::sse2>>(sum {});
+        auto dispatched = xsimd::dispatch<xsimd::arch_list<xsimd::avx, xsimd::sse2>>(sum {});
         float res = dispatched(data, 17);
         EXPECT_EQ(ref, res);
     }
 
     // check that we pick the most appropriate version
     {
-        auto dispatched = xsimd::dispatch<get_arch_version,
-                                          xsimd::arch_list<xsimd::sse3, xsimd::sse2>>(get_arch_version {});
+        auto dispatched = xsimd::dispatch<xsimd::arch_list<xsimd::sse3, xsimd::sse2>>(get_arch_version {});
         unsigned expected = xsimd::available_architectures().best >= xsimd::sse3::version()
             ? xsimd::sse3::version()
             : xsimd::sse2::version();
         EXPECT_EQ(expected, dispatched());
     }
+#endif
+}
+
+TEST(arch, fixed_size_types)
+{
+    using batch4f = xsimd::make_sized_batch_t<float, 4>;
+    using batch2d = xsimd::make_sized_batch_t<double, 2>;
+    using batch4i32 = xsimd::make_sized_batch_t<int32_t, 4>;
+    using batch4u32 = xsimd::make_sized_batch_t<uint32_t, 4>;
+
+    using batch8f = xsimd::make_sized_batch_t<float, 8>;
+    using batch4d = xsimd::make_sized_batch_t<double, 4>;
+    using batch8i32 = xsimd::make_sized_batch_t<int32_t, 8>;
+    using batch8u32 = xsimd::make_sized_batch_t<uint32_t, 8>;
+
+#if XSIMD_WITH_SSE2 || XSIMD_WITH_NEON || XSIMD_WITH_NEON64 || XSIMD_WITH_SVE
+    EXPECT_EQ(4, size_t(batch4f::size));
+    EXPECT_EQ(4, size_t(batch4i32::size));
+    EXPECT_EQ(4, size_t(batch4u32::size));
+
+    EXPECT_TRUE(bool(std::is_same<float, batch4f::value_type>::value));
+    EXPECT_TRUE(bool(std::is_same<int32_t, batch4i32::value_type>::value));
+    EXPECT_TRUE(bool(std::is_same<uint32_t, batch4u32::value_type>::value));
+
+#if XSIMD_WITH_SSE2 || XSIMD_WITH_NEON64 || XSIMD_WITH_SVE
+    EXPECT_EQ(2, size_t(batch2d::size));
+    EXPECT_TRUE(bool(std::is_same<double, batch2d::value_type>::value));
+#else
+    EXPECT_TRUE(bool(std::is_same<void, batch2d>::value));
+#endif
+
+#endif
+#if !XSIMD_WITH_AVX && !XSIMD_WITH_FMA3 && !(XSIMD_WITH_SVE && XSIMD_SVE_BITS == 256)
+    EXPECT_TRUE(bool(std::is_same<void, batch8f>::value));
+    EXPECT_TRUE(bool(std::is_same<void, batch4d>::value));
+    EXPECT_TRUE(bool(std::is_same<void, batch8i32>::value));
+    EXPECT_TRUE(bool(std::is_same<void, batch8u32>::value));
+#else
+    EXPECT_EQ(8, size_t(batch8f::size));
+    EXPECT_EQ(8, size_t(batch8i32::size));
+    EXPECT_EQ(8, size_t(batch8u32::size));
+    EXPECT_EQ(4, size_t(batch4d::size));
+
+    EXPECT_TRUE(bool(std::is_same<float, batch8f::value_type>::value));
+    EXPECT_TRUE(bool(std::is_same<double, batch4d::value_type>::value));
+    EXPECT_TRUE(bool(std::is_same<int32_t, batch8i32::value_type>::value));
+    EXPECT_TRUE(bool(std::is_same<uint32_t, batch8u32::value_type>::value));
 #endif
 }
 
@@ -143,19 +174,13 @@ TEST(arch, default_load)
 {
     // make sure load_aligned / load_unaligned work for the default arch and
     // return the appropriate type.
-    using type_list = xsimd::mpl::type_list<short, int, long, float, double, std::complex<float>, std::complex<double>>;
+    using type_list = xsimd::mpl::type_list<short, int, long, float, std::complex<float>
+#if XSIMD_WITH_NEON64 || !XSIMD_WITH_NEON
+                                            ,
+                                            double, std::complex<double>
+#endif
+                                            >;
     try_loads<type_list>();
 }
 
-#ifdef XSIMD_ENABLE_FALLBACK
-// FIXME: this should be named scalar
-TEST(arch, scalar)
-{
-    float data[17] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17 };
-    float ref = std::accumulate(std::begin(data), std::end(data), 0);
-
-    float res = sum {}(xsimd::arch::scalar {}, data, 17);
-    EXPECT_EQ(ref, res);
-}
-#endif
 #endif

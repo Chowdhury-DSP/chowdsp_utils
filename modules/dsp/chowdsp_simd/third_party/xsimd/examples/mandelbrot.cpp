@@ -20,8 +20,6 @@
 
 #include "pico_bench.hpp"
 
-#define XSIMD_ENABLE_FALLBACK
-
 #include <xsimd/xsimd.hpp>
 
 // helper function to write the rendered image as PPM file
@@ -82,7 +80,7 @@ namespace xsimd
             z_re = c_re + new_re;
             z_im = c_im + new_im;
 
-            vi = select(bool_cast(active), vi + 1, vi);
+            vi = select(batch_bool_cast<int>(active), vi + 1, vi);
         }
 
         return vi;
@@ -126,8 +124,8 @@ namespace xsimd
 
                 // implement masked store!
                 // xsimd::store_aligned(result, output + base_index, active);
-                int_batch_type prev_data(output + base_index);
-                select(bool_cast(active), result, prev_data)
+                int_batch_type prev_data = int_batch_type::load_unaligned(output + base_index);
+                select(batch_bool_cast<int>(active), result, prev_data)
                     .store_aligned(output + base_index);
             }
         }

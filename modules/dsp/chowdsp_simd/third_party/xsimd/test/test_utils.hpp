@@ -25,6 +25,24 @@
 #ifndef XSIMD_TEST_UTILS_HPP
 #define XSIMD_TEST_UTILS_HPP
 
+/**************************
+ * AppleClang workarounds *
+ *************************/
+
+// AppleClang is known for having precision issues
+// in the gamma function codegen. It's known to happen
+// between AVX and AVX2, but it also happens on SSE4.1
+// in GitHub Actions.
+// This also seems to happen in M1.
+struct precision_t
+{
+#if defined(__apple_build_version__) && (XSIMD_WITH_SSE4_1 || XSIMD_WITH_NEON64)
+    static constexpr size_t max = 8192;
+#else
+    static constexpr size_t max = 2048;
+#endif
+};
+
 /*******************
  * Pretty printers *
  *******************/
@@ -36,7 +54,7 @@ public:
     static std::string GetName(int)
     {
         using value_type = typename T::value_type;
-        std::string prefix = "fallback_";
+        std::string prefix;
 #if XSIMD_WITH_SSE
         size_t register_size = T::size * sizeof(value_type) * CHAR_BIT;
         if (register_size == size_t(128))
@@ -233,6 +251,10 @@ namespace detail
     template <class T>
     T safe_division(const T& lhs, const T& rhs)
     {
+        if (rhs == T(0))
+        {
+            return (std::numeric_limits<T>::max)();
+        }
         if (rhs < static_cast<T>(1) && lhs > rhs * (std::numeric_limits<T>::max)())
         {
             return (std::numeric_limits<T>::max)();
@@ -279,8 +301,8 @@ namespace detail
                 return utils::isinf(rhs) && (lhs * rhs > 0) /* same sign */;
             }
 
-            T relative_precision = 2048 * std::numeric_limits<T>::epsilon();
-            T absolute_zero_prox = 2048 * std::numeric_limits<T>::epsilon();
+            T relative_precision = precision_t::max * std::numeric_limits<T>::epsilon();
+            T absolute_zero_prox = precision_t::max * std::numeric_limits<T>::epsilon();
 
             if (max(uabs(lhs), uabs(rhs)) < T(1e-3))
             {
@@ -516,6 +538,34 @@ namespace detail
         return get_nb_diff(lhs.begin(), lhs.end(), rhs.begin());
     }
 
+    template <class T, class A>
+    size_t get_nb_diff_near(const std::vector<T, A>& lhs, const std::vector<T, A>& rhs, float precision)
+    {
+        size_t i = 0;
+        for (size_t i = 0; i < lhs.size(); i++)
+        {
+            if (std::abs(lhs[i] - rhs[i]) > precision)
+            {
+                i++;
+            }
+        }
+        return i;
+    }
+
+    template <class T, size_t N>
+    size_t get_nb_diff_near(const std::array<T, N>& lhs, const std::array<T, N>& rhs, float precision)
+    {
+        size_t i = 0;
+        for (size_t i = 0; i < lhs.size(); i++)
+        {
+            if (std::abs(lhs[i] - rhs[i]) > precision)
+            {
+                i++;
+            }
+        }
+        return i;
+    }
+
     template <class B, class S>
     void load_batch(B& b, const S& src, size_t i = 0)
     {
@@ -526,6 +576,16 @@ namespace detail
     void store_batch(const B& b, D& dst, size_t i = 0)
     {
         b.store_unaligned(dst.data() + i);
+    }
+
+    inline xsimd::as_integer_t<float> nearbyint_as_int(float a)
+    {
+        return std::lroundf(a);
+    }
+
+    inline xsimd::as_integer_t<double> nearbyint_as_int(double a)
+    {
+        return std::llround(a);
     }
 }
 
@@ -618,24 +678,42 @@ namespace xsimd
         batch<uint64_t>,
         batch<int64_t>>;
 
-#if XSIMD_WITH_NEON && !XSIMD_WITH_NEON64
-    using batch_float_type_list = mpl::type_list<batch<float>>;
-#else
+#if XSIMD_WITH_NEON64 || !XSIMD_WITH_NEON
     using batch_float_type_list = mpl::type_list<batch<float>, batch<double>>;
+#else
+    using batch_float_type_list = mpl::type_list<batch<float>>;
 #endif
 
     using batch_int32_type_list = mpl::type_list<
         batch<int32_t>>;
 
-#if XSIMD_WITH_NEON && !XSIMD_WITH_NEON64
-    using batch_complex_type_list = mpl::type_list<
-        batch<std::complex<float>>>;
-#else
+#if XSIMD_WITH_NEON64 || !XSIMD_WITH_NEON
     using batch_complex_type_list = mpl::type_list<
         batch<std::complex<float>>,
         batch<std::complex<double>>>;
+#else
+    using batch_complex_type_list = mpl::type_list<
+        batch<std::complex<float>>>;
 #endif
     using batch_math_type_list = mpl::concatenate_t<batch_int32_type_list, batch_float_type_list>;
+
+    using batch_swizzle_type_list = mpl::type_list<
+#if XSIMD_WITH_NEON64 || !XSIMD_WITH_NEON
+        batch<float>, batch<double>,
+#else
+        batch<float>,
+#endif
+#if !XSIMD_WITH_AVX || XSIMD_WITH_AVX2
+        batch<uint32_t>, batch<int32_t>,
+        batch<uint64_t>, batch<int64_t>,
+#endif
+        batch<std::complex<float>>
+#if XSIMD_WITH_NEON64 || !XSIMD_WITH_NEON
+        ,
+        batch<std::complex<double>>
+#endif
+        >;
+
     using batch_type_list = mpl::concatenate_t<batch_int_type_list, batch_float_type_list>;
 }
 
@@ -644,6 +722,7 @@ using batch_float_types = to_testing_types<xsimd::batch_float_type_list>;
 using batch_complex_types = to_testing_types<xsimd::batch_complex_type_list>;
 using batch_math_types = to_testing_types<xsimd::batch_math_type_list>;
 using batch_types = to_testing_types<xsimd::batch_type_list>;
+using batch_swizzle_types = to_testing_types<xsimd::batch_swizzle_type_list>;
 
 /********************
  * conversion utils *

@@ -40,6 +40,34 @@ protected:
         }
     }
 
+    void test_reciprocal() const
+    {
+        // reciprocal
+        {
+            array_type res, expected;
+            std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
+                           [](const value_type& l) { return value_type(1) / l; });
+            batch_type res1 = reciprocal(batch_lhs());
+            res1.store_unaligned(res.data());
+            size_t diff = detail::get_nb_diff_near(res, expected, 1e-12f);
+            EXPECT_EQ(diff, 0) << print_function_name("reciprocal");
+        }
+    }
+
+    void test_rsqrt() const
+    {
+        // rsqrt
+        {
+            array_type res, expected;
+            std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
+                           [](const value_type& l) { return std::ceil((value_type(1) / std::sqrt(l)) * value_type(100)); });
+            batch_type res1 = ceil(rsqrt(batch_lhs()) * value_type(100));
+            res1.store_unaligned(res.data());
+            size_t diff = detail::get_nb_diff_near(res, expected, 1.5f * std::pow(2, 12));
+            EXPECT_EQ(diff, 0) << print_function_name("rsqrt");
+        }
+    }
+
     void test_sqrt() const
     {
         // sqrt
@@ -94,9 +122,19 @@ private:
 
 TYPED_TEST_SUITE(batch_float_test, batch_float_types, simd_test_names);
 
+TYPED_TEST(batch_float_test, reciprocal)
+{
+    this->test_reciprocal();
+}
+
 TYPED_TEST(batch_float_test, sqrt)
 {
     this->test_sqrt();
+}
+
+TYPED_TEST(batch_float_test, rsqrt)
+{
+    this->test_rsqrt();
 }
 
 TYPED_TEST(batch_float_test, haddp)

@@ -136,7 +136,7 @@ void ModalFilterBank<maxNumModes, SampleType>::process (const chowdsp::BufferVie
     for (size_t modeIdx = 0; modeIdx < numVecModesToProcess; ++modeIdx)
     {
         for (int n = 0; n < numSamples; ++n)
-            renderPtr[n] += xsimd::hadd (modes[modeIdx].processSample (blockPtr[n]));
+            renderPtr[n] += xsimd::reduce_add (modes[modeIdx].processSample (blockPtr[n]));
     }
 }
 
@@ -157,7 +157,7 @@ void ModalFilterBank<maxNumModes, SampleType>::processWithModulation (const chow
         for (int n = 0; n < numSamples; ++n)
         {
             modulator (modes[modeIdx], modeIdx, n);
-            renderPtr[n] += xsimd::hadd (modes[modeIdx].processSample (blockPtr[n]));
+            renderPtr[n] += xsimd::reduce_add (modes[modeIdx].processSample (blockPtr[n]));
         }
     }
 }

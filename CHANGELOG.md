@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [UNRELEASED]
+- Updated XSIMD to version 9.0.1.
+
 ## [1.2.0] 2022-09-03
 - Added filters: Kurt Werner's generalized SVF, ARP 1047 filter.
 - Added waveshapers: Buchla wavefolder, Serge Wave Multiplier, full wave rectifier.

@@ -76,8 +76,11 @@ protected:
     {
         array_type tmp;
         std::fill(tmp.begin(), tmp.end(), value_type(2));
-        batch_type b0(2);
-        EXPECT_EQ(b0, tmp) << print_function_name("batch(value_type)");
+        batch_type b0a(2);
+        EXPECT_EQ(b0a, tmp) << print_function_name("batch(value_type)");
+
+        batch_type b0b { 2 };
+        EXPECT_EQ(b0b, tmp) << print_function_name("batch{value_type}");
 
         batch_type b1 = batch_type::load_unaligned(lhs.data());
         EXPECT_EQ(b1, lhs) << print_function_name("batch(value_type*)");
@@ -556,11 +559,23 @@ protected:
 
     void test_horizontal_operations() const
     {
-        // hadd
+        // reduce_add
         {
             value_type expected = std::accumulate(lhs.cbegin(), lhs.cend(), value_type(0));
-            value_type res = hadd(batch_lhs());
-            EXPECT_SCALAR_EQ(res, expected) << print_function_name("hadd");
+            value_type res = reduce_add(batch_lhs());
+            EXPECT_SCALAR_EQ(res, expected) << print_function_name("reduce_add");
+        }
+        // reduce_max
+        {
+            value_type expected = *std::max_element(lhs.cbegin(), lhs.cend());
+            value_type res = reduce_max(batch_lhs());
+            EXPECT_SCALAR_EQ(res, expected) << print_function_name("reduce_max");
+        }
+        // reduce_min
+        {
+            value_type expected = *std::min_element(lhs.cbegin(), lhs.cend());
+            value_type res = reduce_min(batch_lhs());
+            EXPECT_SCALAR_EQ(res, expected) << print_function_name("reduce_min");
         }
     }
 

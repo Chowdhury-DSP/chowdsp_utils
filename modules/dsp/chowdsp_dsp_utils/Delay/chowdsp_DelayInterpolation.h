@@ -270,7 +270,7 @@ namespace DelayLineInterpolationTypes
                 out += buff_reg * sinc_reg;
             }
 
-            return xsimd::hadd (out);
+            return xsimd::reduce_add (out);
         }
 
         int totalSize = 0;
