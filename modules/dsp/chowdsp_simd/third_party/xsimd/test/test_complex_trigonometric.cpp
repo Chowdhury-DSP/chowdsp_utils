@@ -55,8 +55,7 @@ protected:
     void test_sin()
     {
         std::transform(input.cbegin(), input.cend(), expected.begin(),
-                       [](const value_type& v)
-                       { using std::sin; return sin(v); });
+                       [](const value_type& v) { using std::sin; return sin(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -71,8 +70,7 @@ protected:
     void test_cos()
     {
         std::transform(input.cbegin(), input.cend(), expected.begin(),
-                       [](const value_type& v)
-                       { using std::cos; return cos(v); });
+                       [](const value_type& v) { using std::cos; return cos(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -88,11 +86,9 @@ protected:
     {
         vector_type expected2(nb_input), res2(nb_input);
         std::transform(input.cbegin(), input.cend(), expected.begin(),
-                       [](const value_type& v)
-                       { using std::sin; return sin(v); });
+                       [](const value_type& v) { using std::sin; return sin(v); });
         std::transform(input.cbegin(), input.cend(), expected2.begin(),
-                       [](const value_type& v)
-                       { using std::cos; return cos(v); });
+                       [](const value_type& v) { using std::cos; return cos(v); });
         batch_type in, out1, out2;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -115,8 +111,7 @@ protected:
     void test_asin()
     {
         std::transform(ainput.cbegin(), ainput.cend(), expected.begin(),
-                       [](const value_type& v)
-                       { using std::asin; return asin(v); });
+                       [](const value_type& v) { using std::asin; return asin(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -131,8 +126,7 @@ protected:
     void test_acos()
     {
         std::transform(ainput.cbegin(), ainput.cend(), expected.begin(),
-                       [](const value_type& v)
-                       { using std::acos; return acos(v); });
+                       [](const value_type& v) { using std::acos; return acos(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -147,8 +141,7 @@ protected:
     void test_atan()
     {
         std::transform(atan_input.cbegin(), atan_input.cend(), expected.begin(),
-                       [](const value_type& v)
-                       { using std::atan; return atan(v); });
+                       [](const value_type& v) { using std::atan; return atan(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -164,8 +157,7 @@ private:
     void test_tan_impl()
     {
         std::transform(input.cbegin(), input.cend(), expected.begin(),
-                       [](const value_type& v)
-                       { using std::tan; return tan(v); });
+                       [](const value_type& v) { using std::tan; return tan(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {

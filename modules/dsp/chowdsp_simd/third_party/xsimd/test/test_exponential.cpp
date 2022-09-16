@@ -48,8 +48,7 @@ protected:
         // exp
         {
             std::transform(exp_input.cbegin(), exp_input.cend(), expected.begin(),
-                           [](const value_type& v)
-                           { return std::exp(v); });
+                           [](const value_type& v) { return std::exp(v); });
             batch_type in, out;
             for (size_t i = 0; i < nb_input; i += size)
             {
@@ -64,8 +63,7 @@ protected:
         // exp2
         {
             std::transform(exp_input.cbegin(), exp_input.cend(), expected.begin(),
-                           [](const value_type& v)
-                           { return std::exp2(v); });
+                           [](const value_type& v) { return std::exp2(v); });
             batch_type in, out;
             for (size_t i = 0; i < nb_input; i += size)
             {
@@ -81,8 +79,7 @@ protected:
         {
             std::transform(exp_input.cbegin(), exp_input.cend(), expected.begin(),
                            /* imprecise but enough for testing version of exp10 */
-                           [](const value_type& v)
-                           { return exp(log(10) * v); });
+                           [](const value_type& v) { return exp(log(10) * v); });
             batch_type in, out;
             for (size_t i = 0; i < nb_input; i += size)
             {
@@ -97,8 +94,7 @@ protected:
         // expm1
         {
             std::transform(exp_input.cbegin(), exp_input.cend(), expected.begin(),
-                           [](const value_type& v)
-                           { return std::expm1(v); });
+                           [](const value_type& v) { return std::expm1(v); });
             batch_type in, out;
             for (size_t i = 0; i < nb_input; i += size)
             {
@@ -116,8 +112,7 @@ protected:
         // log
         {
             std::transform(log_input.cbegin(), log_input.cend(), expected.begin(),
-                           [](const value_type& v)
-                           { return std::log(v); });
+                           [](const value_type& v) { return std::log(v); });
             batch_type in, out;
             for (size_t i = 0; i < nb_input; i += size)
             {
@@ -132,8 +127,7 @@ protected:
         // log2
         {
             std::transform(log_input.cbegin(), log_input.cend(), expected.begin(),
-                           [](const value_type& v)
-                           { return std::log2(v); });
+                           [](const value_type& v) { return std::log2(v); });
             batch_type in, out;
             for (size_t i = 0; i < nb_input; i += size)
             {
@@ -148,8 +142,7 @@ protected:
         // log10
         {
             std::transform(log_input.cbegin(), log_input.cend(), expected.begin(),
-                           [](const value_type& v)
-                           { return std::log10(v); });
+                           [](const value_type& v) { return std::log10(v); });
             batch_type in, out;
             for (size_t i = 0; i < nb_input; i += size)
             {
@@ -164,8 +157,7 @@ protected:
         // log1p
         {
             std::transform(log_input.cbegin(), log_input.cend(), expected.begin(),
-                           [](const value_type& v)
-                           { return std::log1p(v); });
+                           [](const value_type& v) { return std::log1p(v); });
             batch_type in, out;
             for (size_t i = 0; i < nb_input; i += size)
             {

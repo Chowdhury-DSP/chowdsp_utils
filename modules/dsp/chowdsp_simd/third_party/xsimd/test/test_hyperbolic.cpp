@@ -51,8 +51,7 @@ protected:
         // sinh
         {
             std::transform(input.cbegin(), input.cend(), expected.begin(),
-                           [](const value_type& v)
-                           { return std::sinh(v); });
+                           [](const value_type& v) { return std::sinh(v); });
             batch_type in, out;
             for (size_t i = 0; i < nb_input; i += size)
             {
@@ -66,8 +65,7 @@ protected:
         // cosh
         {
             std::transform(input.cbegin(), input.cend(), expected.begin(),
-                           [](const value_type& v)
-                           { return std::cosh(v); });
+                           [](const value_type& v) { return std::cosh(v); });
             batch_type in, out;
             for (size_t i = 0; i < nb_input; i += size)
             {
@@ -81,8 +79,7 @@ protected:
         // tanh
         {
             std::transform(input.cbegin(), input.cend(), expected.begin(),
-                           [](const value_type& v)
-                           { return std::tanh(v); });
+                           [](const value_type& v) { return std::tanh(v); });
             batch_type in, out;
             for (size_t i = 0; i < nb_input; i += size)
             {
@@ -100,8 +97,7 @@ protected:
         // asinh
         {
             std::transform(input.cbegin(), input.cend(), expected.begin(),
-                           [](const value_type& v)
-                           { return std::asinh(v); });
+                           [](const value_type& v) { return std::asinh(v); });
             batch_type in, out;
             for (size_t i = 0; i < nb_input; i += size)
             {
@@ -115,8 +111,7 @@ protected:
         // acosh
         {
             std::transform(acosh_input.cbegin(), acosh_input.cend(), expected.begin(),
-                           [](const value_type& v)
-                           { return std::acosh(v); });
+                           [](const value_type& v) { return std::acosh(v); });
             batch_type in, out;
             for (size_t i = 0; i < nb_input; i += size)
             {
@@ -130,8 +125,7 @@ protected:
         // atanh
         {
             std::transform(atanh_input.cbegin(), atanh_input.cend(), expected.begin(),
-                           [](const value_type& v)
-                           { return std::atanh(v); });
+                           [](const value_type& v) { return std::atanh(v); });
             batch_type in, out;
             for (size_t i = 0; i < nb_input; i += size)
             {

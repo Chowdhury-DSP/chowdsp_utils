@@ -46,8 +46,7 @@ protected:
         {
             array_type res, expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [](const value_type& l)
-                           { return value_type(1) / l; });
+                           [](const value_type& l) { return value_type(1) / l; });
             batch_type res1 = reciprocal(batch_lhs());
             res1.store_unaligned(res.data());
             size_t diff = detail::get_nb_diff_near(res, expected, 1e-12f);
@@ -61,8 +60,7 @@ protected:
         {
             array_type res, expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [](const value_type& l)
-                           { return std::ceil((value_type(1) / std::sqrt(l)) * value_type(100)); });
+                           [](const value_type& l) { return std::ceil((value_type(1) / std::sqrt(l)) * value_type(100)); });
             batch_type res1 = ceil(rsqrt(batch_lhs()) * value_type(100));
             res1.store_unaligned(res.data());
             size_t diff = detail::get_nb_diff_near(res, expected, 1.5f * std::pow(2, 12));
@@ -76,8 +74,7 @@ protected:
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [](const value_type& l)
-                           { return std::sqrt(l); });
+                           [](const value_type& l) { return std::sqrt(l); });
             batch_type res = sqrt(batch_lhs());
             EXPECT_BATCH_EQ(res, expected) << print_function_name("sqrt");
         }
