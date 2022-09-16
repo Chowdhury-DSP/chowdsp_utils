@@ -127,7 +127,7 @@ namespace BBD
             poles = xsimd::load_aligned (BBDFilterSpec::oFiltPole);
         }
 
-        [[nodiscard]] inline float calcH0() const noexcept { return -1.0f * xsimd::hadd (gCoef.real()); }
+        [[nodiscard]] inline float calcH0() const noexcept { return -1.0f * xsimd::reduce_add (gCoef.real()); }
 
         inline void set_freq (float freq)
         {

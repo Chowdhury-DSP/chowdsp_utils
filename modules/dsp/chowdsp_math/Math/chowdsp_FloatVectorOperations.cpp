@@ -245,7 +245,7 @@ namespace detail
     template <typename T, typename ScalarOp, typename VecOp>
     T reduce (const T* src, int numValues, T init, ScalarOp&& scalarOp, VecOp&& vecOp)
     {
-        return reduce (src, numValues, init, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), [] (auto val) { return xsimd::hadd (val); });
+        return reduce (src, numValues, init, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), [] (auto val) { return xsimd::reduce_add (val); });
     }
 
     template <typename T, typename Op>
@@ -305,7 +305,7 @@ namespace detail
     template <typename T, typename ScalarOp, typename VecOp>
     T reduce (const T* src1, const T* src2, int numValues, T init, ScalarOp&& scalarOp, VecOp&& vecOp)
     {
-        return reduce (src1, src2, numValues, init, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), [] (auto val) { return xsimd::hadd (val); });
+        return reduce (src1, src2, numValues, init, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), [] (auto val) { return xsimd::reduce_add (val); });
     }
 
     template <typename T, typename Op>

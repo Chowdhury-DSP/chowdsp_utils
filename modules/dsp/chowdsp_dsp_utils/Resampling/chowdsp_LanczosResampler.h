@@ -186,7 +186,7 @@ private:
             rv += fn * dn;
         }
 
-        return xsimd::hadd (rv);
+        return xsimd::reduce_add (rv);
     }
 
     size_t populateNext (float* f, size_t max)

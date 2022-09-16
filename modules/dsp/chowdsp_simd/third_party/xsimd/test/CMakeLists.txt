@@ -42,11 +42,37 @@ OPTION(CROSS_COMPILE_ARM "cross compile for ARM targets" OFF)
 # Note: to compile on ARM (or cross compile), you may need to add the following:
 # -DTARGET_ARCH="armv8-a -mfpu=neon -mfloat-abi=softfp -target arm-linux-gnueabi"
 set(TARGET_ARCH "native" CACHE STRING "Target architecture arguments")
-set(ARM_ARCH_DIRECTORY "arm-linux-gnueabi" CACHE STRING "ARM arch header dir")
-set(ARM_GCC_VER "4.7.3" CACHE STRING "ARM GCC header dir")
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-    if (CROSS_COMPILE_ARM)
+    if (NOT WIN32 AND NOT ANDROID)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wunused-parameter -Wextra -Wreorder")
+        # Users may override the c++ standard:
+        if(NOT DEFINED CMAKE_CXX_STANDARD OR "${CMAKE_CXX_STANDARD}" STREQUAL "")
+            if (ENABLE_XTL_COMPLEX)
+                CHECK_CXX_COMPILER_FLAG("-std=c++14" HAS_CPP14_FLAG)
+                if (NOT HAS_CPP14_FLAG)
+                    message(FATAL_ERROR "Unsupported compiler -- xsimd requires C++14 support when xtl complex support is enabled")
+                endif()
+                set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+            else()
+                CHECK_CXX_COMPILER_FLAG("-std=c++11" HAS_CPP11_FLAG)
+                if (NOT HAS_CPP11_FLAG)
+                    message(FATAL_ERROR "Unsupported compiler -- xsimd requires C++11 support!")
+                else()
+                    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+                endif()
+            endif()
+        endif()
+
+        if (NOT CROSS_COMPILE_ARM)
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fPIC") 
+        endif()
+    endif()
+    
+    if (ANDROID)
+        # Nothing to do here, we assume the cmake Android NDK toolchain sets the
+        # correct options for arm and neon.
+    elseif (CROSS_COMPILE_ARM)
         # We're cross-compiling with clang++ on Azure Pipelines, this is all pretty specific and just for testing
         set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS)
         set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS)
@@ -56,6 +82,8 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU"
         set(CMAKE_C_COMPILER_TARGET arm-linux-gnueabi)
         set(CMAKE_CXX_COMPILER_TARGET arm-linux-gnueabi)
 
+        set(ARM_ARCH_DIRECTORY "arm-linux-gnueabi" CACHE STRING "ARM arch header dir")
+        set(ARM_GCC_VER "4.7.3" CACHE STRING "ARM GCC header dir")
         include_directories(/usr/${ARM_ARCH_DIRECTORY}/include/c++/${ARM_GCC_VER}/${ARM_ARCH_DIRECTORY}/)
         include_directories(/usr/${ARM_ARCH_DIRECTORY}/include/c++/${ARM_GCC_VER}/)
         include_directories(/usr/${ARM_ARCH_DIRECTORY}/include/)
@@ -70,20 +98,13 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU"
         endif()
         message(STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
         message(STATUS "CMAKE_CXX_LINK_EXECUTABLE: ${CMAKE_CXX_LINK_EXECUTABLE}")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wunused-parameter -Wextra -Wreorder -std=c++11")
     elseif(${CMAKE_SYSTEM_PROCESSOR} MATCHES "^ppc64"  OR ${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fPIC -mcpu=${TARGET_ARCH} -mtune=${TARGET_ARCH} -Wunused-parameter -Wextra -Wreorder -std=c++11")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcpu=${TARGET_ARCH} -mtune=${TARGET_ARCH}")
+    elseif(${CMAKE_SYSTEM_PROCESSOR} MATCHES "riscv64")
+        # Nothing specific
     elseif(NOT WIN32)
-        if(NOT CMAKE_CXX_FLAGS MATCHES "-march")
+        if(NOT CMAKE_CXX_FLAGS MATCHES "-march" AND NOT CMAKE_CXX_FLAGS MATCHES "-arch" AND NOT CMAKE_OSX_ARCHITECTURES)
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=${TARGET_ARCH}")
-        endif()
-        CHECK_CXX_COMPILER_FLAG("-std=c++11" HAS_CPP11_FLAG)
-        if (ENABLE_XTL_COMPLEX)
-            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fPIC -Wunused-parameter -Wextra -Wreorder -std=c++14")
-        elseif (HAS_CPP11_FLAG)
-            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fPIC -Wunused-parameter -Wextra -Wreorder -std=c++11")
-        else()
-            message(FATAL_ERROR "Unsupported compiler -- xsimd requires C++11 support!")
         endif()
     endif()
 endif()
@@ -94,7 +115,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
     set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
 endif()
 
-if(CMAKE_CXX_COMPILER_ID MATCHES Clang AND WIN32) # We are using clang-cl
+if(CMAKE_CXX_COMPILER_ID MATCHES Clang AND MSVC AND WIN32) # We are using clang-cl
     add_compile_options(/EHsc /bigobj)
     set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
 endif()
@@ -154,6 +175,7 @@ set(XSIMD_TESTS
     test_batch_int.cpp
     test_bitwise_cast.cpp
     test_batch_constant.cpp
+    test_batch_manip.cpp
     test_complex_exponential.cpp
     test_complex_hyperbolic.cpp
     test_complex_power.cpp
@@ -170,9 +192,11 @@ set(XSIMD_TESTS
     test_power.cpp
     test_rounding.cpp
     test_select.cpp
-    test_shuffle_128.cpp
+    test_shuffle.cpp
+    test_sum.cpp
     test_traits.cpp
     test_trigonometric.cpp
+    test_xsimd_api.cpp
     test_utils.hpp
 )
 

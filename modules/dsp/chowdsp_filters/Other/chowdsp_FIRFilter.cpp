@@ -101,7 +101,7 @@ inline FloatType FIRFilter<FloatType>::simdInnerProduct (const FloatType* z, con
         batch_y += hReg * zReg;
     }
 
-    return xsimd::hadd (batch_y);
+    return xsimd::reduce_add (batch_y);
 }
 
 template <typename FloatType>
