@@ -23,11 +23,11 @@ WernerFilterPlugin::WernerFilterPlugin()
 void WernerFilterPlugin::addParameters (Parameters& params)
 {
     using namespace chowdsp::ParamUtils;
-    createFreqParameter (params, freqTag, "Frequency", 20.0f, 20000.0f, 2000.0f, 1000.0f);
-    createPercentParameter (params, resonanceTag, "Resonance", 0.5f);
-    createPercentParameter (params, dampingTag, "Damping", 0.5f);
-    createPercentParameter (params, morphTag, "Morph", 0.0f);
-    emplace_param<chowdsp::ChoiceParameter> (params, modeTag, "Mode", juce::StringArray ("LPF2", "BPF2", "HPF2", "Multi-Mode", "LPF4"), 3);
+    createFreqParameter (params, { freqTag, 100 }, "Frequency", 20.0f, 20000.0f, 2000.0f, 1000.0f);
+    createPercentParameter (params, { resonanceTag, 100 }, "Resonance", 0.5f);
+    createPercentParameter (params, { dampingTag, 100 }, "Damping", 0.5f);
+    createPercentParameter (params, { morphTag, 100 }, "Morph", 0.0f);
+    emplace_param<chowdsp::ChoiceParameter> (params, juce::ParameterID { modeTag, 100 }, "Mode", juce::StringArray ("LPF2", "BPF2", "HPF2", "Multi-Mode", "LPF4"), 3);
 }
 
 void WernerFilterPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)

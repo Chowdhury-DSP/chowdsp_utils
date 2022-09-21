@@ -20,10 +20,10 @@ PolygonalOscPlugin::PolygonalOscPlugin()
 void PolygonalOscPlugin::addParameters (Parameters& params)
 {
     using namespace chowdsp::ParamUtils;
-    createGainDBParameter (params, gainTag, "Gain", -30.0f, 0.0f, -24.0f);
-    createFreqParameter (params, freqTag, "Frequency", 20.0f, 2000.0f, 200.0f, 440.0f);
-    emplace_param<chowdsp::FloatParameter> (params, orderTag, "Order", createNormalisableRange (2.01f, 10.0f, 4.0f), 3.5f, &floatValToString, &stringToFloatVal);
-    createPercentParameter (params, teethTag, "Teeth", 0.0f);
+    createGainDBParameter (params, { gainTag, 100 }, "Gain", -30.0f, 0.0f, -24.0f);
+    createFreqParameter (params, { freqTag, 100 }, "Frequency", 20.0f, 2000.0f, 200.0f, 440.0f);
+    emplace_param<chowdsp::FloatParameter> (params, juce::ParameterID { orderTag, 100 }, "Order", createNormalisableRange (2.01f, 10.0f, 4.0f), 3.5f, &floatValToString, &stringToFloatVal);
+    createPercentParameter (params, { teethTag, 100 }, "Teeth", 0.0f);
 }
 
 void PolygonalOscPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)

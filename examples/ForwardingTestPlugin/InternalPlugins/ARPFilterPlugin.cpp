@@ -23,11 +23,11 @@ ARPFilterPlugin::ARPFilterPlugin()
 void ARPFilterPlugin::addParameters (Parameters& params)
 {
     using namespace chowdsp::ParamUtils;
-    createFreqParameter (params, freqTag, "Frequency", 20.0f, 20000.0f, 2000.0f, 1000.0f);
-    emplace_param<chowdsp::FloatParameter> (params, qTag, "Q", createNormalisableRange (0.5f, 2.5f, 0.7071f), 0.7071f, &floatValToString, &stringToFloatVal);
-    emplace_param<chowdsp::BoolParameter> (params, limitModeTag, "Limit Mode", false);
-    createBipolarPercentParameter (params, notchTag, "Notch Offset", 0.0f);
-    emplace_param<chowdsp::ChoiceParameter> (params, modeTag, "Mode", juce::StringArray ("LPF2", "BPF2", "HPF2", "Notch"), 0);
+    createFreqParameter (params, { freqTag, 100 }, "Frequency", 20.0f, 20000.0f, 2000.0f, 1000.0f);
+    emplace_param<chowdsp::FloatParameter> (params, juce::ParameterID { qTag, 100 }, "Q", createNormalisableRange (0.5f, 2.5f, 0.7071f), 0.7071f, &floatValToString, &stringToFloatVal);
+    emplace_param<chowdsp::BoolParameter> (params, juce::ParameterID { limitModeTag, 100 }, "Limit Mode", false);
+    createBipolarPercentParameter (params, { notchTag, 100 }, "Notch Offset", 0.0f);
+    emplace_param<chowdsp::ChoiceParameter> (params, juce::ParameterID { modeTag, 100 }, "Mode", juce::StringArray ("LPF2", "BPF2", "HPF2", "Notch"), 0);
 }
 
 void ARPFilterPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)
