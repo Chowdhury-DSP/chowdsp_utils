@@ -35,7 +35,7 @@ public:
     template <bool shouldUpdate = true>
     void setCutoffFrequency (SampleType newFrequencyHz)
     {
-        filter.setCutoffFrequency<shouldUpdate> (newFrequencyHz);
+        filter.template setCutoffFrequency<shouldUpdate> (newFrequencyHz);
     }
 
     /**
@@ -48,7 +48,7 @@ public:
     template <bool shouldUpdate = true>
     void setQValue (SampleType newResonance)
     {
-        filter.setQValue<shouldUpdate> (newResonance);
+        filter.template setQValue<shouldUpdate> (newResonance);
     }
 
     /**
@@ -60,7 +60,7 @@ public:
     template <bool shouldUpdate = true>
     void setGain (SampleType newGainLinear)
     {
-        filter.setGain<shouldUpdate> (newGainLinear);
+        filter.template setGain<shouldUpdate> (newGainLinear);
     }
 
     /**
@@ -72,7 +72,7 @@ public:
     template <bool shouldUpdate = true>
     void setGainDecibels (SampleType newGainDecibels)
     {
-        filter.setGainDecibels<shouldUpdate> (newGainDecibels);
+        filter.template setGainDecibels<shouldUpdate> (newGainDecibels);
     }
 
     /**
