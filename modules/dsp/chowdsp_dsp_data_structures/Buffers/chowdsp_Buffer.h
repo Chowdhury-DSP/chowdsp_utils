@@ -88,11 +88,18 @@ public:
 private:
 #if ! CHOWDSP_NO_XSIMD
     using Allocator = xsimd::default_allocator<SampleType>;
+    static constexpr size_t defaultAlignment = xsimd::default_arch::alignment();
 #else
     using Allocator = std::allocator<SampleType>;
+    static constexpr size_t defaultAlignment = 4;
 #endif
     using ChannelData = std::vector<SampleType, Allocator>;
     std::vector<ChannelData> rawData;
+
+    // if the buffer doesn't need too much memory, let's use some stack-allocated memory for better cache locality.
+    static constexpr int stackMaxNumChannels = 2;
+    static constexpr int stackMaxNumSamples = 2048;
+    alignas (defaultAlignment) std::array<std::array<SampleType, (size_t) stackMaxNumSamples>, (size_t) stackMaxNumChannels> stackMemory {};
 
     int currentNumChannels = 0;
     int currentNumSamples = 0;
