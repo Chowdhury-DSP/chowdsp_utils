@@ -19,17 +19,9 @@ void Buffer<SampleType>::setMaxSize (int numChannels, int numSamples)
     currentNumChannels = 0;
     currentNumSamples = 0;
 
-    if (numChannels <= stackMaxNumChannels && numSamples <= stackMaxNumSamples)
-    {
-        for (int ch = 0; ch < numChannels; ++ch)
-            channelPointers[(size_t) ch] = stackMemory[(size_t) ch].data();
-    }
-    else
-    {
-        rawData.resize ((size_t) numChannels, ChannelData ((size_t) numSamples, SampleType {}));
+    rawData.resize ((size_t) numChannels, ChannelData ((size_t) numSamples, SampleType {}));
         for (int ch = 0; ch < numChannels; ++ch)
             channelPointers[(size_t) ch] = rawData[(size_t) ch].data();
-    }
 
     setCurrentSize (numChannels, numSamples);
 }
