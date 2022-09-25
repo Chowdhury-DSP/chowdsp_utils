@@ -15,13 +15,13 @@ void Buffer<SampleType>::setMaxSize (int numChannels, int numSamples)
     jassert (numSamples > 0);
 
     rawData.clear();
-    rawData.resize ((size_t) numChannels, ChannelData ((size_t) numSamples, SampleType {}));
     hasBeenCleared = true;
+    currentNumChannels = 0;
+    currentNumSamples = 0;
 
-    for (int ch = 0; ch < numChannels; ++ch)
-    {
-        channelPointers[(size_t) ch] = rawData[(size_t) ch].data();
-    }
+    rawData.resize ((size_t) numChannels, ChannelData ((size_t) numSamples, SampleType {}));
+        for (int ch = 0; ch < numChannels; ++ch)
+            channelPointers[(size_t) ch] = rawData[(size_t) ch].data();
 
     setCurrentSize (numChannels, numSamples);
 }
