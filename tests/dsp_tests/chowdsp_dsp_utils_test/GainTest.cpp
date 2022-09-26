@@ -51,6 +51,7 @@ TEMPLATE_TEST_CASE ("Gain Test", "", float, double, xsimd::batch<float>, xsimd::
 
         gain.setGainLinear ((NumericType) 2);
         refGain.setTargetValue ((NumericType) 2);
+        REQUIRE_MESSAGE (gain.isSmoothing() == refGain.isSmoothing(), "isSmoothing() is incorrect!");
         std::transform (bufferData, bufferData + blockSize, bufferData, [] (auto) { return (T) 1; });
         gain.process (buffer);
         for (int i = 0; i < blockSize; ++i)

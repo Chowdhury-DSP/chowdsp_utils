@@ -12,7 +12,7 @@ const juce::String waveshaperTag = "waveshaper";
 SignalGeneratorPlugin::SignalGeneratorPlugin()
 {
     using namespace chowdsp::ParamUtils;
-    freqHzParamSmoothed.setParameterHandle (dynamic_cast<chowdsp::FloatParameter*> (vts.getParameter (freqTag)));
+    freqHzParamSmoothed.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, freqTag));
     loadParameterPointer (toneTypeParam, vts, typeTag);
     loadParameterPointer (upSampleParam, vts, upsampleTag);
     loadParameterPointer (gainDBParam, vts, gainTag);
