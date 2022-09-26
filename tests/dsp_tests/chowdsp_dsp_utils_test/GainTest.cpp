@@ -44,14 +44,17 @@ TEMPLATE_TEST_CASE ("Gain Test", "", float, double, xsimd::batch<float>, xsimd::
         chowdsp::Buffer<T> buffer (1, blockSize);
         auto* bufferData = buffer.getWritePointer (0);
 
-        std::transform (bufferData, bufferData + blockSize, bufferData, [] (auto) { return (T) 1; });
+        std::transform (bufferData, bufferData + blockSize, bufferData, [] (auto)
+                        { return (T) 1; });
         gain.process (buffer);
         for (int i = 0; i < blockSize; ++i)
             REQUIRE_MESSAGE (bufferData[i] == SIMDApprox<T> ((T) refGain.getNextValue()).margin ((NumericType) maxErr), "Unsmoothed gain is incorrect!");
 
         gain.setGainLinear ((NumericType) 2);
         refGain.setTargetValue ((NumericType) 2);
-        std::transform (bufferData, bufferData + blockSize, bufferData, [] (auto) { return (T) 1; });
+        REQUIRE_MESSAGE (gain.isSmoothing() == refGain.isSmoothing(), "isSmoothing() is incorrect!");
+        std::transform (bufferData, bufferData + blockSize, bufferData, [] (auto)
+                        { return (T) 1; });
         gain.process (buffer);
         for (int i = 0; i < blockSize; ++i)
             REQUIRE_MESSAGE (bufferData[i] == SIMDApprox<T> ((T) refGain.getNextValue()).margin ((NumericType) maxErr), "Smoothed gain is incorrect!");
@@ -59,7 +62,8 @@ TEMPLATE_TEST_CASE ("Gain Test", "", float, double, xsimd::batch<float>, xsimd::
 
         gain.reset();
         refGain.reset (0.1, (double) fs);
-        std::transform (bufferData, bufferData + blockSize, bufferData, [] (auto) { return (T) 1; });
+        std::transform (bufferData, bufferData + blockSize, bufferData, [] (auto)
+                        { return (T) 1; });
         gain.process (buffer);
         for (int i = 0; i < blockSize; ++i)
             REQUIRE_MESSAGE (bufferData[i] == SIMDApprox<T> ((T) refGain.getNextValue()).margin ((NumericType) maxErr), "Gain after reset is incorrect!");

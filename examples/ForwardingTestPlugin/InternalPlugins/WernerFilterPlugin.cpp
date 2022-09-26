@@ -17,7 +17,7 @@ WernerFilterPlugin::WernerFilterPlugin()
     loadParameterPointer (dampingParam, vts, dampingTag);
     loadParameterPointer (modeParam, vts, modeTag);
 
-    morphParam.setParameterHandle (dynamic_cast<chowdsp::FloatParameter*> (vts.getParameter (morphTag)));
+    morphParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, morphTag)));
 }
 
 void WernerFilterPlugin::addParameters (Parameters& params)
