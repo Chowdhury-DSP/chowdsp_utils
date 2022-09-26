@@ -47,6 +47,15 @@ namespace ParamUtils
         parameter = typedParameter;
     }
 
+#if JUCE_VERSION >= 0x070000
+    /** Loads a parameter of a given type from the AudioProcessorValueTreeState */
+    template <typename ParameterPointerType>
+    void loadParameterPointer (ParameterPointerType& parameter, const juce::AudioProcessorValueTreeState& vts, const juce::ParameterID& parameterID)
+    {
+        loadParameterPointer (parameter, vts, juce::StringRef { parameterID.getParamID() });
+    }
+#endif
+
     /**
      * Useful alias for `params.push_back (std::make_unique<ParamType> (args...));`
      */
