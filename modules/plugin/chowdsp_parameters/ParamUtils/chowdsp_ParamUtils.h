@@ -32,19 +32,31 @@ namespace ParamUtils
     }
     float stringToFloatVal (const juce::String& s);
 
-    /** Loads a parameter of a given type from the AudioProcessorValueTreeState */
+    /** Returns a parameter of a given type from the AudioProcessorValueTreeState */
     template <typename ParameterPointerType>
-    void loadParameterPointer (ParameterPointerType& parameter, const juce::AudioProcessorValueTreeState& vts, juce::StringRef parameterID)
+    ParameterPointerType getParameterPointer (const juce::AudioProcessorValueTreeState& vts, const chowdsp::ParameterID& parameterID)
     {
-        static_assert (std::is_base_of_v<juce::RangedAudioParameter, std::remove_pointer_t<ParameterPointerType>>);
+        static_assert (std::is_pointer_v<ParameterPointerType>, "Parameter pointer type must be a pointer!");
+        static_assert (std::is_base_of_v<juce::RangedAudioParameter, std::remove_pointer_t<ParameterPointerType>>, "Parameter type must be derived from juce::RangedAudioParameter");
 
+#if JUCE_VERSION < 0x070000
         auto* baseParameter = vts.getParameter (parameterID);
+#else
+        auto* baseParameter = vts.getParameter (parameterID.getParamID());
+#endif
         jassert (baseParameter != nullptr); // parameter was not found in the ValueTreeState!
 
         auto* typedParameter = dynamic_cast<ParameterPointerType> (baseParameter);
         jassert (typedParameter != nullptr); // parameter has the incorrect type!
 
-        parameter = typedParameter;
+        return typedParameter;
+    }
+
+    /** Loads a parameter of a given type from the AudioProcessorValueTreeState */
+    template <typename ParameterPointerType>
+    void loadParameterPointer (ParameterPointerType& parameter, const juce::AudioProcessorValueTreeState& vts, const chowdsp::ParameterID& parameterID)
+    {
+        parameter = getParameterPointer<ParameterPointerType> (vts, parameterID);
     }
 
     /**

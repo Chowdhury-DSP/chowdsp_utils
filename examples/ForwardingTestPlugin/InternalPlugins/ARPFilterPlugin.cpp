@@ -17,7 +17,7 @@ ARPFilterPlugin::ARPFilterPlugin()
     loadParameterPointer (limitModeParam, vts, limitModeTag);
     loadParameterPointer (modeParam, vts, modeTag);
 
-    notchParam.setParameterHandle (dynamic_cast<chowdsp::FloatParameter*> (vts.getParameter (notchTag)));
+    notchParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, notchTag));
 }
 
 void ARPFilterPlugin::addParameters (Parameters& params)
