@@ -20,6 +20,9 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 #pragma once
 
+// STL includes
+#include <thread>
+
 // JUCE includes
 #include <chowdsp_core/chowdsp_core.h>
 
