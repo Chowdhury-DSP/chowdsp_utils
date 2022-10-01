@@ -41,8 +41,7 @@ public:
 
         for (int i = 0; i < 25; ++i)
         {
-            action.call ([&counter]
-                         { counter.increment(); });
+            action.call ([&counter] { counter.increment(); });
             refCounter.fetch_add (1);
             juce::MessageManager::getInstance()->runDispatchLoopUntil (5);
         }
