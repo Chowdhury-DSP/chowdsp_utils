@@ -3,14 +3,12 @@ namespace chowdsp
 template <typename T>
 void SawtoothWave<T>::setFrequency (T newFrequency) noexcept
 {
-    using namespace SIMDUtils;
-
     freq = newFrequency;
     deltaPhase = (T) 2 * freq / fs;
 
     // scale by zero if freq == 0, to avoid divide by zero issue
     waveformPreservingScale = fs / ((T) 4 * freq);
-    waveformPreservingScale = select (freq == (T) 0, (T) 0, waveformPreservingScale);
+    waveformPreservingScale = SIMDUtils::select (freq == (T) 0, (T) 0, waveformPreservingScale);
 }
 
 template <typename T>

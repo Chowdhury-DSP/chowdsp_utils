@@ -53,10 +53,8 @@ public:
 private:
     inline void updatePhase() noexcept
     {
-        using namespace SIMDUtils;
-
         phi += deltaPhase;
-        phi = select (phi >= (T) 1, phi - (T) 2, phi);
+        phi = SIMDUtils::select (phi >= (T) 1, phi - (T) 2, phi);
     }
 
     T z {};
