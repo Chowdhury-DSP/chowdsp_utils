@@ -11,14 +11,17 @@ namespace chowdsp
  * real-time thread). This class uses juce::AsyncUpdater, and a lock-free
  * queue to make that happen.
  */
-class DeferredAction : private juce::AsyncUpdater
+class DeferredAction : private juce::Timer
 {
 public:
     /**
      * Constructs the deferred action handler with a given default
      * size to use for the lock-free queue.
      */
-    explicit DeferredAction (int queueSize = 32) : queue ((size_t) queueSize) {}
+    explicit DeferredAction (int queueSize = 32) : queue ((size_t) queueSize)
+    {
+        startTimer (5);
+    }
 
     /**
      * Calls the operation. If this is called from the main thread,
@@ -53,21 +56,26 @@ public:
             queue.enqueue (std::forward<Callable> (operationToDefer));
         }
 
-        triggerAsyncUpdate();
+        callbacksReady.store (true);
     }
 
 private:
-    void handleAsyncUpdate() override
+    void timerCallback() override
     {
-        Action action;
-        if (queue.try_dequeue (mainThreadConsumerToken, action))
-            action();
+        if (AtomicHelpers::compareNegate (callbacksReady))
+        {
+            Action action;
+            while (queue.try_dequeue (mainThreadConsumerToken, action))
+                action();
+        }
     }
 
     using Action = juce::dsp::FixedSizeFunction<256, void()>;
     moodycamel::ConcurrentQueue<Action> queue;
 
     moodycamel::ConsumerToken mainThreadConsumerToken { queue };
+
+    std::atomic_bool callbacksReady { false };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DeferredAction)
 };
