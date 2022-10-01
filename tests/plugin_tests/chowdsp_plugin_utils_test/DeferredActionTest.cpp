@@ -41,12 +41,13 @@ public:
 
         for (int i = 0; i < 25; ++i)
         {
-            action.call ([&counter] { counter.increment(); });
+            action.call ([&counter]
+                         { counter.increment(); });
             refCounter.fetch_add (1);
             juce::MessageManager::getInstance()->runDispatchLoopUntil (5);
         }
 
-        juce::MessageManager::getInstance()->runDispatchLoopUntil (100); // clear up any remaining async updates
+        juce::MessageManager::getInstance()->runDispatchLoopUntil (250); // clear up any remaining async updates
 
         expectEquals (counter.count, refCounter.load(), "Final count is incorrect!");
     }
