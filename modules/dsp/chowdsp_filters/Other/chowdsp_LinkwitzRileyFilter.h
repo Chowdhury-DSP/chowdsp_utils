@@ -137,6 +137,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LinkwitzRileyFilter)
 };
 
+#if CHOWDSP_USING_JUCE
 /**
  * Linkwitz-Riley Crossover Filter
  *
@@ -200,4 +201,5 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LinkwitzRileyFilter)
 };
+#endif // CHOWDSP_USING_JUCE
 } // namespace chowdsp
