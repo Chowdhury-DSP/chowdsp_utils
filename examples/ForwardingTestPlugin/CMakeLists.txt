@@ -18,6 +18,7 @@ target_sources(ForwardingTestPlugin
         InternalPlugins/WernerFilterPlugin.cpp
         InternalPlugins/ARPFilterPlugin.cpp
         InternalPlugins/PolygonalOscPlugin.cpp
+        InternalPlugins/BandSplitPlugin.cpp
 )
 
 target_compile_definitions(ForwardingTestPlugin

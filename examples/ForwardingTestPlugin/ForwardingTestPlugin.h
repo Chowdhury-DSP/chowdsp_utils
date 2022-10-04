@@ -7,6 +7,7 @@
 #include "InternalPlugins/WernerFilterPlugin.h"
 #include "InternalPlugins/ARPFilterPlugin.h"
 #include "InternalPlugins/PolygonalOscPlugin.h"
+#include "InternalPlugins/BandSplitPlugin.h"
 
 class ForwardingTestPlugin : public chowdsp::PluginBase<ForwardingTestPlugin>,
                              private juce::AudioProcessorValueTreeState::Listener
@@ -38,6 +39,7 @@ private:
     WernerFilterPlugin wernerFilter;
     ARPFilterPlugin arpFilter;
     PolygonalOscPlugin polygonalOsc;
+    BandSplitPlugin bandSplit;
 
     struct ParamForwardingProvider
     {
