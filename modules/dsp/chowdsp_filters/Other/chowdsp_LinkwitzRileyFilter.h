@@ -47,7 +47,7 @@ public:
         }
         else
         {
-            crossoverFilter.setQValue (qVals [0]);
+            crossoverFilter.setQValue (qVals[0]);
 
             static_assert (numLeftoverFilters + 1 == halfFilterOrder);
             for (size_t i = 0; i < (size_t) numLeftoverFilters; ++i)

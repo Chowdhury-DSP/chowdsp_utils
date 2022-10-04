@@ -40,23 +40,20 @@ public:
     template <typename Func>
     void doForEachFilter (Func&& func)
     {
-        chowdsp::TupleHelpers::forEachInTuple ([&] (auto& filter, size_t)
-                                               { func (filter); },
+        chowdsp::TupleHelpers::forEachInTuple ([&] (auto& filter, size_t) { func (filter); },
                                                filters);
     }
 
     /** Prepares each filter in the chain */
     void prepare (const juce::dsp::ProcessSpec& spec)
     {
-        doForEachFilter ([&spec] (auto& f)
-                         { f.prepare (spec); });
+        doForEachFilter ([&spec] (auto& f) { f.prepare (spec); });
     }
 
     /** Resets each filter in the chain */
     void reset()
     {
-        doForEachFilter ([] (auto& f)
-                         { f.reset(); });
+        doForEachFilter ([] (auto& f) { f.reset(); });
     }
 
     /** Processes an individual sample through the filter chain */
