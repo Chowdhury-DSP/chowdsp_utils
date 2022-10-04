@@ -26,7 +26,8 @@ void ForwardingTestPlugin::addParameters (Parameters& params)
                                                  "Reverb",
                                                  "Werner Filter",
                                                  "ARP Filter",
-                                                 "Polygonal Oscillator" },
+                                                 "Polygonal Oscillator",
+                                                 "Band Split" },
                                              0);
 }
 
@@ -37,6 +38,7 @@ void ForwardingTestPlugin::prepareToPlay (double sampleRate, int samplesPerBlock
     wernerFilter.prepareToPlay (sampleRate, samplesPerBlock);
     arpFilter.prepareToPlay (sampleRate, samplesPerBlock);
     polygonalOsc.prepareToPlay (sampleRate, samplesPerBlock);
+    bandSplit.prepareToPlay (sampleRate, samplesPerBlock);
 }
 
 void ForwardingTestPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
@@ -95,6 +97,9 @@ juce::AudioProcessor* ForwardingTestPlugin::getProcessorForIndex (int index)
 
     if (index == 5)
         return &polygonalOsc;
+
+    if (index == 6)
+        return &bandSplit;
 
     return nullptr;
 }

@@ -14,6 +14,7 @@ enum class StateVariableFilterType
     LowShelf,
     HighShelf,
     MultiMode, /**< Allows the filter to be interpolated between lowpass, bandpass, and highpass */
+    Crossover, /**< Returns both the highpass and lowpass outputs of the filter, for use in crossover filters */
 };
 
 /**
@@ -74,8 +75,8 @@ public:
      * Sets the Mode of a multi-mode filter. The mode parameter is expected to be in [0, 1],
      * where 0 corresponds to a LPF, 0.5 corresponds to a BPF, and 1 corresponds to a HPF.
      */
-    template <FilterType M = type>
-    std::enable_if_t<M == FilterType::MultiMode, void> setMode (NumericType mode);
+    template <StateVariableFilterType M = type>
+    std::enable_if_t<M == StateVariableFilterType::MultiMode, void> setMode (NumericType mode);
 
     /**
      * Updates the filter coefficients.
@@ -107,7 +108,8 @@ public:
     void snapToZero() noexcept;
 
     /** Process block of samples */
-    void processBlock (const chowdsp::BufferView<SampleType>& block) noexcept
+    template <StateVariableFilterType M = type>
+    std::enable_if_t<M != StateVariableFilterType::Crossover, void> processBlock (const chowdsp::BufferView<SampleType>& block) noexcept
     {
         const auto numChannels = (int) block.getNumChannels();
         const auto numSamples = (int) block.getNumSamples();
@@ -120,6 +122,37 @@ public:
 
             for (int i = 0; i < numSamples; ++i)
                 sampleData[i] = processSampleInternal (sampleData[i], s1.get(), s2.get());
+        }
+
+#if JUCE_SNAP_TO_ZERO
+        snapToZero();
+#endif
+    }
+
+    /** Process block of samples */
+    template <StateVariableFilterType M = type>
+    std::enable_if_t<M == StateVariableFilterType::Crossover, void> processBlock (const chowdsp::BufferView<SampleType>& blockIn,
+                                                                                  const chowdsp::BufferView<SampleType>& blockLow,
+                                                                                  const chowdsp::BufferView<SampleType>& blockHigh) noexcept
+    {
+        const auto numChannels = blockIn.getNumChannels();
+        const auto numSamples = blockIn.getNumSamples();
+
+        jassert (blockLow.getNumChannels() == numChannels);
+        jassert (blockHigh.getNumChannels() == numChannels);
+        jassert (blockLow.getNumSamples() == numSamples);
+        jassert (blockHigh.getNumSamples() == numSamples);
+
+        for (int channel = 0; channel < numChannels; ++channel)
+        {
+            const auto* inData = blockIn.getReadPointer (channel);
+            auto* outDataLow = blockLow.getWritePointer (channel);
+            auto* outDataHigh = blockHigh.getWritePointer (channel);
+            ScopedValue s1 { ic1eq[(size_t) channel] };
+            ScopedValue s2 { ic2eq[(size_t) channel] };
+
+            for (int i = 0; i < numSamples; ++i)
+                std::tie (outDataLow[i], outDataHigh[i]) = processSampleInternal (inData[i], s1.get(), s2.get());
         }
 
 #if JUCE_SNAP_TO_ZERO
@@ -163,14 +196,18 @@ public:
 #endif
     }
 
-    /** Processes one sample at a time on a given channel. */
-    inline SampleType processSample (int channel, SampleType inputValue) noexcept
+    /**
+     * Processes one sample at a time on a given channel.
+     *
+     * In "Crossover" mode this method will return a pair of (low-band, high-band).
+     */
+    inline auto processSample (int channel, SampleType inputValue) noexcept
     {
         return processSampleInternal (inputValue, ic1eq[(size_t) channel], ic2eq[(size_t) channel]);
     }
 
 private:
-    inline SampleType processSampleInternal (SampleType x, SampleType& s1, SampleType& s2) noexcept
+    inline auto processSampleInternal (SampleType x, SampleType& s1, SampleType& s2) noexcept
     {
         const auto [v0, v1, v2] = processCore (x, s1, s2);
 
@@ -193,10 +230,14 @@ private:
             return Asq * v0 + k0A * v1 + v2; // Asq * high + k0 * A * band + low
         else if constexpr (type == FilterType::MultiMode)
             return lowpassMult * v2 + bandpassMult * v1 + highpassMult * v0;
+        else if constexpr (type == FilterType::Crossover)
+        {
+            return std::make_pair (v2, -v0);
+        }
         else
         {
             jassertfalse; // unknown filter type!
-            return {};
+            return SampleType {};
         }
     }
 
