@@ -128,8 +128,8 @@ private:
     StateVariableFilter<T, StateVariableFilterType::Crossover> crossoverFilter;
 
     static constexpr auto numLeftoverFilters = (Order - 2) / 2;
-    std::array<StateVariableFilter<T, StateVariableFilterType::Lowpass>, numLeftoverFilters> lpfs;
-    std::array<StateVariableFilter<T, StateVariableFilterType::Highpass>, numLeftoverFilters> hpfs;
+    std::array<StateVariableFilter<T, StateVariableFilterType::Lowpass>, (size_t) numLeftoverFilters> lpfs;
+    std::array<StateVariableFilter<T, StateVariableFilterType::Highpass>, (size_t) numLeftoverFilters> hpfs;
 
     static constexpr auto halfFilterOrder = needsPhaseFlip ? numLeftoverFilters : (Order / 2);
     static constexpr auto qVals = QValCalcs::butterworth_Qs<SampleTypeHelpers::NumericType<T>, halfFilterOrder>();
