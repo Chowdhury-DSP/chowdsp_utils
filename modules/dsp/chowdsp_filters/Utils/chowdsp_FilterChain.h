@@ -44,6 +44,12 @@ public:
                                                filters);
     }
 
+    /** Prepares each filter in the chain */
+    void prepare (const juce::dsp::ProcessSpec& spec)
+    {
+        doForEachFilter ([&spec] (auto& f) { f.prepare (spec); });
+    }
+
     /** Resets each filter in the chain */
     void reset()
     {
