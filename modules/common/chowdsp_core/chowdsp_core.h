@@ -69,3 +69,4 @@ namespace experimental
 #include "DataStructures/chowdsp_TupleHelpers.h"
 #include "Memory/chowdsp_MemoryAliasing.h"
 #include "Types/chowdsp_TypeTraits.h"
+#include "Types/chowdsp_TypesList.h"
