@@ -3,6 +3,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [UNRELEASED]
+- Added `LinkwitzRileyFilter` class.
+- Added `TypesList` meta-programming helpers.
 - Updated XSIMD to version 9.0.1.
 
 ## [1.2.0] 2022-09-03
