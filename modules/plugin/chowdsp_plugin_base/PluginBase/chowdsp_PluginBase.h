@@ -85,6 +85,7 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     virtual juce::String getWrapperTypeString() const;
+    bool supportsParameterModulation() const;
 
 protected:
     using Parameters = chowdsp::Parameters;
@@ -234,4 +235,13 @@ juce::String PluginBase<Processor>::getWrapperTypeString() const
 #endif
 }
 
+template <class Processor>
+bool PluginBase<Processor>::supportsParameterModulation() const
+{
+#if JUCE_MODULE_AVAILABLE_chowdsp_clap_extensions
+    return CLAPExtensions::CLAPInfoExtensions::is_clap;
+#else
+    return false;
+#endif
+}
 } // namespace chowdsp
