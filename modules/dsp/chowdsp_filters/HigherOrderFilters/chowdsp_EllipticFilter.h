@@ -15,10 +15,10 @@ enum class EllipticFilterType
  * @tparam order The filter order (must be even)
  * @tparam type  The filter type
  * @tparam stopBandAttenuationDB    The attenuation in the stop-band of the filter (should be given as a positive number)
- * @tparam thousandXPassbandRippleDB    1000 times the amount of ripple allowed in the pass-band of the filter
+ * @tparam passbandRippleDB         A chowdsp::Ratio describing the amount of ripple allowed in the pass-band of the filter (in Decibels)
  * @tparam FloatType    The floating point type to use
  */
-template <int order, EllipticFilterType type = EllipticFilterType::Lowpass, int stopBandAttenuationDB = 60, int thousandXPassbandRippleDB = 100, typename FloatType = float>
+template <int order, EllipticFilterType type = EllipticFilterType::Lowpass, int stopBandAttenuationDB = 60, typename passbandRippleDB = Ratio<1, 10>, typename FloatType = float>
 class EllipticFilter : public SOSFilter<order, FloatType>
 {
     static constexpr auto NFilters = (size_t) order / 2;
@@ -44,7 +44,8 @@ public:
         juce::ignoreUnused (qVal);
 
         FloatType bCoefs[3], bOppCoefs[3], aCoefs[3];
-        auto calcBaseCoefficients = [&] (FloatType stageFreqOff, FloatType stageQ) {
+        auto calcBaseCoefficients = [&] (FloatType stageFreqOff, FloatType stageQ)
+        {
             switch (type)
             {
                 case EllipticFilterType::Lowpass:
@@ -58,7 +59,8 @@ public:
             }
         };
 
-        auto calcCoefsForQ = [&] (FloatType stageFreqOff, FloatType stageQ, FloatType stageLPGain, size_t stageOrder) {
+        auto calcCoefsForQ = [&] (FloatType stageFreqOff, FloatType stageQ, FloatType stageLPGain, size_t stageOrder)
+        {
             calcBaseCoefficients (stageFreqOff, stageQ);
 
             for (size_t i = 0; i < 3; ++i)
@@ -146,7 +148,8 @@ private:
         // (see _arc_jac_cn [1]) suggests 5.
         constexpr int ARC_JAC_SN_MAXITER = 10;
 
-        auto complement = [] (auto kx) {
+        auto complement = [] (auto kx)
+        {
             return std::pow ((1.0 - kx) * (1.0 + kx), 0.5);
         };
 
@@ -172,7 +175,8 @@ private:
             }
         }
 
-        const auto K = std::accumulate (ks.begin() + 1, ks.end(), 1.0, [] (double prev, double next) { return prev * (1.0 + next); })
+        const auto K = std::accumulate (ks.begin() + 1, ks.end(), 1.0, [] (double prev, double next)
+                                        { return prev * (1.0 + next); })
                        * juce::MathConstants<double>::pi * 0.5;
 
         std::vector<std::complex<double>> wns { w };
@@ -208,12 +212,13 @@ private:
     /** mostly a re-implementation of scipy.signal.cheb2ap */
     static void ellipap (PZSet& poles, PZSet& zeros)
     {
-        auto pow10m1 = [] (double x) {
+        auto pow10m1 = [] (double x)
+        {
             return std::exp (std::log (10.0) * x) - 1.0;
         };
 
-        static constexpr auto rp = (double) thousandXPassbandRippleDB * 0.001;
-        const auto eps_sq = pow10m1 (0.1 * (double) rp);
+        static constexpr auto rp = passbandRippleDB::template value<double>;
+        const auto eps_sq = pow10m1 (0.1 * rp);
 
         const auto eps = std::sqrt (eps_sq);
         const auto ck1_sq = eps_sq / pow10m1 (0.1 * (double) stopBandAttenuationDB);
