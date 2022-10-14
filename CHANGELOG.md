@@ -5,7 +5,9 @@ All notable changes to this project will be documented in this file.
 ## [UNRELEASED]
 - Added `LinkwitzRileyFilter` class.
 - Added `TypesList` meta-programming helpers.
+- Added `Ratio` class for creating template parameter floats.
 - Updated XSIMD to version 9.0.1.
+- Updated elliptic filter template arguments to accept a `Ratio` for the passband ripple.
 
 ## [1.2.0] 2022-09-03
 - Added filters: Kurt Werner's generalized SVF, ARP 1047 filter.
