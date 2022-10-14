@@ -10,4 +10,5 @@ target_sources(chowdsp_math_test
         OtherMathOpsTest.cpp
         JacobiEllipticTest.cpp
         PolylogarithmTest.cpp
+        RatioTest.cpp
 )

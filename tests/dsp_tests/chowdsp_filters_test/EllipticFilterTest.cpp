@@ -36,7 +36,7 @@ TEMPLATE_TEST_CASE ("Elliptic Filter Test", "", float)
 
     SECTION ("LPF Test")
     {
-        chowdsp::EllipticFilter<8, FilterType::Lowpass, 60, 10, T> filter;
+        chowdsp::EllipticFilter<8, FilterType::Lowpass, 60, chowdsp::Ratio<10, 1000>, T> filter;
         filter.calcCoefs (Constants::fc, (T) 1 / juce::MathConstants<T>::sqrt2, Constants::fs);
 
         testFilter<T> (filter,
@@ -48,7 +48,7 @@ TEMPLATE_TEST_CASE ("Elliptic Filter Test", "", float)
 
     SECTION ("HPF Test")
     {
-        chowdsp::EllipticFilter<8, FilterType::Highpass, 60, 10, T> filter;
+        chowdsp::EllipticFilter<8, FilterType::Highpass, 60, chowdsp::Ratio<10, 1000>, T> filter;
         filter.calcCoefs (Constants::fc, (T) 1 / juce::MathConstants<T>::sqrt2, Constants::fs);
 
         testFilter<T> (filter,
