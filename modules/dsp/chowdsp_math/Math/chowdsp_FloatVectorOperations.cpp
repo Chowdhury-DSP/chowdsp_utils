@@ -67,13 +67,17 @@ namespace detail
     template <typename T, typename ScalarOp, typename VecOp>
     void unaryOp (T* dest, const T* src, int numValues, ScalarOp&& scalarOp, VecOp&& vecOp)
     {
-        auto loadA = [] (const auto* ptr) { return xsimd::load_aligned (ptr); };
+        auto loadA = [] (const auto* ptr)
+        { return xsimd::load_aligned (ptr); };
 
-        auto loadU = [] (const auto* ptr) { return xsimd::load_unaligned (ptr); };
+        auto loadU = [] (const auto* ptr)
+        { return xsimd::load_unaligned (ptr); };
 
-        auto storeA = [] (auto* ptr, const auto& reg) { xsimd::store_aligned (ptr, reg); };
+        auto storeA = [] (auto* ptr, const auto& reg)
+        { xsimd::store_aligned (ptr, reg); };
 
-        auto storeU = [] (auto* ptr, const auto& reg) { xsimd::store_unaligned (ptr, reg); };
+        auto storeU = [] (auto* ptr, const auto& reg)
+        { xsimd::store_unaligned (ptr, reg); };
 
         if (isAligned (dest))
         {
@@ -135,13 +139,17 @@ namespace detail
     template <typename T, typename ScalarOp, typename VecOp>
     void binaryOp (T* dest, const T* src1, const T* src2, int numValues, ScalarOp&& scalarOp, VecOp&& vecOp)
     {
-        auto loadA = [] (const auto* ptr) { return xsimd::load_aligned (ptr); };
+        auto loadA = [] (const auto* ptr)
+        { return xsimd::load_aligned (ptr); };
 
-        auto loadU = [] (const auto* ptr) { return xsimd::load_unaligned (ptr); };
+        auto loadU = [] (const auto* ptr)
+        { return xsimd::load_unaligned (ptr); };
 
-        auto storeA = [] (auto* ptr, const auto& reg) { xsimd::store_aligned (ptr, reg); };
+        auto storeA = [] (auto* ptr, const auto& reg)
+        { xsimd::store_aligned (ptr, reg); };
 
-        auto storeU = [] (auto* ptr, const auto& reg) { xsimd::store_unaligned (ptr, reg); };
+        auto storeU = [] (auto* ptr, const auto& reg)
+        { xsimd::store_unaligned (ptr, reg); };
 
         if (isAligned (dest))
         {
@@ -245,7 +253,8 @@ namespace detail
     template <typename T, typename ScalarOp, typename VecOp>
     T reduce (const T* src, int numValues, T init, ScalarOp&& scalarOp, VecOp&& vecOp)
     {
-        return reduce (src, numValues, init, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), [] (auto val) { return xsimd::reduce_add (val); });
+        return reduce (src, numValues, init, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), [] (auto val)
+                       { return xsimd::reduce_add (val); });
     }
 
     template <typename T, typename Op>
@@ -265,7 +274,8 @@ namespace detail
             return reduceFallback (src1, src2, numValues, init, std::forward<ScalarOp> (scalarOp));
 
         // Main loop here:
-        auto vecLoop = [&] (auto&& loadOp1, auto&& loadOp2) {
+        auto vecLoop = [&] (auto&& loadOp1, auto&& loadOp2)
+        {
             xsimd::batch<T> resultVec {};
             while (--numVecOps >= 0)
             {
@@ -278,8 +288,10 @@ namespace detail
         };
 
         // define load operations
-        auto loadA = [] (const T* val) { return xsimd::load_aligned (val); };
-        auto loadU = [] (const T* val) { return xsimd::load_unaligned (val); };
+        auto loadA = [] (const T* val)
+        { return xsimd::load_aligned (val); };
+        auto loadU = [] (const T* val)
+        { return xsimd::load_unaligned (val); };
 
         // select load operations based on data alignment
         const auto isSrc1Aligned = isAligned (src1);
@@ -305,67 +317,14 @@ namespace detail
     template <typename T, typename ScalarOp, typename VecOp>
     T reduce (const T* src1, const T* src2, int numValues, T init, ScalarOp&& scalarOp, VecOp&& vecOp)
     {
-        return reduce (src1, src2, numValues, init, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), [] (auto val) { return xsimd::reduce_add (val); });
+        return reduce (src1, src2, numValues, init, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), [] (auto val)
+                       { return xsimd::reduce_add (val); });
     }
 
     template <typename T, typename Op>
     T reduce (const T* src1, const T* src2, int numValues, T init, Op&& op)
     {
         return reduce (src1, src2, numValues, init, std::forward<Op> (op), std::forward<Op> (op));
-    }
-
-// This code was written for FloatVectorOperations::containsNaN, but it hasn't been performing as well,
-// as the naive implementation so let's leave it commented out for now.
-    template <typename T, typename Op>
-    bool reduceBoolFallback (const T* src, int numValues, bool init, Op&& op)
-    {
-        for (int i = 0; i < numValues; ++i)
-            init = op (init, src[i]);
-
-        return init;
-    }
-
-    template <typename T, typename ScalarOp, typename VecOp, typename VecReduceOp>
-    bool reduceBool (const T* src, int numValues, bool init, ScalarOp&& scalarOp, VecOp&& vecOp, VecReduceOp&& vecReduceOp)
-    {
-        constexpr auto vecSize = (int) xsimd::batch<T>::size;
-        auto numVecOps = numValues / vecSize;
-
-        // Fallback: not enough operations to justify vectorizing!
-        if (numVecOps < 2)
-            return reduceBoolFallback (src, numValues, init, std::forward<ScalarOp> (scalarOp));
-
-        // Fallback: starting pointer is not aligned!
-        if (! isAligned (src))
-        {
-            auto* nextAlignedPtr = getNextAlignedPtr (src);
-            auto diff = int (nextAlignedPtr - src);
-            auto initResult = reduceBoolFallback (src, diff, init, std::forward<ScalarOp> (scalarOp));
-            return reduceBool (nextAlignedPtr, numValues - diff, initResult, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), std::forward<VecReduceOp> (vecReduceOp));
-        }
-
-        // Main loop here...
-        auto resultVec = xsimd::batch_bool<T> (init);
-        while (--numVecOps >= 0)
-        {
-            resultVec = vecOp (resultVec, xsimd::load_aligned (src));
-            src += vecSize;
-        }
-
-        auto result = vecReduceOp (resultVec);
-
-        // leftover values that can't be vectorized...
-        auto leftoverValues = numValues % vecSize;
-        if (leftoverValues > 0)
-            result = reduceBoolFallback (src, leftoverValues, result, std::forward<ScalarOp> (scalarOp));
-
-        return result;
-    }
-
-    template <typename T, typename Op>
-    bool reduceBool (const T* src, int numValues, bool init, Op&& op)
-    {
-        return reduceBool (src, numValues, init, std::forward<Op> (op), std::forward<Op> (op), [] (auto vec) { return xsimd::any (vec); });
     }
 } // namespace detail
 #endif // DOXYGEN
@@ -385,13 +344,15 @@ void divide (float* dest, const float* dividend, const float* divisor, int numVa
 #if JUCE_USE_VDSP_FRAMEWORK
     vDSP_vdiv (divisor, 1, dividend, 1, dest, 1, (vDSP_Length) numValues);
 #elif CHOWDSP_NO_XSIMD
-    std::transform (dividend, dividend + numValues, divisor, dest, [] (auto a, auto b) { return a / b; });
+    std::transform (dividend, dividend + numValues, divisor, dest, [] (auto a, auto b)
+                    { return a / b; });
 #else
     detail::binaryOp (dest,
                       dividend,
                       divisor,
                       numValues,
-                      [] (auto num, auto den) {
+                      [] (auto num, auto den)
+                      {
                           using namespace chowdsp::SIMDUtils;
                           return num / den;
                       });
@@ -403,13 +364,15 @@ void divide (double* dest, const double* dividend, const double* divisor, int nu
 #if JUCE_USE_VDSP_FRAMEWORK
     vDSP_vdivD (divisor, 1, dividend, 1, dest, 1, (vDSP_Length) numValues);
 #elif CHOWDSP_NO_XSIMD
-    std::transform (dividend, dividend + numValues, divisor, dest, [] (auto a, auto b) { return a / b; });
+    std::transform (dividend, dividend + numValues, divisor, dest, [] (auto a, auto b)
+                    { return a / b; });
 #else
     detail::binaryOp (dest,
                       dividend,
                       divisor,
                       numValues,
-                      [] (auto num, auto den) {
+                      [] (auto num, auto den)
+                      {
                           return num / den;
                       });
 #endif
@@ -420,12 +383,14 @@ void divide (float* dest, float dividend, const float* divisor, int numValues) n
 #if JUCE_USE_VDSP_FRAMEWORK
     vDSP_svdiv (&dividend, divisor, 1, dest, 1, (vDSP_Length) numValues);
 #elif CHOWDSP_NO_XSIMD
-    std::transform (divisor, divisor + numValues, dest, [dividend] (auto x) { return dividend / x; });
+    std::transform (divisor, divisor + numValues, dest, [dividend] (auto x)
+                    { return dividend / x; });
 #else
     detail::unaryOp (dest,
                      divisor,
                      numValues,
-                     [dividend] (auto x) {
+                     [dividend] (auto x)
+                     {
                          return dividend / x;
                      });
 #endif
@@ -436,12 +401,14 @@ void divide (double* dest, double dividend, const double* divisor, int numValues
 #if JUCE_USE_VDSP_FRAMEWORK
     vDSP_svdivD (&dividend, divisor, 1, dest, 1, (vDSP_Length) numValues);
 #elif CHOWDSP_NO_XSIMD
-    std::transform (divisor, divisor + numValues, dest, [dividend] (auto x) { return dividend / x; });
+    std::transform (divisor, divisor + numValues, dest, [dividend] (auto x)
+                    { return dividend / x; });
 #else
     detail::unaryOp (dest,
                      divisor,
                      numValues,
-                     [dividend] (auto x) {
+                     [dividend] (auto x)
+                     {
                          return dividend / x;
                      });
 #endif
@@ -460,7 +427,8 @@ float accumulate (const float* src, int numValues) noexcept
         src,
         numValues,
         0.0f,
-        [] (auto prev, auto next) { return prev + next; });
+        [] (auto prev, auto next)
+        { return prev + next; });
 #endif
 }
 
@@ -477,7 +445,8 @@ double accumulate (const double* src, int numValues) noexcept
         src,
         numValues,
         0.0,
-        [] (auto prev, auto next) { return prev + next; });
+        [] (auto prev, auto next)
+        { return prev + next; });
 #endif
 }
 
@@ -495,7 +464,8 @@ float innerProduct (const float* src1, const float* src2, int numValues) noexcep
         src2,
         numValues,
         0.0f,
-        [] (auto prev, auto next1, auto next2) { return prev + next1 * next2; });
+        [] (auto prev, auto next1, auto next2)
+        { return prev + next1 * next2; });
 #endif
 }
 
@@ -513,7 +483,8 @@ double innerProduct (const double* src1, const double* src2, int numValues) noex
         src2,
         numValues,
         0.0,
-        [] (auto prev, auto next1, auto next2) { return prev + next1 * next2; });
+        [] (auto prev, auto next1, auto next2)
+        { return prev + next1 * next2; });
 #endif
 }
 
@@ -524,15 +495,20 @@ float findAbsoluteMaximum (const float* src, int numValues) noexcept
     vDSP_maxmgv (src, 1, &result, (vDSP_Length) numValues);
     return result;
 #elif CHOWDSP_NO_XSIMD
-    return [] (const auto& begin, const auto end) -> float { return std::abs (*std::max_element (begin, end, [] (auto a, auto b) { return std::abs (a) < std::abs (b); })); }(src, src + numValues);
+    return [] (const auto& begin, const auto end) -> float
+    { return std::abs (*std::max_element (begin, end, [] (auto a, auto b)
+                                          { return std::abs (a) < std::abs (b); })); }(src, src + numValues);
 #else
     return detail::reduce (
         src,
         numValues,
         0.0f,
-        [] (auto a, auto b) { return juce::jmax (std::abs (a), std::abs (b)); },
-        [] (auto a, auto b) { return xsimd::max (xsimd::abs (a), xsimd::abs (b)); },
-        [] (auto x) { return SIMDUtils::hAbsMaxSIMD (x); });
+        [] (auto a, auto b)
+        { return juce::jmax (std::abs (a), std::abs (b)); },
+        [] (auto a, auto b)
+        { return xsimd::max (xsimd::abs (a), xsimd::abs (b)); },
+        [] (auto x)
+        { return SIMDUtils::hAbsMaxSIMD (x); });
 #endif
 }
 
@@ -543,15 +519,20 @@ double findAbsoluteMaximum (const double* src, int numValues) noexcept
     vDSP_maxmgvD (src, 1, &result, (vDSP_Length) numValues);
     return result;
 #elif CHOWDSP_NO_XSIMD
-    return [] (const auto& begin, const auto end) -> double { return std::abs (*std::max_element (begin, end, [] (auto a, auto b) { return std::abs (a) < std::abs (b); })); }(src, src + numValues);
+    return [] (const auto& begin, const auto end) -> double
+    { return std::abs (*std::max_element (begin, end, [] (auto a, auto b)
+                                          { return std::abs (a) < std::abs (b); })); }(src, src + numValues);
 #else
     return detail::reduce (
         src,
         numValues,
         0.0,
-        [] (auto a, auto b) { return juce::jmax (a, std::abs (b)); },
-        [] (auto a, auto b) { return xsimd::max (a, xsimd::abs (b)); },
-        [] (auto x) { return SIMDUtils::hMaxSIMD (x); });
+        [] (auto a, auto b)
+        { return juce::jmax (a, std::abs (b)); },
+        [] (auto a, auto b)
+        { return xsimd::max (a, xsimd::abs (b)); },
+        [] (auto x)
+        { return SIMDUtils::hMaxSIMD (x); });
 #endif
 }
 
@@ -575,46 +556,60 @@ void integerPowerT (T* dest, const T* src, int exponent, int numValues) noexcept
             juce::FloatVectorOperations::multiply (dest, src, src, numValues);
             break;
         case 3:
-            detail::unaryOp (dest, src, numValues, [] (auto x) { return ipow<3> (x); });
+            detail::unaryOp (dest, src, numValues, [] (auto x)
+                             { return ipow<3> (x); });
             break;
         case 4:
-            detail::unaryOp (dest, src, numValues, [] (auto x) { return ipow<4> (x); });
+            detail::unaryOp (dest, src, numValues, [] (auto x)
+                             { return ipow<4> (x); });
             break;
         case 5:
-            detail::unaryOp (dest, src, numValues, [] (auto x) { return ipow<5> (x); });
+            detail::unaryOp (dest, src, numValues, [] (auto x)
+                             { return ipow<5> (x); });
             break;
         case 6:
-            detail::unaryOp (dest, src, numValues, [] (auto x) { return ipow<6> (x); });
+            detail::unaryOp (dest, src, numValues, [] (auto x)
+                             { return ipow<6> (x); });
             break;
         case 7:
-            detail::unaryOp (dest, src, numValues, [] (auto x) { return ipow<7> (x); });
+            detail::unaryOp (dest, src, numValues, [] (auto x)
+                             { return ipow<7> (x); });
             break;
         case 8:
-            detail::unaryOp (dest, src, numValues, [] (auto x) { return ipow<8> (x); });
+            detail::unaryOp (dest, src, numValues, [] (auto x)
+                             { return ipow<8> (x); });
             break;
         case 9:
-            detail::unaryOp (dest, src, numValues, [] (auto x) { return ipow<9> (x); });
+            detail::unaryOp (dest, src, numValues, [] (auto x)
+                             { return ipow<9> (x); });
             break;
         case 10:
-            detail::unaryOp (dest, src, numValues, [] (auto x) { return ipow<10> (x); });
+            detail::unaryOp (dest, src, numValues, [] (auto x)
+                             { return ipow<10> (x); });
             break;
         case 11:
-            detail::unaryOp (dest, src, numValues, [] (auto x) { return ipow<11> (x); });
+            detail::unaryOp (dest, src, numValues, [] (auto x)
+                             { return ipow<11> (x); });
             break;
         case 12:
-            detail::unaryOp (dest, src, numValues, [] (auto x) { return ipow<12> (x); });
+            detail::unaryOp (dest, src, numValues, [] (auto x)
+                             { return ipow<12> (x); });
             break;
         case 13:
-            detail::unaryOp (dest, src, numValues, [] (auto x) { return ipow<13> (x); });
+            detail::unaryOp (dest, src, numValues, [] (auto x)
+                             { return ipow<13> (x); });
             break;
         case 14:
-            detail::unaryOp (dest, src, numValues, [] (auto x) { return ipow<14> (x); });
+            detail::unaryOp (dest, src, numValues, [] (auto x)
+                             { return ipow<14> (x); });
             break;
         case 15:
-            detail::unaryOp (dest, src, numValues, [] (auto x) { return ipow<15> (x); });
+            detail::unaryOp (dest, src, numValues, [] (auto x)
+                             { return ipow<15> (x); });
             break;
         case 16:
-            detail::unaryOp (dest, src, numValues, [] (auto x) { return ipow<16> (x); });
+            detail::unaryOp (dest, src, numValues, [] (auto x)
+                             { return ipow<16> (x); });
             break;
         default:
             // this method will not be as fast for values outside the range [0, 16]
@@ -622,8 +617,10 @@ void integerPowerT (T* dest, const T* src, int exponent, int numValues) noexcept
                 dest,
                 src,
                 numValues,
-                [exponent] (auto x) { return std::pow (x, (T) exponent); },
-                [exponent] (auto x) { return xsimd::pow (x, xsimd::batch<T> ((T) exponent)); });
+                [exponent] (auto x)
+                { return std::pow (x, (T) exponent); },
+                [exponent] (auto x)
+                { return xsimd::pow (x, xsimd::batch<T> ((T) exponent)); });
             break;
     }
 }
@@ -656,7 +653,8 @@ float computeRMS (const float* src, int numValues) noexcept
     vDSP_rmsqv (src, 1, &result, (vDSP_Length) numValues);
     return result;
 #elif CHOWDSP_NO_XSIMD
-    return [] (const float* data, int numSamples) -> float {
+    return [] (const float* data, int numSamples) -> float
+    {
         auto squareSum = 0.0;
         for (int i = 0; i < numSamples; ++i)
             squareSum += data[i] * data[i];
@@ -666,7 +664,8 @@ float computeRMS (const float* src, int numValues) noexcept
     const auto squareSum = detail::reduce (src,
                                            numValues,
                                            0.0f,
-                                           [] (auto prev, auto next) { return prev + next * next; });
+                                           [] (auto prev, auto next)
+                                           { return prev + next * next; });
     return std::sqrt (squareSum / (float) numValues);
 #endif
 }
@@ -678,7 +677,8 @@ double computeRMS (const double* src, int numValues) noexcept
     vDSP_rmsqvD (src, 1, &result, (vDSP_Length) numValues);
     return result;
 #elif CHOWDSP_NO_XSIMD
-    return [] (const double* data, int numSamples) -> double {
+    return [] (const double* data, int numSamples) -> double
+    {
         auto squareSum = 0.0;
         for (int i = 0; i < numSamples; ++i)
             squareSum += data[i] * data[i];
@@ -688,82 +688,53 @@ double computeRMS (const double* src, int numValues) noexcept
     const auto squareSum = detail::reduce (src,
                                            numValues,
                                            0.0,
-                                           [] (auto prev, auto next) { return prev + next * next; });
+                                           [] (auto prev, auto next)
+                                           { return prev + next * next; });
     return std::sqrt (squareSum / (double) numValues);
 #endif
 }
 
-bool containsNaN (const float* src, int numValues) noexcept
+int countNaNs (const float* src, int numValues) noexcept
 {
-    // No SIMD implementation is measuring the best on ARM at the moment!
-#if CHOWDSP_NO_XSIMD || JUCE_ARM
-        return [] (const float* data, int numSamples) -> bool {
-            bool doesContainNaN = false;
-            for (int i = 0; i < numSamples; ++i)
-                doesContainNaN |= std::isnan (data[i]);
-            return doesContainNaN;
-        }(src, numValues);
-#else
-    CHOWDSP_USING_XSIMD_STD(isnan);
-    return detail::reduceBool (src,
-                               numValues,
-                               false,
-                               [] (auto prev, auto next) { return prev | isnan (next); });
-#endif
+    return [] (const float* data, int numSamples) -> int
+    {
+        int nanCount = 0;
+        for (int i = 0; i < numSamples; ++i)
+            nanCount += (int) std::isnan (data[i]);
+        return nanCount;
+    }(src, numValues);
 }
 
-bool containsNaN (const double* src, int numValues) noexcept
+int countNaNs (const double* src, int numValues) noexcept
 {
-    // No SIMD implementation is measuring the best on ARM at the moment!
-#if CHOWDSP_NO_XSIMD || JUCE_ARM
-    return [] (const double* data, int numSamples) -> bool {
-        bool doesContainNaN = false;
+    return [] (const double* data, int numSamples) -> int
+    {
+        int nanCount = 0;
         for (int i = 0; i < numSamples; ++i)
-            doesContainNaN |= std::isnan (data[i]);
-        return doesContainNaN;
+            nanCount += (int) std::isnan (data[i]);
+        return nanCount;
     }(src, numValues);
-#else
-    CHOWDSP_USING_XSIMD_STD(isnan);
-    return detail::reduceBool (src,
-                               numValues,
-                               false,
-                               [] (auto prev, auto next) { return prev | isnan (next); });
-#endif
 }
 
-bool containsInf (const float* src, int numValues) noexcept
+int countInfs (const float* src, int numValues) noexcept
 {
-#if CHOWDSP_NO_XSIMD || JUCE_ARM
-    return [] (const float* data, int numSamples) -> bool {
-        bool doesContainInf = false;
+    return [] (const float* data, int numSamples) -> int
+    {
+        int nanCount = 0;
         for (int i = 0; i < numSamples; ++i)
-            doesContainInf |= std::isinf (data[i]);
-        return doesContainInf;
+            nanCount += (int) std::isinf (data[i]);
+        return nanCount;
     }(src, numValues);
-#else
-    CHOWDSP_USING_XSIMD_STD(isinf);
-    return detail::reduceBool (src,
-                               numValues,
-                               false,
-                               [] (auto prev, auto next) { return prev | isinf (next); });
-#endif
 }
 
-bool containsInf (const double* src, int numValues) noexcept
+int countInfs (const double* src, int numValues) noexcept
 {
-#if CHOWDSP_NO_XSIMD || JUCE_ARM
-    return [] (const double* data, int numSamples) -> bool {
-        bool doesContainInf = false;
+    return [] (const double* data, int numSamples) -> int
+    {
+        int nanCount = 0;
         for (int i = 0; i < numSamples; ++i)
-            doesContainInf |= std::isinf (data[i]);
-        return doesContainInf;
+            nanCount += (int) std::isinf (data[i]);
+        return nanCount;
     }(src, numValues);
-#else
-    CHOWDSP_USING_XSIMD_STD(isinf);
-    return detail::reduceBool (src,
-                               numValues,
-                               false,
-                               [] (auto prev, auto next) { return prev | isinf (next); });
-#endif
 }
 } // namespace chowdsp::FloatVectorOperations

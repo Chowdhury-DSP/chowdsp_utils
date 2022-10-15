@@ -1,6 +1,7 @@
 #include <CatchUtils.h>
 #include <chowdsp_math/chowdsp_math.h>
 #include <numeric>
+#include <algorithm>
 
 template <typename T, typename VectorOp, typename ReferenceOp>
 void testReduce1dOp (std::vector<T>& in, VectorOp&& vectorOp, ReferenceOp&& referenceOp, T maxError)
@@ -148,8 +149,10 @@ TEMPLATE_TEST_CASE ("FloatVectorOperations Test", "", float, double)
 
             testUnaryOp (
                 divisor,
-                [] (auto* dest, auto* src, int N) { chowdsp::FloatVectorOperations::divide (dest, (TestType) 1, src, N); },
-                [] (auto x) { return (TestType) 1 / x; },
+                [] (auto* dest, auto* src, int N)
+                { chowdsp::FloatVectorOperations::divide (dest, (TestType) 1, src, N); },
+                [] (auto x)
+                { return (TestType) 1 / x; },
                 (TestType) 1.0e-3);
         }
     }
@@ -173,8 +176,10 @@ TEMPLATE_TEST_CASE ("FloatVectorOperations Test", "", float, double)
             testBinaryOp (
                 dividend,
                 divisor,
-                [] (auto* dest, auto* src1, auto* src2, int N) { chowdsp::FloatVectorOperations::divide (dest, src1, src2, N); },
-                [] (auto num, auto den) { return num / den; },
+                [] (auto* dest, auto* src1, auto* src2, int N)
+                { chowdsp::FloatVectorOperations::divide (dest, src1, src2, N); },
+                [] (auto num, auto den)
+                { return num / den; },
                 (TestType) 1.0e-3);
         }
     }
@@ -193,8 +198,10 @@ TEMPLATE_TEST_CASE ("FloatVectorOperations Test", "", float, double)
 
             testReduce1dOp (
                 values,
-                [] (auto* src, int N) { return chowdsp::FloatVectorOperations::accumulate (src, N); },
-                [] (auto* src, int N) { return std::accumulate (src, src + N, (TestType) 0); },
+                [] (auto* src, int N)
+                { return chowdsp::FloatVectorOperations::accumulate (src, N); },
+                [] (auto* src, int N)
+                { return std::accumulate (src, src + N, (TestType) 0); },
                 (TestType) 1.0e-3);
         }
     }
@@ -218,8 +225,10 @@ TEMPLATE_TEST_CASE ("FloatVectorOperations Test", "", float, double)
             testReduce2dOp (
                 values1,
                 values2,
-                [] (auto* src1, auto* src2, int N) { return chowdsp::FloatVectorOperations::innerProduct (src1, src2, N); },
-                [] (auto* src1, auto* src2, int N) { return std::inner_product (src1, src1 + N, src2, (TestType) 0); },
+                [] (auto* src1, auto* src2, int N)
+                { return chowdsp::FloatVectorOperations::innerProduct (src1, src2, N); },
+                [] (auto* src1, auto* src2, int N)
+                { return std::inner_product (src1, src1 + N, src2, (TestType) 0); },
                 (TestType) 1.0e-3);
         }
     }
@@ -228,7 +237,9 @@ TEMPLATE_TEST_CASE ("FloatVectorOperations Test", "", float, double)
     {
         for (auto& range : testRanges)
         {
-            auto refAbsMax = [] (const auto& begin, const auto end) { return std::abs (*std::max_element (begin, end, [] (auto a, auto b) { return std::abs (a) < std::abs (b); })); };
+            auto refAbsMax = [] (const auto& begin, const auto end)
+            { return std::abs (*std::max_element (begin, end, [] (auto a, auto b)
+                                                  { return std::abs (a) < std::abs (b); })); };
 
             std::uniform_int_distribution<int> rand (range.first, range.second);
             const auto numValues = rand (mt);
@@ -240,8 +251,10 @@ TEMPLATE_TEST_CASE ("FloatVectorOperations Test", "", float, double)
 
             testReduce1dOp (
                 values,
-                [] (auto* src, int N) { return chowdsp::FloatVectorOperations::findAbsoluteMaximum (src, N); },
-                [&] (auto* src, int N) { return refAbsMax (src, src + N); },
+                [] (auto* src, int N)
+                { return chowdsp::FloatVectorOperations::findAbsoluteMaximum (src, N); },
+                [&] (auto* src, int N)
+                { return refAbsMax (src, src + N); },
                 (TestType) 1.0e-3);
         }
     }
@@ -262,8 +275,10 @@ TEMPLATE_TEST_CASE ("FloatVectorOperations Test", "", float, double)
 
                 testUnaryOp (
                     inValues,
-                    [exponent] (auto* dest, auto* src, int N) { chowdsp::FloatVectorOperations::integerPower (dest, src, exponent, N); },
-                    [exponent] (auto x) { return std::pow (x, (TestType) exponent); },
+                    [exponent] (auto* dest, auto* src, int N)
+                    { chowdsp::FloatVectorOperations::integerPower (dest, src, exponent, N); },
+                    [exponent] (auto x)
+                    { return std::pow (x, (TestType) exponent); },
                     (TestType) 1.0e-6);
             }
         }
@@ -273,7 +288,8 @@ TEMPLATE_TEST_CASE ("FloatVectorOperations Test", "", float, double)
     {
         for (auto& range : testRanges)
         {
-            auto idealRMS = [] (const auto* data, int numSamples) {
+            auto idealRMS = [] (const auto* data, int numSamples)
+            {
                 auto squareSum = (TestType) 0;
                 for (int i = 0; i < numSamples; ++i)
                     squareSum += data[i] * data[i];
@@ -290,9 +306,63 @@ TEMPLATE_TEST_CASE ("FloatVectorOperations Test", "", float, double)
 
             testReduce1dOp (
                 values,
-                [] (auto* src, int N) { return chowdsp::FloatVectorOperations::computeRMS (src, N); },
-                [&] (auto* src, int N) { return idealRMS (src, N); },
+                [] (auto* src, int N)
+                { return chowdsp::FloatVectorOperations::computeRMS (src, N); },
+                [&] (auto* src, int N)
+                { return idealRMS (src, N); },
                 (TestType) 1.0e-3);
+        }
+    }
+
+    SECTION ("Contains NaN Test")
+    {
+        for (int i = 0; i < 4; ++i)
+        {
+            for (auto& range : testRanges)
+            {
+                std::uniform_int_distribution<int> rand (range.first, range.second);
+                const auto numValues = rand (mt);
+                std::vector<TestType> values ((size_t) numValues, {});
+
+                std::uniform_real_distribution<TestType> floatRand ((TestType) -1, (TestType) 1);
+                for (auto& v : values)
+                    v = floatRand (mt);
+
+                const auto numNaNs = std::uniform_int_distribution<int> { 0, numValues - 1 }(mt);
+                std::vector<size_t> valueIndexes ((size_t) numValues, {});
+                std::iota (valueIndexes.begin(), valueIndexes.end(), 0);
+                std::shuffle (valueIndexes.begin(), valueIndexes.end(), mt);
+                for (int j = 0; j < numNaNs; ++j)
+                    values[valueIndexes[(size_t) j]] = std::numeric_limits<TestType>::quiet_NaN();
+
+                REQUIRE (chowdsp::FloatVectorOperations::countNaNs (values.data(), numValues) == numNaNs);
+            }
+        }
+    }
+
+    SECTION ("Contains Inf Test")
+    {
+        for (int i = 0; i < 4; ++i)
+        {
+            for (auto& range : testRanges)
+            {
+                std::uniform_int_distribution<int> rand (range.first, range.second);
+                const auto numValues = rand (mt);
+                std::vector<TestType> values ((size_t) numValues, {});
+
+                std::uniform_real_distribution<TestType> floatRand ((TestType) -1, (TestType) 1);
+                for (auto& v : values)
+                    v = floatRand (mt);
+
+                const auto numInfs = std::uniform_int_distribution<int> { 0, numValues - 1 }(mt);
+                std::vector<size_t> valueIndexes ((size_t) numValues, {});
+                std::iota (valueIndexes.begin(), valueIndexes.end(), 0);
+                std::shuffle (valueIndexes.begin(), valueIndexes.end(), mt);
+                for (int j = 0; j < numInfs; ++j)
+                    values[valueIndexes[(size_t) j]] = std::numeric_limits<TestType>::infinity();
+
+                REQUIRE (chowdsp::FloatVectorOperations::countInfs (values.data(), numValues) == numInfs);
+            }
         }
     }
 }
