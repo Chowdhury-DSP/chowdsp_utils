@@ -50,5 +50,17 @@ namespace FloatVectorOperations
     /** Computes the Root-Mean-Square average of the input data. */
     [[maybe_unused]] double computeRMS (const double* src, int numValues) noexcept;
 
+    /** Returns true if the input data contains any NaN values */
+    [[maybe_unused]] bool containsNaN (const float* src, int numValues) noexcept;
+
+    /** Returns true if the input data contains any NaN values */
+    [[maybe_unused]] bool containsNaN (const double* src, int numValues) noexcept;
+
+    /** Returns true if the input data contains any Inf values */
+    [[maybe_unused]] bool containsInf (const float* src, int numValues) noexcept;
+
+    /** Returns true if the input data contains any Inf values */
+    [[maybe_unused]] bool containsInf (const double* src, int numValues) noexcept;
+
 } // namespace FloatVectorOperations
 } // namespace chowdsp

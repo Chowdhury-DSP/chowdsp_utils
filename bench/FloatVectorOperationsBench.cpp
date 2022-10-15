@@ -19,7 +19,8 @@ static void DivideScalarSTLFloat (benchmark::State& state)
 {
     for (auto _ : state)
     {
-        std::transform (divScalarVecFloat.begin(), divScalarVecFloat.end(), divScalarOutVecFloat.begin(), [] (auto x) { return 1.0f / x; });
+        std::transform (divScalarVecFloat.begin(), divScalarVecFloat.end(), divScalarOutVecFloat.begin(), [] (auto x)
+                        { return 1.0f / x; });
     }
 }
 BENCHMARK (DivideScalarSTLFloat);
@@ -43,7 +44,8 @@ static void DivideVectorSTLFloat (benchmark::State& state)
 {
     for (auto _ : state)
     {
-        std::transform (divVectorVecFloat1.begin(), divVectorVecFloat1.end(), divVectorVecFloat2.begin(), divVectorOutVecFloat.begin(), [] (auto a, auto b) { return a / b; });
+        std::transform (divVectorVecFloat1.begin(), divVectorVecFloat1.end(), divVectorVecFloat2.begin(), divVectorOutVecFloat.begin(), [] (auto a, auto b)
+                        { return a / b; });
     }
 }
 BENCHMARK (DivideVectorSTLFloat);
@@ -114,7 +116,8 @@ static void AbsMaxSTLFloat (benchmark::State& state)
 {
     for (auto _ : state)
     {
-        auto max = std::abs (*std::max_element (absMaxVecFloat.begin(), absMaxVecFloat.end(), [] (auto a, auto b) { return std::abs (a) < std::abs (b); }));
+        auto max = std::abs (*std::max_element (absMaxVecFloat.begin(), absMaxVecFloat.end(), [] (auto a, auto b)
+                                                { return std::abs (a) < std::abs (b); }));
         benchmark::DoNotOptimize (max);
     }
 }
@@ -136,7 +139,8 @@ const auto rmsVecFloat = bench_utils::makeRandomVector<float> (rmsN);
 
 static void RMSSTLFloat (benchmark::State& state)
 {
-    auto idealRMS = [] (const auto* data, int numSamples) {
+    auto idealRMS = [] (const auto* data, int numSamples)
+    {
         float squareSum = 0.0f;
         for (int i = 0; i < numSamples; ++i)
             squareSum += data[i] * data[i];
@@ -160,5 +164,69 @@ static void RMSChowFloat (benchmark::State& state)
     }
 }
 BENCHMARK (RMSChowFloat);
+
+/** isNAN benchmarks............................ */
+constexpr int containsNanN = 10000;
+const auto containsNanVecFloat = bench_utils::makeRandomVector<float> (containsNanN);
+
+static void containsNanSTLFloat (benchmark::State& state)
+{
+    auto idealContainsNan = [] (const auto* data, int numSamples)
+    {
+        bool containsNan = false;
+        for (int i = 0; i < numSamples; ++i)
+            containsNan |= std::isnan (data[i]);
+        return containsNan;
+    };
+
+    for (auto _ : state)
+    {
+        auto hasNan = idealContainsNan (containsNanVecFloat.data(), containsNanN);
+        benchmark::DoNotOptimize (hasNan);
+    }
+}
+BENCHMARK (containsNanSTLFloat);
+
+static void containsNanChowFloat (benchmark::State& state)
+{
+    for (auto _ : state)
+    {
+        auto hasNan = chowdsp::FloatVectorOperations::containsNaN (containsNanVecFloat.data(), containsNanN);
+        benchmark::DoNotOptimize (hasNan);
+    }
+}
+BENCHMARK (containsNanChowFloat);
+
+/** isInf benchmarks............................ */
+constexpr int containsInfN = 10000;
+const auto containsInfVecFloat = bench_utils::makeRandomVector<float> (containsInfN);
+
+static void containsInfSTLFloat (benchmark::State& state)
+{
+    auto idealContainsInf = [] (const auto* data, int numSamples)
+    {
+        bool containsInf = false;
+        for (int i = 0; i < numSamples; ++i)
+            containsInf |= std::isinf (data[i]);
+        return containsInf;
+    };
+
+    for (auto _ : state)
+    {
+        auto hasInf = idealContainsInf (containsInfVecFloat.data(), containsInfN);
+        benchmark::DoNotOptimize (hasInf);
+    }
+}
+BENCHMARK (containsInfSTLFloat);
+
+static void containsInfChowFloat (benchmark::State& state)
+{
+    for (auto _ : state)
+    {
+        auto hasInf = chowdsp::FloatVectorOperations::containsInf (containsInfVecFloat.data(), containsInfN);
+        benchmark::DoNotOptimize (hasInf);
+    }
+}
+BENCHMARK (containsInfChowFloat);
 
 BENCHMARK_MAIN();

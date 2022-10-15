@@ -313,6 +313,60 @@ namespace detail
     {
         return reduce (src1, src2, numValues, init, std::forward<Op> (op), std::forward<Op> (op));
     }
+
+// This code was written for FloatVectorOperations::containsNaN, but it hasn't been performing as well,
+// as the naive implementation so let's leave it commented out for now.
+    template <typename T, typename Op>
+    bool reduceBoolFallback (const T* src, int numValues, bool init, Op&& op)
+    {
+        for (int i = 0; i < numValues; ++i)
+            init = op (init, src[i]);
+
+        return init;
+    }
+
+    template <typename T, typename ScalarOp, typename VecOp, typename VecReduceOp>
+    bool reduceBool (const T* src, int numValues, bool init, ScalarOp&& scalarOp, VecOp&& vecOp, VecReduceOp&& vecReduceOp)
+    {
+        constexpr auto vecSize = (int) xsimd::batch<T>::size;
+        auto numVecOps = numValues / vecSize;
+
+        // Fallback: not enough operations to justify vectorizing!
+        if (numVecOps < 2)
+            return reduceBoolFallback (src, numValues, init, std::forward<ScalarOp> (scalarOp));
+
+        // Fallback: starting pointer is not aligned!
+        if (! isAligned (src))
+        {
+            auto* nextAlignedPtr = getNextAlignedPtr (src);
+            auto diff = int (nextAlignedPtr - src);
+            auto initResult = reduceBoolFallback (src, diff, init, std::forward<ScalarOp> (scalarOp));
+            return reduceBool (nextAlignedPtr, numValues - diff, initResult, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), std::forward<VecReduceOp> (vecReduceOp));
+        }
+
+        // Main loop here...
+        auto resultVec = xsimd::batch_bool<T> (init);
+        while (--numVecOps >= 0)
+        {
+            resultVec = vecOp (resultVec, xsimd::load_aligned (src));
+            src += vecSize;
+        }
+
+        auto result = vecReduceOp (resultVec);
+
+        // leftover values that can't be vectorized...
+        auto leftoverValues = numValues % vecSize;
+        if (leftoverValues > 0)
+            result = reduceBoolFallback (src, leftoverValues, result, std::forward<ScalarOp> (scalarOp));
+
+        return result;
+    }
+
+    template <typename T, typename Op>
+    bool reduceBool (const T* src, int numValues, bool init, Op&& op)
+    {
+        return reduceBool (src, numValues, init, std::forward<Op> (op), std::forward<Op> (op), [] (auto vec) { return xsimd::any (vec); });
+    }
 } // namespace detail
 #endif // DOXYGEN
 #endif // ! CHOWDSP_NO_XSIMD
@@ -636,6 +690,80 @@ double computeRMS (const double* src, int numValues) noexcept
                                            0.0,
                                            [] (auto prev, auto next) { return prev + next * next; });
     return std::sqrt (squareSum / (double) numValues);
+#endif
+}
+
+bool containsNaN (const float* src, int numValues) noexcept
+{
+    // No SIMD implementation is measuring the best on ARM at the moment!
+#if CHOWDSP_NO_XSIMD || JUCE_ARM
+        return [] (const float* data, int numSamples) -> bool {
+            bool doesContainNaN = false;
+            for (int i = 0; i < numSamples; ++i)
+                doesContainNaN |= std::isnan (data[i]);
+            return doesContainNaN;
+        }(src, numValues);
+#else
+    CHOWDSP_USING_XSIMD_STD(isnan);
+    return detail::reduceBool (src,
+                               numValues,
+                               false,
+                               [] (auto prev, auto next) { return prev | isnan (next); });
+#endif
+}
+
+bool containsNaN (const double* src, int numValues) noexcept
+{
+    // No SIMD implementation is measuring the best on ARM at the moment!
+#if CHOWDSP_NO_XSIMD || JUCE_ARM
+    return [] (const double* data, int numSamples) -> bool {
+        bool doesContainNaN = false;
+        for (int i = 0; i < numSamples; ++i)
+            doesContainNaN |= std::isnan (data[i]);
+        return doesContainNaN;
+    }(src, numValues);
+#else
+    CHOWDSP_USING_XSIMD_STD(isnan);
+    return detail::reduceBool (src,
+                               numValues,
+                               false,
+                               [] (auto prev, auto next) { return prev | isnan (next); });
+#endif
+}
+
+bool containsInf (const float* src, int numValues) noexcept
+{
+#if CHOWDSP_NO_XSIMD || JUCE_ARM
+    return [] (const float* data, int numSamples) -> bool {
+        bool doesContainInf = false;
+        for (int i = 0; i < numSamples; ++i)
+            doesContainInf |= std::isinf (data[i]);
+        return doesContainInf;
+    }(src, numValues);
+#else
+    CHOWDSP_USING_XSIMD_STD(isinf);
+    return detail::reduceBool (src,
+                               numValues,
+                               false,
+                               [] (auto prev, auto next) { return prev | isinf (next); });
+#endif
+}
+
+bool containsInf (const double* src, int numValues) noexcept
+{
+#if CHOWDSP_NO_XSIMD || JUCE_ARM
+    return [] (const double* data, int numSamples) -> bool {
+        bool doesContainInf = false;
+        for (int i = 0; i < numSamples; ++i)
+            doesContainInf |= std::isinf (data[i]);
+        return doesContainInf;
+    }(src, numValues);
+#else
+    CHOWDSP_USING_XSIMD_STD(isinf);
+    return detail::reduceBool (src,
+                               numValues,
+                               false,
+                               [] (auto prev, auto next) { return prev | isinf (next); });
 #endif
 }
 } // namespace chowdsp::FloatVectorOperations
