@@ -177,8 +177,7 @@ TEMPLATE_TEST_CASE ("Buffer Math Test", "", float, double, xsimd::batch<float>, 
 
     if constexpr (std::is_floating_point_v<TestType>)
     {
-        const auto createBufferOfOnes = [] (int numChannels, int numSamples)
-        {
+        const auto createBufferOfOnes = [] (int numChannels, int numSamples) {
             chowdsp::Buffer<TestType> buffer { numChannels, numSamples };
             for (int ch = 0; ch < numChannels; ++ch)
                 juce::FloatVectorOperations::fill (buffer.getWritePointer (ch), (TestType) 1, numSamples);
