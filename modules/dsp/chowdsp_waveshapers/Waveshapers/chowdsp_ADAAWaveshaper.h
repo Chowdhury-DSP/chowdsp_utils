@@ -10,7 +10,7 @@ namespace chowdsp
  * Note that this processor will always add exactly one sample of latency
  * to the signal, _even_ when bypassed.
  */
-template <typename T>
+template <typename T, typename illConditionTolerance = ScientificRatio<1, -2>>
 class ADAAWaveshaper
 {
 public:
@@ -256,7 +256,7 @@ private:
     std::vector<double> ad2_x1;
     std::vector<double> d2;
 
-    static constexpr auto TOL = 1.0e-2;
+    static constexpr auto TOL = illConditionTolerance::template value<double>;
 
     std::vector<std::future<void>> lutLoadingFutures;
 
