@@ -15,5 +15,12 @@ namespace chowdsp
 /** Useful methods for working with SIMD batches via XSIMD */
 namespace SIMDUtils
 {
-}
+#if ! CHOWDSP_NO_XSIMD
+    /** Default byte alignment to use for SIMD-aligned data. */
+    constexpr auto defaultSIMDAlignment = xsimd::default_arch::alignment();
+#else
+    /** Default byte alignment to use for SIMD-aligned data. */
+    constexpr size_t defaultSIMDAlignment = 16;
+#endif
+} // namespace SIMDUtils
 } // namespace chowdsp
