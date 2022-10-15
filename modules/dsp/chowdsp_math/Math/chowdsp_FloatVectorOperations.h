@@ -50,5 +50,17 @@ namespace FloatVectorOperations
     /** Computes the Root-Mean-Square average of the input data. */
     [[maybe_unused]] double computeRMS (const double* src, int numValues) noexcept;
 
+    /** Counts the number of NaN values in the input data */
+    [[maybe_unused]] int countNaNs (const float* src, int numValues) noexcept;
+
+    /** Counts the number of NaN values in the input data */
+    [[maybe_unused]] int countNaNs (const double* src, int numValues) noexcept;
+
+    /** Counts the number of Inf values in the input data */
+    [[maybe_unused]] int countInfs (const float* src, int numValues) noexcept;
+
+    /** Counts the number of Inf values in the input data */
+    [[maybe_unused]] int countInfs (const double* src, int numValues) noexcept;
+
 } // namespace FloatVectorOperations
 } // namespace chowdsp

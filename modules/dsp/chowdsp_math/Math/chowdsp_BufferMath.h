@@ -31,15 +31,22 @@ namespace BufferMath
 
     /** Applies a linear gain to a buffer. */
     template <typename BufferType, typename FloatType = typename BufferType::Type>
-    void applyGain (BufferType& buffer, FloatType gain);
+    void applyGain (BufferType& buffer, FloatType gain) noexcept;
 
     /** Applies a linear gain to a buffer. */
     template <typename BufferType, typename SmoothedValueType>
-    void applyGainSmoothed (BufferType& buffer, SmoothedValueType& gain);
+    void applyGainSmoothed (BufferType& buffer, SmoothedValueType& gain) noexcept;
 
     /** Applies a linear gain to a buffer. */
     template <typename BufferType, typename SmoothedBufferType>
-    void applyGainSmoothedBuffer (BufferType& buffer, SmoothedBufferType& gain);
+    void applyGainSmoothedBuffer (BufferType& buffer, SmoothedBufferType& gain) noexcept;
+
+    /**
+     * If the buffer contains any Infs, NaNs, or values larger than the ceiling,
+     * this method will clear the buffer and return false.
+     */
+    template <typename BufferType, typename FloatType = typename BufferType::Type>
+    bool sanitizeBuffer (BufferType& buffer, FloatType ceiling = (FloatType) 100) noexcept;
 } // namespace BufferMath
 } // namespace chowdsp
 
