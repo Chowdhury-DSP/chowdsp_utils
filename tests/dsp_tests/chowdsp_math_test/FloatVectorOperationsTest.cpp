@@ -1,6 +1,7 @@
 #include <CatchUtils.h>
 #include <chowdsp_math/chowdsp_math.h>
 #include <numeric>
+#include <algorithm>
 
 template <typename T, typename VectorOp, typename ReferenceOp>
 void testReduce1dOp (std::vector<T>& in, VectorOp&& vectorOp, ReferenceOp&& referenceOp, T maxError)
@@ -293,6 +294,58 @@ TEMPLATE_TEST_CASE ("FloatVectorOperations Test", "", float, double)
                 [] (auto* src, int N) { return chowdsp::FloatVectorOperations::computeRMS (src, N); },
                 [&] (auto* src, int N) { return idealRMS (src, N); },
                 (TestType) 1.0e-3);
+        }
+    }
+
+    SECTION ("Contains NaN Test")
+    {
+        for (int i = 0; i < 4; ++i)
+        {
+            for (auto& range : testRanges)
+            {
+                std::uniform_int_distribution<int> rand (range.first, range.second);
+                const auto numValues = rand (mt);
+                std::vector<TestType> values ((size_t) numValues, {});
+
+                std::uniform_real_distribution<TestType> floatRand ((TestType) -1, (TestType) 1);
+                for (auto& v : values)
+                    v = floatRand (mt);
+
+                const auto numNaNs = std::uniform_int_distribution<int> { 0, numValues - 1 }(mt);
+                std::vector<size_t> valueIndexes ((size_t) numValues, {});
+                std::iota (valueIndexes.begin(), valueIndexes.end(), 0);
+                std::shuffle (valueIndexes.begin(), valueIndexes.end(), mt);
+                for (int j = 0; j < numNaNs; ++j)
+                    values[valueIndexes[(size_t) j]] = std::numeric_limits<TestType>::quiet_NaN();
+
+                REQUIRE (chowdsp::FloatVectorOperations::countNaNs (values.data(), numValues) == numNaNs);
+            }
+        }
+    }
+
+    SECTION ("Contains Inf Test")
+    {
+        for (int i = 0; i < 4; ++i)
+        {
+            for (auto& range : testRanges)
+            {
+                std::uniform_int_distribution<int> rand (range.first, range.second);
+                const auto numValues = rand (mt);
+                std::vector<TestType> values ((size_t) numValues, {});
+
+                std::uniform_real_distribution<TestType> floatRand ((TestType) -1, (TestType) 1);
+                for (auto& v : values)
+                    v = floatRand (mt);
+
+                const auto numInfs = std::uniform_int_distribution<int> { 0, numValues - 1 }(mt);
+                std::vector<size_t> valueIndexes ((size_t) numValues, {});
+                std::iota (valueIndexes.begin(), valueIndexes.end(), 0);
+                std::shuffle (valueIndexes.begin(), valueIndexes.end(), mt);
+                for (int j = 0; j < numInfs; ++j)
+                    values[valueIndexes[(size_t) j]] = std::numeric_limits<TestType>::infinity();
+
+                REQUIRE (chowdsp::FloatVectorOperations::countInfs (values.data(), numValues) == numInfs);
+            }
         }
     }
 }

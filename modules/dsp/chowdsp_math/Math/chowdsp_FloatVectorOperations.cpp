@@ -638,4 +638,44 @@ double computeRMS (const double* src, int numValues) noexcept
     return std::sqrt (squareSum / (double) numValues);
 #endif
 }
+
+int countNaNs (const float* src, int numValues) noexcept
+{
+    return [] (const float* data, int numSamples) -> int {
+        int nanCount = 0;
+        for (int i = 0; i < numSamples; ++i)
+            nanCount += (int) std::isnan (data[i]);
+        return nanCount;
+    }(src, numValues);
+}
+
+int countNaNs (const double* src, int numValues) noexcept
+{
+    return [] (const double* data, int numSamples) -> int {
+        int nanCount = 0;
+        for (int i = 0; i < numSamples; ++i)
+            nanCount += (int) std::isnan (data[i]);
+        return nanCount;
+    }(src, numValues);
+}
+
+int countInfs (const float* src, int numValues) noexcept
+{
+    return [] (const float* data, int numSamples) -> int {
+        int nanCount = 0;
+        for (int i = 0; i < numSamples; ++i)
+            nanCount += (int) std::isinf (data[i]);
+        return nanCount;
+    }(src, numValues);
+}
+
+int countInfs (const double* src, int numValues) noexcept
+{
+    return [] (const double* data, int numSamples) -> int {
+        int nanCount = 0;
+        for (int i = 0; i < numSamples; ++i)
+            nanCount += (int) std::isinf (data[i]);
+        return nanCount;
+    }(src, numValues);
+}
 } // namespace chowdsp::FloatVectorOperations

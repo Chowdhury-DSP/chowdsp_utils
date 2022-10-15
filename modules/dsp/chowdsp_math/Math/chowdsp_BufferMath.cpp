@@ -201,7 +201,7 @@ void addBufferChannels (const BufferType1& bufferSrc, BufferType2& bufferDest, i
 }
 
 template <typename BufferType, typename FloatType>
-void applyGain (BufferType& buffer, FloatType gain)
+void applyGain (BufferType& buffer, FloatType gain) noexcept
 {
     using SampleType = typename BufferType::Type;
 
@@ -224,7 +224,7 @@ void applyGain (BufferType& buffer, FloatType gain)
 }
 
 template <typename BufferType, typename SmoothedValueType>
-void applyGainSmoothed (BufferType& buffer, SmoothedValueType& gain)
+void applyGainSmoothed (BufferType& buffer, SmoothedValueType& gain) noexcept
 {
     if (! gain.isSmoothing())
     {
@@ -246,7 +246,7 @@ void applyGainSmoothed (BufferType& buffer, SmoothedValueType& gain)
 }
 
 template <typename BufferType, typename SmoothedBufferType>
-void applyGainSmoothedBuffer (BufferType& buffer, SmoothedBufferType& gain)
+void applyGainSmoothedBuffer (BufferType& buffer, SmoothedBufferType& gain) noexcept
 {
     using SampleType = typename BufferType::Type;
 
@@ -269,5 +269,33 @@ void applyGainSmoothedBuffer (BufferType& buffer, SmoothedBufferType& gain)
         else if constexpr (SampleTypeHelpers::IsSIMDRegister<SampleType>)
             std::transform (audioData[ch], audioData[ch] + numSamples, gainData, audioData[ch], [] (const auto& x, const auto& g) { return x * g; });
     }
+}
+
+template <typename BufferType, typename FloatType>
+bool sanitizeBuffer (BufferType& buffer, FloatType ceiling) noexcept
+{
+    const auto numChannels = buffer.getNumChannels();
+    const auto numSamples = buffer.getNumSamples();
+
+    bool needsClear = false;
+    for (int ch = 0; ch < numChannels; ++ch)
+    {
+        const auto* channelData = buffer.getReadPointer (ch);
+        const auto channelMax = chowdsp::FloatVectorOperations::findAbsoluteMaximum (channelData, numSamples);
+        const auto channelNaNs = chowdsp::FloatVectorOperations::countNaNs (channelData, numSamples);
+        const auto channelInfs = chowdsp::FloatVectorOperations::countInfs (channelData, numSamples);
+
+        if (channelMax >= ceiling || channelNaNs > 0 || channelInfs > 0)
+        {
+            // This buffer contains invalid values! Clearing...
+            jassertfalse;
+            needsClear = true;
+        }
+    }
+
+    if (needsClear)
+        buffer.clear();
+
+    return ! needsClear;
 }
 } // namespace chowdsp::BufferMath

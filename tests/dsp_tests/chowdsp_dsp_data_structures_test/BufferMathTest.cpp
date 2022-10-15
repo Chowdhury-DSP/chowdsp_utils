@@ -174,4 +174,68 @@ TEMPLATE_TEST_CASE ("Buffer Math Test", "", float, double, xsimd::batch<float>, 
             }
         }
     }
+
+    if constexpr (std::is_floating_point_v<TestType>)
+    {
+        const auto createBufferOfOnes = [] (int numChannels, int numSamples) {
+            chowdsp::Buffer<TestType> buffer { numChannels, numSamples };
+            for (int ch = 0; ch < numChannels; ++ch)
+                juce::FloatVectorOperations::fill (buffer.getWritePointer (ch), (TestType) 1, numSamples);
+            return buffer;
+        };
+
+        SECTION ("Sanitize Buffer Test")
+        {
+            { // clean buffer
+                auto buffer = createBufferOfOnes (2, 100);
+                REQUIRE (chowdsp::BufferMath::sanitizeBuffer (buffer));
+
+                const auto** data = buffer.getArrayOfReadPointers();
+                for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
+                {
+                    for (int n = 0; n < buffer.getNumSamples(); ++n)
+                        REQUIRE (data[ch][n] == (TestType) 1);
+                }
+            }
+
+            { // with crazy large values
+                auto buffer = createBufferOfOnes (2, 100);
+                auto** data = buffer.getArrayOfWritePointers();
+                data[1][99] = 100000.0f;
+                REQUIRE (! chowdsp::BufferMath::sanitizeBuffer (buffer));
+
+                for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
+                {
+                    for (int n = 0; n < buffer.getNumSamples(); ++n)
+                        REQUIRE (data[ch][n] == (TestType) 0);
+                }
+            }
+
+            { // with NaN values
+                auto buffer = createBufferOfOnes (2, 100);
+                auto** data = buffer.getArrayOfWritePointers();
+                data[0][99] = std::numeric_limits<TestType>::quiet_NaN();
+                REQUIRE (! chowdsp::BufferMath::sanitizeBuffer (buffer));
+
+                for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
+                {
+                    for (int n = 0; n < buffer.getNumSamples(); ++n)
+                        REQUIRE (data[ch][n] == (TestType) 0);
+                }
+            }
+
+            { // with INF values
+                auto buffer = createBufferOfOnes (2, 100);
+                auto** data = buffer.getArrayOfWritePointers();
+                data[0][2] = std::numeric_limits<TestType>::infinity();
+                REQUIRE (! chowdsp::BufferMath::sanitizeBuffer (buffer));
+
+                for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
+                {
+                    for (int n = 0; n < buffer.getNumSamples(); ++n)
+                        REQUIRE (data[ch][n] == (TestType) 0);
+                }
+            }
+        }
+    }
 }

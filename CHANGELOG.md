@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - Added `LinkwitzRileyFilter` class.
 - Added `TypesList` meta-programming helpers.
 - Added `Ratio` class for creating template parameter floats.
+- Added `BufferMath::sanitizeBuffer` method.
 - Updated XSIMD to version 9.0.1.
 - Updated elliptic filter template arguments to accept a `Ratio` for the passband ripple.
 
