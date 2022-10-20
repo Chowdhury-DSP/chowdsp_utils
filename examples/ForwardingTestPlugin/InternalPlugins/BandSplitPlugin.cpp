@@ -43,11 +43,12 @@ void BandSplitPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
     const auto numSamples = buffer.getNumSamples();
 
     // input buffer is used for low frequency signal
-    auto&& bufferView = chowdsp::BufferView<float> { buffer };
+    auto&& bufferView = chowdsp::BufferView { buffer };
     lowBuffer.setCurrentSize (numChannels, numSamples);
     highBuffer.setCurrentSize (numChannels, numSamples);
 
-    const auto processFilter = [this, &bufferView] (auto& filter) {
+    const auto processFilter = [this, &bufferView] (auto& filter)
+    {
         filter.setCrossoverFrequency (freqParam->getCurrentValue());
         filter.processBlock (bufferView, lowBuffer, highBuffer);
     };
