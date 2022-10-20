@@ -10,11 +10,23 @@ namespace Math
      *
      * For numbers that are not a power of two, this method will round up.
      */
+    template <int n>
+    constexpr int log2()
+    {
+        static_assert (n > 0, "Log2 is undefined for numbers less than or equal to zero!");
+        return ((n <= 1) ? 0 : 2 + (int) gcem::log2 ((n - 1) / 2));
+    }
+
+    /**
+     * log2 for integer values.
+     *
+     * For numbers that are not a power of two, this method will round up.
+     */
     template <typename IntType>
     inline int log2 (IntType n)
     {
         jassert (n > 0); // Log2 is undefined for numbers less than or equal to zero!"
-        return ((n <= 1) ? 0 : 2 + (int) gcem::log2 ((n - 1) / 2));
+        return ((n <= 1) ? 0 : 2 + (int) std::log2 ((n - 1) / 2));
     }
 
     /**

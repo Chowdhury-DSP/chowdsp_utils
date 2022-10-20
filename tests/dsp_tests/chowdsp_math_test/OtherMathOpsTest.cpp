@@ -3,6 +3,16 @@
 
 TEST_CASE ("Other Math Ops Test")
 {
+    SECTION ("constexpr log2 Test")
+    {
+        static_assert (chowdsp::Math::log2<1>() == 0, "Log2(1) is incorrect!");
+        static_assert (chowdsp::Math::log2<63>() == 6, "Log2(63) is incorrect!");
+        static_assert (chowdsp::Math::log2<64>() == 6, "Log2(64) is incorrect!");
+        static_assert (chowdsp::Math::log2<65>() == 7, "Log2(65) is incorrect!");
+        static_assert (chowdsp::Math::log2<127>() == 7, "Log2(100) is incorrect!");
+        static_assert (chowdsp::Math::log2<128>() == 7, "Log2(128) is incorrect!");
+    }
+
     SECTION ("log2 Test")
     {
         REQUIRE_MESSAGE (chowdsp::Math::log2 (-1) == 0, "Negative numbers edge case is not handled correctly!");
