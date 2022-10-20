@@ -14,12 +14,12 @@ namespace chowdsp
 struct IRTransfer
 {
     // create a new IRTransfer object for a given convolution engine
-    explicit IRTransfer (const ConvolutionEngine& eng) : fftSize (eng.fftSize),
-                                                         blockSize (eng.blockSize),
-                                                         irNumSamples (eng.irNumSamples),
-                                                         irFFT (std::make_unique<juce::dsp::FFT> (Math::log2 (fftSize)))
+    explicit IRTransfer (const ConvolutionEngine<>& eng) : fftSize (eng.fftSize),
+                                                           blockSize (eng.blockSize),
+                                                           irNumSamples (eng.irNumSamples),
+                                                           irFFT (std::make_unique<juce::dsp::FFT> (Math::log2 (fftSize)))
     {
-        ConvolutionEngine::updateSegmentsIfNecessary (eng.numSegments, buffersImpulseSegments, fftSize);
+        ConvolutionEngine<>::updateSegmentsIfNecessary (eng.numSegments, buffersImpulseSegments, fftSize);
     }
 
     // loads a new IR to be ready for transferring
@@ -38,14 +38,14 @@ struct IRTransfer
                                                static_cast<int> (juce::jmin (fftSize - blockSize, irNumSamples - currentPtr)));
 
             irFFT->performRealOnlyForwardTransform (impulseResponse);
-            ConvolutionEngine::prepareForConvolution (impulseResponse, fftSize);
+            ConvolutionEngine<>::prepareForConvolution (impulseResponse, fftSize);
 
             currentPtr += (fftSize - blockSize);
         }
     }
 
     // transfers the loaded IR to a convolution engine
-    void transferIR (ConvolutionEngine& engine) const
+    void transferIR (ConvolutionEngine<>& engine) const
     {
         for (size_t i = 0; i < buffersImpulseSegments.size(); ++i)
         {

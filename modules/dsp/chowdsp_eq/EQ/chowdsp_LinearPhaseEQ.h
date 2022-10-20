@@ -52,8 +52,8 @@ private:
     PrototypeEQ prototypeEQ;
     EQParams<ProtoEQParams> params;
 
-    std::vector<std::unique_ptr<chowdsp::ConvolutionEngine>> engines;
-    std::unique_ptr<chowdsp::IRTransfer> irTransfer;
+    std::vector<std::unique_ptr<ConvolutionEngine<>>> engines;
+    std::unique_ptr<IRTransfer> irTransfer;
     juce::AudioBuffer<float> irBuffer;
 
     double fs = 48000.0;
