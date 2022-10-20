@@ -2,11 +2,12 @@
 
 namespace chowdsp
 {
-ConvolutionEngine::ConvolutionEngine (size_t numSamples, size_t maxBlockSize, const float* initialIR)
+template <typename FFTEngineType>
+ConvolutionEngine<FFTEngineType>::ConvolutionEngine (size_t numSamples, size_t maxBlockSize, const float* initialIR)
     : irNumSamples (numSamples),
       blockSize ((size_t) juce::nextPowerOfTwo ((int) maxBlockSize)),
       fftSize (blockSize > 128 ? 2 * blockSize : 4 * blockSize),
-      fftObject (std::make_unique<juce::dsp::FFT> (Math::log2 (fftSize))),
+      fftObject (std::make_unique<FFTEngineType> (Math::log2 (fftSize))),
       numSegments (numSamples / (fftSize - blockSize) + 1u),
       numInputSegments ((blockSize > 128 ? numSegments : 3 * numSegments)),
       bufferInput (1, static_cast<int> (fftSize)),
@@ -25,24 +26,26 @@ ConvolutionEngine::ConvolutionEngine (size_t numSamples, size_t maxBlockSize, co
     reset();
 }
 
-ConvolutionEngine::ConvolutionEngine (ConvolutionEngine&& other) noexcept : irNumSamples (other.irNumSamples),
-                                                                            blockSize (other.blockSize),
-                                                                            fftSize (other.fftSize),
-                                                                            fftObject (std::move (const_cast<std::unique_ptr<juce::dsp::FFT>&> (other.fftObject))),
-                                                                            numSegments (other.numSegments),
-                                                                            numInputSegments (other.numInputSegments),
-                                                                            currentSegment (other.currentSegment),
-                                                                            inputDataPos (other.inputDataPos),
-                                                                            bufferInput (std::move (other.bufferInput)),
-                                                                            bufferOutput (std::move (other.bufferOutput)),
-                                                                            bufferTempOutput (std::move (other.bufferTempOutput)),
-                                                                            bufferOverlap (std::move (other.bufferOverlap)),
-                                                                            buffersInputSegments (std::move (other.buffersInputSegments)),
-                                                                            buffersImpulseSegments (std::move (other.buffersImpulseSegments))
+template <typename FFTEngineType>
+ConvolutionEngine<FFTEngineType>::ConvolutionEngine (ConvolutionEngine&& other) noexcept : irNumSamples (other.irNumSamples),
+                                                                                           blockSize (other.blockSize),
+                                                                                           fftSize (other.fftSize),
+                                                                                           fftObject (std::move (const_cast<std::unique_ptr<FFTEngineType>&> (other.fftObject))),
+                                                                                           numSegments (other.numSegments),
+                                                                                           numInputSegments (other.numInputSegments),
+                                                                                           currentSegment (other.currentSegment),
+                                                                                           inputDataPos (other.inputDataPos),
+                                                                                           bufferInput (std::move (other.bufferInput)),
+                                                                                           bufferOutput (std::move (other.bufferOutput)),
+                                                                                           bufferTempOutput (std::move (other.bufferTempOutput)),
+                                                                                           bufferOverlap (std::move (other.bufferOverlap)),
+                                                                                           buffersInputSegments (std::move (other.buffersInputSegments)),
+                                                                                           buffersImpulseSegments (std::move (other.buffersImpulseSegments))
 {
 }
 
-ConvolutionEngine& ConvolutionEngine::operator= (ConvolutionEngine&& other) noexcept
+template <typename FFTEngineType>
+ConvolutionEngine<FFTEngineType>& ConvolutionEngine<FFTEngineType>::operator= (ConvolutionEngine&& other) noexcept
 {
     if (this != &other)
     {
@@ -52,7 +55,8 @@ ConvolutionEngine& ConvolutionEngine::operator= (ConvolutionEngine&& other) noex
     return *this;
 }
 
-void ConvolutionEngine::updateSegmentsIfNecessary (size_t numSegmentsToUpdate, std::vector<juce::AudioBuffer<float>>& segments, size_t fftSize)
+template <typename FFTEngineType>
+void ConvolutionEngine<FFTEngineType>::updateSegmentsIfNecessary (size_t numSegmentsToUpdate, std::vector<juce::AudioBuffer<float>>& segments, size_t fftSize)
 {
     if (numSegmentsToUpdate == 0
         || numSegmentsToUpdate != (size_t) segments.size()
@@ -64,8 +68,8 @@ void ConvolutionEngine::updateSegmentsIfNecessary (size_t numSegmentsToUpdate, s
             segments.emplace_back (1, static_cast<int> (fftSize * 2));
     }
 }
-
-void ConvolutionEngine::reset()
+template <typename FFTEngineType>
+void ConvolutionEngine<FFTEngineType>::reset()
 {
     bufferInput.clear();
     bufferOverlap.clear();
@@ -78,8 +82,8 @@ void ConvolutionEngine::reset()
     currentSegment = 0;
     inputDataPos = 0;
 }
-
-void ConvolutionEngine::setNewIR (const float* newIR)
+template <typename FFTEngineType>
+void ConvolutionEngine<FFTEngineType>::setNewIR (const float* newIR)
 {
     size_t currentPtr = 0;
     for (auto& buf : buffersImpulseSegments)
@@ -100,8 +104,8 @@ void ConvolutionEngine::setNewIR (const float* newIR)
         currentPtr += (fftSize - blockSize);
     }
 }
-
-void ConvolutionEngine::processSamples (const float* input, float* output, size_t numSamples)
+template <typename FFTEngineType>
+void ConvolutionEngine<FFTEngineType>::processSamples (const float* input, float* output, size_t numSamples)
 {
     // Overlap-add, zero latency convolution algorithm with uniform partitioning
     size_t numSamplesProcessed = 0;
@@ -180,8 +184,8 @@ void ConvolutionEngine::processSamples (const float* input, float* output, size_
         numSamplesProcessed += numSamplesToProcess;
     }
 }
-
-void ConvolutionEngine::processSamplesWithAddedLatency (const float* input, float* output, size_t numSamples)
+template <typename FFTEngineType>
+void ConvolutionEngine<FFTEngineType>::processSamplesWithAddedLatency (const float* input, float* output, size_t numSamples)
 {
     // Overlap-add, zero latency convolution algorithm with uniform partitioning
     size_t numSamplesProcessed = 0;
@@ -258,8 +262,8 @@ void ConvolutionEngine::processSamplesWithAddedLatency (const float* input, floa
         }
     }
 }
-
-void ConvolutionEngine::prepareForConvolution (float* samples, size_t fftSize) noexcept
+template <typename FFTEngineType>
+void ConvolutionEngine<FFTEngineType>::prepareForConvolution (float* samples, size_t fftSize) noexcept
 {
     auto FFTSizeDiv2 = fftSize / 2;
 
@@ -272,7 +276,8 @@ void ConvolutionEngine::prepareForConvolution (float* samples, size_t fftSize) n
         samples[i + FFTSizeDiv2] = -samples[((fftSize - i) << 1) + 1];
 }
 
-void ConvolutionEngine::convolutionProcessingAndAccumulate (const float* input, const float* impulse, float* output) const
+template <typename FFTEngineType>
+void ConvolutionEngine<FFTEngineType>::convolutionProcessingAndAccumulate (const float* input, const float* impulse, float* output) const
 {
     auto FFTSizeDiv2 = fftSize / 2;
 
@@ -285,7 +290,8 @@ void ConvolutionEngine::convolutionProcessingAndAccumulate (const float* input, 
     output[fftSize] += input[fftSize] * impulse[fftSize];
 }
 
-void ConvolutionEngine::updateSymmetricFrequencyDomainData (float* samples) const noexcept
+template <typename FFTEngineType>
+void ConvolutionEngine<FFTEngineType>::updateSymmetricFrequencyDomainData (float* samples) const noexcept
 {
     auto FFTSizeDiv2 = fftSize / 2;
 
@@ -303,5 +309,7 @@ void ConvolutionEngine::updateSymmetricFrequencyDomainData (float* samples) cons
         samples[(i << 1) + 1] = -samples[((fftSize - i) << 1) + 1];
     }
 }
+
+template class ConvolutionEngine<juce::dsp::FFT>;
 
 } // namespace chowdsp
