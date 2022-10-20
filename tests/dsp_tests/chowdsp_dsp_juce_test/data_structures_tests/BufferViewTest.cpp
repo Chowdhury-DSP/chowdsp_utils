@@ -18,7 +18,7 @@ public:
                 x[n] = rand.nextFloat() * 2.0f - 1.0f;
         }
 
-        chowdsp::BufferView<float> view { juceBuffer };
+        chowdsp::BufferView view { juceBuffer };
         expectEquals (view.getNumChannels(), juceBuffer.getNumChannels(), "Number of channels is incorrect!");
         expectEquals (view.getNumSamples(), juceBuffer.getNumSamples(), "Number of samples is incorrect!");
 
@@ -43,7 +43,7 @@ public:
 
         juce::dsp::AudioBlock<float> block { juceBuffer };
 
-        chowdsp::BufferView<float> view { block };
+        chowdsp::BufferView view { block };
         expectEquals (view.getNumChannels(), juceBuffer.getNumChannels(), "Number of channels is incorrect!");
         expectEquals (view.getNumSamples(), juceBuffer.getNumSamples(), "Number of samples is incorrect!");
 

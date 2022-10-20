@@ -150,7 +150,8 @@ static float calcSNR (const chowdsp::BufferView<float>& buffer, float freqExpect
     for (size_t i = 0; i < blockSize; ++i)
         magnitudes[i] = std::pow (fftData[i] / scaleNorm, 2.0f);
 
-    auto getMagForFreq = [=] (float freq) -> float {
+    auto getMagForFreq = [=] (float freq) -> float
+    {
         auto idx = size_t (((float) blockSize / 2.0f) * freq / (fs / 2.0f));
         // average over a few bins to smooth
         return std::accumulate (&magnitudes[idx - negDiff], &magnitudes[idx + posDiff], 0.0f) / (float) avgNum;
@@ -176,7 +177,7 @@ static auto processInSubBlocks (ProcType& proc, chowdsp::Buffer<float>& inBuffer
 
     for (int i = 0; i < inBuffer.getNumSamples(); i += subBlockSize)
     {
-        auto outBlock = proc.process (chowdsp::BufferView<float> { inBuffer, i, subBlockSize });
+        auto outBlock = proc.process (chowdsp::BufferView { inBuffer, i, subBlockSize });
 
         auto numOutSamples = (int) outBlock.getNumSamples();
         juce::FloatVectorOperations::copy (outBuffer.getWritePointer (0) + outBufferPtr, outBlock.getReadPointer (0), numOutSamples);

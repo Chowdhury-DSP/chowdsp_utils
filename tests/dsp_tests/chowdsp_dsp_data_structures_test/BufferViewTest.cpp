@@ -19,7 +19,7 @@ TEMPLATE_TEST_CASE ("Buffer View Test", "", float, double, xsimd::batch<float>, 
         }
 
         {
-            chowdsp::BufferView<TestType> view { buffer };
+            chowdsp::BufferView view { buffer };
             REQUIRE_MESSAGE (buffer.getNumChannels() == view.getNumChannels(), "View has the incorrect number of channels!");
             REQUIRE_MESSAGE (buffer.getNumSamples() == view.getNumSamples(), "View has the incorrect number of samples!");
 
@@ -33,7 +33,7 @@ TEMPLATE_TEST_CASE ("Buffer View Test", "", float, double, xsimd::batch<float>, 
         }
 
         {
-            chowdsp::BufferView<TestType> view { buffer.getArrayOfWritePointers(), buffer.getNumChannels(), buffer.getNumSamples() };
+            chowdsp::BufferView view { buffer.getArrayOfWritePointers(), buffer.getNumChannels(), buffer.getNumSamples() };
             REQUIRE_MESSAGE (buffer.getNumChannels() == view.getNumChannels(), "View has the incorrect number of channels!");
             REQUIRE_MESSAGE (buffer.getNumSamples() == view.getNumSamples(), "View has the incorrect number of samples!");
 
@@ -52,7 +52,7 @@ TEMPLATE_TEST_CASE ("Buffer View Test", "", float, double, xsimd::batch<float>, 
         static constexpr int offset = 32;
 
         chowdsp::Buffer<TestType> buffer { 2, 128 };
-        chowdsp::BufferView<TestType> view { buffer, offset };
+        chowdsp::BufferView view { buffer, offset };
         REQUIRE_MESSAGE (buffer.getNumChannels() == view.getNumChannels(), "View has the incorrect number of channels!");
         REQUIRE_MESSAGE (view.getNumSamples() == buffer.getNumSamples() - offset, "View has the incorrect number of samples!");
 
@@ -78,7 +78,7 @@ TEMPLATE_TEST_CASE ("Buffer View Test", "", float, double, xsimd::batch<float>, 
     SECTION ("Clear Test")
     {
         chowdsp::Buffer<TestType> buffer { 2, 128 };
-        chowdsp::BufferView<TestType> view { buffer };
+        chowdsp::BufferView view { buffer };
 
         auto* xWrite = view.getArrayOfWritePointers();
         for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
