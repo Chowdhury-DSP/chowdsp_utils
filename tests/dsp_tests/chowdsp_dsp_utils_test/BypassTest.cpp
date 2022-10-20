@@ -84,7 +84,7 @@ TEST_CASE ("Bypass Test")
         buffer.clear();
         for (int i = 0; i < bufferTestNIters; ++i)
         {
-            chowdsp::BufferView<float> subBuffer { buffer, i * nSamples, nSamples };
+            chowdsp::BufferView subBuffer { buffer, i * nSamples, nSamples };
             processFunc (subBuffer, bypass, &onOffParam, [] (float x) { return x + 1.0f; });
             onOffParam.store (1.0f - onOffParam.load());
         }
@@ -108,7 +108,7 @@ TEST_CASE ("Bypass Test")
         createPulseTrain (buffer.getWritePointer (0), delayTestNIters * nSamples, pulseSpace);
         for (int i = 0; i < delayTestNIters; ++i)
         {
-            chowdsp::BufferView<float> subBuffer { buffer, i * nSamples, nSamples };
+            chowdsp::BufferView subBuffer { buffer, i * nSamples, nSamples };
             processFunc (subBuffer, bypass, &onOffParam, [&] (float x) {
                 delay.pushSample (0, x);
                 return delay.popSample (0); });

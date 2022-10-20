@@ -33,7 +33,7 @@ TEST_CASE ("Mod Filter Wrapper Test")
         std::copy (data, data + blockSize, modFilterData);
 
         float* modFilterDataPtr[] = { modFilterData };
-        auto&& modBlock = chowdsp::BufferView<float> { modFilterDataPtr, 1, blockSize };
+        auto&& modBlock = chowdsp::BufferView { modFilterDataPtr, 1, blockSize };
         modFilter.processBlock (modBlock);
 
         for (int n = 0; n < blockSize; ++n)
@@ -60,7 +60,7 @@ TEST_CASE ("Mod Filter Wrapper Test")
         std::copy (data, data + blockSize, modFilterData);
 
         double* modFilterDataPtr[] = { modFilterData };
-        auto&& modBlock = chowdsp::BufferView<double> { modFilterDataPtr, 1, blockSize };
+        auto&& modBlock = chowdsp::BufferView { modFilterDataPtr, 1, blockSize };
         modFilter.processBlock (modBlock);
 
         for (int n = 0; n < blockSize; ++n)
