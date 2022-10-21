@@ -14,7 +14,7 @@ namespace Math
     constexpr int log2()
     {
         static_assert (n > 0, "Log2 is undefined for numbers less than or equal to zero!");
-        return ((n <= 1) ? 0 : 2 + (int) gcem::log2 ((n - 1) / 2));
+        return n <= 1 ? 0 : (n == 2 ? 1 : (2 + (int) gcem::log2 ((n - 1) / 2)));
     }
 
     /**
@@ -26,7 +26,7 @@ namespace Math
     inline int log2 (IntType n)
     {
         jassert (n > 0); // Log2 is undefined for numbers less than or equal to zero!"
-        return ((n <= 1) ? 0 : 2 + (int) std::log2 ((n - 1) / 2));
+        return n <= 1 ? 0 : (2 + (int) std::log2 (((double) n - 1.0) / 2.0));
     }
 
     /**
