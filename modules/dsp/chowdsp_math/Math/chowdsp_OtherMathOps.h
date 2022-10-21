@@ -14,7 +14,12 @@ namespace Math
     constexpr int log2()
     {
         static_assert (n > 0, "Log2 is undefined for numbers less than or equal to zero!");
-        return n <= 1 ? 0 : (n == 2 ? 1 : (2 + (int) gcem::log2 ((n - 1) / 2)));
+        if constexpr (n <= 1)
+            return 0;
+        else if constexpr (n == 2)
+            return 1; // gcem::log2 behaves poorly in this case
+        else
+            return 2 + (int) gcem::log2 ((n - 1) / 2);
     }
 
     /**
