@@ -97,3 +97,5 @@ struct ConvolutionEngine
 };
 
 } // namespace chowdsp
+
+#include "chowdsp_ConvolutionEngine.tpp"

@@ -1,4 +1,4 @@
-#include "chowdsp_ConvolutionEngine.h"
+#pragma once
 
 namespace chowdsp
 {
@@ -310,6 +310,6 @@ void ConvolutionEngine<FFTEngineType>::updateSymmetricFrequencyDomainData (float
     }
 }
 
-template class ConvolutionEngine<juce::dsp::FFT>;
+template struct ConvolutionEngine<juce::dsp::FFT>;
 
 } // namespace chowdsp
