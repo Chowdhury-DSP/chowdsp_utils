@@ -7,4 +7,5 @@ target_sources(chowdsp_core_test
         MemoryAliasingTest.cpp
         TupleHelpersTest.cpp
         TypesListTest.cpp
+        BindingsTest.cpp
 )
