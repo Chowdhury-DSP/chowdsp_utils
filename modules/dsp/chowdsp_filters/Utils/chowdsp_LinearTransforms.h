@@ -1,5 +1,7 @@
 #pragma once
 
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wsign-conversion")
+
 namespace chowdsp
 {
 /** Transforming filters with some linear transformations */
@@ -21,3 +23,5 @@ namespace LinearTransforms
     }
 } // namespace LinearTransforms
 } // namespace chowdsp
+
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE

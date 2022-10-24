@@ -8,7 +8,7 @@ TEST_CASE ("Linear Transforms Test")
         { // without normalization
             float b[2] = { 0.5f, -1.0f };
             float a[2] = { 0.5f, 1.0f };
-            chowdsp::LinearTransforms::transformNegativeFeedback<1, float, false> (b, a, 0.5f);
+            chowdsp::LinearTransforms::transformFeedback<1, float, false> (b, a, 0.5f);
 
             REQUIRE (b[0] == 0.5f);
             REQUIRE (b[1] == -1.0f);
@@ -19,7 +19,7 @@ TEST_CASE ("Linear Transforms Test")
         { // with normalization
             double b[2] = { 0.5, -1.0 };
             double a[2] = { 0.5, 1.0 };
-            chowdsp::LinearTransforms::transformNegativeFeedback<1> (b, a, 0.5);
+            chowdsp::LinearTransforms::transformFeedback<1> (b, a, 0.5);
 
             REQUIRE (b[0] == 2.0);
             REQUIRE (b[1] == -4.0);
