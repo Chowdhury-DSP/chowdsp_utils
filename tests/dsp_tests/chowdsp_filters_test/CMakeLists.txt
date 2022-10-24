@@ -17,4 +17,5 @@ target_sources(chowdsp_filters_test
         HilbertFilterTest.cpp
         WernerFilterTest.cpp
         ButterQsTest.cpp
+        LinearTransformsTest.cpp
 )
