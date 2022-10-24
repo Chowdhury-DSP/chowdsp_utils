@@ -29,6 +29,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Utils/chowdsp_CoefficientCalculators.h"
 #include "Utils/chowdsp_FilterChain.h"
 #include "Utils/chowdsp_QValCalcs.h"
+#include "Utils/chowdsp_LinearTransforms.h"
 
 #include "LowerOrderFilters/chowdsp_IIRFilter.h"
 #include "LowerOrderFilters/chowdsp_FirstOrderFilters.h"

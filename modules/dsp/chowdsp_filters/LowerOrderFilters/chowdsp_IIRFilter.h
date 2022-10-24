@@ -147,7 +147,6 @@ protected:
     template <typename PrototypeFilter>
     friend class ModFilterWrapper;
 
-private:
     inline FloatType processSample1stOrder (const FloatType& x, FloatType& z1) noexcept
     {
         FloatType y = z1 + x * b[0];
@@ -163,6 +162,7 @@ private:
         return y;
     }
 
+private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IIRFilter)
 };
 
