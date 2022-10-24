@@ -12,22 +12,24 @@ namespace detail
         std::tuple<FrontParams...> frontArgsTuple;
 
     public:
-        explicit FrontBinder (Func&& f, FrontParams&&... frontArgs) : func (std::forward<Func> (f)),
-                                                                      frontArgsTuple (std::forward<FrontParams> (frontArgs)...)
+        explicit FrontBinder (Func&& f, FrontParams&&... frontArgs) : func (std::move (f)),
+                                                                      frontArgsTuple (std::move (frontArgs)...)
         {
         }
 
         template <typename... BackParams>
         auto operator() (BackParams&&... backArgs)
         {
-            return std::apply ([this] (auto... args) { return std::invoke (func, args...); },
+            return std::apply ([this] (auto... args)
+                               { return std::invoke (func, args...); },
                                std::move (std::tuple_cat (frontArgsTuple, std::forward_as_tuple (backArgs...))));
         }
 
         template <typename... BackParams>
         auto operator() (BackParams&&... backArgs) const
         {
-            return std::apply ([this] (auto... args) { return std::invoke (func, args...); },
+            return std::apply ([this] (auto... args)
+                               { return std::invoke (func, args...); },
                                std::move (std::tuple_cat (frontArgsTuple, std::forward_as_tuple (backArgs...))));
         }
     };
@@ -39,22 +41,24 @@ namespace detail
         std::tuple<BackParams...> backArgsTuple;
 
     public:
-        explicit BackBinder (Func&& f, BackParams&&... backArgs) : func (std::forward<Func> (f)),
-                                                                   backArgsTuple (std::forward<BackParams> (backArgs)...)
+        explicit BackBinder (Func&& f, BackParams&&... backArgs) : func (std::move (f)),
+                                                                   backArgsTuple (std::move (backArgs)...)
         {
         }
 
         template <typename... FrontParams>
         auto operator() (FrontParams&&... frontArgs)
         {
-            return std::apply ([this] (auto... args) { return std::invoke (func, args...); },
+            return std::apply ([this] (auto... args)
+                               { return std::invoke (func, args...); },
                                std::move (std::tuple_cat (std::forward_as_tuple (frontArgs...), backArgsTuple)));
         }
 
         template <typename... FrontParams>
         auto operator() (FrontParams&&... frontArgs) const
         {
-            return std::apply ([this] (auto... args) { return std::invoke (func, args...); },
+            return std::apply ([this] (auto... args)
+                               { return std::invoke (func, args...); },
                                std::move (std::tuple_cat (std::forward_as_tuple (frontArgs...), backArgsTuple)));
         }
     };
