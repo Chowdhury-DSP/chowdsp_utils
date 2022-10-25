@@ -20,14 +20,16 @@ namespace detail
         template <typename... BackParams>
         auto operator() (BackParams&&... backArgs)
         {
-            return std::apply ([this] (auto... args) { return std::invoke (func, args...); },
+            return std::apply ([this] (auto... args)
+                               { return std::invoke (func, args...); },
                                std::move (std::tuple_cat (frontArgsTuple, std::forward_as_tuple (backArgs...))));
         }
 
         template <typename... BackParams>
         auto operator() (BackParams&&... backArgs) const
         {
-            return std::apply ([this] (auto... args) { return std::invoke (func, args...); },
+            return std::apply ([this] (auto... args)
+                               { return std::invoke (func, args...); },
                                std::move (std::tuple_cat (frontArgsTuple, std::forward_as_tuple (backArgs...))));
         }
     };
@@ -47,14 +49,16 @@ namespace detail
         template <typename... FrontParams>
         auto operator() (FrontParams&&... frontArgs)
         {
-            return std::apply ([this] (auto... args) { return std::invoke (func, args...); },
+            return std::apply ([this] (auto... args)
+                               { return std::invoke (func, args...); },
                                std::move (std::tuple_cat (std::forward_as_tuple (frontArgs...), backArgsTuple)));
         }
 
         template <typename... FrontParams>
         auto operator() (FrontParams&&... frontArgs) const
         {
-            return std::apply ([this] (auto... args) { return std::invoke (func, args...); },
+            return std::apply ([this] (auto... args)
+                               { return std::invoke (func, args...); },
                                std::move (std::tuple_cat (std::forward_as_tuple (frontArgs...), backArgsTuple)));
         }
     };
@@ -64,7 +68,7 @@ namespace detail
 /** Extensions on the <functional> header */
 namespace Functional
 {
-#if __cplusplus >= 202002L
+#ifdef __cpp_lib_bind_front
     using std::bind_front;
 #else
     /** Temporary replacement for std::bind_front, which is only available in C++20 */
@@ -74,6 +78,7 @@ namespace Functional
         return detail::FrontBinder<Func, Params...> { std::forward<Func> (func), std::forward<Params> (frontParams)... };
     }
 #endif
+
     /** Temporary replacement for std::bind_back, which is only available in C++23 */
     template <typename Func, typename... Params>
     auto bind_back (Func&& func, Params&&... backParams)
