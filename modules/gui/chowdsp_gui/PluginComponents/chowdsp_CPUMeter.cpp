@@ -71,7 +71,7 @@ void CPUMeter::colourChanged()
 void CPUMeter::timerCallback()
 {
     const auto newLoadProportion = smoother.processSample (0, loadMeasurer.getLoadAsProportion());
-    loadProportion = std::round (newLoadProportion * 100.0) * 0.001;
+    loadProportion = std::round (newLoadProportion * 100.0) * 0.01;
 }
 
 void CPUMeter::resized()
