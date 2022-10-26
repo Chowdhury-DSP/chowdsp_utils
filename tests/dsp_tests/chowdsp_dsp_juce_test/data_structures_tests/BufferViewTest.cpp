@@ -4,7 +4,7 @@
 class BufferViewTest : public TimedUnitTest
 {
 public:
-    BufferViewTest() : TimedUnitTest ("Buffer View Test")
+    BufferViewTest() : TimedUnitTest ("Buffer View Test", "Buffers")
     {
     }
 

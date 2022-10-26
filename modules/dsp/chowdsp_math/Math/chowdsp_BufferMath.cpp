@@ -8,7 +8,7 @@ auto getMagnitude (const BufferType& buffer, int startSample, int numSamples, in
     if (numSamples < 0)
         numSamples = buffer.getNumSamples() - startSample;
 
-    using SampleType = typename BufferType::Type;
+    using SampleType = detail::BufferSampleType<BufferType>;
     auto getChannelMagnitude = [&buffer, startSample, numSamples] (int ch) {
         const auto* channelData = buffer.getReadPointer (ch);
         if constexpr (std::is_floating_point_v<SampleType>)
@@ -42,7 +42,7 @@ auto getMagnitude (const BufferType& buffer, int startSample, int numSamples, in
 template <typename BufferType>
 auto getRMSLevel (const BufferType& buffer, int channel, int startSample, int numSamples) noexcept
 {
-    using SampleType = typename BufferType::Type;
+    using SampleType = detail::BufferSampleType<BufferType>;
 
     if (numSamples < 0)
         numSamples = buffer.getNumSamples() - startSample;
@@ -75,7 +75,8 @@ auto getRMSLevel (const BufferType& buffer, int channel, int startSample, int nu
 template <typename BufferType1, typename BufferType2>
 void copyBufferData (const BufferType1& bufferSrc, BufferType2& bufferDest, int srcStartSample, int destStartSample, int numSamples, int startChannel, int numChannels) noexcept
 {
-    using SampleType = typename BufferType1::Type;
+    using SampleType = detail::BufferSampleType<BufferType1>;
+    static_assert (std::is_same_v<SampleType, detail::BufferSampleType<BufferType2>>, "Both buffer types must have the same sample type!");
 
     if (numSamples < 0)
     {
@@ -116,7 +117,8 @@ void copyBufferData (const BufferType1& bufferSrc, BufferType2& bufferDest, int 
 template <typename BufferType1, typename BufferType2>
 void copyBufferChannels (const BufferType1& bufferSrc, BufferType2& bufferDest, int srcChannel, int destChannel) noexcept
 {
-    using SampleType = typename BufferType1::Type;
+    using SampleType = detail::BufferSampleType<BufferType1>;
+    static_assert (std::is_same_v<SampleType, detail::BufferSampleType<BufferType2>>, "Both buffer types must have the same sample type!");
 
     jassert (bufferSrc.getNumSamples() == bufferDest.getNumSamples());
     const auto numSamples = bufferSrc.getNumSamples();
@@ -137,7 +139,8 @@ void copyBufferChannels (const BufferType1& bufferSrc, BufferType2& bufferDest, 
 template <typename BufferType1, typename BufferType2>
 void addBufferData (const BufferType1& bufferSrc, BufferType2& bufferDest, int srcStartSample, int destStartSample, int numSamples, int startChannel, int numChannels) noexcept
 {
-    using SampleType = typename BufferType1::Type;
+    using SampleType = detail::BufferSampleType<BufferType1>;
+    static_assert (std::is_same_v<SampleType, detail::BufferSampleType<BufferType2>>, "Both buffer types must have the same sample type!");
 
     if (numSamples < 0)
     {
@@ -178,7 +181,8 @@ void addBufferData (const BufferType1& bufferSrc, BufferType2& bufferDest, int s
 template <typename BufferType1, typename BufferType2>
 void addBufferChannels (const BufferType1& bufferSrc, BufferType2& bufferDest, int srcChannel, int destChannel) noexcept
 {
-    using SampleType = typename BufferType1::Type;
+    using SampleType = detail::BufferSampleType<BufferType1>;
+    static_assert (std::is_same_v<SampleType, detail::BufferSampleType<BufferType2>>, "Both buffer types must have the same sample type!");
 
     jassert (bufferSrc.getNumSamples() == bufferDest.getNumSamples());
     const auto numSamples = bufferSrc.getNumSamples();
@@ -203,7 +207,7 @@ void addBufferChannels (const BufferType1& bufferSrc, BufferType2& bufferDest, i
 template <typename BufferType, typename FloatType>
 void applyGain (BufferType& buffer, FloatType gain) noexcept
 {
-    using SampleType = typename BufferType::Type;
+    using SampleType = detail::BufferSampleType<BufferType>;
 
     const auto numChannels = buffer.getNumChannels();
     const auto numSamples = buffer.getNumSamples();
@@ -248,7 +252,7 @@ void applyGainSmoothed (BufferType& buffer, SmoothedValueType& gain) noexcept
 template <typename BufferType, typename SmoothedBufferType>
 void applyGainSmoothedBuffer (BufferType& buffer, SmoothedBufferType& gain) noexcept
 {
-    using SampleType = typename BufferType::Type;
+    using SampleType = detail::BufferSampleType<BufferType>;
 
     if (! gain.isSmoothing())
     {

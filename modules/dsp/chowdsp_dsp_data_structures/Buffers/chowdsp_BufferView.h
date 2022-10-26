@@ -33,6 +33,20 @@ public:
         initialise (buffer.getArrayOfWritePointers(), sampleOffset, startChannel);
     }
 
+    template <int maxNumChannels, int maxNumSamples>
+    BufferView (StaticBuffer<SampleType, maxNumChannels, maxNumSamples>& buffer, // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
+                int sampleOffset = 0,
+                int bufferNumSamples = -1,
+                int startChannel = 0,
+                int bufferNumChannels = -1)
+        : numChannels (bufferNumChannels < 0 ? (buffer.getNumChannels() - startChannel) : bufferNumChannels),
+          numSamples (bufferNumSamples < 0 ? (buffer.getNumSamples() - sampleOffset) : bufferNumSamples)
+    {
+        jassert (buffer.getNumChannels() >= startChannel + numChannels);
+        jassert (buffer.getNumSamples() >= sampleOffset + numSamples);
+        initialise (buffer.getArrayOfWritePointers(), sampleOffset, startChannel);
+    }
+
     BufferView (const BufferView<SampleType>& buffer, // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
                 int sampleOffset = 0,
                 int bufferNumSamples = -1,
