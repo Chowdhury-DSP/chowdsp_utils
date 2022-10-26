@@ -5,6 +5,35 @@ namespace chowdsp
 /** Math operations for working with audio buffers */
 namespace BufferMath
 {
+#ifndef DOXYGEN
+    namespace detail
+    {
+        template <typename BufferType>
+        struct BufferSampleTypeHelper
+        {
+            using Type = typename BufferType::Type;
+        };
+
+#if CHOWDSP_USING_JUCE
+        template <>
+        struct BufferSampleTypeHelper<juce::AudioBuffer<float>>
+        {
+            using Type = float;
+        };
+
+        template <>
+        struct BufferSampleTypeHelper<juce::AudioBuffer<double>>
+        {
+            using Type = double;
+        };
+#endif
+
+        /** Template helper for getting the sample type from a buffer. */
+        template <typename BufferType>
+        using BufferSampleType = typename BufferSampleTypeHelper<BufferType>::Type;
+    } // namespace detail
+#endif // DOXYGEN
+
     /** Computes the absolute magnitude of the buffer. */
     template <typename BufferType>
     auto getMagnitude (const BufferType& buffer, int startSample = 0, int numSamples = -1, int channel = -1) noexcept;
@@ -45,7 +74,7 @@ namespace BufferMath
      * If the buffer contains any Infs, NaNs, or values larger than the ceiling,
      * this method will clear the buffer and return false.
      */
-    template <typename BufferType, typename FloatType = typename BufferType::Type>
+    template <typename BufferType, typename FloatType = detail::BufferSampleType<BufferType>>
     bool sanitizeBuffer (BufferType& buffer, FloatType ceiling = (FloatType) 100) noexcept;
 } // namespace BufferMath
 } // namespace chowdsp

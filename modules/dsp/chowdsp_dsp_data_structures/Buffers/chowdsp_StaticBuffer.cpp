@@ -11,8 +11,8 @@ StaticBuffer<SampleType, maxNumChannels, maxNumSamples>::StaticBuffer (int numCh
 template <typename SampleType, int maxNumChannels, int maxNumSamples>
 void StaticBuffer<SampleType, maxNumChannels, maxNumSamples>::setMaxSize (int numChannels, int numSamples)
 {
-    jassert (juce::isPositiveAndBelow (numChannels, maxNumChannels));
-    jassert (juce::isPositiveAndBelow (numSamples, maxNumSamples));
+    jassert (juce::isPositiveAndNotGreaterThan (numChannels, maxNumChannels));
+    jassert (juce::isPositiveAndNotGreaterThan (numSamples, maxNumSamples));
 
     hasBeenCleared = true;
     currentNumChannels = 0;

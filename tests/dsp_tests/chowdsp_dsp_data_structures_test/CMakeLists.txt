@@ -4,7 +4,6 @@ target_sources(chowdsp_dsp_data_structures_test
     PRIVATE
         BufferTest.cpp
         BufferViewTest.cpp
-        BufferMathTest.cpp
         LookupTableTest.cpp
         RebufferProcessorTest.cpp
         SmoothedBufferValueTest.cpp
