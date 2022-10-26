@@ -13,7 +13,8 @@ class BufferMathTest : public TimedUnitTest
     static constexpr auto maxErr = 1.0e-6;
 
 public:
-    BufferMathTest (const juce::String& bufferTypeName) : TimedUnitTest ("Buffer Math Test [" + bufferTypeName + "]", "Buffers")
+    explicit BufferMathTest (const juce::String& bufferTypeName)
+        : TimedUnitTest ("Buffer Math Test [" + bufferTypeName + "]", "Buffers")
     {
     }
 
@@ -33,13 +34,13 @@ public:
 
     void rmsTest()
     {
-        auto&& sineBuffer = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 48000, (NumericType) 1);
+        auto&& sineBuffer = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 4800, (NumericType) 1);
         expect (getRMSLevel (sineBuffer, 0) == SIMDApprox<T> ((T) (NumericType) 0.7071).margin ((NumericType) maxErr), "RMS of a sine wave is incorrect!");
     }
 
     void copyBufferTest()
     {
-        auto&& srcBuffer = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 48000, (NumericType) 1);
+        auto&& srcBuffer = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 4800, (NumericType) 1);
 
         BufferType destBuffer { srcBuffer.getNumChannels(), srcBuffer.getNumSamples() };
         copyBufferData (srcBuffer, destBuffer);
@@ -74,7 +75,7 @@ public:
 
     void addBufferTest()
     {
-        auto&& srcBuffer = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 48000, (NumericType) 1);
+        auto&& srcBuffer = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 4800, (NumericType) 1);
 
         BufferType destBuffer { srcBuffer.getNumChannels(), srcBuffer.getNumSamples() };
         for (int i = 0; i < destBuffer.getNumSamples(); ++i)
@@ -115,8 +116,8 @@ public:
 
     void applyGainTest()
     {
-        auto&& sineBuffer1 = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 48000, (NumericType) 1);
-        auto&& sineBuffer2 = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 48000, (NumericType) 1);
+        auto&& sineBuffer1 = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 4800, (NumericType) 1);
+        auto&& sineBuffer2 = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 4800, (NumericType) 1);
 
         applyGain (sineBuffer1, (NumericType) 2);
 
@@ -132,8 +133,8 @@ public:
     {
         for (auto target : { (NumericType) 0, (NumericType) 1 })
         {
-            auto&& sineBuffer1 = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 48000, (NumericType) 1);
-            auto&& sineBuffer2 = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 48000, (NumericType) 1);
+            auto&& sineBuffer1 = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 4800, (NumericType) 1);
+            auto&& sineBuffer2 = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 4800, (NumericType) 1);
 
             juce::SmoothedValue<NumericType> sm1;
             sm1.setCurrentAndTargetValue ((NumericType) 0);
@@ -160,8 +161,8 @@ public:
     {
         for (auto target : { (NumericType) 0, (NumericType) -1 })
         {
-            auto&& sineBuffer1 = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 48000, (NumericType) 1);
-            auto&& sineBuffer2 = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 48000, (NumericType) 1);
+            auto&& sineBuffer1 = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 4800, (NumericType) 1);
+            auto&& sineBuffer2 = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 4800, (NumericType) 1);
 
             chowdsp::SmoothedBufferValue<NumericType> sm1;
             sm1.prepare ((NumericType) 48000, sineBuffer1.getNumSamples());
@@ -184,17 +185,21 @@ public:
         }
     }
 
+    static void fillBufferWithOnes (BufferType& buffer)
+    {
+        const auto numChannels = buffer.getNumChannels();
+        const auto numSamples = buffer.getNumSamples();
+
+        for (int ch = 0; ch < numChannels; ++ch)
+            juce::FloatVectorOperations::fill (buffer.getWritePointer (ch), (T) 1, numSamples);
+    }
+
     void sanitizeBufferTest()
     {
-        const auto createBufferOfOnes = [] (int numChannels, int numSamples) {
-            BufferType buffer { numChannels, numSamples };
-            for (int ch = 0; ch < numChannels; ++ch)
-                juce::FloatVectorOperations::fill (buffer.getWritePointer (ch), (T) 1, numSamples);
-            return buffer;
-        };
+        BufferType buffer { 2, 100 };
 
         { // clean buffer
-            auto buffer = createBufferOfOnes (2, 100);
+            fillBufferWithOnes (buffer);
             expect (sanitizeBuffer (buffer));
 
             const auto** data = buffer.getArrayOfReadPointers();
@@ -206,7 +211,7 @@ public:
         }
 
         { // with crazy large values
-            auto buffer = createBufferOfOnes (2, 100);
+            fillBufferWithOnes (buffer);
             auto** data = buffer.getArrayOfWritePointers();
             data[1][99] = 100000.0f;
             expect (! sanitizeBuffer (buffer));
@@ -219,7 +224,7 @@ public:
         }
 
         { // with NaN values
-            auto buffer = createBufferOfOnes (2, 100);
+            fillBufferWithOnes (buffer);
             auto** data = buffer.getArrayOfWritePointers();
             data[0][99] = std::numeric_limits<NumericType>::quiet_NaN();
             expect (! sanitizeBuffer (buffer));
@@ -232,7 +237,7 @@ public:
         }
 
         { // with INF values
-            auto buffer = createBufferOfOnes (2, 100);
+            fillBufferWithOnes (buffer);
             auto** data = buffer.getArrayOfWritePointers();
             data[0][2] = std::numeric_limits<NumericType>::infinity();
             expect (! sanitizeBuffer (buffer));
@@ -286,9 +291,9 @@ static BufferMathTest<chowdsp::Buffer<float>> bufferFloatMathTest { "chowdsp::Bu
 static BufferMathTest<chowdsp::Buffer<double>> bufferDoubleMathTest { "chowdsp::Buffer<double>" };
 static BufferMathTest<chowdsp::Buffer<xsimd::batch<float>>> bufferFloatVecMathTest { "chowdsp::Buffer<xsimd::batch<float>>" };
 static BufferMathTest<chowdsp::Buffer<xsimd::batch<double>>> bufferDoubleVecMathTest { "chowdsp::Buffer<xsimd::batch<double>>" };
-static BufferMathTest<chowdsp::StaticBuffer<float, 2, 48000>> staticBufferFloatMathTest { "chowdsp::StaticBuffer<float>" };
-static BufferMathTest<chowdsp::StaticBuffer<double, 2, 48000>> staticBufferDoubleMathTest { "chowdsp::StaticBuffer<double>" };
-static BufferMathTest<chowdsp::StaticBuffer<xsimd::batch<float>, 2, 48000>> staticBufferFloatVecMathTest { "chowdsp::StaticBuffer<xsimd::batch<float>>" };
-static BufferMathTest<chowdsp::StaticBuffer<xsimd::batch<double>, 2, 48000>> staticBufferDoubleVecMathTest { "chowdsp::StaticBuffer<xsimd::batch<double>>" };
+static BufferMathTest<chowdsp::StaticBuffer<float, 2, 4800>> staticBufferFloatMathTest { "chowdsp::StaticBuffer<float>" };
+static BufferMathTest<chowdsp::StaticBuffer<double, 2, 4800>> staticBufferDoubleMathTest { "chowdsp::StaticBuffer<double>" };
+static BufferMathTest<chowdsp::StaticBuffer<xsimd::batch<float>, 2, 4800>> staticBufferFloatVecMathTest { "chowdsp::StaticBuffer<xsimd::batch<float>>" };
+static BufferMathTest<chowdsp::StaticBuffer<xsimd::batch<double>, 2, 4800>> staticBufferDoubleVecMathTest { "chowdsp::StaticBuffer<xsimd::batch<double>>" };
 static BufferMathTest<juce::AudioBuffer<float>> juceBufferFloatMathTest { "juce::AudioBuffer<float>" };
 static BufferMathTest<juce::AudioBuffer<double>> juceBufferDoubleMathTest { "juce::AudioBuffer<double>" };
