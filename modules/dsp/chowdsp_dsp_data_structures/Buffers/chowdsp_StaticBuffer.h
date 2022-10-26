@@ -8,14 +8,8 @@ namespace buffer_detail
     template <typename ElementType, size_t arraySize, size_t alignment = SIMDUtils::defaultSIMDAlignment>
     struct AlignedArray
     {
-        //        ElementType& operator[] (size_t index) noexcept { return array[index]; }
-        //        const ElementType& operator[] (size_t index) const noexcept { return array[index]; }
-
         ElementType* data() noexcept { return array; }
         const ElementType* data() const noexcept { return array; }
-
-        void clear() { std::fill (std::begin (array), std::end (array), ElementType {}); }
-        static constexpr int size() noexcept { return arraySize; }
 
     private:
         alignas (alignment) ElementType array[arraySize] {};
@@ -46,8 +40,7 @@ public:
     StaticBuffer<SampleType, maxNumChannels, maxNumSamples>& operator= (StaticBuffer<SampleType, maxNumChannels, maxNumSamples>&&) noexcept = default;
 
     /**
-     * This method doesn't really do anything, but exists for easy
-     * compatibility with chowdsp::Buffer.
+     * Sets the maximum size that this buffer can have, and sets the current size as well.
      */
     void setMaxSize (int numChannels, int numSamples);
 
@@ -58,8 +51,6 @@ public:
      * If the requested size is larger than the previous size, any "new" memory
      * will be cleared. Any memory that was previously part of the buffer will
      * not be cleared.
-     *
-     * This method will never allocate memory!
      */
     void setCurrentSize (int numChannels, int numSamples) noexcept;
 
