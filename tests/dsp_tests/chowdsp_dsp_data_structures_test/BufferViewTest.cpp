@@ -51,7 +51,7 @@ TEMPLATE_TEST_CASE ("Buffer View Test", "", float, double, xsimd::batch<float>, 
     {
         static constexpr int offset = 32;
 
-        chowdsp::Buffer<TestType> buffer { 2, 128 };
+        chowdsp::StaticBuffer<TestType, 2, 1024> buffer { 2, 128 };
         chowdsp::BufferView view { buffer, offset };
         REQUIRE_MESSAGE (buffer.getNumChannels() == view.getNumChannels(), "View has the incorrect number of channels!");
         REQUIRE_MESSAGE (view.getNumSamples() == buffer.getNumSamples() - offset, "View has the incorrect number of samples!");

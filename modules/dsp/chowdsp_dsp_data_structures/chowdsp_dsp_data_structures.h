@@ -43,6 +43,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Other/chowdsp_SmoothedBufferValue.h"
 
 #include "Buffers/chowdsp_Buffer.h"
+#include "Buffers/chowdsp_StaticBuffer.h"
 #include "Buffers/chowdsp_BufferView.h"
 #include "Processors/chowdsp_RebufferedProcessor.h"
 #include "LookupTables/chowdsp_LookupTableTransform.h"

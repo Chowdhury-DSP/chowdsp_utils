@@ -17,6 +17,7 @@ target_sources(chowdsp_dsp_juce_test
         data_structures_tests/COLAProcessorTest.cpp
         data_structures_tests/SmoothedBufferValueTest.cpp
         data_structures_tests/BufferViewTest.cpp
+        data_structures_tests/BufferMathTest.cpp
 
         # Filters Tests
         FIRFilterTest.cpp
