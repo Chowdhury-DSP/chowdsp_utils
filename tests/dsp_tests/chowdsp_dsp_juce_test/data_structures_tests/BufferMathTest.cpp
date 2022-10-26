@@ -186,8 +186,7 @@ public:
 
     void sanitizeBufferTest()
     {
-        const auto createBufferOfOnes = [] (int numChannels, int numSamples)
-        {
+        const auto createBufferOfOnes = [] (int numChannels, int numSamples) {
             BufferType buffer { numChannels, numSamples };
             for (int ch = 0; ch < numChannels; ++ch)
                 juce::FloatVectorOperations::fill (buffer.getWritePointer (ch), (T) 1, numSamples);
