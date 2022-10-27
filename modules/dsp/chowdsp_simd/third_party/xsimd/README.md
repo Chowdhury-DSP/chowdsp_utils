@@ -34,7 +34,7 @@ Architecture | Instruction set extensions
 x86          | SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, AVX, AVX2, FMA3+SSE, FMA3+AVX, FMA3+AVX2
 x86          | AVX512BW, AVX512CD, AVX512DQ, AVX512F (gcc7 and higher)
 x86 AMD      | FMA4
-ARM          | NEON, NEON64, SVE128/256 (fixed vector size)
+ARM          | NEON, NEON64, SVE128/256/512 (fixed vector size)
 
 ## Installation
 
@@ -177,37 +177,17 @@ void mean(const vector_type& a, const vector_type& b, vector_type& res)
 }
 ```
 
-We also implement STL algorithms to work optimally on batches. Using `xsimd::transform`
-the loop from the example becomes:
-
-```cpp
-#include <cstddef>
-#include <vector>
-#include "xsimd/xsimd.hpp"
-#include "xsimd/stl/algorithms.hpp"
-
-namespace xs = xsimd;
-using vector_type = std::vector<double, xsimd::aligned_allocator<double>>;
-
-void mean(const vector_type& a, const vector_type& b, vector_type& res)
-{
-    xsimd::transform(a.begin(), a.end(), b.begin(), res.begin(),
-                     [](const auto& x, const auto& y) { (x + y) / 2.; });
-}
-```
-
-
 ## Building and Running the Tests
 
-Building the tests requires the [GTest](https://github.com/google/googletest) testing framework and [cmake](https://cmake.org).
+Building the tests requires [cmake](https://cmake.org).
 
-gtest and cmake are available as a packages for most linux distributions. Besides, they can also be installed with the `conda` package manager (even on windows):
+`cmake` is available as a package for most linux distributions. Besides, they can also be installed with the `conda` package manager (even on windows):
 
 ```bash
-conda install -c conda-forge gtest cmake
+conda install -c conda-forge cmake
 ```
 
-Once `gtest` and `cmake` are installed, you can build and run the tests:
+Once `cmake` is installed, you can build and run the tests:
 
 ```bash
 mkdir build

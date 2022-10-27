@@ -15,9 +15,8 @@
 #include "test_utils.hpp"
 
 template <class B>
-class complex_exponential_test : public testing::Test
+struct complex_exponential_test
 {
-protected:
     using batch_type = B;
     using real_batch_type = typename B::real_batch;
     using value_type = typename B::value_type;
@@ -53,7 +52,8 @@ protected:
     void test_exp()
     {
         std::transform(exp_input.cbegin(), exp_input.cend(), expected.begin(),
-                       [](const value_type& v) { using std::exp; return exp(v); });
+                       [](const value_type& v)
+                       { using std::exp; return exp(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -62,13 +62,14 @@ protected:
             detail::store_batch(out, res, i);
         }
         size_t diff = detail::get_nb_diff(res, expected);
-        EXPECT_EQ(diff, 0) << print_function_name("exp");
+        CHECK_EQ(diff, 0);
     }
 
     void test_expm1()
     {
         std::transform(exp_input.cbegin(), exp_input.cend(), expected.begin(),
-                       [](const value_type& v) { using xsimd::expm1; return expm1(v); });
+                       [](const value_type& v)
+                       { using xsimd::expm1; return expm1(v); });
 
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
@@ -78,13 +79,14 @@ protected:
             detail::store_batch(out, res, i);
         }
         size_t diff = detail::get_nb_diff(res, expected);
-        EXPECT_EQ(diff, 0) << print_function_name("expm1");
+        CHECK_EQ(diff, 0);
     }
 
     void test_huge_exp()
     {
         std::transform(huge_exp_input.cbegin(), huge_exp_input.cend(), expected.begin(),
-                       [](const value_type& v) { using std::exp; return exp(v); });
+                       [](const value_type& v)
+                       { using std::exp; return exp(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -93,13 +95,14 @@ protected:
             detail::store_batch(out, res, i);
         }
         size_t diff = detail::get_nb_diff(res, expected);
-        EXPECT_EQ(diff, 0) << print_function_name("huge exp");
+        CHECK_EQ(diff, 0);
     }
 
     void test_log()
     {
         std::transform(log_input.cbegin(), log_input.cend(), expected.begin(),
-                       [](const value_type& v) { using std::log; return log(v); });
+                       [](const value_type& v)
+                       { using std::log; return log(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -108,13 +111,14 @@ protected:
             detail::store_batch(out, res, i);
         }
         size_t diff = detail::get_nb_diff(res, expected);
-        EXPECT_EQ(diff, 0) << print_function_name("log");
+        CHECK_EQ(diff, 0);
     }
 
     void test_log2()
     {
         std::transform(log_input.cbegin(), log_input.cend(), expected.begin(),
-                       [](const value_type& v) { using xsimd::log2; return log2(v); });
+                       [](const value_type& v)
+                       { using xsimd::log2; return log2(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -123,13 +127,14 @@ protected:
             detail::store_batch(out, res, i);
         }
         size_t diff = detail::get_nb_diff(res, expected);
-        EXPECT_EQ(diff, 0) << print_function_name("log2");
+        CHECK_EQ(diff, 0);
     }
 
     void test_log10()
     {
         std::transform(log_input.cbegin(), log_input.cend(), expected.begin(),
-                       [](const value_type& v) { using std::log10; return log10(v); });
+                       [](const value_type& v)
+                       { using std::log10; return log10(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -138,13 +143,14 @@ protected:
             detail::store_batch(out, res, i);
         }
         size_t diff = detail::get_nb_diff(res, expected);
-        EXPECT_EQ(diff, 0) << print_function_name("log10");
+        CHECK_EQ(diff, 0);
     }
 
     void test_log1p()
     {
         std::transform(log_input.cbegin(), log_input.cend(), expected.begin(),
-                       [](const value_type& v) { using xsimd::log1p; return log1p(v); });
+                       [](const value_type& v)
+                       { using xsimd::log1p; return log1p(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -153,13 +159,14 @@ protected:
             detail::store_batch(out, res, i);
         }
         size_t diff = detail::get_nb_diff(res, expected);
-        EXPECT_EQ(diff, 0) << print_function_name("log1p");
+        CHECK_EQ(diff, 0);
     }
 
     void test_sign()
     {
         std::transform(log_input.cbegin(), log_input.cend(), expected.begin(),
-                       [](const value_type& v) { using xsimd::sign; return sign(v); });
+                       [](const value_type& v)
+                       { using xsimd::sign; return sign(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -168,49 +175,52 @@ protected:
             detail::store_batch(out, res, i);
         }
         size_t diff = detail::get_nb_diff(res, expected);
-        EXPECT_EQ(diff, 0) << print_function_name("sign");
+        CHECK_EQ(diff, 0);
     }
 };
 
-TYPED_TEST_SUITE(complex_exponential_test, batch_complex_types, simd_test_names);
-
-TYPED_TEST(complex_exponential_test, exp)
+TEST_CASE_TEMPLATE("[complex exponential]", B, BATCH_COMPLEX_TYPES)
 {
-    this->test_exp();
-}
+    complex_exponential_test<B> Test;
 
-TYPED_TEST(complex_exponential_test, expm1)
-{
-    this->test_expm1();
-}
+    SUBCASE("exp")
+    {
+        Test.test_exp();
+    }
 
-TYPED_TEST(complex_exponential_test, huge_exp)
-{
-    this->test_huge_exp();
-}
+    SUBCASE("expm1")
+    {
+        Test.test_expm1();
+    }
 
-TYPED_TEST(complex_exponential_test, log)
-{
-    this->test_log();
-}
+    SUBCASE("huge_exp")
+    {
+        Test.test_huge_exp();
+    }
 
-TYPED_TEST(complex_exponential_test, log2)
-{
-    this->test_log2();
-}
+    SUBCASE("log")
+    {
+        Test.test_log();
+    }
 
-TYPED_TEST(complex_exponential_test, log10)
-{
-    this->test_log10();
-}
+    SUBCASE("log2")
+    {
+        Test.test_log2();
+    }
 
-TYPED_TEST(complex_exponential_test, log1p)
-{
-    this->test_log1p();
-}
+    SUBCASE("log10")
+    {
+        Test.test_log10();
+    }
 
-TYPED_TEST(complex_exponential_test, sign)
-{
-    this->test_sign();
+    SUBCASE("log1p")
+    {
+        Test.test_log1p();
+    }
+
+    SUBCASE("sign")
+    {
+        Test.test_sign();
+    }
 }
 #endif

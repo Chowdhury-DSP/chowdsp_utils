@@ -39,9 +39,6 @@ namespace xsimd
             template <class T>
             svbool_t sve_ptrue() noexcept { return sve_ptrue_impl(index<sizeof(T)> {}); }
 
-            template <class T>
-            svbool_t sve_pfalse() noexcept { return svpfalse(); }
-
             // count active lanes in a predicate
             inline uint64_t sve_pcount_impl(svbool_t p, index<1>) noexcept { return svcntp_b8(p, p); }
             inline uint64_t sve_pcount_impl(svbool_t p, index<2>) noexcept { return svcntp_b16(p, p); }
@@ -86,8 +83,6 @@ namespace xsimd
                                                              sve_fix_char_t_impl, T>::type;
         }
 
-        // TODO: gather
-
         template <class A, class T, detail::sve_enable_all_t<T> = 0>
         inline batch<T, A> load_aligned(T const* src, convert<T>, requires_arch<sve>) noexcept
         {
@@ -121,8 +116,6 @@ namespace xsimd
          * Store *
          *********/
 
-        // TODO: scatter
-
         template <class A, class T, detail::sve_enable_all_t<T> = 0>
         inline void store_aligned(T* dst, batch<T, A> const& src, requires_arch<sve>) noexcept
         {
@@ -151,6 +144,30 @@ namespace xsimd
         inline void store_complex_unaligned(std::complex<T>* dst, batch<std::complex<T>, A> const& src, requires_arch<sve>) noexcept
         {
             store_complex_aligned(dst, src, sve {});
+        }
+
+        /******************
+         * scatter/gather *
+         ******************/
+
+        namespace detail
+        {
+            template <class T, class U>
+            using sve_enable_sg_t = typename std::enable_if<(sizeof(T) == sizeof(U) && (sizeof(T) == 4 || sizeof(T) == 8)), int>::type;
+        }
+
+        // scatter
+        template <class A, class T, class U, detail::sve_enable_sg_t<T, U> = 0>
+        inline void scatter(batch<T, A> const& src, T* dst, batch<U, A> const& index, kernel::requires_arch<sve>) noexcept
+        {
+            svst1_scatter_index(detail::sve_ptrue<T>(), dst, index.data, src.data);
+        }
+
+        // gather
+        template <class A, class T, class U, detail::sve_enable_sg_t<T, U> = 0>
+        inline batch<T, A> gather(batch<T, A> const&, T const* src, batch<U, A> const& index, kernel::requires_arch<sve>) noexcept
+        {
+            return svld1_gather_index(detail::sve_ptrue<T>(), src, index.data);
         }
 
         /********************
@@ -326,6 +343,34 @@ namespace xsimd
         inline batch<T, A> abs(batch<T, A> const& arg, requires_arch<sve>) noexcept
         {
             return svabs_x(detail::sve_ptrue<T>(), arg);
+        }
+
+        // fma: x * y + z
+        template <class A, class T, detail::sve_enable_all_t<T> = 0>
+        inline batch<T, A> fma(batch<T, A> const& x, batch<T, A> const& y, batch<T, A> const& z, requires_arch<sve>) noexcept
+        {
+            return svmad_x(detail::sve_ptrue<T>(), x, y, z);
+        }
+
+        // fnma: z - x * y
+        template <class A, class T, detail::sve_enable_all_t<T> = 0>
+        inline batch<T, A> fnma(batch<T, A> const& x, batch<T, A> const& y, batch<T, A> const& z, requires_arch<sve>) noexcept
+        {
+            return svmsb_x(detail::sve_ptrue<T>(), x, y, z);
+        }
+
+        // fms: x * y - z
+        template <class A, class T, detail::sve_enable_all_t<T> = 0>
+        inline batch<T, A> fms(batch<T, A> const& x, batch<T, A> const& y, batch<T, A> const& z, requires_arch<sve>) noexcept
+        {
+            return -fnma(x, y, z, sve {});
+        }
+
+        // fnms: - x * y - z
+        template <class A, class T, detail::sve_enable_all_t<T> = 0>
+        inline batch<T, A> fnms(batch<T, A> const& x, batch<T, A> const& y, batch<T, A> const& z, requires_arch<sve>) noexcept
+        {
+            return -fma(x, y, z, sve {});
         }
 
         /**********************
@@ -749,95 +794,18 @@ namespace xsimd
             return select(batch_bool<T, A> { b... }, true_br, false_br, sve {});
         }
 
-        // zip in 128-bit lane as AVX does, unfortunatly we cannot use svzip which truly and neatly zips two vectors
-        namespace detail
-        {
-            template <int N>
-            struct sve_128b_lane_zipper
-            {
-                template <class A, class T>
-                inline batch<T, A> zip_lo(batch<T, A> const& lhs, batch<T, A> const& rhs) noexcept
-                {
-                    const auto indexes = get_shuffle_indexes<A, T>();
-                    const auto lhs_shuffled = svtbl(lhs, indexes);
-                    const auto rhs_shuffled = svtbl(rhs, indexes);
-                    return svzip1(lhs_shuffled, rhs_shuffled);
-                }
-
-                template <class A, class T>
-                inline batch<T, A> zip_hi(batch<T, A> const& lhs, batch<T, A> const& rhs) noexcept
-                {
-                    const auto indexes = get_shuffle_indexes<A, T>();
-                    const auto lhs_shuffled = svtbl(lhs, indexes);
-                    const auto rhs_shuffled = svtbl(rhs, indexes);
-                    return svzip2(lhs_shuffled, rhs_shuffled);
-                }
-
-                // Pre shuffle per 128-bit lane so we can still use svzip
-                // E.g., sve256/int32: abcd efgh -> abef cdgh
-                // The shuffle indexes are calculated at compile time
-                template <class A, class T, class U = as_unsigned_integer_t<T>>
-                inline batch<U, A> get_shuffle_indexes() noexcept
-                {
-                    constexpr int b128_lanes = N / 128;
-                    constexpr int elements_per_b128 = 128 / (sizeof(T) * 8);
-
-                    U indexes[batch<U, A>::size];
-
-                    int index = 0, step = 0;
-                    for (int i = 0; i < b128_lanes; ++i)
-                    {
-                        for (int j = 0; j < elements_per_b128 / 2; ++j)
-                        {
-                            indexes[index] = index + step;
-                            ++index;
-                        }
-                        step += elements_per_b128 / 2;
-                    }
-                    step -= elements_per_b128 / 2;
-                    for (int i = 0; i < b128_lanes; ++i)
-                    {
-                        for (int j = 0; j < elements_per_b128 / 2; ++j)
-                        {
-                            indexes[index] = index - step;
-                            ++index;
-                        }
-                        step -= elements_per_b128 / 2;
-                    }
-
-                    return svld1(detail::sve_ptrue<U>(), indexes);
-                }
-            };
-
-            template <>
-            struct sve_128b_lane_zipper<128>
-            {
-                template <class A, class T>
-                inline batch<T, A> zip_lo(batch<T, A> const& lhs, batch<T, A> const& rhs) noexcept
-                {
-                    return svzip1(lhs, rhs);
-                }
-
-                template <class A, class T>
-                inline batch<T, A> zip_hi(batch<T, A> const& lhs, batch<T, A> const& rhs) noexcept
-                {
-                    return svzip2(lhs, rhs);
-                }
-            };
-        } // namespace detail
-
         // zip_lo
         template <class A, class T, detail::sve_enable_all_t<T> = 0>
         inline batch<T, A> zip_lo(batch<T, A> const& lhs, batch<T, A> const& rhs, requires_arch<sve>) noexcept
         {
-            return detail::sve_128b_lane_zipper<XSIMD_SVE_BITS>().zip_lo(lhs, rhs);
+            return svzip1(lhs, rhs);
         }
 
         // zip_hi
         template <class A, class T, detail::sve_enable_all_t<T> = 0>
         inline batch<T, A> zip_hi(batch<T, A> const& lhs, batch<T, A> const& rhs, requires_arch<sve>) noexcept
         {
-            return detail::sve_128b_lane_zipper<XSIMD_SVE_BITS>().zip_hi(lhs, rhs);
+            return svzip2(lhs, rhs);
         }
 
         /*****************************
@@ -856,19 +824,6 @@ namespace xsimd
         inline batch<T, A> sqrt(batch<T, A> const& arg, requires_arch<sve>) noexcept
         {
             return svsqrt_x(detail::sve_ptrue<T>(), arg);
-        }
-
-        // fused operations
-        template <class A, class T, detail::sve_enable_floating_point_t<T> = 0>
-        inline batch<T, A> fma(batch<T, A> const& x, batch<T, A> const& y, batch<T, A> const& z, requires_arch<sve>) noexcept
-        {
-            return svmad_x(detail::sve_ptrue<T>(), x, y, z);
-        }
-
-        template <class A, class T, detail::sve_enable_floating_point_t<T> = 0>
-        inline batch<T, A> fms(batch<T, A> const& x, batch<T, A> const& y, batch<T, A> const& z, requires_arch<sve>) noexcept
-        {
-            return svmad_x(detail::sve_ptrue<T>(), x, y, -z);
         }
 
         // reciprocal
@@ -1136,7 +1091,34 @@ namespace xsimd
             return !(arg == arg);
         }
 
-        // TODO: nearbyint_as_int
+        // nearbyint
+        template <class A, class T, detail::sve_enable_floating_point_t<T> = 0>
+        inline batch<T, A> nearbyint(batch<T, A> const& arg, requires_arch<sve>) noexcept
+        {
+            return svrintx_x(detail::sve_ptrue<T>(), arg);
+        }
+
+        // nearbyint_as_int
+        template <class A>
+        inline batch<int32_t, A> nearbyint_as_int(batch<float, A> const& arg, requires_arch<sve>) noexcept
+        {
+            const auto nearest = svrinta_x(detail::sve_ptrue<float>(), arg);
+            return svcvt_s32_x(detail::sve_ptrue<float>(), nearest);
+        }
+
+        template <class A>
+        inline batch<int64_t, A> nearbyint_as_int(batch<double, A> const& arg, requires_arch<sve>) noexcept
+        {
+            const auto nearest = svrinta_x(detail::sve_ptrue<double>(), arg);
+            return svcvt_s64_x(detail::sve_ptrue<double>(), nearest);
+        }
+
+        // ldexp
+        template <class A, class T, detail::sve_enable_floating_point_t<T> = 0>
+        inline batch<T, A> ldexp(const batch<T, A>& x, const batch<as_integer_t<T>, A>& exp, requires_arch<sve>) noexcept
+        {
+            return svscale_x(detail::sve_ptrue<T>(), x, exp);
+        }
 
     } // namespace kernel
 } // namespace xsimd

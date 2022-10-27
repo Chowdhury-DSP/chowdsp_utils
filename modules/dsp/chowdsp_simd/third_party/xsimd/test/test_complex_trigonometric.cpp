@@ -10,15 +10,14 @@
  ****************************************************************************/
 
 #include "xsimd/xsimd.hpp"
+
 #ifndef XSIMD_NO_SUPPORTED_ARCHITECTURE
 
 #include "test_utils.hpp"
-#include "xsimd/xsimd.hpp"
 
 template <class B>
-class complex_trigonometric_test : public testing::Test
+struct complex_trigonometric_test
 {
-protected:
     using batch_type = B;
     using real_batch_type = typename B::real_batch;
     using value_type = typename B::value_type;
@@ -55,7 +54,8 @@ protected:
     void test_sin()
     {
         std::transform(input.cbegin(), input.cend(), expected.begin(),
-                       [](const value_type& v) { using std::sin; return sin(v); });
+                       [](const value_type& v)
+                       { using std::sin; return sin(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -64,13 +64,14 @@ protected:
             detail::store_batch(out, res, i);
         }
         size_t diff = detail::get_nb_diff(res, expected);
-        EXPECT_EQ(diff, 0) << print_function_name("sin");
+        CHECK_EQ(diff, 0);
     }
 
     void test_cos()
     {
         std::transform(input.cbegin(), input.cend(), expected.begin(),
-                       [](const value_type& v) { using std::cos; return cos(v); });
+                       [](const value_type& v)
+                       { using std::cos; return cos(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -79,16 +80,18 @@ protected:
             detail::store_batch(out, res, i);
         }
         size_t diff = detail::get_nb_diff(res, expected);
-        EXPECT_EQ(diff, 0) << print_function_name("cos");
+        CHECK_EQ(diff, 0);
     }
 
     void test_sincos()
     {
         vector_type expected2(nb_input), res2(nb_input);
         std::transform(input.cbegin(), input.cend(), expected.begin(),
-                       [](const value_type& v) { using std::sin; return sin(v); });
+                       [](const value_type& v)
+                       { using std::sin; return sin(v); });
         std::transform(input.cbegin(), input.cend(), expected2.begin(),
-                       [](const value_type& v) { using std::cos; return cos(v); });
+                       [](const value_type& v)
+                       { using std::cos; return cos(v); });
         batch_type in, out1, out2;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -98,9 +101,9 @@ protected:
             detail::store_batch(out2, res2, i);
         }
         size_t diff = detail::get_nb_diff(res, expected);
-        EXPECT_EQ(diff, 0) << print_function_name("sincos(sin)");
+        CHECK_EQ(diff, 0);
         diff = detail::get_nb_diff(res2, expected2);
-        EXPECT_EQ(diff, 0) << print_function_name("sincos(cos)");
+        CHECK_EQ(diff, 0);
     }
 
     void test_tan()
@@ -111,7 +114,8 @@ protected:
     void test_asin()
     {
         std::transform(ainput.cbegin(), ainput.cend(), expected.begin(),
-                       [](const value_type& v) { using std::asin; return asin(v); });
+                       [](const value_type& v)
+                       { using std::asin; return asin(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -120,13 +124,14 @@ protected:
             detail::store_batch(out, res, i);
         }
         size_t diff = detail::get_nb_diff(res, expected);
-        EXPECT_EQ(diff, 0) << print_function_name("asin");
+        CHECK_EQ(diff, 0);
     }
 
     void test_acos()
     {
         std::transform(ainput.cbegin(), ainput.cend(), expected.begin(),
-                       [](const value_type& v) { using std::acos; return acos(v); });
+                       [](const value_type& v)
+                       { using std::acos; return acos(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -135,13 +140,14 @@ protected:
             detail::store_batch(out, res, i);
         }
         size_t diff = detail::get_nb_diff(res, expected);
-        EXPECT_EQ(diff, 0) << print_function_name("acos");
+        CHECK_EQ(diff, 0);
     }
 
     void test_atan()
     {
         std::transform(atan_input.cbegin(), atan_input.cend(), expected.begin(),
-                       [](const value_type& v) { using std::atan; return atan(v); });
+                       [](const value_type& v)
+                       { using std::atan; return atan(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -150,14 +156,15 @@ protected:
             detail::store_batch(out, res, i);
         }
         size_t diff = detail::get_nb_diff(res, expected);
-        EXPECT_EQ(diff, 0) << print_function_name("atan");
+        CHECK_EQ(diff, 0);
     }
 
 private:
     void test_tan_impl()
     {
         std::transform(input.cbegin(), input.cend(), expected.begin(),
-                       [](const value_type& v) { using std::tan; return tan(v); });
+                       [](const value_type& v)
+                       { using std::tan; return tan(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -166,7 +173,7 @@ private:
             detail::store_batch(out, res, i);
         }
         size_t diff = detail::get_nb_diff(res, expected);
-        EXPECT_EQ(diff, 0) << print_function_name("tan");
+        CHECK_EQ(diff, 0);
     }
 
     template <class T, typename std::enable_if<!std::is_same<T, float>::value, int>::type = 0>
@@ -188,40 +195,42 @@ private:
     }
 };
 
-TYPED_TEST_SUITE(complex_trigonometric_test, batch_complex_types, simd_test_names);
-
-TYPED_TEST(complex_trigonometric_test, sin)
+TEST_CASE_TEMPLATE("[complex trigonometric]", B, BATCH_COMPLEX_TYPES)
 {
-    this->test_sin();
-}
+    complex_trigonometric_test<B> Test;
+    SUBCASE("sin")
+    {
+        Test.test_sin();
+    }
 
-TYPED_TEST(complex_trigonometric_test, cos)
-{
-    this->test_cos();
-}
+    SUBCASE("cos")
+    {
+        Test.test_cos();
+    }
 
-TYPED_TEST(complex_trigonometric_test, sincos)
-{
-    this->test_sincos();
-}
+    SUBCASE("sincos")
+    {
+        Test.test_sincos();
+    }
 
-TYPED_TEST(complex_trigonometric_test, tan)
-{
-    this->test_tan();
-}
+    SUBCASE("tan")
+    {
+        Test.test_tan();
+    }
 
-TYPED_TEST(complex_trigonometric_test, asin)
-{
-    this->test_asin();
-}
+    SUBCASE("asin")
+    {
+        Test.test_asin();
+    }
 
-TYPED_TEST(complex_trigonometric_test, acos)
-{
-    this->test_acos();
-}
+    SUBCASE("acos")
+    {
+        Test.test_acos();
+    }
 
-TYPED_TEST(complex_trigonometric_test, atan)
-{
-    this->test_atan();
+    SUBCASE("atan")
+    {
+        Test.test_atan();
+    }
 }
 #endif

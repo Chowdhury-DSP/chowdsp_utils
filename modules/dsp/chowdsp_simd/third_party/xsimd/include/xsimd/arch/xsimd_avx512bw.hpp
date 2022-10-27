@@ -362,11 +362,11 @@ namespace xsimd
         {
             XSIMD_IF_CONSTEXPR(sizeof(T) == 1)
             {
-                return _mm512_mask_blend_epi8(cond, false_br, true_br);
+                return _mm512_mask_blend_epi8(cond, false_br.data, true_br.data);
             }
             else XSIMD_IF_CONSTEXPR(sizeof(T) == 2)
             {
-                return _mm512_mask_blend_epi16(cond, false_br, true_br);
+                return _mm512_mask_blend_epi16(cond, false_br.data, true_br.data);
             }
             else
             {
@@ -410,14 +410,14 @@ namespace xsimd
             batch<T, A> xx;
             if (N & 1)
             {
-                alignas(32) uint64_t buffer[8];
+                alignas(A::alignment()) uint64_t buffer[8];
                 _mm512_store_epi64(&buffer[0], x);
                 for (int i = 7; i > 0; --i)
                     buffer[i] = (buffer[i] << 8) | (buffer[i - 1] >> 56);
                 buffer[0] = buffer[0] << 8;
                 xx = _mm512_load_epi64(&buffer[0]);
 
-                alignas(32) auto slide_perm = detail::make_slide_perm_hi(::xsimd::detail::make_index_sequence<512 / 64>());
+                alignas(A::alignment()) auto slide_perm = detail::make_slide_perm_hi(::xsimd::detail::make_index_sequence<512 / 64>());
                 __m512i xl = _mm512_slli_epi64(x, 8);
                 __m512i xr = _mm512_srli_epi64(x, 56);
                 xr = _mm512_permutex2var_epi64(xr, _mm512_load_epi64(slide_perm.data()), _mm512_setzero_si512());
@@ -429,8 +429,8 @@ namespace xsimd
             {
                 xx = x;
             }
-            alignas(32) auto slide_pattern = detail::make_slide_left_pattern<N / 2>(::xsimd::detail::make_index_sequence<512 / 16>());
-            alignas(32) auto slide_mask = detail::make_slide_left_mask<N / 2>(::xsimd::detail::make_index_sequence<512 / 16>());
+            alignas(A::alignment()) auto slide_pattern = detail::make_slide_left_pattern<N / 2>(::xsimd::detail::make_index_sequence<512 / 16>());
+            alignas(A::alignment()) auto slide_mask = detail::make_slide_left_mask<N / 2>(::xsimd::detail::make_index_sequence<512 / 16>());
             return _mm512_and_si512(_mm512_permutexvar_epi16(_mm512_load_epi32(slide_pattern.data()), xx), _mm512_load_epi32(slide_mask.data()));
         }
 
@@ -469,7 +469,7 @@ namespace xsimd
             batch<T, A> xx;
             if (N & 1)
             {
-                alignas(32) auto slide_perm = detail::make_slide_perm_low(::xsimd::detail::make_index_sequence<512 / 64>());
+                alignas(A::alignment()) auto slide_perm = detail::make_slide_perm_low(::xsimd::detail::make_index_sequence<512 / 64>());
                 __m512i xr = _mm512_srli_epi64(x, 8);
                 __m512i xl = _mm512_slli_epi64(x, 56);
                 xl = _mm512_permutex2var_epi64(xl, _mm512_load_epi64(slide_perm.data()), _mm512_setzero_si512());
@@ -481,8 +481,8 @@ namespace xsimd
             {
                 xx = x;
             }
-            alignas(32) auto slide_pattern = detail::make_slide_right_pattern<N / 2>(::xsimd::detail::make_index_sequence<512 / 16>());
-            alignas(32) auto slide_mask = detail::make_slide_right_mask<N / 2>(::xsimd::detail::make_index_sequence<512 / 16>());
+            alignas(A::alignment()) auto slide_pattern = detail::make_slide_right_pattern<N / 2>(::xsimd::detail::make_index_sequence<512 / 16>());
+            alignas(A::alignment()) auto slide_mask = detail::make_slide_right_mask<N / 2>(::xsimd::detail::make_index_sequence<512 / 16>());
             return _mm512_and_si512(_mm512_permutexvar_epi16(_mm512_load_epi32(slide_pattern.data()), xx), _mm512_load_epi32(slide_mask.data()));
         }
 
@@ -564,6 +564,62 @@ namespace xsimd
         inline batch<int8_t, A> swizzle(batch<int8_t, A> const& self, batch_constant<batch<uint8_t, A>, Vs...> mask, requires_arch<avx512bw>) noexcept
         {
             return bitwise_cast<batch<int8_t, A>>(swizzle(bitwise_cast<batch<uint8_t, A>>(self), mask, avx512bw {}));
+        }
+
+        // zip_hi
+        template <class A, class T, class = typename std::enable_if<std::is_integral<T>::value, void>::type>
+        inline batch<T, A> zip_hi(batch<T, A> const& self, batch<T, A> const& other, requires_arch<avx512bw>) noexcept
+        {
+            __m512i lo, hi;
+            XSIMD_IF_CONSTEXPR(sizeof(T) == 1)
+            {
+                lo = _mm512_unpacklo_epi8(self, other);
+                hi = _mm512_unpackhi_epi8(self, other);
+            }
+            else XSIMD_IF_CONSTEXPR(sizeof(T) == 2)
+            {
+                lo = _mm512_unpacklo_epi16(self, other);
+                hi = _mm512_unpackhi_epi16(self, other);
+            }
+            else
+            {
+                return zip_hi(self, other, avx512f {});
+            }
+            return _mm512_inserti32x4(
+                _mm512_inserti32x4(
+                    _mm512_inserti32x4(hi, _mm512_extracti32x4_epi32(lo, 2), 0),
+                    _mm512_extracti32x4_epi32(lo, 3),
+                    2),
+                _mm512_extracti32x4_epi32(hi, 2),
+                1);
+        }
+
+        // zip_lo
+        template <class A, class T, class = typename std::enable_if<std::is_integral<T>::value, void>::type>
+        inline batch<T, A> zip_lo(batch<T, A> const& self, batch<T, A> const& other, requires_arch<avx512bw>) noexcept
+        {
+            __m512i lo, hi;
+            XSIMD_IF_CONSTEXPR(sizeof(T) == 1)
+            {
+                lo = _mm512_unpacklo_epi8(self, other);
+                hi = _mm512_unpackhi_epi8(self, other);
+            }
+            else XSIMD_IF_CONSTEXPR(sizeof(T) == 2)
+            {
+                lo = _mm512_unpacklo_epi16(self, other);
+                hi = _mm512_unpackhi_epi16(self, other);
+            }
+            else
+            {
+                return zip_lo(self, other, avx512f {});
+            }
+            return _mm512_inserti32x4(
+                _mm512_inserti32x4(
+                    _mm512_inserti32x4(lo, _mm512_extracti32x4_epi32(hi, 0), 1),
+                    _mm512_extracti32x4_epi32(hi, 1),
+                    3),
+                _mm512_extracti32x4_epi32(lo, 1),
+                2);
         }
     }
 }
