@@ -18,7 +18,8 @@ TEST_CASE ("Bindings Test")
 
     SECTION ("Bind Front Test")
     {
-        const auto sum_func = [] (int a, int b, int c, int d) {
+        const auto sum_func = [] (int a, int b, int c, int d)
+        {
             return a + b + c + d;
         };
         const auto sum_two = bind_front (sum_func, 1, 2);
@@ -38,7 +39,8 @@ TEST_CASE ("Bindings Test")
 
     SECTION ("Bind Back Test")
     {
-        const auto func = [] (int a, int b, int c, int d) {
+        const auto func = [] (int a, int b, int c, int d)
+        {
             return a + b - c - d;
         };
         const auto sum_two = bind_back (func, 1, 2);

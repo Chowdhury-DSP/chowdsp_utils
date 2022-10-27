@@ -46,9 +46,8 @@ void test_examples()
 
         test var { 42, 43 };
 
-        pfr::for_each_field (var, [] (auto& field) {
-            field += 1;
-        });
+        pfr::for_each_field (var, [] (auto& field)
+                             { field += 1; });
 
         // Outputs: {43, 44}
         std::cout << pfr::io (var);
@@ -75,11 +74,10 @@ void test_examples()
         // Outputs:
         //  0: tag0
         //  1: tag1
-        pfr::for_each_field (sample {}, [] (const auto& field, std::size_t idx) {
-            std::cout << '\n'
-                      << idx << ": "
-                      << boost::typeindex::type_id_runtime (field);
-        });
+        pfr::for_each_field (sample {}, [] (const auto& field, std::size_t idx)
+                             { std::cout << '\n'
+                                         << idx << ": "
+                                         << boost::typeindex::type_id_runtime (field); });
         //]
     }
 

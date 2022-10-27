@@ -31,35 +31,29 @@ namespace internal
 // see:
 // http://functions.wolfram.com/ElementaryFunctions/Log/06/01/04/01/0003/
 
-
-template<typename T>
-constexpr
-T
-log1p_compute(const T x)
-noexcept
+template <typename T>
+constexpr T
+    log1p_compute (const T x) noexcept
 {
     // return x * ( T(1) + x * ( -T(1)/T(2) +  x * ( T(1)/T(3) +  x * ( -T(1)/T(4) + x/T(5) ) ) ) ); // O(x^6)
-    return x + x * ( - x/T(2) +  x * ( x/T(3) +  x * ( -x/T(4) + x*x/T(5) ) ) ); // O(x^6)
+    return x + x * (-x / T (2) + x * (x / T (3) + x * (-x / T (4) + x * x / T (5)))); // O(x^6)
 }
 
-template<typename T>
-constexpr
-T
-log1p_check(const T x)
-noexcept
+template <typename T>
+constexpr T
+    log1p_check (const T x) noexcept
 {
-    return( // NaN check
-            is_nan(x) ? \
-                GCLIM<T>::quiet_NaN() :
-            //
-            abs(x) > T(1e-04) ? \
-            // if
-                log(T(1) + x) :
-            // else    
-                log1p_compute(x) );
+    return ( // NaN check
+        is_nan (x) ? GCLIM<T>::quiet_NaN() :
+                   //
+            abs (x) > T (1e-04) ? // if
+            log (T (1) + x)
+                                :
+                                // else
+            log1p_compute (x));
 }
 
-}
+} // namespace internal
 
 /**
  * Compile-time natural-logarithm-plus-1 function
@@ -68,13 +62,11 @@ noexcept
  * @return \f$ \log_e(x+1) \f$ using \f[ \log(x+1) = \sum_{k=1}^\infty \dfrac{(-1)^{k-1}x^k}{k}, \ \ |x| < 1 \f] 
  */
 
-template<typename T>
-constexpr
-return_t<T>
-log1p(const T x)
-noexcept
+template <typename T>
+constexpr return_t<T>
+    log1p (const T x) noexcept
 {
-    return internal::log1p_check( static_cast<return_t<T>>(x) );
+    return internal::log1p_check (static_cast<return_t<T>> (x));
 }
 
 #endif

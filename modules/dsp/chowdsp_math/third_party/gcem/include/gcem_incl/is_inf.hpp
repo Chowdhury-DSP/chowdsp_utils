@@ -28,145 +28,115 @@
 namespace internal
 {
 
-template<typename T>
-constexpr
-bool
-is_neginf(const T x)
-noexcept
+template <typename T>
+constexpr bool
+    is_neginf (const T x) noexcept
 {
-    return x == - GCLIM<T>::infinity();
+    return x == -GCLIM<T>::infinity();
 }
 
-template<typename T1, typename T2>
-constexpr
-bool
-any_neginf(const T1 x, const T2 y)
-noexcept
+template <typename T1, typename T2>
+constexpr bool
+    any_neginf (const T1 x, const T2 y) noexcept
 {
-    return( is_neginf(x) || is_neginf(y) );
+    return (is_neginf (x) || is_neginf (y));
 }
 
-template<typename T1, typename T2>
-constexpr
-bool
-all_neginf(const T1 x, const T2 y)
-noexcept
+template <typename T1, typename T2>
+constexpr bool
+    all_neginf (const T1 x, const T2 y) noexcept
 {
-    return( is_neginf(x) && is_neginf(y) );
+    return (is_neginf (x) && is_neginf (y));
 }
 
-template<typename T1, typename T2, typename T3>
-constexpr
-bool
-any_neginf(const T1 x, const T2 y, const T3 z)
-noexcept
+template <typename T1, typename T2, typename T3>
+constexpr bool
+    any_neginf (const T1 x, const T2 y, const T3 z) noexcept
 {
-    return( is_neginf(x) || is_neginf(y) || is_neginf(z) );
+    return (is_neginf (x) || is_neginf (y) || is_neginf (z));
 }
 
-template<typename T1, typename T2, typename T3>
-constexpr
-bool
-all_neginf(const T1 x, const T2 y, const T3 z)
-noexcept
+template <typename T1, typename T2, typename T3>
+constexpr bool
+    all_neginf (const T1 x, const T2 y, const T3 z) noexcept
 {
-    return( is_neginf(x) && is_neginf(y) && is_neginf(z) );
+    return (is_neginf (x) && is_neginf (y) && is_neginf (z));
 }
 
 //
 
-template<typename T>
-constexpr
-bool
-is_posinf(const T x)
-noexcept
+template <typename T>
+constexpr bool
+    is_posinf (const T x) noexcept
 {
     return x == GCLIM<T>::infinity();
 }
 
-template<typename T1, typename T2>
-constexpr
-bool
-any_posinf(const T1 x, const T2 y)
-noexcept
+template <typename T1, typename T2>
+constexpr bool
+    any_posinf (const T1 x, const T2 y) noexcept
 {
-    return( is_posinf(x) || is_posinf(y) );
+    return (is_posinf (x) || is_posinf (y));
 }
 
-template<typename T1, typename T2>
-constexpr
-bool
-all_posinf(const T1 x, const T2 y)
-noexcept
+template <typename T1, typename T2>
+constexpr bool
+    all_posinf (const T1 x, const T2 y) noexcept
 {
-    return( is_posinf(x) && is_posinf(y) );
+    return (is_posinf (x) && is_posinf (y));
 }
 
-template<typename T1, typename T2, typename T3>
-constexpr
-bool
-any_posinf(const T1 x, const T2 y, const T3 z)
-noexcept
+template <typename T1, typename T2, typename T3>
+constexpr bool
+    any_posinf (const T1 x, const T2 y, const T3 z) noexcept
 {
-    return( is_posinf(x) || is_posinf(y) || is_posinf(z) );
+    return (is_posinf (x) || is_posinf (y) || is_posinf (z));
 }
 
-template<typename T1, typename T2, typename T3>
-constexpr
-bool
-all_posinf(const T1 x, const T2 y, const T3 z)
-noexcept
+template <typename T1, typename T2, typename T3>
+constexpr bool
+    all_posinf (const T1 x, const T2 y, const T3 z) noexcept
 {
-    return( is_posinf(x) && is_posinf(y) && is_posinf(z) );
+    return (is_posinf (x) && is_posinf (y) && is_posinf (z));
 }
 
 //
 
-template<typename T>
-constexpr
-bool
-is_inf(const T x)
-noexcept
+template <typename T>
+constexpr bool
+    is_inf (const T x) noexcept
 {
-    return( is_neginf(x) || is_posinf(x) );
+    return (is_neginf (x) || is_posinf (x));
 }
 
-template<typename T1, typename T2>
-constexpr
-bool
-any_inf(const T1 x, const T2 y)
-noexcept
+template <typename T1, typename T2>
+constexpr bool
+    any_inf (const T1 x, const T2 y) noexcept
 {
-    return( is_inf(x) || is_inf(y) );
+    return (is_inf (x) || is_inf (y));
 }
 
-template<typename T1, typename T2>
-constexpr
-bool
-all_inf(const T1 x, const T2 y)
-noexcept
+template <typename T1, typename T2>
+constexpr bool
+    all_inf (const T1 x, const T2 y) noexcept
 {
-    return( is_inf(x) && is_inf(y) );
+    return (is_inf (x) && is_inf (y));
 }
 
-template<typename T1, typename T2, typename T3>
-constexpr
-bool
-any_inf(const T1 x, const T2 y, const T3 z)
-noexcept
+template <typename T1, typename T2, typename T3>
+constexpr bool
+    any_inf (const T1 x, const T2 y, const T3 z) noexcept
 {
-    return( is_inf(x) || is_inf(y) || is_inf(z) );
+    return (is_inf (x) || is_inf (y) || is_inf (z));
 }
 
-template<typename T1, typename T2, typename T3>
-constexpr
-bool
-all_inf(const T1 x, const T2 y, const T3 z)
-noexcept
+template <typename T1, typename T2, typename T3>
+constexpr bool
+    all_inf (const T1 x, const T2 y, const T3 z) noexcept
 {
-    return( is_inf(x) && is_inf(y) && is_inf(z) );
+    return (is_inf (x) && is_inf (y) && is_inf (z));
 }
 
-}
+} // namespace internal
 
 #endif

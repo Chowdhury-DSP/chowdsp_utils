@@ -28,17 +28,15 @@
 namespace internal
 {
 
-template<typename T>
-constexpr
-return_t<T>
-log10_check(const T x)
-noexcept
+template <typename T>
+constexpr return_t<T>
+    log10_check (const T x) noexcept
 {
     // log_10(x) = ln(x) / ln(10)
-    return return_t<T>(log(x) / GCEM_LOG_10);
+    return return_t<T> (log (x) / GCEM_LOG_10);
 }
 
-}
+} // namespace internal
 
 /**
  * Compile-time common logarithm function
@@ -47,13 +45,11 @@ noexcept
  * @return \f$ \log_{10}(x) \f$ using \f[ \log_{10}(x) = \frac{\log_e(x)}{\log_e(10)} \f] 
  */
 
-template<typename T>
-constexpr
-return_t<T>
-log10(const T x)
-noexcept
+template <typename T>
+constexpr return_t<T>
+    log10 (const T x) noexcept
 {
-    return internal::log10_check( x );
+    return internal::log10_check (x);
 }
 
 #endif

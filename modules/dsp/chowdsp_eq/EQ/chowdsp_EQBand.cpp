@@ -43,7 +43,8 @@ void EQBand<FloatType, FilterChoices...>::prepare (const juce::dsp::ProcessSpec&
     fadeBuffer.clear();
 
     TupleHelpers::forEachInTuple (
-        [spec] (auto& filter, size_t) {
+        [spec] (auto& filter, size_t)
+        {
             using FilterType = std::remove_reference_t<decltype (filter)>;
 
             if constexpr (std::is_base_of_v<IIRFilter<FilterType::Order, FloatType>, FilterType> || std::is_base_of_v<SOSFilter<FilterType::Order, FloatType>, FilterType> || std::is_base_of_v<SOSFilter<FilterType::Order - 1, FloatType>, FilterType>)
@@ -67,7 +68,8 @@ void EQBand<FloatType, FilterChoices...>::prepare (const juce::dsp::ProcessSpec&
 template <typename FloatType, typename... FilterChoices>
 void EQBand<FloatType, FilterChoices...>::reset()
 {
-    TupleHelpers::forEachInTuple ([] (auto& filter, size_t) { filter.reset(); },
+    TupleHelpers::forEachInTuple ([] (auto& filter, size_t)
+                                  { filter.reset(); },
                                   filters);
 
     for (auto* smoother : { &freqSmooth, &qSmooth, &gainSmooth })
@@ -81,7 +83,8 @@ template <typename FilterType, typename T, size_t N>
 std::enable_if_t<std::is_base_of_v<IIRFilter<N, T>, FilterType> || std::is_base_of_v<SOSFilter<N, T>, FilterType> || std::is_base_of_v<SOSFilter<N - 1, T>, FilterType>, void>
     EQBand<FloatType, FilterChoices...>::processFilterChannel (FilterType& filter, const chowdsp::BufferView<FloatType>& block)
 {
-    auto setParams = [&filter, fs = this->fs] (FloatType curFreq, FloatType curQ, FloatType curGain) {
+    auto setParams = [&filter, fs = this->fs] (FloatType curFreq, FloatType curQ, FloatType curGain)
+    {
         if constexpr (! FilterType::HasQParameter)
         {
             juce::ignoreUnused (curQ, curGain);
@@ -106,7 +109,8 @@ std::enable_if_t<std::is_base_of_v<IIRFilter<N, T>, FilterType> || std::is_base_
             [setParamsFunc = std::forward<decltype (setParams)> (setParams),
              freqHzValues = freqSmooth.getSmoothedBuffer(),
              qValues = qSmooth.getSmoothedBuffer(),
-             gainValues = gainSmooth.getSmoothedBuffer()] (int n) { setParamsFunc (freqHzValues[n], qValues[n], gainValues[n]); });
+             gainValues = gainSmooth.getSmoothedBuffer()] (int n)
+            { setParamsFunc (freqHzValues[n], qValues[n], gainValues[n]); });
     }
     else
     {
@@ -287,7 +291,8 @@ void EQBand<FloatType, FilterChoices...>::processBlock (const chowdsp::BufferVie
         BufferMath::copyBufferData (buffer, fadeBuffer, 0, 0, numSamples, 0, numChannels);
 
     TupleHelpers::forEachInTuple (
-        [this, &buffer] (auto& filter, size_t filterIndex) {
+        [this, &buffer] (auto& filter, size_t filterIndex)
+        {
             if ((int) filterIndex == filterType)
             {
                 processFilterChannel (filter, buffer);
@@ -343,7 +348,8 @@ void EQBand<FloatType, FilterChoices...>::process (const ProcessContext& context
         BufferMath::copyBufferData (block, fadeBuffer, 0, numSamples, 0, numChannels);
 
     TupleHelpers::forEachInTuple (
-        [this, &block] (auto& filter, size_t filterIndex) {
+        [this, &block] (auto& filter, size_t filterIndex)
+        {
             if ((int) filterIndex == filterType)
             {
                 processFilterChannel (filter, block);

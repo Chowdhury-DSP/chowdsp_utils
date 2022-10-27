@@ -1,4 +1,3 @@
-
 path_classifiers:
   test:
     - tests

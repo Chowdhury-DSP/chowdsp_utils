@@ -28,34 +28,29 @@
 namespace internal
 {
 
-template<typename T>
-constexpr
-T
-expm1_compute(const T x)
-noexcept
+template <typename T>
+constexpr T
+    expm1_compute (const T x) noexcept
 {
     // return x * ( T(1) + x * ( T(1)/T(2) + x * ( T(1)/T(6) + x * ( T(1)/T(24) +  x/T(120) ) ) ) ); // O(x^6)
-    return x + x * ( x/T(2) + x * ( x/T(6) + x * ( x/T(24) +  x*x/T(120) ) ) ); // O(x^6)
+    return x + x * (x / T (2) + x * (x / T (6) + x * (x / T (24) + x * x / T (120)))); // O(x^6)
 }
 
-template<typename T>
-constexpr
-T
-expm1_check(const T x)
-noexcept
+template <typename T>
+constexpr T
+    expm1_check (const T x) noexcept
 {
-    return( // NaN check
-            is_nan(x) ? \
-                GCLIM<T>::quiet_NaN() :
-            //
-            abs(x) > T(1e-04) ? \
-            // if
-                exp(x) - T(1) :
-            // else    
-                expm1_compute(x) );
+    return ( // NaN check
+        is_nan (x) ? GCLIM<T>::quiet_NaN() :
+                   //
+            abs (x) > T (1e-04) ? // if
+            exp (x) - T (1)
+                                :
+                                // else
+            expm1_compute (x));
 }
 
-}
+} // namespace internal
 
 /**
  * Compile-time exponential-minus-1 function
@@ -64,13 +59,11 @@ noexcept
  * @return \f$ \exp(x) - 1 \f$ using \f[ \exp(x) = \sum_{k=0}^\infty \dfrac{x^k}{k!} \f] 
  */
 
-template<typename T>
-constexpr
-return_t<T>
-expm1(const T x)
-noexcept
+template <typename T>
+constexpr return_t<T>
+    expm1 (const T x) noexcept
 {
-    return internal::expm1_check( static_cast<return_t<T>>(x) );
+    return internal::expm1_check (static_cast<return_t<T>> (x));
 }
 
 #endif

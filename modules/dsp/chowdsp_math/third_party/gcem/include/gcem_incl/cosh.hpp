@@ -28,23 +28,20 @@
 namespace internal
 {
 
-template<typename T>
-constexpr
-T
-cosh_compute(const T x)
-noexcept
+template <typename T>
+constexpr T
+    cosh_compute (const T x) noexcept
 {
-    return( // NaN check
-            is_nan(x) ? \
-                GCLIM<T>::quiet_NaN() :
-            // indistinguishable from zero
-            GCLIM<T>::min() > abs(x) ? \
-                T(1) : 
-            // else
-                (exp(x) + exp(-x)) / T(2) );
+    return ( // NaN check
+        is_nan (x) ? GCLIM<T>::quiet_NaN() :
+                   // indistinguishable from zero
+            GCLIM<T>::min() > abs (x) ? T (1)
+                                      :
+                                      // else
+            (exp (x) + exp (-x)) / T (2));
 }
 
-}
+} // namespace internal
 
 /**
  * Compile-time hyperbolic cosine function
@@ -53,13 +50,11 @@ noexcept
  * @return the hyperbolic cosine function using \f[ \cosh(x) = \frac{\exp(x) + \exp(-x)}{2} \f]
  */
 
-template<typename T>
-constexpr
-return_t<T>
-cosh(const T x)
-noexcept
+template <typename T>
+constexpr return_t<T>
+    cosh (const T x) noexcept
 {
-    return internal::cosh_compute( static_cast<return_t<T>>(x) );
+    return internal::cosh_compute (static_cast<return_t<T>> (x));
 }
 
 #endif

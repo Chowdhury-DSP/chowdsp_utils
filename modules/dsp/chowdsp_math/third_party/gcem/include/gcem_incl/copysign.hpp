@@ -30,12 +30,10 @@
  */
 
 template <typename T1, typename T2>
-constexpr
-T1
-copysign(const T1 x, const T2 y)
-noexcept
+constexpr T1
+    copysign (const T1 x, const T2 y) noexcept
 {
-    return( signbit(x) != signbit(y) ? -x : x );
+    return (signbit (x) != signbit (y) ? -x : x);
 }
 
 #endif

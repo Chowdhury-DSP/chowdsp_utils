@@ -28,26 +28,23 @@
 namespace internal
 {
 
-template<typename T>
-constexpr
-T
-acosh_compute(const T x)
-noexcept
+template <typename T>
+constexpr T
+    acosh_compute (const T x) noexcept
 {
-    return( // NaN check
-            is_nan(x) ? \
-                GCLIM<T>::quiet_NaN() :
-            // function defined for x >= 1
-            x < T(1) ? \
-                GCLIM<T>::quiet_NaN() :
-            // indistinguishable from 1
-            GCLIM<T>::min() > abs(x - T(1)) ? \
-                T(0) :
-            // else
-                log( x + sqrt(x*x - T(1)) ) );
+    return ( // NaN check
+        is_nan (x) ? GCLIM<T>::quiet_NaN() :
+                   // function defined for x >= 1
+            x < T (1) ? GCLIM<T>::quiet_NaN()
+                      :
+                      // indistinguishable from 1
+            GCLIM<T>::min() > abs (x - T (1)) ? T (0)
+                                              :
+                                              // else
+            log (x + sqrt (x * x - T (1))));
 }
 
-}
+} // namespace internal
 
 /**
  * Compile-time inverse hyperbolic cosine function
@@ -56,13 +53,11 @@ noexcept
  * @return the inverse hyperbolic cosine function using \f[ \text{acosh}(x) = \ln \left( x + \sqrt{x^2 - 1} \right) \f]
  */
 
-template<typename T>
-constexpr
-return_t<T>
-acosh(const T x)
-noexcept
+template <typename T>
+constexpr return_t<T>
+    acosh (const T x) noexcept
 {
-    return internal::acosh_compute( static_cast<return_t<T>>(x) );
+    return internal::acosh_compute (static_cast<return_t<T>> (x));
 }
 
 #endif

@@ -1,7 +1,9 @@
 # GCE-Math
+
 [![Build Status](https://github.com/kthohr/gcem/actions/workflows/main.yml/badge.svg)](https://github.com/kthohr/gcem/actions/workflows/main.yml) [![Build status](https://ci.appveyor.com/api/projects/status/5kxxkmisln1j4h6b?svg=true)](https://ci.appveyor.com/project/kthohr/gcem) [![Coverage Status](https://codecov.io/github/kthohr/gcem/coverage.svg?branch=master)](https://codecov.io/github/kthohr/gcem?branch=master) [![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/kthohr/gcem.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/kthohr/gcem) [![Documentation Status](https://readthedocs.org/projects/gcem/badge/?version=latest)](https://gcem.readthedocs.io/en/latest/?badge=latest)
 
-GCE-Math (**G**eneralized **C**onstant **E**xpression Math) is a templated C++ library enabling compile-time computation of mathematical functions.
+GCE-Math (**G**eneralized **C**onstant **E**xpression Math) is a templated C++ library enabling compile-time computation
+of mathematical functions.
 
 Features:
 
@@ -16,7 +18,8 @@ Features:
 [![License](https://img.shields.io/badge/Licence-Apache%202.0-blue.svg)](./LICENSE)
 
 ### Contents:
-* [Status and Documentation](#status-and-documentation) 
+
+* [Status and Documentation](#status-and-documentation)
 * [Installation](#installation)
 * [Test Suite](#test-suite)
 * [Jupyter Notebook](#jupyter-notebook)
@@ -28,13 +31,13 @@ Features:
 The library is actively maintained and is still being extended. A list of features includes:
 
 * Basic library functions:
-    - `abs`, `max`, `min`, `pow`, `sqrt`, `inv_sqrt`, 
+    - `abs`, `max`, `min`, `pow`, `sqrt`, `inv_sqrt`,
     - `ceil`, `floor`, `round`, `trunc`, `fmod`,
     - `exp`, `expm1`, `log`, `log1p`, `log2`, `log10`, and more
 * Trigonometric functions:
     - basic: `cos`, `sin`, `tan`
     - inverse: `acos`, `asin`, `atan`, `atan2`
-* Hyperbolic (area) functions: 
+* Hyperbolic (area) functions:
     - `cosh`, `sinh`, `tanh`, `acosh`, `asinh`, `atanh`
 * Algorithms:
     - `gcd`, `lcm`
@@ -49,16 +52,19 @@ Full documentation is available online:
 
 [![Documentation Status](https://readthedocs.org/projects/gcem/badge/?version=latest)](https://gcem.readthedocs.io/en/latest/?badge=latest)
 
-A PDF version of the documentation is available [here](https://buildmedia.readthedocs.org/media/pdf/gcem/latest/gcem.pdf).
+A PDF version of the documentation is
+available [here](https://buildmedia.readthedocs.org/media/pdf/gcem/latest/gcem.pdf).
 
 ## Installation
 
-GCE-Math is a header-only library and does not require any additional libraries or utilities (beyond a C++11 compatible compiler). Simply add the header files to your project using:
+GCE-Math is a header-only library and does not require any additional libraries or utilities (beyond a C++11 compatible
+compiler). Simply add the header files to your project using:
+
 ```cpp
 #include "gcem.hpp"
 ```
 
-### Conda 
+### Conda
 
 [![Anaconda-Server Badge](https://anaconda.org/kthohr/gcem/badges/version.svg)](https://anaconda.org/kthohr/gcem) [![Anaconda-Server Badge](https://anaconda.org/kthohr/gcem/badges/platforms.svg)](https://anaconda.org/kthohr/gcem)
 
@@ -87,6 +93,7 @@ cd build
 cmake .. -DCMAKE_INSTALL_PREFIX=/gcem/install/location
 make install
 ```
+
 For example, `/gcem/install/location` could be `/usr/local/`.
 
 ## Test Suite
@@ -100,6 +107,7 @@ make
 ```
 
 With CMake, the option `GCEM_BUILD_TESTS=1` generates the necessary Makefiles to build the test suite.
+
 ```bash
 cd ./gcem
 mkdir build
@@ -114,22 +122,28 @@ cd tests
 
 ## Jupyter Notebook
 
-You can test the library online using an interactive Jupyter notebook: 
+You can test the library online using an interactive Jupyter notebook:
 
 [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/kthohr/gcem/master?filepath=notebooks%2Fgcem.ipynb)
 
 ## General Syntax
 
-GCE-Math functions are written as C++ templates with `constexpr` specifiers, the format of which might appear confusing to users unfamiliar with template-based programming. 
+GCE-Math functions are written as C++ templates with `constexpr` specifiers, the format of which might appear confusing
+to users unfamiliar with template-based programming.
 
 For example, the [Gaussian error function](https://en.wikipedia.org/wiki/Error_function) (`erf`) is defined as:
+
 ```cpp
 template<typename T>
 constexpr
 return_t<T>
 erf(const T x) noexcept;
 ```
-A set of internal templated `constexpr` functions will implement a continued fraction expansion and return a value of type `return_t<T>`. The output type ('`return_t<T>`') is generally determined by the input type, e.g., `int`, `float`, `double`, `long double`, etc.; when `T` is an integral type, the output will be upgraded to `return_t<T> = double`, otherwise `return_t<T> = T`. For types not covered by `std::is_integral`, recasts should be used.
+
+A set of internal templated `constexpr` functions will implement a continued fraction expansion and return a value of
+type `return_t<T>`. The output type ('`return_t<T>`') is generally determined by the input type, e.g., `int`, `float`
+, `double`, `long double`, etc.; when `T` is an integral type, the output will be upgraded to `return_t<T> = double`,
+otherwise `return_t<T> = T`. For types not covered by `std::is_integral`, recasts should be used.
 
 ## Examples
 
@@ -146,7 +160,9 @@ int main()
     return 0;
 }
 ```
+
 Inspecting the assembly code generated by Clang 7.0.0:
+
 ```assembly
         push    rbp
         mov     rbp, rsp
@@ -157,6 +173,7 @@ Inspecting the assembly code generated by Clang 7.0.0:
         pop     rbp
         ret
 ```
+
 We see that a function call has been replaced by a numeric value (10! = 3628800).
 
 Similarly, to compute the log Gamma function at a point:
@@ -172,7 +189,9 @@ int main()
     return 0;
 }
 ```
+
 Assembly code:
+
 ```assembly
 .LCPI0_0:
         .long   1069547520              # float 1.5

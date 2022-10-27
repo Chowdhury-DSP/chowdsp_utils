@@ -1,10 +1,9 @@
-
 # modified version of:
 # https://gist.github.com/NickNaso/0d478f1481686d5bcc868cac06620a60
 
 name: CI
 
-on: [push, pull_request, release]
+on: [ push, pull_request, release ]
 
 jobs:
   build:
@@ -14,8 +13,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        config: 
-        - {
+        config:
+          - {
             name: "ubuntu_latest_gcc_cxx11",
             os: ubuntu-latest,
             build_type: "Release",
@@ -23,7 +22,7 @@ jobs:
             cxx: "g++",
             cxxstd: "11"
           }
-        - {
+          - {
             name: "ubuntu_latest_gcc_cxx11_coverage",
             os: ubuntu-latest,
             build_type: "Coverage",
@@ -31,7 +30,7 @@ jobs:
             cxx: "g++",
             cxxstd: "11"
           }
-        - {
+          - {
             name: "ubuntu_latest_gcc9_cxx14",
             os: ubuntu-latest,
             build_type: "Release",
@@ -39,7 +38,7 @@ jobs:
             cxx: "g++-9",
             cxxstd: "14"
           }
-        - {
+          - {
             name: "ubuntu_latest_gcc10_cxx14",
             os: ubuntu-latest,
             build_type: "Release",
@@ -47,7 +46,7 @@ jobs:
             cxx: "g++-10",
             cxxstd: "14"
           }
-        - {
+          - {
             name: "ubuntu_latest_gcc11_cxx17",
             os: ubuntu-latest,
             build_type: "Release",
@@ -55,7 +54,7 @@ jobs:
             cxx: "g++-11",
             cxxstd: "17"
           }
-        - {
+          - {
             name: "ubuntu_latest_clang10_cxx11",
             os: ubuntu-latest,
             build_type: "Release",
@@ -63,7 +62,7 @@ jobs:
             cxx: "clang++-10",
             cxxstd: "11"
           }
-        - {
+          - {
             name: "macos_latest_clang_cxx11",
             os: macos-latest,
             build_type: "Release",

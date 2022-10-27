@@ -18,7 +18,8 @@ public:
         juce::String logFileNameRoot;
         juce::String logFileExtension = ".log";
         int maxNumLogFiles = 50;
-        std::function<void (const juce::File&)> crashLogAnalysisCallback = [] (const juce::File& logFile) { PluginLogger::defaultCrashLogAnalyzer (logFile); };
+        std::function<void (const juce::File&)> crashLogAnalysisCallback = [] (const juce::File& logFile)
+        { PluginLogger::defaultCrashLogAnalyzer (logFile); };
     };
 
     PluginLogger (const juce::String& logFileSubDir, const juce::String& logFileNameRoot);

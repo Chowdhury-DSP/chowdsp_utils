@@ -28,20 +28,16 @@
 namespace internal
 {
 
-template<typename T>
-constexpr
-llint_t
-find_exponent(const T x, const llint_t exponent)
-noexcept
+template <typename T>
+constexpr llint_t
+    find_exponent (const T x, const llint_t exponent) noexcept
 {
-    return( x < T(1)  ? \
-                find_exponent(x*T(10),exponent - llint_t(1)) :
-            x > T(10) ? \
-                find_exponent(x/T(10),exponent + llint_t(1)) :
-            // else
-                exponent );
+    return (x < T (1) ? find_exponent (x * T (10), exponent - llint_t (1)) : x > T (10) ? find_exponent (x / T (10), exponent + llint_t (1))
+                                                                                        :
+                                                                                        // else
+                                                                             exponent);
 }
 
-}
+} // namespace internal
 
 #endif

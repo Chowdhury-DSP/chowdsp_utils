@@ -30,13 +30,11 @@
  * where \f$ \Gamma \f$ denotes the gamma function.
  */
 
-template<typename T1, typename T2>
-constexpr
-common_return_t<T1,T2>
-beta(const T1 a, const T2 b)
-noexcept
+template <typename T1, typename T2>
+constexpr common_return_t<T1, T2>
+    beta (const T1 a, const T2 b) noexcept
 {
-    return exp( lbeta(a,b) );
+    return exp (lbeta (a, b));
 }
 
 #endif

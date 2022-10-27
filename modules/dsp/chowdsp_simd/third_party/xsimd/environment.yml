@@ -1,6 +1,6 @@
 name: xsimd
 channels:
-- conda-forge
+  - conda-forge
 dependencies:
   - ninja
   - xtl

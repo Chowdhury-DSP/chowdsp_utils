@@ -1,5 +1,5 @@
 name: macOS build
-on: [push, pull_request]
+on: [ push, pull_request ]
 concurrency:
   group: ${{ github.workflow }}-${{ github.job }}-${{ github.ref }}
   cancel-in-progress: true
@@ -13,14 +13,14 @@ jobs:
     runs-on: macos-${{ matrix.os }}
     name: 'macos-${{ matrix.os }}'
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup
-      run: |
-        mkdir _build
-        cd _build && cmake .. -DBUILD_TESTS=ON -DDOWNLOAD_DOCTEST=ON -DBUILD_BENCHMARK=ON -DBUILD_EXAMPLES=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
-    - name: Build
-      run: cmake --build _build
-    - name: Testing sequential
-      run: cmake --build _build --target xbenchmark
-    - name: Testing xsimd
-      run: ${{github.workspace}}/_build/test/test_xsimd
+      - uses: actions/checkout@v2
+      - name: Setup
+        run: |
+          mkdir _build
+          cd _build && cmake .. -DBUILD_TESTS=ON -DDOWNLOAD_DOCTEST=ON -DBUILD_BENCHMARK=ON -DBUILD_EXAMPLES=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
+      - name: Build
+        run: cmake --build _build
+      - name: Testing sequential
+        run: cmake --build _build --target xbenchmark
+      - name: Testing xsimd
+        run: ${{github.workspace}}/_build/test/test_xsimd

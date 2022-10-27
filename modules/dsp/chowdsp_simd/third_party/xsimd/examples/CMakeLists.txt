@@ -19,26 +19,26 @@ endif ()
 
 include_directories(${XSIMD_INCLUDE_DIR})
 
-if(NOT CMAKE_BUILD_TYPE)
+if (NOT CMAKE_BUILD_TYPE)
     message(STATUS "Setting examples build type to Release")
     set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
-else()
+else ()
     message(STATUS "Tests build type is ${CMAKE_BUILD_TYPE}")
-endif()
+endif ()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
     if (NOT CMAKE_CXX_FLAGS MATCHES "-march" AND NOT CMAKE_CXX_FLAGS MATCHES "-arch" AND NOT CMAKE_OSX_ARCHITECTURES)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -mtune=native")
-    endif()
-    if(NOT CMAKE_CXX_COMPILER_ID MATCHES Clang) # We are using clang-cl
+    endif ()
+    if (NOT CMAKE_CXX_COMPILER_ID MATCHES Clang) # We are using clang-cl
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
-    endif()
-endif()
+    endif ()
+endif ()
 
 add_executable(mandelbrot mandelbrot.cpp ${XSIMD_HEADERS})
 set_property(TARGET mandelbrot PROPERTY CXX_STANDARD 14)
-if(ENABLE_XTL_COMPLEX)
+if (ENABLE_XTL_COMPLEX)
     target_link_libraries(mandelbrot PRIVATE xtl)
-endif()
+endif ()
 
 add_custom_target(xmandelbrot COMMAND mandelbrot DEPENDS mandelbrot)

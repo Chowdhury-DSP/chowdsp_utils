@@ -14,7 +14,8 @@ TEST_CASE ("Triangle Test")
     {
         // our osc has 1/2 sample delay so, run the reference osc at 2x sample rate, and check every other.
         const auto phaseIncrement = juce::MathConstants<float>::twoPi * testFreq / float (2.0 * _sampleRate);
-        auto refOsc = [phase = 0.0f, phaseIncrement]() mutable {
+        auto refOsc = [phase = 0.0f, phaseIncrement]() mutable
+        {
             const auto x = (phase - juce::MathConstants<float>::pi) / juce::MathConstants<float>::pi;
             const auto y = 2.0f * std::abs (x) - 1.0f;
             phase += phaseIncrement;
@@ -42,7 +43,8 @@ TEST_CASE ("Triangle Test")
     {
         // our osc has 1/2 sample delay so, run the reference osc at 2x sample rate, and check every other.
         const auto phaseIncrement = juce::MathConstants<float>::twoPi * testFreq / float (2.0 * _sampleRate);
-        auto refOsc = [phase = 0.0f, phaseIncrement]() mutable {
+        auto refOsc = [phase = 0.0f, phaseIncrement]() mutable
+        {
             const auto x = (phase - juce::MathConstants<float>::pi) / juce::MathConstants<float>::pi;
             const auto y = 2.0f * std::abs (x) - 1.0f;
             phase += phaseIncrement;
@@ -73,7 +75,8 @@ TEST_CASE ("Triangle Test")
     SECTION ("Process Replacing Test")
     {
         const auto phaseIncrement = juce::MathConstants<float>::twoPi * testFreq / float (2.0 * _sampleRate);
-        auto refOsc = [phase = 0.0f, phaseIncrement] (float input) mutable {
+        auto refOsc = [phase = 0.0f, phaseIncrement] (float input) mutable
+        {
             const auto x = (phase - juce::MathConstants<float>::pi) / juce::MathConstants<float>::pi;
             const auto y = 2.0f * std::abs (x) - 1.0f;
             phase += phaseIncrement;

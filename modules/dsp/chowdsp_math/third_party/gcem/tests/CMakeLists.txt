@@ -32,43 +32,43 @@ set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
 
 #
 
-if(NOT MSVC)
+if (NOT MSVC)
     include(CheckCXXCompilerFlag)
     CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
-    
-    if(COMPILER_SUPPORTS_CXX11)
+
+    if (COMPILER_SUPPORTS_CXX11)
         if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g -O0 -Wall -Wextra --coverage -fno-inline -fno-inline-small-functions -fno-default-inline")
-        else()
+        else ()
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g -O0 -Wall -Wextra --coverage -fno-inline")
-        endif()
-    else()
+        endif ()
+    else ()
         message(FATAL_ERROR "Unsupported compiler ${CMAKE_CXX_COMPILER} "
-            "GCEM requires a C++11-compatible compiler.")
-    endif()
-endif()
+                "GCEM requires a C++11-compatible compiler.")
+    endif ()
+endif ()
 
-if(MSVC)
+if (MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /MP /bigobj")
     set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
-endif()
+endif ()
 
 #
 
 file(GLOB GCEM_TESTS_SOURCES **.cpp **.c)
-set( GCEM_TESTS ${GCEM_TESTS_SOURCES})
+set(GCEM_TESTS ${GCEM_TESTS_SOURCES})
 
 set(GCEM_TESTS_EX "")
 
-foreach( file_ ${GCEM_TESTS} )
+foreach (file_ ${GCEM_TESTS})
     get_filename_component(filename ${file_} NAME)
-    string( REPLACE ".cpp" ".test" testname ${filename} )
+    string(REPLACE ".cpp" ".test" testname ${filename})
 
-    add_executable( ${testname} EXCLUDE_FROM_ALL ${filename} )
-    target_link_libraries( ${testname} gcem )
-    
+    add_executable(${testname} EXCLUDE_FROM_ALL ${filename})
+    target_link_libraries(${testname} gcem)
+
     list(APPEND GCEM_TESTS_EX ${testname})
-endforeach()
+endforeach ()
 
 add_custom_target(gcem_tests DEPENDS ${GCEM_TESTS_EX})
 

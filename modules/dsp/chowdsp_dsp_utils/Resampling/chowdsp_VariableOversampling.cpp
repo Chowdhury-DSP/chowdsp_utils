@@ -91,7 +91,8 @@ VariableOversampling<FloatType>::VariableOversampling (const juce::AudioProcesso
     : proc (vts.processor),
       usingIntegerLatency (useIntegerLatency)
 {
-    auto loadParamPointer = [&vts, &prefix] (auto& param, const juce::String& paramSuffix) {
+    auto loadParamPointer = [&vts, &prefix] (auto& param, const juce::String& paramSuffix)
+    {
         using ParamType = std::remove_reference_t<decltype (param)>;
         param = dynamic_cast<ParamType> (vts.getParameter (prefix + paramSuffix));
 
@@ -156,7 +157,8 @@ void VariableOversampling<FloatType>::createParameterLayout (std::vector<std::un
         osModeChoices.add (osModeToString (mode));
     }
 
-    auto getParamID = [&paramPrefix, versionHint] (const juce::String& paramSuffix) {
+    auto getParamID = [&paramPrefix, versionHint] (const juce::String& paramSuffix)
+    {
 #if JUCE_VERSION < 0x070000
         juce::ignoreUnused (versionHint);
         return paramPrefix + paramSuffix;

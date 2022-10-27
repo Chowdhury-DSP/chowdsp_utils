@@ -28,94 +28,77 @@
 namespace internal
 {
 
-template<typename T>
-constexpr
-T
-tan_series_exp_long(const T z)
-noexcept
-{   // this is based on a fourth-order expansion of tan(z) using Bernoulli numbers
-    return( - 1/z + (z/3 + (pow_integral(z,3)/45 + (2*pow_integral(z,5)/945 + pow_integral(z,7)/4725))) );
+template <typename T>
+constexpr T
+    tan_series_exp_long (const T z) noexcept
+{ // this is based on a fourth-order expansion of tan(z) using Bernoulli numbers
+    return (-1 / z + (z / 3 + (pow_integral (z, 3) / 45 + (2 * pow_integral (z, 5) / 945 + pow_integral (z, 7) / 4725))));
 }
 
-template<typename T>
-constexpr
-T
-tan_series_exp(const T x)
-noexcept
+template <typename T>
+constexpr T
+    tan_series_exp (const T x) noexcept
 {
-    return( GCLIM<T>::min() > abs(x - T(GCEM_HALF_PI)) ? \
-            // the value tan(pi/2) is somewhat of a convention;
-            // technically the function is not defined at EXACTLY pi/2,
-            // but this is floating point pi/2
-                T(1.633124e+16) :
-            // otherwise we use an expansion around pi/2
-                tan_series_exp_long(x - T(GCEM_HALF_PI))
-            );
+    return (GCLIM<T>::min() > abs (x - T (GCEM_HALF_PI)) ? // the value tan(pi/2) is somewhat of a convention;
+                // technically the function is not defined at EXACTLY pi/2,
+                // but this is floating point pi/2
+                T (1.633124e+16)
+                                                         :
+                                                         // otherwise we use an expansion around pi/2
+                tan_series_exp_long (x - T (GCEM_HALF_PI)));
 }
 
-template<typename T>
-constexpr
-T
-tan_cf_recur(const T xx, const int depth, const int max_depth)
-noexcept
+template <typename T>
+constexpr T
+    tan_cf_recur (const T xx, const int depth, const int max_depth) noexcept
 {
-    return( depth < max_depth ? \
-            // if
-                T(2*depth - 1) - xx/tan_cf_recur(xx,depth+1,max_depth) :
-            // else
-                T(2*depth - 1) );
+    return (depth < max_depth ? // if
+                T (2 * depth - 1) - xx / tan_cf_recur (xx, depth + 1, max_depth)
+                              :
+                              // else
+                T (2 * depth - 1));
 }
 
-template<typename T>
-constexpr
-T
-tan_cf_main(const T x)
-noexcept
+template <typename T>
+constexpr T
+    tan_cf_main (const T x) noexcept
 {
-    return( (x > T(1.55) && x < T(1.60)) ? \
-                tan_series_exp(x) : // deals with a singularity at tan(pi/2)
-            //
-            x > T(1.4) ? \
-                x/tan_cf_recur(x*x,1,45) :
-            x > T(1)   ? \
-                x/tan_cf_recur(x*x,1,35) :
-            // else
-                x/tan_cf_recur(x*x,1,25) );
+    return ((x > T (1.55) && x < T (1.60)) ? tan_series_exp (x) : // deals with a singularity at tan(pi/2)
+                //
+                x > T (1.4) ? x / tan_cf_recur (x * x, 1, 45)
+            : x > T (1)     ? x / tan_cf_recur (x * x, 1, 35)
+                            :
+                        // else
+                x / tan_cf_recur (x * x, 1, 25));
 }
 
-template<typename T>
-constexpr
-T
-tan_begin(const T x, const int count = 0)
-noexcept
-{   // tan(x) = tan(x + pi)
-    return( x > T(GCEM_PI) ? \
-            // if
+template <typename T>
+constexpr T
+    tan_begin (const T x, const int count = 0) noexcept
+{ // tan(x) = tan(x + pi)
+    return (x > T (GCEM_PI) ? // if
                 count > 1 ? GCLIM<T>::quiet_NaN() : // protect against undefined behavior
-                tan_begin( x - T(GCEM_PI) * internal::floor_check(x/T(GCEM_PI)), count+1 ) :
-            // else 
-                tan_cf_main(x) );
+                    tan_begin (x - T (GCEM_PI) * internal::floor_check (x / T (GCEM_PI)), count + 1)
+                            :
+                            // else
+                tan_cf_main (x));
 }
 
-template<typename T>
-constexpr
-T
-tan_check(const T x)
-noexcept
+template <typename T>
+constexpr T
+    tan_check (const T x) noexcept
 {
-    return( // NaN check
-            is_nan(x) ? \
-                GCLIM<T>::quiet_NaN() :
-            // indistinguishable from zero 
-            GCLIM<T>::min() > abs(x) ? \
-                T(0) :
-            // else
-                x < T(0) ? \
-                    - tan_begin(-x) : 
-                      tan_begin( x) );
+    return ( // NaN check
+        is_nan (x) ? GCLIM<T>::quiet_NaN() :
+                   // indistinguishable from zero
+            GCLIM<T>::min() > abs (x) ? T (0)
+                                      :
+                                      // else
+            x < T (0) ? -tan_begin (-x)
+                      : tan_begin (x));
 }
 
-}
+} // namespace internal
 
 /**
  * Compile-time tangent function
@@ -128,13 +111,11 @@ noexcept
  * where \f$ B_n \f$ is the n-th Bernoulli number.
  */
 
-template<typename T>
-constexpr
-return_t<T>
-tan(const T x)
-noexcept
+template <typename T>
+constexpr return_t<T>
+    tan (const T x) noexcept
 {
-    return internal::tan_check( static_cast<return_t<T>>(x) );
+    return internal::tan_check (static_cast<return_t<T>> (x));
 }
 
 #endif

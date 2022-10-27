@@ -28,33 +28,28 @@
 namespace internal
 {
 
-template<typename T>
-constexpr
-T
-tgamma_check(const T x)
-noexcept
+template <typename T>
+constexpr T
+    tgamma_check (const T x) noexcept
 {
-    return( // NaN check
-            is_nan(x) ? \
-                GCLIM<T>::quiet_NaN() :
-            // indistinguishable from one or zero
-            GCLIM<T>::min() > abs(x - T(1)) ? \
-                T(1) :
-            GCLIM<T>::min() > abs(x) ? \
-                GCLIM<T>::infinity() :
-            // negative numbers
-            x < T(0) ? \
-                // check for integer
-                GCLIM<T>::min() > abs(x - find_whole(x)) ? \
-                    GCLIM<T>::quiet_NaN() :
-                // else
-                tgamma_check(x+T(1)) / x :
+    return ( // NaN check
+        is_nan (x) ? GCLIM<T>::quiet_NaN() :
+                   // indistinguishable from one or zero
+            GCLIM<T>::min() > abs (x - T (1)) ? T (1)
+        : GCLIM<T>::min() > abs (x)           ? GCLIM<T>::infinity()
+                                              :
+                                    // negative numbers
+            x < T (0) ? // check for integer
+            GCLIM<T>::min() > abs (x - find_whole (x)) ? GCLIM<T>::quiet_NaN() :
+                                                       // else
+                tgamma_check (x + T (1)) / x
+                      :
 
-            // else
-                exp(lgamma(x)) );
+                      // else
+            exp (lgamma (x)));
 }
 
-}
+} // namespace internal
 
 /**
  * Compile-time gamma function
@@ -68,13 +63,11 @@ noexcept
  * are taken from Paul Godfrey, whose note can be found here: http://my.fit.edu/~gabdo/gamma.txt
  */
 
-template<typename T>
-constexpr
-return_t<T>
-tgamma(const T x)
-noexcept
+template <typename T>
+constexpr return_t<T>
+    tgamma (const T x) noexcept
 {
-    return internal::tgamma_check( static_cast<return_t<T>>(x) );
+    return internal::tgamma_check (static_cast<return_t<T>> (x));
 }
 
 #endif

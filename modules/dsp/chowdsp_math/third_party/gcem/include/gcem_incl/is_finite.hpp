@@ -28,51 +28,41 @@
 namespace internal
 {
 
-template<typename T>
-constexpr
-bool
-is_finite(const T x)
-noexcept
+template <typename T>
+constexpr bool
+    is_finite (const T x) noexcept
 {
-    return (!is_nan(x)) && (!is_inf(x));
+    return (! is_nan (x)) && (! is_inf (x));
 }
 
-template<typename T1, typename T2>
-constexpr
-bool
-any_finite(const T1 x, const T2 y)
-noexcept
+template <typename T1, typename T2>
+constexpr bool
+    any_finite (const T1 x, const T2 y) noexcept
 {
-    return( is_finite(x) || is_finite(y) );
+    return (is_finite (x) || is_finite (y));
 }
 
-template<typename T1, typename T2>
-constexpr
-bool
-all_finite(const T1 x, const T2 y)
-noexcept
+template <typename T1, typename T2>
+constexpr bool
+    all_finite (const T1 x, const T2 y) noexcept
 {
-    return( is_finite(x) && is_finite(y) );
+    return (is_finite (x) && is_finite (y));
 }
 
-template<typename T1, typename T2, typename T3>
-constexpr
-bool
-any_finite(const T1 x, const T2 y, const T3 z)
-noexcept
+template <typename T1, typename T2, typename T3>
+constexpr bool
+    any_finite (const T1 x, const T2 y, const T3 z) noexcept
 {
-    return( is_finite(x) || is_finite(y) || is_finite(z) );
+    return (is_finite (x) || is_finite (y) || is_finite (z));
 }
 
-template<typename T1, typename T2, typename T3>
-constexpr
-bool
-all_finite(const T1 x, const T2 y, const T3 z)
-noexcept
+template <typename T1, typename T2, typename T3>
+constexpr bool
+    all_finite (const T1 x, const T2 y, const T3 z) noexcept
 {
-    return( is_finite(x) && is_finite(y) && is_finite(z) );
+    return (is_finite (x) && is_finite (y) && is_finite (z));
 }
 
-}
+} // namespace internal
 
 #endif

@@ -28,23 +28,20 @@
 namespace internal
 {
 
-template<typename T>
-constexpr
-T
-sinh_check(const T x)
-noexcept
+template <typename T>
+constexpr T
+    sinh_check (const T x) noexcept
 {
-    return( // NaN check
-            is_nan(x) ? \
-                GCLIM<T>::quiet_NaN() :
-            // indistinguishable from zero
-            GCLIM<T>::min() > abs(x) ? \
-                T(0) :
-            // else
-                (exp(x) - exp(-x))/T(2) );
+    return ( // NaN check
+        is_nan (x) ? GCLIM<T>::quiet_NaN() :
+                   // indistinguishable from zero
+            GCLIM<T>::min() > abs (x) ? T (0)
+                                      :
+                                      // else
+            (exp (x) - exp (-x)) / T (2));
 }
 
-}
+} // namespace internal
 
 /**
  * Compile-time hyperbolic sine function
@@ -53,13 +50,11 @@ noexcept
  * @return the hyperbolic sine function using \f[ \sinh(x) = \frac{\exp(x) - \exp(-x)}{2} \f]
  */
 
-template<typename T>
-constexpr
-return_t<T>
-sinh(const T x)
-noexcept
+template <typename T>
+constexpr return_t<T>
+    sinh (const T x) noexcept
 {
-    return internal::sinh_check( static_cast<return_t<T>>(x) );
+    return internal::sinh_check (static_cast<return_t<T>> (x));
 }
 
 #endif

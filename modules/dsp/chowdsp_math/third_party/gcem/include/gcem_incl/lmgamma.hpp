@@ -30,26 +30,22 @@ namespace internal
 
 // see https://en.wikipedia.org/wiki/Multivariate_gamma_function
 
-template<typename T1, typename T2>
-constexpr
-T1
-lmgamma_recur(const T1 a, const T2 p)
-noexcept
+template <typename T1, typename T2>
+constexpr T1
+    lmgamma_recur (const T1 a, const T2 p) noexcept
 {
-    return( // NaN check
-            is_nan(a) ? \
-                GCLIM<T1>::quiet_NaN() :
-            //
-            p == T2(1) ? \
-                lgamma(a) :
-            p <  T2(1) ? \
-                GCLIM<T1>::quiet_NaN() :
-            // else
-                T1(GCEM_LOG_PI) * (p - T1(1))/T1(2) \
-                    + lgamma(a) + lmgamma_recur(a - T1(0.5),p-T2(1)) );
+    return ( // NaN check
+        is_nan (a) ? GCLIM<T1>::quiet_NaN() :
+                   //
+            p == T2 (1) ? lgamma (a)
+        : p < T2 (1)    ? GCLIM<T1>::quiet_NaN()
+                        :
+                     // else
+            T1 (GCEM_LOG_PI) * (p - T1 (1)) / T1 (2)
+                + lgamma (a) + lmgamma_recur (a - T1 (0.5), p - T2 (1)));
 }
 
-}
+} // namespace internal
 
 /**
  * Compile-time log multivariate gamma function
@@ -61,13 +57,11 @@ noexcept
  * where \f$ \Gamma_1(a) = \Gamma(a) \f$.
  */
 
-template<typename T1, typename T2>
-constexpr
-return_t<T1>
-lmgamma(const T1 a, const T2 p)
-noexcept
+template <typename T1, typename T2>
+constexpr return_t<T1>
+    lmgamma (const T1 a, const T2 p) noexcept
 {
-    return internal::lmgamma_recur(static_cast<return_t<T1>>(a),p);
+    return internal::lmgamma_recur (static_cast<return_t<T1>> (a), p);
 }
 
 #endif

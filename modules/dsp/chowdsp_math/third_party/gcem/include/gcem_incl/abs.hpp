@@ -28,18 +28,15 @@
  * @return the absolute value of \c x, \f$ |x| \f$.
  */
 
-template<typename T>
-constexpr
-T
-abs(const T x)
-noexcept
+template <typename T>
+constexpr T
+    abs (const T x) noexcept
 {
-    return( // deal with signed-zeros
-            x == T(0) ? \
-                T(0) :
-            // else
-            x < T(0) ? \
-                - x : x );
+    return ( // deal with signed-zeros
+        x == T (0) ? T (0) :
+                   // else
+            x < T (0) ? -x
+                      : x);
 }
 
 #endif

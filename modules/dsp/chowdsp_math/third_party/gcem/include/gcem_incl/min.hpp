@@ -29,13 +29,11 @@
  * @return Computes the minimum between \c x and \c y, where \c x and \c y have the same type (e.g., \c int, \c double, etc.)
  */
 
-template<typename T1, typename T2>
-constexpr
-common_t<T1,T2>
-min(const T1 x, const T2 y)
-noexcept
+template <typename T1, typename T2>
+constexpr common_t<T1, T2>
+    min (const T1 x, const T2 y) noexcept
 {
-    return( y > x ? x : y );
+    return (y > x ? x : y);
 }
 
 #endif
