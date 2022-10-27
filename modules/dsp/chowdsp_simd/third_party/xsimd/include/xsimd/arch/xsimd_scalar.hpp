@@ -441,8 +441,7 @@ namespace xsimd
         return !(x0 == x1);
     }
 
-// Temp fix until xsimd merge the fix for this
-#if defined(_GNU_SOURCE) && !defined(__APPLE__) && !defined(__MINGW32__) && !defined(__ANDROID__)
+#ifdef _GNU_SOURCE
     inline float exp10(const float& x) noexcept
     {
         return ::exp10f(x);
