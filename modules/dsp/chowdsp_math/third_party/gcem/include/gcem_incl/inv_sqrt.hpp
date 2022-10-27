@@ -28,46 +28,37 @@
 namespace internal
 {
 
-template<typename T>
-constexpr
-T
-inv_sqrt_recur(const T x, const T xn, const int count)
-noexcept
+template <typename T>
+constexpr T
+    inv_sqrt_recur (const T x, const T xn, const int count) noexcept
 {
-    return( abs( xn - T(1)/(x*xn) ) / (T(1) + xn) < GCLIM<T>::min() ? \
-            // if
-                xn :
-            count < GCEM_INV_SQRT_MAX_ITER ? \
-            // else
-                inv_sqrt_recur(x, T(0.5)*(xn + T(1)/(x*xn)), count+1) :
-                xn );
+    return (abs (xn - T (1) / (x * xn)) / (T (1) + xn) < GCLIM<T>::min() ? // if
+                xn
+                                                                         : count < GCEM_INV_SQRT_MAX_ITER ? // else
+                                                                               inv_sqrt_recur (x, T (0.5) * (xn + T (1) / (x * xn)), count + 1)
+                                                                                                          : xn);
 }
 
-template<typename T>
-constexpr
-T
-inv_sqrt_check(const T x)
-noexcept
+template <typename T>
+constexpr T
+    inv_sqrt_check (const T x) noexcept
 {
-    return( is_nan(x) ? \
-                GCLIM<T>::quiet_NaN() :
-            //
-            x < T(0) ? \
-                GCLIM<T>::quiet_NaN() :
-            //
-            is_posinf(x) ? \
-                T(0) :
-            // indistinguishable from zero or one
-            GCLIM<T>::min() > abs(x) ? \
-                GCLIM<T>::infinity() :
-            GCLIM<T>::min() > abs(T(1) - x) ? \
-                x :
-            // else
-            inv_sqrt_recur(x, x/T(2), 0) );
+    return (is_nan (x) ? GCLIM<T>::quiet_NaN() :
+                       //
+                x < T (0) ? GCLIM<T>::quiet_NaN()
+                          :
+                          //
+                is_posinf (x) ? T (0)
+                              :
+                              // indistinguishable from zero or one
+                GCLIM<T>::min() > abs (x)       ? GCLIM<T>::infinity()
+            : GCLIM<T>::min() > abs (T (1) - x) ? x
+                                                :
+                                                // else
+                inv_sqrt_recur (x, x / T (2), 0));
 }
 
-}
-
+} // namespace internal
 
 /**
  * Compile-time inverse-square-root function
@@ -76,13 +67,11 @@ noexcept
  * @return Computes \f$ 1 / \sqrt{x} \f$ using a Newton-Raphson approach.
  */
 
-template<typename T>
-constexpr
-return_t<T>
-inv_sqrt(const T x)
-noexcept
+template <typename T>
+constexpr return_t<T>
+    inv_sqrt (const T x) noexcept
 {
-    return internal::inv_sqrt_check( static_cast<return_t<T>>(x) );
+    return internal::inv_sqrt_check (static_cast<return_t<T>> (x));
 }
 
 #endif

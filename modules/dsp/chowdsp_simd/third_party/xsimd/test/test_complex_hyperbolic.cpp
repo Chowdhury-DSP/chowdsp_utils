@@ -15,9 +15,8 @@
 #include "test_utils.hpp"
 
 template <class B>
-class complex_hyperbolic_test : public testing::Test
+struct complex_hyperbolic_test
 {
-protected:
     using batch_type = B;
     using real_batch_type = typename B::real_batch;
     using value_type = typename B::value_type;
@@ -54,7 +53,8 @@ protected:
     void test_sinh()
     {
         std::transform(input.cbegin(), input.cend(), expected.begin(),
-                       [](const value_type& v) { using std::sinh; return sinh(v); });
+                       [](const value_type& v)
+                       { using std::sinh; return sinh(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -63,13 +63,14 @@ protected:
             detail::store_batch(out, res, i);
         }
         size_t diff = detail::get_nb_diff(res, expected);
-        EXPECT_EQ(diff, 0) << print_function_name("sinh");
+        CHECK_EQ(diff, 0);
     }
 
     void test_cosh()
     {
         std::transform(input.cbegin(), input.cend(), expected.begin(),
-                       [](const value_type& v) { using std::cosh; return cosh(v); });
+                       [](const value_type& v)
+                       { using std::cosh; return cosh(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -78,13 +79,14 @@ protected:
             detail::store_batch(out, res, i);
         }
         size_t diff = detail::get_nb_diff(res, expected);
-        EXPECT_EQ(diff, 0) << print_function_name("cosh");
+        CHECK_EQ(diff, 0);
     }
 
     void test_tanh()
     {
         std::transform(input.cbegin(), input.cend(), expected.begin(),
-                       [](const value_type& v) { using std::tanh; return tanh(v); });
+                       [](const value_type& v)
+                       { using std::tanh; return tanh(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -93,13 +95,14 @@ protected:
             detail::store_batch(out, res, i);
         }
         size_t diff = detail::get_nb_diff(res, expected);
-        EXPECT_EQ(diff, 0) << print_function_name("tanh");
+        CHECK_EQ(diff, 0);
     }
 
     void test_asinh()
     {
         std::transform(input.cbegin(), input.cend(), expected.begin(),
-                       [](const value_type& v) { using std::asinh; return asinh(v); });
+                       [](const value_type& v)
+                       { using std::asinh; return asinh(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -108,13 +111,14 @@ protected:
             detail::store_batch(out, res, i);
         }
         size_t diff = detail::get_nb_diff(res, expected);
-        EXPECT_EQ(diff, 0) << print_function_name("asinh");
+        CHECK_EQ(diff, 0);
     }
 
     void test_acosh()
     {
         std::transform(acosh_input.cbegin(), acosh_input.cend(), expected.begin(),
-                       [](const value_type& v) { using std::acosh; return acosh(v); });
+                       [](const value_type& v)
+                       { using std::acosh; return acosh(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -123,13 +127,14 @@ protected:
             detail::store_batch(out, res, i);
         }
         size_t diff = detail::get_nb_diff(res, expected);
-        EXPECT_EQ(diff, 0) << print_function_name("acosh");
+        CHECK_EQ(diff, 0);
     }
 
     void test_atanh()
     {
         std::transform(atanh_input.cbegin(), atanh_input.cend(), expected.begin(),
-                       [](const value_type& v) { using std::atanh; return atanh(v); });
+                       [](const value_type& v)
+                       { using std::atanh; return atanh(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -138,39 +143,41 @@ protected:
             detail::store_batch(out, res, i);
         }
         size_t diff = detail::get_nb_diff(res, expected);
-        EXPECT_EQ(diff, 0) << print_function_name("atanh");
+        CHECK_EQ(diff, 0);
     }
 };
 
-TYPED_TEST_SUITE(complex_hyperbolic_test, batch_complex_types, simd_test_names);
-
-TYPED_TEST(complex_hyperbolic_test, sinh)
+TEST_CASE_TEMPLATE("[complex hyperbolic]", B, BATCH_COMPLEX_TYPES)
 {
-    this->test_sinh();
-}
+    complex_hyperbolic_test<B> Test;
+    SUBCASE("sinh")
+    {
+        Test.test_sinh();
+    }
 
-TYPED_TEST(complex_hyperbolic_test, cosh)
-{
-    this->test_cosh();
-}
+    SUBCASE("cosh")
+    {
+        Test.test_cosh();
+    }
 
-TYPED_TEST(complex_hyperbolic_test, tanh)
-{
-    this->test_tanh();
-}
+    SUBCASE("tanh")
+    {
+        Test.test_tanh();
+    }
 
-TYPED_TEST(complex_hyperbolic_test, asinh)
-{
-    this->test_asinh();
-}
+    SUBCASE("asinh")
+    {
+        Test.test_asinh();
+    }
 
-TYPED_TEST(complex_hyperbolic_test, acosh)
-{
-    this->test_acosh();
-}
+    SUBCASE("acosh")
+    {
+        Test.test_acosh();
+    }
 
-TYPED_TEST(complex_hyperbolic_test, atanh)
-{
-    this->test_atanh();
+    SUBCASE("atanh")
+    {
+        Test.test_atanh();
+    }
 }
 #endif

@@ -7,10 +7,12 @@ TEST_CASE ("Tuple Helpers Test")
     {
         std::tuple<float, float, int, int> ints;
 
-        chowdsp::TupleHelpers::forEachInTuple ([] (auto& x, size_t i) { x = (std::remove_reference_t<decltype (x)>) i; },
+        chowdsp::TupleHelpers::forEachInTuple ([] (auto& x, size_t i)
+                                               { x = (std::remove_reference_t<decltype (x)>) i; },
                                                ints);
 
-        chowdsp::TupleHelpers::forEachInTuple ([] (auto& x, size_t i) { REQUIRE (x == (std::remove_reference_t<decltype (x)>) i); },
+        chowdsp::TupleHelpers::forEachInTuple ([] (auto& x, size_t i)
+                                               { REQUIRE (x == (std::remove_reference_t<decltype (x)>) i); },
                                                ints);
     }
 }

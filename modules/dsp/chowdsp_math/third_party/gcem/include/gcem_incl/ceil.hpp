@@ -24,92 +24,74 @@
 namespace internal
 {
 
-template<typename T>
-constexpr
-int
-ceil_resid(const T x, const T x_whole)
-noexcept
+template <typename T>
+constexpr int
+    ceil_resid (const T x, const T x_whole) noexcept
 {
-    return( (x > T(0)) && (x > x_whole) );
+    return ((x > T (0)) && (x > x_whole));
 }
 
-template<typename T>
-constexpr
-T
-ceil_int(const T x, const T x_whole)
-noexcept
+template <typename T>
+constexpr T
+    ceil_int (const T x, const T x_whole) noexcept
 {
-    return( x_whole + static_cast<T>(ceil_resid(x,x_whole)) );
+    return (x_whole + static_cast<T> (ceil_resid (x, x_whole)));
 }
 
-template<typename T>
-constexpr
-T
-ceil_check_internal(const T x)
-noexcept
+template <typename T>
+constexpr T
+    ceil_check_internal (const T x) noexcept
 {
     return x;
 }
 
-template<>
-constexpr
-float
-ceil_check_internal<float>(const float x)
-noexcept
+template <>
+constexpr float
+    ceil_check_internal<float> (const float x) noexcept
 {
-    return( abs(x) >= 8388608.f ? \
-            // if
-                x : \
-            // else
-                ceil_int(x, float(static_cast<int>(x))) );
+    return (abs (x) >= 8388608.f ? // if
+                x
+                                 : // else
+                ceil_int (x, float (static_cast<int> (x))));
 }
 
-template<>
-constexpr
-double
-ceil_check_internal<double>(const double x)
-noexcept
+template <>
+constexpr double
+    ceil_check_internal<double> (const double x) noexcept
 {
-    return( abs(x) >= 4503599627370496. ? \
-            // if
-                x : \
-            // else
-                ceil_int(x, double(static_cast<llint_t>(x))) );
+    return (abs (x) >= 4503599627370496. ? // if
+                x
+                                         : // else
+                ceil_int (x, double (static_cast<llint_t> (x))));
 }
 
-template<>
-constexpr
-long double
-ceil_check_internal<long double>(const long double x)
-noexcept
+template <>
+constexpr long double
+    ceil_check_internal<long double> (const long double x) noexcept
 {
-    return( abs(x) >= 9223372036854775808.l ? \
-            // if
-                x : \
-            // else
-                ceil_int(x, ((long double)static_cast<ullint_t>(abs(x))) * sgn(x)) );
+    return (abs (x) >= 9223372036854775808.l ? // if
+                x
+                                             : // else
+                ceil_int (x, ((long double) static_cast<ullint_t> (abs (x))) * sgn (x)));
 }
 
-template<typename T>
-constexpr
-T
-ceil_check(const T x)
-noexcept
+template <typename T>
+constexpr T
+    ceil_check (const T x) noexcept
 {
-    return( // NaN check
-            is_nan(x) ? \
-                GCLIM<T>::quiet_NaN() :
-            // +/- infinite
-            !is_finite(x) ? \
-                x :
-            // signed-zero cases
-            GCLIM<T>::min() > abs(x) ? \
-                x :
-            // else
-                ceil_check_internal(x) );
+    return ( // NaN check
+        is_nan (x) ? GCLIM<T>::quiet_NaN() :
+                   // +/- infinite
+            ! is_finite (x) ? x
+                            :
+                            // signed-zero cases
+            GCLIM<T>::min() > abs (x) ? x
+                                      :
+                                      // else
+            ceil_check_internal (x));
 }
 
-}
+} // namespace internal
 
 /**
  * Compile-time ceil function
@@ -118,13 +100,11 @@ noexcept
  * @return computes the ceiling-value of the input.
  */
 
-template<typename T>
-constexpr
-return_t<T>
-ceil(const T x)
-noexcept
+template <typename T>
+constexpr return_t<T>
+    ceil (const T x) noexcept
 {
-    return internal::ceil_check( static_cast<return_t<T>>(x) );
+    return internal::ceil_check (static_cast<return_t<T>> (x));
 }
 
 #endif

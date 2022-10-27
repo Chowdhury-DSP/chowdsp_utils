@@ -42,7 +42,8 @@ TEMPLATE_TEST_CASE ("Shelf Filter Test", "", float, xsimd::batch<float>)
         chowdsp::ShelfFilter<T> shelfFilter;
         shelfFilter.calcCoefs ((T) Constants::lowGain, (T) Constants::highGain, (T) Constants::fc, Constants::fs);
 
-        auto testFrequency = [=, &shelfFilter] (float freq, float expGain, const std::string& message) {
+        auto testFrequency = [=, &shelfFilter] (float freq, float expGain, const std::string& message)
+        {
             auto buffer = test_utils::makeSineWave<T> (freq, Constants::fs, (NumericType) 1);
 
             shelfFilter.reset();

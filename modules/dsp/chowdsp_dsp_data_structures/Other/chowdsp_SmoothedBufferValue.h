@@ -86,7 +86,8 @@ public:
      * If using a custom mapping function, make sure this is set properly before calling
      * `prepare()` or `reset()`.
      */
-    std::function<FloatType (FloatType)> mappingFunction = [] (auto x) { return x; };
+    std::function<FloatType (FloatType)> mappingFunction = [] (auto x)
+    { return x; };
 
 private:
 #if ! CHOWDSP_NO_XSIMD

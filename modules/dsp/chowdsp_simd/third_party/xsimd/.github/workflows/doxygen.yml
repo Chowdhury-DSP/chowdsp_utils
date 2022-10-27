@@ -1,5 +1,5 @@
 name: doc
-on: [push, pull_request]
+on: [ push, pull_request ]
 concurrency:
   group: ${{ github.workflow }}-${{ github.job }}-${{ github.ref }}
   cancel-in-progress: true
@@ -7,8 +7,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Install dependencies
-      run: sudo apt install doxygen python3-breathe python3-sphinx-rtd-theme
-    - name: Render
-      run: make -C docs
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: sudo apt install doxygen python3-breathe python3-sphinx-rtd-theme
+      - name: Render
+        run: make -C docs

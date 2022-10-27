@@ -28,63 +28,51 @@
 namespace internal
 {
 
-template<typename T>
-constexpr
-T
-exp_cf_recur(const T x, const int depth)
-noexcept
+template <typename T>
+constexpr T
+    exp_cf_recur (const T x, const int depth) noexcept
 {
-    return( depth < GCEM_EXP_MAX_ITER_SMALL ? \
-            // if
-                depth == 1 ? \
-                    T(1) - x/exp_cf_recur(x,depth+1) : 
-                    T(1) + x/T(depth - 1) - x/depth/exp_cf_recur(x,depth+1) : 
-             // else
-                T(1) );
+    return (depth < GCEM_EXP_MAX_ITER_SMALL ? // if
+                depth == 1 ? T (1) - x / exp_cf_recur (x, depth + 1) : T (1) + x / T (depth - 1) - x / depth / exp_cf_recur (x, depth + 1)
+                                            :
+                                            // else
+                T (1));
 }
 
-template<typename T>
-constexpr
-T
-exp_cf(const T x)
-noexcept
+template <typename T>
+constexpr T
+    exp_cf (const T x) noexcept
 {
-    return( T(1)/exp_cf_recur(x,1) );
+    return (T (1) / exp_cf_recur (x, 1));
 }
 
-template<typename T>
-constexpr
-T
-exp_split(const T x)
-noexcept
+template <typename T>
+constexpr T
+    exp_split (const T x) noexcept
 {
-    return( static_cast<T>(pow_integral(GCEM_E,find_whole(x))) * exp_cf(find_fraction(x)) );
+    return (static_cast<T> (pow_integral (GCEM_E, find_whole (x))) * exp_cf (find_fraction (x)));
 }
 
-template<typename T>
-constexpr
-T
-exp_check(const T x)
-noexcept
+template <typename T>
+constexpr T
+    exp_check (const T x) noexcept
 {
-    return( is_nan(x) ? \
-                GCLIM<T>::quiet_NaN() :
-            //
-            is_neginf(x) ? \
-                T(0) :
-            //
-            GCLIM<T>::min() > abs(x) ? \
-                T(1) : 
-            //
-            is_posinf(x) ? \
-                GCLIM<T>::infinity() :
-            //
-            abs(x) < T(2) ? \
-                exp_cf(x) : \
-                exp_split(x) );
+    return (is_nan (x) ? GCLIM<T>::quiet_NaN() :
+                       //
+                is_neginf (x) ? T (0)
+                              :
+                              //
+                GCLIM<T>::min() > abs (x) ? T (1)
+                                          :
+                                          //
+                is_posinf (x) ? GCLIM<T>::infinity()
+                              :
+                              //
+                abs (x) < T (2) ? exp_cf (x)
+                                : exp_split (x));
 }
 
-}
+} // namespace internal
 
 /**
  * Compile-time exponential function
@@ -94,13 +82,11 @@ noexcept
  * The continued fraction argument is split into two parts: \f$ x = n + r \f$, where \f$ n \f$ is an integer and \f$ r \in [-0.5,0.5] \f$.
  */
 
-template<typename T>
-constexpr
-return_t<T>
-exp(const T x)
-noexcept
+template <typename T>
+constexpr return_t<T>
+    exp (const T x) noexcept
 {
-    return internal::exp_check( static_cast<return_t<T>>(x) );
+    return internal::exp_check (static_cast<return_t<T>> (x));
 }
 
 #endif

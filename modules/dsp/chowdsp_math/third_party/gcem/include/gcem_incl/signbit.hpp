@@ -29,15 +29,13 @@
  */
 
 template <typename T>
-constexpr 
-bool
-signbit(const T x)
-noexcept
+constexpr bool
+    signbit (const T x) noexcept
 {
 #ifdef _MSC_VER
-    return( (x == T(0)) ? (_fpclass(x) == _FPCLASS_NZ) : (x < T(0)) );
+    return ((x == T (0)) ? (_fpclass (x) == _FPCLASS_NZ) : (x < T (0)));
 #else
-    return GCEM_SIGNBIT(x);
+    return GCEM_SIGNBIT (x);
 #endif
 }
 

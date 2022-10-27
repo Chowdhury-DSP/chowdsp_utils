@@ -9,34 +9,24 @@
  * The full license is in the file LICENSE, distributed with this software. *
  ****************************************************************************/
 
-#ifndef XSIMD_FMA5_REGISTER_HPP
-#define XSIMD_FMA5_REGISTER_HPP
-
-#include "./xsimd_avx2_register.hpp"
+#include "xsimd/xsimd.hpp"
+#ifndef XSIMD_NO_SUPPORTED_ARCHITECTURE
 
 namespace xsimd
 {
 
-    /**
-     * @ingroup arch
-     *
-     * AVX2 + FMA instructions
-     */
-    struct fma5 : avx2
-    {
-        static constexpr bool supported() noexcept { return XSIMD_WITH_FMA5; }
-        static constexpr bool available() noexcept { return true; }
-        static constexpr unsigned version() noexcept { return generic::version(2, 3, 0); }
-        static constexpr char const* name() noexcept { return "avx2+fma"; }
-    };
-
-#if XSIMD_WITH_FMA5
-    namespace types
-    {
-
-        XSIMD_DECLARE_SIMD_REGISTER_ALIAS(fma5, avx2);
-
-    }
+    template class batch<char>;
+    template class batch<unsigned char>;
+    template class batch<signed char>;
+    template class batch<unsigned short>;
+    template class batch<signed short>;
+    template class batch<unsigned int>;
+    template class batch<signed int>;
+    template class batch<unsigned long>;
+    template class batch<signed long>;
+    template class batch<float>;
+#if !XSIMD_WITH_NEON || XSIMD_WITH_NEON64
+    template class batch<double>;
 #endif
 }
 #endif

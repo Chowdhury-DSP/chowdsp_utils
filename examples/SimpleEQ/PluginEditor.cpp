@@ -19,11 +19,13 @@ PluginEditor::PluginEditor (SimpleEQPlugin& p) : juce::AudioProcessorEditor (p),
 
     setSize (500, 500);
 
-    saveButton.onClick = [this] {
+    saveButton.onClick = [this]
+    {
         constexpr auto fileBrowserFlags = juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::canSelectFiles;
         fileChooser = std::make_shared<juce::FileChooser> ("Save EQ Params", defaultSaveLocation, eqParamsExt, true, false, getTopLevelComponent());
         fileChooser->launchAsync (fileBrowserFlags,
-                                  [&] (const juce::FileChooser& fc) {
+                                  [&] (const juce::FileChooser& fc)
+                                  {
                                       if (fc.getResults().isEmpty())
                                           return;
 
@@ -35,11 +37,13 @@ PluginEditor::PluginEditor (SimpleEQPlugin& p) : juce::AudioProcessorEditor (p),
                                   });
     };
 
-    loadButton.onClick = [this] {
+    loadButton.onClick = [this]
+    {
         constexpr auto fileBrowserFlags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles;
         fileChooser = std::make_shared<juce::FileChooser> ("Load EQ Params", defaultSaveLocation, eqParamsExt, true, false, getTopLevelComponent());
         fileChooser->launchAsync (fileBrowserFlags,
-                                  [&] (const juce::FileChooser& fc) {
+                                  [&] (const juce::FileChooser& fc)
+                                  {
                                       if (fc.getResults().isEmpty())
                                           return;
 

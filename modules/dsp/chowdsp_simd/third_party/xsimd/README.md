@@ -9,15 +9,21 @@ C++ wrappers for SIMD intrinsics
 
 ## Introduction
 
-SIMD (Single Instruction, Multiple Data) is a feature of microprocessors that has been available for many years. SIMD instructions perform a single operation
-on a batch of values at once, and thus provide a way to significantly accelerate code execution. However, these instructions differ between microprocessor
+SIMD (Single Instruction, Multiple Data) is a feature of microprocessors that has been available for many years. SIMD
+instructions perform a single operation
+on a batch of values at once, and thus provide a way to significantly accelerate code execution. However, these
+instructions differ between microprocessor
 vendors and compilers.
 
-`xsimd` provides a unified means for using these features for library authors. Namely, it enables manipulation of batches of numbers with the same arithmetic
-operators as for single values. It also provides accelerated implementation of common mathematical functions operating on batches.
+`xsimd` provides a unified means for using these features for library authors. Namely, it enables manipulation of
+batches of numbers with the same arithmetic
+operators as for single values. It also provides accelerated implementation of common mathematical functions operating
+on batches.
 
-You can find out more about this implementation of C++ wrappers for SIMD intrinsics at the [The C++ Scientist](http://johanmabille.github.io/blog/archives/).
-The mathematical functions are a lightweight implementation of the algorithms used in [boost.SIMD](https://github.com/NumScale/boost.simd).
+You can find out more about this implementation of C++ wrappers for SIMD intrinsics at
+the [The C++ Scientist](http://johanmabille.github.io/blog/archives/).
+The mathematical functions are a lightweight implementation of the algorithms used
+in [boost.SIMD](https://github.com/NumScale/boost.simd).
 
 `xsimd` requires a C++11 compliant compiler. The following C++ compilers are supported:
 
@@ -34,7 +40,7 @@ Architecture | Instruction set extensions
 x86          | SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, AVX, AVX2, FMA3+SSE, FMA3+AVX, FMA3+AVX2
 x86          | AVX512BW, AVX512CD, AVX512DQ, AVX512F (gcc7 and higher)
 x86 AMD      | FMA4
-ARM          | NEON, NEON64, SVE128/256 (fixed vector size)
+ARM          | NEON, NEON64, SVE128/256/512 (fixed vector size)
 
 ## Installation
 
@@ -81,7 +87,8 @@ http://xsimd.readthedocs.io/
 |  8.x    |     ^0.7.0       |
 |  7.x    |     ^0.7.0       |
 
-The dependency on `xtl` is required if you want to support vectorization for `xtl::xcomplex`. In this case, you must build your project with C++14 support enabled.
+The dependency on `xtl` is required if you want to support vectorization for `xtl::xcomplex`. In this case, you must
+build your project with C++14 support enabled.
 
 ## Usage
 
@@ -91,7 +98,9 @@ A migration guide will be available soon. In the meanwhile, the following exampl
 
 ### Explicit use of an instruction set extension (8.x)
 
-Here is an example that computes the mean of two sets of 4 double floating point values, assuming AVX extension is supported:
+Here is an example that computes the mean of two sets of 4 double floating point values, assuming AVX extension is
+supported:
+
 ```cpp
 #include <iostream>
 #include "xsimd/xsimd.hpp"
@@ -108,7 +117,8 @@ int main(int argc, char* argv[])
 }
 ```
 
-Do not forget to enable AVX extension when building the example. With gcc or clang, this is done with the `-march=native` flag,
+Do not forget to enable AVX extension when building the example. With gcc or clang, this is done with
+the `-march=native` flag,
 on MSVC you have to pass the `/arch:AVX` option.
 
 This example outputs:
@@ -119,7 +129,9 @@ This example outputs:
 
 ### Explicit use of an instruction set extension (7.x and 8.x)
 
-Here is an example that computes the mean of two sets of 4 double floating point values, assuming AVX extension is supported:
+Here is an example that computes the mean of two sets of 4 double floating point values, assuming AVX extension is
+supported:
+
 ```cpp
 #include <iostream>
 #include "xsimd/xsimd.hpp"
@@ -136,7 +148,8 @@ int main(int argc, char* argv[])
 }
 ```
 
-Do not forget to enable AVX extension when building the example. With gcc or clang, this is done with the `-march=native` flag,
+Do not forget to enable AVX extension when building the example. With gcc or clang, this is done with
+the `-march=native` flag,
 on MSVC you have to pass the `/arch:AVX` option.
 
 This example outputs:
@@ -177,37 +190,18 @@ void mean(const vector_type& a, const vector_type& b, vector_type& res)
 }
 ```
 
-We also implement STL algorithms to work optimally on batches. Using `xsimd::transform`
-the loop from the example becomes:
-
-```cpp
-#include <cstddef>
-#include <vector>
-#include "xsimd/xsimd.hpp"
-#include "xsimd/stl/algorithms.hpp"
-
-namespace xs = xsimd;
-using vector_type = std::vector<double, xsimd::aligned_allocator<double>>;
-
-void mean(const vector_type& a, const vector_type& b, vector_type& res)
-{
-    xsimd::transform(a.begin(), a.end(), b.begin(), res.begin(),
-                     [](const auto& x, const auto& y) { (x + y) / 2.; });
-}
-```
-
-
 ## Building and Running the Tests
 
-Building the tests requires the [GTest](https://github.com/google/googletest) testing framework and [cmake](https://cmake.org).
+Building the tests requires [cmake](https://cmake.org).
 
-gtest and cmake are available as a packages for most linux distributions. Besides, they can also be installed with the `conda` package manager (even on windows):
+`cmake` is available as a package for most linux distributions. Besides, they can also be installed with the `conda`
+package manager (even on windows):
 
 ```bash
-conda install -c conda-forge gtest cmake
+conda install -c conda-forge cmake
 ```
 
-Once `gtest` and `cmake` are installed, you can build and run the tests:
+Once `cmake` is installed, you can build and run the tests:
 
 ```bash
 mkdir build
@@ -216,7 +210,8 @@ cmake ../ -DBUILD_TESTS=ON
 make xtest
 ```
 
-In the context of continuous integration with Travis CI, tests are run in a `conda` environment, which can be activated with
+In the context of continuous integration with Travis CI, tests are run in a `conda` environment, which can be activated
+with
 
 ```bash
 cd test
@@ -231,9 +226,9 @@ make xtest
 
 xsimd's documentation is built with three tools
 
- - [doxygen](http://www.doxygen.org)
- - [sphinx](http://www.sphinx-doc.org)
- - [breathe](https://breathe.readthedocs.io)
+- [doxygen](http://www.doxygen.org)
+- [sphinx](http://www.sphinx-doc.org)
+- [breathe](https://breathe.readthedocs.io)
 
 While doxygen must be installed separately, you can install breathe by typing
 

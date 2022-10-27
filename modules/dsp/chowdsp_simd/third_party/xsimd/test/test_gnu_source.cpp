@@ -9,34 +9,22 @@
  * The full license is in the file LICENSE, distributed with this software. *
  ****************************************************************************/
 
-#ifndef XSIMD_FMA3_REGISTER_HPP
-#define XSIMD_FMA3_REGISTER_HPP
+/*
+ * Make sure the inclusion works correctly without _GNU_SOURCE
+ */
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+#include "xsimd/xsimd.hpp"
 
-#include "./xsimd_sse4_2_register.hpp"
+#include "doctest/doctest.h"
 
-namespace xsimd
+TEST_CASE("[GNU_SOURCE support]")
 {
 
-    /**
-     * @ingroup arch
-     *
-     * SSE4.2 + FMA instructions
-     */
-    struct fma3 : sse4_2
+    SUBCASE("exp10")
     {
-        static constexpr bool supported() noexcept { return XSIMD_WITH_FMA3; }
-        static constexpr bool available() noexcept { return true; }
-        static constexpr unsigned version() noexcept { return generic::version(1, 5, 0); }
-        static constexpr char const* name() noexcept { return "sse4.2+fma"; }
-    };
-
-#if XSIMD_WITH_FMA3
-    namespace types
-    {
-
-        XSIMD_DECLARE_SIMD_REGISTER_ALIAS(fma3, sse4_2);
-
+        CHECK_EQ(xsimd::exp10(0.), 1.);
+        CHECK_EQ(xsimd::exp10(0.f), 1.f);
     }
-#endif
 }
-#endif

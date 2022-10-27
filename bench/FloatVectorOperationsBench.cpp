@@ -171,7 +171,8 @@ const auto countNanVecFloat = bench_utils::makeRandomVector<float> (countNanN);
 
 static void countNanSTLFloat (benchmark::State& state)
 {
-    auto idealCountNan = [] (const auto* data, int numSamples) {
+    auto idealCountNan = [] (const auto* data, int numSamples)
+    {
         int nanCount = 0;
         for (int i = 0; i < numSamples; ++i)
             nanCount += (int) std::isnan (data[i]);
@@ -202,7 +203,8 @@ const auto countInfVecFloat = bench_utils::makeRandomVector<float> (countInfN);
 
 static void countInfSTLFloat (benchmark::State& state)
 {
-    auto idealCountInf = [] (const auto* data, int numSamples) {
+    auto idealCountInf = [] (const auto* data, int numSamples)
+    {
         int infsCount = 0;
         for (int i = 0; i < numSamples; ++i)
             infsCount += (int) std::isinf (data[i]);

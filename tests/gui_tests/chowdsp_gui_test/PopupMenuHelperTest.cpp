@@ -16,7 +16,8 @@ public:
 
         juce::Component comp;
         chowdsp::PopupMenuHelper popupMenu;
-        popupMenu.popupMenuCallback = [&] (juce::PopupMenu&, juce::PopupMenu::Options&) { hasPopupMenuShown = true; };
+        popupMenu.popupMenuCallback = [&] (juce::PopupMenu&, juce::PopupMenu::Options&)
+        { hasPopupMenuShown = true; };
         popupMenu.setAssociatedComponent (&comp);
 
         callback (popupMenu, comp);
@@ -33,13 +34,15 @@ public:
 
         beginTest ("Normal Mouse-Click Test");
         checkPopupMenu (false,
-                        [&] (auto& menuHelper, auto& comp) {
+                        [&] (auto& menuHelper, auto& comp)
+                        {
                             menuHelper.mouseDown (createDummyMouseEvent (&comp));
                         });
 
         beginTest ("RMB Mouse-Click Test");
         checkPopupMenu (true,
-                        [&] (auto& menuHelper, auto& comp) {
+                        [&] (auto& menuHelper, auto& comp)
+                        {
                             juce::ModifierKeys mods { juce::ModifierKeys::Flags::rightButtonModifier };
                             auto mouseEvent = createDummyMouseEvent (&comp, mods);
                             menuHelper.mouseDown (mouseEvent);
@@ -47,7 +50,8 @@ public:
 
         beginTest ("Long-Press Test");
         checkPopupMenu (true,
-                        [&] (auto& menuHelper, auto& comp) {
+                        [&] (auto& menuHelper, auto& comp)
+                        {
                             menuHelper.setLongPressSourceTypes ({ juce::MouseInputSource::mouse });
                             expect (menuHelper.isLongPressEnabled(), "Long-presses should be enabled!");
 
@@ -59,7 +63,8 @@ public:
 
         beginTest ("Short-Press Test");
         checkPopupMenu (false,
-                        [&] (auto& menuHelper, auto& comp) {
+                        [&] (auto& menuHelper, auto& comp)
+                        {
                             menuHelper.setLongPressSourceTypes ({ juce::MouseInputSource::mouse });
                             expect (menuHelper.isLongPressEnabled (juce::MouseInputSource::mouse), "Long-presses should be enabled for mouse source type!");
 

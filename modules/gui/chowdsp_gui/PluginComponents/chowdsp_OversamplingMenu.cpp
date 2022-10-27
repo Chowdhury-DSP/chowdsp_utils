@@ -34,13 +34,15 @@ OversamplingMenu<OSType>::OversamplingMenu (OSType& osMgr, juce::AudioProcessorV
 
         attachments[count] = std::make_unique<juce::ParameterAttachment> (
             *param,
-            [=] (float) { generateComboBoxMenu(); },
+            [=] (float)
+            { generateComboBoxMenu(); },
             vts.undoManager);
 
         count += 1;
     }
 
-    sampleRateOrBlockSizeChangedCallback = osManager.sampleRateOrBlockSizeChangedBroadcaster.connect ([this] { generateComboBoxMenu(); });
+    sampleRateOrBlockSizeChangedCallback = osManager.sampleRateOrBlockSizeChangedBroadcaster.connect ([this]
+                                                                                                      { generateComboBoxMenu(); });
 }
 
 template <typename OSType>
@@ -76,13 +78,15 @@ void OversamplingMenu<OSType>::generateComboBoxMenu()
                                 int menuOffset,
                                 const juce::String& choice,
                                 bool forceOff = false,
-                                bool disableSame = false) {
+                                bool disableSame = false)
+    {
         item.itemID = menuIdx++;
         int paramVal = item.itemID - menuOffset;
         bool isSelected = ((int) parameter->convertFrom0to1 (parameter->getValue()) == paramVal) && ! forceOff;
         item.text = choice;
         item.colour = isSelected ? accentColour : juce::Colours::white;
-        item.action = [this, paramVal, disableSame, &attachment] {
+        item.action = [this, paramVal, disableSame, &attachment]
+        {
             if (disableSame)
                 attachments[OSOfflineSame]->setValueAsCompleteGesture (0.0f);
             attachment->setValueAsCompleteGesture (float (paramVal));
@@ -111,7 +115,8 @@ void OversamplingMenu<OSType>::generateComboBoxMenu()
         sameAsRT = parameter != nullptr && (int) parameter->convertFrom0to1 (parameter->getValue()) == 1;
         item.text = "Same as real-time";
         item.colour = sameAsRT ? accentColour : juce::Colours::white;
-        item.action = [&] {
+        item.action = [&]
+        {
             attachments[OSOfflineSame]->setValueAsCompleteGesture (1.0f);
             generateComboBoxMenu();
         };

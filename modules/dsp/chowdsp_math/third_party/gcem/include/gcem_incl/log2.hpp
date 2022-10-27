@@ -28,17 +28,15 @@
 namespace internal
 {
 
-template<typename T>
-constexpr
-return_t<T>
-log2_check(const T x)
-noexcept
+template <typename T>
+constexpr return_t<T>
+    log2_check (const T x) noexcept
 {
     // log_2(x) = ln(x) / ln(2)
-    return return_t<T>(log(x) / GCEM_LOG_2);
+    return return_t<T> (log (x) / GCEM_LOG_2);
 }
 
-}
+} // namespace internal
 
 /**
  * Compile-time binary logarithm function
@@ -47,13 +45,11 @@ noexcept
  * @return \f$ \log_2(x) \f$ using \f[ \log_{2}(x) = \frac{\log_e(x)}{\log_e(2)} \f] 
  */
 
-template<typename T>
-constexpr
-return_t<T>
-log2(const T x)
-noexcept
+template <typename T>
+constexpr return_t<T>
+    log2 (const T x) noexcept
 {
-    return internal::log2_check( x );
+    return internal::log2_check (x);
 }
 
 #endif

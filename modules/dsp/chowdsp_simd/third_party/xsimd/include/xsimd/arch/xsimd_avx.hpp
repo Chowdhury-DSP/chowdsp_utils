@@ -828,11 +828,10 @@ namespace xsimd
                 using batch_type = batch<float, A>;
                 __m128 tmp0 = _mm256_extractf128_ps(hi, 0);
                 __m128 tmp1 = _mm256_extractf128_ps(hi, 1);
-                batch_type real, imag;
                 __m128 tmp_real = _mm_shuffle_ps(tmp0, tmp1, _MM_SHUFFLE(2, 0, 2, 0));
                 __m128 tmp_imag = _mm_shuffle_ps(tmp0, tmp1, _MM_SHUFFLE(3, 1, 3, 1));
-                real = _mm256_insertf128_ps(real, tmp_real, 0);
-                imag = _mm256_insertf128_ps(imag, tmp_imag, 0);
+                batch_type real = _mm256_castps128_ps256(tmp_real);
+                batch_type imag = _mm256_castps128_ps256(tmp_imag);
 
                 tmp0 = _mm256_extractf128_ps(lo, 0);
                 tmp1 = _mm256_extractf128_ps(lo, 1);
@@ -848,15 +847,15 @@ namespace xsimd
                 using batch_type = batch<double, A>;
                 __m128d tmp0 = _mm256_extractf128_pd(hi, 0);
                 __m128d tmp1 = _mm256_extractf128_pd(hi, 1);
-                batch_type real, imag;
-                __m256d re_tmp0 = _mm256_insertf128_pd(real, _mm_unpacklo_pd(tmp0, tmp1), 0);
-                __m256d im_tmp0 = _mm256_insertf128_pd(imag, _mm_unpackhi_pd(tmp0, tmp1), 0);
+                batch_type real = _mm256_castpd128_pd256(_mm_unpacklo_pd(tmp0, tmp1));
+                batch_type imag = _mm256_castpd128_pd256(_mm_unpackhi_pd(tmp0, tmp1));
+
                 tmp0 = _mm256_extractf128_pd(lo, 0);
                 tmp1 = _mm256_extractf128_pd(lo, 1);
                 __m256d re_tmp1 = _mm256_insertf128_pd(real, _mm_unpacklo_pd(tmp0, tmp1), 1);
                 __m256d im_tmp1 = _mm256_insertf128_pd(imag, _mm_unpackhi_pd(tmp0, tmp1), 1);
-                real = _mm256_blend_pd(re_tmp0, re_tmp1, 12);
-                imag = _mm256_blend_pd(im_tmp0, im_tmp1, 12);
+                real = _mm256_blend_pd(real, re_tmp1, 12);
+                imag = _mm256_blend_pd(imag, im_tmp1, 12);
                 return { real, imag };
             }
         }
@@ -1556,23 +1555,20 @@ namespace xsimd
         {
             XSIMD_IF_CONSTEXPR(sizeof(T) == 1 || sizeof(T) == 2)
             {
-                // extract low word
-                __m128i self_lo = _mm256_extractf128_si256(self, 0);
-                __m128i self_hi = _mm256_extractf128_si256(self, 1);
                 // extract high word
-                __m128i other_lo = _mm256_extractf128_si256(other, 0);
+                __m128i self_hi = _mm256_extractf128_si256(self, 1);
                 __m128i other_hi = _mm256_extractf128_si256(other, 1);
 
                 // interleave
                 __m128i res_lo, res_hi;
                 XSIMD_IF_CONSTEXPR(sizeof(T) == 1)
                 {
-                    res_lo = _mm_unpackhi_epi8(self_lo, other_lo);
+                    res_lo = _mm_unpacklo_epi8(self_hi, other_hi);
                     res_hi = _mm_unpackhi_epi8(self_hi, other_hi);
                 }
                 else
                 {
-                    res_lo = _mm_unpackhi_epi16(self_lo, other_lo);
+                    res_lo = _mm_unpacklo_epi16(self_hi, other_hi);
                     res_hi = _mm_unpackhi_epi16(self_hi, other_hi);
                 }
 
@@ -1585,11 +1581,15 @@ namespace xsimd
             }
             else XSIMD_IF_CONSTEXPR(sizeof(T) == 4)
             {
-                return _mm256_castps_si256(_mm256_unpackhi_ps(_mm256_castsi256_ps(self), _mm256_castsi256_ps(other)));
+                auto lo = _mm256_unpacklo_ps(_mm256_castsi256_ps(self), _mm256_castsi256_ps(other));
+                auto hi = _mm256_unpackhi_ps(_mm256_castsi256_ps(self), _mm256_castsi256_ps(other));
+                return _mm256_castps_si256(_mm256_permute2f128_ps(lo, hi, 0x31));
             }
             else XSIMD_IF_CONSTEXPR(sizeof(T) == 8)
             {
-                return _mm256_castpd_si256(_mm256_unpackhi_pd(_mm256_castsi256_pd(self), _mm256_castsi256_pd(other)));
+                auto lo = _mm256_unpacklo_pd(_mm256_castsi256_pd(self), _mm256_castsi256_pd(other));
+                auto hi = _mm256_unpackhi_pd(_mm256_castsi256_pd(self), _mm256_castsi256_pd(other));
+                return _mm256_castpd_si256(_mm256_permute2f128_pd(lo, hi, 0x31));
             }
             else
             {
@@ -1600,12 +1600,16 @@ namespace xsimd
         template <class A>
         inline batch<float, A> zip_hi(batch<float, A> const& self, batch<float, A> const& other, requires_arch<avx>) noexcept
         {
-            return _mm256_unpackhi_ps(self, other);
+            auto lo = _mm256_unpacklo_ps(self, other);
+            auto hi = _mm256_unpackhi_ps(self, other);
+            return _mm256_permute2f128_ps(lo, hi, 0x31);
         }
         template <class A>
         inline batch<double, A> zip_hi(batch<double, A> const& self, batch<double, A> const& other, requires_arch<avx>) noexcept
         {
-            return _mm256_unpackhi_pd(self, other);
+            auto lo = _mm256_unpacklo_pd(self, other);
+            auto hi = _mm256_unpackhi_pd(self, other);
+            return _mm256_permute2f128_pd(lo, hi, 0x31);
         }
 
         // zip_lo
@@ -1616,22 +1620,19 @@ namespace xsimd
             {
                 // extract low word
                 __m128i self_lo = _mm256_extractf128_si256(self, 0);
-                __m128i self_hi = _mm256_extractf128_si256(self, 1);
-                // extract high word
                 __m128i other_lo = _mm256_extractf128_si256(other, 0);
-                __m128i other_hi = _mm256_extractf128_si256(other, 1);
 
                 // interleave
                 __m128i res_lo, res_hi;
                 XSIMD_IF_CONSTEXPR(sizeof(T) == 1)
                 {
                     res_lo = _mm_unpacklo_epi8(self_lo, other_lo);
-                    res_hi = _mm_unpacklo_epi8(self_hi, other_hi);
+                    res_hi = _mm_unpackhi_epi8(self_lo, other_lo);
                 }
                 else
                 {
                     res_lo = _mm_unpacklo_epi16(self_lo, other_lo);
-                    res_hi = _mm_unpacklo_epi16(self_hi, other_hi);
+                    res_hi = _mm_unpackhi_epi16(self_lo, other_lo);
                 }
 
                 // fuse
@@ -1643,11 +1644,15 @@ namespace xsimd
             }
             else XSIMD_IF_CONSTEXPR(sizeof(T) == 4)
             {
-                return _mm256_castps_si256(_mm256_unpacklo_ps(_mm256_castsi256_ps(self), _mm256_castsi256_ps(other)));
+                auto lo = _mm256_unpacklo_ps(_mm256_castsi256_ps(self), _mm256_castsi256_ps(other));
+                auto hi = _mm256_unpackhi_ps(_mm256_castsi256_ps(self), _mm256_castsi256_ps(other));
+                return _mm256_castps_si256(_mm256_insertf128_ps(lo, _mm256_castps256_ps128(hi), 1));
             }
             else XSIMD_IF_CONSTEXPR(sizeof(T) == 8)
             {
-                return _mm256_castpd_si256(_mm256_unpacklo_pd(_mm256_castsi256_pd(self), _mm256_castsi256_pd(other)));
+                auto lo = _mm256_unpacklo_pd(_mm256_castsi256_pd(self), _mm256_castsi256_pd(other));
+                auto hi = _mm256_unpackhi_pd(_mm256_castsi256_pd(self), _mm256_castsi256_pd(other));
+                return _mm256_castpd_si256(_mm256_insertf128_pd(lo, _mm256_castpd256_pd128(hi), 1));
             }
             else
             {
@@ -1659,12 +1664,16 @@ namespace xsimd
         template <class A>
         inline batch<float, A> zip_lo(batch<float, A> const& self, batch<float, A> const& other, requires_arch<avx>) noexcept
         {
-            return _mm256_unpacklo_ps(self, other);
+            auto lo = _mm256_unpacklo_ps(self, other);
+            auto hi = _mm256_unpackhi_ps(self, other);
+            return _mm256_insertf128_ps(lo, _mm256_castps256_ps128(hi), 1);
         }
         template <class A>
         inline batch<double, A> zip_lo(batch<double, A> const& self, batch<double, A> const& other, requires_arch<avx>) noexcept
         {
-            return _mm256_unpacklo_pd(self, other);
+            auto lo = _mm256_unpacklo_pd(self, other);
+            auto hi = _mm256_unpackhi_pd(self, other);
+            return _mm256_insertf128_pd(lo, _mm256_castpd256_pd128(hi), 1);
         }
     }
 }

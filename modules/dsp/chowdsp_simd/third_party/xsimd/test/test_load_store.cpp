@@ -17,9 +17,8 @@
 #include "test_utils.hpp"
 
 template <class B>
-class load_store_test : public testing::Test
+struct load_store_test
 {
-protected:
     using batch_type = B;
     using value_type = typename B::value_type;
     using index_type = typename xsimd::as_integer_t<batch_type>;
@@ -158,23 +157,48 @@ protected:
     }
 
 private:
+#ifdef XSIMD_WITH_SSE2
+    struct test_load_as_return_type
+    {
+        using lower_arch = xsimd::sse2;
+        using expected_batch_type = xsimd::batch<float, lower_arch>;
+        using load_as_return_type = decltype(xsimd::load_as<float, lower_arch>(std::declval<float*>(), xsimd::aligned_mode()));
+        static_assert(std::is_same<load_as_return_type, expected_batch_type>::value, "honoring arch parameter");
+    };
+#endif
+
     template <class V>
     void test_load_impl(const V& v, const std::string& name)
     {
         std::copy(v.cbegin(), v.cend(), expected.begin());
 
         batch_type b = batch_type::load_unaligned(v.data());
-        EXPECT_BATCH_EQ(b, expected) << print_function_name(name + " unaligned");
+        INFO(name, " unaligned");
+        CHECK_BATCH_EQ(b, expected);
 
         b = batch_type::load_aligned(v.data());
-        EXPECT_BATCH_EQ(b, expected) << print_function_name(name + " aligned");
+        INFO(name, " aligned");
+        CHECK_BATCH_EQ(b, expected);
 
         b = xsimd::load_as<value_type>(v.data(), xsimd::unaligned_mode());
-        EXPECT_BATCH_EQ(b, expected) << print_function_name(name + " unaligned (load_as)");
+        INFO(name, " unaligned (load_as)");
+        CHECK_BATCH_EQ(b, expected);
 
         b = xsimd::load_as<value_type>(v.data(), xsimd::aligned_mode());
-        EXPECT_BATCH_EQ(b, expected) << print_function_name(name + " aligned (load_as)");
+        INFO(name, " aligned (load_as)");
+        CHECK_BATCH_EQ(b, expected);
     }
+
+    struct test_load_char
+    {
+        /* Make sure xsimd doesn't try to be smart with char types */
+        static_assert(std::is_same<xsimd::batch<char>, decltype(xsimd::load_as<char>(std::declval<char*>(), xsimd::aligned_mode()))>::value,
+                      "honor explicit type request");
+        static_assert(std::is_same<xsimd::batch<unsigned char>, decltype(xsimd::load_as<unsigned char>(std::declval<unsigned char*>(), xsimd::aligned_mode()))>::value,
+                      "honor explicit type request");
+        static_assert(std::is_same<xsimd::batch<signed char>, decltype(xsimd::load_as<signed char>(std::declval<signed char*>(), xsimd::aligned_mode()))>::value,
+                      "honor explicit type request");
+    };
 
     template <class V>
     void test_store_impl(const V& v, const std::string& name)
@@ -183,16 +207,20 @@ private:
         V res(size);
 
         b.store_unaligned(res.data());
-        EXPECT_VECTOR_EQ(res, v) << print_function_name(name + " unaligned");
+        INFO(name, " unaligned");
+        CHECK_VECTOR_EQ(res, v);
 
         b.store_aligned(res.data());
-        EXPECT_VECTOR_EQ(res, v) << print_function_name(name + " aligned");
+        INFO(name, " aligned");
+        CHECK_VECTOR_EQ(res, v);
 
         xsimd::store_as(res.data(), b, xsimd::unaligned_mode());
-        EXPECT_VECTOR_EQ(res, v) << print_function_name(name + " unaligned (store_as)");
+        INFO(name, " unaligned (store_as)");
+        CHECK_VECTOR_EQ(res, v);
 
         xsimd::store_as(res.data(), b, xsimd::aligned_mode());
-        EXPECT_VECTOR_EQ(res, v) << print_function_name(name + " aligned (store_as)");
+        INFO(name, " aligned (store_as)");
+        CHECK_VECTOR_EQ(res, v);
     }
 
     template <class V>
@@ -201,7 +229,8 @@ private:
         std::copy(v.cbegin(), v.cend(), expected.begin());
         index_type index = xsimd::detail::make_sequence_as_batch<index_type>();
         batch_type b = batch_type::gather(v.data(), index);
-        EXPECT_BATCH_EQ(b, expected) << print_function_name(name + " (in order)");
+        INFO(name, " (in order)");
+        CHECK_BATCH_EQ(b, expected);
 
         std::reverse_copy(v.cbegin(), v.cend(), expected.begin());
         std::array<typename index_type::value_type, index_type::size> index_reverse;
@@ -209,7 +238,8 @@ private:
         std::reverse(index_reverse.begin(), index_reverse.end());
         index = index_type::load_unaligned(index_reverse.data());
         b = batch_type::gather(v.data(), index);
-        EXPECT_BATCH_EQ(b, expected) << print_function_name(name + " (in reverse order)");
+        INFO(name, " (in reverse order)");
+        CHECK_BATCH_EQ(b, expected);
     }
 
     template <class V>
@@ -220,7 +250,8 @@ private:
         V res(size);
 
         b.scatter(res.data(), index);
-        EXPECT_VECTOR_EQ(res, v) << print_function_name(name + " (in order)");
+        INFO(name, " (in order)");
+        CHECK_VECTOR_EQ(res, v);
 
         V reverse_v(size);
         std::reverse_copy(v.cbegin(), v.cend(), reverse_v.begin());
@@ -229,7 +260,8 @@ private:
         std::reverse(reverse_index.begin(), reverse_index.end());
         index = index_type::load_unaligned(reverse_index.data());
         b.scatter(res.data(), index);
-        EXPECT_VECTOR_EQ(res, reverse_v) << print_function_name(name + " (in reverse order)");
+        INFO(name, " (in reverse order)");
+        CHECK_VECTOR_EQ(res, reverse_v);
     }
 
     template <class V>
@@ -243,7 +275,8 @@ private:
         std::default_random_engine generator;
         std::uniform_int_distribution<int> distribution(min, max);
 
-        auto gen = [&distribution, &generator]() {
+        auto gen = [&distribution, &generator]()
+        {
             return static_cast<value_type>(distribution(generator));
         };
 
@@ -251,25 +284,15 @@ private:
     }
 };
 
-TYPED_TEST_SUITE(load_store_test, batch_types, simd_test_names);
-
-TYPED_TEST(load_store_test, load)
+TEST_CASE_TEMPLATE("[load store]", B, BATCH_TYPES)
 {
-    this->test_load();
-}
+    load_store_test<B> Test;
+    SUBCASE("load") { Test.test_load(); }
 
-TYPED_TEST(load_store_test, store)
-{
-    this->test_store();
-}
+    SUBCASE("store") { Test.test_store(); }
 
-TYPED_TEST(load_store_test, gather)
-{
-    this->test_gather();
-}
+    SUBCASE("gather") { Test.test_gather(); }
 
-TYPED_TEST(load_store_test, scatter)
-{
-    this->test_scatter();
+    SUBCASE("scatter") { Test.test_scatter(); }
 }
 #endif

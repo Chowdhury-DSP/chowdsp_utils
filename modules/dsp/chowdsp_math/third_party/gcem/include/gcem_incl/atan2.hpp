@@ -28,43 +28,33 @@
 namespace internal
 {
 
-template<typename T>
-constexpr
-T
-atan2_compute(const T y, const T x)
-noexcept
+template <typename T>
+constexpr T
+    atan2_compute (const T y, const T x) noexcept
 {
-    return( // NaN check
-            any_nan(y,x) ? \
-                GCLIM<T>::quiet_NaN() :
-            //
-            GCLIM<T>::min() > abs(x) ? \
-            //
-                GCLIM<T>::min() > abs(y) ? \
-                    neg_zero(y) ? \
-                        neg_zero(x) ? - T(GCEM_PI) : - T(0) :
-                        neg_zero(x) ?   T(GCEM_PI) :   T(0) :
-                y > T(0) ? \
-                    T(GCEM_HALF_PI) : - T(GCEM_HALF_PI) :
-            //
-            x < T(0) ? \
-                y < T(0) ? \
-                    atan(y/x) - T(GCEM_PI) : 
-                    atan(y/x) + T(GCEM_PI) :
-            //
-                atan(y/x) );
+    return ( // NaN check
+        any_nan (y, x) ? GCLIM<T>::quiet_NaN() :
+                       //
+            GCLIM<T>::min() > abs (x) ? //
+            GCLIM<T>::min() > abs (y) ? neg_zero (y) ? neg_zero (x) ? -T (GCEM_PI) : -T (0) : neg_zero (x) ? T (GCEM_PI)
+                                                                                                           : T (0)
+            : y > T (0) ? T (GCEM_HALF_PI)
+                                      : -T (GCEM_HALF_PI)
+                                      :
+                                      //
+            x < T (0) ? y < T (0) ? atan (y / x) - T (GCEM_PI) : atan (y / x) + T (GCEM_PI) :
+                      //
+                atan (y / x));
 }
 
-template<typename T1, typename T2, typename TC = common_return_t<T1,T2>>
-constexpr
-TC
-atan2_type_check(const T1 y, const T2 x)
-noexcept
+template <typename T1, typename T2, typename TC = common_return_t<T1, T2>>
+constexpr TC
+    atan2_type_check (const T1 y, const T2 x) noexcept
 {
-    return atan2_compute(static_cast<TC>(x),static_cast<TC>(y));
+    return atan2_compute (static_cast<TC> (x), static_cast<TC> (y));
 }
 
-}
+} // namespace internal
 
 /**
  * Compile-time two-argument arctangent function
@@ -76,13 +66,11 @@ noexcept
  * \f[ \text{atan2}(y,x) = \begin{cases} +0 & \text{ if } x = +0 \text{ and } y = +0 \\ -0 & \text{ if } x = +0 \text{ and } y = -0 \\ +\pi & \text{ if } x = -0 \text{ and } y = +0 \\ - \pi & \text{ if } x = -0 \text{ and } y = -0 \end{cases} \f]
  */
 
-template<typename T1, typename T2>
-constexpr
-common_return_t<T1,T2>
-atan2(const T1 y, const T2 x)
-noexcept
+template <typename T1, typename T2>
+constexpr common_return_t<T1, T2>
+    atan2 (const T1 y, const T2 x) noexcept
 {
-    return internal::atan2_type_check(x,y);
+    return internal::atan2_type_check (x, y);
 }
 
 #endif

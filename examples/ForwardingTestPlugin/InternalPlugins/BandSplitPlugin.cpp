@@ -47,7 +47,8 @@ void BandSplitPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
     lowBuffer.setCurrentSize (numChannels, numSamples);
     highBuffer.setCurrentSize (numChannels, numSamples);
 
-    const auto processFilter = [this, &bufferView] (auto& filter) {
+    const auto processFilter = [this, &bufferView] (auto& filter)
+    {
         filter.setCrossoverFrequency (freqParam->getCurrentValue());
         filter.processBlock (bufferView, lowBuffer, highBuffer);
     };

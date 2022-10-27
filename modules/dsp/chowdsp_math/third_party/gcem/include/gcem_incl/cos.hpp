@@ -28,41 +28,33 @@
 namespace internal
 {
 
-template<typename T>
-constexpr
-T
-cos_compute(const T x)
-noexcept
+template <typename T>
+constexpr T
+    cos_compute (const T x) noexcept
 {
-    return( T(1) - x*x)/(T(1) + x*x );
+    return (T (1) - x * x) / (T (1) + x * x);
 }
 
-template<typename T>
-constexpr
-T
-cos_check(const T x)
-noexcept
+template <typename T>
+constexpr T
+    cos_check (const T x) noexcept
 {
-    return( // NaN check
-            is_nan(x) ? \
-                GCLIM<T>::quiet_NaN() :
-            // indistinguishable from 0
-            GCLIM<T>::min() > abs(x) ? 
-                T(1) :
-            // special cases: pi/2 and pi
-            GCLIM<T>::min() > abs(x - T(GCEM_HALF_PI)) ? \
-                T(0) :
-            GCLIM<T>::min() > abs(x + T(GCEM_HALF_PI)) ? \
-                T(0) :
-            GCLIM<T>::min() > abs(x - T(GCEM_PI)) ? \
-                - T(1) :
-            GCLIM<T>::min() > abs(x + T(GCEM_PI)) ? \
-                - T(1) :
-            // else
-                cos_compute( tan(x/T(2)) ) );
+    return ( // NaN check
+        is_nan (x) ? GCLIM<T>::quiet_NaN() :
+                   // indistinguishable from 0
+            GCLIM<T>::min() > abs (x) ? T (1)
+                                      :
+                                      // special cases: pi/2 and pi
+            GCLIM<T>::min() > abs (x - T (GCEM_HALF_PI)) ? T (0)
+        : GCLIM<T>::min() > abs (x + T (GCEM_HALF_PI))   ? T (0)
+        : GCLIM<T>::min() > abs (x - T (GCEM_PI))        ? -T (1)
+        : GCLIM<T>::min() > abs (x + T (GCEM_PI))        ? -T (1)
+                                                         :
+                                                  // else
+            cos_compute (tan (x / T (2))));
 }
 
-}
+} // namespace internal
 
 /**
  * Compile-time cosine function
@@ -71,13 +63,11 @@ noexcept
  * @return the cosine function using \f[ \cos(x) = \frac{1-\tan^2(x/2)}{1+\tan^2(x/2)} \f]
  */
 
-template<typename T>
-constexpr
-return_t<T>
-cos(const T x)
-noexcept
+template <typename T>
+constexpr return_t<T>
+    cos (const T x) noexcept
 {
-    return internal::cos_check( static_cast<return_t<T>>(x) );
+    return internal::cos_check (static_cast<return_t<T>> (x));
 }
 
 #endif

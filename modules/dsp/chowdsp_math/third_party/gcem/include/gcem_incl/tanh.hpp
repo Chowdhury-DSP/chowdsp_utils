@@ -28,47 +28,39 @@
 namespace internal
 {
 
-template<typename T>
-constexpr
-T
-tanh_cf(const T xx, const int depth)
-noexcept
+template <typename T>
+constexpr T
+    tanh_cf (const T xx, const int depth) noexcept
 {
-    return( depth < GCEM_TANH_MAX_ITER ? \
-            // if
-                (2*depth - 1) + xx/tanh_cf(xx,depth+1) :
-            // else
-                T(2*depth - 1) );
+    return (depth < GCEM_TANH_MAX_ITER ? // if
+                (2 * depth - 1) + xx / tanh_cf (xx, depth + 1)
+                                       :
+                                       // else
+                T (2 * depth - 1));
 }
 
-template<typename T>
-constexpr
-T
-tanh_begin(const T x)
-noexcept
+template <typename T>
+constexpr T
+    tanh_begin (const T x) noexcept
 {
-    return( x/tanh_cf(x*x,1) );
+    return (x / tanh_cf (x * x, 1));
 }
 
-template<typename T>
-constexpr
-T
-tanh_check(const T x)
-noexcept
+template <typename T>
+constexpr T
+    tanh_check (const T x) noexcept
 {
-    return( // NaN check
-            is_nan(x) ? \
-                GCLIM<T>::quiet_NaN() :
-            // indistinguishable from zero
-             GCLIM<T>::min() > abs(x) ? \
-                T(0) :
-             // else
-                x < T(0) ? \
-                    - tanh_begin(-x) : 
-                      tanh_begin( x) );
+    return ( // NaN check
+        is_nan (x) ? GCLIM<T>::quiet_NaN() :
+                   // indistinguishable from zero
+            GCLIM<T>::min() > abs (x) ? T (0)
+                                      :
+                                      // else
+            x < T (0) ? -tanh_begin (-x)
+                      : tanh_begin (x));
 }
 
-}
+} // namespace internal
 
 /**
  * Compile-time hyperbolic tangent function
@@ -77,13 +69,11 @@ noexcept
  * @return the hyperbolic tangent function using \f[ \tanh(x) = \dfrac{x}{1 + \dfrac{x^2}{3 + \dfrac{x^2}{5 + \dfrac{x^2}{7 + \ddots}}}} \f]
  */
 
-template<typename T>
-constexpr
-return_t<T>
-tanh(const T x)
-noexcept
+template <typename T>
+constexpr return_t<T>
+    tanh (const T x) noexcept
 {
-    return internal::tanh_check( static_cast<return_t<T>>(x) );
+    return internal::tanh_check (static_cast<return_t<T>> (x));
 }
 
 #endif

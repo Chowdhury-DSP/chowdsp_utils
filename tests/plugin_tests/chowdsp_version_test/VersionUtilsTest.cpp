@@ -12,7 +12,8 @@ public:
 
     void versionCompareTest()
     {
-        auto checkVersions = [=] (const juce::String& strV1, const juce::String& strV2, const std::array<bool, 6>& exp) {
+        auto checkVersions = [=] (const juce::String& strV1, const juce::String& strV2, const std::array<bool, 6>& exp)
+        {
             const Version v1 (strV1);
             const Version v2 (strV2);
 

@@ -24,32 +24,27 @@
 namespace internal
 {
 
-template<typename T>
-constexpr
-T
-fmod_check(const T x, const T y)
-noexcept
+template <typename T>
+constexpr T
+    fmod_check (const T x, const T y) noexcept
 {
-    return( // NaN check
-            any_nan(x, y) ? \
-                GCLIM<T>::quiet_NaN() :
-            // +/- infinite
-            !all_finite(x, y) ? \
-                GCLIM<T>::quiet_NaN() :
-            // else
-                x - trunc(x/y)*y );
+    return ( // NaN check
+        any_nan (x, y) ? GCLIM<T>::quiet_NaN() :
+                       // +/- infinite
+            ! all_finite (x, y) ? GCLIM<T>::quiet_NaN()
+                                :
+                                // else
+            x - trunc (x / y) * y);
 }
 
-template<typename T1, typename T2, typename TC = common_return_t<T1,T2>>
-constexpr
-TC
-fmod_type_check(const T1 x, const T2 y)
-noexcept
+template <typename T1, typename T2, typename TC = common_return_t<T1, T2>>
+constexpr TC
+    fmod_type_check (const T1 x, const T2 y) noexcept
 {
-    return fmod_check(static_cast<TC>(x),static_cast<TC>(y));
+    return fmod_check (static_cast<TC> (x), static_cast<TC> (y));
 }
 
-}
+} // namespace internal
 
 /**
  * Compile-time remainder of division function
@@ -58,13 +53,11 @@ noexcept
  * @return computes the floating-point remainder of \f$ x / y \f$ (rounded towards zero) using \f[ \text{fmod}(x,y) = x - \text{trunc}(x/y) \times y \f] 
  */
 
-template<typename T1, typename T2>
-constexpr
-common_return_t<T1,T2>
-fmod(const T1 x, const T2 y)
-noexcept
+template <typename T1, typename T2>
+constexpr common_return_t<T1, T2>
+    fmod (const T1 x, const T2 y) noexcept
 {
-    return internal::fmod_type_check(x,y);
+    return internal::fmod_type_check (x, y);
 }
 
 #endif

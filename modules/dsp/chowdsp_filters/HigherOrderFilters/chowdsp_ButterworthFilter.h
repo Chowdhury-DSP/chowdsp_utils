@@ -36,7 +36,8 @@ public:
     static void calcCoefs (FloatType fc, FloatType qVal, NumericType fs, std::array<IIRFilter<2, FloatType>, NFilters>& sections, const std::array<NumericType, NFilters>& butterQs)
     {
         FloatType bCoefs[3], aCoefs[3];
-        auto calcCoefsForQ = [&] (FloatType stageQ, size_t stageOrder) {
+        auto calcCoefsForQ = [&] (FloatType stageQ, size_t stageOrder)
+        {
             switch (type)
             {
                 case ButterworthFilterType::Lowpass:

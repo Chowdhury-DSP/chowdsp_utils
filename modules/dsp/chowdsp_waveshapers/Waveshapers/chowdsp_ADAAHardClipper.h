@@ -15,12 +15,15 @@ public:
     {
         using Math::sign;
         this->initialise (
-            [] (auto x) { return juce::jlimit (-1.0, 1.0, x); },
-            [] (auto x) {
+            [] (auto x)
+            { return juce::jlimit (-1.0, 1.0, x); },
+            [] (auto x)
+            {
                 bool inRange = std::abs (x) <= 1.0;
                 return inRange ? x * x / 2.0 : x * sign (x) - 0.5;
             },
-            [] (auto x) {
+            [] (auto x)
+            {
                 bool inRange = std::abs (x) <= 1.0;
                 return inRange ? x * x * x / 6.0 : ((x * x / 2.0) + (1.0 / 6.0)) * sign (x) - (x / 2.0);
             },

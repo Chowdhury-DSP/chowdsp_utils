@@ -9,7 +9,8 @@ constexpr int numChannels = 2;
 constexpr int blockSize = 512;
 constexpr size_t numFilters = 100;
 
-auto juceInBuffer = []() {
+auto juceInBuffer = []()
+{
     juce::AudioBuffer<float> buffer { numChannels, blockSize };
     for (int ch = 0; ch < numChannels; ++ch)
     {
@@ -62,7 +63,8 @@ static void juceBufferBench (benchmark::State& state)
 }
 BENCHMARK (juceBufferBench)->MinTime (5);
 
-auto chowInBuffer = []() {
+auto chowInBuffer = []()
+{
     chowdsp::Buffer<float> buffer { numChannels, blockSize };
     for (int ch = 0; ch < numChannels; ++ch)
     {

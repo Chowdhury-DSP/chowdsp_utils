@@ -81,7 +81,8 @@ public:
         setParameterRange (
             startIndex,
             endIndex,
-            [] (int) -> ParameterForwardingInfo { return {}; },
+            [] (int) -> ParameterForwardingInfo
+            { return {}; },
             deferHostNotification);
     }
 
