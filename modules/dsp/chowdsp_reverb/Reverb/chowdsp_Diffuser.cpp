@@ -37,7 +37,9 @@ void Diffuser<FloatType, nChannels, DelayInterpType>::prepare (double sampleRate
 
     for (size_t i = 0; i < (size_t) nChannels; ++i)
     {
-        delays[i].prepare ({ sampleRate, 128, 1 });
+        delays[i].reset(); //.prepare ({ sampleRate, 128, 1 });
+        delayWritePointers[i] = 0;
+
         delayRelativeMults[i] = (FloatType) DiffuserConfig::getDelayMult ((int) i, nChannels, randGenerator);
         polarityMultipliers[i] = (FloatType) DiffuserConfig::getPolarityMultiplier ((int) i, nChannels, randGenerator);
     }
@@ -54,7 +56,12 @@ template <typename FloatType, int nChannels, typename DelayInterpType>
 void Diffuser<FloatType, nChannels, DelayInterpType>::setDiffusionTimeMs (FloatType diffusionTimeMs)
 {
     for (size_t i = 0; i < (size_t) nChannels; ++i)
-        delays[i].setDelay (delayRelativeMults[i] * diffusionTimeMs * (FloatType) 0.001 * fs);
+    {
+        const auto delayTimesSamples = delayRelativeMults[i] * diffusionTimeMs * (FloatType) 0.001 * fs;
+        delayReadPointers[i] = FloatType (delayWritePointers[i]) + delayTimesSamples;
+        DelayType::decrementPointer (delayReadPointers[i]);
+    }
+    //        delays[i].setDelay (delayRelativeMults[i] * diffusionTimeMs * (FloatType) 0.001 * fs);
 }
 
 //======================================================================

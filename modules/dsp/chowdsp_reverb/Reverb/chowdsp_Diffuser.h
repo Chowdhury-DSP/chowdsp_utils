@@ -27,10 +27,11 @@ struct DefaultDiffuserConfig
 template <typename FloatType, int nChannels, typename DelayInterpType = chowdsp::DelayLineInterpolationTypes::None>
 class Diffuser
 {
-    struct DelayType : public chowdsp::DelayLine<FloatType, DelayInterpType>
-    {
-        DelayType() : chowdsp::DelayLine<FloatType, DelayInterpType> (1 << 18) {}
-    };
+    using DelayType = chowdsp::StaticDelayLine<FloatType, DelayInterpType, 1 << 18>;
+    //    struct DelayType : public chowdsp::DelayLine<FloatType, DelayInterpType>
+    //    {
+    //        DelayType() : chowdsp::DelayLine<FloatType, DelayInterpType> (1 << 18) {}
+    //    };
 
 public:
     using Float = FloatType;
@@ -53,8 +54,11 @@ public:
         // Delay
         for (size_t i = 0; i < (size_t) nChannels; ++i)
         {
-            delays[i].pushSample (0, data[i]);
-            outData[i] = delays[channelSwapIndexes[i]].popSample (0);
+            delays[i].pushSample (data[i], delayWritePointers[i]);
+            outData[i] = delays[channelSwapIndexes[i]].popSample (delayReadPointers[i]);
+
+            DelayType::decrementPointer (delayWritePointers[i]);
+            DelayType::decrementPointer (delayReadPointers[i]);
         }
 
         // Mix with a Hadamard matrix
@@ -72,6 +76,9 @@ private:
     std::array<FloatType, (size_t) nChannels> delayRelativeMults;
     std::array<FloatType, (size_t) nChannels> polarityMultipliers;
     std::array<size_t, (size_t) nChannels> channelSwapIndexes;
+
+    std::array<int, (size_t) nChannels> delayWritePointers;
+    std::array<FloatType, (size_t) nChannels> delayReadPointers;
 
     alignas (xsimd::default_arch::alignment()) std::array<FloatType, (size_t) nChannels> outData;
 

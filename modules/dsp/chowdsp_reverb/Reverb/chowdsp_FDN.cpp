@@ -65,7 +65,9 @@ void FDN<FDNConfig, DelayInterpType>::prepare (double sampleRate)
     fs = (FloatType) sampleRate;
     for (size_t i = 0; i < (size_t) nChannels; ++i)
     {
-        delays[i].prepare ({ sampleRate, 128, 1 });
+        delays[i].reset(); //.prepare ({ sampleRate, 128, 1 });
+        delayWritePointers[i] = 0;
+
         delayRelativeMults[i] = (FloatType) FDNConfig::getDelayMult ((int) i);
     }
 
@@ -84,7 +86,13 @@ template <typename FDNConfig, typename DelayInterpType>
 void FDN<FDNConfig, DelayInterpType>::setDelayTimeMs (FloatType delayTimeMs)
 {
     for (size_t i = 0; i < (size_t) nChannels; ++i)
-        delays[i].setDelay (delayRelativeMults[i] * delayTimeMs * (FloatType) 0.001 * fs);
+    {
+        delayTimesSamples[i] = delayRelativeMults[i] * delayTimeMs * (FloatType) 0.001 * fs;
+        delayReadPointers[i] = FloatType (delayWritePointers[i]) + delayTimesSamples[i];
+        DelayType::decrementPointer (delayReadPointers[i]);
+    }
+    //        delayReadPointers[i] = FloatType (delayWritePointers[i]) + (delayRelativeMults[i] * delayTimeMs * (FloatType) 0.001 * fs);
+    //        delays[i].setDelay (delayRelativeMults[i] * delayTimeMs * (FloatType) 0.001 * fs);
 }
 
 template <typename FDNConfig, typename DelayInterpType>
@@ -94,15 +102,27 @@ void FDN<FDNConfig, DelayInterpType>::setDelayTimeMsWithModulators (FloatType de
     static_assert (NModulators <= nChannels, "Can't have more modulators than channels!");
 
     for (size_t i = 0; i < (size_t) NModulators; ++i)
-        delays[i].setDelay (delayRelativeMults[i] * delayTimeMs * (FloatType) 0.001 * fs * modulationAmt[i]);
+    {
+        delayTimesSamples[i] = delayRelativeMults[i] * delayTimeMs * (FloatType) 0.001 * fs;
+        delayReadPointers[i] = FloatType (delayWritePointers[i]) + (delayTimesSamples[i] * modulationAmt[i]);
+        DelayType::decrementPointer (delayReadPointers[i]);
+    }
+    //        delayTimesSamples[i] = (delayRelativeMults[i] * delayTimeMs * (FloatType) 0.001 * fs * modulationAmt[i]);
+    //        delays[i].setDelay (delayRelativeMults[i] * delayTimeMs * (FloatType) 0.001 * fs * modulationAmt[i]);
 
     for (auto i = (size_t) NModulators; i < (size_t) nChannels; ++i)
-        delays[i].setDelay (delayRelativeMults[i] * delayTimeMs * (FloatType) 0.001 * fs);
+    {
+        delayTimesSamples[i] = delayRelativeMults[i] * delayTimeMs * (FloatType) 0.001 * fs;
+        delayReadPointers[i] = FloatType (delayWritePointers[i]) + delayTimesSamples[i];
+        DelayType::decrementPointer (delayReadPointers[i]);
+    }
+    //        delayTimesSamples[i] = (delayRelativeMults[i] * delayTimeMs * (FloatType) 0.001 * fs);
+    //        delays[i].setDelay (delayRelativeMults[i] * delayTimeMs * (FloatType) 0.001 * fs);
 }
 
 template <typename FDNConfig, typename DelayInterpType>
 typename FDN<FDNConfig, DelayInterpType>::FloatType FDN<FDNConfig, DelayInterpType>::getChannelDelayMs (size_t channelIndex) const noexcept
 {
-    return delays[channelIndex].getDelay() / (fs * (FloatType) 0.001);
+    return delayTimesSamples[channelIndex] / (fs * (FloatType) 0.001);
 }
 } // namespace chowdsp::Reverb

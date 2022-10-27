@@ -43,6 +43,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 // delay
 #include "Delay/chowdsp_DelayInterpolation.h"
 #include "Delay/chowdsp_DelayLine.h"
+#include "Delay/chowdsp_StaticDelayLine.h"
 #include "Delay/chowdsp_PitchShift.h"
 
 #if ! CHOWDSP_NO_XSIMD

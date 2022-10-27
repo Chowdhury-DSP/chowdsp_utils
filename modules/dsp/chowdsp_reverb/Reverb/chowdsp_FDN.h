@@ -46,10 +46,11 @@ class FDN
     using FloatType = typename FDNConfig::Float;
     static constexpr auto nChannels = FDNConfig::NChannels;
 
-    struct DelayType : public chowdsp::DelayLine<FloatType, DelayInterpType>
-    {
-        DelayType() : chowdsp::DelayLine<FloatType, DelayInterpType> (1 << 18) {}
-    };
+    using DelayType = chowdsp::StaticDelayLine<FloatType, DelayInterpType, 1 << 18>;
+    //    struct DelayType : public chowdsp::DelayLine<FloatType, DelayInterpType>
+    //    {
+    //        DelayType() : chowdsp::DelayLine<FloatType, DelayInterpType> (1 << 18) {}
+    //    };
 
 public:
     FDN() = default;
@@ -78,7 +79,10 @@ public:
     {
         // read from delay lines
         for (size_t i = 0; i < (size_t) nChannels; ++i)
-            outData[i] = delays[i].popSample (0);
+        {
+            outData[i] = delays[i].popSample (delayReadPointers[i]);
+            DelayType::decrementPointer (delayReadPointers[i]);
+        }
 
         // do mixing matrix
         FDNConfig::applyMixingMatrix (outData.data());
@@ -88,7 +92,10 @@ public:
 
         // write back to delay lines
         for (size_t i = 0; i < (size_t) nChannels; ++i)
-            delays[i].pushSample (0, data[i] + fbData[i]);
+        {
+            delays[i].pushSample (data[i] + fbData[i], delayWritePointers[i]);
+            DelayType::decrementPointer (delayWritePointers[i]);
+        }
 
         return outData.data();
     }
@@ -99,6 +106,10 @@ public:
 private:
     std::array<DelayType, (size_t) nChannels> delays;
     std::array<FloatType, (size_t) nChannels> delayRelativeMults;
+
+    std::array<FloatType, (size_t) nChannels> delayTimesSamples;
+    std::array<int, (size_t) nChannels> delayWritePointers;
+    std::array<FloatType, (size_t) nChannels> delayReadPointers;
 
     FDNConfig fdnConfig;
 

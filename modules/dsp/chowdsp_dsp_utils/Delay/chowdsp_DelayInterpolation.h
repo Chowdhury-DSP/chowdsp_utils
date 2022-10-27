@@ -15,20 +15,16 @@ namespace DelayLineInterpolationTypes
 */
     struct None
     {
-        void reset (int newTotalSize) { totalSize = newTotalSize; }
-
         template <typename T>
         void updateInternalVariables (int& /*delayIntOffset*/, T& /*delayFrac*/) // NOSONAR (template compatibility)
         {
         }
 
         template <typename SampleType, typename NumericType>
-        inline SampleType call (const SampleType* buffer, int delayInt, NumericType /*delayFrac*/, const SampleType& /*state*/)
+        inline SampleType call (const SampleType* buffer, int delayInt, NumericType /*delayFrac*/, const SampleType& /*state*/ = {})
         {
             return buffer[delayInt];
         }
-
-        int totalSize;
     };
 
     /**
@@ -39,15 +35,13 @@ namespace DelayLineInterpolationTypes
 */
     struct Linear
     {
-        void reset (int newTotalSize) { totalSize = newTotalSize; }
-
         template <typename T>
         void updateInternalVariables (int& /*delayIntOffset*/, T& /*delayFrac*/) // NOSONAR (template compatibility)
         {
         }
 
         template <typename SampleType, typename NumericType>
-        inline SampleType call (const SampleType* buffer, int delayInt, NumericType delayFrac, const SampleType& /*state*/)
+        inline SampleType call (const SampleType* buffer, int delayInt, NumericType delayFrac, const SampleType& /*state*/ = {})
         {
             auto index1 = delayInt;
             auto index2 = index1 + 1;
@@ -57,8 +51,6 @@ namespace DelayLineInterpolationTypes
 
             return value1 + (SampleType) delayFrac * (value2 - value1);
         }
-
-        int totalSize;
     };
 
     /**
@@ -69,8 +61,6 @@ namespace DelayLineInterpolationTypes
 */
     struct Lagrange3rd
     {
-        void reset (int newTotalSize) { totalSize = newTotalSize; }
-
         template <typename T>
         void updateInternalVariables (int& delayIntOffset, T& delayFrac) // NOSONAR (template compatibility)
         {
@@ -82,7 +72,7 @@ namespace DelayLineInterpolationTypes
         }
 
         template <typename SampleType, typename NumericType>
-        inline SampleType call (const SampleType* buffer, int delayInt, NumericType delayFrac, const SampleType& /*state*/)
+        inline SampleType call (const SampleType* buffer, int delayInt, NumericType delayFrac, const SampleType& /*state*/ = {})
         {
             auto index1 = delayInt;
             auto index2 = index1 + 1;
@@ -105,8 +95,6 @@ namespace DelayLineInterpolationTypes
 
             return value1 * c1 + (SampleType) delayFrac * (value2 * c2 + value3 * c3 + value4 * c4);
         }
-
-        int totalSize;
     };
 
     /**
@@ -116,8 +104,6 @@ namespace DelayLineInterpolationTypes
 */
     struct Lagrange5th
     {
-        void reset (int newTotalSize) { totalSize = newTotalSize; }
-
         template <typename T>
         void updateInternalVariables (int& delayIntOffset, T& delayFrac) // NOSONAR (template compatibility)
         {
@@ -129,7 +115,7 @@ namespace DelayLineInterpolationTypes
         }
 
         template <typename SampleType, typename NumericType>
-        inline SampleType call (const SampleType* buffer, int delayInt, NumericType delayFrac, const SampleType& /*state*/)
+        inline SampleType call (const SampleType* buffer, int delayInt, NumericType delayFrac, const SampleType& /*state*/ = {})
         {
             auto index1 = delayInt;
             auto index2 = index1 + 1;
@@ -160,8 +146,6 @@ namespace DelayLineInterpolationTypes
 
             return value1 * c1 + (SampleType) delayFrac * (value2 * c2 + value3 * c3 + value4 * c4 + value5 * c5 + value6 * c6);
         }
-
-        int totalSize;
     };
 
     /**
@@ -173,8 +157,6 @@ namespace DelayLineInterpolationTypes
 */
     struct Thiran
     {
-        void reset (int newTotalSize) { totalSize = newTotalSize; }
-
         template <typename T>
         void updateInternalVariables (int& delayIntOffset, T& delayFrac)
         {
@@ -202,7 +184,6 @@ namespace DelayLineInterpolationTypes
             return output;
         }
 
-        int totalSize = 0;
         double alpha = 0.0;
     };
 
@@ -253,11 +234,9 @@ namespace DelayLineInterpolationTypes
                     + (T) 0.08 * std::cos (4 * juce::MathConstants<T>::pi * i / (n)));
         }
 
-        void reset (int newTotalSize) { totalSize = newTotalSize; }
-
         void updateInternalVariables (int& /*delayIntOffset*/, T& /*delayFrac*/) {} // NOSONAR (template compatibility)
 
-        inline T call (const T* buffer, int delayInt, T delayFrac, const T& /*state*/)
+        inline T call (const T* buffer, int delayInt, T delayFrac, const T& /*state*/ = {})
         {
             const auto sincTableOffset = (size_t) (((T) 1 - delayFrac) * (T) M) * N * 2;
 
@@ -279,7 +258,6 @@ namespace DelayLineInterpolationTypes
 #endif
         }
 
-        int totalSize = 0;
         T sinctable alignas (SIMDUtils::defaultSIMDAlignment)[(M + 1) * N * 2];
     };
     JUCE_END_IGNORE_WARNINGS_MSVC
