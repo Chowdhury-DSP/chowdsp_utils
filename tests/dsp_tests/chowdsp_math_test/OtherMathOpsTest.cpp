@@ -52,4 +52,42 @@ TEST_CASE ("Other Math Ops Test")
         xsimd::batch<float> expected { -1.0f, 0.0f, 1.0f, 1.0f };
         REQUIRE_MESSAGE (xsimd::all (chowdsp::Math::sign (x) == expected), "SIMD signum is incorrect");
     }
+
+    const auto rsqrtTest = [] (auto x_type) {
+        using FloatType = decltype (x_type);
+        using NumericType = chowdsp::SampleTypeHelpers::NumericType<FloatType>;
+
+        for (auto n = (NumericType) -100; n < (NumericType) 100; n += (NumericType) 1)
+        {
+            const auto x = std::exp2 (n);
+            const auto y_exp = FloatType ((NumericType) 1 / std::sqrt (x));
+            const auto y_actual = chowdsp::Math::rsqrt ((FloatType) x);
+
+            CHOWDSP_USING_XSIMD_STD (abs);
+            const auto percentOff = abs ((y_exp / y_actual) - (NumericType) 1);
+            REQUIRE_MESSAGE (percentOff == SIMDApprox<FloatType> (0).margin ((NumericType) 0.005), "rsqrt is inaccurate for input: " + std::to_string (x));
+        }
+    };
+
+    SECTION ("Rsqrt Test [float]") { rsqrtTest (float {}); }
+    SECTION ("Rsqrt Test [double]") { rsqrtTest (double {}); }
+    SECTION ("Rsqrt Test [SIMD float]") { rsqrtTest (xsimd::batch<float> {}); }
+    SECTION ("Rsqrt Test [SIMD double]") { rsqrtTest (xsimd::batch<double> {}); }
+
+    const auto sigmoidTest = [] (auto x_type) {
+        using FloatType = decltype (x_type);
+        using NumericType = chowdsp::SampleTypeHelpers::NumericType<FloatType>;
+
+        for (auto x = (NumericType) -10; x < (NumericType) 10; x += (NumericType) 0.1)
+        {
+            const auto y_exp = FloatType (x / (std::sqrt ((NumericType) 1 + std::pow (x, (NumericType) 2))));
+            const auto y_actual = chowdsp::Math::algebraicSigmoid ((FloatType) x);
+            REQUIRE_MESSAGE (y_actual == SIMDApprox<FloatType> (y_exp).margin ((NumericType) 0.005), "sigmoid is inaccurate for input: " + std::to_string (x));
+        }
+    };
+
+    SECTION ("Sigmoid Test [float]") { sigmoidTest (float {}); }
+    SECTION ("Sigmoid Test [double]") { sigmoidTest (double {}); }
+    SECTION ("Sigmoid Test [SIMD float]") { sigmoidTest (xsimd::batch<float> {}); }
+    SECTION ("Sigmoid Test [SIMD double]") { sigmoidTest (xsimd::batch<double> {}); }
 }
