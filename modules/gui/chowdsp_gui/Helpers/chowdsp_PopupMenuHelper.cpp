@@ -8,8 +8,7 @@ PopupMenuHelper::PopupMenuHelper() : PopupMenuHelper (LongPressActionHelper::Par
 
 PopupMenuHelper::PopupMenuHelper (const LongPressActionHelper::Parameters& params) : longPress (params)
 {
-    longPress.longPressCallback = [=] (juce::Point<int>)
-    { showPopupMenu(); };
+    longPress.longPressCallback = [=] (juce::Point<int>) { showPopupMenu(); };
 }
 
 PopupMenuHelper::~PopupMenuHelper()

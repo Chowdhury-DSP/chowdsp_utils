@@ -28,8 +28,7 @@ int main()
 {
     print_begin ("factorial");
 
-    std::function<long double (long double)> std_fn = [] (long double x) -> long double
-    { return std::tgamma (x + 1); };
+    std::function<long double (long double)> std_fn = [] (long double x) -> long double { return std::tgamma (x + 1); };
 
     //
 

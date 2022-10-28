@@ -48,8 +48,7 @@ public:
         juce::ignoreUnused (qVal);
 
         FloatType bCoefs[3], bOppCoefs[3], aCoefs[3];
-        auto calcBaseCoefficients = [&] (FloatType stageFreqOff, FloatType stageQ)
-        {
+        auto calcBaseCoefficients = [&] (FloatType stageFreqOff, FloatType stageQ) {
             switch (type)
             {
                 case ChebyshevFilterType::Lowpass:
@@ -63,8 +62,7 @@ public:
             }
         };
 
-        auto calcCoefsForQ = [&] (FloatType stageFreqOff, FloatType stageQ, FloatType stageLPGain, size_t stageOrder)
-        {
+        auto calcCoefsForQ = [&] (FloatType stageFreqOff, FloatType stageQ, FloatType stageLPGain, size_t stageOrder) {
             calcBaseCoefficients (stageFreqOff, stageQ);
 
             for (size_t i = 0; i < 3; ++i)

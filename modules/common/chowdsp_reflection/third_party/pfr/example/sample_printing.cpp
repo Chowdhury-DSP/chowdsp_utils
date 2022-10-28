@@ -46,8 +46,7 @@ namespace detail
     {
         const char* sep = "";
 
-        pfr::for_each_field (x.value, [&] (const auto& v)
-                             {
+        pfr::for_each_field (x.value, [&] (const auto& v) {
             out << std::exchange (sep, ", ");
             detail::print_each (out, v); });
         return out;

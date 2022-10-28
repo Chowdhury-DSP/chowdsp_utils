@@ -23,8 +23,7 @@ void wrapAndClearTest()
     std::random_device rd;
     std::mt19937 mt (rd());
 
-    auto randomDist = []()
-    {
+    auto randomDist = []() {
         if constexpr (std::is_same<T, float>::value)
             return std::uniform_real_distribution<float> (-1.0f, 1.0f);
         else if (std::is_same<T, int>::value)

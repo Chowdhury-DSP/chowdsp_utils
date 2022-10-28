@@ -52,8 +52,7 @@ struct complex_exponential_test
     void test_exp()
     {
         std::transform(exp_input.cbegin(), exp_input.cend(), expected.begin(),
-                       [](const value_type& v)
-                       { using std::exp; return exp(v); });
+                       [](const value_type& v) { using std::exp; return exp(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -68,8 +67,7 @@ struct complex_exponential_test
     void test_expm1()
     {
         std::transform(exp_input.cbegin(), exp_input.cend(), expected.begin(),
-                       [](const value_type& v)
-                       { using xsimd::expm1; return expm1(v); });
+                       [](const value_type& v) { using xsimd::expm1; return expm1(v); });
 
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
@@ -85,8 +83,7 @@ struct complex_exponential_test
     void test_huge_exp()
     {
         std::transform(huge_exp_input.cbegin(), huge_exp_input.cend(), expected.begin(),
-                       [](const value_type& v)
-                       { using std::exp; return exp(v); });
+                       [](const value_type& v) { using std::exp; return exp(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -101,8 +98,7 @@ struct complex_exponential_test
     void test_log()
     {
         std::transform(log_input.cbegin(), log_input.cend(), expected.begin(),
-                       [](const value_type& v)
-                       { using std::log; return log(v); });
+                       [](const value_type& v) { using std::log; return log(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -117,8 +113,7 @@ struct complex_exponential_test
     void test_log2()
     {
         std::transform(log_input.cbegin(), log_input.cend(), expected.begin(),
-                       [](const value_type& v)
-                       { using xsimd::log2; return log2(v); });
+                       [](const value_type& v) { using xsimd::log2; return log2(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -133,8 +128,7 @@ struct complex_exponential_test
     void test_log10()
     {
         std::transform(log_input.cbegin(), log_input.cend(), expected.begin(),
-                       [](const value_type& v)
-                       { using std::log10; return log10(v); });
+                       [](const value_type& v) { using std::log10; return log10(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -149,8 +143,7 @@ struct complex_exponential_test
     void test_log1p()
     {
         std::transform(log_input.cbegin(), log_input.cend(), expected.begin(),
-                       [](const value_type& v)
-                       { using xsimd::log1p; return log1p(v); });
+                       [](const value_type& v) { using xsimd::log1p; return log1p(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -165,8 +158,7 @@ struct complex_exponential_test
     void test_sign()
     {
         std::transform(log_input.cbegin(), log_input.cend(), expected.begin(),
-                       [](const value_type& v)
-                       { using xsimd::sign; return sign(v); });
+                       [](const value_type& v) { using xsimd::sign; return sign(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {

@@ -48,7 +48,7 @@ namespace detail
 
     template <class T_out, class T_in>
     inline typename std::enable_if<std::is_floating_point<T_out>::value, bool>::type
-    is_convertible(T_in)
+        is_convertible(T_in)
     {
         return true;
     }

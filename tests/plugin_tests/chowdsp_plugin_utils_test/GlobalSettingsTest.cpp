@@ -139,8 +139,7 @@ public:
         settings.initialise (settingsFile, 1);
         settings.addProperties<&TestListener::globalSettingChanged> ({ test1, test2 }, testListener);
 
-        auto setSettingsVal = [&] (std::string_view name, const auto& val)
-        {
+        auto setSettingsVal = [&] (std::string_view name, const auto& val) {
             auto settingsJson = fromFile (settings.getSettingsFile());
             settingsJson["plugin_settings"][name.data()] = val;
 
@@ -237,8 +236,7 @@ public:
 
         std::atomic<bool> thread1Finished { false };
         juce::Thread::launch (
-            [&]
-            {
+            [&] {
                 chowdsp::SharedPluginSettings thread1Settings;
                 thread1Settings->initialise (settingsFile, 1);
                 for (int i = 0; i < 400; ++i)
@@ -254,8 +252,7 @@ public:
 
         std::atomic<bool> thread2Finished { false };
         juce::Thread::launch (
-            [&]
-            {
+            [&] {
                 chowdsp::SharedPluginSettings thread2Settings;
                 thread2Settings->initialise (settingsFile, 1);
                 for (int i = 0; i < 400; ++i)

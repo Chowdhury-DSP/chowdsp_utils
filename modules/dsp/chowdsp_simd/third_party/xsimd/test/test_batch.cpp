@@ -262,8 +262,7 @@ struct batch_test
         // batch + scalar
         {
             array_type expected;
-            std::transform(lhs.cbegin(), lhs.cend(), expected.begin(), [this](value_type x)
-                           { return xsimd::sadd(x, scalar); });
+            std::transform(lhs.cbegin(), lhs.cend(), expected.begin(), [this](value_type x) { return xsimd::sadd(x, scalar); });
             batch_type lres = xsimd::sadd(batch_lhs(), scalar);
             INFO("sadd(batch, scalar)");
             CHECK_BATCH_EQ(lres, expected);
@@ -274,8 +273,7 @@ struct batch_test
         // batch - batch
         {
             array_type expected;
-            std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(), [](value_type x, value_type y)
-                           { return xsimd::ssub(x, y); });
+            std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(), [](value_type x, value_type y) { return xsimd::ssub(x, y); });
             batch_type res = xsimd::ssub(batch_lhs(), batch_rhs());
             INFO("ssub(batch, batch)");
             CHECK_BATCH_EQ(res, expected);
@@ -283,13 +281,11 @@ struct batch_test
         // batch - scalar
         {
             array_type expected;
-            std::transform(lhs.cbegin(), lhs.cend(), expected.begin(), [this](value_type x)
-                           { return xsimd::ssub(x, scalar); });
+            std::transform(lhs.cbegin(), lhs.cend(), expected.begin(), [this](value_type x) { return xsimd::ssub(x, scalar); });
             batch_type lres = xsimd::ssub(batch_lhs(), scalar);
             INFO("ssub(batch, scalar)");
             CHECK_BATCH_EQ(lres, expected);
-            std::transform(lhs.cbegin(), lhs.cend(), expected.begin(), [this](value_type x)
-                           { return xsimd::ssub(scalar, x); });
+            std::transform(lhs.cbegin(), lhs.cend(), expected.begin(), [this](value_type x) { return xsimd::ssub(scalar, x); });
             batch_type rres = xsimd::ssub(scalar, batch_lhs());
             INFO("ssub(scalar, batch)");
             CHECK_BATCH_EQ(rres, expected);
@@ -380,8 +376,7 @@ struct batch_test
         {
             bool_array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r)
-                           { return l == r; });
+                           [](const value_type& l, const value_type& r) { return l == r; });
             auto res = batch_lhs() == batch_rhs();
             INFO("batch == batch");
             CHECK_BATCH_EQ(res, expected);
@@ -390,8 +385,7 @@ struct batch_test
         {
             bool_array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [this](const value_type& l)
-                           { return l == scalar; });
+                           [this](const value_type& l) { return l == scalar; });
             auto res = batch_lhs() == scalar;
             INFO("batch == scalar");
             CHECK_BATCH_EQ(res, expected);
@@ -400,8 +394,7 @@ struct batch_test
         {
             bool_array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r)
-                           { return l != r; });
+                           [](const value_type& l, const value_type& r) { return l != r; });
             auto res = batch_lhs() != batch_rhs();
             INFO("batch != batch");
             CHECK_BATCH_EQ(res, expected);
@@ -410,8 +403,7 @@ struct batch_test
         {
             bool_array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [this](const value_type& l)
-                           { return l != scalar; });
+                           [this](const value_type& l) { return l != scalar; });
             auto res = batch_lhs() != scalar;
             INFO("batch != scalar");
             CHECK_BATCH_EQ(res, expected);
@@ -420,8 +412,7 @@ struct batch_test
         {
             bool_array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r)
-                           { return l < r; });
+                           [](const value_type& l, const value_type& r) { return l < r; });
             auto res = batch_lhs() < batch_rhs();
             INFO("batch < batch");
             CHECK_BATCH_EQ(res, expected);
@@ -430,8 +421,7 @@ struct batch_test
         {
             bool_array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [this](const value_type& l)
-                           { return l < scalar; });
+                           [this](const value_type& l) { return l < scalar; });
             auto res = batch_lhs() < scalar;
             INFO("batch < scalar");
             CHECK_BATCH_EQ(res, expected);
@@ -441,8 +431,7 @@ struct batch_test
         {
             bool_array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r)
-                           { return l <= r; });
+                           [](const value_type& l, const value_type& r) { return l <= r; });
             auto res = batch_lhs() <= batch_rhs();
             INFO("batch <= batch");
             CHECK_BATCH_EQ(res, expected);
@@ -451,8 +440,7 @@ struct batch_test
         {
             bool_array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [this](const value_type& l)
-                           { return l <= scalar; });
+                           [this](const value_type& l) { return l <= scalar; });
             auto res = batch_lhs() <= scalar;
             INFO("batch <= scalar");
             CHECK_BATCH_EQ(res, expected);
@@ -462,8 +450,7 @@ struct batch_test
         {
             bool_array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r)
-                           { return l > r; });
+                           [](const value_type& l, const value_type& r) { return l > r; });
             auto res = batch_lhs() > batch_rhs();
             INFO("batch > batch");
             CHECK_BATCH_EQ(res, expected);
@@ -472,8 +459,7 @@ struct batch_test
         {
             bool_array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [this](const value_type& l)
-                           { return l > scalar; });
+                           [this](const value_type& l) { return l > scalar; });
             auto res = batch_lhs() > scalar;
             INFO("batch > scalar");
             CHECK_BATCH_EQ(res, expected);
@@ -482,8 +468,7 @@ struct batch_test
         {
             bool_array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r)
-                           { return l >= r; });
+                           [](const value_type& l, const value_type& r) { return l >= r; });
             auto res = batch_lhs() >= batch_rhs();
             INFO("batch >= batch");
             CHECK_BATCH_EQ(res, expected);
@@ -492,8 +477,7 @@ struct batch_test
         {
             bool_array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [this](const value_type& l)
-                           { return l >= scalar; });
+                           [this](const value_type& l) { return l >= scalar; });
             auto res = batch_lhs() >= scalar;
             INFO("batch >= scalar");
             CHECK_BATCH_EQ(res, expected);
@@ -548,8 +532,7 @@ struct batch_test
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r)
-                           { return std::min(l, r); });
+                           [](const value_type& l, const value_type& r) { return std::min(l, r); });
             batch_type res = min(batch_lhs(), batch_rhs());
             INFO("min");
             CHECK_BATCH_EQ(res, expected);
@@ -558,8 +541,7 @@ struct batch_test
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type&, const value_type& r)
-                           { return std::min(std::numeric_limits<value_type>::min(), r); });
+                           [](const value_type&, const value_type& r) { return std::min(std::numeric_limits<value_type>::min(), r); });
             batch_type res = xsimd::min(batch_type(std::numeric_limits<value_type>::min()), batch_rhs());
             INFO("min limit");
             CHECK_BATCH_EQ(res, expected);
@@ -568,8 +550,7 @@ struct batch_test
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r)
-                           { return std::fmin(l, r); });
+                           [](const value_type& l, const value_type& r) { return std::fmin(l, r); });
             batch_type res = min(batch_lhs(), batch_rhs());
             INFO("fmin");
             CHECK_BATCH_EQ(res, expected);
@@ -578,8 +559,7 @@ struct batch_test
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r)
-                           { return std::max(l, r); });
+                           [](const value_type& l, const value_type& r) { return std::max(l, r); });
             batch_type res = max(batch_lhs(), batch_rhs());
             INFO("max");
             CHECK_BATCH_EQ(res, expected);
@@ -588,8 +568,7 @@ struct batch_test
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type&, const value_type& r)
-                           { return std::max(std::numeric_limits<value_type>::max(), r); });
+                           [](const value_type&, const value_type& r) { return std::max(std::numeric_limits<value_type>::max(), r); });
             batch_type res = xsimd::max(batch_type(std::numeric_limits<value_type>::max()), batch_rhs());
             INFO("max limit");
             CHECK_BATCH_EQ(res, expected);
@@ -598,8 +577,7 @@ struct batch_test
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r)
-                           { return std::fmax(l, r); });
+                           [](const value_type& l, const value_type& r) { return std::fmax(l, r); });
             batch_type res = fmax(batch_lhs(), batch_rhs());
             INFO("fmax");
             CHECK_BATCH_EQ(res, expected);
@@ -612,8 +590,7 @@ struct batch_test
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.begin(), expected.begin(),
-                           [](const value_type& l, const value_type& r)
-                           { return l * r + r; });
+                           [](const value_type& l, const value_type& r) { return l * r + r; });
             // Warning: ADL seems to not work correctly on Windows, thus the full qualified call
             batch_type res = xsimd::fma(batch_lhs(), batch_rhs(), batch_rhs());
             INFO("fma");
@@ -623,8 +600,7 @@ struct batch_test
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.begin(), expected.begin(),
-                           [](const value_type& l, const value_type& r)
-                           { return l * r - r; });
+                           [](const value_type& l, const value_type& r) { return l * r - r; });
             batch_type res = fms(batch_lhs(), batch_rhs(), batch_rhs());
             INFO("fms");
             CHECK_BATCH_EQ(res, expected);
@@ -633,8 +609,7 @@ struct batch_test
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.begin(), expected.begin(),
-                           [](const value_type& l, const value_type& r)
-                           { return -l * r + r; });
+                           [](const value_type& l, const value_type& r) { return -l * r + r; });
             batch_type res = fnma(batch_lhs(), batch_rhs(), batch_rhs());
             INFO("fnma");
             CHECK_BATCH_EQ(res, expected);
@@ -643,8 +618,7 @@ struct batch_test
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.begin(), expected.begin(),
-                           [](const value_type& l, const value_type& r)
-                           { return -l * r - r; });
+                           [](const value_type& l, const value_type& r) { return -l * r - r; });
             batch_type res = fnms(batch_lhs(), batch_rhs(), batch_rhs());
             INFO("fnms");
             CHECK_BATCH_EQ(res, expected);
@@ -657,8 +631,7 @@ struct batch_test
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [](const value_type& l)
-                           { return ::detail::uabs(l); });
+                           [](const value_type& l) { return ::detail::uabs(l); });
             batch_type res = abs(batch_lhs());
             INFO("abs");
             CHECK_BATCH_EQ(res, expected);
@@ -667,8 +640,7 @@ struct batch_test
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [](const value_type& l)
-                           { return std::fabs(l); });
+                           [](const value_type& l) { return std::fabs(l); });
             batch_type res = fabs(batch_lhs());
             INFO("fabs");
             CHECK_BATCH_EQ(res, expected);
@@ -723,8 +695,7 @@ struct batch_test
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [](const value_type& l)
-                           { return !l; });
+                           [](const value_type& l) { return !l; });
             batch_type res = (batch_type)!batch_lhs();
             INFO("!batch");
             CHECK_BATCH_EQ(res, expected);

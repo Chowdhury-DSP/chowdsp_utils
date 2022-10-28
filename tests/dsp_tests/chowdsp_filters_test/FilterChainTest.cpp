@@ -48,8 +48,7 @@ TEST_CASE ("Filter Chain Test")
         using FilterType = chowdsp::NthOrderFilter<float, 4>;
         chowdsp::FilterChain<FilterType, FilterType> filters;
 
-        filters.doForEachFilter ([] (auto& filt)
-                                 {
+        filters.doForEachFilter ([] (auto& filt) {
                                          filt.prepare ({ fs, 100000, 1 });
                                          filt.setCutoffFrequency (fc); });
 

@@ -44,8 +44,7 @@ struct fp_manipulation_test
         {
             array_type expected;
             std::transform(input.cbegin(), input.cend(), expected.begin(),
-                           [this](const value_type& v)
-                           { return std::ldexp(v, exponent); });
+                           [this](const value_type& v) { return std::ldexp(v, exponent); });
             batch_type res = xsimd::ldexp(batch_input(), bexp);
             INFO("ldexp");
             CHECK_BATCH_EQ(res, expected);
@@ -54,8 +53,7 @@ struct fp_manipulation_test
         {
             array_type expected;
             std::transform(input.cbegin(), input.cend(), expected.begin(),
-                           [](const value_type& v)
-                           { int tmp; return std::frexp(v, &tmp); });
+                           [](const value_type& v) { int tmp; return std::frexp(v, &tmp); });
             batch_type res = xsimd::frexp(batch_input(), bexp);
             INFO("frexp");
             CHECK_BATCH_EQ(res, expected);

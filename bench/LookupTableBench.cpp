@@ -10,13 +10,11 @@
 constexpr int N = 50000;
 const auto lutVecFloat = bench_utils::makeRandomVector<float> (N);
 auto outVecFloat = std::vector<float> (N, 0.0f);
-const auto juceLUT = juce::dsp::LookupTableTransform<float> ([] (auto x)
-                                                             { return std::tanh (x); },
+const auto juceLUT = juce::dsp::LookupTableTransform<float> ([] (auto x) { return std::tanh (x); },
                                                              -10.0f,
                                                              10.0f,
                                                              1 << 17);
-const auto chowLUT = chowdsp::LookupTableTransform<float> ([] (auto x)
-                                                           { return std::tanh (x); },
+const auto chowLUT = chowdsp::LookupTableTransform<float> ([] (auto x) { return std::tanh (x); },
                                                            -10.0f,
                                                            10.0f,
                                                            1 << 17);

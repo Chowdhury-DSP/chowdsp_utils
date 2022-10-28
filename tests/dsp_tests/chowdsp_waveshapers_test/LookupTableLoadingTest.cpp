@@ -7,18 +7,15 @@ struct SlowWaveshaper : public chowdsp::ADAAWaveshaper<float>
     {
         using namespace std::chrono_literals;
         this->initialise (
-            [] (double x)
-            {
+            [] (double x) {
                 std::this_thread::sleep_for (1ns);
                 return x;
             },
-            [] (double x)
-            {
+            [] (double x) {
                 std::this_thread::sleep_for (1ns);
                 return x;
             },
-            [] (double x)
-            {
+            [] (double x) {
                 std::this_thread::sleep_for (1ns);
                 return x;
             });

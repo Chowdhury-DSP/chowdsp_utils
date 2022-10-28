@@ -24,8 +24,7 @@ TEST_CASE ("Polygonal Test")
     {
         float phase = 0.0f;
         const auto phaseIncrement = juce::MathConstants<float>::twoPi * testFreq / float (_sampleRate);
-        auto refOsc = [&phase, phaseIncrement]() mutable
-        {
+        auto refOsc = [&phase, phaseIncrement]() mutable {
             const auto y = polygonalCore (phase, polygonOrder, polygonTeeth);
 
             phase += phaseIncrement;
@@ -55,8 +54,7 @@ TEST_CASE ("Polygonal Test")
         // our osc has 1/2 sample delay so, run the reference osc at 2x sample rate, and check every other.
         float phase = 0.0f;
         const auto phaseIncrement = juce::MathConstants<float>::twoPi * testFreq / float (_sampleRate);
-        auto refOsc = [&phase, phaseIncrement]() mutable
-        {
+        auto refOsc = [&phase, phaseIncrement]() mutable {
             const auto y = polygonalCore (phase, polygonOrder, polygonTeeth);
 
             phase += phaseIncrement;
@@ -88,8 +86,7 @@ TEST_CASE ("Polygonal Test")
     {
         float phase = 0.0f;
         const auto phaseIncrement = juce::MathConstants<float>::twoPi * testFreq / float (_sampleRate);
-        auto refOsc = [&phase, phaseIncrement] (float input) mutable
-        {
+        auto refOsc = [&phase, phaseIncrement] (float input) mutable {
             const auto y = polygonalCore (phase, polygonOrder, polygonTeeth);
 
             phase += phaseIncrement;

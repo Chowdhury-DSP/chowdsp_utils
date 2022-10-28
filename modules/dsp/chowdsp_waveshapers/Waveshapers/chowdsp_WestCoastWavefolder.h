@@ -33,22 +33,19 @@ public:
         static constexpr auto xMix = 5.0;
 
         this->initialise (
-            [&] (auto x)
-            {
+            [&] (auto x) {
                 double y = xMix * x;
                 for (auto& cell : cells)
                     y += cell.mix * cell.func (x);
                 return y;
             },
-            [&] (auto x)
-            {
+            [&] (auto x) {
                 double y = 0.5 * xMix * Power::ipow<2> (x);
                 for (auto& cell : cells)
                     y += cell.mix * cell.funcDeriv (x);
                 return y;
             },
-            [&] (auto x)
-            {
+            [&] (auto x) {
                 double y = (xMix / 6.0) * Power::ipow<3> (x);
                 for (auto& cell : cells)
                     y += cell.mix * cell.funcDeriv2 (x);

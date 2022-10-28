@@ -41,7 +41,7 @@ namespace VersionUtils
         friend bool operator== (const Version& v1, const Version& v2) noexcept;
         friend bool operator!= (const Version& v1, const Version& v2) noexcept;
         friend bool operator> (const Version& v1, const Version& v2) noexcept;
-        friend bool operator<(const Version& v1, const Version& v2) noexcept;
+        friend bool operator< (const Version& v1, const Version& v2) noexcept;
         friend bool operator>= (const Version& v1, const Version& v2) noexcept;
         friend bool operator<= (const Version& v1, const Version& v2) noexcept;
 

@@ -40,31 +40,27 @@ public:
     template <typename Func>
     void doForEachFilter (Func&& func)
     {
-        chowdsp::TupleHelpers::forEachInTuple ([&] (auto& filter, size_t)
-                                               { func (filter); },
+        chowdsp::TupleHelpers::forEachInTuple ([&] (auto& filter, size_t) { func (filter); },
                                                filters);
     }
 
     /** Prepares each filter in the chain */
     void prepare (const juce::dsp::ProcessSpec& spec)
     {
-        doForEachFilter ([&spec] (auto& f)
-                         { f.prepare (spec); });
+        doForEachFilter ([&spec] (auto& f) { f.prepare (spec); });
     }
 
     /** Resets each filter in the chain */
     void reset()
     {
-        doForEachFilter ([] (auto& f)
-                         { f.reset(); });
+        doForEachFilter ([] (auto& f) { f.reset(); });
     }
 
     /** Processes an individual sample through the filter chain */
     template <typename T>
     T processSample (T x)
     {
-        doForEachFilter ([&] (auto& f)
-                         { x = f.processSample (x); });
+        doForEachFilter ([&] (auto& f) { x = f.processSample (x); });
         return x;
     }
 
@@ -72,24 +68,21 @@ public:
     template <typename T>
     void processBlock (T* x, int numSamples)
     {
-        doForEachFilter ([&] (auto& f)
-                         { f.processBlock (x, numSamples); });
+        doForEachFilter ([&] (auto& f) { f.processBlock (x, numSamples); });
     }
 
     /** Processes a block of samples through the filter chain */
     template <typename T>
     void processBlock (const chowdsp::BufferView<T>& buffer)
     {
-        doForEachFilter ([&] (auto& f)
-                         { f.processBlock (buffer); });
+        doForEachFilter ([&] (auto& f) { f.processBlock (buffer); });
     }
 
     /** Processes a buffer or processing context through the filter chain */
     template <typename... Args>
     void process (Args&&... args)
     {
-        doForEachFilter ([&] (auto& f)
-                         { f.process (std::forward<Args> (args)...); });
+        doForEachFilter ([&] (auto& f) { f.process (std::forward<Args> (args)...); });
     }
 
 private:

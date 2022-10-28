@@ -18,8 +18,7 @@ FloatParameter::FloatParameter (const ParameterID& parameterID,
         AudioProcessorParameter::genericParameter,
         valueToTextFunction == nullptr
             ? std::function<juce::String (float v, int)>()
-            : [valueToTextFunction] (float v, int)
-            { return valueToTextFunction (v); },
+            : [valueToTextFunction] (float v, int) { return valueToTextFunction (v); },
         std::move (textToValueFunction)),
 #else
     : juce::AudioParameterFloat (
@@ -29,8 +28,7 @@ FloatParameter::FloatParameter (const ParameterID& parameterID,
         defaultFloatValue,
         juce::AudioParameterFloatAttributes()
             .withStringFromValueFunction (
-                [valueToTextFunction] (float v, int)
-                { return valueToTextFunction (v); })
+                [valueToTextFunction] (float v, int) { return valueToTextFunction (v); })
             .withValueFromStringFunction (std::move (textToValueFunction))),
 #endif
       unsnappedDefault (valueRange.convertTo0to1 (defaultFloatValue)),

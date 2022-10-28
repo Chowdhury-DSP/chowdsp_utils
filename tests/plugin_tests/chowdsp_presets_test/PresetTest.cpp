@@ -122,8 +122,7 @@ public:
         auto testFile = juce::File::getSpecialLocation (juce::File::userHomeDirectory).getChildFile ("test.preset");
         auto xml = std::make_unique<juce::XmlElement> ("TEST_XML");
 
-        auto testPreset = [=] (const chowdsp::Preset& p)
-        {
+        auto testPreset = [=] (const chowdsp::Preset& p) {
             expectEquals (p.getName(), juce::String ("test preset"), "Preset name incorrect!");
             expectEquals (p.getVendor(), juce::String ("test vendor"), "Preset vendor incorrect!");
             expectEquals (p.getCategory(), juce::String ("test category"), "Preset category incorrect!");

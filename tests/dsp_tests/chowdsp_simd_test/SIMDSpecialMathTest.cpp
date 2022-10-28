@@ -13,8 +13,7 @@ TEMPLATE_TEST_CASE ("SIMD Special Math Test", "", float, double)
     SECTION ("SIMD Decibels Test")
     {
         static constexpr int nIter = 10;
-        static constexpr auto maxErr = []
-        {
+        static constexpr auto maxErr = [] {
             if constexpr (std::is_same_v<FloatType, float>)
                 return 1.0e-5f;
             else
@@ -25,8 +24,7 @@ TEMPLATE_TEST_CASE ("SIMD Special Math Test", "", float, double)
         std::mt19937 mt (rd());
         std::uniform_real_distribution<FloatType> minus10To10 ((FloatType) -10, (FloatType) 10);
 
-        auto baseMathTest = [&minus10To10, &mt] (auto floatFunc, auto simdFunc, const std::string& functionName)
-        {
+        auto baseMathTest = [&minus10To10, &mt] (auto floatFunc, auto simdFunc, const std::string& functionName) {
             for (int i = 0; i < nIter; ++i)
             {
                 auto input = minus10To10 (mt);
@@ -44,15 +42,11 @@ TEMPLATE_TEST_CASE ("SIMD Special Math Test", "", float, double)
 
     SECTION ("SIMD hmin/hmax test")
     {
-        auto refMax = [] (const auto& data)
-        { return *std::max_element (data.begin(), data.end()); };
+        auto refMax = [] (const auto& data) { return *std::max_element (data.begin(), data.end()); };
 
-        auto refMin = [] (const auto& data)
-        { return *std::min_element (data.begin(), data.end()); };
+        auto refMin = [] (const auto& data) { return *std::min_element (data.begin(), data.end()); };
 
-        auto refAbsMax = [] (const auto& data)
-        { return std::abs (*std::max_element (data.begin(), data.end(), [] (auto a, auto b)
-                                              { return std::abs (a) < std::abs (b); })); };
+        auto refAbsMax = [] (const auto& data) { return std::abs (*std::max_element (data.begin(), data.end(), [] (auto a, auto b) { return std::abs (a) < std::abs (b); })); };
 
         std::random_device rd;
         std::mt19937 mt (rd());
