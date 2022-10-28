@@ -104,5 +104,14 @@ namespace Math
 
         return y;
     }
+
+    /**
+     * Algebraic sigmoid function of the form `y = x / sqrt(1 + x^2)`
+     */
+    template <typename T>
+    inline T algebraicSigmoid (T x)
+    {
+        return x * rsqrt (x * x + (T) 1);
+    }
 } // namespace Math
 } // namespace chowdsp
