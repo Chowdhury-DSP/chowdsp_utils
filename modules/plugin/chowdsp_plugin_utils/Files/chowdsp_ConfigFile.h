@@ -20,10 +20,13 @@ public:
     /** Type alias for setting property with ID */
     using Property = std::pair<PropertyID, json>;
 
+    /** Initialises the file. If the file has already been initialised, this will do nothing. */
     void initialise (const juce::File& file, int timerSeconds);
 
+    /** Adds a batch of properties to the file. */
     void addProperties (std::initializer_list<Property> properties);
 
+    /** Returns the value of a property. */
     template <typename T>
     T getProperty (PropertyID id, T&& defaultValue = {}) const;
 
