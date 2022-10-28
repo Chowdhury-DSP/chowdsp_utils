@@ -53,8 +53,7 @@ TEST_CASE ("Other Math Ops Test")
         REQUIRE_MESSAGE (xsimd::all (chowdsp::Math::sign (x) == expected), "SIMD signum is incorrect");
     }
 
-    const auto rsqrtTest = [] (auto x_type)
-    {
+    const auto rsqrtTest = [] (auto x_type) {
         using FloatType = decltype (x_type);
         using NumericType = chowdsp::SampleTypeHelpers::NumericType<FloatType>;
 
@@ -75,8 +74,7 @@ TEST_CASE ("Other Math Ops Test")
     SECTION ("Rsqrt Test [SIMD float]") { rsqrtTest (xsimd::batch<float> {}); }
     SECTION ("Rsqrt Test [SIMD double]") { rsqrtTest (xsimd::batch<double> {}); }
 
-    const auto sigmoidTest = [] (auto x_type)
-    {
+    const auto sigmoidTest = [] (auto x_type) {
         using FloatType = decltype (x_type);
         using NumericType = chowdsp::SampleTypeHelpers::NumericType<FloatType>;
 
