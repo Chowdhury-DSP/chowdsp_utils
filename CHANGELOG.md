@@ -7,7 +7,10 @@ All notable changes to this project will be documented in this file.
 - Added `TypesList` meta-programming helpers.
 - Added `Ratio` class for creating template parameter floats.
 - Added `BufferMath::sanitizeBuffer` method.
-- Updated XSIMD to version 9.0.1.
+- Added `bind_front` and `bind_back` helper methods.
+- Added `algebraicSigmoid` method.
+- Added `StaticBuffer`.
+- Updated XSIMD to version 10.0.0rc.
 - Updated elliptic filter template arguments to accept a `Ratio` for the passband ripple.
 
 ## [1.2.0] 2022-09-03

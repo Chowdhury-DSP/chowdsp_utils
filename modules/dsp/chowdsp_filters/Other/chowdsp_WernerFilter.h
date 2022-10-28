@@ -247,7 +247,7 @@ private:
             y = sArr[TS2] + tValsArr[TS2]; // 4th-order lowpass output (vs2)
         }
 
-        s = xsimd::tanh (s + 2.0f * tVals);
+        s = Math::algebraicSigmoid (s + 2.0f * tVals);
 
         return y;
     }
