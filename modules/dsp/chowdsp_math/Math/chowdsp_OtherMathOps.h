@@ -70,5 +70,48 @@ namespace Math
         return positive - negative;
     }
 #endif
+
+    /** The famous "Fast Inverse Square-Root" method (https://en.wikipedia.org/wiki/Fast_inverse_square_root) */
+    template <typename T, typename NumericType = SampleTypeHelpers::NumericType<T>>
+    inline std::enable_if_t<std::is_same_v<NumericType, float>, T> rsqrt (T x) noexcept
+    {
+        using IntType = std::conditional_t<SampleTypeHelpers::IsSIMDRegister<T>, xsimd::batch<int32_t>, int32_t>;
+
+        const auto x_half = x * 0.5f;
+        auto i = reinterpret_cast<IntType&> (x);
+        i = 0x5f3759df - (i >> 1);
+
+        auto y = reinterpret_cast<T&> (i);
+        y = y * (1.5f - (x_half * y * y)); // 1st iteration
+        // y  = y * (1.5f - (x_half * y * y)); // 2nd iteration, this can be removed
+
+        return y;
+    }
+
+    /** The famous "Fast Inverse Square-Root" method (re-written for double-precision) */
+    template <typename T, typename NumericType = SampleTypeHelpers::NumericType<T>>
+    inline std::enable_if_t<std::is_same_v<NumericType, double>, T> rsqrt (T x) noexcept
+    {
+        using IntType = std::conditional_t<SampleTypeHelpers::IsSIMDRegister<T>, xsimd::batch<int64_t>, int64_t>;
+
+        const auto x_half = x * 0.5;
+        auto i = reinterpret_cast<IntType&> (x);
+        i = 0x5fe6eb50c7b537a9 - (i >> 1); // The magic number is for doubles is from https://cs.uwaterloo.ca/~m32rober/rsqrt.pdf
+
+        auto y = reinterpret_cast<T&> (i);
+        y = y * (1.5 - (x_half * y * y)); // 1st iteration
+        // y  = y * (1.5 - (x_half * y * y)); // 2nd iteration, this can be removed
+
+        return y;
+    }
+
+    /**
+     * Algebraic sigmoid function of the form `y = x / sqrt(1 + x^2)`
+     */
+    template <typename T>
+    inline T algebraicSigmoid (T x)
+    {
+        return x * rsqrt (x * x + (T) 1);
+    }
 } // namespace Math
 } // namespace chowdsp
