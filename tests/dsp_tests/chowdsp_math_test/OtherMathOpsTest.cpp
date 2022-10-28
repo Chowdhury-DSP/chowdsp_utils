@@ -52,4 +52,26 @@ TEST_CASE ("Other Math Ops Test")
         xsimd::batch<float> expected { -1.0f, 0.0f, 1.0f, 1.0f };
         REQUIRE_MESSAGE (xsimd::all (chowdsp::Math::sign (x) == expected), "SIMD signum is incorrect");
     }
+
+    const auto rsqrtTest = [] (auto x_type)
+    {
+        using FloatType = decltype (x_type);
+        using NumericType = chowdsp::SampleTypeHelpers::NumericType<FloatType>;
+
+        for (auto n = (NumericType) -100; n < (NumericType) 100; n += (NumericType) 1)
+        {
+            const auto x = std::exp2 (n);
+            const auto y_exp = FloatType ((NumericType) 1 / std::sqrt (x));
+            const auto y_actual = chowdsp::Math::rsqrt ((FloatType) x);
+
+            CHOWDSP_USING_XSIMD_STD (abs);
+            const auto percentOff = abs ((y_exp / y_actual) - (NumericType) 1);
+            REQUIRE_MESSAGE (percentOff == SIMDApprox<FloatType> (0).margin ((NumericType) 0.01), "rsqrt is inaccurate for input: " + std::to_string (x));
+        }
+    };
+
+    SECTION ("Rsqrt Test [float]") { rsqrtTest (float {}); }
+    SECTION ("Rsqrt Test [float]") { rsqrtTest (double {}); }
+    SECTION ("Rsqrt Test [float]") { rsqrtTest (xsimd::batch<float> {}); }
+    SECTION ("Rsqrt Test [float]") { rsqrtTest (xsimd::batch<double> {}); }
 }
