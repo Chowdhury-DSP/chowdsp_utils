@@ -75,7 +75,11 @@ namespace Math
     template <typename T, typename NumericType = SampleTypeHelpers::NumericType<T>>
     inline std::enable_if_t<std::is_same_v<NumericType, float>, T> rsqrt (T x) noexcept
     {
+#if CHOWDSP_NO_XSIMD
+        using IntType = int32_t;
+#else
         using IntType = std::conditional_t<SampleTypeHelpers::IsSIMDRegister<T>, xsimd::batch<int32_t>, int32_t>;
+#endif
 
         const auto x_half = x * 0.5f;
         auto i = reinterpret_cast<IntType&> (x);
@@ -92,7 +96,11 @@ namespace Math
     template <typename T, typename NumericType = SampleTypeHelpers::NumericType<T>>
     inline std::enable_if_t<std::is_same_v<NumericType, double>, T> rsqrt (T x) noexcept
     {
+#if CHOWDSP_NO_XSIMD
+        using IntType = int64_t;
+#else
         using IntType = std::conditional_t<SampleTypeHelpers::IsSIMDRegister<T>, xsimd::batch<int64_t>, int64_t>;
+#endif
 
         const auto x_half = x * 0.5;
         auto i = reinterpret_cast<IntType&> (x);
@@ -105,9 +113,7 @@ namespace Math
         return y;
     }
 
-    /**
-     * Algebraic sigmoid function of the form `y = x / sqrt(1 + x^2)`
-     */
+    /** Algebraic sigmoid function of the form `y = x / sqrt(1 + x^2)` */
     template <typename T>
     inline T algebraicSigmoid (T x)
     {
