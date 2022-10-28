@@ -42,8 +42,7 @@ public:
     void calcCoefs (FloatType fc, FloatType alpha, NumericType fs)
     {
         const auto k = ConformalMaps::computeKValue (fc, fs);
-        auto setFilterCoefs = [k] (auto& filter, FloatType pole, FloatType zero)
-        {
+        auto setFilterCoefs = [k] (auto& filter, FloatType pole, FloatType zero) {
             FloatType a_z[2] {};
             FloatType b_z[2] {};
 

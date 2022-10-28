@@ -15,8 +15,7 @@ static void stdPow7 (benchmark::State& state)
 {
     for (auto _ : state)
     {
-        std::transform (powerFloat.begin(), powerFloat.end(), outVecFloat.begin(), [] (auto x)
-                        { return std::pow (x, 7.0f); });
+        std::transform (powerFloat.begin(), powerFloat.end(), outVecFloat.begin(), [] (auto x) { return std::pow (x, 7.0f); });
     }
 }
 BENCHMARK (stdPow7)->MinTime (1);
@@ -25,8 +24,7 @@ static void stdPow16 (benchmark::State& state)
 {
     for (auto _ : state)
     {
-        std::transform (powerFloat.begin(), powerFloat.end(), outVecFloat.begin(), [] (auto x)
-                        { return std::pow (x, 16.0f); });
+        std::transform (powerFloat.begin(), powerFloat.end(), outVecFloat.begin(), [] (auto x) { return std::pow (x, 16.0f); });
     }
 }
 BENCHMARK (stdPow16)->MinTime (1);
@@ -35,8 +33,7 @@ static void scalarPow7 (benchmark::State& state)
 {
     for (auto _ : state)
     {
-        std::transform (powerFloat.begin(), powerFloat.end(), outVecFloat.begin(), [] (auto x)
-                        { return chowdsp::Power::ipow<7> (x); });
+        std::transform (powerFloat.begin(), powerFloat.end(), outVecFloat.begin(), [] (auto x) { return chowdsp::Power::ipow<7> (x); });
     }
 }
 BENCHMARK (scalarPow7)->MinTime (1);
@@ -45,8 +42,7 @@ static void scalarPow16 (benchmark::State& state)
 {
     for (auto _ : state)
     {
-        std::transform (powerFloat.begin(), powerFloat.end(), outVecFloat.begin(), [] (auto x)
-                        { return chowdsp::Power::ipow<16> (x); });
+        std::transform (powerFloat.begin(), powerFloat.end(), outVecFloat.begin(), [] (auto x) { return chowdsp::Power::ipow<16> (x); });
     }
 }
 BENCHMARK (scalarPow16)->MinTime (1);

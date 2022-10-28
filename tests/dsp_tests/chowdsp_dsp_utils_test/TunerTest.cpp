@@ -15,8 +15,7 @@ static void tunerTest (float freq, float fs, float maxError)
 
 static void freq2NotesCentsTest (int noteNum, double cents)
 {
-    auto getMidiNoteInHertz = [] (const int noteNumber, const double frequencyOfA)
-    {
+    auto getMidiNoteInHertz = [] (const int noteNumber, const double frequencyOfA) {
         return frequencyOfA * std::pow (2.0, (noteNumber - 69) / 12.0);
     };
 

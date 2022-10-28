@@ -47,33 +47,27 @@ namespace PluginDiagnosticInfo
         const auto pluginCompilerVersionString = juce::String {};
 #endif
 
-        auto getCompilationDateString = []()
-        {
+        auto getCompilationDateString = []() {
             return juce::Time::getCompilationDate().toString (true, true, false, true);
         };
 
-        auto getIs64BitString = []()
-        {
+        auto getIs64BitString = []() {
             return juce::SystemStats::isOperatingSystem64Bit() ? " (64-bit)" : juce::String();
         };
 
-        auto getIsSandboxedString = []()
-        {
+        auto getIsSandboxedString = []() {
             return juce::SystemStats::isRunningInAppExtensionSandbox() ? " (Sandboxed)" : juce::String();
         };
 
-        auto getCPUInfoString = []()
-        {
+        auto getCPUInfoString = []() {
             return juce::String (juce::SystemStats::getNumCpus()) + " Core, " + juce::SystemStats::getCpuModel();
         };
 
-        auto getBlockSizeString = [blockSize = plugin.getBlockSize()]()
-        {
+        auto getBlockSizeString = [blockSize = plugin.getBlockSize()]() {
             return juce::String (blockSize);
         };
 
-        auto getSampleRateString = [sampleRate = plugin.getSampleRate()]()
-        {
+        auto getSampleRateString = [sampleRate = plugin.getSampleRate()]() {
             return juce::String (sampleRate / 1000.0, 1) + " kHz";
         };
 

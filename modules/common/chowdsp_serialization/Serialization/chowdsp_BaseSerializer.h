@@ -187,8 +187,7 @@ public:
     static std::enable_if_t<IsNotDirectlySerializable<T> && ! HasCustomSerialization<T>, SerialType<Serializer>> serialize (const T& object)
     {
         auto serial = Serializer::createBaseElement();
-        pfr::for_each_field (object, [&serial] (const auto& field)
-                             { Serializer::addChildElement (serial, serialize<Serializer> (field)); });
+        pfr::for_each_field (object, [&serial] (const auto& field) { Serializer::addChildElement (serial, serialize<Serializer> (field)); });
 
         return serial;
     }
@@ -198,8 +197,7 @@ public:
     static std::enable_if_t<IsNotDirectlySerializable<T> && ! HasCustomDeserialization<T>, void> deserialize (DeserialType<Serializer> serial, T& object)
     {
         int serialIndex = 0;
-        pfr::for_each_field (object, [&serial, &serialIndex] (auto& field)
-                             { deserialize<Serializer> (Serializer::getChildElement (serial, serialIndex++), field); });
+        pfr::for_each_field (object, [&serial, &serialIndex] (auto& field) { deserialize<Serializer> (Serializer::getChildElement (serial, serialIndex++), field); });
     }
 
     /** Serializer for types with custom serialization behaviour */

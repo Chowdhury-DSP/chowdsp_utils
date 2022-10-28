@@ -17,14 +17,11 @@ public:
     {
         using Math::sign;
         this->initialise (
-            [] (auto x)
-            { return std::abs (x); },
-            [] (auto x)
-            {
+            [] (auto x) { return std::abs (x); },
+            [] (auto x) {
                 return Math::sign (x) * Power::ipow<2> (x) / 2.0;
             },
-            [] (auto x)
-            {
+            [] (auto x) {
                 return Math::sign (x) * Power::ipow<3> (x) / 6.0;
             },
             -range,

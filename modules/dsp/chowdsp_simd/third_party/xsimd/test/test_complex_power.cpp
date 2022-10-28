@@ -61,8 +61,7 @@ struct complex_power_test
     {
         real_vector_type real_expected(nb_input), real_res(nb_input);
         std::transform(lhs_np.cbegin(), lhs_np.cend(), real_expected.begin(),
-                       [](const value_type& v)
-                       { using std::abs; return abs(v); });
+                       [](const value_type& v) { using std::abs; return abs(v); });
         batch_type in;
         real_batch_type out;
         for (size_t i = 0; i < nb_input; i += size)
@@ -79,8 +78,7 @@ struct complex_power_test
     {
         real_vector_type real_expected(nb_input), real_res(nb_input);
         std::transform(lhs_np.cbegin(), lhs_np.cend(), real_expected.begin(),
-                       [](const value_type& v)
-                       { using std::arg; return arg(v); });
+                       [](const value_type& v) { using std::arg; return arg(v); });
         batch_type in;
         real_batch_type out;
         for (size_t i = 0; i < nb_input; i += size)
@@ -101,8 +99,7 @@ struct complex_power_test
     void test_sqrt_nn()
     {
         std::transform(lhs_nn.cbegin(), lhs_nn.cend(), expected.begin(),
-                       [](const value_type& v)
-                       { using std::sqrt; return sqrt(v); });
+                       [](const value_type& v) { using std::sqrt; return sqrt(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -117,8 +114,7 @@ struct complex_power_test
     void test_sqrt_pn()
     {
         std::transform(lhs_pn.cbegin(), lhs_pn.cend(), expected.begin(),
-                       [](const value_type& v)
-                       { using std::sqrt; return sqrt(v); });
+                       [](const value_type& v) { using std::sqrt; return sqrt(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -133,8 +129,7 @@ struct complex_power_test
     void test_sqrt_np()
     {
         std::transform(lhs_np.cbegin(), lhs_np.cend(), expected.begin(),
-                       [](const value_type& v)
-                       { using std::sqrt; return sqrt(v); });
+                       [](const value_type& v) { using std::sqrt; return sqrt(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -149,8 +144,7 @@ struct complex_power_test
     void test_sqrt_pp()
     {
         std::transform(lhs_pp.cbegin(), lhs_pp.cend(), expected.begin(),
-                       [](const value_type& v)
-                       { using std::sqrt; return sqrt(v); });
+                       [](const value_type& v) { using std::sqrt; return sqrt(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -166,8 +160,7 @@ private:
     void test_pow_impl()
     {
         std::transform(lhs_np.cbegin(), lhs_np.cend(), rhs.cbegin(), expected.begin(),
-                       [](const value_type& l, const value_type& r)
-                       { using std::pow; return pow(l, r); });
+                       [](const value_type& l, const value_type& r) { using std::pow; return pow(l, r); });
         batch_type lhs_in, rhs_in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {

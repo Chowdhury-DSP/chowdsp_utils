@@ -36,6 +36,7 @@
 
 #include "Files/chowdsp_AudioFileSaveLoadHelper.h"
 #include "Files/chowdsp_FileListener.h"
+#include "Files/chowdsp_ConfigFile.h"
 
 #include "Logging/chowdsp_PluginLogger.h"
 

@@ -99,16 +99,13 @@ private:
             using Power::ipow;
 
             ADAAWaveshaper<T>::initialise (
-                [&] (auto x)
-                {
+                [&] (auto x) {
                     return (2.0 / D) * std::tanh (x * D) - B * x;
                 },
-                [&] (auto x)
-                {
+                [&] (auto x) {
                     return (2.0 / ipow<2> (D)) * tanhAD1 (x * D) - B * ipow<2> (x) / 2.0;
                 },
-                [&] (auto x)
-                {
+                [&] (auto x) {
                     return (2.0 / ipow<3> (D)) * tanhAD2 (x * D) - B * ipow<3> (x) / 6.0;
                 },
                 -range,

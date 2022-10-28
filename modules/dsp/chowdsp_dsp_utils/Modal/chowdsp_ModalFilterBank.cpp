@@ -56,12 +56,10 @@ void ModalFilterBank<maxNumModes, SampleType>::setModeAmplitudesInternal()
 {
     std::complex<SampleType> modeAmps alignas (xsimd::default_arch::alignment())[vecSize] {};
     doForModes (
-        [&] (size_t j, size_t modeIndex)
-        {
+        [&] (size_t j, size_t modeIndex) {
             modeAmps[j] = modeIndex < numModesToProcess ? amplitudeData[modeIndex] * amplitudeNormalizationFactor : (SampleType) 0;
         },
-        [&] (auto& mode)
-        { mode.setAmp (xsimd::load_aligned (modeAmps)); });
+        [&] (auto& mode) { mode.setAmp (xsimd::load_aligned (modeAmps)); });
 }
 
 template <size_t maxNumModes, typename SampleType>
@@ -69,13 +67,11 @@ void ModalFilterBank<maxNumModes, SampleType>::setModeFrequencies (const SampleT
 {
     SampleType modeFreqs alignas (xsimd::default_arch::alignment())[vecSize] {};
     doForModes (
-        [&] (size_t j, size_t modeIndex)
-        {
+        [&] (size_t j, size_t modeIndex) {
             auto freq = modeIndex < maxNumModes ? (baseFrequencies[modeIndex] * frequencyMultiplier) : (SampleType) 0;
             modeFreqs[j] = freq > maxFreq ? (SampleType) 0 : freq;
         },
-        [&] (auto& mode)
-        { mode.setFreq (xsimd::load_aligned (modeFreqs)); });
+        [&] (auto& mode) { mode.setFreq (xsimd::load_aligned (modeFreqs)); });
 }
 
 template <size_t maxNumModes, typename SampleType>
@@ -83,10 +79,8 @@ void ModalFilterBank<maxNumModes, SampleType>::setModeDecays (const SampleType (
 {
     SampleType modeTaus alignas (xsimd::default_arch::alignment())[vecSize] {};
     doForModes (
-        [&] (size_t j, size_t modeIndex)
-        { modeTaus[j] = modeIndex < maxNumModes ? baseTaus[modeIndex] : (SampleType) 1; },
-        [&] (auto& mode)
-        { mode.setDecay (tau2t60 (xsimd::load_aligned (modeTaus), originalSampleRate) * decayFactor); });
+        [&] (size_t j, size_t modeIndex) { modeTaus[j] = modeIndex < maxNumModes ? baseTaus[modeIndex] : (SampleType) 1; },
+        [&] (auto& mode) { mode.setDecay (tau2t60 (xsimd::load_aligned (modeTaus), originalSampleRate) * decayFactor); });
 }
 
 template <size_t maxNumModes, typename SampleType>
@@ -94,10 +88,8 @@ void ModalFilterBank<maxNumModes, SampleType>::setModeDecays (const SampleType (
 {
     SampleType modeT60s alignas (xsimd::default_arch::alignment())[vecSize] {};
     doForModes (
-        [&] (size_t j, size_t modeIndex)
-        { modeT60s[j] = modeIndex < maxNumModes ? t60s[modeIndex] : (SampleType) 0; },
-        [&] (auto& mode)
-        { mode.setDecay (xsimd::load_aligned (modeT60s)); });
+        [&] (size_t j, size_t modeIndex) { modeT60s[j] = modeIndex < maxNumModes ? t60s[modeIndex] : (SampleType) 0; },
+        [&] (auto& mode) { mode.setDecay (xsimd::load_aligned (modeT60s)); });
 }
 
 template <size_t maxNumModes, typename SampleType>
