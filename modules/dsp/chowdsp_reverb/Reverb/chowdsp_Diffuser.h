@@ -24,14 +24,10 @@ struct DefaultDiffuserConfig
  *   - Polarity flipping
  *   - Hadamard mixing
  */
-template <typename FloatType, int nChannels, typename DelayInterpType = chowdsp::DelayLineInterpolationTypes::None>
+template <typename FloatType, int nChannels, typename DelayInterpType = chowdsp::DelayLineInterpolationTypes::None, int delayBufferSize = 1 << 18>
 class Diffuser
 {
-    using DelayType = chowdsp::StaticDelayLine<FloatType, DelayInterpType, 1 << 18>;
-    //    struct DelayType : public chowdsp::DelayLine<FloatType, DelayInterpType>
-    //    {
-    //        DelayType() : chowdsp::DelayLine<FloatType, DelayInterpType> (1 << 18) {}
-    //    };
+    using DelayType = chowdsp::StaticDelayLine<FloatType, DelayInterpType, delayBufferSize>;
 
 public:
     using Float = FloatType;
@@ -53,11 +49,12 @@ public:
     {
         // Delay
         for (size_t i = 0; i < (size_t) nChannels; ++i)
-        {
-            delays[i].pushSample (data[i], delayWritePointers[i]);
-            outData[i] = delays[channelSwapIndexes[i]].popSample (delayReadPointers[i]);
+            delays[i].pushSample (data[i], delayWritePointer);
+        DelayType::decrementPointer (delayWritePointer);
 
-            DelayType::decrementPointer (delayWritePointers[i]);
+        for (size_t i = 0; i < (size_t) nChannels; ++i)
+        {
+            outData[i] = delays[channelSwapIndexes[i]].popSample (delayReadPointers[i]);
             DelayType::decrementPointer (delayReadPointers[i]);
         }
 
@@ -77,12 +74,12 @@ private:
     std::array<FloatType, (size_t) nChannels> polarityMultipliers;
     std::array<size_t, (size_t) nChannels> channelSwapIndexes;
 
-    std::array<int, (size_t) nChannels> delayWritePointers;
+    int delayWritePointer;
     std::array<FloatType, (size_t) nChannels> delayReadPointers;
 
     alignas (xsimd::default_arch::alignment()) std::array<FloatType, (size_t) nChannels> outData;
 
-    FloatType fs = (FloatType) 48000;
+    FloatType fsOver1000 = FloatType (48000 / 1000);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Diffuser)
 };

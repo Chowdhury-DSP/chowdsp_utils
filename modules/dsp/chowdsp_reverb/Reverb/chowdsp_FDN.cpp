@@ -59,14 +59,14 @@ const FloatType* DefaultFDNConfig<FloatType, nChannels>::doFeedbackProcess (Defa
 }
 
 //======================================================================
-template <typename FDNConfig, typename DelayInterpType>
-void FDN<FDNConfig, DelayInterpType>::prepare (double sampleRate)
+template <typename FDNConfig, typename DelayInterpType, int delayBufferSize>
+void FDN<FDNConfig, DelayInterpType, delayBufferSize>::prepare (double sampleRate)
 {
-    fs = (FloatType) sampleRate;
+    fsOver1000 = (FloatType) sampleRate / (FloatType) 1000;
     for (size_t i = 0; i < (size_t) nChannels; ++i)
     {
-        delays[i].reset(); //.prepare ({ sampleRate, 128, 1 });
-        delayWritePointers[i] = 0;
+        delays[i].reset();
+        delayWritePointer = 0;
 
         delayRelativeMults[i] = (FloatType) FDNConfig::getDelayMult ((int) i);
     }
@@ -74,55 +74,49 @@ void FDN<FDNConfig, DelayInterpType>::prepare (double sampleRate)
     fdnConfig.prepare (sampleRate);
 }
 
-template <typename FDNConfig, typename DelayInterpType>
-void FDN<FDNConfig, DelayInterpType>::reset()
+template <typename FDNConfig, typename DelayInterpType, int delayBufferSize>
+void FDN<FDNConfig, DelayInterpType, delayBufferSize>::reset()
 {
     fdnConfig.reset();
     for (auto& delay : delays)
         delay.reset();
 }
 
-template <typename FDNConfig, typename DelayInterpType>
-void FDN<FDNConfig, DelayInterpType>::setDelayTimeMs (FloatType delayTimeMs)
+template <typename FDNConfig, typename DelayInterpType, int delayBufferSize>
+void FDN<FDNConfig, DelayInterpType, delayBufferSize>::setDelayTimeMs (FloatType delayTimeMs)
 {
     for (size_t i = 0; i < (size_t) nChannels; ++i)
     {
-        delayTimesSamples[i] = delayRelativeMults[i] * delayTimeMs * (FloatType) 0.001 * fs;
-        delayReadPointers[i] = FloatType (delayWritePointers[i]) + delayTimesSamples[i];
-        DelayType::decrementPointer (delayReadPointers[i]);
+        delayTimesSamples[i] = delayRelativeMults[i] * delayTimeMs * fsOver1000;
+        delayReadPointers[i] = std::fmod (FloatType (delayWritePointer) + delayTimesSamples[i], (FloatType) delayBufferSize);
+        jassert (juce::isPositiveAndBelow (delayReadPointers[i], delayBufferSize));
     }
-    //        delayReadPointers[i] = FloatType (delayWritePointers[i]) + (delayRelativeMults[i] * delayTimeMs * (FloatType) 0.001 * fs);
-    //        delays[i].setDelay (delayRelativeMults[i] * delayTimeMs * (FloatType) 0.001 * fs);
 }
 
-template <typename FDNConfig, typename DelayInterpType>
+template <typename FDNConfig, typename DelayInterpType, int delayBufferSize>
 template <int NModulators>
-void FDN<FDNConfig, DelayInterpType>::setDelayTimeMsWithModulators (FloatType delayTimeMs, FloatType (&modulationAmt)[(size_t) NModulators])
+void FDN<FDNConfig, DelayInterpType, delayBufferSize>::setDelayTimeMsWithModulators (FloatType delayTimeMs, FloatType (&modulationAmt)[(size_t) NModulators])
 {
     static_assert (NModulators <= nChannels, "Can't have more modulators than channels!");
 
     for (size_t i = 0; i < (size_t) NModulators; ++i)
     {
-        delayTimesSamples[i] = delayRelativeMults[i] * delayTimeMs * (FloatType) 0.001 * fs;
-        delayReadPointers[i] = FloatType (delayWritePointers[i]) + (delayTimesSamples[i] * modulationAmt[i]);
-        DelayType::decrementPointer (delayReadPointers[i]);
+        delayTimesSamples[i] = delayRelativeMults[i] * delayTimeMs * fsOver1000;
+        delayReadPointers[i] = std::fmod (FloatType (delayWritePointer) + delayTimesSamples[i], (FloatType) delayBufferSize);
+        jassert (juce::isPositiveAndBelow (delayReadPointers[i], delayBufferSize));
     }
-    //        delayTimesSamples[i] = (delayRelativeMults[i] * delayTimeMs * (FloatType) 0.001 * fs * modulationAmt[i]);
-    //        delays[i].setDelay (delayRelativeMults[i] * delayTimeMs * (FloatType) 0.001 * fs * modulationAmt[i]);
 
     for (auto i = (size_t) NModulators; i < (size_t) nChannels; ++i)
     {
-        delayTimesSamples[i] = delayRelativeMults[i] * delayTimeMs * (FloatType) 0.001 * fs;
-        delayReadPointers[i] = FloatType (delayWritePointers[i]) + delayTimesSamples[i];
-        DelayType::decrementPointer (delayReadPointers[i]);
+        delayTimesSamples[i] = delayRelativeMults[i] * delayTimeMs * fsOver1000;
+        delayReadPointers[i] = std::fmod (FloatType (delayWritePointer) + delayTimesSamples[i], (FloatType) delayBufferSize);
+        jassert (juce::isPositiveAndBelow (delayReadPointers[i], delayBufferSize));
     }
-    //        delayTimesSamples[i] = (delayRelativeMults[i] * delayTimeMs * (FloatType) 0.001 * fs);
-    //        delays[i].setDelay (delayRelativeMults[i] * delayTimeMs * (FloatType) 0.001 * fs);
 }
 
-template <typename FDNConfig, typename DelayInterpType>
-typename FDN<FDNConfig, DelayInterpType>::FloatType FDN<FDNConfig, DelayInterpType>::getChannelDelayMs (size_t channelIndex) const noexcept
+template <typename FDNConfig, typename DelayInterpType, int delayBufferSize>
+typename FDN<FDNConfig, DelayInterpType, delayBufferSize>::FloatType FDN<FDNConfig, DelayInterpType, delayBufferSize>::getChannelDelayMs (size_t channelIndex) const noexcept
 {
-    return delayTimesSamples[channelIndex] / (fs * (FloatType) 0.001);
+    return delayTimesSamples[channelIndex] / fsOver1000;
 }
 } // namespace chowdsp::Reverb

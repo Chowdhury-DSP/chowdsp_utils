@@ -40,17 +40,13 @@ private:
 };
 
 /** A feedback delay network processor with a customizable configuration */
-template <typename FDNConfig, typename DelayInterpType = chowdsp::DelayLineInterpolationTypes::None>
+template <typename FDNConfig, typename DelayInterpType = chowdsp::DelayLineInterpolationTypes::None, int delayBufferSize = 1 << 18>
 class FDN
 {
     using FloatType = typename FDNConfig::Float;
     static constexpr auto nChannels = FDNConfig::NChannels;
 
-    using DelayType = chowdsp::StaticDelayLine<FloatType, DelayInterpType, 1 << 18>;
-    //    struct DelayType : public chowdsp::DelayLine<FloatType, DelayInterpType>
-    //    {
-    //        DelayType() : chowdsp::DelayLine<FloatType, DelayInterpType> (1 << 18) {}
-    //    };
+    using DelayType = chowdsp::StaticDelayLine<FloatType, DelayInterpType, delayBufferSize>;
 
 public:
     FDN() = default;
@@ -92,10 +88,8 @@ public:
 
         // write back to delay lines
         for (size_t i = 0; i < (size_t) nChannels; ++i)
-        {
-            delays[i].pushSample (data[i] + fbData[i], delayWritePointers[i]);
-            DelayType::decrementPointer (delayWritePointers[i]);
-        }
+            delays[i].pushSample (data[i] + fbData[i], delayWritePointer);
+        DelayType::decrementPointer (delayWritePointer);
 
         return outData.data();
     }
@@ -108,14 +102,14 @@ private:
     std::array<FloatType, (size_t) nChannels> delayRelativeMults;
 
     std::array<FloatType, (size_t) nChannels> delayTimesSamples;
-    std::array<int, (size_t) nChannels> delayWritePointers;
+    int delayWritePointer = 0;
     std::array<FloatType, (size_t) nChannels> delayReadPointers;
 
     FDNConfig fdnConfig;
 
     alignas (xsimd::default_arch::alignment()) std::array<FloatType, (size_t) nChannels> outData;
 
-    FloatType fs = (FloatType) 48000;
+    FloatType fsOver1000 = FloatType (48000 / 1000);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FDN)
 };

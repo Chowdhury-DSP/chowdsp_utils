@@ -58,6 +58,7 @@ public:
 
     inline void pushSample (SampleType x, int wp) noexcept
     {
+        jassert (juce::isPositiveAndBelow (wp, maxDelaySamples));
         buffer[wp] = x;
         buffer[wp + maxDelaySamples] = x;
     }
@@ -68,6 +69,7 @@ public:
                             SampleType>
         popSample (NumericType rp) noexcept
     {
+        jassert (juce::isPositiveAndBelow (rp, maxDelaySamples));
         return interpolator.call (buffer,
                                   (int) rp,
                                   rp - (NumericType) (int) rp);
@@ -79,6 +81,7 @@ public:
                             SampleType>
         popSample (NumericType rp, SampleType& state) noexcept
     {
+        jassert (juce::isPositiveAndBelow (rp, maxDelaySamples));
         return interpolator.call (buffer,
                                   (int) rp,
                                   rp - (NumericType) (int) rp,

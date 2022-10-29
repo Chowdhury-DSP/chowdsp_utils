@@ -24,11 +24,11 @@ inline void DefaultDiffuserConfig::fillChannelSwapIndexes (size_t* indexes, int 
 }
 
 //======================================================================
-template <typename FloatType, int nChannels, typename DelayInterpType>
+template <typename FloatType, int nChannels, typename DelayInterpType, int delayBufferSize>
 template <typename DiffuserConfig>
-void Diffuser<FloatType, nChannels, DelayInterpType>::prepare (double sampleRate)
+void Diffuser<FloatType, nChannels, DelayInterpType, delayBufferSize>::prepare (double sampleRate)
 {
-    fs = (FloatType) sampleRate;
+    fsOver1000 = (FloatType) sampleRate / (FloatType) 1000;
 
     std::random_device rd;
     std::mt19937 randGenerator (rd());
@@ -37,31 +37,30 @@ void Diffuser<FloatType, nChannels, DelayInterpType>::prepare (double sampleRate
 
     for (size_t i = 0; i < (size_t) nChannels; ++i)
     {
-        delays[i].reset(); //.prepare ({ sampleRate, 128, 1 });
-        delayWritePointers[i] = 0;
+        delays[i].reset();
+        delayWritePointer = 0;
 
         delayRelativeMults[i] = (FloatType) DiffuserConfig::getDelayMult ((int) i, nChannels, randGenerator);
         polarityMultipliers[i] = (FloatType) DiffuserConfig::getPolarityMultiplier ((int) i, nChannels, randGenerator);
     }
 }
 
-template <typename FloatType, int nChannels, typename DelayInterpType>
-void Diffuser<FloatType, nChannels, DelayInterpType>::reset()
+template <typename FloatType, int nChannels, typename DelayInterpType, int delayBufferSize>
+void Diffuser<FloatType, nChannels, DelayInterpType, delayBufferSize>::reset()
 {
     for (auto& delay : delays)
         delay.reset();
 }
 
-template <typename FloatType, int nChannels, typename DelayInterpType>
-void Diffuser<FloatType, nChannels, DelayInterpType>::setDiffusionTimeMs (FloatType diffusionTimeMs)
+template <typename FloatType, int nChannels, typename DelayInterpType, int delayBufferSize>
+void Diffuser<FloatType, nChannels, DelayInterpType, delayBufferSize>::setDiffusionTimeMs (FloatType diffusionTimeMs)
 {
     for (size_t i = 0; i < (size_t) nChannels; ++i)
     {
-        const auto delayTimesSamples = delayRelativeMults[i] * diffusionTimeMs * (FloatType) 0.001 * fs;
-        delayReadPointers[i] = FloatType (delayWritePointers[i]) + delayTimesSamples;
-        DelayType::decrementPointer (delayReadPointers[i]);
+        const auto delayTimesSamples = delayRelativeMults[i] * diffusionTimeMs * fsOver1000;
+        delayReadPointers[i] = std::fmod (FloatType (delayWritePointer) + delayTimesSamples, (FloatType) delayBufferSize);
+        jassert (juce::isPositiveAndBelow (delayReadPointers[i], delayBufferSize));
     }
-    //        delays[i].setDelay (delayRelativeMults[i] * diffusionTimeMs * (FloatType) 0.001 * fs);
 }
 
 //======================================================================
