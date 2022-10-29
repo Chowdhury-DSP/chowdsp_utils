@@ -20,8 +20,8 @@ namespace DelayLineInterpolationTypes
         {
         }
 
-        template <typename SampleType, typename NumericType>
-        inline SampleType call (const SampleType* buffer, int delayInt, NumericType /*delayFrac*/, const SampleType& /*state*/ = {})
+        template <typename SampleType, typename NumericType = SampleTypeHelpers::NumericType<SampleType>>
+        inline SampleType call (const SampleType* buffer, int delayInt, NumericType /*delayFrac*/ = {}, const SampleType& /*state*/ = {})
         {
             return buffer[delayInt];
         }

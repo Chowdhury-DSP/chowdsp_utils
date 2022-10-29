@@ -46,7 +46,7 @@ class FDN
     using FloatType = typename FDNConfig::Float;
     static constexpr auto nChannels = FDNConfig::NChannels;
 
-    using DelayType = chowdsp::StaticDelayLine<FloatType, DelayInterpType, delayBufferSize>;
+    using DelayType = chowdsp::StaticDelayBuffer<FloatType, DelayInterpType, delayBufferSize>;
 
 public:
     FDN() = default;

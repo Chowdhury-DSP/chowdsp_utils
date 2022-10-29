@@ -88,8 +88,7 @@ void FDN<FDNConfig, DelayInterpType, delayBufferSize>::setDelayTimeMs (FloatType
     for (size_t i = 0; i < (size_t) nChannels; ++i)
     {
         delayTimesSamples[i] = delayRelativeMults[i] * delayTimeMs * fsOver1000;
-        delayReadPointers[i] = std::fmod (FloatType (delayWritePointer) + delayTimesSamples[i], (FloatType) delayBufferSize);
-        jassert (juce::isPositiveAndBelow (delayReadPointers[i], delayBufferSize));
+        delayReadPointers[i] = DelayType::getReadPointer (delayWritePointer, delayTimesSamples[i]);
     }
 }
 
@@ -101,16 +100,14 @@ void FDN<FDNConfig, DelayInterpType, delayBufferSize>::setDelayTimeMsWithModulat
 
     for (size_t i = 0; i < (size_t) NModulators; ++i)
     {
-        delayTimesSamples[i] = delayRelativeMults[i] * delayTimeMs * fsOver1000;
-        delayReadPointers[i] = std::fmod (FloatType (delayWritePointer) + delayTimesSamples[i], (FloatType) delayBufferSize);
-        jassert (juce::isPositiveAndBelow (delayReadPointers[i], delayBufferSize));
+        delayTimesSamples[i] = delayRelativeMults[i] * delayTimeMs * fsOver1000 * modulationAmt[i];
+        delayReadPointers[i] = DelayType::getReadPointer (delayWritePointer, delayTimesSamples[i]);
     }
 
     for (auto i = (size_t) NModulators; i < (size_t) nChannels; ++i)
     {
         delayTimesSamples[i] = delayRelativeMults[i] * delayTimeMs * fsOver1000;
-        delayReadPointers[i] = std::fmod (FloatType (delayWritePointer) + delayTimesSamples[i], (FloatType) delayBufferSize);
-        jassert (juce::isPositiveAndBelow (delayReadPointers[i], delayBufferSize));
+        delayReadPointers[i] = DelayType::getReadPointer (delayWritePointer, delayTimesSamples[i]);
     }
 }
 

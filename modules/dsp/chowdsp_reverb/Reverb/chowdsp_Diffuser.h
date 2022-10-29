@@ -27,7 +27,7 @@ struct DefaultDiffuserConfig
 template <typename FloatType, int nChannels, typename DelayInterpType = chowdsp::DelayLineInterpolationTypes::None, int delayBufferSize = 1 << 18>
 class Diffuser
 {
-    using DelayType = chowdsp::StaticDelayLine<FloatType, DelayInterpType, delayBufferSize>;
+    using DelayType = chowdsp::StaticDelayBuffer<FloatType, DelayInterpType, delayBufferSize>;
 
 public:
     using Float = FloatType;

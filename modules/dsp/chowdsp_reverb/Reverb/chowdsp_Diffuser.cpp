@@ -58,8 +58,7 @@ void Diffuser<FloatType, nChannels, DelayInterpType, delayBufferSize>::setDiffus
     for (size_t i = 0; i < (size_t) nChannels; ++i)
     {
         const auto delayTimesSamples = delayRelativeMults[i] * diffusionTimeMs * fsOver1000;
-        delayReadPointers[i] = std::fmod (FloatType (delayWritePointer) + delayTimesSamples, (FloatType) delayBufferSize);
-        jassert (juce::isPositiveAndBelow (delayReadPointers[i], delayBufferSize));
+        delayReadPointers[i] = DelayType::getReadPointer (delayWritePointer, delayTimesSamples);
     }
 }
 

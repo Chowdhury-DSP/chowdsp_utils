@@ -1,0 +1,96 @@
+#pragma once
+
+namespace chowdsp
+{
+/**
+ * Single-channel delay line using statically allocated memory.
+ */
+template <typename SampleType, typename InterpolationType = DelayLineInterpolationTypes::None, int maxDelaySamples = 1 << 18>
+class StaticDelayBuffer
+{
+    using NumericType = SampleTypeHelpers::NumericType<SampleType>;
+
+public:
+    StaticDelayBuffer() = default;
+
+    void reset()
+    {
+        std::fill (std::begin (buffer), std::end (buffer), SampleType {});
+    }
+
+    template <typename IT = InterpolationType>
+    inline std::enable_if_t<! std::is_same_v<IT, DelayLineInterpolationTypes::None>,
+                            SampleType>
+        pushSample (SampleType x, int wp) noexcept
+    {
+        jassert (juce::isPositiveAndBelow (wp, maxDelaySamples));
+        buffer[wp] = x;
+        buffer[wp + maxDelaySamples] = x;
+    }
+
+    template <typename IT = InterpolationType>
+    inline std::enable_if_t<std::is_same_v<IT, DelayLineInterpolationTypes::None>,
+                            SampleType>
+        pushSample (SampleType x, int wp) noexcept
+    {
+        jassert (juce::isPositiveAndBelow (wp, maxDelaySamples));
+        buffer[wp] = x;
+    }
+
+    template <typename IT = InterpolationType>
+    inline std::enable_if_t<! (std::is_same_v<IT, DelayLineInterpolationTypes::Thiran> || std::is_same_v<IT, DelayLineInterpolationTypes::None>),
+                            SampleType>
+        popSample (NumericType rp) noexcept
+    {
+        jassert (juce::isPositiveAndBelow (rp, maxDelaySamples));
+        return interpolator.call (buffer,
+                                  (int) rp,
+                                  rp - (NumericType) (int) rp);
+    }
+
+    template <typename IT = InterpolationType>
+    inline std::enable_if_t<std::is_same_v<IT,
+                                           DelayLineInterpolationTypes::None>,
+                            SampleType>
+        popSample (NumericType rp) noexcept
+    {
+        jassert (juce::isPositiveAndBelow (rp, maxDelaySamples));
+        return interpolator.call (buffer, (int) rp);
+    }
+
+    template <typename IT = InterpolationType>
+    inline std::enable_if_t<std::is_same_v<IT,
+                                           DelayLineInterpolationTypes::Thiran>,
+                            SampleType>
+        popSample (NumericType rp, SampleType& state) noexcept
+    {
+        jassert (juce::isPositiveAndBelow (rp, maxDelaySamples));
+        return interpolator.call (buffer,
+                                  (int) rp,
+                                  rp - (NumericType) (int) rp,
+                                  state);
+    }
+
+    template <typename T>
+    static inline void decrementPointer (T& p) noexcept
+    {
+        p += T (maxDelaySamples - 1);
+        p = p >= (T) maxDelaySamples ? p - (T) maxDelaySamples : p;
+    }
+
+    static inline NumericType getReadPointer (int wp, NumericType delaySamples) noexcept
+    {
+        const auto rp = std::fmod (NumericType (wp) + delaySamples, (NumericType) maxDelaySamples);
+        jassert (juce::isPositiveAndBelow (rp, (NumericType) maxDelaySamples));
+        return rp;
+    }
+
+private:
+    InterpolationType interpolator;
+
+    static constexpr auto bufferSize = size_t (std::is_same_v<InterpolationType, DelayLineInterpolationTypes::None> ? maxDelaySamples : (2 * maxDelaySamples));
+    SampleType buffer[bufferSize] {};
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StaticDelayBuffer)
+};
+} // namespace chowdsp
