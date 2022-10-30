@@ -71,47 +71,24 @@ namespace Math
     }
 #endif
 
-    /** The famous "Fast Inverse Square-Root" method (https://en.wikipedia.org/wiki/Fast_inverse_square_root) */
-    template <typename T, typename NumericType = SampleTypeHelpers::NumericType<T>>
-    inline std::enable_if_t<std::is_same_v<NumericType, float>, T> rsqrt (T x) noexcept
+    /** Returns 1 / sqrt (x) */
+    template <typename T>
+    inline std::enable_if_t<std::is_floating_point_v<T>, T> rsqrt (T x) noexcept
     {
-#if CHOWDSP_NO_XSIMD
-        using IntType = int32_t;
-#else
-        using IntType = std::conditional_t<SampleTypeHelpers::IsSIMDRegister<T>, xsimd::batch<int32_t>, int32_t>;
-#endif
-
-        const auto x_half = x * 0.5f;
-        auto i = reinterpret_cast<IntType&> (x);
-        i = 0x5f3759df - (i >> 1);
-
-        auto y = reinterpret_cast<T&> (i);
-        y = y * (1.5f - (x_half * y * y)); // 1st iteration
-        // y  = y * (1.5f - (x_half * y * y)); // 2nd iteration, this can be removed
-
-        return y;
+        // We could do this with the Fast Inverse Square-Root,
+        // but the compiler usually generates the equivalent
+        // hardware instructions, particularly with -ffast-math.
+        return (T) 1 / std::sqrt (x);
     }
 
-    /** The famous "Fast Inverse Square-Root" method (re-written for double-precision) */
-    template <typename T, typename NumericType = SampleTypeHelpers::NumericType<T>>
-    inline std::enable_if_t<std::is_same_v<NumericType, double>, T> rsqrt (T x) noexcept
+#if ! CHOWDSP_NO_XSIMD
+    /** Returns 1 / sqrt (x) */
+    template <typename T>
+    inline std::enable_if_t<SampleTypeHelpers::IsSIMDRegister<T>, T> rsqrt (T x) noexcept
     {
-#if CHOWDSP_NO_XSIMD
-        using IntType = int64_t;
-#else
-        using IntType = std::conditional_t<SampleTypeHelpers::IsSIMDRegister<T>, xsimd::batch<int64_t>, int64_t>;
-#endif
-
-        const auto x_half = x * 0.5;
-        auto i = reinterpret_cast<IntType&> (x);
-        i = 0x5fe6eb50c7b537a9 - (i >> 1); // The magic number is for doubles is from https://cs.uwaterloo.ca/~m32rober/rsqrt.pdf
-
-        auto y = reinterpret_cast<T&> (i);
-        y = y * (1.5 - (x_half * y * y)); // 1st iteration
-        // y  = y * (1.5 - (x_half * y * y)); // 2nd iteration, this can be removed
-
-        return y;
+        return xsimd::rsqrt (x);
     }
+#endif
 
     /** Algebraic sigmoid function of the form `y = x / sqrt(1 + x^2)` */
     template <typename T>
