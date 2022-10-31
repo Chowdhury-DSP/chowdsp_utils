@@ -95,5 +95,6 @@ struct ConvolutionEngine
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ConvolutionEngine)
 };
-
 } // namespace chowdsp
+
+#include "chowdsp_ConvolutionEngine.cpp"

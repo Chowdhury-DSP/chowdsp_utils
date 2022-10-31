@@ -309,7 +309,4 @@ void ConvolutionEngine<FFTEngineType>::updateSymmetricFrequencyDomainData (float
         samples[(i << 1) + 1] = -samples[((fftSize - i) << 1) + 1];
     }
 }
-
-template struct ConvolutionEngine<juce::dsp::FFT>;
-
 } // namespace chowdsp
