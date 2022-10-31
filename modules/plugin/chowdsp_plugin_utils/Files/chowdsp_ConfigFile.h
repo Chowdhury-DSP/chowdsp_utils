@@ -1,5 +1,8 @@
 #pragma once
 
+#include "../../../common/chowdsp_json/chowdsp_json.h"
+#include "chowdsp_FileListener.h"
+
 namespace chowdsp::experimental
 {
 /**

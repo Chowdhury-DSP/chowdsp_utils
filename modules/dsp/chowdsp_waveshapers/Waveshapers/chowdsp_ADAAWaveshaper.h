@@ -10,7 +10,7 @@ namespace chowdsp
  * Note that this processor will always add exactly one sample of latency
  * to the signal, _even_ when bypassed.
  */
-template <typename T, typename illConditionTolerance = ScientificRatio<1, -2>>
+template <typename T, typename illConditionTolerance = ScientificRatio<1, -2>, bool compensateHighFreqs = false>
 class ADAAWaveshaper
 {
 public:
@@ -64,22 +64,28 @@ public:
     {
         // load lookup tables asynchronously
         if (lut->initialiseIfNotAlreadyInitialised())
-            lutLoadingFutures.push_back (std::async (std::launch::async, [&, func = std::forward<FuncType> (nlFunc), minVal, maxVal, N] { lut->initialise ([&func] (auto x) { return func ((double) x); },
-                                                                                                                                                           minVal,
-                                                                                                                                                           maxVal,
-                                                                                                                                                           (size_t) N); }));
+            lutLoadingFutures.push_back (std::async (std::launch::async, [&, func = std::forward<FuncType> (nlFunc), minVal, maxVal, N]
+                                                     { lut->initialise ([&func] (auto x)
+                                                                        { return func ((double) x); },
+                                                                        minVal,
+                                                                        maxVal,
+                                                                        (size_t) N); }));
 
         if (lut_AD1->initialiseIfNotAlreadyInitialised())
-            lutLoadingFutures.push_back (std::async (std::launch::async, [&, funcD1 = std::forward<FuncTypeD1> (nlFuncD1), minVal, maxVal, N] { lut_AD1->initialise ([&funcD1] (auto x) { return funcD1 ((double) x); },
-                                                                                                                                                                     2 * minVal,
-                                                                                                                                                                     2 * maxVal,
-                                                                                                                                                                     4 * (size_t) N); }));
+            lutLoadingFutures.push_back (std::async (std::launch::async, [&, funcD1 = std::forward<FuncTypeD1> (nlFuncD1), minVal, maxVal, N]
+                                                     { lut_AD1->initialise ([&funcD1] (auto x)
+                                                                            { return funcD1 ((double) x); },
+                                                                            2 * minVal,
+                                                                            2 * maxVal,
+                                                                            4 * (size_t) N); }));
 
         if (lut_AD2->initialiseIfNotAlreadyInitialised())
-            lutLoadingFutures.push_back (std::async (std::launch::async, [&, funcD2 = std::forward<FuncTypeD2> (nlFuncD2), minVal, maxVal, N] { lut_AD2->initialise ([&funcD2] (auto x) { return funcD2 ((double) x); },
-                                                                                                                                                                     4 * minVal,
-                                                                                                                                                                     4 * maxVal,
-                                                                                                                                                                     16 * (size_t) N); }));
+            lutLoadingFutures.push_back (std::async (std::launch::async, [&, funcD2 = std::forward<FuncTypeD2> (nlFuncD2), minVal, maxVal, N]
+                                                     { lut_AD2->initialise ([&funcD2] (auto x)
+                                                                            { return funcD2 ((double) x); },
+                                                                            4 * minVal,
+                                                                            4 * maxVal,
+                                                                            16 * (size_t) N); }));
     }
 
     /** Prepares the waveshaper for a given number of channels. */
@@ -90,6 +96,12 @@ public:
         ad2_x0.resize ((size_t) numChannels, 0.0);
         ad2_x1.resize ((size_t) numChannels, 0.0);
         d2.resize ((size_t) numChannels, 0.0);
+
+        if constexpr (compensateHighFreqs)
+        {
+            compFilter.prepare (numChannels);
+            compFilter.calcCoefsDB ((1.0 / 3.0), 24.0, 32.0, 1.0);
+        }
 
         lutLoadingFutures.clear();
     }
@@ -102,13 +114,22 @@ public:
         std::fill (ad2_x0.begin(), ad2_x0.end(), 0.0);
         std::fill (ad2_x1.begin(), ad2_x1.end(), 0.0);
         std::fill (d2.begin(), d2.end(), 0.0);
+
+        if constexpr (compensateHighFreqs)
+            compFilter.reset();
     }
 
     /** Process a single sample */
     inline T processSample (T input, int channel = 0) noexcept
     {
         const auto ch = (size_t) channel;
-        const auto x = (double) input;
+        const auto x = [&]
+        {
+            if constexpr (compensateHighFreqs)
+                return compFilter.processSample ((double) input, channel);
+            else
+                return (double) input;
+        }();
 
         bool illCondition = std::abs (x - x2[ch]) < TOL;
         const auto d1 = calcD1 (x, x1[ch], ad2_x0[ch], ad2_x1[ch]);
@@ -134,7 +155,14 @@ public:
 
         for (int n = 0; n < numSamples; ++n)
         {
-            const auto x = (double) input[n];
+            const auto x = [&]
+            {
+                if constexpr (compensateHighFreqs)
+                    return compFilter.processSample ((double) input[n], channel);
+                else
+                    return (double) input[n];
+            }();
+
             bool illCondition = std::abs (x - _x2.get()) < TOL;
             const auto d1 = calcD1 (x, _x1.get(), _ad2_x0.get(), _ad2_x1.get());
             output[n] = T (illCondition ? fallback (x, _x1.get(), _x2.get(), _ad2_x1.get()) : (2.0 / (x - _x2.get())) * (d1 - _d2.get()));
@@ -159,7 +187,13 @@ public:
         for (int n = 0; n < numSamples; ++n)
         {
             // add a one-sample delay to the bypassed signal so that everything matches up!
-            const auto x = (double) input[n];
+            const auto x = [&]
+            {
+                if constexpr (compensateHighFreqs)
+                    return compFilter.processSample ((double) input[n], channel);
+                else
+                    return (double) input[n];
+            }();
             output[n] = T (_x1.get());
 
             // update state
@@ -255,6 +289,9 @@ private:
     std::vector<double> ad2_x0;
     std::vector<double> ad2_x1;
     std::vector<double> d2;
+
+    using CompensationFilter = std::conditional_t<compensateHighFreqs, PeakingFilter<double, CoefficientCalculators::CoefficientCalculationMode::Decramped>, std::nullptr_t>;
+    CompensationFilter compFilter {};
 
     static constexpr auto TOL = illConditionTolerance::template value<double>;
 

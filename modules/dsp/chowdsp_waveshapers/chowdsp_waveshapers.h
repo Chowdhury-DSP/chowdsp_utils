@@ -8,7 +8,7 @@ BEGIN_JUCE_MODULE_DECLARATION
    version:       1.2.0
    name:          ChowDSP Waveshapers
    description:   Waveshaping functions for ChowDSP plugins
-   dependencies:  chowdsp_math, chowdsp_dsp_data_structures
+   dependencies:  chowdsp_math, chowdsp_dsp_data_structures, chowdsp_filters
 
    website:       https://ccrma.stanford.edu/~jatin/chowdsp
    license:       GPLv3
@@ -25,6 +25,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 #include <chowdsp_math/chowdsp_math.h>
 #include <chowdsp_dsp_data_structures/chowdsp_dsp_data_structures.h>
+#include <chowdsp_filters/chowdsp_filters.h>
 
 #include "Waveshapers/chowdsp_ADAAWaveshaper.h"
 #include "Waveshapers/chowdsp_ADAAHardClipper.h"
