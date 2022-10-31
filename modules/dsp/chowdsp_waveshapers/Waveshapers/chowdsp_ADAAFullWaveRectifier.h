@@ -10,10 +10,10 @@ namespace chowdsp
  * Derivation: https://www.desmos.com/calculator/jxnfvgqrvs
  */
 template <typename T>
-class ADAAFullWaveRectifier : public ADAAWaveshaper<T>
+class ADAAFullWaveRectifier : public ADAAWaveshaper<T, ScientificRatio<1, -2>, false>
 {
 public:
-    explicit ADAAFullWaveRectifier (LookupTableCache* lutCache = nullptr, T range = (T) 10, int N = 1 << 17) : ADAAWaveshaper<T> (lutCache, "hard_clipper")
+    explicit ADAAFullWaveRectifier (LookupTableCache* lutCache = nullptr, T range = (T) 10, int N = 1 << 17) : ADAAWaveshaper<T, ScientificRatio<1, -2>, false> (lutCache, "hard_clipper")
     {
         using Math::sign;
         this->initialise (

@@ -10,7 +10,7 @@ namespace chowdsp
  * Note that this processor will always add exactly one sample of latency
  * to the signal, _even_ when bypassed.
  */
-template <typename T, typename illConditionTolerance = ScientificRatio<1, -2>>
+template <typename T, typename illConditionTolerance = ScientificRatio<1, -2>, bool compensateHighFreqs = true>
 class ADAAWaveshaper
 {
 public:
@@ -87,11 +87,15 @@ public:
     {
         x1.resize ((size_t) numChannels, 0.0);
         x2.resize ((size_t) numChannels, 0.0);
-        y1.resize ((size_t) numChannels, 0.0);
-        y2.resize ((size_t) numChannels, 0.0);
         ad2_x0.resize ((size_t) numChannels, 0.0);
         ad2_x1.resize ((size_t) numChannels, 0.0);
         d2.resize ((size_t) numChannels, 0.0);
+
+        if constexpr (compensateHighFreqs)
+        {
+            compFilter.prepare (numChannels);
+            compFilter.calcCoefsDB (16000.0, 24.0, 32.0, 48000.0);
+        }
 
         lutLoadingFutures.clear();
     }
@@ -101,22 +105,29 @@ public:
     {
         std::fill (x1.begin(), x1.end(), 0.0);
         std::fill (x2.begin(), x2.end(), 0.0);
-        std::fill (y1.begin(), y1.end(), 0.0);
-        std::fill (y2.begin(), y2.end(), 0.0);
         std::fill (ad2_x0.begin(), ad2_x0.end(), 0.0);
         std::fill (ad2_x1.begin(), ad2_x1.end(), 0.0);
         std::fill (d2.begin(), d2.end(), 0.0);
+
+        if constexpr (compensateHighFreqs)
+            compFilter.reset();
     }
 
     /** Process a single sample */
     inline T processSample (T input, int channel = 0) noexcept
     {
         const auto ch = (size_t) channel;
-        const auto x = (double) input;
+        const auto x = [&]
+        {
+            if constexpr (compensateHighFreqs)
+                return compFilter.processSample ((double) input, channel);
+            else
+                return (double) input;
+        }();
 
         bool illCondition = std::abs (x - x2[ch]) < TOL;
-        const auto d1 = calcD1 (x, x1[ch], ad2_x0[ch], ad2_x1[ch], y1[ch]);
-        const auto y = T (illCondition ? fallback (x, x1[ch], x2[ch], ad2_x1[ch], y1[ch], y2[ch]) : (2.0 / (x - x2[ch])) * (d1 - d2[ch]));
+        const auto d1 = calcD1 (x, x1[ch], ad2_x0[ch], ad2_x1[ch]);
+        const auto y = T (illCondition ? fallback (x, x1[ch], x2[ch], ad2_x1[ch]) : (2.0 / (x - x2[ch])) * (d1 - d2[ch]));
 
         // update state
         d2[ch] = d1;
@@ -132,25 +143,28 @@ public:
     {
         ScopedValue<double> _x1 { x1[(size_t) channel] };
         ScopedValue<double> _x2 { x2[(size_t) channel] };
-        ScopedValue<double> _y1 { y1[(size_t) channel] };
-        ScopedValue<double> _y2 { y2[(size_t) channel] };
         ScopedValue<double> _ad2_x0 { ad2_x0[(size_t) channel] };
         ScopedValue<double> _ad2_x1 { ad2_x1[(size_t) channel] };
         ScopedValue<double> _d2 { d2[(size_t) channel] };
 
         for (int n = 0; n < numSamples; ++n)
         {
-            const auto x = (double) input[n];
+            const auto x = [&]
+            {
+                if constexpr (compensateHighFreqs)
+                    return compFilter.processSample ((double) input[n], channel);
+                else
+                    return (double) input[n];
+            }();
+
             bool illCondition = std::abs (x - _x2.get()) < TOL;
-            const auto d1 = calcD1 (x, _x1.get(), _ad2_x0.get(), _ad2_x1.get(), _y1.get());
-            output[n] = T (illCondition ? fallback (x, _x1.get(), _x2.get(), _ad2_x1.get(), _y1.get(), _y2.get()) : (2.0 / (x - _x2.get())) * (d1 - _d2.get()));
+            const auto d1 = calcD1 (x, _x1.get(), _ad2_x0.get(), _ad2_x1.get());
+            output[n] = T (illCondition ? fallback (x, _x1.get(), _x2.get(), _ad2_x1.get()) : (2.0 / (x - _x2.get())) * (d1 - _d2.get()));
 
             // update state
             _d2.get() = d1;
             _x2.get() = _x1.get();
             _x1.get() = x;
-            _y2.get() = _y1.get();
-            _y1.get() = output[n];
             _ad2_x1.get() = _ad2_x0.get();
         }
     }
@@ -160,8 +174,6 @@ public:
     {
         ScopedValue<double> _x1 { x1[(size_t) channel] };
         ScopedValue<double> _x2 { x2[(size_t) channel] };
-        ScopedValue<double> _y1 { y1[(size_t) channel] };
-        ScopedValue<double> _y2 { y2[(size_t) channel] };
         ad2_x0[(size_t) channel] = 0.0;
         ad2_x1[(size_t) channel] = 0.0;
         d2[(size_t) channel] = 0.0;
@@ -169,14 +181,18 @@ public:
         for (int n = 0; n < numSamples; ++n)
         {
             // add a one-sample delay to the bypassed signal so that everything matches up!
-            const auto x = (double) input[n];
+            const auto x = [&]
+            {
+                if constexpr (compensateHighFreqs)
+                    return compFilter.processSample ((double) input[n], channel);
+                else
+                    return (double) input[n];
+            }();
             output[n] = T (_x1.get());
 
             // update state
             _x2.get() = _x1.get();
             _x1.get() = x;
-            _y2.get() = _y1.get();
-            _y1.get() = output[n];
         }
     }
 
@@ -242,19 +258,19 @@ private:
     [[nodiscard]] inline double nlFunc_AD1 (double x) const noexcept { return lut_AD1->processSample (x); }
     [[nodiscard]] inline double nlFunc_AD2 (double x) const noexcept { return lut_AD2->processSample (x); }
 
-    inline double calcD1 (double x0, const double& _x1, double& _ad2_x0, const double& _ad2_x1, const double& _y1) noexcept
+    inline double calcD1 (double x0, const double& _x1, double& _ad2_x0, const double& _ad2_x1) noexcept
     {
         bool illCondition = std::abs (x0 - _x1) < TOL;
         _ad2_x0 = nlFunc_AD2 (x0);
-        return illCondition ? nlFunc_AD1 (0.5 * (x0 + _x1) - _y1) : (_ad2_x0 - _ad2_x1) / (x0 - _x1);
+        return illCondition ? nlFunc_AD1 (0.5 * (x0 + _x1)) : (_ad2_x0 - _ad2_x1) / (x0 - _x1);
     }
 
-    inline double fallback (double x, const double& _x1, const double& _x2, const double& _ad2_x1, const double& _y1, const double& _y2) noexcept
+    inline double fallback (double x, const double& _x1, const double& _x2, const double& _ad2_x1) noexcept
     {
-        const auto xBar = 0.5 * (x + _x2) - _y2;
+        const auto xBar = 0.5 * (x + _x2);
         const auto delta = xBar - _x1;
         bool illCondition = std::abs (delta) < TOL;
-        return illCondition ? nlFunc (0.5 * (xBar + _x1 - _y2) - _y1) : (2.0 / delta) * (nlFunc_AD1 (xBar) + (_ad2_x1 - nlFunc_AD2 (xBar)) / delta);
+        return illCondition ? nlFunc (0.5 * (xBar + _x1)) : (2.0 / delta) * (nlFunc_AD1 (xBar) + (_ad2_x1 - nlFunc_AD2 (xBar)) / delta);
     }
 
     LookupTableTransform<double>* lut = nullptr;
@@ -267,8 +283,9 @@ private:
     std::vector<double> ad2_x0;
     std::vector<double> ad2_x1;
     std::vector<double> d2;
-    std::vector<double> y1;
-    std::vector<double> y2;
+
+    using CompensationFilter = std::conditional_t<compensateHighFreqs, PeakingFilter<double, CoefficientCalculators::CoefficientCalculationMode::Decramped>, std::nullptr_t>;
+    CompensationFilter compFilter {};
 
     static constexpr auto TOL = illConditionTolerance::template value<double>;
 
