@@ -94,7 +94,7 @@ public:
         if constexpr (compensateHighFreqs)
         {
             compFilter.prepare (numChannels);
-            compFilter.calcCoefsDB (16000.0, 24.0, 32.0, 48000.0);
+            compFilter.calcCoefsDB ((1.0 / 3.0), 24.0, 32.0, 1.0);
         }
 
         lutLoadingFutures.clear();
