@@ -80,31 +80,37 @@ public:
     /** Process block of samples (Optimized for 1st-order filters) */
     template <int N = order>
     inline std::enable_if_t<N == 1, void>
-        processBlock (FloatType* block, const int numSamples, const int channel = 0) noexcept
+        processBlock (FloatType* outputBlock, const FloatType* inputBlock, const int numSamples, const int channel = 0) noexcept
     {
         ScopedValue z1 { z[channel][1] };
         for (int n = 0; n < numSamples; ++n)
-            block[n] = processSample1stOrder (block[n], z1.get());
+            outputBlock[n] = processSample1stOrder (inputBlock[n], z1.get());
     }
 
     /** Process block of samples (Optimized for 2nd-order filters) */
     template <int N = order>
     inline std::enable_if_t<N == 2, void>
-        processBlock (FloatType* block, const int numSamples, const int channel = 0) noexcept
+        processBlock (FloatType* outputBlock, const FloatType* inputBlock, const int numSamples, const int channel = 0) noexcept
     {
         ScopedValue z1 { z[channel][1] };
         ScopedValue z2 { z[channel][2] };
         for (int n = 0; n < numSamples; ++n)
-            block[n] = processSample2ndOrder (block[n], z1.get(), z2.get());
+            outputBlock[n] = processSample2ndOrder (inputBlock[n], z1.get(), z2.get());
     }
 
     /** Process block of samples */
     template <int N = order>
     inline std::enable_if_t<(N > 2), void>
-        processBlock (FloatType* block, const int numSamples, const int channel = 0) noexcept
+        processBlock (FloatType* outputBlock, const FloatType* inputBlock, const int numSamples, const int channel = 0) noexcept
     {
         for (int n = 0; n < numSamples; ++n)
-            block[n] = processSample (block[n], channel);
+            outputBlock[n] = processSample (inputBlock[n], channel);
+    }
+
+    /** Process block of samples */
+    void processBlock (FloatType* block, const int numSamples, const int channel = 0) noexcept
+    {
+        processBlock (block, block, numSamples, channel);
     }
 
     /** Process block of samples */

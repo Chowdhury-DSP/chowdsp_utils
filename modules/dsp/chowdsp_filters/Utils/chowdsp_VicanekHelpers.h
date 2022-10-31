@@ -14,8 +14,8 @@ namespace VicanekHelpers
         CHOWDSP_USING_XSIMD_STD (min);
 
         // @TODO: can we make this range looser when using double-precision?
-        static constexpr auto lowerBound = (NumericType) 0.55;
-        static constexpr auto upperBound = (NumericType) 4.95;
+        static constexpr auto lowerBound = NumericType (std::is_same_v<NumericType, float> ? 0.55 : 0.35);
+        static constexpr auto upperBound = NumericType (std::is_same_v<NumericType, float> ? 4.94 : 27.0);
 
         // Vicanek method has numerical problems for Q-values outside of this range
         jassert (SIMDUtils::all (qVal >= (T) lowerBound));
