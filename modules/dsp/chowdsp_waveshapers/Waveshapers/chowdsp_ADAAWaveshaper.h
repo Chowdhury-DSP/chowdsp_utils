@@ -117,8 +117,7 @@ public:
     inline T processSample (T input, int channel = 0) noexcept
     {
         const auto ch = (size_t) channel;
-        const auto x = [&]
-        {
+        const auto x = [&] {
             if constexpr (compensateHighFreqs)
                 return compFilter.processSample ((double) input, channel);
             else
@@ -149,8 +148,7 @@ public:
 
         for (int n = 0; n < numSamples; ++n)
         {
-            const auto x = [&]
-            {
+            const auto x = [&] {
                 if constexpr (compensateHighFreqs)
                     return compFilter.processSample ((double) input[n], channel);
                 else
@@ -181,8 +179,7 @@ public:
         for (int n = 0; n < numSamples; ++n)
         {
             // add a one-sample delay to the bypassed signal so that everything matches up!
-            const auto x = [&]
-            {
+            const auto x = [&] {
                 if constexpr (compensateHighFreqs)
                     return compFilter.processSample ((double) input[n], channel);
                 else
