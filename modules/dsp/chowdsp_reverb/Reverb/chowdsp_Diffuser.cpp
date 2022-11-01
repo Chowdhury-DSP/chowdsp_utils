@@ -4,8 +4,8 @@ namespace chowdsp::Reverb
 {
 inline double DefaultDiffuserConfig::getDelayMult (int channelIndex, int nChannels, std::mt19937& mt)
 {
-    const auto rangeLow = (double) channelIndex / (double) nChannels;
-    const auto rangeHigh = double (channelIndex + 1) / (double) nChannels;
+    const auto rangeLow = double (channelIndex + 1) / double (nChannels + 1);
+    const auto rangeHigh = double (channelIndex + 2) / double (nChannels + 1);
 
     auto&& dist = std::uniform_real_distribution<> (rangeLow, rangeHigh);
     return dist (mt);

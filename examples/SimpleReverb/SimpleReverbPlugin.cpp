@@ -25,9 +25,9 @@ void SimpleReverbPlugin::addParameters (Parameters& params)
 {
     using namespace chowdsp::ParamUtils;
     createTimeMsParameter (params, { diffusionTimeTag, 100 }, "Diffusion Time", createNormalisableRange (10.0f, 1000.0f, 200.0f), 300.0f);
-    createTimeMsParameter (params, { fdnDelayMsTag, 100 }, "FDN Delay Time", createNormalisableRange (10.0f, 1000.0f, 200.0f), 300.0f);
-    createTimeMsParameter (params, { fdnT60LowMsTag, 100 }, "FDN T60 Low", createNormalisableRange (100.0f, 10000.0f, 1000.0f), 300.0f);
-    createTimeMsParameter (params, { fdnT60HighMsTag, 100 }, "FDN T60 High", createNormalisableRange (100.0f, 10000.0f, 1000.0f), 300.0f);
+    createTimeMsParameter (params, { fdnDelayMsTag, 100 }, "FDN Delay Time", createNormalisableRange (350.0f, 20000.0f, 800.0f), 800.0f);
+    createTimeMsParameter (params, { fdnT60LowMsTag, 100 }, "FDN T60 Low", createNormalisableRange (100.0f, 5000.0f, 1000.0f), 500.0f);
+    createTimeMsParameter (params, { fdnT60HighMsTag, 100 }, "FDN T60 High", createNormalisableRange (100.0f, 5000.0f, 1000.0f), 500.0f);
     createPercentParameter (params, { modAmountTag, 100 }, "Modulation", 0.0f);
     createPercentParameter (params, { dryWetTag, 100 }, "Dry/Wet", 0.25f);
 }
@@ -60,12 +60,14 @@ void SimpleReverbPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
     mixer.setWetMixProportion (*dryWetParam);
     mixer.pushDrySamples (block);
 
-    auto loadSamples = [] (float* inVec, float xL, float xR) {
+    auto loadSamples = [] (float* inVec, float xL, float xR)
+    {
         for (int i = 0; i < 8; ++i)
             inVec[i] = i % 2 == 0 ? xL : xR;
     };
 
-    auto storeSamples = [] (const float* outVec, float& xL, float& xR) {
+    auto storeSamples = [] (const float* outVec, float& xL, float& xR)
+    {
         xL = 0.0f;
         xR = 0.0f;
         for (int i = 0; i < 8; ++i)
@@ -75,7 +77,8 @@ void SimpleReverbPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
         }
     };
 
-    auto processSample = [this, &loadSamples, &storeSamples] (float* inVec, float& xL, float& xR) {
+    auto processSample = [this, &loadSamples, &storeSamples] (float* inVec, float& xL, float& xR)
+    {
         loadSamples (inVec, xL, xR);
         auto* diffuserOutVec = diffuserChain.process (inVec);
         auto* fdnOutVec = fdn.process (diffuserOutVec);

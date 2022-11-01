@@ -20,7 +20,7 @@ public:
 
     template <typename IT = InterpolationType>
     inline std::enable_if_t<! std::is_same_v<IT, DelayLineInterpolationTypes::None>,
-                            SampleType>
+                            void>
         pushSample (SampleType x, int wp) noexcept
     {
         jassert (juce::isPositiveAndBelow (wp, maxDelaySamples));
@@ -30,7 +30,7 @@ public:
 
     template <typename IT = InterpolationType>
     inline std::enable_if_t<std::is_same_v<IT, DelayLineInterpolationTypes::None>,
-                            SampleType>
+                            void>
         pushSample (SampleType x, int wp) noexcept
     {
         jassert (juce::isPositiveAndBelow (wp, maxDelaySamples));
@@ -80,6 +80,7 @@ public:
 
     static inline NumericType getReadPointer (int wp, NumericType delaySamples) noexcept
     {
+        delaySamples = juce::jmax ((NumericType) 1, delaySamples);
         const auto rp = std::fmod (NumericType (wp) + delaySamples, (NumericType) maxDelaySamples);
         jassert (juce::isPositiveAndBelow (rp, (NumericType) maxDelaySamples));
         return rp;
