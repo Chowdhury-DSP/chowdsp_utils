@@ -12,6 +12,9 @@ struct TypesList
 
     template <size_t I>
     using AtIndex = std::tuple_element_t<I, Types>;
+
+    template <typename T>
+    static constexpr bool contains = (std::is_same_v<T, Ts> || ...);
 };
 
 /** Can be used to call a static function for every type in a type list */

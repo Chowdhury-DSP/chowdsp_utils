@@ -24,7 +24,7 @@ struct DefaultDiffuserConfig
  *   - Polarity flipping
  *   - Hadamard mixing
  */
-template <typename FloatType, int nChannels, typename DelayInterpType = chowdsp::DelayLineInterpolationTypes::None, int delayBufferSize = 1 << 18>
+template <typename FloatType, int nChannels, typename DelayInterpType = DelayLineInterpolationTypes::None, int delayBufferSize = 1 << 18>
 class Diffuser
 {
     using DelayType = chowdsp::StaticDelayBuffer<FloatType, DelayInterpType, delayBufferSize>;

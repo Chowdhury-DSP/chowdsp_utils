@@ -40,9 +40,12 @@ private:
 };
 
 /** A feedback delay network processor with a customizable configuration */
-template <typename FDNConfig, typename DelayInterpType = chowdsp::DelayLineInterpolationTypes::None, int delayBufferSize = 1 << 18>
+template <typename FDNConfig, typename DelayInterpType = DelayLineInterpolationTypes::None, int delayBufferSize = 1 << 18>
 class FDN
 {
+    static_assert (TypesList<DelayLineInterpolationTypes::None, DelayLineInterpolationTypes::Linear>::contains<DelayInterpType>,
+                   "DelayInterpType must be either None or Linear");
+
     using FloatType = typename FDNConfig::Float;
     static constexpr auto nChannels = FDNConfig::NChannels;
 

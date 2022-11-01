@@ -26,10 +26,12 @@ TEST_CASE ("Types List Test")
             Type1,
             Type2>;
 
-        static constexpr auto typeNames = [] {
+        static constexpr auto typeNames = []
+        {
             std::array<std::string_view, List::count> names {};
             chowdsp::ForEachInTypeList<List>::doForEach (
-                [&names] (auto index) {
+                [&names] (auto index)
+                {
                     names[index] = List::AtIndex<index>::name;
                 });
             return names;
@@ -38,5 +40,11 @@ TEST_CASE ("Types List Test")
         static_assert (typeNames[0] == "type0");
         static_assert (typeNames[1] == "type1");
         static_assert (typeNames[2] == "type2");
+    }
+
+    SECTION ("Contains Test")
+    {
+        static_assert (chowdsp::TypesList<std::string, int, float>::contains<int>);
+        static_assert (! chowdsp::TypesList<std::string, int, float>::contains<double>);
     }
 }
