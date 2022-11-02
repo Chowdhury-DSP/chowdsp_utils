@@ -72,7 +72,6 @@ void DelayLine<SampleType, InterpolationType>::prepare (const juce::dsp::Process
     this->readPos.resize (spec.numChannels);
 
     this->v.resize (spec.numChannels);
-    interpolator.reset (totalSize);
 
     reset();
 

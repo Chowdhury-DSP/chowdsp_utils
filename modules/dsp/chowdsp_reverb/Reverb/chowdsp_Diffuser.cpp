@@ -4,8 +4,8 @@ namespace chowdsp::Reverb
 {
 inline double DefaultDiffuserConfig::getDelayMult (int channelIndex, int nChannels, std::mt19937& mt)
 {
-    const auto rangeLow = (double) channelIndex / (double) nChannels;
-    const auto rangeHigh = double (channelIndex + 1) / (double) nChannels;
+    const auto rangeLow = double (channelIndex + 1) / double (nChannels + 1);
+    const auto rangeHigh = double (channelIndex + 2) / double (nChannels + 1);
 
     auto&& dist = std::uniform_real_distribution<> (rangeLow, rangeHigh);
     return dist (mt);
@@ -24,11 +24,11 @@ inline void DefaultDiffuserConfig::fillChannelSwapIndexes (size_t* indexes, int 
 }
 
 //======================================================================
-template <typename FloatType, int nChannels, typename DelayInterpType>
+template <typename FloatType, int nChannels, typename DelayInterpType, int delayBufferSize>
 template <typename DiffuserConfig>
-void Diffuser<FloatType, nChannels, DelayInterpType>::prepare (double sampleRate)
+void Diffuser<FloatType, nChannels, DelayInterpType, delayBufferSize>::prepare (double sampleRate)
 {
-    fs = (FloatType) sampleRate;
+    fsOver1000 = (FloatType) sampleRate / (FloatType) 1000;
 
     std::random_device rd;
     std::mt19937 randGenerator (rd());
@@ -37,24 +37,29 @@ void Diffuser<FloatType, nChannels, DelayInterpType>::prepare (double sampleRate
 
     for (size_t i = 0; i < (size_t) nChannels; ++i)
     {
-        delays[i].prepare ({ sampleRate, 128, 1 });
+        delays[i].reset();
+        delayWritePointer = 0;
+
         delayRelativeMults[i] = (FloatType) DiffuserConfig::getDelayMult ((int) i, nChannels, randGenerator);
         polarityMultipliers[i] = (FloatType) DiffuserConfig::getPolarityMultiplier ((int) i, nChannels, randGenerator);
     }
 }
 
-template <typename FloatType, int nChannels, typename DelayInterpType>
-void Diffuser<FloatType, nChannels, DelayInterpType>::reset()
+template <typename FloatType, int nChannels, typename DelayInterpType, int delayBufferSize>
+void Diffuser<FloatType, nChannels, DelayInterpType, delayBufferSize>::reset()
 {
     for (auto& delay : delays)
         delay.reset();
 }
 
-template <typename FloatType, int nChannels, typename DelayInterpType>
-void Diffuser<FloatType, nChannels, DelayInterpType>::setDiffusionTimeMs (FloatType diffusionTimeMs)
+template <typename FloatType, int nChannels, typename DelayInterpType, int delayBufferSize>
+void Diffuser<FloatType, nChannels, DelayInterpType, delayBufferSize>::setDiffusionTimeMs (FloatType diffusionTimeMs)
 {
     for (size_t i = 0; i < (size_t) nChannels; ++i)
-        delays[i].setDelay (delayRelativeMults[i] * diffusionTimeMs * (FloatType) 0.001 * fs);
+    {
+        const auto delayTimesSamples = delayRelativeMults[i] * diffusionTimeMs * fsOver1000;
+        delayReadPointers[i] = DelayType::getReadPointer (delayWritePointer, delayTimesSamples);
+    }
 }
 
 //======================================================================

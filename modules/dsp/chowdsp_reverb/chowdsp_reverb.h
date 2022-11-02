@@ -30,5 +30,6 @@ namespace Reverb
 }
 } // namespace chowdsp
 
+#include "Reverb/chowdsp_ConvolutionDiffuser.h"
 #include "Reverb/chowdsp_Diffuser.h"
 #include "Reverb/chowdsp_FDN.h"

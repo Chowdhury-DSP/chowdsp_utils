@@ -39,4 +39,10 @@ TEST_CASE ("Types List Test")
         static_assert (typeNames[1] == "type1");
         static_assert (typeNames[2] == "type2");
     }
+
+    SECTION ("Contains Test")
+    {
+        static_assert (chowdsp::TypesList<std::string, int, float>::contains<int>);
+        static_assert (! chowdsp::TypesList<std::string, int, float>::contains<double>);
+    }
 }
