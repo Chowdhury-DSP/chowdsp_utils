@@ -74,7 +74,7 @@ private:
     std::array<FloatType, (size_t) nChannels> polarityMultipliers;
     std::array<size_t, (size_t) nChannels> channelSwapIndexes;
 
-    int delayWritePointer;
+    int delayWritePointer = 0;
     std::array<FloatType, (size_t) nChannels> delayReadPointers;
 
     alignas (xsimd::default_arch::alignment()) std::array<FloatType, (size_t) nChannels> outData;

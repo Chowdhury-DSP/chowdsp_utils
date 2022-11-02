@@ -34,7 +34,6 @@ void PitchShifter<SampleType, InterpolationType>::prepare (const juce::dsp::Proc
     crossfade.resize (spec.numChannels);
 
     v.resize (spec.numChannels);
-    interpolator.reset (totalSize);
 
     reset();
 }

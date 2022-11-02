@@ -6,14 +6,16 @@ class DiffuserTest : public TimedUnitTest
 public:
     DiffuserTest() : TimedUnitTest ("Diffuser Test") {}
 
+    static constexpr int nChannels = 8;
+    static constexpr int nStages = 4;
+    using TestDiffuser = chowdsp::Reverb::Diffuser<float, nChannels, chowdsp::DelayLineInterpolationTypes::None, 1 << 13>;
+
     void energyPreservingTest()
     {
         constexpr float fs = 48000.0f;
         constexpr float diffusionTimeMs = 100.0f;
-        constexpr int nChannels = 8;
-        constexpr int nStages = 4;
 
-        chowdsp::Reverb::DiffuserChain<nStages, chowdsp::Reverb::Diffuser<float, nChannels>> diffuserChain;
+        chowdsp::Reverb::DiffuserChain<nStages, TestDiffuser> diffuserChain;
         diffuserChain.prepare ((double) fs);
         diffuserChain.setDiffusionTimeMs (diffusionTimeMs);
 
@@ -37,10 +39,8 @@ public:
     {
         constexpr float fs = 48000.0f;
         constexpr float diffusionTimeMs = 100.0f;
-        constexpr int nChannels = 8;
-        constexpr int nStages = 4;
 
-        chowdsp::Reverb::DiffuserChain<nStages, chowdsp::Reverb::Diffuser<float, nChannels>> diffuserChain;
+        chowdsp::Reverb::DiffuserChain<nStages, TestDiffuser> diffuserChain;
         diffuserChain.prepare ((double) fs);
         diffuserChain.setDiffusionTimeMs (diffusionTimeMs);
 
