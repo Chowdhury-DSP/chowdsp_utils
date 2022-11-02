@@ -24,13 +24,10 @@ struct DefaultDiffuserConfig
  *   - Polarity flipping
  *   - Hadamard mixing
  */
-template <typename FloatType, int nChannels, typename DelayInterpType = chowdsp::DelayLineInterpolationTypes::None>
+template <typename FloatType, int nChannels, typename DelayInterpType = DelayLineInterpolationTypes::None, int delayBufferSize = 1 << 18>
 class Diffuser
 {
-    struct DelayType : public chowdsp::DelayLine<FloatType, DelayInterpType>
-    {
-        DelayType() : chowdsp::DelayLine<FloatType, DelayInterpType> (1 << 18) {}
-    };
+    using DelayType = chowdsp::StaticDelayBuffer<FloatType, DelayInterpType, delayBufferSize>;
 
 public:
     using Float = FloatType;
@@ -52,9 +49,13 @@ public:
     {
         // Delay
         for (size_t i = 0; i < (size_t) nChannels; ++i)
+            delays[i].pushSample (data[i], delayWritePointer);
+        DelayType::decrementPointer (delayWritePointer);
+
+        for (size_t i = 0; i < (size_t) nChannels; ++i)
         {
-            delays[i].pushSample (0, data[i]);
-            outData[i] = delays[channelSwapIndexes[i]].popSample (0);
+            outData[i] = delays[channelSwapIndexes[i]].popSample (delayReadPointers[i]);
+            DelayType::decrementPointer (delayReadPointers[i]);
         }
 
         // Mix with a Hadamard matrix
@@ -73,9 +74,12 @@ private:
     std::array<FloatType, (size_t) nChannels> polarityMultipliers;
     std::array<size_t, (size_t) nChannels> channelSwapIndexes;
 
+    int delayWritePointer;
+    std::array<FloatType, (size_t) nChannels> delayReadPointers;
+
     alignas (xsimd::default_arch::alignment()) std::array<FloatType, (size_t) nChannels> outData;
 
-    FloatType fs = (FloatType) 48000;
+    FloatType fsOver1000 = FloatType (48000 / 1000);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Diffuser)
 };

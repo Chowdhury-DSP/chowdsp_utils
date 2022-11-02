@@ -31,11 +31,10 @@ private:
     juce::SmoothedValue<float, juce::ValueSmoothingTypes::Multiplicative> fdnT60HighSmoother;
     juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> modAmountSmoother;
 
-    using DiffuserType = chowdsp::Reverb::Diffuser<float, 8>;
-    chowdsp::Reverb::DiffuserChain<5, DiffuserType> diffuserChain;
-
+    chowdsp::Reverb::ConvolutionDiffuser diffuser { 1.0 };
+    
     using FDNConfig = chowdsp::Reverb::DefaultFDNConfig<float, 8>;
-    chowdsp::Reverb::FDN<FDNConfig, chowdsp::DelayLineInterpolationTypes::Lagrange3rd> fdn;
+    chowdsp::Reverb::FDN<FDNConfig, chowdsp::DelayLineInterpolationTypes::None> fdn;
 
     chowdsp::SineWave<float> lfos[2];
     float lfoVals[2] {};

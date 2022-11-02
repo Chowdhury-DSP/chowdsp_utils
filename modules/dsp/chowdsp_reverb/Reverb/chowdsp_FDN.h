@@ -40,16 +40,16 @@ private:
 };
 
 /** A feedback delay network processor with a customizable configuration */
-template <typename FDNConfig, typename DelayInterpType = chowdsp::DelayLineInterpolationTypes::None>
+template <typename FDNConfig, typename DelayInterpType = DelayLineInterpolationTypes::None, int delayBufferSize = 1 << 18>
 class FDN
 {
+    static_assert (TypesList<DelayLineInterpolationTypes::None, DelayLineInterpolationTypes::Linear>::contains<DelayInterpType>,
+                   "DelayInterpType must be either None or Linear");
+
     using FloatType = typename FDNConfig::Float;
     static constexpr auto nChannels = FDNConfig::NChannels;
 
-    struct DelayType : public chowdsp::DelayLine<FloatType, DelayInterpType>
-    {
-        DelayType() : chowdsp::DelayLine<FloatType, DelayInterpType> (1 << 18) {}
-    };
+    using DelayType = chowdsp::StaticDelayBuffer<FloatType, DelayInterpType, delayBufferSize>;
 
 public:
     FDN() = default;
@@ -78,7 +78,10 @@ public:
     {
         // read from delay lines
         for (size_t i = 0; i < (size_t) nChannels; ++i)
-            outData[i] = delays[i].popSample (0);
+        {
+            outData[i] = delays[i].popSample (delayReadPointers[i]);
+            DelayType::decrementPointer (delayReadPointers[i]);
+        }
 
         // do mixing matrix
         FDNConfig::applyMixingMatrix (outData.data());
@@ -88,7 +91,8 @@ public:
 
         // write back to delay lines
         for (size_t i = 0; i < (size_t) nChannels; ++i)
-            delays[i].pushSample (0, data[i] + fbData[i]);
+            delays[i].pushSample (data[i] + fbData[i], delayWritePointer);
+        DelayType::decrementPointer (delayWritePointer);
 
         return outData.data();
     }
@@ -100,11 +104,15 @@ private:
     std::array<DelayType, (size_t) nChannels> delays;
     std::array<FloatType, (size_t) nChannels> delayRelativeMults;
 
+    std::array<FloatType, (size_t) nChannels> delayTimesSamples;
+    int delayWritePointer = 0;
+    std::array<FloatType, (size_t) nChannels> delayReadPointers;
+
     FDNConfig fdnConfig;
 
     alignas (xsimd::default_arch::alignment()) std::array<FloatType, (size_t) nChannels> outData;
 
-    FloatType fs = (FloatType) 48000;
+    FloatType fsOver1000 = FloatType (48000 / 1000);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FDN)
 };
