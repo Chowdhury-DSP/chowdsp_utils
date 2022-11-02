@@ -32,7 +32,7 @@ private:
     juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> modAmountSmoother;
 
     chowdsp::Reverb::ConvolutionDiffuser diffuser { 1.0 };
-    
+
     using FDNConfig = chowdsp::Reverb::DefaultFDNConfig<float, 8>;
     chowdsp::Reverb::FDN<FDNConfig, chowdsp::DelayLineInterpolationTypes::None> fdn;
 

@@ -64,8 +64,7 @@ void SimpleReverbPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
     diffuser.setDiffusionTime (diffusionTimeMsParam->getCurrentValue() * 0.001f);
     diffuser.processBlock (buffer);
 
-    auto loadSamples = [] (float* inVec, float xL, float xR)
-    {
+    auto loadSamples = [] (float* inVec, float xL, float xR) {
         for (int i = 0; i < 8; i += 2)
         {
             inVec[i] = xL;
@@ -73,8 +72,7 @@ void SimpleReverbPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
         }
     };
 
-    auto storeSamples = [] (const float* outVec, float& xL, float& xR)
-    {
+    auto storeSamples = [] (const float* outVec, float& xL, float& xR) {
         xL = 0.0f;
         xR = 0.0f;
         for (int i = 0; i < 8; i += 2)
@@ -87,8 +85,7 @@ void SimpleReverbPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
         xR *= 1.0f / 8.0f;
     };
 
-    auto processSample = [this, &loadSamples, &storeSamples] (float* inVec, float& xL, float& xR)
-    {
+    auto processSample = [this, &loadSamples, &storeSamples] (float* inVec, float& xL, float& xR) {
         loadSamples (inVec, xL, xR);
         auto* fdnOutVec = fdn.process (inVec);
         juce::ignoreUnused (fdnOutVec, storeSamples);
