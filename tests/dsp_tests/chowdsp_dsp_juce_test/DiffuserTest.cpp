@@ -6,7 +6,7 @@ class DiffuserTest : public TimedUnitTest
 public:
     DiffuserTest() : TimedUnitTest ("Diffuser Test") {}
 
-    static constexpr int nChannels = 8;
+    static constexpr int nChannels = 4;
     static constexpr int nStages = 4;
     using TestDiffuser = chowdsp::Reverb::Diffuser<float, nChannels, chowdsp::DelayLineInterpolationTypes::None, 1 << 13>;
 
