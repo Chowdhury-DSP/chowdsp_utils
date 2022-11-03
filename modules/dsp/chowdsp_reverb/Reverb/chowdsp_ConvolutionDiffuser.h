@@ -90,7 +90,7 @@ private:
         BufferMath::applyGainSmoothedBuffer (convolutionKernelBuffer, kernelRamp);
     }
 
-    std::vector<ConvolutionEngine> convolutionEngines;
+    std::vector<ConvolutionEngine<>> convolutionEngines {};
 
     Buffer<float> convolutionKernelBuffer;
     Buffer<float> scratchBuffer;

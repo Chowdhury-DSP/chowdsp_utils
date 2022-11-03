@@ -35,10 +35,10 @@ void LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::prepare (const juce::dsp::Pro
 
     engines.clear();
     for (size_t ch = 0; ch < spec.numChannels; ++ch)
-        engines.push_back (std::make_unique<chowdsp::ConvolutionEngine> ((size_t) irSize, spec.maximumBlockSize, irBuffer.getWritePointer (0)));
+        engines.push_back (std::make_unique<ConvolutionEngine<>> ((size_t) irSize, spec.maximumBlockSize, irBuffer.getWritePointer (0)));
 
     irUpdateState.store (IRUpdateState::Good);
-    irTransfer = std::make_unique<chowdsp::IRTransfer> (*engines[0]);
+    irTransfer = std::make_unique<IRTransfer> (*engines[0]);
 
     startTimer (10); // @TODO: should we expose the timer frequency to the user?
 }
@@ -91,7 +91,7 @@ void LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::updateParams()
     prototypeEQ.processBlock (irBuffer);
 
     // halve the IR magnitude sicne we processed it twice
-    chowdsp::IRHelpers::makeHalfMagnitude (irData, irData, irSize, *fft);
+    IRHelpers::makeHalfMagnitude (irData, irData, irSize, *fft);
 }
 
 template <typename PrototypeEQ, int defaultFIRLength>

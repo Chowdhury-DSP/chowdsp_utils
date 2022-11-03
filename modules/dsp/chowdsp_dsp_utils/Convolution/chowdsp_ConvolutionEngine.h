@@ -39,6 +39,7 @@ namespace chowdsp
  *  }
  *  ```
  */
+template <typename FFTEngineType = juce::dsp::FFT>
 struct ConvolutionEngine
 {
     /** Creates a new convolution engine for a given IR, note that while future IRs
@@ -84,7 +85,7 @@ struct ConvolutionEngine
     const size_t irNumSamples;
     const size_t blockSize;
     const size_t fftSize;
-    const std::unique_ptr<juce::dsp::FFT> fftObject;
+    const std::unique_ptr<FFTEngineType> fftObject;
     const size_t numSegments;
     const size_t numInputSegments;
     size_t currentSegment = 0, inputDataPos = 0;
@@ -94,5 +95,6 @@ struct ConvolutionEngine
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ConvolutionEngine)
 };
-
 } // namespace chowdsp
+
+#include "chowdsp_ConvolutionEngine.cpp"

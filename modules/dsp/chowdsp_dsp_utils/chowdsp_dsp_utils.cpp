@@ -15,6 +15,5 @@
 #include "Resampling/chowdsp_VariableOversampling.cpp"
 
 // convolution
-#include "Convolution/chowdsp_ConvolutionEngine.cpp"
 #include "Convolution/chowdsp_IRHelpers.cpp"
 #endif
