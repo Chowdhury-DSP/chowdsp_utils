@@ -141,7 +141,7 @@ private:
 /**
  * Linkwitz-Riley Crossover Filter
  *
- * Specialsed for first-order filters.
+ * Specialised for first-order filters.
  *
  * This filter will be stable under fast modulation.
  */

@@ -9,7 +9,8 @@ All notable changes to this project will be documented in this file.
 - Added `BufferMath::sanitizeBuffer` method.
 - Added `bind_front` and `bind_back` helper methods.
 - Added `algebraicSigmoid` method.
-- Added `StaticBuffer`.
+- Added `StaticBuffer` class.
+- Added `Reverb::ConvolutionDiffuser` class.
 - Updated XSIMD to version 10.0.0rc.
 - Updated elliptic filter template arguments to accept a `Ratio` for the passband ripple.
 
