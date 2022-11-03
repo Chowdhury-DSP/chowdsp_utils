@@ -5,7 +5,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_foleys
    vendor:        Chowdhury DSP
-   version:       1.2.0
+   version:       1.3.0
    name:          ChowDSP Foley's GUI Magic
    description:   Interface between chowdsp_gui and foleys_gui_magic
    dependencies:  juce_core, foleys_gui_magic, chowdsp_gui

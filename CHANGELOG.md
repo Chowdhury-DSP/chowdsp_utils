@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [UNRELEASED]
+## [1.3.0] 2022-11-03
 - Added `LinkwitzRileyFilter` class.
 - Added `TypesList` meta-programming helpers.
 - Added `Ratio` class for creating template parameter floats.

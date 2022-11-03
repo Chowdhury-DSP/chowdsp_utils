@@ -5,7 +5,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_version
    vendor:        Chowdhury DSP
-   version:       1.2.0
+   version:       1.3.0
    name:          ChowDSP Plugin Versioning
    description:   Versioning system for ChowDSP plugins
    dependencies:  juce_core
@@ -41,7 +41,7 @@ namespace VersionUtils
         friend bool operator== (const Version& v1, const Version& v2) noexcept;
         friend bool operator!= (const Version& v1, const Version& v2) noexcept;
         friend bool operator> (const Version& v1, const Version& v2) noexcept;
-        friend bool operator< (const Version& v1, const Version& v2) noexcept;
+        friend bool operator<(const Version& v1, const Version& v2) noexcept;
         friend bool operator>= (const Version& v1, const Version& v2) noexcept;
         friend bool operator<= (const Version& v1, const Version& v2) noexcept;
 

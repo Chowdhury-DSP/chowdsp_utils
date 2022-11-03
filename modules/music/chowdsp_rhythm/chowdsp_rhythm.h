@@ -5,7 +5,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_rhythm
    vendor:        Chowdhury DSP
-   version:       1.2.0
+   version:       1.3.0
    name:          ChowDSP Rhythm Utilities
    description:   Utility classes for working with rhythms
    dependencies:  juce_core

@@ -5,7 +5,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_presets
    vendor:        Chowdhury DSP
-   version:       1.2.0
+   version:       1.3.0
    name:          ChowDSP Presets Utilities
    description:   Presets management system for ChowDSP plugins
    dependencies:  juce_core, juce_audio_utils, chowdsp_version
