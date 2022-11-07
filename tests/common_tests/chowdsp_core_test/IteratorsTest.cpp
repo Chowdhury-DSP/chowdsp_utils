@@ -14,8 +14,7 @@ TEST_CASE ("Enumerate")
         }
 
         std::vector<int> vOut;
-        std::transform (v.begin(), v.end(), std::back_inserter (vOut), [] (auto a)
-                        { return a * 2; });
+        std::transform (v.begin(), v.end(), std::back_inserter (vOut), [] (auto a) { return a * 2; });
         for (const auto [idx, val] : chowdsp::enumerate (vOut))
         {
             REQUIRE ((int) idx * 2 == val);
@@ -39,8 +38,7 @@ TEST_CASE ("Enumerate")
 
     SECTION ("Empty Containers")
     {
-        auto empty = [] (const auto& v)
-        {
+        auto empty = [] (const auto& v) {
             bool never { true };
             for (const auto [i, j] : chowdsp::enumerate (v))
             {
@@ -81,8 +79,7 @@ TEST_CASE ("Zip")
 {
     SECTION ("ZIP with Self")
     {
-        auto selfzip = [] (const auto& v)
-        {
+        auto selfzip = [] (const auto& v) {
             int ct = 0;
             for (const auto& [a, b] : chowdsp::zip (v, v))
             {
