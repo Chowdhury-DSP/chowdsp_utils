@@ -8,4 +8,5 @@ target_sources(chowdsp_core_test
         TupleHelpersTest.cpp
         TypesListTest.cpp
         BindingsTest.cpp
+        IteratorsTest.cpp
 )
