@@ -18,8 +18,7 @@ namespace StringViewHelpers
         {
             constexpr std::size_t len = (Strs.size() + ... + 0);
             std::array<char, len + 1> local_arr {};
-            auto append = [i = (size_t) 0, &local_arr] (auto const& s) mutable
-            {
+            auto append = [i = (size_t) 0, &local_arr] (auto const& s) mutable {
                 for (auto c : s)
                     local_arr[i++] = c;
             };
