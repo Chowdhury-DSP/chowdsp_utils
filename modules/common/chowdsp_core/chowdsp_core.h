@@ -22,12 +22,14 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 // STL includes
 #include <algorithm>
+#include <array>
 #include <atomic>
 #include <cmath>
 #include <functional>
 #include <tuple>
 #include <cstring>
 #include <cstdint>
+#include <string_view>
 
 #ifndef DOXYGEN
 #if JUCE_MODULE_AVAILABLE_juce_core
@@ -68,6 +70,7 @@ namespace experimental
 #include "DataStructures/chowdsp_DoubleBuffer.h"
 #include "DataStructures/chowdsp_TupleHelpers.h"
 #include "DataStructures/chowdsp_Iterators.h"
+#include "DataStructures/chowdsp_StringViewHelpers.h"
 #include "Functional/chowdsp_Bindings.h"
 #include "Memory/chowdsp_MemoryAliasing.h"
 #include "Types/chowdsp_TypeTraits.h"
