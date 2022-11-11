@@ -1,3 +1,4 @@
 add_subdirectory(chowdsp_core_test)
 add_subdirectory(chowdsp_json_test)
 add_subdirectory(chowdsp_serialization_test)
+add_subdirectory(chowdsp_units_test)
