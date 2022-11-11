@@ -86,6 +86,14 @@ public:
         return rp;
     }
 
+    static inline int getReadPointer (int wp, int delaySamples) noexcept
+    {
+        delaySamples = juce::jmax (1, delaySamples);
+        const auto rp = (wp + delaySamples) % maxDelaySamples;
+        jassert (juce::isPositiveAndBelow (rp, maxDelaySamples));
+        return rp;
+    }
+
 private:
     InterpolationType interpolator;
 

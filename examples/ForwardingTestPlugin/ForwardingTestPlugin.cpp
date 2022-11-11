@@ -27,7 +27,9 @@ void ForwardingTestPlugin::addParameters (Parameters& params)
                                                  "Werner Filter",
                                                  "ARP Filter",
                                                  "Polygonal Oscillator",
-                                                 "Band Split" },
+                                                 "Band Split",
+                                                 "Plate Reverb",
+                                             },
                                              0);
 }
 
@@ -68,7 +70,8 @@ void ForwardingTestPlugin::parameterChanged (const juce::String& parameterID, fl
         auto& processorParameters = newProcessor->getParameters();
         forwardingParameters.setParameterRange (0,
                                                 numForwardParameters,
-                                                [&processorParameters] (int i) -> chowdsp::ParameterForwardingInfo {
+                                                [&processorParameters] (int i) -> chowdsp::ParameterForwardingInfo
+                                                {
                                                     if (auto* paramCast = dynamic_cast<juce::RangedAudioParameter*> (processorParameters[i]))
                                                         return { paramCast, paramCast->name };
 
@@ -100,6 +103,9 @@ juce::AudioProcessor* ForwardingTestPlugin::getProcessorForIndex (int index)
 
     if (index == 6)
         return &bandSplit;
+
+    if (index == 7)
+        return &plateReverb;
 
     return nullptr;
 }

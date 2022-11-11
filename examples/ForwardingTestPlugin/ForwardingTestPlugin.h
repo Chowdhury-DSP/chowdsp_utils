@@ -8,6 +8,7 @@
 #include "InternalPlugins/ARPFilterPlugin.h"
 #include "InternalPlugins/PolygonalOscPlugin.h"
 #include "InternalPlugins/BandSplitPlugin.h"
+#include "InternalPlugins/PlateReverb.h"
 
 class ForwardingTestPlugin : public chowdsp::PluginBase<ForwardingTestPlugin>,
                              private juce::AudioProcessorValueTreeState::Listener
@@ -40,6 +41,7 @@ private:
     ARPFilterPlugin arpFilter;
     PolygonalOscPlugin polygonalOsc;
     BandSplitPlugin bandSplit;
+    PlateReverb plateReverb;
 
     struct ParamForwardingProvider
     {

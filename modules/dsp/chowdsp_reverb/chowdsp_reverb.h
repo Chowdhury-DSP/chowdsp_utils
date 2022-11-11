@@ -33,3 +33,4 @@ namespace Reverb
 #include "Reverb/chowdsp_ConvolutionDiffuser.h"
 #include "Reverb/chowdsp_Diffuser.h"
 #include "Reverb/chowdsp_FDN.h"
+#include "Reverb/chowdsp_DattorroReverb.h"
