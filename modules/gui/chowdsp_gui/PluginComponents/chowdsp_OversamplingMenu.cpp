@@ -41,11 +41,9 @@ OversamplingMenu<OSType>::OversamplingMenu (OSType& osMgr, juce::AudioProcessorV
     }
 
     sampleRateOrBlockSizeChangedCallback = osManager.sampleRateOrBlockSizeChangedBroadcaster.connect (
-        [thisComp = this]
-        {
+        [thisComp = this] {
             juce::MessageManager::callAsync (
-                [safeThis = SafePointer { thisComp }]
-                {
+                [safeThis = SafePointer { thisComp }] {
                     if (safeThis != nullptr)
                         safeThis->generateComboBoxMenu();
                 });
