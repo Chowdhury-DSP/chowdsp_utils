@@ -19,7 +19,8 @@ struct SecondsUnit : AbsoluteUnit<T>
     }
 
     static constexpr std::string_view baseName = "s";
-    static constexpr std::string_view name = StringViewHelpers::join_v<Scale::prefix, baseName>;
+    static constexpr std::array<char, 2> nameData { Scale::prefix, 's' };
+    static constexpr std::string_view name = { nameData.data(), nameData.size() };
 };
 
 using Seconds = SecondsUnit<>;

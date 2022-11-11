@@ -8,7 +8,7 @@ BEGIN_JUCE_MODULE_DECLARATION
    version:       1.3.0
    name:          ChowDSP Units
    description:   Unit types and conversion utilities
-   dependencies:  chowdsp_core
+   dependencies:
 
    website:       https://ccrma.stanford.edu/~jatin/chowdsp
    license:       BSD 3-Clause
@@ -20,7 +20,10 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 #pragma once
 
-#include <chowdsp_core/chowdsp_core.h>
+#include <array>
+#include <ostream>
+#include <string_view>
+#include <type_traits>
 
 namespace chowdsp
 {

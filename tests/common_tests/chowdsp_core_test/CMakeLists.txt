@@ -9,5 +9,4 @@ target_sources(chowdsp_core_test
         TypesListTest.cpp
         BindingsTest.cpp
         IteratorsTest.cpp
-        StringViewHelpersTest.cpp
 )
