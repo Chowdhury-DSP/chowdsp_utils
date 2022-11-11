@@ -40,7 +40,14 @@ OversamplingMenu<OSType>::OversamplingMenu (OSType& osMgr, juce::AudioProcessorV
         count += 1;
     }
 
-    sampleRateOrBlockSizeChangedCallback = osManager.sampleRateOrBlockSizeChangedBroadcaster.connect ([this] { generateComboBoxMenu(); });
+    sampleRateOrBlockSizeChangedCallback = osManager.sampleRateOrBlockSizeChangedBroadcaster.connect (
+        [thisComp = this] {
+            juce::MessageManager::callAsync (
+                [safeThis = SafePointer { thisComp }] {
+                    if (safeThis != nullptr)
+                        safeThis->generateComboBoxMenu();
+                });
+        });
 }
 
 template <typename OSType>
