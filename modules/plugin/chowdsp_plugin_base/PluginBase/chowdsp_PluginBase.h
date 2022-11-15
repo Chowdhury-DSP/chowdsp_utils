@@ -16,7 +16,8 @@ template <class Processor>
 class PluginBase : public juce::AudioProcessor
 #if JUCE_MODULE_AVAILABLE_chowdsp_clap_extensions
     ,
-                   private CLAPExtensions::CLAPInfoExtensions
+                   public CLAPExtensions::CLAPInfoExtensions,
+                   public clap_juce_extensions::clap_juce_audio_processor_capabilities
 #endif
 {
 public:

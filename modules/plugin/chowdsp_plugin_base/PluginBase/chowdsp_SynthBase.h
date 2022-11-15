@@ -43,6 +43,7 @@ private:
     }
 
     void processAudioBlock (juce::AudioBuffer<float>&) override {}
-};
 
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SynthBase)
+};
 } // namespace chowdsp

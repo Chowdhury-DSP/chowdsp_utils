@@ -3,7 +3,7 @@
 namespace chowdsp::CLAPExtensions
 {
 /** Interface for clap_juce_extensions::clap_properties */
-struct CLAPInfoExtensions : protected clap_juce_extensions::clap_properties
+struct CLAPInfoExtensions : public clap_juce_extensions::clap_properties
 {
     /**
      * Returns juce::AudioProcessor::getWrapperTypeDescription(), unless
