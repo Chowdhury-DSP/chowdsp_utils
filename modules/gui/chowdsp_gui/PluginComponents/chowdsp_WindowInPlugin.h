@@ -85,6 +85,12 @@ private:
 
         auto parentBounds = parent->getLocalBounds();
         setCentrePosition (parentBounds.getCentre());
+
+        if (getPosition().y < 0)
+            setTopLeftPosition (getPosition().withY (0));
+
+        if (getPosition().x < 0)
+            setTopLeftPosition (getPosition().withX (0));
     }
 
     juce::Component& creatorComp;
