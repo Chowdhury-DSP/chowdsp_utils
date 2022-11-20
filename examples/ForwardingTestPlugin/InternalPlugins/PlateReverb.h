@@ -21,9 +21,12 @@ private:
     chowdsp::FloatParameter* inputDiffusionParam = nullptr;
     chowdsp::FloatParameter* decayParam = nullptr;
     chowdsp::FloatParameter* decayDiffusionParam = nullptr;
+    chowdsp::FloatParameter* dampingParam = nullptr;
+    chowdsp::FloatParameter* mixParam = nullptr;
 
-    using ReverbConfig = chowdsp::Reverb::DefaultDattorroConfig<float>;
-    chowdsp::Reverb::DattorroReverb<ReverbConfig> reverb;
+    chowdsp::Reverb::Dattorro::InputNetwork<> diffusion[2];
+    chowdsp::Reverb::Dattorro::TankNetwork<> tank;
+    juce::dsp::DryWetMixer<float> mixer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PlateReverb)
 };
