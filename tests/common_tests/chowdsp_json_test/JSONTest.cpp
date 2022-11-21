@@ -30,12 +30,31 @@ public:
         };
 
         const auto testFile = juce::File::getSpecialLocation (juce::File::userHomeDirectory).getChildFile ("test.json");
-        chowdsp::JSONUtils::toFile (jTest, testFile);
+        chowdsp::JSONUtils::toFile (jTest, testFile, 4); // 4 space indent
 
         auto jActual = chowdsp::JSONUtils::fromFile (testFile);
         expect (jActual == jTest, "JSON returned from file is incorrect!");
 
         testFile.deleteFile();
+    }
+
+    void jsonMemoryBlockTest()
+    {
+        chowdsp::json jTest = {
+            { "pi", 3.141 },
+            { "happy", true },
+            { "name", "Niels" },
+            { "nothing", nullptr },
+            { "answer", { { "everything", 42 } } },
+            { "list", { 1, 0, 2 } },
+            { "object", { { "currency", "USD" }, { "value", 42.99 } } }
+        };
+
+        auto testBlock = juce::MemoryBlock {};
+        chowdsp::JSONUtils::toMemoryBlock (jTest, testBlock);
+
+        auto jActual = chowdsp::JSONUtils::fromMemoryBlock (testBlock);
+        expect (jActual == jTest, "JSON returned from memory block is incorrect!");
     }
 
     void isSameTypeTest()
@@ -82,6 +101,9 @@ public:
 
         beginTest ("JSON File Test");
         jsonFileTest();
+
+        beginTest ("JSON Memory Block Test");
+        jsonMemoryBlockTest();
 
         beginTest ("Binary Data Test");
         binaryDataTest();

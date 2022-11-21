@@ -56,7 +56,7 @@ void ConfigFile::writeToFile()
     }
 
     const juce::ScopedLock sl { lock };
-    JSONUtils::toFile (configProperties, configFile);
+    JSONUtils::toFile (configProperties, configFile, 4);
 }
 
 void ConfigFile::addProperties (std::initializer_list<Property> properties)
