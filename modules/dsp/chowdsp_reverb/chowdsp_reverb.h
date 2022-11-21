@@ -49,4 +49,3 @@ namespace Reverb
 #include "Reverb/chowdsp_DattorroLattice.h"
 #include "Reverb/chowdsp_DattorroInputNetwork.h"
 #include "Reverb/chowdsp_DattorroTankNetwork.h"
-#include "Reverb/chowdsp_DattorroReverb.h"
