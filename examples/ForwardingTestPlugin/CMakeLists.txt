@@ -19,6 +19,7 @@ target_sources(ForwardingTestPlugin
         InternalPlugins/ARPFilterPlugin.cpp
         InternalPlugins/PolygonalOscPlugin.cpp
         InternalPlugins/BandSplitPlugin.cpp
+        InternalPlugins/PlateReverb.cpp
 )
 
 target_compile_definitions(ForwardingTestPlugin
