@@ -71,8 +71,7 @@ void ForwardingTestPlugin::parameterChanged (const juce::String& parameterID, fl
         auto& processorParameters = newProcessor->getParameters();
         forwardingParameters.setParameterRange (0,
                                                 numForwardParameters,
-                                                [&processorParameters] (int i) -> chowdsp::ParameterForwardingInfo
-                                                {
+                                                [&processorParameters] (int i) -> chowdsp::ParameterForwardingInfo {
                                                     if (auto* paramCast = dynamic_cast<juce::RangedAudioParameter*> (processorParameters[i]))
                                                         return { paramCast, paramCast->name };
 

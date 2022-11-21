@@ -271,8 +271,8 @@ private:
     std::array<FirstOrderLPF<FloatType>, numChannels> dampingFilters;
     FloatType fs = (FloatType) 48000.0;
 
-    int leftOutTaps[7]{};
-    int rightOutTaps[7]{};
+    int leftOutTaps[7] {};
+    int rightOutTaps[7] {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TankNetwork)
 };

@@ -85,7 +85,6 @@ public:
 private:
     std::array<Lattice<FloatType, Config::inputDiffusionStageLatticeLength>, (size_t) Config::InputDiffusionStage::NumStages> stages;
 
-
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (InputNetwork)
 };
 } // namespace chowdsp::Reverb::Dattorro
