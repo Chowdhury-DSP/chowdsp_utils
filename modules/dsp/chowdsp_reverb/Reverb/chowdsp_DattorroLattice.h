@@ -2,6 +2,7 @@
 
 namespace chowdsp::Reverb::Dattorro
 {
+/** Lattice filter used in Dattorro reverb architecture */
 template <typename FloatType, int maxSize, bool invert = false>
 struct Lattice
 {

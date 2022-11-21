@@ -2,6 +2,7 @@
 
 namespace chowdsp::Reverb::Dattorro
 {
+/** Configuration for the Dattorro input network */
 template <typename FloatType = float>
 struct DefaultInputNetworkConfig
 {
@@ -42,6 +43,7 @@ struct DefaultInputNetworkConfig
     }
 };
 
+/** Input diffusion network for the Dattorro reverb architecture */
 template <typename Config = DefaultInputNetworkConfig<>>
 class InputNetwork
 {
