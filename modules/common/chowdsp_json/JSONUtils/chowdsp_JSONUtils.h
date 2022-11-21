@@ -41,9 +41,16 @@ namespace JSONUtils
     /** Dump a json object to a file */
     inline void toFile (const json& j, const juce::File& file, const int indent = -1, const char indent_char = ' ')
     {
+        if (! file.deleteFile())
+        {
+            // unable to delete existing file (maybe there's a directory there?)
+            jassertfalse;
+            return;
+        }
+
         if (auto jsonOutputStream = file.createOutputStream())
         {
-            toOutputStream (j, *jsonOutputStream, file.getSize() == 0, indent, indent_char);
+            toOutputStream (j, *jsonOutputStream, true, indent, indent_char);
         }
         else
         {
