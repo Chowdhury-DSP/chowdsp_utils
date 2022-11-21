@@ -26,7 +26,7 @@ target_link_libraries(MyTarget PUBLIC
     juce::juce_audio_utils
     juce::juce_dsp
     # other JUCE modules...
-    chowdsp::chowdsp_dsp
+    chowdsp::chowdsp_dsp_utils
     chowdsp::chowdsp_gui
     chowdsp::chowdsp_plugin_base
     # Other modules and libraries...
