@@ -32,6 +32,13 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include <chowdsp_foleys/chowdsp_foleys.h>
 #endif
 
+#if JUCE_MODULE_AVAILABLE_chowdsp_plugin_state
+#define CHOWDSP_NO_APVTS 1
+#include <chowdsp_plugin_state/chowdsp_plugin_state.h>
+#else
+#define CHOWDSP_NO_APVTS 0
+#endif
+
 #include "PluginBase/chowdsp_ProgramAdapter.h"
 
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wzero-as-null-pointer-constant", // Clang doesn't like HasAddParameters checker
@@ -42,3 +49,7 @@ JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 #include "PluginBase/chowdsp_DummySynthSound.h"
 #include "PluginBase/chowdsp_SynthBase.h"
 #include "PluginBase/chowdsp_PluginDiagnosticInfo.h"
+
+#if CHOWDSP_NO_APVTS
+#include "PluginBase/chowdsp_PluginBaseWithState.h"
+#endif

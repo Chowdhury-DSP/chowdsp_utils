@@ -32,6 +32,7 @@ namespace ParamUtils
 }
 } // namespace chowdsp
 
+#include "ParamUtils/chowdsp_ParameterConversions.h"
 #include "ParamUtils/chowdsp_ParameterTypes.h"
 #include "ParamUtils/chowdsp_ParamUtils.h"
 #include "Forwarding/chowdsp_ForwardingParameter.h"
