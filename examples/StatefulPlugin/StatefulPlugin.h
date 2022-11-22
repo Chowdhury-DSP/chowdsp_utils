@@ -6,6 +6,8 @@ struct PluginParameterState
 {
     chowdsp::SmartPointer<chowdsp::PercentParameter> percent { "percent", "Percent" };
     chowdsp::SmartPointer<chowdsp::GainDBParameter> gain { "gain", "Gain", juce::NormalisableRange { -30.0f, 0.0f }, 0.0f };
+    chowdsp::SmartPointer<chowdsp::ChoiceParameter> mode { "mode", "Mode", juce::StringArray { "Percent", "Gain", "Percent / Gain", "Gain / Percent" }, 2 };
+    chowdsp::SmartPointer<chowdsp::BoolParameter> onOff { "on_off", "On/Off", true };
 };
 
 using State = chowdsp::PluginState<PluginParameterState>;

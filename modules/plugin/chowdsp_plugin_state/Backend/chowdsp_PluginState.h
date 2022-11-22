@@ -57,7 +57,12 @@ public:
                              [&paramsSerial] (const auto& paramHolder)
                              {
                                  S::addChildElement (paramsSerial, paramHolder->paramID);
-                                 S::addChildElement (paramsSerial, paramHolder->get());
+
+                                 using ParamType = typename std::decay_t<decltype (paramHolder)>::element_type;
+                                 if constexpr (std::is_base_of_v<juce::AudioParameterFloat, ParamType> || std::is_base_of_v<juce::AudioParameterBool, ParamType>)
+                                     S::addChildElement (paramsSerial, paramHolder->get());
+                                 else if constexpr (std::is_base_of_v<juce::AudioParameterChoice, ParamType>)
+                                     S::addChildElement (paramsSerial, paramHolder->getIndex());
                              });
 
         auto fullSerial = S::createBaseElement();
@@ -89,9 +94,26 @@ public:
                                      {
                                          if (paramHolder->paramID == paramID)
                                          {
-                                             float val;
-                                             Serialization::deserialize<S> (S::getChildElement (paramsSerial, i + 1), val);
-                                             paramHolder->setValueNotifyingHost (paramHolder->convertTo0to1 (val));
+                                             using ParamType = typename std::decay_t<decltype (paramHolder)>::element_type;
+                                             if constexpr (std::is_base_of_v<juce::AudioParameterFloat, ParamType>)
+                                             {
+                                                 float val;
+                                                 Serialization::deserialize<S> (S::getChildElement (paramsSerial, i + 1), val);
+                                                 static_cast<juce::AudioParameterFloat&> (*paramHolder) = val;
+                                             }
+                                             else if constexpr (std::is_base_of_v<juce::AudioParameterChoice, ParamType>)
+                                             {
+                                                 int val;
+                                                 Serialization::deserialize<S> (S::getChildElement (paramsSerial, i + 1), val);
+                                                 static_cast<juce::AudioParameterChoice&> (*paramHolder) = val;
+                                             }
+                                             else if constexpr (std::is_base_of_v<juce::AudioParameterBool, ParamType>)
+                                             {
+                                                 bool val;
+                                                 Serialization::deserialize<S> (S::getChildElement (paramsSerial, i + 1), val);
+                                                 static_cast<juce::AudioParameterBool&> (*paramHolder) = val;
+                                             }
+
                                              paramIDsThatHaveBeenDeserialized.add (paramID);
                                          }
                                      });
@@ -109,7 +131,7 @@ public:
                              [&paramIDsThatHaveBeenDeserialized] (auto& paramHolder)
                              {
                                  if (! paramIDsThatHaveBeenDeserialized.contains (paramHolder->paramID))
-                                     paramHolder->setValueNotifyingHost (paramHolder->convertTo0to1 (paramHolder->getDefaultValue()));
+                                     paramHolder->setValueNotifyingHost (paramHolder->convertTo0to1 (static_cast<juce::AudioProcessorParameter&> (*paramHolder).getDefaultValue()));
                              });
 
         Serialization::deserialize<S> (S::getChildElement (serial, 1), object.nonParams);
