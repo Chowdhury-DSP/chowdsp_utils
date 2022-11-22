@@ -36,6 +36,12 @@ public:
         processSynth (buffer, midi);
     }
 
+#if JUCE_MODULE_AVAILABLE_chowdsp_clap_extensions
+    bool supportsNoteName() const noexcept override { return true; }
+    int noteNameCount() noexcept override { return 0; }
+    bool noteNameGet(int /*index*/, clap_note_name* /*noteName*/) noexcept override { return false; }
+#endif
+
 private:
     static juce::AudioProcessor::BusesProperties getDefaultBusLayout()
     {
