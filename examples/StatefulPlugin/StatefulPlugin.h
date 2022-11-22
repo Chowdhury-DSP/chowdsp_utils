@@ -10,7 +10,13 @@ struct PluginParameterState
     chowdsp::SmartPointer<chowdsp::BoolParameter> onOff { "on_off", "On/Off", true };
 };
 
-using State = chowdsp::PluginState<PluginParameterState>;
+struct PluginNonParameterState
+{
+    int editorWidth = 300;
+    int editorHeight = 500;
+};
+
+using State = chowdsp::PluginState<PluginParameterState, PluginNonParameterState>;
 
 class StatefulPlugin : public chowdsp::PluginBaseWithState<State>
 {

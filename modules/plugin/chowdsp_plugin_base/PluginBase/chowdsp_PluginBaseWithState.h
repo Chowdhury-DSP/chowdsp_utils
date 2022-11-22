@@ -79,6 +79,9 @@ public:
     void getStateInformation (juce::MemoryBlock& data) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    auto& getState() { return state; }
+    const auto& getState() const { return state; }
+
     virtual juce::String getWrapperTypeString() const;
     bool supportsParameterModulation() const;
 

@@ -1,4 +1,5 @@
 #include "StatefulPlugin.h"
+#include "PluginEditor.h"
 
 StatefulPlugin::StatefulPlugin()
 {
@@ -45,7 +46,7 @@ void StatefulPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
 
 juce::AudioProcessorEditor* StatefulPlugin::createEditor()
 {
-    return new juce::GenericAudioProcessorEditor { *this };
+    return new PluginEditor { *this };
 }
 
 // This creates new instances of the plugin

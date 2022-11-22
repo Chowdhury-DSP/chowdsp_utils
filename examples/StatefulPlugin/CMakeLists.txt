@@ -8,4 +8,5 @@ target_link_libraries(StatefulPlugin
 target_sources(StatefulPlugin
     PRIVATE
         StatefulPlugin.cpp
+        PluginEditor.cpp
 )
