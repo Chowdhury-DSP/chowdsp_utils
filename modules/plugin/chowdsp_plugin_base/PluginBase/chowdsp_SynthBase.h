@@ -37,7 +37,7 @@ public:
     }
 
 #if JUCE_MODULE_AVAILABLE_chowdsp_clap_extensions
-    bool supportsNoteName() const noexcept override
+    [[nodiscard]] bool supportsNoteName() const noexcept override
     {
         return true;
     }
