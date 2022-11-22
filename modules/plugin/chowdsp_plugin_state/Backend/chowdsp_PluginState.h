@@ -2,38 +2,6 @@
 
 namespace chowdsp
 {
-template <typename T>
-struct OptionallyOwningPointer
-{
-    using Type = T;
-
-    template <typename... Args>
-    explicit OptionallyOwningPointer (Args&&... args)
-    {
-        owningPtr = std::make_unique<T> (std::forward<Args> (args)...);
-        nonOwningPtr = owningPtr.get();
-    }
-
-    OptionallyOwningPointer (OptionallyOwningPointer&&) noexcept = default;
-    OptionallyOwningPointer& operator= (OptionallyOwningPointer&&) noexcept = default;
-
-    auto release()
-    {
-        jassert (owningPtr != nullptr); // Pointer has already been released!
-        return owningPtr.release();
-    }
-
-    operator T&() { return *nonOwningPtr; } // NOSONAR, NOLINT(google-explicit-constructor): we want to be able to do implicit conversion here
-    T* operator->() { return nonOwningPtr; }
-    const T* operator->() const { return nonOwningPtr; }
-    T& operator*() { return *nonOwningPtr; }
-
-private:
-    std::unique_ptr<T> owningPtr;
-    T* nonOwningPtr;
-
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OptionallyOwningPointer)
-};
 
 struct NullState
 {
@@ -50,7 +18,7 @@ public:
         pfr::for_each_field (params,
                              [&processor] (auto& paramHolder)
                              {
-                                 using ParamType = typename std::decay_t<decltype (paramHolder)>::Type;
+                                 using ParamType = typename std::decay_t<decltype (paramHolder)>::element_type;
                                  static_assert (std::is_base_of_v<juce::RangedAudioParameter, ParamType>,
                                                 "All parameters must be OptionallyOwnedPointers of JUCE parameter types!");
 
