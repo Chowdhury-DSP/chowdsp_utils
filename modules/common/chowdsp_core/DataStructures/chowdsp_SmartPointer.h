@@ -57,6 +57,7 @@ struct SmartPointer
     T* operator->() { return nonOwningPtr; }
     const T* operator->() const { return nonOwningPtr; }
     T& operator*() { return *nonOwningPtr; }
+    const T& operator*() const { return *nonOwningPtr; }
 
 private:
     std::unique_ptr<T> owningPtr {};
@@ -122,4 +123,18 @@ bool operator!= (std::nullptr_t, const SmartPointer<T>& p2)
 {
     return nullptr != p2.get();
 }
+
+template <class T>
+struct IsSmartPointerType : std::false_type
+{
+};
+
+template <class T>
+struct IsSmartPointerType<SmartPointer<T>> : std::true_type
+{
+};
+
+/** True if the type is a chowdsp::SmartPointer<T> */
+template <typename T>
+static constexpr bool IsSmartPointer = IsSmartPointerType<T>::value;
 } // namespace chowdsp

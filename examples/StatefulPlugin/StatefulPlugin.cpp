@@ -23,21 +23,21 @@ void StatefulPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
     const auto mode = state.params.mode->getIndex();
     if (mode == 0)
     {
-        leftGain = rightGain = state.params.percent->getCurrentValue();
+        leftGain = rightGain = state.params.levelParams.percent->getCurrentValue();
     }
     else if (mode == 1)
     {
-        leftGain = rightGain = juce::Decibels::decibelsToGain (state.params.gain->getCurrentValue());
+        leftGain = rightGain = juce::Decibels::decibelsToGain (state.params.levelParams.gain->getCurrentValue());
     }
     else if (mode == 2)
     {
-        leftGain = state.params.percent->getCurrentValue();
-        rightGain = juce::Decibels::decibelsToGain (state.params.gain->getCurrentValue());
+        leftGain = state.params.levelParams.percent->getCurrentValue();
+        rightGain = juce::Decibels::decibelsToGain (state.params.levelParams.gain->getCurrentValue());
     }
     else if (mode == 3)
     {
-        rightGain = state.params.percent->getCurrentValue();
-        leftGain = juce::Decibels::decibelsToGain (state.params.gain->getCurrentValue());
+        rightGain = state.params.levelParams.percent->getCurrentValue();
+        leftGain = juce::Decibels::decibelsToGain (state.params.levelParams.gain->getCurrentValue());
     }
 
     buffer.applyGain (0, 0, numSamples, leftGain);

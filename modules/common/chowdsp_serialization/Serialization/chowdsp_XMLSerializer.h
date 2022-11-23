@@ -25,9 +25,22 @@ public:
         serial->writeTo (file);
     }
 
+    static void toMemoryBlock (const SerializedType& serial, juce::MemoryBlock& block)
+    {
+        auto&& outStream = juce::MemoryOutputStream (block, false);
+        serial->writeTo (outStream);
+    }
+
     static SerializedType fromFile (const juce::File& file)
     {
         auto serial = juce::parseXML (file);
+        jassert (serial != nullptr); // unable to load from file!
+        return serial;
+    }
+
+    static SerializedType fromMemoryBlock (const juce::MemoryBlock& block)
+    {
+        auto serial = juce::parseXML (block.toString());
         jassert (serial != nullptr); // unable to load from file!
         return serial;
     }

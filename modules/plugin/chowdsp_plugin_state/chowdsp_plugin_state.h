@@ -23,4 +23,5 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include <chowdsp_core/chowdsp_core.h>
 #include <chowdsp_serialization/chowdsp_serialization.h>
 
+#include "Backend/chowdsp_ParameterStateSerializer.h"
 #include "Backend/chowdsp_PluginState.h"

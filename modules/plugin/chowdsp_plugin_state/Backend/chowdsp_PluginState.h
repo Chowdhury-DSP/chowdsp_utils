@@ -2,6 +2,32 @@
 
 namespace chowdsp
 {
+#ifndef DOXYGEN
+namespace detail
+{
+    template <typename ParamsStateType>
+    void addParamsToProcessor (juce::AudioProcessor& processor, ParamsStateType& paramsState)
+    {
+        pfr::for_each_field (paramsState,
+                             [&processor] (auto& paramHolder)
+                             {
+                                 using Type = std::decay_t<decltype (paramHolder)>;
+                                 if constexpr (IsSmartPointer<Type>)
+                                 {
+                                     using ParamType = typename std::decay_t<decltype (paramHolder)>::element_type;
+                                     static_assert (std::is_base_of_v<juce::RangedAudioParameter, ParamType>,
+                                                    "All parameters must be SmartPointers of JUCE parameter types!");
+
+                                     processor.addParameter (paramHolder.release());
+                                 }
+                                 else
+                                 {
+                                     addParamsToProcessor (processor, paramHolder); // add nested params!
+                                 }
+                             });
+    }
+} // namespace detail
+#endif
 
 struct NullState
 {
@@ -13,62 +39,26 @@ class PluginState
 public:
     explicit PluginState (juce::AudioProcessor& processor)
     {
-        // TODO: what about parameter groups, or nested parameter trees in general?
-
-        pfr::for_each_field (params,
-                             [&processor] (auto& paramHolder)
-                             {
-                                 using ParamType = typename std::decay_t<decltype (paramHolder)>::element_type;
-                                 static_assert (std::is_base_of_v<juce::RangedAudioParameter, ParamType>,
-                                                "All parameters must be OptionallyOwnedPointers of JUCE parameter types!");
-
-                                 processor.addParameter (paramHolder.release());
-                             });
+        detail::addParamsToProcessor (processor, params);
     }
 
     void serialize (juce::MemoryBlock& data)
     {
-        const auto serial = Serialization::serialize<Serializer> (*this);
-        JSONUtils::toMemoryBlock (serial, data);
+        Serialization::serialize<Serializer> (*this, data);
     }
 
     void deserialize (const juce::MemoryBlock& data)
     {
-        json deserial;
-        try
-        {
-            deserial = JSONUtils::fromMemoryBlock (data);
-        }
-        catch (const std::exception& e)
-        {
-            jassertfalse;
-            juce::Logger::writeToLog (juce::String { "Error reading saved state! " } + juce::String { e.what() });
-            return;
-        }
-
-        Serialization::deserialize<Serializer> (deserial, *this);
+        Serialization::deserialize<Serializer> (data, *this);
     }
 
     template <typename S>
     static typename S::SerializedType serialize (const PluginState& object)
     {
-        auto paramsSerial = S::createBaseElement();
-        pfr::for_each_field (object.params,
-                             [&paramsSerial] (const auto& paramHolder)
-                             {
-                                 S::addChildElement (paramsSerial, paramHolder->paramID);
-
-                                 using ParamType = typename std::decay_t<decltype (paramHolder)>::element_type;
-                                 if constexpr (std::is_base_of_v<juce::AudioParameterFloat, ParamType> || std::is_base_of_v<juce::AudioParameterBool, ParamType>)
-                                     S::addChildElement (paramsSerial, paramHolder->get());
-                                 else if constexpr (std::is_base_of_v<juce::AudioParameterChoice, ParamType>)
-                                     S::addChildElement (paramsSerial, paramHolder->getIndex());
-                             });
-
-        auto fullSerial = S::createBaseElement();
-        S::addChildElement (fullSerial, std::move (paramsSerial));
-        S::addChildElement (fullSerial, Serialization::serialize<S> (object.nonParams));
-        return fullSerial;
+        auto serial = S::createBaseElement();
+        S::addChildElement (serial, ParameterStateSerializer::serialize<S> (object.params));
+        S::addChildElement (serial, Serialization::serialize<S> (object.nonParams));
+        return serial;
     }
 
     template <typename S>
@@ -80,60 +70,7 @@ public:
             return;
         }
 
-        const auto paramsSerial = S::getChildElement (serial, 0);
-        juce::StringArray paramIDsThatHaveBeenDeserialized {};
-        if (const auto numParamIDsAndVals = S::getNumChildElements (paramsSerial); numParamIDsAndVals % 2 == 0)
-        {
-            for (int i = 0; i < numParamIDsAndVals; i += 2)
-            {
-                juce::String paramID {};
-                Serialization::deserialize<S> (S::getChildElement (paramsSerial, i), paramID);
-
-                pfr::for_each_field (object.params,
-                                     [i, &paramsSerial, &paramID, &paramIDsThatHaveBeenDeserialized] (auto& paramHolder)
-                                     {
-                                         if (paramHolder->paramID == paramID)
-                                         {
-                                             using ParamType = typename std::decay_t<decltype (paramHolder)>::element_type;
-                                             if constexpr (std::is_base_of_v<juce::AudioParameterFloat, ParamType>)
-                                             {
-                                                 float val;
-                                                 Serialization::deserialize<S> (S::getChildElement (paramsSerial, i + 1), val);
-                                                 static_cast<juce::AudioParameterFloat&> (*paramHolder) = val;
-                                             }
-                                             else if constexpr (std::is_base_of_v<juce::AudioParameterChoice, ParamType>)
-                                             {
-                                                 int val;
-                                                 Serialization::deserialize<S> (S::getChildElement (paramsSerial, i + 1), val);
-                                                 static_cast<juce::AudioParameterChoice&> (*paramHolder) = val;
-                                             }
-                                             else if constexpr (std::is_base_of_v<juce::AudioParameterBool, ParamType>)
-                                             {
-                                                 bool val;
-                                                 Serialization::deserialize<S> (S::getChildElement (paramsSerial, i + 1), val);
-                                                 static_cast<juce::AudioParameterBool&> (*paramHolder) = val;
-                                             }
-
-                                             paramIDsThatHaveBeenDeserialized.add (paramID);
-                                         }
-                                     });
-
-                jassert (paramIDsThatHaveBeenDeserialized.contains (paramID)); // trying to load unknown parameter ID!
-            }
-        }
-        else
-        {
-            jassertfalse; // state loading error
-        }
-
-        // set all un-matched parameters to their default values
-        pfr::for_each_field (object.params,
-                             [&paramIDsThatHaveBeenDeserialized] (auto& paramHolder)
-                             {
-                                 if (! paramIDsThatHaveBeenDeserialized.contains (paramHolder->paramID))
-                                     paramHolder->setValueNotifyingHost (paramHolder->convertTo0to1 (static_cast<juce::AudioProcessorParameter&> (*paramHolder).getDefaultValue()));
-                             });
-
+        ParameterStateSerializer::deserialize<S> (S::getChildElement (serial, 0), object.params);
         Serialization::deserialize<S> (S::getChildElement (serial, 1), object.nonParams);
     }
 
