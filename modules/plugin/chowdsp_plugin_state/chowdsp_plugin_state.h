@@ -18,6 +18,16 @@ BEGIN_JUCE_MODULE_DECLARATION
 ==============================================================================
 */
 
+/**
+ * This module is still a work-in-progress. The API is _unstable_!
+ *
+ * Jatin's TODO list:
+ * - ParameterAttachments
+ * - Listeners (message thread or audio thread)
+ * - UndoManager integration
+ * - Update the rest of chowdsp_utils to use this module over APVTS when it's available
+ */
+
 #pragma once
 
 #include <chowdsp_core/chowdsp_core.h>
