@@ -139,7 +139,7 @@ namespace ParameterStateSerializer
                                  if constexpr (IsSmartPointer<Type>)
                                  {
                                      if (! namesThatHaveBeenDeserialized.contains (paramHolder->paramID))
-                                         paramHolder->setValueNotifyingHost (paramHolder->convertTo0to1 (static_cast<juce::AudioProcessorParameter&> (*paramHolder).getDefaultValue()));
+                                         paramHolder->setValueNotifyingHost (static_cast<juce::AudioProcessorParameter&> (*paramHolder).getDefaultValue());
                                  }
                                  else
                                  {

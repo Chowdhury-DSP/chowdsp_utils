@@ -37,6 +37,8 @@ template <typename ParameterState, typename NonParameterState = NullState, typen
 class PluginState
 {
 public:
+    PluginState() = default;
+    
     explicit PluginState (juce::AudioProcessor& processor)
     {
         detail::addParamsToProcessor (processor, params);
