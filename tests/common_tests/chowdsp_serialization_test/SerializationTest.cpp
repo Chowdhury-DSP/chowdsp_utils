@@ -155,6 +155,27 @@ public:
         expectEquals (actual, ref, "File Serialization is Incorrect!");
     }
 
+    void memoryBlockSerializationTest()
+    {
+        struct Test
+        {
+            int x = 0;
+            float y = 1.0f;
+            double z = -3.0;
+        };
+
+        juce::MemoryBlock block;
+        chowdsp::Serialization::serialize<Serializer> (Test {}, block);
+
+        const auto ref = Serializer::toString (chowdsp::Serialization::serialize<Serializer> (Test {}));
+
+        Test t2;
+        chowdsp::Serialization::deserialize<Serializer> (block, t2);
+        const auto actual = Serializer::toString (chowdsp::Serialization::serialize<Serializer> (t2));
+
+        expectEquals (actual, ref, "MemoryBlock Serialization is Incorrect!");
+    }
+
     void badDeserializationTest()
     {
         struct Test
@@ -222,6 +243,9 @@ public:
 
         beginTest ("File Serialization Test");
         fileSerializationTest();
+
+        beginTest ("MemoryBlock Serialization Test");
+        memoryBlockSerializationTest();
 
         beginTest ("Bad Deserialization Test");
         badDeserializationTest();
