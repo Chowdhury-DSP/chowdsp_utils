@@ -62,6 +62,7 @@ namespace ParameterStateSerializer
     } // namespace detail
 #endif
 
+    /** Helper method for serializing a plugin state object */
     template <typename Serializer, typename ParamsState>
     static typename Serializer::SerializedType serialize (const ParamsState& params)
     {
@@ -92,6 +93,7 @@ namespace ParameterStateSerializer
         return paramsSerial;
     }
 
+    /** Helper method for deserializing a plugin state object */
     template <typename Serializer, typename ParamsState>
     static void deserialize (typename Serializer::DeserializedType paramsSerial, ParamsState& params)
     {
