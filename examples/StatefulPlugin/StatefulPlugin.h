@@ -18,7 +18,7 @@ struct PluginNonParameterState
 
 using State = chowdsp::PluginState<PluginParameterState, PluginNonParameterState>;
 
-class StatefulPlugin : public chowdsp::PluginBaseWithState<State>
+class StatefulPlugin : public chowdsp::PluginBase<State>
 {
 public:
     StatefulPlugin();
