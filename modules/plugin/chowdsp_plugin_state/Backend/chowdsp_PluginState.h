@@ -1,10 +1,31 @@
 #pragma once
 
+#include "../../../common/chowdsp_core/JUCEHelpers/juce_FixedSizeFunction.h"
+
+// @TODO: should we just make this module depend on dsp_data_structures?
+#include "../../../dsp/chowdsp_dsp_data_structures/third_party/moodycamel/readerwriterqueue.h"
+
 namespace chowdsp
 {
 #ifndef DOXYGEN
 namespace detail
 {
+    template <typename ParamStateType, int count = 0, int index = pfr::tuple_size_v<ParamStateType>>
+    struct ParamCountHelper
+    {
+        static constexpr int nextCount = IsSmartPointer<decltype (pfr::get<index - 1> (ParamStateType {}))> ? count + 1 : count;
+        static constexpr int value = ParamCountHelper<ParamStateType, index - 1, nextCount>::value;
+    };
+
+    template <typename ParamStateType, int count>
+    struct ParamCountHelper<ParamStateType, 0, count>
+    {
+        static constexpr int value = count;
+    };
+
+    template <typename ParamStateType>
+    static constexpr int ParamCount = ParamCountHelper<ParamStateType>::value;
+
     template <typename ParamsStateType>
     void addParamsToProcessor (juce::AudioProcessor& processor, ParamsStateType& paramsState)
     {
@@ -41,13 +62,24 @@ struct NullState
  * @tparam Serializer           A type that implements chowdsp::BaseSerializer (JSONSerializer by default)
  */
 template <typename ParameterState, typename NonParameterState = NullState, typename Serializer = JSONSerializer>
-class PluginState
+class PluginState : private juce::HighResolutionTimer,
+                    private juce::AsyncUpdater
 {
 public:
-    PluginState() = default;
+    PluginState()
+    {
+        doForAllParams (params,
+                        [this] (juce::RangedAudioParameter& param, size_t index)
+                        {
+                            paramInfoList[index] = ParamInfo { &param, param.getValue() };
+                        });
+
+        startTimer (10); // @TODO: tune the timer interval
+    }
 
     /** Constructs the state and adds all the state parameters to the given processor */
     explicit PluginState (juce::AudioProcessor& processor)
+        : PluginState()
     {
         detail::addParamsToProcessor (processor, params);
     }
@@ -88,10 +120,114 @@ public:
         Serialization::deserialize<S> (S::getChildElement (serial, 1), object.nonParams);
     }
 
+    /**
+     * Adds a parameter listener which will be called on either the message
+     * thread or the audio thread (you choose!). Listeners should have the
+     * signature void().
+     */
+    template <typename ParamType, typename... ListenerArgs>
+    auto addParameterListener (const ParamType& param, bool listenOnMessageThread, ListenerArgs&&... args)
+    {
+        const auto paramInfoIter = std::find_if (paramInfoList.begin(), paramInfoList.end(), [&param] (const ParamInfo& info)
+                                                 { return info.paramCookie == &param; });
+
+        if (paramInfoIter == paramInfoList.end())
+        {
+            jassertfalse; // trying to listen to a parameter that is not part of this state!
+            return chowdsp::Callback {};
+        }
+
+        const auto index = (size_t) std::distance (paramInfoList.begin(), paramInfoIter);
+        auto& broadcasterList = listenOnMessageThread ? messageThreadBroadcasters : audioThreadBroadcasters;
+        return broadcasterList[index].connect (std::forward<ListenerArgs...> (args...));
+    }
+
+    /**
+     * Runs parameter broadcasters synchronously.
+     * This method is intended to be called from the audio thread.
+     */
+    void callAudioThreadBroadcasters()
+    {
+        AudioThreadAction action;
+        while (audioThreadBroadcastQueue.try_dequeue (action))
+            action();
+    }
+
     ParameterState params;
     NonParameterState nonParams;
 
 private:
+    template <typename ParamsType, typename Callable>
+    static constexpr size_t doForAllParams (ParamsType& params, Callable&& callable, size_t index = 0)
+    {
+        pfr::for_each_field (params,
+                             [&index, call = std::forward<Callable> (callable)] (auto& paramHolder) mutable
+                             {
+                                 using Type = std::decay_t<decltype (paramHolder)>;
+                                 if constexpr (IsSmartPointer<Type>)
+                                 {
+                                     call (*paramHolder, index++);
+                                 }
+                                 else
+                                 {
+                                     index = doForAllParams (paramHolder, std::forward<Callable> (call), index);
+                                 }
+                             });
+        return index;
+    }
+
+    void callMessageThreadBroadcaster (size_t index)
+    {
+        messageThreadBroadcasters[index]();
+    }
+
+    void callAudioThreadBroadcaster (size_t index)
+    {
+        audioThreadBroadcasters[index]();
+    }
+
+    void hiResTimerCallback() override
+    {
+        for (const auto [index, paramInfo] : enumerate (paramInfoList))
+        {
+            if (paramInfo.paramCookie->getValue() == paramInfo.value)
+                continue;
+
+            paramInfo.value = paramInfo.paramCookie->getValue();
+            messageThreadBroadcastQueue.enqueue ([this, i = index]
+                                                 { callMessageThreadBroadcaster (i); });
+            audioThreadBroadcastQueue.try_enqueue ([this, i = index]
+                                                   { callAudioThreadBroadcaster (i); });
+            triggerAsyncUpdate();
+        }
+    }
+
+    void handleAsyncUpdate() override
+    {
+        MessageThreadAction action;
+        while (messageThreadBroadcastQueue.try_dequeue (action))
+            action();
+    }
+
+    struct ParamInfo
+    {
+        const juce::RangedAudioParameter* paramCookie = nullptr;
+        float value = 0.0f;
+    };
+
+    // @TODO: figure out how to count parameters at compile-time!
+    static constexpr auto totalNumParams = (size_t) detail::ParamCount<ParameterState>;
+
+    std::array<ParamInfo, totalNumParams> paramInfoList;
+
+    std::array<chowdsp::Broadcaster<void()>, totalNumParams> messageThreadBroadcasters;
+    using MessageThreadAction = juce::dsp::FixedSizeFunction<sizeof (&PluginState::callMessageThreadBroadcaster), void()>;
+    moodycamel::ReaderWriterQueue<MessageThreadAction> messageThreadBroadcastQueue { totalNumParams };
+
+    std::array<chowdsp::Broadcaster<void()>, totalNumParams> audioThreadBroadcasters;
+    using AudioThreadAction = juce::dsp::FixedSizeFunction<sizeof (&PluginState::callAudioThreadBroadcaster), void()>;
+    moodycamel::ReaderWriterQueue<AudioThreadAction> audioThreadBroadcastQueue { totalNumParams };
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginState)
 };
 } // namespace chowdsp

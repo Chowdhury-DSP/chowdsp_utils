@@ -9,4 +9,5 @@ target_link_libraries(chowdsp_plugin_state_test
 target_sources(chowdsp_plugin_state_test
     PRIVATE
         StateSerializationTest.cpp
+        StateListenersTest.cpp
 )

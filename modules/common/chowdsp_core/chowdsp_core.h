@@ -44,6 +44,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "JUCEHelpers/juce_ExtraDefinitions.h"
 #include "JUCEHelpers/juce_MathsFunctions.h"
 #include "JUCEHelpers/juce_FloatVectorOperations.h"
+#include "JUCEHelpers/juce_FixedSizeFunction.h"
 #include "JUCEHelpers/juce_Decibels.h"
 #include "JUCEHelpers/juce_SmoothedValue.h"
 

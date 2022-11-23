@@ -5,62 +5,6 @@ namespace chowdsp
 /** Serialization/De-serialization functions for parameter state objects */
 namespace ParameterStateSerializer
 {
-#ifndef DOXYGEN
-    namespace detail
-    {
-        template <typename T, typename = void>
-        struct ParameterElementTypeImpl;
-
-        template <typename T>
-        struct ParameterElementTypeImpl<T, typename std::enable_if<std::is_base_of_v<juce::AudioParameterFloat, T>>::type>
-            : std::true_type
-        {
-            using base_type = juce::AudioParameterFloat;
-            using element_type = float;
-        };
-
-        template <typename T>
-        struct ParameterElementTypeImpl<T, typename std::enable_if<std::is_base_of_v<juce::AudioParameterChoice, T>>::type>
-            : std::true_type
-        {
-            using base_type = juce::AudioParameterChoice;
-            using element_type = int;
-        };
-
-        template <typename T>
-        struct ParameterElementTypeImpl<T, typename std::enable_if<std::is_base_of_v<juce::AudioParameterBool, T>>::type>
-            : std::true_type
-        {
-            using base_type = juce::AudioParameterBool;
-            using element_type = bool;
-        };
-
-        /** Returns the base type of the parameter */
-        template <typename ParamType>
-        using ParameterBaseType = typename ParameterElementTypeImpl<ParamType>::base_type;
-
-        /** Returns the element type of the parameter */
-        template <typename ParamType>
-        using ParameterElementType = typename ParameterElementTypeImpl<ParamType>::element_type;
-
-        template <typename ParamType>
-        ParameterElementType<ParamType> getSerializableValue (const ParamType& param)
-        {
-            if constexpr (std::is_base_of_v<juce::AudioParameterFloat, ParamType> || std::is_base_of_v<juce::AudioParameterBool, ParamType>)
-                return param.get();
-            else if constexpr (std::is_base_of_v<juce::AudioParameterChoice, ParamType>)
-                return param.getIndex();
-        }
-
-        template <typename Serializer, typename ParamType>
-        void deserializeParameter (const typename Serializer::SerializedType& serial, ParamType& param)
-        {
-            ParameterElementType<ParamType> val;
-            Serialization::deserialize<Serializer> (serial, val);
-            static_cast<ParameterBaseType<ParamType>&> (param) = val;
-        }
-    } // namespace detail
-#endif
 
     /** Helper method for serializing a plugin state object */
     template <typename Serializer, typename ParamsState>
@@ -75,7 +19,7 @@ namespace ParameterStateSerializer
                                  if constexpr (IsSmartPointer<Type>)
                                  {
                                      Serializer::addChildElement (paramsSerial, paramHolder->paramID);
-                                     Serializer::addChildElement (paramsSerial, detail::getSerializableValue (*paramHolder));
+                                     Serializer::addChildElement (paramsSerial, ParameterTypeHelpers::getSerializableValue (*paramHolder));
                                  }
                              });
 
@@ -114,7 +58,7 @@ namespace ParameterStateSerializer
                                          if constexpr (IsSmartPointer<Type>)
                                          {
                                              if (paramHolder->paramID == name)
-                                                 detail::deserializeParameter<Serializer> (serial, *paramHolder);
+                                                 ParameterTypeHelpers::deserializeParameter<Serializer> (serial, *paramHolder);
                                          }
                                          else
                                          {

@@ -23,7 +23,7 @@ BEGIN_JUCE_MODULE_DECLARATION
  *
  * Jatin's TODO list:
  * - ParameterAttachments
- * - Listeners (message thread or audio thread)
+ * - Listeners: think about threading situation, and test to see how it scales for large numbers of params
  * - UndoManager integration
  * - Update the rest of chowdsp_utils to use this module over APVTS when it's available
  */
@@ -32,7 +32,11 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 #include <chowdsp_core/chowdsp_core.h>
 #include <chowdsp_serialization/chowdsp_serialization.h>
+#include <chowdsp_listeners/chowdsp_listeners.h>
 #include <chowdsp_parameters/chowdsp_parameters.h>
 
+#include "Backend/chowdsp_ParameterTypeHelpers.h"
 #include "Backend/chowdsp_ParameterStateSerializer.h"
 #include "Backend/chowdsp_PluginState.h"
+
+#include "Frontend/chowdsp_ParameterAttachments.h"
