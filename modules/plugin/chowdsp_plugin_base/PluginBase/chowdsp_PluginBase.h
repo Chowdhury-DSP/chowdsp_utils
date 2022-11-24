@@ -94,7 +94,11 @@ public:
     {
         return state;
     }
-    const auto& getState() const { return state; }
+
+    const auto& getState() const
+    {
+        return state;
+    }
 #endif
 
     virtual juce::String getWrapperTypeString() const;

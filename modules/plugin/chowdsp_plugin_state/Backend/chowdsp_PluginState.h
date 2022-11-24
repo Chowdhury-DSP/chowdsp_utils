@@ -1,8 +1,7 @@
 #pragma once
 
+// @TODO: figure out how we want to handle these dependencies...
 #include "../../../common/chowdsp_core/JUCEHelpers/juce_FixedSizeFunction.h"
-
-// @TODO: should we just make this module depend on dsp_data_structures?
 #include "../../../dsp/chowdsp_dsp_data_structures/third_party/moodycamel/readerwriterqueue.h"
 
 namespace chowdsp
@@ -26,6 +25,7 @@ namespace detail
     template <typename ParamStateType>
     static constexpr int ParamCount = ParamCountHelper<ParamStateType>::value;
 
+    // @TODO: use doForParams instead?
     template <typename ParamsStateType>
     void addParamsToProcessor (juce::AudioProcessor& processor, ParamsStateType& paramsState)
     {

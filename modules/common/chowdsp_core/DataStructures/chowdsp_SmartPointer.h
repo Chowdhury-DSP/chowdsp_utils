@@ -46,7 +46,7 @@ struct SmartPointer
     /** Releases ownership of the underlying data */
     T* release()
     {
-        jassert (owningPtr != nullptr); // Pointer has already been released!
+        jassert (isOwner()); // Pointer has already been released!
         return owningPtr.release();
     }
 
