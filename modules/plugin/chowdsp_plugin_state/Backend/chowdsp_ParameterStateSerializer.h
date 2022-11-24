@@ -16,7 +16,7 @@ namespace ParameterStateSerializer
                              [&paramsSerial] (const auto& paramHolder)
                              {
                                  using Type = std::decay_t<decltype (paramHolder)>;
-                                 if constexpr (IsSmartPointer<Type>)
+                                 if constexpr (ParameterTypeHelpers::IsParameterPointerType<Type>)
                                  {
                                      Serializer::addChildElement (paramsSerial, paramHolder->paramID);
                                      Serializer::addChildElement (paramsSerial, ParameterTypeHelpers::getSerializableValue (*paramHolder));
@@ -27,7 +27,7 @@ namespace ParameterStateSerializer
                              [&paramsSerial] (const auto& paramHolder)
                              {
                                  using Type = std::decay_t<decltype (paramHolder)>;
-                                 if constexpr (! IsSmartPointer<Type>)
+                                 if constexpr (! ParameterTypeHelpers::IsParameterPointerType<Type>)
                                  {
                                      Serializer::addChildElement (paramsSerial, Type::name);
                                      Serializer::addChildElement (paramsSerial, serialize<Serializer> (paramHolder));
@@ -55,7 +55,7 @@ namespace ParameterStateSerializer
                                          const auto serial = Serializer::getChildElement (paramsSerial, i + 1);
 
                                          using Type = std::decay_t<decltype (paramHolder)>;
-                                         if constexpr (IsSmartPointer<Type>)
+                                         if constexpr (ParameterTypeHelpers::IsParameterPointerType<Type>)
                                          {
                                              if (paramHolder->paramID == name)
                                                  ParameterTypeHelpers::deserializeParameter<Serializer> (serial, *paramHolder);
@@ -82,7 +82,7 @@ namespace ParameterStateSerializer
                              [&namesThatHaveBeenDeserialized] (auto& paramHolder)
                              {
                                  using Type = std::decay_t<decltype (paramHolder)>;
-                                 if constexpr (IsSmartPointer<Type>)
+                                 if constexpr (ParameterTypeHelpers::IsParameterPointerType<Type>)
                                  {
                                      if (! namesThatHaveBeenDeserialized.contains (paramHolder->paramID))
                                          paramHolder->setValueNotifyingHost (static_cast<juce::AudioProcessorParameter&> (*paramHolder).getDefaultValue());

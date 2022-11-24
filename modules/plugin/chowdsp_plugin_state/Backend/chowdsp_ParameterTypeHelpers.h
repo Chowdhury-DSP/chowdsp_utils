@@ -5,6 +5,20 @@ namespace chowdsp
 #ifndef DOXYGEN
 namespace ParameterTypeHelpers
 {
+    template <typename T>
+    struct IsParameterPointerTypeImpl : std::false_type
+    {
+    };
+
+    template <typename T>
+    struct IsParameterPointerTypeImpl<SmartPointer<T>>
+        : std::conditional_t<std::is_base_of_v<juce::RangedAudioParameter, T>, std::true_type, std::false_type>
+    {
+    };
+
+    template <typename T>
+    static constexpr bool IsParameterPointerType = IsParameterPointerTypeImpl<T>::value;
+
     template <typename T, typename = void>
     struct ParameterElementTypeImpl;
 

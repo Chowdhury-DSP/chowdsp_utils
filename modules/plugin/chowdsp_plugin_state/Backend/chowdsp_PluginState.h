@@ -7,47 +7,52 @@
 namespace chowdsp
 {
 #ifndef DOXYGEN
-namespace detail
+namespace plugin_state_detail
 {
-    template <typename ParamStateType, int count = 0, int index = pfr::tuple_size_v<ParamStateType>>
-    struct ParamCountHelper
+    template <typename ParamStateType, int count = 0, bool only_params = true, int index = pfr::tuple_size_v<ParamStateType>>
+    struct ParamInfoHelper
     {
-        static constexpr int nextCount = IsSmartPointer<decltype (pfr::get<index - 1> (ParamStateType {}))> ? count + 1 : count;
-        static constexpr int value = ParamCountHelper<ParamStateType, index - 1, nextCount>::value;
+        template <typename T, bool isParam>
+        struct SingleParamOrObjectInfo;
+
+        template <typename T>
+        struct SingleParamOrObjectInfo<T, true>
+        {
+            static constexpr int num_params = 1;
+            static constexpr bool is_only_params = ParameterTypeHelpers::IsParameterPointerType<T>;
+        };
+
+        template <typename T>
+        struct SingleParamOrObjectInfo<T, false>
+        {
+            static constexpr int num_params = ParamInfoHelper<T>::num_params;
+            static constexpr bool is_only_params = ParamInfoHelper<T>::is_only_params;
+        };
+
+        using indexed_element_type = decltype (pfr::get<index - 1> (ParamStateType {}));
+        static constexpr auto isParam = ParameterTypeHelpers::IsParameterPointerType<indexed_element_type>;
+
+        static constexpr auto nextCount = count + SingleParamOrObjectInfo<indexed_element_type, isParam>::num_params;
+        static constexpr int num_params = ParamInfoHelper<ParamStateType, nextCount, only_params, index - 1>::num_params;
+
+        static constexpr auto nextOnlyParams = only_params & SingleParamOrObjectInfo<indexed_element_type, isParam>::is_only_params;
+        static constexpr bool is_only_params = ParamInfoHelper<ParamStateType, count, nextOnlyParams, index - 1>::is_only_params;
     };
 
-    template <typename ParamStateType, int count>
-    struct ParamCountHelper<ParamStateType, 0, count>
+    template <typename ParamStateType, int count, bool only_params>
+    struct ParamInfoHelper<ParamStateType, count, only_params, 0>
     {
-        static constexpr int value = count;
+        static constexpr int num_params = count;
+        static constexpr bool is_only_params = only_params;
     };
+
+    // @TODO: implement tests for these!!
+    template <typename ParamStateType>
+    static constexpr int ParamCount = ParamInfoHelper<ParamStateType>::num_params;
 
     template <typename ParamStateType>
-    static constexpr int ParamCount = ParamCountHelper<ParamStateType>::value;
-
-    // @TODO: use doForParams instead?
-    template <typename ParamsStateType>
-    void addParamsToProcessor (juce::AudioProcessor& processor, ParamsStateType& paramsState)
-    {
-        pfr::for_each_field (paramsState,
-                             [&processor] (auto& paramHolder)
-                             {
-                                 using Type = std::decay_t<decltype (paramHolder)>;
-                                 if constexpr (IsSmartPointer<Type>)
-                                 {
-                                     using ParamType = typename std::decay_t<decltype (paramHolder)>::element_type;
-                                     static_assert (std::is_base_of_v<juce::RangedAudioParameter, ParamType>,
-                                                    "All parameters must be SmartPointers of JUCE parameter types!");
-
-                                     processor.addParameter (paramHolder.release());
-                                 }
-                                 else
-                                 {
-                                     addParamsToProcessor (processor, paramHolder); // add nested params!
-                                 }
-                             });
-    }
-} // namespace detail
+    static constexpr int ContainsOnlyParamPointers = ParamInfoHelper<ParamStateType>::is_only_params;
+} // namespace plugin_state_detail
 #endif
 
 struct NullState
@@ -69,9 +74,10 @@ public:
     PluginState()
     {
         doForAllParams (params,
-                        [this] (juce::RangedAudioParameter& param, size_t index)
+                        [this] (auto& paramHolder, size_t index)
                         {
-                            paramInfoList[index] = ParamInfo { &param, param.getValue() };
+                            const auto* rangedParam = static_cast<juce::RangedAudioParameter*> (paramHolder.get());
+                            paramInfoList[index] = ParamInfo { rangedParam, rangedParam->getValue() };
                         });
 
         startTimer (10); // @TODO: tune the timer interval
@@ -81,7 +87,11 @@ public:
     explicit PluginState (juce::AudioProcessor& processor)
         : PluginState()
     {
-        detail::addParamsToProcessor (processor, params);
+        doForAllParams (params,
+                        [&processor] (auto& paramHolder, size_t)
+                        {
+                            processor.addParameter (paramHolder.release());
+                        });
     }
 
     /** Serializes the plugin state to the given MemoryBlock */
@@ -164,9 +174,9 @@ private:
                              [&index, call = std::forward<Callable> (callable)] (auto& paramHolder) mutable
                              {
                                  using Type = std::decay_t<decltype (paramHolder)>;
-                                 if constexpr (IsSmartPointer<Type>)
+                                 if constexpr (ParameterTypeHelpers::IsParameterPointerType<Type>)
                                  {
-                                     call (*paramHolder, index++);
+                                     call (paramHolder, index++);
                                  }
                                  else
                                  {
@@ -215,8 +225,7 @@ private:
         float value = 0.0f;
     };
 
-    // @TODO: figure out how to count parameters at compile-time!
-    static constexpr auto totalNumParams = (size_t) detail::ParamCount<ParameterState>;
+    static constexpr auto totalNumParams = (size_t) plugin_state_detail::ParamCount<ParameterState>;
 
     std::array<ParamInfo, totalNumParams> paramInfoList;
 
