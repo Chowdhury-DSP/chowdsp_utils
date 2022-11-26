@@ -55,7 +55,7 @@ namespace ParameterTypeHelpers
     using ParameterElementType = typename ParameterElementTypeImpl<ParamType>::element_type;
 
     template <typename ParamType>
-    ParameterElementType<ParamType> getSerializableValue (const ParamType& param)
+    ParameterElementType<ParamType> getValue (const ParamType& param)
     {
         if constexpr (std::is_base_of_v<juce::AudioParameterFloat, ParamType> || std::is_base_of_v<juce::AudioParameterBool, ParamType>)
             return param.get();

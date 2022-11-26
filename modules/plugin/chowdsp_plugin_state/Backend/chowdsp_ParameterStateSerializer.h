@@ -19,7 +19,7 @@ namespace ParameterStateSerializer
                                  if constexpr (ParameterTypeHelpers::IsParameterPointerType<Type>)
                                  {
                                      Serializer::addChildElement (paramsSerial, paramHolder->paramID);
-                                     Serializer::addChildElement (paramsSerial, ParameterTypeHelpers::getSerializableValue (*paramHolder));
+                                     Serializer::addChildElement (paramsSerial, ParameterTypeHelpers::getValue (*paramHolder));
                                  }
                              });
 
