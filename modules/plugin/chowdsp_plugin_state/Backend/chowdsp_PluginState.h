@@ -12,7 +12,10 @@ namespace plugin_state_detail
     template <typename ParamStateType, int count = 0, bool only_params = true, int index = pfr::tuple_size_v<ParamStateType>>
     struct ParamInfoHelper
     {
-        template <typename T, bool isParam>
+        template <typename T>
+        static constexpr bool is_pfr_able = std::is_aggregate_v<T> && ! std::is_polymorphic_v<T>;
+
+        template <typename T, bool isParam, typename = void>
         struct SingleParamOrObjectInfo;
 
         template <typename T>
@@ -23,10 +26,17 @@ namespace plugin_state_detail
         };
 
         template <typename T>
-        struct SingleParamOrObjectInfo<T, false>
+        struct SingleParamOrObjectInfo<T, false, std::enable_if_t<is_pfr_able<T>>>
         {
             static constexpr int num_params = ParamInfoHelper<T>::num_params;
             static constexpr bool is_only_params = ParamInfoHelper<T>::is_only_params;
+        };
+
+        template <typename T>
+        struct SingleParamOrObjectInfo<T, false, std::enable_if_t<! is_pfr_able<T>>>
+        {
+            static constexpr int num_params = 0;
+            static constexpr bool is_only_params = false;
         };
 
         using indexed_element_type = decltype (pfr::get<index - 1> (ParamStateType {}));
@@ -46,7 +56,6 @@ namespace plugin_state_detail
         static constexpr bool is_only_params = only_params;
     };
 
-    // @TODO: implement tests for these!!
     template <typename ParamStateType>
     static constexpr int ParamCount = ParamInfoHelper<ParamStateType>::num_params;
 
@@ -70,65 +79,30 @@ template <typename ParameterState, typename NonParameterState = NullState, typen
 class PluginState : private juce::HighResolutionTimer,
                     private juce::AsyncUpdater
 {
-public:
-    PluginState()
-    {
-        doForAllParams (params,
-                        [this] (auto& paramHolder, size_t index)
-                        {
-                            const auto* rangedParam = static_cast<juce::RangedAudioParameter*> (paramHolder.get());
-                            paramInfoList[index] = ParamInfo { rangedParam, rangedParam->getValue() };
-                        });
+    static_assert (plugin_state_detail::ContainsOnlyParamPointers<ParameterState>,
+                   "ParameterState must contain only chowdsp::SmartPointer<> of parameter types,"
+                   " or structs containing those types!");
 
-        startTimer (10); // @TODO: tune the timer interval
-    }
+public:
+    /** Constructs a plugin state with no processor */
+    PluginState();
 
     /** Constructs the state and adds all the state parameters to the given processor */
-    explicit PluginState (juce::AudioProcessor& processor)
-        : PluginState()
-    {
-        doForAllParams (params,
-                        [&processor] (auto& paramHolder, size_t)
-                        {
-                            processor.addParameter (paramHolder.release());
-                        });
-    }
+    explicit PluginState (juce::AudioProcessor& processor);
 
     /** Serializes the plugin state to the given MemoryBlock */
-    void serialize (juce::MemoryBlock& data)
-    {
-        Serialization::serialize<Serializer> (*this, data);
-    }
+    void serialize (juce::MemoryBlock& data) const;
 
     /** Deserializes the plugin state from the given MemoryBlock */
-    void deserialize (const juce::MemoryBlock& data)
-    {
-        Serialization::deserialize<Serializer> (data, *this);
-    }
+    void deserialize (const juce::MemoryBlock& data);
 
     /** Serializer */
-    template <typename S>
-    static typename S::SerializedType serialize (const PluginState& object)
-    {
-        auto serial = S::createBaseElement();
-        S::addChildElement (serial, ParameterStateSerializer::serialize<S> (object.params));
-        S::addChildElement (serial, Serialization::serialize<S> (object.nonParams));
-        return serial;
-    }
+    template <typename>
+    static typename Serializer::SerializedType serialize (const PluginState& object);
 
     /** Deserializer */
-    template <typename S>
-    static void deserialize (typename S::DeserializedType serial, PluginState& object)
-    {
-        if (S::getNumChildElements (serial) != 2)
-        {
-            jassertfalse; // state load error!
-            return;
-        }
-
-        ParameterStateSerializer::deserialize<S> (S::getChildElement (serial, 0), object.params);
-        Serialization::deserialize<S> (S::getChildElement (serial, 1), object.nonParams);
-    }
+    template <typename>
+    static void deserialize (typename Serializer::DeserializedType serial, PluginState& object);
 
     /**
      * Adds a parameter listener which will be called on either the message
@@ -136,32 +110,13 @@ public:
      * signature void().
      */
     template <typename ParamType, typename... ListenerArgs>
-    auto addParameterListener (const ParamType& param, bool listenOnMessageThread, ListenerArgs&&... args)
-    {
-        const auto paramInfoIter = std::find_if (paramInfoList.begin(), paramInfoList.end(), [&param] (const ParamInfo& info)
-                                                 { return info.paramCookie == &param; });
-
-        if (paramInfoIter == paramInfoList.end())
-        {
-            jassertfalse; // trying to listen to a parameter that is not part of this state!
-            return chowdsp::Callback {};
-        }
-
-        const auto index = (size_t) std::distance (paramInfoList.begin(), paramInfoIter);
-        auto& broadcasterList = listenOnMessageThread ? messageThreadBroadcasters : audioThreadBroadcasters;
-        return broadcasterList[index].connect (std::forward<ListenerArgs...> (args...));
-    }
+    auto addParameterListener (const ParamType& param, bool listenOnMessageThread, ListenerArgs&&... args);
 
     /**
      * Runs parameter broadcasters synchronously.
      * This method is intended to be called from the audio thread.
      */
-    void callAudioThreadBroadcasters()
-    {
-        AudioThreadAction action;
-        while (audioThreadBroadcastQueue.try_dequeue (action))
-            action();
-    }
+    void callAudioThreadBroadcasters();
 
     ParameterState params;
     NonParameterState nonParams;
@@ -186,38 +141,11 @@ private:
         return index;
     }
 
-    void callMessageThreadBroadcaster (size_t index)
-    {
-        messageThreadBroadcasters[index]();
-    }
+    void callMessageThreadBroadcaster (size_t index);
+    void callAudioThreadBroadcaster (size_t index);
 
-    void callAudioThreadBroadcaster (size_t index)
-    {
-        audioThreadBroadcasters[index]();
-    }
-
-    void hiResTimerCallback() override
-    {
-        for (const auto [index, paramInfo] : enumerate (paramInfoList))
-        {
-            if (paramInfo.paramCookie->getValue() == paramInfo.value)
-                continue;
-
-            paramInfo.value = paramInfo.paramCookie->getValue();
-            messageThreadBroadcastQueue.enqueue ([this, i = index]
-                                                 { callMessageThreadBroadcaster (i); });
-            audioThreadBroadcastQueue.try_enqueue ([this, i = index]
-                                                   { callAudioThreadBroadcaster (i); });
-            triggerAsyncUpdate();
-        }
-    }
-
-    void handleAsyncUpdate() override
-    {
-        MessageThreadAction action;
-        while (messageThreadBroadcastQueue.try_dequeue (action))
-            action();
-    }
+    void hiResTimerCallback() override;
+    void handleAsyncUpdate() override;
 
     struct ParamInfo
     {
@@ -240,3 +168,5 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginState)
 };
 } // namespace chowdsp
+
+#include "chowdsp_PluginState.cpp"
