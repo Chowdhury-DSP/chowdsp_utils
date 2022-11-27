@@ -8,7 +8,7 @@ BEGIN_JUCE_MODULE_DECLARATION
    version:       1.3.0
    name:          ChowDSP Parameters
    description:   Parameter utilities for ChowDSP plugins
-   dependencies:  juce_core, juce_audio_processors
+   dependencies:  chowdsp_core, juce_audio_processors
 
    website:       https://ccrma.stanford.edu/~jatin/chowdsp
    license:       BSD 3-clause
@@ -21,8 +21,8 @@ BEGIN_JUCE_MODULE_DECLARATION
 #pragma once
 
 // JUCE includes
-#include <juce_core/juce_core.h>
 #include <juce_audio_processors/juce_audio_processors.h>
+#include <chowdsp_core/chowdsp_core.h>
 
 namespace chowdsp
 {

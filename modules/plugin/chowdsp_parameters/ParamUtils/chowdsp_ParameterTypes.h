@@ -54,6 +54,8 @@ public:
                     const std::function<juce::String (float)>& valueToTextFunction,
                     std::function<float (const juce::String&)>&& textToValueFunction);
 
+    using Ptr = OptionalPointer<FloatParameter>;
+
     /** Returns the default value for the parameter. */
     float getDefaultValue() const override { return unsnappedDefault; }
 
@@ -88,6 +90,8 @@ public:
     {
     }
 
+    using Ptr = OptionalPointer<ChoiceParameter>;
+
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ChoiceParameter)
 };
@@ -101,6 +105,8 @@ public:
         : juce::AudioParameterBool (parameterID, parameterName, defaultBoolValue)
     {
     }
+
+    using Ptr = OptionalPointer<BoolParameter>;
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BoolParameter)
@@ -122,6 +128,8 @@ public:
     {
     }
 
+    using Ptr = OptionalPointer<PercentParameter>;
+
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PercentParameter)
 };
@@ -141,6 +149,8 @@ public:
                           &ParamUtils::stringToGainVal)
     {
     }
+
+    using Ptr = OptionalPointer<GainDBParameter>;
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GainDBParameter)

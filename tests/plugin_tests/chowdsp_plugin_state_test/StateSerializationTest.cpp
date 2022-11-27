@@ -4,15 +4,15 @@
 struct LevelParams
 {
     static constexpr std::string_view name = "level_params";
-    chowdsp::SmartPointer<chowdsp::PercentParameter> percent { "percent", "Percent" };
-    chowdsp::SmartPointer<chowdsp::GainDBParameter> gain { "gain", "Gain", juce::NormalisableRange { -30.0f, 0.0f }, 0.0f };
+    chowdsp::PercentParameter::Ptr percent { "percent", "Percent" };
+    chowdsp::GainDBParameter::Ptr gain { "gain", "Gain", juce::NormalisableRange { -30.0f, 0.0f }, 0.0f };
 };
 
 struct PluginParameterState
 {
     LevelParams levelParams;
-    chowdsp::SmartPointer<chowdsp::ChoiceParameter> mode { "mode", "Mode", juce::StringArray { "Percent", "Gain", "Percent / Gain", "Gain / Percent" }, 2 };
-    chowdsp::SmartPointer<chowdsp::BoolParameter> onOff { "on_off", "On/Off", true };
+    chowdsp::ChoiceParameter::Ptr mode { "mode", "Mode", juce::StringArray { "Percent", "Gain", "Percent / Gain", "Gain / Percent" }, 2 };
+    chowdsp::BoolParameter::Ptr onOff { "on_off", "On/Off", true };
 };
 
 struct PluginNonParameterState
@@ -26,9 +26,9 @@ using State = chowdsp::PluginState<PluginParameterState, PluginNonParameterState
 struct PluginParameterStateNewParam
 {
     LevelParams levelParams;
-    chowdsp::SmartPointer<chowdsp::ChoiceParameter> mode { "mode", "Mode", juce::StringArray { "Percent", "Gain", "Percent / Gain", "Gain / Percent" }, 2 };
-    chowdsp::SmartPointer<chowdsp::BoolParameter> onOff { "on_off", "On/Off", true };
-    chowdsp::SmartPointer<chowdsp::GainDBParameter> newParam { "gain_new", "New Gain", juce::NormalisableRange { -45.0f, 12.0f }, 3.3f };
+    chowdsp::ChoiceParameter::Ptr mode { "mode", "Mode", juce::StringArray { "Percent", "Gain", "Percent / Gain", "Gain / Percent" }, 2 };
+    chowdsp::BoolParameter::Ptr onOff { "on_off", "On/Off", true };
+    chowdsp::GainDBParameter::Ptr newParam { "gain_new", "New Gain", juce::NormalisableRange { -45.0f, 12.0f }, 3.3f };
 };
 
 using StateWithNewParam = chowdsp::PluginState<PluginParameterStateNewParam>;
@@ -36,14 +36,14 @@ using StateWithNewParam = chowdsp::PluginState<PluginParameterStateNewParam>;
 struct NewGroup
 {
     static constexpr std::string_view name { "new_group" };
-    chowdsp::SmartPointer<chowdsp::GainDBParameter> newParam { "gain_new", "New Gain", juce::NormalisableRange { -45.0f, 12.0f }, 3.3f };
+    chowdsp::GainDBParameter::Ptr newParam { "gain_new", "New Gain", juce::NormalisableRange { -45.0f, 12.0f }, 3.3f };
 };
 
 struct PluginParameterStateNewGroup
 {
     LevelParams levelParams;
-    chowdsp::SmartPointer<chowdsp::ChoiceParameter> mode { "mode", "Mode", juce::StringArray { "Percent", "Gain", "Percent / Gain", "Gain / Percent" }, 2 };
-    chowdsp::SmartPointer<chowdsp::BoolParameter> onOff { "on_off", "On/Off", true };
+    chowdsp::ChoiceParameter::Ptr mode { "mode", "Mode", juce::StringArray { "Percent", "Gain", "Percent / Gain", "Gain / Percent" }, 2 };
+    chowdsp::BoolParameter::Ptr onOff { "on_off", "On/Off", true };
     NewGroup newGroup;
 };
 

@@ -12,7 +12,7 @@ public:
     {
         struct Params
         {
-            chowdsp::SmartPointer<chowdsp::PercentParameter> pct { "percent", "Percent", 1.0f };
+            chowdsp::PercentParameter::Ptr pct { "percent", "Percent", 1.0f };
         };
 
         chowdsp::PluginState<Params> state {};
@@ -46,7 +46,7 @@ public:
     {
         struct Params
         {
-            chowdsp::SmartPointer<chowdsp::PercentParameter> pct { "percent", "Percent", 1.0f };
+            chowdsp::PercentParameter::Ptr pct { "percent", "Percent", 1.0f };
         };
 
         chowdsp::PluginState<Params> state {};

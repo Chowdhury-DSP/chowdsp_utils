@@ -11,7 +11,7 @@ namespace ParameterTypeHelpers
     };
 
     template <typename T>
-    struct IsParameterPointerTypeImpl<SmartPointer<T>>
+    struct IsParameterPointerTypeImpl<OptionalPointer<T>>
         : std::conditional_t<std::is_base_of_v<juce::RangedAudioParameter, T>, std::true_type, std::false_type>
     {
     };
