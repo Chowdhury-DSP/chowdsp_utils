@@ -13,6 +13,8 @@ public:
                                                                  { c (ParameterTypeHelpers::getValue (param)); });
     }
 
+    using ParamElementyType = ParameterTypeHelpers::ParameterElementType<ParamType>;
+
     /** Calls the parameterChangedCallback function that was registered in
         the constructor, making the UI reflect the current parameter state.
         This function should be called after doing any necessary setup on
@@ -28,13 +30,13 @@ public:
         Call this in the listener callback of the UI control in response
         to a one-off change in the UI like a button-press.
     */
-    void setValueAsCompleteGesture (float newDenormalisedValue)
+    void setValueAsCompleteGesture (ParamElementyType newValue)
     {
-        callIfParameterValueChanged (newDenormalisedValue,
-                                     [this] (float f)
+        callIfParameterValueChanged (newValue,
+                                     [this] (ParamElementyType val)
                                      {
                                          beginGesture();
-                                         param.setValueNotifyingHost (f);
+                                         ParameterTypeHelpers::setValue (val);
                                          endGesture();
                                      });
     }
@@ -52,10 +54,10 @@ public:
         Call this during a continuous interaction, like a slider value
         changed callback.
     */
-    void setValueAsPartOfGesture (float newDenormalisedValue)
+    void setValueAsPartOfGesture (ParamElementyType newValue)
     {
-        callIfParameterValueChanged (newDenormalisedValue, [this] (float f)
-                                     { param.setValueNotifyingHost (f); });
+        callIfParameterValueChanged (newValue, [this] (ParamElementyType val)
+                                     { param.setValueNotifyingHost (val); });
     }
 
     /** Ends a gesture on the managed parameter.
@@ -69,10 +71,10 @@ public:
 
 private:
     template <typename Func>
-    void callIfParameterValueChanged (float newDenormalisedValue, Func&& func)
+    void callIfParameterValueChanged (ParamElementyType newValue, Func&& func)
     {
-        if (ParameterTypeHelpers::getValue (param) != newDenormalisedValue)
-            func (newDenormalisedValue);
+        if (ParameterTypeHelpers::getValue (param) != newValue)
+            func (newValue);
     }
 
     ParamType& param;

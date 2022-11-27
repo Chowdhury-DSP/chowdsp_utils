@@ -64,11 +64,24 @@ namespace ParameterTypeHelpers
     }
 
     template <typename Serializer, typename ParamType>
+    void serializeParameter (typename Serializer::SerializedType& serial, const ParamType& param)
+    {
+        Serializer::addChildElement (serial, param.paramID);
+        Serializer::addChildElement (serial, getValue (param));
+    }
+
+    template <typename ParamType>
+    void setValue (ParameterElementType<ParamType> val, ParamType& param)
+    {
+        static_cast<ParameterBaseType<ParamType>&> (param) = val;
+    }
+
+    template <typename Serializer, typename ParamType>
     void deserializeParameter (const typename Serializer::SerializedType& serial, ParamType& param)
     {
         ParameterElementType<ParamType> val;
         Serialization::deserialize<Serializer> (serial, val);
-        static_cast<ParameterBaseType<ParamType>&> (param) = val;
+        setValue (val, param);
     }
 } // namespace ParameterTypeHelpers
 #endif
