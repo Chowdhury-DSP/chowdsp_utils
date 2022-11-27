@@ -147,10 +147,8 @@ juce::AudioProcessor::BusesProperties PluginBase<P>::getDefaultBusLayout()
 template <class State>
 PluginBase<State>::PluginBase (juce::UndoManager* um, const juce::AudioProcessor::BusesProperties& layout)
     : AudioProcessor (layout),
-      state (*this)
+      state (*this, um)
 {
-    // @TODO: get new state working with UndoManager
-    juce::ignoreUnused (um);
 }
 #else
 template <class Processor>

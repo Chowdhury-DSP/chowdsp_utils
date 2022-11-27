@@ -1,7 +1,8 @@
 namespace chowdsp
 {
 template <typename ParameterState, typename NonParameterState, typename Serializer>
-PluginState<ParameterState, NonParameterState, Serializer>::PluginState()
+PluginState<ParameterState, NonParameterState, Serializer>::PluginState (juce::UndoManager* um)
+    : undoManager (um)
 {
     doForAllParams (params,
                     [this] (auto& paramHolder, size_t index)
@@ -14,8 +15,8 @@ PluginState<ParameterState, NonParameterState, Serializer>::PluginState()
 }
 
 template <typename ParameterState, typename NonParameterState, typename Serializer>
-PluginState<ParameterState, NonParameterState, Serializer>::PluginState (juce::AudioProcessor& processor)
-    : PluginState()
+PluginState<ParameterState, NonParameterState, Serializer>::PluginState (juce::AudioProcessor& processor, juce::UndoManager* um)
+    : PluginState (um)
 {
     doForAllParams (params,
                     [&processor] (auto& paramHolder, size_t)
@@ -34,6 +35,9 @@ template <typename ParameterState, typename NonParameterState, typename Serializ
 void PluginState<ParameterState, NonParameterState, Serializer>::deserialize (const juce::MemoryBlock& data)
 {
     Serialization::deserialize<Serializer> (data, *this);
+
+    if (undoManager != nullptr)
+        undoManager->clearUndoHistory();
 }
 
 /** Serializer */

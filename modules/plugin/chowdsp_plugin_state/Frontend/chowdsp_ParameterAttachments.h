@@ -2,14 +2,16 @@
 
 namespace chowdsp
 {
+// @TODO: handle undo manager stuff here:
+// - probably get UndoManager from plugin state rather than constructor argument?
+// - invoke
 template <typename ParamType, typename PluginStateType, typename Callback = std::function<void (ParameterTypeHelpers::ParameterElementType<ParamType>)>>
 class ParameterAttachment
 {
 public:
     ParameterAttachment (ParamType& parameter,
                          PluginStateType& pluginState,
-                         Callback&& callback,
-                         juce::UndoManager* um = nullptr);
+                         Callback&& callback);
 
     using ParamElementType = ParameterTypeHelpers::ParameterElementType<ParamType>;
 
@@ -41,13 +43,13 @@ public:
      */
     void setValueAsPartOfGesture (ParamElementType newValue);
 
+    ParamType& param;
+
 private:
     template <typename Func>
     void callIfParameterValueChanged (ParamElementType newValue, Func&& func);
 
-    ParamType& param;
     chowdsp::ScopedCallback valueChangedCallback;
-    juce::UndoManager* undoManager;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParameterAttachment)
 };
@@ -64,6 +66,48 @@ struct SetValueCallback
     }
 
     Attachment& attach;
+};
+
+template <typename AttachmentType>
+struct ParameterChangeAction : public juce::UndoableAction
+{
+    using ValueType = typename AttachmentType::ParamElementType;
+
+    explicit ParameterChangeAction (AttachmentType& attach,
+                                    ValueType oldVal,
+                                    ValueType newVal)
+        : attachment (attach),
+          oldValue (oldVal),
+          newValue (newVal)
+    {
+    }
+
+    bool perform() override
+    {
+        if (firstTime)
+        {
+            firstTime = false;
+            return true;
+        }
+
+        // @TODO: should we return false if the parameter is not equal to oldValue?
+        attachment.setValueAsCompleteGesture (newValue);
+        return true;
+    }
+
+    bool undo() override
+    {
+        // @TODO: should we return false if the parameter is not equal to newValue?
+        attachment.setValueAsCompleteGesture (oldValue);
+        return true;
+    }
+
+    int getSizeInUnits() override { return sizeof (*this); }
+
+    AttachmentType& attachment;
+    const ValueType oldValue;
+    const ValueType newValue;
+    bool firstTime = true;
 };
 
 template <typename PluginStateType>
@@ -89,6 +133,12 @@ private:
                         PluginStateType,
                         SetValueCallback<SliderAttachment>>
         attachment;
+    juce::UndoManager* um;
+
+    bool skipSliderChangedCallback = false;
+    float valueAtStartOfGesture = 0.0f;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SliderAttachment)
 };
 
 template <typename PluginStateType>
@@ -112,6 +162,11 @@ private:
                         PluginStateType,
                         SetValueCallback<ComboBoxAttachment>>
         attachment;
+    juce::UndoManager* um;
+
+    bool skipBoxChangedCallback = false;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ComboBoxAttachment)
 };
 
 template <typename PluginStateType>
@@ -135,6 +190,11 @@ private:
                         PluginStateType,
                         SetValueCallback<ButtonAttachment>>
         attachment;
+    juce::UndoManager* um;
+
+    bool skipClickCallback = false;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ButtonAttachment)
 };
 } // namespace chowdsp
 

@@ -85,10 +85,10 @@ class PluginState : private juce::HighResolutionTimer,
 
 public:
     /** Constructs a plugin state with no processor */
-    PluginState();
+    PluginState (juce::UndoManager* um = nullptr);
 
     /** Constructs the state and adds all the state parameters to the given processor */
-    explicit PluginState (juce::AudioProcessor& processor);
+    explicit PluginState (juce::AudioProcessor& processor, juce::UndoManager* um = nullptr);
 
     /** Serializes the plugin state to the given MemoryBlock */
     void serialize (juce::MemoryBlock& data) const;
@@ -120,6 +120,7 @@ public:
 
     ParameterState params;
     NonParameterState nonParams;
+    juce::UndoManager* undoManager = nullptr;
 
 private:
     template <typename ParamsType, typename Callable>

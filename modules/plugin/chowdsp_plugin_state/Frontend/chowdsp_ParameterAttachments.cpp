@@ -3,10 +3,8 @@ namespace chowdsp
 template <typename Param, typename State, typename Callback>
 ParameterAttachment<Param, State, Callback>::ParameterAttachment (Param& parameter,
                                                                   State& pluginState,
-                                                                  Callback&& callback,
-                                                                  juce::UndoManager* um)
-    : param (parameter),
-      undoManager (um)
+                                                                  Callback&& callback)
+    : param (parameter)
 {
     valueChangedCallback = pluginState.addParameterListener (param,
                                                              true,
@@ -19,9 +17,6 @@ ParameterAttachment<Param, State, Callback>::ParameterAttachment (Param& paramet
 template <typename Param, typename State, typename Callback>
 void ParameterAttachment<Param, State, Callback>::beginGesture()
 {
-    if (undoManager != nullptr)
-        undoManager->beginNewTransaction();
-
     param.beginChangeGesture();
 }
 
@@ -69,7 +64,8 @@ SliderAttachment<State>::SliderAttachment (FloatParameter& param,
                                            juce::Slider& paramSlider,
                                            juce::UndoManager* undoManager)
     : slider (paramSlider),
-      attachment (param, pluginState, SetValueCallback { *this }, undoManager)
+      attachment (param, pluginState, SetValueCallback { *this }),
+      um (undoManager != nullptr ? undoManager : pluginState.undoManager)
 {
     slider.valueFromTextFunction = [&p = static_cast<juce::RangedAudioParameter&> (param)] (const juce::String& text)
     {
@@ -135,25 +131,40 @@ SliderAttachment<State>::~SliderAttachment()
 template <typename State>
 void SliderAttachment<State>::setValue (float newValue)
 {
-    if (slider.getValue() != (double) newValue)
-        slider.setValue (newValue, juce::sendNotificationSync);
+    if (slider.getValue() == (double) newValue)
+        return;
+
+    juce::ScopedValueSetter svs { skipSliderChangedCallback, true };
+    slider.setValue (newValue, juce::sendNotificationSync);
 }
 
 template <typename State>
 void SliderAttachment<State>::sliderValueChanged (juce::Slider*)
 {
+    if (skipSliderChangedCallback)
+        return;
+
     attachment.setValueAsPartOfGesture ((float) slider.getValue());
 }
 
 template <typename State>
 void SliderAttachment<State>::sliderDragStarted (juce::Slider*)
 {
+    valueAtStartOfGesture = attachment.param.get();
     attachment.beginGesture();
 }
 
 template <typename State>
 void SliderAttachment<State>::sliderDragEnded (juce::Slider*)
 {
+    if (um != nullptr)
+    {
+        um->beginNewTransaction();
+        um->perform (new ParameterChangeAction (attachment,
+                                                valueAtStartOfGesture,
+                                                attachment.param.get()));
+    }
+
     attachment.endGesture();
 }
 
@@ -164,7 +175,8 @@ ComboBoxAttachment<State>::ComboBoxAttachment (ChoiceParameter& param,
                                                juce::ComboBox& combo,
                                                juce::UndoManager* undoManager)
     : comboBox (combo),
-      attachment (param, pluginState, SetValueCallback { *this }, undoManager)
+      attachment (param, pluginState, SetValueCallback { *this }),
+      um (undoManager != nullptr ? undoManager : pluginState.undoManager)
 {
     comboBox.addItemList (param.choices, 1);
     setValue (param.getIndex());
@@ -180,14 +192,30 @@ ComboBoxAttachment<State>::~ComboBoxAttachment()
 template <typename State>
 void ComboBoxAttachment<State>::setValue (int newValue)
 {
-    if (comboBox.getSelectedItemIndex() != newValue)
-        comboBox.setSelectedItemIndex (newValue, juce::sendNotificationSync);
+    if (comboBox.getSelectedItemIndex() == newValue)
+        return;
+
+    juce::ScopedValueSetter svs { skipBoxChangedCallback, true };
+    comboBox.setSelectedItemIndex (newValue, juce::sendNotificationSync);
 }
 
 template <typename State>
 void ComboBoxAttachment<State>::comboBoxChanged (juce::ComboBox*)
 {
-    attachment.setValueAsCompleteGesture (comboBox.getSelectedItemIndex());
+    if (skipBoxChangedCallback)
+        return;
+
+    const auto newValue = comboBox.getSelectedItemIndex();
+
+    if (um != nullptr)
+    {
+        um->beginNewTransaction();
+        um->perform (new ParameterChangeAction (attachment,
+                                                attachment.param.getIndex(),
+                                                newValue));
+    }
+
+    attachment.setValueAsCompleteGesture (newValue);
 }
 
 //======================================================================
@@ -197,7 +225,8 @@ ButtonAttachment<State>::ButtonAttachment (BoolParameter& param,
                                            juce::Button& paramButton,
                                            juce::UndoManager* undoManager)
     : button (paramButton),
-      attachment (param, pluginState, SetValueCallback { *this }, undoManager)
+      attachment (param, pluginState, SetValueCallback { *this }),
+      um (undoManager != nullptr ? undoManager : pluginState.undoManager)
 {
     button.setButtonText (param.name);
     setValue (param.get());
@@ -213,13 +242,28 @@ ButtonAttachment<State>::~ButtonAttachment()
 template <typename State>
 void ButtonAttachment<State>::setValue (bool newValue)
 {
-    if (button.getToggleState() != newValue)
-        button.setToggleState (newValue, juce::sendNotificationSync);
+    if (button.getToggleState() == newValue)
+        return;
+
+    juce::ScopedValueSetter svs { skipClickCallback, true };
+    button.setToggleState (newValue, juce::sendNotificationSync);
 }
 
 template <typename State>
 void ButtonAttachment<State>::buttonClicked (juce::Button*)
 {
-    attachment.setValueAsCompleteGesture (button.getToggleState());
+    if (skipClickCallback)
+        return;
+
+    const auto newValue = button.getToggleState();
+    if (um != nullptr)
+    {
+        um->beginNewTransaction();
+        um->perform (new ParameterChangeAction (attachment,
+                                                attachment.param.get(),
+                                                newValue));
+    }
+
+    attachment.setValueAsCompleteGesture (newValue);
 }
 } // namespace chowdsp

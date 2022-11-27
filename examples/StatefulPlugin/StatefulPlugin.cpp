@@ -1,9 +1,8 @@
 #include "StatefulPlugin.h"
 #include "PluginEditor.h"
 
-StatefulPlugin::StatefulPlugin()
+StatefulPlugin::StatefulPlugin() : chowdsp::PluginBase<State> (&undoManager)
 {
-    juce::ignoreUnused (this);
 }
 
 void StatefulPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)
