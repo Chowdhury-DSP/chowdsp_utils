@@ -7,7 +7,7 @@ class PluginEditor : public juce::AudioProcessorEditor
 public:
     explicit PluginEditor (StatefulPlugin& plug);
 
-    void resized();
+    void resized() override;
 
 private:
     StatefulPlugin& plugin;
@@ -18,7 +18,11 @@ private:
     juce::Slider percentSlider;
     chowdsp::SliderAttachment<State> percentAttach;
 
-//    juce::GenericAudioProcessorEditor controls;
+    juce::ComboBox modeBox;
+    chowdsp::ComboBoxAttachment<State> modeAttach;
+
+    juce::ToggleButton onOffButton;
+    chowdsp::ButtonAttachment<State> onOffAttach;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginEditor)
 };
