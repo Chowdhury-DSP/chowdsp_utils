@@ -22,9 +22,7 @@ BEGIN_JUCE_MODULE_DECLARATION
  * This module is still a work-in-progress. The API is _unstable_!
  *
  * Jatin's TODO list:
- * - ParameterAttachments
  * - Listeners: think about threading situation, and test to see how it scales for large numbers of params
- * - UndoManager integration
  * - Update the rest of chowdsp_utils to use this module over APVTS when it's available
  */
 

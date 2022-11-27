@@ -2,9 +2,6 @@
 
 namespace chowdsp
 {
-// @TODO: handle undo manager stuff here:
-// - probably get UndoManager from plugin state rather than constructor argument?
-// - invoke
 template <typename ParamType, typename PluginStateType, typename Callback = std::function<void (ParameterTypeHelpers::ParameterElementType<ParamType>)>>
 class ParameterAttachment
 {

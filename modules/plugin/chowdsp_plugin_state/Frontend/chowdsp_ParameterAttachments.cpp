@@ -131,9 +131,6 @@ SliderAttachment<State>::~SliderAttachment()
 template <typename State>
 void SliderAttachment<State>::setValue (float newValue)
 {
-    if (slider.getValue() == (double) newValue)
-        return;
-
     juce::ScopedValueSetter svs { skipSliderChangedCallback, true };
     slider.setValue (newValue, juce::sendNotificationSync);
 }
@@ -192,9 +189,6 @@ ComboBoxAttachment<State>::~ComboBoxAttachment()
 template <typename State>
 void ComboBoxAttachment<State>::setValue (int newValue)
 {
-    if (comboBox.getSelectedItemIndex() == newValue)
-        return;
-
     juce::ScopedValueSetter svs { skipBoxChangedCallback, true };
     comboBox.setSelectedItemIndex (newValue, juce::sendNotificationSync);
 }
@@ -242,9 +236,6 @@ ButtonAttachment<State>::~ButtonAttachment()
 template <typename State>
 void ButtonAttachment<State>::setValue (bool newValue)
 {
-    if (button.getToggleState() == newValue)
-        return;
-
     juce::ScopedValueSetter svs { skipClickCallback, true };
     button.setToggleState (newValue, juce::sendNotificationSync);
 }

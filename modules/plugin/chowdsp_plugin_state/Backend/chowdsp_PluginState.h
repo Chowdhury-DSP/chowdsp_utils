@@ -118,6 +118,12 @@ public:
      */
     void callAudioThreadBroadcasters();
 
+    /**
+     * Runs parameter broadcasters synchronously.
+     * This method is intended to be called from the message thread.
+     */
+    void callMessageThreadBroadcasters();
+
     ParameterState params;
     NonParameterState nonParams;
     juce::UndoManager* undoManager = nullptr;

@@ -93,6 +93,14 @@ void PluginState<ParameterState, NonParameterState, Serializer>::callAudioThread
 }
 
 template <typename ParameterState, typename NonParameterState, typename Serializer>
+void PluginState<ParameterState, NonParameterState, Serializer>::callMessageThreadBroadcasters()
+{
+    MessageThreadAction action;
+    while (messageThreadBroadcastQueue.try_dequeue (action))
+        action();
+}
+
+template <typename ParameterState, typename NonParameterState, typename Serializer>
 void PluginState<ParameterState, NonParameterState, Serializer>::callMessageThreadBroadcaster (size_t index)
 {
     messageThreadBroadcasters[index]();
@@ -125,8 +133,6 @@ void PluginState<ParameterState, NonParameterState, Serializer>::hiResTimerCallb
 template <typename ParameterState, typename NonParameterState, typename Serializer>
 void PluginState<ParameterState, NonParameterState, Serializer>::handleAsyncUpdate()
 {
-    MessageThreadAction action;
-    while (messageThreadBroadcastQueue.try_dequeue (action))
-        action();
+    callMessageThreadBroadcasters();
 }
 } // namespace chowdsp
