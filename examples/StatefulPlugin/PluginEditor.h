@@ -11,7 +11,14 @@ public:
 
 private:
     StatefulPlugin& plugin;
-    juce::GenericAudioProcessorEditor controls;
+
+    juce::Slider gainSlider;
+    chowdsp::SliderAttachment<State> gainAttach;
+
+    juce::Slider percentSlider;
+    chowdsp::SliderAttachment<State> percentAttach;
+
+//    juce::GenericAudioProcessorEditor controls;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginEditor)
 };
