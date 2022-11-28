@@ -26,6 +26,12 @@ PluginState<ParameterState, NonParameterState, Serializer>::PluginState (juce::A
 }
 
 template <typename ParameterState, typename NonParameterState, typename Serializer>
+PluginState<ParameterState, NonParameterState, Serializer>::~PluginState()
+{
+    stopTimer();
+}
+
+template <typename ParameterState, typename NonParameterState, typename Serializer>
 template <typename ParameterType>
 ParameterType& PluginState<ParameterState, NonParameterState, Serializer>::getParameter (const ParameterPath& path)
 {

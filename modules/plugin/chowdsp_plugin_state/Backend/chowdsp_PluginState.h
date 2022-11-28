@@ -11,6 +11,8 @@ struct NullState
 {
 };
 
+JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324)
+
 /**
  * Template type to hold a plugin's state.
  *
@@ -32,6 +34,9 @@ public:
 
     /** Constructs the state and adds all the state parameters to the given processor */
     explicit PluginState (juce::AudioProcessor& processor, juce::UndoManager* um = nullptr);
+
+    /** Destructor */
+    ~PluginState() override;
 
     /** Accesses a parameter with a given path. */
     template <typename ParameterType>
@@ -116,15 +121,18 @@ private:
     std::array<ParamInfo, totalNumParams> paramInfoList;
 
     std::array<chowdsp::Broadcaster<void()>, totalNumParams> messageThreadBroadcasters;
-    using MessageThreadAction = juce::dsp::FixedSizeFunction<sizeof (&PluginState::callMessageThreadBroadcaster), void()>;
+    using MessageThreadAction = juce::dsp::FixedSizeFunction<16, void()>;
     moodycamel::ReaderWriterQueue<MessageThreadAction> messageThreadBroadcastQueue { totalNumParams };
 
     std::array<chowdsp::Broadcaster<void()>, totalNumParams> audioThreadBroadcasters;
-    using AudioThreadAction = juce::dsp::FixedSizeFunction<sizeof (&PluginState::callAudioThreadBroadcaster), void()>;
+    using AudioThreadAction = juce::dsp::FixedSizeFunction<16, void()>;
     moodycamel::ReaderWriterQueue<AudioThreadAction> audioThreadBroadcastQueue { totalNumParams };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginState)
 };
+
+JUCE_END_IGNORE_WARNINGS_MSVC
+
 } // namespace chowdsp
 
 #include "chowdsp_PluginState.cpp"

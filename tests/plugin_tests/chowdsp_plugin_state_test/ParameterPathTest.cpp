@@ -56,7 +56,7 @@ public:
         using State = chowdsp::PluginState<Params>;
         State state;
 
-        chowdsp::ParameterAttachment<chowdsp::BoolParameter, State> attachment { std::string_view { "bool" }, state, [] (bool x) {} };
+        chowdsp::ParameterAttachment<chowdsp::BoolParameter, State> attachment { std::string_view { "bool" }, state, [] (bool) {} };
         expect (state.params.boolean.get() == &attachment.param, "Unable tp create attachment from parameter path!");
     }
 
