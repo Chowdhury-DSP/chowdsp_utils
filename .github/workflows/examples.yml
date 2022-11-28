@@ -22,7 +22,8 @@ jobs:
                   ModalSpringReverb,
                   SignalGenerator,
                   SimpleEQ,
-                  SimpleReverb
+                  SimpleReverb,
+                  StatefulPlugin
                 ]
         os: [ubuntu-latest, windows-2019, macos-latest]
 
