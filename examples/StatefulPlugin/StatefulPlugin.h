@@ -22,8 +22,8 @@ struct PluginNonParameterState
     int editorHeight = 500;
 };
 
-static_assert (chowdsp::plugin_state_detail::ParamCount<PluginParameterState> == 4);
-static_assert (chowdsp::plugin_state_detail::ParamCount<LevelParams> == 2);
+static_assert (chowdsp::PluginStateHelpers::ParamCount<PluginParameterState> == 4);
+static_assert (chowdsp::PluginStateHelpers::ParamCount<LevelParams> == 2);
 
 using State = chowdsp::PluginState<PluginParameterState, PluginNonParameterState>;
 

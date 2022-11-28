@@ -3,6 +3,7 @@
 namespace chowdsp
 {
 #ifndef DOXYGEN
+/** This API is unstable and should not be used directly! */
 namespace ParameterTypeHelpers
 {
     template <typename T>

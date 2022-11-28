@@ -10,7 +10,7 @@
  * @endcode
  */
 #define CHOWDSP_CHECK_HAS_STATIC_METHOD(Name, Method)                                                                                   \
-    template <typename T>                                                                                                               \
+    template <typename _T>                                                                                                              \
     class Test_##Name                                                                                                                   \
     {                                                                                                                                   \
         using No = char;                                                                                                                \
@@ -26,11 +26,11 @@
     public:                                                                                                                             \
         enum                                                                                                                            \
         {                                                                                                                               \
-            value = sizeof (test<T> (nullptr)) == sizeof (Yes)                                                                          \
+            value = sizeof (test<_T> (nullptr)) == sizeof (Yes)                                                                         \
         };                                                                                                                              \
     };                                                                                                                                  \
-    template <typename T>                                                                                                               \
-    static constexpr bool Name = Test_##Name<T>::value;
+    template <typename _T>                                                                                                              \
+    static constexpr bool Name = Test_##Name<_T>::value;
 
 /**
  * Creates a constexpr bool that checks if a class has the given non-static method.
@@ -42,7 +42,7 @@
  * @endcode
  */
 #define CHOWDSP_CHECK_HAS_METHOD(Name, Method, ...)                                                                                     \
-    template <typename T>                                                                                                               \
+    template <typename _T>                                                                                                              \
     class Test_##Name                                                                                                                   \
     {                                                                                                                                   \
         using No = char;                                                                                                                \
@@ -58,11 +58,43 @@
     public:                                                                                                                             \
         enum                                                                                                                            \
         {                                                                                                                               \
-            value = sizeof (test<T> (nullptr)) == sizeof (Yes)                                                                          \
+            value = sizeof (test<_T> (nullptr)) == sizeof (Yes)                                                                         \
         };                                                                                                                              \
     };                                                                                                                                  \
-    template <typename T>                                                                                                               \
-    static constexpr bool Name = Test_##Name<T>::value;
+    template <typename _T>                                                                                                              \
+    static constexpr bool Name = Test_##Name<_T>::value;
+
+/**
+ * Creates a constexpr bool that checks if a class has the given static member variable.
+ *
+ * Usage:
+ * @code {.cpp}
+ * CHOWDSP_CHECK_HAS_STATIC_MEMBER(HasName, name)
+ * static_assert(HasName<MyClass>, "MyClass must have a static name method!");
+ * @endcode
+ */
+#define CHOWDSP_CHECK_HAS_STATIC_MEMBER(Name, Member)                                                                                   \
+    template <typename _T>                                                                                                              \
+    class Test_##Name                                                                                                                   \
+    {                                                                                                                                   \
+        using No = char;                                                                                                                \
+        using Yes = long;                                                                                                               \
+        static_assert (sizeof (No) != sizeof (Yes), "Yes and No have the same size on this platform, undefined behaviour will ensue!"); \
+                                                                                                                                        \
+        template <typename C>                                                                                                           \
+        static Yes test (decltype (C::Member));                                                                                         \
+                                                                                                                                        \
+        template <typename C>                                                                                                           \
+        static No test (...);                                                                                                           \
+                                                                                                                                        \
+    public:                                                                                                                             \
+        enum                                                                                                                            \
+        {                                                                                                                               \
+            value = sizeof (test<_T> (nullptr)) == sizeof (Yes)                                                                         \
+        };                                                                                                                              \
+    };                                                                                                                                  \
+    template <typename _T>                                                                                                              \
+    static constexpr bool Name = Test_##Name<_T>::value;
 
 namespace chowdsp
 {
@@ -76,7 +108,7 @@ namespace TypeTraits
         CHOWDSP_CHECK_HAS_METHOD (HasEnd, end, )
 
         template <typename T>
-        static constexpr auto has_begin_end_v = HasBegin<T>&& HasEnd<T>;
+        static constexpr auto has_begin_end_v = HasBegin<T> && HasEnd<T>;
     } // namespace is_iterable_detail
 #endif // DOXYGEN
 
