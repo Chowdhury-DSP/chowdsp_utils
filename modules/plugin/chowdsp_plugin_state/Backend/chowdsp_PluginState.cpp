@@ -5,8 +5,7 @@ PluginState<ParameterState, NonParameterState, Serializer>::PluginState (juce::U
     : undoManager (um)
 {
     doForAllParams (params,
-                    [this] (auto& paramHolder, size_t index)
-                    {
+                    [this] (auto& paramHolder, size_t index) {
                         const auto* rangedParam = static_cast<juce::RangedAudioParameter*> (paramHolder.get());
                         paramInfoList[index] = ParamInfo { rangedParam, rangedParam->getValue() };
                     });
@@ -19,8 +18,7 @@ PluginState<ParameterState, NonParameterState, Serializer>::PluginState (juce::A
     : PluginState (um)
 {
     doForAllParams (params,
-                    [&processor] (auto& paramHolder, size_t)
-                    {
+                    [&processor] (auto& paramHolder, size_t) {
                         processor.addParameter (paramHolder.release());
                     });
 }
@@ -92,8 +90,7 @@ template <typename ParameterState, typename NonParameterState, typename Serializ
 template <typename ParamType, typename... ListenerArgs>
 auto PluginState<ParameterState, NonParameterState, Serializer>::addParameterListener (const ParamType& param, bool listenOnMessageThread, ListenerArgs&&... args)
 {
-    const auto paramInfoIter = std::find_if (paramInfoList.begin(), paramInfoList.end(), [&param] (const ParamInfo& info)
-                                             { return info.paramCookie == &param; });
+    const auto paramInfoIter = std::find_if (paramInfoList.begin(), paramInfoList.end(), [&param] (const ParamInfo& info) { return info.paramCookie == &param; });
 
     if (paramInfoIter == paramInfoList.end())
     {
@@ -144,10 +141,8 @@ void PluginState<ParameterState, NonParameterState, Serializer>::hiResTimerCallb
 
         paramInfo.value = paramInfo.paramCookie->getValue();
 
-        messageThreadBroadcastQueue.enqueue ([this, i = index]
-                                             { callMessageThreadBroadcaster (i); });
-        audioThreadBroadcastQueue.try_enqueue ([this, i = index]
-                                               { callAudioThreadBroadcaster (i); });
+        messageThreadBroadcastQueue.enqueue ([this, i = index] { callMessageThreadBroadcaster (i); });
+        audioThreadBroadcastQueue.try_enqueue ([this, i = index] { callAudioThreadBroadcaster (i); });
         triggerAsyncUpdate();
     }
 }

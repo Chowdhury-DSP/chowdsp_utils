@@ -5,7 +5,6 @@ namespace chowdsp
 /** Serialization/De-serialization functions for parameter state objects */
 namespace ParameterStateSerializer
 {
-
     /** Helper method for serializing a plugin state object */
     template <typename Serializer, typename ParamsState>
     static typename Serializer::SerializedType serialize (const ParamsState& params)
@@ -13,8 +12,7 @@ namespace ParameterStateSerializer
         auto paramsSerial = Serializer::createBaseElement();
 
         pfr::for_each_field (params,
-                             [&paramsSerial] (const auto& paramHolder)
-                             {
+                             [&paramsSerial] (const auto& paramHolder) {
                                  using Type = std::decay_t<decltype (paramHolder)>;
                                  if constexpr (ParameterTypeHelpers::IsParameterPointerType<Type>)
                                  {
@@ -23,8 +21,7 @@ namespace ParameterStateSerializer
                              });
 
         pfr::for_each_field (params,
-                             [&paramsSerial] (const auto& paramHolder)
-                             {
+                             [&paramsSerial] (const auto& paramHolder) {
                                  using Type = std::decay_t<decltype (paramHolder)>;
                                  if constexpr (! ParameterTypeHelpers::IsParameterPointerType<Type>)
                                  {
@@ -49,8 +46,7 @@ namespace ParameterStateSerializer
                 Serialization::deserialize<Serializer> (Serializer::getChildElement (paramsSerial, i), name);
 
                 pfr::for_each_field (params,
-                                     [i, &paramsSerial, &name, &namesThatHaveBeenDeserialized] (auto& paramHolder)
-                                     {
+                                     [i, &paramsSerial, &name, &namesThatHaveBeenDeserialized] (auto& paramHolder) {
                                          const auto serial = Serializer::getChildElement (paramsSerial, i + 1);
 
                                          using Type = std::decay_t<decltype (paramHolder)>;
@@ -78,8 +74,7 @@ namespace ParameterStateSerializer
 
         // set all un-matched parameters to their default values
         pfr::for_each_field (params,
-                             [&namesThatHaveBeenDeserialized] (auto& paramHolder)
-                             {
+                             [&namesThatHaveBeenDeserialized] (auto& paramHolder) {
                                  using Type = std::decay_t<decltype (paramHolder)>;
                                  if constexpr (ParameterTypeHelpers::IsParameterPointerType<Type>)
                                  {

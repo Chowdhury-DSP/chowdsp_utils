@@ -6,7 +6,6 @@
 
 namespace chowdsp
 {
-
 struct NullState
 {
 };
@@ -89,8 +88,7 @@ private:
     static constexpr size_t doForAllParams (ParamsType& params, Callable&& callable, size_t index = 0)
     {
         pfr::for_each_field (params,
-                             [&index, call = std::forward<Callable> (callable)] (auto& paramHolder) mutable
-                             {
+                             [&index, call = std::forward<Callable> (callable)] (auto& paramHolder) mutable {
                                  using Type = std::decay_t<decltype (paramHolder)>;
                                  if constexpr (ParameterTypeHelpers::IsParameterPointerType<Type>)
                                  {

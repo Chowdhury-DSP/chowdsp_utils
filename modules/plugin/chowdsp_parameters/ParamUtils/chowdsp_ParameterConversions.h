@@ -2,7 +2,6 @@
 
 namespace chowdsp::ParamUtils
 {
-
 juce::String freqValToString (float freqVal);
 float stringToFreqVal (const juce::String& s);
 

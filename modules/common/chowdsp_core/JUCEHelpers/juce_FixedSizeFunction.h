@@ -24,7 +24,6 @@ namespace juce
 {
 namespace dsp
 {
-
 #ifndef DOXYGEN
 
     namespace detail

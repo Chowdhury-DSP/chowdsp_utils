@@ -16,8 +16,7 @@ ParameterAttachment<Param, State, Callback>::ParameterAttachment (Param& paramet
 {
     valueChangedCallback = pluginState.addParameterListener (param,
                                                              true,
-                                                             [this, c = std::forward<Callback> (callback)]() mutable
-                                                             {
+                                                             [this, c = std::forward<Callback> (callback)]() mutable {
                                                                  c (ParameterTypeHelpers::getValue (param));
                                                              });
 }
@@ -38,8 +37,7 @@ template <typename Param, typename State, typename Callback>
 void ParameterAttachment<Param, State, Callback>::setValueAsCompleteGesture (ParamElementType newValue)
 {
     callIfParameterValueChanged (newValue,
-                                 [this] (ParamElementType val)
-                                 {
+                                 [this] (ParamElementType val) {
                                      beginGesture();
                                      ParameterTypeHelpers::setValue (val, param);
                                      endGesture();
@@ -50,8 +48,7 @@ template <typename Param, typename State, typename Callback>
 void ParameterAttachment<Param, State, Callback>::setValueAsPartOfGesture (ParamElementType newValue)
 {
     callIfParameterValueChanged (newValue,
-                                 [this] (ParamElementType val)
-                                 {
+                                 [this] (ParamElementType val) {
                                      ParameterTypeHelpers::setValue (val, param);
                                  });
 }
