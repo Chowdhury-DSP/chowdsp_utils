@@ -1,17 +1,18 @@
 #include "PluginEditor.h"
+using namespace std::string_view_literals;
 
 PluginEditor::PluginEditor (StatefulPlugin& plug) : juce::AudioProcessorEditor (plug),
                                                     plugin (plug),
-                                                    gainAttach (*plug.getState().params.levelParams.gain,
+                                                    gainAttach ("level_params/gain"sv,
                                                                 plug.getState(),
                                                                 gainSlider),
-                                                    percentAttach (*plug.getState().params.levelParams.percent,
+                                                    percentAttach ("level_params/percent"sv,
                                                                    plug.getState(),
                                                                    percentSlider),
-                                                    modeAttach (*plug.getState().params.mode,
+                                                    modeAttach ("mode"sv,
                                                                 plug.getState(),
                                                                 modeBox),
-                                                    onOffAttach (*plug.getState().params.onOff,
+                                                    onOffAttach ("on_off"sv,
                                                                  plug.getState(),
                                                                  onOffButton)
 {

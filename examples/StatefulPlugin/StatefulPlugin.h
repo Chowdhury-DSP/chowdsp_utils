@@ -5,15 +5,15 @@
 struct LevelParams
 {
     static constexpr std::string_view name = "level_params";
-    chowdsp::PercentParameter::Ptr percent { "percent", "Percent" };
-    chowdsp::GainDBParameter::Ptr gain { "gain", "Gain", juce::NormalisableRange { -30.0f, 0.0f }, 0.0f };
+    chowdsp::PercentParameter::Ptr percent { juce::ParameterID { "percent", 100 }, "Percent" };
+    chowdsp::GainDBParameter::Ptr gain { juce::ParameterID { "gain", 100 }, "Gain", juce::NormalisableRange { -30.0f, 0.0f }, 0.0f };
 };
 
 struct PluginParameterState
 {
     LevelParams levelParams;
-    chowdsp::ChoiceParameter::Ptr mode { "mode", "Mode", juce::StringArray { "Percent", "Gain", "Percent / Gain", "Gain / Percent" }, 2 };
-    chowdsp::BoolParameter::Ptr onOff { "on_off", "On/Off", true };
+    chowdsp::ChoiceParameter::Ptr mode { juce::ParameterID { "mode", 100 }, "Mode", juce::StringArray { "Percent", "Gain", "Percent / Gain", "Gain / Percent" }, 2 };
+    chowdsp::BoolParameter::Ptr onOff { juce::ParameterID { "on_off", 100 }, "On/Off", true };
 };
 
 struct PluginNonParameterState

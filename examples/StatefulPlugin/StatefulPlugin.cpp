@@ -3,6 +3,9 @@
 
 StatefulPlugin::StatefulPlugin() : chowdsp::PluginBase<State> (&undoManager)
 {
+    using namespace std::string_view_literals;
+    auto& pctParam = state.getParameter<chowdsp::PercentParameter> ("level_params/percent"sv);
+    juce::ignoreUnused (pctParam);
 }
 
 void StatefulPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)

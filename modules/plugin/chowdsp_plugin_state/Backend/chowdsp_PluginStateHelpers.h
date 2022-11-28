@@ -3,6 +3,7 @@
 namespace chowdsp
 {
 #ifndef DOXYGEN
+/** This API is unstable and should not be used directly! */
 namespace PluginStateHelpers
 {
     template <typename ParamStateType, int count = 0, bool only_params = true, int index = pfr::tuple_size_v<ParamStateType>>

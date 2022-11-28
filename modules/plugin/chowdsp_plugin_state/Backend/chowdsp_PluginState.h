@@ -33,6 +33,14 @@ public:
     /** Constructs the state and adds all the state parameters to the given processor */
     explicit PluginState (juce::AudioProcessor& processor, juce::UndoManager* um = nullptr);
 
+    /** Accesses a parameter with a given path. */
+    template <typename ParameterType>
+    ParameterType& getParameter (const ParameterPath& path);
+
+    /** Accesses a parameter with a given path. */
+    template <typename ParameterType>
+    const ParameterType& getParameter (const ParameterPath& path) const;
+
     /** Serializes the plugin state to the given MemoryBlock */
     void serialize (juce::MemoryBlock& data) const;
 
