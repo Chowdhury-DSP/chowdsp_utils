@@ -6,9 +6,7 @@ namespace chowdsp
 struct ParameterPath
 {
     constexpr ParameterPath (const std::string_view path) // NOSONAR NOLINT(google-explicit-constructor)
-        : head (path.substr (0, delimiter (path))),
-          tail (path.substr (std::min (delimiter (path) + 1, path.size()),
-                             path.size() - std::min (delimiter (path) + 1, path.size())))
+        : ParameterPath (path, delimiter (path))
     {
     }
 
@@ -51,6 +49,17 @@ struct ParameterPath
     }
 
 private:
+    constexpr ParameterPath (const std::string_view path, size_t headLen)
+        : ParameterPath (path, headLen, std::min (headLen + 1, path.size()))
+    {
+    }
+
+    constexpr ParameterPath (const std::string_view path, size_t headLen, size_t tailStart)
+        : head (path.substr (0, headLen)),
+          tail (path.substr (tailStart, path.size() - tailStart))
+    {
+    }
+
     static constexpr size_t delimiter (const std::string_view sv)
     {
         return std::min (sv.find_first_of ('/'), sv.size());

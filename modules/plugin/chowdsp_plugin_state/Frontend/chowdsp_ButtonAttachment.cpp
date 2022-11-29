@@ -3,12 +3,18 @@ namespace chowdsp
 template <typename State>
 ButtonAttachment<State>::ButtonAttachment (const ParameterPath& paramPath,
                                            State& pluginState,
-                                           juce::Button& paramButton,
-                                           juce::UndoManager* undoManager)
+                                           juce::Button& paramButton)
     : ButtonAttachment (pluginState.template getParameter<BoolParameter> (paramPath),
                         pluginState,
-                        paramButton,
-                        undoManager)
+                        paramButton)
+{
+}
+
+template <typename State>
+ButtonAttachment<State>::ButtonAttachment (BoolParameter& param,
+                                           State& pluginState,
+                                           juce::Button& paramButton)
+    : ButtonAttachment (param, pluginState, paramButton, pluginState.undoManager)
 {
 }
 
@@ -19,7 +25,7 @@ ButtonAttachment<State>::ButtonAttachment (BoolParameter& param,
                                            juce::UndoManager* undoManager)
     : button (paramButton),
       attachment (param, pluginState, ParameterAttachmentHelpers::SetValueCallback { *this }),
-      um (undoManager != nullptr ? undoManager : pluginState.undoManager)
+      um (undoManager)
 {
     button.setButtonText (param.name);
     setValue (param.get());

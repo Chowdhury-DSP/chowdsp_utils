@@ -16,14 +16,18 @@ public:
     /** Creates an attachment for a given parameter path */
     SliderAttachment (const ParameterPath& paramPath,
                       PluginStateType& pluginState,
-                      juce::Slider& paramSlider,
-                      juce::UndoManager* undoManager = nullptr);
+                      juce::Slider& paramSlider);
 
-    /** Creates an attachment for a given parameter */
+    /** Creates an attachment for a given parameter, using the undo manager from the plugin state */
+    SliderAttachment (FloatParameter& param,
+                      PluginStateType& pluginState,
+                      juce::Slider& paramSlider);
+
+    /** Creates an attachment for a given parameter, using a custom UndoManager */
     SliderAttachment (FloatParameter& param,
                       PluginStateType& pluginState,
                       juce::Slider& paramSlider,
-                      juce::UndoManager* undoManager = nullptr);
+                      juce::UndoManager* undoManager);
 
     ~SliderAttachment() override;
 

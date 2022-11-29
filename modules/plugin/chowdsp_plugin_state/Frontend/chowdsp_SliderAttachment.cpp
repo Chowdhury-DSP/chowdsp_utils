@@ -3,12 +3,18 @@ namespace chowdsp
 template <typename State>
 SliderAttachment<State>::SliderAttachment (const ParameterPath& paramPath,
                                            State& pluginState,
-                                           juce::Slider& paramSlider,
-                                           juce::UndoManager* undoManager)
+                                           juce::Slider& paramSlider)
     : SliderAttachment (pluginState.template getParameter<FloatParameter> (paramPath),
                         pluginState,
-                        paramSlider,
-                        undoManager)
+                        paramSlider)
+{
+}
+
+template <typename State>
+SliderAttachment<State>::SliderAttachment (FloatParameter& param,
+                                           State& pluginState,
+                                           juce::Slider& paramSlider)
+    : SliderAttachment (param, pluginState, paramSlider, pluginState.undoManager)
 {
 }
 
@@ -19,7 +25,7 @@ SliderAttachment<State>::SliderAttachment (FloatParameter& param,
                                            juce::UndoManager* undoManager)
     : slider (paramSlider),
       attachment (param, pluginState, ParameterAttachmentHelpers::SetValueCallback { *this }),
-      um (undoManager != nullptr ? undoManager : pluginState.undoManager)
+      um (undoManager)
 {
     slider.valueFromTextFunction = [&p = static_cast<juce::RangedAudioParameter&> (param)] (const juce::String& text) {
         return (double) p.convertFrom0to1 (p.getValueForText (text));

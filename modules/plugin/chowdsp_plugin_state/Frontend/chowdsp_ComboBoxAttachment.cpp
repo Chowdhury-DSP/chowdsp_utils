@@ -3,12 +3,18 @@ namespace chowdsp
 template <typename State>
 ComboBoxAttachment<State>::ComboBoxAttachment (const ParameterPath& paramPath,
                                                State& pluginState,
-                                               juce::ComboBox& combo,
-                                               juce::UndoManager* undoManager)
+                                               juce::ComboBox& combo)
     : ComboBoxAttachment (pluginState.template getParameter<ChoiceParameter> (paramPath),
                           pluginState,
-                          combo,
-                          undoManager)
+                          combo)
+{
+}
+
+template <typename State>
+ComboBoxAttachment<State>::ComboBoxAttachment (ChoiceParameter& param,
+                                               State& pluginState,
+                                               juce::ComboBox& combo)
+    : ComboBoxAttachment (param, pluginState, combo, pluginState.undoManager)
 {
 }
 
@@ -19,7 +25,7 @@ ComboBoxAttachment<State>::ComboBoxAttachment (ChoiceParameter& param,
                                                juce::UndoManager* undoManager)
     : comboBox (combo),
       attachment (param, pluginState, ParameterAttachmentHelpers::SetValueCallback { *this }),
-      um (undoManager != nullptr ? undoManager : pluginState.undoManager)
+      um (undoManager)
 {
     comboBox.addItemList (param.choices, 1);
     setValue (param.getIndex());

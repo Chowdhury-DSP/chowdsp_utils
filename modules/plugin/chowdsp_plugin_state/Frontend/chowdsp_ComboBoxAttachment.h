@@ -16,14 +16,18 @@ public:
     /** Creates an attachment for a given parameter path */
     ComboBoxAttachment (const ParameterPath& paramPath,
                         PluginStateType& pluginState,
-                        juce::ComboBox& combo,
-                        juce::UndoManager* undoManager = nullptr);
+                        juce::ComboBox& combo);
 
-    /** Creates an attachment for a given parameter */
+    /** Creates an attachment for a given parameter, using the undo manager from the plugin state */
+    ComboBoxAttachment (ChoiceParameter& param,
+                        PluginStateType& pluginState,
+                        juce::ComboBox& combo);
+
+    /** Creates an attachment for a given parameter, using a custon UndoManager */
     ComboBoxAttachment (ChoiceParameter& param,
                         PluginStateType& pluginState,
                         juce::ComboBox& combo,
-                        juce::UndoManager* undoManager = nullptr);
+                        juce::UndoManager* undoManager);
 
     ~ComboBoxAttachment() override;
 
