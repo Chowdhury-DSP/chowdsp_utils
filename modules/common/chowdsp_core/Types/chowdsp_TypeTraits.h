@@ -82,7 +82,7 @@
         static_assert (sizeof (No) != sizeof (Yes), "Yes and No have the same size on this platform, undefined behaviour will ensue!"); \
                                                                                                                                         \
         template <typename C>                                                                                                           \
-        static Yes test (decltype (C::Member));                                                                                         \
+        static Yes test (decltype (C::Member)*);                                                                                        \
                                                                                                                                         \
         template <typename C>                                                                                                           \
         static No test (...);                                                                                                           \

@@ -6,6 +6,8 @@ namespace chowdsp
 /** This API is unstable and should not be used directly! */
 namespace PluginStateHelpers
 {
+    JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wzero-as-null-pointer-constant")
+
     template <typename ParamStateType, int count = 0, bool only_params = true, int index = pfr::tuple_size_v<ParamStateType>>
     struct ParamInfoHelper
     {
@@ -62,6 +64,8 @@ namespace PluginStateHelpers
 
     template <typename ParamStateType>
     static constexpr int ContainsOnlyParamPointers = ParamInfoHelper<ParamStateType>::is_only_params;
+
+    JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 } // namespace PluginStateHelpers
 #endif
 } // namespace chowdsp

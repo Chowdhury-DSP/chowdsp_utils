@@ -1,8 +1,16 @@
 #pragma once
 
-// @TODO: figure out how we want to handle these dependencies...
+#if JUCE_MODULE_AVAILABLE_juce_dsp
+#include <juce_dsp/juce_dsp.h>
+#else
 #include "../../../common/chowdsp_core/JUCEHelpers/juce_FixedSizeFunction.h"
+#endif
+
+#if JUCE_MODULE_AVAILABLE_chowdsp_dsp_data_structures
+#include <chowdsp_dsp_data_structures/chowdsp_dsp_data_structures.h>
+#else
 #include "../../../dsp/chowdsp_dsp_data_structures/third_party/moodycamel/readerwriterqueue.h"
+#endif
 
 namespace chowdsp
 {

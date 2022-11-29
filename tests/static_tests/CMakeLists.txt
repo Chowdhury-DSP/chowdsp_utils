@@ -5,10 +5,6 @@ create_static_test(StaticLanczosResamplerTest)
 add_static_test_check(StaticLanczosResamplerTest LanczosKernel4_pass.cpp TRUE)
 add_static_test_check(StaticLanczosResamplerTest LanczosKernel5_fail.cpp FALSE)
 
-create_static_test(StaticPluginBaseTest)
-add_static_test_check(StaticPluginBaseTest PluginBaseAddParams_pass.cpp TRUE)
-add_static_test_check(StaticPluginBaseTest PluginBaseNoAddParams_fail.cpp FALSE)
-
 create_static_test(StaticSOSFilterTest)
 add_static_test_check(StaticSOSFilterTest SOSFilterEven_pass.cpp TRUE)
 add_static_test_check(StaticSOSFilterTest SOSFilterOdd_fail.cpp FALSE)
