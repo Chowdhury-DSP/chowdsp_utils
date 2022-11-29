@@ -16,7 +16,8 @@ PluginEditor::PluginEditor (StatefulPlugin& plug) : juce::AudioProcessorEditor (
                                                                  plug.getState(),
                                                                  onOffButton)
 {
-    const auto addSlider = [this] (juce::Slider& slider) {
+    const auto addSlider = [this] (juce::Slider& slider)
+    {
         addAndMakeVisible (slider);
         slider.setSliderStyle (juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
         slider.setTextBoxStyle (juce::Slider::TextBoxBelow, false, 80, 15);
@@ -29,12 +30,14 @@ PluginEditor::PluginEditor (StatefulPlugin& plug) : juce::AudioProcessorEditor (
     addAndMakeVisible (onOffButton);
 
     addAndMakeVisible (undoButton);
-    undoButton.onClick = [this] {
+    undoButton.onClick = [this]
+    {
         plugin.undoManager.undo();
     };
 
     addAndMakeVisible (redoButton);
-    redoButton.onClick = [this] {
+    redoButton.onClick = [this]
+    {
         plugin.undoManager.redo();
     };
 
@@ -43,6 +46,19 @@ PluginEditor::PluginEditor (StatefulPlugin& plug) : juce::AudioProcessorEditor (
 
     setResizable (true, true);
     setSize (plugin.getState().nonParams.editorWidth, plugin.getState().nonParams.editorHeight);
+
+    editorStateCallbacks += {
+        plugin.getState().addNonParameterListener (plugin.getState().nonParams.editorWidth,
+                                                   [this]
+                                                   {
+                                                       setSize (plugin.getState().nonParams.editorWidth, getHeight());
+                                                   }),
+        plugin.getState().addNonParameterListener (plugin.getState().nonParams.editorHeight,
+                                                   [this]
+                                                   {
+                                                       setSize (getWidth(), plugin.getState().nonParams.editorHeight);
+                                                   })
+    };
 }
 
 PluginEditor::~PluginEditor()

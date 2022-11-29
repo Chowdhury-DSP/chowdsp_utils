@@ -4,8 +4,9 @@ template <typename ParameterState, typename NonParameterState, typename Serializ
 PluginState<ParameterState, NonParameterState, Serializer>::PluginState (juce::UndoManager* um)
     : undoManager (um)
 {
-    doForAllParams (params,
-                    [this] (auto& paramHolder, size_t index) {
+    doForAllFields (params,
+                    [this] (auto& paramHolder, size_t index)
+                    {
                         const auto* rangedParam = static_cast<juce::RangedAudioParameter*> (paramHolder.get());
                         paramInfoList[index] = ParamInfo { rangedParam, rangedParam->getValue() };
                     });
@@ -17,8 +18,9 @@ template <typename ParameterState, typename NonParameterState, typename Serializ
 PluginState<ParameterState, NonParameterState, Serializer>::PluginState (juce::AudioProcessor& processor, juce::UndoManager* um)
     : PluginState (um)
 {
-    doForAllParams (params,
-                    [&processor] (auto& paramHolder, size_t) {
+    doForAllFields (params,
+                    [&processor] (auto& paramHolder, size_t)
+                    {
                         processor.addParameter (paramHolder.release());
                     });
 }
@@ -66,8 +68,8 @@ template <typename>
 typename Serializer::SerializedType PluginState<ParameterState, NonParameterState, Serializer>::serialize (const PluginState& object)
 {
     auto serial = Serializer::createBaseElement();
-    Serializer::addChildElement (serial, ParameterStateSerializer::serialize<Serializer> (object.params));
-    Serializer::addChildElement (serial, Serialization::serialize<Serializer> (object.nonParams));
+    Serializer::addChildElement (serial, PluginStateSerializer::serialize<Serializer> (object.params));
+    Serializer::addChildElement (serial, PluginStateSerializer::serialize<Serializer> (object.nonParams));
     return serial;
 }
 
@@ -82,8 +84,8 @@ void PluginState<ParameterState, NonParameterState, Serializer>::deserialize (ty
         return;
     }
 
-    ParameterStateSerializer::deserialize<Serializer> (Serializer::getChildElement (serial, 0), object.params);
-    Serialization::deserialize<Serializer> (Serializer::getChildElement (serial, 1), object.nonParams);
+    PluginStateSerializer::deserialize<Serializer> (Serializer::getChildElement (serial, 0), object.params);
+    PluginStateSerializer::deserialize<Serializer> (Serializer::getChildElement (serial, 1), object.nonParams);
 }
 
 template <typename ParameterState, typename NonParameterState, typename Serializer>
@@ -101,6 +103,13 @@ auto PluginState<ParameterState, NonParameterState, Serializer>::addParameterLis
     const auto index = (size_t) std::distance (paramInfoList.begin(), paramInfoIter);
     auto& broadcasterList = listenOnMessageThread ? messageThreadBroadcasters : audioThreadBroadcasters;
     return broadcasterList[index].connect (std::forward<ListenerArgs...> (args...));
+}
+
+template <typename ParameterState, typename NonParameterState, typename Serializer>
+template <typename NonParamType, typename... ListenerArgs>
+auto PluginState<ParameterState, NonParameterState, Serializer>::addNonParameterListener (StateValue<NonParamType>& nonParam, ListenerArgs&&... args)
+{
+    return nonParam.changeBroadcaster.connect (std::forward<ListenerArgs...> (args...));
 }
 
 template <typename ParameterState, typename NonParameterState, typename Serializer>

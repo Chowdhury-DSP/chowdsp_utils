@@ -18,8 +18,8 @@ struct PluginParameterState
 
 struct PluginNonParameterState
 {
-    int editorWidth = 300;
-    int editorHeight = 500;
+    chowdsp::StateValue<int> editorWidth { "editor_width", 300 };
+    chowdsp::StateValue<int> editorHeight { "editor_height", 500 };
 };
 
 static_assert (chowdsp::PluginStateHelpers::ParamCount<PluginParameterState> == 4);

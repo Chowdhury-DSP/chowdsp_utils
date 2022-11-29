@@ -14,17 +14,13 @@
 
 namespace chowdsp
 {
-struct NullState
-{
-};
-
 JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324)
 
 /**
  * Template type to hold a plugin's state.
  *
- * @tparam ParameterState       Struct containing all of the plugin's parameters as chowdsp::SmartPointer's. Structs can be nested if necessary.
- * @tparam NonParameterState    Struct containing all of the plugin's non-parameter state.
+ * @tparam ParameterState       Struct containing all of the plugin's parameters as chowdsp::SmartPointer's. Structs may be nested.
+ * @tparam NonParameterState    Struct containing all of the plugin's non-parameter state as StateValue onjects. Structs may be nested.
  * @tparam Serializer           A type that implements chowdsp::BaseSerializer (JSONSerializer by default)
  */
 template <typename ParameterState, typename NonParameterState = NullState, typename Serializer = JSONSerializer>
@@ -34,6 +30,9 @@ class PluginState : private juce::HighResolutionTimer,
     static_assert (PluginStateHelpers::ContainsOnlyParamPointers<ParameterState>,
                    "ParameterState must contain only chowdsp::SmartPointer<> of parameter types,"
                    " or structs containing those types!");
+
+    static_assert (PluginStateHelpers::ContainsOnlyStateValues<NonParameterState>,
+                   "NonParameterState must only contain chowdsp::StateValue types or structs containing those types!");
 
 public:
     /** Constructs a plugin state with no processor */
@@ -76,6 +75,14 @@ public:
     auto addParameterListener (const ParamType& param, bool listenOnMessageThread, ListenerArgs&&... args);
 
     /**
+     * Adds a listener to some field of the plugin's non-parameter state.
+     * The listener will be called on whichever thread the state value is
+     * mutated on. Listeners should have the signature void().
+     */
+    template <typename NonParamType, typename... ListenerArgs>
+    auto addNonParameterListener (StateValue<NonParamType>& nonParam, ListenerArgs&&... args);
+
+    /**
      * Runs parameter broadcasters synchronously.
      * This method is intended to be called from the audio thread.
      */
@@ -92,19 +99,20 @@ public:
     juce::UndoManager* undoManager = nullptr;
 
 private:
-    template <typename ParamsType, typename Callable>
-    static constexpr size_t doForAllParams (ParamsType& params, Callable&& callable, size_t index = 0)
+    template <typename StateType, typename Callable>
+    static constexpr size_t doForAllFields (StateType& state, Callable&& callable, size_t index = 0)
     {
-        pfr::for_each_field (params,
-                             [&index, call = std::forward<Callable> (callable)] (auto& paramHolder) mutable {
-                                 using Type = std::decay_t<decltype (paramHolder)>;
-                                 if constexpr (ParameterTypeHelpers::IsParameterPointerType<Type>)
+        pfr::for_each_field (state,
+                             [&index, call = std::forward<Callable> (callable)] (auto& stateObject) mutable
+                             {
+                                 using Type = std::decay_t<decltype (stateObject)>;
+                                 if constexpr (ParameterTypeHelpers::IsParameterPointerType<Type> || PluginStateHelpers::IsStateValue<Type>)
                                  {
-                                     call (paramHolder, index++);
+                                     call (stateObject, index++);
                                  }
                                  else
                                  {
-                                     index = doForAllParams (paramHolder, std::forward<Callable> (call), index);
+                                     index = doForAllFields (stateObject, std::forward<Callable> (call), index);
                                  }
                              });
         return index;
@@ -116,6 +124,7 @@ private:
     void hiResTimerCallback() override;
     void handleAsyncUpdate() override;
 
+    // Tools for managing parameter changes
     struct ParamInfo
     {
         const juce::RangedAudioParameter* paramCookie = nullptr;
@@ -123,7 +132,6 @@ private:
     };
 
     static constexpr auto totalNumParams = (size_t) PluginStateHelpers::ParamCount<ParameterState>;
-
     std::array<ParamInfo, totalNumParams> paramInfoList;
 
     std::array<chowdsp::Broadcaster<void()>, totalNumParams> messageThreadBroadcasters;

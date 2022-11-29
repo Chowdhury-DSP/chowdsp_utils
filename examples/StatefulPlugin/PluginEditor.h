@@ -32,5 +32,7 @@ private:
     juce::TextButton undoButton { "UNDO" };
     juce::TextButton redoButton { "REDO" };
 
+    chowdsp::ScopedCallbackList editorStateCallbacks;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginEditor)
 };
