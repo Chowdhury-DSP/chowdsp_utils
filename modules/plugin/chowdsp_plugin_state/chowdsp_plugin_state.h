@@ -11,7 +11,7 @@ BEGIN_JUCE_MODULE_DECLARATION
    dependencies:  chowdsp_core, chowdsp_serialization, chowdsp_listeners, chowdsp_parameters
 
    website:       https://ccrma.stanford.edu/~jatin/chowdsp
-   license:       @TODO: figure out which license we want to use here!
+   license:       BSD 3-Clause
 
    END_JUCE_MODULE_DECLARATION
 

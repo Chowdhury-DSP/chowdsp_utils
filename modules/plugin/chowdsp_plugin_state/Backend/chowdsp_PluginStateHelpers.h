@@ -2,15 +2,18 @@
 
 namespace chowdsp
 {
+/** An empty plugin state object */
 struct NullState
 {
 };
 
+/** A stateful value that can be used to hold some non-parameter state */
 template <typename T>
 struct StateValue
 {
     using element_type = T;
 
+    /** Constructs the vaslue with a name and default value */
     StateValue (std::string_view valueName, T defaultValue)
         : name (valueName),
           defaultVal (defaultValue),
@@ -18,9 +21,11 @@ struct StateValue
     {
     }
 
+    /** Returns the value */
     T get() const noexcept { return val; }
     operator T() const noexcept { return get(); } // NOLINT(google-explicit-constructor): we want to be able to do implicit conversion
 
+    /** Sets a new value */
     void set (T v)
     {
         if (v == val)
@@ -36,6 +41,7 @@ struct StateValue
         return *this;
     }
 
+    /** Resets the value to its default state */
     void reset() { set (defaultVal); }
 
     const std::string_view name;
