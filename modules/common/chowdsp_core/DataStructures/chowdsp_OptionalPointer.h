@@ -95,25 +95,25 @@ bool operator!= (const OptionalPointer<T>& p1, const OptionalPointer<T>& p2)
 }
 
 template <typename T>
-bool operator== (const OptionalPointer<T>& p1, const std::unique_ptr<T>& p2)
+bool operator== (const OptionalPointer<T>& p1, const std::unique_ptr<T>& p2) // NOSONAR
 {
     return p1.get() == p2.get();
 }
 
 template <typename T>
-bool operator!= (const OptionalPointer<T>& p1, const std::unique_ptr<T>& p2)
+bool operator!= (const OptionalPointer<T>& p1, const std::unique_ptr<T>& p2) // NOSONAR
 {
     return p1.get() != p2.get();
 }
 
 template <typename T>
-bool operator== (const std::unique_ptr<T>& p1, const OptionalPointer<T>& p2)
+bool operator== (const std::unique_ptr<T>& p1, const OptionalPointer<T>& p2) // NOSONAR
 {
     return p1.get() == p2.get();
 }
 
 template <typename T>
-bool operator!= (const std::unique_ptr<T>& p1, const OptionalPointer<T>& p2)
+bool operator!= (const std::unique_ptr<T>& p1, const OptionalPointer<T>& p2) // NOSONAR
 {
     return p1.get() != p2.get();
 }

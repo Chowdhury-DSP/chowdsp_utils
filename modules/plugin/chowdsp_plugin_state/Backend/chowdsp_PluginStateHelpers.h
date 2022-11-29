@@ -19,7 +19,7 @@ struct StateValue
     }
 
     T get() const noexcept { return val; }
-    operator T() const noexcept { return get(); }
+    operator T() const noexcept { return get(); } // NOLINT(google-explicit-constructor): we want to be able to do implicit conversion
 
     void set (T v)
     {
@@ -30,7 +30,11 @@ struct StateValue
         changeBroadcaster();
     }
 
-    void operator= (T v) { set (v); }
+    StateValue& operator= (T v)
+    {
+        set (v);
+        return *this;
+    }
 
     void reset() { set (defaultVal); }
 
@@ -156,7 +160,7 @@ namespace PluginStateHelpers
         static constexpr auto isStateVal = IsStateValue<indexed_element_type>;
 
         static constexpr auto nextCount = count + SingleValOrObjectInfo<indexed_element_type, isStateVal>::num_fields;
-        static constexpr int num_params = NonParamInfoHelper<NonParamStateType, nextCount, only_state_vals, index - 1>::num_fields;
+        static constexpr int num_fields = NonParamInfoHelper<NonParamStateType, nextCount, only_state_vals, index - 1>::num_fields;
 
         static constexpr auto nextOnlyVals = only_state_vals & SingleValOrObjectInfo<indexed_element_type, isStateVal>::is_only_state_vals;
         static constexpr bool is_only_state_vals = NonParamInfoHelper<NonParamStateType, count, nextOnlyVals, index - 1>::is_only_state_vals;
