@@ -12,8 +12,7 @@ namespace PluginStateSerializer
         auto serial = Serializer::createBaseElement();
 
         pfr::for_each_field (state,
-                             [&serial] (const auto& stateObject)
-                             {
+                             [&serial] (const auto& stateObject) {
                                  using Type = std::decay_t<decltype (stateObject)>;
                                  if constexpr (ParameterTypeHelpers::IsParameterPointerType<Type>)
                                  {
@@ -27,8 +26,7 @@ namespace PluginStateSerializer
                              });
 
         pfr::for_each_field (state,
-                             [&serial] (const auto& paramHolder)
-                             {
+                             [&serial] (const auto& paramHolder) {
                                  using Type = std::decay_t<decltype (paramHolder)>;
                                  if constexpr (! (ParameterTypeHelpers::IsParameterPointerType<Type> || PluginStateHelpers::IsStateValue<Type>) )
                                  {
@@ -53,8 +51,7 @@ namespace PluginStateSerializer
                 Serialization::deserialize<Serializer> (Serializer::getChildElement (serial, i), name);
 
                 pfr::for_each_field (state,
-                                     [i, &serial, &name, &namesThatHaveBeenDeserialized] (auto& stateObject)
-                                     {
+                                     [i, &serial, &name, &namesThatHaveBeenDeserialized] (auto& stateObject) {
                                          const auto elementSerial = Serializer::getChildElement (serial, i + 1);
 
                                          using Type = std::decay_t<decltype (stateObject)>;
@@ -91,8 +88,7 @@ namespace PluginStateSerializer
 
         // set all un-matched objects to their default values
         pfr::for_each_field (state,
-                             [&namesThatHaveBeenDeserialized] (auto& stateObject)
-                             {
+                             [&namesThatHaveBeenDeserialized] (auto& stateObject) {
                                  using Type = std::decay_t<decltype (stateObject)>;
                                  if constexpr (ParameterTypeHelpers::IsParameterPointerType<Type>)
                                  {
@@ -111,5 +107,5 @@ namespace PluginStateSerializer
                                  }
                              });
     }
-} // namespace ParameterStateSerializer
+} // namespace PluginStateSerializer
 } // namespace chowdsp

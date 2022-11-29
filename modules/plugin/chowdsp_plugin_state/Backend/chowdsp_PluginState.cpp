@@ -5,8 +5,7 @@ PluginState<ParameterState, NonParameterState, Serializer>::PluginState (juce::U
     : undoManager (um)
 {
     doForAllFields (params,
-                    [this] (auto& paramHolder, size_t index)
-                    {
+                    [this] (auto& paramHolder, size_t index) {
                         const auto* rangedParam = static_cast<juce::RangedAudioParameter*> (paramHolder.get());
                         paramInfoList[index] = ParamInfo { rangedParam, rangedParam->getValue() };
                     });
@@ -19,8 +18,7 @@ PluginState<ParameterState, NonParameterState, Serializer>::PluginState (juce::A
     : PluginState (um)
 {
     doForAllFields (params,
-                    [&processor] (auto& paramHolder, size_t)
-                    {
+                    [&processor] (auto& paramHolder, size_t) {
                         processor.addParameter (paramHolder.release());
                     });
 }

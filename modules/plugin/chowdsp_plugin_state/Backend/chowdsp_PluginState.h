@@ -103,8 +103,7 @@ private:
     static constexpr size_t doForAllFields (StateType& state, Callable&& callable, size_t index = 0)
     {
         pfr::for_each_field (state,
-                             [&index, call = std::forward<Callable> (callable)] (auto& stateObject) mutable
-                             {
+                             [&index, call = std::forward<Callable> (callable)] (auto& stateObject) mutable {
                                  using Type = std::decay_t<decltype (stateObject)>;
                                  if constexpr (ParameterTypeHelpers::IsParameterPointerType<Type> || PluginStateHelpers::IsStateValue<Type>)
                                  {
