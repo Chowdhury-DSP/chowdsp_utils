@@ -20,7 +20,8 @@ struct ParameterPath
         if (path.tail.empty())
         {
             pfr::for_each_field (params,
-                                 [&path, &paramPtr] (auto& paramHolder) {
+                                 [&path, &paramPtr] (auto& paramHolder)
+                                 {
                                      using Type = std::decay_t<decltype (paramHolder)>;
                                      if constexpr (ParameterTypeHelpers::IsParameterPointerType<Type>)
                                      {
@@ -35,11 +36,12 @@ struct ParameterPath
         else
         {
             pfr::for_each_field (params,
-                                 [&path, &paramPtr] (auto& paramHolder) {
+                                 [&path, &paramPtr] (auto& paramHolder)
+                                 {
                                      using Type = std::decay_t<decltype (paramHolder)>;
                                      if constexpr (! ParameterTypeHelpers::IsParameterPointerType<Type>)
                                      {
-                                         if (Type::name == path.head)
+                                         if (NAMEOF_TYPE (Type) == path.head)
                                              paramPtr = getParameterForPath<ParamType> (paramHolder, path.tail);
                                      }
                                  });

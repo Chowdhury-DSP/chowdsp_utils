@@ -27,3 +27,5 @@ BEGIN_JUCE_MODULE_DECLARATION
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wzero-as-null-pointer-constant")
 #include "third_party/pfr/include/pfr.hpp"
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+
+#include "third_party/nameof/include/nameof.hpp"

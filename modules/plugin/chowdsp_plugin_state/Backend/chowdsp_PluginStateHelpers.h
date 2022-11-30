@@ -93,10 +93,6 @@ namespace PluginStateHelpers
         template <typename T>
         struct SingleParamOrObjectInfo<T, false, std::enable_if_t<is_pfr_able<T>>>
         {
-            CHOWDSP_CHECK_HAS_STATIC_MEMBER (HasName, name)
-            static_assert (HasName<T>, "Internal parameter structs must contain a static `name` member!");
-            static_assert (std::is_same_v<decltype (T::name), const std::string_view>, "Internal parameter struct name must be a constexpr std::string_view!");
-
             static constexpr int num_params = ParamInfoHelper<T>::num_params;
             static constexpr bool is_only_params = ParamInfoHelper<T>::is_only_params;
         };
@@ -147,10 +143,6 @@ namespace PluginStateHelpers
         template <typename T>
         struct SingleValOrObjectInfo<T, false, std::enable_if_t<is_pfr_able<T>>>
         {
-            CHOWDSP_CHECK_HAS_STATIC_MEMBER (HasName, name)
-            static_assert (HasName<T>, "Internal non-parameter state structs must contain a static `name` member!");
-            static_assert (std::is_same_v<decltype (T::name), const std::string_view>, "Internal non-parameter state struct name must be a constexpr std::string_view!");
-
             static constexpr int num_fields = NonParamInfoHelper<T>::num_fields;
             static constexpr bool is_only_state_vals = NonParamInfoHelper<T>::is_only_state_vals;
         };
