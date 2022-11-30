@@ -22,13 +22,11 @@ public:
 
     struct Group1
     {
-        static constexpr std::string_view name { "group1" };
         chowdsp::PercentParameter::Ptr percent { "percent", "Percent", 0.5f };
     };
 
     struct Group2
     {
-        static constexpr std::string_view name { "group2" };
         Group1 group1;
         chowdsp::ChoiceParameter::Ptr choice { "choice", "Choice", juce::StringArray { "One", "Two", "Three" }, 1 };
     };
@@ -47,8 +45,8 @@ public:
 
         using namespace std::string_view_literals;
         expect (state.params.boolean.get() == &state.getParameter<chowdsp::BoolParameter> ("bool"sv), "Unable to access top-level parameter!");
-        expect (state.params.group2.choice.get() == &state.getParameter<chowdsp::ChoiceParameter> ("group2/choice"sv), "Unable to access nested parameter!");
-        expect (state.params.group2.group1.percent.get() == &constState.getParameter<chowdsp::PercentParameter> ("group2/group1/percent"sv), "Unable to access doubly-nested parameter!");
+        expect (state.params.group2.choice.get() == &state.getParameter<chowdsp::ChoiceParameter> ("Group2/choice"sv), "Unable to access nested parameter!");
+        expect (state.params.group2.group1.percent.get() == &constState.getParameter<chowdsp::PercentParameter> ("Group2/Group1/percent"sv), "Unable to access doubly-nested parameter!");
     }
 
     void parameterAttachmentTest()
@@ -57,7 +55,7 @@ public:
         State state;
 
         chowdsp::ParameterAttachment<chowdsp::BoolParameter, State> attachment { std::string_view { "bool" }, state, [] (bool) {} };
-        expect (state.params.boolean.get() == &attachment.param, "Unable tp create attachment from parameter path!");
+        expect (state.params.boolean.get() == &attachment.param, "Unable to create attachment from parameter path!");
     }
 
     void runTestTimed() override
