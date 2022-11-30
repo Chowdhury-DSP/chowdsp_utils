@@ -19,8 +19,8 @@ namespace EnumHelpers
         for (auto& name : magic_enum::enum_names<EnumType>())
         {
             juce::String nameStr { name.data() };
-            for (const auto& charMapEntry : charMap)
-                nameStr = nameStr.replaceCharacter (charMapEntry.first, charMapEntry.second);
+            for (const auto& [charToReplace, charToReplaceWith] : charMap)
+                nameStr = nameStr.replaceCharacter (charToReplace, charToReplaceWith);
 
             names.add (nameStr);
         }
