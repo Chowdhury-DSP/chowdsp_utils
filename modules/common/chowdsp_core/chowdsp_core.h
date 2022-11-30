@@ -44,6 +44,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "JUCEHelpers/juce_ExtraDefinitions.h"
 #include "JUCEHelpers/juce_MathsFunctions.h"
 #include "JUCEHelpers/juce_FloatVectorOperations.h"
+#include "JUCEHelpers/juce_FixedSizeFunction.h"
 #include "JUCEHelpers/juce_Decibels.h"
 #include "JUCEHelpers/juce_SmoothedValue.h"
 
@@ -68,6 +69,7 @@ namespace experimental
 #include "DataStructures/chowdsp_DoubleBuffer.h"
 #include "DataStructures/chowdsp_TupleHelpers.h"
 #include "DataStructures/chowdsp_Iterators.h"
+#include "DataStructures/chowdsp_OptionalPointer.h"
 #include "Functional/chowdsp_Bindings.h"
 #include "Memory/chowdsp_MemoryAliasing.h"
 #include "Types/chowdsp_TypeTraits.h"
