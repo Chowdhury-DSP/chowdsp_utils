@@ -189,4 +189,26 @@ public:
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GainDBParameter)
 };
+
+class FreqHzParameter : public FloatParameter
+{
+public:
+    FreqHzParameter (const ParameterID& parameterID,
+                     const juce::String& paramName,
+                     const juce::NormalisableRange<float>& paramRange,
+                     float defaultValue = 0.5f)
+        : FloatParameter (parameterID,
+                          paramName,
+                          paramRange,
+                          defaultValue,
+                          &ParamUtils::freqValToString,
+                          &ParamUtils::stringToFreqVal)
+    {
+    }
+
+    using Ptr = OptionalPointer<FreqHzParameter>;
+
+private:
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FreqHzParameter)
+};
 } // namespace chowdsp

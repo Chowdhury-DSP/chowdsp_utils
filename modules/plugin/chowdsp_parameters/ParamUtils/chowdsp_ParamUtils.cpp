@@ -5,7 +5,7 @@ namespace chowdsp::ParamUtils
 void createFreqParameter (Parameters& params, const ParameterID& id, const juce::String& name, float min, float max, float centre, float defaultValue)
 {
     auto freqRange = createNormalisableRange (min, max, centre);
-    emplace_param<FloatParameter> (params, id, name, freqRange, defaultValue, &freqValToString, &stringToFreqVal);
+    emplace_param<FreqHzParameter> (params, id, name, freqRange, defaultValue);
 }
 
 void createPercentParameter (Parameters& params, const ParameterID& id, const juce::String& name, float defaultValue)
