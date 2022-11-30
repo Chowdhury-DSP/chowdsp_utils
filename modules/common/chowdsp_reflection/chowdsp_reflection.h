@@ -29,3 +29,6 @@ JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wzero-as-null-pointer-constant")
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
 #include "third_party/nameof/include/nameof.hpp"
+#include "third_party/magic_enum/include/magic_enum.hpp"
+
+#include "ReflectionHelpers/chowdsp_EnumHelpers.h"

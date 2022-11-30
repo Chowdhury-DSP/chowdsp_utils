@@ -96,6 +96,40 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ChoiceParameter)
 };
 
+/**
+ * A Choice parameter based off of an enum class type.
+ *
+ * By default, underscores in enum names will be replaced with spaces.
+ * For custom behaviour, replace the charMap argument with a custom
+ * character map.
+ */
+template <typename EnumType>
+class EnumChoiceParameter : public ChoiceParameter
+{
+public:
+    EnumChoiceParameter (const ParameterID& parameterID,
+                         const juce::String& parameterName,
+                         EnumType defaultChoice,
+                         const std::initializer_list<std::pair<char, char>>& charMap = { { '_', ' ' } })
+        : ChoiceParameter (
+            parameterID,
+            parameterName,
+            EnumHelpers::createStringArray<EnumType> (charMap),
+            static_cast<int> (defaultChoice))
+    {
+    }
+
+    EnumType get() const noexcept
+    {
+        return static_cast<EnumType> (getIndex());
+    }
+
+    using Ptr = OptionalPointer<EnumChoiceParameter>;
+
+private:
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EnumChoiceParameter)
+};
+
 /** Wrapper of juce::AudioParameterBool that does not support modulation. */
 class BoolParameter : public juce::AudioParameterBool,
                       public ParamUtils::ModParameterMixin
