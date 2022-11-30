@@ -19,11 +19,29 @@ public:
         JSONUtils::toFile (serial, file);
     }
 
+    static void toMemoryBlock (const json& serial, juce::MemoryBlock& block)
+    {
+        JSONUtils::toMemoryBlock (serial, block);
+    }
+
     static SerializedType fromFile (const juce::File& file)
     {
         try
         {
             return JSONUtils::fromFile (file);
+        }
+        catch (...)
+        {
+            jassertfalse; // unable to load file!
+            return {};
+        }
+    }
+
+    static SerializedType fromMemoryBlock (const juce::MemoryBlock& block)
+    {
+        try
+        {
+            return JSONUtils::fromMemoryBlock (block);
         }
         catch (...)
         {

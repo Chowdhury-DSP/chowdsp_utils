@@ -7,12 +7,10 @@ TEST_CASE ("Tuple Helpers Test")
     {
         std::tuple<float, float, int, int> ints;
 
-        chowdsp::TupleHelpers::forEachInTuple ([] (auto& x, size_t i)
-                                               { x = (std::remove_reference_t<decltype (x)>) i; },
+        chowdsp::TupleHelpers::forEachInTuple ([] (auto& x, size_t i) { x = (std::remove_reference_t<decltype (x)>) i; },
                                                ints);
 
-        chowdsp::TupleHelpers::forEachInTuple ([] (auto& x, size_t i)
-                                               { REQUIRE (x == (std::remove_reference_t<decltype (x)>) i); },
+        chowdsp::TupleHelpers::forEachInTuple ([] (auto& x, size_t i) { REQUIRE (x == (std::remove_reference_t<decltype (x)>) i); },
                                                ints);
     }
 
@@ -32,10 +30,8 @@ TEST_CASE ("Tuple Helpers Test")
 
         std::tuple<Test1, Test2> tuple;
 
-        chowdsp::TupleHelpers::visit_at (tuple, 0, [] (auto& x)
-                                         { x.set (4); });
-        chowdsp::TupleHelpers::visit_at (tuple, 1, [] (auto& x)
-                                         { x.set (5); });
+        chowdsp::TupleHelpers::visit_at (tuple, 0, [] (auto& x) { x.set (4); });
+        chowdsp::TupleHelpers::visit_at (tuple, 1, [] (auto& x) { x.set (5); });
 
         REQUIRE (std::get<0> (tuple).x == 4);
         REQUIRE (std::get<1> (tuple).x == 5.0f);
@@ -57,8 +53,7 @@ TEST_CASE ("Tuple Helpers Test")
 
         int sum = 0;
         for (size_t i = 0; i < std::tuple_size<decltype (tuple)>(); ++i)
-            chowdsp::TupleHelpers::visit_at (tuple, i, [&sum] (auto& x)
-                                             { sum += (int) x.x; });
+            chowdsp::TupleHelpers::visit_at (tuple, i, [&sum] (auto& x) { sum += (int) x.x; });
 
         REQUIRE (sum == 110);
     }

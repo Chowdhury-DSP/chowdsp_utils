@@ -30,6 +30,7 @@ target_link_libraries(static_test_dummy_executable PRIVATE
     chowdsp_rhythm
     chowdsp_parameters
     chowdsp_plugin_base
+    chowdsp_plugin_state
     chowdsp_plugin_utils
     chowdsp_presets
     chowdsp_version
