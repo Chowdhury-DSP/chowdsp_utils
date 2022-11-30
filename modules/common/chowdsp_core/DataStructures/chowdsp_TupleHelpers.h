@@ -23,5 +23,48 @@ namespace TupleHelpers
     {
         forEachInTuple (std::forward<Fn> (fn), std::forward<Tuple> (tuple), TupleIndexSequence<Tuple> {});
     }
+
+#ifndef DOXYGEN
+    namespace tuple_visit_detail
+    {
+        template <size_t I>
+        struct visit_impl
+        {
+            template <typename T, typename F>
+            static void visit (T& tup, size_t idx, F&& fun)
+            {
+                if (idx == I - 1)
+                    fun (std::get<I - 1> (tup));
+                else
+                    visit_impl<I - 1>::visit (tup, idx, std::forward<F> (fun));
+            }
+        };
+
+        template <>
+        struct visit_impl<0>
+        {
+            template <typename T, typename F>
+            static void visit (T&, size_t, F&&)
+            {
+                // Attempting to visit tuple at an invalid index!
+                jassertfalse;
+            }
+        };
+    } // namespace tuple_visit_detail
+#endif
+
+    /** Visits the member of the tuple at the given index */
+    template <typename F, typename... Ts>
+    void visit_at (const std::tuple<Ts...>& tup, size_t idx, F&& fun)
+    {
+        tuple_visit_detail::visit_impl<sizeof...(Ts)>::visit (tup, idx, std::forward<F> (fun));
+    }
+
+    /** Visits the member of the tuple at the given index */
+    template <typename F, typename... Ts>
+    void visit_at (std::tuple<Ts...>& tup, size_t idx, F&& fun)
+    {
+        tuple_visit_detail::visit_impl<sizeof...(Ts)>::visit (tup, idx, std::forward<F> (fun));
+    }
 } // namespace TupleHelpers
 } // namespace chowdsp
