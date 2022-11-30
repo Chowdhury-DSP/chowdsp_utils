@@ -7,12 +7,16 @@ namespace chowdsp
 {
 /**
  * Base class for plugin processors.
- * 
+ *
  * Derived classes must override `prepareToPlay` and `releaseResources`
  * (from `juce::AudioProcessor`), as well as `processAudioBlock`, and
  * `addParameters`.
 */
+#if JUCE_MODULE_AVAILABLE_chowdsp_plugin_state
+template <class PluginStateType>
+#else
 template <class Processor>
+#endif
 class PluginBase : public juce::AudioProcessor
 #if JUCE_MODULE_AVAILABLE_chowdsp_clap_extensions
     ,
@@ -85,15 +89,31 @@ public:
     void getStateInformation (juce::MemoryBlock& data) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+#if JUCE_MODULE_AVAILABLE_chowdsp_plugin_state
+    auto& getState()
+    {
+        return state;
+    }
+
+    const auto& getState() const
+    {
+        return state;
+    }
+#endif
+
     virtual juce::String getWrapperTypeString() const;
     bool supportsParameterModulation() const;
 
 protected:
+#if JUCE_MODULE_AVAILABLE_chowdsp_plugin_state
+    PluginStateType state;
+#else
     using Parameters = chowdsp::Parameters;
     juce::AudioProcessorValueTreeState vts;
 
 #if JUCE_MODULE_AVAILABLE_foleys_gui_magic
     foleys::MagicProcessorState magicState { *this, vts };
+#endif
 #endif
 
 #if JUCE_MODULE_AVAILABLE_chowdsp_presets
@@ -106,21 +126,31 @@ protected:
 private:
     static juce::AudioProcessor::BusesProperties getDefaultBusLayout();
 
+#if ! JUCE_MODULE_AVAILABLE_chowdsp_plugin_state
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
     CHOWDSP_CHECK_HAS_STATIC_METHOD (HasAddParameters, addParameters)
+#endif
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginBase)
 };
 
-template <class Processor>
-juce::AudioProcessor::BusesProperties PluginBase<Processor>::getDefaultBusLayout()
+template <class P>
+juce::AudioProcessor::BusesProperties PluginBase<P>::getDefaultBusLayout()
 {
     return BusesProperties()
         .withInput ("Input", juce::AudioChannelSet::stereo(), true)
         .withOutput ("Output", juce::AudioChannelSet::stereo(), true);
 }
 
+#if JUCE_MODULE_AVAILABLE_chowdsp_plugin_state
+template <class State>
+PluginBase<State>::PluginBase (juce::UndoManager* um, const juce::AudioProcessor::BusesProperties& layout)
+    : AudioProcessor (layout),
+      state (*this, um)
+{
+}
+#else
 template <class Processor>
 PluginBase<Processor>::PluginBase (juce::UndoManager* um, const juce::AudioProcessor::BusesProperties& layout) : AudioProcessor (layout),
                                                                                                                  vts (*this, um, juce::Identifier ("Parameters"), createParameterLayout())
@@ -137,39 +167,40 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginBase<Processor>::creat
 
     return { params.begin(), params.end() };
 }
+#endif
 
-template <class Processor>
-int PluginBase<Processor>::getNumPrograms()
+template <class P>
+int PluginBase<P>::getNumPrograms()
 {
     return programAdaptor->getNumPrograms();
 }
 
-template <class Processor>
-int PluginBase<Processor>::getCurrentProgram()
+template <class P>
+int PluginBase<P>::getCurrentProgram()
 {
     return programAdaptor->getCurrentProgram();
 }
 
-template <class Processor>
-void PluginBase<Processor>::setCurrentProgram (int index)
+template <class P>
+void PluginBase<P>::setCurrentProgram (int index)
 {
     programAdaptor->setCurrentProgram (index);
 }
 
-template <class Processor>
-const juce::String PluginBase<Processor>::getProgramName (int index) // NOLINT(readability-const-return-type): Needs to return a const String for override compatibility
+template <class P>
+const juce::String PluginBase<P>::getProgramName (int index) // NOLINT(readability-const-return-type): Needs to return a const String for override compatibility
 {
     return programAdaptor->getProgramName (index);
 }
 
-template <class Processor>
-void PluginBase<Processor>::changeProgramName (int index, const juce::String& newName)
+template <class P>
+void PluginBase<P>::changeProgramName (int index, const juce::String& newName)
 {
     programAdaptor->changeProgramName (index, newName);
 }
 
-template <class Processor>
-bool PluginBase<Processor>::isBusesLayoutSupported (const juce::AudioProcessor::BusesLayout& layouts) const
+template <class P>
+bool PluginBase<P>::isBusesLayoutSupported (const juce::AudioProcessor::BusesLayout& layouts) const
 {
     // only supports mono and stereo (for now)
     if (layouts.getMainOutputChannelSet() != juce::AudioChannelSet::mono()
@@ -183,8 +214,8 @@ bool PluginBase<Processor>::isBusesLayoutSupported (const juce::AudioProcessor::
     return true;
 }
 
-template <class Processor>
-void PluginBase<Processor>::prepareToPlay (double sampleRate, int samplesPerBlock)
+template <class P>
+void PluginBase<P>::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     setRateAndBufferSizeDetails (sampleRate, samplesPerBlock);
 #if JUCE_MODULE_AVAILABLE_foleys_gui_magic
@@ -192,14 +223,27 @@ void PluginBase<Processor>::prepareToPlay (double sampleRate, int samplesPerBloc
 #endif
 }
 
-template <class Processor>
-void PluginBase<Processor>::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer&)
+template <class P>
+void PluginBase<P>::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer&)
 {
     juce::ScopedNoDenormals noDenormals;
 
     processAudioBlock (buffer);
 }
 
+#if JUCE_MODULE_AVAILABLE_chowdsp_plugin_state
+template <class State>
+void PluginBase<State>::getStateInformation (juce::MemoryBlock& data)
+{
+    state.serialize (data);
+}
+
+template <class State>
+void PluginBase<State>::setStateInformation (const void* data, int sizeInBytes)
+{
+    state.deserialize (juce::MemoryBlock { data, (size_t) sizeInBytes });
+}
+#else
 template <class Processor>
 void PluginBase<Processor>::getStateInformation (juce::MemoryBlock& data)
 {
@@ -225,9 +269,10 @@ void PluginBase<Processor>::setStateInformation (const void* data, int sizeInByt
             vts.replaceState (juce::ValueTree::fromXml (*xmlState));
 #endif
 }
+#endif
 
-template <class Processor>
-juce::String PluginBase<Processor>::getWrapperTypeString() const
+template <class P>
+juce::String PluginBase<P>::getWrapperTypeString() const
 {
 #if JUCE_MODULE_AVAILABLE_chowdsp_clap_extensions
     return CLAPExtensions::CLAPInfoExtensions::getPluginTypeString (wrapperType);
@@ -236,8 +281,8 @@ juce::String PluginBase<Processor>::getWrapperTypeString() const
 #endif
 }
 
-template <class Processor>
-bool PluginBase<Processor>::supportsParameterModulation() const
+template <class P>
+bool PluginBase<P>::supportsParameterModulation() const
 {
 #if JUCE_MODULE_AVAILABLE_chowdsp_clap_extensions
     return CLAPExtensions::CLAPInfoExtensions::is_clap;

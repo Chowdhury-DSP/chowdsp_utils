@@ -194,6 +194,10 @@ sure to abide by the license of each module, as well as whichever libraries are 
 - `ParamUtils`: Useful methods for creating parameters.
 - `ForwardingParameter`: A parameter that forwards on a parameter from another processor.
 
+`chowdsp_plugin_state` (BSD)
+- `PluginState`: Replacement for `juce::AudioProcessorValueTreeState`.
+- Parameter "attachments" for connecting the plugin state to various UI elements.
+
 `chowdsp_plugin_base` (GPLv3)
 - Base classes for creating audio effect or synthesizer plugins.
 

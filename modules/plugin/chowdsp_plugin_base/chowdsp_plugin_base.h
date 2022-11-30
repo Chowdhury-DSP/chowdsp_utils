@@ -32,6 +32,10 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include <chowdsp_foleys/chowdsp_foleys.h>
 #endif
 
+#if JUCE_MODULE_AVAILABLE_chowdsp_plugin_state
+#include <chowdsp_plugin_state/chowdsp_plugin_state.h>
+#endif
+
 #include "PluginBase/chowdsp_ProgramAdapter.h"
 
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wzero-as-null-pointer-constant", // Clang doesn't like HasAddParameters checker

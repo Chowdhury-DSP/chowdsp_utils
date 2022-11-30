@@ -54,6 +54,8 @@ public:
                     const std::function<juce::String (float)>& valueToTextFunction,
                     std::function<float (const juce::String&)>&& textToValueFunction);
 
+    using Ptr = OptionalPointer<FloatParameter>;
+
     /** Returns the default value for the parameter. */
     float getDefaultValue() const override { return unsnappedDefault; }
 
@@ -87,6 +89,11 @@ public:
         : juce::AudioParameterChoice (parameterID, parameterName, parameterChoices, defaultItemIndex)
     {
     }
+
+    using Ptr = OptionalPointer<ChoiceParameter>;
+
+private:
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ChoiceParameter)
 };
 
 /** Wrapper of juce::AudioParameterBool that does not support modulation. */
@@ -98,5 +105,54 @@ public:
         : juce::AudioParameterBool (parameterID, parameterName, defaultBoolValue)
     {
     }
+
+    using Ptr = OptionalPointer<BoolParameter>;
+
+private:
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BoolParameter)
+};
+
+class PercentParameter : public FloatParameter
+{
+public:
+    PercentParameter (const ParameterID& parameterID,
+                      const juce::String& paramName,
+                      float defaultValue = 0.5f,
+                      bool isBipolar = false)
+        : FloatParameter (parameterID,
+                          paramName,
+                          juce::NormalisableRange { isBipolar ? -1.0f : 0.0f, 1.0f },
+                          defaultValue,
+                          &ParamUtils::percentValToString,
+                          &ParamUtils::stringToPercentVal)
+    {
+    }
+
+    using Ptr = OptionalPointer<PercentParameter>;
+
+private:
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PercentParameter)
+};
+
+class GainDBParameter : public FloatParameter
+{
+public:
+    GainDBParameter (const ParameterID& parameterID,
+                     const juce::String& paramName,
+                     const juce::NormalisableRange<float>& paramRange,
+                     float defaultValue = 0.5f)
+        : FloatParameter (parameterID,
+                          paramName,
+                          paramRange,
+                          defaultValue,
+                          &ParamUtils::gainValToString,
+                          &ParamUtils::stringToGainVal)
+    {
+    }
+
+    using Ptr = OptionalPointer<GainDBParameter>;
+
+private:
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GainDBParameter)
 };
 } // namespace chowdsp
