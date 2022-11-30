@@ -26,43 +26,57 @@
 #define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 
-struct MyString {
-  MyString() : str{} {} // required
-  MyString(const char* s) : str{s} {} // required
-  MyString(const char* s, std::size_t l) : str{s, l} {} // required
-  bool empty() const { return str.empty(); } // required
-  MyString& append(std::size_t count, char c) { str.append(count, c); return *this; } // required
-  MyString& append(const char* s) { str.append(s); return *this; } // required
-  MyString& append(const MyString& s) { str.append(s.str); return *this; } // required
+struct MyString
+{
+    MyString() : str {} {} // required
+    MyString (const char* s) : str { s } {} // required
+    MyString (const char* s, std::size_t l) : str { s, l } {} // required
+    bool empty() const { return str.empty(); } // required
+    MyString& append (std::size_t count, char c)
+    {
+        str.append (count, c);
+        return *this;
+    } // required
+    MyString& append (const char* s)
+    {
+        str.append (s);
+        return *this;
+    } // required
+    MyString& append (const MyString& s)
+    {
+        str.append (s.str);
+        return *this;
+    } // required
 
-  std::size_t size() const { return str.size(); }
-  int compare(const char* s) const { return str.compare(s); }
+    std::size_t size() const { return str.size(); }
+    int compare (const char* s) const { return str.compare (s); }
 
- private:
-  std::string str;
+private:
+    std::string str;
 };
 
-struct MyStringView {
-  using value_type = char; // required
-  static constexpr auto npos = std::string_view::npos; // required
+struct MyStringView
+{
+    using value_type = char; // required
+    static constexpr auto npos = std::string_view::npos; // required
 
-  constexpr MyStringView() : str{} {} // required
-  constexpr MyStringView(const char* s) : str{s} {} // required
-  constexpr MyStringView(const char* s, std::size_t size) : str{s, size} {} // required
-  constexpr bool empty() const { return str.empty(); } // required
-  constexpr std::size_t size() const { return str.size(); } // required
-  constexpr const char* data() const { return str.data(); } // required
-  constexpr const char& operator[](std::size_t i) const { return str[i]; } // required
-  constexpr void remove_prefix(std::size_t n) { str.remove_prefix(n); } // required
-  constexpr void remove_suffix(std::size_t n) { str.remove_suffix(n); } // required
-  constexpr int compare(MyStringView s) const { return str.compare(s.str); } // required
+    constexpr MyStringView() : str {} {} // required
+    constexpr MyStringView (const char* s) : str { s } {} // required
+    constexpr MyStringView (const char* s, std::size_t size) : str { s, size } {} // required
+    constexpr bool empty() const { return str.empty(); } // required
+    constexpr std::size_t size() const { return str.size(); } // required
+    constexpr const char* data() const { return str.data(); } // required
+    constexpr const char& operator[] (std::size_t i) const { return str[i]; } // required
+    constexpr void remove_prefix (std::size_t n) { str.remove_prefix (n); } // required
+    constexpr void remove_suffix (std::size_t n) { str.remove_suffix (n); } // required
+    constexpr int compare (MyStringView s) const { return str.compare (s.str); } // required
 
-  constexpr int compare(const char* s) const { return str.compare(s); }
+    constexpr int compare (const char* s) const { return str.compare (s); }
 
- private:
-  std::string_view str;
+private:
+    std::string_view str;
 
-  constexpr MyStringView(std::string_view s) : str{s} {}
+    constexpr MyStringView (std::string_view s) : str { s } {}
 };
 
 #define NAMEOF_USING_ALIAS_STRING using string = MyString;
@@ -70,28 +84,35 @@ struct MyStringView {
 
 #include <nameof.hpp>
 
-enum class Color { RED = 1, GREEN = 2, BLUE = 4 };
+enum class Color
+{
+    RED = 1,
+    GREEN = 2,
+    BLUE = 4
+};
 
-TEST_CASE("string") {
-  auto cr = nameof::nameof_enum_flag(Color::RED);
-  REQUIRE_FALSE(cr.empty());
-  REQUIRE(cr.compare("RED") == 0);
+TEST_CASE ("string")
+{
+    auto cr = nameof::nameof_enum_flag (Color::RED);
+    REQUIRE_FALSE (cr.empty());
+    REQUIRE (cr.compare ("RED") == 0);
 
-  auto crg = nameof::nameof_enum_flag(static_cast<Color>(1 | 2));
-  REQUIRE_FALSE(crg.empty());
-  REQUIRE(crg.compare("RED|GREEN") == 0);
+    auto crg = nameof::nameof_enum_flag (static_cast<Color> (1 | 2));
+    REQUIRE_FALSE (crg.empty());
+    REQUIRE (crg.compare ("RED|GREEN") == 0);
 
-  auto cn = nameof::nameof_enum_flag(Color{0});
-  REQUIRE(cn.empty());
-  REQUIRE(cn.size() == 0);
+    auto cn = nameof::nameof_enum_flag (Color { 0 });
+    REQUIRE (cn.empty());
+    REQUIRE (cn.size() == 0);
 }
 
-TEST_CASE("string_view") {
-  auto cr = nameof::nameof_enum(Color::RED);
-  REQUIRE_FALSE(cr.empty());
-  REQUIRE(cr.compare("RED") == 0);
+TEST_CASE ("string_view")
+{
+    auto cr = nameof::nameof_enum (Color::RED);
+    REQUIRE_FALSE (cr.empty());
+    REQUIRE (cr.compare ("RED") == 0);
 
-  auto cn = nameof::nameof_enum(Color{0});
-  REQUIRE(cn.empty());
-  REQUIRE(cn.size() == 0);
+    auto cn = nameof::nameof_enum (Color { 0 });
+    REQUIRE (cn.empty());
+    REQUIRE (cn.size() == 0);
 }

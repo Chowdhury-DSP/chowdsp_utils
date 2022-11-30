@@ -24,70 +24,91 @@
 
 #include <nameof.hpp>
 
-enum class Color { RED = -10, BLUE = 0, GREEN = 10 };
-enum class Numbers { One, Two, Three };
+enum class Color
+{
+    RED = -10,
+    BLUE = 0,
+    GREEN = 10
+};
+enum class Numbers
+{
+    One,
+    Two,
+    Three
+};
 
 #if defined(NAMEOF_ENUM_SUPPORTED)
 // Сustom definitions of names for enum.
 // Specialization of `enum_name` must be injected in `namespace nameof::customize`.
 template <>
-constexpr std::string_view nameof::customize::enum_name<Color>(Color value) noexcept {
-  switch (value) {
-    case Color::RED:
-      return "the red color";
-    case Color::BLUE:
-      return "The BLUE";
-    case Color::GREEN:
-      return {}; // Empty string for default value.
-  }
-  return {}; // Empty string for unknow value.
+constexpr std::string_view nameof::customize::enum_name<Color> (Color value) noexcept
+{
+    switch (value)
+    {
+        case Color::RED:
+            return "the red color";
+        case Color::BLUE:
+            return "The BLUE";
+        case Color::GREEN:
+            return {}; // Empty string for default value.
+    }
+    return {}; // Empty string for unknow value.
 }
 
 // Сustom definitions of names for enum.
 // Specialization of `enum_name` must be injected in `namespace nameof::customize`.
 template <>
-constexpr std::string_view nameof::customize::enum_name<Numbers>(Numbers value) noexcept {
-  switch (value) {
-    case Numbers::One:
-      return "the one";
-    default:
-      return {}; // Empty string for default or unknow value.
-  }
+constexpr std::string_view nameof::customize::enum_name<Numbers> (Numbers value) noexcept
+{
+    switch (value)
+    {
+        case Numbers::One:
+            return "the one";
+        default:
+            return {}; // Empty string for default or unknow value.
+    }
 }
 #endif
 
 // Сustom definitions of names for type.
 // Specialization of `type_name` must be injected in `namespace nameof::customize`.
 template <>
-constexpr std::string_view nameof::customize::type_name<Color>() noexcept {
-  return "The Color";
+constexpr std::string_view nameof::customize::type_name<Color>() noexcept
+{
+    return "The Color";
 }
 
-class a1_test {};
-class a2_test {};
+class a1_test
+{
+};
+class a2_test
+{
+};
 
 // Сustom definitions of names for type.
 // Specialization of `type_name` must be injected in `namespace nameof::customize`.
 template <>
-constexpr std::string_view nameof::customize::type_name<a1_test>() noexcept {
-  return "Animal";
+constexpr std::string_view nameof::customize::type_name<a1_test>() noexcept
+{
+    return "Animal";
 }
 
-int main() {
+int main()
+{
 #if defined(NAMEOF_ENUM_SUPPORTED)
-  std::cout << nameof::nameof_enum(Color::RED) << std::endl; // 'the red color'
-  std::cout << nameof::nameof_enum(Color::BLUE) << std::endl; // 'The BLUE'
-  std::cout << nameof::nameof_enum(Color::GREEN) << std::endl; // 'GREEN'
+    std::cout << nameof::nameof_enum (Color::RED) << std::endl; // 'the red color'
+    std::cout << nameof::nameof_enum (Color::BLUE) << std::endl; // 'The BLUE'
+    std::cout << nameof::nameof_enum (Color::GREEN) << std::endl; // 'GREEN'
 
-  std::cout << nameof::nameof_enum(Numbers::One) << std::endl; // 'the one'
-  std::cout << nameof::nameof_enum(Numbers::Two) << std::endl; // 'Two'
-  std::cout << nameof::nameof_enum(Numbers::Three) << std::endl; // 'Three'
+    std::cout << nameof::nameof_enum (Numbers::One) << std::endl; // 'the one'
+    std::cout << nameof::nameof_enum (Numbers::Two) << std::endl; // 'Two'
+    std::cout << nameof::nameof_enum (Numbers::Three) << std::endl; // 'Three'
 #endif
 
-  std::cout << nameof::nameof_type<Color>() << std::endl; // 'The Color'
-  std::cout << nameof::nameof_type<Numbers>() << std::endl; // 'Numbers'
-  std::cout << nameof::nameof_type<a1_test>() << std::endl; // 'Animal'
-  std::cout << nameof::nameof_type<a2_test>() << std::endl; // 'a2_test'
+    std::cout << nameof::nameof_type<Color>() << std::endl; // 'The Color'
+    std::cout << nameof::nameof_type<Numbers>() << std::endl; // 'Numbers'
+    std::cout << nameof::nameof_type<a1_test>() << std::endl; // 'Animal'
+    std::cout << nameof::nameof_type<a2_test>() << std::endl; // 'a2_test'
 
-  return 0;
+    return 0;
 }
