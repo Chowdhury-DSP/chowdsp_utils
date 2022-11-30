@@ -1,5 +1,6 @@
 #include "chowdsp_parameters.h"
 
+#include "ParamUtils/chowdsp_ParameterConversions.cpp"
 #include "ParamUtils/chowdsp_ParamUtils.cpp"
 #include "chowdsp_parameters/Forwarding/chowdsp_ForwardingParameter.cpp"
 #include "ParamUtils/chowdsp_ParameterTypes.cpp"
