@@ -14,7 +14,12 @@
 
 namespace chowdsp
 {
-JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324)
+JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324) // struct was padded warning
+
+/** An empty plugin state object */
+struct NullState
+{
+};
 
 /**
  * Template type to hold a plugin's state.
@@ -24,7 +29,7 @@ JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324)
  * @tparam Serializer           A type that implements chowdsp::BaseSerializer (JSONSerializer by default)
  */
 template <typename ParameterState, typename NonParameterState = NullState, typename Serializer = JSONSerializer>
-class PluginState : private juce::HighResolutionTimer,
+class PluginState : private juce::HighResolutionTimer, // @TODO: maybe we should use a TimeSliceThread instead?
                     private juce::AsyncUpdater
 {
     static_assert (PluginStateHelpers::ContainsOnlyParamPointers<ParameterState>,
@@ -133,12 +138,13 @@ private:
     static constexpr auto totalNumParams = (size_t) PluginStateHelpers::ParamCount<ParameterState>;
     std::array<ParamInfo, totalNumParams> paramInfoList;
 
+    static constexpr size_t actionSize = 16; // sizeof ([this, i = index] { callMessageThreadBroadcaster (i); })
     std::array<chowdsp::Broadcaster<void()>, totalNumParams> messageThreadBroadcasters;
-    using MessageThreadAction = juce::dsp::FixedSizeFunction<16, void()>;
+    using MessageThreadAction = juce::dsp::FixedSizeFunction<actionSize, void()>;
     moodycamel::ReaderWriterQueue<MessageThreadAction> messageThreadBroadcastQueue { totalNumParams };
 
     std::array<chowdsp::Broadcaster<void()>, totalNumParams> audioThreadBroadcasters;
-    using AudioThreadAction = juce::dsp::FixedSizeFunction<16, void()>;
+    using AudioThreadAction = juce::dsp::FixedSizeFunction<actionSize, void()>;
     moodycamel::ReaderWriterQueue<AudioThreadAction> audioThreadBroadcastQueue { totalNumParams };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginState)

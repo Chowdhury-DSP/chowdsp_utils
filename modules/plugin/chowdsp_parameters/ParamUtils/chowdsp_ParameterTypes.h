@@ -174,7 +174,7 @@ public:
     GainDBParameter (const ParameterID& parameterID,
                      const juce::String& paramName,
                      const juce::NormalisableRange<float>& paramRange,
-                     float defaultValue = 0.5f)
+                     float defaultValue)
         : FloatParameter (parameterID,
                           paramName,
                           paramRange,
@@ -196,7 +196,7 @@ public:
     FreqHzParameter (const ParameterID& parameterID,
                      const juce::String& paramName,
                      const juce::NormalisableRange<float>& paramRange,
-                     float defaultValue = 0.5f)
+                     float defaultValue)
         : FloatParameter (parameterID,
                           paramName,
                           paramRange,

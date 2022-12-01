@@ -39,7 +39,7 @@ struct ParameterPath
                                      using Type = std::decay_t<decltype (paramHolder)>;
                                      if constexpr (! ParameterTypeHelpers::IsParameterPointerType<Type>)
                                      {
-                                         if (NameOfHelpers::getLocalTypeName<Type>() == path.head)
+                                         if (nameof::nameof_short_type<Type>() == path.head)
                                              paramPtr = getParameterForPath<ParamType> (paramHolder, path.tail);
                                      }
                                  });

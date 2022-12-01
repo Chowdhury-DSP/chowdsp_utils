@@ -33,6 +33,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include <chowdsp_listeners/chowdsp_listeners.h>
 #include <chowdsp_parameters/chowdsp_parameters.h>
 
+#include "Backend/chowdsp_StateValue.h"
 #include "Backend/chowdsp_ParameterTypeHelpers.h"
 #include "Backend/chowdsp_PluginStateHelpers.h"
 #include "Backend/chowdsp_ParameterStateSerializer.h"

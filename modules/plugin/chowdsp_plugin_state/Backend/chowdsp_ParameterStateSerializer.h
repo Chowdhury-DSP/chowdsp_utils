@@ -20,8 +20,7 @@ namespace PluginStateSerializer
                                  }
                                  else if constexpr (PluginStateHelpers::IsStateValue<Type>)
                                  {
-                                     Serializer::addChildElement (serial, stateObject.name);
-                                     Serializer::addChildElement (serial, Serialization::serialize<Serializer> (stateObject.get()));
+                                     Type::template serialize<Serializer> (serial, stateObject);
                                  }
                              });
 
@@ -30,7 +29,7 @@ namespace PluginStateSerializer
                                  using Type = std::decay_t<decltype (stateObject)>;
                                  if constexpr (! (ParameterTypeHelpers::IsParameterPointerType<Type> || PluginStateHelpers::IsStateValue<Type>) )
                                  {
-                                     Serializer::addChildElement (serial, NAMEOF_TYPE (Type));
+                                     Serializer::addChildElement (serial, nameof::nameof_type<Type>());
                                      Serializer::addChildElement (serial, serialize<Serializer> (stateObject));
                                  }
                              });
@@ -63,15 +62,11 @@ namespace PluginStateSerializer
                                          else if constexpr (PluginStateHelpers::IsStateValue<Type>)
                                          {
                                              if (juce::String { stateObject.name.data() } == name)
-                                             {
-                                                 typename Type::element_type val;
-                                                 Serialization::deserialize<Serializer> (elementSerial, val);
-                                                 stateObject.set (val);
-                                             }
+                                                 Type::template deserialize<Serializer> (elementSerial, stateObject);
                                          }
                                          else
                                          {
-                                             if (juce::String { NAMEOF_TYPE (Type).data() } == name)
+                                             if (juce::String { nameof::nameof_type<Type>().data() } == name)
                                                  deserialize<Serializer> (elementSerial, stateObject);
                                          }
 
@@ -102,7 +97,7 @@ namespace PluginStateSerializer
                                  }
                                  else
                                  {
-                                     if (! namesThatHaveBeenDeserialized.contains (NAMEOF_TYPE (Type).data()))
+                                     if (! namesThatHaveBeenDeserialized.contains (nameof::nameof_type<Type>().data()))
                                          deserialize<Serializer> ({}, stateObject);
                                  }
                              });

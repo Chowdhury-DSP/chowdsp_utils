@@ -18,7 +18,10 @@ PluginState<ParameterState, NonParameterState, Serializer>::PluginState (juce::A
     : PluginState (um)
 {
     doForAllFields (params,
-                    [&processor] (auto& paramHolder, size_t) {
+                    [&processor] (auto& paramHolder, size_t)
+                    {
+                        // Parameter must be non-null and owned by it's pointer before being released to the processor
+                        jassert (paramHolder != nullptr && paramHolder.isOwner());
                         processor.addParameter (paramHolder.release());
                     });
 }
@@ -148,8 +151,10 @@ void PluginState<ParameterState, NonParameterState, Serializer>::hiResTimerCallb
 
         paramInfo.value = paramInfo.paramCookie->getValue();
 
-        messageThreadBroadcastQueue.enqueue ([this, i = index] { callMessageThreadBroadcaster (i); });
-        audioThreadBroadcastQueue.try_enqueue ([this, i = index] { callAudioThreadBroadcaster (i); });
+        messageThreadBroadcastQueue.enqueue ([this, i = index]
+                                             { callMessageThreadBroadcaster (i); });
+        audioThreadBroadcastQueue.try_enqueue ([this, i = index]
+                                               { callAudioThreadBroadcaster (i); });
         triggerAsyncUpdate();
     }
 }
