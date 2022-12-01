@@ -84,6 +84,9 @@ namespace ParameterTypeHelpers
         Serialization::deserialize<Serializer> (serial, val);
         setValue (val, param);
     }
+
+    template <typename T>
+    static constexpr auto IsStringType = std::is_same_v<T, std::string_view>;
 } // namespace ParameterTypeHelpers
 #endif
 } // namespace chowdsp

@@ -21,6 +21,23 @@ struct NullState
 {
 };
 
+struct NameTag
+{
+    const std::string name;
+
+    template <typename Serializer>
+    static typename Serializer::SerializedType serialize (const NameTag& object)
+    {
+        return Serializer::serializeString (object.name);
+    }
+
+    template <typename Serializer>
+    static void deserialize (typename Serializer::DeserializedType serial, NameTag& object)
+    {
+        object.name = Serializer::template deserializeString<std::string> (serial);
+    }
+};
+
 /**
  * Template type to hold a plugin's state.
  *
@@ -113,6 +130,10 @@ private:
                                  if constexpr (ParameterTypeHelpers::IsParameterPointerType<Type> || PluginStateHelpers::IsStateValue<Type>)
                                  {
                                      call (stateObject, index++);
+                                 }
+                                 else if constexpr (ParameterTypeHelpers::IsStringType<Type>)
+                                 {
+                                     return; // don't do anything with this field!
                                  }
                                  else
                                  {

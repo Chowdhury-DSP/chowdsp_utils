@@ -3,7 +3,7 @@
 
 struct LevelParams
 {
-    static constexpr std::string_view name = "level_params";
+    const std::string_view name = "level_params";
     chowdsp::PercentParameter::Ptr percent { "percent", "Percent" };
     chowdsp::GainDBParameter::Ptr gain { "gain", "Gain", juce::NormalisableRange { -30.0f, 0.0f }, 0.0f };
 };
@@ -32,6 +32,27 @@ struct PluginParameterStateNewParam
 };
 
 using StateWithNewParam = chowdsp::PluginState<PluginParameterStateNewParam>;
+
+struct PluginParameterStateDoubleOfSameType
+{
+    LevelParams levelParams1 { "level_params1" };
+    LevelParams levelParams2 { "level_params2" };
+    chowdsp::ChoiceParameter::Ptr mode { "mode", "Mode", juce::StringArray { "Percent", "Gain", "Percent / Gain", "Gain / Percent" }, 2 };
+    chowdsp::BoolParameter::Ptr onOff { "on_off", "On/Off", true };
+};
+
+using StateWithDoubleOfSameType = chowdsp::PluginState<PluginParameterStateDoubleOfSameType>;
+
+struct PluginParameterStateTripleOfSameType
+{
+    LevelParams levelParams1 { "level_params1" };
+    LevelParams levelParams2 { "level_params2" };
+    LevelParams levelParams3 { "level_params3" };
+    chowdsp::ChoiceParameter::Ptr mode { "mode", "Mode", juce::StringArray { "Percent", "Gain", "Percent / Gain", "Gain / Percent" }, 2 };
+    chowdsp::BoolParameter::Ptr onOff { "on_off", "On/Off", true };
+};
+
+using StateWithTripleOfSameType = chowdsp::PluginState<PluginParameterStateTripleOfSameType>;
 
 struct NewGroup
 {
@@ -151,6 +172,39 @@ public:
         expectWithinAbsoluteError (state.params.newGroup.newParam->get(), 3.3f, 1.0e-6f, "Added param value is incorrect");
     }
 
+    void multipleOfSameTypeTest()
+    {
+        static constexpr float percentVal1 = 0.25f;
+        static constexpr float gainVal1 = -22.0f;
+        static constexpr float percentVal2 = 0.85f;
+        static constexpr float gainVal2 = -29.0f;
+        static constexpr int choiceVal = 0;
+        static constexpr bool boolVal = false;
+
+        juce::MemoryBlock block;
+        {
+            StateWithDoubleOfSameType state;
+            static_cast<juce::AudioParameterFloat&> (state.params.levelParams1.percent) = percentVal1;
+            static_cast<juce::AudioParameterFloat&> (state.params.levelParams1.gain) = gainVal1;
+            static_cast<juce::AudioParameterFloat&> (state.params.levelParams2.percent) = percentVal2;
+            static_cast<juce::AudioParameterFloat&> (state.params.levelParams2.gain) = gainVal2;
+            static_cast<juce::AudioParameterChoice&> (state.params.mode) = choiceVal;
+            static_cast<juce::AudioParameterBool&> (state.params.onOff) = boolVal;
+            state.serialize (block);
+        }
+
+        StateWithTripleOfSameType state {};
+        state.deserialize (block);
+        expectEquals (state.params.levelParams1.percent->get(), percentVal1, "Percent value 1 is incorrect");
+        expectEquals (state.params.levelParams1.gain->get(), gainVal1, "Gain value 1 is incorrect");
+        expectEquals (state.params.levelParams2.percent->get(), percentVal2, "Percent value 2 is incorrect");
+        expectEquals (state.params.levelParams2.gain->get(), gainVal2, "Gain value 2 is incorrect");
+        expectEquals (state.params.levelParams3.percent->get(), 0.5f, "Percent value 3 is incorrect");
+        expectEquals (state.params.levelParams3.gain->get(), 0.0f, "Gain value 3 is incorrect");
+        expectEquals (state.params.mode->getIndex(), choiceVal, "Choice value is incorrect");
+        expect (state.params.onOff->get() == boolVal, "Bool value is incorrect");
+    }
+
     void addedNonParameterFieldTest()
     {
         static constexpr int width = 200;
@@ -184,6 +238,9 @@ public:
 
         beginTest ("Added Parameter Group Test");
         addedGroupTest();
+
+        beginTest ("Double of Same Type Test");
+        multipleOfSameTypeTest();
 
         beginTest ("Added Non-Parameter Field Test");
         addedNonParameterFieldTest();
