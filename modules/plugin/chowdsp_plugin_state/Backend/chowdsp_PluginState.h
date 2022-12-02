@@ -131,7 +131,7 @@ private:
                                  {
                                      call (stateObject, index++);
                                  }
-                                 else if constexpr (ParameterTypeHelpers::IsStringType<Type>)
+                                 else if constexpr (ParameterTypeHelpers::IsHelperType<Type>)
                                  {
                                      return; // don't do anything with this field!
                                  }

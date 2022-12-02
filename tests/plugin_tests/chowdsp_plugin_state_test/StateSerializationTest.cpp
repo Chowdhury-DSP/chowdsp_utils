@@ -4,8 +4,9 @@
 struct LevelParams
 {
     const std::string_view name = "level_params";
-    chowdsp::PercentParameter::Ptr percent { "percent", "Percent" };
-    chowdsp::GainDBParameter::Ptr gain { "gain", "Gain", juce::NormalisableRange { -30.0f, 0.0f }, 0.0f };
+    const int version = 100;
+    chowdsp::PercentParameter::Ptr percent { juce::ParameterID { "percent", version }, "Percent" };
+    chowdsp::GainDBParameter::Ptr gain { juce::ParameterID { "gain", version }, "Gain", juce::NormalisableRange { -30.0f, 0.0f }, 0.0f };
 };
 
 struct PluginParameterState
@@ -36,7 +37,7 @@ using StateWithNewParam = chowdsp::PluginState<PluginParameterStateNewParam>;
 struct PluginParameterStateDoubleOfSameType
 {
     LevelParams levelParams1 { "level_params1" };
-    LevelParams levelParams2 { "level_params2" };
+    LevelParams levelParams2 { "level_params2", 101 };
     chowdsp::ChoiceParameter::Ptr mode { "mode", "Mode", juce::StringArray { "Percent", "Gain", "Percent / Gain", "Gain / Percent" }, 2 };
     chowdsp::BoolParameter::Ptr onOff { "on_off", "On/Off", true };
 };
@@ -46,8 +47,8 @@ using StateWithDoubleOfSameType = chowdsp::PluginState<PluginParameterStateDoubl
 struct PluginParameterStateTripleOfSameType
 {
     LevelParams levelParams1 { "level_params1" };
-    LevelParams levelParams2 { "level_params2" };
-    LevelParams levelParams3 { "level_params3" };
+    LevelParams levelParams2 { "level_params2", 101 };
+    LevelParams levelParams3 { "level_params3", 102 };
     chowdsp::ChoiceParameter::Ptr mode { "mode", "Mode", juce::StringArray { "Percent", "Gain", "Percent / Gain", "Gain / Percent" }, 2 };
     chowdsp::BoolParameter::Ptr onOff { "on_off", "On/Off", true };
 };

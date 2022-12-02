@@ -13,7 +13,8 @@ namespace PluginStateSerializer
         {
             std::string_view name {};
             pfr::for_each_field (object,
-                                 [&name] (const auto& field) {
+                                 [&name] (const auto& field)
+                                 {
                                      using Type = std::decay_t<decltype (field)>;
                                      if constexpr (ParameterTypeHelpers::IsStringType<Type>)
                                          name = field;
@@ -34,7 +35,8 @@ namespace PluginStateSerializer
         auto serial = Serializer::createBaseElement();
 
         pfr::for_each_field (state,
-                             [&serial] (const auto& stateObject) {
+                             [&serial] (const auto& stateObject)
+                             {
                                  using Type = std::decay_t<decltype (stateObject)>;
                                  if constexpr (ParameterTypeHelpers::IsParameterPointerType<Type>)
                                  {
@@ -47,9 +49,10 @@ namespace PluginStateSerializer
                              });
 
         pfr::for_each_field (state,
-                             [&serial] (const auto& stateObject) {
+                             [&serial] (const auto& stateObject)
+                             {
                                  using Type = std::decay_t<decltype (stateObject)>;
-                                 if constexpr (! (ParameterTypeHelpers::IsParameterPointerType<Type> || PluginStateHelpers::IsStateValue<Type> || ParameterTypeHelpers::IsStringType<Type>) )
+                                 if constexpr (! (ParameterTypeHelpers::IsParameterPointerType<Type> || PluginStateHelpers::IsStateValue<Type> || ParameterTypeHelpers::IsHelperType<Type>) )
                                  {
                                      Serializer::addChildElement (serial, detail::getObjectName (stateObject));
                                      Serializer::addChildElement (serial, serialize<Serializer> (stateObject));
@@ -72,7 +75,8 @@ namespace PluginStateSerializer
                 Serialization::deserialize<Serializer> (Serializer::getChildElement (serial, i), name);
 
                 pfr::for_each_field (state,
-                                     [i, &serial, &name, &namesThatHaveBeenDeserialized] (auto& stateObject) {
+                                     [i, &serial, &name, &namesThatHaveBeenDeserialized] (auto& stateObject)
+                                     {
                                          const auto elementSerial = Serializer::getChildElement (serial, i + 1);
 
                                          using Type = std::decay_t<decltype (stateObject)>;
@@ -86,7 +90,7 @@ namespace PluginStateSerializer
                                              if (juce::String { stateObject.name.data() } == name)
                                                  Type::template deserialize<Serializer> (elementSerial, stateObject);
                                          }
-                                         else if constexpr (ParameterTypeHelpers::IsStringType<Type>)
+                                         else if constexpr (ParameterTypeHelpers::IsHelperType<Type>)
                                          {
                                              return; // nothing to do
                                          }
@@ -109,7 +113,8 @@ namespace PluginStateSerializer
 
         // set all un-matched objects to their default values
         pfr::for_each_field (state,
-                             [&namesThatHaveBeenDeserialized] (auto& stateObject) {
+                             [&namesThatHaveBeenDeserialized] (auto& stateObject)
+                             {
                                  using Type = std::decay_t<decltype (stateObject)>;
                                  if constexpr (ParameterTypeHelpers::IsParameterPointerType<Type>)
                                  {
@@ -121,7 +126,7 @@ namespace PluginStateSerializer
                                      if (! namesThatHaveBeenDeserialized.contains (stateObject.name.data()))
                                          stateObject.reset();
                                  }
-                                 else if constexpr (ParameterTypeHelpers::IsStringType<Type>)
+                                 else if constexpr (ParameterTypeHelpers::IsHelperType<Type>)
                                  {
                                      return; // nothing to do
                                  }

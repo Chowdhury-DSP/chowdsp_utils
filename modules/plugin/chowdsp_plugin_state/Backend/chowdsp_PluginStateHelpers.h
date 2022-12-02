@@ -9,7 +9,7 @@ namespace PluginStateHelpers
     JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wzero-as-null-pointer-constant")
 
     template <typename T>
-    static constexpr bool is_pfr_able = std::is_aggregate_v<T> && ! std::is_polymorphic_v<T> && ! std::is_same_v<std::string_view, T>;
+    static constexpr bool is_pfr_able = std::is_aggregate_v<T> && ! std::is_polymorphic_v<T> && ! ParameterTypeHelpers::IsHelperType<T>;
 
     template <class T>
     struct IsStateValueType : std::false_type
@@ -48,7 +48,7 @@ namespace PluginStateHelpers
         struct SingleParamOrObjectInfo<T, false, std::enable_if_t<! is_pfr_able<T>>>
         {
             static constexpr int num_params = 0;
-            static constexpr bool is_only_params = std::is_same_v<std::string_view, T>;
+            static constexpr bool is_only_params = ParameterTypeHelpers::IsHelperType<T>;
         };
 
         using indexed_element_type = std::decay_t<decltype (pfr::get<index - 1> (ParamStateType {}))>;
@@ -98,7 +98,7 @@ namespace PluginStateHelpers
         struct SingleValOrObjectInfo<T, false, std::enable_if_t<! is_pfr_able<T>>>
         {
             static constexpr int num_fields = 0;
-            static constexpr bool is_only_state_vals = std::is_same_v<std::string_view, T>;
+            static constexpr bool is_only_state_vals = ParameterTypeHelpers::IsHelperType<T>;
         };
 
         using indexed_element_type = std::decay_t<decltype (pfr::get<index - 1> (NonParamStateType {}))>;

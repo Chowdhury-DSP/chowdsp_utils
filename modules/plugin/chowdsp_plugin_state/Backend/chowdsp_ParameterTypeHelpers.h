@@ -87,6 +87,9 @@ namespace ParameterTypeHelpers
 
     template <typename T>
     static constexpr auto IsStringType = std::is_same_v<T, std::string_view>;
+
+    template <typename T>
+    static constexpr auto IsHelperType = IsStringType<T> || std::is_arithmetic_v<T>;
 } // namespace ParameterTypeHelpers
 #endif
 } // namespace chowdsp
