@@ -21,6 +21,13 @@ namespace Serialization
         Serializer::toFile (serialize<Serializer> (objectToSerialize), targetFile);
     }
 
+    /** Serialize an object to a MemoryBlock with a given serializer */
+    template <typename Serializer, typename TypeToSerialize>
+    void serialize (const TypeToSerialize& objectToSerialize, juce::MemoryBlock& targetMemory)
+    {
+        Serializer::toMemoryBlock (serialize<Serializer> (objectToSerialize), targetMemory);
+    }
+
     /** Deserialize an object with a given serializer */
     template <typename Serializer, typename TypeToDeserialize>
     void deserialize (const typename Serializer::SerializedType& serial, TypeToDeserialize& objectToDeserialize)
@@ -36,6 +43,13 @@ namespace Serialization
     void deserialize (const juce::File& file, TypeToDeserialize& objectToDeserialize)
     {
         deserialize<Serializer> (Serializer::fromFile (file), objectToDeserialize);
+    }
+
+    /** Deserialize an object from a MemoryBlock with a given serializer */
+    template <typename Serializer, typename TypeToDeserialize>
+    void deserialize (const juce::MemoryBlock& memory, TypeToDeserialize& objectToDeserialize)
+    {
+        deserialize<Serializer> (Serializer::fromMemoryBlock (memory), objectToDeserialize);
     }
 
     /** Deserialize an object from binary data with a given serializer */

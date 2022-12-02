@@ -34,6 +34,7 @@ target_link_libraries(chowdsp_utils_codeql PRIVATE
     chowdsp_rhythm
     chowdsp_parameters
     chowdsp_plugin_base
+    chowdsp_plugin_state
     chowdsp_plugin_utils
     chowdsp_presets
     chowdsp_version

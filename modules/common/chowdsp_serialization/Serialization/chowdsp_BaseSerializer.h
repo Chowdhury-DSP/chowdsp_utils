@@ -1,5 +1,9 @@
 #pragma once
 
+#if JUCE_MODULE_AVAILABLE_juce_graphics
+#include <juce_graphics/juce_graphics.h>
+#endif
+
 namespace chowdsp
 {
 #ifndef DOXYGEN
@@ -50,11 +54,26 @@ class BaseSerializer
     template <typename T>
     static constexpr auto IsString = std::is_same_v<T, std::string> || std::is_same_v<T, juce::String>;
 
+#if JUCE_MODULE_AVAILABLE_juce_graphics
+    template <class T>
+    struct IsJucePointType : std::false_type
+    {
+    };
+
+    template <class T>
+    struct IsJucePointType<juce::Point<T>> : std::true_type
+    {
+    };
+
+    template <typename T>
+    static constexpr auto IsPoint = IsJucePointType<T>::value;
+#endif
+
     template <typename T>
     static constexpr auto IsContainerNotMapOrString = TypeTraits::IsIterable<T> && ! IsString<T> && ! TypeTraits::IsMapLike<T>;
 
     template <typename T>
-    static constexpr auto IsNotDirectlySerializable = ! std::is_arithmetic_v<T> && ! IsString<T> && ! TypeTraits::IsIterable<T>;
+    static constexpr auto IsNotDirectlySerializable = ! std::is_arithmetic_v<T> && ! IsString<T> && ! TypeTraits::IsIterable<T> && ! IsPoint<T>;
 
     template <typename T>
     static constexpr auto HasCustomSerialization = serialization_detail::HasCustomSerializer<T>;
@@ -101,6 +120,35 @@ public:
     {
         x = Serializer::template deserializeString<T> (serial);
     }
+
+#if JUCE_MODULE_AVAILABLE_juce_graphics
+    /** Serializer for juce::Point types */
+    template <typename Serializer, typename T>
+    static std::enable_if_t<IsPoint<T>, SerialType<Serializer>>
+        serialize (const T& point)
+    {
+        auto serial = Serializer::createBaseElement();
+        Serializer::addChildElement (serial, serialize<Serializer> (point.x));
+        Serializer::addChildElement (serial, serialize<Serializer> (point.y));
+        return serial;
+    }
+
+    /** Deserializer for juce::Point types */
+    template <typename Serializer, typename T>
+    static std::enable_if_t<IsPoint<T>, void>
+        deserialize (DeserialType<Serializer> serial, T& point)
+    {
+        if (Serializer::getNumChildElements (serial) != 2)
+        {
+            jassertfalse; // the serialized data does not contain the correct number of elements to fill this array!
+            point = {};
+            return;
+        }
+
+        deserialize<Serializer> (Serializer::getChildElement (serial, 0), point.x);
+        deserialize<Serializer> (Serializer::getChildElement (serial, 1), point.y);
+    }
+#endif
 
     /** Serializer for container types */
     template <typename Serializer, typename T>

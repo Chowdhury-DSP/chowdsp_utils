@@ -7,6 +7,7 @@
 // @TODO: figure out a way to re-implement jassert...
 #define jassert(expression)
 #define jassertfalse
+#define jassertquiet(expression)
 
 /** This macro defines the C calling convention used as the standard for JUCE calls. */
 #if JUCE_WINDOWS

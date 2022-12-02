@@ -90,6 +90,8 @@ sure to abide by the license of each module, as well as whichever libraries are 
 
 `chowdsp_reflection` (BSD)
 - A thin wrapper around [`boost::pfr`](https://github.com/boostorg/pfr) (Boost license, included internally).
+- A thin wrapper around [`nameof`](https://github.com/Neargye/nameof) (MIT license, included internally).
+- A thin wrapper around [`magic_enum`](https://github.com/Neargye/magic_enum) (MIT license, included internally).
 
 `chowdsp_serialization` (BSD)
 - Tools for serializing/deserializing data, using JSON or XML formats.
@@ -193,6 +195,10 @@ sure to abide by the license of each module, as well as whichever libraries are 
 `chowdsp_parameters` (BSD)
 - `ParamUtils`: Useful methods for creating parameters.
 - `ForwardingParameter`: A parameter that forwards on a parameter from another processor.
+
+`chowdsp_plugin_state` (BSD)
+- `PluginState`: Replacement for `juce::AudioProcessorValueTreeState`.
+- Parameter "attachments" for connecting the plugin state to various UI elements.
 
 `chowdsp_plugin_base` (GPLv3)
 - Base classes for creating audio effect or synthesizer plugins.
