@@ -8,7 +8,7 @@ class ParamHelpersTest : public TimedUnitTest
 public:
     ParamHelpersTest() : TimedUnitTest ("Param Helpers Test", "Parameters") {}
 
-    void checkRange (juce::NormalisableRange<float> range, float start, float end, float centre)
+    void checkRange (const juce::NormalisableRange<float>& range, float start, float end, float centre)
     {
         constexpr float maxErr = 1.0e-3f;
 
@@ -88,6 +88,23 @@ public:
         expectEquals (params[0]->getText (1.0f, 1024), juce::String ("5.00 : 1"), "5 : 1 value string is incorrect!");
     }
 
+    void enumParamTest()
+    {
+        enum Mode
+        {
+            Mode_1,
+            Mode_2,
+            Mode_3,
+        };
+
+        chowdsp::EnumChoiceParameter<Mode> modeParam ("mode", "Mode", Mode::Mode_1);
+
+        expect (modeParam.get() == Mode_1, "Default value is incorrect!");
+        expectEquals (static_cast<juce::RangedAudioParameter&> (modeParam).getText (0.0f, 1024), juce::String ("Mode 1"), "Mode 1 value string is incorrect!");
+        expectEquals (static_cast<juce::RangedAudioParameter&> (modeParam).getText (0.5f, 1024), juce::String ("Mode 2"), "Mode 2 value string is incorrect!");
+        expectEquals (static_cast<juce::RangedAudioParameter&> (modeParam).getText (1.0f, 1024), juce::String ("Mode 3"), "Mode 3 value string is incorrect!");
+    }
+
     void runTestTimed() override
     {
         beginTest ("Create Normalisable Range Test");
@@ -107,6 +124,9 @@ public:
 
         beginTest ("Create Ratio Param Test");
         ratioParamTest();
+
+        beginTest ("Create Enum Param Test");
+        enumParamTest();
     }
 };
 
