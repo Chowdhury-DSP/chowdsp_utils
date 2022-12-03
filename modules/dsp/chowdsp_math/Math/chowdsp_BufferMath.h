@@ -77,14 +77,19 @@ namespace BufferMath
     template <typename BufferType, typename FloatType = detail::BufferSampleType<BufferType>>
     bool sanitizeBuffer (BufferType& buffer, FloatType ceiling = (FloatType) 100) noexcept;
 
+    /** Applies a function to every sample in the buffer */
     template <typename BufferType, typename FunctionType>
     void applyFunction (BufferType& buffer, FunctionType&& function);
 
+#if ! CHOWDSP_NO_XSIMD
+    /** Applies a SIMD/scalar function to every sample in the buffer */
     template <typename BufferType, typename FunctionType, typename FloatType = detail::BufferSampleType<BufferType>>
     std::enable_if_t<std::is_floating_point_v<FloatType>, void> applyFunctionSIMD (BufferType& buffer, FunctionType&& function);
 
+    /** Applies a SIMD or scalar function to every sample in the buffer */
     template <typename BufferType, typename SIMDFunctionType, typename ScalarFunctionType, typename FloatType = detail::BufferSampleType<BufferType>>
     std::enable_if_t<std::is_floating_point_v<FloatType>, void> applyFunctionSIMD (BufferType& buffer, SIMDFunctionType&& simdFunction, ScalarFunctionType&& scalarFunction);
+#endif
 } // namespace BufferMath
 } // namespace chowdsp
 
