@@ -321,7 +321,7 @@ void applyFunction (BufferType& buffer, FunctionType&& function)
 template <typename BufferType, typename FunctionType, typename FloatType>
 std::enable_if_t<std::is_floating_point_v<FloatType>, void> applyFunctionSIMD (BufferType& buffer, FunctionType&& function)
 {
-    applyFunctionSIMD (buffer, function, function);
+    applyFunctionSIMD (buffer, std::forward<FunctionType> (function), std::forward<FunctionType> (function));
 }
 
 template <typename BufferType, typename SIMDFunctionType, typename ScalarFunctionType, typename FloatType>
