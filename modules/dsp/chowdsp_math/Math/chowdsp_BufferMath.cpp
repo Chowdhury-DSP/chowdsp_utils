@@ -302,4 +302,57 @@ bool sanitizeBuffer (BufferType& buffer, FloatType ceiling) noexcept
 
     return ! needsClear;
 }
+
+template <typename BufferType, typename FunctionType>
+void applyFunction (BufferType& buffer, FunctionType&& function)
+{
+    const auto numChannels = buffer.getNumChannels();
+    const auto numSamples = buffer.getNumSamples();
+
+    for (int ch = 0; ch < numChannels; ++ch)
+    {
+        auto* data = buffer.getWritePointer (ch);
+        for (int n = 0; n < numSamples; ++n)
+            data[n] = function (data[n]);
+    }
+}
+
+#if ! CHOWDSP_NO_XSIMD
+template <typename BufferType, typename FunctionType, typename FloatType>
+std::enable_if_t<std::is_floating_point_v<FloatType>, void> applyFunctionSIMD (BufferType& buffer, FunctionType&& function)
+{
+    applyFunctionSIMD (buffer, std::forward<FunctionType> (function), std::forward<FunctionType> (function));
+}
+
+template <typename BufferType, typename SIMDFunctionType, typename ScalarFunctionType, typename FloatType>
+std::enable_if_t<std::is_floating_point_v<FloatType>, void> applyFunctionSIMD (BufferType& buffer, SIMDFunctionType&& simdFunction, ScalarFunctionType&& scalarFunction)
+{
+#if CHOWDSP_USING_JUCE
+    static_assert (! std::is_same_v<BufferType, juce::AudioBuffer<FloatType>>,
+                   "applyFunctionSIMD expects that the buffers channel data will be aligned"
+                   "which cannot be guaranteed with juce::AudioBuffer!");
+#endif
+
+    const auto numChannels = buffer.getNumChannels();
+    const auto numSamples = buffer.getNumSamples();
+
+    static constexpr auto vecSize = (int) xsimd::batch<FloatType>::size;
+    auto numVecOps = numSamples / vecSize;
+    const auto leftoverValues = numSamples % vecSize;
+
+    for (int ch = 0; ch < numChannels; ++ch)
+    {
+        auto* data = buffer.getWritePointer (ch);
+
+        while (--numVecOps >= 0)
+        {
+            xsimd::store_aligned (data, simdFunction (xsimd::load_aligned (data)));
+            data += vecSize;
+        }
+
+        for (int n = 0; n < leftoverValues; ++n)
+            data[n] = scalarFunction (data[n]);
+    }
+}
+#endif // ! CHOWDSP_NO_XSIMD
 } // namespace chowdsp::BufferMath
