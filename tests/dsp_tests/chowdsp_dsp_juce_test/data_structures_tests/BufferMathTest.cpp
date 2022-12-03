@@ -266,8 +266,7 @@ public:
         }
 
         applyFunction (bufferTest,
-                       [] (auto x)
-                       {
+                       [] (auto x) {
                            CHOWDSP_USING_XSIMD_STD (tanh);
                            return tanh (x);
                        });
@@ -297,8 +296,7 @@ public:
         }
 
         applyFunctionSIMD (bufferTest,
-                           [] (auto x)
-                           {
+                           [] (auto x) {
                                CHOWDSP_USING_XSIMD_STD (tanh);
                                return tanh (x);
                            });
