@@ -2,6 +2,7 @@
 
 namespace chowdsp
 {
+#if ! CHOWDSP_NO_XSIMD
 /**
  * Copies data from a chowdsp::Buffer of some scalar type,
  * to a chowdsp::Buffer of the corresponding SIMD type.
@@ -53,7 +54,7 @@ template <typename T>
             scalarChannelPointers[i] = scalarBuffer.getReadPointer (scalarChannelIndex);
         }
 
-        auto* simdChannelData = reinterpret_cast<T*> (simdBuffer.getWritePointer (ch / vecSize));
+        auto* simdChannelData = reinterpret_cast<T*> (simdBuffer.getWritePointer (ch / vecSize)); // NOSONAR (reinterpret_cast is safe here)
         interleaveSamples (scalarChannelPointers, simdChannelData, channelsToInterleave);
     }
 }
@@ -95,15 +96,16 @@ template <typename T>
     {
         const auto channelsToDeinterleave = juce::jmin (vecSize, scalarBuffer.getNumChannels() - ch * vecSize);
 
-        T* scalarChannelPointers[vecSize] {};
+        T* scalarChannelPointers[(size_t) vecSize] {};
         for (int i = 0; i < channelsToDeinterleave; ++i)
         {
             const auto scalarChannelIndex = ch * vecSize + i;
             scalarChannelPointers[i] = scalarBuffer.getWritePointer (scalarChannelIndex);
         }
 
-        auto* simdChannelData = reinterpret_cast<const T*> (simdBuffer.getReadPointer (ch));
+        auto* simdChannelData = reinterpret_cast<const T*> (simdBuffer.getReadPointer (ch)); // NOSONAR (reinterpret_cast is safe here)
         deinterleaveSamples (simdChannelData, scalarChannelPointers, channelsToDeinterleave);
     }
 }
+#endif // ! CHOWDSP_NO_XSIMD
 } // namespace chowdsp
