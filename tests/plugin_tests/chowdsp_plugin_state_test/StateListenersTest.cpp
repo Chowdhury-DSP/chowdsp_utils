@@ -89,11 +89,10 @@ public:
         bool listenerCalled = false;
         chowdsp::PluginState<Params, NonParams> state {};
         const auto listener = state.addNonParameterListener (state.nonParams.value,
-                                                             [this, &state, &listenerCalled]
-                                                             {
+                                                             [this, &state, &listenerCalled] {
                                                                  listenerCalled = true;
                                                                  expectEquals ((int) state.nonParams.value, newValue, "Value after listerner callback is incorrect!");
-                                       });
+                                                             });
 
         state.nonParams.value = newValue;
 
