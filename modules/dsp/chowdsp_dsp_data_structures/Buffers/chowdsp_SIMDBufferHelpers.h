@@ -24,8 +24,7 @@ template <typename T>
     const auto numScalarChannels = scalarBuffer.getNumChannels();
     const auto numSIMDChannels = Math::ceiling_divide (numScalarChannels, vecSize);
 
-    const auto interleaveSamples = [numSamples] (const T** source, T* dest, int numChannels)
-    {
+    const auto interleaveSamples = [numSamples] (const T** source, T* dest, int numChannels) {
         std::fill (dest, dest + numSamples * vecSize, (T) 0);
 
         for (int chan = 0; chan < numChannels; ++chan)
@@ -78,8 +77,7 @@ template <typename T>
     jassert (scalarBuffer.getNumSamples() == numSamples); // Scalar buffer must have the same number of samples!
     jassert (scalarBuffer.getNumChannels() <= numSIMDChannels * vecSize); // Scalar buffer does not have enough channels!
 
-    const auto deinterleaveSamples = [numSamples] (const T* source, T** dest, int numChannels)
-    {
+    const auto deinterleaveSamples = [numSamples] (const T* source, T** dest, int numChannels) {
         for (int chan = 0; chan < numChannels; ++chan)
         {
             auto i = chan;
