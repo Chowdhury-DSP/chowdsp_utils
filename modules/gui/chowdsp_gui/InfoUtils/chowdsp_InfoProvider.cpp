@@ -22,7 +22,7 @@ juce::URL StandardInfoProvider::getManufacturerWebsiteURL()
 
 juce::String StandardInfoProvider::getPlatformString()
 {
-    return juce::String (SystemInfo::getOSDescription().data()) + "-" + juce::String (SystemInfo::getProcArch().data());
+    return toString (SystemInfo::getOSDescription()) + "-" + toString (SystemInfo::getProcArch());
 }
 
 juce::String StandardInfoProvider::getVersionString()

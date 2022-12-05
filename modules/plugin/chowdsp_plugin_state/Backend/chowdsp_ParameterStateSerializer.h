@@ -83,7 +83,7 @@ namespace PluginStateSerializer
                                          }
                                          else if constexpr (PluginStateHelpers::IsStateValue<Type>)
                                          {
-                                             if (juce::String { stateObject.name.data() } == name)
+                                             if (toString (stateObject.name) == name)
                                                  Type::template deserialize<Serializer> (elementSerial, stateObject);
                                          }
                                          else if constexpr (ParameterTypeHelpers::IsHelperType<Type>)
@@ -92,7 +92,7 @@ namespace PluginStateSerializer
                                          }
                                          else
                                          {
-                                             if (juce::String { detail::getObjectName (stateObject).data() } == name)
+                                             if (toString (detail::getObjectName (stateObject)) == name)
                                                  deserialize<Serializer> (elementSerial, stateObject);
                                          }
 
@@ -118,7 +118,7 @@ namespace PluginStateSerializer
                                  }
                                  else if constexpr (PluginStateHelpers::IsStateValue<Type>)
                                  {
-                                     if (! namesThatHaveBeenDeserialized.contains (stateObject.name.data()))
+                                     if (! namesThatHaveBeenDeserialized.contains (toString (stateObject.name)))
                                          stateObject.reset();
                                  }
                                  else if constexpr (ParameterTypeHelpers::IsHelperType<Type>)
@@ -127,7 +127,7 @@ namespace PluginStateSerializer
                                  }
                                  else
                                  {
-                                     if (! namesThatHaveBeenDeserialized.contains (detail::getObjectName (stateObject).data()))
+                                     if (! namesThatHaveBeenDeserialized.contains (toString (detail::getObjectName (stateObject))))
                                          deserialize<Serializer> ({}, stateObject);
                                  }
                              });

@@ -26,7 +26,7 @@ struct ParameterPath
                                      {
                                          if constexpr (std::is_base_of_v<ParamType, typename Type::element_type>)
                                          {
-                                             if (paramHolder->paramID == path.head.data())
+                                             if (paramHolder->paramID == toString (path.head))
                                                  paramPtr = static_cast<ParamType*> (paramHolder.get());
                                          }
                                      }

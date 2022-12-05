@@ -68,6 +68,7 @@ namespace experimental
 #include "DataStructures/chowdsp_AtomicHelpers.h"
 #include "DataStructures/chowdsp_DoubleBuffer.h"
 #include "DataStructures/chowdsp_TupleHelpers.h"
+#include "DataStructures/chowdsp_StringHelpers.h"
 #include "DataStructures/chowdsp_Iterators.h"
 #include "DataStructures/chowdsp_OptionalPointer.h"
 #include "Functional/chowdsp_Bindings.h"
