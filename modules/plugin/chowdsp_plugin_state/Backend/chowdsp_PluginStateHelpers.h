@@ -48,7 +48,7 @@ namespace PluginStateHelpers
         struct SingleParamOrObjectInfo<T, false, std::enable_if_t<! is_pfr_able<T>>>
         {
             static constexpr int num_params = 0;
-            static constexpr bool is_only_params = ParameterTypeHelpers::IsHelperType<T>;
+            static constexpr bool is_only_params = ParameterTypeHelpers::IsHelperType<T> || TypeTraits::IsIterable<T>;
         };
 
         using indexed_element_type = std::decay_t<decltype (pfr::get<index - 1> (ParamStateType {}))>;
@@ -98,7 +98,7 @@ namespace PluginStateHelpers
         struct SingleValOrObjectInfo<T, false, std::enable_if_t<! is_pfr_able<T>>>
         {
             static constexpr int num_fields = 0;
-            static constexpr bool is_only_state_vals = ParameterTypeHelpers::IsHelperType<T>;
+            static constexpr bool is_only_state_vals = ParameterTypeHelpers::IsHelperType<T> || TypeTraits::IsIterable<T>;
         };
 
         using indexed_element_type = std::decay_t<decltype (pfr::get<index - 1> (NonParamStateType {}))>;

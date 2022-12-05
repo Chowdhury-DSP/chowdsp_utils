@@ -33,9 +33,12 @@ public:
     /** Sets the current EQ parameters. */
     void setParameters (const ProtoEQParams& newParams);
 
+    /** Process a buffer of audio data. */
+    void processBlock (const BufferView<float>& buffer) noexcept;
+
     /** Process a new block of audio data. */
     template <typename ProcessContext>
-    void process (const ProcessContext& context);
+    void process (const ProcessContext& context) noexcept;
 
     /** Returns the latency introduced by this processor. */
     [[nodiscard]] int getLatencySamples() const noexcept;

@@ -5,6 +5,7 @@ target_link_libraries(SimpleEQ
         juce::juce_dsp
         chowdsp::chowdsp_serialization
         chowdsp::chowdsp_eq
+        chowdsp::chowdsp_plugin_state
 )
 
 target_sources(SimpleEQ

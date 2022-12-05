@@ -1,3 +1,47 @@
+#if JUCE_MODULE_AVAILABLE_chowdsp_plugin_state
+namespace chowdsp::EQ
+{
+template <size_t NumBands>
+typename StandardEQParameters<NumBands>::Params StandardEQParameters<NumBands>::getEQParameters (const EQParameterHandles& paramHandles)
+{
+    Params params {};
+    for (size_t i = 0; i < NumBands; ++i)
+    {
+        params.bands[i] = { typename Params::BandParams {
+            paramHandles[i].freqParam->getCurrentValue(),
+            paramHandles[i].qParam->getCurrentValue(),
+            paramHandles[i].gainParam->getCurrentValue(),
+            paramHandles[i].typeParam->getIndex(),
+            paramHandles[i].onOffParam->get(),
+        } };
+    }
+
+    return params;
+}
+
+template <size_t NumBands>
+template <typename EQType>
+void StandardEQParameters<NumBands>::setEQParameters (EQType& eq, const Params& params)
+{
+    Params::setEQParameters (eq, params);
+}
+
+template <size_t NumBands>
+void StandardEQParameters<NumBands>::loadEQParameters (const Params& eqParams, StandardEQParameters& stateParams)
+{
+    for (size_t i = 0; i < NumBands; ++i)
+    {
+        const auto& bandParams = eqParams.bands[i].params;
+
+        ParameterTypeHelpers::setValue (bandParams.bandOnOff, *stateParams.eqParams[i].onOffParam);
+        ParameterTypeHelpers::setValue (bandParams.bandType, *stateParams.eqParams[i].typeParam);
+        ParameterTypeHelpers::setValue (bandParams.bandFreqHz, *stateParams.eqParams[i].freqParam);
+        ParameterTypeHelpers::setValue (bandParams.bandQ, *stateParams.eqParams[i].qParam);
+        ParameterTypeHelpers::setValue (bandParams.bandGainDB, *stateParams.eqParams[i].gainParam);
+    }
+}
+} // namespace chowdsp::EQ
+#else
 namespace chowdsp::EQ
 {
 #ifndef DOXYGEN
@@ -139,3 +183,4 @@ void StandardEQParameters<NumBands>::loadEQParameters (const Params& params, juc
     }
 }
 } // namespace chowdsp::EQ
+#endif
