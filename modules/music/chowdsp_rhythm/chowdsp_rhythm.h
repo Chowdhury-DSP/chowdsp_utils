@@ -8,7 +8,7 @@ BEGIN_JUCE_MODULE_DECLARATION
    version:       1.3.0
    name:          ChowDSP Rhythm Utilities
    description:   Utility classes for working with rhythms
-   dependencies:  juce_core
+   dependencies:  chowdsp_core
 
    website:       https://ccrma.stanford.edu/~jatin/chowdsp
    license:       BSD 3-clause
@@ -23,7 +23,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include <initializer_list>
 #include <string_view>
 #include <vector>
-#include <juce_core/juce_core.h>
+#include <chowdsp_core/chowdsp_core.h>
 
 namespace chowdsp
 {
@@ -40,7 +40,7 @@ namespace RhythmUtils
                                                       tempoFactor (rhythmTempoFactor) {}
 
         /** Returns the rhythm's label (i.e. a quarter note has the label "1/4" */
-        [[nodiscard]] inline juce::String getLabel() const { return { static_cast<std::string> (label) }; }
+        [[nodiscard]] inline juce::String getLabel() const { return toString (label); }
 
         /** Return time in seconds for rhythm and tempo */
         [[nodiscard]] constexpr double getTimeSeconds (double tempoBPM) const

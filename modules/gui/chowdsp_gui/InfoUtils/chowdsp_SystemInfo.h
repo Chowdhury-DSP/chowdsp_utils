@@ -28,9 +28,9 @@ namespace SystemInfo
     }
 
     /**
- * Returns the target system architecture.
- * Currently only "Intel" or "ARM".
- */
+     * Returns the target system architecture.
+     * Currently only "Intel" or "ARM".
+     */
     constexpr std::string_view getProcArch()
     {
 #if JUCE_INTEL
