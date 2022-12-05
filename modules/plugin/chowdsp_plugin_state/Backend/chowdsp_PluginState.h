@@ -94,7 +94,7 @@ public:
      * signature void().
      */
     template <typename ParamType, typename... ListenerArgs>
-    auto addParameterListener (const ParamType& param, bool listenOnMessageThread, ListenerArgs&&... args);
+    [[nodiscard]] auto addParameterListener (const ParamType& param, bool listenOnMessageThread, ListenerArgs&&... args);
 
     /**
      * Adds a listener to some field of the plugin's non-parameter state.
@@ -102,7 +102,7 @@ public:
      * mutated on. Listeners should have the signature void().
      */
     template <typename NonParamType, typename... ListenerArgs>
-    auto addNonParameterListener (StateValue<NonParamType>& nonParam, ListenerArgs&&... args);
+    [[nodiscard]] auto addNonParameterListener (StateValue<NonParamType>& nonParam, ListenerArgs&&... args);
 
     /**
      * Runs parameter broadcasters synchronously.
