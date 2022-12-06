@@ -93,9 +93,9 @@ public:
 #endif
 
     /** Clears memory within the buffer view. */
-    void clear() noexcept
+    void clear() const noexcept
     {
-        buffer_detail::clear (channelPointers.data(), 0, numChannels, 0, numSamples);
+        buffer_detail::clear (const_cast<SampleType**> (channelPointers.data()), 0, numChannels, 0, numSamples);
     }
 
     /** Returns the number of channels in the buffer view. */
