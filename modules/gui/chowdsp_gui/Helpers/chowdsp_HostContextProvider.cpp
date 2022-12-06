@@ -2,7 +2,7 @@ namespace chowdsp
 {
 // LCOV_EXCL_START
 void HostContextProvider::showParameterContextPopupMenu (const juce::RangedAudioParameter& param,
-                                                         juce::PopupMenu::Options&& menuOptions,
+                                                         const juce::PopupMenu::Options& menuOptions,
                                                          juce::LookAndFeel* lookAndFeel) const
 {
     if (const auto contextMenu = getContextMenuForParameter (param))

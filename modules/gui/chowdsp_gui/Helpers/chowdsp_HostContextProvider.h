@@ -24,14 +24,14 @@ public:
 
     /** Shows the parameter context menu for a given parameter */
     void showParameterContextPopupMenu (const juce::RangedAudioParameter& param,
-                                        juce::PopupMenu::Options&& menuOptions = {},
+                                        const juce::PopupMenu::Options& menuOptions = {},
                                         juce::LookAndFeel* lookAndFeel = nullptr) const;
 
     /** Returns a context menu for a given parameter */
-    [[nodiscard]] std::unique_ptr<juce::HostProvidedContextMenu> getContextMenuForParameter (const juce::RangedAudioParameter& param) const;
+    [[nodiscard]] virtual std::unique_ptr<juce::HostProvidedContextMenu> getContextMenuForParameter (const juce::RangedAudioParameter& param) const;
 
     /** Registers a component for a parameter. (See getParameterIndexForComponent()) */
-    void registerParameterComponent (juce::Component& comp, const juce::RangedAudioParameter& param);
+    virtual void registerParameterComponent (juce::Component& comp, const juce::RangedAudioParameter& param);
 
     /**
      * After a Component has been registered with registerParameterForComponent(),
