@@ -53,7 +53,6 @@
 #include "InfoUtils/chowdsp_InfoProvider.h"
 #include "InfoUtils/chowdsp_SystemInfo.h"
 
-
 #include "PluginComponents/chowdsp_CPUMeter.h"
 #include "PluginComponents/chowdsp_InfoComp.h"
 #include "PluginComponents/chowdsp_TitleComp.h"

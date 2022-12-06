@@ -9,37 +9,31 @@ class HostContextProviderTest : public TimedUnitTest
 public:
     HostContextProviderTest() : TimedUnitTest ("Host Context Provider Test") {}
 
-
-    void showParameterContextPopupMenuTest ()
+    void showParameterContextPopupMenuTest()
     {
         using namespace chowdsp::ParamUtils;
 
-        DummyPlugin plugin{ true };
-        chowdsp::HostContextProvider<DummyPlugin> hostContextProvider(plugin, *plugin.createEditor());
+        DummyPlugin plugin { true };
+        chowdsp::HostContextProvider<DummyPlugin> hostContextProvider (plugin, *plugin.createEditor());
 
         chowdsp::Parameters params;
-        plugin.addParameters(params);
+        plugin.addParameters (params);
     }
 
     void getContextMenuForParameterTest()
     {
-
-
     }
 
     void registerParameterComponentTest()
-    {   
-
+    {
     }
 
     void getParameterIndexForComponentTest()
     {
-
     }
 
     void componentBeingDeletedTest()
     {
-
     }
 
     void runTestTimed() override
@@ -47,20 +41,17 @@ public:
         beginTest ("Show Parameter Context Popup Menu Test");
         showParameterContextPopupMenuTest();
 
-        beginTest("Get Context Menu For Parameter Test");
+        beginTest ("Get Context Menu For Parameter Test");
         getContextMenuForParameterTest();
 
-        beginTest("Register Parameter Component Test");
+        beginTest ("Register Parameter Component Test");
         registerParameterComponentTest();
 
-        beginTest("Get Parameter Index For Component Test");
+        beginTest ("Get Parameter Index For Component Test");
         getParameterIndexForComponentTest();
 
-        beginTest("Component Being Deleted Test");
+        beginTest ("Component Being Deleted Test");
         componentBeingDeletedTest();
-
-
-
     }
 };
 static HostContextProviderTest hostContextProviderTest;

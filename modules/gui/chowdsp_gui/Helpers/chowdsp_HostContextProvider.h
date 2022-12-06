@@ -5,7 +5,6 @@
 
 namespace chowdsp
 {
-
 template <class Processor>
 class HostContextProvider : private juce::ComponentListener
 {
@@ -63,7 +62,6 @@ public:
     const bool supportsParameterModulation;
 
 private:
-
     const PluginBase<Processor>& plugin;
     juce::AudioProcessorEditor& editor;
 
