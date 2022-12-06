@@ -35,7 +35,19 @@ public:
 #if ! JUCE_MODULE_AVAILABLE_foleys_gui_magic
     juce::AudioProcessorEditor* createEditor() override
     {
-        return nullptr;
+        struct Editor : juce::AudioProcessorEditor
+        {
+            explicit Editor (DummyPlugin& plugin) : juce::AudioProcessorEditor (plugin)
+            {
+                setSize (100, 100);
+            }
+
+            void paint (juce::Graphics& g) override
+            {
+                g.fillAll (juce::Colours::black);
+            }
+        };
+        return new Editor { *this };
     }
 #endif
 

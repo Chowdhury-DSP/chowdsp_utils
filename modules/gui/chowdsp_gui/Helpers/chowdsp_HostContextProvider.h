@@ -1,69 +1,56 @@
 #pragma once
 
-#include "chowdsp_plugin_base/chowdsp_plugin_base.h"
-#include <chowdsp_plugin_utils/chowdsp_plugin_utils.h>
-
 namespace chowdsp
 {
-template <class Processor>
+/**
+ * A class used to provide a bridge between a host/plugin format
+ * and a plugin GUI.
+ *
+ * Currently functionality includes:
+ * - Helpers for creating parameter context menus (VST3)
+ * - Helpers for getting a parameter index for a component (AAX)
+ * - Helpers for determining if the plugin is being used in a context that supports parameter modulation (CLAP)
+ */
 class HostContextProvider : private juce::ComponentListener
 {
 public:
-    HostContextProvider (const PluginBase<Processor>& p, juce::AudioProcessorEditor& ed)
-        : supportsParameterModulation (p.supportsParameterModulation()),
-          plugin (p),
-          editor (ed)
+    /** Constructs a HostContextProvider for a plugin and plugin editor */
+    template <typename PluginType>
+    HostContextProvider (const PluginType& plugin, juce::AudioProcessorEditor& pluginEditor)
+        : editor (pluginEditor),
+          pluginSupportsParamModulation (plugin.supportsParameterModulation())
     {
     }
 
-    // For VST3 parameter context menus
-    void showParameterContextPopupMenu (const juce::RangedAudioParameter& param) const
-    {
-        if (const auto contextMenu = getContextMenuForParameter (param))
-        {
-            auto popupMenu = contextMenu->getEquivalentPopupMenu();
-            if (popupMenu.containsAnyActiveItems())
-            {
-                const auto options = juce::PopupMenu::Options()
-                                         .withParentComponent (&editor)
-                                         .withPreferredPopupDirection (juce::PopupMenu::Options::PopupDirection::downwards)
-                                         .withStandardItemHeight (27);
+    /** Shows the parameter context menu for a given parameter */
+    void showParameterContextPopupMenu (const juce::RangedAudioParameter& param,
+                                        juce::PopupMenu::Options&& menuOptions = {},
+                                        juce::LookAndFeel* lookAndFeel = nullptr) const;
 
-                popupMenu.showMenuAsync (juce::PopupMenu::Options());
-            }
-        }
-    }
+    /** Returns a context menu for a given parameter */
+    [[nodiscard]] std::unique_ptr<juce::HostProvidedContextMenu> getContextMenuForParameter (const juce::RangedAudioParameter& param) const;
 
-    std::unique_ptr<juce::HostProvidedContextMenu> getContextMenuForParameter (const juce::RangedAudioParameter& param) const
-    {
-        if (const auto* editorContext = editor.getHostContext())
-            return editorContext->getContextMenuForParameter (&param);
+    /** Registers a component for a parameter. (See getParameterIndexForComponent()) */
+    void registerParameterComponent (juce::Component& comp, const juce::RangedAudioParameter& param);
 
-        return {};
-    }
+    /**
+     * After a Component has been registered with registerParameterForComponent(),
+     * this method can be used to get a parameter index for a given parameter. This
+     * can be useful for implementing juce::AudioProcessorEditor::getControlParameterIndex().
+     */
+    int getParameterIndexForComponent (juce::Component& comp) const;
 
-    // For AAX automation menus
-    void registerParameterComponent (juce::Component& comp, const juce::RangedAudioParameter& param)
-    {
-        componentToParameterIndexMap.insert_or_assign (&comp, param.getParameterIndex());
-    }
-    int getParameterIndexForComponent (juce::Component& comp) const
-    {
-        if (const auto iter = componentToParameterIndexMap.find (&comp); iter != componentToParameterIndexMap.end())
-            return iter->second;
-        return -1;
-    }
-
-    void componentBeingDeleted (juce::Component& comp)
-    {
-        componentToParameterIndexMap.erase (&comp);
-    }
-
-    const bool supportsParameterModulation;
+    /**
+     * Returns true if the plugin supports non-destructive parameter automation.
+     * Currently this will only return true for CLAP plugins.
+     */
+    bool supportsParameterModulation() const noexcept { return pluginSupportsParamModulation; }
 
 private:
-    const PluginBase<Processor>& plugin;
+    void componentBeingDeleted (juce::Component& comp) override;
+
     juce::AudioProcessorEditor& editor;
+    const bool pluginSupportsParamModulation;
 
     std::unordered_map<juce::Component*, int> componentToParameterIndexMap;
 
