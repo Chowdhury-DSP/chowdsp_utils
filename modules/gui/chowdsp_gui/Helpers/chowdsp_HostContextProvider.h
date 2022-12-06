@@ -35,7 +35,7 @@ public:
 
     /**
      * After a Component has been registered with registerParameterForComponent(),
-     * this method can be used to get a parameter index for a given parameter. This
+     * this method can be used to get a parameter index for a given component. This
      * can be useful for implementing juce::AudioProcessorEditor::getControlParameterIndex().
      */
     int getParameterIndexForComponent (juce::Component& comp) const;
