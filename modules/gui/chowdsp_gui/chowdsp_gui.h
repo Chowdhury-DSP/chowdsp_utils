@@ -48,9 +48,11 @@
 #include "Helpers/chowdsp_LongPressActionHelper.h"
 #include "Helpers/chowdsp_PopupMenuHelper.h"
 #include "Helpers/chowdsp_OpenGLHelper.h"
+#include "Helpers/chowdsp_HostContextProvider.h"
 
 #include "InfoUtils/chowdsp_InfoProvider.h"
 #include "InfoUtils/chowdsp_SystemInfo.h"
+
 
 #include "PluginComponents/chowdsp_CPUMeter.h"
 #include "PluginComponents/chowdsp_InfoComp.h"
