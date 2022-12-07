@@ -10,4 +10,5 @@ target_sources(chowdsp_core_test
         BindingsTest.cpp
         IteratorsTest.cpp
         OptionalPointerTest.cpp
+        StringHelpersTest.cpp
 )
