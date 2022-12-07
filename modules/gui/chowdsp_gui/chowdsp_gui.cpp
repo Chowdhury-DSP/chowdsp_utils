@@ -6,6 +6,7 @@
 #include "Helpers/chowdsp_LongPressActionHelper.cpp"
 #include "Helpers/chowdsp_PopupMenuHelper.cpp"
 #include "Helpers/chowdsp_OpenGLHelper.cpp"
+#include "Helpers/chowdsp_HostContextProvider.cpp"
 
 #include "InfoUtils/chowdsp_InfoProvider.cpp"
 

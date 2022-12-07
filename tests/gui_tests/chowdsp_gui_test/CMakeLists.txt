@@ -15,4 +15,5 @@ target_sources(chowdsp_gui_test PRIVATE
     PopupMenuHelperTest.cpp
     PresetsCompTest.cpp
     WindowInPluginTest.cpp
+    HostContextProviderTest.cpp
 )
