@@ -16,5 +16,5 @@ target_sources(chowdsp_plugin_utils_test PRIVATE
     PluginLoggerTest.cpp
     LNFAllocatorTest.cpp
     UIStateTest.cpp
-    ConfigFileTest.cpp
+        TweaksFileTest.cpp
 )
