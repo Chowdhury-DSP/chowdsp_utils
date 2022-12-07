@@ -46,7 +46,7 @@ bool GenericTweaksFile<false>::reloadFromFile()
     return true;
 }
 
-void GenericTweaksFile<false>::writeToFile()
+void GenericTweaksFile<false>::writeToFile() const
 {
     const auto configFile = fileListener->getListenerFile();
     if (! configFile.existsAsFile())

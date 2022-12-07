@@ -38,7 +38,7 @@ public:
 
 private:
     bool reloadFromFile();
-    void writeToFile();
+    void writeToFile() const;
 
     struct TweaksFileListener : public FileListener
     {
