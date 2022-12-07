@@ -1,30 +1,30 @@
-#include "chowdsp_ConfigFile.h"
+#include "chowdsp_TweaksFile.h"
 
 namespace chowdsp::experimental
 {
-ConfigFile::ConfigFileListener::ConfigFileListener (const juce::File& file, int timerSeconds, ConfigFile& cFile)
+TweaksFile::TweaksFileListener::TweaksFileListener (const juce::File& file, int timerSeconds, TweaksFile& cFile)
     : FileListener (file, timerSeconds),
       configFile (cFile)
 {
 }
 
-void ConfigFile::ConfigFileListener::listenerFileChanged()
+void TweaksFile::TweaksFileListener::listenerFileChanged()
 {
     configFile.reloadFromFile();
 }
 
 //=================================================
-void ConfigFile::initialise (const juce::File& file, int timerSeconds)
+void TweaksFile::initialise (const juce::File& file, int timerSeconds)
 {
     if (fileListener != nullptr)
         return; // already initialised
 
     const juce::ScopedLock sl { lock };
-    fileListener = std::make_unique<ConfigFileListener> (file, timerSeconds, *this);
+    fileListener = std::make_unique<TweaksFileListener> (file, timerSeconds, *this);
     reloadFromFile();
 }
 
-bool ConfigFile::reloadFromFile()
+bool TweaksFile::reloadFromFile()
 {
     const auto configFile = fileListener->getListenerFile();
     if (! configFile.existsAsFile())
@@ -46,7 +46,7 @@ bool ConfigFile::reloadFromFile()
     return true;
 }
 
-void ConfigFile::writeToFile()
+void TweaksFile::writeToFile()
 {
     const auto configFile = fileListener->getListenerFile();
     if (! configFile.existsAsFile())
@@ -59,7 +59,7 @@ void ConfigFile::writeToFile()
     JSONUtils::toFile (configProperties, configFile, 4);
 }
 
-void ConfigFile::addProperties (std::initializer_list<Property> properties)
+void TweaksFile::addProperties (std::initializer_list<Property> properties)
 {
     jassert (fileListener != nullptr); // Trying to add properties before initializing? Don't do that!
 
@@ -73,18 +73,24 @@ void ConfigFile::addProperties (std::initializer_list<Property> properties)
 }
 
 template <typename T>
-T ConfigFile::getProperty (PropertyID id, T&& defaultValue) const
+T TweaksFile::getProperty (PropertyID id, T&& defaultValue)
 {
     const juce::ScopedLock sl { lock };
-    jassert (configProperties.contains (id));
+    if (! configProperties.contains (id))
+    {
+        addProperties ({ { id, defaultValue } });
+        return defaultValue;
+    }
+
     return configProperties.value (id, std::forward<T> (defaultValue));
 }
 
 #ifndef DOXYGEN
-template bool ConfigFile::getProperty<bool> (PropertyID, bool&&) const;
-template int ConfigFile::getProperty<int> (PropertyID, int&&) const;
-template double ConfigFile::getProperty<double> (PropertyID, double&&) const;
-template juce::String ConfigFile::getProperty<juce::String> (PropertyID, juce::String&&) const;
-template json ConfigFile::getProperty<json> (PropertyID, json&&) const;
+template bool TweaksFile::getProperty<bool> (PropertyID, bool&&);
+template int TweaksFile::getProperty<int> (PropertyID, int&&);
+template float TweaksFile::getProperty<float> (PropertyID, float&&);
+template double TweaksFile::getProperty<double> (PropertyID, double&&);
+template juce::String TweaksFile::getProperty<juce::String> (PropertyID, juce::String&&);
+template json TweaksFile::getProperty<json> (PropertyID, json&&);
 #endif
 } // namespace chowdsp::experimental

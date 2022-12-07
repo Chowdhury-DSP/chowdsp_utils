@@ -12,10 +12,10 @@ namespace chowdsp::experimental
  * @TODO: We should figure out an easy way to "bake" a config file
  * with binary data for release builds.
  */
-class ConfigFile
+class TweaksFile
 {
 public:
-    ConfigFile() = default;
+    TweaksFile() = default;
 
     /** Type alias for setting ID */
     using PropertyID = std::string_view;
@@ -31,7 +31,7 @@ public:
 
     /** Returns the value of a property. */
     template <typename T>
-    T getProperty (PropertyID id, T&& defaultValue = {}) const;
+    T getProperty (PropertyID id, T&& defaultValue = {});
 
     // @TODO: add interface for listening to changes? (should be excluded from release builds)
 
@@ -39,19 +39,19 @@ private:
     bool reloadFromFile();
     void writeToFile();
 
-    struct ConfigFileListener : public FileListener
+    struct TweaksFileListener : public FileListener
     {
-        ConfigFileListener (const juce::File& file, int timerSeconds, ConfigFile& configFile);
+        TweaksFileListener (const juce::File& file, int timerSeconds, TweaksFile& configFile);
         void listenerFileChanged() override;
 
-        ConfigFile& configFile;
+        TweaksFile& configFile;
     };
 
-    std::unique_ptr<ConfigFileListener> fileListener;
+    std::unique_ptr<TweaksFileListener> fileListener;
     json configProperties {};
 
     juce::CriticalSection lock;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ConfigFile)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TweaksFile)
 };
 } // namespace chowdsp::experimental
