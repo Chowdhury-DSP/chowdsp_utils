@@ -21,6 +21,15 @@
 
 #pragma once
 
+/** Config: CHOWDSP_BAKE_TWEAKS
+            When using chowdsp::TweaksFile, enabling this flag will switch to a different
+            implementation of the class that uses a BinaryData version of the file,
+            rather than reading/writing to a file on disk.
+*/
+#ifndef CHOWDSP_BAKE_TWEAKS
+#define CHOWDSP_BAKE_TWEAKS 0
+#endif
+
 // STL includes
 #include <unordered_map>
 
