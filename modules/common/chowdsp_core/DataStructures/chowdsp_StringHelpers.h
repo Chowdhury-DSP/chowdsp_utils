@@ -10,6 +10,7 @@ inline juce::String toString (const std::string_view& sv) noexcept
 }
 #endif
 
+#if __cplusplus >= 202002L
 #ifndef DOXYGEN
 namespace string_helpers_detail
 {
@@ -22,7 +23,8 @@ namespace string_helpers_detail
         {
             constexpr size_t len = (Strs.size() + ... + 0);
             std::array<char, len + 1> arr_internal {};
-            auto append = [i = (size_t) 0, &arr_internal] (auto const& s) mutable {
+            auto append = [i = (size_t) 0, &arr_internal] (auto const& s) mutable
+            {
                 for (auto c : s)
                     arr_internal[i++] = c;
             };
@@ -41,4 +43,5 @@ namespace string_helpers_detail
 /** Concatenates a group of string_views */
 template <std::string_view const&... Strs>
 static constexpr auto string_view_concat = string_helpers_detail::concat<Strs...>::value;
+#endif // __cplusplus >= 202002L
 } // namespace chowdsp

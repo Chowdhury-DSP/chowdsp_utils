@@ -12,3 +12,5 @@ target_sources(chowdsp_core_test
         OptionalPointerTest.cpp
         StringHelpersTest.cpp
 )
+
+set_target_properties(chowdsp_core_test PROPERTIES CXX_STANDARD 20)
