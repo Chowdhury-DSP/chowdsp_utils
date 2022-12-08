@@ -23,8 +23,7 @@ namespace string_helpers_detail
         {
             constexpr size_t len = (Strs.size() + ... + 0);
             std::array<char, len + 1> arr_internal {};
-            auto append = [i = (size_t) 0, &arr_internal] (auto const& s) mutable
-            {
+            auto append = [i = (size_t) 0, &arr_internal] (auto const& s) mutable {
                 for (auto c : s)
                     arr_internal[i++] = c;
             };
