@@ -90,14 +90,14 @@ void PluginState<ParameterState, NonParameterState, Serializer>::deserialize (ty
 
 template <typename ParameterState, typename NonParameterState, typename Serializer>
 template <typename ParamType, typename... ListenerArgs>
-auto PluginState<ParameterState, NonParameterState, Serializer>::addParameterListener (const ParamType& param, bool listenOnMessageThread, ListenerArgs&&... args)
+ScopedCallback PluginState<ParameterState, NonParameterState, Serializer>::addParameterListener (const ParamType& param, bool listenOnMessageThread, ListenerArgs&&... args)
 {
     const auto paramInfoIter = std::find_if (paramInfoList.begin(), paramInfoList.end(), [&param] (const ParamInfo& info) { return info.paramCookie == &param; });
 
     if (paramInfoIter == paramInfoList.end())
     {
         jassertfalse; // trying to listen to a parameter that is not part of this state!
-        return chowdsp::Callback {};
+        return {};
     }
 
     const auto index = (size_t) std::distance (paramInfoList.begin(), paramInfoIter);
@@ -107,7 +107,7 @@ auto PluginState<ParameterState, NonParameterState, Serializer>::addParameterLis
 
 template <typename ParameterState, typename NonParameterState, typename Serializer>
 template <typename NonParamType, typename... ListenerArgs>
-auto PluginState<ParameterState, NonParameterState, Serializer>::addNonParameterListener (StateValue<NonParamType>& nonParam, ListenerArgs&&... args)
+ScopedCallback PluginState<ParameterState, NonParameterState, Serializer>::addNonParameterListener (StateValue<NonParamType>& nonParam, ListenerArgs&&... args)
 {
     return nonParam.changeBroadcaster.connect (std::forward<ListenerArgs...> (args...));
 }
