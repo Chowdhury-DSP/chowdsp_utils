@@ -22,9 +22,11 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 // STL includes
 #include <algorithm>
+#include <array>
 #include <atomic>
 #include <cmath>
 #include <functional>
+#include <string_view>
 #include <tuple>
 #include <cstring>
 #include <cstdint>

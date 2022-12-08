@@ -10,4 +10,7 @@ target_sources(chowdsp_core_test
         BindingsTest.cpp
         IteratorsTest.cpp
         OptionalPointerTest.cpp
+        StringHelpersTest.cpp
 )
+
+set_target_properties(chowdsp_core_test PROPERTIES CXX_STANDARD 20)
