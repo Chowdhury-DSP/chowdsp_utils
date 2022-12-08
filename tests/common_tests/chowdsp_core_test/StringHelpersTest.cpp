@@ -3,6 +3,7 @@
 
 TEST_CASE ("String Helpers Test")
 {
+#if __cplusplus >= 202002L
     SECTION ("String View Concatenation")
     {
         using namespace std::string_view_literals;
@@ -17,4 +18,5 @@ TEST_CASE ("String Helpers Test")
         static_assert (sv_concat2 == "blah_blaaa"sv, "String view concatenation of two string is incorrect!");
         static_assert (sv_concat3 == "blah_blaaa_blaa"sv, "String view concatenation of three string is incorrect!");
     }
+#endif
 }
