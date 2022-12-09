@@ -69,7 +69,7 @@ public:
     }
 
     /** Processes a block of samples */
-    void processBlock (const chowdsp::BufferView<T>& buffer)
+    void processBlock (const BufferView<T>& buffer)
     {
         for (auto& filt : filters)
             filt.processBlock (buffer);
@@ -77,7 +77,7 @@ public:
 
 #if JUCE_MODULE_AVAILABLE_juce_dsp
     /** Processes a block of samples */
-    void process (const chowdsp::ProcessContextReplacing<T>& context)
+    void process (const ProcessContextReplacing<T>& context)
     {
         for (auto& filt : filters)
             filt.process (context);
@@ -95,7 +95,7 @@ public:
 private:
     static constexpr size_t nFilters = order / 2;
 
-    chowdsp::StateVariableFilter<T, type> filters[nFilters];
+    StateVariableFilter<T, type> filters[nFilters];
     static constexpr std::array<NumericType, nFilters> butterQVals = QValCalcs::butterworth_Qs<NumericType, order>();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NthOrderFilter)

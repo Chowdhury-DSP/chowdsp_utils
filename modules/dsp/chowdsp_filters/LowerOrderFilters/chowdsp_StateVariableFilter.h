@@ -109,7 +109,7 @@ public:
 
     /** Process block of samples */
     template <StateVariableFilterType M = type>
-    std::enable_if_t<M != StateVariableFilterType::Crossover, void> processBlock (const chowdsp::BufferView<SampleType>& block) noexcept
+    std::enable_if_t<M != StateVariableFilterType::Crossover, void> processBlock (const BufferView<SampleType>& block) noexcept
     {
         const auto numChannels = (int) block.getNumChannels();
         const auto numSamples = (int) block.getNumSamples();
@@ -131,9 +131,9 @@ public:
 
     /** Process block of samples */
     template <StateVariableFilterType M = type>
-    std::enable_if_t<M == StateVariableFilterType::Crossover, void> processBlock (const chowdsp::BufferView<SampleType>& blockIn,
-                                                                                  const chowdsp::BufferView<SampleType>& blockLow,
-                                                                                  const chowdsp::BufferView<SampleType>& blockHigh) noexcept
+    std::enable_if_t<M == StateVariableFilterType::Crossover, void> processBlock (const BufferView<SampleType>& blockIn,
+                                                                                  const BufferView<SampleType>& blockLow,
+                                                                                  const BufferView<SampleType>& blockHigh) noexcept
     {
         const auto numChannels = blockIn.getNumChannels();
         const auto numSamples = blockIn.getNumSamples();

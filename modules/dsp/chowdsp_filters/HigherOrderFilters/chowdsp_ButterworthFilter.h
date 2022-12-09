@@ -36,7 +36,8 @@ public:
     static void calcCoefs (FloatType fc, FloatType qVal, NumericType fs, std::array<IIRFilter<2, FloatType>, NFilters>& sections, const std::array<NumericType, NFilters>& butterQs)
     {
         FloatType bCoefs[3], aCoefs[3];
-        auto calcCoefsForQ = [&] (FloatType stageQ, size_t stageOrder) {
+        auto calcCoefsForQ = [&] (FloatType stageQ, size_t stageOrder)
+        {
             switch (type)
             {
                 case ButterworthFilterType::Lowpass:
@@ -124,7 +125,7 @@ public:
     }
 
     /** Process block of samples */
-    void processBlock (const chowdsp::BufferView<FloatType>& block) noexcept
+    void processBlock (const BufferView<FloatType>& block) noexcept
     {
         SOSFilter<order - 1, FloatType>::processBlock (block);
         firstOrderSection.processBlock (block);
@@ -132,7 +133,7 @@ public:
 
     /** Process block of samples with a custom modulation callback which is called every sample */
     template <typename Modulator>
-    void processBlockWithModulation (const chowdsp::BufferView<FloatType>& block, Modulator&& modulator) noexcept
+    void processBlockWithModulation (const BufferView<FloatType>& block, Modulator&& modulator) noexcept
     {
         const auto numChannels = block.getNumChannels();
         const auto numSamples = block.getNumSamples();

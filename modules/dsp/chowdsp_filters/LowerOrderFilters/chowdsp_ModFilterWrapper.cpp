@@ -40,7 +40,7 @@ void ModFilterWrapper<PrototypeFilter>::calcCoefs (Args&&... args)
 }
 
 template <typename PrototypeFilter>
-void ModFilterWrapper<PrototypeFilter>::processBlock (const chowdsp::BufferView<SampleType>& block) noexcept
+void ModFilterWrapper<PrototypeFilter>::processBlock (const BufferView<SampleType>& block) noexcept
 {
     const auto numChannels = (int) block.getNumChannels();
     const auto numSamples = (int) block.getNumSamples();

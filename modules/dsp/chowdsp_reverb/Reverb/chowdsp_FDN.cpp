@@ -26,7 +26,7 @@ double DefaultFDNConfig<FloatType, nChannels>::getDelayMult (int channelIndex)
 template <typename FloatType, int nChannels>
 void DefaultFDNConfig<FloatType, nChannels>::applyMixingMatrix (FloatType* data)
 {
-    chowdsp::MatrixOps::HouseHolder<FloatType, nChannels>::inPlace (data);
+    MatrixOps::HouseHolder<FloatType, nChannels>::inPlace (data);
 }
 
 template <typename FloatType, int nChannels>

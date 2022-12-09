@@ -35,7 +35,7 @@ public:
     void calcCoefs (Args&&... args);
 
     /** Process block of samples */
-    void processBlock (const chowdsp::BufferView<SampleType>& block) noexcept;
+    void processBlock (const BufferView<SampleType>& block) noexcept;
 
     /** Process a block  */
     template <typename ProcessContext>

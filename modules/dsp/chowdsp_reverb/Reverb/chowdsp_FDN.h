@@ -35,7 +35,7 @@ protected:
     alignas (xsimd::default_arch::alignment()) std::array<FloatType, (size_t) nChannels> fbData;
 
 private:
-    std::array<chowdsp::ShelfFilter<FloatType>, (size_t) nChannels> shelfs;
+    std::array<ShelfFilter<FloatType>, (size_t) nChannels> shelfs;
     FloatType fs = 48000.0f;
 };
 
@@ -49,7 +49,7 @@ class FDN
     using FloatType = typename FDNConfig::Float;
     static constexpr auto nChannels = FDNConfig::NChannels;
 
-    using DelayType = chowdsp::StaticDelayBuffer<FloatType, DelayInterpType, delayBufferSize>;
+    using DelayType = StaticDelayBuffer<FloatType, DelayInterpType, delayBufferSize>;
 
 public:
     FDN() = default;

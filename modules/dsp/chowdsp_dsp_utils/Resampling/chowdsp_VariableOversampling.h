@@ -100,10 +100,10 @@ public:
     [[nodiscard]] float getLatencyMilliseconds (int osIndex = -1) const noexcept;
 
     /** Upsample a new block of data */
-    auto processSamplesUp (const chowdsp::AudioBlock<const FloatType>& inputBlock) noexcept { return oversamplers[curOS]->processSamplesUp (inputBlock); }
+    auto processSamplesUp (const AudioBlock<const FloatType>& inputBlock) noexcept { return oversamplers[curOS]->processSamplesUp (inputBlock); }
 
     /** Downsample the last block of data into the given output block */
-    void processSamplesDown (chowdsp::AudioBlock<FloatType>& outputBlock) noexcept { oversamplers[curOS]->processSamplesDown (outputBlock); }
+    void processSamplesDown (AudioBlock<FloatType>& outputBlock) noexcept { oversamplers[curOS]->processSamplesDown (outputBlock); }
 
     /** Returns the set of parameters used by the oversamplers */
     auto getParameters() { return std::tie (osParam, osModeParam, osOfflineParam, osOfflineModeParam, osOfflineSameParam); }

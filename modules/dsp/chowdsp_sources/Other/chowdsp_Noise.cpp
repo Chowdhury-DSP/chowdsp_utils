@@ -5,10 +5,10 @@ void Noise<T>::prepare (const juce::dsp::ProcessSpec& spec) noexcept
 {
     juce::dsp::Gain<NumericType>::prepare (spec);
 
-    randBlock = chowdsp::AudioBlock<T> (randBlockData, spec.numChannels, spec.maximumBlockSize);
+    randBlock = AudioBlock<T> (randBlockData, spec.numChannels, spec.maximumBlockSize);
     randBlock.clear();
 
-    gainBlock = chowdsp::AudioBlock<T> (gainBlockData, spec.numChannels, spec.maximumBlockSize);
+    gainBlock = AudioBlock<T> (gainBlockData, spec.numChannels, spec.maximumBlockSize);
     gainBlock.clear();
 
     pink.reset (spec.numChannels);
@@ -125,7 +125,7 @@ void Noise<T>::process (const ProcessContext& context) noexcept
     auto len = outBlock.getNumSamples();
 
     auto randSubBlock = randBlock.getSubBlock (0, len);
-    chowdsp::ProcessContextReplacing<T> randContext (randSubBlock);
+    ProcessContextReplacing<T> randContext (randSubBlock);
 
     // generate random block
     if (type == Uniform)

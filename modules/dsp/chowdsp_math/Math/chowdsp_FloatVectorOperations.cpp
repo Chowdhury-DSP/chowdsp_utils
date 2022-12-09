@@ -338,7 +338,6 @@ void divide (float* dest, const float* dividend, const float* divisor, int numVa
                       divisor,
                       numValues,
                       [] (auto num, auto den) {
-                          using namespace chowdsp::SIMDUtils;
                           return num / den;
                       });
 #endif

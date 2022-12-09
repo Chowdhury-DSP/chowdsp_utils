@@ -47,7 +47,7 @@ protected:
     SampleType tauRel = (SampleType) 1;
 
 private:
-    chowdsp::Buffer<SampleType> absBuffer;
+    Buffer<SampleType> absBuffer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LevelDetector)
 };

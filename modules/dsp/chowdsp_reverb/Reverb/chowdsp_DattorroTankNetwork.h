@@ -113,7 +113,7 @@ class TankNetwork
     using FloatType = typename Config::Float;
 
     template <int maxSize>
-    using DelayType = chowdsp::StaticDelayBuffer<FloatType, DelayLineInterpolationTypes::None, maxSize>;
+    using DelayType = StaticDelayBuffer<FloatType, DelayLineInterpolationTypes::None, maxSize>;
 
 public:
     TankNetwork() = default;

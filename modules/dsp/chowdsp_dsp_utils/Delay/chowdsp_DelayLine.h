@@ -59,7 +59,7 @@ public:
             bufferData.setMaxSize (numChannels, numSamples);
         }
 
-        chowdsp::BufferMath::copyBufferData (other.bufferData, bufferData);
+        BufferMath::copyBufferData (other.bufferData, bufferData);
 
         if (v.empty() || other.v.empty()) // nothing to copy!
             return;
@@ -70,7 +70,7 @@ public:
     }
 
 protected:
-    chowdsp::Buffer<SampleType> bufferData;
+    Buffer<SampleType> bufferData;
     std::vector<SampleType> v;
     std::vector<int> writePos, readPos;
 };

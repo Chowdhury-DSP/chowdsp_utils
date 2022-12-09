@@ -60,7 +60,7 @@ namespace ProgramAdapter
         }
 
     private:
-        std::unique_ptr<chowdsp::PresetManager>& presetManager;
+        std::unique_ptr<PresetManager>& presetManager;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetsProgramAdapter)
     };

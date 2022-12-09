@@ -58,14 +58,14 @@ public:
       * If it returns false, you can safely skip all other
       * processing.
       */
-    bool processBlockIn (const chowdsp::BufferView<SampleType>& buffer, bool onOffParam);
+    bool processBlockIn (const BufferView<SampleType>& buffer, bool onOffParam);
 
     /**
       * Call this at the end of your processBlock().
       * It will fade the dry signal back in with the main
       * signal as needed.
       */
-    void processBlockOut (const chowdsp::BufferView<SampleType>& buffer, bool onOffParam);
+    void processBlockOut (const BufferView<SampleType>& buffer, bool onOffParam);
 
 private:
     void setLatencySamplesInternal (SampleType delaySamples);

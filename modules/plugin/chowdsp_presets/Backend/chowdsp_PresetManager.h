@@ -42,7 +42,7 @@ public:
     void setDefaultPreset (Preset&& defaultPreset);
 
     /** Returns a pointer to the default preset. */
-    const chowdsp::Preset* getDefaultPreset() const noexcept { return defaultPreset; }
+    const Preset* getDefaultPreset() const noexcept { return defaultPreset; }
 
     /** Loads the default preset. */
     void loadDefaultPreset();

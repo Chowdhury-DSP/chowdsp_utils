@@ -57,11 +57,11 @@ public:
     }
 
     /** Process an audio buffer */
-    void process (const chowdsp::BufferView<SampleType>& buffer) noexcept;
+    void process (const BufferView<SampleType>& buffer) noexcept;
 
     /** Process with some user-defined modulator */
     template <typename Modulator>
-    void processWithModulation (const chowdsp::BufferView<SampleType>& block, Modulator&& modulator) noexcept;
+    void processWithModulation (const BufferView<SampleType>& block, Modulator&& modulator) noexcept;
 
     /** Returns a mono buffer of rendered audio */
     const auto& getRenderBuffer() const noexcept { return renderBuffer; }
@@ -74,12 +74,12 @@ private:
     void updateAmplitudeNormalizationFactor (SampleType normalize);
     void setModeAmplitudesInternal();
 
-    std::array<chowdsp::ModalFilter<Vec>, maxNumVecModes> modes;
+    std::array<ModalFilter<Vec>, maxNumVecModes> modes;
 
     std::array<std::complex<SampleType>, maxNumModes> amplitudeData;
     SampleType amplitudeNormalizationFactor = (SampleType) 1;
 
-    chowdsp::Buffer<SampleType> renderBuffer;
+    Buffer<SampleType> renderBuffer;
     SampleType maxFreq = (SampleType) 0;
     size_t numModesToProcess = maxNumModes;
     size_t numVecModesToProcess = maxNumVecModes;
