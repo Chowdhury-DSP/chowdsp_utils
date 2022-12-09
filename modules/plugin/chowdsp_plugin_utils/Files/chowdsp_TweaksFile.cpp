@@ -42,7 +42,27 @@ bool GenericTweaksFile<false>::reloadFromFile()
     }
 
     const juce::ScopedLock sl { lock };
+    const auto oldProperties = configProperties;
     configProperties = newProperties;
+
+    for (const auto& [name, value] : oldProperties.items())
+    {
+        if (! configProperties.contains (name))
+            continue;
+
+        auto& newProperty = configProperties[name];
+        if (! JSONUtils::isSameType (value, newProperty))
+        {
+            // new property does not have the same type as the original!
+            // also hit when listenerFileChanged callback is hit and our properties are different than the settings file
+            jassertfalse;
+
+            newProperty = value;
+        }
+
+        if (value != newProperty)
+            changeBroadcaster (name);
+    }
     return true;
 }
 

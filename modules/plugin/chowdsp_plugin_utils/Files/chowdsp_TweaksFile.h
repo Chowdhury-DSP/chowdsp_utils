@@ -34,7 +34,12 @@ public:
     template <typename T>
     T getProperty (PropertyID id, T&& defaultValue = {});
 
-    // @TODO: add interface for listening to changes?
+    /** Adds a property listener to the tweaks file */
+    template <typename... ListenerArgs>
+    [[nodiscard]] ScopedCallback addListener (ListenerArgs&&... args)
+    {
+        return changeBroadcaster.connect (std::forward<ListenerArgs...> (args...));
+    }
 
 private:
     bool reloadFromFile();
@@ -51,6 +56,8 @@ private:
     std::unique_ptr<TweaksFileListener> fileListener;
 
     json configProperties {};
+
+    Broadcaster<void(PropertyID)> changeBroadcaster;
 
     juce::CriticalSection lock;
 
