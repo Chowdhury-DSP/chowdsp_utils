@@ -6,7 +6,7 @@ namespace chowdsp::Reverb::Dattorro
 template <typename FloatType, int maxSize, bool invert = false>
 struct Lattice
 {
-    using DelayType = chowdsp::StaticDelayBuffer<FloatType, DelayLineInterpolationTypes::None, maxSize>;
+    using DelayType = StaticDelayBuffer<FloatType, DelayLineInterpolationTypes::None, maxSize>;
 
     void reset()
     {

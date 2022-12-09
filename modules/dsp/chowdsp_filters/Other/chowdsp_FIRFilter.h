@@ -61,14 +61,14 @@ public:
     {
         auto* z = state[channel].data();
         const auto* h = coefficients.data();
-        chowdsp::ScopedValue zPtrLocal { zPtr[channel] };
+        ScopedValue zPtrLocal { zPtr[channel] };
 
         for (int n = 0; n < numSamples; ++n)
             block[n] = processSampleInternal (block[n], z, h, zPtrLocal.get(), order, paddedOrder);
     }
 
     /** Process block of samples */
-    void processBlock (const chowdsp::BufferView<FloatType>& block) noexcept
+    void processBlock (const BufferView<FloatType>& block) noexcept
     {
         const auto numChannels = (int) block.getNumChannels();
         const auto numSamples = (int) block.getNumSamples();
@@ -83,7 +83,7 @@ public:
     void processBlockBypassed (const FloatType* block, const int numSamples, const int channel = 0) noexcept
     {
         auto* z = state[channel].data();
-        chowdsp::ScopedValue zPtrLocal { zPtr[channel] };
+        ScopedValue zPtrLocal { zPtr[channel] };
 
         for (int n = 0; n < numSamples; ++n)
             processSampleInternalBypassed (block[n], z, zPtrLocal.get(), order);
@@ -93,7 +93,7 @@ public:
      * Pushes a block of samples into the filter state without processing.
      * This can be useful for "bypassing" the filter.
      */
-    void processBlockBypassed (const chowdsp::BufferView<FloatType>& block) noexcept
+    void processBlockBypassed (const BufferView<FloatType>& block) noexcept
     {
         const auto numChannels = (int) block.getNumChannels();
         const auto numSamples = (int) block.getNumSamples();

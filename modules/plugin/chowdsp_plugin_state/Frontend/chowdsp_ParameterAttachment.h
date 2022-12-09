@@ -53,7 +53,7 @@ private:
     template <typename Func>
     void callIfParameterValueChanged (ParamElementType newValue, Func&& func);
 
-    chowdsp::ScopedCallback valueChangedCallback;
+    ScopedCallback valueChangedCallback;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParameterAttachment)
 };

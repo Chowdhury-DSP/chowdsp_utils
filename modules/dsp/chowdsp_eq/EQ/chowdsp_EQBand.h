@@ -56,7 +56,7 @@ public:
     void reset();
 
     /** Processes an buffer of samples. */
-    void processBlock (const chowdsp::BufferView<FloatType>& buffer) noexcept;
+    void processBlock (const BufferView<FloatType>& buffer) noexcept;
 
     /** Processes an audio context */
     template <typename ProcessContext>
@@ -65,15 +65,15 @@ public:
 private:
     template <typename FilterType, typename T = FloatType, size_t N = FilterType::Order>
     std::enable_if_t<std::is_base_of_v<IIRFilter<N, T>, FilterType> || std::is_base_of_v<SOSFilter<N, T>, FilterType> || std::is_base_of_v<SOSFilter<N - 1, T>, FilterType>, void>
-        processFilterChannel (FilterType& filter, const chowdsp::BufferView<FloatType>& block);
+        processFilterChannel (FilterType& filter, const BufferView<FloatType>& block);
 
     template <typename FilterType, typename T = FloatType, StateVariableFilterType type = FilterType::Type>
     std::enable_if_t<std::is_same_v<StateVariableFilter<T, type>, FilterType>, void>
-        processFilterChannel (FilterType& filter, const chowdsp::BufferView<FloatType>& block);
+        processFilterChannel (FilterType& filter, const BufferView<FloatType>& block);
 
     template <typename FilterType, typename T = FloatType, size_t N = FilterType::Order, StateVariableFilterType type = FilterType::Type>
     std::enable_if_t<std::is_same_v<NthOrderFilter<T, N, type>, FilterType>, void>
-        processFilterChannel (FilterType& filter, const chowdsp::BufferView<FloatType>& block);
+        processFilterChannel (FilterType& filter, const BufferView<FloatType>& block);
 
     void fadeBuffers (const FloatType* fadeInBuffer, const FloatType* fadeOutBuffer, FloatType* targetBuffer, int numSamples);
 
@@ -92,7 +92,7 @@ private:
 
     FloatType fs = FloatType (44100.0);
 
-    chowdsp::Buffer<FloatType> fadeBuffer;
+    Buffer<FloatType> fadeBuffer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EQBand)
 };

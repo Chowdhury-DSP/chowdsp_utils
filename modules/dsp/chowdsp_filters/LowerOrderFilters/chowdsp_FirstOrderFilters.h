@@ -9,7 +9,7 @@ namespace chowdsp
  * This filter can be used to model an ideal RC lowpwass filter.
  */
 template <typename T>
-class FirstOrderLPF final : public chowdsp::IIRFilter<1, T>
+class FirstOrderLPF final : public IIRFilter<1, T>
 {
 public:
     using NumericType = SampleTypeHelpers::ProcessorNumericType<FirstOrderLPF>;
@@ -36,7 +36,7 @@ private:
  * This filter can be used to model an ideal RC highpass filter.
  */
 template <typename T>
-class FirstOrderHPF final : public chowdsp::IIRFilter<1, T>
+class FirstOrderHPF final : public IIRFilter<1, T>
 {
 public:
     using NumericType = SampleTypeHelpers::ProcessorNumericType<FirstOrderHPF>;

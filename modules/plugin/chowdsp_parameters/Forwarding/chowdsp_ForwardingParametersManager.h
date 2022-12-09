@@ -26,7 +26,7 @@ public:
         for (int i = 0; i < totalNumForwardingParameters; ++i)
         {
             auto id = Provider::getForwardingParameterID (i);
-            auto forwardedParam = std::make_unique<chowdsp::ForwardingParameter> (id, nullptr, "Blank");
+            auto forwardedParam = std::make_unique<ForwardingParameter> (id, nullptr, "Blank");
 
             forwardedParam->setProcessor (&vts.processor);
             forwardedParams[(size_t) i] = forwardedParam.get();
@@ -81,7 +81,8 @@ public:
         setParameterRange (
             startIndex,
             endIndex,
-            [] (int) -> ParameterForwardingInfo { return {}; },
+            [] (int) -> ParameterForwardingInfo
+            { return {}; },
             deferHostNotification);
     }
 

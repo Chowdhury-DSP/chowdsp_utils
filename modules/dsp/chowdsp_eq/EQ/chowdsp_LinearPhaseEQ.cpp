@@ -110,7 +110,7 @@ bool LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::attemptIRTransfer()
 }
 
 template <typename PrototypeEQ, int defaultFIRLength>
-void LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::processBlocksInternal (const chowdsp::AudioBlock<const float>& inBlock, chowdsp::AudioBlock<float>& outBlock) noexcept
+void LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::processBlocksInternal (const AudioBlock<const float>& inBlock, AudioBlock<float>& outBlock) noexcept
 {
     const auto numChannels = outBlock.getNumChannels();
     const auto numSamples = outBlock.getNumSamples();

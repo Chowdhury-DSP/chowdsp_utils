@@ -27,7 +27,7 @@ struct DefaultDiffuserConfig
 template <typename FloatType, int nChannels, typename DelayInterpType = DelayLineInterpolationTypes::None, int delayBufferSize = 1 << 18>
 class Diffuser
 {
-    using DelayType = chowdsp::StaticDelayBuffer<FloatType, DelayInterpType, delayBufferSize>;
+    using DelayType = StaticDelayBuffer<FloatType, DelayInterpType, delayBufferSize>;
 
 public:
     using Float = FloatType;
@@ -59,7 +59,7 @@ public:
         }
 
         // Mix with a Hadamard matrix
-        chowdsp::MatrixOps::Hadamard<FloatType, nChannels>::inPlace (outData.data());
+        MatrixOps::Hadamard<FloatType, nChannels>::inPlace (outData.data());
 
         // Flip some polarities
         for (size_t i = 0; i < (size_t) nChannels; ++i)

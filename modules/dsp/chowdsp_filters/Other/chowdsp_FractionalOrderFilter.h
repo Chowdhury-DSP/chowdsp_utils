@@ -42,7 +42,8 @@ public:
     void calcCoefs (FloatType fc, FloatType alpha, NumericType fs)
     {
         const auto k = ConformalMaps::computeKValue (fc, fs);
-        auto setFilterCoefs = [k] (auto& filter, FloatType pole, FloatType zero) {
+        auto setFilterCoefs = [k] (auto& filter, FloatType pole, FloatType zero)
+        {
             FloatType a_z[2] {};
             FloatType b_z[2] {};
 
@@ -77,7 +78,7 @@ public:
     }
 
     /** Process block of samples */
-    void processBlock (const chowdsp::BufferView<FloatType>& block) noexcept
+    void processBlock (const BufferView<FloatType>& block) noexcept
     {
         for (auto& filt : filters)
             filt.processBlock (block);

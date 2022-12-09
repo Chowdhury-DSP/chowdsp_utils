@@ -114,7 +114,7 @@ protected:
 private:
     int runTaskOnBackgroundThread() override;
 
-    std::vector<chowdsp::DoubleBuffer<float>> data;
+    std::vector<DoubleBuffer<float>> data;
     std::atomic<int> writePosition { 0 };
 
     std::atomic_bool shouldBeRunning { false };

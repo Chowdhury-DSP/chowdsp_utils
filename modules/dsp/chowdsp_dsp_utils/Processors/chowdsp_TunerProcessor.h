@@ -74,7 +74,7 @@ public:
         for (int i = 0; i < autocorrelationSize; ++i)
         {
             sumOld = sum;
-            sum = chowdsp::FloatVectorOperations::innerProduct (data, &data[i], autocorrelationSize - i);
+            sum = FloatVectorOperations::innerProduct (data, &data[i], autocorrelationSize - i);
 
             // set threshold on first pass
             if (i == 0)

@@ -50,9 +50,9 @@ private:
 
 #if JUCE_MODULE_AVAILABLE_juce_dsp
     juce::HeapBlock<char> dataBlock;
-    chowdsp::AudioBlock<T> interMediateData;
+    AudioBlock<T> interMediateData;
 #endif
-    chowdsp::Buffer<T> intermediateBuffer;
+    Buffer<T> intermediateBuffer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SquareWave)
 };

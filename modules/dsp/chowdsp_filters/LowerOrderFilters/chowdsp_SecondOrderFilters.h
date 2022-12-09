@@ -6,7 +6,7 @@ namespace chowdsp
 {
 /** Second-order lowpass filter. */
 template <typename T, CoefficientCalculators::CoefficientCalculationMode mode = CoefficientCalculators::CoefficientCalculationMode::Standard>
-class SecondOrderLPF final : public chowdsp::IIRFilter<2, T>
+class SecondOrderLPF final : public IIRFilter<2, T>
 {
 public:
     using NumericType = SampleTypeHelpers::ProcessorNumericType<SecondOrderLPF>;
@@ -30,7 +30,7 @@ private:
 
 /** Second-order highpass filter. */
 template <typename T, CoefficientCalculators::CoefficientCalculationMode mode = CoefficientCalculators::CoefficientCalculationMode::Standard>
-class SecondOrderHPF final : public chowdsp::IIRFilter<2, T>
+class SecondOrderHPF final : public IIRFilter<2, T>
 {
 public:
     using NumericType = SampleTypeHelpers::ProcessorNumericType<SecondOrderHPF>;
@@ -54,7 +54,7 @@ private:
 
 /** Second-order bandpass filter. */
 template <typename T, CoefficientCalculators::CoefficientCalculationMode mode = CoefficientCalculators::CoefficientCalculationMode::Standard>
-class SecondOrderBPF final : public chowdsp::IIRFilter<2, T>
+class SecondOrderBPF final : public IIRFilter<2, T>
 {
 public:
     using NumericType = SampleTypeHelpers::ProcessorNumericType<SecondOrderBPF>;
@@ -78,7 +78,7 @@ private:
 
 /** Second-order notch filter. */
 template <typename T, CoefficientCalculators::CoefficientCalculationMode mode = CoefficientCalculators::CoefficientCalculationMode::Standard>
-class NotchFilter final : public chowdsp::IIRFilter<2, T>
+class NotchFilter final : public IIRFilter<2, T>
 {
 public:
     using NumericType = SampleTypeHelpers::ProcessorNumericType<NotchFilter>;
@@ -102,7 +102,7 @@ private:
 
 /** Second-order peaking filter. */
 template <typename T, CoefficientCalculators::CoefficientCalculationMode mode = CoefficientCalculators::CoefficientCalculationMode::Standard>
-class PeakingFilter final : public chowdsp::IIRFilter<2, T>
+class PeakingFilter final : public IIRFilter<2, T>
 {
 public:
     using NumericType = SampleTypeHelpers::ProcessorNumericType<PeakingFilter>;
@@ -137,7 +137,7 @@ private:
 
 /** Second-order low-shelf filter. */
 template <typename T, CoefficientCalculators::CoefficientCalculationMode mode = CoefficientCalculators::CoefficientCalculationMode::Standard>
-class LowShelfFilter final : public chowdsp::IIRFilter<2, T>
+class LowShelfFilter final : public IIRFilter<2, T>
 {
 public:
     using NumericType = SampleTypeHelpers::ProcessorNumericType<LowShelfFilter>;
@@ -172,7 +172,7 @@ private:
 
 /** Second-order high-shelf filter. */
 template <typename T, CoefficientCalculators::CoefficientCalculationMode mode = CoefficientCalculators::CoefficientCalculationMode::Standard>
-class HighShelfFilter final : public chowdsp::IIRFilter<2, T>
+class HighShelfFilter final : public IIRFilter<2, T>
 {
 public:
     using NumericType = SampleTypeHelpers::ProcessorNumericType<HighShelfFilter>;

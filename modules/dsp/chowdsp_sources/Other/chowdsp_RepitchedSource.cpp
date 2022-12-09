@@ -33,14 +33,14 @@ void RepitchedSource<ResamplingType>::reset()
 }
 
 template <typename ResamplingType>
-chowdsp::AudioBlock<float> RepitchedSource<ResamplingType>::process (int numSamples) noexcept
+AudioBlock<float> RepitchedSource<ResamplingType>::process (int numSamples) noexcept
 {
     const auto resampleRatio = 1.0f / resampler.getResampleRatio();
     auto resampledNumSamples = (int) std::ceil (resampleRatio * (float) numSamples);
     resampledBuffer.setSize (resampledBuffer.getNumChannels(), resampledNumSamples, false, false, true);
     resampledBuffer.clear();
 
-    auto&& block = chowdsp::AudioBlock<float> { resampledBuffer };
+    auto&& block = AudioBlock<float> { resampledBuffer };
     processRepitched (block);
     return resampler.process (block).toAudioBlock();
 }

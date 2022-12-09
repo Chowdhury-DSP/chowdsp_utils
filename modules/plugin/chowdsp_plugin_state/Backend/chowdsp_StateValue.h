@@ -59,7 +59,7 @@ struct StateValue
 
 private:
     T val;
-    chowdsp::Broadcaster<void()> changeBroadcaster;
+    Broadcaster<void()> changeBroadcaster;
 
     template <typename ParameterState, typename NonParameterState, typename Serializer>
     friend class PluginState;

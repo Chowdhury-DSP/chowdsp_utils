@@ -134,7 +134,7 @@ private:
         return interpolator.call (bufferPtrs[channel], delayInt, delayFrac, v[channel]);
     }
 
-    chowdsp::Buffer<SampleType> bufferData; // Ring buffer for storing data
+    Buffer<SampleType> bufferData; // Ring buffer for storing data
     SampleType** bufferPtrs = nullptr; // pointers to data buffer
     std::vector<SampleType> v; // State needed for Thiran interpolator
     InterpolationType interpolator;

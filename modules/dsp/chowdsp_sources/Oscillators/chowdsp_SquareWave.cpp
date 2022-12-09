@@ -11,7 +11,7 @@ template <typename T>
 void SquareWave<T>::prepare (const juce::dsp::ProcessSpec& spec) noexcept
 {
 #if JUCE_MODULE_AVAILABLE_juce_dsp
-    interMediateData = chowdsp::AudioBlock<T> (dataBlock, spec.numChannels, spec.maximumBlockSize);
+    interMediateData = AudioBlock<T> (dataBlock, spec.numChannels, spec.maximumBlockSize);
 #endif
     intermediateBuffer.setMaxSize ((int) spec.numChannels, (int) spec.maximumBlockSize);
 
@@ -77,7 +77,7 @@ void SquareWave<T>::process (const ProcessContext& context) noexcept
     }
 
     auto&& intermediateBlock = interMediateData.getSubBlock (0, outBlock.getNumSamples());
-    saw2.template process<chowdsp::ProcessContextNonReplacing<T>> (chowdsp::ProcessContextNonReplacing<T> { inBlock, intermediateBlock });
+    saw2.template process<ProcessContextNonReplacing<T>> (ProcessContextNonReplacing<T> { inBlock, intermediateBlock });
 
     if (context.usesSeparateInputAndOutputBlocks())
         outBlock += intermediateBlock;
@@ -85,7 +85,7 @@ void SquareWave<T>::process (const ProcessContext& context) noexcept
         outBlock.copyFrom (intermediateBlock);
 
     intermediateBlock.clear();
-    saw1.template process<chowdsp::ProcessContextReplacing<T>> (chowdsp::ProcessContextReplacing<T> { intermediateBlock });
+    saw1.template process<ProcessContextReplacing<T>> (ProcessContextReplacing<T> { intermediateBlock });
     outBlock -= intermediateBlock;
 }
 #endif
