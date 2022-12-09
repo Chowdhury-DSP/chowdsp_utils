@@ -108,7 +108,7 @@ protected:
 #if JUCE_MODULE_AVAILABLE_chowdsp_plugin_state
     PluginStateType state;
 #else
-    using Parameters = Parameters;
+    using Parameters = chowdsp::Parameters;
     juce::AudioProcessorValueTreeState vts;
 
 #if JUCE_MODULE_AVAILABLE_foleys_gui_magic
