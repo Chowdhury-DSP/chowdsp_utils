@@ -80,6 +80,47 @@ public:
         testTweaksFile.deleteFile();
     }
 
+    void tweaksFileListenerTest()
+    {
+        chowdsp::GenericTweaksFile<false> tweaksFile;
+        tweaksFile.initialise (testTweaksFile, 1);
+
+        tweaksFile.addProperties ({ { "test_int", 0 }, { "test_string", juce::String {} } });
+        tweaksFile.getProperty ("test_float", -1.0f);
+
+        expectEquals (tweaksFile.getProperty<int> ("test_int"), 0, "Initial integer property is incorrect");
+        expectEquals (tweaksFile.getProperty<juce::String> ("test_string"), juce::String {}, "Initial string property is incorrect");
+        expectEquals (tweaksFile.getProperty<float> ("test_float"), -1.0f, "Initial float property is incorrect");
+
+        static constexpr int newInt = 440;
+        static constexpr float newFloat = -110.0f;
+
+        bool listenerHit = false;
+        auto callback = tweaksFile.addListener (
+            [this, &listenerHit, &tweaksFile] (const std::string_view& name)
+            {
+                listenerHit = true;
+                if (name == "test_int")
+                    expectEquals (tweaksFile.getProperty<int> ("test_int"), newInt, "Integer property is incorrect");
+                else if (name == "test_float")
+                    expectEquals (tweaksFile.getProperty<float> ("test_float"), newFloat, "Float property is incorrect");
+            });
+
+        const auto jsonConfig = chowdsp::json {
+            { "test_int", newInt },
+            { "test_float", newFloat },
+        };
+        chowdsp::JSONUtils::toFile (jsonConfig, testTweaksFile);
+
+        juce::MessageManager::getInstance()->runDispatchLoopUntil (2000);
+
+        expectEquals (tweaksFile.getProperty<int> ("test_int"), newInt, "Integer property is incorrect");
+        expectEquals (tweaksFile.getProperty<float> ("test_float"), newFloat, "Float property is incorrect");
+        expect (listenerHit, "Tweaks file listener was never hit!");
+
+        testTweaksFile.deleteFile();
+    }
+
     void bakedFileTest()
     {
         chowdsp::GenericTweaksFile<true> tweaksFile;
@@ -96,6 +137,9 @@ public:
 
         beginTest ("Write/Read Test");
         writeReadTest (random);
+
+        beginTest ("Tweaks File Listener Test");
+        tweaksFileListenerTest();
 
         beginTest ("Baked File Test");
         bakedFileTest();
