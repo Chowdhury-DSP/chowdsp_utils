@@ -442,12 +442,17 @@ struct Rectangle
                  static_cast<double> (height) };
     }
 
-    [[nodiscard]] Rectangle toJuceRectangle() const noexcept
+    [[nodiscard]] juce::Rectangle<T> toJuceRectangle() const noexcept
     {
         return juce::Rectangle { position.x,
                                  position.y,
                                  width,
                                  height };
+    }
+
+    operator juce::Rectangle<T>() const noexcept // NOSONAR, NOLINT(google-explicit-constructor): we want to be able to do implicit conversion here
+    {
+        return toJuceRectangle();
     }
 };
 } // namespace chowdsp
