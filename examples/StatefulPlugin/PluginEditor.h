@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chowdsp_gui/chowdsp_gui.h>
 #include "StatefulPlugin.h"
 
 class PluginEditor : public juce::AudioProcessorEditor,
@@ -16,17 +17,7 @@ private:
 
     StatefulPlugin& plugin;
 
-    juce::Slider gainSlider;
-    chowdsp::SliderAttachment<State> gainAttach;
-
-    juce::Slider percentSlider;
-    chowdsp::SliderAttachment<State> percentAttach;
-
-    juce::ComboBox modeBox;
-    chowdsp::ComboBoxAttachment<State> modeAttach;
-
-    juce::ToggleButton onOffButton;
-    chowdsp::ButtonAttachment<State> onOffAttach;
+    chowdsp::ParametersViewEditor<State, PluginParameterState> paramsView; // { *this, state, state.params };
 
     void refreshUndoRedoButtons();
     juce::TextButton undoButton { "UNDO" };
