@@ -8,6 +8,21 @@ public:
     {
     }
 
+    template <typename BufferViewType>
+    void testBufferView (const BufferViewType& bufferView, const juce::AudioBuffer<float>& buffer)
+    {
+        expectEquals (bufferView.getNumChannels(), buffer.getNumChannels(), "Number of channels is incorrect!");
+        expectEquals (bufferView.getNumSamples(), buffer.getNumSamples(), "Number of samples is incorrect!");
+
+        for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
+        {
+            auto* x = buffer.getReadPointer (ch);
+            auto* xView = bufferView.getReadPointer (ch);
+            for (int n = 0; n < buffer.getNumSamples(); ++n)
+                expectEquals (xView[n], x[n], "Sample is incorrect");
+        }
+    }
+
     void audioBufferToBufferViewTest (juce::Random& rand)
     {
         juce::AudioBuffer<float> juceBuffer (2, 128);
@@ -18,17 +33,10 @@ public:
                 x[n] = rand.nextFloat() * 2.0f - 1.0f;
         }
 
-        chowdsp::BufferView view { juceBuffer };
-        expectEquals (view.getNumChannels(), juceBuffer.getNumChannels(), "Number of channels is incorrect!");
-        expectEquals (view.getNumSamples(), juceBuffer.getNumSamples(), "Number of samples is incorrect!");
-
-        for (int ch = 0; ch < juceBuffer.getNumChannels(); ++ch)
-        {
-            auto* x = juceBuffer.getReadPointer (ch);
-            auto* xView = view.getReadPointer (ch);
-            for (int n = 0; n < juceBuffer.getNumSamples(); ++n)
-                expectEquals (xView[n], x[n], "Sample is incorrect");
-        }
+        auto& constJuceBuffer = static_cast<juce::AudioBuffer<float>&> (juceBuffer);
+        testBufferView<chowdsp::BufferView<float>> (juceBuffer, constJuceBuffer);
+        testBufferView<chowdsp::BufferView<const float>> (juceBuffer, constJuceBuffer);
+        testBufferView<chowdsp::BufferView<const float>> (constJuceBuffer, constJuceBuffer);
     }
 
     void audioBlockToBufferViewTest (juce::Random& rand)
@@ -42,18 +50,11 @@ public:
         }
 
         juce::dsp::AudioBlock<float> block { juceBuffer };
+        auto constBlock = static_cast<juce::dsp::AudioBlock<const float>> (block);
 
-        chowdsp::BufferView view { block };
-        expectEquals (view.getNumChannels(), juceBuffer.getNumChannels(), "Number of channels is incorrect!");
-        expectEquals (view.getNumSamples(), juceBuffer.getNumSamples(), "Number of samples is incorrect!");
-
-        for (int ch = 0; ch < juceBuffer.getNumChannels(); ++ch)
-        {
-            auto* x = juceBuffer.getReadPointer (ch);
-            auto* xView = view.getReadPointer (ch);
-            for (int n = 0; n < juceBuffer.getNumSamples(); ++n)
-                expectEquals (xView[n], x[n], "Sample is incorrect");
-        }
+        testBufferView<chowdsp::BufferView<float>> (block, juceBuffer);
+        testBufferView<chowdsp::BufferView<const float>> (block, juceBuffer);
+        testBufferView<chowdsp::BufferView<const float>> (constBlock, juceBuffer);
     }
 
     template <typename T>

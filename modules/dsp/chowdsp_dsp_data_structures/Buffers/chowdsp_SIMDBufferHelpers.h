@@ -25,7 +25,8 @@ template <typename T1, typename T2>
     const auto numScalarChannels = scalarBuffer.getNumChannels();
     const auto numSIMDChannels = Math::ceiling_divide (numScalarChannels, vecSize);
 
-    const auto interleaveSamples = [numSamples] (const T1** source, T2* dest, int numChannels) {
+    const auto interleaveSamples = [numSamples] (const T1** source, T2* dest, int numChannels)
+    {
         std::fill (dest, dest + numSamples * vecSize, (T2) 0);
 
         for (int chan = 0; chan < numChannels; ++chan)
@@ -66,7 +67,7 @@ template <typename T1, typename T2>
 template <typename T1, typename T2>
 [[maybe_unused]] static void copyToSIMDBuffer (const Buffer<T1>& scalarBuffer, Buffer<xsimd::batch<T2>>& simdBuffer) noexcept
 {
-    copyToSIMDBuffer (scalarBuffer, simdBuffer);
+    copyToSIMDBuffer (static_cast<const BufferView<const T1>&> (scalarBuffer), simdBuffer);
 }
 
 /**
@@ -88,7 +89,8 @@ template <typename T1, typename T2>
     jassert (scalarBuffer.getNumSamples() == numSamples); // Scalar buffer must have the same number of samples!
     jassert (scalarBuffer.getNumChannels() <= numSIMDChannels * vecSize); // Scalar buffer does not have enough channels!
 
-    const auto deinterleaveSamples = [numSamples] (const T2* source, T1** dest, int numChannels) {
+    const auto deinterleaveSamples = [numSamples] (const T2* source, T1** dest, int numChannels)
+    {
         for (int chan = 0; chan < numChannels; ++chan)
         {
             auto i = chan;
@@ -125,7 +127,7 @@ template <typename T1, typename T2>
 template <typename T1, typename T2>
 [[maybe_unused]] static void copyFromSIMDBuffer (const Buffer<xsimd::batch<T2>>& simdBuffer, Buffer<T1>& scalarBuffer) noexcept
 {
-    copyFromSIMDBuffer (simdBuffer, scalarBuffer);
+    copyFromSIMDBuffer (simdBuffer, static_cast<const BufferView<T1>&> (scalarBuffer));
 }
 #endif // ! CHOWDSP_NO_XSIMD
 } // namespace chowdsp

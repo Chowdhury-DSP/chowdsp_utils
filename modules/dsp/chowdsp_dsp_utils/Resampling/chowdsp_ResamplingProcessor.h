@@ -77,7 +77,7 @@ public:
                                                              (size_t) numSamples);
         }
 
-        return BufferView { outputBuffer, 0, (int) outNumSamples };
+        return BufferView<float> { outputBuffer, 0, (int) outNumSamples };
     }
 
 private:
