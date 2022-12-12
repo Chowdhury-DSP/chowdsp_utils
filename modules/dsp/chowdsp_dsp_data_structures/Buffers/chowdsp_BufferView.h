@@ -20,6 +20,13 @@ public:
         initialise (data, sampleOffset);
     }
 
+    template <typename T = SampleType, std::enable_if_t<std::is_const_v<T>>* = nullptr>
+    BufferView (const SampleType** data, int dataNumChannels, int dataNumSamples, int sampleOffset = 0) : numChannels (dataNumChannels),
+                                                                                                          numSamples (dataNumSamples)
+    {
+        initialise (data, sampleOffset);
+    }
+
     BufferView (Buffer<SampleType>& buffer, // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
                 int sampleOffset = 0,
                 int bufferNumSamples = -1,
@@ -31,6 +38,20 @@ public:
         jassert (buffer.getNumChannels() >= startChannel + numChannels);
         jassert (buffer.getNumSamples() >= sampleOffset + numSamples);
         initialise (buffer.getArrayOfWritePointers(), sampleOffset, startChannel);
+    }
+
+    template <typename T = SampleType, std::enable_if_t<std::is_const_v<T>>* = nullptr>
+    BufferView (const Buffer<SampleType>& buffer, // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
+                int sampleOffset = 0,
+                int bufferNumSamples = -1,
+                int startChannel = 0,
+                int bufferNumChannels = -1)
+        : numChannels (bufferNumChannels < 0 ? (buffer.getNumChannels() - startChannel) : bufferNumChannels),
+          numSamples (bufferNumSamples < 0 ? (buffer.getNumSamples() - sampleOffset) : bufferNumSamples)
+    {
+        jassert (buffer.getNumChannels() >= startChannel + numChannels);
+        jassert (buffer.getNumSamples() >= sampleOffset + numSamples);
+        initialise (buffer.getArrayOfReadPointers(), sampleOffset, startChannel);
     }
 
     template <int maxNumChannels, int maxNumSamples>
@@ -47,8 +68,21 @@ public:
         initialise (buffer.getArrayOfWritePointers(), sampleOffset, startChannel);
     }
 
-    template <typename OtherSampleType, std::enable_if_t<std::is_same_v<std::remove_const_t<SampleType>, std::remove_const_t<OtherSampleType>>>* = nullptr>
-    BufferView (const BufferView<OtherSampleType>& buffer, // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
+    template <int maxNumChannels, int maxNumSamples, typename T = SampleType, std::enable_if_t<std::is_const_v<T>>* = nullptr>
+    BufferView (const StaticBuffer<SampleType, maxNumChannels, maxNumSamples>& buffer, // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
+                int sampleOffset = 0,
+                int bufferNumSamples = -1,
+                int startChannel = 0,
+                int bufferNumChannels = -1)
+        : numChannels (bufferNumChannels < 0 ? (buffer.getNumChannels() - startChannel) : bufferNumChannels),
+          numSamples (bufferNumSamples < 0 ? (buffer.getNumSamples() - sampleOffset) : bufferNumSamples)
+    {
+        jassert (buffer.getNumChannels() >= startChannel + numChannels);
+        jassert (buffer.getNumSamples() >= sampleOffset + numSamples);
+        initialise (buffer.getArrayOfReadPointers(), sampleOffset, startChannel);
+    }
+
+    BufferView (const BufferView<std::remove_const_t<SampleType>>& buffer, // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
                 int sampleOffset = 0,
                 int bufferNumSamples = -1,
                 int startChannel = 0,
@@ -59,6 +93,20 @@ public:
         jassert (buffer.getNumChannels() >= startChannel + numChannels);
         jassert (buffer.getNumSamples() >= sampleOffset + numSamples);
         initialise (buffer.getArrayOfWritePointers(), sampleOffset, startChannel);
+    }
+
+    template <typename T = SampleType, std::enable_if_t<std::is_const_v<T>>* = nullptr>
+    BufferView (const BufferView<const SampleType>& buffer, // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
+                int sampleOffset = 0,
+                int bufferNumSamples = -1,
+                int startChannel = 0,
+                int bufferNumChannels = -1)
+        : numChannels (bufferNumChannels < 0 ? (buffer.getNumChannels() - startChannel) : bufferNumChannels),
+          numSamples (bufferNumSamples < 0 ? (buffer.getNumSamples() - sampleOffset) : bufferNumSamples)
+    {
+        jassert (buffer.getNumChannels() >= startChannel + numChannels);
+        jassert (buffer.getNumSamples() >= sampleOffset + numSamples);
+        initialise (buffer.getArrayOfReadPointers(), sampleOffset, startChannel);
     }
 
 #if CHOWDSP_USING_JUCE
@@ -73,8 +121,33 @@ public:
         initialise (buffer.getArrayOfWritePointers(), sampleOffset, startChannel);
     }
 
+    template <typename T = SampleType, std::enable_if_t<std::is_const_v<T>>* = nullptr>
+    BufferView (juce::AudioBuffer<SampleType>& buffer, // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
+                int sampleOffset = 0,
+                int bufferNumSamples = -1,
+                int startChannel = 0,
+                int bufferNumChannels = -1)
+        : numChannels (bufferNumChannels < 0 ? (buffer.getNumChannels() - startChannel) : bufferNumChannels),
+          numSamples (bufferNumSamples < 0 ? (buffer.getNumSamples() - sampleOffset) : bufferNumSamples)
+    {
+        initialise (buffer.getArrayOfReadPointers(), sampleOffset, startChannel);
+    }
+
 #if JUCE_MODULE_AVAILABLE_juce_dsp
-    BufferView (const juce::dsp::AudioBlock<SampleType>& block, // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
+    BufferView (const juce::dsp::AudioBlock<std::remove_const_t<SampleType>>& block, // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
+                int sampleOffset = 0,
+                int bufferNumSamples = -1,
+                int startChannel = 0,
+                int bufferNumChannels = -1)
+        : numChannels (bufferNumChannels < 0 ? ((int) block.getNumChannels() - startChannel) : bufferNumChannels),
+          numSamples (bufferNumSamples < 0 ? ((int) block.getNumSamples() - sampleOffset) : bufferNumSamples)
+    {
+        for (size_t ch = 0; ch < (size_t) numChannels; ++ch)
+            channelPointers[ch] = block.getChannelPointer (ch + (size_t) startChannel) + sampleOffset;
+    }
+
+    template <typename T = SampleType, std::enable_if_t<std::is_const_v<T>>* = nullptr>
+    BufferView (const juce::dsp::AudioBlock<const SampleType>& block, // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
                 int sampleOffset = 0,
                 int bufferNumSamples = -1,
                 int startChannel = 0,
@@ -123,10 +196,18 @@ public:
     }
 
     /** Returns the entire buffer view as an array of pointers to each channel's data. */
-    [[nodiscard]] const SampleType** getArrayOfReadPointers() const noexcept { return const_cast<const SampleType**> (channelPointers.data()); }
+    [[nodiscard]] const SampleType* const* getArrayOfReadPointers() const noexcept { return const_cast<const SampleType**> (channelPointers.data()); }
 
 private:
-    void initialise (SampleType* const* data, int sampleOffset, int startChannel = 0)
+    template <typename T = SampleType>
+    std::enable_if_t<! std::is_const_v<T>, void> initialise (SampleType* const* data, int sampleOffset, int startChannel = 0)
+    {
+        for (size_t ch = 0; ch < (size_t) numChannels; ++ch)
+            channelPointers[ch] = data[ch + (size_t) startChannel] + sampleOffset;
+    }
+
+    template <typename T = SampleType>
+    std::enable_if_t<std::is_const_v<T>, void> initialise (const SampleType* const* data, int sampleOffset, int startChannel = 0)
     {
         for (size_t ch = 0; ch < (size_t) numChannels; ++ch)
             channelPointers[ch] = data[ch + (size_t) startChannel] + sampleOffset;
