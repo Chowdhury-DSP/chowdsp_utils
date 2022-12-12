@@ -4,25 +4,25 @@ template <typename FloatType, typename... FilterChoices>
 EQBand<FloatType, FilterChoices...>::EQBand() = default;
 
 template <typename FloatType, typename... FilterChoices>
-void EQBand<FloatType, FilterChoices...>::setCutoffFrequency (FloatType newCutoffHz)
+void EQBand<FloatType, FilterChoices...>::setCutoffFrequency (NumericType newCutoffHz)
 {
     freqHzHandle = newCutoffHz;
 }
 
 template <typename FloatType, typename... FilterChoices>
-void EQBand<FloatType, FilterChoices...>::setQValue (FloatType newQValue)
+void EQBand<FloatType, FilterChoices...>::setQValue (NumericType newQValue)
 {
     qHandle = newQValue;
 }
 
 template <typename FloatType, typename... FilterChoices>
-void EQBand<FloatType, FilterChoices...>::setGain (FloatType newGain)
+void EQBand<FloatType, FilterChoices...>::setGain (NumericType newGain)
 {
     gainHandle = newGain;
 }
 
 template <typename FloatType, typename... FilterChoices>
-void EQBand<FloatType, FilterChoices...>::setGainDB (FloatType newGainDB)
+void EQBand<FloatType, FilterChoices...>::setGainDB (NumericType newGainDB)
 {
     gainHandle = juce::Decibels::decibelsToGain (newGainDB);
 }
@@ -37,7 +37,7 @@ void EQBand<FloatType, FilterChoices...>::setFilterType (int newFilterType)
 template <typename FloatType, typename... FilterChoices>
 void EQBand<FloatType, FilterChoices...>::prepare (const juce::dsp::ProcessSpec& spec)
 {
-    fs = (FloatType) spec.sampleRate;
+    fs = (NumericType) spec.sampleRate;
 
     fadeBuffer.setMaxSize ((int) spec.numChannels, (int) spec.maximumBlockSize);
     fadeBuffer.clear();

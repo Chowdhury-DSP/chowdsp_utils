@@ -64,7 +64,7 @@ public:
      * 
      *  @return the output block of generated samples at the new sample rate
      */
-    BufferView<float> process (const BufferView<float>& block) noexcept
+    BufferView<float> process (const BufferView<const float>& block) noexcept
     {
         const auto numChannels = block.getNumChannels();
         const auto numSamples = block.getNumSamples();

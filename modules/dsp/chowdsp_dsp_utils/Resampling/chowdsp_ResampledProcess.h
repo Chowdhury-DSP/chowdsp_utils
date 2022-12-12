@@ -77,12 +77,12 @@ public:
      *
      *  @return the output block of generated samples at the target sample rate
      */
-    BufferView<float> processIn (const BufferView<float>& block) noexcept
+    BufferView<float> processIn (const BufferView<const float>& block) noexcept
     {
         return inputResampler.process (block);
     }
 
-    void processOut (const BufferView<float>& inBlock, BufferView<float>& outputBlock)
+    void processOut (const BufferView<const float>& inBlock, BufferView<float>& outputBlock)
     {
         auto outBlockTemp = outputResampler.process (inBlock);
 

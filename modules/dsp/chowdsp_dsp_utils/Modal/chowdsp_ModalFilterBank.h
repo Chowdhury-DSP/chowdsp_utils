@@ -57,11 +57,11 @@ public:
     }
 
     /** Process an audio buffer */
-    void process (const BufferView<SampleType>& buffer) noexcept;
+    void process (const BufferView<const SampleType>& buffer) noexcept;
 
     /** Process with some user-defined modulator */
     template <typename Modulator>
-    void processWithModulation (const BufferView<SampleType>& block, Modulator&& modulator) noexcept;
+    void processWithModulation (const BufferView<const SampleType>& block, Modulator&& modulator) noexcept;
 
     /** Returns a mono buffer of rendered audio */
     const auto& getRenderBuffer() const noexcept { return renderBuffer; }

@@ -39,9 +39,9 @@ struct Params
     PrototypeEQ::EQParams eqParams {
         "chowdsp_eq",
         PrototypeEQ::EQParams::EQParameterHandles {
-            BandParams { "eq_band_0", 100, 0, 250.0f, bandTypeChoices, 10 },
-            BandParams { "eq_band_1", 100, 1, 1000.0f, bandTypeChoices, 10 },
-            BandParams { "eq_band_2", 100, 2, 4000.0f, bandTypeChoices, 10 },
+            BandParams { 0, "eq_band_0", "Band ", 100, 250.0f, bandTypeChoices, 10 },
+            BandParams { 1, "eq_band_1", "Band ", 100, 1000.0f, bandTypeChoices, 10 },
+            BandParams { 2, "eq_band_2", "Band ", 100, 4000.0f, bandTypeChoices, 10 },
         }
     };
 

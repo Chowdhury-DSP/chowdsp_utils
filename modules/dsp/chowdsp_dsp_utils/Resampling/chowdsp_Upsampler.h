@@ -61,7 +61,7 @@ public:
     }
 
     /** Process a block of data */
-    BufferView<T> process (const BufferView<T>& block) noexcept
+    BufferView<T> process (const BufferView<const T>& block) noexcept
     {
         const auto numChannels = block.getNumChannels();
         const auto numSamples = block.getNumSamples();

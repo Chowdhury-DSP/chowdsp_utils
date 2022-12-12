@@ -84,7 +84,7 @@ public:
     }
 
     /** Processes the lowpass part of the crossover filter */
-    [[maybe_unused]] void processBlock (const BufferView<T>& bufferIn,
+    [[maybe_unused]] void processBlock (const BufferView<const T>& bufferIn,
                                         const BufferView<T>& bufferLow,
                                         const BufferView<T>& bufferHigh) noexcept
     {
@@ -177,7 +177,7 @@ public:
     }
 
     /** Processes the lowpass part of the crossover filter */
-    [[maybe_unused]] void processBlock (const BufferView<T>& bufferIn,
+    [[maybe_unused]] void processBlock (const BufferView<const T>& bufferIn,
                                         const BufferView<T>& bufferLow,
                                         const BufferView<T>& bufferHigh) noexcept
     {

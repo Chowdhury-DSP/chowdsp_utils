@@ -21,6 +21,9 @@ public:
 
     struct EQBandParams
     {
+        /** The index of this band in the EQ */
+        const int bandIndex = 0;
+
         /**
          * Default parameter ID prefix for EQ parameters.
          *
@@ -28,6 +31,9 @@ public:
          * use a custom parameter ID prefix to avoid overlap.
          */
         const std::string_view bandParamPrefix;
+
+        /** Default name prefix for EQ parameters. */
+        const std::string_view bandNamePrefix = "Band ";
 
         /**
          * Default version hint for EQ parameters.
@@ -38,8 +44,6 @@ public:
          */
         const int versionHint = 100;
 
-        const int bandIndex = 0;
-
         const float defaultFreqHz = 1000.0f;
 
         /** A comma-separated string containing EQ band type choices */
@@ -48,38 +52,43 @@ public:
         /** The index of the default EQ band */
         const int defaultEQBandTypeChoice = 3;
 
+        /** The range to use for the Q parameter in this band */
+        const float qMin = 0.1f;
+        const float qMax = 10.0f;
+        const float qDefault = CoefficientCalculators::butterworthQ<float>;
+
         BoolParameter::Ptr onOffParam {
-            juce::ParameterID { juce::String { bandParamPrefix.data() } + "eq_band_on_off", versionHint },
-            "Band " + juce::String (bandIndex + 1) + " On/Off",
+            juce::ParameterID { toString (bandParamPrefix) + "eq_band_on_off", versionHint },
+            toString (bandNamePrefix) + juce::String (bandIndex + 1) + " On/Off",
             false
         };
 
         ChoiceParameter::Ptr typeParam {
-            juce::ParameterID { juce::String { bandParamPrefix.data() } + "eq_band_type", versionHint },
-            "Band " + juce::String (bandIndex + 1) + " Type",
-            juce::StringArray::fromTokens (bandTypeChoices.data(), ",", ""),
+            juce::ParameterID { toString (bandParamPrefix) + "eq_band_type", versionHint },
+            toString (bandNamePrefix) + juce::String (bandIndex + 1) + " Type",
+            juce::StringArray::fromTokens (toString (bandTypeChoices), ",", ""),
             defaultEQBandTypeChoice
         };
 
         FreqHzParameter::Ptr freqParam {
-            juce::ParameterID { juce::String { bandParamPrefix.data() } + "eq_band_freq", versionHint },
-            "Band " + juce::String (bandIndex + 1) + " Frequency",
+            juce::ParameterID { toString (bandParamPrefix) + "eq_band_freq", versionHint },
+            toString (bandNamePrefix) + juce::String (bandIndex + 1) + " Frequency",
             ParamUtils::createNormalisableRange (20.0f, 20000.0f, 2000.0f),
             defaultFreqHz
         };
 
         FloatParameter::Ptr qParam {
-            juce::ParameterID { juce::String { bandParamPrefix.data() } + "eq_band_q", versionHint },
-            "Band " + juce::String (bandIndex + 1) + " Q",
-            ParamUtils::createNormalisableRange (0.1f, 10.0f, 0.7071f),
+            juce::ParameterID { toString (bandParamPrefix) + "eq_band_q", versionHint },
+            toString (bandNamePrefix) + juce::String (bandIndex + 1) + " Q",
+            ParamUtils::createNormalisableRange (qMin, qMax, qDefault),
             0.7071f,
             &ParamUtils::floatValToString,
             &ParamUtils::stringToFloatVal
         };
 
         FreqHzParameter::Ptr gainParam {
-            juce::ParameterID { juce::String { bandParamPrefix.data() } + "eq_band_gain", versionHint },
-            "Band " + juce::String (bandIndex + 1) + " Gain",
+            juce::ParameterID { toString (bandParamPrefix) + "eq_band_gain", versionHint },
+            toString (bandNamePrefix) + juce::String (bandIndex + 1) + " Gain",
             juce::NormalisableRange { -18.0f, 18.0f },
             0.0f
         };
@@ -99,9 +108,6 @@ public:
 
     /** Loads a set of EQ parameters into the StandardEQParameters, from a given parameters struct. */
     static void loadEQParameters (const Params& eqParams, StandardEQParameters& stateParams);
-
-private:
-    StandardEQParameters() = default; // static use only!
 };
 } // namespace chowdsp::EQ
 #else

@@ -4,11 +4,12 @@ template <typename ParameterState, typename NonParameterState, typename Serializ
 PluginState<ParameterState, NonParameterState, Serializer>::PluginState (juce::UndoManager* um)
     : undoManager (um)
 {
-    doForAllFields (params,
-                    [this] (auto& paramHolder, size_t index) {
-                        const auto* rangedParam = static_cast<juce::RangedAudioParameter*> (paramHolder.get());
-                        paramInfoList[index] = ParamInfo { rangedParam, rangedParam->getValue() };
-                    });
+    PluginStateHelpers::doForAllFields (params,
+                                        [this] (auto& paramHolder, size_t index)
+                                        {
+                                            const auto* rangedParam = static_cast<juce::RangedAudioParameter*> (paramHolder.get());
+                                            paramInfoList[index] = ParamInfo { rangedParam, rangedParam->getValue() };
+                                        });
 
     startTimer (10); // @TODO: tune the timer interval
 }
@@ -17,12 +18,13 @@ template <typename ParameterState, typename NonParameterState, typename Serializ
 PluginState<ParameterState, NonParameterState, Serializer>::PluginState (juce::AudioProcessor& processor, juce::UndoManager* um)
     : PluginState (um)
 {
-    doForAllFields (params,
-                    [&processor] (auto& paramHolder, size_t) {
-                        // Parameter must be non-null and owned by it's pointer before being released to the processor
-                        jassert (paramHolder != nullptr && paramHolder.isOwner());
-                        processor.addParameter (paramHolder.release());
-                    });
+    PluginStateHelpers::doForAllFields (params,
+                                        [&processor] (auto& paramHolder, size_t)
+                                        {
+                                            // Parameter must be non-null and owned by it's pointer before being released to the processor
+                                            jassert (paramHolder != nullptr && paramHolder.isOwner());
+                                            processor.addParameter (paramHolder.release());
+                                        });
 }
 
 template <typename ParameterState, typename NonParameterState, typename Serializer>
@@ -92,7 +94,8 @@ template <typename ParameterState, typename NonParameterState, typename Serializ
 template <typename ParamType, typename... ListenerArgs>
 ScopedCallback PluginState<ParameterState, NonParameterState, Serializer>::addParameterListener (const ParamType& param, bool listenOnMessageThread, ListenerArgs&&... args)
 {
-    const auto paramInfoIter = std::find_if (paramInfoList.begin(), paramInfoList.end(), [&param] (const ParamInfo& info) { return info.paramCookie == &param; });
+    const auto paramInfoIter = std::find_if (paramInfoList.begin(), paramInfoList.end(), [&param] (const ParamInfo& info)
+                                             { return info.paramCookie == &param; });
 
     if (paramInfoIter == paramInfoList.end())
     {
@@ -150,8 +153,10 @@ void PluginState<ParameterState, NonParameterState, Serializer>::hiResTimerCallb
 
         paramInfo.value = paramInfo.paramCookie->getValue();
 
-        messageThreadBroadcastQueue.enqueue ([this, i = index] { callMessageThreadBroadcaster (i); });
-        audioThreadBroadcastQueue.try_enqueue ([this, i = index] { callAudioThreadBroadcaster (i); });
+        messageThreadBroadcastQueue.enqueue ([this, i = index]
+                                             { callMessageThreadBroadcaster (i); });
+        audioThreadBroadcastQueue.try_enqueue ([this, i = index]
+                                               { callAudioThreadBroadcaster (i); });
         triggerAsyncUpdate();
     }
 }

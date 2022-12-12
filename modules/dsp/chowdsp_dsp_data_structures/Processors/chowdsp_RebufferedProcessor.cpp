@@ -86,7 +86,7 @@ void RebufferedProcessor<FloatType>::pullOutputSignal (const BufferView<FloatTyp
 }
 
 template <typename FloatType>
-void RebufferedProcessor<FloatType>::pushInputSignal (const BufferView<FloatType>& buffer, int startSample, int samplesToWrite)
+void RebufferedProcessor<FloatType>::pushInputSignal (const BufferView<const FloatType>& buffer, int startSample, int samplesToWrite)
 {
     auto& writeBuffer = reBuffers[writeBufferIndex];
     BufferMath::copyBufferData (buffer, writeBuffer, startSample, bufferCount, samplesToWrite);

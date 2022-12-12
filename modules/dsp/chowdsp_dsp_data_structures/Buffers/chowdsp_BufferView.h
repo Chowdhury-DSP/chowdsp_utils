@@ -47,7 +47,8 @@ public:
         initialise (buffer.getArrayOfWritePointers(), sampleOffset, startChannel);
     }
 
-    BufferView (const BufferView<SampleType>& buffer, // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
+    template <typename OtherSampleType, std::enable_if_t<std::is_same_v<std::remove_const_t<SampleType>, std::remove_const_t<OtherSampleType>>>* = nullptr>
+    BufferView (const BufferView<OtherSampleType>& buffer, // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
                 int sampleOffset = 0,
                 int bufferNumSamples = -1,
                 int startChannel = 0,
@@ -105,13 +106,21 @@ public:
     [[nodiscard]] int getNumSamples() const noexcept { return numSamples; }
 
     /** Returns a pointer which can be used to write to a single channel of the buffer view. */
-    [[nodiscard]] SampleType* getWritePointer (int channel) const noexcept { return channelPointers[(size_t) channel]; }
+    template <typename T = SampleType>
+    [[nodiscard]] std::enable_if_t<! std::is_const_v<T>, SampleType*> getWritePointer (int channel) const noexcept
+    {
+        return channelPointers[(size_t) channel];
+    }
 
     /** Returns a pointer which can be used to read from a single channel of the buffer view. */
     [[nodiscard]] const SampleType* getReadPointer (int channel) const noexcept { return channelPointers[(size_t) channel]; }
 
     /** Returns the entire buffer view as an array of pointers to each channel's data. */
-    [[nodiscard]] SampleType* const* getArrayOfWritePointers() const noexcept { return channelPointers.data(); }
+    template <typename T = SampleType>
+    [[nodiscard]] std::enable_if_t<! std::is_const_v<T>, SampleType* const*> getArrayOfWritePointers() const noexcept
+    {
+        return channelPointers.data();
+    }
 
     /** Returns the entire buffer view as an array of pointers to each channel's data. */
     [[nodiscard]] const SampleType** getArrayOfReadPointers() const noexcept { return const_cast<const SampleType**> (channelPointers.data()); }

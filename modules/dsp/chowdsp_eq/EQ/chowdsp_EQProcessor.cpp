@@ -4,28 +4,28 @@ template <typename FloatType, size_t numBands, typename EQBandType>
 EQProcessor<FloatType, numBands, EQBandType>::EQProcessor() = default;
 
 template <typename FloatType, size_t numBands, typename EQBandType>
-void EQProcessor<FloatType, numBands, EQBandType>::setCutoffFrequency (int band, FloatType newCutoffHz)
+void EQProcessor<FloatType, numBands, EQBandType>::setCutoffFrequency (int band, NumericType newCutoffHz)
 {
     jassert (juce::isPositiveAndBelow (band, (int) numBands));
     bands[(size_t) band].setCutoffFrequency (newCutoffHz);
 }
 
 template <typename FloatType, size_t numBands, typename EQBandType>
-void EQProcessor<FloatType, numBands, EQBandType>::setQValue (int band, FloatType newQValue)
+void EQProcessor<FloatType, numBands, EQBandType>::setQValue (int band, NumericType newQValue)
 {
     jassert (juce::isPositiveAndBelow (band, (int) numBands));
     bands[(size_t) band].setQValue (newQValue);
 }
 
 template <typename FloatType, size_t numBands, typename EQBandType>
-void EQProcessor<FloatType, numBands, EQBandType>::setGain (int band, FloatType newGain)
+void EQProcessor<FloatType, numBands, EQBandType>::setGain (int band, NumericType newGain)
 {
     jassert (juce::isPositiveAndBelow (band, (int) numBands));
     bands[(size_t) band].setGain (newGain);
 }
 
 template <typename FloatType, size_t numBands, typename EQBandType>
-void EQProcessor<FloatType, numBands, EQBandType>::setGainDB (int band, FloatType newGainDB)
+void EQProcessor<FloatType, numBands, EQBandType>::setGainDB (int band, NumericType newGainDB)
 {
     jassert (juce::isPositiveAndBelow (band, (int) numBands));
     bands[(size_t) band].setGainDB (newGainDB);

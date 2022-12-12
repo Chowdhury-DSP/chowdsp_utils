@@ -123,7 +123,7 @@ void ModalFilterBank<maxNumModes, SampleType>::reset()
 }
 
 template <size_t maxNumModes, typename SampleType>
-void ModalFilterBank<maxNumModes, SampleType>::process (const BufferView<SampleType>& block) noexcept
+void ModalFilterBank<maxNumModes, SampleType>::process (const BufferView<const SampleType>& block) noexcept
 {
     const auto numSamples = block.getNumSamples();
 
@@ -142,7 +142,7 @@ void ModalFilterBank<maxNumModes, SampleType>::process (const BufferView<SampleT
 
 template <size_t maxNumModes, typename SampleType>
 template <typename Modulator>
-void ModalFilterBank<maxNumModes, SampleType>::processWithModulation (const BufferView<SampleType>& block, Modulator&& modulator) noexcept
+void ModalFilterBank<maxNumModes, SampleType>::processWithModulation (const BufferView<const SampleType>& block, Modulator&& modulator) noexcept
 {
     const auto numSamples = block.getNumSamples();
 
