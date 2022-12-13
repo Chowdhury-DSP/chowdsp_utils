@@ -184,7 +184,7 @@ public:
 
 private:
     template <ARPFilterType type>
-    inline SampleType processSampleInternal (SampleType x, SampleType& s1, SampleType& s2, NumericType notchMix) noexcept
+    inline SampleType processSampleInternal (SampleType x, SampleType& s1, SampleType& s2, [[maybe_unused]] NumericType notchMix) noexcept
     {
         auto inputMult = useLimitMode ? filter.k0 : SampleType (1);
         const auto [v0, v1, v2] = filter.processCore (inputMult * x, s1, s2);
