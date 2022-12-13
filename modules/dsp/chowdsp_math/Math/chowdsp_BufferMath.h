@@ -62,6 +62,10 @@ namespace BufferMath
     template <typename BufferType, typename FloatType = typename BufferType::Type>
     void applyGain (BufferType& buffer, FloatType gain) noexcept;
 
+    /** Applies a linear gain to a buffer and stores the result in another buffer. */
+    template <typename BufferType1, typename BufferType2 = BufferType1, typename FloatType = typename BufferType1::Type>
+    void applyGain (const BufferType1& bufferSrc, BufferType2 bufferDest, FloatType gain) noexcept;
+
     /** Applies a linear gain to a buffer. */
     template <typename BufferType, typename SmoothedValueType>
     void applyGainSmoothed (BufferType& buffer, SmoothedValueType& gain) noexcept;
@@ -69,6 +73,10 @@ namespace BufferMath
     /** Applies a linear gain to a buffer. */
     template <typename BufferType, typename SmoothedBufferType>
     void applyGainSmoothedBuffer (BufferType& buffer, SmoothedBufferType& gain) noexcept;
+
+    /** Applies a linear gain to a buffer and stores the result in another buffer. */
+    template <typename BufferType1, typename SmoothedBufferType, typename BufferType2 = BufferType1>
+    void applyGainSmoothedBuffer (const BufferType1& bufferSrc, BufferType2 bufferDest, SmoothedBufferType& gain) noexcept;
 
     /**
      * If the buffer contains any Infs, NaNs, or values larger than the ceiling,
