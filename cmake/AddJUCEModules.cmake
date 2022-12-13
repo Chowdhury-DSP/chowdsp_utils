@@ -12,6 +12,7 @@ juce_add_modules(
     ${PROJECT_SOURCE_DIR}/modules/dsp/chowdsp_dsp_utils
     ${PROJECT_SOURCE_DIR}/modules/dsp/chowdsp_eq
     ${PROJECT_SOURCE_DIR}/modules/dsp/chowdsp_math
+    ${PROJECT_SOURCE_DIR}/modules/dsp/chowdsp_modal_dsp
     ${PROJECT_SOURCE_DIR}/modules/dsp/chowdsp_reverb
     ${PROJECT_SOURCE_DIR}/modules/dsp/chowdsp_simd
     ${PROJECT_SOURCE_DIR}/modules/dsp/chowdsp_sources

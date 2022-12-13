@@ -99,7 +99,7 @@ sure to abide by the license of each module, as well as whichever libraries are 
 ### DSP Modules
 
 `chowdsp_dsp_data_structures` (GPLv3)
-- `Buffer`/`BufferView`: Basic data structures for storing audio.
+- `Buffer`/`StaticBuffer`/`BufferView`: Basic data structures for storing audio.
 - `LookupTableTransform`: Some modifications on `juce::dsp::LookupTableTransform`.
 - `LookupTableCache`: A cache for storing lookup tables, so they don't need to be re-computed.
 - `ScopedValue`: A stack value that writes its value back to a more permanent variable when it goes out of scope.
@@ -112,7 +112,6 @@ sure to abide by the license of each module, as well as whichever libraries are 
 - Utilities for working with convolution and impulse responses.
 - `DelayLine`: A re-implementation of `juce::dsp::DelayLine` with more interpolation options.
 - `PitchShifter`: Simple pitch-shifting effect using a ring buffer with two read pointers.
-- Useful classes for modal signal processing.
 - Various classes for integer or non-integer resampling
   - Optionally depends on [libsamplerate](https://github.com/libsndfile/libsamplerate). User must link with libsamplerate externally, and define `CHOWDSP_USE_LIBSAMPLERATE=1`
 - A few other useful processors.
@@ -142,8 +141,12 @@ sure to abide by the license of each module, as well as whichever libraries are 
 - `Power`: Fast integer exponential operations.
 - A few other useful math operations.
 
+`chowdsp_modal_dsp` (GPLv3)
+- `ModalFilter`: Implementation of the Max Mathews "phasor filter".
+- `ModalFilterBank`: Vectorized modal filterbank, which can be used to implement large-scale modal models.
+
 `chowdsp_reverb` (GPLv3)
-- Some modular template classes for constructing Feedback Delay Network reverbs.
+- Some modular template classes for constructing Feedback Delay Network of Dattorro reverbs.
 
 `chowdsp_simd` (BSD)
 - A wrapper around [XSIMD](https://github.com/xtensor-stack/xsimd) (BSD, included internally).
@@ -173,6 +176,7 @@ sure to abide by the license of each module, as well as whichever libraries are 
 - Custom `LookAndFeel`.
 - Helper class for optionally using OpenGL.
 - Helper classes for working with long-presses and popup menus on touch screens.
+- Helper class for connecting UI elements to host-specific parameter information.
 - Custom tooltip viewer.
 - Component to display plugin info (version, format, etc.).
 - Component for controlling preset management.

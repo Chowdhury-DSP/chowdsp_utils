@@ -1,45 +1,8 @@
 #include "ModalReverbPlugin.h"
 
-namespace
-{
-const juce::String pitchTag = "pitch";
-const juce::String decayTag = "decay";
-const juce::String mixTag = "mix";
-const juce::String modModesTag = "mod_modes";
-const juce::String modFreqTag = "mod_freq";
-const juce::String modDepthTag = "mod_depth";
-} // namespace
-
 ModalReverbPlugin::ModalReverbPlugin()
 {
     modalFilterBank.setModeAmplitudes (ModeParams::amps_real, ModeParams::amps_imag);
-
-    using namespace chowdsp::ParamUtils;
-    loadParameterPointer (pitchParam, vts, pitchTag);
-    loadParameterPointer (decayParam, vts, decayTag);
-    loadParameterPointer (mixParam, vts, mixTag);
-    loadParameterPointer (modModesParam, vts, modModesTag);
-    loadParameterPointer (modFreqParam, vts, modFreqTag);
-    loadParameterPointer (modDepthParam, vts, modDepthTag);
-}
-
-void ModalReverbPlugin::addParameters (Parameters& params)
-{
-    using namespace chowdsp::ParamUtils;
-    createPercentParameter (params, { pitchTag, 100 }, "Pitch", 0.5f);
-    createPercentParameter (params, { decayTag, 100 }, "Decay", 0.5f);
-    createPercentParameter (params, { mixTag, 100 }, "Mix", 0.5f);
-    emplace_param<chowdsp::FloatParameter> (
-        params,
-        chowdsp::ParameterID { modModesTag, 100 },
-        "Mod. Modes",
-        createNormalisableRange (0.0f, 200.0f, 20.0f),
-        0.0f,
-        [] (float x)
-        { return juce::String ((int) x); },
-        &stringToFloatVal);
-    createFreqParameter (params, { modFreqTag, 100 }, "Mod. Freq", 0.5f, 10.0f, 2.0f, 1.0f);
-    createPercentParameter (params, { modDepthTag, 100 }, "Mod. Depth", 0.5f);
 }
 
 void ModalReverbPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)
@@ -57,32 +20,33 @@ void ModalReverbPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
 {
     const auto numChannels = buffer.getNumChannels();
     const auto numSamples = buffer.getNumSamples();
+    const auto& params = state.params;
+
+    // push dry data int mixer
+    mixer.setWetMixProportion (params.mixParam->getCurrentValue());
+    mixer.pushDrySamples (juce::dsp::AudioBlock<float> { buffer });
 
     // make buffer mono
     for (int ch = 1; ch < numChannels; ++ch)
         buffer.addFrom (0, 0, buffer, ch, 0, numSamples);
     buffer.applyGain (1.0f / (float) numChannels);
 
-    // push dry data int mixer
-    mixer.setWetMixProportion (*mixParam);
-    mixer.pushDrySamples (juce::dsp::AudioBlock<float> { buffer });
-
     // update mode frequencies
-    const auto freqMult = std::pow (2.0f, 2.0f * *pitchParam - 1.0f);
+    const auto freqMult = std::pow (2.0f, params.pitchParam->getCurrentValue());
     modalFilterBank.setModeFrequencies (ModeParams::freqs, freqMult);
 
     // update mode decay rates
-    const auto decayFactor = std::pow (4.0f, 2.0f * *decayParam - 1.0f);
+    const auto decayFactor = std::pow (4.0f, 2.0f * params.decayParam->getCurrentValue() - 1.0f);
     modalFilterBank.setModeDecays (ModeParams::taus, ModeParams::analysisFs, decayFactor);
 
     // set up modulation data
     modBuffer.setSize (1, numSamples, false, false, true);
     modBuffer.clear();
-    modSine.setFrequency (*modFreqParam);
+    modSine.setFrequency (params.modFreqParam->getCurrentValue());
     auto&& modBlock = juce::dsp::AudioBlock<float> { modBuffer };
     modSine.process (juce::dsp::ProcessContextReplacing<float> { modBlock });
 
-    const auto numModesToMod = (int) modModesParam->getCurrentValue();
+    const auto numModesToMod = (int) params.modModesParam->getCurrentValue();
     if (numModesToMod == 0)
     {
         // process modal filter without modulation
@@ -91,7 +55,7 @@ void ModalReverbPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
     else
     {
         // process modal filter with modulation
-        const auto modDepth = modDepthParam->getCurrentValue();
+        const auto modDepth = params.modDepthParam->getCurrentValue();
         auto&& block = juce::dsp::AudioBlock<float> { buffer };
         const auto* modData = modBuffer.getReadPointer (0);
         modalFilterBank.processWithModulation (
