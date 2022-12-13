@@ -86,7 +86,7 @@ public:
                 int sampleOffset = 0,
                 int bufferNumSamples = -1,
                 int startChannel = 0,
-                int bufferNumChannels = -1)
+                int bufferNumChannels = -1      )
         : numChannels (bufferNumChannels < 0 ? (buffer.getNumChannels() - startChannel) : bufferNumChannels),
           numSamples (bufferNumSamples < 0 ? (buffer.getNumSamples() - sampleOffset) : bufferNumSamples)
     {
