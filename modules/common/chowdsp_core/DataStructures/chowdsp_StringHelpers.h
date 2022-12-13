@@ -40,11 +40,12 @@ namespace string_helpers_detail
 } // namespace string_helpers_detail
 #endif // DOXYGEN
 
-/** Concatenates a group of string_views */
+/** Concatenates a group of string_views at compile-time */
 template <std::string_view const&... Strs>
 static constexpr auto string_view_concat = string_helpers_detail::concat<Strs...>::value;
 #endif // __cplusplus >= 202002L
 
+/** Concatenates two string_views at run-time */
 template <size_t max_chars = 64>
 struct concatenate_strings
 {
