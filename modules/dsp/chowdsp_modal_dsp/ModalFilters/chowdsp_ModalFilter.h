@@ -1,10 +1,9 @@
 #pragma once
 
-#include <complex>
-
 namespace chowdsp
 {
-/** Max Mathews phasor filter, a recursive filter
+/**
+ * Max Mathews phasor filter, a recursive filter
  * that filters a single frequency, with a given
  * damping factor and complex amplitude. This filter
  * is guaranteed stable, and reacts well to real-time
@@ -91,7 +90,7 @@ protected:
 
 #if ! CHOWDSP_NO_XSIMD
 //=========================================================================
-/** An implementation of the modal filter parallelised with SIMDComplex. */
+/** An implementation of the modal filter parallelised with xsimd::batch<std::complex>. */
 template <typename FloatType>
 class ModalFilter<xsimd::batch<FloatType>>
 {
@@ -175,5 +174,4 @@ protected:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ModalFilter)
 };
 #endif // ! CHOWDSP_NO_XSIMD
-
 } // namespace chowdsp

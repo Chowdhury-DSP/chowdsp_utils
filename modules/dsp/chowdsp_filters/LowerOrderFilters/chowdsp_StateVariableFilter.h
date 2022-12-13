@@ -131,7 +131,7 @@ public:
 
     /** Process block of samples */
     template <StateVariableFilterType M = type>
-    std::enable_if_t<M == StateVariableFilterType::Crossover, void> processBlock (const BufferView<SampleType>& blockIn,
+    std::enable_if_t<M == StateVariableFilterType::Crossover, void> processBlock (const BufferView<const SampleType>& blockIn,
                                                                                   const BufferView<SampleType>& blockLow,
                                                                                   const BufferView<SampleType>& blockHigh) noexcept
     {

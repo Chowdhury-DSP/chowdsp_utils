@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [UNRELEASED]
+- Added `chowdsp_plugin_state` for managing plugin state.
+- Added Dattorro reverb classes.
+- Added `enumerate` and `zip` iterators.
+- Added CLAP note name support to `chowdsp::SynthBase`.
+- Added `TupleHelpers::visit_at`.
+- Added `chowdsp::OptionalPointer`.
+- Added `chowdsp::toString()` for converting `std::string_view` to `juce::String`.
+- Added `chowdsp::HostContextProvider` for connecting UI elements to host parameter context info.
+- Added `chowdsp::TweaksFile` for prototyping and fine-tuning with live changes.
+- Added `chowdsp::Rectangle`: a `constexpr`-capable clone of `juce::Rectangle`.
+- Improved const-correctness of `chowdsp::BufferView`.
+- Improved flexibility for saving/loading JSON objects.
+
 ## [1.3.0] 2022-11-03
 - Added `LinkwitzRileyFilter` class.
 - Added `TypesList` meta-programming helpers.

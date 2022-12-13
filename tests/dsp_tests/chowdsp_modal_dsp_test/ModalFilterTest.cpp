@@ -1,5 +1,5 @@
 #include <CatchUtils.h>
-#include <chowdsp_dsp_utils/chowdsp_dsp_utils.h>
+#include <chowdsp_modal_dsp/chowdsp_modal_dsp.h>
 
 namespace
 {

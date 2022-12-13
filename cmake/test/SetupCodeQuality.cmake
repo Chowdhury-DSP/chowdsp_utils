@@ -26,6 +26,7 @@ target_link_libraries(chowdsp_utils_codeql PRIVATE
     chowdsp_eq
     chowdsp_filters
     chowdsp_math
+    chowdsp_modal_dsp
     chowdsp_reverb
     chowdsp_simd
     chowdsp_sources

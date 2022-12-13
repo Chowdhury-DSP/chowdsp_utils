@@ -22,6 +22,7 @@ target_link_libraries(static_test_dummy_executable PRIVATE
     chowdsp_eq
     chowdsp_filters
     chowdsp_math
+    chowdsp_modal_dsp
     chowdsp_reverb
     chowdsp_simd
     chowdsp_sources

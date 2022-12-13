@@ -19,6 +19,7 @@ jobs:
       matrix:
         target: [
                   AutoWah,
+                  ForwardingTestPlugin,
                   ModalSpringReverb,
                   SignalGenerator,
                   SimpleEQ,

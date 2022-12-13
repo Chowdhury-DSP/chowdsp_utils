@@ -52,10 +52,6 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Delay/BBD/chowdsp_BBDDelayWrapper.h"
 #endif
 
-// modal tools
-#include "Modal/chowdsp_ModalFilter.h"
-#include "Modal/chowdsp_ModalFilterBank.h"
-
 // resamplers
 #include "Resampling/chowdsp_Upsampler.h"
 #include "Resampling/chowdsp_Downsampler.h"

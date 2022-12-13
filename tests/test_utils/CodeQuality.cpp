@@ -10,6 +10,7 @@
 #include <chowdsp_eq/chowdsp_eq.h>
 #include <chowdsp_filters/chowdsp_filters.h>
 #include <chowdsp_math/chowdsp_math.h>
+#include <chowdsp_modal_dsp/chowdsp_modal_dsp.h>
 #include <chowdsp_reverb/chowdsp_reverb.h>
 #include <chowdsp_simd/chowdsp_simd.h>
 #include <chowdsp_sources/chowdsp_sources.h>

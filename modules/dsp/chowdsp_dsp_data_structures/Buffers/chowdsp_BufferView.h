@@ -155,7 +155,8 @@ public:
 #endif
 
     /** Clears memory within the buffer view. */
-    void clear() const noexcept
+    template <typename T = SampleType>
+    std::enable_if_t<! std::is_const_v<T>, void> clear() const noexcept
     {
         buffer_detail::clear (const_cast<SampleType**> (channelPointers.data()), 0, numChannels, 0, numSamples);
     }
