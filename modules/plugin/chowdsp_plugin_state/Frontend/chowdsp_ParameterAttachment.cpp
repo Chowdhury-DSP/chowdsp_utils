@@ -4,7 +4,7 @@ template <typename Param, typename State, typename Callback>
 ParameterAttachment<Param, State, Callback>::ParameterAttachment (const ParameterPath& parameterPath,
                                                                   State& pluginState,
                                                                   Callback&& callback)
-    : ParameterAttachment (pluginState.template getParameter<Param> (parameterPath), pluginState, std::forward<Callback> (callback))
+    : ParameterAttachment (pluginState.template getParameter<Param> (parameterPath), pluginState, std::move (callback))
 {
 }
 
@@ -16,7 +16,7 @@ ParameterAttachment<Param, State, Callback>::ParameterAttachment (Param& paramet
 {
     valueChangedCallback = pluginState.addParameterListener (param,
                                                              true,
-                                                             [this, c = std::forward<Callback> (callback)]() mutable {
+                                                             [this, c = std::move (callback)]() mutable {
                                                                  c (ParameterTypeHelpers::getValue (param));
                                                              });
 }

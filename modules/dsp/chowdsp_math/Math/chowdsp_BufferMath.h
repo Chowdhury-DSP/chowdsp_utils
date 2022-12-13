@@ -11,7 +11,7 @@ namespace BufferMath
         template <typename BufferType>
         struct BufferSampleTypeHelper
         {
-            using Type = typename BufferType::Type;
+            using Type = std::remove_const_t<typename BufferType::Type>;
         };
 
 #if CHOWDSP_USING_JUCE

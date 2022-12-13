@@ -48,7 +48,7 @@ namespace PluginStateHelpers
         struct SingleParamOrObjectInfo<T, false, std::enable_if_t<! is_pfr_able<T>>>
         {
             static constexpr int num_params = 0;
-            static constexpr bool is_only_params = ParameterTypeHelpers::IsHelperType<T>;
+            static constexpr bool is_only_params = ParameterTypeHelpers::IsHelperType<T> || TypeTraits::IsIterable<T>;
         };
 
         using indexed_element_type = std::decay_t<decltype (pfr::get<index - 1> (ParamStateType {}))>;
@@ -98,7 +98,7 @@ namespace PluginStateHelpers
         struct SingleValOrObjectInfo<T, false, std::enable_if_t<! is_pfr_able<T>>>
         {
             static constexpr int num_fields = 0;
-            static constexpr bool is_only_state_vals = ParameterTypeHelpers::IsHelperType<T>;
+            static constexpr bool is_only_state_vals = ParameterTypeHelpers::IsHelperType<T> || TypeTraits::IsIterable<T>;
         };
 
         using indexed_element_type = std::decay_t<decltype (pfr::get<index - 1> (NonParamStateType {}))>;
@@ -123,6 +123,29 @@ namespace PluginStateHelpers
 
     template <typename NonParamStateType>
     static constexpr int ContainsOnlyStateValues = NonParamInfoHelper<NonParamStateType>::is_only_state_vals;
+
+    template <typename StateType, typename Callable>
+    constexpr size_t doForAllFields (StateType& state, Callable&& callable, size_t index = 0)
+    {
+        pfr::for_each_field (state,
+                             [&index, call = std::forward<Callable> (callable)] (auto& stateObject) mutable
+                             {
+                                 using Type = std::decay_t<decltype (stateObject)>;
+                                 if constexpr (ParameterTypeHelpers::IsParameterPointerType<Type> || PluginStateHelpers::IsStateValue<Type>)
+                                 {
+                                     call (stateObject, index++);
+                                 }
+                                 else if constexpr (ParameterTypeHelpers::IsHelperType<Type>)
+                                 {
+                                     return; // don't do anything with this field!
+                                 }
+                                 else
+                                 {
+                                     index = doForAllFields (stateObject, std::move (call), index);
+                                 }
+                             });
+        return index;
+    }
 
     JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 } // namespace PluginStateHelpers

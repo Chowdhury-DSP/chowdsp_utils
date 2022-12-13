@@ -61,7 +61,7 @@ public:
     }
 
     /** Process a block of data */
-    BufferView<T> process (const BufferView<T>& block) noexcept
+    BufferView<T> process (const BufferView<const T>& block) noexcept
     {
         const auto numChannels = block.getNumChannels();
         const auto numSamples = block.getNumSamples();
@@ -69,7 +69,7 @@ public:
         for (int ch = 0; ch < numChannels; ++ch)
             process (block.getReadPointer (ch), upsampledBuffer.getWritePointer (ch), ch, numSamples);
 
-        return BufferView { upsampledBuffer, 0, numSamples * ratio };
+        return { upsampledBuffer, 0, numSamples * ratio };
     }
 
 private:

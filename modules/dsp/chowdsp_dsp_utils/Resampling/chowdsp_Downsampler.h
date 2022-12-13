@@ -65,7 +65,7 @@ public:
      * Process a block of data.
      * Note that the block size must be an integer multiple of the downsampling ratio.
      */
-    BufferView<T> process (const BufferView<T>& block) noexcept
+    BufferView<T> process (const BufferView<const T>& block) noexcept
     {
         const auto numChannels = block.getNumChannels();
         const auto numSamples = block.getNumSamples();
@@ -76,7 +76,7 @@ public:
         for (int ch = 0; ch < numChannels; ++ch)
             process (block.getReadPointer (ch), downsampledBuffer.getWritePointer (ch), ch, numSamples);
 
-        return BufferView { downsampledBuffer, 0, numSamples / ratio };
+        return { downsampledBuffer, 0, numSamples / ratio };
     }
 
 private:

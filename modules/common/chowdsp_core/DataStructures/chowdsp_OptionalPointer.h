@@ -51,7 +51,7 @@ struct OptionalPointer
      * Make sure the new owner has a longer lifetime than this
      * object, or calls `invalidate()` before being deleted.
      */
-    T* release()
+    [[nodiscard]] T* release()
     {
         jassert (isOwner()); // Pointer has already been released!
         return owningPtr.release();
@@ -68,14 +68,14 @@ struct OptionalPointer
         nonOwningPtr = nullptr;
     }
 
-    T* get() { return nonOwningPtr; }
-    const T* get() const { return nonOwningPtr; }
+    [[nodiscard]] T* get() { return nonOwningPtr; }
+    [[nodiscard]] const T* get() const { return nonOwningPtr; }
 
-    operator T&() { return *nonOwningPtr; } // NOSONAR, NOLINT(google-explicit-constructor): we want to be able to do implicit conversion here
-    T* operator->() { return nonOwningPtr; }
-    const T* operator->() const { return nonOwningPtr; }
-    T& operator*() { return *nonOwningPtr; }
-    const T& operator*() const { return *nonOwningPtr; }
+    [[nodiscard]] operator T&() { return *nonOwningPtr; } // NOSONAR, NOLINT(google-explicit-constructor): we want to be able to do implicit conversion here
+    [[nodiscard]] T* operator->() { return nonOwningPtr; }
+    [[nodiscard]] const T* operator->() const { return nonOwningPtr; }
+    [[nodiscard]] T& operator*() { return *nonOwningPtr; }
+    [[nodiscard]] const T& operator*() const { return *nonOwningPtr; }
 
 private:
     std::unique_ptr<T> owningPtr {};

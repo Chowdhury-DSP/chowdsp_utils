@@ -39,7 +39,7 @@ protected:
 private:
     void processInternal (const BufferView<FloatType>& buffer);
     void pullOutputSignal (const BufferView<FloatType>& buffer, int startSample, int samplesToRead) const;
-    void pushInputSignal (const BufferView<FloatType>& buffer, int startSample, int samplesToWrite);
+    void pushInputSignal (const BufferView<const FloatType>& buffer, int startSample, int samplesToWrite);
 
     int rebufferSize = 0;
     int numChannelsAllocated = 0;

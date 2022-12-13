@@ -1,60 +1,18 @@
 #include "SimpleEQPlugin.h"
 #include "PluginEditor.h"
 
-namespace
-{
-const juce::String linPhaseModeTag = "linear_phase_mode";
-
-const auto eqTypeChoices = juce::StringArray {
-    "1-Pole HPF",
-    "2-Pole HPF",
-    "2-Pole HPF SVF",
-    "3-Pole HPF",
-    "4-Pole HPF",
-    "8-Pole HPF",
-    "8-Pole Cheby. HPF",
-    "12-Pole Elliptic HPF",
-    "Low-Shelf",
-    "Low-Shelf SVF",
-    "Bell",
-    "Bell SVF",
-    "Notch",
-    "Notch SVF",
-    "High-Shelf",
-    "High-Shelf SVF",
-    "2-Pole BPF",
-    "2-Pole BPF SVF",
-    "1-Pole LPF",
-    "2-Pole LPF",
-    "2-Pole LPF SVF",
-    "3-Pole LPF",
-    "4-Pole LPF",
-    "8-Pole LPF",
-    "8-Pole Cheby. LPF",
-    "12-Pole Elliptic LPF",
-};
-} // namespace
-
 SimpleEQPlugin::SimpleEQPlugin()
+    : eqParamsHandles (state.params.eqParams.eqParams)
 {
-    PrototypeEQ::EQParams::initialiseEQParameters (vts, eqParamsHandles);
-    linPhaseModeOn = vts.getRawParameterValue (linPhaseModeTag);
+    linPhaseEQ.updatePrototypeEQParameters = [] (auto& eq, auto& eqParams)
+    { eq.setParameters (eqParams); };
 
-    linPhaseEQ.updatePrototypeEQParameters = [] (auto& eq, auto& eqParams) { eq.setParameters (eqParams); };
-
-    vts.addParameterListener (linPhaseModeTag, this);
-}
-
-SimpleEQPlugin::~SimpleEQPlugin()
-{
-    vts.removeParameterListener (linPhaseModeTag, this);
-}
-
-void SimpleEQPlugin::addParameters (Parameters& params)
-{
-    using namespace chowdsp::ParamUtils;
-    PrototypeEQ::EQParams::addEQParameters (params, PrototypeEQ::EQParams::defaultEQParamPrefix, eqTypeChoices, 7);
-    emplace_param<chowdsp::BoolParameter> (params, chowdsp::ParameterID { linPhaseModeTag, 100 }, "Linear Phase", false);
+    linPhaseModeChangeCallback = state.addParameterListener (*state.params.linPhaseMode,
+                                                             true,
+                                                             [this]
+                                                             {
+                                                                 setLatencySamples (state.params.linPhaseMode.get() ? linPhaseEQ.getLatencySamples() : 0);
+                                                             });
 }
 
 void SimpleEQPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)
@@ -68,7 +26,7 @@ void SimpleEQPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)
     linPhaseEQ.prepare (spec, getEQParams()); // prepare the linear phase EQ with some initial parameters
 
     // make sure the reported latency is up-to-date
-    parameterChanged (linPhaseModeTag, *linPhaseModeOn);
+    setLatencySamples (state.params.linPhaseMode.get() ? linPhaseEQ.getLatencySamples() : 0);
 }
 
 PrototypeEQ::Params SimpleEQPlugin::getEQParams() const
@@ -78,7 +36,8 @@ PrototypeEQ::Params SimpleEQPlugin::getEQParams() const
 
 void SimpleEQPlugin::loadEQParams (const PrototypeEQ::Params& params)
 {
-    PrototypeEQ::EQParams::loadEQParameters (params, vts);
+    juce::ignoreUnused (params);
+    PrototypeEQ::EQParams::loadEQParameters (params, state.params.eqParams);
 }
 
 void SimpleEQPlugin::setEQParams()
@@ -94,28 +53,21 @@ void SimpleEQPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
     // any thread, but we'll do it on the audio thread here.
     setEQParams();
 
-    if (*linPhaseModeOn == 0)
+    if (state.params.linPhaseMode.get())
+    {
+        // Linear phase mode is on: processing the linear phase EQ here!
+        linPhaseEQ.processBlock (buffer);
+    }
+    else
     {
         // Not in linear phase mode, so just process the regular EQ
         protoEQ.processBlock (buffer);
     }
-    else
-    {
-        // Linear phase mode is on: processing the linear phase EQ here!
-        auto&& block = juce::dsp::AudioBlock<float> { buffer };
-        linPhaseEQ.process (juce::dsp::ProcessContextReplacing<float> { block });
-    }
-}
-
-void SimpleEQPlugin::parameterChanged (const juce::String& parameterID, float newValue)
-{
-    if (parameterID == linPhaseModeTag)
-        setLatencySamples (newValue == 1.0f ? linPhaseEQ.getLatencySamples() : 0);
 }
 
 juce::AudioProcessorEditor* SimpleEQPlugin::createEditor()
 {
-    return new PluginEditor (*this); // juce::GenericAudioProcessorEditor (*this);
+    return new PluginEditor (*this);
 }
 
 // This creates new instances of the plugin

@@ -15,32 +15,34 @@ template <typename FloatType, typename... FilterChoices>
 class EQBand
 {
 public:
+    using NumericType = SampleTypeHelpers::NumericType<FloatType>;
+
     /** Default constructor */
     EQBand();
 
     /** Sets the cutoff frequency of the EQ band in Hz */
-    void setCutoffFrequency (FloatType newCutoffHz);
+    void setCutoffFrequency (NumericType newCutoffHz);
 
     /**
      * Sets the Q value of the EQ band.
      * If the current filter type does not have a Q parameter,
      * this method will have no apparent effect.
      */
-    void setQValue (FloatType newQValue);
+    void setQValue (NumericType newQValue);
 
     /**
      * Sets the linear gain of the EQ band.
      * If the current filter type does not have a gain parameter,
      * this method will have no apparent effect.
      */
-    void setGain (FloatType newGain);
+    void setGain (NumericType newGain);
 
     /**
      * Sets the gain of the EQ band in Decibels.
      * If the current filter type does not have a gain parameter,
      * this method will have no apparent effect.
      */
-    void setGainDB (FloatType newGainDB);
+    void setGainDB (NumericType newGainDB);
 
     /**
      * Selects the type of filter to use for the EQ band.
@@ -81,16 +83,16 @@ private:
     using Filters = std::tuple<FilterChoices...>;
     Filters filters;
 
-    FloatType freqHzHandle = 1000.0f;
-    FloatType qHandle = 0.7071f;
-    FloatType gainHandle = 1.0f;
+    NumericType freqHzHandle = 1000.0f;
+    NumericType qHandle = 0.7071f;
+    NumericType gainHandle = 1.0f;
 
-    SmoothedBufferValue<FloatType, juce::ValueSmoothingTypes::Multiplicative> freqSmooth;
-    SmoothedBufferValue<FloatType, juce::ValueSmoothingTypes::Multiplicative> qSmooth;
-    SmoothedBufferValue<FloatType, juce::ValueSmoothingTypes::Multiplicative> gainSmooth;
+    SmoothedBufferValue<NumericType, juce::ValueSmoothingTypes::Multiplicative> freqSmooth;
+    SmoothedBufferValue<NumericType, juce::ValueSmoothingTypes::Multiplicative> qSmooth;
+    SmoothedBufferValue<NumericType, juce::ValueSmoothingTypes::Multiplicative> gainSmooth;
     int filterType = 0, prevFilterType = 0;
 
-    FloatType fs = FloatType (44100.0);
+    NumericType fs = NumericType (44100.0);
 
     Buffer<FloatType> fadeBuffer;
 

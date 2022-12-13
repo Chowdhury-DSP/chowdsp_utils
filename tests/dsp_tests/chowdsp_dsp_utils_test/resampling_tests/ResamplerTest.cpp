@@ -163,7 +163,7 @@ void resampledProcessTest (float freq, double avgErrLimit, double maxErrLimit)
         int out_ptr2 = 0;
         for (int i = 0; i + origBlockSize < origNumSamples; i += origBlockSize)
         {
-            auto block = chowdsp::BufferView { buffer, i, origBlockSize };
+            auto block = chowdsp::BufferView<float> { buffer, i, origBlockSize };
 
             auto resampledBlock = resampler.processIn (block);
             auto rSize = resampledBlock.getNumSamples();

@@ -121,29 +121,6 @@ public:
     juce::UndoManager* undoManager = nullptr;
 
 private:
-    template <typename StateType, typename Callable>
-    static constexpr size_t doForAllFields (StateType& state, Callable&& callable, size_t index = 0)
-    {
-        pfr::for_each_field (state,
-                             [&index, call = std::forward<Callable> (callable)] (auto& stateObject) mutable
-                             {
-                                 using Type = std::decay_t<decltype (stateObject)>;
-                                 if constexpr (ParameterTypeHelpers::IsParameterPointerType<Type> || PluginStateHelpers::IsStateValue<Type>)
-                                 {
-                                     call (stateObject, index++);
-                                 }
-                                 else if constexpr (ParameterTypeHelpers::IsHelperType<Type>)
-                                 {
-                                     return; // don't do anything with this field!
-                                 }
-                                 else
-                                 {
-                                     index = doForAllFields (stateObject, std::forward<Callable> (call), index);
-                                 }
-                             });
-        return index;
-    }
-
     void callMessageThreadBroadcaster (size_t index);
     void callAudioThreadBroadcaster (size_t index);
 

@@ -57,7 +57,7 @@ public:
     }
 
 private:
-    static constexpr std::array<NumericType, NFilters> butterQVals = QValCalcs::butterworth_Qs<FloatType, (size_t) order>();
+    static constexpr std::array<NumericType, NFilters> butterQVals = QValCalcs::butterworth_Qs<NumericType, (size_t) order>();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ButterworthFilter)
 };
@@ -150,7 +150,7 @@ public:
 private:
     IIRFilter<1, FloatType> firstOrderSection;
 
-    static constexpr std::array<NumericType, NFilters> butterQVals = QValCalcs::butterworth_Qs<FloatType, (size_t) order>();
+    static constexpr std::array<NumericType, NFilters> butterQVals = QValCalcs::butterworth_Qs<NumericType, (size_t) order>();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ButterworthFilter)
 };

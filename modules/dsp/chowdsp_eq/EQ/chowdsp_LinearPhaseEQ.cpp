@@ -110,7 +110,24 @@ bool LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::attemptIRTransfer()
 }
 
 template <typename PrototypeEQ, int defaultFIRLength>
-void LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::processBlocksInternal (const AudioBlock<const float>& inBlock, AudioBlock<float>& outBlock) noexcept
+void LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::processBlock (const BufferView<float>& buffer) noexcept
+{
+    if (irUpdateState == IRUpdateState::Ready)
+        attemptIRTransfer();
+
+    const auto numChannels = buffer.getNumChannels();
+    const auto numSamples = buffer.getNumSamples();
+
+    for (int ch = 0; ch < numChannels; ++ch)
+    {
+        engines[(size_t) ch]->processSamples (buffer.getReadPointer (ch),
+                                              buffer.getWritePointer (ch),
+                                              (size_t) numSamples);
+    }
+}
+
+template <typename PrototypeEQ, int defaultFIRLength>
+void LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::processBlocksInternal (const chowdsp::AudioBlock<const float>& inBlock, chowdsp::AudioBlock<float>& outBlock) noexcept
 {
     const auto numChannels = outBlock.getNumChannels();
     const auto numSamples = outBlock.getNumSamples();
@@ -125,7 +142,7 @@ void LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::processBlocksInternal (const 
 
 template <typename PrototypeEQ, int defaultFIRLength>
 template <typename ProcessContext>
-void LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::process (const ProcessContext& context)
+void LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::process (const ProcessContext& context) noexcept
 {
     if (irUpdateState == IRUpdateState::Ready)
         attemptIRTransfer();

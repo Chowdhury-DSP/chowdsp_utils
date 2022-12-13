@@ -26,6 +26,8 @@ template <typename SampleType, typename DelayInterpType = DelayLineInterpolation
 class BypassProcessor
 {
 public:
+    using NumericType = SampleTypeHelpers::NumericType<SampleType>;
+
     BypassProcessor() = default;
 
     /** Converts a parameter handle to a boolean */
@@ -51,7 +53,7 @@ public:
      * time here, so that the bypass processing will be
      * correctly time-aligned.
      */
-    void setLatencySamples (SampleType delaySamples);
+    void setLatencySamples (NumericType delaySamples);
 
     /**
       * Call this at the start of your processBlock().
@@ -68,14 +70,14 @@ public:
     void processBlockOut (const BufferView<SampleType>& buffer, bool onOffParam);
 
 private:
-    void setLatencySamplesInternal (SampleType delaySamples);
+    void setLatencySamplesInternal (NumericType delaySamples);
     int getFadeStartSample (const int numSamples);
 
     bool prevOnOffParam = false;
     Buffer<SampleType> fadeBuffer;
 
     DelayLine<SampleType, DelayInterpType> compDelay { 1 << 18 }; // max latency = 2^18 = 262144 samples
-    SampleType prevDelay {};
+    NumericType prevDelay {};
     int latencySampleCount = -1;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BypassProcessor)
