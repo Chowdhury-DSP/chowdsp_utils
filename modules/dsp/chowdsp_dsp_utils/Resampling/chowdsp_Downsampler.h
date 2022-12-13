@@ -76,7 +76,7 @@ public:
         for (int ch = 0; ch < numChannels; ++ch)
             process (block.getReadPointer (ch), downsampledBuffer.getWritePointer (ch), ch, numSamples);
 
-        return BufferView { downsampledBuffer, 0, numSamples / ratio };
+        return { downsampledBuffer, 0, numSamples / ratio };
     }
 
 private:

@@ -21,8 +21,8 @@ public:
     }
 
     template <typename T = SampleType, std::enable_if_t<std::is_const_v<T>>* = nullptr>
-    BufferView (const SampleType** data, int dataNumChannels, int dataNumSamples, int sampleOffset = 0) : numChannels (dataNumChannels),
-                                                                                                          numSamples (dataNumSamples)
+    BufferView (const SampleType* const* data, int dataNumChannels, int dataNumSamples, int sampleOffset = 0) : numChannels (dataNumChannels),
+                                                                                                                numSamples (dataNumSamples)
     {
         initialise (data, sampleOffset);
     }

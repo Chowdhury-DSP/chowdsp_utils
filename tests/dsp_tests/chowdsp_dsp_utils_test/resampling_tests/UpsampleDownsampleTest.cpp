@@ -176,7 +176,7 @@ static auto processInSubBlocks (ProcType& proc, chowdsp::Buffer<float>& inBuffer
 
     for (int i = 0; i < inBuffer.getNumSamples(); i += subBlockSize)
     {
-        auto outBlock = proc.process (chowdsp::BufferView { inBuffer, i, subBlockSize });
+        auto outBlock = proc.process (chowdsp::BufferView<float> { inBuffer, i, subBlockSize });
 
         auto numOutSamples = (int) outBlock.getNumSamples();
         juce::FloatVectorOperations::copy (outBuffer.getWritePointer (0) + outBufferPtr, outBlock.getReadPointer (0), numOutSamples);
