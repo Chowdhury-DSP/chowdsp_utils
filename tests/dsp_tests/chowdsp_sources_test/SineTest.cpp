@@ -55,7 +55,7 @@ TEST_CASE ("Sine Test")
         // process with chowdsp::SineWave
         for (int i = 0; i < 2; ++i)
         {
-            chowdsp::BufferView block { chowBuffer, i * blockSize, blockSize };
+            chowdsp::BufferView<double> block { chowBuffer, i * blockSize, blockSize };
             chowSine.processBlock (block);
         }
 
