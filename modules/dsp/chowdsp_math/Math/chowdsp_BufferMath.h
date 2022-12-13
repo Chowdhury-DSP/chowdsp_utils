@@ -34,9 +34,6 @@ namespace BufferMath
     } // namespace detail
 #endif // DOXYGEN
 
-    template <typename>
-    class BufferView;
-
     /** Computes the absolute magnitude of the buffer. */
     template <typename BufferType>
     auto getMagnitude (const BufferType& buffer, int startSample = 0, int numSamples = -1, int channel = -1) noexcept;
