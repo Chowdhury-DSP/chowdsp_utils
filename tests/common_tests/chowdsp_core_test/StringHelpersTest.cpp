@@ -3,7 +3,7 @@
 
 TEST_CASE ("String Helpers Test")
 {
-#if (defined(__cplusplus) && __cplusplus >= 202002L) || (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L)
+#if __cplusplus >= 202002L
     SECTION ("String View Compile-Time Concatenation")
     {
         using namespace std::string_view_literals;
@@ -26,8 +26,11 @@ TEST_CASE ("String Helpers Test")
         static constexpr auto sv1 = "blah_"sv;
         static constexpr auto sv2 = "blaaa"sv;
         static constexpr auto sv3 = "_blaa"sv;
-        const auto sv_concat1 = chowdsp::concatenate_strings { sv1, sv2 }.value;
-        const auto sv_concat2 = chowdsp::concatenate_strings { sv_concat1, sv3 }.value;
+
+        const auto c1 = chowdsp::concatenate_strings { sv1, sv2 };
+        const auto sv_concat1 = c1.value;
+        const auto c2 = chowdsp::concatenate_strings { sv_concat1, sv3 };
+        const auto sv_concat2 = c2.value;
 
         REQUIRE (sv_concat1 == "blah_blaaa"sv);
         REQUIRE (sv_concat2 == "blah_blaaa_blaa"sv);
