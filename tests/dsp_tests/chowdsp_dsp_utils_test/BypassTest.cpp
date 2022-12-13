@@ -85,7 +85,8 @@ TEST_CASE ("Bypass Test")
         for (int i = 0; i < bufferTestNIters; ++i)
         {
             chowdsp::BufferView<float> subBuffer { buffer, i * nSamples, nSamples };
-            processFunc (subBuffer, bypass, &onOffParam, [] (float x) { return x + 1.0f; });
+            processFunc (subBuffer, bypass, &onOffParam, [] (float x)
+                         { return x + 1.0f; });
             onOffParam.store (1.0f - onOffParam.load());
         }
 
@@ -109,7 +110,8 @@ TEST_CASE ("Bypass Test")
         for (int i = 0; i < delayTestNIters; ++i)
         {
             chowdsp::BufferView<float> subBuffer { buffer, i * nSamples, nSamples };
-            processFunc (subBuffer, bypass, &onOffParam, [&] (float x) {
+            processFunc (subBuffer, bypass, &onOffParam, [&] (float x)
+                         {
                 delay.pushSample (0, x);
                 return delay.popSample (0); });
 

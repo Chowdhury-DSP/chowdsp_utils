@@ -48,13 +48,15 @@ PresetsComp::PresetsComp (PresetManager& presetManager) : manager (presetManager
     presetNameEditor.setMultiLine (false, false);
     presetNameEditor.setJustification (juce::Justification::centred);
 
-    auto setupNextPrevButton = [=] (juce::DrawableButton& button, bool forward) {
+    auto setupNextPrevButton = [=] (juce::DrawableButton& button, bool forward)
+    {
         addAndMakeVisible (button);
         button.setWantsKeyboardFocus (false);
         button.setTitle ("Go to " + juce::String (forward ? "next" : "previous") + " preset");
         button.setColour (juce::ComboBox::outlineColourId, juce::Colours::transparentBlack);
         button.setColour (juce::TextButton::buttonColourId, juce::Colours::transparentBlack);
-        button.onClick = [=] { goToNextPreset (forward); };
+        button.onClick = [=]
+        { goToNextPreset (forward); };
     };
 
     setupNextPrevButton (prevPresetButton, false);
@@ -173,7 +175,8 @@ int PresetsComp::createPresetsMenu (int optionID)
 
         juce::PopupMenu::Item presetItem { preset.getName() };
         presetItem.itemID = presetID + 1;
-        presetItem.action = [=, &preset] {
+        presetItem.action = [=, &preset]
+        {
             updatePresetBoxText();
             manager.loadPreset (preset);
         };
@@ -193,7 +196,8 @@ int PresetsComp::createPresetsMenu (int optionID)
         for (const auto& [category, categoryMenu] : vendorCollection.categoryPresetMenus)
             vendorMenu.addSubMenu (category, categoryMenu);
 
-        std::sort (vendorCollection.nonCategoryItems.begin(), vendorCollection.nonCategoryItems.end(), [] (auto& item1, auto& item2) { return item1.text < item2.text; });
+        std::sort (vendorCollection.nonCategoryItems.begin(), vendorCollection.nonCategoryItems.end(), [] (auto& item1, auto& item2)
+                   { return item1.text < item2.text; });
         for (const auto& extraItem : vendorCollection.nonCategoryItems)
             vendorMenu.addItem (extraItem);
 
@@ -211,7 +215,8 @@ int PresetsComp::addSavePresetOptions (int optionID)
     optionID = addPresetMenuItem (menu,
                                   optionID,
                                   "Reset",
-                                  [&] {
+                                  [&]
+                                  {
                                       if (auto* currentPreset = manager.getCurrentPreset())
                                           manager.loadPreset (*currentPreset);
                                   });
@@ -219,7 +224,8 @@ int PresetsComp::addSavePresetOptions (int optionID)
     optionID = addPresetMenuItem (menu,
                                   optionID,
                                   "Save Preset As",
-                                  [&] { saveUserPreset(); });
+                                  [&]
+                                  { saveUserPreset(); });
 
     if (auto* currentPreset = manager.getCurrentPreset())
     {
@@ -229,7 +235,8 @@ int PresetsComp::addSavePresetOptions (int optionID)
             optionID = addPresetMenuItem (menu,
                                           optionID,
                                           "Resave Preset",
-                                          [this] {
+                                          [this]
+                                          {
                                               if (auto* curPreset = manager.getCurrentPreset())
                                                   savePresetFile (curPreset->getPresetFile().getRelativePathFrom (manager.getUserPresetPath()));
                                           });
@@ -240,7 +247,8 @@ int PresetsComp::addSavePresetOptions (int optionID)
             optionID = addPresetMenuItem (menu,
                                           optionID,
                                           "Delete Preset",
-                                          [this] {
+                                          [this]
+                                          {
                                               if (auto* curPreset = manager.getCurrentPreset())
                                               {
                                                   auto presetFile = curPreset->getPresetFile();
@@ -272,7 +280,8 @@ int PresetsComp::addSharePresetOptions (int optionID)
     optionID = addPresetMenuItem (menu,
                                   optionID,
                                   "Copy Current Preset",
-                                  [&] {
+                                  [&]
+                                  {
                                       if (auto* currentPreset = manager.getCurrentPreset())
                                           juce::SystemClipboard::copyTextToClipboard (currentPreset->toXml()->toString());
                                   });
@@ -280,7 +289,8 @@ int PresetsComp::addSharePresetOptions (int optionID)
     optionID = addPresetMenuItem (menu,
                                   optionID,
                                   "Paste Preset",
-                                  [&] {
+                                  [&]
+                                  {
                                       const auto presetText = juce::SystemClipboard::getTextFromClipboard();
                                       if (presetText.isEmpty())
                                           return;
@@ -290,7 +300,8 @@ int PresetsComp::addSharePresetOptions (int optionID)
                                   });
 
 #if ! JUCE_IOS
-    return addPresetMenuItem (menu, optionID, "Load Preset From File", [&] {
+    return addPresetMenuItem (menu, optionID, "Load Preset From File", [&]
+                              {
         constexpr auto fileBrowserFlags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles;
         fileChooser = std::make_shared<juce::FileChooser> ("Load Preset", manager.getUserPresetPath(), "*" + presetExt, true, false, getTopLevelComponent());
         fileChooser->launchAsync (fileBrowserFlags,
@@ -312,23 +323,27 @@ int PresetsComp::addPresetFolderOptions (int optionID)
 
     if (manager.getUserPresetPath().isDirectory())
     {
-        optionID = addPresetMenuItem (menu, optionID, "Go to Preset Folder...", [&] { manager.getUserPresetPath().startAsProcess(); });
+        optionID = addPresetMenuItem (menu, optionID, "Go to Preset Folder...", [&]
+                                      { manager.getUserPresetPath().startAsProcess(); });
     }
 
-    return addPresetMenuItem (menu, optionID, "Choose Preset Folder...", [&] { chooseUserPresetFolder ({}); });
+    return addPresetMenuItem (menu, optionID, "Choose Preset Folder...", [&]
+                              { chooseUserPresetFolder ({}); });
 }
 
 void PresetsComp::loadPresetSafe (std::unique_ptr<Preset> preset)
 {
-    manager.loadPresetSafe (std::move (preset), [] { juce::MessageManager::callAsync (
-                                                         [] {
-                                                             juce::NativeMessageBox::showAsync (juce::MessageBoxOptions()
-                                                                                                    .withIconType (juce::MessageBoxIconType::WarningIcon)
-                                                                                                    .withTitle ("Preset Load Failure")
-                                                                                                    .withMessage ("Unable to load preset!")
-                                                                                                    .withButton ("OK"),
-                                                                                                [] (int) {});
-                                                         }); });
+    manager.loadPresetSafe (std::move (preset), []
+                            { juce::MessageManager::callAsync (
+                                  []
+                                  {
+                                      juce::NativeMessageBox::showAsync (juce::MessageBoxOptions()
+                                                                             .withIconType (juce::MessageBoxIconType::WarningIcon)
+                                                                             .withTitle ("Preset Load Failure")
+                                                                             .withMessage ("Unable to load preset!")
+                                                                             .withButton ("OK"),
+                                                                         [] (int) {});
+                                  }); });
 }
 
 void PresetsComp::chooseUserPresetFolder (const std::function<void()>& onFinish)
@@ -336,7 +351,8 @@ void PresetsComp::chooseUserPresetFolder (const std::function<void()>& onFinish)
     constexpr auto folderChooserFlags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectDirectories;
     fileChooser = std::make_shared<juce::FileChooser> ("Choose User Preset Folder");
     {
-        fileChooser->launchAsync (folderChooserFlags, [=] (const juce::FileChooser& chooser) {
+        fileChooser->launchAsync (folderChooserFlags, [=] (const juce::FileChooser& chooser)
+                                  {
             manager.setUserPresetPath (chooser.getResult());
 
             if (onFinish != nullptr)
@@ -352,7 +368,8 @@ void PresetsComp::saveUserPreset()
     presetNameEditor.grabKeyboardFocus();
     presetNameEditor.setHighlightedRegion ({ 0, 100 });
 
-    presetNameEditor.onReturnKey = [=] {
+    presetNameEditor.onReturnKey = [=]
+    {
         presetNameEditor.setVisible (false);
 
         auto presetName = presetNameEditor.getText();
@@ -360,7 +377,8 @@ void PresetsComp::saveUserPreset()
         if (presetPath == juce::File() || ! presetPath.isDirectory())
         {
             presetPath.deleteRecursively();
-            chooseUserPresetFolder ([=] { savePresetFile (presetName + presetExt); });
+            chooseUserPresetFolder ([=]
+                                    { savePresetFile (presetName + presetExt); });
         }
         else
         {
@@ -368,12 +386,14 @@ void PresetsComp::saveUserPreset()
         }
     };
 
-    presetNameEditor.onEscapeKey = [=] {
+    presetNameEditor.onEscapeKey = [=]
+    {
         presetNameEditor.setVisible (false);
         updatePresetBoxText();
     };
 
-    presetNameEditor.onFocusLost = [=] {
+    presetNameEditor.onFocusLost = [=]
+    {
         presetNameEditor.setVisible (false);
         updatePresetBoxText();
     };

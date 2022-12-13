@@ -15,7 +15,8 @@ public:
         bool hasLongPressOccured = false;
         chowdsp::LongPressActionHelper longPress;
         longPress.setLongPressSourceTypes ({ juce::MouseInputSource::mouse });
-        longPress.longPressCallback = [&] (juce::Point<int>) { hasLongPressOccured = true; };
+        longPress.longPressCallback = [&] (juce::Point<int>)
+        { hasLongPressOccured = true; };
 
         callback (longPress);
 
@@ -32,7 +33,8 @@ public:
     {
         beginTest ("Start and Don't Move Test");
         checkLongPress (true,
-                        [] (auto& longPress) {
+                        [] (auto& longPress)
+                        {
                             longPress.startPress (juce::Point<int> {});
                             longPress.setDragDistance (1.0f);
                             juce::MessageManager::getInstance()->runDispatchLoopUntil (1000);
@@ -40,7 +42,8 @@ public:
 
         beginTest ("Start and Move Too Far Test");
         checkLongPress (false,
-                        [] (auto& longPress) {
+                        [] (auto& longPress)
+                        {
                             longPress.startPress (juce::Point<int> {});
                             longPress.setDragDistance (20.0f);
                             juce::MessageManager::getInstance()->runDispatchLoopUntil (1000);
@@ -48,7 +51,8 @@ public:
 
         beginTest ("Start and Abort Test");
         checkLongPress (false,
-                        [this] (auto& longPress) {
+                        [this] (auto& longPress)
+                        {
                             longPress.startPress (juce::Point<int> {});
                             expect (longPress.isBeingPressed(), "Press should be started!");
                             juce::MessageManager::getInstance()->runDispatchLoopUntil (100);
@@ -58,7 +62,8 @@ public:
         beginTest ("Long-Press Disabled Test");
         checkLongPress (
             false,
-            [this] (auto& longPress) {
+            [this] (auto& longPress)
+            {
                 longPress.setLongPressSourceTypes ({});
                 longPress.startPress (juce::Point<int> {});
 
@@ -73,7 +78,8 @@ public:
         using namespace test_utils;
         beginTest ("Component Long-Press Test");
         checkLongPress (true,
-                        [=] (auto& longPress) {
+                        [=] (auto& longPress)
+                        {
                             juce::Component comp;
                             longPress.setAssociatedComponent (&comp);
 
@@ -87,7 +93,8 @@ public:
 
         beginTest ("Component Short-Press Test");
         checkLongPress (false,
-                        [=] (auto& longPress) {
+                        [=] (auto& longPress)
+                        {
                             juce::Component comp;
                             longPress.setAssociatedComponent (&comp);
 

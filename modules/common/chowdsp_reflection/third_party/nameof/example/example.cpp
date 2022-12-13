@@ -214,7 +214,8 @@ int main()
 
     std::cout << SomeMethod4<int> (structvar) << std::endl; // 'SomeMethod4<int, SomeStruct>(SomeStruct value)'
 
-    auto div = [] (int x, int y) -> int {
+    auto div = [] (int x, int y) -> int
+    {
         if (y == 0)
         {
             throw std::invalid_argument (NAMEOF (y).str() + " should not be zero!");

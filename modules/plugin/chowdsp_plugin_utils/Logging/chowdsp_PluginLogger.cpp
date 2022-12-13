@@ -141,7 +141,8 @@ void PluginLogger::defaultCrashLogAnalyzer (const juce::File& logFile)
 
     juce::AlertWindow::showAsync (
         alertOptions,
-        [logFile] (int result) {
+        [logFile] (int result)
+        {
             if (result == 1)
             {
 #if JUCE_IOS

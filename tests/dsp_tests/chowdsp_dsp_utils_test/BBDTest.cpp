@@ -74,7 +74,8 @@ TEST_CASE ("BBD Test")
         constexpr int numSamples = 2048;
         constexpr auto lenSeconds = (float) numSamples / (float) fs;
 
-        auto runBuffer = [=] (float filterFreq, auto& samples) {
+        auto runBuffer = [=] (float filterFreq, auto& samples)
+        {
             chowdsp::BBD::BBDDelayWrapper<8192> delay;
             delay.prepare ({ fs, (juce::uint32) numSamples, 1 });
             delay.setDelay (1.0f);

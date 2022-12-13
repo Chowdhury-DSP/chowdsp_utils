@@ -27,10 +27,12 @@ SliderAttachment<State>::SliderAttachment (FloatParameter& param,
       attachment (param, pluginState, ParameterAttachmentHelpers::SetValueCallback { *this }),
       um (undoManager)
 {
-    slider.valueFromTextFunction = [&p = static_cast<juce::RangedAudioParameter&> (param)] (const juce::String& text) {
+    slider.valueFromTextFunction = [&p = static_cast<juce::RangedAudioParameter&> (param)] (const juce::String& text)
+    {
         return (double) p.convertFrom0to1 (p.getValueForText (text));
     };
-    slider.textFromValueFunction = [&p = static_cast<juce::RangedAudioParameter&> (param)] (double value) {
+    slider.textFromValueFunction = [&p = static_cast<juce::RangedAudioParameter&> (param)] (double value)
+    {
         return p.getText (p.convertTo0to1 ((float) value), 0);
     };
     slider.setDoubleClickReturnValue (true, param.convertFrom0to1 (param.getDefaultValue()));
@@ -39,7 +41,8 @@ SliderAttachment<State>::SliderAttachment (FloatParameter& param,
 
     auto convertFrom0To1Function = [range] (double currentRangeStart,
                                             double currentRangeEnd,
-                                            double normalisedValue) mutable {
+                                            double normalisedValue) mutable
+    {
         range.start = (float) currentRangeStart;
         range.end = (float) currentRangeEnd;
         return (double) range.convertFrom0to1 ((float) normalisedValue);
@@ -47,7 +50,8 @@ SliderAttachment<State>::SliderAttachment (FloatParameter& param,
 
     auto convertTo0To1Function = [range] (double currentRangeStart,
                                           double currentRangeEnd,
-                                          double mappedValue) mutable {
+                                          double mappedValue) mutable
+    {
         range.start = (float) currentRangeStart;
         range.end = (float) currentRangeEnd;
         return (double) range.convertTo0to1 ((float) mappedValue);
@@ -55,7 +59,8 @@ SliderAttachment<State>::SliderAttachment (FloatParameter& param,
 
     auto snapToLegalValueFunction = [range] (double currentRangeStart,
                                              double currentRangeEnd,
-                                             double mappedValue) mutable {
+                                             double mappedValue) mutable
+    {
         range.start = (float) currentRangeStart;
         range.end = (float) currentRangeEnd;
         return (double) range.snapToLegalValue ((float) mappedValue);

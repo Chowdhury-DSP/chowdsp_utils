@@ -79,7 +79,8 @@ struct basic_math_test
         array_type expected;
         std::transform(
             lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-            [](const value_type& l, const value_type& r) { return std::fmod(l, r); });
+            [](const value_type& l, const value_type& r)
+            { return std::fmod(l, r); });
         batch_type res = xsimd::fmod(batch_lhs(), batch_rhs());
         CHECK_BATCH_EQ(res, expected);
     }
@@ -88,7 +89,8 @@ struct basic_math_test
     {
         array_type expected;
         std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                       [](const value_type& l, const value_type& r) { return std::remainder(l, r); });
+                       [](const value_type& l, const value_type& r)
+                       { return std::remainder(l, r); });
         batch_type res = xsimd::remainder(batch_lhs(), batch_rhs());
         CHECK_BATCH_EQ(res, expected);
     }
@@ -97,7 +99,8 @@ struct basic_math_test
     {
         array_type expected;
         std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                       [](const value_type& l, const value_type& r) { return std::fdim(l, r); });
+                       [](const value_type& l, const value_type& r)
+                       { return std::fdim(l, r); });
         batch_type res = xsimd::fdim(batch_lhs(), batch_rhs());
         CHECK_BATCH_EQ(res, expected);
     }
@@ -108,7 +111,8 @@ struct basic_math_test
         value_type clip_hi = static_cast<value_type>(1.);
         array_type expected;
         std::transform(clip_input.cbegin(), clip_input.cend(), expected.begin(),
-                       [clip_lo, clip_hi](const value_type& l) {
+                       [clip_lo, clip_hi](const value_type& l)
+                       {
                            return l < clip_lo ? clip_lo : clip_hi < l ? clip_hi
                                                                       : l;
                        });
@@ -130,7 +134,8 @@ struct basic_math_test
     {
         array_type expected;
         std::transform(from_input.cbegin(), from_input.cend(), rhs.cbegin(), expected.begin(),
-                       [](const value_type& l, const value_type& r) { return std::nextafter(l, r); });
+                       [](const value_type& l, const value_type& r)
+                       { return std::nextafter(l, r); });
         batch_type res = xsimd::nextafter(batch_from_input(), batch_rhs());
         CHECK_BATCH_EQ(res, expected);
     }

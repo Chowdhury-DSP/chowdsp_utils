@@ -26,19 +26,22 @@ public:
         juce::ignoreUnused (G2);
 
         this->initialise (
-            [] (auto x) {
+            [] (auto x)
+            {
                 if (std::abs (x * normFactor) > 1.0)
                     return sign (x);
                 else
                     return ((x * normFactor) - ipow<degree> (x * normFactor) / D) * invNormFactor;
             },
-            [] (auto x) {
+            [] (auto x)
+            {
                 if (std::abs (x * normFactor) > 1.0)
                     return x * sign (x) + G1 - invNormFactor;
                 else
                     return ((normFactor * ipow<2> (x) / 2.0) - (ipow<degree> (normFactor) * ipow<degree + 1> (x) / (D * (D + 1.0)))) * invNormFactor;
             },
-            [] (auto x) {
+            [] (auto x)
+            {
                 if (std::abs (x * normFactor) > 1.0)
                     return ((ipow<2> (x) / 2.0) + G2 + (1.0 / (2.0 * ipow<2> (normFactor))) - G1 * invNormFactor) * sign (x) + x * (G1 - invNormFactor);
                 else

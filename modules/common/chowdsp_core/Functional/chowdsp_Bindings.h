@@ -20,14 +20,16 @@ namespace detail
         template <typename... BackParams>
         auto operator() (BackParams&&... backArgs)
         {
-            return std::apply ([this] (auto... args) { return std::invoke (func, args...); },
+            return std::apply ([this] (auto... args)
+                               { return std::invoke (func, args...); },
                                std::move (std::tuple_cat (frontArgsTuple, std::forward_as_tuple (backArgs...))));
         }
 
         template <typename... BackParams>
         auto operator() (BackParams&&... backArgs) const
         {
-            return std::apply ([this] (auto... args) { return std::invoke (func, args...); },
+            return std::apply ([this] (auto... args)
+                               { return std::invoke (func, args...); },
                                std::move (std::tuple_cat (frontArgsTuple, std::forward_as_tuple (backArgs...))));
         }
     };
@@ -47,14 +49,16 @@ namespace detail
         template <typename... FrontParams>
         auto operator() (FrontParams&&... frontArgs)
         {
-            return std::apply ([this] (auto... args) { return std::invoke (func, args...); },
+            return std::apply ([this] (auto... args)
+                               { return std::invoke (func, args...); },
                                std::move (std::tuple_cat (std::forward_as_tuple (frontArgs...), backArgsTuple)));
         }
 
         template <typename... FrontParams>
         auto operator() (FrontParams&&... frontArgs) const
         {
-            return std::apply ([this] (auto... args) { return std::invoke (func, args...); },
+            return std::apply ([this] (auto... args)
+                               { return std::invoke (func, args...); },
                                std::move (std::tuple_cat (std::forward_as_tuple (frontArgs...), backArgsTuple)));
         }
     };

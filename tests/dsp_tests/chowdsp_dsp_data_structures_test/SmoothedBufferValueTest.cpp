@@ -21,7 +21,8 @@ TEMPLATE_PRODUCT_TEST_CASE ("Smoothed Buffer Value Test", "", chowdsp::SmoothedB
 
     SECTION ("Value Compare Test")
     {
-        auto testSmooth = [=] (auto& ref, auto& comp, FloatType value, int numBlocks) {
+        auto testSmooth = [=] (auto& ref, auto& comp, FloatType value, int numBlocks)
+        {
             ref.setTargetValue (value);
             for (int i = 0; i < numBlocks; ++i)
             {

@@ -50,7 +50,8 @@ struct error_gamma_test
         // erf
         {
             std::transform(input.cbegin(), input.cend(), expected.begin(),
-                           [](const value_type& v) { return std::erf(v); });
+                           [](const value_type& v)
+                           { return std::erf(v); });
             batch_type in, out;
             for (size_t i = 0; i < nb_input; i += size)
             {
@@ -65,7 +66,8 @@ struct error_gamma_test
         // erfc
         {
             std::transform(input.cbegin(), input.cend(), expected.begin(),
-                           [](const value_type& v) { return std::erfc(v); });
+                           [](const value_type& v)
+                           { return std::erfc(v); });
             batch_type in, out;
             for (size_t i = 0; i < nb_input; i += size)
             {
@@ -84,7 +86,8 @@ struct error_gamma_test
         // tgamma
         {
             std::transform(gamma_input.cbegin(), gamma_input.cend(), expected.begin(),
-                           [](const value_type& v) { return std::tgamma(v); });
+                           [](const value_type& v)
+                           { return std::tgamma(v); });
             batch_type in, out;
             for (size_t i = 0; i < nb_input; i += size)
             {
@@ -99,7 +102,8 @@ struct error_gamma_test
         // tgamma (negative input)
         {
             std::transform(gamma_neg_input.cbegin(), gamma_neg_input.cend(), expected.begin(),
-                           [](const value_type& v) { return std::tgamma(v); });
+                           [](const value_type& v)
+                           { return std::tgamma(v); });
             batch_type in, out;
             for (size_t i = 0; i < nb_input; i += size)
             {
@@ -114,7 +118,8 @@ struct error_gamma_test
         // lgamma
         {
             std::transform(gamma_input.cbegin(), gamma_input.cend(), expected.begin(),
-                           [](const value_type& v) { return std::lgamma(v); });
+                           [](const value_type& v)
+                           { return std::lgamma(v); });
             batch_type in, out;
             for (size_t i = 0; i < nb_input; i += size)
             {
@@ -131,7 +136,8 @@ struct error_gamma_test
         // tgamma (negative input)
         {
             std::transform(gamma_neg_input.cbegin(), gamma_neg_input.cend(), expected.begin(),
-                           [](const value_type& v) { return std::lgamma(v); });
+                           [](const value_type& v)
+                           { return std::lgamma(v); });
             batch_type in, out;
             for (size_t i = 0; i < nb_input; i += size)
             {
