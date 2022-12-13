@@ -1,5 +1,3 @@
-#include "chowdsp_BufferMath.h"
-
 namespace chowdsp::BufferMath
 {
 template <typename BufferType>
@@ -229,7 +227,7 @@ void applyGain (const BufferType1& bufferSrc, BufferType2& bufferDest, FloatType
 
     for (int ch = 0; ch < numChannels; ++ch)
     {
-        auto* dataIn = bufferSrc.getReadPointer (ch);
+        const auto* dataIn = bufferSrc.getReadPointer (ch);
         auto* dataOut = bufferDest.getWritePointer (ch);
 
         if constexpr (std::is_floating_point_v<SampleType>)
@@ -247,48 +245,74 @@ void applyGain (const BufferType1& bufferSrc, BufferType2& bufferDest, FloatType
 template <typename BufferType, typename SmoothedValueType>
 void applyGainSmoothed (BufferType& buffer, SmoothedValueType& gain) noexcept
 {
+    applyGainSmoothed (buffer, buffer, gain);
+}
+
+template <typename BufferType1, typename SmoothedValueType, typename BufferType2>
+void applyGainSmoothed (const BufferType1& bufferSrc, BufferType2& bufferDest, SmoothedValueType& gain) noexcept
+{
     if (! gain.isSmoothing())
     {
-        applyGain (buffer, gain.getCurrentValue());
+        applyGain (bufferSrc, bufferDest, gain.getCurrentValue());
         return;
     }
 
-    const auto numChannels = buffer.getNumChannels();
-    const auto numSamples = buffer.getNumSamples();
+    using SampleType = detail::BufferSampleType<BufferType1>;
+    static_assert (std::is_same_v<SampleType, detail::BufferSampleType<BufferType2>>, "Both buffer types must have the same sample type!");
 
-    auto data = buffer.getArrayOfWritePointers();
+    const auto numChannels = bufferSrc.getNumChannels();
+    const auto numSamples = bufferSrc.getNumSamples();
+
+    // both buffers must have the same size
+    jassert (bufferDest.getNumChannels() == numChannels);
+    jassert (bufferDest.getNumSamples() == numSamples);
+
+    const auto dataIn = bufferSrc.getArrayOfReadPointers();
+    auto dataOut = bufferDest.getArrayOfWritePointers();
     for (int n = 0; n < numSamples; ++n)
     {
         const auto sampleGain = gain.getNextValue();
 
         for (int ch = 0; ch < numChannels; ++ch)
-            data[ch][n] *= sampleGain;
+            dataOut[ch][n] = dataIn[ch][n] * sampleGain;
     }
 }
 
 template <typename BufferType, typename SmoothedBufferType>
 void applyGainSmoothedBuffer (BufferType& buffer, SmoothedBufferType& gain) noexcept
 {
-    using SampleType = detail::BufferSampleType<BufferType>;
+    applyGainSmoothedBuffer (buffer, buffer, gain);
+}
 
+template <typename BufferType1, typename SmoothedBufferType, typename BufferType2>
+void applyGainSmoothedBuffer (const BufferType1& bufferSrc, BufferType2& bufferDest, SmoothedBufferType& gain) noexcept
+{
     if (! gain.isSmoothing())
     {
-        applyGain (buffer, gain.getCurrentValue());
+        applyGain (bufferSrc, bufferDest, gain.getCurrentValue());
         return;
     }
 
-    const auto numChannels = buffer.getNumChannels();
-    const auto numSamples = buffer.getNumSamples();
+    using SampleType = detail::BufferSampleType<BufferType1>;
+    static_assert (std::is_same_v<SampleType, detail::BufferSampleType<BufferType2>>, "Both buffer types must have the same sample type!");
 
-    auto audioData = buffer.getArrayOfWritePointers();
+    const auto numChannels = bufferSrc.getNumChannels();
+    const auto numSamples = bufferSrc.getNumSamples();
+
+    // both buffers must have the same size
+    jassert (bufferDest.getNumChannels() == numChannels);
+    jassert (bufferDest.getNumSamples() == numSamples);
+
+    const auto audioDataIn = bufferDest.getArrayOfReadPointers();
+    auto audioDataOut = bufferDest.getArrayOfWritePointers();
     const auto gainData = gain.getSmoothedBuffer();
 
     for (int ch = 0; ch < numChannels; ++ch)
     {
         if constexpr (std::is_floating_point_v<SampleType>)
-            juce::FloatVectorOperations::multiply (audioData[ch], gainData, numSamples);
+            juce::FloatVectorOperations::multiply (audioDataOut[ch], audioDataIn[ch], gainData, numSamples);
         else if constexpr (SampleTypeHelpers::IsSIMDRegister<SampleType>)
-            std::transform (audioData[ch], audioData[ch] + numSamples, gainData, audioData[ch], [] (const auto& x, const auto& g)
+            std::transform (audioDataIn[ch], audioDataIn[ch] + numSamples, gainData, audioDataOut[ch], [] (const auto& x, const auto& g)
                             { return x * g; });
     }
 }
@@ -322,37 +346,76 @@ bool sanitizeBuffer (BufferType& buffer, FloatType ceiling) noexcept
 }
 
 template <typename BufferType, typename FunctionType>
-void applyFunction (BufferType& buffer, FunctionType&& function)
+void applyFunction (BufferType& buffer, FunctionType&& function) noexcept
 {
-    const auto numChannels = buffer.getNumChannels();
-    const auto numSamples = buffer.getNumSamples();
+    applyFunction (buffer, buffer, std::forward<FunctionType> (function));
+}
+
+template <typename BufferType1, typename BufferType2, typename FunctionType>
+void applyFunction (const BufferType1& bufferSrc, BufferType2& bufferDest, FunctionType&& function) noexcept
+{
+    using SampleType = detail::BufferSampleType<BufferType1>;
+    static_assert (std::is_same_v<SampleType, detail::BufferSampleType<BufferType2>>, "Both buffer types must have the same sample type!");
+
+    const auto numChannels = bufferSrc.getNumChannels();
+    const auto numSamples = bufferSrc.getNumSamples();
+
+    // both buffers must have the same size
+    jassert (bufferDest.getNumChannels() == numChannels);
+    jassert (bufferDest.getNumSamples() == numSamples);
 
     for (int ch = 0; ch < numChannels; ++ch)
     {
-        auto* data = buffer.getWritePointer (ch);
+        const auto* dataIn = bufferSrc.getReadPointer (ch);
+        auto* dataOut = bufferDest.getWritePointer (ch);
         for (int n = 0; n < numSamples; ++n)
-            data[n] = function (data[n]);
+            dataOut[n] = function (dataIn[n]);
     }
 }
 
 #if ! CHOWDSP_NO_XSIMD
 template <typename BufferType, typename FunctionType, typename FloatType>
-std::enable_if_t<std::is_floating_point_v<FloatType>, void> applyFunctionSIMD (BufferType& buffer, FunctionType&& function)
+std::enable_if_t<std::is_floating_point_v<FloatType>, void> applyFunctionSIMD (BufferType& buffer, FunctionType&& function) noexcept
 {
     applyFunctionSIMD (buffer, std::forward<FunctionType> (function), std::forward<FunctionType> (function));
 }
 
+template <typename BufferType1, typename BufferType2, typename FunctionType, typename FloatType>
+std::enable_if_t<std::is_floating_point_v<FloatType>, void>
+    applyFunctionSIMD (const BufferType1& bufferSrc, BufferType2& bufferDest, FunctionType&& function) noexcept
+{
+    applyFunctionSIMD (bufferSrc, bufferDest, std::forward<FunctionType> (function), std::forward<FunctionType> (function));
+}
+
 template <typename BufferType, typename SIMDFunctionType, typename ScalarFunctionType, typename FloatType>
-std::enable_if_t<std::is_floating_point_v<FloatType>, void> applyFunctionSIMD (BufferType& buffer, SIMDFunctionType&& simdFunction, ScalarFunctionType&& scalarFunction)
+std::enable_if_t<std::is_floating_point_v<FloatType>, void>
+    applyFunctionSIMD (BufferType& buffer, SIMDFunctionType&& simdFunction, ScalarFunctionType&& scalarFunction) noexcept
+{
+    applyFunctionSIMD (buffer, buffer, std::forward<SIMDFunctionType> (simdFunction), std::forward<ScalarFunctionType> (scalarFunction));
+}
+
+template <typename BufferType1, typename BufferType2, typename SIMDFunctionType, typename ScalarFunctionType, typename FloatType>
+std::enable_if_t<std::is_floating_point_v<FloatType>, void>
+    applyFunctionSIMD (const BufferType1& bufferSrc, BufferType2& bufferDest, SIMDFunctionType&& simdFunction, ScalarFunctionType&& scalarFunction) noexcept
 {
 #if CHOWDSP_USING_JUCE
-    static_assert (! std::is_same_v<BufferType, juce::AudioBuffer<FloatType>>,
+    static_assert (! std::is_same_v<BufferType1, juce::AudioBuffer<FloatType>>,
+                   "applyFunctionSIMD expects that the buffers channel data will be aligned"
+                   "which cannot be guaranteed with juce::AudioBuffer!");
+    static_assert (! std::is_same_v<BufferType2, juce::AudioBuffer<FloatType>>,
                    "applyFunctionSIMD expects that the buffers channel data will be aligned"
                    "which cannot be guaranteed with juce::AudioBuffer!");
 #endif
 
-    const auto numChannels = buffer.getNumChannels();
-    const auto numSamples = buffer.getNumSamples();
+    using SampleType = detail::BufferSampleType<BufferType1>;
+    static_assert (std::is_same_v<SampleType, detail::BufferSampleType<BufferType2>>, "Both buffer types must have the same sample type!");
+
+    const auto numChannels = bufferSrc.getNumChannels();
+    const auto numSamples = bufferSrc.getNumSamples();
+
+    // both buffers must have the same size
+    jassert (bufferDest.getNumChannels() == numChannels);
+    jassert (bufferDest.getNumSamples() == numSamples);
 
     static constexpr auto vecSize = (int) xsimd::batch<FloatType>::size;
     auto numVecOps = numSamples / vecSize;
@@ -360,16 +423,18 @@ std::enable_if_t<std::is_floating_point_v<FloatType>, void> applyFunctionSIMD (B
 
     for (int ch = 0; ch < numChannels; ++ch)
     {
-        auto* data = buffer.getWritePointer (ch);
+        const auto* dataIn = bufferSrc.getReadPointer (ch);
+        auto* dataOut = bufferDest.getWritePointer (ch);
 
         while (--numVecOps >= 0)
         {
-            xsimd::store_aligned (data, simdFunction (xsimd::load_aligned (data)));
-            data += vecSize;
+            xsimd::store_aligned (dataOut, simdFunction (xsimd::load_aligned (dataIn)));
+            dataIn += vecSize;
+            dataOut += vecSize;
         }
 
         for (int n = 0; n < leftoverValues; ++n)
-            data[n] = scalarFunction (data[n]);
+            dataOut[n] = scalarFunction (dataIn[n]);
     }
 }
 #endif // ! CHOWDSP_NO_XSIMD
