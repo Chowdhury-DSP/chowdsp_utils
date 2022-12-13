@@ -10,7 +10,7 @@ inline juce::String toString (const std::string_view& sv) noexcept
 }
 #endif
 
-#if __cplusplus >= 202002L
+#if (defined(__cplusplus) && __cplusplus >= 202002L) || (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L)
 #ifndef DOXYGEN
 namespace string_helpers_detail
 {
