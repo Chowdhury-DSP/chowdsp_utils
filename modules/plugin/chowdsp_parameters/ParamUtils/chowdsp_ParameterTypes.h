@@ -211,4 +211,48 @@ public:
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FreqHzParameter)
 };
+
+class TimeMsParameter : public FloatParameter
+{
+public:
+    TimeMsParameter (const ParameterID& parameterID,
+                     const juce::String& paramName,
+                     const juce::NormalisableRange<float>& paramRange,
+                     float defaultValue)
+        : FloatParameter (parameterID,
+                          paramName,
+                          paramRange,
+                          defaultValue,
+                          &ParamUtils::timeMsValToString,
+                          &ParamUtils::stringToTimeMsVal)
+    {
+    }
+
+    using Ptr = OptionalPointer<TimeMsParameter>;
+
+private:
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TimeMsParameter)
+};
+
+class RatioParameter : public FloatParameter
+{
+public:
+    RatioParameter (const ParameterID& parameterID,
+                    const juce::String& paramName,
+                    const juce::NormalisableRange<float>& paramRange,
+                    float defaultValue)
+        : FloatParameter (parameterID,
+                          paramName,
+                          paramRange,
+                          defaultValue,
+                          &ParamUtils::ratioValToString,
+                          &ParamUtils::stringToRatioVal)
+    {
+    }
+
+    using Ptr = OptionalPointer<RatioParameter>;
+
+private:
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (RatioParameter)
+};
 } // namespace chowdsp

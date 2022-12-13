@@ -29,12 +29,11 @@ void createGainDBParameter (Parameters& params, const ParameterID& id, const juc
 
 void createTimeMsParameter (Parameters& params, const ParameterID& id, const juce::String& name, const juce::NormalisableRange<float>& range, float defaultValue)
 {
-    emplace_param<FloatParameter> (params, id, name, range, defaultValue, &timeMsValToString, &stringToTimeMsVal);
+    emplace_param<TimeMsParameter> (params, id, name, range, defaultValue);
 }
 
 void createRatioParameter (Parameters& params, const ParameterID& id, const juce::String& name, const juce::NormalisableRange<float>& range, float defaultValue)
 {
-    emplace_param<FloatParameter> (params, id, name, range, defaultValue, &ratioValToString, &stringToRatioVal);
+    emplace_param<RatioParameter> (params, id, name, range, defaultValue);
 }
-
 } // namespace chowdsp::ParamUtils
