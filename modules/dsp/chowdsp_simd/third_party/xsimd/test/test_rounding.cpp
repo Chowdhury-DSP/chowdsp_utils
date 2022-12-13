@@ -60,7 +60,8 @@ struct rounding_test
         // ceil
         {
             std::transform(input.cbegin(), input.cend(), expected.begin(),
-                           [](const value_type& v) { return std::ceil(v); });
+                           [](const value_type& v)
+                           { return std::ceil(v); });
             batch_type in, out;
             for (size_t i = 0; i < nb_batches; i += size)
             {
@@ -79,7 +80,8 @@ struct rounding_test
         // floor
         {
             std::transform(input.cbegin(), input.cend(), expected.begin(),
-                           [](const value_type& v) { return std::floor(v); });
+                           [](const value_type& v)
+                           { return std::floor(v); });
             batch_type in, out;
             for (size_t i = 0; i < nb_batches; i += size)
             {
@@ -98,7 +100,8 @@ struct rounding_test
         // trunc
         {
             std::transform(input.cbegin(), input.cend(), expected.begin(),
-                           [](const value_type& v) { return std::trunc(v); });
+                           [](const value_type& v)
+                           { return std::trunc(v); });
             batch_type in, out;
             for (size_t i = 0; i < nb_batches; i += size)
             {
@@ -117,7 +120,8 @@ struct rounding_test
         // round
         {
             std::transform(input.cbegin(), input.cend(), expected.begin(),
-                           [](const value_type& v) { return std::round(v); });
+                           [](const value_type& v)
+                           { return std::round(v); });
             batch_type in, out;
             for (size_t i = 0; i < nb_batches; i += size)
             {
@@ -136,7 +140,8 @@ struct rounding_test
         // nearbyint
         {
             std::transform(input.cbegin(), input.cend(), expected.begin(),
-                           [](const value_type& v) { return std::nearbyint(v); });
+                           [](const value_type& v)
+                           { return std::nearbyint(v); });
             batch_type in, out;
             for (size_t i = 0; i < nb_batches; i += size)
             {
@@ -157,7 +162,8 @@ struct rounding_test
             std::array<int_value_type, nb_input> expected;
             std::array<int_value_type, nb_input> res;
             std::transform(input.cbegin(), input.cend(), expected.begin(),
-                           [](const value_type& v) { return detail::nearbyint_as_int(v); });
+                           [](const value_type& v)
+                           { return detail::nearbyint_as_int(v); });
             batch_type in;
             int_batch_type out;
             for (size_t i = 0; i < nb_batches; i += size)
@@ -177,7 +183,8 @@ struct rounding_test
         // rint
         {
             std::transform(input.cbegin(), input.cend(), expected.begin(),
-                           [](const value_type& v) { return std::rint(v); });
+                           [](const value_type& v)
+                           { return std::rint(v); });
             batch_type in, out;
             for (size_t i = 0; i < nb_batches; i += size)
             {

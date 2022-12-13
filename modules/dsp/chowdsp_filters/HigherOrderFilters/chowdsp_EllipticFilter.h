@@ -44,7 +44,8 @@ public:
         juce::ignoreUnused (qVal);
 
         FloatType bCoefs[3], bOppCoefs[3], aCoefs[3];
-        auto calcBaseCoefficients = [&] (FloatType stageFreqOff, FloatType stageQ) {
+        auto calcBaseCoefficients = [&] (FloatType stageFreqOff, FloatType stageQ)
+        {
             switch (type)
             {
                 case EllipticFilterType::Lowpass:
@@ -58,7 +59,8 @@ public:
             }
         };
 
-        auto calcCoefsForQ = [&] (FloatType stageFreqOff, FloatType stageQ, FloatType stageLPGain, size_t stageOrder) {
+        auto calcCoefsForQ = [&] (FloatType stageFreqOff, FloatType stageQ, FloatType stageLPGain, size_t stageOrder)
+        {
             calcBaseCoefficients (stageFreqOff, stageQ);
 
             for (size_t i = 0; i < 3; ++i)
@@ -146,7 +148,8 @@ private:
         // (see _arc_jac_cn [1]) suggests 5.
         constexpr int ARC_JAC_SN_MAXITER = 10;
 
-        auto complement = [] (auto kx) {
+        auto complement = [] (auto kx)
+        {
             return std::pow ((1.0 - kx) * (1.0 + kx), 0.5);
         };
 
@@ -172,7 +175,8 @@ private:
             }
         }
 
-        const auto K = std::accumulate (ks.begin() + 1, ks.end(), 1.0, [] (double prev, double next) { return prev * (1.0 + next); })
+        const auto K = std::accumulate (ks.begin() + 1, ks.end(), 1.0, [] (double prev, double next)
+                                        { return prev * (1.0 + next); })
                        * juce::MathConstants<double>::pi * 0.5;
 
         std::vector<std::complex<double>> wns { w };
@@ -208,7 +212,8 @@ private:
     /** mostly a re-implementation of scipy.signal.cheb2ap */
     static void ellipap (PZSet& poles, PZSet& zeros)
     {
-        auto pow10m1 = [] (double x) {
+        auto pow10m1 = [] (double x)
+        {
             return std::exp (std::log (10.0) * x) - 1.0;
         };
 

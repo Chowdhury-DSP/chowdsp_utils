@@ -212,7 +212,8 @@ struct batch_complex_test
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return l + r.real(); });
+                           [](const value_type& l, const value_type& r)
+                           { return l + r.real(); });
             batch_type lres = batch_lhs() + batch_rhs().real();
             CHECK_BATCH_EQ(lres, expected);
             batch_type rres = batch_rhs().real() + batch_lhs();
@@ -248,11 +249,13 @@ struct batch_complex_test
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return l - r.real(); });
+                           [](const value_type& l, const value_type& r)
+                           { return l - r.real(); });
             batch_type lres = batch_lhs() - batch_rhs().real();
             CHECK_BATCH_EQ(lres, expected);
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return r.real() - l; });
+                           [](const value_type& l, const value_type& r)
+                           { return r.real() - l; });
             batch_type rres = batch_rhs().real() - batch_lhs();
             CHECK_BATCH_EQ(rres, expected);
         }
@@ -286,7 +289,8 @@ struct batch_complex_test
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return l * r.real(); });
+                           [](const value_type& l, const value_type& r)
+                           { return l * r.real(); });
             batch_type lres = batch_lhs() * batch_rhs().real();
             CHECK_BATCH_EQ(lres, expected);
             batch_type rres = batch_rhs().real() * batch_lhs();
@@ -322,11 +326,13 @@ struct batch_complex_test
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return l / r.real(); });
+                           [](const value_type& l, const value_type& r)
+                           { return l / r.real(); });
             batch_type lres = batch_lhs() / batch_rhs().real();
             CHECK_BATCH_EQ(lres, expected);
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return r.real() / l; });
+                           [](const value_type& l, const value_type& r)
+                           { return r.real() / l; });
             batch_type rres = batch_rhs().real() / batch_lhs();
             CHECK_BATCH_EQ(rres, expected);
         }
@@ -365,7 +371,8 @@ struct batch_complex_test
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return l + r.real(); });
+                           [](const value_type& l, const value_type& r)
+                           { return l + r.real(); });
             batch_type res = batch_lhs();
             res += batch_rhs().real();
             CHECK_BATCH_EQ(res, expected);
@@ -398,7 +405,8 @@ struct batch_complex_test
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return l - r.real(); });
+                           [](const value_type& l, const value_type& r)
+                           { return l - r.real(); });
             batch_type res = batch_lhs();
             res -= batch_rhs().real();
             CHECK_BATCH_EQ(res, expected);
@@ -431,7 +439,8 @@ struct batch_complex_test
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return l * r.real(); });
+                           [](const value_type& l, const value_type& r)
+                           { return l * r.real(); });
             batch_type res = batch_lhs();
             res *= batch_rhs().real();
             CHECK_BATCH_EQ(res, expected);
@@ -464,7 +473,8 @@ struct batch_complex_test
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.cbegin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return l / r.real(); });
+                           [](const value_type& l, const value_type& r)
+                           { return l / r.real(); });
             batch_type res = batch_lhs();
             res /= batch_rhs().real();
             CHECK_BATCH_EQ(res, expected);
@@ -485,7 +495,8 @@ struct batch_complex_test
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [](const value_type& v) { using std::conj; return conj(v); });
+                           [](const value_type& v)
+                           { using std::conj; return conj(v); });
             batch_type res = conj(batch_lhs());
             CHECK_BATCH_EQ(res, expected);
         }
@@ -493,7 +504,8 @@ struct batch_complex_test
         {
             real_array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [](const value_type& v) { using std::norm; return norm(v); });
+                           [](const value_type& v)
+                           { using std::norm; return norm(v); });
             real_batch_type res = norm(batch_lhs());
             CHECK_BATCH_EQ(res, expected);
         }
@@ -501,7 +513,8 @@ struct batch_complex_test
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [](const value_type& v) { using std::proj; return proj(v); });
+                           [](const value_type& v)
+                           { using std::proj; return proj(v); });
             batch_type res = proj(batch_lhs());
             CHECK_BATCH_EQ(res, expected);
         }
@@ -513,7 +526,8 @@ struct batch_complex_test
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [](const value_type& v) { return std::conj(std::real(v)); });
+                           [](const value_type& v)
+                           { return std::conj(std::real(v)); });
             batch_type res = conj(real(batch_lhs()));
             CHECK_BATCH_EQ(res, expected);
         }
@@ -521,7 +535,8 @@ struct batch_complex_test
         {
             real_array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [](const value_type& v) { return std::norm(std::real(v)); });
+                           [](const value_type& v)
+                           { return std::norm(std::real(v)); });
             real_batch_type res = norm(real(batch_lhs()));
             CHECK_BATCH_EQ(res, expected);
         }
@@ -529,7 +544,8 @@ struct batch_complex_test
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [](const value_type& v) { return std::proj(std::real(v)); });
+                           [](const value_type& v)
+                           { return std::proj(std::real(v)); });
             batch_type res = proj(real(batch_lhs()));
             CHECK_BATCH_EQ(res, expected);
         }
@@ -541,7 +557,8 @@ struct batch_complex_test
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.begin(), expected.begin(),
-                           [](const value_type& v_lhs, const value_type& v_rhs) { return std::polar(std::real(v_lhs), std::real(v_rhs)); });
+                           [](const value_type& v_lhs, const value_type& v_rhs)
+                           { return std::polar(std::real(v_lhs), std::real(v_rhs)); });
             batch_type res = polar(real(batch_lhs()), real(batch_rhs()));
             CHECK_BATCH_EQ(res, expected);
         }
@@ -563,7 +580,8 @@ struct batch_complex_test
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.begin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return l * r + r; });
+                           [](const value_type& l, const value_type& r)
+                           { return l * r + r; });
             batch_type res = xsimd::fma(batch_lhs(), batch_rhs(), batch_rhs());
             CHECK_BATCH_EQ(res, expected);
         }
@@ -571,7 +589,8 @@ struct batch_complex_test
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.begin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return l * r - r; });
+                           [](const value_type& l, const value_type& r)
+                           { return l * r - r; });
             batch_type res = fms(batch_lhs(), batch_rhs(), batch_rhs());
             CHECK_BATCH_EQ(res, expected);
         }
@@ -580,7 +599,8 @@ struct batch_complex_test
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.begin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return -l * r + r; });
+                           [](const value_type& l, const value_type& r)
+                           { return -l * r + r; });
             batch_type res = fnma(batch_lhs(), batch_rhs(), batch_rhs());
             CHECK_BATCH_EQ(res, expected);
         }
@@ -588,7 +608,8 @@ struct batch_complex_test
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), rhs.begin(), expected.begin(),
-                           [](const value_type& l, const value_type& r) { return -l * r - r; });
+                           [](const value_type& l, const value_type& r)
+                           { return -l * r - r; });
             batch_type res = fnms(batch_lhs(), batch_rhs(), batch_rhs());
             CHECK_BATCH_EQ(res, expected);
         }
@@ -600,7 +621,8 @@ struct batch_complex_test
         {
             array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [](const value_type& l) { return l == value_type(0); });
+                           [](const value_type& l)
+                           { return l == value_type(0); });
             batch_type res = (batch_type)!batch_lhs();
             CHECK_BATCH_EQ(res, expected);
         }
@@ -611,7 +633,8 @@ struct batch_complex_test
         {
             bool_array_type expected;
             std::transform(lhs.cbegin(), lhs.cend(), expected.begin(),
-                           [](const value_type& l) { return std::isnan(l.real()) || std::isnan(l.imag()); });
+                           [](const value_type& l)
+                           { return std::isnan(l.real()) || std::isnan(l.imag()); });
             typename batch_type::batch_bool_type res = isnan(batch_lhs());
             CHECK_BATCH_EQ(res, expected);
         }

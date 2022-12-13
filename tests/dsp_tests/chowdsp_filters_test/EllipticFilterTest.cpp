@@ -10,7 +10,8 @@ constexpr float fc = 1000.0f;
 template <typename T, typename Filter>
 void testFilter (Filter& filt, std::vector<float> freqs, std::vector<float> mags, std::vector<float> errs, const std::vector<std::string>& messages)
 {
-    auto testFrequency = [&filt] (float freq, float expGain, float err, const std::string& message) {
+    auto testFrequency = [&filt] (float freq, float expGain, float err, const std::string& message)
+    {
         auto buffer = test_utils::makeSineWave<T> (freq, Constants::fs, 1.0f);
 
         filt.reset();

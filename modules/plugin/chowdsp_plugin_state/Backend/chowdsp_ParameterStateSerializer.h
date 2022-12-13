@@ -68,10 +68,7 @@ namespace PluginStateSerializer
                              [&serial] (const auto& stateObject)
                              {
                                  using Type = std::decay_t<decltype (stateObject)>;
-                                 if constexpr (! (ParameterTypeHelpers::IsParameterPointerType<Type>
-                                                  || PluginStateHelpers::IsStateValue<Type>
-                                                  || ParameterTypeHelpers::IsHelperType<Type>
-                                                  || TypeTraits::IsIterable<Type>) )
+                                 if constexpr (! (ParameterTypeHelpers::IsParameterPointerType<Type> || PluginStateHelpers::IsStateValue<Type> || ParameterTypeHelpers::IsHelperType<Type> || TypeTraits::IsIterable<Type>) )
                                  {
                                      Serializer::addChildElement (serial, detail::getObjectName (stateObject));
                                      Serializer::addChildElement (serial, serialize<Serializer> (stateObject));

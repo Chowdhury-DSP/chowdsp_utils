@@ -106,7 +106,8 @@ public:
         expectEquals (testParam->getName (1024), juce::String ("Custom Name"), "Custom parameter name is incorrect!");
 
         std::atomic<bool> threadFinished { false };
-        juce::Thread::launch ([&] {
+        juce::Thread::launch ([&]
+                              {
             constexpr float error = 1.0e-6f;
             constexpr float value1 = 0.8f;
 

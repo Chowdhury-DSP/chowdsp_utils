@@ -37,7 +37,8 @@ struct constant_batch_test
         array_type expected;
         size_t i = 0;
         std::generate(expected.begin(), expected.end(),
-                      [&i]() { return generator::get(i++, size); });
+                      [&i]()
+                      { return generator::get(i++, size); });
         constexpr auto b = xsimd::make_batch_constant<batch_type, generator>();
         INFO("batch(value_type)");
         CHECK_BATCH_EQ((batch_type)b, expected);
@@ -56,7 +57,8 @@ struct constant_batch_test
         array_type expected;
         size_t i = 0;
         std::generate(expected.begin(), expected.end(),
-                      [&i]() { return arange::get(i++, size); });
+                      [&i]()
+                      { return arange::get(i++, size); });
         constexpr auto b = xsimd::make_batch_constant<batch_type, arange>();
         INFO("batch(value_type)");
         CHECK_BATCH_EQ((batch_type)b, expected);
@@ -116,7 +118,8 @@ struct constant_bool_batch_test
         bool_array_type expected;
         size_t i = 0;
         std::generate(expected.begin(), expected.end(),
-                      [&i]() { return generator::get(i++, size); });
+                      [&i]()
+                      { return generator::get(i++, size); });
         constexpr auto b = xsimd::make_batch_bool_constant<batch_type, generator>();
         INFO("batch_bool_constant(value_type)");
         CHECK_BATCH_EQ((batch_bool_type)b, expected);
@@ -135,7 +138,8 @@ struct constant_bool_batch_test
         bool_array_type expected;
         size_t i = 0;
         std::generate(expected.begin(), expected.end(),
-                      [&i]() { return split::get(i++, size); });
+                      [&i]()
+                      { return split::get(i++, size); });
         constexpr auto b = xsimd::make_batch_bool_constant<batch_type, split>();
         INFO("batch_bool_constant(value_type)");
         CHECK_BATCH_EQ((batch_bool_type)b, expected);

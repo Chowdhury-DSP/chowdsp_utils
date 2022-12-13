@@ -41,7 +41,8 @@ public:
     template <typename MapFuncType>
     void parameterCompareTest (MapFuncType&& mapFunc)
     {
-        auto testSmooth = [=] (auto& ref, auto& comp, auto* param, FloatType value, int numBlocks) {
+        auto testSmooth = [=] (auto& ref, auto& comp, auto* param, FloatType value, int numBlocks)
+        {
             ref.setTargetValue (value);
             param->setValueNotifyingHost ((float) value);
 
@@ -65,7 +66,8 @@ public:
         juce::SmoothedValue<FloatType, SmoothingType> refSmooth;
 
         compSmooth.setParameterHandle (vts.getRawParameterValue ("dummy"));
-        compSmooth.mappingFunction = [&] (auto x) { return mapFunc (x); };
+        compSmooth.mappingFunction = [&] (auto x)
+        { return mapFunc (x); };
         compSmooth.prepare (fs, maxBlockSize);
         compSmooth.setRampLength (rampLegnth1);
 
@@ -78,10 +80,12 @@ public:
     void runTestTimed() override
     {
         beginTest ("Parameter Compare Test");
-        parameterCompareTest ([] (auto x) { return x; });
+        parameterCompareTest ([] (auto x)
+                              { return x; });
 
         beginTest ("Parameter Mapping Test");
-        parameterCompareTest ([] (auto x) { return std::pow (x, 10.0f); });
+        parameterCompareTest ([] (auto x)
+                              { return std::pow (x, 10.0f); });
     }
 };
 

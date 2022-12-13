@@ -154,7 +154,10 @@ TEST_CASE ("enum_cast")
         constexpr auto cr = enum_cast<Color> ("red");
         REQUIRE (cr.value() == Color::RED);
         REQUIRE (enum_cast<Color&> ("GREEN").value() == Color::GREEN);
-        REQUIRE (enum_cast<Color> ("blue", [] (char lhs, char rhs) { return std::tolower (lhs) == std::tolower (rhs); }).value() == Color::BLUE);
+        REQUIRE (enum_cast<Color> ("blue", [] (char lhs, char rhs)
+                                   { return std::tolower (lhs) == std::tolower (rhs); })
+                     .value()
+                 == Color::BLUE);
         REQUIRE_FALSE (enum_cast<Color> ("None").has_value());
 
         constexpr auto no = enum_cast<Numbers> ("one");
@@ -437,7 +440,8 @@ TEST_CASE ("enum_contains")
         constexpr auto cr = "red";
         REQUIRE (enum_contains<Color> (cr));
         REQUIRE (enum_contains<Color&> ("GREEN"));
-        REQUIRE (enum_contains<Color> ("blue", [] (char lhs, char rhs) { return std::tolower (lhs) == std::tolower (rhs); }));
+        REQUIRE (enum_contains<Color> ("blue", [] (char lhs, char rhs)
+                                       { return std::tolower (lhs) == std::tolower (rhs); }));
         REQUIRE_FALSE (enum_contains<Color> ("None"));
 
         constexpr auto no = std::string_view { "one" };
@@ -728,7 +732,8 @@ TEST_CASE ("enum_entries")
 
 TEST_CASE ("ostream_operators")
 {
-    auto test_ostream = [] (auto e, std::string name) {
+    auto test_ostream = [] (auto e, std::string name)
+    {
         using namespace magic_enum::ostream_operators;
         std::stringstream ss;
         ss << e;
@@ -775,7 +780,8 @@ TEST_CASE ("ostream_operators")
 
 TEST_CASE ("istream_operators")
 {
-    auto test_istream = [] (const auto e, std::string name) {
+    auto test_istream = [] (const auto e, std::string name)
+    {
         using namespace magic_enum::istream_operators;
         std::istringstream ss (name);
         std::decay_t<decltype (e)> v;
@@ -1170,26 +1176,24 @@ TEST_CASE ("enum_for_each")
     SECTION ("no return type")
     {
         underlying_type_t<Color> sum {};
-        enum_for_each<Color> ([&sum] (auto val) {
+        enum_for_each<Color> ([&sum] (auto val)
+                              {
             constexpr underlying_type_t<Color> v = enum_integer (val());
-            sum += v;
-        });
+            sum += v; });
         REQUIRE (sum == 10);
     }
 
     SECTION ("same return type")
     {
-        constexpr auto workResults = enum_for_each<Color> ([] (auto val) {
-            return DoWork<val>();
-        });
+        constexpr auto workResults = enum_for_each<Color> ([] (auto val)
+                                                           { return DoWork<val>(); });
         REQUIRE (workResults == std::array<std::string_view, 3> { "default", "override", "default" });
     }
 
     SECTION ("different return type")
     {
-        constexpr auto colorInts = enum_for_each<Color> ([] (auto val) {
-            return val;
-        });
+        constexpr auto colorInts = enum_for_each<Color> ([] (auto val)
+                                                         { return val; });
 
         REQUIRE (std::is_same_v<std::remove_const_t<decltype (colorInts)>,
                                 std::tuple<enum_constant<Color::RED>,
@@ -1222,13 +1226,11 @@ struct Foo
 
 TEST_CASE ("constexpr_for")
 {
-    constexpr_for<0, magic_enum::enum_count<Color>(), 1> ([] (auto i) {
-        [[maybe_unused]] Foo<Color, magic_enum::enum_value<Color, i>()> bar {};
-    });
+    constexpr_for<0, magic_enum::enum_count<Color>(), 1> ([] (auto i)
+                                                          { [[maybe_unused]] Foo<Color, magic_enum::enum_value<Color, i>()> bar {}; });
 
-    constexpr_for<0, magic_enum::enum_count<Numbers>(), 1> ([] (auto i) {
-        [[maybe_unused]] Foo<Numbers, magic_enum::enum_value<Numbers, i>()> bar {};
-    });
+    constexpr_for<0, magic_enum::enum_count<Numbers>(), 1> ([] (auto i)
+                                                            { [[maybe_unused]] Foo<Numbers, magic_enum::enum_value<Numbers, i>()> bar {}; });
 }
 
 #if defined(_MSC_VER)

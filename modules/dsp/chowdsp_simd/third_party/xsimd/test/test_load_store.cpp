@@ -275,7 +275,8 @@ private:
         std::default_random_engine generator;
         std::uniform_int_distribution<int> distribution(min, max);
 
-        auto gen = [&distribution, &generator]() {
+        auto gen = [&distribution, &generator]()
+        {
             return static_cast<value_type>(distribution(generator));
         };
 

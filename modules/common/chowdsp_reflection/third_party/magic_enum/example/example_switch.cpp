@@ -57,7 +57,8 @@ int main()
 {
     Color c = Color::RED;
 
-    auto lambda = [] (auto value) {
+    auto lambda = [] (auto value)
+    {
         std::cout << DoWork<value>() << std::endl;
     };
 
@@ -69,10 +70,12 @@ int main()
 
     // with object, explicit enum type
     auto switcher1 = overloaded {
-        [] (magic_enum::enum_constant<Color::BLUE>) {
+        [] (magic_enum::enum_constant<Color::BLUE>)
+        {
             std::cout << "Blue" << std::endl;
         },
-        [] (magic_enum::enum_constant<Color::RED>) {
+        [] (magic_enum::enum_constant<Color::RED>)
+        {
             std::cout << "Red" << std::endl;
         }
     };
@@ -83,7 +86,8 @@ int main()
 
     // explicit result type
     auto switcher2 = overloaded {
-        [] (magic_enum::enum_constant<Color::GREEN>) {
+        [] (magic_enum::enum_constant<Color::GREEN>)
+        {
             return "called with green argument";
         },
         [] (Color other) { // default case
@@ -102,10 +106,12 @@ int main()
     std::cout << magic_enum::enum_switch<std::string> (switcher2, static_cast<Color> (-3), "unrecognized") << std::endl; // prints "unrecognized"
 
     auto switcher3 = overloaded {
-        [] (magic_enum::enum_constant<Color::RED>) -> std::optional<std::string> {
+        [] (magic_enum::enum_constant<Color::RED>) -> std::optional<std::string>
+        {
             return "red result";
         },
-        [] (magic_enum::enum_constant<Color::BLUE>) -> std::optional<std::string> {
+        [] (magic_enum::enum_constant<Color::BLUE>) -> std::optional<std::string>
+        {
             return std::nullopt;
         }
     };

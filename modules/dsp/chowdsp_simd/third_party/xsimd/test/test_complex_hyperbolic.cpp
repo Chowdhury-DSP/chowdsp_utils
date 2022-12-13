@@ -53,7 +53,8 @@ struct complex_hyperbolic_test
     void test_sinh()
     {
         std::transform(input.cbegin(), input.cend(), expected.begin(),
-                       [](const value_type& v) { using std::sinh; return sinh(v); });
+                       [](const value_type& v)
+                       { using std::sinh; return sinh(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -68,7 +69,8 @@ struct complex_hyperbolic_test
     void test_cosh()
     {
         std::transform(input.cbegin(), input.cend(), expected.begin(),
-                       [](const value_type& v) { using std::cosh; return cosh(v); });
+                       [](const value_type& v)
+                       { using std::cosh; return cosh(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -83,7 +85,8 @@ struct complex_hyperbolic_test
     void test_tanh()
     {
         std::transform(input.cbegin(), input.cend(), expected.begin(),
-                       [](const value_type& v) { using std::tanh; return tanh(v); });
+                       [](const value_type& v)
+                       { using std::tanh; return tanh(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -98,7 +101,8 @@ struct complex_hyperbolic_test
     void test_asinh()
     {
         std::transform(input.cbegin(), input.cend(), expected.begin(),
-                       [](const value_type& v) { using std::asinh; return asinh(v); });
+                       [](const value_type& v)
+                       { using std::asinh; return asinh(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -113,7 +117,8 @@ struct complex_hyperbolic_test
     void test_acosh()
     {
         std::transform(acosh_input.cbegin(), acosh_input.cend(), expected.begin(),
-                       [](const value_type& v) { using std::acosh; return acosh(v); });
+                       [](const value_type& v)
+                       { using std::acosh; return acosh(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {
@@ -128,7 +133,8 @@ struct complex_hyperbolic_test
     void test_atanh()
     {
         std::transform(atanh_input.cbegin(), atanh_input.cend(), expected.begin(),
-                       [](const value_type& v) { using std::atanh; return atanh(v); });
+                       [](const value_type& v)
+                       { using std::atanh; return atanh(v); });
         batch_type in, out;
         for (size_t i = 0; i < nb_input; i += size)
         {

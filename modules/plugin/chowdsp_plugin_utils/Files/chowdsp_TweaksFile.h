@@ -57,7 +57,7 @@ private:
 
     json configProperties {};
 
-    Broadcaster<void(PropertyID)> changeBroadcaster;
+    Broadcaster<void (PropertyID)> changeBroadcaster;
 
     juce::CriticalSection lock;
 

@@ -57,7 +57,8 @@ TEST_CASE ("Atomic Helpers Test")
         float x = 0.0f;
 
         std::thread thread1 (
-            [&x] {
+            [&x]
+            {
                 chowdsp::AtomicRef xFreq { x };
                 for (int i = 0; i < 100000; ++i)
                 {
@@ -66,7 +67,8 @@ TEST_CASE ("Atomic Helpers Test")
             });
 
         std::thread thread2 (
-            [&x] {
+            [&x]
+            {
                 chowdsp::AtomicRef xFreq { std::as_const (x) };
                 while (xFreq.load() < 90000.0f)
                 {

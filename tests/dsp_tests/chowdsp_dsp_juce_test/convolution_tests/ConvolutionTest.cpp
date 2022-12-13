@@ -102,7 +102,8 @@ public:
         chowdsp::ConvolutionEngine engine (irSize, irSize);
         engine.setNewIR (testIR.data());
 
-        auto testProcess = [&] (auto& eng) {
+        auto testProcess = [&] (auto& eng)
+        {
             std::vector<float> testOutput (2 * irSize);
             testOutput[0] = 1.0f;
 

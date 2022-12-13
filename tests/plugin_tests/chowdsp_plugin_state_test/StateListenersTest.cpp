@@ -21,7 +21,8 @@ public:
         int listenerCount = 0;
         chowdsp::ScopedCallback listener = state.addParameterListener (*state.params.pct,
                                                                        true,
-                                                                       [this, &listenerCount, &state, &mostRecentParamValue] {
+                                                                       [this, &listenerCount, &state, &mostRecentParamValue]
+                                                                       {
                                                                            expect (juce::MessageManager::getInstance()->isThisTheMessageThread(),
                                                                                    "Listener called on a thread other than the message thread!");
                                                                            expectEquals (state.params.pct->getCurrentValue(),
@@ -54,7 +55,8 @@ public:
         int listenerCount = 0;
         chowdsp::ScopedCallback listener = state.addParameterListener (*state.params.pct,
                                                                        false,
-                                                                       [this, &listenerCount, &state, &mostRecentParamValue] {
+                                                                       [this, &listenerCount, &state, &mostRecentParamValue]
+                                                                       {
                                                                            expectEquals (state.params.pct->getCurrentValue(),
                                                                                          mostRecentParamValue,
                                                                                          "Parameter has the incorrect value when the listener is called!");
@@ -89,7 +91,8 @@ public:
         bool listenerCalled = false;
         chowdsp::PluginState<Params, NonParams> state {};
         const auto listener = state.addNonParameterListener (state.nonParams.value,
-                                                             [this, &state, &listenerCalled] {
+                                                             [this, &state, &listenerCalled]
+                                                             {
                                                                  listenerCalled = true;
                                                                  expectEquals ((int) state.nonParams.value, newValue, "Value after listerner callback is incorrect!");
                                                              });
