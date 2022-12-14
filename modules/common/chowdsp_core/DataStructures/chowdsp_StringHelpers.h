@@ -44,33 +44,4 @@ namespace string_helpers_detail
 template <std::string_view const&... Strs>
 static constexpr auto string_view_concat = string_helpers_detail::concat<Strs...>::value;
 #endif // __cplusplus >= 202002L
-
-/** Concatenates two string_views at run-time */
-template <size_t max_chars = 64>
-struct concatenate_strings
-{
-    concatenate_strings (const std::string_view& sv1, const std::string_view& sv2)
-        : value (concat (sv1.data(), sv1.size(), sv2.data(), sv2.size(), const_cast<char*> (data)))
-    {
-    }
-
-    static std::string_view concat (const char* data1, size_t size1, const char* data2, size_t size2, char* dest)
-    {
-        // max_chars is too small!
-        jassert (max_chars >= size1 + size2);
-
-        const auto size1_clamped = std::min (size1, max_chars);
-        const auto size2_clamped = std::min (size2, max_chars - size1_clamped);
-
-        std::copy (data1, data1 + size1_clamped, dest);
-        std::copy (data2, data2 + size2_clamped, dest + size1);
-        return { dest, size1_clamped + size2_clamped };
-    }
-
-private:
-    const char data[max_chars] {};
-
-public:
-    const std::string_view value;
-};
 } // namespace chowdsp

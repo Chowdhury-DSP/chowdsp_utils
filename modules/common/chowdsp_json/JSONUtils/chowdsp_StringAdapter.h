@@ -9,7 +9,7 @@ struct adl_serializer<juce::String>
 {
     static void to_json (json& j, const juce::String& s)
     {
-        j = s.toStdString();
+        j = s.toUTF8();
     }
 
     static void from_json (const json& j, juce::String& s)

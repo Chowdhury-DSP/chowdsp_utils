@@ -8,23 +8,45 @@ namespace PluginStateSerializer
 #ifndef DOXYGEN
     namespace detail
     {
-        template <typename T>
-        constexpr std::string_view getObjectName (const T& object)
+        template <typename StringType>
+        juce::String getName (const StringType& str)
         {
-            std::string_view name {};
+            static_assert (ParameterTypeHelpers::IsStringType<StringType>, "State ID must be a string type!");
+
+            if constexpr (std::is_same_v<StringType, std::string_view>)
+                return toString (str);
+            else
+                return str;
+        }
+
+        CHOWDSP_CHECK_HAS_STATIC_MEMBER (HasStaticStateID, state_id)
+        CHOWDSP_CHECK_HAS_MEMBER (HasNonStaticStateID, state_id)
+
+        template <typename T>
+        juce::String getObjectName (const T& object)
+        {
+            if constexpr (HasStaticStateID<T>)
+                return getName (T::state_id);
+
+            if constexpr (HasNonStaticStateID<T>)
+                return getName (object.state_id);
+
+            juce::String name {};
             pfr::for_each_field (object,
                                  [&name] (const auto& field)
                                  {
+                                     if (name.isNotEmpty())
+                                         return;
+
                                      using Type = std::decay_t<decltype (field)>;
                                      if constexpr (ParameterTypeHelpers::IsStringType<Type>)
-                                         if (name.empty())
-                                             name = field;
+                                         name = getName (field);
                                  });
 
-            if (! name.empty())
+            if (name.isNotEmpty())
                 return name;
 
-            return nameof::nameof_type<T>();
+            return toString (nameof::nameof_type<T>());
         }
     } // namespace detail
 #endif
@@ -57,7 +79,7 @@ namespace PluginStateSerializer
                                  {
                                      for (const auto& [index, elem] : enumerate (stateObject))
                                      {
-                                         const auto elementTag = juce::String { detail::getObjectName (elem).data() } + "_" + juce::String (index);
+                                         const auto elementTag = detail::getObjectName (elem) + "_" + juce::String (index);
                                          Serializer::addChildElement (serial, elementTag);
                                          Serializer::addChildElement (serial, serialize<Serializer> (elem));
                                      }
@@ -120,7 +142,7 @@ namespace PluginStateSerializer
                                          {
                                              for (const auto& [index, elem] : enumerate (stateObject))
                                              {
-                                                 const auto elementTag = juce::String { detail::getObjectName (elem).data() } + "_" + juce::String (index);
+                                                 const auto elementTag = detail::getObjectName (elem) + "_" + juce::String (index);
                                                  if (elementTag == name)
                                                  {
                                                      deserialize<Serializer> (elementSerial, elem);
@@ -130,7 +152,7 @@ namespace PluginStateSerializer
                                          }
                                          else
                                          {
-                                             if (toString (detail::getObjectName (stateObject)) == name)
+                                             if (detail::getObjectName (stateObject) == name)
                                              {
                                                  deserialize<Serializer> (elementSerial, stateObject);
                                                  namesThatHaveBeenDeserialized.add (name);
@@ -169,14 +191,14 @@ namespace PluginStateSerializer
                                  {
                                      for (const auto& [index, elem] : enumerate (stateObject))
                                      {
-                                         const auto elementTag = juce::String { detail::getObjectName (elem).data() } + "_" + juce::String (index);
+                                         const auto elementTag = detail::getObjectName (elem) + "_" + juce::String (index);
                                          if (! namesThatHaveBeenDeserialized.contains (elementTag))
                                              deserialize<Serializer> ({}, elem);
                                      }
                                  }
                                  else
                                  {
-                                     if (! namesThatHaveBeenDeserialized.contains (toString (detail::getObjectName (stateObject))))
+                                     if (! namesThatHaveBeenDeserialized.contains (detail::getObjectName (stateObject)))
                                          deserialize<Serializer> ({}, stateObject);
                                  }
                              });
