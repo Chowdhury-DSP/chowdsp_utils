@@ -19,20 +19,4 @@ TEST_CASE ("String Helpers Test")
         static_assert (sv_concat3 == "blah_blaaa_blaa"sv, "String view concatenation of three string is incorrect!");
     }
 #endif
-
-    SECTION ("String View Run-Time Concatenation")
-    {
-        using namespace std::string_view_literals;
-        static constexpr auto sv1 = "blah_"sv;
-        static constexpr auto sv2 = "blaaa"sv;
-        static constexpr auto sv3 = "_blaa"sv;
-
-        const auto c1 = chowdsp::concatenate_strings { sv1, sv2 };
-        const auto sv_concat1 = c1.value;
-        const auto c2 = chowdsp::concatenate_strings { sv_concat1, sv3 };
-        const auto sv_concat2 = c2.value;
-
-        REQUIRE (sv_concat1 == "blah_blaaa"sv);
-        REQUIRE (sv_concat2 == "blah_blaaa_blaa"sv);
-    }
 }

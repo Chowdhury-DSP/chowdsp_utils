@@ -13,11 +13,6 @@ template <typename PluginStateType>
 class SliderAttachment : private juce::Slider::Listener
 {
 public:
-    /** Creates an attachment for a given parameter path */
-    SliderAttachment (const ParameterPath& paramPath,
-                      PluginStateType& pluginState,
-                      juce::Slider& paramSlider);
-
     /** Creates an attachment for a given parameter, using the undo manager from the plugin state */
     SliderAttachment (FloatParameter& param,
                       PluginStateType& pluginState,

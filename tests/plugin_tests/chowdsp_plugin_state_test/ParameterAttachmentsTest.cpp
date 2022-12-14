@@ -1,8 +1,6 @@
 #include <TimedUnitTest.h>
 #include <chowdsp_plugin_state/chowdsp_plugin_state.h>
 
-using namespace std::string_view_literals;
-
 class SliderAttachmentTest : public TimedUnitTest
 {
 public:
@@ -23,7 +21,7 @@ public:
         auto& param = state.params.param;
 
         juce::Slider slider;
-        chowdsp::SliderAttachment attach { "pct"sv, state, slider };
+        chowdsp::SliderAttachment attach { param, state, slider };
 
         expectEquals (slider.getValue(), (double) param->get(), "Incorrect slider value after setup!");
         expectEquals (slider.getRange().getStart(), 0.0, "Slider range start is incorrect!");
@@ -39,7 +37,7 @@ public:
         const auto& param = state.params.param;
 
         juce::Slider slider;
-        chowdsp::SliderAttachment attach { "pct"sv, state, slider };
+        chowdsp::SliderAttachment attach { state.params.param, state, slider };
 
         static constexpr auto newValue = 0.2f;
 
@@ -57,7 +55,7 @@ public:
         auto& param = state.params.param;
 
         juce::Slider slider;
-        chowdsp::SliderAttachment attach { "pct"sv, state, slider };
+        chowdsp::SliderAttachment attach { param, state, slider };
 
         static constexpr auto newValue = 0.7f;
 
@@ -75,7 +73,7 @@ public:
         const auto& param = state.params.param;
 
         juce::Slider slider;
-        chowdsp::SliderAttachment attach { "pct"sv, state, slider };
+        chowdsp::SliderAttachment attach { state.params.param, state, slider };
 
         const auto originalValue = param->get();
         static constexpr auto newValue = 0.99f;
@@ -132,7 +130,7 @@ public:
         auto& param = state.params.param;
 
         juce::ComboBox box;
-        chowdsp::ComboBoxAttachment attach { "choice"sv, state, box };
+        chowdsp::ComboBoxAttachment attach { param, state, box };
 
         expectEquals (box.getNumItems(), param->choices.size(), "Num choices is incorrect!");
         expectEquals (box.getSelectedItemIndex(), param->getIndex(), "Initial choice index is incorrect!");
@@ -144,7 +142,7 @@ public:
         const auto& param = state.params.param;
 
         juce::ComboBox box;
-        chowdsp::ComboBoxAttachment attach { "choice"sv, state, box };
+        chowdsp::ComboBoxAttachment attach { state.params.param, state, box };
 
         static constexpr int newValue = 2;
         box.setSelectedItemIndex (newValue, juce::sendNotificationSync);
@@ -158,7 +156,7 @@ public:
         auto& param = state.params.param;
 
         juce::ComboBox box;
-        chowdsp::ComboBoxAttachment attach { "choice"sv, state, box };
+        chowdsp::ComboBoxAttachment attach { param, state, box };
 
         static constexpr int newValue = 0;
 
@@ -176,7 +174,7 @@ public:
         auto& param = state.params.param;
 
         juce::ComboBox box;
-        chowdsp::ComboBoxAttachment attach { "choice"sv, state, box };
+        chowdsp::ComboBoxAttachment attach { param, state, box };
 
         const auto originalValue = param->getIndex();
         static constexpr int newValue = 2;
@@ -230,7 +228,7 @@ public:
         auto& param = state.params.param;
 
         juce::ToggleButton button;
-        chowdsp::ButtonAttachment attach { "bool"sv, state, button };
+        chowdsp::ButtonAttachment attach { param, state, button };
 
         expectEquals (button.getButtonText(), param->name, "Button name is incorrect!");
         expect (button.getToggleState() == param->get(), "Initial button state is incorrect!");
@@ -242,7 +240,7 @@ public:
         const auto& param = state.params.param;
 
         juce::ToggleButton button;
-        chowdsp::ButtonAttachment attach { "bool"sv, state, button };
+        chowdsp::ButtonAttachment attach { state.params.param, state, button };
 
         static constexpr bool newValue = true;
         button.setToggleState (newValue, juce::sendNotificationSync);
@@ -256,7 +254,7 @@ public:
         auto& param = state.params.param;
 
         juce::ToggleButton button;
-        chowdsp::ButtonAttachment attach { "bool"sv, state, button };
+        chowdsp::ButtonAttachment attach { param, state, button };
 
         static constexpr bool newValue = true;
 
@@ -274,7 +272,7 @@ public:
         auto& param = state.params.param;
 
         juce::ToggleButton button;
-        chowdsp::ButtonAttachment attach { "bool"sv, state, button };
+        chowdsp::ButtonAttachment attach { param, state, button };
 
         const auto originalValue = param->get();
         static constexpr bool newValue = true;

@@ -86,7 +86,7 @@ namespace ParameterTypeHelpers
     }
 
     template <typename T>
-    static constexpr auto IsStringType = std::is_same_v<T, std::string_view>;
+    static constexpr auto IsStringType = std::is_same_v<T, std::string_view> || std::is_same_v<T, std::string> || std::is_same_v<T, juce::String>;
 
     template <typename T>
     static constexpr auto IsHelperType = IsStringType<T> || std::is_arithmetic_v<T>;

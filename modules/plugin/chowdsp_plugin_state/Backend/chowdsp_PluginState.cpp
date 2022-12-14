@@ -34,22 +34,6 @@ PluginState<ParameterState, NonParameterState, Serializer>::~PluginState()
 }
 
 template <typename ParameterState, typename NonParameterState, typename Serializer>
-template <typename ParameterType>
-ParameterType& PluginState<ParameterState, NonParameterState, Serializer>::getParameter (const ParameterPath& path)
-{
-    auto* paramPtr = ParameterPath::getParameterForPath<ParameterType> (params, path);
-    jassert (paramPtr != nullptr); // Unable to find parameter at this path!
-    return *paramPtr;
-}
-
-template <typename ParameterState, typename NonParameterState, typename Serializer>
-template <typename ParameterType>
-const ParameterType& PluginState<ParameterState, NonParameterState, Serializer>::getParameter (const ParameterPath& path) const
-{
-    return const_cast<PluginState*> (this)->getParameter<ParameterType> (path);
-}
-
-template <typename ParameterState, typename NonParameterState, typename Serializer>
 void PluginState<ParameterState, NonParameterState, Serializer>::serialize (juce::MemoryBlock& data) const
 {
     Serialization::serialize<Serializer> (*this, data);
