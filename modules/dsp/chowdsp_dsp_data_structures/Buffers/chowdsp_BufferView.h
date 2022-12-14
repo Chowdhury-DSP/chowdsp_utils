@@ -121,6 +121,18 @@ public:
         initialise (buffer.getArrayOfWritePointers(), sampleOffset, startChannel);
     }
 
+    template <typename T = SampleType, std::enable_if_t<std::is_const_v<T>>* = nullptr>
+    BufferView (const juce::AudioBuffer<std::remove_const_t<SampleType>>& buffer, // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
+                int sampleOffset = 0,
+                int bufferNumSamples = -1,
+                int startChannel = 0,
+                int bufferNumChannels = -1)
+        : numChannels (bufferNumChannels < 0 ? (buffer.getNumChannels() - startChannel) : bufferNumChannels),
+          numSamples (bufferNumSamples < 0 ? (buffer.getNumSamples() - sampleOffset) : bufferNumSamples)
+    {
+        initialise (buffer.getArrayOfReadPointers(), sampleOffset, startChannel);
+    }
+
 #if JUCE_MODULE_AVAILABLE_juce_dsp
     BufferView (const juce::dsp::AudioBlock<std::remove_const_t<SampleType>>& block, // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
                 int sampleOffset = 0,
