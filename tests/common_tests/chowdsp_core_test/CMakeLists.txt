@@ -13,4 +13,6 @@ target_sources(chowdsp_core_test
         StringHelpersTest.cpp
 )
 
-set_target_properties(chowdsp_core_test PROPERTIES CXX_STANDARD 20)
+#set_target_properties(chowdsp_core_test PROPERTIES CXX_STANDARD 20)
+
+target_compile_features(chowdsp_core_test PRIVATE cxx_std_20)
