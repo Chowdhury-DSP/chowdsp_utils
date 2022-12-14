@@ -33,7 +33,7 @@ public:
                 x[n] = rand.nextFloat() * 2.0f - 1.0f;
         }
 
-        auto& constJuceBuffer = static_cast<juce::AudioBuffer<float>&> (juceBuffer);
+        const auto constJuceBuffer = juce::AudioBuffer<float> { juceBuffer };
         testBufferView<chowdsp::BufferView<float>> (juceBuffer, constJuceBuffer);
         testBufferView<chowdsp::BufferView<const float>> (juceBuffer, constJuceBuffer);
         testBufferView<chowdsp::BufferView<const float>> (constJuceBuffer, constJuceBuffer);
