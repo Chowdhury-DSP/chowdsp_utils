@@ -13,11 +13,6 @@ template <typename PluginStateType>
 class ComboBoxAttachment : private juce::ComboBox::Listener
 {
 public:
-    /** Creates an attachment for a given parameter path */
-    ComboBoxAttachment (const ParameterPath& paramPath,
-                        PluginStateType& pluginState,
-                        juce::ComboBox& combo);
-
     /** Creates an attachment for a given parameter, using the undo manager from the plugin state */
     ComboBoxAttachment (ChoiceParameter& param,
                         PluginStateType& pluginState,

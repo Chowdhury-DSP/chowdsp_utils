@@ -1,16 +1,6 @@
 namespace chowdsp
 {
 template <typename State>
-ButtonAttachment<State>::ButtonAttachment (const ParameterPath& paramPath,
-                                           State& pluginState,
-                                           juce::Button& paramButton)
-    : ButtonAttachment (pluginState.template getParameter<BoolParameter> (paramPath),
-                        pluginState,
-                        paramButton)
-{
-}
-
-template <typename State>
 ButtonAttachment<State>::ButtonAttachment (BoolParameter& param,
                                            State& pluginState,
                                            juce::Button& paramButton)

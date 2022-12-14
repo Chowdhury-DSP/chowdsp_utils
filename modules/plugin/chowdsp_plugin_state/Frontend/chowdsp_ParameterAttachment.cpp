@@ -1,14 +1,6 @@
 namespace chowdsp
 {
 template <typename Param, typename State, typename Callback>
-ParameterAttachment<Param, State, Callback>::ParameterAttachment (const ParameterPath& parameterPath,
-                                                                  State& pluginState,
-                                                                  Callback&& callback)
-    : ParameterAttachment (pluginState.template getParameter<Param> (parameterPath), pluginState, std::move (callback))
-{
-}
-
-template <typename Param, typename State, typename Callback>
 ParameterAttachment<Param, State, Callback>::ParameterAttachment (Param& parameter,
                                                                   State& pluginState,
                                                                   Callback&& callback)
