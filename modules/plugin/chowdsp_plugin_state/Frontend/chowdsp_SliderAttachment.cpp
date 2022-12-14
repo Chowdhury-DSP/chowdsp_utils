@@ -1,16 +1,6 @@
 namespace chowdsp
 {
 template <typename State>
-SliderAttachment<State>::SliderAttachment (const ParameterPath& paramPath,
-                                           State& pluginState,
-                                           juce::Slider& paramSlider)
-    : SliderAttachment (pluginState.template getParameter<FloatParameter> (paramPath),
-                        pluginState,
-                        paramSlider)
-{
-}
-
-template <typename State>
 SliderAttachment<State>::SliderAttachment (FloatParameter& param,
                                            State& pluginState,
                                            juce::Slider& paramSlider)

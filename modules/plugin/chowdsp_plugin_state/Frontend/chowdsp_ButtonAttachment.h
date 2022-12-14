@@ -13,11 +13,6 @@ template <typename PluginStateType>
 class ButtonAttachment : private juce::Button::Listener
 {
 public:
-    /** Creates an attachment for a given parameter path */
-    ButtonAttachment (const ParameterPath& paramPath,
-                      PluginStateType& pluginState,
-                      juce::Button& paramButton);
-
     /** Creates an attachment for a given parameter, using the undo manager from the plugin state  */
     ButtonAttachment (BoolParameter& param,
                       PluginStateType& pluginState,

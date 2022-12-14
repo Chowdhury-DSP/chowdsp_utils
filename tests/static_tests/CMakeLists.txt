@@ -28,6 +28,9 @@ add_static_test_check(HasMemberMethodTest HasMemberMethodTest_pass.cpp TRUE)
 create_static_test(HasStaticMemberTest)
 add_static_test_check(HasStaticMemberTest HasStaticMemberTest_pass.cpp TRUE)
 
+create_static_test(HasMemberTest)
+add_static_test_check(HasMemberTest HasMemberTest_pass.cpp TRUE)
+
 create_static_test(IsContainerTest)
 add_static_test_check(IsContainerTest CorrectContainers_pass.cpp TRUE)
 

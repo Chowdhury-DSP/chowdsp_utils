@@ -7,11 +7,6 @@ template <typename ParamType, typename PluginStateType, typename Callback = std:
 class ParameterAttachment
 {
 public:
-    /** Creates an attachment for a given parameter path and plugin state. */
-    ParameterAttachment (const ParameterPath& parameterPath,
-                         PluginStateType& pluginState,
-                         Callback&& callback);
-
     /** Creates an attachment for a given parameter and plugin state. */
     ParameterAttachment (ParamType& parameter,
                          PluginStateType& pluginState,

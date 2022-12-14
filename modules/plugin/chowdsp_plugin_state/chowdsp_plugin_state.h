@@ -37,7 +37,6 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Backend/chowdsp_ParameterTypeHelpers.h"
 #include "Backend/chowdsp_PluginStateHelpers.h"
 #include "Backend/chowdsp_ParameterStateSerializer.h"
-#include "Backend/chowdsp_ParameterPath.h"
 #include "Backend/chowdsp_PluginState.h"
 
 #include "Frontend/chowdsp_ParameterAttachment.h"

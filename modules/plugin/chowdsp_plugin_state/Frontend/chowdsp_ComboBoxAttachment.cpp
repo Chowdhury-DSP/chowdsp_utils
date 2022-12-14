@@ -1,16 +1,6 @@
 namespace chowdsp
 {
 template <typename State>
-ComboBoxAttachment<State>::ComboBoxAttachment (const ParameterPath& paramPath,
-                                               State& pluginState,
-                                               juce::ComboBox& combo)
-    : ComboBoxAttachment (pluginState.template getParameter<ChoiceParameter> (paramPath),
-                          pluginState,
-                          combo)
-{
-}
-
-template <typename State>
 ComboBoxAttachment<State>::ComboBoxAttachment (ChoiceParameter& param,
                                                State& pluginState,
                                                juce::ComboBox& combo)
