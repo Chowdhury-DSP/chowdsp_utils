@@ -21,6 +21,20 @@ public:
     /** Resets the internal state variables of the processor. */
     void reset();
 
+    /**
+     * Processes a buffer of audio data in-place.
+     * If the buffer contains more than one channel,
+     * the output level will be stored in the first channel.
+     */
+    void processBlock (const BufferView<SampleType>& buffer) noexcept;
+
+    /**
+     * Processes a buffer of audio data in-place.
+     * If the output buffer contains more than one channel,
+     * the output level will be stored in the first channel.
+     */
+    void processBlock (const BufferView<const SampleType>& bufferIn, const BufferView<SampleType>& bufferOut) noexcept;
+
     /** Processes the input and output samples supplied in the processing context. */
     template <typename ProcessContext>
     void process (const ProcessContext& context) noexcept;
@@ -28,14 +42,7 @@ public:
     /** Processes a single sample. Note that this function expects the input to be non-negative */
     virtual inline SampleType processSample (SampleType x) noexcept
     {
-        auto tau = increasing ? tauAtt : tauRel;
-        x = yOld + tau * (x - yOld);
-
-        // update for next sample
-        increasing = x > yOld;
-        yOld = x;
-
-        return x;
+        return processSampleInternal (x, increasing, yOld);
     }
 
 protected:
@@ -47,6 +54,18 @@ protected:
     SampleType tauRel = (SampleType) 1;
 
 private:
+    inline SampleType processSampleInternal (SampleType x, bool& _increasing, SampleType& _yOld) noexcept
+    {
+        auto tau = _increasing ? tauAtt : tauRel;
+        x = _yOld + tau * (x - _yOld);
+
+        // update for next sample
+        _increasing = x > _yOld;
+        _yOld = x;
+
+        return x;
+    }
+
     Buffer<SampleType> absBuffer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LevelDetector)

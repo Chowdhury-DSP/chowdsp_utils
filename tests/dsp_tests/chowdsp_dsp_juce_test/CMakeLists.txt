@@ -19,15 +19,6 @@ target_sources(chowdsp_dsp_juce_test
         data_structures_tests/BufferViewTest.cpp
         data_structures_tests/BufferMathTest.cpp
 
-        # Filters Tests
-        FIRFilterTest.cpp
-
-        # EQ Tests
-        LinearPhaseEQTest.cpp
-
-        # Reverb Tests
-        DiffuserTest.cpp
-
         # Convolution Tests
         convolution_tests/ConvolutionTest.cpp
         convolution_tests/IRHelpersTest.cpp
@@ -36,6 +27,8 @@ target_sources(chowdsp_dsp_juce_test
         source_tests/NoiseTest.cpp
         source_tests/RepitchedSourceTest.cpp
 
-        # Resampling Tests
+        DiffuserTest.cpp
+        FIRFilterTest.cpp
+        LinearPhaseEQTest.cpp
         resampling_tests/VariableOversamplingTest.cpp
 )

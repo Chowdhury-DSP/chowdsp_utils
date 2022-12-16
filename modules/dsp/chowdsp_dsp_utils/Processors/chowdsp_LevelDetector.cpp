@@ -1,5 +1,3 @@
-#include "chowdsp_LevelDetector.h"
-
 namespace chowdsp
 {
 #ifndef DOXYGEN
@@ -21,7 +19,7 @@ void LevelDetector<SampleType>::prepare (const juce::dsp::ProcessSpec& spec)
 {
     expFactor = -1000.0f / (float) spec.sampleRate;
 
-    absBuffer.setMaxSize ((int) spec.numChannels, (int) spec.maximumBlockSize);
+    absBuffer.setMaxSize (1, (int) spec.maximumBlockSize);
 
     reset();
 }
@@ -34,48 +32,52 @@ void LevelDetector<SampleType>::reset()
 }
 
 template <typename SampleType>
+void LevelDetector<SampleType>::processBlock (const BufferView<SampleType>& buffer) noexcept
+{
+    processBlock (buffer, buffer);
+}
+
+template <typename SampleType>
+void LevelDetector<SampleType>::processBlock (const BufferView<const SampleType>& bufferIn, const BufferView<SampleType>& bufferOut) noexcept
+{
+    const auto numSamples = bufferIn.getNumSamples();
+    const auto numInputChannels = bufferIn.getNumChannels();
+    jassert (bufferOut.getNumSamples() == numSamples);
+
+    auto* levelData = bufferOut.getWritePointer (0);
+    if (numInputChannels == 1)
+    {
+        juce::FloatVectorOperations::abs (levelData, bufferIn.getReadPointer (0), numSamples);
+    }
+    else
+    {
+        absBuffer.setCurrentSize (1, numSamples);
+        auto* absData = absBuffer.getWritePointer (0);
+
+        juce::FloatVectorOperations::abs (levelData, bufferIn.getReadPointer (0), numSamples);
+        for (int ch = 1; ch < numInputChannels; ch++)
+        {
+            juce::FloatVectorOperations::abs (absData, bufferIn.getReadPointer (ch), numSamples);
+            juce::FloatVectorOperations::add (levelData, absData, numSamples);
+        }
+
+        const auto normGain = (SampleType) 1.0 / (SampleType) numInputChannels;
+        juce::FloatVectorOperations::multiply (levelData, normGain, numSamples);
+    }
+
+    ScopedValue _increasing { increasing };
+    ScopedValue _yOld { yOld };
+    for (int n = 0; n < numSamples; ++n)
+        levelData[n] = processSampleInternal (levelData[n], _increasing.get(), _yOld.get());
+}
+
+template <typename SampleType>
 template <typename ProcessContext>
 void LevelDetector<SampleType>::process (const ProcessContext& context) noexcept
 {
     const auto& inputBlock = context.getInputBlock();
     auto& outputBlock = context.getOutputBlock();
 
-    const auto numSamples = inputBlock.getNumSamples();
-    const auto numInputChannels = inputBlock.getNumChannels();
-    jassert (outputBlock.getNumChannels() == 1);
-
-    // take absolute value and sum to mono
-    auto* levelPtr = outputBlock.getChannelPointer (0);
-    absBuffer.setCurrentSize ((int) numInputChannels, (int) numSamples);
-    for (int ch = 0; ch < (int) numInputChannels; ++ch)
-        juce::FloatVectorOperations::copy (absBuffer.getWritePointer (ch), inputBlock.getChannelPointer ((size_t) ch), numSamples);
-
-    if (numInputChannels == 1)
-    {
-        auto* absPtr = absBuffer.getWritePointer (0);
-        juce::FloatVectorOperations::abs (absPtr, absPtr, (int) numSamples);
-
-        auto&& outBufferView = BufferView<SampleType> { outputBlock };
-        BufferMath::copyBufferData (absBuffer, outBufferView, 0, 0, (int) numSamples);
-    }
-    else // sum to mono
-    {
-        const auto gain = (SampleType) 1.0 / (SampleType) numInputChannels;
-
-        auto* basePtr = absBuffer.getWritePointer (0);
-        juce::FloatVectorOperations::abs (basePtr, basePtr, (int) numSamples);
-        juce::FloatVectorOperations::copyWithMultiply (levelPtr, basePtr, gain, (int) numSamples);
-
-        for (int ch = 1; ch < (int) numInputChannels; ch++)
-        {
-            auto* otherPtr = absBuffer.getWritePointer (ch);
-            juce::FloatVectorOperations::abs (otherPtr, otherPtr, (int) numSamples);
-            juce::FloatVectorOperations::addWithMultiply (levelPtr, otherPtr, gain, (int) numSamples);
-        }
-    }
-
-    for (size_t n = 0; n < numSamples; ++n)
-        levelPtr[n] = processSample (levelPtr[n]);
+    processBlock (inputBlock, outputBlock);
 }
-
 } // namespace chowdsp

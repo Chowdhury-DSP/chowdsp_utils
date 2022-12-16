@@ -40,7 +40,7 @@ void AutoWahPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)
     const auto&& spec = juce::dsp::ProcessSpec { sampleRate, (juce::uint32) samplesPerBlock, (juce::uint32) getTotalNumInputChannels() };
 
     levelDetector.prepare (spec);
-    levelBuffer.setSize (1, samplesPerBlock);
+    levelBuffer.setMaxSize (1, samplesPerBlock);
 
     wahFilter.prepare (spec);
     fs = (float) sampleRate;
@@ -51,10 +51,9 @@ void AutoWahPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
     const auto numSamples = buffer.getNumSamples();
     auto&& block = juce::dsp::AudioBlock<float> { buffer };
 
-    levelBuffer.setSize (1, numSamples, false, false, true);
-    auto&& levelBlock = juce::dsp::AudioBlock<float> { levelBuffer };
+    levelBuffer.setCurrentSize (1, numSamples);
     levelDetector.setParameters (*attackMsParam, *releaseMsParam);
-    levelDetector.process (juce::dsp::ProcessContextNonReplacing<float> { block, levelBlock });
+    levelDetector.processBlock (buffer, levelBuffer);
     const auto* levelData = levelBuffer.getReadPointer (0);
 
     const auto baseFreqHz = freqHzParam->getCurrentValue();

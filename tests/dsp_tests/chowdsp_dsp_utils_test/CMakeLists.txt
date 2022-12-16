@@ -7,6 +7,7 @@ target_sources(chowdsp_dsp_utils_test
         GainTest.cpp
         PannerTest.cpp
         TunerTest.cpp
+        LevelDetectorTest.cpp
 
         BBDTest.cpp
         PitchShiftTest.cpp
