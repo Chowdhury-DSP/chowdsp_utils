@@ -25,7 +25,7 @@ private:
     chowdsp::FloatParameter* freqModParam = nullptr;
 
     chowdsp::LevelDetector<float> levelDetector;
-    juce::AudioBuffer<float> levelBuffer;
+    chowdsp::Buffer<float> levelBuffer;
 
     chowdsp::ModFilterWrapper<chowdsp::PeakingFilter<float>> wahFilter;
     float fs = 0.0f;
