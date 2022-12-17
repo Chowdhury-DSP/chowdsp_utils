@@ -151,35 +151,30 @@ namespace parameters_view_detail
         PluginStateType& state;
     };
 
-    template <typename PluginStateType, typename Parameters>
+    template <typename PluginStateType>
     struct ParameterGroupItem : public juce::TreeViewItem
     {
-        ParameterGroupItem (juce::Component& editor, Parameters& params, PluginStateType& pluginState)
+        ParameterGroupItem (juce::Component& editor, ParamHolder& params, PluginStateType& pluginState)
             : name (toString (nameof::nameof_short_type<Parameters>()))
         {
-            pfr::for_each_field (params,
-                                 [&] (auto& paramHolder)
-                                 {
-                                     using Type = std::decay_t<decltype (paramHolder)>;
-                                     if constexpr (ParameterTypeHelpers::IsParameterPointerType<Type>)
-                                     {
-                                         addSubItem (std::make_unique<ParamControlItem<PluginStateType>> (editor,
-                                                                                                          *paramHolder,
-                                                                                                          pluginState)
-                                                         .release());
-                                     }
-                                     else if constexpr (ParameterTypeHelpers::IsHelperType<Type>)
-                                     {
-                                         return; // nothing to do
-                                     }
-                                     else
-                                     {
-                                         addSubItem (std::make_unique<ParameterGroupItem<PluginStateType, Type>> (editor,
-                                                                                                                  paramHolder,
-                                                                                                                  pluginState)
-                                                         .release());
-                                     }
-                                 });
+            params.template doForAllParameterContainers (
+                [&] (auto& paramVec)
+                {
+                    for (auto& param : paramVec)
+                    {
+                        addSubItem (std::make_unique<ParamControlItem<PluginStateType>> (editor,
+                                                                                         param,
+                                                                                         pluginState)
+                                        .release());
+                    }
+                },
+                [&] (auto& paramHolder)
+                {
+                    addSubItem (std::make_unique<ParameterGroupItem<PluginStateType>> (editor,
+                                                                                       paramHolder,
+                                                                                       pluginState)
+                                    .release());
+                });
         }
 
         bool mightContainSubItems() override { return getNumSubItems() > 0; }
@@ -194,10 +189,10 @@ namespace parameters_view_detail
 } // namespace parameters_view_detail
 #endif
 //==============================================================================
-template <typename PluginStateType, typename Parameters>
-struct ParametersView<PluginStateType, Parameters>::Pimpl
+template <typename PluginStateType>
+struct ParametersView<PluginStateType>::Pimpl
 {
-    Pimpl (juce::Component& editor, Parameters& params, PluginStateType& pluginState)
+    Pimpl (juce::Component& editor, ParamHolder& params, PluginStateType& pluginState)
         : groupItem (editor, params, pluginState)
     {
         const auto numIndents = getNumIndents (groupItem);
@@ -219,13 +214,13 @@ struct ParametersView<PluginStateType, Parameters>::Pimpl
         return maxInner;
     }
 
-    parameters_view_detail::ParameterGroupItem<PluginStateType, Parameters> groupItem {};
+    parameters_view_detail::ParameterGroupItem<PluginStateType> groupItem {};
     juce::TreeView view;
 };
 
 //==============================================================================
-template <typename PluginStateType, typename Parameters>
-ParametersView<PluginStateType, Parameters>::ParametersView (PluginStateType& pluginState, Parameters& params)
+template <typename PluginStateType>
+ParametersView<PluginStateType>::ParametersView (PluginStateType& pluginState, ParamHolder& params)
     : pimpl (std::make_unique<Pimpl> (*this, params, pluginState))
 {
     auto* viewport = pimpl->view.getViewport();
@@ -237,17 +232,17 @@ ParametersView<PluginStateType, Parameters>::ParametersView (PluginStateType& pl
              juce::jlimit (125, 400, viewport->getViewedComponent()->getHeight()));
 }
 
-template <typename PluginStateType, typename Parameters>
-ParametersView<PluginStateType, Parameters>::~ParametersView() = default;
+template <typename PluginStateType>
+ParametersView<PluginStateType>::~ParametersView() = default;
 
-template <typename PluginStateType, typename Parameters>
-void ParametersView<PluginStateType, Parameters>::paint (juce::Graphics& g)
+template <typename PluginStateType>
+void ParametersView<PluginStateType>::paint (juce::Graphics& g)
 {
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
 }
 
-template <typename PluginStateType, typename Parameters>
-void ParametersView<PluginStateType, Parameters>::resized()
+template <typename PluginStateType>
+void ParametersView<PluginStateType>::resized()
 {
     pimpl->view.setBounds (getLocalBounds());
 }

@@ -2,14 +2,24 @@
 
 #include <chowdsp_plugin_base/chowdsp_plugin_base.h>
 
-struct LevelParams
+struct LevelParams : chowdsp::ParamHolder
 {
+    LevelParams()
+    {
+        add (percent, gain);
+    }
+
     chowdsp::PercentParameter::Ptr percent { juce::ParameterID { "percent", 100 }, "Percent" };
     chowdsp::GainDBParameter::Ptr gain { juce::ParameterID { "gain", 100 }, "Gain", juce::NormalisableRange { -30.0f, 0.0f }, 0.0f };
 };
 
-struct PluginParameterState
+struct PluginParameterState : chowdsp::ParamHolder
 {
+    PluginParameterState()
+    {
+        add (levelParams, mode, onOff);
+    }
+
     LevelParams levelParams;
     chowdsp::ChoiceParameter::Ptr mode { juce::ParameterID { "mode", 100 }, "Mode", juce::StringArray { "Percent", "Gain", "Percent / Gain", "Gain / Percent" }, 2 };
     chowdsp::BoolParameter::Ptr onOff { juce::ParameterID { "on_off", 100 }, "On/Off", true };
@@ -19,9 +29,6 @@ struct PluginNonParameterState
 {
     chowdsp::StateValue<juce::Point<int>> editorBounds { "editor_bounds", { 300, 500 } };
 };
-
-static_assert (chowdsp::PluginStateHelpers::ParamCount<PluginParameterState> == 4);
-static_assert (chowdsp::PluginStateHelpers::ParamCount<LevelParams> == 2);
 
 using State = chowdsp::PluginState<PluginParameterState, PluginNonParameterState>;
 

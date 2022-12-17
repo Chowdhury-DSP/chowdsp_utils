@@ -49,9 +49,7 @@ template <typename ParameterState, typename NonParameterState = NullState, typen
 class PluginState : private juce::HighResolutionTimer, // @TODO: maybe we should use a TimeSliceThread instead?
                     private juce::AsyncUpdater
 {
-    static_assert (PluginStateHelpers::ContainsOnlyParamPointers<ParameterState>,
-                   "ParameterState must contain only chowdsp::SmartPointer<> of parameter types,"
-                   " or structs containing those types!");
+    static_assert (std::is_base_of_v<ParamHolder, ParameterState>, "ParameterState must be a ParamHolder!");
 
     static_assert (PluginStateHelpers::ContainsOnlyStateValues<NonParameterState>,
                    "NonParameterState must only contain chowdsp::StateValue types or structs containing those types!");
@@ -126,15 +124,15 @@ private:
         float value = 0.0f;
     };
 
-    static constexpr auto totalNumParams = (size_t) PluginStateHelpers::ParamCount<ParameterState>;
-    std::array<ParamInfo, totalNumParams> paramInfoList;
+    const size_t totalNumParams = (size_t) params.count();
+    std::vector<ParamInfo> paramInfoList { totalNumParams };
 
     static constexpr size_t actionSize = 16; // sizeof ([this, i = index] { callMessageThreadBroadcaster (i); })
-    std::array<Broadcaster<void()>, totalNumParams> messageThreadBroadcasters;
+    std::vector<Broadcaster<void()>> messageThreadBroadcasters { totalNumParams };
     using MessageThreadAction = juce::dsp::FixedSizeFunction<actionSize, void()>;
     moodycamel::ReaderWriterQueue<MessageThreadAction> messageThreadBroadcastQueue { totalNumParams };
 
-    std::array<Broadcaster<void()>, totalNumParams> audioThreadBroadcasters;
+    std::vector<Broadcaster<void()>> audioThreadBroadcasters { totalNumParams };
     using AudioThreadAction = juce::dsp::FixedSizeFunction<actionSize, void()>;
     moodycamel::ReaderWriterQueue<AudioThreadAction> audioThreadBroadcastQueue { totalNumParams };
 

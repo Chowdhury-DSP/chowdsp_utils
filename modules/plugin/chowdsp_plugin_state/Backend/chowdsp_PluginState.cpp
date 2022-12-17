@@ -4,12 +4,12 @@ template <typename ParameterState, typename NonParameterState, typename Serializ
 PluginState<ParameterState, NonParameterState, Serializer>::PluginState (juce::UndoManager* um)
     : undoManager (um)
 {
-    PluginStateHelpers::doForAllFields (params,
-                                        [this] (auto& paramHolder, size_t index)
-                                        {
-                                            const auto* rangedParam = static_cast<juce::RangedAudioParameter*> (paramHolder.get());
-                                            paramInfoList[index] = ParamInfo { rangedParam, rangedParam->getValue() };
-                                        });
+    params.doForAllParameters (
+        [this] (auto& param, size_t index)
+        {
+            const auto* rangedParam = static_cast<juce::RangedAudioParameter*> (&param);
+            paramInfoList[index] = ParamInfo { rangedParam, rangedParam->getValue() };
+        });
 
     startTimer (10); // @TODO: tune the timer interval
 }
@@ -18,13 +18,7 @@ template <typename ParameterState, typename NonParameterState, typename Serializ
 PluginState<ParameterState, NonParameterState, Serializer>::PluginState (juce::AudioProcessor& processor, juce::UndoManager* um)
     : PluginState (um)
 {
-    PluginStateHelpers::doForAllFields (params,
-                                        [&processor] (auto& paramHolder, size_t)
-                                        {
-                                            // Parameter must be non-null and owned by it's pointer before being released to the processor
-                                            jassert (paramHolder != nullptr && paramHolder.isOwner());
-                                            processor.addParameter (paramHolder.release());
-                                        });
+    params.connectParametersToProcessor (processor);
 }
 
 template <typename ParameterState, typename NonParameterState, typename Serializer>
@@ -54,7 +48,7 @@ template <typename>
 typename Serializer::SerializedType PluginState<ParameterState, NonParameterState, Serializer>::serialize (const PluginState& object)
 {
     auto serial = Serializer::createBaseElement();
-    Serializer::addChildElement (serial, PluginStateSerializer::serialize<Serializer> (object.params));
+    Serializer::addChildElement (serial, Serializer::template serialize<Serializer, ParamHolder> (object.params));
     Serializer::addChildElement (serial, PluginStateSerializer::serialize<Serializer> (object.nonParams));
     return serial;
 }
@@ -70,7 +64,7 @@ void PluginState<ParameterState, NonParameterState, Serializer>::deserialize (ty
         return;
     }
 
-    PluginStateSerializer::deserialize<Serializer> (Serializer::getChildElement (serial, 0), object.params);
+    Serializer::template deserialize<Serializer, ParamHolder> (Serializer::getChildElement (serial, 0), object.params);
     PluginStateSerializer::deserialize<Serializer> (Serializer::getChildElement (serial, 1), object.nonParams);
 }
 
