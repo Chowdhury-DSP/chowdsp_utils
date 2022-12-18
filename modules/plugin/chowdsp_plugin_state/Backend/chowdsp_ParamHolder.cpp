@@ -140,12 +140,15 @@ void ParamHolder::deserialize (typename Serializer::DeserializedType deserial, P
         {
             juce::String paramID {};
             Serialization::deserialize<Serializer> (Serializer::getChildElement (deserial, i), paramID);
+            const auto paramDeserial = Serializer::getChildElement (deserial, i + 1);
             paramHolder.doForAllParameters (
-                [&deserial, &paramID = std::as_const (paramID), &paramIDsThatHaveBeenDeserialized] (auto& param, size_t)
+                [paramDeserial,
+                 &paramID = std::as_const (paramID),
+                 &paramIDsThatHaveBeenDeserialized] (auto& param, size_t)
                 {
                     if (param.paramID == paramID)
                     {
-                        ParameterTypeHelpers::deserializeParameter<Serializer> (deserial, param);
+                        ParameterTypeHelpers::deserializeParameter<Serializer> (paramDeserial, param);
                         paramIDsThatHaveBeenDeserialized.add (paramID);
                     }
                 });

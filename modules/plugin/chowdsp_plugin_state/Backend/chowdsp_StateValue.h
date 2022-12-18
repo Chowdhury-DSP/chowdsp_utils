@@ -2,15 +2,6 @@
 
 namespace chowdsp
 {
-//struct StateValueBase
-//{
-//    explicit StateValueBase (std::string_view valueName) : name (valueName) {}
-//
-//    virtual void reset() = 0;
-//
-//    const std::string_view name;
-//};
-
 /** A stateful value that can be used to hold some non-parameter state */
 template <typename T>
 struct StateValue
@@ -58,7 +49,7 @@ struct StateValue
     template <typename Serializer>
     static void deserialize (typename Serializer::DeserializedType serial, StateValue& value)
     {
-        T val;
+        T val {};
         Serialization::deserialize<Serializer> (serial, val);
         value.set (val);
     }

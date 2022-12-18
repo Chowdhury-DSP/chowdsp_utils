@@ -63,7 +63,7 @@ namespace NonParameterStateSerialization
                                          }
                                      });
 
-                jassert (namesThatHaveBeenDeserialized.contains (name)); // trying to load unknown parameter ID!
+                jassert (namesThatHaveBeenDeserialized.contains (name)); // trying to load unknown field!
             }
         }
         else

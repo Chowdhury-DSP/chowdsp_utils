@@ -8,12 +8,17 @@ public:
     {
     }
 
-    struct Params
+    struct Params : chowdsp::ParamHolder
     {
+        Params()
+        {
+            add (param);
+        }
+
         chowdsp::PercentParameter::Ptr param { "pct", "Percent", 0.5f };
     };
 
-    using State = chowdsp::PluginState<Params>;
+    using State = chowdsp::PluginStateImpl<Params>;
 
     void setupTest()
     {
@@ -117,12 +122,17 @@ public:
     {
     }
 
-    struct Params
+    struct Params : chowdsp::ParamHolder
     {
+        Params()
+        {
+            add (param);
+        }
+
         chowdsp::ChoiceParameter::Ptr param { "choice", "Choice", juce::StringArray { "One", "Two", "Three" }, 1 };
     };
 
-    using State = chowdsp::PluginState<Params>;
+    using State = chowdsp::PluginStateImpl<Params>;
 
     void setupTest()
     {
@@ -215,12 +225,17 @@ public:
     {
     }
 
-    struct Params
+    struct Params : chowdsp::ParamHolder
     {
+        Params()
+        {
+            add (param);
+        }
+
         chowdsp::BoolParameter::Ptr param { "bool", "Bool", false };
     };
 
-    using State = chowdsp::PluginState<Params>;
+    using State = chowdsp::PluginStateImpl<Params>;
 
     void setupTest()
     {
