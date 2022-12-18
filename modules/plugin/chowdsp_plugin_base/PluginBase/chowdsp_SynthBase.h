@@ -27,12 +27,15 @@ public:
     {
         juce::ScopedNoDenormals noDenormals;
 
-        buffer.clear();
+#if JUCE_MODULE_AVAILABLE_chowdsp_plugin_state
+        this->state.getParameterListeners().callAudioThreadBroadcasters();
+#endif
 
 #if JUCE_MODULE_AVAILABLE_foleys_gui_magic
         this->magicState.processMidiBuffer (midi, buffer.getNumSamples(), true);
 #endif
 
+        buffer.clear();
         processSynth (buffer, midi);
     }
 

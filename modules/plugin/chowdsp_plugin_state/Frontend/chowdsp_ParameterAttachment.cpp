@@ -7,7 +7,7 @@ ParameterAttachment<Param, State, Callback>::ParameterAttachment (Param& paramet
     : param (parameter)
 {
     valueChangedCallback = pluginState.addParameterListener (param,
-                                                             true,
+                                                             ParameterListenerThread::MessageThread,
                                                              [this, c = std::move (callback)]() mutable
                                                              {
                                                                  c (ParameterTypeHelpers::getValue (param));

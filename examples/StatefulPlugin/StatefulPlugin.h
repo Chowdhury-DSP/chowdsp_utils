@@ -30,7 +30,7 @@ struct PluginNonParameterState
     chowdsp::StateValue<juce::Point<int>> editorBounds { "editor_bounds", { 300, 500 } };
 };
 
-using State = chowdsp::PluginState<PluginParameterState, PluginNonParameterState>;
+using State = chowdsp::PluginStateImpl<PluginParameterState, PluginNonParameterState>;
 
 class StatefulPlugin : public chowdsp::PluginBase<State>
 {
