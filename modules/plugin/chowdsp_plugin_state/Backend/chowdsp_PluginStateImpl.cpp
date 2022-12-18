@@ -43,6 +43,8 @@ template <typename ParameterState, typename NonParameterState, typename Serializ
 template <typename>
 void PluginStateImpl<ParameterState, NonParameterState, Serializer>::deserialize (typename Serializer::DeserializedType serial, PluginStateImpl& object)
 {
+    // @TODO: What about version streaming?
+
     //    if (Serializer::getNumChildElements (serial) != 2)
     //    {
     //        jassertfalse; // state load error!
