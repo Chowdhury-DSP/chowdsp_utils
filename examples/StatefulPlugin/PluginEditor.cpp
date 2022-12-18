@@ -31,10 +31,10 @@ PluginEditor::PluginEditor (StatefulPlugin& plug) : juce::AudioProcessorEditor (
     };
     setSizeFromState();
 
-    //    editorStateCallbacks += {
-    //        plugin.getState().addNonParameterListener (plugin.getState().nonParams.editorBounds, [setSizeFromState]
-    //                                                   { setSizeFromState(); }),
-    //    };
+    editorStateCallbacks += {
+        plugin.getState().addNonParameterListener (plugin.getState().nonParams.editorBounds, [setSizeFromState]
+                                                   { setSizeFromState(); }),
+    };
 }
 
 PluginEditor::~PluginEditor()

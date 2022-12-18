@@ -2,31 +2,40 @@
 
 namespace chowdsp
 {
+//struct StateValueBase
+//{
+//    explicit StateValueBase (std::string_view valueName) : name (valueName) {}
+//
+//    virtual void reset() = 0;
+//
+//    const std::string_view name;
+//};
+
 /** A stateful value that can be used to hold some non-parameter state */
 template <typename T>
 struct StateValue
 {
     using element_type = T;
 
-    /** Constructs the vaslue with a name and default value */
-    StateValue (std::string_view valueName, T defaultValue)
+    /** Constructs the value with a name and default value */
+    StateValue (std::string_view valueName, T defaultVal)
         : name (valueName),
-          defaultVal (defaultValue),
-          val (defaultVal)
+          defaultValue (defaultVal),
+          currentValue (defaultValue)
     {
     }
 
     /** Returns the value */
-    T get() const noexcept { return val; }
+    T get() const noexcept { return currentValue; }
     operator T() const noexcept { return get(); } // NOLINT(google-explicit-constructor): we want to be able to do implicit conversion
 
     /** Sets a new value */
     void set (T v)
     {
-        if (v == val)
+        if (v == currentValue)
             return;
 
-        val = v;
+        currentValue = v;
         changeBroadcaster();
     }
 
@@ -37,7 +46,7 @@ struct StateValue
     }
 
     /** Resets the value to its default state */
-    void reset() { set (defaultVal); }
+    void reset() { set (defaultValue); }
 
     template <typename Serializer>
     static void serialize (typename Serializer::SerializedType& serial, const StateValue& value)
@@ -55,13 +64,13 @@ struct StateValue
     }
 
     const std::string_view name;
-    const T defaultVal;
+    const T defaultValue;
 
-private:
-    T val;
     Broadcaster<void()> changeBroadcaster;
 
-    template <typename ParameterState, typename NonParameterState, typename Serializer>
-    friend class PluginState;
+private:
+    T currentValue;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StateValue)
 };
 } // namespace chowdsp

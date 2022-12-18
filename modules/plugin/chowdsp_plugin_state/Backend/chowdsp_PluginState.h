@@ -45,11 +45,11 @@ public:
      * The listener will be called on whichever thread the state value is
      * mutated on. Listeners should have the signature void().
      */
-    //    template <typename NonParamType, typename... ListenerArgs>
-    //    [[nodiscard]] ScopedCallback addNonParameterListener (StateValue<NonParamType>& nonParam, ListenerArgs&&... args)
-    //    {
-    //        return nonParam.changeBroadcaster.connect (std::forward<ListenerArgs...> (args...));
-    //    }
+    template <typename NonParamType, typename... ListenerArgs>
+    [[nodiscard]] ScopedCallback addNonParameterListener (StateValue<NonParamType>& nonParam, ListenerArgs&&... args)
+    {
+        return nonParam.changeBroadcaster.connect (std::forward<ListenerArgs...> (args...));
+    }
 
     juce::UndoManager* undoManager = nullptr;
 

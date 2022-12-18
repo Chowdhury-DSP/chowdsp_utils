@@ -34,7 +34,7 @@ typename Serializer::SerializedType PluginStateImpl<ParameterState, NonParameter
 {
     auto serial = Serializer::createBaseElement();
     Serializer::addChildElement (serial, Serializer::template serialize<Serializer, ParamHolder> (object.params));
-    //    Serializer::addChildElement (serial, PluginStateSerializer::serialize<Serializer> (object.nonParams));
+    Serializer::addChildElement (serial, NonParameterStateSerialization::serialize<Serializer> (object.nonParams));
     return serial;
 }
 
@@ -45,13 +45,13 @@ void PluginStateImpl<ParameterState, NonParameterState, Serializer>::deserialize
 {
     // @TODO: What about version streaming?
 
-    //    if (Serializer::getNumChildElements (serial) != 2)
-    //    {
-    //        jassertfalse; // state load error!
-    //        return;
-    //    }
+    if (Serializer::getNumChildElements (serial) != 2)
+    {
+        jassertfalse; // state load error!
+        return;
+    }
 
     Serializer::template deserialize<Serializer, ParamHolder> (Serializer::getChildElement (serial, 0), object.params);
-    //    PluginStateSerializer::deserialize<Serializer> (Serializer::getChildElement (serial, 1), object.nonParams);
+    NonParameterStateSerialization::deserialize<Serializer> (Serializer::getChildElement (serial, 1), object.nonParams);
 }
 } // namespace chowdsp

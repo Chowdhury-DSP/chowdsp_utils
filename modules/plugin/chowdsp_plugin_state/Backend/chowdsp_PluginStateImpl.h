@@ -2,6 +2,7 @@
 
 namespace chowdsp
 {
+/** Empty struct that can be used as a placeholder for NonParameterState */
 struct NullState
 {
 };
@@ -17,9 +18,7 @@ template <typename ParameterState, typename NonParameterState = NullState, typen
 class PluginStateImpl : public PluginState
 {
     static_assert (std::is_base_of_v<ParamHolder, ParameterState>, "ParameterState must be a ParamHolder!");
-
-    //    static_assert (PluginStateHelpers::ContainsOnlyStateValues<NonParameterState>,
-    //                   "NonParameterState must only contain chowdsp::StateValue types or structs containing those types!");
+    static_assert (std::is_aggregate_v<NonParameterState>, "NonParameterState must be an aggregate type!");
 
 public:
     /** Constructs a plugin state with no processor */
@@ -29,10 +28,10 @@ public:
     explicit PluginStateImpl (juce::AudioProcessor& processor, juce::UndoManager* um = nullptr, juce::TimeSliceThread* backgroundThread = nullptr);
 
     /** Serializes the plugin state to the given MemoryBlock */
-    void serialize (juce::MemoryBlock& data) const;
+    void serialize (juce::MemoryBlock& data) const override;
 
     /** Deserializes the plugin state from the given MemoryBlock */
-    void deserialize (const juce::MemoryBlock& data);
+    void deserialize (const juce::MemoryBlock& data) override;
 
     /** Serializer */
     template <typename>
