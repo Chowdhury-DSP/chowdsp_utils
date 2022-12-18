@@ -4,11 +4,10 @@ namespace chowdsp
 namespace parameters_view_detail
 {
     //==============================================================================
-    template <typename PluginStateType>
     class BooleanParameterComponent : public juce::Component
     {
     public:
-        BooleanParameterComponent (BoolParameter& param, PluginStateType& pluginState)
+        BooleanParameterComponent (BoolParameter& param, PluginState& pluginState)
             : attachment (param, pluginState, button)
         {
             addAndMakeVisible (button);
@@ -23,16 +22,15 @@ namespace parameters_view_detail
 
     private:
         juce::ToggleButton button;
-        ButtonAttachment<PluginStateType> attachment;
+        ButtonAttachment attachment;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BooleanParameterComponent)
     };
 
-    template <typename PluginStateType>
     class ChoiceParameterComponent : public juce::Component
     {
     public:
-        ChoiceParameterComponent (ChoiceParameter& param, PluginStateType& pluginState)
+        ChoiceParameterComponent (ChoiceParameter& param, PluginState& pluginState)
             : attachment (param, pluginState, box)
         {
             addAndMakeVisible (box);
@@ -47,16 +45,15 @@ namespace parameters_view_detail
 
     private:
         juce::ComboBox box;
-        ComboBoxAttachment<PluginStateType> attachment;
+        ComboBoxAttachment attachment;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ChoiceParameterComponent)
     };
 
-    template <typename PluginStateType>
     class SliderParameterComponent : public juce::Component
     {
     public:
-        SliderParameterComponent (FloatParameter& param, PluginStateType& pluginState)
+        SliderParameterComponent (FloatParameter& param, PluginState& pluginState)
             : attachment (param, pluginState, slider)
         {
             slider.setScrollWheelEnabled (false);
@@ -71,17 +68,16 @@ namespace parameters_view_detail
 
     private:
         juce::Slider slider { juce::Slider::LinearHorizontal, juce::Slider::TextEntryBoxPosition::TextBoxRight };
-        SliderAttachment<PluginStateType> attachment;
+        SliderAttachment attachment;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SliderParameterComponent)
     };
 
     //==============================================================================
-    template <typename PluginStateType>
     class ParameterDisplayComponent : public juce::Component
     {
     public:
-        ParameterDisplayComponent (juce::Component& editorIn, juce::RangedAudioParameter& param, PluginStateType& pluginState)
+        ParameterDisplayComponent (juce::Component& editorIn, juce::RangedAudioParameter& param, PluginState& pluginState)
             : editor (editorIn), parameter (param)
         {
             parameterName.setText (parameter.getName (128), juce::dontSendNotification);
@@ -113,16 +109,16 @@ namespace parameters_view_detail
         juce::Label parameterName, parameterLabel;
         std::unique_ptr<juce::Component> parameterComp;
 
-        std::unique_ptr<juce::Component> createParameterComp (PluginStateType& pluginState) const
+        std::unique_ptr<juce::Component> createParameterComp (PluginState& pluginState) const
         {
             if (auto* boolParam = dynamic_cast<BoolParameter*> (&parameter))
-                return std::make_unique<BooleanParameterComponent<PluginStateType>> (*boolParam, pluginState);
+                return std::make_unique<BooleanParameterComponent> (*boolParam, pluginState);
 
             if (auto* choiceParam = dynamic_cast<ChoiceParameter*> (&parameter))
-                return std::make_unique<ChoiceParameterComponent<PluginStateType>> (*choiceParam, pluginState);
+                return std::make_unique<ChoiceParameterComponent> (*choiceParam, pluginState);
 
             if (auto* sliderParam = dynamic_cast<FloatParameter*> (&parameter))
-                return std::make_unique<SliderParameterComponent<PluginStateType>> (*sliderParam, pluginState);
+                return std::make_unique<SliderParameterComponent> (*sliderParam, pluginState);
 
             return {};
         }
@@ -131,30 +127,28 @@ namespace parameters_view_detail
     };
 
     //==============================================================================
-    template <typename PluginStateType>
     struct ParamControlItem : public juce::TreeViewItem
     {
-        ParamControlItem (juce::Component& editorIn, juce::RangedAudioParameter& paramIn, PluginStateType& pluginState)
+        ParamControlItem (juce::Component& editorIn, juce::RangedAudioParameter& paramIn, PluginState& pluginState)
             : editor (editorIn), param (paramIn), state (pluginState) {}
 
         bool mightContainSubItems() override { return false; }
 
         std::unique_ptr<juce::Component> createItemComponent() override
         {
-            return std::make_unique<ParameterDisplayComponent<PluginStateType>> (editor, param, state);
+            return std::make_unique<ParameterDisplayComponent> (editor, param, state);
         }
 
         [[nodiscard]] int getItemHeight() const override { return 40; }
 
         juce::Component& editor;
         juce::RangedAudioParameter& param;
-        PluginStateType& state;
+        PluginState& state;
     };
 
-    template <typename PluginStateType>
     struct ParameterGroupItem : public juce::TreeViewItem
     {
-        ParameterGroupItem (juce::Component& editor, ParamHolder& params, PluginStateType& pluginState)
+        ParameterGroupItem (juce::Component& editor, ParamHolder& params, PluginState& pluginState)
             : name (toString (nameof::nameof_short_type<Parameters>()))
         {
             params.template doForAllParameterContainers (
@@ -162,17 +156,17 @@ namespace parameters_view_detail
                 {
                     for (auto& param : paramVec)
                     {
-                        addSubItem (std::make_unique<ParamControlItem<PluginStateType>> (editor,
-                                                                                         param,
-                                                                                         pluginState)
+                        addSubItem (std::make_unique<ParamControlItem> (editor,
+                                                                        param,
+                                                                        pluginState)
                                         .release());
                     }
                 },
                 [&] (auto& paramHolder)
                 {
-                    addSubItem (std::make_unique<ParameterGroupItem<PluginStateType>> (editor,
-                                                                                       paramHolder,
-                                                                                       pluginState)
+                    addSubItem (std::make_unique<ParameterGroupItem> (editor,
+                                                                      paramHolder,
+                                                                      pluginState)
                                     .release());
                 });
         }
@@ -188,11 +182,11 @@ namespace parameters_view_detail
     };
 } // namespace parameters_view_detail
 #endif
+
 //==============================================================================
-template <typename PluginStateType>
-struct ParametersView<PluginStateType>::Pimpl
+struct ParametersView::Pimpl
 {
-    Pimpl (juce::Component& editor, ParamHolder& params, PluginStateType& pluginState)
+    Pimpl (juce::Component& editor, ParamHolder& params, PluginState& pluginState)
         : groupItem (editor, params, pluginState)
     {
         const auto numIndents = getNumIndents (groupItem);
@@ -214,13 +208,12 @@ struct ParametersView<PluginStateType>::Pimpl
         return maxInner;
     }
 
-    parameters_view_detail::ParameterGroupItem<PluginStateType> groupItem {};
+    parameters_view_detail::ParameterGroupItem groupItem;
     juce::TreeView view;
 };
 
 //==============================================================================
-template <typename PluginStateType>
-ParametersView<PluginStateType>::ParametersView (PluginStateType& pluginState, ParamHolder& params)
+ParametersView::ParametersView (PluginState& pluginState, ParamHolder& params)
     : pimpl (std::make_unique<Pimpl> (*this, params, pluginState))
 {
     auto* viewport = pimpl->view.getViewport();
@@ -232,17 +225,14 @@ ParametersView<PluginStateType>::ParametersView (PluginStateType& pluginState, P
              juce::jlimit (125, 400, viewport->getViewedComponent()->getHeight()));
 }
 
-template <typename PluginStateType>
-ParametersView<PluginStateType>::~ParametersView() = default;
+ParametersView::~ParametersView() = default;
 
-template <typename PluginStateType>
-void ParametersView<PluginStateType>::paint (juce::Graphics& g)
+void ParametersView::paint (juce::Graphics& g)
 {
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
 }
 
-template <typename PluginStateType>
-void ParametersView<PluginStateType>::resized()
+void ParametersView::resized()
 {
     pimpl->view.setBounds (getLocalBounds());
 }
