@@ -149,7 +149,7 @@ namespace parameters_view_detail
     struct ParameterGroupItem : public juce::TreeViewItem
     {
         ParameterGroupItem (juce::Component& editor, ParamHolder& params, PluginState& pluginState)
-            : name (toString (nameof::nameof_short_type<Parameters>()))
+            : name (params.getName())
         {
             params.template doForAllParameterContainers (
                 [&] (auto& paramVec)

@@ -6,7 +6,10 @@ namespace chowdsp
 class ParamHolder
 {
 public:
-    ParamHolder() = default;
+    ParamHolder (const juce::String& name = {});
+
+    ParamHolder (ParamHolder&&) noexcept = default;
+    ParamHolder& operator= (ParamHolder&&) noexcept = default;
 
     /** Adds parameters to the ParamHolder. */
     template <typename ParamType, typename... OtherParams>
@@ -33,6 +36,9 @@ public:
 
     /** Connects all the parameters to an AudioProcessor */
     void connectParametersToProcessor (juce::AudioProcessor& processor);
+
+    /** Returns the paramHolder name */
+    [[nodiscard]] juce::String getName() const noexcept { return name; }
 
     /** Internal use only! */
     template <typename ParamContainersCallable, typename ParamHolderCallable>
@@ -74,6 +80,8 @@ private:
     std::vector<OptionalPointer<ChoiceParameter>> choiceParams;
     std::vector<OptionalPointer<BoolParameter>> boolParams;
     std::vector<ParamHolder*> otherParams;
+
+    juce::String name;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParamHolder)
 };

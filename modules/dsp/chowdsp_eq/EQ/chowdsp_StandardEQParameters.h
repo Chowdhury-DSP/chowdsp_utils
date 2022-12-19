@@ -9,15 +9,13 @@ namespace chowdsp::EQ
 {
 /** Static class for working with standard EQ parameters */
 template <size_t NumBands>
-struct StandardEQParameters
+struct StandardEQParameters : ParamHolder
 {
 public:
     static constexpr auto EQNumBands = NumBands;
 
     /** Parameters to determine the EQ behaviour */
     using Params = BasicEQParams<NumBands>;
-
-    const std::string_view name = "chowdsp_eq";
 
     struct EQBandParams
     {
@@ -30,73 +28,82 @@ public:
          * If your plugin contains multiple EQs you may want to
          * use a custom parameter ID prefix to avoid overlap.
          */
-        const std::string_view bandParamPrefix;
+        const juce::String bandParamPrefix;
 
         /** Default name prefix for EQ parameters. */
-        const std::string_view bandNamePrefix = "Band ";
+        const juce::String bandNamePrefix = "Band ";
 
-        /**
-         * Default version hint for EQ parameters.
-         *
-         * If your plugin adds an EQ in a version after 1.0.0,
-         * you may want to override this value with a custom
-         * version hint.
-         */
+        /** Default version hint for EQ parameters. */
         const int versionHint = 100;
 
-        const float defaultFreqHz = 1000.0f;
-
         /** A comma-separated string containing EQ band type choices */
-        const std::string_view bandTypeChoices = "1-Pole HPF,2-Pole HPF,Low-Shelf,Bell,Notch,High-Shelf,1-Pole LPF,2-Pole LPF";
+        const juce::StringArray bandTypeChoices = { "1-Pole HPF", "2-Pole HPF", "Low-Shelf", "Bell", "Notch", "High-Shelf", "1-Pole LPF", "2-Pole LPF" };
 
         /** The index of the default EQ band */
         const int defaultEQBandTypeChoice = 3;
 
-        /** The range to use for the Q parameter in this band */
-        const float qMin = 0.1f;
-        const float qMax = 10.0f;
+        /** Default frequency for this band */
+        const float freqDefault = 1000.0f;
+
+        /** The range to use for the frequency parameter in this band */
+        const juce::NormalisableRange<float> freqRange = ParamUtils::createNormalisableRange (20.0f, 20000.0f, 2000.0f);
+
+        /** Default Q-value for this band */
         const float qDefault = CoefficientCalculators::butterworthQ<float>;
 
+        /** The range to use for the Q parameter in this band */
+        const juce::NormalisableRange<float> qRange = ParamUtils::createNormalisableRange (0.5f, 20.0f, CoefficientCalculators::butterworthQ<float>);
+
+        /** The range to use for the Gain [dB] parameter in this band */
+        const juce::NormalisableRange<float> gainRange = juce::NormalisableRange { -18.0f, 18.0f };
+
         BoolParameter::Ptr onOffParam {
-            juce::ParameterID { toString (bandParamPrefix) + "eq_band_on_off", versionHint },
-            toString (bandNamePrefix) + juce::String (bandIndex + 1) + " On/Off",
+            juce::ParameterID { bandParamPrefix + "eq_band_on_off", versionHint },
+            bandNamePrefix + juce::String (bandIndex + 1) + " On/Off",
             false
         };
 
         ChoiceParameter::Ptr typeParam {
-            juce::ParameterID { toString (bandParamPrefix) + "eq_band_type", versionHint },
-            toString (bandNamePrefix) + juce::String (bandIndex + 1) + " Type",
-            juce::StringArray::fromTokens (toString (bandTypeChoices), ",", ""),
+            juce::ParameterID { bandParamPrefix + "eq_band_type", versionHint },
+            bandNamePrefix + juce::String (bandIndex + 1) + " Type",
+            bandTypeChoices,
             defaultEQBandTypeChoice
         };
 
         FreqHzParameter::Ptr freqParam {
-            juce::ParameterID { toString (bandParamPrefix) + "eq_band_freq", versionHint },
-            toString (bandNamePrefix) + juce::String (bandIndex + 1) + " Frequency",
-            ParamUtils::createNormalisableRange (20.0f, 20000.0f, 2000.0f),
-            defaultFreqHz
+            juce::ParameterID { bandParamPrefix + "eq_band_freq", versionHint },
+            bandNamePrefix + juce::String (bandIndex + 1) + " Frequency",
+            freqRange,
+            freqDefault
         };
 
         FloatParameter::Ptr qParam {
-            juce::ParameterID { toString (bandParamPrefix) + "eq_band_q", versionHint },
-            toString (bandNamePrefix) + juce::String (bandIndex + 1) + " Q",
-            ParamUtils::createNormalisableRange (qMin, qMax, qDefault),
-            0.7071f,
+            juce::ParameterID { bandParamPrefix + "eq_band_q", versionHint },
+            bandNamePrefix + juce::String (bandIndex + 1) + " Q",
+            qRange,
+            qDefault,
             &ParamUtils::floatValToString,
             &ParamUtils::stringToFloatVal
         };
 
         FreqHzParameter::Ptr gainParam {
-            juce::ParameterID { toString (bandParamPrefix) + "eq_band_gain", versionHint },
-            toString (bandNamePrefix) + juce::String (bandIndex + 1) + " Gain",
-            juce::NormalisableRange { -18.0f, 18.0f },
+            juce::ParameterID { bandParamPrefix + "eq_band_gain", versionHint },
+            bandNamePrefix + juce::String (bandIndex + 1) + " Gain",
+            gainRange,
             0.0f
         };
+
+        /** Internal use only! */
+        chowdsp::ParamHolder paramHolder { bandNamePrefix + juce::String (bandIndex + 1) };
     };
 
     /** Set of parameter handles for the entire EQ. */
     using EQParameterHandles = std::array<EQBandParams, NumBands>;
 
+    /** Constructor */
+    explicit StandardEQParameters (EQParameterHandles&& paramHandles);
+
+    /** Parameter handles */
     EQParameterHandles eqParams;
 
     /** Returns a struct of EQ parameters based on the given set of parameter handles. */

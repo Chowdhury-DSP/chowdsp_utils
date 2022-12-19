@@ -8,7 +8,7 @@ SimpleEQPlugin::SimpleEQPlugin()
     { eq.setParameters (eqParams); };
 
     linPhaseModeChangeCallback = state.addParameterListener (*state.params.linPhaseMode,
-                                                             true,
+                                                              chowdsp::ParameterListenerThread::MessageThread,
                                                              [this]
                                                              {
                                                                  setLatencySamples (state.params.linPhaseMode.get() ? linPhaseEQ.getLatencySamples() : 0);

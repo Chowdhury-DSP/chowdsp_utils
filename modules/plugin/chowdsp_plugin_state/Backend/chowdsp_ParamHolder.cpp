@@ -1,5 +1,9 @@
 namespace chowdsp
 {
+inline ParamHolder::ParamHolder (const juce::String& paramHolderName) : name (paramHolderName)
+{
+}
+
 template <typename ParamType, typename... OtherParams>
 std::enable_if_t<std::is_base_of_v<FloatParameter, ParamType>, void>
     ParamHolder::add (OptionalPointer<ParamType>& floatParam, OtherParams&... others)

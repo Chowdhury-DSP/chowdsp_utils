@@ -4,7 +4,7 @@
 
 struct LevelParams : chowdsp::ParamHolder
 {
-    LevelParams()
+    LevelParams() : chowdsp::ParamHolder ("Level")
     {
         add (percent, gain);
     }
