@@ -108,4 +108,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParameterListeners)
 };
 JUCE_END_IGNORE_WARNINGS_MSVC
-}
+} // namespace chowdsp

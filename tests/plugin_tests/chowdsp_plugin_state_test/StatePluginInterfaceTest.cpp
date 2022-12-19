@@ -30,7 +30,6 @@ struct Plugin : chowdsp::PluginBase<chowdsp::PluginStateImpl<PluginParameterStat
     void releaseResources() override {}
     void processAudioBlock (juce::AudioBuffer<float>&) override {}
     juce::AudioProcessorEditor* createEditor() override { return nullptr; }
-
 };
 
 class StatePluginInterfaceTest : public TimedUnitTest
@@ -50,9 +49,7 @@ public:
 
         juce::StringArray expectedParamIDs;
         params.doForAllParameters ([&expectedParamIDs] (auto& param, size_t)
-                                   {
-                                      expectedParamIDs.add (param.paramID);
-                                   });
+                                   { expectedParamIDs.add (param.paramID); });
 
         juce::StringArray actualParamIDs;
         for (const auto* param : pluginParams)
