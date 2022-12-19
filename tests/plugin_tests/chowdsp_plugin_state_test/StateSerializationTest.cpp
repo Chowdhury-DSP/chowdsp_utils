@@ -3,7 +3,7 @@
 
 struct LevelParams : chowdsp::ParamHolder
 {
-    LevelParams (const juce::String& paramPrefix = "", int version = 100)
+    explicit LevelParams (const juce::String& paramPrefix = "", int version = 100)
         : prefix (paramPrefix),
           versionHint (version)
     {
@@ -29,8 +29,10 @@ struct PluginParameterState : chowdsp::ParamHolder
     chowdsp::BoolParameter::Ptr onOff { "on_off", "On/Off", true };
 };
 
-struct PluginNonParameterState
+struct PluginNonParameterState : chowdsp::NonParamState
 {
+    PluginNonParameterState() : chowdsp::NonParamState ({ &editorWidth, &editorHeight }) {}
+
     chowdsp::StateValue<int> editorWidth { "editor_width", 300 };
     chowdsp::StateValue<int> editorHeight { "editor_height", 500 };
 };
@@ -109,8 +111,13 @@ struct PluginParameterStateNewGroup : chowdsp::ParamHolder
 
 using StateWithNewGroup = chowdsp::PluginStateImpl<PluginParameterStateNewGroup>;
 
-struct PluginNonParameterStateNewField
+struct PluginNonParameterStateNewField : chowdsp::NonParamState
 {
+    PluginNonParameterStateNewField()
+        : chowdsp::NonParamState ({ &editorWidth, &editorHeight, &randomString })
+    {
+    }
+
     chowdsp::StateValue<int> editorWidth { "editor_width", 300 };
     chowdsp::StateValue<int> editorHeight { "editor_height", 500 };
     chowdsp::StateValue<juce::String> randomString { "random_string", "default" };

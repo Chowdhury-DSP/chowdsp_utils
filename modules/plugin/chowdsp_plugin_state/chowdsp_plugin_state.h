@@ -36,11 +36,12 @@ BEGIN_JUCE_MODULE_DECLARATION
 JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324) // struct was padded warning
 
 #include "Backend/chowdsp_StateValue.h"
+#include "Backend/chowdsp_NonParamState.h"
+
 #include "Backend/chowdsp_ParameterTypeHelpers.h"
 #include "Backend/chowdsp_ParamHolder.h"
 #include "Backend/chowdsp_ParameterListeners.h"
 #include "Backend/chowdsp_PluginState.h"
-#include "Backend/chowdsp_NonParameterStateSerialization.h"
 #include "Backend/chowdsp_PluginStateImpl.h"
 
 #include "Frontend/chowdsp_ParameterAttachment.h"

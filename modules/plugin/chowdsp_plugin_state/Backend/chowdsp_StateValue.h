@@ -2,15 +2,29 @@
 
 namespace chowdsp
 {
+struct StateValueBase
+{
+    explicit StateValueBase (std::string_view valueName) : name (valueName) {}
+    virtual ~StateValueBase() = default;
+
+    virtual void reset() {}
+
+    virtual void serialize (JSONSerializer::SerializedType&) const {}
+    virtual void deserialize (JSONSerializer::DeserializedType) {}
+
+    const std::string_view name;
+    Broadcaster<void()> changeBroadcaster;
+};
+
 /** A stateful value that can be used to hold some non-parameter state */
 template <typename T>
-struct StateValue
+struct StateValue : StateValueBase
 {
     using element_type = T;
 
     /** Constructs the value with a name and default value */
     StateValue (std::string_view valueName, T defaultVal)
-        : name (valueName),
+        : StateValueBase (valueName),
           defaultValue (defaultVal),
           currentValue (defaultValue)
     {
@@ -37,8 +51,23 @@ struct StateValue
     }
 
     /** Resets the value to its default state */
-    void reset() { set (defaultValue); }
+    void reset() override { set (defaultValue); }
 
+    /** JSON Serializer */
+    void serialize (JSONSerializer::SerializedType& serial) const override
+    {
+        serialize<JSONSerializer> (serial, *this);
+    }
+
+    /** JSON Deserializer */
+    void deserialize (JSONSerializer::DeserializedType deserial) override
+    {
+        deserialize<JSONSerializer> (deserial, *this);
+    }
+
+    const T defaultValue;
+
+private:
     template <typename Serializer>
     static void serialize (typename Serializer::SerializedType& serial, const StateValue& value)
     {
@@ -47,19 +76,13 @@ struct StateValue
     }
 
     template <typename Serializer>
-    static void deserialize (typename Serializer::DeserializedType serial, StateValue& value)
+    static void deserialize (typename Serializer::DeserializedType deserial, StateValue& value)
     {
         T val {};
-        Serialization::deserialize<Serializer> (serial, val);
+        Serialization::deserialize<Serializer> (deserial, val);
         value.set (val);
     }
 
-    const std::string_view name;
-    const T defaultValue;
-
-    Broadcaster<void()> changeBroadcaster;
-
-private:
     T currentValue;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StateValue)

@@ -149,7 +149,7 @@ namespace parameters_view_detail
         ParameterGroupItem (ParamHolder& params, PluginState& pluginState)
             : name (params.getName())
         {
-            params.template doForAllParameterContainers (
+            params.doForAllParameterContainers (
                 [this, &pluginState] (auto& paramVec)
                 {
                     for (auto& param : paramVec)

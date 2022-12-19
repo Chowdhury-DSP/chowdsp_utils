@@ -2,23 +2,18 @@
 
 namespace chowdsp
 {
-/** Empty struct that can be used as a placeholder for NonParameterState */
-struct NullState
-{
-};
-
 /**
  * Template type to hold a plugin's state.
  *
- * @tparam ParameterState       Struct containing all of the plugin's parameters as chowdsp::SmartPointer's. Structs may be nested.
- * @tparam NonParameterState    Struct containing all of the plugin's non-parameter state as StateValue onjects. Structs may be nested.
+ * @tparam ParameterState       Struct containing all of the plugin's parameters as chowdsp::OptionalPointer's.
+ * @tparam NonParameterState    Struct containing all of the plugin's non-parameter state as StateValue objects.
  * @tparam Serializer           A type that implements chowdsp::BaseSerializer (JSONSerializer by default)
  */
-template <typename ParameterState, typename NonParameterState = NullState, typename Serializer = JSONSerializer>
+template <typename ParameterState, typename NonParameterState = NonParamState, typename Serializer = JSONSerializer>
 class PluginStateImpl : public PluginState
 {
-    static_assert (std::is_base_of_v<ParamHolder, ParameterState>, "ParameterState must be a ParamHolder!");
-    static_assert (std::is_aggregate_v<NonParameterState>, "NonParameterState must be an aggregate type!");
+    static_assert (std::is_base_of_v<ParamHolder, ParameterState>, "ParameterState must be a chowdsp::ParamHolder!");
+    static_assert (std::is_base_of_v<NonParamState, NonParameterState>, "NonParameterState must be a chowdsp::NonParamState!");
 
 public:
     /** Constructs a plugin state with no processor */

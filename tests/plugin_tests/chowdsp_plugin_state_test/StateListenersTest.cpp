@@ -85,8 +85,9 @@ public:
             chowdsp::PercentParameter::Ptr pct { "percent", "Percent", 1.0f };
         };
 
-        struct NonParams
+        struct NonParams : chowdsp::NonParamState
         {
+            NonParams() : chowdsp::NonParamState ({ &value }) {}
             chowdsp::StateValue<int> value { "value", 100 };
         };
 

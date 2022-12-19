@@ -25,8 +25,10 @@ struct PluginParameterState : chowdsp::ParamHolder
     chowdsp::BoolParameter::Ptr onOff { juce::ParameterID { "on_off", 100 }, "On/Off", true };
 };
 
-struct PluginNonParameterState
+struct PluginNonParameterState : chowdsp::NonParamState
 {
+    PluginNonParameterState() : chowdsp::NonParamState ({ &editorBounds }) {}
+
     chowdsp::StateValue<juce::Point<int>> editorBounds { "editor_bounds", { 300, 500 } };
 };
 
