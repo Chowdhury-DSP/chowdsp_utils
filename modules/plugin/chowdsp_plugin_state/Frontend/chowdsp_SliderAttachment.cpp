@@ -55,11 +55,11 @@ SliderAttachment::SliderAttachment (FloatParameter& param,
     };
 
     auto newRange = juce::NormalisableRange<double> { // NOSONAR
-        (double) range.start,
-        (double) range.end,
-        std::move (convertFrom0To1Function),
-        std::move (convertTo0To1Function),
-        std::move (snapToLegalValueFunction)
+                                                      (double) range.start,
+                                                      (double) range.end,
+                                                      std::move (convertFrom0To1Function),
+                                                      std::move (convertTo0To1Function),
+                                                      std::move (snapToLegalValueFunction)
     };
     newRange.interval = range.interval;
     newRange.skew = range.skew;

@@ -59,7 +59,6 @@
 #include "PluginComponents/chowdsp_TooltipComp.h"
 #include "PluginComponents/chowdsp_WindowInPlugin.h"
 
-
 #include "PluginComponents/chowdsp_ParametersView.h"
 #endif
 
