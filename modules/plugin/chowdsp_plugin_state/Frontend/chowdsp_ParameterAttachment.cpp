@@ -1,33 +1,41 @@
 namespace chowdsp
 {
-template <typename Param, typename State, typename Callback>
-ParameterAttachment<Param, State, Callback>::ParameterAttachment (Param& parameter,
-                                                                  State& pluginState,
-                                                                  Callback&& callback)
-    : param (parameter)
+template <typename Param, typename Callback>
+ParameterAttachment<Param, Callback>::ParameterAttachment (Param& parameter,
+                                                           PluginState& pluginState,
+                                                           Callback&& callback)
+    : ParameterAttachment (parameter, pluginState.getParameterListeners(), std::move<Callback> (callback))
 {
-    valueChangedCallback = pluginState.addParameterListener (param,
-                                                             true,
-                                                             [this, c = std::move (callback)]() mutable
-                                                             {
-                                                                 c (ParameterTypeHelpers::getValue (param));
-                                                             });
 }
 
-template <typename Param, typename State, typename Callback>
-void ParameterAttachment<Param, State, Callback>::beginGesture()
+template <typename Param, typename Callback>
+ParameterAttachment<Param, Callback>::ParameterAttachment (Param& parameter,
+                                                           ParameterListeners& listeners,
+                                                           Callback&& callback)
+    : param (parameter)
+{
+    valueChangedCallback = listeners.addParameterListener (param,
+                                                           ParameterListenerThread::MessageThread,
+                                                           [this, c = std::move (callback)]() mutable
+                                                           {
+                                                               c (ParameterTypeHelpers::getValue (param));
+                                                           });
+}
+
+template <typename Param, typename Callback>
+void ParameterAttachment<Param, Callback>::beginGesture()
 {
     param.beginChangeGesture();
 }
 
-template <typename Param, typename State, typename Callback>
-void ParameterAttachment<Param, State, Callback>::endGesture()
+template <typename Param, typename Callback>
+void ParameterAttachment<Param, Callback>::endGesture()
 {
     param.endChangeGesture();
 }
 
-template <typename Param, typename State, typename Callback>
-void ParameterAttachment<Param, State, Callback>::setValueAsCompleteGesture (ParamElementType newValue)
+template <typename Param, typename Callback>
+void ParameterAttachment<Param, Callback>::setValueAsCompleteGesture (ParamElementType newValue)
 {
     callIfParameterValueChanged (newValue,
                                  [this] (ParamElementType val)
@@ -38,8 +46,8 @@ void ParameterAttachment<Param, State, Callback>::setValueAsCompleteGesture (Par
                                  });
 }
 
-template <typename Param, typename State, typename Callback>
-void ParameterAttachment<Param, State, Callback>::setValueAsPartOfGesture (ParamElementType newValue)
+template <typename Param, typename Callback>
+void ParameterAttachment<Param, Callback>::setValueAsPartOfGesture (ParamElementType newValue)
 {
     callIfParameterValueChanged (newValue,
                                  [this] (ParamElementType val)
@@ -48,10 +56,10 @@ void ParameterAttachment<Param, State, Callback>::setValueAsPartOfGesture (Param
                                  });
 }
 
-template <typename Param, typename State, typename Callback>
+template <typename Param, typename Callback>
 template <typename Func>
-void ParameterAttachment<Param, State, Callback>::callIfParameterValueChanged (ParamElementType newValue,
-                                                                               Func&& func)
+void ParameterAttachment<Param, Callback>::callIfParameterValueChanged (ParamElementType newValue,
+                                                                        Func&& func)
 {
     if (ParameterTypeHelpers::getValue (param) != newValue)
         func (newValue);

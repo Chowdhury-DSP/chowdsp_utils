@@ -9,18 +9,17 @@ namespace chowdsp
  * to a parameter. When this object is deleted, the connection is broken. Make sure that your parameter and
  * Slider are not deleted before this object!
  */
-template <typename PluginStateType>
 class SliderAttachment : private juce::Slider::Listener
 {
 public:
-    /** Creates an attachment for a given parameter, using the undo manager from the plugin state */
+    /** Creates an attachment for a given parameter, using the undo manager from the plugin state. */
     SliderAttachment (FloatParameter& param,
-                      PluginStateType& pluginState,
+                      PluginState& pluginState,
                       juce::Slider& paramSlider);
 
-    /** Creates an attachment for a given parameter, using a custom UndoManager */
+    /** Creates an attachment for a given parameter. */
     SliderAttachment (FloatParameter& param,
-                      PluginStateType& pluginState,
+                      ParameterListeners& listeners,
                       juce::Slider& paramSlider,
                       juce::UndoManager* undoManager);
 
@@ -36,7 +35,6 @@ private:
 
     juce::Slider& slider;
     ParameterAttachment<FloatParameter,
-                        PluginStateType,
                         ParameterAttachmentHelpers::SetValueCallback<SliderAttachment>>
         attachment;
     juce::UndoManager* um = nullptr;
@@ -47,5 +45,3 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SliderAttachment)
 };
 } // namespace chowdsp
-
-#include "chowdsp_SliderAttachment.cpp"

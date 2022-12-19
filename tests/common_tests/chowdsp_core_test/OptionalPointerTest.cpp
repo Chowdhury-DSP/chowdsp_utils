@@ -27,7 +27,8 @@ TEST_CASE ("Smart Pointer Test")
     SECTION ("Non-Owning")
     {
         const auto x_owned = std::make_unique<TestType> (4, 5);
-        const chowdsp::OptionalPointer<TestType> x { x_owned.get() };
+        chowdsp::OptionalPointer<TestType> x;
+        x.setNonOwning (x_owned.get());
         REQUIRE (! x.isOwner());
         REQUIRE (x->x == 4);
         REQUIRE (x->y == 5);
@@ -54,6 +55,24 @@ TEST_CASE ("Smart Pointer Test")
         REQUIRE (x == nullptr);
     }
 
+    SECTION ("Non-Owning -> Owning")
+    {
+        auto x_owned = std::make_unique<TestType> (4, 5);
+        chowdsp::OptionalPointer<TestType> x;
+        x.setNonOwning (x_owned.get());
+        REQUIRE (! x.isOwner());
+        REQUIRE (x->x == 4);
+        REQUIRE (x->y == 5);
+
+        x.setOwning (x_owned.release());
+        REQUIRE (x.isOwner());
+        REQUIRE (x->x == 4);
+        REQUIRE (x->y == 5);
+
+        x.setOwning (nullptr);
+        REQUIRE (x == nullptr);
+    }
+
     SECTION ("Equality with nullptr")
     {
         const chowdsp::OptionalPointer<TestType> x { 4, 5 };
@@ -76,7 +95,8 @@ TEST_CASE ("Smart Pointer Test")
     SECTION ("Equality with other OptionalPointer")
     {
         chowdsp::OptionalPointer<TestType> x { 4, 5 };
-        chowdsp::OptionalPointer<TestType> y { x.get() };
+        chowdsp::OptionalPointer<TestType> y;
+        y.setNonOwning (x.get());
         REQUIRE (x == y);
         REQUIRE_FALSE (x != y);
     }

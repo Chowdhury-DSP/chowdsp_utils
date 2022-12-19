@@ -9,7 +9,8 @@ namespace Serialization
     template <typename Serializer, typename TypeToSerialize>
     typename Serializer::SerializedType serialize (const TypeToSerialize& objectToSerialize)
     {
-        static_assert (std::is_base_of_v<BaseSerializer, Serializer>, "Serializer type must be derived from BaseSerializer");
+        static_assert (std::is_base_of_v<BaseSerializer, Serializer> || std::is_same_v<serialization_detail::DummySerializer, Serializer>,
+                       "Serializer type must be derived from BaseSerializer");
 
         return Serializer::template serialize<Serializer> (objectToSerialize);
     }
@@ -32,10 +33,11 @@ namespace Serialization
     template <typename Serializer, typename TypeToDeserialize>
     void deserialize (const typename Serializer::SerializedType& serial, TypeToDeserialize& objectToDeserialize)
     {
-        static_assert (std::is_base_of_v<BaseSerializer, Serializer>, "Serializer type must be derived from BaseSerializer");
+        static_assert (std::is_base_of_v<BaseSerializer, Serializer> || std::is_same_v<serialization_detail::DummySerializer, Serializer>,
+                       "Serializer type must be derived from BaseSerializer");
 
-        auto deserial = Serializer::template getDeserial<Serializer> (serial);
-        return Serializer::template deserialize<Serializer> (deserial, objectToDeserialize);
+        const auto deserial = Serializer::template getDeserial<Serializer> (serial);
+        Serializer::template deserialize<Serializer> (deserial, objectToDeserialize);
     }
 
     /** Deserialize an object from a file with a given serializer */

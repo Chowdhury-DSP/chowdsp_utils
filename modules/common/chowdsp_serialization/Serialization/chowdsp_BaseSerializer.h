@@ -11,21 +11,27 @@ namespace serialization_detail
 {
     struct DummySerializer
     {
-        using SerializedType = bool;
-        using DeserializedType = const bool&;
+        using SerializedType = json;
+        using DeserializedType = const json&;
 
         static auto createBaseElement() { return SerializedType {}; }
         static void addChildElement (SerializedType&, SerializedType&&) {}
         static auto getChildElement (DeserializedType, int) { return false; }
         static int getNumChildElements (DeserializedType) { return 0; }
 
-        template <typename Serializer, typename C>
+        template <typename, typename C>
         static SerializedType serialize (const C&)
         {
-            return false;
+            return {};
         }
 
-        template <typename Serializer, typename C>
+        template <typename>
+        static DeserializedType getDeserial (const SerializedType& serial)
+        {
+            return serial;
+        }
+
+        template <typename, typename C>
         static void deserialize (DeserializedType, C&)
         {
         }

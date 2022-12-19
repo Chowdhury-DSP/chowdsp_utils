@@ -3,13 +3,18 @@
 namespace chowdsp
 {
 /** An attachment onject that can be used implement UI controllers for attachments. */
-template <typename ParamType, typename PluginStateType, typename Callback = std::function<void (ParameterTypeHelpers::ParameterElementType<ParamType>)>>
+template <typename ParamType, typename Callback = std::function<void (ParameterTypeHelpers::ParameterElementType<ParamType>)>>
 class ParameterAttachment
 {
 public:
     /** Creates an attachment for a given parameter and plugin state. */
     ParameterAttachment (ParamType& parameter,
-                         PluginStateType& pluginState,
+                         PluginState& pluginState,
+                         Callback&& callback);
+
+    /** Creates an attachment for a given parameter and parameter listeners. */
+    ParameterAttachment (ParamType& parameter,
+                         ParameterListeners& listeners,
                          Callback&& callback);
 
     using ParamElementType = ParameterTypeHelpers::ParameterElementType<ParamType>;

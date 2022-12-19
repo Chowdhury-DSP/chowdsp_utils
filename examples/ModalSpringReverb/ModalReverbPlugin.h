@@ -7,8 +7,18 @@
 
 #include "ModeParams.h"
 
-struct Parameters
+struct Parameters : chowdsp::ParamHolder
 {
+    Parameters()
+    {
+        add (pitchParam,
+             decayParam,
+             mixParam,
+             modModesParam,
+             modFreqParam,
+             modDepthParam);
+    }
+
     chowdsp::PercentParameter::Ptr pitchParam { juce::ParameterID { "pitch", 100 },
                                                 "Pitch",
                                                 0.0f,
@@ -37,7 +47,7 @@ struct Parameters
                                                    "Mod. Depth" };
 };
 
-class ModalReverbPlugin : public chowdsp::PluginBase<chowdsp::PluginState<Parameters>>
+class ModalReverbPlugin : public chowdsp::PluginBase<chowdsp::PluginStateImpl<Parameters>>
 {
 public:
     ModalReverbPlugin();
