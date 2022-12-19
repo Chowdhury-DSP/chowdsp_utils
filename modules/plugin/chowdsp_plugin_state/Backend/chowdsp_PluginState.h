@@ -7,6 +7,8 @@ class PluginState
 public:
     PluginState() = default;
 
+    virtual ~PluginState() = default;
+
     void initialise (ParamHolder& parameters,
                      juce::AudioProcessor* processor = nullptr,
                      juce::UndoManager* um = nullptr,
@@ -46,7 +48,8 @@ public:
      * mutated on. Listeners should have the signature void().
      */
     template <typename NonParamType, typename... ListenerArgs>
-    [[nodiscard]] ScopedCallback addNonParameterListener (StateValue<NonParamType>& nonParam, ListenerArgs&&... args)
+    [[nodiscard]] ScopedCallback addNonParameterListener (StateValue<NonParamType>& nonParam,
+                                                          ListenerArgs&&... args) const
     {
         return nonParam.changeBroadcaster.connect (std::forward<ListenerArgs...> (args...));
     }

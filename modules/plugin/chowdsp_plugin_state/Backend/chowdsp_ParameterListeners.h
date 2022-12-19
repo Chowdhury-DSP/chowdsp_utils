@@ -36,7 +36,7 @@ public:
     explicit ParameterListeners (ParamHolder& parameters, juce::TimeSliceThread* backgroundThread = nullptr, int backgroundThreadIntervalMilliseconds = 10);
 
     /** Destructor */
-    ~ParameterListeners() override;
+    ~ParameterListeners() override; // NOSONAR
 
     /**
      * Runs any queued listeners on the audio thread.
@@ -85,7 +85,7 @@ private:
         int useTimeSlice() override;
         ParameterListeners& listeners;
         const int interval;
-    } backgroundTask;
+    } backgroundTask; // NOSONAR
 
     struct ParamInfo
     {

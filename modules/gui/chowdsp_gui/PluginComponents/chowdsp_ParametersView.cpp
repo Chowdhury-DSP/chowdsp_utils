@@ -77,8 +77,8 @@ namespace parameters_view_detail
     class ParameterDisplayComponent : public juce::Component
     {
     public:
-        ParameterDisplayComponent (juce::Component& editorIn, juce::RangedAudioParameter& param, PluginState& pluginState)
-            : editor (editorIn), parameter (param)
+        ParameterDisplayComponent (juce::RangedAudioParameter& param, PluginState& pluginState)
+            : parameter (param)
         {
             parameterName.setText (parameter.getName (128), juce::dontSendNotification);
             parameterName.setJustificationType (juce::Justification::centredRight);
@@ -104,7 +104,6 @@ namespace parameters_view_detail
         }
 
     private:
-        juce::Component& editor;
         juce::RangedAudioParameter& parameter;
         juce::Label parameterName, parameterLabel;
         std::unique_ptr<juce::Component> parameterComp;
@@ -129,45 +128,36 @@ namespace parameters_view_detail
     //==============================================================================
     struct ParamControlItem : public juce::TreeViewItem
     {
-        ParamControlItem (juce::Component& editorIn, juce::RangedAudioParameter& paramIn, PluginState& pluginState)
-            : editor (editorIn), param (paramIn), state (pluginState) {}
+        ParamControlItem (juce::RangedAudioParameter& paramIn, PluginState& pluginState)
+            : param (paramIn), state (pluginState) {}
 
         bool mightContainSubItems() override { return false; }
 
         std::unique_ptr<juce::Component> createItemComponent() override
         {
-            return std::make_unique<ParameterDisplayComponent> (editor, param, state);
+            return std::make_unique<ParameterDisplayComponent> (param, state);
         }
 
         [[nodiscard]] int getItemHeight() const override { return 40; }
 
-        juce::Component& editor;
         juce::RangedAudioParameter& param;
         PluginState& state;
     };
 
     struct ParameterGroupItem : public juce::TreeViewItem
     {
-        ParameterGroupItem (juce::Component& editor, ParamHolder& params, PluginState& pluginState)
+        ParameterGroupItem (ParamHolder& params, PluginState& pluginState)
             : name (params.getName())
         {
             params.template doForAllParameterContainers (
-                [&] (auto& paramVec)
+                [this, &pluginState] (auto& paramVec)
                 {
                     for (auto& param : paramVec)
-                    {
-                        addSubItem (std::make_unique<ParamControlItem> (editor,
-                                                                        param,
-                                                                        pluginState)
-                                        .release());
-                    }
+                        addSubItem (std::make_unique<ParamControlItem> (param, pluginState).release());
                 },
-                [&] (auto& paramHolder)
+                [this, &pluginState] (auto& paramHolder)
                 {
-                    addSubItem (std::make_unique<ParameterGroupItem> (editor,
-                                                                      paramHolder,
-                                                                      pluginState)
-                                    .release());
+                    addSubItem (std::make_unique<ParameterGroupItem> (paramHolder, pluginState).release());
                 });
         }
 
@@ -186,8 +176,8 @@ namespace parameters_view_detail
 //==============================================================================
 struct ParametersView::Pimpl
 {
-    Pimpl (juce::Component& editor, ParamHolder& params, PluginState& pluginState)
-        : groupItem (editor, params, pluginState)
+    Pimpl (ParamHolder& params, PluginState& pluginState)
+        : groupItem (params, pluginState)
     {
         const auto numIndents = getNumIndents (groupItem);
         const auto width = 400 + view.getIndentSize() * numIndents;
@@ -214,7 +204,7 @@ struct ParametersView::Pimpl
 
 //==============================================================================
 ParametersView::ParametersView (PluginState& pluginState, ParamHolder& params)
-    : pimpl (std::make_unique<Pimpl> (*this, params, pluginState))
+    : pimpl (std::make_unique<Pimpl> (params, pluginState))
 {
     auto* viewport = pimpl->view.getViewport();
 

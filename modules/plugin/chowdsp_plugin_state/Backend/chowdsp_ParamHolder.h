@@ -6,7 +6,7 @@ namespace chowdsp
 class ParamHolder
 {
 public:
-    ParamHolder (const juce::String& name = {});
+    explicit ParamHolder (const juce::String& name = {});
 
     ParamHolder (ParamHolder&&) noexcept = default;
     ParamHolder& operator= (ParamHolder&&) noexcept = default;
@@ -71,7 +71,7 @@ public:
     static void deserialize (typename Serializer::DeserializedType deserial, ParamHolder& paramHolder);
 
 private:
-    void add()
+    void add() const
     {
         // base case!
     }

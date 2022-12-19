@@ -11,9 +11,12 @@
 #include "InfoUtils/chowdsp_InfoProvider.cpp"
 
 #include "PluginComponents/chowdsp_CPUMeter.cpp"
-#include "PluginComponents/chowdsp_ParametersView.cpp"
 #include "PluginComponents/chowdsp_TitleComp.cpp"
 #include "PluginComponents/chowdsp_TooltipComp.cpp"
+
+#if JUCE_MODULE_AVAILABLE_chowdsp_plugin_state
+#include "PluginComponents/chowdsp_ParametersView.cpp"
+#endif
 
 #if CHOWDSP_USING_JUCE && JUCE_MODULE_AVAILABLE_chowdsp_dsp_utils
 #include "PluginComponents/chowdsp_OversamplingMenu.cpp"

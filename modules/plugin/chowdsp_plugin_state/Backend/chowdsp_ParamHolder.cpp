@@ -44,7 +44,7 @@ std::enable_if_t<std::is_base_of_v<ParamHolder, ParamType>, void>
 
 [[nodiscard]] inline int ParamHolder::count() const noexcept
 {
-    int numParams = int (floatParams.size() + choiceParams.size() + boolParams.size());
+    auto numParams = int (floatParams.size() + choiceParams.size() + boolParams.size());
     for (const auto& holder : otherParams)
         numParams += holder->count();
     return numParams;
@@ -112,7 +112,10 @@ size_t ParamHolder::doForAllParameters (Callable&& callable, size_t index) const
         [&index, call = std::forward<Callable> (callable)] (const auto& paramVec)
         {
             for (const auto& param : paramVec)
-                call (*param, index++);
+            {
+                call (*param, index);
+                index++;
+            }
         },
         [&index, call = std::forward<Callable> (callable)] (const auto& holder)
         {

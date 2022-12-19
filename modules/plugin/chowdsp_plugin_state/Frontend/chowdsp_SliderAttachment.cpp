@@ -54,11 +54,13 @@ SliderAttachment::SliderAttachment (FloatParameter& param,
         return (double) range.snapToLegalValue ((float) mappedValue);
     };
 
-    juce::NormalisableRange<double> newRange { (double) range.start,
-                                               (double) range.end,
-                                               std::move (convertFrom0To1Function),
-                                               std::move (convertTo0To1Function),
-                                               std::move (snapToLegalValueFunction) };
+    auto newRange = juce::NormalisableRange<double> { // NOSONAR
+        (double) range.start,
+        (double) range.end,
+        std::move (convertFrom0To1Function),
+        std::move (convertTo0To1Function),
+        std::move (snapToLegalValueFunction)
+    };
     newRange.interval = range.interval;
     newRange.skew = range.skew;
     newRange.symmetricSkew = range.symmetricSkew;

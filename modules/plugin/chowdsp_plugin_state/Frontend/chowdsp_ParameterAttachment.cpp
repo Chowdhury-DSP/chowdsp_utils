@@ -4,7 +4,7 @@ template <typename Param, typename Callback>
 ParameterAttachment<Param, Callback>::ParameterAttachment (Param& parameter,
                                                            PluginState& pluginState,
                                                            Callback&& callback)
-    : ParameterAttachment (parameter, pluginState.getParameterListeners(), std::forward<Callback> (callback))
+    : ParameterAttachment (parameter, pluginState.getParameterListeners(), std::move<Callback> (callback))
 {
 }
 

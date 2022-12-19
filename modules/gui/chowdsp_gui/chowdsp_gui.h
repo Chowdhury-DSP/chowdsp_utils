@@ -59,7 +59,7 @@
 #include "PluginComponents/chowdsp_TooltipComp.h"
 #include "PluginComponents/chowdsp_WindowInPlugin.h"
 
-#if JUCE_MODULE_AVAILABLE_chowdsp_plugin_state
+
 #include "PluginComponents/chowdsp_ParametersView.h"
 #endif
 
