@@ -8,7 +8,7 @@ class NonParamState
 public:
     NonParamState() = default;
 
-    NonParamState (std::initializer_list<StateValueBase*>&& stateValues)
+    NonParamState (const std::initializer_list<StateValueBase*>& stateValues)
         : values (stateValues)
     {
     }
@@ -28,7 +28,7 @@ public:
 
     /** Custom deserializer */
     template <typename Serializer>
-    static void deserialize (typename Serializer::DeserializedType deserial, NonParamState& state)
+    static void deserialize (typename Serializer::DeserializedType deserial, const NonParamState& state)
     {
         juce::StringArray namesThatHaveBeenDeserialized {};
         if (const auto numNamesAndVals = Serializer::getNumChildElements (deserial); numNamesAndVals % 2 == 0)

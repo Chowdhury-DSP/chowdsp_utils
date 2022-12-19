@@ -1,15 +1,15 @@
 namespace chowdsp
 {
 template <typename ParameterState, typename NonParameterState, typename Serializer>
-PluginStateImpl<ParameterState, NonParameterState, Serializer>::PluginStateImpl (juce::UndoManager* um, juce::TimeSliceThread* backgroundThread)
+PluginStateImpl<ParameterState, NonParameterState, Serializer>::PluginStateImpl (juce::UndoManager* um)
 {
-    initialise (params, nullptr, um, backgroundThread);
+    initialise (params, nullptr, um);
 }
 
 template <typename ParameterState, typename NonParameterState, typename Serializer>
-PluginStateImpl<ParameterState, NonParameterState, Serializer>::PluginStateImpl (juce::AudioProcessor& processor, juce::UndoManager* um, juce::TimeSliceThread* backgroundThread)
+PluginStateImpl<ParameterState, NonParameterState, Serializer>::PluginStateImpl (juce::AudioProcessor& processor, juce::UndoManager* um)
 {
-    initialise (params, &processor, um, backgroundThread);
+    initialise (params, &processor, um);
 }
 
 template <typename ParameterState, typename NonParameterState, typename Serializer>

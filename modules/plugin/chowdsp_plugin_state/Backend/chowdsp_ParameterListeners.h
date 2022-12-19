@@ -22,19 +22,11 @@ enum class ParameterListenerThread
 };
 
 /** Utility class to manage a set of parameter listeners. */
-class ParameterListeners : private juce::AsyncUpdater
+class ParameterListeners : private juce::Timer
 {
 public:
-    /**
-     * Initialises the listeners with a set of parameters.
-     *
-     * By default, this class will create it's own background thread to use for triggering
-     * the listeners, but users can also supply their own thread to use instead.
-     */
-    explicit ParameterListeners (ParamHolder& parameters, juce::TimeSliceThread* backgroundThread = nullptr, int backgroundThreadIntervalMilliseconds = 10);
-
-    /** Destructor */
-    ~ParameterListeners() override;
+    /** Initialises the listeners with a set of parameters. */
+    explicit ParameterListeners (ParamHolder& parameters, int intervalMilliseconds = 10);
 
     /**
      * Runs any queued listeners on the audio thread.
@@ -43,14 +35,6 @@ public:
      * otherwise, users must call this in the audio callback themselves!
      */
     void callAudioThreadBroadcasters();
-
-    /**
-     * Runs any queued listeners on the message thread.
-     *
-     * This will be called automatically whenever a parameter changes (via juce::AsyncUpdater),
-     * but users can also call this on the message thread manually if they like.
-     */
-    void callMessageThreadBroadcasters();
 
     /** Creates a new parameter listener. */
     template <typename... ListenerArgs>
@@ -73,17 +57,7 @@ public:
 private:
     void callMessageThreadBroadcaster (size_t index);
     void callAudioThreadBroadcaster (size_t index);
-    void handleAsyncUpdate() override;
-
-    OptionalPointer<juce::TimeSliceThread> backgroundThread;
-
-    struct ParameterListenersBackgroundTask : juce::TimeSliceClient
-    {
-        explicit ParameterListenersBackgroundTask (ParameterListeners& paramListeners, int timeSliceInterval);
-        int useTimeSlice() override;
-        ParameterListeners& listeners;
-        const int interval;
-    } backgroundTask; // NOSONAR
+    void timerCallback() override;
 
     struct ParamInfo
     {
@@ -94,11 +68,9 @@ private:
     const size_t totalNumParams;
     std::vector<ParamInfo> paramInfoList { totalNumParams };
 
-    static constexpr size_t actionSize = 16; // sizeof ([this, i = index] { callMessageThreadBroadcaster (i); })
     std::vector<Broadcaster<void()>> messageThreadBroadcasters { totalNumParams };
-    using MessageThreadAction = juce::dsp::FixedSizeFunction<actionSize, void()>;
-    moodycamel::ReaderWriterQueue<MessageThreadAction> messageThreadBroadcastQueue { totalNumParams };
 
+    static constexpr size_t actionSize = 16; // sizeof ([this, i = index] { callMessageThreadBroadcaster (i); })
     std::vector<Broadcaster<void()>> audioThreadBroadcasters { totalNumParams };
     using AudioThreadAction = juce::dsp::FixedSizeFunction<actionSize, void()>;
     moodycamel::ReaderWriterQueue<AudioThreadAction> audioThreadBroadcastQueue { totalNumParams };

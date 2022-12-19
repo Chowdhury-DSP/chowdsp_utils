@@ -11,11 +11,10 @@ public:
 
     void initialise (ParamHolder& parameters,
                      juce::AudioProcessor* processor = nullptr,
-                     juce::UndoManager* um = nullptr,
-                     juce::TimeSliceThread* backgroundThread = nullptr)
+                     juce::UndoManager* um = nullptr)
     {
         undoManager = um;
-        listeners.emplace (parameters, backgroundThread);
+        listeners.emplace (parameters);
         if (processor != nullptr)
             parameters.connectParametersToProcessor (*processor);
     }
