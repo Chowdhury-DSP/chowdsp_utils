@@ -11,8 +11,8 @@ namespace serialization_detail
 {
     struct DummySerializer
     {
-        using SerializedType = bool;
-        using DeserializedType = const bool&;
+        using SerializedType = json;
+        using DeserializedType = const json&;
 
         static auto createBaseElement() { return SerializedType {}; }
         static void addChildElement (SerializedType&, SerializedType&&) {}
@@ -22,7 +22,7 @@ namespace serialization_detail
         template <typename, typename C>
         static SerializedType serialize (const C&)
         {
-            return false;
+            return {};
         }
 
         template <typename>
