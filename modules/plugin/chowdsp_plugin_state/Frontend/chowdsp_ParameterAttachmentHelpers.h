@@ -26,9 +26,10 @@ namespace ParameterAttachmentHelpers
         using ValueType = ParameterTypeHelpers::ParameterElementType<ParamType>;
 
         explicit ParameterChangeAction (ParamType& parameter,
+                                        ValueType oldVal,
                                         ValueType newVal)
             : param (parameter),
-              oldValue (ParameterTypeHelpers::getValue (parameter)),
+              oldValue (oldVal),
               newValue (newVal)
         {
         }

@@ -249,7 +249,7 @@ public:
         expect (button.getToggleState() == param->get(), "Initial button state is incorrect!");
     }
 
-    void boxParamChangeTest()
+    void buttonParamChangeTest()
     {
         State state;
         const auto& param = state.params.param;
@@ -310,8 +310,8 @@ public:
         beginTest ("Setup Test");
         setupTest();
 
-        beginTest ("Box Change Test");
-        boxParamChangeTest();
+        beginTest ("Button Change Test");
+        buttonParamChangeTest();
 
         beginTest ("Host Change Test");
         hostParamChangeTest();

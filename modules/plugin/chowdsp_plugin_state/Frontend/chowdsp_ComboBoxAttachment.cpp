@@ -44,6 +44,7 @@ void ComboBoxAttachment::comboBoxChanged (juce::ComboBox*)
         um->perform (
             new ParameterAttachmentHelpers::ParameterChangeAction<ChoiceParameter> (
                 attachment.param,
+                attachment.param.getIndex(),
                 newValue));
     }
 

@@ -2,9 +2,9 @@
 #include <chowdsp_plugin_base/chowdsp_plugin_base.h>
 #include <chowdsp_plugin_state/chowdsp_plugin_state.h>
 
-struct LevelParams : chowdsp::ParamHolder
+struct LevelParams2 : chowdsp::ParamHolder
 {
-    LevelParams()
+    LevelParams2()
     {
         add (percent, gain);
     }
@@ -13,19 +13,19 @@ struct LevelParams : chowdsp::ParamHolder
     chowdsp::GainDBParameter::Ptr gain { juce::ParameterID { "gain", 100 }, "Gain", juce::NormalisableRange { -30.0f, 0.0f }, 0.0f };
 };
 
-struct PluginParameterState : chowdsp::ParamHolder
+struct PluginParameterState2 : chowdsp::ParamHolder
 {
-    PluginParameterState()
+    PluginParameterState2()
     {
         add (levelParams, mode, onOff);
     }
 
-    LevelParams levelParams;
+    LevelParams2 levelParams;
     chowdsp::ChoiceParameter::Ptr mode { juce::ParameterID { "mode", 100 }, "Mode", juce::StringArray { "Percent", "Gain", "Percent / Gain", "Gain / Percent" }, 2 };
     chowdsp::BoolParameter::Ptr onOff { juce::ParameterID { "on_off", 100 }, "On/Off", true };
 };
 
-struct Plugin : chowdsp::PluginBase<chowdsp::PluginStateImpl<PluginParameterState>>
+struct Plugin : chowdsp::PluginBase<chowdsp::PluginStateImpl<PluginParameterState2>>
 {
     void releaseResources() override {}
     void processAudioBlock (juce::AudioBuffer<float>&) override {}

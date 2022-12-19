@@ -95,7 +95,10 @@ size_t ParamHolder::doForAllParameters (Callable&& callable, size_t index)
         [&index, call = std::forward<Callable> (callable)] (auto& paramVec)
         {
             for (auto& param : paramVec)
-                call (*param, index++);
+            {
+                call (*param, index);
+                index++;
+            }
         },
         [&index, call = std::forward<Callable> (callable)] (auto& holder)
         {

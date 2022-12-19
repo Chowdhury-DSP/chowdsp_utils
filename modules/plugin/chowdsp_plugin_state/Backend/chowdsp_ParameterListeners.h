@@ -21,8 +21,6 @@ enum class ParameterListenerThread
     AudioThread,
 };
 
-JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324) // struct was padded warning
-
 /** Utility class to manage a set of parameter listeners. */
 class ParameterListeners : private juce::AsyncUpdater
 {
@@ -36,7 +34,7 @@ public:
     explicit ParameterListeners (ParamHolder& parameters, juce::TimeSliceThread* backgroundThread = nullptr, int backgroundThreadIntervalMilliseconds = 10);
 
     /** Destructor */
-    ~ParameterListeners() override; // NOSONAR
+    ~ParameterListeners() override;
 
     /**
      * Runs any queued listeners on the audio thread.
@@ -107,5 +105,4 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParameterListeners)
 };
-JUCE_END_IGNORE_WARNINGS_MSVC
 } // namespace chowdsp

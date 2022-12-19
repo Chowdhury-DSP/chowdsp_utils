@@ -43,6 +43,7 @@ void ButtonAttachment::buttonClicked (juce::Button*)
         um->perform (
             new ParameterAttachmentHelpers::ParameterChangeAction<BoolParameter> (
                 attachment.param,
+                attachment.param.get(),
                 newValue));
     }
 

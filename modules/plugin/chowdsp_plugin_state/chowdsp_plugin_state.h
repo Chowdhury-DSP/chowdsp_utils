@@ -33,6 +33,8 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include <chowdsp_listeners/chowdsp_listeners.h>
 #include <chowdsp_parameters/chowdsp_parameters.h>
 
+JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324) // struct was padded warning
+
 #include "Backend/chowdsp_StateValue.h"
 #include "Backend/chowdsp_ParameterTypeHelpers.h"
 #include "Backend/chowdsp_ParamHolder.h"
@@ -46,3 +48,5 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Frontend/chowdsp_SliderAttachment.h"
 #include "Frontend/chowdsp_ComboBoxAttachment.h"
 #include "Frontend/chowdsp_ButtonAttachment.h"
+
+JUCE_END_IGNORE_WARNINGS_MSVC
