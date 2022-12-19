@@ -100,9 +100,10 @@ void SliderAttachment::sliderDragEnded (juce::Slider*)
     if (um != nullptr)
     {
         um->beginNewTransaction();
-        um->perform (new ParameterAttachmentHelpers::ParameterChangeAction (attachment,
-                                                                            valueAtStartOfGesture,
-                                                                            attachment.param.get()));
+        um->perform (
+            new ParameterAttachmentHelpers::ParameterChangeAction<FloatParameter> (
+                attachment.param,
+                attachment.param.get()));
     }
 
     attachment.endGesture();

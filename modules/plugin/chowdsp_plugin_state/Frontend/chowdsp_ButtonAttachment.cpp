@@ -40,9 +40,10 @@ void ButtonAttachment::buttonClicked (juce::Button*)
     if (um != nullptr)
     {
         um->beginNewTransaction();
-        um->perform (new ParameterAttachmentHelpers::ParameterChangeAction (attachment,
-                                                                            attachment.param.get(),
-                                                                            newValue));
+        um->perform (
+            new ParameterAttachmentHelpers::ParameterChangeAction<BoolParameter> (
+                attachment.param,
+                newValue));
     }
 
     attachment.setValueAsCompleteGesture (newValue);

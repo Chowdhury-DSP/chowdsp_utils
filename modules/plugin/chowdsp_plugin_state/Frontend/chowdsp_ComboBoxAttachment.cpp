@@ -41,9 +41,10 @@ void ComboBoxAttachment::comboBoxChanged (juce::ComboBox*)
     if (um != nullptr)
     {
         um->beginNewTransaction();
-        um->perform (new ParameterAttachmentHelpers::ParameterChangeAction (attachment,
-                                                                            attachment.param.getIndex(),
-                                                                            newValue));
+        um->perform (
+            new ParameterAttachmentHelpers::ParameterChangeAction<ChoiceParameter> (
+                attachment.param,
+                newValue));
     }
 
     attachment.setValueAsCompleteGesture (newValue);
