@@ -19,13 +19,19 @@ namespace serialization_detail
         static auto getChildElement (DeserializedType, int) { return false; }
         static int getNumChildElements (DeserializedType) { return 0; }
 
-        template <typename Serializer, typename C>
+        template <typename, typename C>
         static SerializedType serialize (const C&)
         {
             return false;
         }
 
-        template <typename Serializer, typename C>
+        template <typename>
+        static DeserializedType getDeserial (const SerializedType& serial)
+        {
+            return serial;
+        }
+
+        template <typename, typename C>
         static void deserialize (DeserializedType, C&)
         {
         }

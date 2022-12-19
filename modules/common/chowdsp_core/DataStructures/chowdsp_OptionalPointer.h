@@ -18,6 +18,9 @@ struct OptionalPointer
     /** The type being pointed to */
     using element_type = T;
 
+    /** Intializes a null OptionalPointer */
+    OptionalPointer() = default;
+
     /** Creates an owning optional pointer */
     template <typename... Args>
     explicit OptionalPointer (Args&&... args)
@@ -26,11 +29,24 @@ struct OptionalPointer
     {
     }
 
-    /** Creates a non-owning optional pointer */
-    explicit OptionalPointer (T* ptr)
-        : owningPtr (nullptr),
-          nonOwningPtr (ptr)
+    /**
+     * Sets OptionalPointer to point to a new pointer, and take ownership of it.
+     * If the OptionalPointer previously owned some data, that data will e deleted.
+     */
+    void setOwning (T* ptr)
     {
+        owningPtr.reset (ptr);
+        nonOwningPtr = ptr;
+    }
+
+    /**
+     * Sets OptionalPointer to point to a new pointer, WITHOUT taking ownership of it.
+     * If the OptionalPointer previously owned some data, that data will e deleted.
+     */
+    void setNonOwning (T* ptr)
+    {
+        owningPtr.reset();
+        nonOwningPtr = ptr;
     }
 
     /** Move constructor */

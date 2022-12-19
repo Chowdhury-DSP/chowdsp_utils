@@ -2,31 +2,45 @@
 
 namespace chowdsp
 {
+struct StateValueBase
+{
+    explicit StateValueBase (std::string_view valueName) : name (valueName) {}
+    virtual ~StateValueBase() = default;
+
+    virtual void reset() {}
+
+    virtual void serialize (JSONSerializer::SerializedType&) const {}
+    virtual void deserialize (JSONSerializer::DeserializedType) {}
+
+    const std::string_view name;
+    Broadcaster<void()> changeBroadcaster;
+};
+
 /** A stateful value that can be used to hold some non-parameter state */
 template <typename T>
-struct StateValue
+struct StateValue : StateValueBase
 {
     using element_type = T;
 
-    /** Constructs the vaslue with a name and default value */
-    StateValue (std::string_view valueName, T defaultValue)
-        : name (valueName),
-          defaultVal (defaultValue),
-          val (defaultVal)
+    /** Constructs the value with a name and default value */
+    StateValue (std::string_view valueName, T defaultVal)
+        : StateValueBase (valueName),
+          defaultValue (defaultVal),
+          currentValue (defaultValue)
     {
     }
 
     /** Returns the value */
-    T get() const noexcept { return val; }
+    T get() const noexcept { return currentValue; }
     operator T() const noexcept { return get(); } // NOLINT(google-explicit-constructor): we want to be able to do implicit conversion
 
     /** Sets a new value */
     void set (T v)
     {
-        if (v == val)
+        if (v == currentValue)
             return;
 
-        val = v;
+        currentValue = v;
         changeBroadcaster();
     }
 
@@ -37,8 +51,23 @@ struct StateValue
     }
 
     /** Resets the value to its default state */
-    void reset() { set (defaultVal); }
+    void reset() override { set (defaultValue); }
 
+    /** JSON Serializer */
+    void serialize (JSONSerializer::SerializedType& serial) const override
+    {
+        serialize<JSONSerializer> (serial, *this);
+    }
+
+    /** JSON Deserializer */
+    void deserialize (JSONSerializer::DeserializedType deserial) override
+    {
+        deserialize<JSONSerializer> (deserial, *this);
+    }
+
+    const T defaultValue;
+
+private:
     template <typename Serializer>
     static void serialize (typename Serializer::SerializedType& serial, const StateValue& value)
     {
@@ -47,21 +76,15 @@ struct StateValue
     }
 
     template <typename Serializer>
-    static void deserialize (typename Serializer::DeserializedType serial, StateValue& value)
+    static void deserialize (typename Serializer::DeserializedType deserial, StateValue& value)
     {
-        T val;
-        Serialization::deserialize<Serializer> (serial, val);
+        T val {};
+        Serialization::deserialize<Serializer> (deserial, val);
         value.set (val);
     }
 
-    const std::string_view name;
-    const T defaultVal;
+    T currentValue;
 
-private:
-    T val;
-    Broadcaster<void()> changeBroadcaster;
-
-    template <typename ParameterState, typename NonParameterState, typename Serializer>
-    friend class PluginState;
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StateValue)
 };
 } // namespace chowdsp

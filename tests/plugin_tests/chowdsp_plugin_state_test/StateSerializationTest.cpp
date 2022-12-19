@@ -1,51 +1,81 @@
 #include <TimedUnitTest.h>
 #include <chowdsp_plugin_state/chowdsp_plugin_state.h>
 
-struct LevelParams
+struct LevelParams : chowdsp::ParamHolder
 {
-    const std::string_view name = "level_params";
-    const int version = 100;
-    chowdsp::PercentParameter::Ptr percent { juce::ParameterID { "percent", version }, "Percent" };
-    chowdsp::GainDBParameter::Ptr gain { juce::ParameterID { "gain", version }, "Gain", juce::NormalisableRange { -30.0f, 0.0f }, 0.0f };
+    explicit LevelParams (const juce::String& paramPrefix = "", int version = 100)
+        : prefix (paramPrefix),
+          versionHint (version)
+    {
+        add (percent, gain);
+    }
+
+    const juce::String prefix;
+    const int versionHint;
+
+    chowdsp::PercentParameter::Ptr percent { juce::ParameterID { prefix + "percent", versionHint }, "Percent" };
+    chowdsp::GainDBParameter::Ptr gain { juce::ParameterID { prefix + "gain", versionHint }, "Gain", juce::NormalisableRange { -30.0f, 0.0f }, 0.0f };
 };
 
-struct PluginParameterState
+struct PluginParameterState : chowdsp::ParamHolder
 {
+    PluginParameterState()
+    {
+        add (levelParams, mode, onOff);
+    }
+
     LevelParams levelParams;
     chowdsp::ChoiceParameter::Ptr mode { "mode", "Mode", juce::StringArray { "Percent", "Gain", "Percent / Gain", "Gain / Percent" }, 2 };
     chowdsp::BoolParameter::Ptr onOff { "on_off", "On/Off", true };
 };
 
-struct PluginNonParameterState
+struct PluginNonParameterState : chowdsp::NonParamState
 {
+    PluginNonParameterState() : chowdsp::NonParamState ({ &editorWidth, &editorHeight }) {}
+
     chowdsp::StateValue<int> editorWidth { "editor_width", 300 };
     chowdsp::StateValue<int> editorHeight { "editor_height", 500 };
 };
 
-using State = chowdsp::PluginState<PluginParameterState, PluginNonParameterState>;
+using State = chowdsp::PluginStateImpl<PluginParameterState, PluginNonParameterState>;
 
-struct PluginParameterStateNewParam
+struct PluginParameterStateNewParam : chowdsp::ParamHolder
 {
+    PluginParameterStateNewParam()
+    {
+        add (levelParams, mode, onOff, newParam);
+    }
+
     LevelParams levelParams;
     chowdsp::ChoiceParameter::Ptr mode { "mode", "Mode", juce::StringArray { "Percent", "Gain", "Percent / Gain", "Gain / Percent" }, 2 };
     chowdsp::BoolParameter::Ptr onOff { "on_off", "On/Off", true };
     chowdsp::GainDBParameter::Ptr newParam { "gain_new", "New Gain", juce::NormalisableRange { -45.0f, 12.0f }, 3.3f };
 };
 
-using StateWithNewParam = chowdsp::PluginState<PluginParameterStateNewParam>;
+using StateWithNewParam = chowdsp::PluginStateImpl<PluginParameterStateNewParam>;
 
-struct PluginParameterStateDoubleOfSameType
+struct PluginParameterStateDoubleOfSameType : chowdsp::ParamHolder
 {
+    PluginParameterStateDoubleOfSameType()
+    {
+        add (levelParams1, levelParams2, mode, onOff);
+    }
+
     LevelParams levelParams1 { "level_params1" };
     LevelParams levelParams2 { "level_params2", 101 };
     chowdsp::ChoiceParameter::Ptr mode { "mode", "Mode", juce::StringArray { "Percent", "Gain", "Percent / Gain", "Gain / Percent" }, 2 };
     chowdsp::BoolParameter::Ptr onOff { "on_off", "On/Off", true };
 };
 
-using StateWithDoubleOfSameType = chowdsp::PluginState<PluginParameterStateDoubleOfSameType>;
+using StateWithDoubleOfSameType = chowdsp::PluginStateImpl<PluginParameterStateDoubleOfSameType>;
 
-struct PluginParameterStateTripleOfSameType
+struct PluginParameterStateTripleOfSameType : chowdsp::ParamHolder
 {
+    PluginParameterStateTripleOfSameType()
+    {
+        add (levelParams1, levelParams2, levelParams3, mode, onOff);
+    }
+
     LevelParams levelParams1 { "level_params1" };
     LevelParams levelParams2 { "level_params2", 101 };
     LevelParams levelParams3 { "level_params3", 102 };
@@ -53,32 +83,47 @@ struct PluginParameterStateTripleOfSameType
     chowdsp::BoolParameter::Ptr onOff { "on_off", "On/Off", true };
 };
 
-using StateWithTripleOfSameType = chowdsp::PluginState<PluginParameterStateTripleOfSameType>;
+using StateWithTripleOfSameType = chowdsp::PluginStateImpl<PluginParameterStateTripleOfSameType>;
 
-struct NewGroup
+struct NewGroup : chowdsp::ParamHolder
 {
+    NewGroup()
+    {
+        add (newParam);
+    }
+
     static constexpr std::string_view name { "new_group" };
     chowdsp::GainDBParameter::Ptr newParam { "gain_new", "New Gain", juce::NormalisableRange { -45.0f, 12.0f }, 3.3f };
 };
 
-struct PluginParameterStateNewGroup
+struct PluginParameterStateNewGroup : chowdsp::ParamHolder
 {
+    PluginParameterStateNewGroup()
+    {
+        add (levelParams, mode, onOff, newGroup);
+    }
+
     LevelParams levelParams;
     chowdsp::ChoiceParameter::Ptr mode { "mode", "Mode", juce::StringArray { "Percent", "Gain", "Percent / Gain", "Gain / Percent" }, 2 };
     chowdsp::BoolParameter::Ptr onOff { "on_off", "On/Off", true };
     NewGroup newGroup;
 };
 
-using StateWithNewGroup = chowdsp::PluginState<PluginParameterStateNewGroup>;
+using StateWithNewGroup = chowdsp::PluginStateImpl<PluginParameterStateNewGroup>;
 
-struct PluginNonParameterStateNewField
+struct PluginNonParameterStateNewField : chowdsp::NonParamState
 {
+    PluginNonParameterStateNewField()
+        : chowdsp::NonParamState ({ &editorWidth, &editorHeight, &randomString })
+    {
+    }
+
     chowdsp::StateValue<int> editorWidth { "editor_width", 300 };
     chowdsp::StateValue<int> editorHeight { "editor_height", 500 };
     chowdsp::StateValue<juce::String> randomString { "random_string", "default" };
 };
 
-using StateWithNewNonParameterField = chowdsp::PluginState<PluginParameterState, PluginNonParameterStateNewField>;
+using StateWithNewNonParameterField = chowdsp::PluginStateImpl<PluginParameterState, PluginNonParameterStateNewField>;
 
 class StateSerializationTest : public TimedUnitTest
 {

@@ -10,32 +10,31 @@ public:
 
     void mainThreadListenersTest()
     {
-        struct Params
-        {
-            chowdsp::PercentParameter::Ptr pct { "percent", "Percent", 1.0f };
-        };
-
-        chowdsp::PluginState<Params> state {};
+        chowdsp::ParamHolder params {};
+        chowdsp::PercentParameter::Ptr pct { "percent", "Percent", 1.0f };
+        params.add (pct);
+        chowdsp::ParameterListeners listeners { params };
 
         float mostRecentParamValue = -1.0f;
         int listenerCount = 0;
-        chowdsp::ScopedCallback listener = state.addParameterListener (*state.params.pct,
-                                                                       true,
-                                                                       [this, &listenerCount, &state, &mostRecentParamValue]
-                                                                       {
-                                                                           expect (juce::MessageManager::getInstance()->isThisTheMessageThread(),
-                                                                                   "Listener called on a thread other than the message thread!");
-                                                                           expectEquals (state.params.pct->getCurrentValue(),
-                                                                                         mostRecentParamValue,
-                                                                                         "Parameter has the incorrect value when the listener is called!");
-                                                                           listenerCount++;
-                                                                       });
+        chowdsp::ScopedCallback listener = listeners.addParameterListener (
+            pct,
+            chowdsp::ParameterListenerThread::MessageThread,
+            [this, &listenerCount, &pct, &mostRecentParamValue]
+            {
+                expect (juce::MessageManager::getInstance()->isThisTheMessageThread(),
+                        "Listener called on a thread other than the message thread!");
+                expectEquals (pct->getCurrentValue(),
+                              mostRecentParamValue,
+                              "Parameter has the incorrect value when the listener is called!");
+                listenerCount++;
+            });
 
         static constexpr int numIters = 100;
         for (int i = 0; i < numIters; ++i)
         {
             mostRecentParamValue = (float) i / float (numIters - 1);
-            static_cast<juce::AudioParameterFloat&> (state.params.pct) = mostRecentParamValue;
+            static_cast<juce::AudioParameterFloat&> (pct) = mostRecentParamValue;
             juce::MessageManager::getInstance()->runDispatchLoopUntil (20);
         }
 
@@ -44,32 +43,31 @@ public:
 
     void audioThreadListenersTest()
     {
-        struct Params
-        {
-            chowdsp::PercentParameter::Ptr pct { "percent", "Percent", 1.0f };
-        };
-
-        chowdsp::PluginState<Params> state {};
+        chowdsp::ParamHolder params {};
+        chowdsp::PercentParameter::Ptr pct { "percent", "Percent", 1.0f };
+        params.add (pct);
+        chowdsp::ParameterListeners listeners { params };
 
         float mostRecentParamValue = -1.0f;
         int listenerCount = 0;
-        chowdsp::ScopedCallback listener = state.addParameterListener (*state.params.pct,
-                                                                       false,
-                                                                       [this, &listenerCount, &state, &mostRecentParamValue]
-                                                                       {
-                                                                           expectEquals (state.params.pct->getCurrentValue(),
-                                                                                         mostRecentParamValue,
-                                                                                         "Parameter has the incorrect value when the listener is called!");
-                                                                           listenerCount++;
-                                                                       });
+        chowdsp::ScopedCallback listener = listeners.addParameterListener (
+            pct,
+            chowdsp::ParameterListenerThread::AudioThread,
+            [this, &listenerCount, &pct, &mostRecentParamValue]
+            {
+                expectEquals (pct->getCurrentValue(),
+                              mostRecentParamValue,
+                              "Parameter has the incorrect value when the listener is called!");
+                listenerCount++;
+            });
 
         static constexpr int numIters = 100;
         for (int i = 0; i < numIters; ++i)
         {
             mostRecentParamValue = (float) i / float (numIters - 1);
-            static_cast<juce::AudioParameterFloat&> (state.params.pct) = mostRecentParamValue;
+            static_cast<juce::AudioParameterFloat&> (pct) = mostRecentParamValue;
             juce::MessageManager::getInstance()->runDispatchLoopUntil (20);
-            state.callAudioThreadBroadcasters();
+            listeners.callAudioThreadBroadcasters();
         }
 
         expectEquals (listenerCount, numIters, "Incorrect number of listener callbacks!");
@@ -77,25 +75,32 @@ public:
 
     void nonParameterListenersTest()
     {
-        struct Params
+        struct Params : chowdsp::ParamHolder
         {
+            Params()
+            {
+                add (pct);
+            }
+
             chowdsp::PercentParameter::Ptr pct { "percent", "Percent", 1.0f };
         };
 
-        struct NonParams
+        struct NonParams : chowdsp::NonParamState
         {
+            NonParams() : chowdsp::NonParamState ({ &value }) {}
             chowdsp::StateValue<int> value { "value", 100 };
         };
 
         static constexpr int newValue = 1000;
         bool listenerCalled = false;
-        chowdsp::PluginState<Params, NonParams> state {};
-        const auto listener = state.addNonParameterListener (state.nonParams.value,
-                                                             [this, &state, &listenerCalled]
-                                                             {
-                                                                 listenerCalled = true;
-                                                                 expectEquals ((int) state.nonParams.value, newValue, "Value after listerner callback is incorrect!");
-                                                             });
+        chowdsp::PluginStateImpl<Params, NonParams> state {};
+        const auto listener = state.addNonParameterListener (
+            state.nonParams.value,
+            [this, &state, &listenerCalled]
+            {
+                listenerCalled = true;
+                expectEquals ((int) state.nonParams.value, newValue, "Value after listener callback is incorrect!");
+            });
 
         state.nonParams.value = newValue;
 

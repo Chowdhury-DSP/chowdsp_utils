@@ -5,11 +5,10 @@
 namespace chowdsp
 {
 /** Clone of juce::GenericAudioProcessorEditor, but usable as a generic component */
-template <typename PluginStateType, typename Parameters>
 class ParametersView : public juce::Component
 {
 public:
-    explicit ParametersView (PluginStateType& pluginState, Parameters& params);
+    explicit ParametersView (PluginState& pluginState, ParamHolder& params);
     ~ParametersView() override;
 
     void paint (juce::Graphics&) override;
@@ -23,11 +22,10 @@ private:
 };
 
 /** Clone of juce::GenericAudioProcessorEditor. */
-template <typename PluginStateType, typename Parameters>
 class ParametersViewEditor : public juce::AudioProcessorEditor
 {
 public:
-    ParametersViewEditor (juce::AudioProcessor& proc, PluginStateType& pluginState, Parameters& params)
+    ParametersViewEditor (juce::AudioProcessor& proc, PluginState& pluginState, ParamHolder& params)
         : juce::AudioProcessorEditor (proc),
           view (pluginState, params)
     {
@@ -43,10 +41,8 @@ public:
     }
 
 private:
-    ParametersView<PluginStateType, Parameters> view;
+    ParametersView view;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParametersViewEditor)
 };
 } // namespace chowdsp
-
-#include "chowdsp_ParametersView.cpp"

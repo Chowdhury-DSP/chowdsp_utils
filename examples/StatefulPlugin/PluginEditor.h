@@ -17,7 +17,7 @@ private:
 
     StatefulPlugin& plugin;
 
-    chowdsp::ParametersViewEditor<State, PluginParameterState> paramsView; // { *this, state, state.params };
+    chowdsp::ParametersViewEditor paramsView;
 
     void refreshUndoRedoButtons();
     juce::TextButton undoButton { "UNDO" };

@@ -1,20 +1,18 @@
 namespace chowdsp
 {
-template <typename State>
-SliderAttachment<State>::SliderAttachment (FloatParameter& param,
-                                           State& pluginState,
-                                           juce::Slider& paramSlider)
-    : SliderAttachment (param, pluginState, paramSlider, pluginState.undoManager)
+SliderAttachment::SliderAttachment (FloatParameter& param,
+                                    PluginState& pluginState,
+                                    juce::Slider& paramSlider)
+    : SliderAttachment (param, pluginState.getParameterListeners(), paramSlider, pluginState.undoManager)
 {
 }
 
-template <typename State>
-SliderAttachment<State>::SliderAttachment (FloatParameter& param,
-                                           State& pluginState,
-                                           juce::Slider& paramSlider,
-                                           juce::UndoManager* undoManager)
+SliderAttachment::SliderAttachment (FloatParameter& param,
+                                    ParameterListeners& listeners,
+                                    juce::Slider& paramSlider,
+                                    juce::UndoManager* undoManager)
     : slider (paramSlider),
-      attachment (param, pluginState, ParameterAttachmentHelpers::SetValueCallback { *this }),
+      attachment (param, listeners, ParameterAttachmentHelpers::SetValueCallback { *this }),
       um (undoManager)
 {
     slider.valueFromTextFunction = [&p = static_cast<juce::RangedAudioParameter&> (param)] (const juce::String& text)
@@ -56,11 +54,13 @@ SliderAttachment<State>::SliderAttachment (FloatParameter& param,
         return (double) range.snapToLegalValue ((float) mappedValue);
     };
 
-    juce::NormalisableRange<double> newRange { (double) range.start,
-                                               (double) range.end,
-                                               std::move (convertFrom0To1Function),
-                                               std::move (convertTo0To1Function),
-                                               std::move (snapToLegalValueFunction) };
+    auto newRange = juce::NormalisableRange<double> { // NOSONAR
+                                                      (double) range.start,
+                                                      (double) range.end,
+                                                      std::move (convertFrom0To1Function),
+                                                      std::move (convertTo0To1Function),
+                                                      std::move (snapToLegalValueFunction)
+    };
     newRange.interval = range.interval;
     newRange.skew = range.skew;
     newRange.symmetricSkew = range.symmetricSkew;
@@ -72,21 +72,18 @@ SliderAttachment<State>::SliderAttachment (FloatParameter& param,
     slider.addListener (this);
 }
 
-template <typename State>
-SliderAttachment<State>::~SliderAttachment()
+SliderAttachment::~SliderAttachment()
 {
     slider.removeListener (this);
 }
 
-template <typename State>
-void SliderAttachment<State>::setValue (float newValue)
+void SliderAttachment::setValue (float newValue)
 {
     juce::ScopedValueSetter svs { skipSliderChangedCallback, true };
     slider.setValue (newValue, juce::sendNotificationSync);
 }
 
-template <typename State>
-void SliderAttachment<State>::sliderValueChanged (juce::Slider*)
+void SliderAttachment::sliderValueChanged (juce::Slider*)
 {
     if (skipSliderChangedCallback)
         return;
@@ -94,22 +91,22 @@ void SliderAttachment<State>::sliderValueChanged (juce::Slider*)
     attachment.setValueAsPartOfGesture ((float) slider.getValue());
 }
 
-template <typename State>
-void SliderAttachment<State>::sliderDragStarted (juce::Slider*)
+void SliderAttachment::sliderDragStarted (juce::Slider*)
 {
     valueAtStartOfGesture = attachment.param.get();
     attachment.beginGesture();
 }
 
-template <typename State>
-void SliderAttachment<State>::sliderDragEnded (juce::Slider*)
+void SliderAttachment::sliderDragEnded (juce::Slider*)
 {
     if (um != nullptr)
     {
         um->beginNewTransaction();
-        um->perform (new ParameterAttachmentHelpers::ParameterChangeAction (attachment,
-                                                                            valueAtStartOfGesture,
-                                                                            attachment.param.get()));
+        um->perform (
+            new ParameterAttachmentHelpers::ParameterChangeAction<FloatParameter> (
+                attachment.param,
+                valueAtStartOfGesture,
+                attachment.param.get()));
     }
 
     attachment.endGesture();

@@ -9,18 +9,17 @@ namespace chowdsp
  * to a parameter. When this object is deleted, the connection is broken. Make sure that your parameter
  * and ComboBox are not deleted before this object!
  */
-template <typename PluginStateType>
 class ComboBoxAttachment : private juce::ComboBox::Listener
 {
 public:
-    /** Creates an attachment for a given parameter, using the undo manager from the plugin state */
+    /** Creates an attachment for a given parameter, using the undo manager from the plugin state. */
     ComboBoxAttachment (ChoiceParameter& param,
-                        PluginStateType& pluginState,
+                        PluginState& pluginState,
                         juce::ComboBox& combo);
 
-    /** Creates an attachment for a given parameter, using a custon UndoManager */
+    /** Creates an attachment for a given parameter. */
     ComboBoxAttachment (ChoiceParameter& param,
-                        PluginStateType& pluginState,
+                        ParameterListeners& listeners,
                         juce::ComboBox& combo,
                         juce::UndoManager* undoManager);
 
@@ -34,7 +33,6 @@ private:
 
     juce::ComboBox& comboBox;
     ParameterAttachment<ChoiceParameter,
-                        PluginStateType,
                         ParameterAttachmentHelpers::SetValueCallback<ComboBoxAttachment>>
         attachment;
     juce::UndoManager* um = nullptr;
@@ -44,5 +42,3 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ComboBoxAttachment)
 };
 } // namespace chowdsp
-
-#include "chowdsp_ComboBoxAttachment.cpp"

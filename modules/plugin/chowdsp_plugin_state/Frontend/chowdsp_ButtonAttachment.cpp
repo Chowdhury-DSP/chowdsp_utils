@@ -1,20 +1,18 @@
 namespace chowdsp
 {
-template <typename State>
-ButtonAttachment<State>::ButtonAttachment (BoolParameter& param,
-                                           State& pluginState,
-                                           juce::Button& paramButton)
-    : ButtonAttachment (param, pluginState, paramButton, pluginState.undoManager)
+ButtonAttachment::ButtonAttachment (BoolParameter& param,
+                                    PluginState& pluginState,
+                                    juce::Button& paramButton)
+    : ButtonAttachment (param, pluginState.getParameterListeners(), paramButton, pluginState.undoManager)
 {
 }
 
-template <typename State>
-ButtonAttachment<State>::ButtonAttachment (BoolParameter& param,
-                                           State& pluginState,
-                                           juce::Button& paramButton,
-                                           juce::UndoManager* undoManager)
+ButtonAttachment::ButtonAttachment (BoolParameter& param,
+                                    ParameterListeners& listeners,
+                                    juce::Button& paramButton,
+                                    juce::UndoManager* undoManager)
     : button (paramButton),
-      attachment (param, pluginState, ParameterAttachmentHelpers::SetValueCallback { *this }),
+      attachment (param, listeners, ParameterAttachmentHelpers::SetValueCallback { *this }),
       um (undoManager)
 {
     button.setButtonText (param.name);
@@ -22,21 +20,18 @@ ButtonAttachment<State>::ButtonAttachment (BoolParameter& param,
     button.addListener (this);
 }
 
-template <typename State>
-ButtonAttachment<State>::~ButtonAttachment()
+ButtonAttachment::~ButtonAttachment()
 {
     button.removeListener (this);
 }
 
-template <typename State>
-void ButtonAttachment<State>::setValue (bool newValue)
+void ButtonAttachment::setValue (bool newValue)
 {
     juce::ScopedValueSetter svs { skipClickCallback, true };
     button.setToggleState (newValue, juce::sendNotificationSync);
 }
 
-template <typename State>
-void ButtonAttachment<State>::buttonClicked (juce::Button*)
+void ButtonAttachment::buttonClicked (juce::Button*)
 {
     if (skipClickCallback)
         return;
@@ -45,9 +40,11 @@ void ButtonAttachment<State>::buttonClicked (juce::Button*)
     if (um != nullptr)
     {
         um->beginNewTransaction();
-        um->perform (new ParameterAttachmentHelpers::ParameterChangeAction (attachment,
-                                                                            attachment.param.get(),
-                                                                            newValue));
+        um->perform (
+            new ParameterAttachmentHelpers::ParameterChangeAction<BoolParameter> (
+                attachment.param,
+                attachment.param.get(),
+                newValue));
     }
 
     attachment.setValueAsCompleteGesture (newValue);

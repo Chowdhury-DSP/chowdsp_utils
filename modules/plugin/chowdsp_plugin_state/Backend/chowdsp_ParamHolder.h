@@ -1,0 +1,90 @@
+#pragma once
+
+namespace chowdsp
+{
+/** A base class for storing parameters that can go into a plugin state. */
+class ParamHolder
+{
+public:
+    explicit ParamHolder (const juce::String& name = {});
+
+    ParamHolder (ParamHolder&&) noexcept = default;
+    ParamHolder& operator= (ParamHolder&&) noexcept = default;
+
+    /** Adds parameters to the ParamHolder. */
+    template <typename ParamType, typename... OtherParams>
+    std::enable_if_t<std::is_base_of_v<FloatParameter, ParamType>, void>
+        add (OptionalPointer<ParamType>& floatParam, OtherParams&... others);
+
+    /** Adds parameters to the ParamHolder. */
+    template <typename ParamType, typename... OtherParams>
+    std::enable_if_t<std::is_base_of_v<ChoiceParameter, ParamType>, void>
+        add (OptionalPointer<ParamType>& choiceParam, OtherParams&... others);
+
+    /** Adds parameters to the ParamHolder. */
+    template <typename ParamType, typename... OtherParams>
+    std::enable_if_t<std::is_base_of_v<BoolParameter, ParamType>, void>
+        add (OptionalPointer<ParamType>& boolParam, OtherParams&... others);
+
+    /** Adds parameters to the ParamHolder. */
+    template <typename ParamType, typename... OtherParams>
+    std::enable_if_t<std::is_base_of_v<ParamHolder, ParamType>, void>
+        add (ParamType& paramHolder, OtherParams&... others);
+
+    /** Counts all the parameters held internally. */
+    [[nodiscard]] int count() const noexcept;
+
+    /** Connects all the parameters to an AudioProcessor */
+    void connectParametersToProcessor (juce::AudioProcessor& processor);
+
+    /** Returns the paramHolder name */
+    [[nodiscard]] juce::String getName() const noexcept { return name; }
+
+    /** Internal use only! */
+    template <typename ParamContainersCallable, typename ParamHolderCallable>
+    void doForAllParameterContainers (ParamContainersCallable&& paramContainersCallable, ParamHolderCallable&& paramHolderCallable);
+
+    /** Internal use only! */
+    template <typename ParamContainersCallable, typename ParamHolderCallable>
+    void doForAllParameterContainers (ParamContainersCallable&& paramContainersCallable, ParamHolderCallable&& paramHolderCallable) const;
+
+    /**
+     * Do some callable for all the stored parameters.
+     * Callable must have the signature void(ParameterType&, size_t).
+     */
+    template <typename Callable>
+    size_t doForAllParameters (Callable&& callable, size_t index = 0);
+
+    /**
+     * Do some callable for all the stored parameters.
+     * Callable must have the signature void(ParameterType&, size_t).
+     */
+    template <typename Callable>
+    size_t doForAllParameters (Callable&& callable, size_t index = 0) const;
+
+    /** Custom serializer */
+    template <typename Serializer>
+    static typename Serializer::SerializedType serialize (const ParamHolder& paramHolder);
+
+    /** Custom deserializer */
+    template <typename Serializer>
+    static void deserialize (typename Serializer::DeserializedType deserial, ParamHolder& paramHolder);
+
+private:
+    void add() const
+    {
+        // base case!
+    }
+
+    std::vector<OptionalPointer<FloatParameter>> floatParams;
+    std::vector<OptionalPointer<ChoiceParameter>> choiceParams;
+    std::vector<OptionalPointer<BoolParameter>> boolParams;
+    std::vector<ParamHolder*> otherParams;
+
+    juce::String name;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParamHolder)
+};
+} // namespace chowdsp
+
+#include "chowdsp_ParamHolder.cpp"

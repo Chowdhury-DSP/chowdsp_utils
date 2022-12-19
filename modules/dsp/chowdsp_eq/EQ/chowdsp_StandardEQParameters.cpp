@@ -2,6 +2,20 @@
 namespace chowdsp::EQ
 {
 template <size_t NumBands>
+StandardEQParameters<NumBands>::StandardEQParameters (EQParameterHandles&& paramHandles) : eqParams (std::move (paramHandles))
+{
+    for (auto& bandParams : eqParams)
+    {
+        bandParams.paramHolder.add (bandParams.onOffParam,
+                                    bandParams.typeParam,
+                                    bandParams.freqParam,
+                                    bandParams.qParam,
+                                    bandParams.gainParam);
+        add (bandParams.paramHolder);
+    }
+}
+
+template <size_t NumBands>
 typename StandardEQParameters<NumBands>::Params StandardEQParameters<NumBands>::getEQParameters (const EQParameterHandles& paramHandles)
 {
     Params params {};

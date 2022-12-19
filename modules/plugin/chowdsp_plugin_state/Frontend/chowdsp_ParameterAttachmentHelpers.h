@@ -20,15 +20,15 @@ namespace ParameterAttachmentHelpers
         Attachment& attach;
     };
 
-    template <typename AttachmentType>
+    template <typename ParamType>
     struct ParameterChangeAction : public juce::UndoableAction
     {
-        using ValueType = typename AttachmentType::ParamElementType;
+        using ValueType = ParameterTypeHelpers::ParameterElementType<ParamType>;
 
-        explicit ParameterChangeAction (AttachmentType& attach,
+        explicit ParameterChangeAction (ParamType& parameter,
                                         ValueType oldVal,
                                         ValueType newVal)
-            : attachment (attach),
+            : param (parameter),
               oldValue (oldVal),
               newValue (newVal)
         {
@@ -42,19 +42,27 @@ namespace ParameterAttachmentHelpers
                 return true;
             }
 
-            attachment.setValueAsCompleteGesture (newValue);
+            setParameterValue (newValue);
             return true;
         }
 
         bool undo() override
         {
-            attachment.setValueAsCompleteGesture (oldValue);
+            setParameterValue (oldValue);
             return true;
         }
 
         int getSizeInUnits() override { return sizeof (*this); }
 
-        AttachmentType& attachment;
+    private:
+        void setParameterValue (ValueType val)
+        {
+            param.beginChangeGesture();
+            ParameterTypeHelpers::setValue (val, param);
+            param.endChangeGesture();
+        }
+
+        ParamType& param;
         const ValueType oldValue;
         const ValueType newValue;
         bool firstTime = true;

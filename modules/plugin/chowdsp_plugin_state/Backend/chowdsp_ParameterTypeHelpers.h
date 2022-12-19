@@ -6,20 +6,6 @@ namespace chowdsp
 /** This API is unstable and should not be used directly! */
 namespace ParameterTypeHelpers
 {
-    template <typename T>
-    struct IsParameterPointerTypeImpl : std::false_type
-    {
-    };
-
-    template <typename T>
-    struct IsParameterPointerTypeImpl<OptionalPointer<T>>
-        : std::conditional_t<std::is_base_of_v<juce::RangedAudioParameter, T>, std::true_type, std::false_type>
-    {
-    };
-
-    template <typename T>
-    static constexpr bool IsParameterPointerType = IsParameterPointerTypeImpl<T>::value;
-
     template <typename T, typename = void>
     struct ParameterElementTypeImpl;
 
@@ -84,12 +70,6 @@ namespace ParameterTypeHelpers
         Serialization::deserialize<Serializer> (serial, val);
         setValue (val, param);
     }
-
-    template <typename T>
-    static constexpr auto IsStringType = std::is_same_v<T, std::string_view> || std::is_same_v<T, std::string> || std::is_same_v<T, juce::String>;
-
-    template <typename T>
-    static constexpr auto IsHelperType = IsStringType<T> || std::is_arithmetic_v<T>;
 } // namespace ParameterTypeHelpers
 #endif
 } // namespace chowdsp

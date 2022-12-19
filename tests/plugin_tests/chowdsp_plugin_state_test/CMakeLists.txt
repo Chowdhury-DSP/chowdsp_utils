@@ -3,6 +3,7 @@ setup_juce_test(chowdsp_plugin_state_test)
 
 target_link_libraries(chowdsp_plugin_state_test
     PRIVATE
+        chowdsp_plugin_base
         chowdsp_plugin_state
 )
 
@@ -11,4 +12,5 @@ target_sources(chowdsp_plugin_state_test
         StateSerializationTest.cpp
         StateListenersTest.cpp
         ParameterAttachmentsTest.cpp
+        StatePluginInterfaceTest.cpp
 )

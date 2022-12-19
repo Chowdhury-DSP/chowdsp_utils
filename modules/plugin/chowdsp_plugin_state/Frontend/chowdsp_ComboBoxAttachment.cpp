@@ -1,20 +1,18 @@
 namespace chowdsp
 {
-template <typename State>
-ComboBoxAttachment<State>::ComboBoxAttachment (ChoiceParameter& param,
-                                               State& pluginState,
-                                               juce::ComboBox& combo)
-    : ComboBoxAttachment (param, pluginState, combo, pluginState.undoManager)
+ComboBoxAttachment::ComboBoxAttachment (ChoiceParameter& param,
+                                        PluginState& pluginState,
+                                        juce::ComboBox& combo)
+    : ComboBoxAttachment (param, pluginState.getParameterListeners(), combo, pluginState.undoManager)
 {
 }
 
-template <typename State>
-ComboBoxAttachment<State>::ComboBoxAttachment (ChoiceParameter& param,
-                                               State& pluginState,
-                                               juce::ComboBox& combo,
-                                               juce::UndoManager* undoManager)
+ComboBoxAttachment::ComboBoxAttachment (ChoiceParameter& param,
+                                        ParameterListeners& listeners,
+                                        juce::ComboBox& combo,
+                                        juce::UndoManager* undoManager)
     : comboBox (combo),
-      attachment (param, pluginState, ParameterAttachmentHelpers::SetValueCallback { *this }),
+      attachment (param, listeners, ParameterAttachmentHelpers::SetValueCallback { *this }),
       um (undoManager)
 {
     comboBox.addItemList (param.choices, 1);
@@ -22,21 +20,18 @@ ComboBoxAttachment<State>::ComboBoxAttachment (ChoiceParameter& param,
     comboBox.addListener (this);
 }
 
-template <typename State>
-ComboBoxAttachment<State>::~ComboBoxAttachment()
+ComboBoxAttachment::~ComboBoxAttachment()
 {
     comboBox.removeListener (this);
 }
 
-template <typename State>
-void ComboBoxAttachment<State>::setValue (int newValue)
+void ComboBoxAttachment::setValue (int newValue)
 {
     juce::ScopedValueSetter svs { skipBoxChangedCallback, true };
     comboBox.setSelectedItemIndex (newValue, juce::sendNotificationSync);
 }
 
-template <typename State>
-void ComboBoxAttachment<State>::comboBoxChanged (juce::ComboBox*)
+void ComboBoxAttachment::comboBoxChanged (juce::ComboBox*)
 {
     if (skipBoxChangedCallback)
         return;
@@ -46,9 +41,11 @@ void ComboBoxAttachment<State>::comboBoxChanged (juce::ComboBox*)
     if (um != nullptr)
     {
         um->beginNewTransaction();
-        um->perform (new ParameterAttachmentHelpers::ParameterChangeAction (attachment,
-                                                                            attachment.param.getIndex(),
-                                                                            newValue));
+        um->perform (
+            new ParameterAttachmentHelpers::ParameterChangeAction<ChoiceParameter> (
+                attachment.param,
+                attachment.param.getIndex(),
+                newValue));
     }
 
     attachment.setValueAsCompleteGesture (newValue);

@@ -9,18 +9,17 @@ namespace chowdsp
  * to a parameter. When this object is deleted, the connection is broken. Make sure that your parameter
  * and Button are not deleted before this object!
  */
-template <typename PluginStateType>
 class ButtonAttachment : private juce::Button::Listener
 {
 public:
-    /** Creates an attachment for a given parameter, using the undo manager from the plugin state  */
+    /** Creates an attachment for a given parameter, using the undo manager from the plugin state. */
     ButtonAttachment (BoolParameter& param,
-                      PluginStateType& pluginState,
+                      PluginState& pluginState,
                       juce::Button& paramButton);
 
-    /** Creates an attachment for a given parameter, using a custom UndoManager */
+    /** Creates an attachment for a given parameter. */
     ButtonAttachment (BoolParameter& param,
-                      PluginStateType& pluginState,
+                      ParameterListeners& listeners,
                       juce::Button& paramButton,
                       juce::UndoManager* undoManager);
 
@@ -34,7 +33,6 @@ private:
 
     juce::Button& button;
     ParameterAttachment<BoolParameter,
-                        PluginStateType,
                         ParameterAttachmentHelpers::SetValueCallback<ButtonAttachment>>
         attachment;
     juce::UndoManager* um = nullptr;
@@ -44,5 +42,3 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ButtonAttachment)
 };
 } // namespace chowdsp
-
-#include "chowdsp_ButtonAttachment.cpp"
