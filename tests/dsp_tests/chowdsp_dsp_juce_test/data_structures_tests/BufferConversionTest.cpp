@@ -4,7 +4,7 @@
 class BufferConversionTest : public TimedUnitTest
 {
 public:
-    BufferConversionTest() : TimedUnitTest ("Buffer Conversion Test")
+    BufferConversionTest() : TimedUnitTest ("Buffer Conversion Test", "Buffers")
     {
     }
 
