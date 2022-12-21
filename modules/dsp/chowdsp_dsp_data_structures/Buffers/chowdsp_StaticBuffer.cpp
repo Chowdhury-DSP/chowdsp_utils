@@ -77,7 +77,7 @@ juce::AudioBuffer<SampleType> StaticBuffer<SampleType, maxNumChannels, maxNumSam
 template <typename SampleType, int maxNumChannels, int maxNumSamples>
 juce::AudioBuffer<SampleType> StaticBuffer<SampleType, maxNumChannels, maxNumSamples>::toAudioBuffer() const
 {
-    return { const_cast<SampleType* const*> (getArrayOfReadPointers()), currentNumChannels, currentNumSamples };
+    return { const_cast<SampleType* const*> (getArrayOfReadPointers()), currentNumChannels, currentNumSamples }; // NOSONAR
 }
 
 #if JUCE_MODULE_AVAILABLE_juce_dsp
