@@ -36,7 +36,6 @@ public:
         expectEquals ((int64_t) constJuceBlock.getChannelPointer (0), (int64_t) buffer.getReadPointer (0), "Incorrect data!");
     }
 
-
     void runTestTimed() override
     {
         chowdsp::Buffer<float> buffer { 2, 32 };

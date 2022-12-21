@@ -79,7 +79,7 @@ juce::AudioBuffer<SampleType> Buffer<SampleType>::toAudioBuffer()
 template <typename SampleType>
 juce::AudioBuffer<SampleType> Buffer<SampleType>::toAudioBuffer() const
 {
-    return { const_cast<SampleType* const *> (getArrayOfReadPointers()), currentNumChannels, currentNumSamples };
+    return { const_cast<SampleType* const*> (getArrayOfReadPointers()), currentNumChannels, currentNumSamples };
 }
 
 #if JUCE_MODULE_AVAILABLE_juce_dsp
