@@ -191,7 +191,48 @@ public:
         const auto numSamples = buffer.getNumSamples();
 
         for (int ch = 0; ch < numChannels; ++ch)
-            juce::FloatVectorOperations::fill (buffer.getWritePointer (ch), (T) 1, numSamples);
+        {
+            if constexpr (std::is_floating_point_v<T>)
+            {
+                juce::FloatVectorOperations::fill (buffer.getWritePointer (ch),
+                                                   (T) 1,
+                                                   numSamples);
+            }
+            else
+            {
+                std::transform (buffer.getReadPointer (ch),
+                                buffer.getReadPointer (ch) + numSamples,
+                                buffer.getWritePointer (ch),
+                                [] (const auto&)
+                                { return (T) 1; });
+            }
+        }
+    }
+
+    void sumToMonoTest()
+    {
+        BufferType buffer { 2, 100 };
+        fillBufferWithOnes (buffer);
+
+        {
+            sumToMono (buffer, buffer, (NumericType) 1);
+            const auto** data = buffer.getArrayOfReadPointers();
+            for (int n = 0; n < buffer.getNumSamples(); ++n)
+            {
+                expect (chowdsp::SIMDUtils::all (data[0][n] == (T) 2));
+                expect (chowdsp::SIMDUtils::all (data[1][n] == (T) 1));
+            }
+        }
+
+        {
+            BufferType monoBuffer { 1, 100 };
+            sumToMono (buffer, monoBuffer);
+            const auto* data = monoBuffer.getReadPointer (0);
+            for (int n = 0; n < buffer.getNumSamples(); ++n)
+            {
+                expect (chowdsp::SIMDUtils::all (data[n] == (T) 1.5));
+            }
+        }
     }
 
     void sanitizeBufferTest()
@@ -346,6 +387,9 @@ public:
             beginTest ("Sanitize Buffer Test");
             sanitizeBufferTest();
         }
+
+        beginTest ("Sum To Mono Test");
+        sumToMonoTest();
 
         beginTest ("Apply Function Test");
         applyFunctionTest();

@@ -75,6 +75,22 @@ public:
     /** Returns the entire buffer as an array of pointers to each channel's data. */
     [[nodiscard]] const SampleType** getArrayOfReadPointers() const noexcept;
 
+#if CHOWDSP_USING_JUCE
+    /** Constructs a juce::AudioBuffer from the data in this buffer */
+    [[nodiscard]] juce::AudioBuffer<SampleType> toAudioBuffer();
+
+    /** Constructs a juce::AudioBuffer from the data in this buffer */
+    [[nodiscard]] juce::AudioBuffer<SampleType> toAudioBuffer() const;
+
+#if JUCE_MODULE_AVAILABLE_juce_dsp
+    /** Constructs a juce::dsp::AudioBlock from the data in this buffer */
+    [[nodiscard]] AudioBlock<SampleType> toAudioBlock();
+
+    /** Constructs a juce::dsp::AudioBlock from the data in this buffer */
+    [[nodiscard]] AudioBlock<const SampleType> toAudioBlock() const;
+#endif
+#endif
+
 private:
     int currentNumChannels = 0;
     int currentNumSamples = 0;
