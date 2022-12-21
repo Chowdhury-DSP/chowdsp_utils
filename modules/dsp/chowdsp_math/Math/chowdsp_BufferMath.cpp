@@ -1,5 +1,18 @@
 namespace chowdsp::BufferMath
 {
+#ifndef DOXYGEN
+namespace detail
+{
+    template <typename T>
+    static bool isAligned (const T* p) noexcept
+    {
+        static constexpr auto RegisterSize = sizeof (xsimd::batch<T>);
+        uintptr_t bitmask = RegisterSize - 1;
+        return ((uintptr_t) p & bitmask) == 0;
+    }
+} // namespace detail
+#endif
+
 template <typename BufferType>
 auto getMagnitude (const BufferType& buffer, int startSample, int numSamples, int channel) noexcept
 {
@@ -458,6 +471,14 @@ std::enable_if_t<std::is_floating_point_v<FloatType>, void>
     // both buffers must have the same size
     jassert (bufferDest.getNumChannels() == numChannels);
     jassert (bufferDest.getNumSamples() == numSamples);
+
+#if JUCE_DEBUG
+    for (int ch = 0; ch < numChannels; ++ch)
+    {
+        jassert (detail::isAligned (bufferSrc.getReadPointer (ch)));
+        jassert (detail::isAligned (bufferDest.getReadPointer (ch)));
+    }
+#endif
 
     static constexpr auto vecSize = (int) xsimd::batch<FloatType>::size;
     auto numVecOps = numSamples / vecSize;
