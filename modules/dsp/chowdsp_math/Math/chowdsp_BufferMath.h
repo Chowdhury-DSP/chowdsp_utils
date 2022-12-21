@@ -83,6 +83,18 @@ namespace BufferMath
     void applyGainSmoothedBuffer (const BufferType1& bufferSrc, BufferType2& bufferDest, SmoothedBufferType& gain) noexcept;
 
     /**
+     * Sums the channels in the source buffer, and stores
+     * the result in the first channel of the destination buffer.
+     * Other channels in the destination buffer will be unaffected.
+     *
+     * The caller can pass a custom normalization gain value. If a negative
+     * value is passed, a "default" normalization value of 1 / bufferSrc.getNumChannels()
+     * will be applied.
+     */
+    template <typename BufferType1, typename BufferType2, typename FloatType = SampleTypeHelpers::NumericType<detail::BufferSampleType<BufferType1>>>
+    void sumToMono (const BufferType1& bufferSrc, BufferType2& bufferDest, FloatType normGain = (FloatType) -1);
+
+    /**
      * If the buffer contains any Infs, NaNs, or values larger than the ceiling,
      * this method will clear the buffer and return false.
      */

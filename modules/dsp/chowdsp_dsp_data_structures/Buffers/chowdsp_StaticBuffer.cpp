@@ -67,6 +67,34 @@ const SampleType** StaticBuffer<SampleType, maxNumChannels, maxNumSamples>::getA
     return const_cast<const SampleType**> (channelPointers.data()); // NOSONAR (using const_cast to be more strict)
 }
 
+#if CHOWDSP_USING_JUCE
+template <typename SampleType, int maxNumChannels, int maxNumSamples>
+juce::AudioBuffer<SampleType> StaticBuffer<SampleType, maxNumChannels, maxNumSamples>::toAudioBuffer()
+{
+    return { getArrayOfWritePointers(), currentNumChannels, currentNumSamples };
+}
+
+template <typename SampleType, int maxNumChannels, int maxNumSamples>
+juce::AudioBuffer<SampleType> StaticBuffer<SampleType, maxNumChannels, maxNumSamples>::toAudioBuffer() const
+{
+    return { const_cast<SampleType* const*> (getArrayOfReadPointers()), currentNumChannels, currentNumSamples }; // NOSONAR
+}
+
+#if JUCE_MODULE_AVAILABLE_juce_dsp
+template <typename SampleType, int maxNumChannels, int maxNumSamples>
+AudioBlock<SampleType> StaticBuffer<SampleType, maxNumChannels, maxNumSamples>::toAudioBlock()
+{
+    return { getArrayOfWritePointers(), (size_t) currentNumChannels, (size_t) currentNumSamples };
+}
+
+template <typename SampleType, int maxNumChannels, int maxNumSamples>
+AudioBlock<const SampleType> StaticBuffer<SampleType, maxNumChannels, maxNumSamples>::toAudioBlock() const
+{
+    return { getArrayOfReadPointers(), (size_t) currentNumChannels, (size_t) currentNumSamples };
+}
+#endif
+#endif
+
 template <typename SampleType, int maxNumChannels, int maxNumSamples>
 void StaticBuffer<SampleType, maxNumChannels, maxNumSamples>::clear() noexcept
 {

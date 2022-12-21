@@ -317,6 +317,48 @@ void applyGainSmoothedBuffer (const BufferType1& bufferSrc, BufferType2& bufferD
     }
 }
 
+template <typename BufferType1, typename BufferType2, typename FloatType>
+void sumToMono (const BufferType1& bufferSrc, BufferType2& bufferDest, FloatType normGain)
+{
+    using SampleType = detail::BufferSampleType<BufferType1>;
+    static_assert (std::is_same_v<SampleType, detail::BufferSampleType<BufferType2>>, "Both buffer types must have the same sample type!");
+
+    const auto numInChannels = bufferSrc.getNumChannels();
+    [[maybe_unused]] const auto numSamples = bufferSrc.getNumSamples();
+
+    // both buffers must have the same size
+    jassert (bufferDest.getNumSamples() == numSamples);
+
+    if (normGain < (FloatType) 0)
+        normGain = (FloatType) 1 / (FloatType) bufferSrc.getNumChannels();
+
+    if (bufferSrc.getReadPointer (0) != bufferDest.getWritePointer (0))
+        copyBufferChannels (bufferSrc, bufferDest, 0, 0);
+
+    for (int ch = 1; ch < numInChannels; ++ch)
+        addBufferChannels (bufferSrc, bufferDest, ch, 0);
+
+    // apply normalization gain
+    if (normGain != (FloatType) 1)
+    {
+        if constexpr (std::is_floating_point_v<SampleType>)
+        {
+            juce::FloatVectorOperations::multiply (bufferDest.getWritePointer (0),
+                                                   bufferDest.getReadPointer (0),
+                                                   normGain,
+                                                   numSamples);
+        }
+        else if constexpr (SampleTypeHelpers::IsSIMDRegister<SampleType>)
+        {
+            std::transform (bufferDest.getReadPointer (0),
+                            bufferDest.getReadPointer (0) + numSamples,
+                            bufferDest.getWritePointer (0),
+                            [normGain] (const auto& x)
+                            { return x * normGain; });
+        }
+    }
+}
+
 template <typename BufferType, typename FloatType>
 bool sanitizeBuffer (BufferType& buffer, FloatType ceiling) noexcept
 {

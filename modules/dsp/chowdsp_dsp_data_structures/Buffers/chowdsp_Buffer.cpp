@@ -69,6 +69,34 @@ const SampleType** Buffer<SampleType>::getArrayOfReadPointers() const noexcept
     return const_cast<const SampleType**> (channelPointers.data()); // NOSONAR (using const_cast to be more strict)
 }
 
+#if CHOWDSP_USING_JUCE
+template <typename SampleType>
+juce::AudioBuffer<SampleType> Buffer<SampleType>::toAudioBuffer()
+{
+    return { getArrayOfWritePointers(), currentNumChannels, currentNumSamples };
+}
+
+template <typename SampleType>
+juce::AudioBuffer<SampleType> Buffer<SampleType>::toAudioBuffer() const
+{
+    return { const_cast<SampleType* const*> (getArrayOfReadPointers()), currentNumChannels, currentNumSamples }; // NOSONAR
+}
+
+#if JUCE_MODULE_AVAILABLE_juce_dsp
+template <typename SampleType>
+AudioBlock<SampleType> Buffer<SampleType>::toAudioBlock()
+{
+    return { getArrayOfWritePointers(), (size_t) currentNumChannels, (size_t) currentNumSamples };
+}
+
+template <typename SampleType>
+AudioBlock<const SampleType> Buffer<SampleType>::toAudioBlock() const
+{
+    return { getArrayOfReadPointers(), (size_t) currentNumChannels, (size_t) currentNumSamples };
+}
+#endif
+#endif
+
 template <typename SampleType>
 void Buffer<SampleType>::clear() noexcept
 {

@@ -18,6 +18,7 @@ target_sources(chowdsp_dsp_juce_test
         data_structures_tests/SmoothedBufferValueTest.cpp
         data_structures_tests/BufferViewTest.cpp
         data_structures_tests/BufferMathTest.cpp
+        data_structures_tests/BufferConversionTest.cpp
 
         # Convolution Tests
         convolution_tests/ConvolutionTest.cpp

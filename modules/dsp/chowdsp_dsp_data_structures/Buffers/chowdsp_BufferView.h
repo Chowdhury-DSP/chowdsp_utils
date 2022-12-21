@@ -133,6 +133,12 @@ public:
         initialise (buffer.getArrayOfReadPointers(), sampleOffset, startChannel);
     }
 
+    /** Constructs a juce::AudioBuffer from this BufferView */
+    [[nodiscard]] juce::AudioBuffer<SampleType> toAudioBuffer() const noexcept
+    {
+        return { channelPointers.data(), numChannels, numSamples };
+    }
+
 #if JUCE_MODULE_AVAILABLE_juce_dsp
     BufferView (const juce::dsp::AudioBlock<std::remove_const_t<SampleType>>& block, // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
                 int sampleOffset = 0,
@@ -159,9 +165,10 @@ public:
             channelPointers[ch] = block.getChannelPointer (ch + (size_t) startChannel) + sampleOffset;
     }
 
+    /** Constructs a juce::dsp::AudioBlock from this BufferView */
     [[nodiscard]] AudioBlock<SampleType> toAudioBlock() const noexcept
     {
-        return AudioBlock<SampleType> { channelPointers.data(), (size_t) numChannels, (size_t) numSamples };
+        return { channelPointers.data(), (size_t) numChannels, (size_t) numSamples };
     }
 #endif
 #endif
