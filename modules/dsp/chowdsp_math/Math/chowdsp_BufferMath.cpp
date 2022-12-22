@@ -1,18 +1,5 @@
 namespace chowdsp::BufferMath
 {
-#ifndef DOXYGEN
-namespace detail
-{
-    template <typename T>
-    static bool isAligned (const T* p) noexcept
-    {
-        static constexpr auto RegisterSize = sizeof (xsimd::batch<T>);
-        uintptr_t bitmask = RegisterSize - 1;
-        return ((uintptr_t) p & bitmask) == 0;
-    }
-} // namespace detail
-#endif
-
 template <typename BufferType>
 auto getMagnitude (const BufferType& buffer, int startSample, int numSamples, int channel) noexcept
 {
@@ -429,6 +416,19 @@ void applyFunction (const BufferType1& bufferSrc, BufferType2& bufferDest, Funct
 }
 
 #if ! CHOWDSP_NO_XSIMD
+#ifndef DOXYGEN
+namespace detail
+{
+    template <typename T>
+    static bool isAligned (const T* p) noexcept
+    {
+        static constexpr auto RegisterSize = sizeof (xsimd::batch<T>);
+        uintptr_t bitmask = RegisterSize - 1;
+        return ((uintptr_t) p & bitmask) == 0;
+    }
+} // namespace detail
+#endif
+
 template <typename BufferType, typename FunctionType, typename FloatType>
 std::enable_if_t<std::is_floating_point_v<FloatType>, void> applyFunctionSIMD (BufferType& buffer, FunctionType&& function) noexcept
 {
