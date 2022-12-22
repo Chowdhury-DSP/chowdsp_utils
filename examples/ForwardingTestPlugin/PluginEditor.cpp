@@ -8,25 +8,18 @@ PluginEditor::PluginEditor (ForwardingTestPlugin& p) : juce::AudioProcessorEdito
 
     setSize (800, 400);
 
-    plugin.getVTS().addParameterListener (ForwardingTestPlugin::processorChoiceParamID, this);
-    updateProcessorEditor ((int) plugin.getVTS().getRawParameterValue (ForwardingTestPlugin::processorChoiceParamID)->load());
+    processorChangedCallback = plugin.getState().addParameterListener (
+        plugin.getState().params.processorChoice,
+        chowdsp::ParameterListenerThread::MessageThread,
+        [this]
+        {
+            updateProcessorEditor (plugin.getState().params.processorChoice->getIndex());
+        });
+
+    updateProcessorEditor (plugin.getState().params.processorChoice->getIndex());
 }
 
-PluginEditor::~PluginEditor()
-{
-    plugin.getVTS().removeParameterListener (ForwardingTestPlugin::processorChoiceParamID, this);
-}
-
-void PluginEditor::parameterChanged (const juce::String& parameterID, float newValue)
-{
-    if (parameterID != ForwardingTestPlugin::processorChoiceParamID)
-    {
-        jassertfalse;
-        return;
-    }
-
-    updateProcessorEditor ((int) newValue);
-}
+PluginEditor::~PluginEditor() = default;
 
 void PluginEditor::updateProcessorEditor (int processorIndex)
 {

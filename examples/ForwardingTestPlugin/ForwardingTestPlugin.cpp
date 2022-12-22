@@ -1,37 +1,33 @@
 #include "ForwardingTestPlugin.h"
 #include "PluginEditor.h"
 
-ForwardingTestPlugin::ForwardingTestPlugin() : forwardingParameters (vts)
+ForwardingTestPlugin::ForwardingTestPlugin() : forwardingParameters (*this)
 {
-    using namespace chowdsp::ParamUtils;
-    chowdsp::ParamUtils::loadParameterPointer (processorChoiceParameter, vts, processorChoiceParamID);
+    processorChangedCallback = state.addParameterListener (
+        state.params.processorChoice,
+        chowdsp::ParameterListenerThread::MessageThread,
+        [this]
+        {
+            if (auto* newProcessor = getProcessorForIndex (state.params.processorChoice->getIndex()))
+            {
+                forwardingParameters.setParameterRange (0,
+                                                        numForwardParameters,
+                                                        [&processorParameters = newProcessor->getParameters()] (int i) -> chowdsp::ParameterForwardingInfo
+                                                        {
+                                                            if (auto* paramCast = dynamic_cast<juce::RangedAudioParameter*> (processorParameters[i]))
+                                                                return { paramCast, paramCast->name };
 
-    vts.addParameterListener (processorChoiceParamID, this);
+                                                            return {};
+                                                        });
+            }
+            else
+            {
+                forwardingParameters.clearParameterRange (0, numForwardParameters);
+            }
+        });
 }
 
-ForwardingTestPlugin::~ForwardingTestPlugin()
-{
-    vts.removeParameterListener (processorChoiceParamID, this);
-}
-
-void ForwardingTestPlugin::addParameters (Parameters& params)
-{
-    using namespace chowdsp::ParamUtils;
-    emplace_param<chowdsp::ChoiceParameter> (params,
-                                             chowdsp::ParameterID { processorChoiceParamID, 100 },
-                                             "Processor Choice",
-                                             juce::StringArray {
-                                                 "None",
-                                                 "Tone Generator",
-                                                 "Reverb",
-                                                 "Werner Filter",
-                                                 "ARP Filter",
-                                                 "Polygonal Oscillator",
-                                                 "Band Split",
-                                                 "Plate Reverb",
-                                             },
-                                             0);
-}
+ForwardingTestPlugin::~ForwardingTestPlugin() = default;
 
 void ForwardingTestPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
@@ -47,7 +43,7 @@ void ForwardingTestPlugin::prepareToPlay (double sampleRate, int samplesPerBlock
 void ForwardingTestPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
 {
     juce::MidiBuffer midi;
-    if (auto* processor = getProcessorForIndex (processorChoiceParameter->getIndex()))
+    if (auto* processor = getProcessorForIndex (state.params.processorChoice->getIndex()))
     {
         processor->processBlock (buffer, midi);
     }
@@ -56,33 +52,6 @@ void ForwardingTestPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
 juce::AudioProcessorEditor* ForwardingTestPlugin::createEditor()
 {
     return new PluginEditor (*this);
-}
-
-void ForwardingTestPlugin::parameterChanged (const juce::String& parameterID, float newValue)
-{
-    if (parameterID != ForwardingTestPlugin::processorChoiceParamID)
-    {
-        jassertfalse;
-        return;
-    }
-
-    if (auto* newProcessor = getProcessorForIndex ((int) newValue))
-    {
-        auto& processorParameters = newProcessor->getParameters();
-        forwardingParameters.setParameterRange (0,
-                                                numForwardParameters,
-                                                [&processorParameters] (int i) -> chowdsp::ParameterForwardingInfo
-                                                {
-                                                    if (auto* paramCast = dynamic_cast<juce::RangedAudioParameter*> (processorParameters[i]))
-                                                        return { paramCast, paramCast->name };
-
-                                                    return {};
-                                                });
-    }
-    else
-    {
-        forwardingParameters.clearParameterRange (0, numForwardParameters);
-    }
 }
 
 juce::AudioProcessor* ForwardingTestPlugin::getProcessorForIndex (int index)

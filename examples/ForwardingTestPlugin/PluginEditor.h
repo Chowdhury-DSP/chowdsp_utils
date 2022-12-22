@@ -2,8 +2,7 @@
 
 #include "ForwardingTestPlugin.h"
 
-class PluginEditor : public juce::AudioProcessorEditor,
-                     private juce::AudioProcessorValueTreeState::Listener
+class PluginEditor : public juce::AudioProcessorEditor
 {
 public:
     explicit PluginEditor (ForwardingTestPlugin& plugin);
@@ -14,12 +13,13 @@ public:
 
 private:
     void updateProcessorEditor (int processorIndex);
-    void parameterChanged (const juce::String& parameterID, float newValue) override;
 
     ForwardingTestPlugin& plugin;
 
     juce::GenericAudioProcessorEditor mainEditor;
     std::unique_ptr<juce::GenericAudioProcessorEditor> processorEditor;
+
+    chowdsp::ScopedCallback processorChangedCallback;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginEditor)
 };

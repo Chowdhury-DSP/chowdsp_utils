@@ -1,34 +1,8 @@
 #include "SignalGeneratorPlugin.h"
 
-namespace
-{
-const juce::String freqTag = "freq_hz";
-const juce::String typeTag = "tone_type";
-const juce::String upsampleTag = "upsample_tag";
-const juce::String gainTag = "gain_db";
-const juce::String waveshaperTag = "waveshaper";
-} // namespace
-
 SignalGeneratorPlugin::SignalGeneratorPlugin()
 {
-    using namespace chowdsp::ParamUtils;
-    freqHzParamSmoothed.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, freqTag));
-    loadParameterPointer (toneTypeParam, vts, typeTag);
-    loadParameterPointer (upSampleParam, vts, upsampleTag);
-    loadParameterPointer (gainDBParam, vts, gainTag);
-    loadParameterPointer (waveshaperParam, vts, waveshaperTag);
-}
-
-void SignalGeneratorPlugin::addParameters (Parameters& params)
-{
-    using namespace chowdsp::ParamUtils;
-    createFreqParameter (params, { freqTag, 100 }, "Frequency", 50.0f, 50000.0f, 2500.0f, 1000.0f);
-    createGainDBParameter (params, { gainTag, 100 }, "Gain", -45.0f, 12.0f, -24.0f);
-    emplace_param<chowdsp::ChoiceParameter> (params, chowdsp::ParameterID { typeTag, 100 }, "Tone Type", juce::StringArray { "Sine", "Saw", "Square", "Triangle" }, 0);
-    emplace_param<chowdsp::ChoiceParameter> (params, chowdsp::ParameterID { upsampleTag, 100 }, "Upsample", juce::StringArray { "1x", "2x", "3x", "4x" }, 0);
-
-    juce::StringArray waveshapeOptions { "None", "Hard Clip", "Tanh Clip", "Cubic Clip", "9th-Order Clip", "Full Wave Rectify", "West Coast", "Wave Multiply" };
-    emplace_param<chowdsp::ChoiceParameter> (params, chowdsp::ParameterID { waveshaperTag, 100 }, "Waveshaper", waveshapeOptions, 0);
+    freqHzParamSmoothed.setParameterHandle (state.params.freqParam.get());
 }
 
 void SignalGeneratorPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)
@@ -83,7 +57,7 @@ void SignalGeneratorPlugin::prepareTones (double sampleRate, int maxSamplesPerBl
 
 void SignalGeneratorPlugin::setUpSampleChoice()
 {
-    const auto upsampleChoice = (int) *upSampleParam;
+    const auto upsampleChoice = state.params.upsampleParam->getIndex();
     if (upsampleChoice != previousUpSampleChoice)
     {
         previousUpSampleChoice = upsampleChoice;
@@ -156,38 +130,39 @@ void SignalGeneratorPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
                 upsampledBuffer.copyFrom (ch, 0, upsampledBuffer, 0, 0, osNumSamples);
         }
 
-        gain.setGainDecibels (gainDBParam->getCurrentValue());
+        gain.setGainDecibels (state.params.gainParam->getCurrentValue());
         gain.process (upsampledBuffer);
 
-        if (waveshaperParam->getIndex() == 0)
+        const auto waveshapeIndex = state.params.waveshapeParam->getIndex();
+        if (waveshapeIndex == 0)
         {
             // no waveshaper
         }
-        else if (waveshaperParam->getIndex() == 1)
+        else if (waveshapeIndex == 1)
         {
             adaaHardClipper.process (upsampledContext);
         }
-        else if (waveshaperParam->getIndex() == 2)
+        else if (waveshapeIndex == 2)
         {
             adaaTanhClipper.process (upsampledContext);
         }
-        else if (waveshaperParam->getIndex() == 3)
+        else if (waveshapeIndex == 3)
         {
             adaaCubicClipper.process (upsampledContext);
         }
-        else if (waveshaperParam->getIndex() == 4)
+        else if (waveshapeIndex == 4)
         {
             adaa9thOrderClipper.process (upsampledContext);
         }
-        else if (waveshaperParam->getIndex() == 5)
+        else if (waveshapeIndex == 5)
         {
             fullWaveRectifier.process (upsampledContext);
         }
-        else if (waveshaperParam->getIndex() == 6)
+        else if (waveshapeIndex == 6)
         {
             westCoastFolder.process (upsampledContext);
         }
-        else if (waveshaperParam->getIndex() == 7)
+        else if (waveshapeIndex == 7)
         {
             waveMultiplyFolder.processBlock (upsampledBuffer);
         }
@@ -204,7 +179,7 @@ void SignalGeneratorPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
     };
 
     setUpSampleChoice();
-    const auto typeChoice = (int) *toneTypeParam;
+    const auto typeChoice = state.params.typeParam->getIndex();
     if (typeChoice == 0)
         processTone (sine);
     else if (typeChoice == 1)

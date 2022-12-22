@@ -3,12 +3,41 @@
 #include <chowdsp_filters/chowdsp_filters.h>
 #include <chowdsp_plugin_base/chowdsp_plugin_base.h>
 
-class BandSplitPlugin : public chowdsp::PluginBase<BandSplitPlugin>
+struct BandSplitParams : chowdsp::ParamHolder
+{
+    BandSplitParams()
+    {
+        add (freqParam,
+             orderParam,
+             modeParam);
+    }
+
+    chowdsp::FreqHzParameter::Ptr freqParam {
+        juce::ParameterID { "freq", 100 },
+        "Crossover Frequency",
+        chowdsp::ParamUtils::createNormalisableRange (20.0f, 20000.0f, 2000.0f),
+        1000.0f
+    };
+
+    chowdsp::ChoiceParameter::Ptr orderParam {
+        juce::ParameterID { "order", 100 },
+        "Order",
+        juce::StringArray { "1", "2", "4", "8", "12" },
+        0
+    };
+
+    chowdsp::ChoiceParameter::Ptr modeParam {
+        juce::ParameterID { "mode", 100 },
+        "Mode",
+        juce::StringArray { "Through", "Mute Low", "Mute High" },
+        0
+    };
+};
+
+class BandSplitPlugin : public chowdsp::PluginBase<chowdsp::PluginStateImpl<BandSplitParams>>
 {
 public:
     BandSplitPlugin();
-
-    static void addParameters (Parameters& params);
 
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override {}
@@ -18,10 +47,6 @@ public:
     juce::AudioProcessorEditor* createEditor() override { return nullptr; }
 
 private:
-    chowdsp::FloatParameter* freqParam = nullptr;
-    chowdsp::ChoiceParameter* orderParam = nullptr;
-    chowdsp::ChoiceParameter* modeParam = nullptr;
-
     chowdsp::LinkwitzRileyFilter<float, 1> filter1;
     chowdsp::LinkwitzRileyFilter<float, 2> filter2;
     chowdsp::LinkwitzRileyFilter<float, 4> filter4;

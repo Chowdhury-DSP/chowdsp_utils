@@ -10,14 +10,35 @@
 #include "InternalPlugins/BandSplitPlugin.h"
 #include "InternalPlugins/PlateReverb.h"
 
-class ForwardingTestPlugin : public chowdsp::PluginBase<ForwardingTestPlugin>,
-                             private juce::AudioProcessorValueTreeState::Listener
+struct PluginParams : chowdsp::ParamHolder
+{
+    PluginParams()
+    {
+        add (processorChoice);
+    }
+
+    chowdsp::ChoiceParameter::Ptr processorChoice {
+        chowdsp::ParameterID { "processor_choice", 100 },
+        "Processor Choice",
+        juce::StringArray {
+            "None",
+            "Tone Generator",
+            "Reverb",
+            "Werner Filter",
+            "ARP Filter",
+            "Polygonal Oscillator",
+            "Band Split",
+            "Plate Reverb",
+        },
+        0
+    };
+};
+
+class ForwardingTestPlugin : public chowdsp::PluginBase<chowdsp::PluginStateImpl<PluginParams>>
 {
 public:
     ForwardingTestPlugin();
     ~ForwardingTestPlugin() override;
-
-    static void addParameters (Parameters& params);
 
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override {}
@@ -25,16 +46,9 @@ public:
 
     juce::AudioProcessorEditor* createEditor() override;
 
-    auto& getVTS() { return vts; }
     juce::AudioProcessor* getProcessorForIndex (int index);
 
-    inline static const juce::String processorChoiceParamID = "proc_choice";
-
 private:
-    void parameterChanged (const juce::String& parameterID, float newValue) override;
-
-    chowdsp::ChoiceParameter* processorChoiceParameter = nullptr;
-
     SignalGeneratorPlugin toneGenerator;
     SimpleReverbPlugin reverb;
     WernerFilterPlugin wernerFilter;
@@ -54,6 +68,8 @@ private:
     static constexpr int numForwardParameters = 10;
     using ForwardingParams = chowdsp::ForwardingParametersManager<ParamForwardingProvider, numForwardParameters>;
     ForwardingParams forwardingParameters;
+
+    chowdsp::ScopedCallback processorChangedCallback;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ForwardingTestPlugin)
 };

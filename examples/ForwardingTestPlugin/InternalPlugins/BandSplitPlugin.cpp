@@ -7,21 +7,7 @@ const juce::ParameterID orderTag = { "order", 100 };
 const juce::ParameterID modeTag = { "mode", 100 };
 } // namespace
 
-BandSplitPlugin::BandSplitPlugin()
-{
-    using namespace chowdsp::ParamUtils;
-    loadParameterPointer (freqParam, vts, freqTag);
-    loadParameterPointer (orderParam, vts, orderTag);
-    loadParameterPointer (modeParam, vts, modeTag);
-}
-
-void BandSplitPlugin::addParameters (Parameters& params)
-{
-    using namespace chowdsp::ParamUtils;
-    createFreqParameter (params, freqTag, "Crossover Frequency", 20.0f, 20000.0f, 1000.0f, 1000.0f);
-    emplace_param<chowdsp::ChoiceParameter> (params, orderTag, "Order", juce::StringArray { "1", "2", "4", "8", "12" }, 0);
-    emplace_param<chowdsp::ChoiceParameter> (params, modeTag, "Mode", juce::StringArray { "Through", "Mute Low", "Mute High" }, 0);
-}
+BandSplitPlugin::BandSplitPlugin() = default;
 
 void BandSplitPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
@@ -49,11 +35,11 @@ void BandSplitPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
 
     const auto processFilter = [this, &bufferView] (auto& filter)
     {
-        filter.setCrossoverFrequency (freqParam->getCurrentValue());
+        filter.setCrossoverFrequency (*state.params.freqParam);
         filter.processBlock (bufferView, lowBuffer, highBuffer);
     };
 
-    const auto orderIndex = orderParam->getIndex();
+    const auto orderIndex = state.params.orderParam->getIndex();
     if (orderIndex == 0)
         processFilter (filter1);
     else if (orderIndex == 1)
@@ -66,7 +52,7 @@ void BandSplitPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
         processFilter (filter12);
 
     // mute bands if needed
-    const auto modeIndex = modeParam->getIndex();
+    const auto modeIndex = state.params.modeParam->getIndex();
     if (modeIndex == 1)
         chowdsp::BufferMath::applyGain (lowBuffer, 0.0f);
     else if (modeIndex == 2)
