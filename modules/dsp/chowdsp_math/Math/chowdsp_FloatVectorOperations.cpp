@@ -128,18 +128,18 @@ namespace detail
         auto storeU = [] (auto* ptr, const auto& reg)
         { xsimd::store_unaligned (ptr, reg); };
 
-        if (isAligned (dest))
+        if (SIMDUtils::isAligned (dest))
         {
-            if (isAligned (src1))
+            if (SIMDUtils::isAligned (src1))
             {
-                if (isAligned (src2))
+                if (SIMDUtils::isAligned (src2))
                     binaryOp (dest, src1, src2, numValues, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), loadA, loadA, storeA);
                 else
                     binaryOp (dest, src1, src2, numValues, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), loadA, loadU, storeA);
             }
             else
             {
-                if (isAligned (src2))
+                if (SIMDUtils::isAligned (src2))
                     binaryOp (dest, src1, src2, numValues, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), loadU, loadA, storeA);
                 else
                     binaryOp (dest, src1, src2, numValues, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), loadU, loadU, storeA);
@@ -147,16 +147,16 @@ namespace detail
         }
         else
         {
-            if (isAligned (src1))
+            if (SIMDUtils::isAligned (src1))
             {
-                if (isAligned (src2))
+                if (SIMDUtils::isAligned (src2))
                     binaryOp (dest, src1, src2, numValues, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), loadA, loadA, storeU);
                 else
                     binaryOp (dest, src1, src2, numValues, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), loadA, loadU, storeU);
             }
             else
             {
-                if (isAligned (src2))
+                if (SIMDUtils::isAligned (src2))
                     binaryOp (dest, src1, src2, numValues, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), loadU, loadA, storeU);
                 else
                     binaryOp (dest, src1, src2, numValues, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), loadU, loadU, storeU);
@@ -199,7 +199,7 @@ namespace detail
             return reduceFallback (src, numValues, init, std::forward<ScalarOp> (scalarOp));
 
         // Fallback: starting pointer is not aligned!
-        if (! isAligned (src))
+        if (! SIMDUtils::isAligned (src))
         {
             auto* nextAlignedPtr = getNextAlignedPtr (src);
             auto diff = int (nextAlignedPtr - src);
@@ -271,8 +271,8 @@ namespace detail
         { return xsimd::load_unaligned (val); };
 
         // select load operations based on data alignment
-        const auto isSrc1Aligned = isAligned (src1);
-        const auto isSrc2Aligned = isAligned (src2);
+        const auto isSrc1Aligned = SIMDUtils::isAligned (src1);
+        const auto isSrc2Aligned = SIMDUtils::isAligned (src2);
         T result {};
         if (isSrc1Aligned && isSrc2Aligned)
             result = vecReduceOp (vecLoop (loadA, loadA));

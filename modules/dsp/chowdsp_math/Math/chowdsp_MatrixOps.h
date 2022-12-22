@@ -12,14 +12,6 @@ namespace MatrixOps
 #ifndef DOXYGEN
     namespace detail
     {
-        template <typename T>
-        static bool isAligned (const T* p) noexcept
-        {
-            static constexpr auto RegisterSize = sizeof (xsimd::batch<T>);
-            uintptr_t bitmask = RegisterSize - 1;
-            return ((uintptr_t) p & bitmask) == 0;
-        }
-
         constexpr bool isPowerOfTwo (int n)
         {
             return (n & (n - 1)) == 0;
@@ -45,8 +37,8 @@ namespace MatrixOps
             outOfPlace (FloatType* out, const FloatType* in)
         {
             // must be used with aligned data!
-            jassert (detail::isAligned (in));
-            jassert (detail::isAligned (out));
+            jassert (SIMDUtils::isAligned (in));
+            jassert (SIMDUtils::isAligned (out));
 
             using Vec = xsimd::batch<T>;
             static constexpr auto vec_size = (int) Vec::size;
@@ -172,7 +164,7 @@ namespace MatrixOps
             inPlace (FloatType* arr)
         {
             // must be used with aligned data!
-            jassert (detail::isAligned (arr));
+            jassert (SIMDUtils::isAligned (arr));
 
             using Vec = xsimd::batch<T>;
             static constexpr auto vec_size = (int) Vec::size;
