@@ -5,6 +5,7 @@ target_link_libraries(ForwardingTestPlugin
         juce::juce_dsp
         chowdsp_reverb
         chowdsp_sources
+        chowdsp_plugin_state
 )
 
 target_sources(ForwardingTestPlugin

@@ -3,12 +3,54 @@
 #include <chowdsp_filters/chowdsp_filters.h>
 #include <chowdsp_plugin_base/chowdsp_plugin_base.h>
 
-class WernerFilterPlugin : public chowdsp::PluginBase<WernerFilterPlugin>
+struct WernerFilterParams : chowdsp::ParamHolder
+{
+    WernerFilterParams()
+    {
+        add (freqParam,
+             resonanceParam,
+             dampingParam,
+             morphParam,
+             modeParam);
+    }
+
+    chowdsp::FreqHzParameter::Ptr freqParam {
+        juce::ParameterID { "freq", 100 },
+        "Frequency",
+        chowdsp::ParamUtils::createNormalisableRange (20.0f, 20000.0f, 2000.0f),
+        1000.0f
+    };
+
+    chowdsp::PercentParameter::Ptr resonanceParam {
+        juce::ParameterID { "resonance", 100 },
+        "Resonance",
+        0.5f
+    };
+
+    chowdsp::PercentParameter::Ptr dampingParam {
+        juce::ParameterID { "damping", 100 },
+        "Damping",
+        0.5f
+    };
+
+    chowdsp::PercentParameter::Ptr morphParam {
+        juce::ParameterID { "morph", 100 },
+        "Morph",
+        0.0f
+    };
+
+    chowdsp::ChoiceParameter::Ptr modeParam {
+        juce::ParameterID { "mode", 100 },
+        "Mode",
+        juce::StringArray ("LPF2", "BPF2", "HPF2", "Multi-Mode", "LPF4"),
+        3
+    };
+};
+
+class WernerFilterPlugin : public chowdsp::PluginBase<chowdsp::PluginStateImpl<WernerFilterParams>>
 {
 public:
     WernerFilterPlugin();
-
-    static void addParameters (Parameters& params);
 
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override {}
@@ -18,11 +60,7 @@ public:
     juce::AudioProcessorEditor* createEditor() override { return nullptr; }
 
 private:
-    chowdsp::FloatParameter* freqParam = nullptr;
-    chowdsp::FloatParameter* resonanceParam = nullptr;
-    chowdsp::FloatParameter* dampingParam = nullptr;
     chowdsp::SmoothedBufferValue<float> morphParam;
-    chowdsp::ChoiceParameter* modeParam = nullptr;
 
     chowdsp::WernerFilter filter;
 

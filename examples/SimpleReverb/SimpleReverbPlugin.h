@@ -4,12 +4,58 @@
 #include <chowdsp_reverb/chowdsp_reverb.h>
 #include <chowdsp_sources/chowdsp_sources.h>
 
-class SimpleReverbPlugin : public chowdsp::PluginBase<SimpleReverbPlugin>
+struct ReverbParams : chowdsp::ParamHolder
+{
+    ReverbParams()
+    {
+        add (diffusionTime,
+             fdnDelay,
+             fdnT60Low,
+             fdnT60High,
+             modAmount,
+             dryWet);
+    }
+
+    chowdsp::TimeMsParameter::Ptr diffusionTime {
+        juce::ParameterID { "diffusion", 100 },
+        "Diffusion Time",
+        chowdsp::ParamUtils::createNormalisableRange (10.0f, 1000.0f, 100.0f),
+        100.0f
+    };
+    chowdsp::TimeMsParameter::Ptr fdnDelay {
+        juce::ParameterID { "delay", 100 },
+        "FDN Delay Time",
+        chowdsp::ParamUtils::createNormalisableRange (50.0f, 500.0f, 150.0f),
+        100.0f
+    };
+    chowdsp::TimeMsParameter::Ptr fdnT60Low {
+        juce::ParameterID { "t60_low", 100 },
+        "FDN T60 Low",
+        chowdsp::ParamUtils::createNormalisableRange (100.0f, 5000.0f, 1000.0f),
+        500.0f
+    };
+    chowdsp::TimeMsParameter::Ptr fdnT60High {
+        juce::ParameterID { "t60_high", 100 },
+        "FDN T60 High",
+        chowdsp::ParamUtils::createNormalisableRange (100.0f, 5000.0f, 1000.0f),
+        500.0f
+    };
+    chowdsp::PercentParameter::Ptr modAmount {
+        juce::ParameterID { "mod_amount", 100 },
+        "Modulation",
+        0.0f
+    };
+    chowdsp::PercentParameter::Ptr dryWet {
+        juce::ParameterID { "dry_wet", 100 },
+        "Dry/Wet",
+        0.25f
+    };
+};
+
+class SimpleReverbPlugin : public chowdsp::PluginBase<chowdsp::PluginStateImpl<ReverbParams>>
 {
 public:
     SimpleReverbPlugin();
-
-    static void addParameters (Parameters& params);
 
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override {}
@@ -18,13 +64,6 @@ public:
     juce::AudioProcessorEditor* createEditor() override;
 
 private:
-    chowdsp::FloatParameter* diffusionTimeMsParam = nullptr;
-    chowdsp::FloatParameter* fdnDelayMsParam = nullptr;
-    chowdsp::FloatParameter* fdnT60LowMsParam = nullptr;
-    chowdsp::FloatParameter* fdnT60HighMsParam = nullptr;
-    chowdsp::FloatParameter* modAmountParam = nullptr;
-    chowdsp::FloatParameter* dryWetParam = nullptr;
-
     juce::SmoothedValue<float, juce::ValueSmoothingTypes::Multiplicative> diffusionTimeSmoother;
     juce::SmoothedValue<float, juce::ValueSmoothingTypes::Multiplicative> fdnTimeSmoother;
     juce::SmoothedValue<float, juce::ValueSmoothingTypes::Multiplicative> fdnT60LowSmoother;

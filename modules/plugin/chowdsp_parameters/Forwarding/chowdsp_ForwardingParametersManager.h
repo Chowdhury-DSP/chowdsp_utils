@@ -21,16 +21,21 @@ class ForwardingParametersManager
 {
 public:
     /** Initializes handles to the forwarding parameters, and connects them to the given processor */
-    explicit ForwardingParametersManager (juce::AudioProcessorValueTreeState& vts) : processor (vts.processor)
+    explicit ForwardingParametersManager (juce::AudioProcessorValueTreeState& vts) : ForwardingParametersManager (vts.processor)
+    {
+    }
+
+    /** Initializes handles to the forwarding parameters, and connects them to the given processor */
+    explicit ForwardingParametersManager (juce::AudioProcessor& audioProcessor) : processor (audioProcessor)
     {
         for (int i = 0; i < totalNumForwardingParameters; ++i)
         {
             auto id = Provider::getForwardingParameterID (i);
             auto forwardedParam = std::make_unique<ForwardingParameter> (id, nullptr, "Blank");
 
-            forwardedParam->setProcessor (&vts.processor);
+            forwardedParam->setProcessor (&processor);
             forwardedParams[(size_t) i] = forwardedParam.get();
-            vts.processor.addParameter (forwardedParam.release());
+            processor.addParameter (forwardedParam.release());
         }
     }
 

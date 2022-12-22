@@ -1,36 +1,6 @@
 #include "SimpleReverbPlugin.h"
 
-namespace
-{
-const juce::String diffusionTimeTag = "diffuse_time";
-const juce::String fdnDelayMsTag = "fdn_time";
-const juce::String fdnT60LowMsTag = "fdn_t60_low";
-const juce::String fdnT60HighMsTag = "fdn_t60_high";
-const juce::String modAmountTag = "mod_amount";
-const juce::String dryWetTag = "dry_wet";
-} // namespace
-
-SimpleReverbPlugin::SimpleReverbPlugin()
-{
-    using namespace chowdsp::ParamUtils;
-    loadParameterPointer (diffusionTimeMsParam, vts, diffusionTimeTag);
-    loadParameterPointer (fdnDelayMsParam, vts, fdnDelayMsTag);
-    loadParameterPointer (fdnT60LowMsParam, vts, fdnT60LowMsTag);
-    loadParameterPointer (fdnT60HighMsParam, vts, fdnT60HighMsTag);
-    loadParameterPointer (modAmountParam, vts, modAmountTag);
-    loadParameterPointer (dryWetParam, vts, dryWetTag);
-}
-
-void SimpleReverbPlugin::addParameters (Parameters& params)
-{
-    using namespace chowdsp::ParamUtils;
-    createTimeMsParameter (params, { diffusionTimeTag, 100 }, "Diffusion Time", createNormalisableRange (10.0f, 1000.0f, 100.0f), 100.0f);
-    createTimeMsParameter (params, { fdnDelayMsTag, 100 }, "FDN Delay Time", createNormalisableRange (50.0f, 500.0f, 150.0f), 100.0f);
-    createTimeMsParameter (params, { fdnT60LowMsTag, 100 }, "FDN T60 Low", createNormalisableRange (100.0f, 5000.0f, 1000.0f), 500.0f);
-    createTimeMsParameter (params, { fdnT60HighMsTag, 100 }, "FDN T60 High", createNormalisableRange (100.0f, 5000.0f, 1000.0f), 500.0f);
-    createPercentParameter (params, { modAmountTag, 100 }, "Modulation", 0.0f);
-    createPercentParameter (params, { dryWetTag, 100 }, "Dry/Wet", 0.25f);
-}
+SimpleReverbPlugin::SimpleReverbPlugin() = default;
 
 void SimpleReverbPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
@@ -58,10 +28,10 @@ void SimpleReverbPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
     const auto numSamples = buffer.getNumSamples();
 
     auto&& block = juce::dsp::AudioBlock<float> { buffer };
-    mixer.setWetMixProportion (*dryWetParam);
+    mixer.setWetMixProportion (*state.params.dryWet);
     mixer.pushDrySamples (block);
 
-    diffuser.setDiffusionTime (diffusionTimeMsParam->getCurrentValue() * 0.001f);
+    diffuser.setDiffusionTime (state.params.diffusionTime->getCurrentValue() * 0.001f);
     diffuser.processBlock (buffer);
 
     auto loadSamples = [] (float* inVec, float xL, float xR)
@@ -95,11 +65,11 @@ void SimpleReverbPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
         storeSamples (fdnOutVec, xL, xR);
     };
 
-    diffusionTimeSmoother.setTargetValue (*diffusionTimeMsParam);
-    fdnTimeSmoother.setTargetValue (*fdnDelayMsParam);
-    fdnT60LowSmoother.setTargetValue (*fdnT60LowMsParam);
-    fdnT60HighSmoother.setTargetValue (*fdnT60HighMsParam);
-    modAmountSmoother.setTargetValue (*modAmountParam);
+    diffusionTimeSmoother.setTargetValue (*state.params.diffusionTime);
+    fdnTimeSmoother.setTargetValue (*state.params.fdnDelay);
+    fdnT60LowSmoother.setTargetValue (*state.params.fdnT60Low);
+    fdnT60HighSmoother.setTargetValue (*state.params.fdnT60High);
+    modAmountSmoother.setTargetValue (*state.params.modAmount);
 
     auto* dataL = buffer.getWritePointer (0);
     auto* dataR = buffer.getWritePointer (1 % numChannels);

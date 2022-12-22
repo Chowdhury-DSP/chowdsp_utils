@@ -1,33 +1,6 @@
 #include "PlateReverb.h"
 
-namespace
-{
-const juce::ParameterID inputDiffusionTag { "input_diffusion", 100 };
-const juce::ParameterID decayTag { "decay", 100 };
-const juce::ParameterID decayDiffusionTag { "decay_diffusion", 100 };
-const juce::ParameterID dampingTag { "damping", 100 };
-const juce::ParameterID mixTag { "mix", 100 };
-} // namespace
-
-PlateReverb::PlateReverb()
-{
-    using namespace chowdsp::ParamUtils;
-    loadParameterPointer (inputDiffusionParam, vts, inputDiffusionTag);
-    loadParameterPointer (decayParam, vts, decayTag);
-    loadParameterPointer (decayDiffusionParam, vts, decayDiffusionTag);
-    loadParameterPointer (dampingParam, vts, dampingTag);
-    loadParameterPointer (mixParam, vts, mixTag);
-}
-
-void PlateReverb::addParameters (Parameters& params)
-{
-    using namespace chowdsp::ParamUtils;
-    createPercentParameter (params, inputDiffusionTag, "Input Diffusion", 0.5f);
-    createPercentParameter (params, decayTag, "Decay", 0.5f);
-    createPercentParameter (params, decayDiffusionTag, "Decay Diffusion", 0.5f);
-    createFreqParameter (params, dampingTag, "Damping", 2000.0f, 20000.0f, 10000.0f, 10000.0f);
-    createPercentParameter (params, mixTag, "Mix", 0.5f);
-}
+PlateReverb::PlateReverb() = default;
 
 void PlateReverb::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
@@ -45,10 +18,10 @@ void PlateReverb::processAudioBlock (juce::AudioBuffer<float>& buffer)
     const auto numChannels = buffer.getNumChannels();
     const auto numSamples = buffer.getNumSamples();
 
-    mixer.setWetMixProportion (mixParam->getCurrentValue());
+    mixer.setWetMixProportion (*state.params.mix);
     mixer.pushDrySamples (buffer);
 
-    const auto inputDiffusionPercent = inputDiffusionParam->getCurrentValue();
+    const auto inputDiffusionPercent = state.params.inputDiffusion->getCurrentValue();
     const auto diffMult1 = 0.25f + inputDiffusionPercent * 0.5f;
     const auto diffMult2 = 0.05f + inputDiffusionPercent * 0.5f;
 
@@ -63,9 +36,9 @@ void PlateReverb::processAudioBlock (juce::AudioBuffer<float>& buffer)
     }
 
     using TankConfig = chowdsp::Reverb::Dattorro::DefaultTankNetworkConfig<>;
-    tank.setDecayAmount (0.5f * decayParam->getCurrentValue());
-    tank.setDampingFrequency (dampingParam->getCurrentValue());
-    TankConfig::setDecayDiffusion1Parameters (tank, decayDiffusionParam->getCurrentValue());
+    tank.setDecayAmount (0.5f * state.params.decay->getCurrentValue());
+    tank.setDampingFrequency (state.params.damping->getCurrentValue());
+    TankConfig::setDecayDiffusion1Parameters (tank, state.params.decayDiffusion->getCurrentValue());
 
     const auto leftCh = 0;
     const auto rightCh = 1 % numChannels;
