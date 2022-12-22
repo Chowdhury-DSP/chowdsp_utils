@@ -7,29 +7,6 @@ namespace chowdsp::FloatVectorOperations
 #ifndef DOXYGEN
 namespace detail
 {
-    template <typename T>
-    static bool isAligned (const T* p) noexcept
-    {
-        static constexpr auto RegisterSize = sizeof (xsimd::batch<T>);
-        uintptr_t bitmask = RegisterSize - 1;
-        return ((uintptr_t) p & bitmask) == 0;
-    }
-
-    /** A handy function to round up a pointer to the nearest multiple of a given number of bytes.
-    alignmentBytes must be a power of two. */
-    template <typename Type, typename IntegerType>
-    inline Type* snapPointerToAlignment (Type* basePointer, IntegerType alignmentBytes) noexcept
-    {
-        return (Type*) ((((size_t) basePointer) + (alignmentBytes - 1)) & ~(alignmentBytes - 1));
-    }
-
-    template <typename T>
-    static T* getNextAlignedPtr (T* p) noexcept
-    {
-        static constexpr auto RegisterSize = sizeof (xsimd::batch<std::remove_const_t<T>>);
-        return snapPointerToAlignment (p, RegisterSize);
-    }
-
     template <typename T, typename Op>
     void unaryOpFallback (T* dest, const T* src, int numValues, Op&& op)
     {
@@ -79,16 +56,16 @@ namespace detail
         auto storeU = [] (auto* ptr, const auto& reg)
         { xsimd::store_unaligned (ptr, reg); };
 
-        if (isAligned (dest))
+        if (SIMDUtils::isAligned (dest))
         {
-            if (isAligned (src))
+            if (SIMDUtils::isAligned (src))
                 unaryOp (dest, src, numValues, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), loadA, storeA);
             else
                 unaryOp (dest, src, numValues, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), loadU, storeA);
         }
         else
         {
-            if (isAligned (src))
+            if (SIMDUtils::isAligned (src))
                 unaryOp (dest, src, numValues, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), loadA, storeU);
             else
                 unaryOp (dest, src, numValues, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), loadU, storeU);
