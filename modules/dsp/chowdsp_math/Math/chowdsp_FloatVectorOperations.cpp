@@ -201,7 +201,7 @@ namespace detail
         // Fallback: starting pointer is not aligned!
         if (! SIMDUtils::isAligned (src))
         {
-            auto* nextAlignedPtr = getNextAlignedPtr (src);
+            auto* nextAlignedPtr = SIMDUtils::getNextAlignedPtr (src);
             auto diff = int (nextAlignedPtr - src);
             auto initResult = reduceFallback (src, diff, init, std::forward<ScalarOp> (scalarOp));
             return reduce (nextAlignedPtr, numValues - diff, initResult, std::forward<ScalarOp> (scalarOp), std::forward<VecOp> (vecOp), std::forward<VecReduceOp> (vecReduceOp));
