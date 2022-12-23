@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [UNRELEASED]
+## [2.0.0] 2022-12-22
 - Added `chowdsp_plugin_state` for managing plugin state.
 - Added Dattorro reverb classes.
 - Added `enumerate` and `zip` iterators.

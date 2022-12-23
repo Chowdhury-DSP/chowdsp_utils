@@ -5,7 +5,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_plugin_state
    vendor:        Chowdhury DSP
-   version:       1.3.0
+   version:       2.0.0
    name:          ChowDSP Plugin State
    description:   Utilities for managing state in a ChowDSP plugin
    dependencies:  chowdsp_core, chowdsp_serialization, chowdsp_listeners, chowdsp_parameters
@@ -19,11 +19,10 @@ BEGIN_JUCE_MODULE_DECLARATION
 */
 
 /**
- * This module is still a work-in-progress. The API is _unstable_!
- *
- * Jatin's TODO list:
- * - Listeners: think about threading situation, and test to see how it scales for large numbers of params
- * - Update the rest of chowdsp_utils to use this module over APVTS when it's available
+ * This module is still now _mostly_ stable. However, there's still
+ * a few things TODO:
+ * - Test how well the listener strategy scales for plugins with lots of parameters
+ * - Update chowdsp_presets to work with this method for storing plugin state.
  */
 
 #pragma once

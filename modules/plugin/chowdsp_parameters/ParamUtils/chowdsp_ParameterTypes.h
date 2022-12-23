@@ -146,6 +146,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BoolParameter)
 };
 
+/** A float parameter which specifically stores a percentage value. */
 class PercentParameter : public FloatParameter
 {
 public:
@@ -168,6 +169,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PercentParameter)
 };
 
+/** A float parameter which specifically stores a gain value in Decibels. */
 class GainDBParameter : public FloatParameter
 {
 public:
@@ -190,6 +192,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GainDBParameter)
 };
 
+/** A float parameter which specifically stores a frequency value in Hertz. */
 class FreqHzParameter : public FloatParameter
 {
 public:
@@ -212,6 +215,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FreqHzParameter)
 };
 
+/** A float parameter which specifically stores a time value in milliseconds. */
 class TimeMsParameter : public FloatParameter
 {
 public:
@@ -234,6 +238,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TimeMsParameter)
 };
 
+/** A float parameter which specifically stores a ratio value. */
 class RatioParameter : public FloatParameter
 {
 public:

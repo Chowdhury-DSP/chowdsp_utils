@@ -5,7 +5,7 @@
 
 namespace chowdsp
 {
-/** Jacobi elliptic methods mostly borrowmed from BOOST.math */
+/** Jacobi elliptic methods mostly adapted from BOOST.math */
 namespace jacobi
 {
     template <class T>

@@ -5,8 +5,8 @@ namespace chowdsp
 // N.B. `enumerate` and `zip` implementations are borrowed from
 // https://github.com/surge-synthesizer/sst-cpputils, under the MIT license.
 
-/*
- * enumerate allows structured bindings of iterators. A typical usage would be
+/**
+ * Enumerate allows structured bindings of iterators. A typical usage would be
  *
  * ```
  * std::vector<int> v {7,14,21};
@@ -43,8 +43,8 @@ constexpr auto enumerate (T&& iterable)
     return iterable_wrapper { std::forward<T> (iterable) };
 }
 
-/*
- * Zip is an obvious extension of the above, interleaving a pair of containers.
+/**
+ * Zip is an obvious extension of enumerate, interleaving a pair of containers.
  * We use the semantic that we stop at the end of the shortest container.
  *
  * ```

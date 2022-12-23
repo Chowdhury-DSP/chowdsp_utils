@@ -2,6 +2,7 @@
 
 namespace chowdsp
 {
+#ifndef DOXYGEN
 struct StateValueBase
 {
     explicit StateValueBase (std::string_view valueName) : name (valueName) {}
@@ -15,6 +16,7 @@ struct StateValueBase
     const std::string_view name;
     Broadcaster<void()> changeBroadcaster;
 };
+#endif
 
 /** A stateful value that can be used to hold some non-parameter state */
 template <typename T>

@@ -12,6 +12,7 @@ namespace chowdsp
 template <bool isBaked>
 class GenericTweaksFile;
 
+/** Specialization of GenericTweaksFile that is not baked into the plugin at compile-time. */
 template <>
 class GenericTweaksFile<false>
 {
@@ -64,6 +65,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GenericTweaksFile)
 };
 
+/** Specialization of GenericTweaksFile that is baked into the plugin at compile-time. */
 template <>
 class GenericTweaksFile<true>
 {

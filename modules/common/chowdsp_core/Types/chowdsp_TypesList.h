@@ -85,6 +85,7 @@ struct ForEachInTypeList
     }
 };
 
+#ifndef DOXYGEN
 template <typename TypesList, size_t typeIndex>
 struct ForEachInTypeList<TypesList, typeIndex, 0>
 {
@@ -93,4 +94,5 @@ struct ForEachInTypeList<TypesList, typeIndex, 0>
     {
     }
 };
+#endif
 } // namespace chowdsp

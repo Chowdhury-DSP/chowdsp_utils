@@ -2,13 +2,14 @@
 
 namespace chowdsp
 {
+/** Base class for managing a plugin's state. */
 class PluginState
 {
 public:
     PluginState() = default;
-
     virtual ~PluginState() = default;
 
+    /** Initialises the plugin state with a given set of parameters. */
     void initialise (ParamHolder& parameters,
                      juce::AudioProcessor* processor = nullptr,
                      juce::UndoManager* um = nullptr)

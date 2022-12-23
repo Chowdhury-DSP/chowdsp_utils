@@ -104,8 +104,6 @@ struct DefaultTankNetworkConfig
 
 /**
  * Diffusion and decay "tank" network for the Dattorro reverb architecture.
- *
- * @TODO: The diffusion in this network seems to be broken?
  */
 template <typename Config = DefaultTankNetworkConfig<>>
 class TankNetwork

@@ -5,7 +5,7 @@
 
     ID:            chowdsp_plugin_utils
     vendor:        Chowdhury DSP
-    version:       1.3.0
+    version:       2.0.0
     name:          ChowDSP Plugin Utilities
     description:   Utilities for creating ChowDSP plugins
     dependencies:  juce_events, juce_audio_basics, juce_audio_formats,

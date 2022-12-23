@@ -2,7 +2,7 @@
 
 namespace chowdsp::SIMDUtils
 {
-// @TODO: Remove all these ops once XSIMD has sub-sumed them (hopefully)
+// @TODO: Remove all these ops once XSIMD has subsumed them (hopefully)
 
 using namespace SampleTypeHelpers;
 

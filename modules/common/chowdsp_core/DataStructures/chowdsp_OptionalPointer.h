@@ -31,7 +31,7 @@ struct OptionalPointer
 
     /**
      * Sets OptionalPointer to point to a new pointer, and take ownership of it.
-     * If the OptionalPointer previously owned some data, that data will e deleted.
+     * If the OptionalPointer previously owned some data, that data will be deleted.
      */
     void setOwning (T* ptr)
     {
@@ -41,7 +41,7 @@ struct OptionalPointer
 
     /**
      * Sets OptionalPointer to point to a new pointer, WITHOUT taking ownership of it.
-     * If the OptionalPointer previously owned some data, that data will e deleted.
+     * If the OptionalPointer previously owned some data, that data will be deleted.
      */
     void setNonOwning (T* ptr)
     {
@@ -158,6 +158,7 @@ bool operator!= (std::nullptr_t, const OptionalPointer<T>& p2)
     return nullptr != p2.get();
 }
 
+#ifndef DOXYGEN
 template <class T>
 struct IsOptionalPointerType : std::false_type
 {
@@ -167,6 +168,7 @@ template <class T>
 struct IsOptionalPointerType<OptionalPointer<T>> : std::true_type
 {
 };
+#endif
 
 /** True if the type is a chowdsp::OptionalPointer<T> */
 template <typename T>

@@ -23,6 +23,7 @@ struct Ratio
 template <std::intmax_t Mantissa, std::intmax_t Exp, typename = void>
 struct ScientificRatio;
 
+#ifndef DOXYGEN
 template <std::intmax_t Mantissa>
 struct ScientificRatio<Mantissa, 0> : Ratio<Mantissa, 1>
 {
@@ -37,4 +38,5 @@ template <std::intmax_t Mantissa, std::intmax_t Exp>
 struct ScientificRatio<Mantissa, Exp, std::enable_if_t<(Exp > 0)>> : Ratio<Mantissa * gcem::pow<std::intmax_t, std::intmax_t> (10, Exp), 1>
 {
 };
+#endif
 } // namespace chowdsp

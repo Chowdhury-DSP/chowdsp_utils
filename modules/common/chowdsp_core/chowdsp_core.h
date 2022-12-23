@@ -5,7 +5,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_core
    vendor:        Chowdhury DSP
-   version:       1.3.0
+   version:       2.0.0
    name:          ChowDSP Core
    description:   Core code for other ChowDSP modules
    dependencies:
@@ -58,13 +58,15 @@ BEGIN_JUCE_MODULE_DECLARATION
 #endif // CHOWDSP_USING_JUCE
 #endif // DOXYGEN
 
-/** Namespace reserved for code written for Chowdhury DSP projects */
+/** Namespace reserved for code written for Chowdhury DSP projects. */
 namespace chowdsp
 {
+
 /** Namespace reserved for code that has an unstable API or is otherwise not yet production ready. */
 namespace experimental
 {
 }
+
 } // namespace chowdsp
 
 #include "DataStructures/chowdsp_AtomicHelpers.h"
