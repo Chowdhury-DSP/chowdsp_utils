@@ -6,11 +6,13 @@ target_link_libraries(SimpleEQ
         chowdsp::chowdsp_serialization
         chowdsp::chowdsp_eq
         chowdsp::chowdsp_plugin_state
-)
+        chowdsp::chowdsp_visualizers
+    )
 
 target_sources(SimpleEQ
     PRIVATE
         PrototypeEQ.cpp
         SimpleEQPlugin.cpp
         PluginEditor.cpp
+        FilterPlots.cpp
 )

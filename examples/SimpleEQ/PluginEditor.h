@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SimpleEQPlugin.h"
+#include "FilterPlots.h"
 
 class PluginEditor : public juce::AudioProcessorEditor
 {
@@ -14,6 +15,8 @@ private:
     SimpleEQPlugin& plugin;
 
     juce::GenericAudioProcessorEditor genericEditor;
+
+    FilterPlots plots;
 
     juce::TextButton saveButton { "Save EQ Params" }, loadButton { "Load EQ Params" };
 
