@@ -2,6 +2,7 @@
 
 namespace chowdsp::EQ
 {
+/** Base class for plotting EQ filters. */
 struct EQFilterPlot
 {
     EQFilterPlot() = default;
@@ -13,6 +14,7 @@ struct EQFilterPlot
     [[nodiscard]] virtual float getMagnitudeForFrequency ([[maybe_unused]] float freqHz) const { return 1.0f; }
 };
 
+/** Plotting helper for first-order filters. */
 struct FirstOrderFilterPlot : public EQFilterPlot
 {
     float b_coeffs[2] {}; // s-domain numerator coefficients
@@ -33,6 +35,7 @@ struct FirstOrderFilterPlot : public EQFilterPlot
     }
 };
 
+/** Plotting helper for second-order filters. */
 struct SecondOrderFilterPlot : public EQFilterPlot
 {
     float b_coeffs[3] {}; // s-domain numerator coefficients
@@ -54,6 +57,7 @@ struct SecondOrderFilterPlot : public EQFilterPlot
     }
 };
 
+/** Plotting helper for first-order LPF. */
 struct LPF1Plot : FirstOrderFilterPlot
 {
     LPF1Plot()
@@ -62,6 +66,7 @@ struct LPF1Plot : FirstOrderFilterPlot
     }
 };
 
+/** Plotting helper for first-order HPF. */
 struct HPF1Plot : FirstOrderFilterPlot
 {
     HPF1Plot()
@@ -70,6 +75,7 @@ struct HPF1Plot : FirstOrderFilterPlot
     }
 };
 
+/** Plotting helper for second-order LPF. */
 struct LPF2Plot : SecondOrderFilterPlot
 {
     LPF2Plot()
@@ -83,6 +89,7 @@ struct LPF2Plot : SecondOrderFilterPlot
     }
 };
 
+/** Plotting helper for second-order HPF. */
 struct HPF2Plot : SecondOrderFilterPlot
 {
     HPF2Plot()
@@ -96,6 +103,7 @@ struct HPF2Plot : SecondOrderFilterPlot
     }
 };
 
+/** Plotting helper for second-order BPF. */
 struct BPF2Plot : SecondOrderFilterPlot
 {
     BPF2Plot() = default;
@@ -107,6 +115,7 @@ struct BPF2Plot : SecondOrderFilterPlot
     }
 };
 
+/** Plotting helper for peaking filter. */
 struct BellPlot : SecondOrderFilterPlot
 {
     BellPlot()
@@ -146,6 +155,7 @@ private:
     float qValue = CoefficientCalculators::butterworthQ<float>;
 };
 
+/** Plotting helper for notch filter. */
 struct NotchPlot : SecondOrderFilterPlot
 {
     NotchPlot()
@@ -160,6 +170,7 @@ struct NotchPlot : SecondOrderFilterPlot
     }
 };
 
+/** Plotting helper for low-shelf filter. */
 struct LowShelfPlot : SecondOrderFilterPlot
 {
     LowShelfPlot() = default;
@@ -190,6 +201,8 @@ private:
     float qValue = CoefficientCalculators::butterworthQ<float>;
 };
 
+
+/** Plotting helper for high-shelf filter. */
 struct HighShelfPlot : SecondOrderFilterPlot
 {
     HighShelfPlot() = default;
@@ -220,6 +233,7 @@ private:
     float qValue = CoefficientCalculators::butterworthQ<float>;
 };
 
+/** Plotting helper for higher-order LPFs. */
 template <int order>
 struct HigherOrderLPFPlot : EQFilterPlot
 {
@@ -243,7 +257,7 @@ struct HigherOrderLPFPlot : EQFilterPlot
 
     void setQValue (float qVal) override
     {
-        plots[0].a_coeffs[1] = 1.0f / (qVal * butterQVals[0]);
+        plots[0].a_coeffs[1] = 1.0f / ((qVal / CoefficientCalculators::butterworthQ<float>) * butterQVals[0]);
     }
 
     [[nodiscard]] float getMagnitudeForFrequency (float freqHz) const override
@@ -264,6 +278,7 @@ private:
     static constexpr auto butterQVals = chowdsp::QValCalcs::butterworth_Qs<float, order>();
 };
 
+/** Plotting helper for higher-order HPFs. */
 template <int order>
 struct HigherOrderHPFPlot : EQFilterPlot
 {
@@ -287,7 +302,7 @@ struct HigherOrderHPFPlot : EQFilterPlot
 
     void setQValue (float qVal) override
     {
-        plots[0].a_coeffs[1] = 1.0f / (qVal * butterQVals[0]);
+        plots[0].a_coeffs[1] = 1.0f / ((qVal / CoefficientCalculators::butterworthQ<float>) * butterQVals[0]);
     }
 
     [[nodiscard]] float getMagnitudeForFrequency (float freqHz) const override
