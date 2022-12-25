@@ -201,7 +201,6 @@ private:
     float qValue = CoefficientCalculators::butterworthQ<float>;
 };
 
-
 /** Plotting helper for high-shelf filter. */
 struct HighShelfPlot : SecondOrderFilterPlot
 {
@@ -257,7 +256,7 @@ struct HigherOrderLPFPlot : EQFilterPlot
 
     void setQValue (float qVal) override
     {
-        plots[0].a_coeffs[1] = 1.0f / ((qVal / CoefficientCalculators::butterworthQ<float>) * butterQVals[0]);
+        plots[0].a_coeffs[1] = 1.0f / ((qVal / CoefficientCalculators::butterworthQ<float>) *butterQVals[0]);
     }
 
     [[nodiscard]] float getMagnitudeForFrequency (float freqHz) const override
@@ -302,7 +301,7 @@ struct HigherOrderHPFPlot : EQFilterPlot
 
     void setQValue (float qVal) override
     {
-        plots[0].a_coeffs[1] = 1.0f / ((qVal / CoefficientCalculators::butterworthQ<float>) * butterQVals[0]);
+        plots[0].a_coeffs[1] = 1.0f / ((qVal / CoefficientCalculators::butterworthQ<float>) *butterQVals[0]);
     }
 
     [[nodiscard]] float getMagnitudeForFrequency (float freqHz) const override
