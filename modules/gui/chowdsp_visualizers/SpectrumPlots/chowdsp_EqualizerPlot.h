@@ -2,6 +2,7 @@
 
 namespace chowdsp::EQ
 {
+/** EQ filter types that can be plotted */
 enum class EQPlotFilterType
 {
     LPF1,
@@ -37,22 +38,37 @@ enum class EQPlotFilterType
     HighShelf,
 };
 
+/** UI component for plotting EQ filter frequency responses. */
 class EqualizerPlot : public SpectrumPlotBase
 {
 public:
     explicit EqualizerPlot (int numBands, SpectrumPlotParams&& params = {});
 
+    /** Sets the filter type for a given band. */
     void setFilterType (int bandIndex, EQPlotFilterType type);
 
+    /** Sets the given filter band to be active or inactive. */
+    void setFilterActive (int bandIndex, bool isActive);
+
+    /** Returns true if the given filter band is active. */
+    [[nodiscard]] bool getFilterActive (int bandIndex) const;
+
+    /** Sets the cutoff frequency for a given band. */
     void setCutoffParameter (int bandIndex, float cutoffHz);
 
+    /** Sets the Q value for a given band. */
     void setQParameter (int bandIndex, float qValue);
 
+    /** Sets the gain parameter for a given band. */
     void setGainDBParameter (int bandIndex, float gainDB);
 
+    /** Forcibly updates the path for a given filter plot. */
     void updateFilterPlotPath (int bandIndex);
 
+    /** Returns the path for a given filter plot. */
     [[nodiscard]] const juce::Path& getPath (int bandIndex) const;
+
+    /** Returns the path for a "master" filter plot, comprised of the combination of all the filter responses. */
     [[nodiscard]] const juce::Path& getMasterFilterPath() const { return masterFilterPlotPath; }
 
     void resized() override;
@@ -69,6 +85,8 @@ private:
 
     std::vector<BandPlotInfo> filterPlots;
     juce::Path masterFilterPlotPath;
+
+    std::vector<bool> filtersActiveFlags;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EqualizerPlot)
 };
@@ -114,17 +132,26 @@ public:
                             updateGainDBParameter (bandIndex);
                             updateFilterPlotPath (bandIndex);
                         }),
-                    listeners.template addParameterListener (
+                    listeners.addParameterListener (
                         bandParams.typeParam,
                         chowdsp::ParameterListenerThread::MessageThread,
                         [this, bandIndex, filterTypeMap = std::move (filterTypeMap)]
                         {
                             updateFilterType (bandIndex, filterTypeMap);
                             updateFilterPlotPath (bandIndex);
+                        }),
+                    listeners.addParameterListener (
+                        bandParams.onOffParam,
+                        chowdsp::ParameterListenerThread::MessageThread,
+                        [this, bandIndex]
+                        {
+                            updateFilterOnOff (bandIndex);
+                            updateFilterPlotPath (bandIndex);
                         })
                 };
 
             updateFilterType (bandIndex, filterTypeMap);
+            updateFilterOnOff (bandIndex);
         }
     }
 
@@ -150,6 +177,11 @@ private:
         updateFreqParameter (bandIndex);
         updateQParameter (bandIndex);
         updateGainDBParameter (bandIndex);
+    }
+
+    void updateFilterOnOff (int bandIndex)
+    {
+        setFilterActive (bandIndex, eqParams.eqParams[(size_t) bandIndex].onOffParam->get());
     }
 
     chowdsp::EQ::StandardEQParameters<numBands>& eqParams;

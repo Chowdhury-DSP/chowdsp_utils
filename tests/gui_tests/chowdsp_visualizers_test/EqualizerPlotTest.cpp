@@ -20,19 +20,20 @@ struct TestEQParams : chowdsp::ParamHolder
         add (testEQParams);
     }
 
-    chowdsp::EQ::StandardEQParameters<3> testEQParams {
+    chowdsp::EQ::StandardEQParameters<4> testEQParams {
         {
-            chowdsp::EQ::StandardEQParameters<3>::EQBandParams { 0, "eq_band_0", "Band ", 100, bandTypeChoices, 3, 250.0f },
-            chowdsp::EQ::StandardEQParameters<3>::EQBandParams { 1, "eq_band_1", "Band ", 100, bandTypeChoices, 3, 1000.0f },
-            chowdsp::EQ::StandardEQParameters<3>::EQBandParams { 2, "eq_band_2", "Band ", 100, bandTypeChoices, 3, 4000.0f },
+            chowdsp::EQ::StandardEQParameters<4>::EQBandParams { 0, "eq_band_0", "Band ", 100, bandTypeChoices, 3, 250.0f },
+            chowdsp::EQ::StandardEQParameters<4>::EQBandParams { 1, "eq_band_1", "Band ", 100, bandTypeChoices, 3, 1000.0f },
+            chowdsp::EQ::StandardEQParameters<4>::EQBandParams { 2, "eq_band_2", "Band ", 100, bandTypeChoices, 3, 4000.0f },
+            chowdsp::EQ::StandardEQParameters<4>::EQBandParams { 3, "eq_band_3", "Band ", 100, bandTypeChoices, 3, 10000.0f },
         }
     };
 };
 
-struct TestEQComp : chowdsp::EQ::EqualizerPlotWithParameters<3>
+struct TestEQComp : chowdsp::EQ::EqualizerPlotWithParameters<4>
 {
     explicit TestEQComp (chowdsp::PluginStateImpl<TestEQParams>& state)
-        : chowdsp::EQ::EqualizerPlotWithParameters<3> (
+        : chowdsp::EQ::EqualizerPlotWithParameters<4> (
             state.getParameterListeners(),
             state.params.testEQParams,
             [] (int typeIndex) -> chowdsp::EQ::EQPlotFilterType
@@ -76,6 +77,9 @@ struct TestEQComp : chowdsp::EQ::EqualizerPlotWithParameters<3>
         g.setColour (juce::Colours::dodgerblue);
         g.strokePath (getPath (2), juce::PathStrokeType { 1.0f });
 
+        g.setColour (getFilterActive (3) ? juce::Colours::white : juce::Colours::grey);
+        g.strokePath (getPath (3), juce::PathStrokeType { 2.5f });
+
         g.setColour (juce::Colours::yellow);
         g.strokePath (getMasterFilterPath(), juce::PathStrokeType { 2.5f });
     }
@@ -97,6 +101,7 @@ public:
         chowdsp::ParameterTypeHelpers::setValue (100.0f, *state.params.testEQParams.eqParams[0].freqParam);
         chowdsp::ParameterTypeHelpers::setValue (1000.0f, *state.params.testEQParams.eqParams[1].freqParam);
         chowdsp::ParameterTypeHelpers::setValue (1000.0f, *state.params.testEQParams.eqParams[2].freqParam);
+        chowdsp::ParameterTypeHelpers::setValue (8000.0f, *state.params.testEQParams.eqParams[3].freqParam);
 
         chowdsp::ParameterTypeHelpers::setValue (1.5f, *state.params.testEQParams.eqParams[1].qParam);
         chowdsp::ParameterTypeHelpers::setValue (2.5f, *state.params.testEQParams.eqParams[2].qParam);
@@ -104,9 +109,15 @@ public:
         chowdsp::ParameterTypeHelpers::setValue (1, *state.params.testEQParams.eqParams[0].typeParam);
         chowdsp::ParameterTypeHelpers::setValue (3, *state.params.testEQParams.eqParams[1].typeParam);
         chowdsp::ParameterTypeHelpers::setValue (5, *state.params.testEQParams.eqParams[2].typeParam);
+        chowdsp::ParameterTypeHelpers::setValue (7, *state.params.testEQParams.eqParams[3].typeParam);
 
         chowdsp::ParameterTypeHelpers::setValue (15.0f, *state.params.testEQParams.eqParams[1].gainParam);
         chowdsp::ParameterTypeHelpers::setValue (-10.0f, *state.params.testEQParams.eqParams[2].gainParam);
+
+        chowdsp::ParameterTypeHelpers::setValue (true, *state.params.testEQParams.eqParams[0].onOffParam);
+        chowdsp::ParameterTypeHelpers::setValue (true, *state.params.testEQParams.eqParams[1].onOffParam);
+        chowdsp::ParameterTypeHelpers::setValue (true, *state.params.testEQParams.eqParams[2].onOffParam);
+        chowdsp::ParameterTypeHelpers::setValue (false, *state.params.testEQParams.eqParams[3].onOffParam);
         juce::MessageManager::getInstance()->runDispatchLoopUntil (100);
 
         const auto testScreenshot = plotComp.createComponentSnapshot ({ 500, 300 });

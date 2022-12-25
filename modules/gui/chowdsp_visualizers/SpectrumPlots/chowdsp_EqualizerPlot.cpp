@@ -4,7 +4,8 @@ namespace chowdsp::EQ
 {
 EqualizerPlot::EqualizerPlot (int numBands, SpectrumPlotParams&& plotParams)
     : SpectrumPlotBase (std::move (plotParams)),
-      filterPlots ((size_t) numBands)
+      filterPlots ((size_t) numBands),
+      filtersActiveFlags ((size_t) numBands, true)
 {
     for (auto& plot : filterPlots)
         plot.plot = std::make_unique<EQFilterPlot>();
@@ -111,6 +112,16 @@ void EqualizerPlot::setFilterType (int bandIndex, EQPlotFilterType type)
     }
 }
 
+void EqualizerPlot::setFilterActive (int bandIndex, bool isActive)
+{
+    filtersActiveFlags[(size_t) bandIndex] = isActive;
+}
+
+bool EqualizerPlot::getFilterActive (int bandIndex) const
+{
+    return filtersActiveFlags[(size_t) bandIndex];
+}
+
 void EqualizerPlot::setCutoffParameter (int bandIndex, float cutoffHz)
 {
     filterPlots[(size_t) bandIndex].plot->setCutoffFrequency (cutoffHz);
@@ -162,15 +173,22 @@ void EqualizerPlot::updateMasterFilterPlotPath()
     masterFilterPlotPath.clear();
     masterFilterPlotPath.preallocateSpace (width * 3);
 
-    const auto getPointForXCoord = [this] (int x) -> juce::Point<float>
+    std::vector<std::vector<float>*> activePlots;
+    for (auto [index, filterPlot] : enumerate (filterPlots))
+    {
+        if (filtersActiveFlags[index])
+            activePlots.push_back (&filterPlot.plotData);
+    }
+
+    const auto getPointForXCoord = [this, &activePlots = std::as_const (activePlots)] (int x) -> juce::Point<float>
     {
         float magLinear = 1.0f;
-        for (auto& filterPlot : filterPlots)
+        for (auto* plotData : activePlots)
         {
-            if (filterPlot.plotData.size() <= (size_t) x)
+            if (plotData->size() <= (size_t) x)
                 break;
 
-            magLinear *= filterPlot.plotData[(size_t) x];
+            magLinear *= plotData->operator[] ((size_t) x);
         }
 
         const auto magDB = juce::Decibels::gainToDecibels (magLinear);
