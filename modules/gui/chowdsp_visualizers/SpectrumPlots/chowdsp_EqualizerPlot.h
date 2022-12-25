@@ -92,7 +92,7 @@ private:
 };
 
 #if JUCE_MODULE_AVAILABLE_chowdsp_plugin_state && JUCE_MODULE_AVAILABLE_chowdsp_eq
-template <int numBands>
+template <size_t numBands>
 class EqualizerPlotWithParameters : public EqualizerPlot
 {
 public:
@@ -171,7 +171,7 @@ private:
         setGainDBParameter (bandIndex, eqParams.eqParams[(size_t) bandIndex].gainParam->get());
     }
 
-    void updateFilterType (int bandIndex, const std::function<EQPlotFilterType (int)>& filterTypeMap)
+    void updateFilterType (int bandIndex, const std::function<EQPlotFilterType (int)>& filterTypeMap) // NOSONAR
     {
         setFilterType (bandIndex, filterTypeMap (eqParams.eqParams[(size_t) bandIndex].typeParam->getIndex()));
         updateFreqParameter (bandIndex);

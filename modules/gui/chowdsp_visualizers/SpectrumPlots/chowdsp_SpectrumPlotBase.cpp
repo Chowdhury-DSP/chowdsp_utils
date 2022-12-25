@@ -23,7 +23,7 @@ float SpectrumPlotBase::getYCoordinateForDecibels (float gainDB) const
     return (float) getHeight() * (params.maxMagnitudeDB - gainDB) / params.rangeDB;
 }
 
-void SpectrumPlotBase::drawFrequencyLines (juce::Graphics& g, const std::vector<float>& freqHzList, float lineThickness, std::vector<float> dashLengths) const
+void SpectrumPlotBase::drawFrequencyLines (const juce::Graphics& g, const std::vector<float>& freqHzList, float lineThickness, std::vector<float> dashLengths) const
 {
     for (auto& freqHz : freqHzList)
     {
@@ -35,7 +35,7 @@ void SpectrumPlotBase::drawFrequencyLines (juce::Graphics& g, const std::vector<
     }
 }
 
-void SpectrumPlotBase::drawMagnitudeLines (juce::Graphics& g, const std::vector<float>& magDBList, float lineThickness, std::vector<float> dashLengths) const
+void SpectrumPlotBase::drawMagnitudeLines (const juce::Graphics& g, const std::vector<float>& magDBList, float lineThickness, std::vector<float> dashLengths) const
 {
     for (auto& magDB : magDBList)
     {

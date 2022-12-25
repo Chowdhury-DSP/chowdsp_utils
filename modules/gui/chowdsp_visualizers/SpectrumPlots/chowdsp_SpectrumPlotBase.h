@@ -31,10 +31,10 @@ public:
     [[nodiscard]] float getYCoordinateForDecibels (float magDB) const;
 
     /** Draws a set of frequency grid lines. */
-    void drawFrequencyLines (juce::Graphics& g, const std::vector<float>& freqHz, float lineThickness = 1.0f, std::vector<float> dashLengths = {}) const;
+    void drawFrequencyLines (const juce::Graphics& g, const std::vector<float>& freqHz, float lineThickness = 1.0f, std::vector<float> dashLengths = {}) const;
 
     /** Draws a set of magnitude grid lines. */
-    void drawMagnitudeLines (juce::Graphics& g, const std::vector<float>& magDB, float lineThickness = 1.0f, std::vector<float> dashLengths = {}) const;
+    void drawMagnitudeLines (const juce::Graphics& g, const std::vector<float>& magDB, float lineThickness = 1.0f, std::vector<float> dashLengths = {}) const;
 
 protected:
     SpectrumPlotParams params;

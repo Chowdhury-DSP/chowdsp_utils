@@ -157,7 +157,7 @@ void EqualizerPlot::updateFilterPlotPath (int bandIndex)
         return { (float) x, getYCoordinateForDecibels (magDB) };
     };
 
-    path.startNewSubPath (getPointForXCoord (0.0f));
+    path.startNewSubPath (getPointForXCoord (0));
     for (int x = 1; x < width; ++x)
         path.lineTo (getPointForXCoord (x));
 
@@ -195,7 +195,7 @@ void EqualizerPlot::updateMasterFilterPlotPath()
         return { (float) x, getYCoordinateForDecibels (magDB) };
     };
 
-    masterFilterPlotPath.startNewSubPath (getPointForXCoord (0.0f));
+    masterFilterPlotPath.startNewSubPath (getPointForXCoord (0));
     for (int x = 1; x < width; ++x)
         masterFilterPlotPath.lineTo (getPointForXCoord (x));
 }
