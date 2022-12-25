@@ -16,6 +16,7 @@
 #include <chowdsp_sources/chowdsp_sources.h>
 #include <chowdsp_waveshapers/chowdsp_waveshapers.h>
 #include <chowdsp_gui/chowdsp_gui.h>
+#include <chowdsp_visualizers/chowdsp_visualizers.h>
 #include <chowdsp_rhythm/chowdsp_rhythm.h>
 #include <chowdsp_parameters/chowdsp_parameters.h>
 #include <chowdsp_plugin_base/chowdsp_plugin_base.h>

@@ -28,6 +28,7 @@ target_link_libraries(static_test_dummy_executable PRIVATE
     chowdsp_sources
     chowdsp_waveshapers
     chowdsp_gui
+    chowdsp_visualizers
     chowdsp_rhythm
     chowdsp_parameters
     chowdsp_plugin_base

@@ -16,7 +16,7 @@ namespace QValCalcs
 
         while (k <= lim)
         {
-            auto b = static_cast<T> (-2) * gcem::cos (((T) 2 * k + N - 1) * juce::MathConstants<T>::pi / ((T) 2 * N));
+            auto b = static_cast<T> (-2) * gcem::cos ((T (2 * k) + N - 1) * juce::MathConstants<T>::pi / ((T) 2 * N));
             qVals[k - 1] = static_cast<T> (1) / b;
             k += 1;
         }
