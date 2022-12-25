@@ -9,7 +9,7 @@ class LinkwitzRileyFilter;
 /**
  * Linkwitz-Riley Crossover Filter
  *
- * Specialsed for filters of order 2, 4, 8, 12, ...
+ * Specialised for filters of order 2, 4, 8, 12, ...
  *
  * This filter will be stable under fast modulation.
  */

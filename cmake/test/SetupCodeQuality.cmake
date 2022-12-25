@@ -32,6 +32,7 @@ target_link_libraries(chowdsp_utils_codeql PRIVATE
     chowdsp_sources
     chowdsp_waveshapers
     chowdsp_gui
+    chowdsp_visualizers
     chowdsp_rhythm
     chowdsp_parameters
     chowdsp_plugin_base

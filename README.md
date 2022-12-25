@@ -181,6 +181,9 @@ sure to abide by the license of each module, as well as whichever libraries are 
 - Component to display plugin info (version, format, etc.).
 - Component for controlling preset management.
 
+`chowdsp_visualizers` (GPLv3)
+- `EqualizerPlot`: UI component which can be extended to plot filter frequency responses.
+
 `chowdsp_foleys` (GPLv3)
 - Interface between `chowdsp_gui` and [`foleys_gui_magic`](https://github.com/ffAudio/foleys_gui_magic) (must be linked externally).
 

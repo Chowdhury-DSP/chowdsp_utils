@@ -29,6 +29,7 @@ juce_add_modules(
 
     ${PROJECT_SOURCE_DIR}/modules/gui/chowdsp_gui
     ${PROJECT_SOURCE_DIR}/modules/gui/chowdsp_foleys
+    ${PROJECT_SOURCE_DIR}/modules/gui/chowdsp_visualizers
 
     ${PROJECT_SOURCE_DIR}/modules/music/chowdsp_rhythm
 )

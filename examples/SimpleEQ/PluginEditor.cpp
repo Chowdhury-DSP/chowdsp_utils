@@ -11,13 +11,15 @@ const auto defaultSaveLocation = juce::File::getSpecialLocation (juce::File::use
 
 PluginEditor::PluginEditor (SimpleEQPlugin& p) : juce::AudioProcessorEditor (p),
                                                  plugin (p),
-                                                 genericEditor (plugin)
+                                                 genericEditor (plugin),
+                                                 plots (plugin.getState(), plugin.getState().params.eqParams)
 {
     addAndMakeVisible (genericEditor);
     addAndMakeVisible (saveButton);
     addAndMakeVisible (loadButton);
+    addAndMakeVisible (plots);
 
-    setSize (500, 500);
+    setSize (500, 700);
 
     saveButton.onClick = [this]
     {
@@ -65,7 +67,9 @@ void PluginEditor::paint (juce::Graphics& g)
 void PluginEditor::resized()
 {
     auto bounds = getLocalBounds();
-    genericEditor.setBounds (bounds.removeFromTop (proportionOfHeight (0.93f)));
+
+    plots.setBounds (bounds.removeFromTop (200));
+    genericEditor.setBounds (bounds.removeFromTop (bounds.proportionOfHeight (0.93f)));
 
     const auto buttonWidth = proportionOfWidth (0.33f);
     saveButton.setBounds (bounds.removeFromLeft (buttonWidth));
