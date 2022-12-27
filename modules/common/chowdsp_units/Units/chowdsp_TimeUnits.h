@@ -88,6 +88,9 @@ public:
     /** Returns the time value */
     [[nodiscard]] constexpr auto value() const noexcept { return val; }
 
+    /** Returns the time value */
+    constexpr operator T() const noexcept { return val; } // NOLINT(google-explicit-constructor)
+
 private:
     T val {};
 };
@@ -119,6 +122,9 @@ public:
     /** Returns the time value */
     [[nodiscard]] constexpr auto value() const noexcept { return val; }
 
+    /** Returns the time value */
+    constexpr operator T() const noexcept { return val; } // NOLINT(google-explicit-constructor)
+
 private:
     template <typename>
     friend class Time;
@@ -133,5 +139,41 @@ template <typename Unit>
 std::ostream& operator<< (std::ostream& os, const Time<Unit>& time)
 {
     return os << time.value() << " " << Unit::name;
+}
+
+template <typename Unit, typename OtherUnit>
+constexpr bool operator== (const Time<Unit>& lhs, const Time<OtherUnit>& rhs)
+{
+    return lhs.value() == Time<Unit> { rhs }.value();
+}
+
+template <typename Unit, typename OtherUnit>
+constexpr bool operator!= (const Time<Unit>& lhs, const Time<OtherUnit>& rhs)
+{
+    return ! (lhs == rhs);
+}
+
+template <typename Unit, typename OtherUnit>
+constexpr bool operator<(const Time<Unit>& lhs, const Time<OtherUnit>& rhs)
+{
+    return lhs.value() < Time<Unit> { rhs }.value();
+}
+
+template <typename Unit, typename OtherUnit>
+constexpr bool operator> (const Time<Unit>& lhs, const Time<OtherUnit>& rhs)
+{
+    return rhs < lhs;
+}
+
+template <typename Unit, typename OtherUnit>
+constexpr bool operator<= (const Time<Unit>& lhs, const Time<OtherUnit>& rhs)
+{
+    return ! (lhs > rhs);
+}
+
+template <typename Unit, typename OtherUnit>
+constexpr bool operator>= (const Time<Unit>& lhs, const Time<OtherUnit>& rhs)
+{
+    return ! (lhs < rhs);
 }
 } // namespace chowdsp::Units

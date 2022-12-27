@@ -28,4 +28,41 @@ TEST_CASE ("Time Units Test")
         constexpr auto ttt_samples = Time<SamplesUnit<int>> { ttt_sec, 500.0 };
         REQUIRE_MESSAGE (ttt_samples.value() == 500, ttt_samples << " should be equal to " << 500);
     }
+
+    SECTION ("Comparison Tests")
+    {
+        constexpr auto tt_seconds = Time<Seconds> { 0.1f };
+        constexpr auto tt_milliseconds = Time<MilliSeconds> { 100.0f };
+        constexpr auto t_microseconds = Time<MicroSeconds> { 1000.0f };
+
+        // equal/not-equal
+        static_assert (tt_seconds == tt_milliseconds);
+        REQUIRE (tt_seconds == tt_milliseconds);
+        static_assert (tt_seconds != t_microseconds);
+        REQUIRE (tt_seconds != t_microseconds);
+
+        // greater than or equal
+        static_assert (tt_seconds >= tt_milliseconds);
+        REQUIRE (tt_seconds >= tt_milliseconds);
+        static_assert (tt_seconds >= t_microseconds);
+        REQUIRE (tt_seconds >= t_microseconds);
+
+        // greater than (but not equal)
+        static_assert (! (tt_seconds > tt_milliseconds));
+        REQUIRE (! (tt_seconds > tt_milliseconds));
+        static_assert (tt_seconds > t_microseconds);
+        REQUIRE (tt_seconds > t_microseconds);
+
+        // less than or equal
+        static_assert (tt_seconds <= tt_milliseconds);
+        REQUIRE (tt_seconds <= tt_milliseconds);
+        static_assert (t_microseconds <= tt_seconds);
+        REQUIRE (t_microseconds <= tt_seconds);
+
+        // less than (but not equal)
+        static_assert (! (tt_seconds < tt_milliseconds));
+        REQUIRE (! (tt_seconds < tt_milliseconds));
+        static_assert (t_microseconds < tt_seconds);
+        REQUIRE (t_microseconds < tt_seconds);
+    }
 }
