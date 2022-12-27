@@ -27,10 +27,12 @@ namespace ParameterAttachmentHelpers
 
         explicit ParameterChangeAction (ParamType& parameter,
                                         ValueType oldVal,
-                                        ValueType newVal)
+                                        ValueType newVal,
+                                        bool skipFirstTime = true)
             : param (parameter),
               oldValue (oldVal),
-              newValue (newVal)
+              newValue (newVal),
+              firstTime (skipFirstTime)
         {
         }
 
