@@ -140,6 +140,8 @@ void EqualizerPlot::setGainDBParameter (int bandIndex, float gainDB)
 void EqualizerPlot::updateFilterPlotPath (int bandIndex)
 {
     const auto width = getWidth();
+    if (width == 0 || getHeight() == 0)
+        return;
 
     const auto& plot = *filterPlots[(size_t) bandIndex].plot;
     auto& plotData = filterPlots[(size_t) bandIndex].plotData;
@@ -169,6 +171,8 @@ void EqualizerPlot::updateFilterPlotPath (int bandIndex)
 void EqualizerPlot::updateMasterFilterPlotPath()
 {
     const auto width = getWidth();
+    if (width == 0 || getHeight() == 0)
+        return;
 
     masterFilterPlotPath.clear();
     masterFilterPlotPath.preallocateSpace (width * 3);
