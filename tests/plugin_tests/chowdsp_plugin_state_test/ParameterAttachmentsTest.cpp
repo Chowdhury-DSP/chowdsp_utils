@@ -1,13 +1,8 @@
-#include <TimedUnitTest.h>
+#include <CatchUtils.h>
 #include <chowdsp_plugin_state/chowdsp_plugin_state.h>
 
-class SliderAttachmentTest : public TimedUnitTest
+TEST_CASE ("Slider Attachment Test", "[state][attachments]")
 {
-public:
-    SliderAttachmentTest() : TimedUnitTest ("Slider Attachment Test", "ChowDSP State")
-    {
-    }
-
     struct Params : chowdsp::ParamHolder
     {
         Params()
@@ -17,10 +12,9 @@ public:
 
         chowdsp::PercentParameter::Ptr param { "pct", "Percent", 0.5f };
     };
-
     using State = chowdsp::PluginStateImpl<Params>;
 
-    void setupTest()
+    SECTION ("Setup Test")
     {
         State state;
         auto& param = state.params.param;
@@ -28,15 +22,15 @@ public:
         juce::Slider slider;
         chowdsp::SliderAttachment attach { param, state, slider };
 
-        expectEquals (slider.getValue(), (double) param->get(), "Incorrect slider value after setup!");
-        expectEquals (slider.getRange().getStart(), 0.0, "Slider range start is incorrect!");
-        expectEquals (slider.getRange().getEnd(), 1.0, "Slider range end is incorrect!");
+        REQUIRE_MESSAGE (slider.getValue() == (double) param->get(), "Incorrect slider value after setup!");
+        REQUIRE_MESSAGE (slider.getRange().getStart() == 0.0, "Slider range start is incorrect!");
+        REQUIRE_MESSAGE (slider.getRange().getEnd() == 1.0, "Slider range end is incorrect!");
 
-        expectEquals (slider.textFromValueFunction (param->get()), param->getCurrentValueAsText(), "Slider text from value function is incorrect!");
-        expectEquals (slider.valueFromTextFunction (param->getCurrentValueAsText()), (double) param->get(), "Slider value from text function is incorrect!");
+        REQUIRE_MESSAGE (slider.textFromValueFunction (param->get()) == param->getCurrentValueAsText(), "Slider text from value function is incorrect!");
+        REQUIRE_MESSAGE (slider.valueFromTextFunction (param->getCurrentValueAsText()) == (double) param->get(), "Slider value from text function is incorrect!");
     }
 
-    void sliderParamChangeTest()
+    SECTION ("Slider Change Test")
     {
         State state;
         const auto& param = state.params.param;
@@ -51,10 +45,10 @@ public:
             slider.setValue ((double) newValue, juce::sendNotificationSync);
         }
 
-        expectEquals (param->get(), newValue, "Parameter value after slider drag is incorrect!");
+        REQUIRE_MESSAGE (param->get() == newValue, "Parameter value after slider drag is incorrect!");
     }
 
-    void hostParamChangeTest()
+    SECTION ("Host Change Test")
     {
         State state;
         auto& param = state.params.param;
@@ -67,10 +61,10 @@ public:
         chowdsp::ParameterTypeHelpers::setValue (newValue, *param);
         juce::MessageManager::getInstance()->runDispatchLoopUntil (20);
 
-        expectEquals (slider.getValue(), (double) newValue, "Slider value after parameter change is incorrect!");
+        REQUIRE_MESSAGE (slider.getValue() == (double) newValue, "Slider value after parameter change is incorrect!");
     }
 
-    void withUndoRedo()
+    SECTION ("With Undo/Redo Test")
     {
         juce::UndoManager um { 100 };
 
@@ -88,40 +82,20 @@ public:
             slider.setValue ((double) newValue, juce::sendNotificationSync);
         }
 
-        expectEquals (param->get(), newValue, "Parameter value after slider drag is incorrect!");
-        expect (um.canUndo(), "Slider drag is not creating undoable action!");
+        REQUIRE_MESSAGE (param->get() == newValue, "Parameter value after slider drag is incorrect!");
+        REQUIRE_MESSAGE (um.canUndo(), "Slider drag is not creating undoable action!");
 
         um.undo();
-        expectEquals (param->get(), originalValue, "Parameter value after undo action is incorrect!");
-        expect (um.canRedo(), "Slider drag undo is not creating redoable action!");
+        REQUIRE_MESSAGE (param->get() == originalValue, "Parameter value after undo action is incorrect!");
+        REQUIRE_MESSAGE (um.canRedo(), "Slider drag undo is not creating redoable action!");
 
         um.redo();
-        expectEquals (param->get(), newValue, "Parameter value after redo action is incorrect!");
+        REQUIRE_MESSAGE (param->get() == newValue, "Parameter value after redo action is incorrect!");
     }
+}
 
-    void runTestTimed() override
-    {
-        beginTest ("Setup Test");
-        setupTest();
-
-        beginTest ("Slider Change Test");
-        sliderParamChangeTest();
-
-        beginTest ("Host Change Test");
-        hostParamChangeTest();
-
-        beginTest ("With Undo/Redo Test");
-        withUndoRedo();
-    }
-};
-
-class ComboBoxAttachmentTest : public TimedUnitTest
+TEST_CASE ("ComboBox Attachment Test", "[state][attachments]")
 {
-public:
-    ComboBoxAttachmentTest() : TimedUnitTest ("ComboBox Attachment Test", "ChowDSP State")
-    {
-    }
-
     struct Params : chowdsp::ParamHolder
     {
         Params()
@@ -134,7 +108,7 @@ public:
 
     using State = chowdsp::PluginStateImpl<Params>;
 
-    void setupTest()
+    SECTION ("Setup Test")
     {
         State state;
         auto& param = state.params.param;
@@ -142,11 +116,11 @@ public:
         juce::ComboBox box;
         chowdsp::ComboBoxAttachment attach { param, state, box };
 
-        expectEquals (box.getNumItems(), param->choices.size(), "Num choices is incorrect!");
-        expectEquals (box.getSelectedItemIndex(), param->getIndex(), "Initial choice index is incorrect!");
+        REQUIRE_MESSAGE (box.getNumItems() == param->choices.size(), "Num choices is incorrect!");
+        REQUIRE_MESSAGE (box.getSelectedItemIndex() == param->getIndex(), "Initial choice index is incorrect!");
     }
 
-    void boxParamChangeTest()
+    SECTION ("Box Change Test")
     {
         State state;
         const auto& param = state.params.param;
@@ -157,10 +131,10 @@ public:
         static constexpr int newValue = 2;
         box.setSelectedItemIndex (newValue, juce::sendNotificationSync);
 
-        expectEquals (param->getIndex(), newValue, "Parameter value after box change is incorrect!");
+        REQUIRE_MESSAGE (param->getIndex() == newValue, "Parameter value after box change is incorrect!");
     }
 
-    void hostParamChangeTest()
+    SECTION ("Host Change Test")
     {
         State state;
         auto& param = state.params.param;
@@ -173,10 +147,10 @@ public:
         chowdsp::ParameterTypeHelpers::setValue (newValue, *param);
         juce::MessageManager::getInstance()->runDispatchLoopUntil (20);
 
-        expectEquals (box.getSelectedItemIndex(), newValue, "Box value after parameter change is incorrect!");
+        REQUIRE_MESSAGE (box.getSelectedItemIndex() == newValue, "Box value after parameter change is incorrect!");
     }
 
-    void withUndoRedo()
+    SECTION ("With Undo/Redo Test")
     {
         juce::UndoManager um { 100 };
 
@@ -191,40 +165,20 @@ public:
 
         box.setSelectedItemIndex (newValue, juce::sendNotificationSync);
 
-        expectEquals (param->getIndex(), newValue, "Parameter value after box change is incorrect!");
-        expect (um.canUndo(), "Slider drag is not creating undoable action!");
+        REQUIRE_MESSAGE (param->getIndex() == newValue, "Parameter value after box change is incorrect!");
+        REQUIRE_MESSAGE (um.canUndo(), "Slider drag is not creating undoable action!");
 
         um.undo();
-        expectEquals (param->getIndex(), originalValue, "Parameter value after undo action is incorrect!");
-        expect (um.canRedo(), "Slider drag undo is not creating redoable action!");
+        REQUIRE_MESSAGE (param->getIndex() == originalValue, "Parameter value after undo action is incorrect!");
+        REQUIRE_MESSAGE (um.canRedo(), "Slider drag undo is not creating redoable action!");
 
         um.redo();
-        expectEquals (param->getIndex(), newValue, "Parameter value after redo action is incorrect!");
+        REQUIRE_MESSAGE (param->getIndex() == newValue, "Parameter value after redo action is incorrect!");
     }
+}
 
-    void runTestTimed() override
-    {
-        beginTest ("Setup Test");
-        setupTest();
-
-        beginTest ("Box Change Test");
-        boxParamChangeTest();
-
-        beginTest ("Host Change Test");
-        hostParamChangeTest();
-
-        beginTest ("With Undo/Redo Test");
-        withUndoRedo();
-    }
-};
-
-class ButtonAttachmentTest : public TimedUnitTest
+TEST_CASE ("Button Attachment Test", "[state][attachments]")
 {
-public:
-    ButtonAttachmentTest() : TimedUnitTest ("Button Attachment Test", "ChowDSP State")
-    {
-    }
-
     struct Params : chowdsp::ParamHolder
     {
         Params()
@@ -237,7 +191,7 @@ public:
 
     using State = chowdsp::PluginStateImpl<Params>;
 
-    void setupTest()
+    SECTION ("Setup Test")
     {
         State state;
         auto& param = state.params.param;
@@ -245,11 +199,11 @@ public:
         juce::ToggleButton button;
         chowdsp::ButtonAttachment attach { param, state, button };
 
-        expectEquals (button.getButtonText(), param->name, "Button name is incorrect!");
-        expect (button.getToggleState() == param->get(), "Initial button state is incorrect!");
+        REQUIRE_MESSAGE (button.getButtonText() == param->name, "Button name is incorrect!");
+        REQUIRE_MESSAGE (button.getToggleState() == param->get(), "Initial button state is incorrect!");
     }
 
-    void buttonParamChangeTest()
+    SECTION ("Button Change Test")
     {
         State state;
         const auto& param = state.params.param;
@@ -260,10 +214,10 @@ public:
         static constexpr bool newValue = true;
         button.setToggleState (newValue, juce::sendNotificationSync);
 
-        expect (param->get() == newValue, "Parameter value after button change is incorrect!");
+        REQUIRE_MESSAGE (param->get() == newValue, "Parameter value after button change is incorrect!");
     }
 
-    void hostParamChangeTest()
+    SECTION ("Host Change Test")
     {
         State state;
         auto& param = state.params.param;
@@ -276,10 +230,10 @@ public:
         chowdsp::ParameterTypeHelpers::setValue (newValue, *param);
         juce::MessageManager::getInstance()->runDispatchLoopUntil (20);
 
-        expect (button.getToggleState() == newValue, "Button state after parameter change is incorrect!");
+        REQUIRE_MESSAGE (button.getToggleState() == newValue, "Button state after parameter change is incorrect!");
     }
 
-    void withUndoRedo()
+    SECTION ("With Undo/Redo Test")
     {
         juce::UndoManager um { 100 };
 
@@ -294,33 +248,14 @@ public:
 
         button.setToggleState (newValue, juce::sendNotificationSync);
 
-        expect (param->get() == newValue, "Parameter value after button change is incorrect!");
-        expect (um.canUndo(), "Slider drag is not creating undoable action!");
+        REQUIRE_MESSAGE (param->get() == newValue, "Parameter value after button change is incorrect!");
+        REQUIRE_MESSAGE (um.canUndo(), "Slider drag is not creating undoable action!");
 
         um.undo();
-        expect (param->get() == originalValue, "Parameter value after undo action is incorrect!");
-        expect (um.canRedo(), "Slider drag undo is not creating redoable action!");
+        REQUIRE_MESSAGE (param->get() == originalValue, "Parameter value after undo action is incorrect!");
+        REQUIRE_MESSAGE (um.canRedo(), "Slider drag undo is not creating redoable action!");
 
         um.redo();
-        expect (param->get() == newValue, "Parameter value after redo action is incorrect!");
+        REQUIRE_MESSAGE (param->get() == newValue, "Parameter value after redo action is incorrect!");
     }
-
-    void runTestTimed() override
-    {
-        beginTest ("Setup Test");
-        setupTest();
-
-        beginTest ("Button Change Test");
-        buttonParamChangeTest();
-
-        beginTest ("Host Change Test");
-        hostParamChangeTest();
-
-        beginTest ("With Undo/Redo Test");
-        withUndoRedo();
-    }
-};
-
-static SliderAttachmentTest sliderAttachmentTest;
-static ComboBoxAttachmentTest comboBoxAttachmentTest;
-static ButtonAttachmentTest buttonAttachmentTest;
+}

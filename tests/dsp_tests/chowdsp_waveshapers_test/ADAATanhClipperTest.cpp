@@ -33,7 +33,7 @@ static void processTest (bool isBypassed = false)
     for (int i = 2; i < Constants::N - 1; ++i)
     {
         float actualY = testBuffer.getReadPointer (0)[i];
-        REQUIRE_MESSAGE (actualY == Approx (expYs[i - 1]).margin (Constants::maxErr), "Tanh Clipper value is incorrect!");
+        REQUIRE_MESSAGE (actualY == Catch::Approx (expYs[i - 1]).margin (Constants::maxErr), "Tanh Clipper value is incorrect!");
     }
 }
 

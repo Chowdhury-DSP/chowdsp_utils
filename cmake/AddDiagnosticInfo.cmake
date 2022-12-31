@@ -37,11 +37,12 @@ function(add_diagnostic_info target)
     message(STATUS "Setting compiler ID: ${CMAKE_CXX_COMPILER_ID}")
     message(STATUS "Setting compiler version: ${CMAKE_CXX_COMPILER_VERSION}")
 
-    target_compile_definitions(${target} PUBLIC
-        CHOWDSP_PLUGIN_GIT_BRANCH="${GIT_BRANCH}"
-        CHOWDSP_PLUGIN_GIT_COMMIT_HASH="${GIT_COMMIT_HASH}"
-        CHOWDSP_PLUGIN_BUILD_FQDN="${PROJECT_BUILD_FQDN}"
-        CHOWDSP_PLUGIN_CXX_COMPILER_ID="${CMAKE_CXX_COMPILER_ID}"
-        CHOWDSP_PLUGIN_CXX_COMPILER_VERSION="${CMAKE_CXX_COMPILER_VERSION}"
+    target_compile_definitions(${target}
+        PUBLIC
+            CHOWDSP_PLUGIN_GIT_BRANCH="${GIT_BRANCH}"
+            CHOWDSP_PLUGIN_GIT_COMMIT_HASH="${GIT_COMMIT_HASH}"
+            CHOWDSP_PLUGIN_BUILD_FQDN="${PROJECT_BUILD_FQDN}"
+            CHOWDSP_PLUGIN_CXX_COMPILER_ID="${CMAKE_CXX_COMPILER_ID}"
+            CHOWDSP_PLUGIN_CXX_COMPILER_VERSION="${CMAKE_CXX_COMPILER_VERSION}"
     )
 endfunction()

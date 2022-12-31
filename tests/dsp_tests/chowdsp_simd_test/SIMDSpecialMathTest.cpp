@@ -34,7 +34,7 @@ TEMPLATE_TEST_CASE ("SIMD Special Math Test", "", float, double)
                 auto actual = simdFunc (xsimd::batch<FloatType> (input));
 
                 for (size_t j = 0; j < xsimd::batch<FloatType>::size; ++j)
-                    REQUIRE_MESSAGE (actual.get (j) == Approx (expected).margin (maxErr), "SIMD function is incorrect: " << functionName);
+                    REQUIRE_MESSAGE (actual.get (j) == Catch::Approx (expected).margin (maxErr), "SIMD function is incorrect: " << functionName);
             }
         };
 

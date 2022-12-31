@@ -35,7 +35,7 @@ TEST_CASE ("Sawtooth Test")
         for (int i = 0; i < 20; ++i)
         {
             refOsc();
-            REQUIRE_MESSAGE (testOsc.processSample() == Approx (refOsc()).margin (0.01f), "Generated sample is incorrect!");
+            REQUIRE_MESSAGE (testOsc.processSample() == Catch::Approx (refOsc()).margin (0.01f), "Generated sample is incorrect!");
         }
     }
 
@@ -67,8 +67,8 @@ TEST_CASE ("Sawtooth Test")
 
             auto expOut = refOsc();
             auto testOut = testOsc.processSample();
-            REQUIRE_MESSAGE (testOut.get (0) == Approx (expOut).margin (0.01f), "Generated sample is incorrect!");
-            REQUIRE_MESSAGE (testOut.get (1) == Approx (expOut).margin (0.01f), "Generated sample is incorrect!");
+            REQUIRE_MESSAGE (testOut.get (0) == Catch::Approx (expOut).margin (0.01f), "Generated sample is incorrect!");
+            REQUIRE_MESSAGE (testOut.get (1) == Catch::Approx (expOut).margin (0.01f), "Generated sample is incorrect!");
         }
     }
 
@@ -100,7 +100,7 @@ TEST_CASE ("Sawtooth Test")
             refOsc (1.0f);
             auto expOut = refOsc (1.0f);
             auto actualOut = testBuffer.getReadPointer (0)[i + 1];
-            REQUIRE_MESSAGE (actualOut == Approx (expOut).margin (0.01f), "Generated sample is incorrect!");
+            REQUIRE_MESSAGE (actualOut == Catch::Approx (expOut).margin (0.01f), "Generated sample is incorrect!");
         }
     }
 

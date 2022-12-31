@@ -11,13 +11,13 @@ void testReduce1dOp (std::vector<T>& in, VectorOp&& vectorOp, ReferenceOp&& refe
     {
         auto actual = vectorOp (in.data(), numValues);
         auto expected = referenceOp (in.data(), numValues);
-        REQUIRE_MESSAGE (actual == Approx (expected).margin (maxError), "Aligned result is incorrect!");
+        REQUIRE_MESSAGE (actual == Catch::Approx (expected).margin (maxError), "Aligned result is incorrect!");
     }
 
     {
         auto actual = vectorOp (in.data() + 1, numValues - 1);
         auto expected = referenceOp (in.data() + 1, numValues - 1);
-        REQUIRE_MESSAGE (actual == Approx (expected).margin (maxError), "Unaligned result is incorrect!");
+        REQUIRE_MESSAGE (actual == Catch::Approx (expected).margin (maxError), "Unaligned result is incorrect!");
     }
 }
 
@@ -29,25 +29,25 @@ void testReduce2dOp (std::vector<T>& in1, std::vector<T> in2, VectorOp&& vectorO
     {
         auto actual = vectorOp (in1.data(), in2.data(), numValues);
         auto expected = referenceOp (in1.data(), in2.data(), numValues);
-        REQUIRE_MESSAGE (actual == Approx (expected).margin (maxError), "Aligned result is incorrect!");
+        REQUIRE_MESSAGE (actual == Catch::Approx (expected).margin (maxError), "Aligned result is incorrect!");
     }
 
     {
         auto actual = vectorOp (in1.data() + 1, in2.data(), numValues - 1);
         auto expected = referenceOp (in1.data() + 1, in2.data(), numValues - 1);
-        REQUIRE_MESSAGE (actual == Approx (expected).margin (maxError), "Unaligned/Aligned result is incorrect!");
+        REQUIRE_MESSAGE (actual == Catch::Approx (expected).margin (maxError), "Unaligned/Aligned result is incorrect!");
     }
 
     {
         auto actual = vectorOp (in1.data(), in2.data() + 1, numValues - 1);
         auto expected = referenceOp (in1.data(), in2.data() + 1, numValues - 1);
-        REQUIRE_MESSAGE (actual == Approx (expected).margin (maxError), "Aligned/Unaligned result is incorrect!");
+        REQUIRE_MESSAGE (actual == Catch::Approx (expected).margin (maxError), "Aligned/Unaligned result is incorrect!");
     }
 
     {
         auto actual = vectorOp (in1.data() + 1, in2.data() + 1, numValues - 1);
         auto expected = referenceOp (in1.data() + 1, in2.data() + 1, numValues - 1);
-        REQUIRE_MESSAGE (actual == Approx (expected).margin (maxError), "Unaligned result is incorrect!");
+        REQUIRE_MESSAGE (actual == Catch::Approx (expected).margin (maxError), "Unaligned result is incorrect!");
     }
 }
 
@@ -60,25 +60,25 @@ void testUnaryOp (std::vector<T>& in, VectorOp&& vectorOp, ReferenceOp&& referen
     {
         vectorOp (actual.data(), in.data(), numValues);
         for (size_t i = 0; i < (size_t) numValues; ++i)
-            REQUIRE_MESSAGE (actual[i] == Approx (referenceOp (in[i])).margin (maxError), "Result with aligned inputs and ouputs is incorrect!");
+            REQUIRE_MESSAGE (actual[i] == Catch::Approx (referenceOp (in[i])).margin (maxError), "Result with aligned inputs and ouputs is incorrect!");
     }
 
     {
         vectorOp (actual.data(), in.data() + 1, numValues - 1);
         for (size_t i = 1; i < (size_t) numValues; ++i)
-            REQUIRE_MESSAGE (actual[i - 1] == Approx (referenceOp (in[i])).margin (maxError), "Result with unaligned input is incorrect!");
+            REQUIRE_MESSAGE (actual[i - 1] == Catch::Approx (referenceOp (in[i])).margin (maxError), "Result with unaligned input is incorrect!");
     }
 
     {
         vectorOp (actual.data() + 1, in.data(), numValues - 1);
         for (size_t i = 1; i < (size_t) numValues; ++i)
-            REQUIRE_MESSAGE (actual[i] == Approx (referenceOp (in[i - 1])).margin (maxError), "Result with unaligned output is incorrect!");
+            REQUIRE_MESSAGE (actual[i] == Catch::Approx (referenceOp (in[i - 1])).margin (maxError), "Result with unaligned output is incorrect!");
     }
 
     {
         vectorOp (actual.data() + 1, in.data() + 1, numValues - 1);
         for (size_t i = 1; i < (size_t) numValues; ++i)
-            REQUIRE_MESSAGE (actual[i] == Approx (referenceOp (in[i])).margin (maxError), "Result with unaligned input and output is incorrect!");
+            REQUIRE_MESSAGE (actual[i] == Catch::Approx (referenceOp (in[i])).margin (maxError), "Result with unaligned input and output is incorrect!");
     }
 }
 
@@ -96,25 +96,25 @@ void testBinaryOp (std::vector<T>& in1, std::vector<T>& in2, VectorOp&& vectorOp
         {
             vectorOp (actualPtr, in1.data(), in2.data(), numValues);
             for (size_t i = 0; i < (size_t) numValues; ++i)
-                REQUIRE_MESSAGE (actualPtr[i] == Approx (referenceOp (in1[i], in2[i])).margin (maxError), outputStr << "Result with aligned inputs is incorrect!");
+                REQUIRE_MESSAGE (actualPtr[i] == Catch::Approx (referenceOp (in1[i], in2[i])).margin (maxError), outputStr << "Result with aligned inputs is incorrect!");
         }
 
         {
             vectorOp (actualPtr, in1.data() + 1, in2.data(), numValues - 1);
             for (size_t i = 1; i < (size_t) numValues; ++i)
-                REQUIRE_MESSAGE (actualPtr[i - 1] == Approx (referenceOp (in1[i], in2[i - 1])).margin (maxError), outputStr << "Result with first unaligned input is incorrect!");
+                REQUIRE_MESSAGE (actualPtr[i - 1] == Catch::Approx (referenceOp (in1[i], in2[i - 1])).margin (maxError), outputStr << "Result with first unaligned input is incorrect!");
         }
 
         {
             vectorOp (actualPtr, in1.data(), in2.data() + 1, numValues - 1);
             for (size_t i = 1; i < (size_t) numValues; ++i)
-                REQUIRE_MESSAGE (actualPtr[i - 1] == Approx (referenceOp (in1[i - 1], in2[i])).margin (maxError), outputStr << "Result with second unaligned input is incorrect!");
+                REQUIRE_MESSAGE (actualPtr[i - 1] == Catch::Approx (referenceOp (in1[i - 1], in2[i])).margin (maxError), outputStr << "Result with second unaligned input is incorrect!");
         }
 
         {
             vectorOp (actualPtr, in1.data() + 1, in2.data() + 1, numValues - 1);
             for (size_t i = 1; i < (size_t) numValues; ++i)
-                REQUIRE_MESSAGE (actualPtr[i - 1] == Approx (referenceOp (in1[i], in2[i])).margin (maxError), outputStr << "Result with both unaligned inputs is incorrect!");
+                REQUIRE_MESSAGE (actualPtr[i - 1] == Catch::Approx (referenceOp (in1[i], in2[i])).margin (maxError), outputStr << "Result with both unaligned inputs is incorrect!");
         }
     }
 }
@@ -122,9 +122,9 @@ void testBinaryOp (std::vector<T>& in1, std::vector<T>& in2, VectorOp&& vectorOp
 TEMPLATE_TEST_CASE ("FloatVectorOperations Test", "", float, double)
 {
     if (chowdsp::FloatVectorOperations::isUsingVDSP())
-        INFO ("chowdsp::FloatVectorOperations: using vDSP")
+        INFO ("chowdsp::FloatVectorOperations: using vDSP");
     else
-        INFO ("chowdsp::FloatVectorOperations: not using vDSP")
+        INFO ("chowdsp::FloatVectorOperations: not using vDSP");
 
     std::random_device rd;
     std::mt19937 mt (rd());

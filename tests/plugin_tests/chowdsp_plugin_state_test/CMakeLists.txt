@@ -1,11 +1,4 @@
-add_executable(chowdsp_plugin_state_test)
-setup_juce_test(chowdsp_plugin_state_test)
-
-target_link_libraries(chowdsp_plugin_state_test
-    PRIVATE
-        chowdsp_plugin_base
-        chowdsp_plugin_state
-)
+setup_catch_juce_test(chowdsp_plugin_state_test chowdsp::chowdsp_plugin_base chowdsp::chowdsp_plugin_state)
 
 target_sources(chowdsp_plugin_state_test
     PRIVATE

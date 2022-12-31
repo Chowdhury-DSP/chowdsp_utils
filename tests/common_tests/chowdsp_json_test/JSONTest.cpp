@@ -1,12 +1,9 @@
 #include <chowdsp_json/chowdsp_json.h>
-#include <TimedUnitTest.h>
+#include <CatchUtils.h>
 
-class JSONTest : public TimedUnitTest
+TEST_CASE ("JSON Test")
 {
-public:
-    JSONTest() : TimedUnitTest ("JSON Test") {}
-
-    void stringSerializationTest()
+    SECTION ("JUCE String Serialization Test")
     {
         auto testString = juce::String ("TEST_STRING");
 
@@ -14,10 +11,10 @@ public:
         parent["key"] = testString;
         auto returnString = parent["key"].get<juce::String>();
 
-        expectEquals (returnString, testString, "JSON serialized string is incorrect!");
+        REQUIRE_MESSAGE (returnString == testString, "JSON serialized string is incorrect!");
     }
 
-    void jsonFileTest()
+    SECTION ("JSON File Test")
     {
         chowdsp::json jTest = {
             { "pi", 3.141 },
@@ -33,12 +30,12 @@ public:
         chowdsp::JSONUtils::toFile (jTest, testFile, 4); // 4 space indent
 
         auto jActual = chowdsp::JSONUtils::fromFile (testFile);
-        expect (jActual == jTest, "JSON returned from file is incorrect!");
+        REQUIRE_MESSAGE (jActual == jTest, "JSON returned from file is incorrect!");
 
         testFile.deleteFile();
     }
 
-    void jsonMemoryBlockTest()
+    SECTION ("JSON Memory Block Test")
     {
         chowdsp::json jTest = {
             { "pi", 3.141 },
@@ -54,27 +51,27 @@ public:
         chowdsp::JSONUtils::toMemoryBlock (jTest, testBlock);
 
         auto jActual = chowdsp::JSONUtils::fromMemoryBlock (testBlock);
-        expect (jActual == jTest, "JSON returned from memory block is incorrect!");
+        REQUIRE_MESSAGE (jActual == jTest, "JSON returned from memory block is incorrect!");
     }
 
-    void isSameTypeTest()
+    SECTION ("Binary Data Test")
     {
         using namespace chowdsp::JSONUtils;
 
         // number vs. number
         auto num_num = isSameType (chowdsp::json (4), chowdsp::json (2.0f));
-        expect (num_num, "Numbers should be the same type!");
+        REQUIRE_MESSAGE (num_num, "Numbers should be the same type!");
 
         // number vs. string
         auto num_str = isSameType (chowdsp::json (4), chowdsp::json (juce::String ("zzz")));
-        expect (! num_str, "Numbers and strings should be different types!");
+        REQUIRE_MESSAGE (! num_str, "Numbers and strings should be different types!");
 
         // string vs. string
         auto str_str = isSameType (chowdsp::json (juce::String ("aaa")), chowdsp::json ("zzz"));
-        expect (str_str, "Strings should be the same type!");
+        REQUIRE_MESSAGE (str_str, "Strings should be the same type!");
     }
 
-    void binaryDataTest()
+    SECTION ("Same Type Test")
     {
         chowdsp::json jTest = {
             { "pi", 3.141 },
@@ -91,26 +88,6 @@ public:
         int size = (int) sizeof (char) * (int) jString.size();
         auto jActual = chowdsp::JSONUtils::fromBinaryData (data, size);
 
-        expect (jActual == jTest, "JSON returned from binary data is incorrect!");
+        REQUIRE_MESSAGE (jActual == jTest, "JSON returned from binary data is incorrect!");
     }
-
-    void runTestTimed() override
-    {
-        beginTest ("JUCE String Serialization Test");
-        stringSerializationTest();
-
-        beginTest ("JSON File Test");
-        jsonFileTest();
-
-        beginTest ("JSON Memory Block Test");
-        jsonMemoryBlockTest();
-
-        beginTest ("Binary Data Test");
-        binaryDataTest();
-
-        beginTest ("Same Type Test");
-        isSameTypeTest();
-    }
-};
-
-static JSONTest jsonTest;
+}

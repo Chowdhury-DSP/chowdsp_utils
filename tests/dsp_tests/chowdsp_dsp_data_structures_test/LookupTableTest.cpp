@@ -30,7 +30,7 @@ TEST_CASE ("Lookup Table Test")
             const auto testVal = minus1To1 (mt) * 15.0f;
             const auto actualVal = chowLUT (testVal);
             const auto expVal = juceLUT (testVal);
-            REQUIRE_MESSAGE (actualVal == Approx (expVal).margin (1.0e-18f), "Lookup Table value incorrect!");
+            REQUIRE_MESSAGE (actualVal == Catch::Approx (expVal).margin (1.0e-18f), "Lookup Table value incorrect!");
         }
     }
 
@@ -41,7 +41,7 @@ TEST_CASE ("Lookup Table Test")
             const auto testVal = minus1To1 (mt) * 10.0f;
             const auto actualVal = chowLUT[testVal];
             const auto expVal = juceLUT[testVal];
-            REQUIRE_MESSAGE (actualVal == Approx (expVal).margin (1.0e-18f), "Lookup Table value incorrect!");
+            REQUIRE_MESSAGE (actualVal == Catch::Approx (expVal).margin (1.0e-18f), "Lookup Table value incorrect!");
         }
     }
 
@@ -60,7 +60,7 @@ TEST_CASE ("Lookup Table Test")
         {
             const auto actualVal = actualBuffer.getReadPointer (0)[i];
             const auto expVal = expBuffer.getReadPointer (0)[i];
-            REQUIRE_MESSAGE (actualVal == Approx (expVal).margin (1.0e-18f), "Lookup Table value incorrect!");
+            REQUIRE_MESSAGE (actualVal == Catch::Approx (expVal).margin (1.0e-18f), "Lookup Table value incorrect!");
         }
     }
 
@@ -79,7 +79,7 @@ TEST_CASE ("Lookup Table Test")
         {
             const auto actualVal = actualBuffer.getReadPointer (0)[i];
             const auto expVal = expBuffer.getReadPointer (0)[i];
-            REQUIRE_MESSAGE (actualVal == Approx (expVal).margin (1.0e-18f), "Lookup Table value incorrect!");
+            REQUIRE_MESSAGE (actualVal == Catch::Approx (expVal).margin (1.0e-18f), "Lookup Table value incorrect!");
         }
     }
 }

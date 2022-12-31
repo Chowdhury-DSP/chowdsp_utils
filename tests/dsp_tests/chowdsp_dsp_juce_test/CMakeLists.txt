@@ -3,12 +3,13 @@ setup_juce_test(chowdsp_dsp_juce_test)
 
 target_link_libraries(chowdsp_dsp_juce_test
     PRIVATE
-        juce_dsp
-        chowdsp_dsp_data_structures
-        chowdsp_eq
-        chowdsp_reverb
-        chowdsp_sources
-        chowdsp_plugin_base
+        Catch2::Catch2
+        juce::juce_dsp
+        chowdsp::chowdsp_dsp_data_structures
+        chowdsp::chowdsp_eq
+        chowdsp::chowdsp_reverb
+        chowdsp::chowdsp_sources
+        chowdsp::chowdsp_plugin_base
 )
 
 target_sources(chowdsp_dsp_juce_test

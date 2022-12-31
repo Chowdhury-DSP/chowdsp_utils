@@ -83,7 +83,7 @@ static void runPitchShiftTest (bool shouldUseBuffers, bool shouldShift, bool sho
         buffer = processSamples (shifter);
 
     const auto actualFrequency = tunerTest (buffer);
-    REQUIRE_MESSAGE (actualFrequency == Approx (freqExpected).margin (freqExpected * 0.01f), "Shifted frequency is incorrect!");
+    REQUIRE_MESSAGE (actualFrequency == Catch::Approx (freqExpected).margin (freqExpected * 0.01f), "Shifted frequency is incorrect!");
 
     //    REQUIRE_MESSAGE (snr >= minSNR, "SNR too low!");
 }

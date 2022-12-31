@@ -37,7 +37,7 @@ TEST_CASE ("Mod Filter Wrapper Test")
         modFilter.processBlock (modBlock);
 
         for (int n = 0; n < blockSize; ++n)
-            REQUIRE_MESSAGE (modFilterData[n] == Approx (originalFilterData[n]).margin (1.0e-3f), "Sample " << std::to_string (n) << " is incorrect");
+            REQUIRE_MESSAGE (modFilterData[n] == Catch::Approx (originalFilterData[n]).margin (1.0e-3f), "Sample " << std::to_string (n) << " is incorrect");
     }
 
     SECTION ("First-Order LPF Test")
@@ -64,7 +64,7 @@ TEST_CASE ("Mod Filter Wrapper Test")
         modFilter.processBlock (modBlock);
 
         for (int n = 0; n < blockSize; ++n)
-            REQUIRE_MESSAGE (modFilterData[n] == Approx (originalFilterData[n]).margin (1.0e-3f), "Sample " << std::to_string (n) << " is incorrect");
+            REQUIRE_MESSAGE (modFilterData[n] == Catch::Approx (originalFilterData[n]).margin (1.0e-3f), "Sample " << std::to_string (n) << " is incorrect");
     }
 
     // @TODO: test this with juce_dsp

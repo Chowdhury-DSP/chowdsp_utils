@@ -12,7 +12,7 @@ static void checkBufferLevel (const chowdsp::Buffer<float>& buffer, float expGai
 {
     const auto halfSamples = buffer.getNumSamples() / 2;
     auto magDB = juce::Decibels::gainToDecibels (chowdsp::BufferMath::getMagnitude (buffer, halfSamples, halfSamples));
-    REQUIRE_MESSAGE (magDB == Approx (expGainDB).margin (maxError), message);
+    REQUIRE_MESSAGE (magDB == Catch::Approx (expGainDB).margin (maxError), message);
 }
 
 TEST_CASE ("Filter Chain Test")

@@ -107,7 +107,7 @@ TEMPLATE_TEST_CASE ("Modal Filter Test", "[Modal]", float, double, xsimd::batch<
         filter.processBlock (buffer.data(), (int) buffer.size());
 
         auto mag = juce::Decibels::gainToDecibels (getMagnitude (buffer, int (fs * 0.5f), int (fs * 0.1f)));
-        REQUIRE_MESSAGE (mag == Approx ((NumericType) -60.0f).margin ((NumericType) 1.0f), "Incorrect decay time.");
+        REQUIRE_MESSAGE (mag == Catch::Approx ((NumericType) -60.0f).margin ((NumericType) 1.0f), "Incorrect decay time.");
     }
 
     SECTION ("Initial Phase Test")

@@ -19,7 +19,7 @@ TEST_CASE ("Wave Multiplier Test")
             inputVals[i] = 10.0f * std::sin (juce::MathConstants<float>::twoPi * (float) i * 8000.0f / 48000.0f);
             actualVals[i] = folder.processSample (inputVals[i]);
 
-            REQUIRE (actualVals[i] == Approx (expVals[i]).margin (1.0e-6));
+            REQUIRE (actualVals[i] == Catch::Approx (expVals[i]).margin (1.0e-6));
         }
     }
 }

@@ -20,11 +20,11 @@ TEMPLATE_TEST_CASE ("Gain Test", "", float, double, xsimd::batch<float>, xsimd::
 
         gain.setGainLinear ((NumericType) 2);
         REQUIRE_MESSAGE (gain.getGainLinear() == (NumericType) 2, "Set linear gain is incorrect!");
-        REQUIRE_MESSAGE (gain.getGainDecibels() == Approx ((NumericType) 6).margin (0.03), "Get Decibels gain is incorrect!");
+        REQUIRE_MESSAGE (gain.getGainDecibels() == Catch::Approx ((NumericType) 6).margin (0.03), "Get Decibels gain is incorrect!");
 
         gain.setGainDecibels ((NumericType) -6);
-        REQUIRE_MESSAGE (gain.getGainDecibels() == Approx ((NumericType) -6).margin (1.0e-6), "Set Decibels gain is incorrect!");
-        REQUIRE_MESSAGE (gain.getGainLinear() == Approx ((NumericType) 0.5).margin (0.02), "Get linear gain is incorrect!");
+        REQUIRE_MESSAGE (gain.getGainDecibels() == Catch::Approx ((NumericType) -6).margin (1.0e-6), "Set Decibels gain is incorrect!");
+        REQUIRE_MESSAGE (gain.getGainLinear() == Catch::Approx ((NumericType) 0.5).margin (0.02), "Get linear gain is incorrect!");
 
         gain.setRampDurationSeconds (0.05);
         REQUIRE_MESSAGE (gain.getRampDurationSeconds() == 0.05, "Set ramp duration is incorrect!");

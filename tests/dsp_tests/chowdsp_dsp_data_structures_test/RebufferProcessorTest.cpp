@@ -44,7 +44,7 @@ static void rebufferTest (int inputBlockSize, bool fewerChannels = false)
     {
         auto actual = buffer.getReadPointer (0)[i];
         auto expected = refBuffer.getReadPointer (0)[i];
-        REQUIRE_MESSAGE (actual == Approx (expected).margin (1.0e-6f), "Output sample is incorrect! At index " << std::to_string (i));
+        REQUIRE_MESSAGE (actual == Catch::Approx (expected).margin (1.0e-6f), "Output sample is incorrect! At index " << std::to_string (i));
     }
 }
 
