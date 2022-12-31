@@ -54,6 +54,9 @@ function(setup_catch_juce_test target)
             JUCE_STANDALONE_APPLICATION=1
     )
 
+    list(REMOVE_AT ARGV 0) # Remove "target" argument
+    target_link_libraries(${target} PRIVATE ${ARGV})
+
     # set coverage flags if needed
     if(CODE_COVERAGE)
         enable_coverage_flags(${target})
