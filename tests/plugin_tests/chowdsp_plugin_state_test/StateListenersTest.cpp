@@ -1,14 +1,9 @@
-#include <TimedUnitTest.h>
+#include <CatchUtils.h>
 #include <chowdsp_plugin_state/chowdsp_plugin_state.h>
 
-class StateListenersTest : public TimedUnitTest
+TEST_CASE ("State Listeners Test", "[state][listeners]")
 {
-public:
-    StateListenersTest() : TimedUnitTest ("State Listeners Test", "ChowDSP State")
-    {
-    }
-
-    void mainThreadListenersTest()
+    SECTION ("Main Thread Listeners Test")
     {
         chowdsp::ParamHolder params {};
         chowdsp::PercentParameter::Ptr pct { "percent", "Percent", 1.0f };
@@ -20,13 +15,12 @@ public:
         chowdsp::ScopedCallback listener = listeners.addParameterListener (
             pct,
             chowdsp::ParameterListenerThread::MessageThread,
-            [this, &listenerCount, &pct, &mostRecentParamValue]
+            [&listenerCount, &pct, &mostRecentParamValue]
             {
-                expect (juce::MessageManager::getInstance()->isThisTheMessageThread(),
-                        "Listener called on a thread other than the message thread!");
-                expectEquals (pct->getCurrentValue(),
-                              mostRecentParamValue,
-                              "Parameter has the incorrect value when the listener is called!");
+                REQUIRE_MESSAGE (juce::MessageManager::getInstance()->isThisTheMessageThread(),
+                                 "Listener called on a thread other than the message thread!");
+                REQUIRE_MESSAGE (pct->getCurrentValue() == mostRecentParamValue,
+                                 "Parameter has the incorrect value when the listener is called!");
                 listenerCount++;
             });
 
@@ -38,10 +32,10 @@ public:
             juce::MessageManager::getInstance()->runDispatchLoopUntil (20);
         }
 
-        expectEquals (listenerCount, numIters, "Incorrect number of listener callbacks!");
+        REQUIRE_MESSAGE (listenerCount == Catch::Approx (numIters).margin (2), "Incorrect number of listener callbacks!");
     }
 
-    void audioThreadListenersTest()
+    SECTION ("Audio Thread Listeners Test")
     {
         chowdsp::ParamHolder params {};
         chowdsp::PercentParameter::Ptr pct { "percent", "Percent", 1.0f };
@@ -53,11 +47,10 @@ public:
         chowdsp::ScopedCallback listener = listeners.addParameterListener (
             pct,
             chowdsp::ParameterListenerThread::AudioThread,
-            [this, &listenerCount, &pct, &mostRecentParamValue]
+            [&listenerCount, &pct, &mostRecentParamValue]
             {
-                expectEquals (pct->getCurrentValue(),
-                              mostRecentParamValue,
-                              "Parameter has the incorrect value when the listener is called!");
+                REQUIRE_MESSAGE (pct->getCurrentValue() == mostRecentParamValue,
+                                 "Parameter has the incorrect value when the listener is called!");
                 listenerCount++;
             });
 
@@ -70,10 +63,10 @@ public:
             listeners.callAudioThreadBroadcasters();
         }
 
-        expectEquals (listenerCount, numIters, "Incorrect number of listener callbacks!");
+        REQUIRE_MESSAGE (listenerCount == Catch::Approx (numIters).margin (2), "Incorrect number of listener callbacks!");
     }
 
-    void nonParameterListenersTest()
+    SECTION ("Non Parameter Listeners Test")
     {
         struct Params : chowdsp::ParamHolder
         {
@@ -96,28 +89,14 @@ public:
         chowdsp::PluginStateImpl<Params, NonParams> state {};
         const auto listener = state.addNonParameterListener (
             state.nonParams.value,
-            [this, &state, &listenerCalled]
+            [&state, &listenerCalled]
             {
                 listenerCalled = true;
-                expectEquals ((int) state.nonParams.value, newValue, "Value after listener callback is incorrect!");
+                REQUIRE_MESSAGE ((int) state.nonParams.value == newValue, "Value after listener callback is incorrect!");
             });
 
         state.nonParams.value = newValue;
 
-        expect (listenerCalled, "Listener was never called!");
+        REQUIRE_MESSAGE (listenerCalled, "Listener was never called!");
     }
-
-    void runTestTimed() override
-    {
-        beginTest ("Main Thread Listeners Test");
-        mainThreadListenersTest();
-
-        beginTest ("Audio Thread Listeners Test");
-        audioThreadListenersTest();
-
-        beginTest ("Non Parameter Listeners Test");
-        nonParameterListenersTest();
-    }
-};
-
-static StateListenersTest stateListenersTest;
+}

@@ -2,10 +2,11 @@
 #
 # Configures a Catch unit test
 function(setup_catch_test_base target)
+    target_sources(${target} PRIVATE ${CMAKE_SOURCE_DIR}/tests/test_utils/CatchTestRunner.cpp)
     target_include_directories(${target} PRIVATE ${CMAKE_SOURCE_DIR}/tests/test_utils)
     target_link_libraries(${target}
         PRIVATE
-            Catch2::Catch2WithMain
+            Catch2::Catch2
             juce::juce_recommended_config_flags
             juce::juce_recommended_lto_flags
             juce::juce_recommended_warning_flags
