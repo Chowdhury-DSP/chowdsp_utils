@@ -76,7 +76,7 @@ TEMPLATE_PRODUCT_TEST_CASE ("Common Smoothed Value Tests", "", SIMDSmoothedValue
         for (int i = 0; i < numSamples; ++i)
         {
             svTime.skip (1);
-            REQUIRE (svSamples.getNextValue().get (0) == Approx (svTime.getNextValue().get (0)).margin ((FloatType) 1.0e-7f));
+            REQUIRE (svSamples.getNextValue().get (0) == Catch::Approx (svTime.getNextValue().get (0)).margin ((FloatType) 1.0e-7f));
         }
     }
 
@@ -96,11 +96,11 @@ TEMPLATE_PRODUCT_TEST_CASE ("Common Smoothed Value Tests", "", SIMDSmoothedValue
         sv.setCurrentAndTargetValue (1.0f);
         sv.setTargetValue (2.0f);
 
-        REQUIRE (sv.skip (1).get (0) == Approx (reference[0].get (0)).margin ((FloatType) 1.0e-6f));
-        REQUIRE (sv.skip (1).get (0) == Approx (reference[1].get (0)).margin ((FloatType) 1.0e-6f));
-        REQUIRE (sv.skip (2).get (0) == Approx (reference[3].get (0)).margin ((FloatType) 1.0e-6f));
+        REQUIRE (sv.skip (1).get (0) == Catch::Approx (reference[0].get (0)).margin ((FloatType) 1.0e-6f));
+        REQUIRE (sv.skip (1).get (0) == Catch::Approx (reference[1].get (0)).margin ((FloatType) 1.0e-6f));
+        REQUIRE (sv.skip (2).get (0) == Catch::Approx (reference[3].get (0)).margin ((FloatType) 1.0e-6f));
         sv.skip (3);
-        REQUIRE (sv.getCurrentValue().get (0) == Approx (reference[6].get (0)).margin ((FloatType) 1.0e-6f));
+        REQUIRE (sv.getCurrentValue().get (0) == Catch::Approx (reference[6].get (0)).margin ((FloatType) 1.0e-6f));
         REQUIRE (sv.skip (300).get (0) == sv.getTargetValue().get (0));
         REQUIRE (sv.getCurrentValue().get (0) == sv.getTargetValue().get (0));
     }

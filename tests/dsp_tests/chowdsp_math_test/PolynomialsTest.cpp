@@ -23,7 +23,7 @@ template <typename T>
 void checkError (T actual, T exp, const std::string& message)
 {
     auto maxErr = getMaxErr (exp);
-    REQUIRE_MESSAGE (actual == Approx (exp).margin (maxErr), message);
+    REQUIRE_MESSAGE (actual == Catch::Approx (exp).margin (maxErr), message);
 }
 
 template <typename T>
@@ -42,8 +42,8 @@ template <typename T>
 void checkError (std::complex<T> actual, std::complex<T> exp, const std::string& message)
 {
     auto maxErr = getMaxErr (exp);
-    REQUIRE_MESSAGE (std::real (actual) == Approx (std::real (exp)).margin (maxErr), message);
-    REQUIRE_MESSAGE (std::imag (actual) == Approx (std::imag (exp)).margin (maxErr), message);
+    REQUIRE_MESSAGE (std::real (actual) == Catch::Approx (std::real (exp)).margin (maxErr), message);
+    REQUIRE_MESSAGE (std::imag (actual) == Catch::Approx (std::imag (exp)).margin (maxErr), message);
 }
 
 template <int ORDER, typename Coeffs, typename Args>

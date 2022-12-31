@@ -27,7 +27,7 @@ TEST_CASE ("Sine Test")
         {
             auto actual = chowSine.processSample();
             auto expected = std::sin (juce::MathConstants<double>::twoPi * freq1 * i / fs);
-            REQUIRE_MESSAGE (actual == Approx (expected).margin (err), "Sine Wave is inaccurate");
+            REQUIRE_MESSAGE (actual == Catch::Approx (expected).margin (err), "Sine Wave is inaccurate");
         }
     }
 
@@ -64,7 +64,7 @@ TEST_CASE ("Sine Test")
         {
             for (int i = 0; i < 2 * blockSize; ++i)
             {
-                REQUIRE_MESSAGE (chowBuffer.getReadPointer (ch)[i] == Approx (refBuffer.getReadPointer (ch)[i]).margin (err), "Sine Wave is inaccurate");
+                REQUIRE_MESSAGE (chowBuffer.getReadPointer (ch)[i] == Catch::Approx (refBuffer.getReadPointer (ch)[i]).margin (err), "Sine Wave is inaccurate");
             }
         }
     }

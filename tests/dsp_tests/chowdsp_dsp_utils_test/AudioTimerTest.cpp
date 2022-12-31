@@ -13,8 +13,8 @@ static void audioTimerTest (double sampleRate)
         timer.advance (100);
 
         REQUIRE_MESSAGE (timer.getTimeSamples() == (juce::int64) 1600, "Sample time is incorrect!");
-        REQUIRE_MESSAGE (timer.getTimeMilliseconds() == Approx (1600.0 * (1000.0 / sampleRate)).margin (1.0e-12), "Milliseconds time is incorrect");
-        REQUIRE_MESSAGE (timer.getTimeSeconds() == Approx (1600.0 / sampleRate).margin (1.0e-12), "Seconds time is incorrect");
+        REQUIRE_MESSAGE (timer.getTimeMilliseconds() == Catch::Approx (1600.0 * (1000.0 / sampleRate)).margin (1.0e-12), "Milliseconds time is incorrect");
+        REQUIRE_MESSAGE (timer.getTimeSeconds() == Catch::Approx (1600.0 / sampleRate).margin (1.0e-12), "Seconds time is incorrect");
     }
 
     {
@@ -23,8 +23,8 @@ static void audioTimerTest (double sampleRate)
         timer.advance (500);
 
         REQUIRE_MESSAGE (timer.getTimeSamples() == (juce::int64) 2500, "Sample time is incorrect!");
-        REQUIRE_MESSAGE (timer.getTimeMilliseconds() == Approx (2500.0 * (1000.0 / sampleRate)).margin (1.0e-12), "Milliseconds time is incorrect");
-        REQUIRE_MESSAGE (timer.getTimeSeconds() == Approx (2500.0 / sampleRate).margin (1.0e-12), "Seconds time is incorrect");
+        REQUIRE_MESSAGE (timer.getTimeMilliseconds() == Catch::Approx (2500.0 * (1000.0 / sampleRate)).margin (1.0e-12), "Milliseconds time is incorrect");
+        REQUIRE_MESSAGE (timer.getTimeSeconds() == Catch::Approx (2500.0 / sampleRate).margin (1.0e-12), "Seconds time is incorrect");
     }
 }
 

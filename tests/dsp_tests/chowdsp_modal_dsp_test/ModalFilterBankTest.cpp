@@ -28,7 +28,7 @@ void testImpulse (FilterBank& filterbank, RefModes& refModes)
         for (auto& mode : refModes)
             y += mode.processSample (bufferPtr[n]);
 
-        REQUIRE_MESSAGE (actualOut[n] == Approx (y).margin (1.0e-6f), "Modal filterbank output is incorrect!");
+        REQUIRE_MESSAGE (actualOut[n] == Catch::Approx (y).margin (1.0e-6f), "Modal filterbank output is incorrect!");
     }
 }
 } // namespace

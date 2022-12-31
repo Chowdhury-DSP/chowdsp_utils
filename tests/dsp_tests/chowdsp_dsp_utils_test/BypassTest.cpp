@@ -55,7 +55,7 @@ static void checkPulseSpacing (const float* buffer, const int numSamples, int sp
             auto space = n - lastPulseIdx;
             if (space != spacingSamples)
             {
-                INFO ("Incorrect spacing found! Start: " << lastPulseIdx << ", Length: " << space)
+                INFO ("Incorrect spacing found! Start: " << lastPulseIdx << ", Length: " << space);
                 numBadPulses++;
             }
             else

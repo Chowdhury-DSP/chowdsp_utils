@@ -1,6 +1,9 @@
 #pragma once
 
-#include <catch2/catch2.hpp>
+#include <random>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_template_test_macros.hpp>
 
 #if JUCE_MODULE_AVAILABLE_chowdsp_simd
 #include <chowdsp_simd/chowdsp_simd.h>
@@ -36,7 +39,7 @@ struct SIMDApproxImpl
     {
         bool result = true;
         for (size_t i = 0; i < xsimd::batch<T>::size; ++i)
-            result &= (lhs.get (i) == Approx (rhs.m_value.get (0)).margin (rhs.m_margin));
+            result &= (lhs.get (i) == Catch::Approx (rhs.m_value.get (0)).margin (rhs.m_margin));
 
         return result;
     }
@@ -47,7 +50,7 @@ private:
 };
 
 template <typename T>
-using SIMDApprox = std::conditional_t<chowdsp::SampleTypeHelpers::IsSIMDRegister<std::remove_const_t<T>>, SIMDApproxImpl<chowdsp::SampleTypeHelpers::NumericType<T>>, Approx>;
+using SIMDApprox = std::conditional_t<chowdsp::SampleTypeHelpers::IsSIMDRegister<std::remove_const_t<T>>, SIMDApproxImpl<chowdsp::SampleTypeHelpers::NumericType<T>>, Catch::Approx>;
 #endif
 
 namespace test_utils

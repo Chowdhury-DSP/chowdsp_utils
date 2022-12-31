@@ -6,9 +6,9 @@ TEST_CASE ("Jacobi Elliptic Test")
     auto checkValues = [] (double x, double k, double sn, double cn, double dn)
     {
         auto [sn_actual, cn_actual, dn_actual] = chowdsp::jacobi::jacobi_elliptic (x, k);
-        REQUIRE_MESSAGE (sn_actual == Approx (sn).margin (1.0e-12), "sn value is incorrect!");
-        REQUIRE_MESSAGE (cn_actual == Approx (cn).margin (1.0e-12), "cn value is incorrect!");
-        REQUIRE_MESSAGE (dn_actual == Approx (dn).margin (1.0e-12), "dn value is incorrect!");
+        REQUIRE_MESSAGE (sn_actual == Catch::Approx (sn).margin (1.0e-12), "sn value is incorrect!");
+        REQUIRE_MESSAGE (cn_actual == Catch::Approx (cn).margin (1.0e-12), "cn value is incorrect!");
+        REQUIRE_MESSAGE (dn_actual == Catch::Approx (dn).margin (1.0e-12), "dn value is incorrect!");
     };
 
     SECTION ("Zero x")

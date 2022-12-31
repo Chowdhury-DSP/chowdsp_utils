@@ -34,7 +34,7 @@ function(setup_juce_test target)
         enable_coverage_flags(${target})
     endif()
 
-    # supress warning from Foley's
+    # suppress warning from Foley's
     if ((CMAKE_CXX_COMPILER_ID STREQUAL "MSVC") OR (CMAKE_CXX_SIMULATE_ID STREQUAL "MSVC"))
         target_compile_options(${target} PUBLIC /wd4458)
     endif ()
@@ -46,7 +46,4 @@ function(setup_juce_test target)
         COMMAND ${CMAKE_COMMAND} -E make_directory test-binary
         COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:${target}>" test-binary
     )
-
-    include(AddDiagnosticInfo)
-    add_diagnostic_info(${target})
 endfunction(setup_juce_test)

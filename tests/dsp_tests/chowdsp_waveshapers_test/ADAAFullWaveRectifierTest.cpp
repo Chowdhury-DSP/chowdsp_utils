@@ -32,7 +32,7 @@ TEST_CASE ("ADAA Full Wave Rectifier Test")
         for (int i = 1; i < Constants::N; ++i)
         {
             float actualY = testBuffer.getReadPointer (0)[i];
-            REQUIRE_MESSAGE (actualY == Approx (expYs[i - 1]).margin (Constants::maxErr), "Hard Clipper value is incorrect!");
+            REQUIRE_MESSAGE (actualY == Catch::Approx (expYs[i - 1]).margin (Constants::maxErr), "Hard Clipper value is incorrect!");
         }
     }
 }
