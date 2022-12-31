@@ -90,7 +90,7 @@ TEST_CASE ("Slider Attachment Test", "[state][attachments]")
         REQUIRE_MESSAGE (um.canRedo(), "Slider drag undo is not creating redoable action!");
 
         um.redo();
-       REQUIRE_MESSAGE (param->get() == newValue, "Parameter value after redo action is incorrect!");
+        REQUIRE_MESSAGE (param->get() == newValue, "Parameter value after redo action is incorrect!");
     }
 }
 
