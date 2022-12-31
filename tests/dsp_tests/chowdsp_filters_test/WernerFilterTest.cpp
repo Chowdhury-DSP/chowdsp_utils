@@ -23,7 +23,7 @@ TEST_CASE ("Werner Filter Test")
             const auto x = minus1To1 (mt);
             const auto actual = filterMM.processSample<FilterType::MultiMode> (0, x, 0.0f);
             const auto exp = filterMM.processSample<FilterType::Lowpass2> (0, x);
-            REQUIRE (actual == Approx (exp).margin (1.0e-6f));
+            REQUIRE (actual == Catch::Approx (exp).margin (1.0e-6f));
         }
     }
 
@@ -49,7 +49,7 @@ TEST_CASE ("Werner Filter Test")
         filterMM.processBlock<FilterType::MultiMode> ({ &expData, 1, (int) spec.maximumBlockSize }, 0.5f);
 
         for (size_t i = 0; i < spec.maximumBlockSize; ++i)
-            REQUIRE (actual[i] == Approx (exp[i]).margin (1.0e-6f));
+            REQUIRE (actual[i] == Catch::Approx (exp[i]).margin (1.0e-6f));
     }
 
     SECTION ("HPF/Multi-Mode Test")
@@ -76,6 +76,6 @@ TEST_CASE ("Werner Filter Test")
         filterMM.processBlock<FilterType::MultiMode> ({ &expData, 1, (int) spec.maximumBlockSize }, mode.data());
 
         for (size_t i = 0; i < spec.maximumBlockSize; ++i)
-            REQUIRE (actual[i] == Approx (exp[i]).margin (1.0e-6f));
+            REQUIRE (actual[i] == Catch::Approx (exp[i]).margin (1.0e-6f));
     }
 }

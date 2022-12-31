@@ -72,7 +72,7 @@ TEST_CASE ("Panner Test")
         auto leftMag = chowdsp::BufferMath::getMagnitude (buffer, 0, nSamples, 0);
         auto rightMag = chowdsp::BufferMath::getMagnitude (buffer, 0, nSamples, 1);
 
-        REQUIRE (leftMag == Approx (1.0f).margin (1.0e-3f));
-        REQUIRE (rightMag == Approx (1.0f).margin (1.0e-3f));
+        REQUIRE (leftMag == Catch::Approx (1.0f).margin (1.0e-3f));
+        REQUIRE (rightMag == Catch::Approx (1.0f).margin (1.0e-3f));
     }
 }

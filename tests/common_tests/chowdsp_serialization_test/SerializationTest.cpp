@@ -1,5 +1,5 @@
 #include <chowdsp_serialization/chowdsp_serialization.h>
-#include <TimedUnitTest.h>
+#include <CatchUtils.h>
 #include <test_utils.h>
 
 #include "TestSerialBinaryData.h"
@@ -35,21 +35,11 @@ struct CustomTest
     static_assert (chowdsp::serialization_detail::HasCustomDeserializer<CustomTest>);
 };
 
-template <typename Serializer>
-class SerializationTest : public TimedUnitTest
+TEMPLATE_TEST_CASE ("Serialization Test", "", chowdsp::JSONSerializer, chowdsp::XMLSerializer)
 {
-public:
-    SerializationTest() : TimedUnitTest (getSerializerTypeName() + " Serialization Test") {}
+    using Serializer = TestType;
 
-    static juce::String getSerializerTypeName()
-    {
-        if constexpr (std::is_same_v<Serializer, chowdsp::JSONSerializer>)
-            return "JSON";
-        else
-            return "XML";
-    }
-
-    void numericTest()
+    SECTION ("Numeric Test")
     {
         struct Test
         {
@@ -60,17 +50,17 @@ public:
 
         Test test;
         auto res = chowdsp::Serialization::serialize<Serializer> (test);
-        std::cout << Serializer::toString (res) << std::endl;
+        INFO (Serializer::toString (res));
 
         test.x = 4;
         test.y = 0.0f;
         test.z = 5.0;
         chowdsp::Serialization::deserialize<Serializer> (res, test);
 
-        expect (pfr::eq_fields (test, Test {}), "Serialization/Deserialization is incorrect");
+        REQUIRE_MESSAGE (pfr::eq_fields (test, Test {}), "Serialization/Deserialization is incorrect");
     }
 
-    void stringsTest()
+    SECTION ("String Test")
     {
         struct Test
         {
@@ -80,16 +70,16 @@ public:
 
         Test test;
         auto res = chowdsp::Serialization::serialize<Serializer> (test);
-        std::cout << Serializer::toString (res) << std::endl;
+        INFO (Serializer::toString (res));
 
         test.x = "";
         test.y = "";
         chowdsp::Serialization::deserialize<Serializer> (res, test);
 
-        expect (pfr::eq_fields (test, Test {}), "Serialization/Deserialization is incorrect");
+        REQUIRE_MESSAGE (pfr::eq_fields (test, Test {}), "Serialization/Deserialization is incorrect");
     }
 
-    void containerTest()
+    SECTION ("Container Test")
     {
         struct TestInner
         {
@@ -112,28 +102,28 @@ public:
 
         Test test;
         auto res = chowdsp::Serialization::serialize<Serializer> (test);
-        std::cout << Serializer::toString (res) << std::endl;
+        INFO (Serializer::toString (res));
 
         test.x.clear();
         test.y[0].x = 40;
         chowdsp::Serialization::deserialize<Serializer> (res, test);
 
-        expect (pfr::eq_fields (test, Test {}), "Serialization/Deserialization is incorrect");
+        REQUIRE_MESSAGE (pfr::eq_fields (test, Test {}), "Serialization/Deserialization is incorrect");
     }
 
-    void customSerializationTest()
+    SECTION ("Custom Serialization Test")
     {
         CustomTest test;
         auto res = chowdsp::Serialization::serialize<Serializer> (test);
-        std::cout << Serializer::toString (res) << std::endl;
+        INFO (Serializer::toString (res));
 
         test.x.getReference (0) = "";
         chowdsp::Serialization::deserialize<Serializer> (res, test);
 
-        expect (pfr::eq_fields (test, CustomTest {}), "Serialization/Deserialization is incorrect");
+        REQUIRE_MESSAGE (pfr::eq_fields (test, CustomTest {}), "Serialization/Deserialization is incorrect");
     }
 
-    void fileSerializationTest()
+    SECTION ("File Serialization Test")
     {
         struct Test
         {
@@ -152,10 +142,10 @@ public:
         chowdsp::Serialization::deserialize<Serializer> (testFile.file, t2);
         const auto actual = Serializer::toString (chowdsp::Serialization::serialize<Serializer> (t2));
 
-        expectEquals (actual, ref, "File Serialization is Incorrect!");
+        REQUIRE_MESSAGE (actual == ref, "File Serialization is Incorrect!");
     }
 
-    void memoryBlockSerializationTest()
+    SECTION ("MemoryBlock Serialization Test")
     {
         struct Test
         {
@@ -173,10 +163,10 @@ public:
         chowdsp::Serialization::deserialize<Serializer> (block, t2);
         const auto actual = Serializer::toString (chowdsp::Serialization::serialize<Serializer> (t2));
 
-        expectEquals (actual, ref, "MemoryBlock Serialization is Incorrect!");
+        REQUIRE_MESSAGE (actual == ref, "MemoryBlock Serialization is Incorrect!");
     }
 
-    void badDeserializationTest()
+    SECTION ("Bad Deserialization Test")
     {
         struct Test
         {
@@ -195,18 +185,18 @@ public:
             Test test;
             chowdsp::Serialization::deserialize<Serializer> (juce::File {}, test);
 
-            expect (pfr::eq_fields (test, nullStruct), "Bad File Deserialization is incorrect");
+            REQUIRE_MESSAGE (pfr::eq_fields (test, nullStruct), "Bad File Deserialization is incorrect");
         }
 
         {
             Test test;
             chowdsp::Serialization::deserialize<Serializer> (nullptr, 0, test);
 
-            expect (pfr::eq_fields (test, nullStruct), "Bad Binary Data Deserialization is incorrect");
+            REQUIRE_MESSAGE (pfr::eq_fields (test, nullStruct), "Bad Binary Data Deserialization is incorrect");
         }
     }
 
-    void binaryDataDeserializationTest()
+    SECTION ("Binary Data Deserialization Test")
     {
         struct Test
         {
@@ -224,36 +214,6 @@ public:
         else
             chowdsp::Serialization::deserialize<Serializer> (BinaryData::test_xml_xml, BinaryData::test_xml_xmlSize, actual);
 
-        expect (pfr::eq_fields (expected, actual), "Binary Data Deserialization is incorrect");
+        REQUIRE_MESSAGE (pfr::eq_fields (expected, actual), "Binary Data Deserialization is incorrect");
     }
-
-    void runTestTimed() override
-    {
-        beginTest ("Numeric Test");
-        numericTest();
-
-        beginTest ("String Test");
-        stringsTest();
-
-        beginTest ("Container Test");
-        containerTest();
-
-        beginTest ("Custom Serialization Test");
-        customSerializationTest();
-
-        beginTest ("File Serialization Test");
-        fileSerializationTest();
-
-        beginTest ("MemoryBlock Serialization Test");
-        memoryBlockSerializationTest();
-
-        beginTest ("Bad Deserialization Test");
-        badDeserializationTest();
-
-        beginTest ("Binary Data Deserialization Test");
-        binaryDataDeserializationTest();
-    }
-};
-
-static SerializationTest<chowdsp::JSONSerializer> jsonSerializationTest;
-static SerializationTest<chowdsp::XMLSerializer> xmlSerializationTest;
+}

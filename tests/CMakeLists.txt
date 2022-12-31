@@ -16,9 +16,14 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/../../JUCE JUCE)
 subproject_version(JUCE juce_version)
 message(STATUS "VERSION for JUCE: ${juce_version}")
 
+# Set up JUCE modules
 include(AddJUCEModules)
 juce_add_module(${CMAKE_SOURCE_DIR}/../foleys_gui_magic)
 add_subdirectory(${CMAKE_SOURCE_DIR}/../clap-juce-extensions clap_juce_extensions EXCLUDE_FROM_ALL)
+
+# include CPM
+include(CPM)
+CPMAddPackage("gh:catchorg/Catch2@3.2.1")
 
 option(CODE_COVERAGE "Enable coverage reporting" OFF)
 

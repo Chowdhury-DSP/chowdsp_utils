@@ -1,4 +1,4 @@
-#include <TimedUnitTest.h>
+#include <CatchUtils.h>
 #include <chowdsp_plugin_state/chowdsp_plugin_state.h>
 
 struct LevelParams : chowdsp::ParamHolder
@@ -125,14 +125,9 @@ struct PluginNonParameterStateNewField : chowdsp::NonParamState
 
 using StateWithNewNonParameterField = chowdsp::PluginStateImpl<PluginParameterState, PluginNonParameterStateNewField>;
 
-class StateSerializationTest : public TimedUnitTest
+TEST_CASE ("State Serialization Test", "[state]")
 {
-public:
-    StateSerializationTest() : TimedUnitTest ("State Serialization Test", "ChowDSP State")
-    {
-    }
-
-    void saveLoadParametersTest()
+    SECTION ("Save/Load Parameters Test")
     {
         static constexpr float percentVal = 0.25f;
         static constexpr float gainVal = -22.0f;
@@ -160,14 +155,14 @@ public:
         um.beginNewTransaction();
         um.perform (new DummyAction {});
         state.deserialize (block);
-        expectEquals (state.params.levelParams.percent->get(), percentVal, "Percent value is incorrect");
-        expectEquals (state.params.levelParams.gain->get(), gainVal, "Gain value is incorrect");
-        expectEquals (state.params.mode->getIndex(), choiceVal, "Choice value is incorrect");
-        expect (state.params.onOff->get() == boolVal, "Bool value is incorrect");
-        expect (! um.canUndo(), "Undo manager was not cleared after loading new state!");
+        REQUIRE_MESSAGE (state.params.levelParams.percent->get() == percentVal, "Percent value is incorrect");
+        REQUIRE_MESSAGE (state.params.levelParams.gain->get() == gainVal, "Gain value is incorrect");
+        REQUIRE_MESSAGE (state.params.mode->getIndex() == choiceVal, "Choice value is incorrect");
+        REQUIRE_MESSAGE (state.params.onOff->get() == boolVal, "Bool value is incorrect");
+        REQUIRE_MESSAGE (! um.canUndo(), "Undo manager was not cleared after loading new state!");
     }
 
-    void saveLoadNonParametersTest()
+    SECTION ("Save/Load Non-Parameters Test")
     {
         static constexpr int width = 200;
         static constexpr int height = 150;
@@ -182,11 +177,11 @@ public:
 
         State state;
         state.deserialize (block);
-        expectEquals (state.nonParams.editorWidth.get(), width, "Editor width is incorrect");
-        expectEquals (state.nonParams.editorHeight.get(), height, "Editor height is incorrect");
+        REQUIRE_MESSAGE (state.nonParams.editorWidth.get() == width, "Editor width is incorrect");
+        REQUIRE_MESSAGE (state.nonParams.editorHeight.get() == height, "Editor height is incorrect");
     }
 
-    void addedParamTest()
+    SECTION ("Added Parameter Test")
     {
         static constexpr float newGainVal = -22.0f;
 
@@ -199,10 +194,10 @@ public:
         StateWithNewParam state;
         static_cast<juce::AudioParameterFloat&> (state.params.newParam) = newGainVal;
         state.deserialize (block);
-        expectWithinAbsoluteError (state.params.newParam->get(), 3.3f, 1.0e-6f, "Added param value is incorrect");
+        REQUIRE_MESSAGE (state.params.newParam->get() == Catch::Approx (3.3f).margin (1.0e-6f), "Added param value is incorrect");
     }
 
-    void addedGroupTest()
+    SECTION ("Added Parameter Group Test")
     {
         static constexpr float newGainVal = -22.0f;
 
@@ -215,10 +210,10 @@ public:
         StateWithNewGroup state;
         static_cast<juce::AudioParameterFloat&> (state.params.newGroup.newParam) = newGainVal;
         state.deserialize (block);
-        expectWithinAbsoluteError (state.params.newGroup.newParam->get(), 3.3f, 1.0e-6f, "Added param value is incorrect");
+        REQUIRE_MESSAGE (state.params.newGroup.newParam->get() == Catch::Approx (3.3f).margin (1.0e-6f), "Added param value is incorrect");
     }
 
-    void multipleOfSameTypeTest()
+    SECTION ("Double of Same Type Test")
     {
         static constexpr float percentVal1 = 0.25f;
         static constexpr float gainVal1 = -22.0f;
@@ -241,17 +236,17 @@ public:
 
         StateWithTripleOfSameType state {};
         state.deserialize (block);
-        expectEquals (state.params.levelParams1.percent->get(), percentVal1, "Percent value 1 is incorrect");
-        expectEquals (state.params.levelParams1.gain->get(), gainVal1, "Gain value 1 is incorrect");
-        expectEquals (state.params.levelParams2.percent->get(), percentVal2, "Percent value 2 is incorrect");
-        expectEquals (state.params.levelParams2.gain->get(), gainVal2, "Gain value 2 is incorrect");
-        expectEquals (state.params.levelParams3.percent->get(), 0.5f, "Percent value 3 is incorrect");
-        expectEquals (state.params.levelParams3.gain->get(), 0.0f, "Gain value 3 is incorrect");
-        expectEquals (state.params.mode->getIndex(), choiceVal, "Choice value is incorrect");
-        expect (state.params.onOff->get() == boolVal, "Bool value is incorrect");
+        REQUIRE_MESSAGE (state.params.levelParams1.percent->get() == percentVal1, "Percent value 1 is incorrect");
+        REQUIRE_MESSAGE (state.params.levelParams1.gain->get() == gainVal1, "Gain value 1 is incorrect");
+        REQUIRE_MESSAGE (state.params.levelParams2.percent->get() == percentVal2, "Percent value 2 is incorrect");
+        REQUIRE_MESSAGE (state.params.levelParams2.gain->get() == gainVal2, "Gain value 2 is incorrect");
+        REQUIRE_MESSAGE (state.params.levelParams3.percent->get() == 0.5f, "Percent value 3 is incorrect");
+        REQUIRE_MESSAGE (state.params.levelParams3.gain->get() == 0.0f, "Gain value 3 is incorrect");
+        REQUIRE_MESSAGE (state.params.mode->getIndex() == choiceVal, "Choice value is incorrect");
+        REQUIRE_MESSAGE (state.params.onOff->get() == boolVal, "Bool value is incorrect");
     }
 
-    void addedNonParameterFieldTest()
+    SECTION ("Added Non-Parameter Field Test")
     {
         static constexpr int width = 200;
         static constexpr int height = 150;
@@ -266,31 +261,8 @@ public:
 
         StateWithNewNonParameterField state;
         state.deserialize (block);
-        expectEquals (state.nonParams.editorWidth.get(), width, "Editor width is incorrect");
-        expectEquals (state.nonParams.editorHeight.get(), height, "Editor height is incorrect");
-        expectEquals (state.nonParams.randomString.get(), juce::String { "default" }, "Added field is incorrect");
+        REQUIRE_MESSAGE (state.nonParams.editorWidth.get() == width, "Editor width is incorrect");
+        REQUIRE_MESSAGE (state.nonParams.editorHeight.get() == height, "Editor height is incorrect");
+        REQUIRE_MESSAGE (state.nonParams.randomString.get() == juce::String { "default" }, "Added field is incorrect");
     }
-
-    void runTestTimed() override
-    {
-        beginTest ("Save/Load Parameters Test");
-        saveLoadParametersTest();
-
-        beginTest ("Save/Load Non-Parameters Test");
-        saveLoadNonParametersTest();
-
-        beginTest ("Added Parameter Test");
-        addedParamTest();
-
-        beginTest ("Added Parameter Group Test");
-        addedGroupTest();
-
-        beginTest ("Double of Same Type Test");
-        multipleOfSameTypeTest();
-
-        beginTest ("Added Non-Parameter Field Test");
-        addedNonParameterFieldTest();
-    }
-};
-
-static StateSerializationTest stateSerializationTest;
+}

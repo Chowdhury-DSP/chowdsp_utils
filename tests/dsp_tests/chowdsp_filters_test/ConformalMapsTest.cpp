@@ -13,8 +13,8 @@ void testBilinearTransform (const float (&bs)[N], const float (&as)[N], const fl
 
     for (int i = 0; i < N; ++i)
     {
-        REQUIRE_MESSAGE (b[i] == Approx (b_exp[i]).margin (1.0e-6f), "B coefficient " << std::to_string (i) << " is incorrect!");
-        REQUIRE_MESSAGE (a[i] == Approx (a_exp[i]).margin (1.0e-6f), "A coefficient " << std::to_string (i) << " is incorrect!");
+        REQUIRE_MESSAGE (b[i] == Catch::Approx (b_exp[i]).margin (1.0e-6f), "B coefficient " << std::to_string (i) << " is incorrect!");
+        REQUIRE_MESSAGE (a[i] == Catch::Approx (a_exp[i]).margin (1.0e-6f), "A coefficient " << std::to_string (i) << " is incorrect!");
     }
 }
 
@@ -68,8 +68,8 @@ TEST_CASE ("Conformal Maps Test")
 
             for (int i = 0; i < 2; ++i)
             {
-                REQUIRE_MESSAGE (b[i] == Approx (b_ref[i]).margin (1.0e-6f), "Bilinear Transform should match reference!");
-                REQUIRE_MESSAGE (a[i] == Approx (a_ref[i]).margin (1.0e-6f), "Bilinear Transform should match reference!");
+                REQUIRE_MESSAGE (b[i] == Catch::Approx (b_ref[i]).margin (1.0e-6f), "Bilinear Transform should match reference!");
+                REQUIRE_MESSAGE (a[i] == Catch::Approx (a_ref[i]).margin (1.0e-6f), "Bilinear Transform should match reference!");
             }
         }
     }
@@ -100,8 +100,8 @@ TEST_CASE ("Conformal Maps Test")
 
             for (int i = 0; i < 3; ++i)
             {
-                REQUIRE_MESSAGE (b[i] == Approx (b_ref[i]).margin (1.0e-6f), "Bilinear Transform should match reference!");
-                REQUIRE_MESSAGE (a[i] == Approx (a_ref[i]).margin (1.0e-6f), "Bilinear Transform should match reference!");
+                REQUIRE_MESSAGE (b[i] == Catch::Approx (b_ref[i]).margin (1.0e-6f), "Bilinear Transform should match reference!");
+                REQUIRE_MESSAGE (a[i] == Catch::Approx (a_ref[i]).margin (1.0e-6f), "Bilinear Transform should match reference!");
             }
         }
     }

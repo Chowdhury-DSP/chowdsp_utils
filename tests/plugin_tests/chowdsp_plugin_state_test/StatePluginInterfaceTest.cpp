@@ -1,4 +1,4 @@
-#include <TimedUnitTest.h>
+#include <CatchUtils.h>
 #include <chowdsp_plugin_base/chowdsp_plugin_base.h>
 #include <chowdsp_plugin_state/chowdsp_plugin_state.h>
 
@@ -32,20 +32,15 @@ struct Plugin : chowdsp::PluginBase<chowdsp::PluginStateImpl<PluginParameterStat
     juce::AudioProcessorEditor* createEditor() override { return nullptr; }
 };
 
-class StatePluginInterfaceTest : public TimedUnitTest
+TEST_CASE ("State/Plugin Interface Test", "[state][plugin_base]")
 {
-public:
-    StatePluginInterfaceTest() : TimedUnitTest ("State/Plugin Interface Test", "ChowDSP State")
-    {
-    }
-
-    void parameterInfoTest()
+    SECTION ("Parameter Info Test")
     {
         Plugin plugin {};
         auto& params = plugin.getState().params;
 
         const auto pluginParams = plugin.getParameters();
-        expectEquals (pluginParams.size(), params.count(), "Plugin has the incorrect number of parameters!");
+        REQUIRE_MESSAGE (pluginParams.size() == params.count(), "Plugin has the incorrect number of parameters!");
 
         juce::StringArray expectedParamIDs;
         params.doForAllParameters ([&expectedParamIDs] (auto& param, size_t)
@@ -57,18 +52,10 @@ public:
 
         for (auto& paramID : expectedParamIDs)
         {
-            expect (actualParamIDs.contains (paramID), "Plugin does not contain parameter ID!");
+            REQUIRE_MESSAGE (actualParamIDs.contains (paramID), "Plugin does not contain parameter ID!");
             actualParamIDs.removeString (paramID);
         }
 
-        expect (actualParamIDs.isEmpty(), "Plugin has extra parameter IDs!");
+        REQUIRE_MESSAGE (actualParamIDs.isEmpty(), "Plugin has extra parameter IDs!");
     }
-
-    void runTestTimed() override
-    {
-        beginTest ("Parameter Info Test");
-        parameterInfoTest();
-    }
-};
-
-static StatePluginInterfaceTest statePluginInterfaceTest;
+}

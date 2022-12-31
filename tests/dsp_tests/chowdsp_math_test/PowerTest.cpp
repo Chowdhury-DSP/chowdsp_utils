@@ -23,12 +23,12 @@ void scalarPowerTest()
         const auto testFloat = floatRand (mt);
         const auto expFloat = std::pow (testFloat, (float) exponent);
         const auto actualFloat = ipow<exponent> (testFloat);
-        REQUIRE_MESSAGE (actualFloat == Approx (expFloat).margin (maxErrFloat), "Float power is incorrect for exponent: " << std::to_string (exponent));
+        REQUIRE_MESSAGE (actualFloat == Catch::Approx (expFloat).margin (maxErrFloat), "Float power is incorrect for exponent: " << std::to_string (exponent));
 
         const auto testDouble = doubleRand (mt);
         const auto expDouble = std::pow (testDouble, (double) exponent);
         const auto actualDouble = ipow<exponent> (testDouble);
-        REQUIRE_MESSAGE (actualDouble == Approx (expDouble).margin (maxErrDouble), "Double power is incorrect for exponent: " << std::to_string (exponent));
+        REQUIRE_MESSAGE (actualDouble == Catch::Approx (expDouble).margin (maxErrDouble), "Double power is incorrect for exponent: " << std::to_string (exponent));
     }
 }
 
@@ -89,8 +89,8 @@ TEST_CASE ("Power Test")
 
             for (int n = 0; n < N; ++n)
             {
-                REQUIRE_MESSAGE (actualFloats[n] == Approx (expFloats[n]).margin (maxErrFloat), "Float power is incorrect for exponent: " << std::to_string (exponent));
-                REQUIRE_MESSAGE (actualDoubles[n] == Approx (expDoubles[n]).margin (maxErrDouble), "Double power is incorrect for exponent: " << std::to_string (exponent));
+                REQUIRE_MESSAGE (actualFloats[n] == Catch::Approx (expFloats[n]).margin (maxErrFloat), "Float power is incorrect for exponent: " << std::to_string (exponent));
+                REQUIRE_MESSAGE (actualDoubles[n] == Catch::Approx (expDoubles[n]).margin (maxErrDouble), "Double power is incorrect for exponent: " << std::to_string (exponent));
             }
         }
     }

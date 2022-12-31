@@ -17,7 +17,7 @@ public:
         juce::Logger::writeToLog (diagString);
 
         beginTest ("Name/Version Test");
-        expect (diagString.contains ("Version: DummyPlugin 9.9.9"), "Diag name/version is icnorrect!");
+        expect (diagString.contains ("Version: DummyPlugin 9.9.9"), "Diag name/version is incorrect!");
 
         beginTest ("Sample Rate/Block Size Test");
         expect (diagString.contains ("running at sample rate 44.1 kHz with block size 256"), "Diag sample rate info is incorrect!");

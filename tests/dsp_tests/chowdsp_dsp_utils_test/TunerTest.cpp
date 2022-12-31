@@ -10,7 +10,7 @@ static void tunerTest (float freq, float fs, float maxError)
     auto buffer = test_utils::makeSineWave (freq, fs, bufferSize);
     tuner.process (buffer.getReadPointer (0));
 
-    REQUIRE_MESSAGE (tuner.getCurrentFrequencyHz() == Approx (freq).margin (maxError), "Tuner frequency reading is incorrect!");
+    REQUIRE_MESSAGE (tuner.getCurrentFrequencyHz() == Catch::Approx (freq).margin (maxError), "Tuner frequency reading is incorrect!");
 }
 
 static void freq2NotesCentsTest (int noteNum, double cents)
@@ -25,7 +25,7 @@ static void freq2NotesCentsTest (int noteNum, double cents)
     auto [resNoteNum, resCents] = chowdsp::TuningHelpers::frequencyHzToNoteAndCents (adjustedFreq);
 
     REQUIRE_MESSAGE (resNoteNum == noteNum, "Note number is incorrect!");
-    REQUIRE_MESSAGE (resCents == Approx (cents).margin (0.01), "Cents is incorrect!");
+    REQUIRE_MESSAGE (resCents == Catch::Approx (cents).margin (0.01), "Cents is incorrect!");
 }
 
 TEST_CASE ("Tuner Test")

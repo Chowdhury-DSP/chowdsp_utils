@@ -32,7 +32,7 @@ void scalarProcessTest()
         const auto testX = minus1To1 (mt);
         const auto expY = idealSoftClipper (testX, degree);
         const auto actualY = chowdsp::SoftClipper<degree>::processSample (testX);
-        REQUIRE_MESSAGE (actualY == Approx (expY).margin (maxErr), "Soft Clipper value at degree " << std::to_string (degree) << " is incorrect!");
+        REQUIRE_MESSAGE (actualY == Catch::Approx (expY).margin (maxErr), "Soft Clipper value at degree " << std::to_string (degree) << " is incorrect!");
     }
 }
 
@@ -59,7 +59,7 @@ void vectorProcessTest()
     for (int i = 0; i < N; ++i)
     {
         float actualY = testBuffer.getReadPointer (0)[i];
-        REQUIRE_MESSAGE (actualY == Approx (expYs[i]).margin (maxErr), "Soft Clipper value at degree " << std::to_string (degree) << " is incorrect!");
+        REQUIRE_MESSAGE (actualY == Catch::Approx (expYs[i]).margin (maxErr), "Soft Clipper value at degree " << std::to_string (degree) << " is incorrect!");
     }
 }
 

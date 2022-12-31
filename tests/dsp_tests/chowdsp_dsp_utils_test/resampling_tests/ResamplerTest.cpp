@@ -33,7 +33,7 @@ static std::pair<int, int> calc_latency (const std::vector<float>& data, const s
     auto actual_one = find_first_point5 (data);
 
     if (actual_one < 0)
-        INFO ("WARNING: data never reached above 0.5!")
+        INFO ("WARNING: data never reached above 0.5!");
 
     return std::make_pair (std::max (actual_one - ref_one, 0), std::max (ref_one - actual_one, 0));
 }
@@ -124,7 +124,7 @@ void resamplingFactorTest()
 
         auto expFs = origSampleRate * factor;
         auto actualFs = resampledProcess.getTargetSampleRate();
-        REQUIRE_MESSAGE (actualFs == Approx (expFs).margin (1.0e-6f), "Resampler target sample rate incorrect!");
+        REQUIRE_MESSAGE (actualFs == Catch::Approx (expFs).margin (1.0e-6f), "Resampler target sample rate incorrect!");
     }
 }
 
@@ -139,7 +139,7 @@ void resamplingSampleRateTest()
         resampledProcess.setTargetSampleRate (origSampleRate * factor);
 
         auto actualRatio = resampledProcess.getResampleRatio();
-        REQUIRE_MESSAGE (actualRatio == Approx (factor).margin (1.0e-6f), "Resampling ratio incorrect!");
+        REQUIRE_MESSAGE (actualRatio == Catch::Approx (factor).margin (1.0e-6f), "Resampling ratio incorrect!");
     }
 }
 
@@ -172,7 +172,7 @@ void resampledProcessTest (float freq, double avgErrLimit, double maxErrLimit)
             auto resampledBlock = resampler.processIn (block);
             auto rSize = resampledBlock.getNumSamples();
             if (out_ptr > 2 * expBlockSize)
-                REQUIRE_MESSAGE (rSize == Approx (expBlockSize).margin (2), "Resampled block size is incorrect");
+                REQUIRE_MESSAGE (rSize == Catch::Approx (expBlockSize).margin (2), "Resampled block size is incorrect");
 
             auto rPtr = resampledBlock.getWritePointer (0);
             std::copy (rPtr, rPtr + rSize, out.begin() + out_ptr);
