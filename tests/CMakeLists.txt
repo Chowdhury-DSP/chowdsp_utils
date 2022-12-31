@@ -26,7 +26,6 @@ include(CPM)
 CPMAddPackage("gh:catchorg/Catch2@3.2.1")
 
 option(CODE_COVERAGE "Enable coverage reporting" OFF)
-
 add_subdirectory(common_tests)
 add_subdirectory(dsp_tests)
 add_subdirectory(plugin_tests)
