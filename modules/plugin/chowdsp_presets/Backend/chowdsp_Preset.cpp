@@ -62,7 +62,7 @@ void Preset::initialise (const juce::XmlElement* xml)
     if (versionStr.isEmpty())
         return;
 
-    version = std::make_unique<VersionUtils::Version> (versionStr);
+    version = Version { versionStr };
 
     const auto presetSavedFile = juce::File { xml->getStringAttribute (fileTag) };
     if (presetSavedFile.existsAsFile())
@@ -106,15 +106,13 @@ std::unique_ptr<juce::XmlElement> Preset::toXml() const
 #endif
     presetXml->setAttribute (vendorTag, vendor);
     presetXml->setAttribute (categoryTag, category);
-    presetXml->setAttribute (versionTag, version->getVersionString());
+    presetXml->setAttribute (versionTag, version.getVersionString());
     presetXml->setAttribute (fileTag, file.getFullPathName());
 
     presetXml->addChildElement (new juce::XmlElement (*state));
     presetXml->addChildElement (new juce::XmlElement (extraInfo));
 
-    JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wpessimizing-move")
-    return std::move (presetXml);
-    JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+    return presetXml;
 }
 
 bool Preset::isValid() const
@@ -124,13 +122,10 @@ bool Preset::isValid() const
 
 bool Preset::operator== (const Preset& other) const noexcept
 {
-    if (version == nullptr || other.version == nullptr)
-        return false;
-
     if (state == nullptr)
         return false;
 
-    const auto infoEqual = name == other.name && vendor == other.vendor && category == other.category && *version == *other.version;
+    const auto infoEqual = name == other.name && vendor == other.vendor && category == other.category && version == other.version;
     const auto stateEqual = state->isEquivalentTo (other.state.get(), true);
     const auto extraInfoEqual = extraInfo.isEquivalentTo (&other.extraInfo, true);
 
