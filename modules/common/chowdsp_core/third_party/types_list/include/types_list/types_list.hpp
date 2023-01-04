@@ -1,9 +1,11 @@
 #pragma once
 
-namespace chowdsp
+#include <tuple>
+#include <type_traits>
+
+namespace types_list
 {
-#ifndef DOXYGEN
-namespace type_list_detail
+namespace detail
 {
     template <typename TypesList, typename OtherListType, size_t typeIndex = 0, size_t numTypesLeft = OtherListType::count>
     struct ConcatHelper
@@ -35,10 +37,9 @@ namespace type_list_detail
     {
         using TupleTypesList = TypesList;
     };
-} // namespace type_list_detail
-#endif // DOXYGEN
+}
 
-/** Struct that can be used as a list of types. */
+/** Template object that can be used as a list of types */
 template <typename... Ts>
 struct TypesList
 {
@@ -66,33 +67,22 @@ struct TypesList
 
     /** Concatenates this list type with another */
     template <typename OtherListType>
-    using Concatenate = typename type_list_detail::ConcatHelper<TypesList, OtherListType>::ConcatenatedListType;
+    using Concatenate = typename detail::ConcatHelper<TypesList, OtherListType>::ConcatenatedListType;
 };
 
 /** Constructs a TypesList from a tuple */
 template <typename TupleType>
-using TupleTypeList = typename type_list_detail::TupleHelpers<TypesList<>, TupleType>::TupleTypesList;
+using TupleList = typename detail::TupleHelpers<TypesList<>, TupleType>::TupleTypesList;
 
-/** Can be used to call a static function for every type in a type list */
-template <typename TypesList, size_t typeIndex = 0, size_t numTypesLeft = TypesList::count>
-struct ForEachInTypeList
+/** Can be used to call a lambda for every type in a type list */
+template<typename TypesList, typename ForEachAction, size_t typeIndex = 0, size_t numTypesLeft = TypesList::count>
+static constexpr void forEach (ForEachAction&& forEachAction)
 {
-    template <typename ForEachAction>
-    static constexpr void doForEach (ForEachAction&& forEachAction)
+    if constexpr (numTypesLeft > 0)
     {
-        forEachAction (std::integral_constant<std::size_t, typeIndex>());
-        ForEachInTypeList<TypesList, typeIndex + 1, numTypesLeft - 1>::doForEach (std::forward<ForEachAction> (forEachAction));
+        forEachAction(std::integral_constant<std::size_t, typeIndex>());
+        forEach<TypesList, ForEachAction, typeIndex + 1, numTypesLeft - 1>(std::forward<ForEachAction>(forEachAction));
     }
-};
+}
+}
 
-#ifndef DOXYGEN
-template <typename TypesList, size_t typeIndex>
-struct ForEachInTypeList<TypesList, typeIndex, 0>
-{
-    template <typename ForEachAction>
-    static constexpr void doForEach (ForEachAction&&)
-    {
-    }
-};
-#endif
-} // namespace chowdsp

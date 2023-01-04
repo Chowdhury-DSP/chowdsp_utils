@@ -1,6 +1,9 @@
-#include <CatchUtils.h>
-#include <chowdsp_core/chowdsp_core.h>
+#define CATCH_CONFIG_MAIN
+#include <catch.hpp>
+#include <string_view>
 #include <array>
+
+#include <types_list/types_list.hpp>
 
 struct Type0
 {
@@ -26,12 +29,10 @@ TEST_CASE ("Types List Test")
             Type1,
             Type2>;
 
-        static constexpr auto typeNames = []
-        {
+        static constexpr auto typeNames = [] {
             std::array<std::string_view, List::count> names {};
             types_list::forEach<List> (
-                [&names] (auto index)
-                {
+                [&names] (auto index) {
                     names[index] = List::AtIndex<index>::name;
                 });
             return names;

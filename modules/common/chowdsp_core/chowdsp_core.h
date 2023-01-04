@@ -69,6 +69,8 @@ namespace experimental
 
 } // namespace chowdsp
 
+#include "third_party/types_list/include/types_list/types_list.hpp"
+
 #include "DataStructures/chowdsp_AtomicHelpers.h"
 #include "DataStructures/chowdsp_DoubleBuffer.h"
 #include "DataStructures/chowdsp_TupleHelpers.h"
@@ -80,4 +82,3 @@ namespace experimental
 #include "Functional/chowdsp_Bindings.h"
 #include "Memory/chowdsp_MemoryAliasing.h"
 #include "Types/chowdsp_TypeTraits.h"
-#include "Types/chowdsp_TypesList.h"

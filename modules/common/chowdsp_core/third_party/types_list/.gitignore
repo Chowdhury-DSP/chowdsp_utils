@@ -1,0 +1,10 @@
+# Build artifacts
+build*/
+cmake-build*/
+
+# IDE configs
+.vscode/
+.idea/
+
+# Mac extras
+.DS_Store
