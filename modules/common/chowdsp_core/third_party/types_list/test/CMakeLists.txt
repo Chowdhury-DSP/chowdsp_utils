@@ -1,0 +1,55 @@
+message(STATUS "Configuring types_list tests")
+
+include(CheckCXXCompilerFlag)
+if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    set(OPTIONS /W4 /WX)
+    check_cxx_compiler_flag(/permissive HAS_PERMISSIVE_FLAG)
+    if(HAS_PERMISSIVE_FLAG)
+        set(OPTIONS ${OPTIONS} /permissive-)
+    endif()
+
+    check_cxx_compiler_flag(/std:c++20 HAS_CPP20_FLAG)
+    check_cxx_compiler_flag(/std:c++23 HAS_CPP23_FLAG)
+    check_cxx_compiler_flag(/std:c++latest HAS_CPPLATEST_FLAG)
+
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    set(CMAKE_VERBOSE_MAKEFILE ON)
+    set(OPTIONS -Wall -Wextra -pedantic-errors -Werror)
+
+    check_cxx_compiler_flag(-std=c++20 HAS_CPP20_FLAG)
+    check_cxx_compiler_flag(-std=c++23 HAS_CPP23_FLAG)
+endif()
+
+function(make_test_std src target std)
+    add_executable(${target} ${src})
+    target_compile_options(${target} PRIVATE ${OPTIONS})
+    target_include_directories(${target} PRIVATE third_party/Catch2)
+    target_link_libraries(${target} PRIVATE ${CMAKE_PROJECT_NAME})
+    set_target_properties(${target} PROPERTIES CXX_EXTENSIONS OFF)
+    if(std)
+        if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+            target_compile_options(${target} PRIVATE /std:${std})
+        else()
+            target_compile_options(${target} PRIVATE -std=${std})
+        endif()
+    endif()
+    add_test(NAME ${target} COMMAND ${target})
+endfunction()
+
+function(make_test src target)
+    make_test_std(${src} ${target}-cpp17 c++17)
+
+    if(HAS_CPP20_FLAG)
+        make_test_std(${src} ${target}-cpp20 c++20)
+    endif()
+
+    if(HAS_CPP23_FLAG)
+        make_test_std(${src} ${target}-cpp23 c++23)
+    endif()
+
+    if(HAS_CPPLATEST_FLAG)
+        make_test_std(${src} ${target}-cpp-latest c++latest)
+    endif()
+endfunction()
+
+make_test(test.cpp test)
