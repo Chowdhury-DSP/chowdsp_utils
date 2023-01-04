@@ -111,6 +111,8 @@ struct ScopedFile
         file.deleteRecursively();
     }
 
+    operator juce::File() { return file; } // NOLINT
+
     const juce::File file;
 };
 

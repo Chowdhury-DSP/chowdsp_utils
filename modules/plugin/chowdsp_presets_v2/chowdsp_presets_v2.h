@@ -3,12 +3,12 @@
 
 BEGIN_JUCE_MODULE_DECLARATION
 
-   ID:            chowdsp_presets
+   ID:            chowdsp_presets_v2
    vendor:        Chowdhury DSP
-   version:       1.3.0
-   name:          ChowDSP Presets Utilities
-   description:   Presets management system for ChowDSP plugins
-   dependencies:  juce_core, juce_audio_utils, chowdsp_version
+   version:       2.0.0
+   name:          ChowDSP Presets Utilities Version 2
+   description:   Presets management system for ChowDSP plugins with chowdsp::PluginState
+   dependencies:  chowdsp_core, chowdsp_json, chowdsp_version
 
    website:       https://ccrma.stanford.edu/~jatin/chowdsp
    license:       BSD 3-clause
@@ -20,13 +20,10 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 #pragma once
 
-// STL includes
-#include <unordered_map>
-
 // JUCE includes
-#include <juce_core/juce_core.h>
-#include <juce_audio_utils/juce_audio_utils.h>
+#include <chowdsp_core/chowdsp_core.h>
+#include <chowdsp_json/chowdsp_json.h>
 #include <chowdsp_version/chowdsp_version.h>
 
 #include "Backend/chowdsp_Preset.h"
-#include "Backend/chowdsp_PresetManager.h"
+//#include "Backend/chowdsp_PresetManager.h"
