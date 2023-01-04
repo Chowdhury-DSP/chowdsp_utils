@@ -50,7 +50,7 @@ struct Preset
     [[nodiscard]] const juce::String& getCategory() const noexcept { return category; }
 
     /** Returns the version of the plugin that was used to create this preset */
-    [[nodiscard]] const VersionUtils::Version& getVersion() const noexcept { return *version; }
+    [[nodiscard]] const Version& getVersion() const noexcept { return version; }
 
     /** Returns the preset's state */
     [[nodiscard]] const juce::XmlElement* getState() const noexcept { return state.get(); }
@@ -86,10 +86,11 @@ private:
     juce::String category;
 
 #if defined JucePlugin_VersionString
-    std::unique_ptr<VersionUtils::Version> version = std::make_unique<VersionUtils::Version> (JucePlugin_VersionString);
+    static constexpr std::string_view versionString = JucePlugin_VersionString;
 #else
-    std::unique_ptr<VersionUtils::Version> version = std::make_unique<VersionUtils::Version> ("0.0.0");
+    static constexpr std::string_view versionString = "0.0.0";
 #endif
+    Version version { versionString };
 
     std::unique_ptr<juce::XmlElement> state;
 
