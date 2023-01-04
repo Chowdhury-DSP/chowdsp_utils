@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## [UNRELEASED]
 - Added `chowdsp_visualizers` module.
+- Moved `Version` to `chowdsp` namespace, and made constexpr-able.
 
 ## [2.0.0] 2022-12-22
 - Added `chowdsp_plugin_state` for managing plugin state.
