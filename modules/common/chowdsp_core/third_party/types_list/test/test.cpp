@@ -1,6 +1,9 @@
-#include <CatchUtils.h>
-#include <chowdsp_core/chowdsp_core.h>
+#define CATCH_CONFIG_MAIN
+#include <catch.hpp>
+#include <string_view>
 #include <array>
+
+#include <types_list/types_list.hpp>
 
 struct Type0
 {
