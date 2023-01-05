@@ -39,4 +39,4 @@ constexpr bool operator<= (const Version& v1, const Version& v2) noexcept
     return v1 < v2 || v1 == v2;
 }
 #endif // DOXYGEN
-}
+} // namespace chowdsp

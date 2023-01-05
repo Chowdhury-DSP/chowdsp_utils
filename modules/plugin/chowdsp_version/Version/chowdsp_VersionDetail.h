@@ -39,4 +39,4 @@ namespace version_detail
     }
 } // namespace version_detail
 #endif // DOXYGEN
-}
+} // namespace chowdsp

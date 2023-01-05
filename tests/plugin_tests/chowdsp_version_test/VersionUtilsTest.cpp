@@ -123,6 +123,6 @@ TEST_CASE ("Version Test", "[version]")
         const auto v5_49_15 = chowdsp::Version { 5, 49, 15 };
         REQUIRE (v5_49_15.getVersionHint() == 54915);
 
-        REQUIRE (chowdsp::Version{}.getVersionHint() == 0);
+        REQUIRE (chowdsp::Version {}.getVersionHint() == 0);
     }
 }
