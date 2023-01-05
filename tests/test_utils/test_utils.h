@@ -1,6 +1,5 @@
 #pragma once
 
-#include <juce_dsp/juce_dsp.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 
@@ -10,8 +9,6 @@
 
 namespace test_utils
 {
-JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wpessimizing-move") // Clang doesn't like std::move
-
 template <typename FloatType = float>
 inline juce::AudioBuffer<FloatType> makeSineWave (FloatType frequency, FloatType sampleRate, FloatType lengthSeconds)
 {
@@ -21,7 +18,7 @@ inline juce::AudioBuffer<FloatType> makeSineWave (FloatType frequency, FloatType
     for (int n = 0; n < lengthSamples; ++n)
         sineBuffer.setSample (0, n, std::sin (juce::MathConstants<FloatType>::twoPi * frequency * (FloatType) n / sampleRate));
 
-    return std::move (sineBuffer);
+    return sineBuffer;
 }
 
 template <typename FloatType = float>
@@ -32,7 +29,7 @@ inline juce::AudioBuffer<FloatType> makeSineWave (FloatType frequency, FloatType
     for (int n = 0; n < lengthSamples; ++n)
         sineBuffer.setSample (0, n, std::sin (juce::MathConstants<FloatType>::twoPi * frequency * (FloatType) n / sampleRate));
 
-    return std::move (sineBuffer);
+    return sineBuffer;
 }
 
 inline juce::AudioBuffer<float> makeImpulse (float amplitude, float sampleRate, float lengthSeconds)
@@ -43,7 +40,7 @@ inline juce::AudioBuffer<float> makeImpulse (float amplitude, float sampleRate, 
 
     impBuffer.setSample (0, 0, amplitude);
 
-    return std::move (impBuffer);
+    return impBuffer;
 }
 
 inline juce::AudioBuffer<float> makeNoise (juce::Random& rand, int numSamples, int numChannels = 1)
@@ -54,7 +51,7 @@ inline juce::AudioBuffer<float> makeNoise (juce::Random& rand, int numSamples, i
         for (int n = 0; n < numSamples; ++n)
             noiseBuffer.setSample (ch, n, (rand.nextFloat() - 0.5f) * 2.0f);
 
-    return std::move (noiseBuffer);
+    return noiseBuffer;
 }
 
 inline juce::AudioBuffer<float> makeNoise (float sampleRate, float lengthSeconds)
@@ -74,7 +71,7 @@ inline chowdsp::AudioBlock<T> bufferToBlock (juce::HeapBlock<char>& dataBlock, c
     for (int i = 0; i < buffer.getNumSamples(); ++i)
         block.setSample (0, i, buffer.getSample (0, i));
 
-    return std::move (block);
+    return block;
 }
 
 /** Convert from a AudioBlock to AudioBuffer (maybe changing data type...) */
@@ -93,8 +90,6 @@ inline void blockToBuffer (juce::AudioBuffer<NumericType>& buffer, const chowdsp
     }
 }
 #endif // JUCE_MODULE_AVAILABLE_chowdsp_dsp_data_structures
-
-JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
 struct ScopedFile
 {

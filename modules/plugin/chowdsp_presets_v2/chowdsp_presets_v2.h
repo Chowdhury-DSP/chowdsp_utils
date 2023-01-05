@@ -8,7 +8,7 @@ BEGIN_JUCE_MODULE_DECLARATION
    version:       2.0.0
    name:          ChowDSP Presets Utilities Version 2
    description:   Presets management system for ChowDSP plugins with chowdsp::PluginState
-   dependencies:  chowdsp_core, chowdsp_json, chowdsp_version
+   dependencies:  chowdsp_core, chowdsp_json, chowdsp_version, chowdsp_plugin_state
 
    website:       https://ccrma.stanford.edu/~jatin/chowdsp
    license:       BSD 3-clause
@@ -24,6 +24,8 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include <chowdsp_core/chowdsp_core.h>
 #include <chowdsp_json/chowdsp_json.h>
 #include <chowdsp_version/chowdsp_version.h>
+#include <chowdsp_plugin_state/chowdsp_plugin_state.h>
 
 #include "Backend/chowdsp_Preset.h"
-//#include "Backend/chowdsp_PresetManager.h"
+#include "Backend/chowdsp_PresetTree.h"
+#include "Backend/chowdsp_PresetManager.h"
