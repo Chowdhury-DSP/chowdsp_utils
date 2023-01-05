@@ -70,6 +70,12 @@ public:
     template <typename Serializer>
     static void deserialize (typename Serializer::DeserializedType deserial, ParamHolder& paramHolder);
 
+    /** Recursively applies version streaming to the parameters herein. */
+    void applyVersionStreaming (const Version&);
+
+    /** Assign this function to apply version streaming to your non-parameter state. */
+    std::function<void (const Version&)> versionStreamingCallback = nullptr;
+
 private:
     void add() const
     {

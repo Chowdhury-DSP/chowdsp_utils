@@ -61,6 +61,9 @@ public:
         }
     }
 
+    /** Assign this function to apply version streaming to your non-parameter state. */
+    std::function<void (const Version&)> versionStreamingCallback = nullptr;
+
 private:
     std::vector<StateValueBase*> values;
 
