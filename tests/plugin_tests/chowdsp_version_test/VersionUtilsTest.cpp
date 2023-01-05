@@ -107,4 +107,14 @@ TEST_CASE ("Version Test")
         chowdsp::Version v2 (juce::String { "v1.2.3" });
         REQUIRE_MESSAGE (v2.getVersionString() == juce::String ("1.2.3"), "Incorrect version string!");
     }
+
+    SECTION ("Version Hint Test")
+    {
+        using namespace chowdsp::version_literals;
+        static constexpr auto v1_2_3 = "1.2.3"_v;
+        static_assert (v1_2_3.getVersionHint() == 10203);
+
+        const auto v99_99_99 = "99.99.99"_v;
+        REQUIRE (v99_99_99.getVersionHint() == 999999);
+    }
 }

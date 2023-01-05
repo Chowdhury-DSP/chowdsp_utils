@@ -92,7 +92,11 @@ public:
     constexpr Version (const Version&) = default;
     constexpr Version& operator= (const Version&) = default;
 
+    /** Returns the version as a string of the form MAJOR.MINOR.PATCH. */
     [[nodiscard]] juce::String getVersionString() const;
+
+    /** Returns an integer hint for this version value. */
+    [[nodiscard]] constexpr int getVersionHint() const { return major * 10000 + minor * 100 + patch; }
 
     friend constexpr bool operator== (const Version& v1, const Version& v2) noexcept;
     friend constexpr bool operator!= (const Version& v1, const Version& v2) noexcept;
@@ -149,4 +153,14 @@ namespace VersionUtils
     /** Utility class to manage version strings. */
     using Version = ::chowdsp::Version;
 } // namespace VersionUtils
+
+namespace version_literals
+{
+    inline constexpr Version operator"" _v (const char* str, size_t len) noexcept
+    {
+        return Version { std::string_view (str, len) };
+    }
+
+    using namespace std::literals::string_view_literals;
+} // namespace version_literals
 } // namespace chowdsp
