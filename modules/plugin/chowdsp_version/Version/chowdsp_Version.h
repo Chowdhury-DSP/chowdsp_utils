@@ -1,9 +1,5 @@
 #pragma once
 
-//#if JUCE_MODULE_AVAILABLE_chowdsp_serialization
-//#include <chowdsp_serialization/chowdsp_serialization.h>
-//#endif
-
 namespace chowdsp
 {
 /** Utility class to manage version strings. */
@@ -61,7 +57,7 @@ public:
     template <typename Serializer>
     static typename Serializer::SerializedType serialize (const Version& object)
     {
-        return Serializer::serializeString (object.getVersionString());
+        return Serializer::template serialize<Serializer> (object.getVersionString());
     }
 
     /** Custom deserializer */
@@ -88,7 +84,7 @@ private:
 
 namespace version_literals
 {
-    inline constexpr Version operator"" _v (const char* str, size_t len) noexcept
+    constexpr Version operator"" _v (const char* str, size_t len) noexcept
     {
         return Version { std::string_view (str, len) };
     }
