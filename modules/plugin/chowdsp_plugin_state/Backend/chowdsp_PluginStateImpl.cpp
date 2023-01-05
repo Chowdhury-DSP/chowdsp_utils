@@ -23,6 +23,10 @@ void PluginStateImpl<ParameterState, NonParameterState, Serializer>::deserialize
 {
     Serialization::deserialize<Serializer> (data, *this);
 
+    params.applyVersionStreaming (pluginStateVersion);
+    if (nonParams.versionStreamingCallback != nullptr)
+        nonParams.versionStreamingCallback (pluginStateVersion);
+
     if (undoManager != nullptr)
         undoManager->clearUndoHistory();
 }
@@ -33,6 +37,11 @@ template <typename>
 typename Serializer::SerializedType PluginStateImpl<ParameterState, NonParameterState, Serializer>::serialize (const PluginStateImpl& object)
 {
     auto serial = Serializer::createBaseElement();
+
+#if defined JucePlugin_VersionString
+    Serializer::addChildElement (serial, Serializer::template serialize<Serializer> (currentPluginVersion));
+#endif
+
     Serializer::addChildElement (serial, Serializer::template serialize<Serializer, ParamHolder> (object.params));
     Serializer::addChildElement (serial, Serializer::template serialize<Serializer, NonParamState> (object.nonParams));
     return serial;
@@ -43,15 +52,30 @@ template <typename ParameterState, typename NonParameterState, typename Serializ
 template <typename>
 void PluginStateImpl<ParameterState, NonParameterState, Serializer>::deserialize (typename Serializer::DeserializedType serial, PluginStateImpl& object)
 {
-    // @TODO: What about version streaming?
+    enum
+    {
+#if defined JucePlugin_VersionString
+        versionChildIndex,
+#endif
+        paramStateChildIndex,
+        nonParamStateChildIndex,
+        expectedNumChildElements,
+    };
 
-    if (Serializer::getNumChildElements (serial) != 2)
+    if (Serializer::getNumChildElements (serial) != expectedNumChildElements)
     {
         jassertfalse; // state load error!
         return;
     }
 
-    Serializer::template deserialize<Serializer, ParamHolder> (Serializer::getChildElement (serial, 0), object.params);
-    Serializer::template deserialize<Serializer, NonParamState> (Serializer::getChildElement (serial, 1), object.nonParams);
+#if defined JucePlugin_VersionString
+    Serializer::template deserialize<Serializer> (Serializer::getChildElement (serial, versionChildIndex), object.pluginStateVersion);
+#else
+    using namespace version_literals;
+    object.pluginStateVersion = "0.0.0"_v;
+#endif
+
+    Serializer::template deserialize<Serializer, ParamHolder> (Serializer::getChildElement (serial, paramStateChildIndex), object.params);
+    Serializer::template deserialize<Serializer, NonParamState> (Serializer::getChildElement (serial, nonParamStateChildIndex), object.nonParams);
 }
 } // namespace chowdsp

@@ -6,4 +6,10 @@ target_sources(chowdsp_plugin_state_test
         StateListenersTest.cpp
         ParameterAttachmentsTest.cpp
         StatePluginInterfaceTest.cpp
+        VersionStreamingTest.cpp
+)
+
+target_compile_definitions(chowdsp_plugin_state_test
+    PUBLIC
+        JucePlugin_VersionString="9.9.9"
 )
