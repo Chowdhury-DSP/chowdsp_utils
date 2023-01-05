@@ -8,7 +8,7 @@ BEGIN_JUCE_MODULE_DECLARATION
    version:       2.0.0
    name:          ChowDSP Plugin State
    description:   Utilities for managing state in a ChowDSP plugin
-   dependencies:  chowdsp_core, chowdsp_serialization, chowdsp_listeners, chowdsp_parameters
+   dependencies:  chowdsp_core, chowdsp_serialization, chowdsp_listeners, chowdsp_version, chowdsp_parameters
 
    website:       https://ccrma.stanford.edu/~jatin/chowdsp
    license:       BSD 3-Clause
@@ -30,6 +30,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include <chowdsp_core/chowdsp_core.h>
 #include <chowdsp_serialization/chowdsp_serialization.h>
 #include <chowdsp_listeners/chowdsp_listeners.h>
+#include <chowdsp_version/chowdsp_version.h>
 #include <chowdsp_parameters/chowdsp_parameters.h>
 
 JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324) // struct was padded warning

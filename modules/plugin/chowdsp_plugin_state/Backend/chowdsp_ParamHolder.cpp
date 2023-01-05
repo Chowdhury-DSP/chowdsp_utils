@@ -177,4 +177,17 @@ void ParamHolder::deserialize (typename Serializer::DeserializedType deserial, P
                 param.setValueNotifyingHost (static_cast<juce::AudioProcessorParameter&> (param).getDefaultValue());
         });
 }
+
+inline void ParamHolder::applyVersionStreaming (const Version& version)
+{
+    if (versionStreamingCallback != nullptr)
+        versionStreamingCallback (version);
+
+    doForAllParameterContainers (
+        [] (auto&) {},
+        [&version] (auto& holder)
+        {
+            holder.applyVersionStreaming (version);
+        });
+}
 } // namespace chowdsp

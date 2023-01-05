@@ -25,7 +25,7 @@
         REQUIRE_MESSAGE ((v1 <= v2) == exp[5], "Incorrect version comparison (less than or equals)!");    \
     }
 
-TEST_CASE ("Version Test")
+TEST_CASE ("Version Test", "[version]")
 {
     SECTION ("Constexpr Version Test")
     {
@@ -106,5 +106,23 @@ TEST_CASE ("Version Test")
 
         chowdsp::Version v2 (juce::String { "v1.2.3" });
         REQUIRE_MESSAGE (v2.getVersionString() == juce::String ("1.2.3"), "Incorrect version string!");
+    }
+
+    SECTION ("Version Hint Test")
+    {
+        using namespace chowdsp::version_literals;
+        static constexpr auto v1_2_3 = "1.2.3"_v;
+        static_assert (v1_2_3.getVersionHint() == 10203);
+
+        static constexpr auto v50_49_5 = chowdsp::Version { 50, 49, 5 };
+        static_assert (v50_49_5.getVersionHint() == 504905);
+
+        const auto v99_99_99 = "99.99.99"_v;
+        REQUIRE (v99_99_99.getVersionHint() == 999999);
+
+        const auto v5_49_15 = chowdsp::Version { 5, 49, 15 };
+        REQUIRE (v5_49_15.getVersionHint() == 54915);
+
+        REQUIRE (chowdsp::Version {}.getVersionHint() == 0);
     }
 }
