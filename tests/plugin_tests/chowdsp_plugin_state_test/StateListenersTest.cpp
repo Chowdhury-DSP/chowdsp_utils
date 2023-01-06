@@ -29,7 +29,7 @@ TEST_CASE ("State Listeners Test", "[state][listeners]")
         {
             mostRecentParamValue = (float) i / float (numIters - 1);
             static_cast<juce::AudioParameterFloat&> (pct) = mostRecentParamValue;
-            juce::MessageManager::getInstance()->runDispatchLoopUntil (20);
+            juce::MessageManager::getInstance()->runDispatchLoopUntil (50);
         }
 
         REQUIRE_MESSAGE (listenerCount == Catch::Approx (numIters).margin (2), "Incorrect number of listener callbacks!");

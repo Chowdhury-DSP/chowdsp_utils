@@ -82,7 +82,7 @@ public:
 
         testEQ.setParameters ({ false });
         testEQ.setParameters ({ false });
-        juce::Thread::sleep (20);
+        juce::MessageManager::getInstance()->runDispatchLoopUntil (100);
         expectLessThan (processBlock(), 0.1f, "Processing OFF is incorrect!");
     }
 
