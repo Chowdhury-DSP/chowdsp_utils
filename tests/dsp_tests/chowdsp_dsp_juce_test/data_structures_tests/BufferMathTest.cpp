@@ -216,7 +216,7 @@ public:
 
         {
             sumToMono (buffer, buffer, (NumericType) 1);
-            const auto** data = buffer.getArrayOfReadPointers();
+            const auto* const* data = buffer.getArrayOfReadPointers();
             for (int n = 0; n < buffer.getNumSamples(); ++n)
             {
                 expect (chowdsp::SIMDUtils::all (data[0][n] == (T) 2));
@@ -243,7 +243,7 @@ public:
             fillBufferWithOnes (buffer);
             expect (sanitizeBuffer (buffer));
 
-            const auto** data = buffer.getArrayOfReadPointers();
+            const auto* const* data = buffer.getArrayOfReadPointers();
             for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
             {
                 for (int n = 0; n < buffer.getNumSamples(); ++n)
@@ -253,7 +253,7 @@ public:
 
         { // with crazy large values
             fillBufferWithOnes (buffer);
-            auto** data = buffer.getArrayOfWritePointers();
+            auto* const* data = buffer.getArrayOfWritePointers();
             data[1][99] = 100000.0f;
             expect (! sanitizeBuffer (buffer));
 
@@ -266,7 +266,7 @@ public:
 
         { // with NaN values
             fillBufferWithOnes (buffer);
-            auto** data = buffer.getArrayOfWritePointers();
+            auto* const* data = buffer.getArrayOfWritePointers();
             data[0][99] = std::numeric_limits<NumericType>::quiet_NaN();
             expect (! sanitizeBuffer (buffer));
 
@@ -279,7 +279,7 @@ public:
 
         { // with INF values
             fillBufferWithOnes (buffer);
-            auto** data = buffer.getArrayOfWritePointers();
+            auto* const* data = buffer.getArrayOfWritePointers();
             data[0][2] = std::numeric_limits<NumericType>::infinity();
             expect (! sanitizeBuffer (buffer));
 

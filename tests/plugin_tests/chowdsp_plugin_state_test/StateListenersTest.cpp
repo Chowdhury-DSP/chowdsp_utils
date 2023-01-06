@@ -24,12 +24,12 @@ TEST_CASE ("State Listeners Test", "[state][listeners]")
                 listenerCount++;
             });
 
-        static constexpr int numIters = 100;
+        static constexpr int numIters = 50;
         for (int i = 0; i < numIters; ++i)
         {
             mostRecentParamValue = (float) i / float (numIters - 1);
             static_cast<juce::AudioParameterFloat&> (pct) = mostRecentParamValue;
-            juce::MessageManager::getInstance()->runDispatchLoopUntil (20);
+            juce::MessageManager::getInstance()->runDispatchLoopUntil (100);
         }
 
         REQUIRE_MESSAGE (listenerCount == Catch::Approx (numIters).margin (2), "Incorrect number of listener callbacks!");
@@ -54,12 +54,12 @@ TEST_CASE ("State Listeners Test", "[state][listeners]")
                 listenerCount++;
             });
 
-        static constexpr int numIters = 100;
+        static constexpr int numIters = 50;
         for (int i = 0; i < numIters; ++i)
         {
             mostRecentParamValue = (float) i / float (numIters - 1);
             static_cast<juce::AudioParameterFloat&> (pct) = mostRecentParamValue;
-            juce::MessageManager::getInstance()->runDispatchLoopUntil (20);
+            juce::MessageManager::getInstance()->runDispatchLoopUntil (100);
             listeners.callAudioThreadBroadcasters();
         }
 

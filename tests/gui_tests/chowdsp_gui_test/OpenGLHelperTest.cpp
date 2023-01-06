@@ -1,7 +1,7 @@
 #include <TimedUnitTest.h>
 #include <chowdsp_gui/chowdsp_gui.h>
 
-#define CHECK_OPENGL_CONTEXT_TESTS JUCE_MODULE_AVAILABLE_juce_opengl && ! JUCE_LINUX
+#define CHECK_OPENGL_CONTEXT_TESTS JUCE_MODULE_AVAILABLE_juce_opengl
 
 namespace
 {
@@ -194,13 +194,9 @@ public:
         attachToNullTest (true);
         attachToNullTest (false);
 
-#if 0 // CI machines don't have up-to-date OpenGL, so let's skip this test for now
         beginTest ("Check OpenGL Available Test");
         checkOpenGLAvailableTest();
-#endif
     }
 };
 
-#if ! JUCE_LINUX // can't run this test on Linux CI for some reason!
 static OpenGLHelperTest openGlHelperTest;
-#endif
