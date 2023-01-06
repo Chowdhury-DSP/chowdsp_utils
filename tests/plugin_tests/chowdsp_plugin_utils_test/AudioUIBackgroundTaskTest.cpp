@@ -156,6 +156,7 @@ public:
     void customTimeSliceThreadTest()
     {
         std::atomic<size_t> magsIndex {};
+        juce::TimeSliceThread timeSliceThread { "Test Thread" };
 
         SimpleTask<TaskType> task (this);
         task.magsIndex = &magsIndex;
@@ -165,7 +166,6 @@ public:
         task.setShouldBeRunning (true);
         expect (task.isTaskRunning(), "Task should now be running!");
 
-        juce::TimeSliceThread timeSliceThread { "Test Thread" };
         task.setTimeSliceThreadToUse (&timeSliceThread);
 
         audioThreadTest (&timeSliceThread);

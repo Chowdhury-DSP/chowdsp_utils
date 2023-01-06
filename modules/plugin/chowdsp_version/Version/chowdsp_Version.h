@@ -18,7 +18,13 @@ public:
                 numDots++;
 
         // Valid version strings must have two dots!
-        jassert (numDots == 2);
+        if (numDots != 2)
+        {
+            major = 0;
+            minor = 0;
+            patch = 0;
+            return;
+        }
 
         const auto firstDot = versionStr.find ('.');
         const auto majorVersionStr = versionStr.substr (0, firstDot);
