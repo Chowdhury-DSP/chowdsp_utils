@@ -42,12 +42,13 @@ std::enable_if_t<std::is_base_of_v<ParamHolder, ParamType>, void>
     add (others...);
 }
 
-template <typename ParamContainerType>
+template <typename ParamContainerType, typename... OtherParams>
 std::enable_if_t<TypeTraits::IsIterable<ParamContainerType>, void>
-    ParamHolder::add (ParamContainerType& paramContainer)
+    ParamHolder::add (ParamContainerType& paramContainer, OtherParams&... others)
 {
     for (auto& param : paramContainer)
         add (param);
+    add (others...);
 }
 
 [[nodiscard]] inline int ParamHolder::count() const noexcept

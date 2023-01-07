@@ -32,9 +32,9 @@ public:
         add (ParamType& paramHolder, OtherParams&... others);
 
     /** Adds parameters to the ParamHolder. */
-    template <typename ParamContainerType>
+    template <typename ParamContainerType, typename... OtherParams>
     std::enable_if_t<TypeTraits::IsIterable<ParamContainerType>, void>
-        add (ParamContainerType& paramContainer);
+        add (ParamContainerType& paramContainer, OtherParams&... others);
 
     /** Counts all the parameters held internally. */
     [[nodiscard]] int count() const noexcept;
