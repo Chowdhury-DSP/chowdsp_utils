@@ -19,12 +19,10 @@ TEST_CASE ("ParamHolder Test", "[state]")
 
         auto allParamIDs = [&params]
         {
-           juce::StringArray allIDs;
-           params.doForAllParameters ([&allIDs] (auto& param, size_t)
-                                      {
-                                          allIDs.add (param.paramID);
-                                      });
-           return allIDs;
+            juce::StringArray allIDs;
+            params.doForAllParameters ([&allIDs] (auto& param, size_t)
+                                       { allIDs.add (param.paramID); });
+            return allIDs;
         }();
 
         REQUIRE (allParamIDs.contains (boolNested->paramID));
