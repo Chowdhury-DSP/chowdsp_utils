@@ -185,4 +185,28 @@ TEST_CASE ("Preset Tree Test", "[presets]")
         REQUIRE (presetTree.getTotalNumberOfPresets() == 1);
         REQUIRE (presetTree.getPresetByIndex (0)->getName() == "Bass1");
     }
+
+    SECTION ("Delete by Expression")
+    {
+        chowdsp::PresetTree presetTree;
+        presetTree.treeInserter = &chowdsp::PresetTreeInserters::vendorCategoryInserter;
+
+        presetTree.insertPresets ({
+            chowdsp::Preset { "Bass1", "Jatin", {}, "Bass" },
+            chowdsp::Preset { "Bass2", "Jatin", {}, "Bass" },
+            chowdsp::Preset { "Drums1", "Jatin", {}, "Drums" },
+            chowdsp::Preset { "Blah", "Jatin", {}, "" },
+            chowdsp::Preset { "Gtr1", "Steve", {}, "Gtr" },
+            chowdsp::Preset { "Gtr2", "Steve", {}, "Gtr" },
+        });
+        REQUIRE (presetTree.getTreeItems().size() == 2);
+
+        presetTree.removePresets ([] (const chowdsp::Preset& preset)
+                                  { return preset.getVendor() == "Jatin"; });
+
+        REQUIRE (presetTree.getTreeItems().size() == 1);
+        REQUIRE (presetTree.getTotalNumberOfPresets() == 2);
+        REQUIRE (presetTree.getPresetByIndex (0)->getVendor() == "Steve");
+        REQUIRE (presetTree.getPresetByIndex (1)->getVendor() == "Steve");
+    }
 }

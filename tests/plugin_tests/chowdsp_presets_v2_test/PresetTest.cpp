@@ -1,6 +1,7 @@
 #include <CatchUtils.h>
 #include <chowdsp_presets_v2/chowdsp_presets_v2.h>
 #include "test_utils.h"
+#include "TestPresetBinaryData.h"
 
 TEST_CASE ("Preset Test", "[presets]")
 {
@@ -35,8 +36,8 @@ TEST_CASE ("Preset Test", "[presets]")
             preset.toFile (testFile);
             REQUIRE_MESSAGE (! testFile.existsAsFile(), "Invalid presets can't be saved to a file!");
 
-            //            chowdsp::Preset testValidPreset { BinaryData::test_preset_preset, BinaryData::test_preset_presetSize };
-            //            expect (preset != testValidPreset, "Invalid preset should not equal valid preset!");
+            chowdsp::Preset testValidPreset { BinaryData::test_preset_preset, BinaryData::test_preset_presetSize };
+            REQUIRE_MESSAGE (preset != testValidPreset, "Invalid preset should not equal valid preset!");
         }
 
         {
@@ -88,11 +89,11 @@ TEST_CASE ("Preset Test", "[presets]")
     {
         auto testPreset = [] (const chowdsp::Preset& p)
         {
-            REQUIRE_MESSAGE (p.getName() == juce::String ("Name"), "Preset name incorrect!");
-            REQUIRE_MESSAGE (p.getVendor() == juce::String ("Vendor"), "Preset vendor incorrect!");
-            REQUIRE_MESSAGE (p.getCategory() == juce::String ("Category"), "Preset category incorrect!");
+            REQUIRE_MESSAGE (p.getName() == "Name", "Preset name incorrect!");
+            REQUIRE_MESSAGE (p.getVendor() == "Vendor", "Preset vendor incorrect!");
+            REQUIRE_MESSAGE (p.getCategory() == "Category", "Preset category incorrect!");
             REQUIRE_MESSAGE (p.getState()["tag"] == 0.0f, "Preset state incorrect!");
-            REQUIRE_MESSAGE (p.getVersion().getVersionString() == juce::String (JucePlugin_VersionString), "Preset version incorrect!");
+            REQUIRE_MESSAGE (p.getVersion().getVersionString() == JucePlugin_VersionString, "Preset version incorrect!");
         };
 
         chowdsp::Preset preset { "Name", "Vendor", { { "tag", 0.0f } }, "Category" };
@@ -106,16 +107,16 @@ TEST_CASE ("Preset Test", "[presets]")
         REQUIRE_MESSAGE (newPreset.getPresetFile() == presetFile, "Preset file incorrect!");
     }
 
-    //    void binaryDataPresetTest()
-    //    {
-    //        chowdsp::Preset testPreset { BinaryData::test_preset_preset, BinaryData::test_preset_presetSize };
-    //
-    //        expectEquals (testPreset.getName(), juce::String ("Test Preset"), "BinaryData preset name is incorrect!");
-    //        expectEquals (testPreset.getVendor(), juce::String ("Factory"), "BinaryData preset vendor is incorrect!");
-    //
-    //        auto testValue = testPreset.getState()->getChildByName ("PARAM")->getDoubleAttribute ("value");
-    //        expectEquals (testValue, 1.0, "Preset test value is incorrect!");
-    //    }
+    SECTION ("BinaryData Preset")
+    {
+        chowdsp::Preset testPreset { BinaryData::test_preset_preset, BinaryData::test_preset_presetSize };
+
+        REQUIRE_MESSAGE (testPreset.getName() == "Name", "BinaryData preset name is incorrect!");
+        REQUIRE_MESSAGE (testPreset.getVendor() == "Vendor", "BinaryData preset vendor is incorrect!");
+        REQUIRE_MESSAGE (testPreset.getCategory() == "", "Preset category incorrect!");
+        REQUIRE_MESSAGE (testPreset.getState()["tag"] == 0.0f, "Preset state incorrect!");
+        REQUIRE_MESSAGE (testPreset.getVersion().getVersionString() == JucePlugin_VersionString, "Preset version incorrect!");
+    }
 
     SECTION ("Extra Info")
     {

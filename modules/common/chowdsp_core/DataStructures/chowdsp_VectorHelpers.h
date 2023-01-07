@@ -20,5 +20,29 @@ namespace VectorHelpers
     {
         return vec.insert (std::upper_bound (vec.begin(), vec.end(), item, std::less<T> {}), item);
     }
+
+#if __cpp_lib_erase_if
+    using std::erase_if, std::erase;
+#else
+    template <class T, class Alloc, class U>
+    constexpr typename std::vector<T, Alloc>::size_type
+        erase (std::vector<T, Alloc>& c, const U& value)
+    {
+        auto it = std::remove (c.begin(), c.end(), value);
+        auto r = std::distance (it, c.end());
+        c.erase (it, c.end());
+        return (size_t) r;
+    }
+
+    template <class T, class Alloc, class Pred>
+    constexpr typename std::vector<T, Alloc>::size_type
+        erase_if (std::vector<T, Alloc>& c, Pred pred)
+    {
+        auto it = std::remove_if (c.begin(), c.end(), pred);
+        auto r = std::distance (it, c.end());
+        c.erase (it, c.end());
+        return (size_t) r;
+    }
+#endif
 } // namespace VectorHelpers
 } // namespace chowdsp

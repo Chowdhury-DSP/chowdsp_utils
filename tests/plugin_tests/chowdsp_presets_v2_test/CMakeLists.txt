@@ -5,6 +5,8 @@ target_sources(chowdsp_presets_v2_test
         PresetTest.cpp
         PresetTreeTest.cpp
         PresetManagerTest.cpp
+
+        TestPresetBinaryData.cpp
 )
 
 target_compile_definitions(chowdsp_presets_v2_test

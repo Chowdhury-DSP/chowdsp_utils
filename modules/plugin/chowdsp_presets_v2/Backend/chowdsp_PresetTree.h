@@ -44,6 +44,9 @@ public:
     /** Removes a preset by value. */
     void removePreset (const Preset& preset);
 
+    /** Removes presets that meet the given criterion. */
+    void removePresets (std::function<bool (const Preset& preset)>&& presetsToRemove);
+
     /** Returns the total number of presets contained in this tree. */
     [[nodiscard]] int getTotalNumberOfPresets() const { return totalNumPresets; }
 

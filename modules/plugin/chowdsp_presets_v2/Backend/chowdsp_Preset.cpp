@@ -38,6 +38,7 @@ Preset::Preset (const void* presetData, size_t presetDataSize)
     catch (const std::exception& exception)
     {
         juce::Logger::writeToLog ("Error loading preset from binary data: " + juce::String { exception.what() });
+        jassertfalse;
         state = {};
         file = juce::File {};
     }

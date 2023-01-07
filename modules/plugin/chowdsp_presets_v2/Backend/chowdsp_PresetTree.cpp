@@ -107,34 +107,16 @@ static void doForAllPresetItems (Callable&& callable, const std::vector<PresetTr
 }
 
 template <typename Callable>
-static bool removePresetGeneric (Callable&& isThisTheOneToDelete, std::vector<PresetTree::Item>& items)
+static void removePresetsGeneric (Callable&& shouldDeletePresetItem, std::vector<PresetTree::Item>& items)
 {
-    const auto removeFromVec = [&isThisTheOneToDelete] (std::vector<PresetTree::Item>& vec) -> bool
-    {
-        if (auto iter = std::find_if (vec.begin(), vec.end(), isThisTheOneToDelete);
-            iter != vec.end())
-        {
-            vec.erase (iter);
-            return true;
-        }
-        return false;
-    };
-
-    const auto removedPreset = removeFromVec (items);
-    if (removedPreset)
-        return true;
-
+    VectorHelpers::erase_if (items, shouldDeletePresetItem);
     for (auto& item : items)
     {
         if (! item.preset.has_value())
-        {
-            const auto removedPresetFromSubTree = removePresetGeneric (std::forward<Callable> (isThisTheOneToDelete), item.subtree);
-            if (removedPresetFromSubTree)
-                return true;
-        }
+            removePresetsGeneric (std::forward<Callable> (shouldDeletePresetItem), item.subtree);
     }
-
-    return false;
+    VectorHelpers::erase_if (items, [] (const PresetTree::Item& item)
+                             { return ! item.preset.has_value() && item.subtree.empty(); });
 }
 
 PresetTree::PresetTree (InsertionHelper&& insertionHelper)
@@ -186,17 +168,25 @@ void PresetTree::insertPresets (std::vector<Preset>&& presets)
 
 void PresetTree::removePreset (int index)
 {
-    removePresetGeneric ([index] (const Item& item)
-                         { return item.preset.has_value() && item.presetIndex == index; },
-                         items);
+    removePresetsGeneric ([index] (const Item& item)
+                          { return item.preset.has_value() && item.presetIndex == index; },
+                          items);
     refreshPresetIndexes();
 }
 
 void PresetTree::removePreset (const Preset& preset)
 {
-    removePresetGeneric ([&preset] (const Item& item)
-                         { return item.preset.has_value() && item.preset == preset; },
-                         items);
+    removePresetsGeneric ([&preset] (const Item& item)
+                          { return item.preset.has_value() && item.preset == preset; },
+                          items);
+    refreshPresetIndexes();
+}
+
+void PresetTree::removePresets (std::function<bool (const Preset& preset)>&& presetsToRemove)
+{
+    removePresetsGeneric ([&presetsToRemove] (const Item& item)
+                          { return item.preset.has_value() && presetsToRemove (*item.preset); },
+                          items);
     refreshPresetIndexes();
 }
 
