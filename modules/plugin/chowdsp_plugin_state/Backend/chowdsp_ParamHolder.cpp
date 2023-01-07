@@ -42,6 +42,14 @@ std::enable_if_t<std::is_base_of_v<ParamHolder, ParamType>, void>
     add (others...);
 }
 
+template <typename ParamContainerType>
+std::enable_if_t<TypeTraits::IsIterable<ParamContainerType>, void>
+    ParamHolder::add (ParamContainerType& paramContainer)
+{
+    for (auto& param : paramContainer)
+        add (param);
+}
+
 [[nodiscard]] inline int ParamHolder::count() const noexcept
 {
     auto numParams = int (floatParams.size() + choiceParams.size() + boolParams.size());
