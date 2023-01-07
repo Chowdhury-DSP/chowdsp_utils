@@ -5,6 +5,7 @@ target_sources(chowdsp_plugin_state_test
         StateSerializationTest.cpp
         StateListenersTest.cpp
         ParameterAttachmentsTest.cpp
+        ParamHolderTest.cpp
         StatePluginInterfaceTest.cpp
         VersionStreamingTest.cpp
 )

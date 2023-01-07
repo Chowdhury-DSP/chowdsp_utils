@@ -18,7 +18,7 @@ struct OptionalPointer
     /** The type being pointed to */
     using element_type = T;
 
-    /** Intializes a null OptionalPointer */
+    /** Initializes a null OptionalPointer */
     OptionalPointer() = default;
 
     /** Creates an owning optional pointer */
