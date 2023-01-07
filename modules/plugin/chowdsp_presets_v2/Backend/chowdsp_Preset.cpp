@@ -112,7 +112,7 @@ bool Preset::isValid() const
 
 bool Preset::operator== (const Preset& other) const noexcept
 {
-    if (state == nullptr)
+    if (state.is_null() || other.state.is_null())
         return false;
 
     return name == other.name

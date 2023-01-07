@@ -4,4 +4,11 @@ target_sources(chowdsp_presets_v2_test
     PRIVATE
         PresetTest.cpp
         PresetTreeTest.cpp
+        PresetManagerTest.cpp
+)
+
+target_compile_definitions(chowdsp_presets_v2_test
+    PRIVATE
+        JucePlugin_Name="TestPlugin"
+        JucePlugin_VersionString="9.9.9"
 )

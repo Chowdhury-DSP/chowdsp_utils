@@ -26,6 +26,9 @@ public:
     Preset (Preset&&) noexcept = default;
     Preset& operator= (Preset&&) noexcept = default;
 
+    /** Serializes this preset to JSON */
+    [[nodiscard]] nlohmann::json toJson() const;
+
     /** Saves this preset to a file */
     void toFile (const juce::File& presetFile);
 
@@ -53,6 +56,12 @@ public:
     /** Returns the preset's state */
     [[nodiscard]] const auto& getState() const noexcept { return state; }
 
+    /** Returns the preset's extra info */
+    [[nodiscard]] const auto& getExtraInfo() const noexcept { return extraInfo; }
+
+    /** Returns the preset's extra info */
+    [[nodiscard]] auto& getExtraInfo() noexcept { return extraInfo; }
+
     /** Returns true if the two presets are equivalent. */
     bool operator== (const Preset& other) const noexcept;
 
@@ -71,7 +80,6 @@ public:
 
 private:
     void initialise (const nlohmann::json& presetJson);
-    nlohmann::json toJson() const;
 
     juce::String name;
     juce::String vendor;

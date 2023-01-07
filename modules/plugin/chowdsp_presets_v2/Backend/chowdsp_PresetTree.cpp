@@ -133,6 +133,8 @@ static bool removePresetGeneric (Callable&& isThisTheOneToDelete, std::vector<Pr
                 return true;
         }
     }
+
+    return false;
 }
 
 PresetTree::PresetTree (InsertionHelper&& insertionHelper)
