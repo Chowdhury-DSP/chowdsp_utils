@@ -59,7 +59,8 @@ void PresetManager::initializeListeners (ParamHolder& params, ParameterListeners
 
 void PresetManager::loadPreset (const Preset& preset)
 {
-    currentPreset = preset;
+    pluginState.callOnMainThread ([this, &preset]
+                                  { currentPreset = preset; });
 }
 
 nlohmann::json PresetManager::savePresetState()

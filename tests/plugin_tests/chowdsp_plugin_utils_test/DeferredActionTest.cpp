@@ -37,7 +37,7 @@ public:
                                  { counter.increment(); },
                                  fakeAudioThread);
                     refCounter.fetch_add (1);
-                    juce::Thread::sleep (5);
+                    juce::Thread::sleep (12);
                 }
             });
 

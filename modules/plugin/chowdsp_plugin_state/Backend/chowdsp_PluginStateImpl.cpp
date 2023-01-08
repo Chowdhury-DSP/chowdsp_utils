@@ -21,16 +21,20 @@ void PluginStateImpl<ParameterState, NonParameterState, Serializer>::serialize (
 template <typename ParameterState, typename NonParameterState, typename Serializer>
 void PluginStateImpl<ParameterState, NonParameterState, Serializer>::deserialize (const juce::MemoryBlock& data)
 {
-    Serialization::deserialize<Serializer> (data, *this);
+    callOnMainThread (
+        [this, data]
+        {
+            Serialization::deserialize<Serializer> (data, *this);
 
-    params.applyVersionStreaming (pluginStateVersion);
-    if (nonParams.versionStreamingCallback != nullptr)
-        nonParams.versionStreamingCallback (pluginStateVersion);
+            params.applyVersionStreaming (pluginStateVersion);
+            if (nonParams.versionStreamingCallback != nullptr)
+                nonParams.versionStreamingCallback (pluginStateVersion);
 
-    getParameterListeners().updateBroadcastersFromMessageThread();
+            getParameterListeners().updateBroadcastersFromMessageThread();
 
-    if (undoManager != nullptr)
-        undoManager->clearUndoHistory();
+            if (undoManager != nullptr)
+                undoManager->clearUndoHistory();
+        });
 }
 
 /** Serializer */

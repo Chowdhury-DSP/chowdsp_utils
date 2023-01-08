@@ -1,5 +1,11 @@
 #pragma once
 
+#if JUCE_MODULE_AVAILABLE_chowdsp_plugin_utils
+#include <chowdsp_plugin_utils/chowdsp_plugin_utils.h>
+#else
+#include "../../chowdsp_plugin_utils/Threads/chowdsp_DeferredMainThreadAction.h"
+#endif
+
 namespace chowdsp
 {
 /** Base class for managing a plugin's state. */
@@ -61,11 +67,19 @@ public:
     /** Returns the plugin state's parameters */
     [[nodiscard]] const ParamHolder& getParameters() const { return *params; }
 
+    /** Calls an action on the main thread via chowdsp::DeferredAction */
+    template <typename Callable>
+    void callOnMainThread (Callable&& func, bool couldBeAudioThread = false)
+    {
+        mainThreadAction.call (std::forward<Callable> (func), couldBeAudioThread);
+    }
+
     juce::UndoManager* undoManager = nullptr;
 
 private:
     std::optional<ParameterListeners> listeners;
     ParamHolder* params = nullptr;
+    DeferredAction mainThreadAction;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginState)
 };
