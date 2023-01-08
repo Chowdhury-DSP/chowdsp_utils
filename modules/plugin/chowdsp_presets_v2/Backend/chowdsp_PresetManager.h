@@ -43,12 +43,6 @@ public:
     /** Loads the default preset. */
     void loadDefaultPreset();
 
-    /** Returns true if the plugin state has changed since loading the last preset */
-    bool getIsDirty() const noexcept { return isPresetDirty; }
-
-    /** Call this function to tell the preset manager if the plugin state is "dirty" */
-    void setIsDirty (bool shouldBeDirty);
-
     [[nodiscard]] auto& getPresetTree() { return presetTree; }
     [[nodiscard]] const auto& getPresetTree() const { return presetTree; }
 

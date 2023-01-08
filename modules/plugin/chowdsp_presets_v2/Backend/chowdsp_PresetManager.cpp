@@ -4,9 +4,6 @@ namespace chowdsp
 {
 static bool isPresetAgnosticParameter (const juce::RangedAudioParameter& param, const std::vector<juce::RangedAudioParameter*>& presetAgnosticParams)
 {
-    //    if (presetAgnosticParams.empty())
-    //        return false;
-
     return std::find_if (
                presetAgnosticParams.begin(),
                presetAgnosticParams.end(),
@@ -14,7 +11,7 @@ static bool isPresetAgnosticParameter (const juce::RangedAudioParameter& param, 
                {
                    return param.paramID == presetAgnosticParam->paramID;
                })
-           == presetAgnosticParams.end();
+           != presetAgnosticParams.end();
 }
 
 void PresetManager::initializeParameterListeners (ParamHolder& params, ParameterListeners& listeners)
@@ -62,7 +59,6 @@ void PresetManager::loadPreset (const Preset& preset)
 
 nlohmann::json PresetManager::savePresetState()
 {
-    // @TODO: what about parameters that should be preset-agnostic?
     nlohmann::json state;
     std::as_const (pluginState)
         .getParameters()
