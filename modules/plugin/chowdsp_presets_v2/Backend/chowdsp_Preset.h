@@ -18,6 +18,9 @@ public:
     /** Create a preset from a file */
     explicit Preset (const juce::File& presetFile);
 
+    /** Create a preset from json */
+    explicit Preset (const nlohmann::json& presetJson);
+
     /** Create a preset from BinaryData */
     Preset (const void* presetData, size_t presetDataSize);
 
@@ -79,6 +82,8 @@ public:
     static constexpr std::string_view stateTag { "preset_state" };
 
 private:
+    template <typename JSONGetType>
+    void initialiseSafe (JSONGetType jsonGetter, const juce::String& source);
     void initialise (const nlohmann::json& presetJson);
 
     juce::String name;

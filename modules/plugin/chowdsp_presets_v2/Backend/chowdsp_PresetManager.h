@@ -13,8 +13,8 @@ public:
           pluginState (state),
           presetAgnosticParameters (std::move (presetAgnosticParams))
     {
-        state.nonParams.addStateValues ({ &isPresetDirty });
-        initializeParameterListeners (state.params, state.getParameterListeners());
+        state.nonParams.addStateValues ({ &currentPreset, &isPresetDirty });
+        initializeListeners (state.params, state.getParameterListeners());
     }
 
     virtual ~PresetManager() = default;
@@ -22,14 +22,11 @@ public:
     /** Loads a preset by reference. */
     void loadPreset (const Preset& preset);
 
-    /** Adds a vector of factory presets. */
-    void addPresets (std::vector<Preset>&& presets);
+    /** Adds a vector of presets. */
+    void addPresets (std::vector<Preset>&& presets, bool areFactoryPresets = true);
 
     /** Saves the plugin's current state to a preset file, and loads the preset */
     void saveUserPreset (const juce::File& file);
-
-    /** Returns a pointer to the currently selected preset */
-    const Preset* getCurrentPreset() const noexcept { return currentPreset; }
 
     /**
      * Selects a preset to be the default preset.
@@ -55,8 +52,8 @@ public:
     virtual void loadUserPresetsFromFolder (const juce::File& file);
 
     chowdsp::Broadcaster<void()> presetListUpdatedBroadcaster;
-    chowdsp::Broadcaster<void()> currentPresetChangedBroadcaster;
     StateValue<bool> isPresetDirty { "is_preset_dirty", false };
+    PresetState currentPreset;
 
 protected:
     /** Override this if your presets need custom state-saving behaviour */
@@ -68,19 +65,18 @@ protected:
     /** Override this to support backwards compatibility for user presets */
     [[nodiscard]] virtual Preset loadUserPresetFromFile (const juce::File& file);
 
-    const Preset* currentPreset = nullptr;
-
 private:
-    void initializeParameterListeners (ParamHolder& params, ParameterListeners& listeners);
+    void initializeListeners (ParamHolder& params, ParameterListeners& listeners);
 
     juce::AudioProcessor* processor = nullptr;
     chowdsp::PluginState& pluginState;
 
     const std::vector<juce::RangedAudioParameter*> presetAgnosticParameters;
-    chowdsp::ScopedCallbackList parameterListeners;
+    chowdsp::ScopedCallbackList listeners;
 
     PresetTree presetTree;
     const Preset* defaultPreset = nullptr;
+    std::vector<const Preset*> factoryPresets;
 
     juce::String userPresetConfigPath;
     juce::String userPresetsVendor { "User" };

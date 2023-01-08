@@ -14,47 +14,52 @@ static bool isPresetAgnosticParameter (const juce::RangedAudioParameter& param, 
            != presetAgnosticParams.end();
 }
 
-void PresetManager::initializeParameterListeners (ParamHolder& params, ParameterListeners& listeners)
+void PresetManager::initializeListeners (ParamHolder& params, ParameterListeners& paramListeners)
 {
     params.doForAllParameters (
-        [this, &listeners] (auto& param, size_t)
+        [this, &paramListeners] (auto& param, size_t)
         {
             if (isPresetAgnosticParameter (param, presetAgnosticParameters))
                 return;
 
-            parameterListeners += {
-                listeners.addParameterListener (param, ParameterListenerThread::MessageThread, [this]
-                                                { isPresetDirty.set (true); })
+            listeners += {
+                paramListeners.addParameterListener (param, ParameterListenerThread::MessageThread, [this]
+                                                     { isPresetDirty.set (true); })
             };
         });
+
+    listeners +=
+        {
+            currentPreset.changeBroadcaster.connect (
+                [this]
+                {
+                    if (currentPreset == nullptr)
+                        return;
+
+                    loadPresetState (currentPreset->getState()); // @TODO: could this throw?
+                    pluginState.getParameterListeners().updateBroadcastersFromMessageThread();
+                    isPresetDirty.set (false);
+
+                    if (processor != nullptr)
+                    {
+            // For some reason, when VST3 in Ableton Live (Win64), calling updateHostDisplay
+            // causes the plugin to load the preset at index 1. @TODO: figure out the problem!
+            //        if (processor->wrapperType == juce::AudioProcessor::WrapperType::wrapperType_VST3)
+            //            return;
+
+#if JUCE_VERSION > 0x60007
+                        processor->updateHostDisplay (juce::AudioProcessorListener::ChangeDetails().withProgramChanged (true));
+#else
+                        processor->updateHostDisplay();
+#endif
+                    }
+                })
+        };
 }
 
 void PresetManager::loadPreset (const Preset& preset)
 {
-    // we need to set current preset before loading its state,
-    // since `loadPresetState()` might need to know the name
-    // of the current preset that it's loading, or something like that.
-    currentPreset = &preset;
-    loadPresetState (preset.getState()); // @TODO: could this throw?
-
-    pluginState.getParameterListeners().updateBroadcastersFromMessageThread();
-
-    isPresetDirty.set (false);
-    currentPresetChangedBroadcaster();
-
-    if (processor != nullptr)
-    {
-        // For some reason, when VST3 in Ableton Live (Win64), calling updateHostDisplay
-        // causes the plugin to load the preset at index 1. @TODO: figure out the problem!
-        //        if (processor->wrapperType == juce::AudioProcessor::WrapperType::wrapperType_VST3)
-        //            return;
-
-#if JUCE_VERSION > 0x60007
-        processor->updateHostDisplay (juce::AudioProcessorListener::ChangeDetails().withProgramChanged (true));
-#else
-        processor->updateHostDisplay();
-#endif
-    }
+    currentPreset = preset;
 }
 
 nlohmann::json PresetManager::savePresetState()
@@ -75,9 +80,9 @@ nlohmann::json PresetManager::savePresetState()
 
 void PresetManager::loadPresetState (const nlohmann::json& state)
 {
-    if (auto* curPreset = getCurrentPreset())
+    if (currentPreset != nullptr)
     {
-        const auto newPresetName = curPreset->getName();
+        const auto newPresetName = currentPreset->getName();
         juce::Logger::writeToLog ("Loading preset: " + newPresetName);
     }
 
@@ -99,12 +104,16 @@ void PresetManager::loadPresetState (const nlohmann::json& state)
             });
 }
 
-void PresetManager::addPresets (std::vector<Preset>&& presets)
+void PresetManager::addPresets (std::vector<Preset>&& presets, bool areFactoryPresets)
 {
     for (auto& preset : presets)
     {
         if (preset.isValid())
-            presetTree.insertPreset (std::move (preset));
+        {
+            const auto& justAddedPreset = presetTree.insertPreset (std::move (preset));
+            if (areFactoryPresets)
+                factoryPresets.emplace_back (&justAddedPreset);
+        }
     }
 
     presetListUpdatedBroadcaster();
@@ -203,9 +212,9 @@ void PresetManager::loadUserPresetsFromFolder (const juce::File& file)
         presets.push_back (loadUserPresetFromFile (f));
 
     // delete old user presets
-    presetTree.removePresets ([this] (const Preset& preset)
-                              { return preset.getVendor() == userPresetsVendor; });
+    presetTree.removePresets ([this] (const Preset& preset) -> bool
+                              { return std::find (factoryPresets.begin(), factoryPresets.end(), &preset) == factoryPresets.end(); });
 
-    addPresets (std::move (presets));
+    addPresets (std::move (presets), false);
 }
 } // namespace chowdsp

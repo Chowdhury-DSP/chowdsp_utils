@@ -27,5 +27,6 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include <chowdsp_plugin_state/chowdsp_plugin_state.h>
 
 #include "Backend/chowdsp_Preset.h"
+#include "Backend/chowdsp_PresetState.h"
 #include "Backend/chowdsp_PresetTree.h"
 #include "Backend/chowdsp_PresetManager.h"

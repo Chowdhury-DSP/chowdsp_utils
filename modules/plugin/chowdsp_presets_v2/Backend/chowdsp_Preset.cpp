@@ -17,27 +17,36 @@ Preset::Preset (const juce::String& pName,
 
 Preset::Preset (const juce::File& presetFile) : file (presetFile)
 {
-    try
-    {
-        initialise (JSONUtils::fromFile (presetFile));
-    }
-    catch (const std::exception& exception)
-    {
-        juce::Logger::writeToLog ("Error loading preset file: " + juce::String { exception.what() });
-        state = {};
-        file = juce::File {};
-    }
+    initialiseSafe ([this]
+                    { return JSONUtils::fromFile (file); },
+                    "file");
+}
+
+Preset::Preset (const nlohmann::json& presetJson)
+{
+    initialiseSafe (presetJson, "json");
 }
 
 Preset::Preset (const void* presetData, size_t presetDataSize)
 {
+    initialiseSafe ([&presetData, &presetDataSize]
+                    { return JSONUtils::fromBinaryData (presetData, (int) presetDataSize); },
+                    "binary data");
+}
+
+template <typename JSONGetType>
+void Preset::initialiseSafe (JSONGetType jsonGetter, const juce::String& source)
+{
     try
     {
-        initialise (JSONUtils::fromBinaryData (presetData, (int) presetDataSize));
+        if constexpr (std::is_same_v<std::decay_t<JSONGetType>, nlohmann::json>)
+            initialise (jsonGetter);
+        else
+            initialise (jsonGetter());
     }
     catch (const std::exception& exception)
     {
-        juce::Logger::writeToLog ("Error loading preset from binary data: " + juce::String { exception.what() });
+        juce::Logger::writeToLog ("Error loading preset from " + source + ": " + juce::String { exception.what() });
         jassertfalse;
         state = {};
         file = juce::File {};

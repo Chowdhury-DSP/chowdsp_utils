@@ -73,6 +73,22 @@ struct ScopedPresetManager
     test_utils::ScopedFile presetPath { "preset_path" };
 };
 
+static chowdsp::Preset saveUserPreset (const juce::String& file, float val, bool makeDefault = false)
+{
+    ScopedPresetManager presetMgr {};
+    presetMgr.setFloatParam (val);
+    const auto presetFile = presetMgr.getPresetFile (file);
+    presetMgr->saveUserPreset (presetFile);
+
+    if (makeDefault)
+    {
+        presetMgr->setDefaultPreset (chowdsp::Preset { presetFile });
+        REQUIRE_MESSAGE (chowdsp::Preset { presetFile } == *presetMgr->getDefaultPreset(), "Default preset is incorrect!");
+    }
+
+    return chowdsp::Preset { presetFile };
+}
+
 TEST_CASE ("Preset Manager Test", "[presets][state]")
 {
     SECTION ("Save/Load User Presets")
@@ -96,19 +112,10 @@ TEST_CASE ("Preset Manager Test", "[presets][state]")
     SECTION ("Factory Presets")
     {
         static constexpr float testValue = 0.05f;
-
-        std::vector<chowdsp::Preset> presets;
-        {
-            ScopedPresetManager presetMgr {};
-            presetMgr.setFloatParam (testValue);
-
-            const auto presetFile = presetMgr.getPresetFile ("test.preset");
-            presetMgr->saveUserPreset (presetFile);
-            presets.emplace_back (presetFile);
-        }
+        auto preset = saveUserPreset ("test.preset", testValue);
 
         ScopedPresetManager presetMgr {};
-        presetMgr->addPresets (std::move (presets));
+        presetMgr->addPresets ({ preset });
 
         presetMgr.loadPreset (0);
         REQUIRE_MESSAGE (presetMgr.getFloatParam() == testValue, "Preset value is incorrect!");
@@ -136,15 +143,7 @@ TEST_CASE ("Preset Manager Test", "[presets][state]")
         static constexpr float extraValue = 1.0f;
         static constexpr float defaultValue = 0.0f;
 
-        std::vector<chowdsp::Preset> presets;
-        {
-            ScopedPresetManager presetMgr {};
-            presetMgr.setFloatParam (testValue);
-
-            const auto presetFile = presetMgr.getPresetFile ("test.preset");
-            presetMgr->saveUserPreset (presetFile);
-            presets.emplace_back (presetFile);
-        }
+        auto preset = saveUserPreset ("test.preset", testValue);
 
         ScopedPresetManager<true> presetMgr {};
         REQUIRE_MESSAGE (presetMgr.state.params.extraParam->get() == defaultValue, "Initial value is incorrect!");
@@ -154,7 +153,7 @@ TEST_CASE ("Preset Manager Test", "[presets][state]")
         REQUIRE_MESSAGE (presetMgr.state.params.extraParam->get() == extraValue, "Set value is incorrect!");
         REQUIRE_MESSAGE (presetMgr->isPresetDirty, "Preset dirty after set value is incorrect!");
 
-        presetMgr->addPresets (std::move (presets));
+        presetMgr->addPresets ({ preset });
         presetMgr.loadPreset (0);
         REQUIRE_MESSAGE (presetMgr.state.params.extraParam->get() == defaultValue, "Reset value is incorrect!");
     }
@@ -198,21 +197,10 @@ TEST_CASE ("Preset Manager Test", "[presets][state]")
         static constexpr float testValue = 0.05f;
         static constexpr float otherValue = 0.75f;
 
-        std::vector<chowdsp::Preset> presets;
-        {
-            ScopedPresetManager presetMgr {};
-            presetMgr.setFloatParam (testValue);
-
-            const auto presetFile = presetMgr.getPresetFile ("test.preset");
-            presetMgr->saveUserPreset (presetFile);
-            presetMgr->setDefaultPreset (chowdsp::Preset { presetFile });
-            REQUIRE_MESSAGE (chowdsp::Preset { presetFile } == *presetMgr->getDefaultPreset(), "Default preset is incorrect!");
-
-            presets.emplace_back (chowdsp::Preset { presetFile });
-        }
+        auto preset = saveUserPreset ("test.preset", testValue, true);
 
         ScopedPresetManager presetMgr {};
-        presetMgr->setDefaultPreset (std::move (presets[0]));
+        presetMgr->setDefaultPreset (std::move (preset));
 
         presetMgr.setFloatParam (otherValue);
         presetMgr->loadDefaultPreset();
@@ -221,32 +209,56 @@ TEST_CASE ("Preset Manager Test", "[presets][state]")
 
     SECTION ("User Presets")
     {
-        static constexpr float testValue = 0.05f;
+        static constexpr float testValue1 = 0.05f;
+        static constexpr float testValue2 = 0.55f;
 
-        std::vector<chowdsp::Preset> presets;
-        juce::File presetConfigFile {};
-        {
-            ScopedPresetManager presetMgr {};
-            presetMgr.setFloatParam (testValue);
+        auto preset1 = saveUserPreset ("test1.preset", testValue1);
+        auto preset2 = saveUserPreset ("test2.preset", testValue2);
+        juce::File presetConfigFile = ScopedPresetManager{}->getUserPresetConfigFile();
 
-            const auto presetFile = presetMgr.getPresetFile ("test.preset");
-            presetMgr->saveUserPreset (presetFile);
-            presetMgr->setDefaultPreset (chowdsp::Preset { presetFile });
-            REQUIRE_MESSAGE (chowdsp::Preset { presetFile } == *presetMgr->getDefaultPreset(), "Default preset is incorrect!");
-
-            presets.emplace_back (chowdsp::Preset { presetFile });
-            presetConfigFile = presetMgr->getUserPresetConfigFile();
-        }
-
-        test_utils::ScopedFile userPresetsDir { "user_presets" };
-        userPresetsDir.file.createDirectory();
-        for (auto& preset : presets)
-            preset.toFile (userPresetsDir.file.getChildFile (preset.getName()));
+        test_utils::ScopedFile userPresetsDir1 { "user_presets1" };
+        userPresetsDir1.file.createDirectory();
+        preset1.toFile (userPresetsDir1.file.getChildFile (preset1.getName()));
 
         presetConfigFile.create();
-        presetConfigFile.replaceWithText (userPresetsDir.file.getFullPathName());
+        presetConfigFile.replaceWithText (userPresetsDir1.file.getFullPathName());
 
-        const ScopedPresetManager presetMgr { presetConfigFile.getFileName() };
-        REQUIRE (*presetMgr->getPresetTree().getPresetByIndex (0) == presets[0]);
+        ScopedPresetManager presetMgr { presetConfigFile.getFileName() };
+        REQUIRE_MESSAGE (*presetMgr->getPresetTree().getPresetByIndex (0) == preset1, "User preset loaded from folder is incorrect!");
+
+        presetMgr->setUserPresetPath ({});
+        REQUIRE_MESSAGE (*presetMgr->getPresetTree().getPresetByIndex (0) == preset1, "User presets should not change when loading null file as preset path!");
+
+        test_utils::ScopedFile userPresetsDir2 { "user_presets2" };
+        userPresetsDir2.file.createDirectory();
+        preset2.toFile (userPresetsDir2.file.getChildFile (preset2.getName()));
+        presetMgr->setUserPresetPath (userPresetsDir2);
+        REQUIRE_MESSAGE (*presetMgr->getPresetTree().getPresetByIndex (0) == preset2, "User presets not loaded correctly after changing user preset path!");
+    }
+
+    SECTION ("State Test")
+    {
+        static constexpr float testValue = 0.05f;
+        static constexpr float otherValue = 0.15f;
+        auto preset = saveUserPreset ("test.preset", testValue);
+
+        juce::MemoryBlock state;
+        {
+            ScopedPresetManager presetMgr {};
+            presetMgr->addPresets ({ chowdsp::Preset { preset } });
+            presetMgr.loadPreset (0);
+            REQUIRE (presetMgr.getFloatParam() == testValue);
+
+            presetMgr.setFloatParam (otherValue);
+            REQUIRE (presetMgr.getFloatParam() == otherValue);
+
+            presetMgr.state.serialize (state);
+        }
+
+        ScopedPresetManager presetMgr {};
+        presetMgr.state.deserialize (state);
+        REQUIRE_MESSAGE (presetMgr.getFloatParam() == otherValue, "Preset state is overriding parameter state!");
+        REQUIRE (*presetMgr->currentPreset.get() == preset);
+        REQUIRE (presetMgr->isPresetDirty);
     }
 }
