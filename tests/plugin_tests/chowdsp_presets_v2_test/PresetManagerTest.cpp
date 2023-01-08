@@ -236,7 +236,28 @@ TEST_CASE ("Preset Manager Test", "[presets][state]")
         REQUIRE_MESSAGE (*presetMgr->getPresetTree().getPresetByIndex (0) == preset2, "User presets not loaded correctly after changing user preset path!");
     }
 
-    SECTION ("State Test")
+    SECTION ("Null State Test")
+    {
+        static constexpr float otherValue = 0.15f;
+
+        juce::MemoryBlock state;
+        {
+            ScopedPresetManager presetMgr {};
+
+            presetMgr.setFloatParam (otherValue);
+            REQUIRE (presetMgr.getFloatParam() == otherValue);
+
+            presetMgr.state.serialize (state);
+        }
+
+        ScopedPresetManager presetMgr {};
+        presetMgr.state.deserialize (state);
+        REQUIRE_MESSAGE (presetMgr.getFloatParam() == otherValue, "Preset state is overriding parameter state!");
+        REQUIRE (presetMgr->currentPreset == nullptr);
+        REQUIRE (presetMgr->isPresetDirty);
+    }
+
+    SECTION ("Preset State Test")
     {
         static constexpr float testValue = 0.05f;
         static constexpr float otherValue = 0.15f;

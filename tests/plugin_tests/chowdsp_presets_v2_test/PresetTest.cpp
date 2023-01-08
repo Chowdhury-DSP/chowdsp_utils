@@ -143,4 +143,13 @@ TEST_CASE ("Preset Test", "[presets]")
         chowdsp::Preset nullPreset { "Name", "Vendor", {}, "Category" };
         REQUIRE_MESSAGE (preset != nullPreset, "Preset with null state should never be equivalent!");
     }
+
+    SECTION ("From JSON")
+    {
+        chowdsp::Preset preset { "Name", "Vendor", { { "tag", 0.0f } } };
+        chowdsp::Preset preset2 { preset.toJson() };
+        chowdsp::Preset preset3 { nlohmann::json {} };
+        REQUIRE (preset == preset2);
+        REQUIRE (preset != preset3);
+    }
 }
