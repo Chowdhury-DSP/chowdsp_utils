@@ -6,6 +6,9 @@ target_sources(chowdsp_presets_v2_test
         PresetTreeTest.cpp
         PresetManagerTest.cpp
 
+        NextPreviousTest.cpp
+        ProgramAdapterTest.cpp
+
         TestPresetBinaryData.cpp
 )
 

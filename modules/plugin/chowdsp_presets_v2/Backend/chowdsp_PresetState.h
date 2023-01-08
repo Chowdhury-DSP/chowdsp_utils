@@ -38,11 +38,13 @@ public:
         return *this;
     }
 
+    /** Internal use only! */
     void reset() override
     {
         set ({});
     }
 
+    /** Internal use only! */
     void serialize (JSONSerializer::SerializedType& serial) const override
     {
         JSONSerializer::addChildElement (serial, name);
@@ -52,6 +54,7 @@ public:
             JSONSerializer::addChildElement (serial, preset->toJson());
     }
 
+    /** Internal use only! */
     void deserialize (JSONSerializer::DeserializedType deserial) override
     {
         if (deserial.is_null())
@@ -68,4 +71,4 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetState)
 };
-}
+} // namespace chowdsp

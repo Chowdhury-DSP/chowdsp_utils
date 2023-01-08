@@ -195,10 +195,7 @@ const Preset* PresetTree::getPresetByIndex (int index) const
 {
     const Preset* result = nullptr;
     if (! juce::isPositiveAndBelow (index, totalNumPresets))
-    {
-        jassertfalse; // index is out of range!
         return result;
-    }
 
     doForAllPresetItems ([&result, index] (const Item& item)
                          {

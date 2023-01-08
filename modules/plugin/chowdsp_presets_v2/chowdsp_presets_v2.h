@@ -30,3 +30,16 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Backend/chowdsp_PresetState.h"
 #include "Backend/chowdsp_PresetTree.h"
 #include "Backend/chowdsp_PresetManager.h"
+
+namespace chowdsp
+{
+/** Interfaces for working with the chowdsp::PresetManager */
+namespace PresetsFrontend
+{
+}
+} // namespace chowdsp
+
+#include "Frontend/chowdsp_PresetsProgramAdapter.h"
+#include "Frontend/chowdsp_PresetsMenuInterface.h"
+#include "Frontend/chowdsp_PresetsTextInterface.h"
+#include "Frontend/chowdsp_PresetsNextPreviousInterface.h"

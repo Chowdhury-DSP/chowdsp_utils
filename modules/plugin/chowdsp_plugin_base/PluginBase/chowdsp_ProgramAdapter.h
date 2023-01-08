@@ -1,6 +1,8 @@
 #pragma once
 
+#if JUCE_MODULE_AVAILABLE_chowdsp_presets
 #include <chowdsp_presets/chowdsp_presets.h>
+#endif
 
 namespace chowdsp
 {
