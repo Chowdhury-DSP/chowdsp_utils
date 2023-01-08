@@ -14,6 +14,7 @@ public:
                      juce::AudioProcessor* processor = nullptr,
                      juce::UndoManager* um = nullptr)
     {
+        params = &parameters;
         undoManager = um;
         listeners.emplace (parameters);
         if (processor != nullptr)
@@ -54,10 +55,17 @@ public:
         return stateValue.changeBroadcaster.connect (std::forward<ListenerArgs...> (args...));
     }
 
+    /** Returns the plugin state's parameters */
+    [[nodiscard]] ParamHolder& getParameters() { return *params; }
+
+    /** Returns the plugin state's parameters */
+    [[nodiscard]] const ParamHolder& getParameters() const { return *params; }
+
     juce::UndoManager* undoManager = nullptr;
 
 private:
     std::optional<ParameterListeners> listeners;
+    ParamHolder* params = nullptr;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginState)
 };

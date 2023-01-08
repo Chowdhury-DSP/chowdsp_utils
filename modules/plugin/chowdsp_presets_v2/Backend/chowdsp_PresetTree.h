@@ -18,9 +18,9 @@ public:
     /** Methods for sorting and inserting presets into the tree. */
     struct InsertionHelper
     {
-        std::function<bool(const juce::String&, const juce::String&)> tagSortMethod = nullptr;
-        std::function<bool(const Preset&, const Preset&)> presetSortMethod = nullptr;
-        std::function<void(std::vector<Item>&, Item&&)> insertItemIntoTree = nullptr;
+        std::function<bool (const juce::String&, const juce::String&)> tagSortMethod = nullptr;
+        std::function<bool (const Preset&, const Preset&)> presetSortMethod = nullptr;
+        std::function<Item& (std::vector<Item>&, Item&&)> insertItemIntoTree = nullptr;
     };
 
     explicit PresetTree (InsertionHelper&& insertionHelper = { nullptr, nullptr, nullptr });
@@ -30,7 +30,7 @@ public:
      * Inserts a preset into the tree.
      * Calling this invalidates any existing preset indices.
      */
-    void insertPreset (Preset&& presetToInsert);
+    const Preset& insertPreset (Preset&& presetToInsert);
 
     /**
      * Inserts a bunch of presets into the tree.
@@ -56,12 +56,15 @@ public:
     /** Returns the index of a preset, or -1 if the preset is not present int the tree. */
     [[nodiscard]] int getIndexForPreset (const Preset& preset) const;
 
+    /** Checks if the tree currently contains a preset. If true, then return the preset, else return nullptr. */
+    [[nodiscard]] const Preset* findPreset (const Preset& preset) const;
+
     /**
      * Method for inserting presets into the tree.
      *
      * Uses PresetTreeInserters::flatInserter by default.
      */
-    std::function<void(Preset&&, std::vector<Item>&, const InsertionHelper&)> treeInserter;
+    std::function<Preset& (Preset&&, std::vector<Item>&, const InsertionHelper&)> treeInserter;
 
     [[nodiscard]] auto& getTreeItems() { return items; }
     [[nodiscard]] const auto& getTreeItems() const { return items; }
@@ -86,15 +89,15 @@ namespace PresetTreeInserters
     bool defaultPresetComparator (const Preset&, const Preset&);
 
     /** Inserts all presets into the tree as a flat list. */
-    void flatInserter (Preset&&, std::vector<PresetTree::Item>&, const PresetTree::InsertionHelper&);
+    Preset& flatInserter (Preset&&, std::vector<PresetTree::Item>&, const PresetTree::InsertionHelper&);
 
     /** Inserts presets into the tree with sub-trees for each vendor. */
-    void vendorInserter (Preset&&, std::vector<PresetTree::Item>&, const PresetTree::InsertionHelper&);
+    Preset& vendorInserter (Preset&&, std::vector<PresetTree::Item>&, const PresetTree::InsertionHelper&);
 
     /** Inserts presets into the tree with sub-trees for each category. */
-    void categoryInserter (Preset&&, std::vector<PresetTree::Item>&, const PresetTree::InsertionHelper&);
+    Preset& categoryInserter (Preset&&, std::vector<PresetTree::Item>&, const PresetTree::InsertionHelper&);
 
     /** Inserts presets into the tree with sub-trees for each vendor, and internal sub-trees for each category. */
-    void vendorCategoryInserter (Preset&&, std::vector<PresetTree::Item>&, const PresetTree::InsertionHelper&);
-}
-}
+    Preset& vendorCategoryInserter (Preset&&, std::vector<PresetTree::Item>&, const PresetTree::InsertionHelper&);
+} // namespace PresetTreeInserters
+} // namespace chowdsp

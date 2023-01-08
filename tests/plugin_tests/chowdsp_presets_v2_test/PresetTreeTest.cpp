@@ -209,4 +209,15 @@ TEST_CASE ("Preset Tree Test", "[presets]")
         REQUIRE (presetTree.getPresetByIndex (0)->getVendor() == "Steve");
         REQUIRE (presetTree.getPresetByIndex (1)->getVendor() == "Steve");
     }
+
+    SECTION ("Find Preset")
+    {
+        chowdsp::PresetTree presetTree;
+        const auto& preset = presetTree.insertPreset (chowdsp::Preset { "Blah", "Jatin", { { "tag", 1.0f } }, "Cat1" });
+
+        const auto* foundPreset = presetTree.findPreset (preset);
+        REQUIRE (*foundPreset == preset);
+
+        REQUIRE (presetTree.findPreset (chowdsp::Preset { "Blah", "Jatin", { { "tag", 100.0f } } }) == nullptr);
+    }
 }

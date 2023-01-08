@@ -14,65 +14,63 @@ namespace PresetTreeInserters
         return first.getName().compare (second.getName()) < 0;
     }
 
-    void flatInserter (Preset&& preset, std::vector<PresetTree::Item>& topLevelItems, const PresetTree::InsertionHelper& insertionHelper)
+    Preset& flatInserter (Preset&& preset, std::vector<PresetTree::Item>& topLevelItems, const PresetTree::InsertionHelper& insertionHelper)
     {
         PresetTree::Item item;
         item.preset = preset;
-        insertionHelper.insertItemIntoTree (topLevelItems, std::move (item));
+
+        auto& insertedItem = insertionHelper.insertItemIntoTree (topLevelItems, std::move (item));
+        jassert (insertedItem.preset.has_value());
+        return *insertedItem.preset;
     }
 
     template <typename TagGetter, typename FallbackInserter = decltype (&flatInserter)>
-    void tagBasedInserter (Preset&& preset,
-                           std::vector<PresetTree::Item>& topLevelItems,
-                           const PresetTree::InsertionHelper& insertionHelper,
-                           TagGetter&& tagGetter,
-                           FallbackInserter&& fallbackInserter = &flatInserter)
+    Preset& tagBasedInserter (Preset&& preset,
+                              std::vector<PresetTree::Item>& topLevelItems,
+                              const PresetTree::InsertionHelper& insertionHelper,
+                              TagGetter&& tagGetter,
+                              FallbackInserter&& fallbackInserter = &flatInserter)
     {
         const auto tag = tagGetter (preset);
         if (tag.isEmpty())
-        {
             // no category, so just add this to the top-level list
-            fallbackInserter (std::move (preset), topLevelItems, insertionHelper);
-            return;
-        }
+            return fallbackInserter (std::move (preset), topLevelItems, insertionHelper);
 
         for (auto& items : topLevelItems)
         {
             if (items.tag == tag)
-            {
-                fallbackInserter (std::move (preset), items.subtree, insertionHelper);
-                return;
-            }
+                return fallbackInserter (std::move (preset), items.subtree, insertionHelper);
         }
 
         // preset vendor is not currently in the tree, so let's add a new sub-tree
         PresetTree::Item tree;
         tree.tag = tag;
-        fallbackInserter (std::move (preset), tree.subtree, insertionHelper);
+        auto& insertedPreset = fallbackInserter (std::move (preset), tree.subtree, insertionHelper);
         insertionHelper.insertItemIntoTree (topLevelItems, std::move (tree));
+        return insertedPreset;
     }
 
-    void vendorInserter (Preset&& preset, std::vector<PresetTree::Item>& topLevelItems, const PresetTree::InsertionHelper& insertionHelper)
+    Preset& vendorInserter (Preset&& preset, std::vector<PresetTree::Item>& topLevelItems, const PresetTree::InsertionHelper& insertionHelper)
     {
-        tagBasedInserter (std::move (preset),
-                          topLevelItems,
-                          insertionHelper,
-                          [] (const Preset& p)
-                          { return p.getVendor(); });
+        return tagBasedInserter (std::move (preset),
+                                 topLevelItems,
+                                 insertionHelper,
+                                 [] (const Preset& p)
+                                 { return p.getVendor(); });
     }
 
-    void categoryInserter (Preset&& preset, std::vector<PresetTree::Item>& topLevelItems, const PresetTree::InsertionHelper& insertionHelper)
+    Preset& categoryInserter (Preset&& preset, std::vector<PresetTree::Item>& topLevelItems, const PresetTree::InsertionHelper& insertionHelper)
     {
-        tagBasedInserter (std::move (preset),
-                          topLevelItems,
-                          insertionHelper,
-                          [] (const Preset& p)
-                          { return p.getCategory(); });
+        return tagBasedInserter (std::move (preset),
+                                 topLevelItems,
+                                 insertionHelper,
+                                 [] (const Preset& p)
+                                 { return p.getCategory(); });
     }
 
-    void vendorCategoryInserter (Preset&& preset, std::vector<PresetTree::Item>& topLevelItems, const PresetTree::InsertionHelper& insertionHelper)
+    Preset& vendorCategoryInserter (Preset&& preset, std::vector<PresetTree::Item>& topLevelItems, const PresetTree::InsertionHelper& insertionHelper)
     {
-        tagBasedInserter (
+        return tagBasedInserter (
             std::move (preset),
             topLevelItems,
             insertionHelper,
@@ -115,6 +113,8 @@ static void removePresetsGeneric (Callable&& shouldDeletePresetItem, std::vector
         if (! item.preset.has_value())
             removePresetsGeneric (std::forward<Callable> (shouldDeletePresetItem), item.subtree);
     }
+
+    // Remove empty sub-trees
     VectorHelpers::erase_if (items, [] (const PresetTree::Item& item)
                              { return ! item.preset.has_value() && item.subtree.empty(); });
 }
@@ -130,33 +130,34 @@ PresetTree::PresetTree (InsertionHelper&& insertionHelper)
         insertHelper.presetSortMethod = &PresetTreeInserters::defaultPresetComparator;
 
     if (insertHelper.insertItemIntoTree == nullptr)
-        insertHelper.insertItemIntoTree = [this] (std::vector<Item>& vec, Item&& item)
+        insertHelper.insertItemIntoTree = [this] (std::vector<Item>& vec, Item&& item) -> Item&
         {
-            VectorHelpers::insert_sorted (vec,
-                                          std::move (item),
-                                          [&tagComp = std::as_const (insertHelper.tagSortMethod),
-                                           &presetComp = std::as_const (insertHelper.presetSortMethod)] (const Item& item1, const Item& item2)
-                                          {
-                                              if (item1.preset.has_value() && ! item2.preset.has_value())
-                                                  return false;
+            return *VectorHelpers::insert_sorted (vec,
+                                                  std::move (item),
+                                                  [&tagComp = std::as_const (insertHelper.tagSortMethod),
+                                                   &presetComp = std::as_const (insertHelper.presetSortMethod)] (const Item& item1, const Item& item2)
+                                                  {
+                                                      if (item1.preset.has_value() && ! item2.preset.has_value())
+                                                          return false;
 
-                                              if (! item1.preset.has_value() && item2.preset.has_value())
-                                                  return true;
+                                                      if (! item1.preset.has_value() && item2.preset.has_value())
+                                                          return true;
 
-                                              if (item1.preset.has_value())
-                                                  return presetComp (*item1.preset, *item2.preset);
+                                                      if (item1.preset.has_value())
+                                                          return presetComp (*item1.preset, *item2.preset);
 
-                                              return tagComp (item1.tag, item2.tag);
-                                          });
+                                                      return tagComp (item1.tag, item2.tag);
+                                                  });
         };
 }
 
 PresetTree::~PresetTree() = default;
 
-void PresetTree::insertPreset (Preset&& presetToInsert)
+const Preset& PresetTree::insertPreset (Preset&& presetToInsert)
 {
-    treeInserter (std::move (presetToInsert), items, insertHelper);
+    const auto& insertedPreset = treeInserter (std::move (presetToInsert), items, insertHelper);
     refreshPresetIndexes();
+    return insertedPreset;
 }
 
 void PresetTree::insertPresets (std::vector<Preset>&& presets)
@@ -195,7 +196,7 @@ const Preset* PresetTree::getPresetByIndex (int index) const
     const Preset* result = nullptr;
     if (! juce::isPositiveAndBelow (index, totalNumPresets))
     {
-        jassertfalse;
+        jassertfalse; // index is out of range!
         return result;
     }
 
@@ -214,6 +215,17 @@ int PresetTree::getIndexForPreset (const Preset& preset) const
                          {
                              if (item.preset.has_value() && preset == item.preset)
                                  result = item.presetIndex; },
+                         items);
+    return result;
+}
+
+const Preset* PresetTree::findPreset (const Preset& preset) const
+{
+    const Preset* result = nullptr;
+    doForAllPresetItems ([&result, &preset] (const Item& item)
+                         {
+                             if (item.preset.has_value() && preset == item.preset)
+                                 result = &(*item.preset); },
                          items);
     return result;
 }

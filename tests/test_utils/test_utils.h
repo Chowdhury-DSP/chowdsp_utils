@@ -95,6 +95,8 @@ struct ScopedFile
 {
     explicit ScopedFile (const juce::String& name) : file (juce::File::getSpecialLocation (juce::File::userHomeDirectory).getChildFile (name))
     {
+        if (file.existsAsFile())
+            file.deleteFile();
     }
 
     explicit ScopedFile (const juce::File& thisFile) : file (thisFile)
@@ -107,6 +109,7 @@ struct ScopedFile
     }
 
     operator juce::File() { return file; } // NOLINT
+    operator const juce::File() const { return file; } // NOLINT
 
     const juce::File file;
 };
