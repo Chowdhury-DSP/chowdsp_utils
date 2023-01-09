@@ -1,11 +1,11 @@
 #include <CatchUtils.h>
 #include <chowdsp_presets_v2/chowdsp_presets_v2.h>
 
-struct Params : chowdsp::ParamHolder
+struct NPParams : chowdsp::ParamHolder
 {
 };
 
-using State = chowdsp::PluginStateImpl<Params>;
+using State = chowdsp::PluginStateImpl<NPParams>;
 
 TEST_CASE ("Next/Previous Test", "[presets]")
 {

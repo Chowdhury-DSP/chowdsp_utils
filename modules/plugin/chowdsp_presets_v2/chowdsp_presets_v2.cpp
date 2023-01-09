@@ -6,3 +6,5 @@
 
 #include "Frontend/chowdsp_PresetsProgramAdapter.cpp"
 #include "Frontend/chowdsp_PresetsNextPreviousInterface.cpp"
+#include "Frontend/chowdsp_PresetsTextInterface.cpp"
+#include "Frontend/chowdsp_PresetsMenuInterface.cpp"

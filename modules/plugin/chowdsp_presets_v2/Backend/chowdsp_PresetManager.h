@@ -25,8 +25,20 @@ public:
     /** Adds a vector of presets. */
     void addPresets (std::vector<Preset>&& presets, bool areFactoryPresets = true);
 
-    /** Saves the plugin's current state to a preset file, and loads the preset */
+    /**
+     * Saves the plugin's current state to a preset file, and loads the preset.
+     * The preset will have the same name as the file.
+     */
     void saveUserPreset (const juce::File& file);
+
+    /** Saves the given preset to a preset file, and loads the preset */
+    void saveUserPreset (const juce::File& file, Preset&& preset);
+
+    /**
+     * Returns a json object containing the plugin's preset state.
+     * Override this if your presets need custom state-saving behaviour
+     */
+    virtual nlohmann::json savePresetState();
 
     /**
      * Selects a preset to be the default preset.
@@ -56,11 +68,11 @@ public:
     PresetState currentPreset;
 
 protected:
-    /** Override this if your presets need custom state-saving behaviour */
-    virtual nlohmann::json savePresetState();
-
     /** Override this if your presets need custom state-loading behaviour */
     virtual void loadPresetState (const nlohmann::json& state);
+
+    /** Returns true if the given parameter is preset-agnostic */
+    bool isPresetAgnosticParameter (const juce::RangedAudioParameter& param) const;
 
     /** Override this to support backwards compatibility for user presets */
     [[nodiscard]] virtual Preset loadUserPresetFromFile (const juce::File& file);

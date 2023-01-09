@@ -1,8 +1,27 @@
-//
-// Created by jatin on 1/8/23.
-//
+#pragma once
 
-#ifndef CHOWDSP_UTILS_CHOWDSP_PRESETSTEXTINTERFACE_H
-#define CHOWDSP_UTILS_CHOWDSP_PRESETSTEXTINTERFACE_H
+namespace chowdsp::PresetsFrontend
+{
+/** Interface for getting the text associated with the preset manager's state. */
+class TextInterface
+{
+public:
+    explicit TextInterface (PresetManager& manager);
 
-#endif //CHOWDSP_UTILS_CHOWDSP_PRESETSTEXTINTERFACE_H
+    /** Returns the text associated with the current preset. */
+    [[nodiscard]] juce::String getPresetText() const noexcept { return presetText; }
+
+    /** Called whenever the preset text is changed. */
+    Broadcaster<void (const juce::String&)> presetTextChangedBroadcaster;
+
+private:
+    void updateText();
+
+    PresetManager& presetManager;
+    juce::String presetText {};
+
+    ScopedCallbackList listeners;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TextInterface)
+};
+} // namespace chowdsp::PresetsFrontend

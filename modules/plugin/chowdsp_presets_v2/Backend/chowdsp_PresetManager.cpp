@@ -2,18 +2,6 @@
 
 namespace chowdsp
 {
-static bool isPresetAgnosticParameter (const juce::RangedAudioParameter& param, const std::vector<juce::RangedAudioParameter*>& presetAgnosticParams)
-{
-    return std::find_if (
-               presetAgnosticParams.begin(),
-               presetAgnosticParams.end(),
-               [&param] (const juce::RangedAudioParameter* presetAgnosticParam)
-               {
-                   return param.paramID == presetAgnosticParam->paramID;
-               })
-           != presetAgnosticParams.end();
-}
-
 void PresetManager::initializeListeners (ParamHolder& params, ParameterListeners& paramListeners)
 {
     params.doForAllParameters (
@@ -61,6 +49,18 @@ void PresetManager::loadPreset (const Preset& preset)
 {
     pluginState.callOnMainThread ([this, &preset]
                                   { currentPreset = preset; });
+}
+
+bool PresetManager::isPresetAgnosticParameter (const juce::RangedAudioParameter& param) const
+{
+    return std::find_if (
+               presetAgnosticParameters.begin(),
+               presetAgnosticParameters.end(),
+               [&param] (const juce::RangedAudioParameter* presetAgnosticParam)
+               {
+                   return param.paramID == presetAgnosticParam->paramID;
+               })
+           != presetAgnosticParameters.end();
 }
 
 nlohmann::json PresetManager::savePresetState()
@@ -123,9 +123,12 @@ void PresetManager::addPresets (std::vector<Preset>&& presets, bool areFactoryPr
 void PresetManager::saveUserPreset (const juce::File& file)
 {
     const auto name = file.getFileNameWithoutExtension();
+    saveUserPreset (file, Preset { name, userPresetsVendor, savePresetState() });
+}
 
-    auto preset = Preset { name, userPresetsVendor, savePresetState() };
-    jassert (preset.isValid());
+void PresetManager::saveUserPreset (const juce::File& file, Preset&& preset)
+{
+    jassert (preset.isValid()); // trying to save an invalid preset??
 
     if (file.existsAsFile())
         file.deleteFile();
@@ -150,8 +153,9 @@ void PresetManager::setDefaultPreset (Preset&& newDefaultPreset)
         return;
     }
 
-    // default preset is not in factory presets (yet)
+    // default preset is not in factory presets, so let's add it!
     defaultPreset = &presetTree.insertPreset (std::move (newDefaultPreset));
+    factoryPresets.emplace_back (defaultPreset);
 }
 
 void PresetManager::loadDefaultPreset()

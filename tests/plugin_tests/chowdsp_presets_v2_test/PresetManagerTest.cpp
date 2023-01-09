@@ -50,7 +50,7 @@ struct ScopedPresetManager
     void setFloatParam (float newValue)
     {
         chowdsp::ParameterTypeHelpers::setValue (newValue, *state.params.floatParam);
-        juce::MessageManager::getInstance()->runDispatchLoopUntil (20);
+        state.getParameterListeners().updateBroadcastersFromMessageThread();
     }
 
     float getFloatParam() const
@@ -61,7 +61,7 @@ struct ScopedPresetManager
     void toggleBoolParam()
     {
         chowdsp::ParameterTypeHelpers::setValue (! state.params.boolParam->get(), *state.params.boolParam);
-        juce::MessageManager::getInstance()->runDispatchLoopUntil (20);
+        state.getParameterListeners().updateBroadcastersFromMessageThread();
     }
 
     operator chowdsp::PresetManager&() { return manager; } // NOLINT
@@ -149,7 +149,7 @@ TEST_CASE ("Preset Manager Test", "[presets][state]")
         REQUIRE_MESSAGE (presetMgr.state.params.extraParam->get() == defaultValue, "Initial value is incorrect!");
 
         chowdsp::ParameterTypeHelpers::setValue (extraValue, *presetMgr.state.params.extraParam);
-        juce::MessageManager::getInstance()->runDispatchLoopUntil (20);
+        presetMgr.state.getParameterListeners().updateBroadcastersFromMessageThread();
         REQUIRE_MESSAGE (presetMgr.state.params.extraParam->get() == extraValue, "Set value is incorrect!");
         REQUIRE_MESSAGE (presetMgr->isPresetDirty, "Preset dirty after set value is incorrect!");
 

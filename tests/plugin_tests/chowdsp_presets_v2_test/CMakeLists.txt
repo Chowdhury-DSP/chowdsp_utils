@@ -8,6 +8,7 @@ target_sources(chowdsp_presets_v2_test
 
         NextPreviousTest.cpp
         ProgramAdapterTest.cpp
+        TextInterfaceTest.cpp
 
         TestPresetBinaryData.cpp
 )
