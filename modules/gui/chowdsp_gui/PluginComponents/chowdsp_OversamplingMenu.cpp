@@ -3,15 +3,15 @@
 
 namespace chowdsp
 {
-template <typename OSType>
-OversamplingMenu<OSType>::OversamplingMenu (OSType& osMgr, juce::AudioProcessorValueTreeState& vts) : osManager (osMgr)
+template <typename OSType, typename ComboBoxType>
+void OversamplingMenu<OSType, ComboBoxType>::initialise (juce::AudioProcessorValueTreeState& vts)
 {
-    setDescription ("Oversampling Menu");
+    this->setDescription ("Oversampling Menu");
 
-    setColour (backgroundColourID, juce::Colours::transparentBlack);
-    setColour (textColourID, juce::Colours::white);
-    setColour (outlineColourID, juce::Colours::white);
-    setColour (accentColourID, juce::Colours::yellow);
+    this->setColour (backgroundColourID, juce::Colours::transparentBlack);
+    this->setColour (textColourID, juce::Colours::white);
+    this->setColour (outlineColourID, juce::Colours::white);
+    this->setColour (accentColourID, juce::Colours::yellow);
 
     std::tie (parameters[OSParam],
               parameters[OSMode],
@@ -45,7 +45,7 @@ OversamplingMenu<OSType>::OversamplingMenu (OSType& osMgr, juce::AudioProcessorV
         [thisComp = this]
         {
             juce::MessageManager::callAsync (
-                [safeThis = SafePointer { thisComp }]
+                [safeThis = juce::Component::SafePointer { thisComp }]
                 {
                     if (safeThis != nullptr)
                         safeThis->generateComboBoxMenu();
@@ -53,40 +53,40 @@ OversamplingMenu<OSType>::OversamplingMenu (OSType& osMgr, juce::AudioProcessorV
         });
 }
 
-template <typename OSType>
-void OversamplingMenu<OSType>::updateColours()
+template <typename OSType, typename ComboBoxType>
+void OversamplingMenu<OSType, ComboBoxType>::updateColours()
 {
-    setColour (juce::ComboBox::ColourIds::backgroundColourId, findColour (backgroundColourID));
-    setColour (juce::ComboBox::ColourIds::textColourId, findColour (textColourID));
-    setColour (juce::ComboBox::ColourIds::outlineColourId, findColour (outlineColourID));
+    this->setColour (juce::ComboBox::ColourIds::backgroundColourId, this->findColour (backgroundColourID));
+    this->setColour (juce::ComboBox::ColourIds::textColourId, this->findColour (textColourID));
+    this->setColour (juce::ComboBox::ColourIds::outlineColourId, this->findColour (outlineColourID));
 
-    auto newAccentColour = findColour (accentColourID);
+    auto newAccentColour = this->findColour (accentColourID);
     if (accentColour != newAccentColour)
     {
         accentColour = newAccentColour;
         generateComboBoxMenu();
     }
 
-    repaint();
+    this->repaint();
 }
 
-template <typename OSType>
-void OversamplingMenu<OSType>::generateComboBoxMenu()
+template <typename OSType, typename ComboBoxType>
+void OversamplingMenu<OSType, ComboBoxType>::generateComboBoxMenu()
 {
-    clear();
+    this->clear();
     if (! osManager.hasBeenPrepared())
         return;
 
-    auto* menu = getRootMenu();
+    auto* menu = this->getRootMenu();
 
-    auto createParamItem = [=] (juce::PopupMenu::Item& item,
-                                auto* parameter,
-                                auto& attachment,
-                                int& menuIdx,
-                                int menuOffset,
-                                const juce::String& choice,
-                                bool forceOff = false,
-                                bool disableSame = false)
+    auto createParamItem = [this] (juce::PopupMenu::Item& item,
+                                   auto* parameter,
+                                   auto& attachment,
+                                   int& menuIdx,
+                                   int menuOffset,
+                                   const juce::String& choice,
+                                   bool forceOff = false,
+                                   bool disableSame = false)
     {
         item.itemID = menuIdx++;
         int paramVal = item.itemID - menuOffset;
@@ -168,7 +168,7 @@ void OversamplingMenu<OSType>::generateComboBoxMenu()
     juce::String comboBoxText = selectedText.first;
     if (! sameAsRT && offlineParamsAvailable)
         comboBoxText += " / " + selectedText.second;
-    setText (comboBoxText);
+    this->setText (comboBoxText);
 
     if (offlineParamsAvailable)
     {
