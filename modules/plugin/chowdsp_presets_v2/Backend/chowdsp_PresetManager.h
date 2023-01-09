@@ -52,6 +52,9 @@ public:
     /** Loads the default preset. */
     void loadDefaultPreset();
 
+    /** Returns true if the given preset is a factory preset. */
+    bool isFactoryPreset (const Preset& preset) const;
+
     [[nodiscard]] auto& getPresetTree() { return presetTree; }
     [[nodiscard]] const auto& getPresetTree() const { return presetTree; }
 

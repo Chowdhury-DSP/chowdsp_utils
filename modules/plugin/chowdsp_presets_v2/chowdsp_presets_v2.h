@@ -40,6 +40,8 @@ namespace PresetsFrontend
 } // namespace chowdsp
 
 #include "Frontend/chowdsp_PresetsProgramAdapter.h"
+#include "Frontend/chowdsp_PresetsFileInterface.h"
+#include "Frontend/chowdsp_PresetsClipboardInterface.h"
 #include "Frontend/chowdsp_PresetsMenuInterface.h"
 #include "Frontend/chowdsp_PresetsTextInterface.h"
 #include "Frontend/chowdsp_PresetsNextPreviousInterface.h"

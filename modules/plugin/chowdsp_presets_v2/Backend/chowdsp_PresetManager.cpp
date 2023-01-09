@@ -7,7 +7,7 @@ void PresetManager::initializeListeners (ParamHolder& params, ParameterListeners
     params.doForAllParameters (
         [this, &paramListeners] (auto& param, size_t)
         {
-            if (isPresetAgnosticParameter (param, presetAgnosticParameters))
+            if (isPresetAgnosticParameter (param))
                 return;
 
             listeners += {
@@ -71,7 +71,7 @@ nlohmann::json PresetManager::savePresetState()
         .doForAllParameters (
             [this, &state] (auto& param, size_t)
             {
-                if (isPresetAgnosticParameter (param, presetAgnosticParameters))
+                if (isPresetAgnosticParameter (param))
                     return;
 
                 state[param.paramID.toStdString()] = ParameterTypeHelpers::getValue (param);
@@ -92,7 +92,7 @@ void PresetManager::loadPresetState (const nlohmann::json& state)
         .doForAllParameters (
             [this, &state] (auto& param, size_t)
             {
-                if (isPresetAgnosticParameter (param, presetAgnosticParameters))
+                if (isPresetAgnosticParameter (param))
                     return;
 
                 if (state.contains (param.paramID.toStdString()))
@@ -167,6 +167,11 @@ void PresetManager::loadDefaultPreset()
         loadPreset (*defaultPreset);
 }
 
+bool PresetManager::isFactoryPreset (const Preset& preset) const
+{
+    return std::find (factoryPresets.begin(), factoryPresets.end(), &preset) == factoryPresets.end();
+}
+
 void PresetManager::setUserPresetConfigFile (const juce::String& presetConfigFilePath)
 {
     userPresetConfigPath = presetConfigFilePath;
@@ -217,8 +222,7 @@ void PresetManager::loadUserPresetsFromFolder (const juce::File& file)
         presets.push_back (loadUserPresetFromFile (f));
 
     // delete old user presets
-    presetTree.removePresets ([this] (const Preset& preset) -> bool
-                              { return std::find (factoryPresets.begin(), factoryPresets.end(), &preset) == factoryPresets.end(); });
+    presetTree.removePresets ([this] (const Preset& preset) { return isFactoryPreset (preset); });
 
     addPresets (std::move (presets), false);
 }

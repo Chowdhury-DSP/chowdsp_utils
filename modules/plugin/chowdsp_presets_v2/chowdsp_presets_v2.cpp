@@ -8,3 +8,5 @@
 #include "Frontend/chowdsp_PresetsNextPreviousInterface.cpp"
 #include "Frontend/chowdsp_PresetsTextInterface.cpp"
 #include "Frontend/chowdsp_PresetsMenuInterface.cpp"
+#include "Frontend/chowdsp_PresetsFileInterface.cpp"
+#include "Frontend/chowdsp_PresetsClipboardInterface.cpp"

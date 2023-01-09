@@ -2,7 +2,8 @@
 
 namespace chowdsp::PresetsFrontend
 {
-MenuInterface::MenuInterface (PresetManager& manager) : presetManager (manager)
+MenuInterface::MenuInterface (PresetManager& manager, FileInterface* fileFace)
+    : presetManager (manager), fileInterface (fileFace), clipboardInterface (manager)
 {
     presetManager.presetListUpdatedBroadcaster.connect ([this]
                                                         { refreshPresetsMenu(); });
@@ -17,16 +18,11 @@ void MenuInterface::addPresetsToMenu (juce::PopupMenu& menu)
 
 void MenuInterface::addExtraMenuItems (juce::PopupMenu& menu, std::initializer_list<ExtraMenuItems> extraMenuItems)
 {
-    const auto addPresetMenuItem = [&menu] (const juce::String& itemText, auto&& action)
-    {
-        juce::PopupMenu::Item item { itemText };
-        item.itemID = -1;
-        item.action = [&, forwardedAction = std::forward<decltype (action)> (action)]
-        {
-            forwardedAction();
-        };
-        menu.addItem (item);
-    };
+    const auto* currentPreset = presetManager.currentPreset.get();
+    const auto currentPresetExists = currentPreset != nullptr && currentPreset->isValid();
+    const auto currentPresetFileExists = currentPresetExists && currentPreset->getPresetFile().existsAsFile();
+    const auto userPresetDirExists = presetManager.getUserPresetPath().isDirectory();
+    const auto hasFileInterface = fileInterface != nullptr;
 
     for (auto itemID : extraMenuItems)
     {
@@ -37,25 +33,72 @@ void MenuInterface::addExtraMenuItems (juce::PopupMenu& menu, std::initializer_l
         }
 
         const auto itemName = toString (magic_enum::enum_name (itemID)).replaceCharacter ('_', ' ');
-        if (itemID == Resave_Preset)
+        const auto addPresetMenuItem = [&menu, &itemName] (auto&& action, bool shouldShow = true)
         {
-            if (presetManager.currentPreset != nullptr && presetManager.currentPreset->isValid())
-                addPresetMenuItem (itemName, [this]
-                                   { presetManager.loadPreset (*presetManager.currentPreset); });
-            continue;
-        }
+            if (shouldShow)
+            {
+                juce::PopupMenu::Item item { itemName };
+                item.itemID = -1;
+                item.action = [&, forwardedAction = std::forward<decltype (action)> (action)]
+                {
+                    forwardedAction();
+                };
+                menu.addItem (item);
+            }
+        };
 
-        if (itemID == Save_Preset_As)
+        if (itemID == Reset)
         {
-            if (presetManager.getUserPresetPath().isDirectory())
-                addPresetMenuItem (
-                    itemName,
-                    [this]
-                    {
-                        auto [preset, file] = savePresetCallback (presetManager.savePresetState());
-                        presetManager.saveUserPreset (file, std::move (preset));
-                    });
-            continue;
+            addPresetMenuItem ([this]
+                               { presetManager.loadPreset (*presetManager.currentPreset); },
+                               currentPresetExists);
+        }
+        else if (itemID == Save_Preset_As)
+        {
+            addPresetMenuItem ([this]
+                               { fileInterface->savePreset(); },
+                               userPresetDirExists && hasFileInterface);
+        }
+        else if (itemID == Resave_Preset)
+        {
+            addPresetMenuItem ([this]
+                               { fileInterface->resaveCurrentPreset(); },
+                               currentPresetFileExists && ! presetManager.isFactoryPreset (*currentPreset) && hasFileInterface);
+        }
+        else if (itemID == Delete_Preset)
+        {
+            addPresetMenuItem ([this]
+                               { fileInterface->deleteCurrentPreset(); },
+                               currentPresetFileExists && ! presetManager.isFactoryPreset (*currentPreset) && hasFileInterface);
+        }
+        else if (itemID == Copy_Current_Preset)
+        {
+            addPresetMenuItem ([this]
+                               { clipboardInterface.copyCurrentPreset(); },
+                               currentPresetExists);
+        }
+        else if (itemID == Paste_Preset)
+        {
+            addPresetMenuItem ([this]
+                               { clipboardInterface.tryToPastePreset(); });
+        }
+        else if (itemID == Load_Preset_From_File)
+        {
+            addPresetMenuItem ([this]
+                               { fileInterface->loadPresetFromFile(); },
+                               hasFileInterface);
+        }
+        else if (itemID == Go_to_User_Presets_Folder)
+        {
+            addPresetMenuItem ([this]
+                               { fileInterface->goToUserPresetsFolder(); },
+                               userPresetDirExists && hasFileInterface);
+        }
+        else if (itemID == Choose_User_Presets_Folder)
+        {
+            addPresetMenuItem ([this]
+                               { fileInterface->chooseUserPresetsFolder(); },
+                               hasFileInterface);
         }
     }
 }
