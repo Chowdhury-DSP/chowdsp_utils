@@ -19,6 +19,8 @@ private:
 
     chowdsp::ParametersViewEditor paramsView;
 
+    chowdsp::PresetsComponent presetsComp;
+
     void refreshUndoRedoButtons();
     juce::TextButton undoButton { "UNDO" };
     juce::TextButton redoButton { "REDO" };

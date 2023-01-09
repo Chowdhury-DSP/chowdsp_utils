@@ -1,10 +1,6 @@
 #pragma once
 
-#if JUCE_MODULE_AVAILABLE_chowdsp_plugin_base
-#include <chowdsp_plugin_base/chowdsp_plugin_base.h>
-#else
 #include "../../chowdsp_plugin_base/PluginBase/chowdsp_ProgramAdapter.h"
-#endif
 
 namespace chowdsp
 {
