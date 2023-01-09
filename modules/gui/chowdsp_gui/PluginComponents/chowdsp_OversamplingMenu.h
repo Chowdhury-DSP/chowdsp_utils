@@ -22,7 +22,7 @@ public:
     /** Constructor with fields for the oversampling object, and APVTS */
     template <typename... Args>
     OversamplingMenu (OSType& oversamplingManager, juce::AudioProcessorValueTreeState& vts, Args&&... args)
-     : ComboBoxType (args...), osManager (oversamplingManager)
+        : ComboBoxType (args...), osManager (oversamplingManager)
     {
         initialise (vts);
     }
