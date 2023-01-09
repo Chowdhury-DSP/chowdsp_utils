@@ -11,8 +11,7 @@ FileInterface::FileInterface (PresetManager& manager, const juce::String& preset
 void FileInterface::savePreset()
 {
     jassert (savePresetCallback != nullptr);
-    auto [preset, file] = savePresetCallback (presetManager.savePresetState());
-    presetManager.saveUserPreset (file, std::move (preset));
+    savePresetCallback (presetManager.savePresetState());
 }
 
 void FileInterface::resaveCurrentPreset()
@@ -93,6 +92,6 @@ void FileInterface::chooseUserPresetsFolder()
 juce::File FileInterface::getFileForPreset (const Preset& preset) const
 {
     jassert (presetManager.getUserPresetPath().isDirectory());
-    return presetManager.getUserPresetPath().getNonexistentChildFile (preset.getName(), presetFileExtension);
+    return presetManager.getUserPresetPath().getChildFile (preset.getName() + presetFileExtension);
 }
 } // namespace chowdsp::PresetsFrontend

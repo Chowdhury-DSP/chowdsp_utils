@@ -116,6 +116,7 @@ static void loadPresetsIntoMenu (juce::PopupMenu& menu, const std::vector<Preset
             {
                 presetMgr.loadPreset (preset);
             };
+            menu.addItem (menuItem);
 
             // @TODO: figure out how to mark a preset as selected?
         }

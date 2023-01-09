@@ -21,6 +21,7 @@ public:
     bool goToPreviousPreset();
 
 private:
+    void updateCurrentPresetIndex();
     bool navigateThroughPresets (bool forward);
 
     PresetManager& presetManager;

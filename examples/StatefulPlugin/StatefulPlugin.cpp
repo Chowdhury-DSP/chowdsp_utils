@@ -4,6 +4,7 @@
 StatefulPlugin::StatefulPlugin() : chowdsp::PluginBase<State> (&undoManager)
 {
     presetManager = std::make_unique<chowdsp::PresetManager> (state);
+    presetManager->setUserPresetConfigFile ("ChowdhuryDSP/Stateful Plugin/UserPresetsPath.txt");
 }
 
 void StatefulPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)

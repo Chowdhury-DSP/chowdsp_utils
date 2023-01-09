@@ -15,7 +15,7 @@ public:
     void goToUserPresetsFolder();
     void chooseUserPresetsFolder();
 
-    std::function<std::pair<Preset, juce::File> (nlohmann::json&&)> savePresetCallback;
+    std::function<void (nlohmann::json&&)> savePresetCallback;
     std::function<bool (const Preset&)> checkDeletePresetCallback;
     std::function<void (const Preset&)> failedToLoadPresetCallback;
 

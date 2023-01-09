@@ -66,6 +66,8 @@ public:
 
     virtual void loadUserPresetsFromFolder (const juce::File& file);
 
+    [[nodiscard]] juce::String getUserPresetVendorName() const noexcept { return userPresetsVendor; }
+
     chowdsp::Broadcaster<void()> presetListUpdatedBroadcaster;
     StateValue<bool> isPresetDirty { "is_preset_dirty", false };
     PresetState currentPreset;

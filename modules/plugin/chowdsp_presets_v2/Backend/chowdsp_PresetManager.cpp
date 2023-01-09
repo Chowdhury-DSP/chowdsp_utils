@@ -174,6 +174,7 @@ bool PresetManager::isFactoryPreset (const Preset& preset) const
 
 void PresetManager::setUserPresetConfigFile (const juce::String& presetConfigFilePath)
 {
+    // @TODO: should we use PluginSettings for this instead?
     userPresetConfigPath = presetConfigFilePath;
 
     auto userPresetPath = getUserPresetPath();
@@ -193,6 +194,7 @@ void PresetManager::setUserPresetPath (const juce::File& file)
         return;
 
     auto config = getUserPresetConfigFile();
+    jassert (config != juce::File{} && ! config.isDirectory()); // config file was not set!
     config.deleteFile();
     config.create();
     config.replaceWithText (file.getFullPathName());
@@ -219,7 +221,12 @@ void PresetManager::loadUserPresetsFromFolder (const juce::File& file)
 
     std::vector<Preset> presets;
     for (const auto& f : file.findChildFiles (juce::File::findFiles, true))
+    {
+        if (f.getFileName() == ".DS_Store")
+            continue;
+
         presets.push_back (loadUserPresetFromFile (f));
+    }
 
     // delete old user presets
     presetTree.removePresets ([this] (const Preset& preset) { return isFactoryPreset (preset); });
