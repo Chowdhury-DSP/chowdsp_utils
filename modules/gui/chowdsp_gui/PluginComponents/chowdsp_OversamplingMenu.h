@@ -21,7 +21,11 @@ public:
 
     /** Constructor with fields for the oversampling object, and APVTS */
     template <typename... Args>
-    OversamplingMenu (OSType& osManager, juce::AudioProcessorValueTreeState& vts, Args&&... args);
+    OversamplingMenu (OSType& oversamplingManager, juce::AudioProcessorValueTreeState& vts, Args&&... args)
+     : ComboBoxType (args...), osManager (oversamplingManager)
+    {
+        initialise (vts);
+    }
 
     void updateColours();
 
@@ -29,9 +33,11 @@ protected:
     virtual void generateComboBoxMenu();
 
 private:
+    void initialise (juce::AudioProcessorValueTreeState& vts);
+
     juce::Colour accentColour;
 
-    std::unique_ptr<juce::ParameterAttachment> attachments[5];
+    std::unique_ptr<juce::ParameterAttachment> attachments[5] {};
     juce::RangedAudioParameter* parameters[5] {};
 
     enum ParamTypes

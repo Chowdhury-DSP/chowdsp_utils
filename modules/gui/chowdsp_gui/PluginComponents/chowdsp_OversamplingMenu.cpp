@@ -4,9 +4,7 @@
 namespace chowdsp
 {
 template <typename OSType, typename ComboBoxType>
-template <typename... Args>
-OversamplingMenu<OSType, ComboBoxType>::OversamplingMenu (OSType& osMgr, juce::AudioProcessorValueTreeState& vts, Args&&... args)
-    : ComboBoxType (args...), osManager (osMgr)
+void OversamplingMenu<OSType, ComboBoxType>::initialise (juce::AudioProcessorValueTreeState& vts)
 {
     this->setDescription ("Oversampling Menu");
 
