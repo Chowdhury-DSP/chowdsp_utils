@@ -9,6 +9,7 @@ template <typename OSType, typename ComboBoxType = juce::ComboBox>
 class OversamplingMenu : public ComboBoxType
 {
     static_assert (std::is_base_of_v<juce::ComboBox, ComboBoxType>, "ComboBoxType must be derived from juce::ComboBox");
+
 public:
     enum ColourIDs
     {
