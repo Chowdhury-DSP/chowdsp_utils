@@ -107,6 +107,9 @@ void SignalGeneratorPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
         auto&& upsampledBlock = juce::dsp::AudioBlock<float> { upsampledBuffer };
         auto&& upsampledContext = juce::dsp::ProcessContextReplacing<float> { upsampledBlock };
 
+        if constexpr (std::is_same_v<std::decay_t<decltype (tone)>, chowdsp::SquareWave<float>>)
+            tone.setDutyCycle (state.params.dutyCycleParam->getCurrentValue());
+
         freqHzParamSmoothed.process (upsampledBuffer.getNumSamples());
         if (! freqHzParamSmoothed.isSmoothing())
         {

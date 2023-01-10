@@ -24,7 +24,15 @@ template <typename T>
 void SquareWave<T>::reset (T phase) noexcept
 {
     saw1.reset (phase);
-    saw2.reset (phase + (T) 1);
+    saw2.reset (phase + (T) 2 * dutyCycle);
+}
+
+template <typename T>
+void SquareWave<T>::setDutyCycle (T newDutyCycle) noexcept
+{
+    dutyCycle = (T) 1 - newDutyCycle;
+    makeupBias = (T) -2 * dutyCycle + (T) 1;
+    saw2.reset (saw1.getPhase() + (T) 2 * dutyCycle);
 }
 
 template <typename T>
@@ -53,6 +61,7 @@ void SquareWave<T>::processBlock (const BufferView<T>& buffer) noexcept
         const auto* intermediateChannelData = intermediateBuffer.getReadPointer (ch);
         auto* outputData = buffer.getWritePointer (ch);
         juce::FloatVectorOperations::subtract (outputData, intermediateChannelData, numSamples);
+        juce::FloatVectorOperations::add (outputData, makeupBias, numSamples);
     }
 }
 
@@ -87,6 +96,7 @@ void SquareWave<T>::process (const ProcessContext& context) noexcept
     intermediateBlock.clear();
     saw1.template process<ProcessContextReplacing<T>> (ProcessContextReplacing<T> { intermediateBlock });
     outBlock -= intermediateBlock;
+    outBlock += makeupBias;
 }
 #endif
 } // namespace chowdsp

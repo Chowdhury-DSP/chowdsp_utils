@@ -11,6 +11,7 @@ struct SignalGenParams : chowdsp::ParamHolder
     {
         add (freqParam,
              gainParam,
+             dutyCycleParam,
              typeParam,
              upsampleParam,
              waveshapeParam);
@@ -28,6 +29,12 @@ struct SignalGenParams : chowdsp::ParamHolder
         "Gain",
         juce::NormalisableRange { -45.0f, 12.0f },
         -24.0f
+    };
+
+    chowdsp::PercentParameter::Ptr dutyCycleParam {
+        juce::ParameterID { "duty_cycle", 100 },
+        "Square Wave Duty Cycle",
+        0.5f
     };
 
     chowdsp::ChoiceParameter::Ptr typeParam {

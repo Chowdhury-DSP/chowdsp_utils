@@ -30,6 +30,9 @@ public:
     /** Resets the internal state of the oscillator, with a phase in range [-1, 1] */
     void reset (T phase = (T) -1) noexcept;
 
+    /** Returns the oscillator's current phase. */
+    T getPhase() const noexcept { return phi; }
+
     /** Returns the result of processing a single sample. */
     inline T processSample() noexcept
     {
