@@ -57,8 +57,6 @@ public:
     void processBlockOut (const BufferView<SampleType>& buffer, bool onOffParam);
 
 private:
-    //    int getFadeStartSample (const int numSamples);
-
     bool prevOnOffParam = false;
     Buffer<SampleType> fadeBuffer;
 
