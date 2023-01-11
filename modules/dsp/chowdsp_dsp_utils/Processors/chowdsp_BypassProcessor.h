@@ -22,8 +22,51 @@ namespace chowdsp
  * }
  * ```
  */
-template <typename SampleType, typename DelayInterpType = DelayLineInterpolationTypes::None>
-class BypassProcessor
+template <typename SampleType, typename DelayInterpType = std::nullptr_t, typename = void>
+class BypassProcessor;
+
+template <typename SampleType, typename DelayInterpType>
+class BypassProcessor<SampleType, DelayInterpType, std::enable_if_t<std::is_same_v<DelayInterpType, std::nullptr_t>>>
+{
+public:
+    using NumericType = SampleTypeHelpers::NumericType<SampleType>;
+
+    BypassProcessor() = default;
+
+    /** Converts a parameter handle to a boolean */
+    static bool toBool (const std::atomic<float>* param)
+    {
+        return static_cast<bool> (param->load());
+    }
+
+    /** Allocated required memory, and resets the property */
+    void prepare (const juce::dsp::ProcessSpec& spec, bool onOffParam);
+
+    /**
+      * Call this at the start of your processBlock().
+      * If it returns false, you can safely skip all other
+      * processing.
+      */
+    bool processBlockIn (const BufferView<SampleType>& buffer, bool onOffParam);
+
+    /**
+      * Call this at the end of your processBlock().
+      * It will fade the dry signal back in with the main
+      * signal as needed.
+      */
+    void processBlockOut (const BufferView<SampleType>& buffer, bool onOffParam);
+
+private:
+    //    int getFadeStartSample (const int numSamples);
+
+    bool prevOnOffParam = false;
+    Buffer<SampleType> fadeBuffer;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BypassProcessor)
+};
+
+template <typename SampleType, typename DelayInterpType>
+class BypassProcessor<SampleType, DelayInterpType, std::enable_if_t<! std::is_same_v<DelayInterpType, std::nullptr_t>>>
 {
 public:
     using NumericType = SampleTypeHelpers::NumericType<SampleType>;

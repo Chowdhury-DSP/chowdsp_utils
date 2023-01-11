@@ -1,9 +1,85 @@
-#include "chowdsp_BypassProcessor.h"
-
 namespace chowdsp
 {
 template <typename SampleType, typename DelayInterpType>
-void BypassProcessor<SampleType, DelayInterpType>::prepare (const juce::dsp::ProcessSpec& spec, bool onOffParam)
+void BypassProcessor<SampleType, DelayInterpType, std::enable_if_t<std::is_same_v<DelayInterpType, std::nullptr_t>>>::prepare (const juce::dsp::ProcessSpec& spec, bool onOffParam)
+{
+    prevOnOffParam = onOffParam;
+    fadeBuffer.setMaxSize ((int) spec.numChannels, (int) spec.maximumBlockSize);
+}
+
+template <typename SampleType, typename DelayInterpType>
+bool BypassProcessor<SampleType, DelayInterpType, std::enable_if_t<std::is_same_v<DelayInterpType, std::nullptr_t>>>::processBlockIn (const BufferView<SampleType>& block, bool onOffParam)
+{
+    if (! onOffParam && ! prevOnOffParam)
+    {
+        return false;
+    }
+
+    if (onOffParam != prevOnOffParam)
+    {
+        fadeBuffer.setCurrentSize (block.getNumChannels(), block.getNumSamples());
+        BufferMath::copyBufferData (block, fadeBuffer);
+    }
+
+    return true;
+}
+
+template <typename SampleType, typename DelayInterpType>
+void BypassProcessor<SampleType, DelayInterpType, std::enable_if_t<std::is_same_v<DelayInterpType, std::nullptr_t>>>::processBlockOut (const BufferView<SampleType>& block, bool onOffParam)
+{
+    auto fadeOutputBuffer = [onOffParam] (auto* blockPtr, const auto* fadePtr, const int startSample, const int numSamples)
+    {
+        SampleType startGain = ! onOffParam ? static_cast<NumericType> (1) // fade out
+                                            : static_cast<NumericType> (0); // fade in
+        SampleType endGain = static_cast<NumericType> (1) - startGain;
+
+        SampleType gain = startGain;
+        SampleType increment = (endGain - startGain) / (NumericType) (numSamples - startSample);
+
+        // From samples [0, startSample)
+        if constexpr (SampleTypeHelpers::IsSIMDRegister<SampleType>)
+        {
+            const auto fadeBufferGain = static_cast<NumericType> (1) - gain;
+            for (int n = 0; n < startSample; ++n)
+                blockPtr[n] = blockPtr[n] * gain + fadePtr[n] * fadeBufferGain;
+        }
+        else
+        {
+            juce::FloatVectorOperations::multiply (blockPtr, gain, startSample);
+            juce::FloatVectorOperations::addWithMultiply (blockPtr, fadePtr, static_cast<SampleType> (1) - gain, startSample);
+        }
+
+        // From [startSample, numSamples)
+        for (int n = startSample; n < numSamples; ++n)
+        {
+            blockPtr[n] = blockPtr[n] * gain + fadePtr[n] * (static_cast<NumericType> (1) - gain);
+            gain += increment;
+        }
+    };
+
+    if (onOffParam == prevOnOffParam)
+    {
+        return;
+    }
+
+    const auto numChannels = block.getNumChannels();
+    const auto numSamples = block.getNumSamples();
+
+    for (int ch = 0; ch < numChannels; ++ch)
+    {
+        auto* blockPtr = block.getWritePointer (ch);
+        const auto* fadePtr = fadeBuffer.getReadPointer (ch);
+
+        fadeOutputBuffer (blockPtr, fadePtr, 0, numSamples);
+    }
+
+    if (0 < numSamples)
+        prevOnOffParam = onOffParam;
+}
+
+//===========================================================
+template <typename SampleType, typename DelayInterpType>
+void BypassProcessor<SampleType, DelayInterpType, std::enable_if_t<! std::is_same_v<DelayInterpType, std::nullptr_t>>>::prepare (const juce::dsp::ProcessSpec& spec, bool onOffParam)
 {
     prevOnOffParam = onOffParam;
     fadeBuffer.setMaxSize ((int) spec.numChannels, (int) spec.maximumBlockSize);
@@ -12,20 +88,20 @@ void BypassProcessor<SampleType, DelayInterpType>::prepare (const juce::dsp::Pro
 }
 
 template <typename SampleType, typename DelayInterpType>
-void BypassProcessor<SampleType, DelayInterpType>::setLatencySamples (int delaySamples)
+void BypassProcessor<SampleType, DelayInterpType, std::enable_if_t<! std::is_same_v<DelayInterpType, std::nullptr_t>>>::setLatencySamples (int delaySamples)
 {
     setLatencySamplesInternal ((NumericType) delaySamples);
 }
 
 template <typename SampleType, typename DelayInterpType>
-void BypassProcessor<SampleType, DelayInterpType>::setLatencySamples (NumericType delaySamples)
+void BypassProcessor<SampleType, DelayInterpType, std::enable_if_t<! std::is_same_v<DelayInterpType, std::nullptr_t>>>::setLatencySamples (NumericType delaySamples)
 {
     static_assert (! std::is_same_v<DelayInterpType, DelayLineInterpolationTypes::None>, "Attempting to set non-integer latency value without using delay interpolation!");
     setLatencySamplesInternal (delaySamples);
 }
 
 template <typename SampleType, typename DelayInterpType>
-void BypassProcessor<SampleType, DelayInterpType>::setLatencySamplesInternal (NumericType delaySamples)
+void BypassProcessor<SampleType, DelayInterpType, std::enable_if_t<! std::is_same_v<DelayInterpType, std::nullptr_t>>>::setLatencySamplesInternal (NumericType delaySamples)
 {
     if (delaySamples == prevDelay)
         return;
@@ -39,7 +115,7 @@ void BypassProcessor<SampleType, DelayInterpType>::setLatencySamplesInternal (Nu
 }
 
 template <typename SampleType, typename DelayInterpType>
-bool BypassProcessor<SampleType, DelayInterpType>::processBlockIn (const BufferView<SampleType>& block, bool onOffParam)
+bool BypassProcessor<SampleType, DelayInterpType, std::enable_if_t<! std::is_same_v<DelayInterpType, std::nullptr_t>>>::processBlockIn (const BufferView<SampleType>& block, bool onOffParam)
 {
     enum class DelayOp
     {
@@ -101,7 +177,7 @@ bool BypassProcessor<SampleType, DelayInterpType>::processBlockIn (const BufferV
 }
 
 template <typename SampleType, typename DelayInterpType>
-void BypassProcessor<SampleType, DelayInterpType>::processBlockOut (const BufferView<SampleType>& block, bool onOffParam)
+void BypassProcessor<SampleType, DelayInterpType, std::enable_if_t<! std::is_same_v<DelayInterpType, std::nullptr_t>>>::processBlockOut (const BufferView<SampleType>& block, bool onOffParam)
 {
     auto fadeOutputBuffer = [onOffParam] (auto* blockPtr, const auto* fadePtr, const int startSample, const int numSamples)
     {
@@ -156,7 +232,7 @@ void BypassProcessor<SampleType, DelayInterpType>::processBlockOut (const Buffer
 }
 
 template <typename SampleType, typename DelayInterpType>
-int BypassProcessor<SampleType, DelayInterpType>::getFadeStartSample (const int numSamples)
+int BypassProcessor<SampleType, DelayInterpType, std::enable_if_t<! std::is_same_v<DelayInterpType, std::nullptr_t>>>::getFadeStartSample (const int numSamples)
 {
     if (latencySampleCount <= 0)
     {
@@ -176,5 +252,4 @@ int BypassProcessor<SampleType, DelayInterpType>::getFadeStartSample (const int 
         return numSamples;
     }
 }
-
 } // namespace chowdsp
