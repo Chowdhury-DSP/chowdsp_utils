@@ -18,7 +18,7 @@ void FileInterface::savePreset()
 
 void FileInterface::resaveCurrentPreset()
 {
-    const auto* currentPreset = presetManager.currentPreset.get();
+    const auto* currentPreset = presetManager.getCurrentPreset();
     jassert (currentPreset != nullptr && currentPreset->getPresetFile().existsAsFile() && ! presetManager.isFactoryPreset (*currentPreset));
 
     presetManager.saveUserPreset (
@@ -33,7 +33,7 @@ void FileInterface::resaveCurrentPreset()
 
 void FileInterface::deleteCurrentPreset()
 {
-    const auto* currentPreset = presetManager.currentPreset.get();
+    const auto* currentPreset = presetManager.getCurrentPreset();
     jassert (currentPreset != nullptr && currentPreset->getPresetFile().existsAsFile() && ! presetManager.isFactoryPreset (*currentPreset));
 
     if (checkDeletePresetCallback != nullptr && ! checkDeletePresetCallback (*currentPreset))

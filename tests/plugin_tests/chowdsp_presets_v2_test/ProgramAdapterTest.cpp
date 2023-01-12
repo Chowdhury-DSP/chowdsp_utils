@@ -31,7 +31,7 @@ TEST_CASE ("Program Adapter Test", "[presets]")
         REQUIRE (adapter.getCurrentProgram() == 0);
         REQUIRE (adapter.getProgramName (0).isEmpty());
         adapter.setCurrentProgram (0);
-        REQUIRE (presetMgr->currentPreset == nullptr);
+        REQUIRE (presetMgr->getCurrentPreset() == nullptr);
     }
 
     SECTION ("Get Program Info")
@@ -56,7 +56,7 @@ TEST_CASE ("Program Adapter Test", "[presets]")
 
     const auto checkPresetIndex = [] (chowdsp::PresetManager& mgr, int expectedIndex)
     {
-        REQUIRE (mgr.currentPreset->getState()["value"] == expectedIndex);
+        REQUIRE (mgr.getCurrentPreset()->getState()["value"] == expectedIndex);
     };
 
     SECTION ("Get Current Program")

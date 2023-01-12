@@ -25,7 +25,6 @@ TEST_CASE ("Next/Previous Test", "[presets]")
         chowdsp::PresetManager presetMgr { state };
         presetMgr.addPresets ({ chowdsp::Preset { "Name", "Vendor", { { "dummy", 0.0f } } } });
         chowdsp::PresetsFrontend::NextPrevious nextPrev { presetMgr };
-        presetMgr.currentPreset.reset();
 
         REQUIRE (nextPrev.goToNextPreset() == false);
         REQUIRE (nextPrev.goToPreviousPreset() == false);
@@ -38,7 +37,7 @@ TEST_CASE ("Next/Previous Test", "[presets]")
 
     const auto checkPresetIndex = [] (chowdsp::PresetManager& mgr, int expectedIndex)
     {
-        REQUIRE (mgr.currentPreset->getState()["value"] == expectedIndex);
+        REQUIRE (mgr.getCurrentPreset()->getState()["value"] == expectedIndex);
     };
 
     SECTION ("No Wrapping")

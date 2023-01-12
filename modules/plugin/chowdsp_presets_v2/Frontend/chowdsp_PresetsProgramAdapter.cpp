@@ -17,10 +17,10 @@ int PresetsProgramAdapter::getNumPrograms()
 
 int PresetsProgramAdapter::getCurrentProgram()
 {
-    if (presetManager == nullptr || presetManager->currentPreset == nullptr)
+    if (presetManager == nullptr || presetManager->getCurrentPreset() == nullptr)
         return BaseProgramAdapter::getCurrentProgram();
 
-    return presetManager->getPresetTree().getIndexForPreset (*presetManager->currentPreset);
+    return presetManager->getPresetTree().getIndexForPreset (*presetManager->getCurrentPreset());
 }
 
 void PresetsProgramAdapter::setCurrentProgram (int index)

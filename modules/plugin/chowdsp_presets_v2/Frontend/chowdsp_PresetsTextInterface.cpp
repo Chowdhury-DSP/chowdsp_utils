@@ -5,10 +5,10 @@ namespace chowdsp::PresetsFrontend
 TextInterface::TextInterface (PresetManager& manager) : presetManager (manager)
 {
     listeners += {
-        presetManager.currentPreset.changeBroadcaster.connect ([this]
-                                                               { updateText(); }),
-        presetManager.isPresetDirty.changeBroadcaster.connect ([this]
-                                                               { updateText(); }),
+        presetManager.presetChangedBroadcaster.connect ([this]
+                                                        { updateText(); }),
+        presetManager.presetDirtyStatusBroadcaster.connect ([this]
+                                                            { updateText(); }),
     };
 
     updateText();
@@ -17,12 +17,12 @@ TextInterface::TextInterface (PresetManager& manager) : presetManager (manager)
 void TextInterface::updateText()
 {
     presetText = {};
-    if (auto* currentPreset = presetManager.currentPreset.get())
+    if (auto* currentPreset = presetManager.getCurrentPreset())
     {
         if (currentPreset->isValid())
         {
             presetText = currentPreset->getName();
-            if (presetManager.isPresetDirty)
+            if (presetManager.getIsPresetDirty())
                 presetText += "*";
         }
     }

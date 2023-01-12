@@ -8,8 +8,8 @@ ClipboardInterface::ClipboardInterface (PresetManager& manager) : presetManager 
 
 void ClipboardInterface::copyCurrentPreset() const
 {
-    jassert (presetManager.currentPreset != nullptr && presetManager.currentPreset->isValid());
-    juce::SystemClipboard::copyTextToClipboard (presetManager.currentPreset->toJson().dump());
+    jassert (presetManager.getCurrentPreset() != nullptr && presetManager.getCurrentPreset()->isValid());
+    juce::SystemClipboard::copyTextToClipboard (presetManager.getCurrentPreset()->toJson().dump());
 }
 
 bool ClipboardInterface::tryToPastePreset()

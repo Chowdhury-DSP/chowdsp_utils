@@ -4,7 +4,7 @@ namespace chowdsp::PresetsFrontend
 {
 NextPrevious::NextPrevious (PresetManager& manager) : presetManager (manager)
 {
-    presetChangedCallback = presetManager.currentPreset.changeBroadcaster
+    presetChangedCallback = presetManager.presetChangedBroadcaster
                                 .connect ([this]
                                           { updateCurrentPresetIndex(); });
     updateCurrentPresetIndex();
@@ -12,13 +12,13 @@ NextPrevious::NextPrevious (PresetManager& manager) : presetManager (manager)
 
 void NextPrevious::updateCurrentPresetIndex()
 {
-    if (presetManager.currentPreset == nullptr)
+    if (presetManager.getCurrentPreset() == nullptr)
     {
         currentPresetIndex = -1;
         return;
     }
 
-    currentPresetIndex = presetManager.getPresetTree().getIndexForPreset (*presetManager.currentPreset);
+    currentPresetIndex = presetManager.getPresetTree().getIndexForPreset (*presetManager.getCurrentPreset());
 }
 
 bool NextPrevious::navigateThroughPresets (bool forward)

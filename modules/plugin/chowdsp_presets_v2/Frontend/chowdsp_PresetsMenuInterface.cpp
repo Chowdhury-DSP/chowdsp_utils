@@ -18,7 +18,7 @@ void MenuInterface::addPresetsToMenu (juce::PopupMenu& menu)
 
 void MenuInterface::addExtraMenuItems (juce::PopupMenu& menu, std::initializer_list<ExtraMenuItems> extraMenuItems)
 {
-    const auto* currentPreset = presetManager.currentPreset.get();
+    const auto* currentPreset = presetManager.getCurrentPreset();
     const auto currentPresetExists = currentPreset != nullptr && currentPreset->isValid();
     const auto currentPresetFileExists = currentPresetExists && currentPreset->getPresetFile().existsAsFile();
     const auto userPresetDirExists = presetManager.getUserPresetPath().isDirectory();
@@ -50,7 +50,7 @@ void MenuInterface::addExtraMenuItems (juce::PopupMenu& menu, std::initializer_l
         if (itemID == Reset)
         {
             addPresetMenuItem ([this]
-                               { presetManager.loadPreset (*presetManager.currentPreset); },
+                               { presetManager.loadPreset (*presetManager.getCurrentPreset()); },
                                currentPresetExists);
         }
         else if (itemID == Save_Preset_As)

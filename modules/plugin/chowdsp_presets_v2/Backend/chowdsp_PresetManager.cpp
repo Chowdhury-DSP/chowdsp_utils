@@ -26,6 +26,7 @@ void PresetManager::initializeListeners (ParamHolder& params, ParameterListeners
 
                     loadPresetState (currentPreset->getState()); // @TODO: could this throw?
                     pluginState.getParameterListeners().updateBroadcastersFromMessageThread();
+                    presetChangedBroadcaster();
                     isPresetDirty.set (false);
 
                     if (processor != nullptr)
@@ -47,8 +48,49 @@ void PresetManager::initializeListeners (ParamHolder& params, ParameterListeners
 
 void PresetManager::loadPreset (const Preset& preset)
 {
-    pluginState.callOnMainThread ([this, &preset]
-                                  { currentPreset = preset; });
+    struct ChangePresetAction : juce::UndoableAction
+    {
+        explicit ChangePresetAction (PresetManager& mgr, const Preset& preset)
+            : manager (mgr), keepAlivePreset (preset) {}
+
+        bool perform() override
+        {
+            const bool presetIsDirty = manager.isPresetDirty;
+            const auto currentPresetCopy = Preset { manager.currentPreset->getName(),
+                                                    manager.currentPreset->getVendor(),
+                                                    manager.savePresetState(),
+                                                    manager.currentPreset->getCategory(),
+                                                    manager.currentPreset->getPresetFile() };
+
+            manager.currentPreset = keepAlivePreset;
+            keepAlivePreset = std::move (currentPresetCopy);
+
+            manager.isPresetDirty.set (presetWasDirty);
+            presetWasDirty = presetIsDirty;
+
+            return true;
+        }
+
+        bool undo() override { return perform(); }
+        int getSizeInUnits() override { return (int) sizeof (*this); }
+
+        PresetManager& manager;
+        Preset keepAlivePreset;
+        bool presetWasDirty = false;
+    };
+
+    pluginState.callOnMainThread (
+        [this, &preset]
+        {
+            if (currentPreset == nullptr || pluginState.undoManager == nullptr)
+            {
+                currentPreset = preset;
+                return;
+            }
+
+            pluginState.undoManager->beginNewTransaction ("Loading preset: " + preset.getName());
+            pluginState.undoManager->perform (std::make_unique<ChangePresetAction> (*this, preset).release());
+        });
 }
 
 bool PresetManager::isPresetAgnosticParameter (const juce::RangedAudioParameter& param) const
@@ -205,7 +247,8 @@ void PresetManager::loadUserPresetsFromFolder (const juce::File& file)
     }
 
     // delete old user presets
-    presetTree.removePresets ([this] (const Preset& preset) { return isFactoryPreset (preset); });
+    presetTree.removePresets ([this] (const Preset& preset)
+                              { return isFactoryPreset (preset); });
 
     addPresets (std::move (presets), false);
 }

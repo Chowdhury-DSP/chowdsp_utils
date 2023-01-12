@@ -24,6 +24,12 @@ public:
     /** Loads a preset by reference. */
     void loadPreset (const Preset& preset);
 
+    /** Returns the currently loaded preset, or nullptr if no preset is loaded. */
+    [[nodiscard]] const Preset* getCurrentPreset() const { return currentPreset.get(); }
+
+    /** Returns true if the currently loaded preset is "dirty". */
+    [[nodiscard]] bool getIsPresetDirty() const noexcept { return isPresetDirty.get(); }
+
     /** Adds a vector of presets. */
     void addPresets (std::vector<Preset>&& presets, bool areFactoryPresets = true);
 
@@ -67,9 +73,9 @@ public:
 
     [[nodiscard]] juce::String getUserPresetVendorName() const noexcept { return userPresetsVendor; }
 
-    chowdsp::Broadcaster<void()> presetListUpdatedBroadcaster;
-    StateValue<bool> isPresetDirty { "is_preset_dirty", false };
-    PresetState currentPreset;
+    Broadcaster<void()> presetListUpdatedBroadcaster;
+    Broadcaster<void()> presetChangedBroadcaster;
+    Broadcaster<void()> presetDirtyStatusBroadcaster;
 
 protected:
     /** Override this if your presets need custom state-loading behaviour */
@@ -80,6 +86,9 @@ protected:
 
     /** Override this to support backwards compatibility for user presets */
     [[nodiscard]] virtual Preset loadUserPresetFromFile (const juce::File& file);
+
+    PresetState currentPreset;
+    StateValue<bool> isPresetDirty { "chowdsp_is_preset_dirty", false };
 
 private:
     void initializeListeners (ParamHolder& params, ParameterListeners& listeners);

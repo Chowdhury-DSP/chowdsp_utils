@@ -143,7 +143,7 @@ TEST_CASE ("Preset Manager Test", "[presets][state]")
         chowdsp::ParameterTypeHelpers::setValue (extraValue, *presetMgr.state.params.extraParam);
         presetMgr.state.getParameterListeners().updateBroadcastersFromMessageThread();
         REQUIRE_MESSAGE (presetMgr.state.params.extraParam->get() == extraValue, "Set value is incorrect!");
-        REQUIRE_MESSAGE (presetMgr->isPresetDirty, "Preset dirty after set value is incorrect!");
+        REQUIRE_MESSAGE (presetMgr->getIsPresetDirty(), "Preset dirty after set value is incorrect!");
 
         presetMgr->addPresets ({ preset });
         presetMgr.loadPreset (0);
@@ -157,31 +157,31 @@ TEST_CASE ("Preset Manager Test", "[presets][state]")
         static constexpr float testValue2 = 0.85f;
 
         ScopedPresetManager presetMgr {};
-        REQUIRE_MESSAGE (! presetMgr->isPresetDirty, "Initial dirty state is incorrect!");
+        REQUIRE_MESSAGE (! presetMgr->getIsPresetDirty(), "Initial dirty state is incorrect!");
 
         const auto presetFile1 = presetMgr.getPresetFile ("test.preset");
         presetMgr->saveUserPreset (presetFile1);
-        REQUIRE_MESSAGE (! presetMgr->isPresetDirty, "Dirty state after saving first preset is incorrect!");
+        REQUIRE_MESSAGE (! presetMgr->getIsPresetDirty(), "Dirty state after saving first preset is incorrect!");
 
         presetMgr.setFloatParam (testValue1);
-        REQUIRE_MESSAGE (presetMgr->isPresetDirty, "Dirty state after changing value is incorrect!");
+        REQUIRE_MESSAGE (presetMgr->getIsPresetDirty(), "Dirty state after changing value is incorrect!");
 
         presetMgr.setFloatParam (initialValue);
-        REQUIRE_MESSAGE (presetMgr->isPresetDirty, "Dirty state after return to initial value is incorrect!");
+        REQUIRE_MESSAGE (presetMgr->getIsPresetDirty(), "Dirty state after return to initial value is incorrect!");
 
         presetMgr.setFloatParam (testValue2);
         const auto presetFile2 = presetMgr.getPresetFile ("test2.preset");
         presetMgr->saveUserPreset (presetFile2);
-        REQUIRE_MESSAGE (! presetMgr->isPresetDirty, "Dirty state after saving second preset is incorrect!");
+        REQUIRE_MESSAGE (! presetMgr->getIsPresetDirty(), "Dirty state after saving second preset is incorrect!");
 
         presetMgr.setFloatParam (testValue2);
-        REQUIRE_MESSAGE (! presetMgr->isPresetDirty, "Dirty state after staying at initial value is incorrect!");
+        REQUIRE_MESSAGE (! presetMgr->getIsPresetDirty(), "Dirty state after staying at initial value is incorrect!");
 
         presetMgr.toggleBoolParam();
-        REQUIRE_MESSAGE (! presetMgr->isPresetDirty, "Dirty state after changing preset-agnostic parameter is incorrect!");
+        REQUIRE_MESSAGE (! presetMgr->getIsPresetDirty(), "Dirty state after changing preset-agnostic parameter is incorrect!");
 
         presetMgr.setFloatParam (testValue1);
-        REQUIRE_MESSAGE (presetMgr->isPresetDirty, "Dirty state after moving from initial value is incorrect!");
+        REQUIRE_MESSAGE (presetMgr->getIsPresetDirty(), "Dirty state after moving from initial value is incorrect!");
     }
 
     SECTION ("Default Preset")
@@ -241,8 +241,8 @@ TEST_CASE ("Preset Manager Test", "[presets][state]")
         ScopedPresetManager presetMgr {};
         presetMgr.state.deserialize (state);
         REQUIRE_MESSAGE (presetMgr.getFloatParam() == otherValue, "Preset state is overriding parameter state!");
-        REQUIRE (presetMgr->currentPreset == nullptr);
-        REQUIRE (presetMgr->isPresetDirty);
+        REQUIRE (presetMgr->getCurrentPreset() == nullptr);
+        REQUIRE (presetMgr->getIsPresetDirty());
     }
 
     SECTION ("Preset State Test")
@@ -267,7 +267,42 @@ TEST_CASE ("Preset Manager Test", "[presets][state]")
         ScopedPresetManager presetMgr {};
         presetMgr.state.deserialize (state);
         REQUIRE_MESSAGE (presetMgr.getFloatParam() == otherValue, "Preset state is overriding parameter state!");
-        REQUIRE (*presetMgr->currentPreset.get() == preset);
-        REQUIRE (presetMgr->isPresetDirty);
+        REQUIRE (*presetMgr->getCurrentPreset() == preset);
+        REQUIRE (presetMgr->getIsPresetDirty());
+    }
+
+    SECTION ("Preset Undo/Redo Test")
+    {
+        static constexpr float testValue = 0.05f;
+        static constexpr float testValue2 = 0.15f;
+        static constexpr float dirtyVal = 0.22f;
+        auto preset = saveUserPreset ("test.preset", testValue);
+        auto preset2 = saveUserPreset ("test1.preset", testValue2);
+
+        juce::UndoManager um { 1000 };
+        ScopedPresetManager presetMgr {};
+        presetMgr.state.undoManager = &um;
+
+        presetMgr->addPresets ({ chowdsp::Preset { preset }, chowdsp::Preset { preset2 } });
+        presetMgr.loadPreset (0);
+        REQUIRE (presetMgr.getFloatParam() == testValue);
+
+        presetMgr.setFloatParam (dirtyVal);
+        REQUIRE (presetMgr.getFloatParam() == dirtyVal);
+        REQUIRE (presetMgr->getIsPresetDirty());
+
+        presetMgr.loadPreset (1);
+        REQUIRE (presetMgr.getFloatParam() == testValue2);
+        REQUIRE (! presetMgr->getIsPresetDirty());
+
+        REQUIRE (um.canUndo());
+        REQUIRE (um.undo());
+        REQUIRE (presetMgr->getIsPresetDirty());
+        REQUIRE (presetMgr.getFloatParam() == dirtyVal);
+
+        REQUIRE (um.canRedo());
+        REQUIRE (um.redo());
+        REQUIRE (! presetMgr->getIsPresetDirty());
+        REQUIRE (presetMgr.getFloatParam() == testValue2);
     }
 }
