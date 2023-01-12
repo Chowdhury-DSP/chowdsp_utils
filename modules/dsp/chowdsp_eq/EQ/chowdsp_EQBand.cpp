@@ -72,8 +72,9 @@ void EQBand<FloatType, FilterChoices...>::reset()
                                   { filter.reset(); },
                                   filters);
 
-    for (auto* smoother : { &freqSmooth, &qSmooth, &gainSmooth })
-        smoother->reset();
+    freqSmooth.reset (freqHzHandle);
+    qSmooth.reset (qHandle);
+    gainSmooth.reset (gainHandle);
 
     prevFilterType = filterType;
 }
