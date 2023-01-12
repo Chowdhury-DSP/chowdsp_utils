@@ -172,42 +172,18 @@ bool PresetManager::isFactoryPreset (const Preset& preset) const
     return std::find (factoryPresets.begin(), factoryPresets.end(), &preset) == factoryPresets.end();
 }
 
-void PresetManager::setUserPresetConfigFile (const juce::String& presetConfigFilePath)
-{
-    // @TODO: should we use PluginSettings for this instead?
-    userPresetConfigPath = presetConfigFilePath;
-
-    auto userPresetPath = getUserPresetPath();
-    if (userPresetPath.isDirectory())
-        loadUserPresetsFromFolder (userPresetPath);
-}
-
-juce::File PresetManager::getUserPresetConfigFile() const
-{
-    juce::File updatePresetFile = juce::File::getSpecialLocation (juce::File::userApplicationDataDirectory);
-    return updatePresetFile.getChildFile (userPresetConfigPath);
-}
-
 void PresetManager::setUserPresetPath (const juce::File& file)
 {
+    userPresetPath = file;
     if (file == juce::File())
         return;
 
-    auto config = getUserPresetConfigFile();
-    jassert (config != juce::File{} && ! config.isDirectory()); // config file was not set!
-    config.deleteFile();
-    config.create();
-    config.replaceWithText (file.getFullPathName());
     loadUserPresetsFromFolder (file);
 }
 
 juce::File PresetManager::getUserPresetPath() const
 {
-    auto userPresetConfigFile = getUserPresetConfigFile();
-    if (userPresetConfigFile.existsAsFile())
-        return userPresetConfigFile.loadFileAsString();
-
-    return {};
+    return userPresetPath;
 }
 
 Preset PresetManager::loadUserPresetFromFile (const juce::File& file)

@@ -45,3 +45,4 @@ namespace PresetsFrontend
 #include "Frontend/chowdsp_PresetsMenuInterface.h"
 #include "Frontend/chowdsp_PresetsTextInterface.h"
 #include "Frontend/chowdsp_PresetsNextPreviousInterface.h"
+#include "Frontend/chowdsp_PresetsSettingsInterface.h"

@@ -2,8 +2,10 @@
 
 namespace chowdsp::PresetsFrontend
 {
-FileInterface::FileInterface (PresetManager& manager, const juce::String& presetFileExt)
-    : presetManager (manager), presetFileExtension (presetFileExt)
+FileInterface::FileInterface (PresetManager& manager,
+                              const juce::String& presetFileExt,
+                              SettingsInterface* settingsFace)
+    : presetManager (manager), presetFileExtension (presetFileExt), settingsInterface (settingsFace)
 {
     jassert (presetFileExtension[0] == '.'); // invalid extension!
 }
@@ -74,6 +76,7 @@ void FileInterface::goToUserPresetsFolder()
 
 void FileInterface::chooseUserPresetsFolder()
 {
+#if JUCE_MODULE_AVAILABLE_chowdsp_plugin_utils
     constexpr auto folderChooserFlags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectDirectories;
     fileChooser = std::make_shared<juce::FileChooser> ("Choose User Preset Folder");
     {
@@ -84,9 +87,10 @@ void FileInterface::chooseUserPresetsFolder()
                 if (chooser.getResults().isEmpty())
                     return;
 
-                presetManager.setUserPresetPath (chooser.getResult());
+                settingsInterface->setUserPresetsPath (chooser.getResult());
             });
     }
+#endif
 }
 
 juce::File FileInterface::getFileForPreset (const Preset& preset) const

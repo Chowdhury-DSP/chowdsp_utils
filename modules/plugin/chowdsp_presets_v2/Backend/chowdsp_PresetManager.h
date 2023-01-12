@@ -8,10 +8,12 @@ public:
     template <typename PluginStateType>
     explicit PresetManager (PluginStateType& state,
                             juce::AudioProcessor* plugin = nullptr,
-                            std::vector<juce::RangedAudioParameter*>&& presetAgnosticParams = {})
+                            std::vector<juce::RangedAudioParameter*>&& presetAgnosticParams = {},
+                            PresetTree::InsertionHelper&& insertionHelper = { nullptr, nullptr, nullptr })
         : processor (plugin),
           pluginState (state),
-          presetAgnosticParameters (std::move (presetAgnosticParams))
+          presetAgnosticParameters (std::move (presetAgnosticParams)),
+          presetTree (std::move (insertionHelper))
     {
         state.nonParams.addStateValues ({ &currentPreset, &isPresetDirty });
         initializeListeners (state.params, state.getParameterListeners());
@@ -58,9 +60,6 @@ public:
     [[nodiscard]] auto& getPresetTree() { return presetTree; }
     [[nodiscard]] const auto& getPresetTree() const { return presetTree; }
 
-    void setUserPresetConfigFile (const juce::String& presetConfigFilePath);
-    [[nodiscard]] juce::File getUserPresetConfigFile() const;
-
     void setUserPresetPath (const juce::File& file);
     [[nodiscard]] juce::File getUserPresetPath() const;
 
@@ -95,7 +94,7 @@ private:
     const Preset* defaultPreset = nullptr;
     std::vector<const Preset*> factoryPresets;
 
-    juce::String userPresetConfigPath;
+    juce::File userPresetPath {};
     juce::String userPresetsVendor { "User" };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetManager)

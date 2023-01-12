@@ -98,7 +98,7 @@ void MenuInterface::addExtraMenuItems (juce::PopupMenu& menu, std::initializer_l
         {
             addPresetMenuItem ([this]
                                { fileInterface->chooseUserPresetsFolder(); },
-                               hasFileInterface);
+                               hasFileInterface && fileInterface->hasSettingsInterface());
         }
     }
 }

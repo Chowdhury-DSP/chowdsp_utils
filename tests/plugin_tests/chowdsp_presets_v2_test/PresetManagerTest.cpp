@@ -19,23 +19,15 @@ struct Params : chowdsp::ParamHolder
 template <bool extraParameter = false>
 struct ScopedPresetManager
 {
-    explicit ScopedPresetManager (const juce::String& presetConfigFile = {})
+    explicit ScopedPresetManager (const juce::File& userPresetsPath = {})
     {
-        if (presetConfigFile.isEmpty())
-        {
-            manager.setUserPresetConfigFile ("preset_config.txt");
+        if (userPresetsPath == juce::File{})
             manager.setUserPresetPath (presetPath.file);
-        }
         else
-        {
-            manager.setUserPresetConfigFile (presetConfigFile);
-        }
+            manager.setUserPresetPath (userPresetsPath);
     }
 
-    ~ScopedPresetManager()
-    {
-        manager.getUserPresetConfigFile().deleteFile();
-    }
+    ~ScopedPresetManager() = default;
 
     auto getPresetFile (const juce::String& path)
     {
@@ -214,16 +206,12 @@ TEST_CASE ("Preset Manager Test", "[presets][state]")
 
         auto preset1 = saveUserPreset ("test1.preset", testValue1);
         auto preset2 = saveUserPreset ("test2.preset", testValue2);
-        juce::File presetConfigFile = ScopedPresetManager{}->getUserPresetConfigFile();
 
         test_utils::ScopedFile userPresetsDir1 { "user_presets1" };
         userPresetsDir1.file.createDirectory();
         preset1.toFile (userPresetsDir1.file.getChildFile (preset1.getName()));
 
-        presetConfigFile.create();
-        presetConfigFile.replaceWithText (userPresetsDir1.file.getFullPathName());
-
-        ScopedPresetManager presetMgr { presetConfigFile.getFileName() };
+        ScopedPresetManager presetMgr { userPresetsDir1 };
         REQUIRE_MESSAGE (*presetMgr->getPresetTree().getPresetByIndex (0) == preset1, "User preset loaded from folder is incorrect!");
 
         presetMgr->setUserPresetPath ({});

@@ -19,6 +19,7 @@ private:
 
     chowdsp::ParametersViewEditor paramsView;
 
+    chowdsp::PresetsFrontend::FileInterface presetsFileInterface { plugin.getPresetManager(), ".chowpreset", &(*plugin.presetsSettings) };
     chowdsp::PresetsComponent presetsComp;
 
     void refreshUndoRedoButtons();
