@@ -4,7 +4,7 @@
 template <typename T>
 using TestStaticBuffer = chowdsp::StaticBuffer<T, 2, 128>;
 
-TEMPLATE_PRODUCT_TEST_CASE ("Buffer Test", "", (chowdsp::Buffer, TestStaticBuffer), (float, double, xsimd::batch<float>, xsimd::batch<double>) )
+TEMPLATE_PRODUCT_TEST_CASE ("Buffer Test", "[buffers]", (chowdsp::Buffer, TestStaticBuffer), (float, double, xsimd::batch<float>, xsimd::batch<double>) )
 {
     using BufferType = TestType;
     using SampleType = typename BufferType::Type;
@@ -95,5 +95,20 @@ TEMPLATE_PRODUCT_TEST_CASE ("Buffer Test", "", (chowdsp::Buffer, TestStaticBuffe
             for (int n = 0; n < buffer.getNumSamples(); ++n)
                 REQUIRE_MESSAGE (all (xConst[ch][n] == SampleType (0)), "Buffer was not cleared! " << ch << ", " << n);
         }
+    }
+
+    SECTION ("Resize Null Test")
+    {
+        BufferType buffer { 2, 128 };
+
+        buffer.setCurrentSize (0, 64);
+        REQUIRE (buffer.getNumChannels() == 0);
+        REQUIRE (buffer.getNumSamples() == 64);
+        REQUIRE (buffer.getArrayOfReadPointers() != nullptr);
+
+        buffer.setCurrentSize (1, 0);
+        REQUIRE (buffer.getNumChannels() == 1);
+        REQUIRE (buffer.getNumSamples() == 0);
+        REQUIRE (buffer.getArrayOfReadPointers() != nullptr);
     }
 }

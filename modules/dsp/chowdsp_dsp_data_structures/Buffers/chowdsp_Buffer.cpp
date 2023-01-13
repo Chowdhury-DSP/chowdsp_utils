@@ -11,8 +11,12 @@ Buffer<SampleType>::Buffer (int numChannels, int numSamples)
 template <typename SampleType>
 void Buffer<SampleType>::setMaxSize (int numChannels, int numSamples)
 {
+    // Make sure we don't have any null internal buffers
     jassert (juce::isPositiveAndBelow (numChannels, maxNumChannels));
     jassert (numSamples > 0);
+
+    numChannels = juce::jmax (numChannels, 1);
+    numSamples = juce::jmax (numSamples, 1);
 
     rawData.clear();
     hasBeenCleared = true;

@@ -289,7 +289,10 @@ void EQBand<FloatType, FilterChoices...>::processBlock (const BufferView<FloatTy
 
     const auto needsFade = filterType != prevFilterType;
     if (needsFade)
-        BufferMath::copyBufferData (buffer, fadeBuffer, 0, 0, numSamples, 0, numChannels);
+    {
+        fadeBuffer.setCurrentSize (numChannels, numSamples);
+        BufferMath::copyBufferData (buffer, fadeBuffer);
+    }
 
     TupleHelpers::forEachInTuple (
         [this, &buffer] (auto& filter, size_t filterIndex)

@@ -1,7 +1,7 @@
 #include <CatchUtils.h>
 #include <chowdsp_dsp_data_structures/chowdsp_dsp_data_structures.h>
 
-TEMPLATE_TEST_CASE ("SIMD Buffer Copy Test", "", float, double)
+TEMPLATE_TEST_CASE ("SIMD Buffer Copy Test", "[buffers]", float, double)
 {
     using T = TestType;
 
