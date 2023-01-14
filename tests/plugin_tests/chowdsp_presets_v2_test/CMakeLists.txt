@@ -1,4 +1,6 @@
-setup_catch_juce_test(chowdsp_presets_v2_test juce::juce_graphics chowdsp::chowdsp_presets_v2 chowdsp::chowdsp_plugin_utils)
+setup_catch_juce_test(chowdsp_presets_v2_test
+    juce::juce_graphics chowdsp::chowdsp_presets_v2 chowdsp::chowdsp_plugin_utils
+)
 
 target_sources(chowdsp_presets_v2_test
     PRIVATE
@@ -9,6 +11,8 @@ target_sources(chowdsp_presets_v2_test
         NextPreviousTest.cpp
         ProgramAdapterTest.cpp
         TextInterfaceTest.cpp
+        ClipboardInterfaceTest.cpp
+        SettingsInterfaceTest.cpp
 
         TestPresetBinaryData.cpp
 )

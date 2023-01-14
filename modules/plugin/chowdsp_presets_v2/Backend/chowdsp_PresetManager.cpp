@@ -253,7 +253,7 @@ void PresetManager::loadUserPresetsFromFolder (const juce::File& file)
     std::vector<Preset> presets;
     for (const auto& f : file.findChildFiles (juce::File::findFiles, true))
     {
-        if (f.getFileName() == ".DS_Store")
+        if (f.getFileExtension() != presetFileExt)
             continue;
 
         presets.push_back (loadUserPresetFromFile (f));

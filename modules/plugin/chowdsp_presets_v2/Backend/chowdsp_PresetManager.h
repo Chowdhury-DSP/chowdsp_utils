@@ -8,13 +8,16 @@ public:
     template <typename PluginStateType>
     explicit PresetManager (PluginStateType& state,
                             juce::AudioProcessor* plugin = nullptr,
+                            const juce::String& presetFileExtension = ".preset",
                             std::vector<juce::RangedAudioParameter*>&& presetAgnosticParams = {},
                             PresetTree::InsertionHelper&& insertionHelper = { nullptr, nullptr, nullptr })
         : processor (plugin),
           pluginState (state),
           presetAgnosticParameters (std::move (presetAgnosticParams)),
-          presetTree (std::move (insertionHelper))
+          presetTree (std::move (insertionHelper)),
+          presetFileExt (presetFileExtension)
     {
+        jassert (presetFileExt[0] == '.'); // invalid file extension!
         state.nonParams.addStateValues ({ &currentPreset, &isPresetDirty });
         initializeListeners (state.params, state.getParameterListeners());
     }
@@ -69,6 +72,8 @@ public:
     void setUserPresetPath (const juce::File& file);
     [[nodiscard]] juce::File getUserPresetPath() const;
 
+    [[nodiscard]] juce::String getPresetFileExtension() const noexcept { return presetFileExt; }
+
     virtual void loadUserPresetsFromFolder (const juce::File& file);
 
     [[nodiscard]] juce::String getUserPresetVendorName() const noexcept { return userPresetsVendor; }
@@ -105,6 +110,7 @@ private:
 
     juce::File userPresetPath {};
     juce::String userPresetsVendor { "User" };
+    const juce::String presetFileExt {};
 
     bool areWeInTheMidstOfAPresetChange = false;
     

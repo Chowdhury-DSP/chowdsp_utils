@@ -7,8 +7,8 @@ class FileInterface
 {
 public:
     FileInterface (PresetManager& manager,
-                   const juce::String& presetFileExtension,
                    SettingsInterface* settingsInterface = nullptr);
+    virtual ~FileInterface() = default;
 
     void savePreset();
     void resaveCurrentPreset();
@@ -16,7 +16,7 @@ public:
     void loadPresetFromFile();
 
     void goToUserPresetsFolder();
-    void chooseUserPresetsFolder();
+    virtual void chooseUserPresetsFolder();
 
     std::function<void (nlohmann::json&&)> savePresetCallback;
     std::function<bool (const Preset&)> checkDeletePresetCallback;
@@ -30,8 +30,6 @@ private:
     PresetManager& presetManager;
 
     std::shared_ptr<juce::FileChooser> fileChooser;
-
-    const juce::String presetFileExtension;
 
     SettingsInterface* settingsInterface = nullptr;
 

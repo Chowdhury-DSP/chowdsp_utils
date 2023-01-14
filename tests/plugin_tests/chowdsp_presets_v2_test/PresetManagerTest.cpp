@@ -31,7 +31,7 @@ struct ScopedPresetManager
 
     auto getPresetFile (const juce::String& path)
     {
-        return test_utils::ScopedFile { presetPath.file.getFileName() + "/" + path };
+        return test_utils::ScopedFile { presetPath.file.getChildFile (path).withFileExtension (manager.getPresetFileExtension()) };
     }
 
     void loadPreset (int index)
@@ -61,7 +61,7 @@ struct ScopedPresetManager
     const chowdsp::PresetManager* operator->() const { return &manager; }
 
     chowdsp::PluginStateImpl<Params<extraParameter>> state;
-    chowdsp::PresetManager manager { state, nullptr, { state.params.boolParam.get() } };
+    chowdsp::PresetManager manager { state, nullptr, ".preset", { state.params.boolParam.get() } };
     test_utils::ScopedFile presetPath { "preset_path" };
 };
 
@@ -209,7 +209,9 @@ TEST_CASE ("Preset Manager Test", "[presets][state]")
 
         test_utils::ScopedFile userPresetsDir1 { "user_presets1" };
         userPresetsDir1.file.createDirectory();
-        preset1.toFile (userPresetsDir1.file.getChildFile (preset1.getName()));
+        preset1.toFile (userPresetsDir1.file.getChildFile (preset1.getPresetFile().getFileName()));
+        juce::File dummyFile { preset1.getPresetFile().getSiblingFile ("DUMMY") };
+        dummyFile.create();
 
         ScopedPresetManager presetMgr { userPresetsDir1 };
         REQUIRE_MESSAGE (*presetMgr->getPresetTree().getPresetByIndex (0) == preset1, "User preset loaded from folder is incorrect!");
@@ -219,7 +221,7 @@ TEST_CASE ("Preset Manager Test", "[presets][state]")
 
         test_utils::ScopedFile userPresetsDir2 { "user_presets2" };
         userPresetsDir2.file.createDirectory();
-        preset2.toFile (userPresetsDir2.file.getChildFile (preset2.getName()));
+        preset2.toFile (userPresetsDir2.file.getChildFile (preset2.getPresetFile().getFileName()));
         presetMgr->setUserPresetPath (userPresetsDir2);
         REQUIRE_MESSAGE (*presetMgr->getPresetTree().getPresetByIndex (0) == preset2, "User presets not loaded correctly after changing user preset path!");
     }

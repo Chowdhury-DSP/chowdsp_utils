@@ -1,13 +1,15 @@
 #include "chowdsp_PresetsFileInterface.h"
 
+#if JUCE_MODULE_AVAILABLE_chowdsp_plugin_utils
+#include <chowdsp_plugin_utils/chowdsp_plugin_utils.h>
+#endif
+
 namespace chowdsp::PresetsFrontend
 {
 FileInterface::FileInterface (PresetManager& manager,
-                              const juce::String& presetFileExt,
                               SettingsInterface* settingsFace)
-    : presetManager (manager), presetFileExtension (presetFileExt), settingsInterface (settingsFace)
+    : presetManager (manager), settingsInterface (settingsFace)
 {
-    jassert (presetFileExtension[0] == '.'); // invalid extension!
 }
 
 void FileInterface::savePreset()
@@ -50,7 +52,7 @@ void FileInterface::loadPresetFromFile()
     constexpr auto fileBrowserFlags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles;
     fileChooser = std::make_shared<juce::FileChooser> ("Load Preset",
                                                        presetManager.getUserPresetPath(),
-                                                       "*" + presetFileExtension);
+                                                       "*" + presetManager.getPresetFileExtension());
     fileChooser->launchAsync (fileBrowserFlags,
                               [this] (const juce::FileChooser& fc)
                               {
@@ -76,6 +78,7 @@ void FileInterface::goToUserPresetsFolder()
 
 void FileInterface::chooseUserPresetsFolder()
 {
+    jassert (hasSettingsInterface());
 #if JUCE_MODULE_AVAILABLE_chowdsp_plugin_utils
     constexpr auto folderChooserFlags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectDirectories;
     fileChooser = std::make_shared<juce::FileChooser> ("Choose User Preset Folder");
@@ -96,6 +99,6 @@ void FileInterface::chooseUserPresetsFolder()
 juce::File FileInterface::getFileForPreset (const Preset& preset) const
 {
     jassert (presetManager.getUserPresetPath().isDirectory());
-    return presetManager.getUserPresetPath().getChildFile (preset.getName() + presetFileExtension);
+    return presetManager.getUserPresetPath().getChildFile (preset.getName() + presetManager.getPresetFileExtension());
 }
 } // namespace chowdsp::PresetsFrontend
