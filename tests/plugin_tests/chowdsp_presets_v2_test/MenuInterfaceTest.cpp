@@ -7,10 +7,11 @@ struct MenuIParams : chowdsp::ParamHolder
 
 TEST_CASE ("Menu Interface Test", "[presets]")
 {
+    chowdsp::PluginStateImpl<MenuIParams> state {};
+    chowdsp::PresetManager presetMgr { state };
+
     SECTION ("Presets Tree Menu")
     {
-        chowdsp::PluginStateImpl<MenuIParams> state {};
-        chowdsp::PresetManager presetMgr { state };
         presetMgr.getPresetTree().treeInserter = &chowdsp::PresetTreeInserters::vendorInserter;
 
         presetMgr.addPresets ({
@@ -74,8 +75,6 @@ TEST_CASE ("Menu Interface Test", "[presets]")
 
     SECTION ("Extra Menu Items")
     {
-        chowdsp::PluginStateImpl<MenuIParams> state {};
-        chowdsp::PresetManager presetMgr { state };
         using Items = chowdsp::PresetsFrontend::MenuInterface::ExtraMenuItems;
 
         // with nothing
