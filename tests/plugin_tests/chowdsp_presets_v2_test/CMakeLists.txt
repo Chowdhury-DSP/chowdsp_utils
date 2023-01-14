@@ -13,6 +13,7 @@ target_sources(chowdsp_presets_v2_test
         TextInterfaceTest.cpp
         ClipboardInterfaceTest.cpp
         SettingsInterfaceTest.cpp
+        MenuInterfaceTest.cpp
 
         TestPresetBinaryData.cpp
 )
