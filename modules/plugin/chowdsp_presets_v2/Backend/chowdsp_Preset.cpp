@@ -69,7 +69,7 @@ void Preset::initialise (const nlohmann::json& presetJson)
         throw std::runtime_error ("Preset was saved from a different plugin!");
 #endif
 
-    const auto versionStr = juce::String { presetJson.at (versionTag) };
+    const juce::String versionStr = presetJson.at (versionTag);
     if (versionStr.isEmpty())
         throw std::runtime_error ("Preset does not contain a valid version!");
     version = Version { versionStr };

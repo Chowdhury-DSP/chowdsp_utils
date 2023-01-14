@@ -11,31 +11,40 @@ void PresetManager::initializeListeners (ParamHolder& params, ParameterListeners
                 return;
 
             listeners += {
-                paramListeners.addParameterListener (param, ParameterListenerThread::MessageThread, [this]
-                                                     { isPresetDirty.set (true); })
+                paramListeners.addParameterListener (
+                    param,
+                    ParameterListenerThread::MessageThread,
+                    [this]
+                    {
+                        if (! areWeInTheMidstOfAPresetChange)
+                            isPresetDirty.set (true);
+                    })
             };
         });
 
     listeners +=
         {
+            isPresetDirty.changeBroadcaster.connect (
+                [this]
+                {
+                    if (! areWeInTheMidstOfAPresetChange)
+                        presetDirtyStatusBroadcaster();
+                }),
             currentPreset.changeBroadcaster.connect (
                 [this]
                 {
                     if (currentPreset == nullptr)
                         return;
 
+                    juce::ScopedValueSetter svs { areWeInTheMidstOfAPresetChange, true };
+
                     loadPresetState (currentPreset->getState()); // @TODO: could this throw?
                     pluginState.getParameterListeners().updateBroadcastersFromMessageThread();
-                    presetChangedBroadcaster();
                     isPresetDirty.set (false);
+                    presetChangedBroadcaster();
 
                     if (processor != nullptr)
                     {
-            // For some reason, when VST3 in Ableton Live (Win64), calling updateHostDisplay
-            // causes the plugin to load the preset at index 1. @TODO: figure out the problem!
-            //        if (processor->wrapperType == juce::AudioProcessor::WrapperType::wrapperType_VST3)
-            //            return;
-
 #if JUCE_VERSION > 0x60007
                         processor->updateHostDisplay (juce::AudioProcessorListener::ChangeDetails().withProgramChanged (true));
 #else
@@ -51,32 +60,36 @@ void PresetManager::loadPreset (const Preset& preset)
     struct ChangePresetAction : juce::UndoableAction
     {
         explicit ChangePresetAction (PresetManager& mgr, const Preset& preset)
-            : manager (mgr), keepAlivePreset (preset) {}
+            : manager (mgr),
+              performPreset (preset),
+              undoPreset (manager.currentPreset->getName(),
+                          manager.currentPreset->getVendor(),
+                          manager.savePresetState(),
+                          manager.currentPreset->getCategory(),
+                          manager.currentPreset->getPresetFile()),
+              previousStateWasDirty (manager.isPresetDirty)
+        {
+        }
 
         bool perform() override
         {
-            const bool presetIsDirty = manager.isPresetDirty;
-            const auto currentPresetCopy = Preset { manager.currentPreset->getName(),
-                                                    manager.currentPreset->getVendor(),
-                                                    manager.savePresetState(),
-                                                    manager.currentPreset->getCategory(),
-                                                    manager.currentPreset->getPresetFile() };
-
-            manager.currentPreset = keepAlivePreset;
-            keepAlivePreset = std::move (currentPresetCopy);
-
-            manager.isPresetDirty.set (presetWasDirty);
-            presetWasDirty = presetIsDirty;
-
+            manager.currentPreset = performPreset;
             return true;
         }
 
-        bool undo() override { return perform(); }
+        bool undo() override
+        {
+            manager.currentPreset = undoPreset;
+            manager.isPresetDirty.set (previousStateWasDirty);
+            return true;
+        }
+
         int getSizeInUnits() override { return (int) sizeof (*this); }
 
         PresetManager& manager;
-        Preset keepAlivePreset;
-        bool presetWasDirty = false;
+        const Preset& performPreset;
+        const Preset undoPreset;
+        const bool previousStateWasDirty = false;
     };
 
     pluginState.callOnMainThread (

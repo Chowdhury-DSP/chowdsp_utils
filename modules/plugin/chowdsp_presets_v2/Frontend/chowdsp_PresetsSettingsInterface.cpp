@@ -23,12 +23,18 @@ void SettingsInterface::setUserPresetsPath (const juce::File& userPresetsPath)
 
 void SettingsInterface::globalSettingChanged (SettingID settingID)
 {
-    if (settingID == userPresetsDirID)
+    if (settingID != userPresetsDirID)
         return;
 
     const auto newUserPresetsPath = juce::File { pluginSettings.getProperty<juce::String> (userPresetsDirID) };
     if (presetManager.getUserPresetPath() == newUserPresetsPath)
         return;
+
+    if (newUserPresetsPath.existsAsFile())
+        newUserPresetsPath.deleteFile();
+
+    if (! newUserPresetsPath.isDirectory())
+        newUserPresetsPath.createDirectory();
 
     presetManager.setUserPresetPath (newUserPresetsPath);
 }

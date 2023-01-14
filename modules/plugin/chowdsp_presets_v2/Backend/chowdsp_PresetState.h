@@ -71,4 +71,16 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetState)
 };
+
+#ifndef DOXYGEN
+inline bool operator== (const PresetState& presetState, std::nullptr_t)
+{
+    return presetState.get() == nullptr;
+}
+
+inline bool operator!= (const PresetState& presetState, std::nullptr_t)
+{
+    return ! (presetState == nullptr);
+}
+#endif
 } // namespace chowdsp

@@ -3,8 +3,7 @@ using namespace std::string_view_literals;
 
 PluginEditor::PluginEditor (StatefulPlugin& plug) : juce::AudioProcessorEditor (plug),
                                                     plugin (plug),
-                                                    paramsView (plug, plug.getState(), plug.getState().params),
-                                                    presetsComp (plugin.getPresetManager())
+                                                    paramsView (plug, plug.getState(), plug.getState().params)
 {
     addAndMakeVisible (paramsView);
     addAndMakeVisible (presetsComp);

@@ -24,23 +24,19 @@ PresetsComponent::PresetsComponent (PresetManager& manager,
     setColour (bubbleColour, juce::Colours::grey);
 
     if (fileFace == nullptr)
-    {
         fileInterface = OptionalPointer<PresetsFrontend::FileInterface> (presetManager, ".chowpreset");
-        fileInterface->savePresetCallback = [this] (nlohmann::json&& presetState)
-        {
-            saveUserPreset (std::move (presetState));
-        };
-        fileInterface->checkDeletePresetCallback = [] (const Preset&)
-        {
-            // @TODO: show warning message!
-            return true;
-        };
-        fileInterface->failedToLoadPresetCallback = [] (const Preset&) {}; // @TODO: show warning message!
-    }
     else
-    {
         fileInterface.setNonOwning (fileFace);
-    }
+    fileInterface->savePresetCallback = [this] (nlohmann::json&& presetState)
+    {
+        saveUserPreset (std::move (presetState));
+    };
+    fileInterface->checkDeletePresetCallback = [] (const Preset&)
+    {
+        // @TODO: show warning message!
+        return true;
+    };
+    fileInterface->failedToLoadPresetCallback = [] (const Preset&) {}; // @TODO: show warning message!
 
     menuInterface = std::make_unique<PresetsFrontend::MenuInterface> (presetManager, fileInterface.get());
 
@@ -108,7 +104,6 @@ void PresetsComponent::resized()
 
     presetNameDisplay.setBounds (b.reduced (arrowPad, 0));
     presetNameEditor.setBounds (presetNameDisplay.getBoundsInParent());
-    //    repaint();
 }
 
 void PresetsComponent::setNextPrevButton (const juce::Drawable* image, bool isNext)
@@ -185,6 +180,9 @@ void PresetsComponent::saveUserPreset (nlohmann::json&& presetState)
         // @TODO: warn on file overwrite?
 
         presetManager.saveUserPreset (file, std::move (preset));
+
+        presetNameDisplay.setVisible (true);
+        presetNameEditor.setVisible (false);
     };
 }
 } // namespace chowdsp
