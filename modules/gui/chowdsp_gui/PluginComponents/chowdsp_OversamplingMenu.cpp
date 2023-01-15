@@ -34,7 +34,7 @@ void OversamplingMenu<OSType, ComboBoxType>::initialise (juce::AudioProcessorVal
 
         attachments[count] = std::make_unique<juce::ParameterAttachment> (
             *param,
-            [=] (float)
+            [this] (float)
             { generateComboBoxMenu(); },
             vts.undoManager);
 
