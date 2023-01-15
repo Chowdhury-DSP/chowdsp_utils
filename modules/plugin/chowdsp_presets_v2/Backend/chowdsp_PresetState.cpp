@@ -66,4 +66,4 @@ bool operator!= (const PresetState& presetState, std::nullptr_t)
 {
     return ! (presetState == nullptr);
 }
-}
+} // namespace chowdsp

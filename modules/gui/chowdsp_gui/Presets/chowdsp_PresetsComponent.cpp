@@ -191,8 +191,8 @@ void PresetsComponent::saveUserPreset (nlohmann::json&& presetState)
 
         if (file.existsAsFile() && ! queryShouldOverwriteFile())
         {
-                hidePresetNameEditor();
-                return;
+            hidePresetNameEditor();
+            return;
         }
 
         presetManager.saveUserPreset (file, std::move (preset));
