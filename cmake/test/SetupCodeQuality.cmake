@@ -12,6 +12,7 @@ target_compile_definitions(chowdsp_utils_codeql PRIVATE
     JUCE_WEB_BROWSER=0
     JUCE_MODAL_LOOPS_PERMITTED=1
     JUCE_STANDALONE_APPLICATION=0
+    JUCE_MODULE_AVAILABLE_chowdsp_presets=0
 )
 
 target_link_libraries(chowdsp_utils_codeql PRIVATE
@@ -38,7 +39,6 @@ target_link_libraries(chowdsp_utils_codeql PRIVATE
     chowdsp_plugin_base
     chowdsp_plugin_state
     chowdsp_plugin_utils
-    chowdsp_presets
     chowdsp_presets_v2
     chowdsp_version
     chowdsp_clap_extensions

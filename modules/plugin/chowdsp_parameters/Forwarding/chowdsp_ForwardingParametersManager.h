@@ -94,7 +94,7 @@ public:
         for (int i = startIndex; i < endIndex; ++i)
         {
             auto [param, paramName] = paramInfoProvider (i);
-            forwardedParams[(size_t) i]->setFloatParam (param, paramName, deferHostNotification || forceDeferHostNotifications);
+            forwardedParams[(size_t) i]->setParam (param, paramName, deferHostNotification || forceDeferHostNotifications);
         }
 
         if (deferHostNotification && ! forceDeferHostNotifications)

@@ -1,5 +1,6 @@
 #include <CatchUtils.h>
 #include <chowdsp_core/chowdsp_core.h>
+#include <numeric>
 
 TEST_CASE ("Vector Helpers Test")
 {

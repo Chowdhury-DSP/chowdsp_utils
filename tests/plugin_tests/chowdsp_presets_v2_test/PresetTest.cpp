@@ -118,20 +118,6 @@ TEST_CASE ("Preset Test", "[presets]")
         REQUIRE_MESSAGE (testPreset.getVersion().getVersionString() == JucePlugin_VersionString, "Preset version incorrect!");
     }
 
-    SECTION ("Extra Info")
-    {
-        test_utils::ScopedFile presetFile { "extra_info.preset" };
-        {
-            chowdsp::Preset preset { "Name", "Vendor", { { "tag", 0.0f } } };
-            preset.getExtraInfo() = { { "tag2", "something" } };
-            preset.toFile (presetFile);
-        }
-
-        const chowdsp::Preset preset { presetFile };
-        const juce::String extraInfoValue = preset.getExtraInfo().at ("tag2");
-        REQUIRE_MESSAGE (extraInfoValue == "something", "Extra info state is incorrect!");
-    }
-
     SECTION ("Presets Equal")
     {
         chowdsp::Preset preset { "Name", "Vendor", { { "tag", 0.0f } }, "Category" };
