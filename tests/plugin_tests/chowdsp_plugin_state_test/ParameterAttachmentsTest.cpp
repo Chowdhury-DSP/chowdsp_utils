@@ -59,7 +59,7 @@ TEST_CASE ("Slider Attachment Test", "[state][attachments]")
         static constexpr auto newValue = 0.7f;
 
         chowdsp::ParameterTypeHelpers::setValue (newValue, *param);
-        juce::MessageManager::getInstance()->runDispatchLoopUntil (100);
+        state.getParameterListeners().updateBroadcastersFromMessageThread();
 
         REQUIRE_MESSAGE (slider.getValue() == (double) newValue, "Slider value after parameter change is incorrect!");
     }
@@ -145,7 +145,7 @@ TEST_CASE ("ComboBox Attachment Test", "[state][attachments]")
         static constexpr int newValue = 0;
 
         chowdsp::ParameterTypeHelpers::setValue (newValue, *param);
-        juce::MessageManager::getInstance()->runDispatchLoopUntil (100);
+        state.getParameterListeners().updateBroadcastersFromMessageThread();
 
         REQUIRE_MESSAGE (box.getSelectedItemIndex() == newValue, "Box value after parameter change is incorrect!");
     }
@@ -228,7 +228,7 @@ TEST_CASE ("Button Attachment Test", "[state][attachments]")
         static constexpr bool newValue = true;
 
         chowdsp::ParameterTypeHelpers::setValue (newValue, *param);
-        juce::MessageManager::getInstance()->runDispatchLoopUntil (100);
+        state.getParameterListeners().updateBroadcastersFromMessageThread();
 
         REQUIRE_MESSAGE (button.getToggleState() == newValue, "Button state after parameter change is incorrect!");
     }

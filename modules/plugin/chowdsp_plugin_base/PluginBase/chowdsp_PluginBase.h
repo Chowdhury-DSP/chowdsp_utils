@@ -3,6 +3,14 @@
 #include <chowdsp_parameters/chowdsp_parameters.h>
 #include "chowdsp_ProgramAdapter.h"
 
+#if JUCE_MODULE_AVAILABLE_chowdsp_presets
+#include <chowdsp_presets/chowdsp_presets.h>
+#endif
+
+#if JUCE_MODULE_AVAILABLE_chowdsp_presets_v2
+#include <chowdsp_presets_v2/chowdsp_presets_v2.h>
+#endif
+
 namespace chowdsp
 {
 /**
@@ -55,7 +63,12 @@ public:
     const juce::String getProgramName (int) override;
     void changeProgramName (int, const juce::String&) override;
 
-#if JUCE_MODULE_AVAILABLE_chowdsp_presets
+#if JUCE_MODULE_AVAILABLE_chowdsp_presets_v2
+    virtual PresetManager& getPresetManager()
+    {
+        return *presetManager;
+    }
+#elif JUCE_MODULE_AVAILABLE_chowdsp_presets
     virtual PresetManager& getPresetManager()
     {
         return *presetManager;
@@ -116,7 +129,10 @@ protected:
 #endif
 #endif
 
-#if JUCE_MODULE_AVAILABLE_chowdsp_presets
+#if JUCE_MODULE_AVAILABLE_chowdsp_presets_v2
+    std::unique_ptr<PresetManager> presetManager;
+    std::unique_ptr<ProgramAdapter::BaseProgramAdapter> programAdaptor = std::make_unique<PresetsProgramAdapter> (presetManager);
+#elif JUCE_MODULE_AVAILABLE_chowdsp_presets
     std::unique_ptr<PresetManager> presetManager;
     std::unique_ptr<ProgramAdapter::BaseProgramAdapter> programAdaptor = std::make_unique<ProgramAdapter::PresetsProgramAdapter> (presetManager);
 #else
@@ -132,6 +148,7 @@ private:
     CHOWDSP_CHECK_HAS_STATIC_METHOD (HasAddParameters, addParameters)
 #endif
 
+private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginBase)
 };
 

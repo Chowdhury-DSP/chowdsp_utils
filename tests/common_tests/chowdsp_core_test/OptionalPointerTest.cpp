@@ -1,7 +1,7 @@
 #include <CatchUtils.h>
 #include <chowdsp_core/chowdsp_core.h>
 
-TEST_CASE ("Smart Pointer Test")
+TEST_CASE ("Optional Pointer Test")
 {
     struct TestType
     {
@@ -15,7 +15,7 @@ TEST_CASE ("Smart Pointer Test")
 
     SECTION ("Owning")
     {
-        chowdsp::OptionalPointer<TestType> x { 4, 5 };
+        auto x = chowdsp::makeOptionalPointer<TestType> (4, 5);
         REQUIRE (x.isOwner());
         REQUIRE (x->x == 4);
         REQUIRE (x->y == 5);
@@ -27,8 +27,7 @@ TEST_CASE ("Smart Pointer Test")
     SECTION ("Non-Owning")
     {
         const auto x_owned = std::make_unique<TestType> (4, 5);
-        chowdsp::OptionalPointer<TestType> x;
-        x.setNonOwning (x_owned.get());
+        auto x = chowdsp::makeOptionalPointer<TestType> (x_owned.get());
         REQUIRE (! x.isOwner());
         REQUIRE (x->x == 4);
         REQUIRE (x->y == 5);

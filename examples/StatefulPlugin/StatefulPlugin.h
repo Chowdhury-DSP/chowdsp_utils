@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chowdsp_plugin_base/chowdsp_plugin_base.h>
+#include <chowdsp_plugin_utils/chowdsp_plugin_utils.h>
 
 struct LevelParams : chowdsp::ParamHolder
 {
@@ -46,6 +47,9 @@ public:
     juce::AudioProcessorEditor* createEditor() override;
 
     juce::UndoManager undoManager { 3000 };
+
+    chowdsp::SharedPluginSettings pluginSettings;
+    std::optional<chowdsp::PresetsFrontend::SettingsInterface> presetsSettings;
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StatefulPlugin)

@@ -18,13 +18,6 @@ BEGIN_JUCE_MODULE_DECLARATION
 ==============================================================================
 */
 
-/**
- * This module is still now _mostly_ stable. However, there's still
- * a few things TODO:
- * - Test how well the listener strategy scales for plugins with lots of parameters
- * - Update chowdsp_presets to work with this method for storing plugin state.
- */
-
 #pragma once
 
 #include <chowdsp_core/chowdsp_core.h>

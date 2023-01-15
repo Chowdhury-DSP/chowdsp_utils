@@ -11,6 +11,7 @@ target_sources(chowdsp_core_test
         IteratorsTest.cpp
         OptionalPointerTest.cpp
         StringHelpersTest.cpp
+        VectorHelpersTest.cpp
 )
 
 #set_target_properties(chowdsp_core_test PROPERTIES CXX_STANDARD 20)

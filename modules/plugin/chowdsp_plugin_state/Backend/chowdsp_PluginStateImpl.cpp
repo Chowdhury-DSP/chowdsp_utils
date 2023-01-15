@@ -21,14 +21,20 @@ void PluginStateImpl<ParameterState, NonParameterState, Serializer>::serialize (
 template <typename ParameterState, typename NonParameterState, typename Serializer>
 void PluginStateImpl<ParameterState, NonParameterState, Serializer>::deserialize (const juce::MemoryBlock& data)
 {
-    Serialization::deserialize<Serializer> (data, *this);
+    callOnMainThread (
+        [this, data]
+        {
+            Serialization::deserialize<Serializer> (data, *this);
 
-    params.applyVersionStreaming (pluginStateVersion);
-    if (nonParams.versionStreamingCallback != nullptr)
-        nonParams.versionStreamingCallback (pluginStateVersion);
+            params.applyVersionStreaming (pluginStateVersion);
+            if (nonParams.versionStreamingCallback != nullptr)
+                nonParams.versionStreamingCallback (pluginStateVersion);
 
-    if (undoManager != nullptr)
-        undoManager->clearUndoHistory();
+            getParameterListeners().updateBroadcastersFromMessageThread();
+
+            if (undoManager != nullptr)
+                undoManager->clearUndoHistory();
+        });
 }
 
 /** Serializer */
@@ -42,8 +48,8 @@ typename Serializer::SerializedType PluginStateImpl<ParameterState, NonParameter
     Serializer::addChildElement (serial, Serializer::template serialize<Serializer> (currentPluginVersion));
 #endif
 
-    Serializer::addChildElement (serial, Serializer::template serialize<Serializer, ParamHolder> (object.params));
     Serializer::addChildElement (serial, Serializer::template serialize<Serializer, NonParamState> (object.nonParams));
+    Serializer::addChildElement (serial, Serializer::template serialize<Serializer, ParamHolder> (object.params));
     return serial;
 }
 
@@ -57,8 +63,8 @@ void PluginStateImpl<ParameterState, NonParameterState, Serializer>::deserialize
 #if defined JucePlugin_VersionString
         versionChildIndex,
 #endif
-        paramStateChildIndex,
         nonParamStateChildIndex,
+        paramStateChildIndex,
         expectedNumChildElements,
     };
 
@@ -75,7 +81,7 @@ void PluginStateImpl<ParameterState, NonParameterState, Serializer>::deserialize
     object.pluginStateVersion = "0.0.0"_v;
 #endif
 
-    Serializer::template deserialize<Serializer, ParamHolder> (Serializer::getChildElement (serial, paramStateChildIndex), object.params);
     Serializer::template deserialize<Serializer, NonParamState> (Serializer::getChildElement (serial, nonParamStateChildIndex), object.nonParams);
+    Serializer::template deserialize<Serializer, ParamHolder> (Serializer::getChildElement (serial, paramStateChildIndex), object.params);
 }
 } // namespace chowdsp

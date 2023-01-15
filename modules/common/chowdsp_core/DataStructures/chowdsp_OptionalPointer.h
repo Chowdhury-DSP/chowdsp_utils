@@ -173,4 +173,20 @@ struct IsOptionalPointerType<OptionalPointer<T>> : std::true_type
 /** True if the type is a chowdsp::OptionalPointer<T> */
 template <typename T>
 static constexpr bool IsOptionalPointer = IsOptionalPointerType<T>::value;
+
+/** Creates a new (non-owning) optional pointer. */
+template <typename T>
+OptionalPointer<T> makeOptionalPointer (T* ptr)
+{
+    OptionalPointer<T> result {};
+    result.setNonOwning (ptr);
+    return result;
+}
+
+/** Creates a new (owning) optional pointer. */
+template <typename T, typename... Args>
+OptionalPointer<T> makeOptionalPointer (Args&&... args)
+{
+    return OptionalPointer<T> { std::forward<Args> (args)... };
+}
 } // namespace chowdsp

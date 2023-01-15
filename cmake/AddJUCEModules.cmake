@@ -21,6 +21,7 @@ juce_add_modules(
 
     ${PROJECT_SOURCE_DIR}/modules/plugin/chowdsp_version
     ${PROJECT_SOURCE_DIR}/modules/plugin/chowdsp_presets
+    ${PROJECT_SOURCE_DIR}/modules/plugin/chowdsp_presets_v2
     ${PROJECT_SOURCE_DIR}/modules/plugin/chowdsp_parameters
     ${PROJECT_SOURCE_DIR}/modules/plugin/chowdsp_plugin_base
     ${PROJECT_SOURCE_DIR}/modules/plugin/chowdsp_plugin_utils
