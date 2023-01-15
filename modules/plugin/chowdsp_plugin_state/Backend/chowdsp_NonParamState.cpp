@@ -67,4 +67,4 @@ void NonParamState::deserialize (typename Serializer::DeserializedType deserial,
             value->reset();
     }
 }
-}
+} // namespace chowdsp

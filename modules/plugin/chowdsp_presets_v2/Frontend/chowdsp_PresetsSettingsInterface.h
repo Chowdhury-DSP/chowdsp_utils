@@ -10,6 +10,7 @@ namespace chowdsp::PresetsFrontend
 class SettingsInterface
 {
     using SettingID = GlobalPluginSettings::SettingID;
+
 public:
     SettingsInterface (PresetManager& manager,
                        GlobalPluginSettings& settings,
@@ -28,6 +29,6 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SettingsInterface)
 };
-}
+} // namespace chowdsp::PresetsFrontend
 
 #endif

@@ -100,7 +100,7 @@ TEST_CASE ("Menu Interface Test", "[presets]")
         // with current preset
         {
             chowdsp::PresetsFrontend::MenuInterface menuInterface { presetMgr };
-            presetMgr.setDefaultPreset(chowdsp::Preset { "Preset4", "Vendor C", { { "param", 0.0f } } });
+            presetMgr.setDefaultPreset (chowdsp::Preset { "Preset4", "Vendor C", { { "param", 0.0f } } });
             presetMgr.loadDefaultPreset();
 
             juce::PopupMenu menu;

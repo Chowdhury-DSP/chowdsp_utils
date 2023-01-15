@@ -99,4 +99,4 @@ private:
 
     JUCE_LEAK_DETECTOR (Preset)
 };
-}
+} // namespace chowdsp

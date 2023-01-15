@@ -109,7 +109,7 @@ static void removePresetsGeneric (Callable&& shouldDeletePresetItem, std::vector
 {
     VectorHelpers::erase_if (
         items,
-        [&presetState, shouldDelete = std::forward<Callable> (shouldDeletePresetItem)](const PresetTree::Item& item)
+        [&presetState, shouldDelete = std::forward<Callable> (shouldDeletePresetItem)] (const PresetTree::Item& item)
         {
             if (shouldDelete (item))
             {

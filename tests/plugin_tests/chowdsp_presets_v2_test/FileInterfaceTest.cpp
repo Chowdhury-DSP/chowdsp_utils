@@ -56,7 +56,8 @@ TEST_CASE ("File Interface Test", "[presets]")
         presetMgr.setDefaultPreset (std::move (preset));
         presetMgr.loadDefaultPreset();
 
-        fileInterface.checkDeletePresetCallback = [] (const auto&) { return true; };
+        fileInterface.checkDeletePresetCallback = [] (const auto&)
+        { return true; };
         fileInterface.deleteCurrentPreset();
         REQUIRE (! file.file.existsAsFile());
     }

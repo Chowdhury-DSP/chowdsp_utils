@@ -21,7 +21,7 @@ public:
     {
         std::function<bool (const juce::String&, const juce::String&)> tagSortMethod = nullptr;
         std::function<bool (const Preset&, const Preset&)> presetSortMethod = nullptr;
-        std::function<Item& (std::vector<Item>&, Item&&)> insertItemIntoTree = nullptr;
+        std::function<Item&(std::vector<Item>&, Item&&)> insertItemIntoTree = nullptr;
     };
 
     explicit PresetTree (PresetState* presetState = nullptr, InsertionHelper&& insertionHelper = { nullptr, nullptr, nullptr });
@@ -65,7 +65,7 @@ public:
      *
      * Uses PresetTreeInserters::flatInserter by default.
      */
-    std::function<Preset& (Preset&&, std::vector<Item>&, const InsertionHelper&)> treeInserter;
+    std::function<Preset&(Preset&&, std::vector<Item>&, const InsertionHelper&)> treeInserter;
 
     [[nodiscard]] auto& getTreeItems() { return items; }
     [[nodiscard]] const auto& getTreeItems() const { return items; }

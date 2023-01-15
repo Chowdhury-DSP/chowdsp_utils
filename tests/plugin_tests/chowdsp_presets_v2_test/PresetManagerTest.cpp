@@ -21,7 +21,7 @@ struct ScopedPresetManager
 {
     explicit ScopedPresetManager (const juce::File& userPresetsPath = {})
     {
-        if (userPresetsPath == juce::File{})
+        if (userPresetsPath == juce::File {})
             manager.setUserPresetPath (presetPath.file);
         else
             manager.setUserPresetPath (userPresetsPath);
