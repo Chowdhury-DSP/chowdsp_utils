@@ -60,13 +60,13 @@ public:
     void setDefaultPreset (Preset&& defaultPreset);
 
     /** Returns a pointer to the default preset. */
-    const Preset* getDefaultPreset() const noexcept { return defaultPreset; }
+    [[nodiscard]] const Preset* getDefaultPreset() const noexcept { return defaultPreset; }
 
     /** Loads the default preset. */
     void loadDefaultPreset();
 
     /** Returns true if the given preset is a factory preset. */
-    bool isFactoryPreset (const Preset& preset) const;
+    [[nodiscard]] bool isFactoryPreset (const Preset& preset) const;
 
     /** Returns the internal preset tree. */
     [[nodiscard]] auto& getPresetTree() { return presetTree; }
@@ -90,20 +90,20 @@ public:
     virtual void loadUserPresetsFromFolder (const juce::File& file);
 
     /** Called whenever the preset lsit has changed. */
-    Broadcaster<void()> presetListUpdatedBroadcaster;
+    Broadcaster<void()> presetListUpdatedBroadcaster {};
 
     /** Called when the current preset has changed. */
-    Broadcaster<void()> presetChangedBroadcaster;
+    Broadcaster<void()> presetChangedBroadcaster {};
 
     /** Called whenever the current preset's "dirty" status has changed. */
-    Broadcaster<void()> presetDirtyStatusBroadcaster;
+    Broadcaster<void()> presetDirtyStatusBroadcaster {};
 
 protected:
     /** Override this if your presets need custom state-loading behaviour */
     virtual void loadPresetState (const nlohmann::json& state);
 
     /** Returns true if the given parameter is preset-agnostic */
-    bool isPresetAgnosticParameter (const juce::RangedAudioParameter& param) const;
+    [[nodiscard]] bool isPresetAgnosticParameter (const juce::RangedAudioParameter& param) const;
 
     /** Override this to support backwards compatibility for user presets */
     [[nodiscard]] virtual Preset loadUserPresetFromFile (const juce::File& file);
@@ -118,12 +118,12 @@ private:
     juce::AudioProcessor* processor = nullptr;
     chowdsp::PluginState& pluginState;
 
-    const std::vector<juce::RangedAudioParameter*> presetAgnosticParameters;
+    const std::vector<juce::RangedAudioParameter*> presetAgnosticParameters {};
     chowdsp::ScopedCallbackList listeners;
 
     PresetTree presetTree;
     const Preset* defaultPreset = nullptr;
-    std::vector<const Preset*> factoryPresets;
+    std::vector<const Preset*> factoryPresets {};
 
     juce::File userPresetPath {};
     const juce::String presetFileExt {};

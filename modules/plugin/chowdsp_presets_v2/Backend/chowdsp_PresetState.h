@@ -11,7 +11,7 @@ public:
     PresetState();
 
     /** Returns the value */
-    const Preset* get() const noexcept { return preset.get(); }
+    [[nodiscard]] const Preset* get() const noexcept { return preset.get(); }
     operator const Preset*() const noexcept { return get(); } // NOLINT(google-explicit-constructor): we want to be able to do implicit conversion
     const Preset* operator->() const noexcept { return get(); } // NOLINT(google-explicit-constructor): we want to be able to do implicit conversion
 

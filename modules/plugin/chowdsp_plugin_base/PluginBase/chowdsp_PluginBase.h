@@ -130,7 +130,7 @@ protected:
 #endif
 
 #if JUCE_MODULE_AVAILABLE_chowdsp_presets_v2
-    std::unique_ptr<PresetManager> presetManager;
+    std::unique_ptr<PresetManager> presetManager {};
     std::unique_ptr<ProgramAdapter::BaseProgramAdapter> programAdaptor = std::make_unique<PresetsProgramAdapter> (presetManager);
 #elif JUCE_MODULE_AVAILABLE_chowdsp_presets
     std::unique_ptr<PresetManager> presetManager;
