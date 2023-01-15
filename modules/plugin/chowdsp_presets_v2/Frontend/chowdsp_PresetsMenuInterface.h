@@ -2,13 +2,21 @@
 
 namespace chowdsp::PresetsFrontend
 {
+/** Interface for interacting with a presets systems from a juce::PopupMenu */
 class MenuInterface
 {
 public:
     explicit MenuInterface (PresetManager& manager, FileInterface* fileInterface = nullptr);
 
+    /**
+     * Adds all the available presets to the menu.
+     *
+     * Presets will be organized by whatever methods have been supplied to
+     * the associated PresetTree.
+     */
     void addPresetsToMenu (juce::PopupMenu& menu);
 
+    /** Extra menu items that can be added to the menu. */
     enum ExtraMenuItems
     {
         Reset, /**< Reset the plugin to the current preset state */
@@ -23,6 +31,7 @@ public:
         Separator, /**< A menu separator line */
     };
 
+    /** Adds additional items to the menu. */
     void addExtraMenuItems (juce::PopupMenu& menu, std::initializer_list<ExtraMenuItems> extraMenuItems);
 
 private:

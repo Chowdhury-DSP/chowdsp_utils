@@ -8,9 +8,7 @@ class PresetState : public StateValueBase
     using PresetPtr = OptionalPointer<const Preset>;
 
 public:
-    PresetState() : StateValueBase ("chowdsp_preset_manager_preset_state")
-    {
-    }
+    PresetState();
 
     /** Returns the value */
     const Preset* get() const noexcept { return preset.get(); }
@@ -18,59 +16,36 @@ public:
     const Preset* operator->() const noexcept { return get(); } // NOLINT(google-explicit-constructor): we want to be able to do implicit conversion
 
     /** Sets a new value */
-    void set (PresetPtr&& v)
-    {
-        preset = std::move (v);
-        changeBroadcaster();
-    }
+    void set (PresetPtr&& v);
 
-    PresetState& operator= (PresetPtr&& v)
-    {
-        set (std::move (v));
-        return *this;
-    }
+    /** Assigns a new value */
+    PresetState& operator= (PresetPtr&& v);
 
-    PresetState& operator= (const Preset& v)
-    {
-        set (makeOptionalPointer (&v));
-        return *this;
-    }
+    /**
+     * Sets a new preset.
+     *
+     * Note that the user must ensure that the preset is not deleted while
+     * it is held in the preset state. If you do need to delete the preset,
+     * without changing the preset state, call `assumeOwnership()`.
+     */
+    PresetState& operator= (const Preset& v);
 
-    void assumeOwnership()
-    {
-        if (preset.isOwner())
-            return;
-
-        preset = makeOptionalPointer<const Preset> (std::move (*preset));
-    }
+    /**
+     * Copies the preset state and takes ownership of the copy.
+     * This can be useful in cases where the preset object needs
+     * to be deleted (e.g. re-scanning user presets), without changing
+     * the preset state.
+     */
+    void assumeOwnership();
 
     /** Internal use only! */
-    void reset() override
-    {
-        set ({});
-    }
+    void reset() override;
 
     /** Internal use only! */
-    void serialize (JSONSerializer::SerializedType& serial) const override
-    {
-        JSONSerializer::addChildElement (serial, name);
-        if (preset == nullptr)
-            JSONSerializer::addChildElement (serial, {});
-        else
-            JSONSerializer::addChildElement (serial, preset->toJson());
-    }
+    void serialize (JSONSerializer::SerializedType& serial) const override;
 
     /** Internal use only! */
-    void deserialize (JSONSerializer::DeserializedType deserial) override
-    {
-        if (deserial.is_null())
-        {
-            reset();
-            return;
-        }
-
-        set (PresetPtr { deserial });
-    }
+    void deserialize (JSONSerializer::DeserializedType deserial) override;
 
 private:
     PresetPtr preset {};
@@ -79,14 +54,7 @@ private:
 };
 
 #ifndef DOXYGEN
-inline bool operator== (const PresetState& presetState, std::nullptr_t)
-{
-    return presetState.get() == nullptr;
-}
-
-inline bool operator!= (const PresetState& presetState, std::nullptr_t)
-{
-    return ! (presetState == nullptr);
-}
+bool operator== (const PresetState& presetState, std::nullptr_t);
+bool operator!= (const PresetState& presetState, std::nullptr_t);
 #endif
 } // namespace chowdsp

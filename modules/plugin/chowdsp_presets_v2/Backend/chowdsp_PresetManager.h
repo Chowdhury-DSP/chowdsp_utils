@@ -2,9 +2,11 @@
 
 namespace chowdsp
 {
+/** A class for managing a plugin's presets system. */
 class PresetManager
 {
 public:
+    /** Creates a PresetManager for a given plugin state. */
     template <typename PluginStateType>
     explicit PresetManager (PluginStateType& state,
                             juce::AudioProcessor* plugin = nullptr,
@@ -66,20 +68,34 @@ public:
     /** Returns true if the given preset is a factory preset. */
     bool isFactoryPreset (const Preset& preset) const;
 
+    /** Returns the internal preset tree. */
     [[nodiscard]] auto& getPresetTree() { return presetTree; }
+
+    /** Returns the internal preset tree. */
     [[nodiscard]] const auto& getPresetTree() const { return presetTree; }
 
+    /** Set's the user preset path. This will force any user presets to be re-scanned. */
     void setUserPresetPath (const juce::File& file);
+
+    /** Returns the user preset path. */
     [[nodiscard]] juce::File getUserPresetPath() const;
 
+    /** Returns the file extension used for saving preset files. */
     [[nodiscard]] juce::String getPresetFileExtension() const noexcept { return presetFileExt; }
 
-    virtual void loadUserPresetsFromFolder (const juce::File& file);
-
+    /** Returns the "Vendor" name used for user presets. */
     [[nodiscard]] juce::String getUserPresetVendorName() const noexcept { return userPresetsVendor; }
 
+    /** Loads a set of user presets from the given folder path. */
+    virtual void loadUserPresetsFromFolder (const juce::File& file);
+
+    /** Called whenever the preset lsit has changed. */
     Broadcaster<void()> presetListUpdatedBroadcaster;
+
+    /** Called when the current preset has changed. */
     Broadcaster<void()> presetChangedBroadcaster;
+
+    /** Called whenever the current preset's "dirty" status has changed. */
     Broadcaster<void()> presetDirtyStatusBroadcaster;
 
 protected:
@@ -94,6 +110,7 @@ protected:
 
     PresetState currentPreset;
     StateValue<bool> isPresetDirty { "chowdsp_is_preset_dirty", false };
+    juce::String userPresetsVendor { "User" };
 
 private:
     void initializeListeners (ParamHolder& params, ParameterListeners& listeners);
@@ -109,7 +126,6 @@ private:
     std::vector<const Preset*> factoryPresets;
 
     juce::File userPresetPath {};
-    juce::String userPresetsVendor { "User" };
     const juce::String presetFileExt {};
 
     bool areWeInTheMidstOfAPresetChange = false;

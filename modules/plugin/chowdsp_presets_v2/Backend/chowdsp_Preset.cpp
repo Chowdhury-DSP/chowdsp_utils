@@ -75,8 +75,6 @@ void Preset::initialise (const nlohmann::json& presetJson)
     version = Version { versionStr };
 
     file = presetJson.value (fileTag, file.getFullPathName());
-    extraInfo = presetJson.value (extraInfoTag, nlohmann::json {});
-
     state = presetJson.at (stateTag);
 }
 
@@ -96,9 +94,6 @@ nlohmann::json Preset::toJson() const
             { versionTag, version.getVersionString() },
             { fileTag, file.getFullPathName() },
             { stateTag, state },
-        {
-            extraInfoTag, extraInfo
-        }
     };
 }
 
@@ -129,8 +124,7 @@ bool Preset::operator== (const Preset& other) const noexcept
            && vendor == other.vendor
            && category == other.category
            && version == other.version
-           && state == other.state
-           && extraInfo == other.extraInfo;
+           && state == other.state;
 }
 
 bool Preset::operator!= (const Preset& other) const noexcept

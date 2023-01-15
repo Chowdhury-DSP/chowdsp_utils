@@ -2,6 +2,7 @@
 
 namespace chowdsp
 {
+/** A tree-like data structure for storing presets. */
 class PresetTree
 {
 public:
@@ -99,7 +100,7 @@ namespace PresetTreeInserters
     /** Inserts presets into the tree with sub-trees for each category. */
     Preset& categoryInserter (Preset&&, std::vector<PresetTree::Item>&, const PresetTree::InsertionHelper&);
 
-    /** Inserts presets into the tree with sub-trees for each vendor, and internal sub-trees for each category. */
+    /** Inserts presets into the tree with sub-trees for each vendor, and sub-sub-trees for each category. */
     Preset& vendorCategoryInserter (Preset&&, std::vector<PresetTree::Item>&, const PresetTree::InsertionHelper&);
 } // namespace PresetTreeInserters
 } // namespace chowdsp

@@ -6,6 +6,7 @@
 
 namespace chowdsp::PresetsFrontend
 {
+/** Interface for interacting with a presets system from a GlobalPluginSettings object. */
 class SettingsInterface
 {
     using SettingID = GlobalPluginSettings::SettingID;
@@ -14,6 +15,7 @@ public:
                        GlobalPluginSettings& settings,
                        const juce::File& userPresetsDir);
 
+    /** Set's the user preset path as a plugin setting. */
     void setUserPresetsPath (const juce::File& userPresetsPath);
 
 private:

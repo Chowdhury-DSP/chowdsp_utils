@@ -78,7 +78,7 @@ void FileInterface::goToUserPresetsFolder()
 
 void FileInterface::chooseUserPresetsFolder()
 {
-    jassert (hasSettingsInterface());
+    jassert (hasSettingsInterface()); // this implementation requires a settings interface!
 #if JUCE_MODULE_AVAILABLE_chowdsp_plugin_utils
     constexpr auto folderChooserFlags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectDirectories;
     fileChooser = std::make_shared<juce::FileChooser> ("Choose User Preset Folder");

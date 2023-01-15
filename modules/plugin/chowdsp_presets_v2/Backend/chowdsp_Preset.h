@@ -38,7 +38,7 @@ public:
     /** Returns true if this preset is valid */
     [[nodiscard]] bool isValid() const;
 
-    /** Returns the preset's name */
+    /** Returns the name of the preset */
     [[nodiscard]] juce::String getName() const noexcept { return name; }
 
     /** Returns the name of the vendor that created this preset */
@@ -56,16 +56,13 @@ public:
      */
     [[nodiscard]] juce::File getPresetFile() const noexcept { return file; }
 
-    /** Returns the preset's state */
+    /** Returns the preset state */
     [[nodiscard]] const auto& getState() const noexcept { return state; }
 
-    /** Returns the preset's extra info */
-    [[nodiscard]] const auto& getExtraInfo() const noexcept { return extraInfo; }
-
-    /** Returns the preset's extra info */
-    [[nodiscard]] auto& getExtraInfo() noexcept { return extraInfo; }
-
-    /** Returns true if the two presets are equivalent. */
+    /**
+     * Returns true if the two presets are equivalent.
+     * Note that this compares the entire preset state.
+     */
     bool operator== (const Preset& other) const noexcept;
 
     /** Returns true if the two presets are NOT equivalent. */
@@ -78,7 +75,6 @@ public:
     static constexpr std::string_view categoryTag { "category" };
     static constexpr std::string_view versionTag { "version" };
     static constexpr std::string_view fileTag { "preset_file" };
-    static constexpr std::string_view extraInfoTag { "extra_info" };
     static constexpr std::string_view stateTag { "preset_state" };
 
 private:
@@ -98,7 +94,6 @@ private:
     Version version { versionString };
 
     nlohmann::json state {};
-    nlohmann::json extraInfo {};
 
     juce::File file {};
 
