@@ -105,13 +105,27 @@ static void doForAllPresetItems (Callable&& callable, const std::vector<PresetTr
 }
 
 template <typename Callable>
-static void removePresetsGeneric (Callable&& shouldDeletePresetItem, std::vector<PresetTree::Item>& items)
+static void removePresetsGeneric (Callable&& shouldDeletePresetItem, std::vector<PresetTree::Item>& items, PresetState* presetState)
 {
-    VectorHelpers::erase_if (items, shouldDeletePresetItem);
+    VectorHelpers::erase_if (
+        items,
+        [&presetState, shouldDelete = std::forward<Callable> (shouldDeletePresetItem)](const PresetTree::Item& item)
+        {
+            if (shouldDelete (item))
+            {
+                if (presetState != nullptr && presetState->get() != nullptr && *presetState->get() == *item.preset)
+                    presetState->assumeOwnership();
+
+                return true;
+            }
+
+            return false;
+        });
+
     for (auto& item : items)
     {
         if (! item.preset.has_value())
-            removePresetsGeneric (std::forward<Callable> (shouldDeletePresetItem), item.subtree);
+            removePresetsGeneric (std::forward<Callable> (shouldDeletePresetItem), item.subtree, presetState);
     }
 
     // Remove empty sub-trees
@@ -119,8 +133,9 @@ static void removePresetsGeneric (Callable&& shouldDeletePresetItem, std::vector
                              { return ! item.preset.has_value() && item.subtree.empty(); });
 }
 
-PresetTree::PresetTree (InsertionHelper&& insertionHelper)
+PresetTree::PresetTree (PresetState* currentPresetState, InsertionHelper&& insertionHelper)
     : treeInserter (&PresetTreeInserters::flatInserter),
+      presetState (currentPresetState),
       insertHelper (std::move (insertionHelper))
 {
     if (insertHelper.tagSortMethod == nullptr)
@@ -171,7 +186,8 @@ void PresetTree::removePreset (int index)
 {
     removePresetsGeneric ([index] (const Item& item)
                           { return item.preset.has_value() && item.presetIndex == index; },
-                          items);
+                          items,
+                          presetState);
     refreshPresetIndexes();
 }
 
@@ -179,7 +195,8 @@ void PresetTree::removePreset (const Preset& preset)
 {
     removePresetsGeneric ([&preset] (const Item& item)
                           { return item.preset.has_value() && item.preset == preset; },
-                          items);
+                          items,
+                          presetState);
     refreshPresetIndexes();
 }
 
@@ -187,7 +204,8 @@ void PresetTree::removePresets (std::function<bool (const Preset& preset)>&& pre
 {
     removePresetsGeneric ([&presetsToRemove] (const Item& item)
                           { return item.preset.has_value() && presetsToRemove (*item.preset); },
-                          items);
+                          items,
+                          presetState);
     refreshPresetIndexes();
 }
 

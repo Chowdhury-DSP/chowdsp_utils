@@ -13,3 +13,8 @@ target_sources(StatefulPlugin
         StatefulPlugin.cpp
         PluginEditor.cpp
 )
+
+target_compile_definitions(StatefulPlugin
+    PUBLIC
+        JUCE_MODAL_LOOPS_PERMITTED=1
+)

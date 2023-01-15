@@ -224,15 +224,15 @@ void PresetManager::loadDefaultPreset()
 
 bool PresetManager::isFactoryPreset (const Preset& preset) const
 {
-    return std::find (factoryPresets.begin(), factoryPresets.end(), &preset) == factoryPresets.end();
+    return std::find (factoryPresets.begin(), factoryPresets.end(), &preset) != factoryPresets.end();
 }
 
 void PresetManager::setUserPresetPath (const juce::File& file)
 {
-    userPresetPath = file;
     if (file == juce::File())
         return;
 
+    userPresetPath = file;
     loadUserPresetsFromFolder (file);
 }
 
@@ -261,7 +261,7 @@ void PresetManager::loadUserPresetsFromFolder (const juce::File& file)
 
     // delete old user presets
     presetTree.removePresets ([this] (const Preset& preset)
-                              { return isFactoryPreset (preset); });
+                              { return ! isFactoryPreset (preset); });
 
     addPresets (std::move (presets), false);
 }

@@ -220,4 +220,19 @@ TEST_CASE ("Preset Tree Test", "[presets]")
 
         REQUIRE (presetTree.findPreset (chowdsp::Preset { "Blah", "Jatin", { { "tag", 100.0f } } }) == nullptr);
     }
+
+    SECTION ("With Preset State")
+    {
+        const auto preset = chowdsp::Preset { "Blah", "Jatin", { { "tag", 1.0f } }, "Cat1" };
+
+        chowdsp::PresetState state;
+        chowdsp::PresetTree presetTree { &state };
+        presetTree.insertPreset (chowdsp::Preset { preset });
+
+        state = *presetTree.getPresetByIndex (0);
+        REQUIRE (*state.get() == preset);
+
+        presetTree.removePreset (0);
+        REQUIRE (*state.get() == preset);
+    }
 }

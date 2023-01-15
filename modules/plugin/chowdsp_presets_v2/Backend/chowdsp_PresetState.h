@@ -32,10 +32,16 @@ public:
 
     PresetState& operator= (const Preset& v)
     {
-        PresetPtr presetPtr {};
-        presetPtr.setNonOwning (&v);
-        set (std::move (presetPtr));
+        set (makeOptionalPointer (&v));
         return *this;
+    }
+
+    void assumeOwnership()
+    {
+        if (preset.isOwner())
+            return;
+
+        preset = makeOptionalPointer<const Preset> (std::move (*preset));
     }
 
     /** Internal use only! */

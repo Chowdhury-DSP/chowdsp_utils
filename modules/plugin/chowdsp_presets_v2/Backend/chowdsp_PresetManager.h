@@ -14,7 +14,7 @@ public:
         : processor (plugin),
           pluginState (state),
           presetAgnosticParameters (std::move (presetAgnosticParams)),
-          presetTree (std::move (insertionHelper)),
+          presetTree (&currentPreset, std::move (insertionHelper)),
           presetFileExt (presetFileExtension)
     {
         jassert (presetFileExt[0] == '.'); // invalid file extension!

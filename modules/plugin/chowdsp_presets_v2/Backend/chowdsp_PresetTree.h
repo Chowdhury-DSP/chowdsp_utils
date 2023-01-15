@@ -23,7 +23,7 @@ public:
         std::function<Item& (std::vector<Item>&, Item&&)> insertItemIntoTree = nullptr;
     };
 
-    explicit PresetTree (InsertionHelper&& insertionHelper = { nullptr, nullptr, nullptr });
+    explicit PresetTree (PresetState* presetState = nullptr, InsertionHelper&& insertionHelper = { nullptr, nullptr, nullptr });
     ~PresetTree();
 
     /**
@@ -74,6 +74,8 @@ private:
 
     std::vector<Item> items;
     int totalNumPresets = 0;
+
+    PresetState* presetState = nullptr;
 
     InsertionHelper insertHelper;
 

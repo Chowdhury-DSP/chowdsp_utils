@@ -6,14 +6,14 @@ class SettingsInterface;
 class FileInterface
 {
 public:
-    FileInterface (PresetManager& manager,
-                   SettingsInterface* settingsInterface = nullptr);
+    explicit FileInterface (PresetManager& manager,
+                            SettingsInterface* settingsInterface = nullptr);
     virtual ~FileInterface() = default;
 
-    void savePreset();
-    void resaveCurrentPreset();
-    void deleteCurrentPreset();
-    void loadPresetFromFile();
+    virtual void savePreset();
+    virtual void resaveCurrentPreset();
+    virtual void deleteCurrentPreset();
+    virtual void loadPresetFromFile();
 
     void goToUserPresetsFolder();
     virtual void chooseUserPresetsFolder();

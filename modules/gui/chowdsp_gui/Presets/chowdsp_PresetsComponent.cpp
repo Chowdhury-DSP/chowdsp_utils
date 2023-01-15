@@ -23,20 +23,33 @@ PresetsComponent::PresetsComponent (PresetManager& manager,
     setColour (backgroundColour, juce::Colours::transparentBlack);
     setColour (bubbleColour, juce::Colours::grey);
 
-    if (fileFace == nullptr)
-        fileInterface = OptionalPointer<PresetsFrontend::FileInterface> (presetManager, ".chowpreset");
-    else
-        fileInterface.setNonOwning (fileFace);
-    fileInterface->savePresetCallback = [this] (nlohmann::json&& presetState)
+    fileInterface = fileFace == nullptr
+                        ? makeOptionalPointer<PresetsFrontend::FileInterface> (presetManager)
+                        : makeOptionalPointer (fileFace);
+
+    if (fileInterface->savePresetCallback == nullptr)
     {
-        saveUserPreset (std::move (presetState));
-    };
-    fileInterface->checkDeletePresetCallback = [] (const Preset&)
+        fileInterface->savePresetCallback = [this] (nlohmann::json&& presetState)
+        {
+            saveUserPreset (std::move (presetState));
+        };
+    }
+
+    if (fileInterface->checkDeletePresetCallback == nullptr)
     {
-        // @TODO: show warning message!
-        return true;
-    };
-    fileInterface->failedToLoadPresetCallback = [] (const Preset&) {}; // @TODO: show warning message!
+        fileInterface->checkDeletePresetCallback = [this] (const Preset& preset)
+        {
+            return queryShouldDeletePreset (preset);
+        };
+    }
+
+    if (fileInterface->failedToLoadPresetCallback == nullptr)
+    {
+        fileInterface->failedToLoadPresetCallback = [this] (const Preset& preset)
+        {
+            showFailedToLoadPresetMessage (preset);
+        };
+    }
 
     menuInterface = std::make_unique<PresetsFrontend::MenuInterface> (presetManager, fileInterface.get());
 
@@ -61,13 +74,11 @@ PresetsComponent::PresetsComponent (PresetManager& manager,
     addChildComponent (presetNameEditor);
     presetNameEditor.onFocusLost = [this]
     {
-        presetNameDisplay.setVisible (true);
-        presetNameEditor.setVisible (false);
+        hidePresetNameEditor();
     };
     presetNameEditor.onEscapeKey = [this]
     {
-        presetNameDisplay.setVisible (true);
-        presetNameEditor.setVisible (false);
+        hidePresetNameEditor();
     };
 
     auto setupNextPrevButton = [this] (juce::DrawableButton& button, bool forward)
@@ -177,12 +188,61 @@ void PresetsComponent::saveUserPreset (nlohmann::json&& presetState)
     {
         Preset preset { presetNameEditor.getText(), presetManager.getUserPresetVendorName(), std::move (presetState) };
         const auto file = fileInterface->getFileForPreset (preset);
-        // @TODO: warn on file overwrite?
+
+        if (file.existsAsFile())
+        {
+            if (! queryShouldOverwriteFile())
+            {
+                hidePresetNameEditor();
+                return;
+            }
+        }
 
         presetManager.saveUserPreset (file, std::move (preset));
-
-        presetNameDisplay.setVisible (true);
-        presetNameEditor.setVisible (false);
+        hidePresetNameEditor();
     };
+}
+
+void PresetsComponent::hidePresetNameEditor()
+{
+    presetNameDisplay.setVisible (true);
+    presetNameEditor.setVisible (false);
+}
+
+bool PresetsComponent::queryShouldDeletePreset (const Preset& preset)
+{
+    return juce::NativeMessageBox::showOkCancelBox (juce::AlertWindow::WarningIcon,
+                                                    "Preset Deletion Warning!",
+                                                    "Are you sure you want to delete the following preset? "
+                                                    "This action cannot be undone!\n"
+                                                        + preset.getName(),
+                                                    this,
+                                                    nullptr);
+}
+
+bool PresetsComponent::queryShouldOverwriteFile()
+{
+    return juce::NativeMessageBox::showOkCancelBox (juce::AlertWindow::WarningIcon,
+                                                    "Preset Overwrite Warning!",
+                                                    "Saving this preset will overwrite an existing file. Are you sure you want to continue?",
+                                                    this,
+                                                    nullptr);
+}
+
+void PresetsComponent::showFailedToLoadPresetMessage (const Preset& preset)
+{
+    const auto alertMessage = [&preset]() -> juce::String
+    {
+        if (preset.getName().isEmpty())
+            return "Failed to load preset!";
+
+        return "Failed to load preset: " + preset.getName();
+    }();
+
+    juce::NativeMessageBox::showOkCancelBox (juce::AlertWindow::InfoIcon,
+                                             "Failed To Load Preset!",
+                                             alertMessage,
+                                             this,
+                                             nullptr);
 }
 } // namespace chowdsp

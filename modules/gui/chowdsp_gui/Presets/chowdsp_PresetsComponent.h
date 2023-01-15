@@ -21,10 +21,16 @@ public:
 
     void setNextPrevButton (const juce::Drawable* image, bool isNext);
 
+    void hidePresetNameEditor();
+
 protected:
     void mouseDown (const juce::MouseEvent& e) override;
     void colourChanged() override;
     virtual void saveUserPreset (nlohmann::json&& presetState);
+
+    virtual bool queryShouldDeletePreset (const Preset&);
+    virtual bool queryShouldOverwriteFile();
+    virtual void showFailedToLoadPresetMessage (const Preset&);
 
     PresetManager& presetManager;
 
@@ -35,10 +41,10 @@ protected:
     OptionalPointer<PresetsFrontend::FileInterface> fileInterface {};
     std::unique_ptr<PresetsFrontend::MenuInterface> menuInterface;
 
-private:
     PresetsFrontend::NextPrevious presetsNextPrevious { presetManager };
     PresetsFrontend::TextInterface textInterface { presetManager };
 
+private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetsComponent)
 };
 } // namespace chowdsp

@@ -19,7 +19,7 @@ Preset::Preset (const juce::File& presetFile) : file (presetFile)
 {
     initialiseSafe ([this]
                     { return JSONUtils::fromFile (file); },
-                    "file");
+                    "file (" + file.getFullPathName() + ")");
 }
 
 Preset::Preset (const nlohmann::json& presetJson)
