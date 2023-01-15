@@ -19,6 +19,9 @@ private:
 
     chowdsp::ParametersViewEditor paramsView;
 
+    chowdsp::PresetsFrontend::FileInterface presetsFileInterface { plugin.getPresetManager(), &(*plugin.presetsSettings) };
+    chowdsp::PresetsComponent presetsComp { plugin.getPresetManager(), &presetsFileInterface };
+
     void refreshUndoRedoButtons();
     juce::TextButton undoButton { "UNDO" };
     juce::TextButton redoButton { "REDO" };

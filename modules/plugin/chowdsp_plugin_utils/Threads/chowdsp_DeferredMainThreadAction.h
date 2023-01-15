@@ -1,7 +1,16 @@
 #pragma once
 
+#if JUCE_MODULE_AVAILABLE_juce_dsp
 #include <juce_dsp/juce_dsp.h>
+#else
+#include "../../../common/chowdsp_core/JUCEHelpers/juce_FixedSizeFunction.h"
+#endif
+
+#if JUCE_MODULE_AVAILABLE_chowdsp_dsp_data_structures
+#include <chowdsp_dsp_data_structures/chowdsp_dsp_data_structures.h>
+#else
 #include "../../../dsp/chowdsp_dsp_data_structures/third_party/moodycamel/concurrentqueue.h"
+#endif
 
 namespace chowdsp
 {
@@ -20,7 +29,7 @@ public:
      */
     explicit DeferredAction (int queueSize = 32) : queue ((size_t) queueSize)
     {
-        startTimer (5);
+        startTimer (10);
     }
 
     /**

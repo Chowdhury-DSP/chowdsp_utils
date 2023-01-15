@@ -70,3 +70,7 @@
 #if JUCE_MODULE_AVAILABLE_chowdsp_presets
 #include "Presets/chowdsp_PresetsComp.h"
 #endif
+
+#if JUCE_MODULE_AVAILABLE_chowdsp_presets_v2
+#include "Presets/chowdsp_PresetsComponent.h"
+#endif

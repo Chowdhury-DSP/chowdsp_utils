@@ -1,6 +1,7 @@
 add_subdirectory(chowdsp_version_test)
 add_subdirectory(chowdsp_parameters_test)
 add_subdirectory(chowdsp_presets_test)
+add_subdirectory(chowdsp_presets_v2_test)
 add_subdirectory(chowdsp_plugin_base_test)
 add_subdirectory(chowdsp_plugin_utils_test)
 add_subdirectory(chowdsp_plugin_state_test)

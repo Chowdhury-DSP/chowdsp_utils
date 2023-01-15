@@ -37,7 +37,7 @@ public:
                                  { counter.increment(); },
                                  fakeAudioThread);
                     refCounter.fetch_add (1);
-                    juce::Thread::sleep (5);
+                    juce::Thread::sleep (12);
                 }
             });
 
@@ -46,10 +46,10 @@ public:
             action.call ([&counter]
                          { counter.increment(); });
             refCounter.fetch_add (1);
-            juce::MessageManager::getInstance()->runDispatchLoopUntil (5);
+            juce::MessageManager::getInstance()->runDispatchLoopUntil (15);
         }
 
-        juce::MessageManager::getInstance()->runDispatchLoopUntil (250); // clear up any remaining async updates
+        juce::MessageManager::getInstance()->runDispatchLoopUntil (500); // clear up any remaining async updates
 
         expectEquals (counter.count, refCounter.load(), "Final count is incorrect!");
     }

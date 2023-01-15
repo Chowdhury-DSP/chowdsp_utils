@@ -24,10 +24,6 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include <chowdsp_core/chowdsp_core.h>
 #include <chowdsp_parameters/chowdsp_parameters.h>
 
-#if JUCE_MODULE_AVAILABLE_chowdsp_presets
-#include <chowdsp_presets/chowdsp_presets.h>
-#endif
-
 #if JUCE_MODULE_AVAILABLE_chowdsp_foleys
 #include <chowdsp_foleys/chowdsp_foleys.h>
 #endif

@@ -183,7 +183,7 @@ void ParamHolder::deserialize (typename Serializer::DeserializedType deserial, P
         [&paramIDsThatHaveBeenDeserialized] (auto& param, size_t)
         {
             if (! paramIDsThatHaveBeenDeserialized.contains (param.paramID))
-                param.setValueNotifyingHost (static_cast<juce::AudioProcessorParameter&> (param).getDefaultValue());
+                ParameterTypeHelpers::resetParameter (param);
         });
 }
 

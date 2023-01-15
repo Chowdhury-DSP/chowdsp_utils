@@ -34,7 +34,7 @@ target_link_libraries(static_test_dummy_executable PRIVATE
     chowdsp_plugin_base
     chowdsp_plugin_state
     chowdsp_plugin_utils
-    chowdsp_presets
+    chowdsp_presets_v2
     chowdsp_version
     juce::juce_recommended_config_flags
     juce::juce_recommended_lto_flags

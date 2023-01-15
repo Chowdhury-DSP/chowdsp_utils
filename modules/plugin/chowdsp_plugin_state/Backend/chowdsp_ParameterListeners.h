@@ -36,6 +36,13 @@ public:
      */
     void callAudioThreadBroadcasters();
 
+    /**
+     * If you are changing a bunch of parameters at once (e.g. preset loading),
+     * and want the MessageThread changes to propagate immediately, this function
+     * will do that for you!
+     */
+    void updateBroadcastersFromMessageThread();
+
     /** Creates a new parameter listener. */
     template <typename... ListenerArgs>
     [[nodiscard]] ScopedCallback addParameterListener (const juce::RangedAudioParameter& param, ParameterListenerThread listenerThread, ListenerArgs&&... args)
