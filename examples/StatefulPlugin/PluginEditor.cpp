@@ -6,6 +6,7 @@ PluginEditor::PluginEditor (StatefulPlugin& plug) : juce::AudioProcessorEditor (
                                                     paramsView (plug, plug.getState(), plug.getState().params)
 {
     addAndMakeVisible (paramsView);
+    addAndMakeVisible (presetsComp);
 
     addAndMakeVisible (undoButton);
     undoButton.onClick = [this]
@@ -58,10 +59,11 @@ void PluginEditor::refreshUndoRedoButtons()
 
 void PluginEditor::resized()
 {
-    paramsView.setBounds (getLocalBounds().withHeight (getHeight() - 30));
-
-    undoButton.setBounds (0, getHeight() - 30, 80, 30);
-    redoButton.setBounds (80, getHeight() - 30, 80, 30);
+    auto bounds = getLocalBounds();
+    paramsView.setBounds (bounds.removeFromTop (getHeight() - 70));
+    presetsComp.setBounds (bounds.removeFromTop (40).removeFromLeft (180));
+    undoButton.setBounds (bounds.removeFromLeft (80));
+    redoButton.setBounds (bounds.removeFromLeft (80));
 
     plugin.getState().nonParams.editorBounds = getLocalBounds().getBottomRight();
 }

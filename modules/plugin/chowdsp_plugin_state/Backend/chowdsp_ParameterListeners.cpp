@@ -17,6 +17,12 @@ ParameterListeners::ParameterListeners (ParamHolder& parameters, int interval)
 
 void ParameterListeners::timerCallback()
 {
+    updateBroadcastersFromMessageThread();
+}
+
+void ParameterListeners::updateBroadcastersFromMessageThread()
+{
+    jassert (juce::MessageManager::existsAndIsCurrentThread());
     for (const auto [index, paramInfo] : enumerate (paramInfoList))
     {
         if (paramInfo.paramCookie->getValue() == paramInfo.value)

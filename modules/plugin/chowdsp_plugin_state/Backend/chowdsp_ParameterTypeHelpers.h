@@ -50,6 +50,12 @@ namespace ParameterTypeHelpers
             return param.getIndex();
     }
 
+    /** Resets a parameter to it's default value. */
+    inline void resetParameter (juce::AudioProcessorParameter& param)
+    {
+        param.setValueNotifyingHost (param.getDefaultValue());
+    }
+
     template <typename Serializer, typename ParamType>
     void serializeParameter (typename Serializer::SerializedType& serial, const ParamType& param)
     {

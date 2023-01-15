@@ -1,6 +1,8 @@
 #pragma once
 
+#if JUCE_MODULE_AVAILABLE_chowdsp_presets
 #include <chowdsp_presets/chowdsp_presets.h>
+#endif
 
 namespace chowdsp
 {
@@ -16,7 +18,7 @@ namespace ProgramAdapter
         virtual int getCurrentProgram() { return 0; }
         virtual void setCurrentProgram (int) {}
 
-        virtual const juce::String getProgramName (int) { return {}; } // NOLINT(readability-const-return-type): Needs to return a const String for override compatibility
+        virtual const juce::String getProgramName (int) { return {}; } // NOSONAR NOLINT(readability-const-return-type): Needs to return a const String for override compatibility
         virtual void changeProgramName (int, const juce::String&) {}
     };
 
