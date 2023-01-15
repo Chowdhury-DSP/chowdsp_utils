@@ -27,7 +27,7 @@ Preset::Preset (const nlohmann::json& presetJson)
     initialiseSafe (presetJson, "json");
 }
 
-Preset::Preset (const void* presetData, size_t presetDataSize)
+Preset::Preset (const void* presetData, size_t presetDataSize) // NOSONAR
 {
     initialiseSafe ([&presetData, &presetDataSize]
                     { return JSONUtils::fromBinaryData (presetData, (int) presetDataSize); },
@@ -44,7 +44,7 @@ void Preset::initialiseSafe (JSONGetType jsonGetter, const juce::String& source)
         else
             initialise (jsonGetter());
     }
-    catch (const std::exception& exception)
+    catch (const std::exception& exception) // NOSONAR
     {
         juce::Logger::writeToLog ("Error loading preset from " + source + ": " + juce::String { exception.what() });
         jassertfalse;
@@ -62,16 +62,16 @@ void Preset::initialise (const nlohmann::json& presetJson)
     vendor = presetJson.at (vendorTag);
     category = presetJson.at (categoryTag);
     if (name.isEmpty() || vendor.isEmpty())
-        throw std::runtime_error ("Preset does not contain name or vendor!");
+        throw std::runtime_error ("Preset does not contain name or vendor!"); // NOSONAR
 
 #if defined JucePlugin_Name
     if (presetJson.at (pluginTag) != JucePlugin_Name)
-        throw std::runtime_error ("Preset was saved from a different plugin!");
+        throw std::runtime_error ("Preset was saved from a different plugin!"); // NOSONAR
 #endif
 
     const juce::String versionStr = presetJson.at (versionTag);
     if (versionStr.isEmpty())
-        throw std::runtime_error ("Preset does not contain a valid version!");
+        throw std::runtime_error ("Preset does not contain a valid version!"); // NOSONAR
     version = Version { versionStr };
 
     file = presetJson.value (fileTag, file.getFullPathName());

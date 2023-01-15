@@ -14,7 +14,7 @@ public:
      * Presets will be organized by whatever methods have been supplied to
      * the associated PresetTree.
      */
-    void addPresetsToMenu (juce::PopupMenu& menu);
+    void addPresetsToMenu (juce::PopupMenu& menu) const;
 
     /** Extra menu items that can be added to the menu. */
     enum ExtraMenuItems

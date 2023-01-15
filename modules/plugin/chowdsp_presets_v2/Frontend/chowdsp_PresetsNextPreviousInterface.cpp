@@ -23,7 +23,7 @@ void NextPrevious::updateCurrentPresetIndex()
 
 bool NextPrevious::navigateThroughPresets (bool forward)
 {
-    auto& presetTree = presetManager.getPresetTree();
+    const auto& presetTree = presetManager.getPresetTree();
     const auto numAvailablePresets = presetTree.getTotalNumberOfPresets();
     if (currentPresetIndex < 0 || numAvailablePresets <= currentPresetIndex)
         return false;

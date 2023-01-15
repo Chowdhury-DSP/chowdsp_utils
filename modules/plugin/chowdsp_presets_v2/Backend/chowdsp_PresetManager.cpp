@@ -162,7 +162,7 @@ void PresetManager::loadPresetState (const nlohmann::json& state)
 
 void PresetManager::addPresets (std::vector<Preset>&& presets, bool areFactoryPresets)
 {
-    for (auto& preset : presets)
+    for (auto& preset : std::move (presets))
     {
         if (preset.isValid())
         {
@@ -181,7 +181,7 @@ void PresetManager::saveUserPreset (const juce::File& file)
     saveUserPreset (file, Preset { name, userPresetsVendor, savePresetState() });
 }
 
-void PresetManager::saveUserPreset (const juce::File& file, Preset&& preset)
+void PresetManager::saveUserPreset (const juce::File& file, Preset&& preset) // NOSONAR
 {
     jassert (preset.isValid()); // trying to save an invalid preset??
 

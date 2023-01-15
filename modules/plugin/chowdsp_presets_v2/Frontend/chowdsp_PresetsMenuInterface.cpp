@@ -10,7 +10,7 @@ MenuInterface::MenuInterface (PresetManager& manager, FileInterface* fileFace)
     refreshPresetsMenu();
 }
 
-void MenuInterface::addPresetsToMenu (juce::PopupMenu& menu)
+void MenuInterface::addPresetsToMenu (juce::PopupMenu& menu) const
 {
     for (auto iter = juce::PopupMenu::MenuItemIterator { presetsMenu }; iter.next();)
         menu.addItem (iter.getItem());

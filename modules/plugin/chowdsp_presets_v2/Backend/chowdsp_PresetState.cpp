@@ -29,7 +29,7 @@ void PresetState::assumeOwnership()
     if (preset.isOwner())
         return;
 
-    preset = makeOptionalPointer<const Preset> (std::move (*preset));
+    preset = makeOptionalPointer<const Preset> (*preset);
 }
 
 void PresetState::reset()
@@ -66,4 +66,4 @@ bool operator!= (const PresetState& presetState, std::nullptr_t)
 {
     return ! (presetState == nullptr);
 }
-} // namespace chowdsp
+}

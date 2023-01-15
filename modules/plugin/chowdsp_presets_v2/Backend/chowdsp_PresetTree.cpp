@@ -17,7 +17,7 @@ namespace PresetTreeInserters
     Preset& flatInserter (Preset&& preset, std::vector<PresetTree::Item>& topLevelItems, const PresetTree::InsertionHelper& insertionHelper)
     {
         PresetTree::Item item;
-        item.preset = preset;
+        item.preset = std::move (preset);
 
         auto& insertedItem = insertionHelper.insertItemIntoTree (topLevelItems, std::move (item));
         jassert (insertedItem.preset.has_value());
@@ -134,7 +134,7 @@ static void removePresetsGeneric (Callable&& shouldDeletePresetItem, std::vector
 }
 
 PresetTree::PresetTree (PresetState* currentPresetState, InsertionHelper&& insertionHelper)
-    : treeInserter (&PresetTreeInserters::flatInserter),
+    : treeInserter (&PresetTreeInserters::flatInserter), // NOSONAR
       presetState (currentPresetState),
       insertHelper (std::move (insertionHelper))
 {
@@ -177,7 +177,7 @@ const Preset& PresetTree::insertPreset (Preset&& presetToInsert)
 
 void PresetTree::insertPresets (std::vector<Preset>&& presets)
 {
-    for (auto& preset : presets)
+    for (auto& preset : std::move (presets))
         treeInserter (std::move (preset), items, insertHelper);
     refreshPresetIndexes();
 }

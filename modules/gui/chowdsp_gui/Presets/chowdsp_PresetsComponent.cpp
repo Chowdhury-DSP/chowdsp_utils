@@ -31,7 +31,7 @@ PresetsComponent::PresetsComponent (PresetManager& manager,
     {
         fileInterface->savePresetCallback = [this] (nlohmann::json&& presetState)
         {
-            saveUserPreset (std::move (presetState));
+            saveUserPreset (std::move (presetState)); // NOSONAR
         };
     }
 
@@ -39,7 +39,7 @@ PresetsComponent::PresetsComponent (PresetManager& manager,
     {
         fileInterface->checkDeletePresetCallback = [this] (const Preset& preset)
         {
-            return queryShouldDeletePreset (preset);
+            return queryShouldDeletePreset (preset); // NOSONAR
         };
     }
 
@@ -47,7 +47,7 @@ PresetsComponent::PresetsComponent (PresetManager& manager,
     {
         fileInterface->failedToLoadPresetCallback = [this] (const Preset& preset)
         {
-            showFailedToLoadPresetMessage (preset);
+            showFailedToLoadPresetMessage (preset); // NOSONAR
         };
     }
 
@@ -189,13 +189,10 @@ void PresetsComponent::saveUserPreset (nlohmann::json&& presetState)
         Preset preset { presetNameEditor.getText(), presetManager.getUserPresetVendorName(), std::move (presetState) };
         const auto file = fileInterface->getFileForPreset (preset);
 
-        if (file.existsAsFile())
+        if (file.existsAsFile() && ! queryShouldOverwriteFile())
         {
-            if (! queryShouldOverwriteFile())
-            {
                 hidePresetNameEditor();
                 return;
-            }
         }
 
         presetManager.saveUserPreset (file, std::move (preset));

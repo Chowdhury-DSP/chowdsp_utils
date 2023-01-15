@@ -70,7 +70,7 @@ void FileInterface::loadPresetFromFile()
                               });
 }
 
-void FileInterface::goToUserPresetsFolder()
+void FileInterface::goToUserPresetsFolder() const
 {
     if (presetManager.getUserPresetPath().isDirectory())
         presetManager.getUserPresetPath().startAsProcess();

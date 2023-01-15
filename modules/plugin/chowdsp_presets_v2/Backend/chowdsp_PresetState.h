@@ -12,7 +12,7 @@ public:
 
     /** Returns the value */
     [[nodiscard]] const Preset* get() const noexcept { return preset.get(); }
-    operator const Preset*() const noexcept { return get(); } // NOLINT(google-explicit-constructor): we want to be able to do implicit conversion
+    operator const Preset*() const noexcept { return get(); } // NOSONAR NOLINT(google-explicit-constructor): we want to be able to do implicit conversion
     const Preset* operator->() const noexcept { return get(); } // NOLINT(google-explicit-constructor): we want to be able to do implicit conversion
 
     /** Sets a new value */

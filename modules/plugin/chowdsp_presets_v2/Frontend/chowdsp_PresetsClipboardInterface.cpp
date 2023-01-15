@@ -23,7 +23,7 @@ bool ClipboardInterface::tryToPastePreset()
         presetManager.loadPreset (newPreset);
         return true;
     }
-    catch (std::exception& e)
+    catch (std::exception& e) //NOSONAR
     {
         juce::Logger::writeToLog (juce::String { "Unable to load pasted preset! " } + e.what());
         jassertfalse;

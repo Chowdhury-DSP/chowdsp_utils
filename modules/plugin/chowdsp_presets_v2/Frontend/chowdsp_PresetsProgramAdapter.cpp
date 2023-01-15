@@ -35,7 +35,7 @@ void PresetsProgramAdapter::setCurrentProgram (int index)
     presetManager->loadPreset (*presetForIndex);
 }
 
-const juce::String PresetsProgramAdapter::getProgramName (int index) // NOLINT(readability-const-return-type)
+const juce::String PresetsProgramAdapter::getProgramName (int index) // NOSONAR NOLINT(readability-const-return-type)
 {
     if (presetManager == nullptr)
         return BaseProgramAdapter::getProgramName (index);

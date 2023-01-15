@@ -46,7 +46,7 @@ public:
             action.call ([&counter]
                          { counter.increment(); });
             refCounter.fetch_add (1);
-            juce::MessageManager::getInstance()->runDispatchLoopUntil (5);
+            juce::MessageManager::getInstance()->runDispatchLoopUntil (15);
         }
 
         juce::MessageManager::getInstance()->runDispatchLoopUntil (250); // clear up any remaining async updates

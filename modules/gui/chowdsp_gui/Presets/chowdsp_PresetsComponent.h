@@ -34,7 +34,8 @@ protected:
 
     PresetManager& presetManager;
 
-    juce::DrawableButton prevPresetButton, nextPresetButton;
+    juce::DrawableButton prevPresetButton { "", juce::DrawableButton::ImageOnButtonBackground };
+    juce::DrawableButton nextPresetButton { "", juce::DrawableButton::ImageOnButtonBackground };
     juce::Label presetNameDisplay;
     juce::TextEditor presetNameEditor;
 

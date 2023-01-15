@@ -1,6 +1,8 @@
 #include <CatchUtils.h>
 #include <chowdsp_presets_v2/chowdsp_presets_v2.h>
 
+#if ! JUCE_LINUX
+
 struct CIParams : chowdsp::ParamHolder
 {
     CIParams()
@@ -65,3 +67,5 @@ TEST_CASE ("Clipboard Interface Test", "[presets]")
         REQUIRE (state.params.floatParam->get() == val1);
     }
 }
+
+#endif

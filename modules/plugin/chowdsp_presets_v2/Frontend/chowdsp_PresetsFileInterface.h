@@ -31,7 +31,7 @@ public:
     virtual void loadPresetFromFile();
 
     /** Launches the user presets folder in a file browser. */
-    void goToUserPresetsFolder();
+    void goToUserPresetsFolder() const;
 
     /** Launches a file browser so that the user can choose their user presets folder. */
     virtual void chooseUserPresetsFolder();
