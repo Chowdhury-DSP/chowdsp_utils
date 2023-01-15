@@ -15,9 +15,7 @@ namespace chowdsp
 {
 PresetsComponent::PresetsComponent (PresetManager& manager,
                                     PresetsFrontend::FileInterface* fileFace)
-    : presetManager (manager),
-      prevPresetButton ("", juce::DrawableButton::ImageOnButtonBackground),
-      nextPresetButton ("", juce::DrawableButton::ImageOnButtonBackground)
+    : presetManager (manager)
 {
     setColour (textColour, juce::Colours::white);
     setColour (backgroundColour, juce::Colours::transparentBlack);
