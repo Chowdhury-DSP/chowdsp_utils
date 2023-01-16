@@ -22,7 +22,7 @@ void testFrequency (FilterType& filter, NumericType freq, NumericType expGainDB,
     REQUIRE_MESSAGE (magDB == SIMDApprox<T> ((T) expGainDB).margin (maxError), message);
 }
 
-TEMPLATE_TEST_CASE ("First Order Filters Test", "Filters", float, double, xsimd::batch<float>, xsimd::batch<double>)
+TEMPLATE_TEST_CASE ("First Order Filters Test", "[dsp][filters][simd]", float, double, xsimd::batch<float>, xsimd::batch<double>)
 {
     using T = TestType;
     using NumericType = chowdsp::SampleTypeHelpers::NumericType<T>;

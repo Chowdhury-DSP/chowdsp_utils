@@ -8,7 +8,7 @@ constexpr int fftSize = 1 << fftOrder;
 constexpr double fs = 48000.0f;
 } // namespace Constants
 
-TEST_CASE ("COLA Processor Test")
+TEST_CASE ("COLA Processor Test", "[dsp][data-structures]")
 {
     struct TestProcessor : public chowdsp::COLAProcessor<float>
     {

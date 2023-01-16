@@ -2,7 +2,7 @@
 #include <chowdsp_core/chowdsp_core.h>
 #include <numeric>
 
-TEST_CASE ("Vector Helpers Test")
+TEST_CASE ("Vector Helpers Test", "[common][data-structures]")
 {
     SECTION ("Insert Sorted (Default)")
     {

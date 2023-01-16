@@ -9,7 +9,7 @@ constexpr int blockSize = 512;
 constexpr auto maxErr = 0.01;
 } // namespace
 
-TEMPLATE_TEST_CASE ("Gain Test", "", float, double, xsimd::batch<float>, xsimd::batch<double>)
+TEMPLATE_TEST_CASE ("Gain Test", "[dsp][misc]", float, double, xsimd::batch<float>, xsimd::batch<double>)
 {
     using T = TestType;
     using NumericType = chowdsp::SampleTypeHelpers::NumericType<T>;

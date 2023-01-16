@@ -48,7 +48,7 @@ struct TestPlugin : public chowdsp::PluginBase<TestPlugin>
     chowdsp::VariableOversampling<float> oversampling;
 };
 
-TEST_CASE ("Variable Oversampling Test", "[resampling]")
+TEST_CASE ("Variable Oversampling Test", "[dsp][resampling]")
 {
     SECTION ("Real-Time Oversampling Test")
     {

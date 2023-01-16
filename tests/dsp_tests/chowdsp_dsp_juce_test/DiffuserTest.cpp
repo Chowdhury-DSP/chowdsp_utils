@@ -1,7 +1,7 @@
 #include <CatchUtils.h>
 #include <chowdsp_reverb/chowdsp_reverb.h>
 
-TEST_CASE ("Diffuser Test", "[reverb]")
+TEST_CASE ("Diffuser Test", "[dsp][reverb]")
 {
     static constexpr int nChannels = 4;
     static constexpr int nStages = 4;

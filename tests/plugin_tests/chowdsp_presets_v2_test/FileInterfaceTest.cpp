@@ -11,7 +11,7 @@ struct FileIParams : chowdsp::ParamHolder
     chowdsp::PercentParameter::Ptr floatParam { "float", "Param", 0.5f };
 };
 
-TEST_CASE ("File Interface Test", "[presets]")
+TEST_CASE ("File Interface Test", "[plugin][presets]")
 {
     chowdsp::PluginStateImpl<FileIParams> state {};
     chowdsp::PresetManager presetMgr { state };

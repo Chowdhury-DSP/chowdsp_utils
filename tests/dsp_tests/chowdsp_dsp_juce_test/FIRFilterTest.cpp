@@ -3,7 +3,7 @@
 #include <juce_dsp/juce_dsp.h>
 #include <chowdsp_filters/chowdsp_filters.h>
 
-TEST_CASE ("FIR Filter Test", "[filters]")
+TEST_CASE ("FIR Filter Test", "[dsp][filters]")
 {
     SECTION ("FIR Filter Test")
     {

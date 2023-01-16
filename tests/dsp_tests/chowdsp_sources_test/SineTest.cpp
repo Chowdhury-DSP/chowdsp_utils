@@ -13,7 +13,7 @@ constexpr double err = 1.0e-3;
  *  - single samples
  *  - buffers
 */
-TEST_CASE ("Sine Test", "[sources]")
+TEST_CASE ("Sine Test", "[dsp][sources]")
 {
     SECTION ("Single-Sample Processing Test")
     {

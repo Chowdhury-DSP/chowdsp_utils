@@ -33,7 +33,7 @@ void testImpulse (FilterBank& filterbank, RefModes& refModes)
 }
 } // namespace
 
-TEST_CASE ("Modal FilterBank Test", "[Modal]")
+TEST_CASE ("Modal FilterBank Test", "[dsp][modal]")
 {
     SECTION ("Real/Imag-Tau Test")
     {

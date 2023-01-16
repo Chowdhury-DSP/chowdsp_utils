@@ -26,7 +26,7 @@ struct NotAFilter
     bool onOff = true;
 };
 
-TEST_CASE ("Linear Phase EQ Test", "[EQ]")
+TEST_CASE ("Linear Phase EQ Test", "[dsp][EQ]")
 {
     SECTION ("Process Test")
     {

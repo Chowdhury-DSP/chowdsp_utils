@@ -1,7 +1,7 @@
 #include <CatchUtils.h>
 #include <chowdsp_filters/chowdsp_filters.h>
 
-TEST_CASE ("Linear Transforms Test")
+TEST_CASE ("Linear Transforms Test", "[dsp][filters]")
 {
     SECTION ("Negative Feedback Test")
     {

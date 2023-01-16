@@ -4,7 +4,7 @@
 template <typename T>
 using TestStaticBuffer = chowdsp::StaticBuffer<T, 2, 128>;
 
-TEMPLATE_PRODUCT_TEST_CASE ("Buffer Test", "[buffers]", (chowdsp::Buffer, TestStaticBuffer), (float, double, xsimd::batch<float>, xsimd::batch<double>) )
+TEMPLATE_PRODUCT_TEST_CASE ("Buffer Test", "[dsp][buffers][simd]", (chowdsp::Buffer, TestStaticBuffer), (float, double, xsimd::batch<float>, xsimd::batch<double>) )
 {
     using BufferType = TestType;
     using SampleType = typename BufferType::Type;

@@ -1,7 +1,7 @@
 #include <CatchUtils.h>
 #include <chowdsp_dsp_utils/chowdsp_dsp_utils.h>
 
-TEST_CASE ("IRHelpers Test", "[convolution]")
+TEST_CASE ("IRHelpers Test", "[dsp][convolution]")
 {
     SECTION ("Linear Phase Test")
     {

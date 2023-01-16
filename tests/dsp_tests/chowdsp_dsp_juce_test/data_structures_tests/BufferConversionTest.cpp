@@ -29,7 +29,7 @@ void toAudioBlockTest (BufferType& buffer)
     REQUIRE_MESSAGE ((int64_t) constJuceBlock.getChannelPointer (0) == (int64_t) buffer.getReadPointer (0), "Incorrect data!");
 }
 
-TEST_CASE ("Buffer Conversion Test", "[buffers]")
+TEST_CASE ("Buffer Conversion Test", "[dsp][buffers]")
 {
     chowdsp::Buffer<float> buffer { 2, 32 };
     chowdsp::BufferView<float> bufferView { buffer };

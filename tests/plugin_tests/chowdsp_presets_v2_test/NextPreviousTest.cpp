@@ -7,7 +7,7 @@ struct NPParams : chowdsp::ParamHolder
 
 using State = chowdsp::PluginStateImpl<NPParams>;
 
-TEST_CASE ("Next/Previous Test", "[presets]")
+TEST_CASE ("Next/Previous Test", "[plugin][presets]")
 {
     State state {};
 

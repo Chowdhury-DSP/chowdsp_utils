@@ -3,7 +3,7 @@
 #include "test_utils.h"
 #include "TestPresetBinaryData.h"
 
-TEST_CASE ("Preset Test", "[presets]")
+TEST_CASE ("Preset Test", "[plugin][presets]")
 {
     SECTION ("File Save/Load")
     {

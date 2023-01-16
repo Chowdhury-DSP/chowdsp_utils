@@ -1,7 +1,7 @@
 #include <CatchUtils.h>
 #include <chowdsp_dsp_data_structures/chowdsp_dsp_data_structures.h>
 
-TEST_CASE ("Scoped Value Test")
+TEST_CASE ("Scoped Value Test", "[dsp][data-structures]")
 {
     SECTION ("Read/Write Test")
     {

@@ -2,7 +2,7 @@
 #include <chowdsp_math/chowdsp_math.h>
 #include <array>
 
-TEST_CASE ("Matrix Ops Test")
+TEST_CASE ("Matrix Ops Test", "[dsp][math][simd]")
 {
     SECTION ("Householder Scalar Test")
     {

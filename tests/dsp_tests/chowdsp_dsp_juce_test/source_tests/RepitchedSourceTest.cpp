@@ -11,7 +11,7 @@ constexpr int blockSize = 256;
 constexpr float sineFreq = 100.0f;
 } // namespace Constants
 
-TEST_CASE ("Repitched Source Test", "[sources]")
+TEST_CASE ("Repitched Source Test", "[dsp][sources][resampling]")
 {
     struct SineProcessor : chowdsp::RepitchedSource<chowdsp::ResamplingTypes::LanczosResampler<>>
     {

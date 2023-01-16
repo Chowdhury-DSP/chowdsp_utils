@@ -17,7 +17,7 @@ const chowdsp::LookupTableTransform<float> chowLUT { [] (auto x)
                                                      maxVal,
                                                      N };
 
-TEST_CASE ("Lookup Table Test")
+TEST_CASE ("Lookup Table Test", "[dsp][data-structures]")
 {
     std::random_device rd;
     std::mt19937 mt (rd());

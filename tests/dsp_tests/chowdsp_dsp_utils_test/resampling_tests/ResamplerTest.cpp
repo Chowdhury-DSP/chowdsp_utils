@@ -218,7 +218,7 @@ void resampledProcessTest (float freq, double avgErrLimit, double maxErrLimit)
         testSampleRate (origSampleRate * factor);
 }
 
-TEST_CASE ("Resampler Test")
+TEST_CASE ("Resampler Test", "[dsp][resampling]")
 {
     using namespace chowdsp::ResamplingTypes;
 

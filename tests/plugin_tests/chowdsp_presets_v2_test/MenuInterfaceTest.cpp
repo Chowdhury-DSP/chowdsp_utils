@@ -5,7 +5,7 @@ struct MenuIParams : chowdsp::ParamHolder
 {
 };
 
-TEST_CASE ("Menu Interface Test", "[presets]")
+TEST_CASE ("Menu Interface Test", "[plugin][presets]")
 {
     chowdsp::PluginStateImpl<MenuIParams> state {};
     chowdsp::PresetManager presetMgr { state };

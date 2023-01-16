@@ -35,7 +35,7 @@ struct CustomTest
     static_assert (chowdsp::serialization_detail::HasCustomDeserializer<CustomTest>);
 };
 
-TEMPLATE_TEST_CASE ("Serialization Test", "", chowdsp::JSONSerializer, chowdsp::XMLSerializer)
+TEMPLATE_TEST_CASE ("Serialization Test", "[common][serialization]", chowdsp::JSONSerializer, chowdsp::XMLSerializer)
 {
     using Serializer = TestType;
 

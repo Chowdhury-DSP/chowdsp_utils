@@ -10,7 +10,7 @@ constexpr float val1 = 0.5;
 } // namespace
 
 TEMPLATE_TEST_CASE ("Smoothed Buffer Value Test",
-                    "",
+                    "[dsp][data-structures]",
                     (chowdsp::SmoothedBufferValue<float, juce::ValueSmoothingTypes::Linear>),
                     (chowdsp::SmoothedBufferValue<double, juce::ValueSmoothingTypes::Linear>),
                     (chowdsp::SmoothedBufferValue<float, juce::ValueSmoothingTypes::Multiplicative>),

@@ -3,7 +3,7 @@
 
 using namespace chowdsp::SIMDUtils;
 
-TEMPLATE_TEST_CASE ("SIMD Alignment Helpers Test", "", float, double)
+TEMPLATE_TEST_CASE ("SIMD Alignment Helpers Test", "[dsp][simd]", float, double)
 {
     SECTION ("isAligned() Test")
     {

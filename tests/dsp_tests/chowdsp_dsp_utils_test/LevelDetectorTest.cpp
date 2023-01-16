@@ -1,7 +1,7 @@
 #include <CatchUtils.h>
 #include <chowdsp_dsp_utils/chowdsp_dsp_utils.h>
 
-TEMPLATE_TEST_CASE ("Level Detector Test", "", float, double)
+TEMPLATE_TEST_CASE ("Level Detector Test", "[dsp][misc]", float, double)
 {
     SECTION ("Single-Channel Test")
     {

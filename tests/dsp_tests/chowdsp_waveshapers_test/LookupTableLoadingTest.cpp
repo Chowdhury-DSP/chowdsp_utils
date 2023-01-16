@@ -25,7 +25,7 @@ struct SlowWaveshaper : public chowdsp::ADAAWaveshaper<float>
     }
 };
 
-TEST_CASE ("Lookup Table Loading Test")
+TEST_CASE ("Lookup Table Loading Test", "[dsp][data-structures][waveshapers]")
 {
     static constexpr int numInstances = 20;
     chowdsp::LookupTableCache lutCache;

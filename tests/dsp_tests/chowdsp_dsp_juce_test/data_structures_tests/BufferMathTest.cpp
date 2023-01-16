@@ -30,7 +30,7 @@ static void fillBufferWithOnes (BufferType& buffer)
 }
 
 TEMPLATE_TEST_CASE ("Buffer Math Test",
-                    "[buffers]",
+                    "[dsp][buffers][simd]",
                     (chowdsp::Buffer<float>),
                     (chowdsp::Buffer<double>),
                     (chowdsp::Buffer<xsimd::batch<float>>),

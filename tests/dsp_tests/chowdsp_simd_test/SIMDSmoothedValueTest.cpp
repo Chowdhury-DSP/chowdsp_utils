@@ -5,7 +5,7 @@ using namespace chowdsp::SIMDUtils;
 
 //static CommonSmoothedValueTests<float, juce::ValueSmoothingTypes::Linear> floatSIMDSmoothTest;
 //static CommonSmoothedValueTests<double, juce::ValueSmoothingTypes::Multiplicative> doubleSIMDSmoothTest;
-TEMPLATE_PRODUCT_TEST_CASE ("Common Smoothed Value Tests", "", SIMDSmoothedValue, ((float, juce::ValueSmoothingTypes::Linear), (double, juce::ValueSmoothingTypes::Multiplicative)))
+TEMPLATE_PRODUCT_TEST_CASE ("Common Smoothed Value Tests", "[dsp][simd]", SIMDSmoothedValue, ((float, juce::ValueSmoothingTypes::Linear), (double, juce::ValueSmoothingTypes::Multiplicative)))
 {
     using SmoothedValueType = TestType;
     using VecType = typename SmoothedValueType::VecType;

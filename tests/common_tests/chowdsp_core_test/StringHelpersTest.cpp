@@ -1,7 +1,7 @@
 #include <CatchUtils.h>
 #include <chowdsp_core/chowdsp_core.h>
 
-TEST_CASE ("String Helpers Test")
+TEST_CASE ("String Helpers Test", "[common][data-structures]")
 {
 #if __cplusplus >= 202002L
     SECTION ("String View Compile-Time Concatenation")

@@ -14,7 +14,7 @@ constexpr float val3 = 0.25;
 constexpr float val4 = 2.5;
 } // namespace
 
-TEMPLATE_PRODUCT_TEST_CASE ("Smoothed Buffer Value Test", "", chowdsp::SmoothedBufferValue, ((float, juce::ValueSmoothingTypes::Linear), (double, juce::ValueSmoothingTypes::Multiplicative)))
+TEMPLATE_PRODUCT_TEST_CASE ("Smoothed Buffer Value Test", "[dsp][data-structures]", chowdsp::SmoothedBufferValue, ((float, juce::ValueSmoothingTypes::Linear), (double, juce::ValueSmoothingTypes::Multiplicative)))
 {
     using FloatType = typename TestType::NumericType;
     using SmoothingType = typename TestType::SmoothingType;

@@ -31,7 +31,7 @@ void processTest (chowdsp::LookupTableCache& lutCache)
     }
 }
 
-TEST_CASE ("ADAA Soft Clipper Test")
+TEST_CASE ("ADAA Soft Clipper Test", "[dsp][waveshapers]")
 {
     chowdsp::LookupTableCache lutCache;
 

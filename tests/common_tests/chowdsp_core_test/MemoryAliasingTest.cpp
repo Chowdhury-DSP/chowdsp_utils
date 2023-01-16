@@ -4,7 +4,7 @@
 
 using namespace chowdsp::MemoryUtils;
 
-TEST_CASE ("Memory Aliasing Test")
+TEST_CASE ("Memory Aliasing Test", "[common][memory]")
 {
     SECTION ("Raw Memory Test")
     {

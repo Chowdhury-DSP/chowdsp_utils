@@ -40,7 +40,7 @@ static void accuracyTest (bool zeroLatency, float tolerance)
     checkAccuracy (testOutput.data() + (zeroLatency ? 0 : irSize), testIR.data(), irSize, tolerance);
 }
 
-TEST_CASE ("Convolution Test", "[convolution]")
+TEST_CASE ("Convolution Test", "[dsp][convolution]")
 {
     SECTION ("Accuracy Test")
     {

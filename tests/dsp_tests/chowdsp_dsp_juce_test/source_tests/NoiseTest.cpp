@@ -149,7 +149,7 @@ void runNoiseTest (typename chowdsp::Noise<FloatType>::NoiseType type, float noi
  *   - Gaussian (Normal) white noise (flat frequency spectrum)
  *   - Pink noise (-3dB / Oct)
  */
-TEST_CASE ("Noise Test", "[sources]")
+TEST_CASE ("Noise Test", "[dsp][sources]")
 {
     SECTION ("Uniform White Noise Test")
     {

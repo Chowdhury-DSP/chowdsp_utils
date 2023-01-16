@@ -1,7 +1,7 @@
 #include <CatchUtils.h>
 #include <chowdsp_core/chowdsp_core.h>
 
-TEST_CASE ("Tuple Helpers Test")
+TEST_CASE ("Tuple Helpers Test", "[common][data-structures]")
 {
     SECTION ("forEachInTuple Test")
     {

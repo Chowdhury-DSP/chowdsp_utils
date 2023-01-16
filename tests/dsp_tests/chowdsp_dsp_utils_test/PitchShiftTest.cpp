@@ -96,7 +96,7 @@ static void runPitchShiftTest (bool shouldUseBuffers, bool shouldShift, bool sho
  *  - Shifting by semitones
  *  - No shift
  */
-TEST_CASE ("Pitch Shift Test")
+TEST_CASE ("Pitch Shift Test", "[dsp][misc]")
 {
     SECTION ("Single-sample Processing")
     {

@@ -11,7 +11,7 @@ constexpr float filterGain = 2.0f;
 constexpr float data[blockSize] = { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
 } // namespace Constants
 
-TEST_CASE ("Mod Filter Wrapper Test")
+TEST_CASE ("Mod Filter Wrapper Test", "[dsp][filters]")
 {
     SECTION ("Peaking Filter Test")
     {

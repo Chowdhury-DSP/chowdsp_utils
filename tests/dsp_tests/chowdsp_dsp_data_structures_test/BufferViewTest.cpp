@@ -38,7 +38,7 @@ void testBufferViewOffset (const BufferViewType view, const chowdsp::StaticBuffe
     }
 }
 
-TEMPLATE_TEST_CASE ("Buffer View Test", "[buffers]", float, double, xsimd::batch<float>, xsimd::batch<double>)
+TEMPLATE_TEST_CASE ("Buffer View Test", "[dsp][buffers][simd]", float, double, xsimd::batch<float>, xsimd::batch<double>)
 {
     using chowdsp::SIMDUtils::all;
     std::random_device rd;
