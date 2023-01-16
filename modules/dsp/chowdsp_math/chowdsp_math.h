@@ -24,7 +24,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 #include <chowdsp_simd/chowdsp_simd.h>
 
-JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE("-Wimplicit-int-float-conversion")
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wimplicit-int-float-conversion")
 #include "third_party/gcem/include/gcem.hpp"
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 

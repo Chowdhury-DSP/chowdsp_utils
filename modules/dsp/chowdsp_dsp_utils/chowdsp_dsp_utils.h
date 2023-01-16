@@ -75,7 +75,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include <juce_audio_processors/juce_audio_processors.h>
 
 #if JUCE_MODULE_AVAILABLE_juce_dsp
-JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE("-Wimplicit-const-int-float-conversion")
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wimplicit-const-int-float-conversion")
 #include <juce_dsp/juce_dsp.h>
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 

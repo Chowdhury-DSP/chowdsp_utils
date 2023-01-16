@@ -31,7 +31,7 @@
 #include <juce_core/juce_core.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_basics/juce_gui_basics.h>
-JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE("-Wimplicit-const-int-float-conversion")
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wimplicit-const-int-float-conversion")
 #include <juce_dsp/juce_dsp.h>
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 #include <chowdsp_core/chowdsp_core.h>

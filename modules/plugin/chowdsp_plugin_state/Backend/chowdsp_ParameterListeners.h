@@ -1,7 +1,7 @@
 #pragma once
 
 #if JUCE_MODULE_AVAILABLE_juce_dsp
-JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE("-Wimplicit-const-int-float-conversion")
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wimplicit-const-int-float-conversion")
 #include <juce_dsp/juce_dsp.h>
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 #else
