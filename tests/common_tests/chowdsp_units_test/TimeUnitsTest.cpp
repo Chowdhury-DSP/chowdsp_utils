@@ -3,7 +3,7 @@
 
 using namespace chowdsp::Units;
 
-TEST_CASE ("Time Units Test")
+TEST_CASE ("Time Units Test", "[common][units]")
 {
     SECTION ("Seconds to Seconds")
     {

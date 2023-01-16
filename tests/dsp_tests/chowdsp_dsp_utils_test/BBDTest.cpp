@@ -30,7 +30,7 @@ static int findFirstNonZero (const float* bufferPtr, const int numSamples)
     return firstNonZero;
 }
 
-TEST_CASE ("BBD Test")
+TEST_CASE ("BBD Test", "[dsp][misc]")
 {
     SECTION ("Pre-Delay Test")
     {

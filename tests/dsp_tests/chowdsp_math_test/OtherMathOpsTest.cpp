@@ -1,7 +1,7 @@
 #include <CatchUtils.h>
 #include <chowdsp_math/chowdsp_math.h>
 
-TEST_CASE ("Other Math Ops Test")
+TEST_CASE ("Other Math Ops Test", "[dsp][math][simd]")
 {
     SECTION ("constexpr log2 Test")
     {

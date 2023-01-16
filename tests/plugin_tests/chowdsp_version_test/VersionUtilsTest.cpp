@@ -25,7 +25,7 @@
         REQUIRE_MESSAGE ((v1 <= v2) == exp[5], "Incorrect version comparison (less than or equals)!");    \
     }
 
-TEST_CASE ("Version Test", "[version]")
+TEST_CASE ("Version Test", "[plugin][version]")
 {
     SECTION ("Constexpr Version Test")
     {

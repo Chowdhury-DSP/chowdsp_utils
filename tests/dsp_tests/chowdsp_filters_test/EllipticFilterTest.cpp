@@ -30,7 +30,7 @@ void testFilter (Filter& filt, std::vector<float> freqs, std::vector<float> mags
         testFrequency (freqs[i], mags[i], errs[i], "Incorrect gain at " + messages[i] + " frequency.");
 }
 
-TEMPLATE_TEST_CASE ("Elliptic Filter Test", "", float)
+TEMPLATE_TEST_CASE ("Elliptic Filter Test", "[dsp][filters]", float)
 {
     using T = TestType;
     using FilterType = chowdsp::EllipticFilterType;

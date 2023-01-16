@@ -12,7 +12,7 @@ struct CIParams : chowdsp::ParamHolder
     chowdsp::PercentParameter::Ptr floatParam { "float", "Param", 0.5f };
 };
 
-TEST_CASE ("Clipboard Interface Test", "[presets]")
+TEST_CASE ("Clipboard Interface Test", "[plugin][presets]")
 {
     static constexpr auto val1 = 0.1f;
     static constexpr auto val2 = 0.99f;

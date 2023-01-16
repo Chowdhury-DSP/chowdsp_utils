@@ -1,7 +1,7 @@
 #include <CatchUtils.h>
 #include <chowdsp_filters/chowdsp_filters.h>
 
-TEST_CASE ("Werner Filter Test")
+TEST_CASE ("Werner Filter Test", "[dsp][filters]")
 {
     const auto spec = juce::dsp::ProcessSpec { 48000.0f, 256, 1 };
 

@@ -11,14 +11,14 @@ constexpr auto polygonOrder = 2.5f;
 constexpr auto polygonTeeth = 1.25f;
 } // namespace
 
-float polygonalCore (float phase, float order, float teeth)
+static float polygonalCore (float phase, float order, float teeth)
 {
     static constexpr auto pi = juce::MathConstants<float>::pi;
     const auto p = std::cos (pi / order) / std::cos ((1.0f / order) * std::fmod (phase * order, 2.0f * pi) - pi / order + teeth);
     return std::sin (phase) * p;
 }
 
-TEST_CASE ("Polygonal Test")
+TEST_CASE ("Polygonal Test", "[dsp][sources]")
 {
     SECTION ("Reference Test")
     {

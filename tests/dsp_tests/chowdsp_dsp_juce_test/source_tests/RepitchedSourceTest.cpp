@@ -1,4 +1,4 @@
-#include <TimedUnitTest.h>
+#include <CatchUtils.h>
 #include <chowdsp_sources/chowdsp_sources.h>
 
 /** @TODO: figure out why this test is flaky on Linux */
@@ -8,15 +8,11 @@ namespace Constants
 {
 constexpr double fs = 48000.0f;
 constexpr int blockSize = 256;
-
 constexpr float sineFreq = 100.0f;
 } // namespace Constants
 
-class RepitchedSourceTest : public TimedUnitTest
+TEST_CASE ("Repitched Source Test", "[dsp][sources][resampling]")
 {
-public:
-    RepitchedSourceTest() : TimedUnitTest ("Repitched Source Test") {}
-
     struct SineProcessor : chowdsp::RepitchedSource<chowdsp::ResamplingTypes::LanczosResampler<>>
     {
         chowdsp::SineWave<float> sine;
@@ -34,7 +30,7 @@ public:
         }
     };
 
-    void runSineTest (float repitchFactor)
+    const auto runSineTest = [] (float repitchFactor)
     {
         using namespace Constants;
 
@@ -42,7 +38,7 @@ public:
         sineProc.prepare ({ fs, (juce::uint32) blockSize, 1 });
         sineProc.sine.setFrequency (sineFreq);
         sineProc.setRepitchFactor (repitchFactor);
-        expectEquals (sineProc.getRepitchFactor(), repitchFactor, "Set repitch factor is incorrect!");
+        REQUIRE_MESSAGE (sineProc.getRepitchFactor() == repitchFactor, "Set repitch factor is incorrect!");
 
         chowdsp::TunerProcessor<float> tuner;
         tuner.prepare (fs);
@@ -63,22 +59,25 @@ public:
             tuner.process (buffer.getReadPointer (0));
         }
 
-        expectWithinAbsoluteError (tuner.getCurrentFrequencyHz(), sineFreq * repitchFactor, 1.0f, "Repitched frequency is incorrect!");
+        REQUIRE_MESSAGE (tuner.getCurrentFrequencyHz()
+                             == Catch::Approx { sineFreq * repitchFactor }.margin (1.0f),
+                         "Repitched frequency is incorrect!");
+    };
+
+    SECTION ("No Repitch Test")
+    {
+        runSineTest (1.0f);
     }
 
-    void runTestTimed() override
+    SECTION ("Pitch Up Test")
     {
-        beginTest ("No Repitch Test");
-        runSineTest (1.0f);
-
-        beginTest ("Pitch Up Test");
         runSineTest (2.0f);
+    }
 
-        beginTest ("Pitch Down Test");
+    SECTION ("Pitch Down Test")
+    {
         runSineTest (0.5f);
     }
-};
-
-static RepitchedSourceTest repitchedSourceTest;
+}
 
 #endif

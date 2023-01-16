@@ -15,7 +15,7 @@ static void checkBufferLevel (const chowdsp::Buffer<float>& buffer, float expGai
     REQUIRE_MESSAGE (magDB == Catch::Approx (expGainDB).margin (maxError), message);
 }
 
-TEST_CASE ("Filter Chain Test")
+TEST_CASE ("Filter Chain Test", "[dsp][filters]")
 {
     SECTION ("Second Order Filter Test")
     {

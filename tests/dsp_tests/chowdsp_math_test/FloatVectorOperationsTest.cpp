@@ -119,7 +119,7 @@ void testBinaryOp (std::vector<T>& in1, std::vector<T>& in2, VectorOp&& vectorOp
     }
 }
 
-TEMPLATE_TEST_CASE ("FloatVectorOperations Test", "", float, double)
+TEMPLATE_TEST_CASE ("FloatVectorOperations Test", "[dsp][math]", float, double)
 {
     if (chowdsp::FloatVectorOperations::isUsingVDSP())
         INFO ("chowdsp::FloatVectorOperations: using vDSP");

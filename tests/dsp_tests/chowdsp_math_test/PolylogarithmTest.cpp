@@ -1,7 +1,7 @@
 #include <CatchUtils.h>
 #include <chowdsp_math/chowdsp_math.h>
 
-TEST_CASE ("Polylogarithm Test")
+TEST_CASE ("Polylogarithm Test", "[dsp][math]")
 {
     SECTION ("Li2 Test")
     {

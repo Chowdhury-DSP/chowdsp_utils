@@ -1,7 +1,7 @@
 #include <CatchUtils.h>
 #include <chowdsp_core/chowdsp_core.h>
 
-TEST_CASE ("Optional Pointer Test")
+TEST_CASE ("Optional Pointer Test", "[common][data-structures]")
 {
     struct TestType
     {

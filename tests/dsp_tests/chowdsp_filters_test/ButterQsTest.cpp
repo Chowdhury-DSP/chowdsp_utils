@@ -1,7 +1,7 @@
 #include <CatchUtils.h>
 #include <chowdsp_filters/chowdsp_filters.h>
 
-TEST_CASE ("Butterworth Q Values")
+TEST_CASE ("Butterworth Q Values", "[dsp][filters]")
 {
     SECTION ("First Order")
     {

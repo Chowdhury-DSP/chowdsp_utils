@@ -9,7 +9,7 @@ constexpr auto sineFreq = 1000.0;
 constexpr int N = 140;
 } // namespace Constants
 
-TEST_CASE ("Hilbert Filter Test")
+TEST_CASE ("Hilbert Filter Test", "[dsp][filters]")
 {
     SECTION ("Phase Shift Test")
     {

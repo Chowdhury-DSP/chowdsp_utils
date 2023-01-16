@@ -1,4 +1,4 @@
-#include <TimedUnitTest.h>
+#include <CatchUtils.h>
 #include <chowdsp_dsp_utils/chowdsp_dsp_utils.h>
 #include <chowdsp_plugin_base/chowdsp_plugin_base.h>
 
@@ -48,12 +48,9 @@ struct TestPlugin : public chowdsp::PluginBase<TestPlugin>
     chowdsp::VariableOversampling<float> oversampling;
 };
 
-class VariableOversamplingTest : public TimedUnitTest
+TEST_CASE ("Variable Oversampling Test", "[dsp][resampling]")
 {
-public:
-    VariableOversamplingTest() : TimedUnitTest ("Variable Oversampling Test") {}
-
-    void realTimeTest()
+    SECTION ("Real-Time Oversampling Test")
     {
         TestPlugin testPlugin;
         testPlugin.prepareToPlay (_sampleRate, _blockSize);
@@ -64,8 +61,8 @@ public:
             testPlugin.processAudioBlock (buffer);
             testPlugin.releaseResources();
 
-            expectEquals (testPlugin.oversampling.getOSFactor(), expectedFactor, message);
-            expectEquals (testPlugin.lastOSBlockSize, expectedFactor * _blockSize, message);
+            REQUIRE_MESSAGE (testPlugin.oversampling.getOSFactor() == expectedFactor, message);
+            REQUIRE_MESSAGE (testPlugin.lastOSBlockSize == expectedFactor * _blockSize, message);
         };
 
         auto& vts = testPlugin.getVTS();
@@ -90,7 +87,7 @@ public:
         checkOSFactor (8, "OS factor after changin OS mode is incorrect!");
     }
 
-    void offlineTest()
+    SECTION ("Offline Oversampling Test")
     {
         TestPlugin testPlugin;
         testPlugin.setNonRealtime (true);
@@ -100,7 +97,7 @@ public:
         {
             juce::AudioBuffer<float> buffer (_numChannels, _blockSize);
             testPlugin.processAudioBlock (buffer);
-            expectEquals (testPlugin.lastOSBlockSize, expectedFactor * _blockSize, message);
+            REQUIRE_MESSAGE (testPlugin.lastOSBlockSize == expectedFactor * _blockSize, message);
         };
 
         auto& vts = testPlugin.getVTS();
@@ -132,7 +129,7 @@ public:
         checkOSFactor (16, "OS factor \"same as real-time\" is incorrect!");
     }
 
-    void latencyTest()
+    SECTION ("Latency Test")
     {
         TestPlugin testPlugin;
         testPlugin.prepareToPlay (_sampleRate, _blockSize);
@@ -151,11 +148,11 @@ public:
             auto actualLatencySamples = std::distance (outData, maxElement);
 
             auto expLatencySamples = testPlugin.oversampling.getLatencySamples();
-            expectWithinAbsoluteError ((float) actualLatencySamples, expLatencySamples, 1.1f, message);
+            REQUIRE_MESSAGE ((float) actualLatencySamples == Catch::Approx { expLatencySamples }.margin (1.1f), message);
 
             auto actualLatencyMs = ((float) actualLatencySamples / (float) _sampleRate) * 1000.0f;
             auto expLatencyMs = testPlugin.oversampling.getLatencyMilliseconds();
-            expectWithinAbsoluteError (actualLatencyMs, expLatencyMs, 0.1f, message);
+            REQUIRE_MESSAGE (actualLatencyMs == Catch::Approx { expLatencyMs }.margin (0.1f), message);
         };
 
         auto& vts = testPlugin.getVTS();
@@ -173,18 +170,4 @@ public:
             }
         }
     }
-
-    void runTestTimed() override
-    {
-        beginTest ("Real-Time Oversampling Test");
-        realTimeTest();
-
-        beginTest ("Offline Oversampling Test");
-        offlineTest();
-
-        beginTest ("Latency Test");
-        latencyTest();
-    }
-};
-
-static VariableOversamplingTest variableOversamplingTest;
+}

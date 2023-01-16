@@ -6,7 +6,7 @@ using namespace chowdsp::SIMDUtils;
 #define FLOATFUNC(func) [] (FloatType x) { return func (x); }
 #define SIMDFUNC(func) [] (xsimd::batch<FloatType> x) { return func (x); }
 
-TEMPLATE_TEST_CASE ("SIMD Special Math Test", "", float, double)
+TEMPLATE_TEST_CASE ("SIMD Special Math Test", "[dsp][simd]", float, double)
 {
     using FloatType = TestType;
 

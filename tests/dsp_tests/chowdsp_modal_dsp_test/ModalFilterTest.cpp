@@ -50,7 +50,7 @@ static typename std::enable_if_t<chowdsp::SampleTypeHelpers::IsSIMDRegister<T>, 
  *   - Check that filter damps frequencies other than center frequency
  *   - Check that filter has correct decay time
  */
-TEMPLATE_TEST_CASE ("Modal Filter Test", "[Modal]", float, double, xsimd::batch<float>, xsimd::batch<double>)
+TEMPLATE_TEST_CASE ("Modal Filter Test", "[dsp][modal][simd]", float, double, xsimd::batch<float>, xsimd::batch<double>)
 {
     using T = TestType;
     using NumericType = chowdsp::SampleTypeHelpers::NumericType<T>;

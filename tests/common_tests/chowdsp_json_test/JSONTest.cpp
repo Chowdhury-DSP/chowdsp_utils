@@ -1,7 +1,7 @@
 #include <chowdsp_json/chowdsp_json.h>
 #include <CatchUtils.h>
 
-TEST_CASE ("JSON Test")
+TEST_CASE ("JSON Test", "[common][json]")
 {
     SECTION ("JUCE String Serialization Test")
     {

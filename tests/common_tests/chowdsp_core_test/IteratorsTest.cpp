@@ -3,7 +3,7 @@
 #include <array>
 #include <map>
 
-TEST_CASE ("Enumerate")
+TEST_CASE ("Enumerate", "[common][data-structures]")
 {
     SECTION ("Simple Vector")
     {

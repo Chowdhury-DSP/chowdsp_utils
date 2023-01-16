@@ -1,5 +1,4 @@
-#include <DummyPlugin.h>
-#include <TimedUnitTest.h>
+#include <CatchUtils.h>
 #include <chowdsp_dsp_data_structures/chowdsp_dsp_data_structures.h>
 
 namespace
@@ -10,41 +9,23 @@ constexpr double rampLegnth1 = 0.025;
 constexpr float val1 = 0.5;
 } // namespace
 
-template <typename FloatType, typename SmoothingType>
-class SmoothedBufferValueTest : public TimedUnitTest
+TEMPLATE_TEST_CASE ("Smoothed Buffer Value Test",
+                    "[dsp][data-structures]",
+                    (chowdsp::SmoothedBufferValue<float, juce::ValueSmoothingTypes::Linear>),
+                    (chowdsp::SmoothedBufferValue<double, juce::ValueSmoothingTypes::Linear>),
+                    (chowdsp::SmoothedBufferValue<float, juce::ValueSmoothingTypes::Multiplicative>),
+                    (chowdsp::SmoothedBufferValue<double, juce::ValueSmoothingTypes::Multiplicative>) )
 {
-public:
-    SmoothedBufferValueTest() : TimedUnitTest ("Smoothed Buffer Value Test: " + getSampleType() + " with " + getSmoothingType() + " smoothing")
+    using SmoothedValueType = TestType;
+    using FloatType = typename SmoothedValueType::NumericType;
+    using SmoothingType = typename SmoothedValueType::SmoothingType;
+
+    const auto parameterCompareTest = [] (auto&& mapFunc)
     {
-    }
-
-    static juce::String getSampleType()
-    {
-        if (std::is_same_v<FloatType, float>)
-            return "Float";
-        if (std::is_same_v<FloatType, double>)
-            return "Double";
-
-        return "Unknown";
-    }
-
-    static juce::String getSmoothingType()
-    {
-        if (std::is_same_v<SmoothingType, juce::ValueSmoothingTypes::Linear>)
-            return "Linear";
-        if (std::is_same_v<SmoothingType, juce::ValueSmoothingTypes::Multiplicative>)
-            return "Multiplicative";
-
-        return "Unknown";
-    }
-
-    template <typename MapFuncType>
-    void parameterCompareTest (MapFuncType&& mapFunc)
-    {
-        auto testSmooth = [=] (auto& ref, auto& comp, auto* param, FloatType value, int numBlocks)
+        auto testSmooth = [&mapFunc] (auto& ref, auto& comp, auto& param, FloatType value, int numBlocks)
         {
             ref.setTargetValue (value);
-            param->setValueNotifyingHost ((float) value);
+            param.setValueNotifyingHost ((float) value);
 
             for (int i = 0; i < numBlocks; ++i)
             {
@@ -52,44 +33,38 @@ public:
                 const auto* smoothData = comp.getSmoothedBuffer();
 
                 for (int n = 0; n < maxBlockSize; ++n)
-                    expectEquals (smoothData[n], mapFunc (ref.getNextValue()), "SmoothedValue was inaccurate!");
+                    REQUIRE_MESSAGE (smoothData[n] == mapFunc (ref.getNextValue()), "SmoothedValue was inaccurate!");
             }
 
-            expect (comp.isSmoothing() == ref.isSmoothing(), "SmoothedBufferValue is not smoothing correctly!");
+            REQUIRE_MESSAGE (comp.isSmoothing() == ref.isSmoothing(), "SmoothedBufferValue is not smoothing correctly!");
         };
 
-        DummyPlugin plugin;
-        auto& vts = plugin.getVTS();
-        auto* param = vts.getParameter ("dummy");
+        chowdsp::PercentParameter param { "param", "Name", 0.5f };
 
         chowdsp::SmoothedBufferValue<FloatType, SmoothingType> compSmooth;
         juce::SmoothedValue<FloatType, SmoothingType> refSmooth;
 
-        compSmooth.setParameterHandle (vts.getRawParameterValue ("dummy"));
-        compSmooth.mappingFunction = [&] (auto x)
+        compSmooth.setParameterHandle (&param);
+        compSmooth.mappingFunction = [&mapFunc] (auto x)
         { return mapFunc (x); };
         compSmooth.prepare (fs, maxBlockSize);
         compSmooth.setRampLength (rampLegnth1);
 
         refSmooth.reset (fs, rampLegnth1);
-        refSmooth.setCurrentAndTargetValue ((FloatType) param->getValue());
+        refSmooth.setCurrentAndTargetValue ((FloatType) param.get());
 
         testSmooth (refSmooth, compSmooth, param, (FloatType) val1, 5);
-    }
+    };
 
-    void runTestTimed() override
+    SECTION ("Parameter Compare")
     {
-        beginTest ("Parameter Compare Test");
         parameterCompareTest ([] (auto x)
                               { return x; });
+    }
 
-        beginTest ("Parameter Mapping Test");
+    SECTION ("Parameter with Mapping")
+    {
         parameterCompareTest ([] (auto x)
                               { return std::pow (x, 10.0f); });
     }
-};
-
-static SmoothedBufferValueTest<float, juce::ValueSmoothingTypes::Linear> smoothedBufferValueTest_float_linear;
-static SmoothedBufferValueTest<double, juce::ValueSmoothingTypes::Linear> smoothedBufferValueTest_double_linear;
-static SmoothedBufferValueTest<float, juce::ValueSmoothingTypes::Multiplicative> smoothedBufferValueTest_float_mult;
-static SmoothedBufferValueTest<double, juce::ValueSmoothingTypes::Multiplicative> smoothedBufferValueTest_double_mult;
+}

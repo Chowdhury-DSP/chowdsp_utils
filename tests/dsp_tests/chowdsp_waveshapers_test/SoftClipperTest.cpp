@@ -63,7 +63,7 @@ void vectorProcessTest()
     }
 }
 
-TEST_CASE ("Soft Clipper Test")
+TEST_CASE ("Soft Clipper Test", "[dsp][waveshapers]")
 {
     SECTION ("Scalar Process Test")
     {

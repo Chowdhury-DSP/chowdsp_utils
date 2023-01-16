@@ -81,7 +81,7 @@ static chowdsp::Preset saveUserPreset (const juce::String& file, float val, bool
     return chowdsp::Preset { presetFile };
 }
 
-TEST_CASE ("Preset Manager Test", "[presets][state]")
+TEST_CASE ("Preset Manager Test", "[plugin][presets][state]")
 {
     SECTION ("Save/Load User Presets")
     {

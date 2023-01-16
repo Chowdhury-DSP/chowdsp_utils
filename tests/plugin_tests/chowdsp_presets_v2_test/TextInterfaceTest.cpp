@@ -10,7 +10,7 @@ struct TIParams : chowdsp::ParamHolder
     chowdsp::PercentParameter::Ptr floatParam { "float", "Param", 0.5f };
 };
 
-TEST_CASE ("Text Interface Test", "[presets]")
+TEST_CASE ("Text Interface Test", "[plugin][presets]")
 {
     chowdsp::PluginStateImpl<TIParams> state {};
     chowdsp::PresetManager presetMgr { state };

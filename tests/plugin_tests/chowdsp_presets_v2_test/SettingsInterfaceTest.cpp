@@ -6,7 +6,7 @@ struct SettingsIParams : chowdsp::ParamHolder
 {
 };
 
-TEST_CASE ("Settings Interface Test", "[presets][plugin settings]")
+TEST_CASE ("Settings Interface Test", "[plugin][presets][plugin-settings]")
 {
     chowdsp::PluginStateImpl<SettingsIParams> state {};
     chowdsp::PresetManager presetMgr { state };

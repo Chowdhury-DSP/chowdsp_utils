@@ -1,7 +1,7 @@
 #include <CatchUtils.h>
 #include <chowdsp_plugin_state/chowdsp_plugin_state.h>
 
-TEST_CASE ("State Listeners Test", "[state][listeners]")
+TEST_CASE ("State Listeners Test", "[plugin][state][listeners]")
 {
     SECTION ("Main Thread Listeners Test")
     {
