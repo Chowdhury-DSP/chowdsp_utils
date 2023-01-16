@@ -1,36 +1,46 @@
-#include <TimedUnitTest.h>
+#include <CatchUtils.h>
+#include <catch2/generators/catch_generators_all.hpp>
 #include <chowdsp_dsp_data_structures/chowdsp_dsp_data_structures.h>
 
-class BufferViewTest : public TimedUnitTest
+template <typename BufferViewType>
+void testBufferView (const BufferViewType& bufferView, const juce::AudioBuffer<float>& buffer)
 {
-public:
-    BufferViewTest() : TimedUnitTest ("Buffer View Test", "Buffers")
+    REQUIRE_MESSAGE (bufferView.getNumChannels() == buffer.getNumChannels(), "Number of channels is incorrect!");
+    REQUIRE_MESSAGE (bufferView.getNumSamples() == buffer.getNumSamples(), "Number of samples is incorrect!");
+
+    for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
     {
+        auto* x = buffer.getReadPointer (ch);
+        auto* xView = bufferView.getReadPointer (ch);
+        for (int n = 0; n < buffer.getNumSamples(); ++n)
+            REQUIRE_MESSAGE (xView[n] == x[n], "Sample " + juce::String (n) + " is incorrect");
     }
+}
 
-    template <typename BufferViewType>
-    void testBufferView (const BufferViewType& bufferView, const juce::AudioBuffer<float>& buffer)
+template <typename T>
+static void processBufferView (const chowdsp::BufferView<T>& buffer)
+{
+    const auto numChannels = buffer.getNumChannels();
+    const auto numSamples = buffer.getNumSamples();
+    for (int ch = 0; ch < numChannels; ++ch)
     {
-        expectEquals (bufferView.getNumChannels(), buffer.getNumChannels(), "Number of channels is incorrect!");
-        expectEquals (bufferView.getNumSamples(), buffer.getNumSamples(), "Number of samples is incorrect!");
-
-        for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
-        {
-            auto* x = buffer.getReadPointer (ch);
-            auto* xView = bufferView.getReadPointer (ch);
-            for (int n = 0; n < buffer.getNumSamples(); ++n)
-                expectEquals (xView[n], x[n], "Sample is incorrect");
-        }
+        auto* x = buffer.getWritePointer (ch);
+        juce::FloatVectorOperations::multiply (x, (T) 2, numSamples);
     }
+}
 
-    void audioBufferToBufferViewTest (juce::Random& rand)
+TEST_CASE ("Buffer View Test", "[dsp][buffers]")
+{
+    const auto rand = Catch::Generators::random (-1.0f, 1.0f);
+
+    SECTION ("juce::AudioBuffer to BufferView Test")
     {
         juce::AudioBuffer<float> juceBuffer (2, 128);
         for (int ch = 0; ch < juceBuffer.getNumChannels(); ++ch)
         {
             auto* x = juceBuffer.getWritePointer (ch);
             for (int n = 0; n < juceBuffer.getNumSamples(); ++n)
-                x[n] = rand.nextFloat() * 2.0f - 1.0f;
+                x[n] = rand.get();
         }
 
         const auto constJuceBuffer = juce::AudioBuffer<float> { juceBuffer };
@@ -39,14 +49,14 @@ public:
         testBufferView<chowdsp::BufferView<const float>> (constJuceBuffer, constJuceBuffer);
     }
 
-    void audioBlockToBufferViewTest (juce::Random& rand)
+    SECTION ("juce::AudioBlock to BufferView Test")
     {
         juce::AudioBuffer<float> juceBuffer (2, 128);
         for (int ch = 0; ch < juceBuffer.getNumChannels(); ++ch)
         {
             auto* x = juceBuffer.getWritePointer (ch);
             for (int n = 0; n < juceBuffer.getNumSamples(); ++n)
-                x[n] = rand.nextFloat() * 2.0f - 1.0f;
+                x[n] = rand.get();
         }
 
         juce::dsp::AudioBlock<float> block { juceBuffer };
@@ -57,19 +67,7 @@ public:
         testBufferView<chowdsp::BufferView<const float>> (constBlock, juceBuffer);
     }
 
-    template <typename T>
-    static void processBufferView (const chowdsp::BufferView<T>& buffer)
-    {
-        const auto numChannels = buffer.getNumChannels();
-        const auto numSamples = buffer.getNumSamples();
-        for (int ch = 0; ch < numChannels; ++ch)
-        {
-            auto* x = buffer.getWritePointer (ch);
-            juce::FloatVectorOperations::multiply (x, (T) 2, numSamples);
-        }
-    }
-
-    void processTest()
+    SECTION ("Process test")
     {
         juce::AudioBuffer<float> juceBuffer (2, 128);
         for (int ch = 0; ch < juceBuffer.getNumChannels(); ++ch)
@@ -87,23 +85,7 @@ public:
         {
             auto* x = juceBuffer.getReadPointer (ch);
             for (int n = 0; n < juceBuffer.getNumSamples(); ++n)
-                expectEquals (x[n], 4.0f, "Sample is incorrect");
+                REQUIRE_MESSAGE (x[n] == 4.0f, "Sample " + juce::String (n) + " is incorrect");
         }
     }
-
-    void runTestTimed() override
-    {
-        auto rand = getRandom();
-
-        beginTest ("juce::AudioBuffer to BufferView Test");
-        audioBufferToBufferViewTest (rand);
-
-        beginTest ("juce::AudioBlock to BufferView Test");
-        audioBlockToBufferViewTest (rand);
-
-        beginTest ("Process test");
-        processTest();
-    }
-};
-
-static BufferViewTest bufferViewTest;
+}

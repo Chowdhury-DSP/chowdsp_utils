@@ -26,7 +26,7 @@ void testFilter (Filter& filt, std::vector<float> freqs, std::vector<float> mags
         testFrequency (freqs[i], mags[i], errs[i], "Incorrect gain at " + messages[i] + " frequency.");
 }
 
-TEMPLATE_TEST_CASE ("Nth Order Filter Test", "", float, xsimd::batch<float>)
+TEMPLATE_TEST_CASE ("Nth Order Filter Test", "[dsp][filters][simd]", float, xsimd::batch<float>)
 {
     using T = TestType;
     using NumericType = chowdsp::SampleTypeHelpers::NumericType<T>;

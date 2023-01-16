@@ -37,7 +37,7 @@ static void processTest (bool isBypassed = false)
     }
 }
 
-TEST_CASE ("ADAA Tanh Clipper Test")
+TEST_CASE ("ADAA Tanh Clipper Test", "[dsp][waveshapers]")
 {
     SECTION ("Process Test")
     {

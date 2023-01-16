@@ -48,7 +48,7 @@ static void rebufferTest (int inputBlockSize, bool fewerChannels = false)
     }
 }
 
-TEST_CASE ("Rebuffer Test")
+TEST_CASE ("Rebuffer Test", "[dsp][data-structures]")
 {
     SECTION ("Same Sized Blocks Test")
     {

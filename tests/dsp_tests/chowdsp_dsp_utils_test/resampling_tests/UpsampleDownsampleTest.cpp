@@ -224,7 +224,7 @@ void downsampleQualityTest (int downsampleRatio)
     REQUIRE_MESSAGE (rms < -50.0f, "RMS level is too high!");
 }
 
-TEST_CASE ("Upsample/Downsample Test")
+TEST_CASE ("Upsample/Downsample Test", "[dsp][resampling]")
 {
     SECTION ("Upsample 2x Quality Test")
     {

@@ -7,7 +7,7 @@ struct Params : chowdsp::ParamHolder
 
 using State = chowdsp::PluginStateImpl<Params>;
 
-TEST_CASE ("Program Adapter Test", "[presets]")
+TEST_CASE ("Program Adapter Test", "[plugin][presets]")
 {
     State state {};
 

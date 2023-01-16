@@ -25,7 +25,7 @@ void testFrequency (FilterType& filter, NumericType freq, NumericType expGainDB,
 }
 
 using CoeffMode = chowdsp::CoefficientCalculators::CoefficientCalculationMode;
-TEMPLATE_TEST_CASE_SIG ("Second Order Filters Test", "", ((typename T, CoeffMode Mode), T, Mode), (float, CoeffMode::Standard), (float, CoeffMode::Decramped), (double, CoeffMode::Standard), (double, CoeffMode::Decramped), (xsimd::batch<float>, CoeffMode::Standard), (xsimd::batch<float>, CoeffMode::Decramped), (xsimd::batch<double>, CoeffMode::Standard), (xsimd::batch<double>, CoeffMode::Decramped))
+TEMPLATE_TEST_CASE_SIG ("Second Order Filters Test", "[dsp][filters][simd]", ((typename T, CoeffMode Mode), T, Mode), (float, CoeffMode::Standard), (float, CoeffMode::Decramped), (double, CoeffMode::Standard), (double, CoeffMode::Decramped), (xsimd::batch<float>, CoeffMode::Standard), (xsimd::batch<float>, CoeffMode::Decramped), (xsimd::batch<double>, CoeffMode::Standard), (xsimd::batch<double>, CoeffMode::Decramped))
 {
     using NumericType = chowdsp::SampleTypeHelpers::NumericType<T>;
     static constexpr auto maxError = (NumericType) 1.0e-2;

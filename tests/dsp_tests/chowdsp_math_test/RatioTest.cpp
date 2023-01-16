@@ -1,7 +1,7 @@
 #include <CatchUtils.h>
 #include <chowdsp_math/chowdsp_math.h>
 
-TEST_CASE ("Constexpr Ratio Test")
+TEST_CASE ("Constexpr Ratio Test", "[dsp][math]")
 {
     SECTION ("Ratio Test")
     {

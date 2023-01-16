@@ -32,7 +32,7 @@ void scalarPowerTest()
     }
 }
 
-TEST_CASE ("Power Test")
+TEST_CASE ("Power Test", "[dsp][math]")
 {
     SECTION ("Scalar Power Test")
     {

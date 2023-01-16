@@ -18,7 +18,7 @@ void testBilinearTransform (const float (&bs)[N], const float (&as)[N], const fl
     }
 }
 
-TEST_CASE ("Conformal Maps Test")
+TEST_CASE ("Conformal Maps Test", "[dsp][filters]")
 {
     constexpr float fs = 48000.0f;
     const auto kVal = chowdsp::ConformalMaps::computeKValue (10000.0f, fs);

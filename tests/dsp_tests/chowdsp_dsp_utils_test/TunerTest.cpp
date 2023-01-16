@@ -28,7 +28,7 @@ static void freq2NotesCentsTest (int noteNum, double cents)
     REQUIRE_MESSAGE (resCents == Catch::Approx (cents).margin (0.01), "Cents is incorrect!");
 }
 
-TEST_CASE ("Tuner Test")
+TEST_CASE ("Tuner Test", "[dsp][misc]")
 {
     SECTION ("Silence Test")
     {

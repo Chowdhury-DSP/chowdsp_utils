@@ -9,7 +9,7 @@ constexpr int nSamples = 512;
 constexpr float lenSeconds = (float) nSamples / fs;
 } // namespace
 
-TEST_CASE ("Panner Test")
+TEST_CASE ("Panner Test", "[dsp][misc]")
 {
     SECTION ("Buffer Test")
     {

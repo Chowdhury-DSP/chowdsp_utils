@@ -40,7 +40,7 @@ namespace RhythmUtils
                                                       tempoFactor (rhythmTempoFactor) {}
 
         /** Returns the rhythm's label (i.e. a quarter note has the label "1/4" */
-        [[nodiscard]] inline juce::String getLabel() const { return toString (label); }
+        [[nodiscard]] inline std::string getLabel() const { return std::string (label); }
 
         /** Return time in seconds for rhythm and tempo */
         [[nodiscard]] constexpr double getTimeSeconds (double tempoBPM) const
@@ -51,7 +51,12 @@ namespace RhythmUtils
 
         constexpr bool operator== (const Rhythm& other) const
         {
-            return name == other.name && label == other.label && tempoFactor == other.tempoFactor;
+            return tempoFactor == other.tempoFactor;
+        }
+
+        constexpr bool operator!= (const Rhythm& other) const
+        {
+            return ! (*this == other);
         }
 
         std::string_view name;

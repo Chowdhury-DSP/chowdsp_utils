@@ -1,7 +1,7 @@
 #include <CatchUtils.h>
 #include <chowdsp_core/chowdsp_core.h>
 
-TEST_CASE ("Bindings Test")
+TEST_CASE ("Bindings Test", "[common][functional]")
 {
     using namespace chowdsp::Functional;
 

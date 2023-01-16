@@ -3,7 +3,7 @@
 
 using namespace chowdsp::Combinatorics;
 
-TEST_CASE ("Combinatorics Test")
+TEST_CASE ("Combinatorics Test", "[dsp][math]")
 {
     SECTION ("Factorial Test")
     {

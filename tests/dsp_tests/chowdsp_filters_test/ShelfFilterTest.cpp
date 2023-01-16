@@ -16,7 +16,7 @@ constexpr float maxError = 0.1f;
  *   - High frequencies boosted by +6 dB
  *   - Transition frequency, stable at +0 dB
  */
-TEMPLATE_TEST_CASE ("Shelf Filter Test", "", float, xsimd::batch<float>)
+TEMPLATE_TEST_CASE ("Shelf Filter Test", "[dsp][filters][simd]", float, xsimd::batch<float>)
 {
     using T = TestType;
     using NumericType = chowdsp::SampleTypeHelpers::NumericType<T>;

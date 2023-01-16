@@ -61,7 +61,7 @@ void wrapAndClearTest()
         REQUIRE_MESSAGE (testData[i] == (T) 0, "Erroneous non-zero value at index " << std::to_string (i));
 }
 
-TEST_CASE ("Double Buffer Test")
+TEST_CASE ("Double Buffer Test", "[common][data-structures]")
 {
     SECTION ("Size Test")
     {

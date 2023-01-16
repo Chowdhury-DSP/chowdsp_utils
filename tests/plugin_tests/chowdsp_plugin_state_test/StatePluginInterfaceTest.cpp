@@ -32,7 +32,7 @@ struct Plugin : chowdsp::PluginBase<chowdsp::PluginStateImpl<PluginParameterStat
     juce::AudioProcessorEditor* createEditor() override { return nullptr; }
 };
 
-TEST_CASE ("State/Plugin Interface Test", "[state][plugin_base]")
+TEST_CASE ("State/Plugin Interface Test", "[plugin][state][plugin-base]")
 {
     SECTION ("Parameter Info Test")
     {

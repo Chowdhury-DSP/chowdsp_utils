@@ -68,7 +68,7 @@ void estrinsMethodTest (const Coeffs& coeffs, const Args& args)
     }
 }
 
-TEST_CASE ("Polynomials Test")
+TEST_CASE ("Polynomials Test", "[dsp][math][simd]")
 {
     const float float4[] = { 1.0f, 0.0f, -12.0f, 0.5f, 0.0f };
     const float float7[] = { 1.0f, 0.0f, 12.0f, 0.5f, 0.2f, 0.65f, 90.0f, -121.0f };

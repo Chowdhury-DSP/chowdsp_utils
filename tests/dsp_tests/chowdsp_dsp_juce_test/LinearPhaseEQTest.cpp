@@ -1,4 +1,4 @@
-#include <TimedUnitTest.h>
+#include <CatchUtils.h>
 #include <chowdsp_eq/chowdsp_eq.h>
 
 namespace Constants
@@ -26,14 +26,11 @@ struct NotAFilter
     bool onOff = true;
 };
 
-class LinearPhaseEQTest : public TimedUnitTest
+TEST_CASE ("Linear Phase EQ Test", "[dsp][EQ]")
 {
-public:
-    LinearPhaseEQTest() : TimedUnitTest ("Linear Phase EQ Test") {}
-
-    void processTest()
+    SECTION ("Process Test")
     {
-        constexpr int FIRLength = 128;
+        static constexpr int FIRLength = 128;
         chowdsp::EQ::LinearPhaseEQ<NotAFilter, FIRLength> testEQ;
         testEQ.updatePrototypeEQParameters = [] (auto& eq, auto& params)
         { eq.onOff = params.onOff; };
@@ -51,17 +48,17 @@ public:
             const auto sample = buffer.getSample (0, i);
 
             if (i == FIRLength / 2)
-                expectWithinAbsoluteError (sample, 1.0f, 1.0e-3f, "Shifted impulse is incorrect!");
+                REQUIRE_MESSAGE (sample == Catch::Approx { 1.0f }.margin (1.0e-3f), "Shifted impulse is incorrect!");
             else
-                expectLessThan (sample, 1.0e-3f, "Signal other than the impulse was detected at index " + juce::String (i) + "!");
+                REQUIRE_MESSAGE (sample < 1.0e-3f, "Signal other than the impulse was detected at index " + juce::String (i) + "!");
         }
 
-        expectEquals (testEQ.getLatencySamples(), FIRLength / 2, "Reported latency is incorrect!");
+        REQUIRE_MESSAGE (testEQ.getLatencySamples() == FIRLength / 2, "Reported latency is incorrect!");
     }
 
-    void parametersTest()
+    SECTION ("Parameters Test")
     {
-        constexpr int FIRLength = 16;
+        static constexpr int FIRLength = 16;
         chowdsp::EQ::LinearPhaseEQ<NotAFilter, FIRLength> testEQ;
         testEQ.updatePrototypeEQParameters = [] (auto& eq, auto& params)
         { eq.onOff = params.onOff; };
@@ -78,48 +75,34 @@ public:
         };
 
         testEQ.setParameters ({ true });
-        expectGreaterThan (processBlock(), 0.9f, "Processing ON is incorrect!");
+        REQUIRE_MESSAGE (processBlock() > 0.9f, "Processing ON is incorrect!");
 
         testEQ.setParameters ({ false });
         testEQ.setParameters ({ false });
         juce::MessageManager::getInstance()->runDispatchLoopUntil (100);
-        expectLessThan (processBlock(), 0.1f, "Processing OFF is incorrect!");
+        REQUIRE_MESSAGE (processBlock() < 0.1f, "Processing OFF is incorrect!");
     }
 
-    void firLengthTest()
+    SECTION ("FIR Length Test")
     {
-        constexpr int FIRLength = 16;
+        static constexpr int FIRLength = 16;
         chowdsp::EQ::LinearPhaseEQ<NotAFilter, FIRLength> testEQ;
         testEQ.updatePrototypeEQParameters = [] (auto& eq, auto& params)
         { eq.onOff = params.onOff; };
 
         {
             testEQ.prepare ({ 48000.0, Constants::blockSize, 1 }, { true });
-            expectEquals (testEQ.getLatencySamples(), FIRLength / 2, "Latency at 48 kHz is incorrect!");
+            REQUIRE_MESSAGE (testEQ.getLatencySamples() == FIRLength / 2, "Latency at 48 kHz is incorrect!");
         }
 
         {
             testEQ.prepare ({ 44100.0, Constants::blockSize, 1 }, { true });
-            expectEquals (testEQ.getLatencySamples(), FIRLength / 2, "Latency at 44.1 kHz is incorrect!");
+            REQUIRE_MESSAGE (testEQ.getLatencySamples() == FIRLength / 2, "Latency at 44.1 kHz is incorrect!");
         }
 
         {
             testEQ.prepare ({ 96000.0, Constants::blockSize, 1 }, { true });
-            expectEquals (testEQ.getLatencySamples(), FIRLength, "Latency at 96 kHz is incorrect!");
+            REQUIRE_MESSAGE (testEQ.getLatencySamples() == FIRLength, "Latency at 96 kHz is incorrect!");
         }
     }
-
-    void runTestTimed() override
-    {
-        beginTest ("Process Test");
-        processTest();
-
-        beginTest ("Parameters Test");
-        parametersTest();
-
-        beginTest ("FIR Length Test");
-        firLengthTest();
-    }
-};
-
-static LinearPhaseEQTest linearPhaseEqTest;
+}

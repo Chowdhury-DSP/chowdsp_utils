@@ -1,7 +1,7 @@
 #include <CatchUtils.h>
 #include <chowdsp_math/chowdsp_math.h>
 
-TEST_CASE ("Jacobi Elliptic Test")
+TEST_CASE ("Jacobi Elliptic Test", "[dsp][math]")
 {
     auto checkValues = [] (double x, double k, double sn, double cn, double dn)
     {

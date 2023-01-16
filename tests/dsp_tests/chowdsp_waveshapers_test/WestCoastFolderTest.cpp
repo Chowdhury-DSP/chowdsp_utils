@@ -1,7 +1,7 @@
 #include <CatchUtils.h>
 #include <chowdsp_waveshapers/chowdsp_waveshapers.h>
 
-TEST_CASE ("West Coast Folder Test")
+TEST_CASE ("West Coast Folder Test", "[dsp][waveshapers]")
 {
     SECTION ("Process Test")
     {

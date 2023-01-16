@@ -2,7 +2,7 @@
 #include <chowdsp_waveshapers/chowdsp_waveshapers.h>
 #include <iostream>
 
-TEST_CASE ("Wave Multiplier Test")
+TEST_CASE ("Wave Multiplier Test", "[dsp][waveshapers]")
 {
     SECTION ("Process Test")
     {

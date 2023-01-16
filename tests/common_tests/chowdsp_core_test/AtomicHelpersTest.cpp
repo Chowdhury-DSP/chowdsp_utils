@@ -3,7 +3,7 @@
 #include <chrono>
 #include <thread>
 
-TEST_CASE ("Atomic Helpers Test")
+TEST_CASE ("Atomic Helpers Test", "[common][data-structures]")
 {
     SECTION ("Compare/Exchange Test")
     {

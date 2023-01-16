@@ -1,58 +1,61 @@
-#include <test_utils.h>
-#include <TimedUnitTest.h>
+#include <CatchUtils.h>
 #include <chowdsp_dsp_utils/chowdsp_dsp_utils.h>
 
-class ConvolutionTest : public TimedUnitTest
+static void createTestIR (std::vector<float>& ir, size_t size)
 {
-public:
-    ConvolutionTest() : TimedUnitTest ("Convolution Test") {}
+    const auto halfSize = size / 2;
 
-    static void createTestIR (std::vector<float>& ir, size_t size)
+    for (size_t i = 0; i < size; ++i)
+        ir[i] = 1.0f - std::abs ((float) ((int) i - (int) halfSize) / (float) halfSize);
+}
+
+static void checkAccuracy (const float* output, const float* testIR, int irSize, float tolerance)
+{
+    for (int i = 0; i < irSize; ++i)
+        REQUIRE_MESSAGE (output[i] == Catch::Approx { testIR[i] }.margin (tolerance), "Convolution output is not accurate!");
+}
+
+static void accuracyTest (bool zeroLatency, float tolerance)
+{
+    constexpr size_t irSize = 256;
+
+    std::vector<float> testIR (irSize);
+    createTestIR (testIR, irSize);
+
+    chowdsp::ConvolutionEngine engine (irSize, irSize, testIR.data());
+
+    std::vector<float> testOutput (zeroLatency ? irSize : 2 * irSize);
+    testOutput[0] = 1.0f;
+
+    if (zeroLatency)
     {
-        const auto halfSize = size / 2;
-
-        for (size_t i = 0; i < size; ++i)
-            ir[i] = 1.0f - std::abs ((float) ((int) i - (int) halfSize) / (float) halfSize);
+        engine.processSamples (testOutput.data(), testOutput.data(), irSize);
+    }
+    else
+    {
+        for (size_t ptr = 0; ptr < testOutput.size(); ptr += irSize)
+            engine.processSamplesWithAddedLatency (testOutput.data() + ptr, testOutput.data() + ptr, irSize);
     }
 
-    void checkAccuracy (const float* output, const float* testIR, int irSize, float tolerance)
+    checkAccuracy (testOutput.data() + (zeroLatency ? 0 : irSize), testIR.data(), irSize, tolerance);
+}
+
+TEST_CASE ("Convolution Test", "[dsp][convolution]")
+{
+    SECTION ("Accuracy Test")
     {
-        for (int i = 0; i < irSize; ++i)
-        {
-            auto error = std::abs (output[i] - testIR[i]);
-            expectLessThan (error, tolerance, "Convolution output is not accurate!");
-        }
+        accuracyTest (false, 1.0e-6f);
     }
 
-    void accuracyTest (bool zeroLatency, float tolerance)
+    SECTION ("Accuracy Test (Zero-Latency)")
     {
-        constexpr size_t irSize = 256;
-
-        std::vector<float> testIR (irSize);
-        createTestIR (testIR, irSize);
-
-        chowdsp::ConvolutionEngine engine (irSize, irSize, testIR.data());
-
-        std::vector<float> testOutput (zeroLatency ? irSize : 2 * irSize);
-        testOutput[0] = 1.0f;
-
-        if (zeroLatency)
-        {
-            engine.processSamples (testOutput.data(), testOutput.data(), irSize);
-        }
-        else
-        {
-            for (size_t ptr = 0; ptr < testOutput.size(); ptr += irSize)
-                engine.processSamplesWithAddedLatency (testOutput.data() + ptr, testOutput.data() + ptr, irSize);
-        }
-
-        checkAccuracy (testOutput.data() + (zeroLatency ? 0 : irSize), testIR.data(), irSize, tolerance);
+        accuracyTest (true, 1.0e-6f);
     }
 
-    void smoothTransferTest()
+    SECTION ("Smooth Transfer Test")
     {
-        constexpr float freq = 25.0f;
-        constexpr float fs = 48000.0f;
+        static constexpr float freq = 25.0f;
+        static constexpr float fs = 48000.0f;
         constexpr size_t irSize = 1024;
 
         std::vector<float> testIR (irSize, 0.0f);
@@ -89,12 +92,12 @@ public:
             maxDiff = juce::jmax (maxDiff, curDiff);
         }
 
-        expectLessThan (maxDiff, 0.5f, "IR Transfer is not smooth enough!");
+        REQUIRE_MESSAGE (maxDiff < 0.5f, "IR Transfer is not smooth enough!");
     }
 
-    void moveConstructionTest()
+    SECTION ("Move Construction Test")
     {
-        constexpr size_t irSize = 1024;
+        static constexpr size_t irSize = 1024;
 
         std::vector<float> testIR (irSize, 0.0f);
         testIR[irSize / 2] = 1.0f;
@@ -128,21 +131,4 @@ public:
             testProcess (engineTest);
         }
     }
-
-    void runTestTimed() override
-    {
-        beginTest ("Accuracy Test");
-        accuracyTest (false, 1.0e-6f);
-
-        beginTest ("Accuracy Test (Zero-Latency)");
-        accuracyTest (true, 1.0e-6f);
-
-        beginTest ("Smooth Transfer Test");
-        smoothTransferTest();
-
-        beginTest ("Move Construction Test");
-        moveConstructionTest();
-    }
-};
-
-static ConvolutionTest convTest;
+}

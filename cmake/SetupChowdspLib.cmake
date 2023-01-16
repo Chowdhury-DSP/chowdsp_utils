@@ -21,7 +21,7 @@ function(_chowdsp_load_module module)
 
     find_path(chowdsp_module_path
         NAMES "${module}.h"
-        PATHS "${CHOWDSP_MODULES_DIR}/common" "${CHOWDSP_MODULES_DIR}/dsp"
+        PATHS "${CHOWDSP_MODULES_DIR}/common" "${CHOWDSP_MODULES_DIR}/dsp" "${CHOWDSP_MODULES_DIR}/music"
         PATH_SUFFIXES "${module}"
         REQUIRED
     )

@@ -9,39 +9,42 @@
 
 namespace test_utils
 {
-template <typename FloatType = float>
-inline juce::AudioBuffer<FloatType> makeSineWave (FloatType frequency, FloatType sampleRate, FloatType lengthSeconds)
+namespace juce_utils
 {
-    const int lengthSamples = int (lengthSeconds * sampleRate);
-    juce::AudioBuffer<FloatType> sineBuffer (1, lengthSamples);
+    template <typename FloatType = float>
+    inline juce::AudioBuffer<FloatType> makeSineWave (FloatType frequency, FloatType sampleRate, FloatType lengthSeconds)
+    {
+        const int lengthSamples = int (lengthSeconds * sampleRate);
+        juce::AudioBuffer<FloatType> sineBuffer (1, lengthSamples);
 
-    for (int n = 0; n < lengthSamples; ++n)
-        sineBuffer.setSample (0, n, std::sin (juce::MathConstants<FloatType>::twoPi * frequency * (FloatType) n / sampleRate));
+        for (int n = 0; n < lengthSamples; ++n)
+            sineBuffer.setSample (0, n, std::sin (juce::MathConstants<FloatType>::twoPi * frequency * (FloatType) n / sampleRate));
 
-    return sineBuffer;
-}
+        return sineBuffer;
+    }
 
-template <typename FloatType = float>
-inline juce::AudioBuffer<FloatType> makeSineWave (FloatType frequency, FloatType sampleRate, int lengthSamples)
-{
-    juce::AudioBuffer<FloatType> sineBuffer (1, lengthSamples);
+    template <typename FloatType = float>
+    inline juce::AudioBuffer<FloatType> makeSineWave (FloatType frequency, FloatType sampleRate, int lengthSamples)
+    {
+        juce::AudioBuffer<FloatType> sineBuffer (1, lengthSamples);
 
-    for (int n = 0; n < lengthSamples; ++n)
-        sineBuffer.setSample (0, n, std::sin (juce::MathConstants<FloatType>::twoPi * frequency * (FloatType) n / sampleRate));
+        for (int n = 0; n < lengthSamples; ++n)
+            sineBuffer.setSample (0, n, std::sin (juce::MathConstants<FloatType>::twoPi * frequency * (FloatType) n / sampleRate));
 
-    return sineBuffer;
-}
+        return sineBuffer;
+    }
 
-inline juce::AudioBuffer<float> makeImpulse (float amplitude, float sampleRate, float lengthSeconds)
-{
-    const int lengthSamples = int (lengthSeconds * sampleRate);
-    juce::AudioBuffer<float> impBuffer (1, lengthSamples);
-    impBuffer.clear();
+    inline juce::AudioBuffer<float> makeImpulse (float amplitude, float sampleRate, float lengthSeconds)
+    {
+        const int lengthSamples = int (lengthSeconds * sampleRate);
+        juce::AudioBuffer<float> impBuffer (1, lengthSamples);
+        impBuffer.clear();
 
-    impBuffer.setSample (0, 0, amplitude);
+        impBuffer.setSample (0, 0, amplitude);
 
-    return impBuffer;
-}
+        return impBuffer;
+    }
+} // namespace juce_utils
 
 inline juce::AudioBuffer<float> makeNoise (juce::Random& rand, int numSamples, int numChannels = 1)
 {

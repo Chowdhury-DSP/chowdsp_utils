@@ -28,7 +28,7 @@ static void audioTimerTest (double sampleRate)
     }
 }
 
-TEST_CASE ("Audio Timer Test")
+TEST_CASE ("Audio Timer Test", "[dsp][misc]")
 {
     audioTimerTest (44100.0);
     audioTimerTest (48000.0);

@@ -17,7 +17,7 @@ struct Type2
     static constexpr std::string_view name = "type2";
 };
 
-TEST_CASE ("Types List Test")
+TEST_CASE ("Types List Test", "[common][types]")
 {
     SECTION ("For Each In Type List Test")
     {

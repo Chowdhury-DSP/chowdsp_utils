@@ -71,7 +71,7 @@ static void checkPulseSpacing (const float* buffer, const int numSamples, int sp
     REQUIRE_MESSAGE (numGoodPulses == numSamples / spacingSamples, "Incorrect number of correct pulses!");
 }
 
-TEST_CASE ("Bypass Test")
+TEST_CASE ("Bypass Test", "[dsp][misc]")
 {
     static constexpr int bufferTestNIters = 5;
     SECTION ("Audio Buffer Test")

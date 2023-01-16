@@ -7,7 +7,7 @@ constexpr int N = 1000;
 constexpr float maxErr = 1.0e-1f;
 } // namespace Constants
 
-TEST_CASE ("ADAA Hard Clipper Test")
+TEST_CASE ("ADAA Hard Clipper Test", "[dsp][waveshapers]")
 {
     SECTION ("Process Test")
     {
