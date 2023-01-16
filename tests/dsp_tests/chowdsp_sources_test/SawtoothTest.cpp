@@ -8,7 +8,7 @@ constexpr auto _blockSize = 512;
 constexpr auto testFreq = 100.0f;
 } // namespace
 
-TEST_CASE ("Sawtooth Test")
+TEST_CASE ("Sawtooth Test", "[sources]")
 {
     SECTION ("Reference Test")
     {

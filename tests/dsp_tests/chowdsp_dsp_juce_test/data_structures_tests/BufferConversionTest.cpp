@@ -1,65 +1,67 @@
-#include <TimedUnitTest.h>
+#include <CatchUtils.h>
 #include <chowdsp_dsp_data_structures/chowdsp_dsp_data_structures.h>
 
-class BufferConversionTest : public TimedUnitTest
+template <typename BufferType>
+void toAudioBufferTest (BufferType& buffer)
 {
-public:
-    BufferConversionTest() : TimedUnitTest ("Buffer Conversion Test", "Buffers")
+    auto juceBuffer = buffer.toAudioBuffer();
+    REQUIRE_MESSAGE (juceBuffer.getNumChannels() == buffer.getNumChannels(), "Incorrect channel count!");
+    REQUIRE_MESSAGE (juceBuffer.getNumSamples() == buffer.getNumSamples(), "Incorrect sample count!");
+    REQUIRE_MESSAGE ((int64_t) juceBuffer.getWritePointer (0) == (int64_t) buffer.getWritePointer (0), "Incorrect data!");
+
+    const auto constJuceBuffer = std::as_const (buffer).toAudioBuffer();
+    REQUIRE_MESSAGE (constJuceBuffer.getNumChannels() == buffer.getNumChannels(), "Incorrect channel count!");
+    REQUIRE_MESSAGE (constJuceBuffer.getNumSamples() == buffer.getNumSamples(), "Incorrect sample count!");
+    REQUIRE_MESSAGE ((int64_t) constJuceBuffer.getReadPointer (0) == (int64_t) buffer.getReadPointer (0), "Incorrect data!");
+}
+
+template <typename BufferType>
+void toAudioBlockTest (BufferType& buffer)
+{
+    auto juceBlock = buffer.toAudioBlock();
+    REQUIRE_MESSAGE ((int) juceBlock.getNumChannels() == buffer.getNumChannels(), "Incorrect channel count!");
+    REQUIRE_MESSAGE ((int) juceBlock.getNumSamples() == buffer.getNumSamples(), "Incorrect sample count!");
+    REQUIRE_MESSAGE ((int64_t) juceBlock.getChannelPointer (0) == (int64_t) buffer.getWritePointer (0), "Incorrect data!");
+
+    const auto constJuceBlock = std::as_const (buffer).toAudioBlock();
+    REQUIRE_MESSAGE ((int) constJuceBlock.getNumChannels() == buffer.getNumChannels(), "Incorrect channel count!");
+    REQUIRE_MESSAGE ((int) constJuceBlock.getNumSamples() == buffer.getNumSamples(), "Incorrect sample count!");
+    REQUIRE_MESSAGE ((int64_t) constJuceBlock.getChannelPointer (0) == (int64_t) buffer.getReadPointer (0), "Incorrect data!");
+}
+
+TEST_CASE ("Buffer Conversion Test", "[buffers]")
+{
+    chowdsp::Buffer<float> buffer { 2, 32 };
+    chowdsp::BufferView<float> bufferView { buffer };
+    chowdsp::StaticBuffer<float, 2, 32> staticBuffer { 2, 32 };
+
+    SECTION ("chowdsp::Buffer -> juce::AudioBuffer")
     {
-    }
-
-    template <typename BufferType>
-    void toAudioBufferTest (BufferType& buffer)
-    {
-        auto juceBuffer = buffer.toAudioBuffer();
-        expectEquals (juceBuffer.getNumChannels(), buffer.getNumChannels(), "Incorrect channel count!");
-        expectEquals (juceBuffer.getNumSamples(), buffer.getNumSamples(), "Incorrect sample count!");
-        expectEquals ((int64_t) juceBuffer.getWritePointer (0), (int64_t) buffer.getWritePointer (0), "Incorrect data!");
-
-        const auto constJuceBuffer = std::as_const (buffer).toAudioBuffer();
-        expectEquals (constJuceBuffer.getNumChannels(), buffer.getNumChannels(), "Incorrect channel count!");
-        expectEquals (constJuceBuffer.getNumSamples(), buffer.getNumSamples(), "Incorrect sample count!");
-        expectEquals ((int64_t) constJuceBuffer.getReadPointer (0), (int64_t) buffer.getReadPointer (0), "Incorrect data!");
-    }
-
-    template <typename BufferType>
-    void toAudioBlockTest (BufferType& buffer)
-    {
-        auto juceBlock = buffer.toAudioBlock();
-        expectEquals ((int) juceBlock.getNumChannels(), buffer.getNumChannels(), "Incorrect channel count!");
-        expectEquals ((int) juceBlock.getNumSamples(), buffer.getNumSamples(), "Incorrect sample count!");
-        expectEquals ((int64_t) juceBlock.getChannelPointer (0), (int64_t) buffer.getWritePointer (0), "Incorrect data!");
-
-        const auto constJuceBlock = std::as_const (buffer).toAudioBlock();
-        expectEquals ((int) constJuceBlock.getNumChannels(), buffer.getNumChannels(), "Incorrect channel count!");
-        expectEquals ((int) constJuceBlock.getNumSamples(), buffer.getNumSamples(), "Incorrect sample count!");
-        expectEquals ((int64_t) constJuceBlock.getChannelPointer (0), (int64_t) buffer.getReadPointer (0), "Incorrect data!");
-    }
-
-    void runTestTimed() override
-    {
-        chowdsp::Buffer<float> buffer { 2, 32 };
-        chowdsp::BufferView<float> bufferView { buffer };
-        chowdsp::StaticBuffer<float, 2, 32> staticBuffer { 2, 32 };
-
-        beginTest ("chowdsp::Buffer -> juce::AudioBuffer");
         toAudioBufferTest (buffer);
+    }
 
-        beginTest ("chowdsp::StaticBuffer -> juce::AudioBuffer");
+    SECTION ("chowdsp::StaticBuffer -> juce::AudioBuffer")
+    {
         toAudioBufferTest (staticBuffer);
+    }
 
-        beginTest ("chowdsp::BufferView -> juce::AudioBuffer");
+    SECTION ("chowdsp::BufferView -> juce::AudioBuffer")
+    {
         toAudioBufferTest (bufferView);
+    }
 
-        beginTest ("chowdsp::Buffer -> juce::AudioBlock");
+    SECTION ("chowdsp::Buffer -> juce::AudioBlock")
+    {
         toAudioBlockTest (buffer);
+    }
 
-        beginTest ("chowdsp::StaticBuffer -> juce::AudioBlock");
+    SECTION ("chowdsp::StaticBuffer -> juce::AudioBlock")
+    {
         toAudioBlockTest (staticBuffer);
+    }
 
-        beginTest ("chowdsp::BufferView -> juce::AudioBlock");
+    SECTION ("chowdsp::BufferView -> juce::AudioBlock")
+    {
         toAudioBlockTest (bufferView);
     }
-};
-
-static BufferConversionTest bufferConversionTest;
+}

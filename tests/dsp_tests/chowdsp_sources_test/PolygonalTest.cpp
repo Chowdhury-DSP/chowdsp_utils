@@ -18,7 +18,7 @@ float polygonalCore (float phase, float order, float teeth)
     return std::sin (phase) * p;
 }
 
-TEST_CASE ("Polygonal Test")
+TEST_CASE ("Polygonal Test", "[sources]")
 {
     SECTION ("Reference Test")
     {

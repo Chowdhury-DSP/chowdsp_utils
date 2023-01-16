@@ -1,19 +1,16 @@
-#include <TimedUnitTest.h>
+#include <CatchUtils.h>
 #include <chowdsp_reverb/chowdsp_reverb.h>
 
-class DiffuserTest : public TimedUnitTest
+TEST_CASE ("Diffuser Test", "[reverb]")
 {
-public:
-    DiffuserTest() : TimedUnitTest ("Diffuser Test") {}
-
     static constexpr int nChannels = 4;
     static constexpr int nStages = 4;
     using TestDiffuser = chowdsp::Reverb::Diffuser<float, nChannels, chowdsp::DelayLineInterpolationTypes::None, 1 << 13>;
 
-    void energyPreservingTest()
+    SECTION ("Energy Preserving Test")
     {
-        constexpr float fs = 48000.0f;
-        constexpr float diffusionTimeMs = 100.0f;
+        static constexpr float fs = 48000.0f;
+        static constexpr float diffusionTimeMs = 100.0f;
 
         chowdsp::Reverb::DiffuserChain<nStages, TestDiffuser> diffuserChain;
         diffuserChain.prepare ((double) fs);
@@ -32,13 +29,13 @@ public:
 
         const auto actualRMS = chowdsp::FloatVectorOperations::computeRMS (data.data(), (int) data.size());
         const auto expRMS = std::sqrt ((float) nChannels / (float) data.size());
-        expectWithinAbsoluteError (actualRMS, expRMS, 1.0e-3f, "Energy is not preserved!");
+        REQUIRE_MESSAGE (actualRMS == Catch::Approx { expRMS }.margin (1.0e-3f), "Energy is not preserved!");
     }
 
-    void resetTest()
+    SECTION ("Reset Test")
     {
-        constexpr float fs = 48000.0f;
-        constexpr float diffusionTimeMs = 100.0f;
+        static constexpr float fs = 48000.0f;
+        static constexpr float diffusionTimeMs = 100.0f;
 
         chowdsp::Reverb::DiffuserChain<nStages, TestDiffuser> diffuserChain;
         diffuserChain.prepare ((double) fs);
@@ -64,17 +61,6 @@ public:
             sumAfterReset += chowdsp::FloatVectorOperations::accumulate (outVec, nChannels);
         }
 
-        expectEquals (sumAfterReset, 0.0f, "State was not cleared after reset!");
+        REQUIRE_MESSAGE (sumAfterReset == 0.0f, "State was not cleared after reset!");
     }
-
-    void runTestTimed() override
-    {
-        beginTest ("Energy Preserving Test");
-        energyPreservingTest();
-
-        beginTest ("Reset Test");
-        resetTest();
-    }
-};
-
-static DiffuserTest diffuserTest;
+}

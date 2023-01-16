@@ -1,22 +1,19 @@
-#include <TimedUnitTest.h>
+#include <CatchUtils.h>
 #include <test_utils.h>
-
 #include <juce_dsp/juce_dsp.h>
 #include <chowdsp_filters/chowdsp_filters.h>
 
-class FIRFilterTest : public TimedUnitTest
+TEST_CASE ("FIR Filter Test", "[filters]")
 {
-public:
-    FIRFilterTest() : TimedUnitTest ("FIR Filter Test", "Filters") {}
-
-    void firFilterTest (juce::Random& rand)
+    SECTION ("FIR Filter Test")
     {
         static constexpr double fs = 48000.0;
         static constexpr int blockSize = 512;
         static constexpr int firOrder = 63;
+        auto rand = juce::Random { 123456 };
 
         auto&& coeffsBuffer = test_utils::makeNoise (rand, firOrder);
-        auto&& refBuffer = test_utils::makeSineWave (100.0f, (float) fs, blockSize);
+        auto&& refBuffer = test_utils::juce_utils::makeSineWave (100.0f, (float) fs, blockSize);
         auto&& actualBuffer = juce::AudioBuffer { refBuffer };
 
         {
@@ -35,7 +32,7 @@ public:
         {
             chowdsp::FIRFilter<float> filter { firOrder };
             filter.setCoefficients (coeffsBuffer.getReadPointer (0));
-            expectEquals (filter.getOrder(), firOrder, "Filter order is incorrect!");
+            REQUIRE_MESSAGE (filter.getOrder() == firOrder, "Filter order is incorrect!");
 
             auto&& block = juce::dsp::AudioBlock<float> { actualBuffer };
             filter.processBlock (block);
@@ -45,18 +42,19 @@ public:
         {
             const auto ref = refBuffer.getSample (0, i);
             const auto actual = actualBuffer.getSample (0, i);
-            expectWithinAbsoluteError (actual, ref, 1.0e-3f, "Sample at index: " + juce::String (i) + " is incorrect!");
+            REQUIRE_MESSAGE (actual == Catch::Approx { ref }.margin (1.0e-3f), "Sample at index: " + juce::String (i) + " is incorrect!");
         }
     }
 
-    void firFilterBypassTest (juce::Random& rand)
+    SECTION ("FIR Filter Bypass Test")
     {
         static constexpr double fs = 48000.0;
         static constexpr int blockSize = 512;
         static constexpr int firOrder = 63;
+        auto rand = juce::Random { 123456 };
 
         auto&& coeffsBuffer = test_utils::makeNoise (rand, firOrder);
-        auto&& refBuffer = test_utils::makeSineWave (100.0f, (float) fs, blockSize);
+        auto&& refBuffer = test_utils::juce_utils::makeSineWave (100.0f, (float) fs, blockSize);
         auto&& actualBuffer = juce::AudioBuffer { refBuffer };
 
         {
@@ -79,7 +77,7 @@ public:
             chowdsp::FIRFilter<float> filter;
             filter.setOrder (firOrder);
             filter.setCoefficients (coeffsBuffer.getReadPointer (0));
-            expectEquals (filter.getOrder(), firOrder, "Filter order is incorrect!");
+            REQUIRE_MESSAGE (filter.getOrder() == firOrder, "Filter order is incorrect!");
 
             auto&& copyBuffer = juce::AudioBuffer<float> { refBuffer };
             auto&& copyBlock = juce::dsp::AudioBlock<float> { copyBuffer };
@@ -96,20 +94,7 @@ public:
         {
             const auto ref = refBuffer.getSample (0, i);
             const auto actual = actualBuffer.getSample (0, i);
-            expectWithinAbsoluteError (actual, ref, 1.0e-3f, "Sample at index: " + juce::String (i) + " is incorrect!");
+            REQUIRE_MESSAGE (actual == Catch::Approx { ref }.margin (1.0e-3f), "Sample at index: " + juce::String (i) + " is incorrect!");
         }
     }
-
-    void runTestTimed() override
-    {
-        auto random = getRandom();
-
-        beginTest ("FIR Filter Test");
-        firFilterTest (random);
-
-        beginTest ("FIR Filter Bypass Test");
-        firFilterBypassTest (random);
-    }
-};
-
-static FIRFilterTest firFilterTest;
+}
