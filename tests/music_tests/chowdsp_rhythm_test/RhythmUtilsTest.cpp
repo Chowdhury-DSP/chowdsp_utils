@@ -1,24 +1,23 @@
-#include <TimedUnitTest.h>
+#include <CatchUtils.h>
 #include <chowdsp_rhythm/chowdsp_rhythm.h>
 
 using namespace chowdsp::RhythmUtils;
 
-class RhythmUtilsTest : public TimedUnitTest
+TEST_CASE ("Rhythm Utils Test")
 {
-public:
-    RhythmUtilsTest() : TimedUnitTest ("Rhythm Utils Test") {}
-
-    void runTestTimed() override
+    SECTION ("Rhythm Time Test")
     {
-        beginTest ("Rhythm Time Test");
-        expectEquals (QUARTER.getTimeSeconds (60.0), 1.0, "Quarter Note time is incorrect!");
-
-        beginTest ("Label Test");
-        expectEquals (QUARTER.getLabel(), juce::String ("1/4"), "Quarter Note label is incorrect!");
-
-        beginTest ("Equality Test");
-        expect (QUARTER == QUARTER, "Quarter Notes are not equal!");
+        STATIC_REQUIRE (QUARTER.getTimeSeconds (60.0) == 1.0);
     }
-};
 
-class RhythmUtilsTest rhythmUtilsTest;
+    SECTION ("Label Test")
+    {
+        REQUIRE_MESSAGE (QUARTER.getLabel() == "1/4", "Quarter Note label is incorrect!");
+    }
+
+    SECTION ("Equality Test")
+    {
+        STATIC_REQUIRE (QUARTER == QUARTER);
+        STATIC_REQUIRE (QUARTER != QUARTER_DOT);
+    }
+}
