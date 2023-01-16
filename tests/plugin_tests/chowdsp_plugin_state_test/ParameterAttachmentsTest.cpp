@@ -1,7 +1,7 @@
 #include <CatchUtils.h>
 #include <chowdsp_plugin_state/chowdsp_plugin_state.h>
 
-TEST_CASE ("Slider Attachment Test", "[plugin][[state][attachments]")
+TEST_CASE ("Slider Attachment Test", "[plugin][state][attachments]")
 {
     struct Params : chowdsp::ParamHolder
     {
