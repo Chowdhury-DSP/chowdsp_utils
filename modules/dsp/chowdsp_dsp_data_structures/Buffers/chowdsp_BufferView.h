@@ -204,7 +204,7 @@ public:
     }
 
     /** Returns the entire buffer view as an array of pointers to each channel's data. */
-    [[nodiscard]] const SampleType* const* getArrayOfReadPointers() const noexcept { return const_cast<const SampleType**> (channelPointers.data()); }
+    [[nodiscard]] const SampleType* const* getArrayOfReadPointers() const noexcept { return const_cast<const SampleType* const*> (channelPointers.data()); }
 
 private:
     template <typename T = SampleType>

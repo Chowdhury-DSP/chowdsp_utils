@@ -10,22 +10,22 @@ public:
     using DeserializedType = const juce::XmlElement*;
 
     template <typename Serializer>
-    static DeserializedType getDeserial (const SerializedType& serial)
+    static DeserializedType getDeserial (const SerializedType& serial) // NOSONAR
     {
         return serial.get();
     }
 
-    static juce::String toString (const SerializedType& serial)
+    static juce::String toString (const SerializedType& serial) // NOSONAR
     {
         return serial->toString();
     }
 
-    static void toFile (const SerializedType& serial, const juce::File& file)
+    static void toFile (const SerializedType& serial, const juce::File& file) // NOSONAR
     {
         serial->writeTo (file);
     }
 
-    static void toMemoryBlock (const SerializedType& serial, juce::MemoryBlock& block)
+    static void toMemoryBlock (const SerializedType& serial, juce::MemoryBlock& block) // NOSONAR
     {
         auto&& outStream = juce::MemoryOutputStream (block, false);
         serial->writeTo (outStream);
@@ -57,7 +57,7 @@ public:
         return std::make_unique<juce::XmlElement> (defaultID);
     }
 
-    static void addChildElement (SerializedType& parent, SerializedType&& newChild)
+    static void addChildElement (SerializedType& parent, SerializedType&& newChild) // NOSONAR
     {
         parent->addChildElement (newChild.release());
     }

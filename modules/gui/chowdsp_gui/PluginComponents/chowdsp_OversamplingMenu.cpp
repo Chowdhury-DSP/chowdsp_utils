@@ -123,7 +123,7 @@ void OversamplingMenu<OSType, ComboBoxType>::generateComboBoxMenu()
         sameAsRT = parameter != nullptr && (int) parameter->convertFrom0to1 (parameter->getValue()) == 1;
         item.text = "Same as real-time";
         item.colour = sameAsRT ? accentColour : juce::Colours::white;
-        item.action = [&]
+        item.action = [this]
         {
             attachments[OSOfflineSame]->setValueAsCompleteGesture (1.0f);
             generateComboBoxMenu();
@@ -132,7 +132,7 @@ void OversamplingMenu<OSType, ComboBoxType>::generateComboBoxMenu()
     }
 
     // add parameter to menus
-    std::pair<juce::String, juce::String> selectedText;
+    juce::String osParamText, osOfflineParamText;
     for (int paramIdx = 0; paramIdx < 4; ++paramIdx)
     {
         if (parameters[paramIdx] == nullptr)
@@ -159,15 +159,15 @@ void OversamplingMenu<OSType, ComboBoxType>::generateComboBoxMenu()
             thisMenu->addItem (item);
 
             if (isSelected && paramIdx == OSParam)
-                selectedText.first = item.text;
+                osParamText = item.text;
             else if (isSelected && paramIdx == OSOfflineParam)
-                selectedText.second = item.text;
+                osOfflineParamText = item.text;
         }
     }
 
-    juce::String comboBoxText = selectedText.first;
+    juce::String comboBoxText = osParamText;
     if (! sameAsRT && offlineParamsAvailable)
-        comboBoxText += " / " + selectedText.second;
+        comboBoxText += " / " + osOfflineParamText;
     this->setText (comboBoxText);
 
     if (offlineParamsAvailable)

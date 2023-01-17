@@ -15,7 +15,7 @@ namespace serialization_detail
         using DeserializedType = const json&;
 
         static auto createBaseElement() { return SerializedType {}; }
-        static void addChildElement (SerializedType&, SerializedType&&) {}
+        static void addChildElement (SerializedType&, SerializedType&&) {} //NOSONAR
         static auto getChildElement (DeserializedType, int) { return false; }
         static int getNumChildElements (DeserializedType) { return 0; }
 

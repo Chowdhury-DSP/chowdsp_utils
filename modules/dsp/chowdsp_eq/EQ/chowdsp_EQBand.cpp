@@ -264,7 +264,7 @@ std::enable_if_t<std::is_same_v<NthOrderFilter<T, N, type>, FilterType>, void>
 }
 
 template <typename FloatType, typename... FilterChoices>
-void EQBand<FloatType, FilterChoices...>::fadeBuffers (const FloatType* fadeInBuffer, const FloatType* fadeOutBuffer, FloatType* targetBuffer, int numSamples)
+void EQBand<FloatType, FilterChoices...>::fadeBuffers (const FloatType* fadeInBuffer, const FloatType* fadeOutBuffer, FloatType* targetBuffer, int numSamples) const
 {
     auto fadeInGain = (FloatType) 0;
     auto fadeOutGain = (FloatType) 1;

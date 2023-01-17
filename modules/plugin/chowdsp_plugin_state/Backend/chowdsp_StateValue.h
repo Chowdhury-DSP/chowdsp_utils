@@ -34,7 +34,7 @@ struct StateValue : StateValueBase
 
     /** Returns the value */
     T get() const noexcept { return currentValue; }
-    operator T() const noexcept { return get(); } // NOLINT(google-explicit-constructor): we want to be able to do implicit conversion
+    operator T() const noexcept { return get(); } // NOSONAR NOLINT(google-explicit-constructor): we want to be able to do implicit conversion
 
     /** Sets a new value */
     void set (T v)

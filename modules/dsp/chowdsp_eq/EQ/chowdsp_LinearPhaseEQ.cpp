@@ -102,7 +102,7 @@ bool LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::attemptIRTransfer()
         return false; // we weren't able to grab the irTransfer lock, so let's skip and  try again later!
 
     // Lock acquired! Let's do the swap
-    for (auto& eng : engines)
+    for (const auto& eng : engines)
         irTransfer->transferIR (*eng);
 
     irUpdateState.store (IRUpdateState::Good);

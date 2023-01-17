@@ -471,7 +471,7 @@ float findAbsoluteMaximum (const float* src, int numValues) noexcept
     vDSP_maxmgv (src, 1, &result, (vDSP_Length) numValues);
     return result;
 #elif CHOWDSP_NO_XSIMD
-    return [] (const auto& begin, const auto end) -> float
+    return [] (const auto& begin, const auto end)
     { return std::abs (*std::max_element (begin, end, [] (auto a, auto b)
                                           { return std::abs (a) < std::abs (b); })); }(src, src + numValues);
 #else
@@ -495,7 +495,7 @@ double findAbsoluteMaximum (const double* src, int numValues) noexcept
     vDSP_maxmgvD (src, 1, &result, (vDSP_Length) numValues);
     return result;
 #elif CHOWDSP_NO_XSIMD
-    return [] (const auto& begin, const auto end) -> double
+    return [] (const auto& begin, const auto end)
     { return std::abs (*std::max_element (begin, end, [] (auto a, auto b)
                                           { return std::abs (a) < std::abs (b); })); }(src, src + numValues);
 #else
@@ -629,7 +629,7 @@ float computeRMS (const float* src, int numValues) noexcept
     vDSP_rmsqv (src, 1, &result, (vDSP_Length) numValues);
     return result;
 #elif CHOWDSP_NO_XSIMD
-    return [] (const float* data, int numSamples) -> float
+    return [] (const float* data, int numSamples)
     {
         auto squareSum = 0.0;
         for (int i = 0; i < numSamples; ++i)
@@ -653,7 +653,7 @@ double computeRMS (const double* src, int numValues) noexcept
     vDSP_rmsqvD (src, 1, &result, (vDSP_Length) numValues);
     return result;
 #elif CHOWDSP_NO_XSIMD
-    return [] (const double* data, int numSamples) -> double
+    return [] (const double* data, int numSamples)
     {
         auto squareSum = 0.0;
         for (int i = 0; i < numSamples; ++i)
@@ -672,7 +672,7 @@ double computeRMS (const double* src, int numValues) noexcept
 
 int countNaNs (const float* src, int numValues) noexcept
 {
-    return [] (const float* data, int numSamples) -> int
+    return [] (const float* data, int numSamples)
     {
         int nanCount = 0;
         for (int i = 0; i < numSamples; ++i)
@@ -683,7 +683,7 @@ int countNaNs (const float* src, int numValues) noexcept
 
 int countNaNs (const double* src, int numValues) noexcept
 {
-    return [] (const double* data, int numSamples) -> int
+    return [] (const double* data, int numSamples)
     {
         int nanCount = 0;
         for (int i = 0; i < numSamples; ++i)
@@ -694,7 +694,7 @@ int countNaNs (const double* src, int numValues) noexcept
 
 int countInfs (const float* src, int numValues) noexcept
 {
-    return [] (const float* data, int numSamples) -> int
+    return [] (const float* data, int numSamples)
     {
         int nanCount = 0;
         for (int i = 0; i < numSamples; ++i)
@@ -705,7 +705,7 @@ int countInfs (const float* src, int numValues) noexcept
 
 int countInfs (const double* src, int numValues) noexcept
 {
-    return [] (const double* data, int numSamples) -> int
+    return [] (const double* data, int numSamples)
     {
         int nanCount = 0;
         for (int i = 0; i < numSamples; ++i)
