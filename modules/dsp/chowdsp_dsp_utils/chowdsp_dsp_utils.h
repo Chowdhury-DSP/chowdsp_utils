@@ -87,8 +87,4 @@ JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 // resamplers
 #include "Resampling/chowdsp_VariableOversampling.h"
 #endif
-
-// some other useful processors
-#include "Processors/chowdsp_GainProcessor.h"
-
 #endif

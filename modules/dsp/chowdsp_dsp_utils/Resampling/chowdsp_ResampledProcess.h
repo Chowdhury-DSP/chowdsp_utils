@@ -82,7 +82,7 @@ public:
         return inputResampler.process (block);
     }
 
-    void processOut (const BufferView<const float>& inBlock, BufferView<float>& outputBlock)
+    void processOut (const BufferView<const float>& inBlock, const BufferView<float>& outputBlock)
     {
         auto outBlockTemp = outputResampler.process (inBlock);
 

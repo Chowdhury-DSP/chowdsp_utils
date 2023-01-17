@@ -99,7 +99,7 @@ T GenericTweaksFile<false>::getProperty (PropertyID id, T&& defaultValue)
     if (! configProperties.contains (id))
     {
         addProperties ({ { id, defaultValue } });
-        return std::move (defaultValue);
+        return std::forward<T> (defaultValue);
     }
 
     return configProperties.value (id, std::forward<T> (defaultValue));

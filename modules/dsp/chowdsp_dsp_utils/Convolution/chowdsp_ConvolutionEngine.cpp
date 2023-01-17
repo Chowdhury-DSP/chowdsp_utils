@@ -59,7 +59,7 @@ template <typename FFTEngineType>
 void ConvolutionEngine<FFTEngineType>::updateSegmentsIfNecessary (size_t numSegmentsToUpdate, std::vector<juce::AudioBuffer<float>>& segments, size_t fftSize)
 {
     if (numSegmentsToUpdate == 0
-        || numSegmentsToUpdate != (size_t) segments.size()
+        || numSegmentsToUpdate != segments.size()
         || (size_t) segments[0].getNumSamples() != fftSize * 2)
     {
         segments.clear();

@@ -10,7 +10,7 @@ namespace ParameterTypeHelpers
     struct ParameterElementTypeImpl;
 
     template <typename T>
-    struct ParameterElementTypeImpl<T, typename std::enable_if<std::is_base_of_v<juce::AudioParameterFloat, T>>::type>
+    struct ParameterElementTypeImpl<T, typename std::enable_if_t<std::is_base_of_v<juce::AudioParameterFloat, T>>>
         : std::true_type
     {
         using base_type = juce::AudioParameterFloat;
@@ -18,7 +18,7 @@ namespace ParameterTypeHelpers
     };
 
     template <typename T>
-    struct ParameterElementTypeImpl<T, typename std::enable_if<std::is_base_of_v<juce::AudioParameterChoice, T>>::type>
+    struct ParameterElementTypeImpl<T, typename std::enable_if_t<std::is_base_of_v<juce::AudioParameterChoice, T>>>
         : std::true_type
     {
         using base_type = juce::AudioParameterChoice;
@@ -26,7 +26,7 @@ namespace ParameterTypeHelpers
     };
 
     template <typename T>
-    struct ParameterElementTypeImpl<T, typename std::enable_if<std::is_base_of_v<juce::AudioParameterBool, T>>::type>
+    struct ParameterElementTypeImpl<T, typename std::enable_if_t<std::is_base_of_v<juce::AudioParameterBool, T>>>
         : std::true_type
     {
         using base_type = juce::AudioParameterBool;

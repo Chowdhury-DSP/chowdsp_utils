@@ -40,7 +40,7 @@ public:
     }
 
     /** Reset filter state */
-    virtual void reset()
+    void reset()
     {
         for (auto& state : z)
             std::fill (state.begin(), state.end(), 0.0f);
@@ -139,7 +139,7 @@ public:
     }
 
     /** Set coefficients to new values */
-    virtual void setCoefs (const FloatType (&newB)[order + 1], const FloatType (&newA)[order + 1])
+    void setCoefs (const FloatType (&newB)[order + 1], const FloatType (&newA)[order + 1])
     {
         std::copy (newB, &newB[order + 1], b);
         std::copy (newA, &newA[order + 1], a);

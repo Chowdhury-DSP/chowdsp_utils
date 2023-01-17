@@ -25,7 +25,7 @@ SliderAttachment::SliderAttachment (FloatParameter& param,
     };
     slider.setDoubleClickReturnValue (true, param.convertFrom0to1 (param.getDefaultValue()));
 
-    auto range = param.getNormalisableRange();
+    auto range = param.getNormalisableRange(); // NOSONAR
 
     auto convertFrom0To1Function = [range] (double currentRangeStart,
                                             double currentRangeEnd,

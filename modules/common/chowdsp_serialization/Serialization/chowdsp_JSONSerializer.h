@@ -70,7 +70,7 @@ public:
 
     static void addChildElement (json& parent, json&& newChild)
     {
-        parent.push_back (newChild);
+        parent.push_back (std::move (newChild));
     }
 
     static auto getChildElement (const json& parent, int index)

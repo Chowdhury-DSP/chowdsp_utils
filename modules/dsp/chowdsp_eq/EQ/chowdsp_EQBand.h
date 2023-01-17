@@ -77,7 +77,7 @@ private:
     std::enable_if_t<std::is_same_v<NthOrderFilter<T, N, type>, FilterType>, void>
         processFilterChannel (FilterType& filter, const BufferView<FloatType>& block);
 
-    void fadeBuffers (const FloatType* fadeInBuffer, const FloatType* fadeOutBuffer, FloatType* targetBuffer, int numSamples);
+    void fadeBuffers (const FloatType* fadeInBuffer, const FloatType* fadeOutBuffer, FloatType* targetBuffer, int numSamples) const;
 
     static constexpr auto numFilterChoices = sizeof...(FilterChoices);
     using Filters = std::tuple<FilterChoices...>;

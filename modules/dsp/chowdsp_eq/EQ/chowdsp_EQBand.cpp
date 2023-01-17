@@ -84,7 +84,7 @@ template <typename FilterType, typename T, size_t N>
 std::enable_if_t<std::is_base_of_v<IIRFilter<N, T>, FilterType> || std::is_base_of_v<SOSFilter<N, T>, FilterType> || std::is_base_of_v<SOSFilter<N - 1, T>, FilterType>, void>
     EQBand<FloatType, FilterChoices...>::processFilterChannel (FilterType& filter, const BufferView<FloatType>& block)
 {
-    auto setParams = [&filter, fs = this->fs] (FloatType curFreq, FloatType curQ, FloatType curGain)
+    const auto setParams = [&filter, fs = this->fs] (FloatType curFreq, FloatType curQ, FloatType curGain)
     {
         if constexpr (! FilterType::HasQParameter)
         {
@@ -107,11 +107,11 @@ std::enable_if_t<std::is_base_of_v<IIRFilter<N, T>, FilterType> || std::is_base_
     {
         filter.processBlockWithModulation (
             block,
-            [setParamsFunc = std::forward<decltype (setParams)> (setParams),
+            [&setParams,
              freqHzValues = freqSmooth.getSmoothedBuffer(),
              qValues = qSmooth.getSmoothedBuffer(),
              gainValues = gainSmooth.getSmoothedBuffer()] (int n)
-            { setParamsFunc (freqHzValues[n], qValues[n], gainValues[n]); });
+            { setParams (freqHzValues[n], qValues[n], gainValues[n]); });
     }
     else
     {
@@ -264,7 +264,7 @@ std::enable_if_t<std::is_same_v<NthOrderFilter<T, N, type>, FilterType>, void>
 }
 
 template <typename FloatType, typename... FilterChoices>
-void EQBand<FloatType, FilterChoices...>::fadeBuffers (const FloatType* fadeInBuffer, const FloatType* fadeOutBuffer, FloatType* targetBuffer, int numSamples)
+void EQBand<FloatType, FilterChoices...>::fadeBuffers (const FloatType* fadeInBuffer, const FloatType* fadeOutBuffer, FloatType* targetBuffer, int numSamples) const
 {
     auto fadeInGain = (FloatType) 0;
     auto fadeOutGain = (FloatType) 1;
