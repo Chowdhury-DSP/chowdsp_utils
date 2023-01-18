@@ -86,6 +86,12 @@ constexpr StringLiteral<N + M> operator+ (const StringLiteral<N>& sl1, const Str
 }
 
 template <size_t N, size_t M>
+constexpr StringLiteral<N + M> operator+ (const StringLiteral<N>& sl1, const char (&chars)[M])
+{
+    return sl1 + StringLiteral { chars };
+}
+
+template <size_t N, size_t M>
 constexpr bool operator== (const StringLiteral<N>& lhs, const StringLiteral<M>& rhs) noexcept
 {
     return lhs.toStringView() == rhs.toStringView();
