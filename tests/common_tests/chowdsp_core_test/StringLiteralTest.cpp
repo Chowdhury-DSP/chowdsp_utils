@@ -63,4 +63,11 @@ TEST_CASE ("String Literal Test", "[common][data-structures]")
         std::string str = sl;
         REQUIRE (str == "BLAH");
     }
+
+    SECTION ("Concatenation")
+    {
+        static constexpr chowdsp::StringLiteral sl { "BLAH" };
+        const auto sl2 = sl + " BLAH!";
+        REQUIRE (sl2 == "BLAH BLAH!");
+    }
 }
