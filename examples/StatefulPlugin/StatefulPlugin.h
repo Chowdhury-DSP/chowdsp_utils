@@ -10,8 +10,9 @@ struct LevelParams : chowdsp::ParamHolder
         add (percent, gain);
     }
 
-    chowdsp::PercentParameter::Ptr percent { juce::ParameterID { "percent", 100 }, "Percent" };
-    chowdsp::GainDBParameter::Ptr gain { juce::ParameterID { "gain", 100 }, "Gain", juce::NormalisableRange { -30.0f, 0.0f }, 0.0f };
+    static constexpr auto percentID = chowdsp::StringLiteral { "percent" };
+    chowdsp::PercentParameter::Ptr percent { juce::ParameterID { percentID, 100 }, "Percent" };
+    chowdsp::GainDBParameter::Ptr gain { juce::ParameterID { chowdsp::StringLiteral { "gain" }, 100 }, "Gain", juce::NormalisableRange { -30.0f, 0.0f }, 0.0f };
 };
 
 struct PluginParameterState : chowdsp::ParamHolder
