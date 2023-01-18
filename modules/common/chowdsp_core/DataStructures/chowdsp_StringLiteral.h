@@ -108,13 +108,43 @@ constexpr bool operator== (const StringLiteral<N>& lhs, const StringLiteral<M>& 
 template <size_t N, size_t M>
 constexpr bool operator== (const StringLiteral<N>& lhs, const char (&rhs)[M]) noexcept
 {
-    return lhs.toStringView() == StringLiteral<M> { rhs };
+    return lhs == StringLiteral<M> { rhs };
+}
+
+template <size_t N, size_t M>
+constexpr bool operator== (const char (&lhs)[N], const StringLiteral<M>& rhs) noexcept
+{
+    return StringLiteral<N> { lhs } == rhs;
 }
 
 template <size_t N>
-constexpr bool operator== (const StringLiteral<N>& lhs, const std::string_view& rhs) noexcept
+constexpr bool operator== (const std::string_view& lhs, const StringLiteral<N>& rhs) noexcept
 {
-    return lhs.toStringView() == rhs;
+    return lhs == rhs.toStringView();
+}
+
+template <size_t N, size_t M>
+constexpr bool operator!= (const StringLiteral<N>& lhs, const StringLiteral<M>& rhs) noexcept
+{
+    return ! (lhs == rhs);
+}
+
+template <size_t N, size_t M>
+constexpr bool operator!= (const StringLiteral<N>& lhs, const char (&rhs)[M]) noexcept
+{
+    return ! (lhs == rhs);
+}
+
+template <size_t N, size_t M>
+constexpr bool operator!= (const char (&lhs)[N], const StringLiteral<M>& rhs) noexcept
+{
+    return ! (lhs == rhs);
+}
+
+template <size_t N>
+constexpr bool operator!= (const std::string_view& lhs, const StringLiteral<N>& rhs) noexcept
+{
+    return ! (lhs == rhs);
 }
 } // namespace chowdsp
 
