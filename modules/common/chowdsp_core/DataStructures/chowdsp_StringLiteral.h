@@ -43,7 +43,9 @@ public:
     constexpr StringLiteral& operator= (StringLiteral&&) noexcept = default;
 
     constexpr StringLiteral (const char (&str)[N]) // NOSONAR NOLINT(google-explicit-constructor)
-        : StringLiteral (str, std::integral_constant<size_t, N-1> {}) {}
+        : StringLiteral (str, std::integral_constant<size_t, N - 1> {})
+    {
+    }
 
     template <size_t M>
     constexpr StringLiteral (const char* c, std::integral_constant<size_t, M> num)
@@ -58,11 +60,17 @@ public:
     [[nodiscard]] std::string toString() const { return { data(), size() }; }
     operator std::string() const { return toString(); } // NOSONAR NOLINT(google-explicit-constructor)
 #if CHOWDSP_USING_JUCE
-    [[nodiscard]] juce::String toJUCEString() const { return toString(); }
+    [[nodiscard]] juce::String toJUCEString() const
+    {
+        return toString();
+    }
     operator juce::String() const { return toJUCEString(); } // NOSONAR NOLINT(google-explicit-constructor)
 #endif
 
-    [[nodiscard]] constexpr const char* data() const { return chars.data(); }
+    [[nodiscard]] constexpr const char* data() const
+    {
+        return chars.data();
+    }
     [[nodiscard]] constexpr size_t size() const { return actual_size; }
     constexpr auto begin() const { return chars.begin(); }
     constexpr auto end() const { return chars.begin() + actual_size; }
