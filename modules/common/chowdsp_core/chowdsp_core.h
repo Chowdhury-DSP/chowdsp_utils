@@ -79,6 +79,7 @@ namespace experimental
 #include "DataStructures/chowdsp_Iterators.h"
 #include "DataStructures/chowdsp_OptionalPointer.h"
 #include "DataStructures/chowdsp_GraphicsHelpers.h"
+#include "DataStructures/chowdsp_StringLiteral.h"
 
 #include "Functional/chowdsp_Bindings.h"
 #include "Memory/chowdsp_MemoryAliasing.h"
