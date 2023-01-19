@@ -212,17 +212,17 @@ struct Rectangle
 
     [[nodiscard]] constexpr Rectangle withWidth (T newWidth) const noexcept
     {
-        return { position.x, position.y, jmax (T(), newWidth), height };
+        return { position.x, position.y, juce::jmax (T(), newWidth), height };
     }
 
     [[nodiscard]] constexpr Rectangle withHeight (T newHeight) const noexcept
     {
-        return { position.x, position.y, width, jmax (T(), newHeight) };
+        return { position.x, position.y, width, juce::jmax (T(), newHeight) };
     }
 
     [[nodiscard]] constexpr Rectangle withSize (T newWidth, T newHeight) const noexcept
     {
-        return { position.x, position.y, jmax (T(), newWidth), jmax (T(), newHeight) };
+        return { position.x, position.y, juce::jmax (T(), newWidth), juce::jmax (T(), newHeight) };
     }
 
     [[nodiscard]] constexpr Rectangle withSizeKeepingCentre (T newWidth, T newHeight) const noexcept
