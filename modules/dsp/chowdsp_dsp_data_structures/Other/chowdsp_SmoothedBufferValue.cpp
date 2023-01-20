@@ -5,24 +5,22 @@ namespace chowdsp
 template <typename FloatType, typename ValueSmoothingTypes>
 void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::setParameterHandle (std::atomic<float>* handle)
 {
-#if JUCE_MODULE_AVAILABLE_chowdsp_parameters
     modulatableParameterHandle = nullptr;
-#endif
 
     parameterHandle = handle;
     reset (parameterHandle->load());
 }
 
-#if JUCE_MODULE_AVAILABLE_chowdsp_parameters
 template <typename FloatType, typename ValueSmoothingTypes>
-void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::setParameterHandle (FloatParameter* handle)
+void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::setParameterHandle ([[maybe_unused]] FloatParameter* handle)
 {
     parameterHandle = nullptr;
 
+#if JUCE_MODULE_AVAILABLE_chowdsp_parameters
     modulatableParameterHandle = handle;
     reset (modulatableParameterHandle->getCurrentValue());
-}
 #endif
+}
 
 template <typename FloatType, typename ValueSmoothingTypes>
 void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::prepare (double fs, int samplesPerBlock)
