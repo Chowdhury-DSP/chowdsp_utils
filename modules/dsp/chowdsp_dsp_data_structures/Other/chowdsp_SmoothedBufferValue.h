@@ -10,9 +10,12 @@ namespace juce
 }
 #endif
 
-class FloatParameter;
 namespace chowdsp
 {
+#ifndef DOXYGEN
+class FloatParameter;
+#endif
+
 /**
  * Template class for smoothing a value over a series of buffers.
  * This can be used with raw values or with parameter handles.
