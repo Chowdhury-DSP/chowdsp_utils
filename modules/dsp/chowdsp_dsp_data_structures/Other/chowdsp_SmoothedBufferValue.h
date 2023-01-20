@@ -10,6 +10,7 @@ namespace juce
 }
 #endif
 
+class FloatParameter;
 namespace chowdsp
 {
 /**
@@ -34,7 +35,6 @@ public:
      */
     void setParameterHandle (std::atomic<float>* handle);
 
-#if JUCE_MODULE_AVAILABLE_chowdsp_parameters
     /**
      * Sets a parameter handle for this buffer to use for smoothing.
      * Note that the parameter handle must not be deleted before this object!
@@ -42,7 +42,6 @@ public:
      * @param handle A parameter handle to use for smoothing
      */
     void setParameterHandle (FloatParameter* handle);
-#endif
 
     /** Prepare the smoother to process samples with a given sample rate and block size. */
     void prepare (double sampleRate, int samplesPerBlock);
@@ -100,9 +99,7 @@ private:
 
     std::atomic<float>* parameterHandle = nullptr;
 
-#if JUCE_MODULE_AVAILABLE_chowdsp_parameters
     FloatParameter* modulatableParameterHandle = nullptr;
-#endif
 
     double sampleRate = 48000.0;
     double rampLengthInSeconds = 0.05;
