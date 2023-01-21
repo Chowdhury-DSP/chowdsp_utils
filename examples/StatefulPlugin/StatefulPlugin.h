@@ -29,7 +29,10 @@ struct PluginParameterState : chowdsp::ParamHolder
 
 struct PluginNonParameterState : chowdsp::NonParamState
 {
-    PluginNonParameterState() : chowdsp::NonParamState ({ &editorBounds }) {}
+    PluginNonParameterState()
+    {
+        addStateValues ({ &editorBounds });
+    }
 
     chowdsp::StateValue<juce::Point<int>> editorBounds { "editor_bounds", { 300, 500 } };
 };

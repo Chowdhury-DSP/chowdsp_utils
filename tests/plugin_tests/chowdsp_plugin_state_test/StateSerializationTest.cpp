@@ -31,7 +31,10 @@ struct PluginParameterState : chowdsp::ParamHolder
 
 struct PluginNonParameterState : chowdsp::NonParamState
 {
-    PluginNonParameterState() : chowdsp::NonParamState ({ &editorWidth, &editorHeight }) {}
+    PluginNonParameterState()
+    {
+        addStateValues ({ &editorWidth, &editorHeight });
+    }
 
     chowdsp::StateValue<int> editorWidth { "editor_width", 300 };
     chowdsp::StateValue<int> editorHeight { "editor_height", 500 };
@@ -114,8 +117,8 @@ using StateWithNewGroup = chowdsp::PluginStateImpl<PluginParameterStateNewGroup>
 struct PluginNonParameterStateNewField : chowdsp::NonParamState
 {
     PluginNonParameterStateNewField()
-        : chowdsp::NonParamState ({ &editorWidth, &editorHeight, &randomString })
     {
+        addStateValues ({ &editorWidth, &editorHeight, &randomString });
     }
 
     chowdsp::StateValue<int> editorWidth { "editor_width", 300 };
