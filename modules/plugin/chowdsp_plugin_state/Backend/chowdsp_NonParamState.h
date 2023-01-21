@@ -7,7 +7,6 @@ class NonParamState
 {
 public:
     NonParamState() = default;
-    NonParamState (const std::initializer_list<StateValueBase*>& stateValues); // NOSONAR
 
     NonParamState (NonParamState&&) noexcept = default;
     NonParamState& operator= (NonParamState&&) noexcept = default;

@@ -1,11 +1,5 @@
 namespace chowdsp
 {
-inline NonParamState::NonParamState (const std::initializer_list<StateValueBase*>& stateValues) // NOSONAR
-    : values (stateValues)
-{
-    validateStateValues();
-}
-
 inline void NonParamState::addStateValues (const std::initializer_list<StateValueBase*>& newStateValues)
 {
     values.insert (values.end(), newStateValues.begin(), newStateValues.end());

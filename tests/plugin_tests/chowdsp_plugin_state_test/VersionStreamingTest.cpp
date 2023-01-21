@@ -30,8 +30,9 @@ struct Params : chowdsp::ParamHolder
 
 struct NonParams : chowdsp::NonParamState
 {
-    NonParams() : chowdsp::NonParamState ({ &editorSize })
+    NonParams()
     {
+        addStateValues ({ &editorSize });
         versionStreamingCallback = [this] (const chowdsp::Version& version)
         {
             if (version <= "9.9.9"_v)

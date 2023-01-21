@@ -80,7 +80,7 @@ TEST_CASE ("State Listeners Test", "[plugin][state][listeners]")
 
         struct NonParams : chowdsp::NonParamState
         {
-            NonParams() : chowdsp::NonParamState ({ &value }) {}
+            NonParams() { addStateValues ({ &value }); }
             chowdsp::StateValue<int> value { "value", 100 };
         };
 
