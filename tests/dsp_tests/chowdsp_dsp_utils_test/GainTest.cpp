@@ -44,8 +44,7 @@ TEMPLATE_TEST_CASE ("Gain Test", "[dsp][misc]", float, double, xsimd::batch<floa
         chowdsp::Buffer<T> buffer (1, blockSize);
         auto* bufferData = buffer.getWritePointer (0);
 
-        std::transform (bufferData, bufferData + blockSize, bufferData, [] (auto)
-                        { return (T) 1; });
+        std::fill (bufferData, bufferData + blockSize, (T) 1);
         gain.process (buffer);
         for (int i = 0; i < blockSize; ++i)
             REQUIRE_MESSAGE (bufferData[i] == SIMDApprox<T> ((T) refGain.getNextValue()).margin ((NumericType) maxErr), "Unsmoothed gain is incorrect!");
@@ -53,8 +52,7 @@ TEMPLATE_TEST_CASE ("Gain Test", "[dsp][misc]", float, double, xsimd::batch<floa
         gain.setGainLinear ((NumericType) 2);
         refGain.setTargetValue ((NumericType) 2);
         REQUIRE_MESSAGE (gain.isSmoothing() == refGain.isSmoothing(), "isSmoothing() is incorrect!");
-        std::transform (bufferData, bufferData + blockSize, bufferData, [] (auto)
-                        { return (T) 1; });
+        std::fill (bufferData, bufferData + blockSize, (T) 1);
         gain.process (buffer);
         for (int i = 0; i < blockSize; ++i)
             REQUIRE_MESSAGE (bufferData[i] == SIMDApprox<T> ((T) refGain.getNextValue()).margin ((NumericType) maxErr), "Smoothed gain is incorrect!");
@@ -62,10 +60,30 @@ TEMPLATE_TEST_CASE ("Gain Test", "[dsp][misc]", float, double, xsimd::batch<floa
 
         gain.reset();
         refGain.reset (0.1, (double) fs);
-        std::transform (bufferData, bufferData + blockSize, bufferData, [] (auto)
-                        { return (T) 1; });
+        std::fill (bufferData, bufferData + blockSize, (T) 1);
         gain.process (buffer);
         for (int i = 0; i < blockSize; ++i)
             REQUIRE_MESSAGE (bufferData[i] == SIMDApprox<T> ((T) refGain.getNextValue()).margin ((NumericType) maxErr), "Gain after reset is incorrect!");
+    }
+
+    SECTION ("Reset Test")
+    {
+        chowdsp::Gain<T> gain;
+        gain.setGainLinear ((NumericType) 0);
+        gain.prepare ({ (double) fs, (uint32_t) blockSize, 1 });
+        gain.setRampDurationSeconds (0.1);
+
+        chowdsp::Buffer<T> buffer (1, blockSize);
+        auto* bufferData = buffer.getWritePointer (0);
+
+        std::fill (bufferData, bufferData + blockSize, (T) 1);
+        gain.process (buffer);
+        REQUIRE_MESSAGE (bufferData[0] == SIMDApprox<T> ((T) 0), "Gain after prepare() is incorrect!");
+
+        gain.setGainDecibels ((NumericType) 0);
+        gain.reset();
+        std::fill (bufferData, bufferData + blockSize, (T) 1);
+        gain.process (buffer);
+        REQUIRE_MESSAGE (bufferData[0] == SIMDApprox<T> ((T) 1), "Gain after reset() is incorrect!");
     }
 }
