@@ -51,7 +51,7 @@ public:
     /** Resets the internal state of the gain */
     void reset() noexcept
     {
-        gain.reset();
+        gain.reset (gainTargetLinear);
     }
 
     /** Processes the Buffer. */
