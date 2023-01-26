@@ -1,4 +1,4 @@
-setup_catch_test(chowdsp_simd_test MODULES chowdsp_simd)
+setup_catch_lib_test(chowdsp_simd_test dsp_tests_lib)
 
 target_sources(chowdsp_simd_test
     PRIVATE

@@ -1,4 +1,4 @@
-setup_catch_juce_test(chowdsp_serialization_test juce::juce_gui_basics chowdsp::chowdsp_serialization)
+setup_catch_lib_test(chowdsp_serialization_test common_tests_lib)
 
 target_sources(chowdsp_serialization_test PRIVATE
     SerializationTest.cpp

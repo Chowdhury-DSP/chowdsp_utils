@@ -1,4 +1,4 @@
-setup_catch_juce_test(chowdsp_json_test chowdsp::chowdsp_json)
+setup_catch_lib_test(chowdsp_json_test common_tests_lib)
 
 target_sources(chowdsp_json_test PRIVATE
     JSONTest.cpp

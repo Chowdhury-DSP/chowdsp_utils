@@ -1,4 +1,4 @@
-setup_catch_test(chowdsp_math_test MODULES chowdsp_math)
+setup_catch_lib_test(chowdsp_math_test dsp_tests_lib)
 
 target_sources(chowdsp_math_test
     PRIVATE

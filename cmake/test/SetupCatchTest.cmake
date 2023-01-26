@@ -21,28 +21,37 @@ function(setup_catch_test_base target)
     )
 endfunction(setup_catch_test_base)
 
-# setup_catch_test(<target-name>)
+# setup_catch_lib_test(<target-name> <library-name>)
 #
 # Configures a Catch unit test
-function(setup_catch_test target)
+function(setup_catch_lib_test target library)
     add_executable(${target})
     add_test(NAME ${target} COMMAND $<TARGET_FILE:${target}>)
 
-    setup_chowdsp_lib(${target}_lib ${ARGV})
-    target_link_libraries(${target} PRIVATE ${target}_lib)
+    target_link_libraries(${target} PRIVATE ${library})
 
     # set coverage flags if needed
     if(CODE_COVERAGE)
         enable_coverage_flags(${target})
-        enable_coverage_flags(${target}_lib)
+        enable_coverage_flags(${library})
     endif()
 
     setup_catch_test_base(${target})
+endfunction(setup_catch_lib_test)
+
+# setup_catch_test(<target-name>)
+#
+# Configures a Catch unit test from chowdsp modules only
+# TODO: Switch to using setup_catch_lib_test with shared static library
+function(setup_catch_test target)
+    setup_chowdsp_lib(${target}_lib ${ARGV})
+    setup_catch_lib_test(${target} ${target}_lib)
 endfunction(setup_catch_test)
 
 # setup_catch_juce_test(<target-name>)
 #
-# Configures a Catch unit test
+# Configures a Catch unit test from JUCE modules (including chowdsp)
+# TODO: Switch to using setup_catch_lib_test with shared static library
 function(setup_catch_juce_test target)
     add_executable(${target})
     add_test(NAME ${target} COMMAND $<TARGET_FILE:${target}>)
@@ -65,3 +74,28 @@ function(setup_catch_juce_test target)
 
     setup_catch_test_base(${target})
 endfunction(setup_catch_juce_test)
+
+# setup_juce_lib(<library-name> <module1> <module2> ...)
+#
+# Configures a static library from a set of JUCE modules
+function(setup_juce_lib library modules)
+    add_library(${library} STATIC)
+
+    list(REMOVE_AT ARGV 0) # Remove "library" argument
+    target_link_libraries(${library} PRIVATE ${ARGV})
+
+    target_compile_definitions(${library}
+        PUBLIC
+            JUCE_USE_CURL=0
+            JUCE_WEB_BROWSER=0
+            JUCE_MODAL_LOOPS_PERMITTED=1
+            JUCE_STANDALONE_APPLICATION=1
+        INTERFACE
+            $<TARGET_PROPERTY:${library},COMPILE_DEFINITIONS>
+    )
+
+    target_include_directories(${library}
+        INTERFACE
+            $<TARGET_PROPERTY:${library},INCLUDE_DIRECTORIES>
+    )
+endfunction(setup_juce_lib)

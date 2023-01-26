@@ -1,4 +1,4 @@
-setup_catch_test(chowdsp_filters_test MODULES chowdsp_filters)
+setup_catch_lib_test(chowdsp_filters_test dsp_tests_lib)
 
 target_sources(chowdsp_filters_test
     PRIVATE

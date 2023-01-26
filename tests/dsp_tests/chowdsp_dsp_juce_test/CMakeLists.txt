@@ -1,11 +1,4 @@
-setup_catch_juce_test(chowdsp_dsp_juce_test
-    juce::juce_dsp
-    chowdsp::chowdsp_dsp_data_structures
-    chowdsp::chowdsp_eq
-    chowdsp::chowdsp_reverb
-    chowdsp::chowdsp_sources
-    chowdsp::chowdsp_plugin_base
-)
+setup_catch_lib_test(chowdsp_dsp_juce_test dsp_juce_tests_lib)
 
 target_sources(chowdsp_dsp_juce_test
     PRIVATE

@@ -1,4 +1,4 @@
-setup_catch_test(chowdsp_waveshapers_test MODULES chowdsp_waveshapers)
+setup_catch_lib_test(chowdsp_waveshapers_test dsp_tests_lib)
 
 # These tests take _forever_ on Windows CI, so let's skip most of them for now.
 if (WIN32)
@@ -11,7 +11,7 @@ if (WIN32)
     )
 else()
     target_sources(chowdsp_waveshapers_test
-            PRIVATE
+        PRIVATE
             SoftClipperTest.cpp
             ADAAFullWaveRectifierTest.cpp
             ADAAHardClipperTest.cpp
@@ -20,5 +20,5 @@ else()
             WaveMultiplierTest.cpp
             WestCoastFolderTest.cpp
             LookupTableLoadingTest.cpp
-            )
+    )
 endif()
