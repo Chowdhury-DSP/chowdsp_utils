@@ -206,6 +206,48 @@ void addBufferChannels (const BufferType1& bufferSrc, BufferType2& bufferDest, i
     }
 }
 
+template <typename BufferType1, typename BufferType2>
+void multiplyBufferData (const BufferType1& bufferSrc, BufferType2& bufferDest, int srcStartSample, int destStartSample, int numSamples, int startChannel, int numChannels) noexcept
+{
+    using SampleType = detail::BufferSampleType<BufferType1>;
+    static_assert (std::is_same_v<SampleType, detail::BufferSampleType<BufferType2>>, "Both buffer types must have the same sample type!");
+
+    if (numSamples < 0)
+    {
+        jassert (bufferSrc.getNumSamples() == bufferDest.getNumSamples());
+        numSamples = bufferDest.getNumSamples();
+    }
+
+    if (numChannels < 0)
+    {
+        jassert (bufferSrc.getNumChannels() == bufferDest.getNumChannels());
+        numChannels = bufferDest.getNumChannels();
+    }
+
+    jassert (srcStartSample + numSamples <= bufferSrc.getNumSamples());
+    jassert (destStartSample + numSamples <= bufferDest.getNumSamples());
+
+    for (int ch = startChannel; ch < startChannel + numChannels; ++ch)
+    {
+        const auto* srcData = bufferSrc.getReadPointer (ch);
+        auto* destData = bufferDest.getWritePointer (ch);
+
+        if constexpr (std::is_floating_point_v<SampleType>)
+        {
+            juce::FloatVectorOperations::multiply (destData + destStartSample, srcData + srcStartSample, numSamples);
+        }
+        else if constexpr (SampleTypeHelpers::IsSIMDRegister<SampleType>)
+        {
+            std::transform (srcData + srcStartSample,
+                            srcData + srcStartSample + numSamples,
+                            destData + destStartSample,
+                            destData + destStartSample,
+                            [] (const auto& a, const auto& b)
+                            { return a * b; });
+        }
+    }
+}
+
 template <typename BufferType, typename FloatType>
 void applyGain (BufferType& buffer, FloatType gain) noexcept
 {

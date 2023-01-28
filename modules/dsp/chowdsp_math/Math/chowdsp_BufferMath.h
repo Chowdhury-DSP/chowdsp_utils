@@ -58,6 +58,10 @@ namespace BufferMath
     template <typename BufferType1, typename BufferType2 = BufferType1>
     void addBufferChannels (const BufferType1& bufferSrc, BufferType2& bufferDest, int srcChannel, int destChannel) noexcept;
 
+    /** Multiplies data from one buffer by another. */
+    template <typename BufferType1, typename BufferType2 = BufferType1>
+    void multiplyBufferData (const BufferType1& bufferSrc, BufferType2& bufferDest, int srcStartSample = 0, int destStartSample = 0, int numSamples = -1, int startChannel = 0, int numChannels = -1) noexcept;
+
     /** Applies a linear gain to a buffer. */
     template <typename BufferType, typename FloatType = typename BufferType::Type>
     void applyGain (BufferType& buffer, FloatType gain) noexcept;
