@@ -32,7 +32,7 @@ TEST_CASE ("Mod Filter Wrapper Test", "[dsp][filters]")
         float modFilterData[blockSize] {};
         std::copy (data, data + blockSize, modFilterData);
 
-        auto&& modBlock = chowdsp::BufferView { modFilterData, 1, blockSize };
+        auto&& modBlock = chowdsp::BufferView { modFilterData, blockSize };
         modFilter.processBlock (modBlock);
 
         for (int n = 0; n < blockSize; ++n)
@@ -58,7 +58,7 @@ TEST_CASE ("Mod Filter Wrapper Test", "[dsp][filters]")
         double modFilterData[blockSize] {};
         std::copy (data, data + blockSize, modFilterData);
 
-        auto&& modBlock = chowdsp::BufferView { modFilterData, 1, blockSize };
+        auto&& modBlock = chowdsp::BufferView { modFilterData, blockSize };
         modFilter.processBlock (modBlock);
 
         for (int n = 0; n < blockSize; ++n)
