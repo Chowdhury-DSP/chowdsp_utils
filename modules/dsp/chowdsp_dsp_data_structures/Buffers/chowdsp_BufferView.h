@@ -27,6 +27,19 @@ public:
         initialise (data, sampleOffset);
     }
 
+    BufferView (SampleType* data, int dataNumSamples, int sampleOffset = 0) : numChannels (1),
+                                                                              numSamples (dataNumSamples)
+    {
+        initialise (&data, sampleOffset);
+    }
+
+    template <typename T = SampleType, std::enable_if_t<std::is_const_v<T>>* = nullptr>
+    BufferView (const SampleType* data, int dataNumSamples, int sampleOffset = 0) : numChannels (1),
+                                                                                    numSamples (dataNumSamples)
+    {
+        initialise (&data, sampleOffset);
+    }
+
     BufferView (Buffer<std::remove_const_t<SampleType>>& buffer, // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
                 int sampleOffset = 0,
                 int bufferNumSamples = -1,

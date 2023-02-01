@@ -89,7 +89,7 @@ TEMPLATE_PRODUCT_TEST_CASE ("Buffer Test", "[dsp][buffers][simd]", (chowdsp::Buf
         buffer.clear();
 
         buffer.setCurrentSize (2, 64);
-        auto** xConst = buffer.getArrayOfReadPointers();
+        auto xConst = buffer.getArrayOfReadPointers();
         for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
         {
             for (int n = 0; n < buffer.getNumSamples(); ++n)
