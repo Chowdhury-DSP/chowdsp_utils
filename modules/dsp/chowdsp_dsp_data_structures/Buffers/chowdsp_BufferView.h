@@ -27,14 +27,14 @@ public:
         initialise (data, sampleOffset);
     }
 
-    BufferView (SampleType* data, int dataNumSamples, int sampleOffset = 0) : numChannels (1),
+    BufferView (SampleType* data, int dataNumSamples, int sampleOffset = 0) : numChannels (1), // NOLINT
                                                                               numSamples (dataNumSamples)
     {
         initialise (&data, sampleOffset);
     }
 
     template <typename T = SampleType, std::enable_if_t<std::is_const_v<T>>* = nullptr>
-    BufferView (const SampleType* data, int dataNumSamples, int sampleOffset = 0) : numChannels (1),
+    BufferView (const SampleType* data, int dataNumSamples, int sampleOffset = 0) : numChannels (1), // NOLINT
                                                                                     numSamples (dataNumSamples)
     {
         initialise (&data, sampleOffset);
