@@ -108,4 +108,26 @@ TEMPLATE_TEST_CASE ("Buffer View Test", "[dsp][buffers][simd]", float, double, x
                 REQUIRE_MESSAGE (all (xRead[ch][n] == TestType (0)), "Data in view not correct!");
         }
     }
+
+    SECTION ("1D-Array Test")
+    {
+        const auto testBuffer = [](const auto& buffer, float offset = 0.0f)
+        {
+            REQUIRE (buffer.getNumChannels() == 1);
+            REQUIRE (buffer.getNumSamples() == 5);
+
+            for (int i = 0; i < 5; ++i)
+                REQUIRE (buffer.getReadPointer (0)[i] == (float) i + offset);
+        };
+
+        float data[10] = { 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f };
+        {
+            testBuffer (chowdsp::BufferView<float> { data, 5 });
+            testBuffer (chowdsp::BufferView<const  float> { data, 5 });
+        }
+        {
+            testBuffer (chowdsp::BufferView<float> { data, 5, 5 }, 5.0f);
+            testBuffer (chowdsp::BufferView<const  float> { data, 5, 5 }, 5.0f);
+        }
+    }
 }
