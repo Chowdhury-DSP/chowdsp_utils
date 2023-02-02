@@ -111,4 +111,13 @@ TEMPLATE_PRODUCT_TEST_CASE ("Buffer Test", "[dsp][buffers][simd]", (chowdsp::Buf
         REQUIRE (buffer.getNumSamples() == 0);
         REQUIRE (buffer.getArrayOfReadPointers() != nullptr);
     }
+
+    SECTION ("Alignment Test")
+    {
+        BufferType buffer {};
+        buffer.setMaxSize (2, 33);
+
+        REQUIRE (chowdsp::SIMDUtils::isAligned (buffer.getReadPointer (0)));
+        REQUIRE (chowdsp::SIMDUtils::isAligned (buffer.getReadPointer (1)));
+    }
 }
