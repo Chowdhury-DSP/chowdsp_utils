@@ -116,10 +116,9 @@ public:
     /** Process block of samples */
     void processBlock (const BufferView<FloatType>& block) noexcept
     {
-        const auto numChannels = (int) block.getNumChannels();
-        const auto numSamples = (int) block.getNumSamples();
-        for (int channel = 0; channel < numChannels; ++channel)
-            processBlock (block.getWritePointer (channel), numSamples, channel);
+        const auto numSamples = block.getNumSamples();
+        for (auto [channel, channelData] : buffer_iters::channels (block))
+            processBlock (channelData, numSamples, channel);
     }
 
     /** Process block of samples with a custom modulation callback which is called every sample */

@@ -107,16 +107,13 @@ private:
 #else
     using Allocator = std::allocator<SampleType>;
 #endif
-    using ChannelData = std::vector<SampleType, Allocator>;
-    std::vector<ChannelData> rawData;
+    std::vector<SampleType, Allocator> rawData;
 
     int currentNumChannels = 0;
     int currentNumSamples = 0;
     bool hasBeenCleared = true;
 
-    // Assuming we will never need an audio buffer with more than 64 channels.
-    // Maybe we'll need to increase this is we're doing high-order ambisonics or something?
-    static constexpr int maxNumChannels = 64;
+    static constexpr int maxNumChannels = CHOWDSP_BUFFER_MAX_NUM_CHANNELS;
     std::array<SampleType*, (size_t) maxNumChannels> channelPointers {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Buffer)

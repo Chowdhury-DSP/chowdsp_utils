@@ -35,6 +35,11 @@ JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 #include "chowdsp_dsp_data_structures/Buffers/chowdsp_SIMDAudioBlock.h"
 #endif
 
+/** The max number of channels that can fit in a chowdsp::Buffer or chowdsp::BufferView */
+#ifndef CHOWDSP_BUFFER_MAX_NUM_CHANNELS
+#define CHOWDSP_BUFFER_MAX_NUM_CHANNELS 32
+#endif
+
 // third-party includes
 #if ! JUCE_TEENSY // readerwriterqueue does not compile with the Teensy toolchain
 #include "third_party/moodycamel/readerwriterqueue.h"
@@ -47,6 +52,7 @@ JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 #include "Buffers/chowdsp_Buffer.h"
 #include "Buffers/chowdsp_StaticBuffer.h"
 #include "Buffers/chowdsp_BufferView.h"
+#include "Buffers/chowdsp_BufferIterators.h"
 #include "Buffers/chowdsp_SIMDBufferHelpers.h"
 
 #include "Processors/chowdsp_RebufferedProcessor.h"
