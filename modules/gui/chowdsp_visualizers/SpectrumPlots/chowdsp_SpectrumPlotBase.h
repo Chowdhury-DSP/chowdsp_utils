@@ -36,8 +36,7 @@ public:
     /** Draws a set of magnitude grid lines. */
     void drawMagnitudeLines (const juce::Graphics& g, const std::vector<float>& magDB, float lineThickness = 1.0f, std::vector<float> dashLengths = {}) const;
 
-protected:
-    SpectrumPlotParams params;
+    const SpectrumPlotParams params;
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SpectrumPlotBase)
