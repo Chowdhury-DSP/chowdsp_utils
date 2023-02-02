@@ -32,17 +32,14 @@ void SineWave<T>::reset (T phase) noexcept
 template <typename T>
 void SineWave<T>::processBlock (const BufferView<T>& buffer) noexcept
 {
-    const auto numChannels = buffer.getNumChannels();
-    const auto numSamples = buffer.getNumSamples();
-
     T x1_temp = x1;
     T x2_temp = x2;
 
-    for (int ch = 0; ch < numChannels; ++ch)
+    const auto numSamples = buffer.getNumSamples();
+    for (auto [_, data] : buffer_iters::channels (buffer))
     {
         x1_temp = x1;
         x2_temp = x2;
-        auto* data = buffer.getWritePointer (ch);
 
         for (int i = 0; i < numSamples; ++i)
         {

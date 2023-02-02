@@ -74,10 +74,9 @@ private:
     void generateConvolutionKernel (double sampleRate, int numChannels, int kernelSize)
     {
         convolutionKernelBuffer.setMaxSize (numChannels, kernelSize);
-        for (int ch = 0; ch < numChannels; ++ch)
+        for (auto [_, data] : buffer_iters::channels (convolutionKernelBuffer))
         {
             juce::Random rand;
-            auto* data = convolutionKernelBuffer.getWritePointer (ch);
             for (int n = 0; n < kernelSize; ++n)
                 data[n] = rand.nextFloat() * 2.0f - 1.0f;
         }
