@@ -111,12 +111,9 @@ public:
     template <StateVariableFilterType M = type>
     std::enable_if_t<M != StateVariableFilterType::Crossover, void> processBlock (const BufferView<SampleType>& block) noexcept
     {
-        const auto numChannels = (int) block.getNumChannels();
-        const auto numSamples = (int) block.getNumSamples();
-
-        for (int channel = 0; channel < numChannels; ++channel)
+        const auto numSamples = block.getNumSamples();
+        for (auto [channel, sampleData] : buffer_iters::channels (block))
         {
-            auto* sampleData = block.getWritePointer (channel);
             ScopedValue s1 { ic1eq[(size_t) channel] };
             ScopedValue s2 { ic2eq[(size_t) channel] };
 

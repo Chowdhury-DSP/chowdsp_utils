@@ -123,15 +123,11 @@ public:
     template <ARPFilterType type>
     void processBlock (const BufferView<SampleType>& buffer, NumericType notchMix = 0) noexcept
     {
-        const auto numChannels = (int) buffer.getNumChannels();
-        const auto numSamples = (int) buffer.getNumSamples();
-
-        for (int channel = 0; channel < numChannels; ++channel)
+        const auto numSamples = buffer.getNumSamples();
+        for (auto [channel, sampleData] : buffer_iters::channels (buffer))
         {
-            auto* sampleData = buffer.getWritePointer (channel);
             ScopedValue s1 { filter.ic1eq[(size_t) channel] };
             ScopedValue s2 { filter.ic2eq[(size_t) channel] };
-
             for (int i = 0; i < numSamples; ++i)
                 sampleData[i] = processSampleInternal<type> (sampleData[i], s1.get(), s2.get(), notchMix);
         }
@@ -151,15 +147,11 @@ public:
     template <ARPFilterType type>
     void processBlock (const BufferView<SampleType>& buffer, const float* notchMix) noexcept
     {
-        const auto numChannels = (int) buffer.getNumChannels();
-        const auto numSamples = (int) buffer.getNumSamples();
-
-        for (int channel = 0; channel < numChannels; ++channel)
+        const auto numSamples = buffer.getNumSamples();
+        for (auto [channel, sampleData] : buffer_iters::channels (buffer))
         {
-            auto* sampleData = buffer.getWritePointer (channel);
             ScopedValue s1 { filter.ic1eq[(size_t) channel] };
             ScopedValue s2 { filter.ic2eq[(size_t) channel] };
-
             for (int i = 0; i < numSamples; ++i)
                 sampleData[i] = processSampleInternal<type> (sampleData[i], s1.get(), s2.get(), notchMix[i]);
         }

@@ -18,15 +18,22 @@ void Buffer<SampleType>::setMaxSize (int numChannels, int numSamples)
     numChannels = juce::jmax (numChannels, 1);
     numSamples = juce::jmax (numSamples, 1);
 
+    int numSamplesPadded = numSamples;
+#if ! CHOWDSP_NO_XSIMD
+    static constexpr auto vec_size = (int) xsimd::batch<SampleType>::size;
+    if constexpr (std::is_floating_point_v<SampleType>)
+        numSamplesPadded = Math::ceiling_divide (numSamples, vec_size) * vec_size;
+#endif
+
     rawData.clear();
     hasBeenCleared = true;
     currentNumChannels = 0;
     currentNumSamples = 0;
 
-    rawData.resize ((size_t) numChannels, ChannelData ((size_t) numSamples, SampleType {}));
+    rawData.resize ((size_t) numChannels * (size_t) numSamplesPadded, SampleType {});
     std::fill (channelPointers.begin(), channelPointers.end(), nullptr);
     for (int ch = 0; ch < numChannels; ++ch)
-        channelPointers[(size_t) ch] = rawData[(size_t) ch].data();
+        channelPointers[(size_t) ch] = rawData.data() + ch * numSamplesPadded;
 
     setCurrentSize (numChannels, numSamples);
 }

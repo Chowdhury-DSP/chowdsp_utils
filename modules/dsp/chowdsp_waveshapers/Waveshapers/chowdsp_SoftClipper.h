@@ -36,13 +36,9 @@ public:
     /** Process a block of samples. */
     void processBlock (const BufferView<T>& buffer) noexcept
     {
-        const auto numChannels = buffer.getNumChannels();
         const auto numSamples = buffer.getNumSamples();
-
-        for (int ch = 0; ch < numChannels; ++ch)
+        for (auto [_, channelData] : buffer_iters::channels (buffer))
         {
-            auto* channelData = buffer.getWritePointer (ch);
-
             juce::FloatVectorOperations::multiply (channelData, normFactor, numSamples);
             juce::FloatVectorOperations::clip (channelData, channelData, (T) -1, (T) 1, numSamples);
 

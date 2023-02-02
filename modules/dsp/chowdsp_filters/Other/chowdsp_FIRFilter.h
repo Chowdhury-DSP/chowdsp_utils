@@ -70,10 +70,9 @@ public:
     /** Process block of samples */
     void processBlock (const BufferView<FloatType>& block) noexcept
     {
-        const auto numChannels = (int) block.getNumChannels();
-        const auto numSamples = (int) block.getNumSamples();
-        for (int channel = 0; channel < numChannels; ++channel)
-            processBlock (block.getWritePointer (channel), numSamples, channel);
+        const auto numSamples = block.getNumSamples();
+        for (const auto [channel, data] : buffer_iters::channels (block))
+            processBlock (data, numSamples, channel);
     }
 
     /**
@@ -93,12 +92,11 @@ public:
      * Pushes a block of samples into the filter state without processing.
      * This can be useful for "bypassing" the filter.
      */
-    void processBlockBypassed (const BufferView<FloatType>& block) noexcept
+    void processBlockBypassed (const BufferView<const FloatType>& block) noexcept
     {
-        const auto numChannels = (int) block.getNumChannels();
-        const auto numSamples = (int) block.getNumSamples();
-        for (int channel = 0; channel < numChannels; ++channel)
-            processBlockBypassed (block.getReadPointer (channel), numSamples, channel);
+        const auto numSamples = block.getNumSamples();
+        for (const auto [channel, data] : buffer_iters::channels (block))
+            processBlockBypassed (data, numSamples, channel);
     }
 
 private:
