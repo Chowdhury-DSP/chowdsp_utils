@@ -30,7 +30,7 @@ void Buffer<SampleType>::setMaxSize (int numChannels, int numSamples)
     currentNumChannels = 0;
     currentNumSamples = 0;
 
-    rawData.resize ((size_t) numChannels * (size_t) numSamplesPadded, SampleType{});
+    rawData.resize ((size_t) numChannels * (size_t) numSamplesPadded, SampleType {});
     std::fill (channelPointers.begin(), channelPointers.end(), nullptr);
     for (int ch = 0; ch < numChannels; ++ch)
         channelPointers[(size_t) ch] = rawData.data() + ch * numSamplesPadded;
