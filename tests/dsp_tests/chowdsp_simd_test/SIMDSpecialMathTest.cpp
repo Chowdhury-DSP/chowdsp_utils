@@ -1,5 +1,6 @@
 #include <CatchUtils.h>
 #include <chowdsp_simd/chowdsp_simd.h>
+#include "CatchUtils.h"
 
 using namespace chowdsp::SIMDUtils;
 
@@ -21,15 +22,13 @@ TEMPLATE_TEST_CASE ("SIMD Special Math Test", "[dsp][simd]", float, double)
                 return 1.0e-12;
         }();
 
-        std::random_device rd;
-        std::mt19937 mt (rd());
-        std::uniform_real_distribution<FloatType> minus10To10 ((FloatType) -10, (FloatType) 10);
+        auto minus10To10 = test_utils::RandomFloatGenerator { (FloatType) -10, (FloatType) 10 };
 
         auto baseMathTest = [&minus10To10, &mt] (auto floatFunc, auto simdFunc, const std::string& functionName)
         {
             for (int i = 0; i < nIter; ++i)
             {
-                auto input = minus10To10 (mt);
+                auto input = minus10To10();
                 auto expected = floatFunc (input);
                 auto actual = simdFunc (xsimd::batch<FloatType> (input));
 
@@ -54,9 +53,7 @@ TEMPLATE_TEST_CASE ("SIMD Special Math Test", "[dsp][simd]", float, double)
         { return std::abs (*std::max_element (data.begin(), data.end(), [] (auto a, auto b)
                                               { return std::abs (a) < std::abs (b); })); };
 
-        std::random_device rd;
-        std::mt19937 mt (rd());
-        std::uniform_real_distribution<FloatType> minus1To1 ((FloatType) -1, (FloatType) 1);
+        auto minus1To1 = test_utils::RandomFloatGenerator { (FloatType) -1, (FloatType) 1 };
 
         static constexpr int nIter = 10;
         for (int i = 0; i < nIter; ++i)
@@ -64,7 +61,7 @@ TEMPLATE_TEST_CASE ("SIMD Special Math Test", "[dsp][simd]", float, double)
             using Vec = xsimd::batch<FloatType>;
             std::vector<FloatType> vecData (Vec::size, (FloatType) 0);
             for (auto& v : vecData)
-                v = minus1To1 (mt);
+                v = minus1To1();
 
             auto vec = xsimd::load_unaligned (vecData.data());
             REQUIRE_MESSAGE (hMinSIMD (vec) == refMin (vecData), "Incorrect minimum value!");

@@ -12,15 +12,13 @@ TEST_CASE ("Werner Filter Test", "[dsp][filters]")
     filterRef.prepare (spec);
     filterMM.prepare (spec);
 
-    std::random_device rd {};
-    std::mt19937 mt { rd() };
-    std::uniform_real_distribution minus1To1 { -1.0f, 1.0f };
+    auto minus1To1 = test_utils::RandomFloatGenerator { -1.0f, 1.0f };
 
     SECTION ("LPF/Multi-Mode Test")
     {
         for (int i = 0; i < 20; ++i)
         {
-            const auto x = minus1To1 (mt);
+            const auto x = minus1To1();
             const auto actual = filterMM.processSample<FilterType::MultiMode> (0, x, 0.0f);
             const auto exp = filterMM.processSample<FilterType::Lowpass2> (0, x);
             REQUIRE (actual == Catch::Approx (exp).margin (1.0e-6f));
@@ -37,7 +35,7 @@ TEST_CASE ("Werner Filter Test", "[dsp][filters]")
 
         for (size_t i = 0; i < spec.maximumBlockSize; ++i)
         {
-            const auto x = minus1To1 (mt);
+            const auto x = minus1To1();
             actual[i] = x;
             exp[i] = x;
         }
@@ -63,7 +61,7 @@ TEST_CASE ("Werner Filter Test", "[dsp][filters]")
 
         for (size_t i = 0; i < spec.maximumBlockSize; ++i)
         {
-            const auto x = minus1To1 (mt);
+            const auto x = minus1To1();
             actual[i] = x;
             exp[i] = x;
             mode[i] = 1.0f;

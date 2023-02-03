@@ -10,9 +10,7 @@ TEMPLATE_PRODUCT_TEST_CASE ("Buffer Test", "[dsp][buffers][simd]", (chowdsp::Buf
     using SampleType = typename BufferType::Type;
 
     using chowdsp::SIMDUtils::all;
-    std::random_device rd;
-    std::mt19937 mt (rd());
-    std::uniform_real_distribution<float> dist (-1.0f, 1.0f);
+    auto minus1To1 = test_utils::RandomFloatGenerator { -1.0f, 0.0f };
 
     SECTION ("Default Construction Test")
     {
@@ -58,7 +56,7 @@ TEMPLATE_PRODUCT_TEST_CASE ("Buffer Test", "[dsp][buffers][simd]", (chowdsp::Buf
         for (auto [_, x] : chowdsp::buffer_iters::channels (buffer))
         {
             for (int n = 0; n < buffer.getNumSamples(); ++n)
-                x[n] = SampleType (dist (mt));
+                x[n] = SampleType (minus1To1());
         }
 
         for (int i = 0; i < 2; ++i)
@@ -78,7 +76,7 @@ TEMPLATE_PRODUCT_TEST_CASE ("Buffer Test", "[dsp][buffers][simd]", (chowdsp::Buf
         for (auto [_, channelData] : chowdsp::buffer_iters::channels (buffer))
         {
             for (int n = 0; n < buffer.getNumSamples(); ++n)
-                channelData[n] = SampleType (dist (mt));
+                channelData[n] = SampleType (minus1To1());
         }
 
         buffer.setCurrentSize (1, 32);

@@ -20,8 +20,7 @@ void wrapTest()
 template <typename T>
 void wrapAndClearTest()
 {
-    std::random_device rd;
-    std::mt19937 mt (rd());
+    std::mt19937 mt (Catch::Generators::Detail::getSeed());
 
     auto randomDist = []()
     {

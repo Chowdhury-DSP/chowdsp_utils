@@ -4,6 +4,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_template_test_macros.hpp>
+#include <catch2/generators/catch_generators_random.hpp>
 
 #if JUCE_MODULE_AVAILABLE_chowdsp_simd
 #include <chowdsp_simd/chowdsp_simd.h>
@@ -55,6 +56,42 @@ using SIMDApprox = std::conditional_t<chowdsp::SampleTypeHelpers::IsSIMDRegister
 
 namespace test_utils
 {
+template <typename FloatType>
+struct RandomFloatGenerator
+{
+    Catch::Generators::RandomFloatingGenerator<FloatType> generator;
+
+    RandomFloatGenerator (FloatType a, FloatType b)
+        : generator (a, b, Catch::Generators::Detail::getSeed())
+    {
+    }
+
+    FloatType operator()()
+    {
+        const auto y = generator.get();
+        generator.next();
+        return y;
+    }
+};
+
+template <typename IntType>
+struct RandomIntGenerator
+{
+    Catch::Generators::RandomIntegerGenerator<IntType> generator;
+
+    RandomIntGenerator (IntType a, IntType b)
+        : generator (a, b, Catch::Generators::Detail::getSeed())
+    {
+    }
+
+    IntType operator()()
+    {
+        const auto y = generator.get();
+        generator.next();
+        return y;
+    }
+};
+
 #if JUCE_MODULE_AVAILABLE_chowdsp_dsp_data_structures
 template <typename FloatType = float, typename NumericType = chowdsp::SampleTypeHelpers::NumericType<FloatType>>
 inline auto makeSineWave (NumericType frequency, NumericType sampleRate, int lengthSamples, int numChannels = 1)
@@ -81,17 +118,14 @@ inline auto makeSineWave (NumericType frequency, NumericType sampleRate, Numeric
 template <typename FloatType = float, typename NumericType = chowdsp::SampleTypeHelpers::NumericType<FloatType>>
 inline auto makeNoise (int numSamples, int numChannels = 1)
 {
-    std::random_device rd;
-    std::mt19937 mt (rd());
-    std::uniform_real_distribution<float> minus1To1 (-1.0f, 1.0f);
-
+    auto minus1To1 = RandomFloatGenerator (-1.0f, 1.0f);
     chowdsp::Buffer<FloatType> noiseBuffer (numChannels, numSamples);
 
     for (int ch = 0; ch < numChannels; ++ch)
     {
         auto* x = noiseBuffer.getWritePointer (ch);
         for (int n = 0; n < numSamples; ++n)
-            x[n] = (FloatType) minus1To1 (mt);
+            x[n] = (FloatType) minus1To1();
     }
 
     return std::move (noiseBuffer);

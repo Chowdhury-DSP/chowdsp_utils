@@ -79,10 +79,7 @@ TEMPLATE_TEST_CASE ("Nth Order Filter Test", "[dsp][filters][simd]", float, xsim
         static constexpr int Order = 6;
         static constexpr NumericType maxErr = 1.0e-1f;
 
-        std::random_device rd;
-        std::mt19937 mt (rd());
-        std::uniform_real_distribution<NumericType> minus1To1 ((NumericType) -1, (NumericType) 1);
-
+        auto minus1To1 = test_utils::RandomFloatGenerator { (NumericType) -1, (NumericType) 1 };
         chowdsp::NthOrderFilter<T, Order, chowdsp::StateVariableFilterType::MultiMode> testFilter;
         testFilter.prepare ({ Constants::fs, (uint32_t) 128, 1 });
 
@@ -99,7 +96,7 @@ TEMPLATE_TEST_CASE ("Nth Order Filter Test", "[dsp][filters][simd]", float, xsim
 
             for (int i = 0; i < 1000; ++i)
             {
-                const auto x = (T) minus1To1 (mt);
+                const auto x = (T) minus1To1();
                 const auto actualY = testFilter.processSample (0, x);
                 const auto expY = compareFilter.processSample (0, x) * gainComp;
                 REQUIRE (actualY == SIMDApprox<T> (expY).margin (maxErr));

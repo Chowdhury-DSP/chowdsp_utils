@@ -126,9 +126,7 @@ TEMPLATE_TEST_CASE ("FloatVectorOperations Test", "[dsp][math]", float, double)
     else
         INFO ("chowdsp::FloatVectorOperations: not using vDSP");
 
-    std::random_device rd;
-    std::mt19937 mt (rd());
-
+    std::mt19937 mt (Catch::Generators::Detail::getSeed());
     std::vector<std::pair<int, int>> testRanges {
         { 2, 6 },
         { 100, 200 },

@@ -19,15 +19,13 @@ const chowdsp::LookupTableTransform<float> chowLUT { [] (auto x)
 
 TEST_CASE ("Lookup Table Test", "[dsp][data-structures]")
 {
-    std::random_device rd;
-    std::mt19937 mt (rd());
-    std::uniform_real_distribution<float> minus1To1 (-1.0f, 1.0f);
+    auto minus1To1 = test_utils::RandomFloatGenerator { -1.0f, 1.0f };
 
     SECTION ("Process Single Checked")
     {
         for (int i = 0; i < TestN; ++i)
         {
-            const auto testVal = minus1To1 (mt) * 15.0f;
+            const auto testVal = minus1To1() * 15.0f;
             const auto actualVal = chowLUT (testVal);
             const auto expVal = juceLUT (testVal);
             REQUIRE_MESSAGE (actualVal == Catch::Approx (expVal).margin (1.0e-18f), "Lookup Table value incorrect!");
@@ -38,7 +36,7 @@ TEST_CASE ("Lookup Table Test", "[dsp][data-structures]")
     {
         for (int i = 0; i < TestN; ++i)
         {
-            const auto testVal = minus1To1 (mt) * 10.0f;
+            const auto testVal = minus1To1() * 10.0f;
             const auto actualVal = chowLUT[testVal];
             const auto expVal = juceLUT[testVal];
             REQUIRE_MESSAGE (actualVal == Catch::Approx (expVal).margin (1.0e-18f), "Lookup Table value incorrect!");
@@ -51,7 +49,7 @@ TEST_CASE ("Lookup Table Test", "[dsp][data-structures]")
         chowdsp::Buffer<float> actualBuffer (1, TestN);
         chowdsp::Buffer<float> expBuffer (1, TestN);
         for (int i = 0; i < TestN; ++i)
-            inBuffer.getWritePointer (0)[i] = minus1To1 (mt) * 15.0f;
+            inBuffer.getWritePointer (0)[i] = minus1To1() * 15.0f;
 
         chowLUT.process (inBuffer.getReadPointer (0), actualBuffer.getWritePointer (0), TestN);
         juceLUT.process (inBuffer.getReadPointer (0), expBuffer.getWritePointer (0), TestN);
@@ -70,7 +68,7 @@ TEST_CASE ("Lookup Table Test", "[dsp][data-structures]")
         chowdsp::Buffer<float> actualBuffer (1, TestN);
         chowdsp::Buffer<float> expBuffer (1, TestN);
         for (int i = 0; i < TestN; ++i)
-            inBuffer.getWritePointer (0)[i] = minus1To1 (mt) * 10.0f;
+            inBuffer.getWritePointer (0)[i] = minus1To1() * 10.0f;
 
         chowLUT.processUnchecked (inBuffer.getReadPointer (0), actualBuffer.getWritePointer (0), TestN);
         juceLUT.processUnchecked (inBuffer.getReadPointer (0), expBuffer.getWritePointer (0), TestN);

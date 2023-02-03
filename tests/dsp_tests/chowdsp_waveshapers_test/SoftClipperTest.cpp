@@ -23,13 +23,10 @@ float idealSoftClipper (float x, int degree)
 template <int degree>
 void scalarProcessTest()
 {
-    std::random_device rd;
-    std::mt19937 mt (rd());
-    std::uniform_real_distribution minus1To1 (-10.0f, 10.0f);
-
+    auto minus10To10 = test_utils::RandomFloatGenerator { -10.0f, 10.0f };
     for (int i = 0; i < N; ++i)
     {
-        const auto testX = minus1To1 (mt);
+        const auto testX = minus10To10();
         const auto expY = idealSoftClipper (testX, degree);
         const auto actualY = chowdsp::SoftClipper<degree>::processSample (testX);
         REQUIRE_MESSAGE (actualY == Catch::Approx (expY).margin (maxErr), "Soft Clipper value at degree " << std::to_string (degree) << " is incorrect!");
@@ -39,15 +36,12 @@ void scalarProcessTest()
 template <int degree>
 void vectorProcessTest()
 {
-    std::random_device rd;
-    std::mt19937 mt (rd());
-    std::uniform_real_distribution minus1To1 (-10.0f, 10.0f);
-
+    auto minus10To10 = test_utils::RandomFloatGenerator { -10.0f, 10.0f };
     chowdsp::Buffer<float> testBuffer (1, N);
     float expYs[N];
     for (int i = 0; i < N; ++i)
     {
-        const auto testX = minus1To1 (mt);
+        const auto testX = minus10To10();
         testBuffer.getWritePointer (0)[i] = testX;
         expYs[i] = idealSoftClipper (testX, degree);
     }
