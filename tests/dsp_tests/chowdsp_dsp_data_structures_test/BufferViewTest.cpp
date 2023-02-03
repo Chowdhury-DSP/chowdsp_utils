@@ -39,9 +39,7 @@ void testBufferViewOffset (const BufferViewType view, const chowdsp::StaticBuffe
 TEMPLATE_TEST_CASE ("Buffer View Test", "[dsp][buffers][simd]", float, double, xsimd::batch<float>, xsimd::batch<double>)
 {
     using chowdsp::SIMDUtils::all;
-    std::random_device rd;
-    std::mt19937 mt (rd());
-    std::uniform_real_distribution<float> dist (-1.0f, 1.0f);
+    auto minus1To1 = test_utils::RandomFloatGenerator { -1.0f, 1.0f };
 
     SECTION ("Data Test")
     {
@@ -49,7 +47,7 @@ TEMPLATE_TEST_CASE ("Buffer View Test", "[dsp][buffers][simd]", float, double, x
         for (auto [_, x] : chowdsp::buffer_iters::channels (buffer))
         {
             for (int n = 0; n < buffer.getNumSamples(); ++n)
-                x[n] = TestType (dist (mt));
+                x[n] = TestType (minus1To1());
         }
 
         testBufferView<chowdsp::BufferView<TestType>> (buffer, buffer);
@@ -74,7 +72,7 @@ TEMPLATE_TEST_CASE ("Buffer View Test", "[dsp][buffers][simd]", float, double, x
         for (auto [_, x] : chowdsp::buffer_iters::channels (view))
         {
             for (int n = 0; n < view.getNumSamples(); ++n)
-                x[n] = TestType (dist (mt));
+                x[n] = TestType (minus1To1());
         }
 
         const auto& constBuffer = std::as_const (buffer);
@@ -91,7 +89,7 @@ TEMPLATE_TEST_CASE ("Buffer View Test", "[dsp][buffers][simd]", float, double, x
         for (auto [_, xWrite] : chowdsp::buffer_iters::channels (view))
         {
             for (int n = 0; n < view.getNumSamples(); ++n)
-                xWrite[n] = TestType (dist (mt));
+                xWrite[n] = TestType (minus1To1());
         }
 
         view.clear();

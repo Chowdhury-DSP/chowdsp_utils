@@ -13,19 +13,17 @@ constexpr double maxErrDouble = 1.0e-12;
 template <int exponent>
 void scalarPowerTest()
 {
-    std::random_device rd;
-    std::mt19937 mt (rd());
-    std::uniform_real_distribution<float> floatRand (0.0f, 1.0f);
-    std::uniform_real_distribution<double> doubleRand (0.0, 1.0);
+    auto floatRand = test_utils::RandomFloatGenerator { 0.0f, 1.0f };
+    auto doubleRand = test_utils::RandomFloatGenerator { 0.0, 1.0 };
 
     for (int n = 0; n < N; ++n)
     {
-        const auto testFloat = floatRand (mt);
+        const auto testFloat = floatRand();
         const auto expFloat = std::pow (testFloat, (float) exponent);
         const auto actualFloat = ipow<exponent> (testFloat);
         REQUIRE_MESSAGE (actualFloat == Catch::Approx (expFloat).margin (maxErrFloat), "Float power is incorrect for exponent: " << std::to_string (exponent));
 
-        const auto testDouble = doubleRand (mt);
+        const auto testDouble = doubleRand();
         const auto expDouble = std::pow (testDouble, (double) exponent);
         const auto actualDouble = ipow<exponent> (testDouble);
         REQUIRE_MESSAGE (actualDouble == Catch::Approx (expDouble).margin (maxErrDouble), "Double power is incorrect for exponent: " << std::to_string (exponent));
@@ -59,10 +57,8 @@ TEST_CASE ("Power Test", "[dsp][math]")
 
     SECTION ("Vector Power Test")
     {
-        std::random_device rd;
-        std::mt19937 mt (rd());
-        std::uniform_real_distribution<float> floatRand (0.0f, 1.0f);
-        std::uniform_real_distribution<double> doubleRand (0.0, 1.0);
+        auto floatRand = test_utils::RandomFloatGenerator { 0.0f, 1.0f };
+        auto doubleRand = test_utils::RandomFloatGenerator { 0.0, 1.0 };
 
         for (int exponent = 0; exponent < 19; ++exponent)
         {
@@ -77,10 +73,10 @@ TEST_CASE ("Power Test", "[dsp][math]")
 
             for (int n = 0; n < N; ++n)
             {
-                testFloats[n] = floatRand (mt);
+                testFloats[n] = floatRand();
                 expFloats[n] = std::pow (testFloats[n], (float) exponent);
 
-                testDoubles[n] = doubleRand (mt);
+                testDoubles[n] = doubleRand();
                 expDoubles[n] = std::pow (testDoubles[n], (double) exponent);
             }
 
