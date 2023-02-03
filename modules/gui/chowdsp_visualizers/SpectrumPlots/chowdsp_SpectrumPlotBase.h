@@ -31,10 +31,32 @@ public:
     [[nodiscard]] float getYCoordinateForDecibels (float magDB) const;
 
     /** Draws a set of frequency grid lines. */
-    void drawFrequencyLines (const juce::Graphics& g, const std::vector<float>& freqHz, float lineThickness = 1.0f, std::vector<float> dashLengths = {}) const;
+    template <typename FreqsContainer = std::initializer_list<float>, typename Dashes = std::initializer_list<float>>
+    void drawFrequencyLines (const juce::Graphics& g, const FreqsContainer& freqHzList, float lineThickness = 1.0f, const Dashes& dashLengths = {}) const
+    {
+        for (auto& freqHz : freqHzList)
+        {
+            const auto line = juce::Line<float>::fromStartAndAngle (juce::Point { getXCoordinateForFrequency (freqHz), 0.0f }, (float) getHeight(), juce::MathConstants<float>::pi);
+            if (std::size (dashLengths) == 0)
+                g.drawLine (line, lineThickness);
+            else
+                g.drawDashedLine (line, std::data (dashLengths), (int) std::size (dashLengths), lineThickness);
+        }
+    }
 
     /** Draws a set of magnitude grid lines. */
-    void drawMagnitudeLines (const juce::Graphics& g, const std::vector<float>& magDB, float lineThickness = 1.0f, std::vector<float> dashLengths = {}) const;
+    template <typename MagsContainer = std::initializer_list<float>, typename Dashes = std::initializer_list<float>>
+    void drawMagnitudeLines (const juce::Graphics& g, const MagsContainer& magDBList, float lineThickness = 1.0f, const Dashes& dashLengths = {}) const
+    {
+        for (auto& magDB : magDBList)
+        {
+            const auto line = juce::Line<float>::fromStartAndAngle (juce::Point { 0.0f, getYCoordinateForDecibels (magDB) }, (float) getWidth(), juce::MathConstants<float>::halfPi);
+            if (std::size (dashLengths) == 0)
+                g.drawLine (line, lineThickness);
+            else
+                g.drawDashedLine (line, std::data (dashLengths), (int) std::size (dashLengths), lineThickness);
+        }
+    }
 
     const SpectrumPlotParams params;
 
