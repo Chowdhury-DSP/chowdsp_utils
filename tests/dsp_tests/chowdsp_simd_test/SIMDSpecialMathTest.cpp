@@ -24,7 +24,7 @@ TEMPLATE_TEST_CASE ("SIMD Special Math Test", "[dsp][simd]", float, double)
 
         auto minus10To10 = test_utils::RandomFloatGenerator { (FloatType) -10, (FloatType) 10 };
 
-        auto baseMathTest = [&minus10To10, &mt] (auto floatFunc, auto simdFunc, const std::string& functionName)
+        auto baseMathTest = [&minus10To10] (auto floatFunc, auto simdFunc, const std::string& functionName)
         {
             for (int i = 0; i < nIter; ++i)
             {
