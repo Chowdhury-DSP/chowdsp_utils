@@ -17,7 +17,7 @@ public:
     std::pair<const std::vector<float>&, const std::vector<float>&> plotFilterMagnitudeResponse();
     void updateFilterPlot();
 
-    const auto& getPath() const { return plotPath; }
+    [[nodiscard]] const auto& getPath() const { return plotPath; }
 
     std::function<void(const float*, float*, int)> runFilterCallback;
 
