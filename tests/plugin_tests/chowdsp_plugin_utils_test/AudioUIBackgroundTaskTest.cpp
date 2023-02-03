@@ -1,4 +1,4 @@
-#include <TimedUnitTest.h>
+#include <CatchUtils.h>
 #include <chowdsp_plugin_utils/chowdsp_plugin_utils.h>
 
 namespace
@@ -9,8 +9,7 @@ constexpr int blockSize = 1 << 19;
 template <typename Task>
 struct SimpleTask : Task
 {
-    explicit SimpleTask (juce::UnitTest* thisTest) : Task ("Basic Task"),
-                                                     ut (thisTest)
+    explicit SimpleTask () : Task ("Basic Task")
     {
     }
 
@@ -28,19 +27,18 @@ struct SimpleTask : Task
 
         if (wasReset)
         {
-            ut->expectWithinAbsoluteError (mag, 0.0f, 0.1f, "Magnitude after reset is incorrect!");
+            REQUIRE_MESSAGE (mag == Catch::Approx { 0.0f }.margin (0.1f), "Magnitude after reset is incorrect!");
             wasReset.store (false);
         }
         else
         {
-            ut->expectWithinAbsoluteError (mag, mags[prevIndex], 0.1f, "Magnitude is incorrect!");
+            REQUIRE_MESSAGE (mag == Catch::Approx { mags[prevIndex] }.margin (0.1f), "Magnitude is incorrect!");
         }
 
         prevIndex.store (magsIndex->load());
         readyForInc = true;
     }
 
-    juce::UnitTest* ut;
     std::atomic_bool readyForInc { false };
     std::atomic<size_t> prevIndex {};
     std::atomic<size_t>* magsIndex = nullptr;
@@ -50,28 +48,18 @@ struct SimpleTask : Task
 } // namespace
 
 template <typename TaskType>
-class AudioUIBackgroundTaskTest : public TimedUnitTest
+class AudioUIBackgroundTaskTest
 {
 public:
-    AudioUIBackgroundTaskTest() : TimedUnitTest (getTestName(), "Threads")
-    {
-    }
-
-    static juce::String getTestName()
-    {
-        if constexpr (std::is_same<TaskType, chowdsp::SingleThreadAudioUIBackgroundTask>::value)
-            return "Single Thread Audio/UI Background Task Test";
-        else
-            return "Time Slice Audio/UI Background Task Test";
-    }
+    AudioUIBackgroundTaskTest() = default;
 
     void audioThreadTest (juce::TimeSliceThread* timeSliceThread = nullptr)
     {
         std::atomic<size_t> magsIndex {};
 
-        SimpleTask<TaskType> task (this);
+        SimpleTask<TaskType> task;
         task.magsIndex = &magsIndex;
-        expect (! task.isTaskRunning(), "Task should not be running yet!");
+        REQUIRE_MESSAGE (! task.isTaskRunning(), "Task should not be running yet!");
 
         if constexpr (std::is_same<TaskType, chowdsp::TimeSliceAudioUIBackgroundTask>::value)
         {
@@ -81,7 +69,7 @@ public:
 
         task.prepare (48.0e3, blockSize, 1);
         task.setShouldBeRunning (true);
-        expect (task.isTaskRunning(), "Task should now be running!");
+        REQUIRE_MESSAGE (task.isTaskRunning(), "Task should now be running!");
 
         std::vector<float> data ((size_t) blockSize, 0.0f);
         while (magsIndex < mags.size() - 1)
@@ -97,14 +85,14 @@ public:
         }
 
         task.setShouldBeRunning (false);
-        expect (! task.isTaskRunning(), "Task should no longer be running!");
+        REQUIRE_MESSAGE (! task.isTaskRunning(), "Task should no longer be running!");
     }
 
     void guiThreadTest()
     {
         std::atomic<size_t> magsIndex {};
 
-        SimpleTask<TaskType> task (this);
+        SimpleTask<TaskType> task;
         task.magsIndex = &magsIndex;
 
         task.prepare (24.0e3, 128, 1);
@@ -115,17 +103,17 @@ public:
         juce::Thread::launch ([&] { // fake UI thread
             while (magsIndex < mags.size() / 2)
             {
-                expectWithinAbsoluteError (task.mag, mags[task.prevIndex], 0.1f, "Magnitude read from UI thread is incorrect!");
+                REQUIRE_MESSAGE (task.mag == Catch::Approx { mags[task.prevIndex] }.margin (0.1f), "Magnitude read from UI thread is incorrect!");
                 juce::Thread::sleep (1);
             }
 
             task.reset();
             task.wasReset.store (true);
-            expectWithinAbsoluteError (task.mag, 0.0f, 0.1f, "Magnitude after reset is incorrect!");
+            REQUIRE_MESSAGE (task.mag == Catch::Approx { 0.0f }.margin (0.1f), "Magnitude after reset is incorrect!");
 
             while (magsIndex < mags.size() - 1)
             {
-                expectWithinAbsoluteError (task.mag, mags[task.prevIndex], 0.1f, "Magnitude read from UI thread is incorrect!");
+                REQUIRE_MESSAGE (task.mag == Catch::Approx { mags[task.prevIndex] }.margin (0.1f), "Magnitude read from UI thread is incorrect!");
                 juce::Thread::sleep (1);
             }
             uiThreadFinished = true;
@@ -151,6 +139,7 @@ public:
 
         while (! uiThreadFinished)
             juce::Thread::sleep (1);
+    
     }
 
     void customTimeSliceThreadTest()
@@ -158,13 +147,13 @@ public:
         std::atomic<size_t> magsIndex {};
         juce::TimeSliceThread timeSliceThread { "Test Thread" };
 
-        SimpleTask<TaskType> task (this);
+        SimpleTask<TaskType> task;
         task.magsIndex = &magsIndex;
-        expect (! task.isTaskRunning(), "Task should not be running yet!");
+        REQUIRE_MESSAGE (! task.isTaskRunning(), "Task should not be running yet!");
 
         task.prepare (48.0e3, blockSize, 1);
         task.setShouldBeRunning (true);
-        expect (task.isTaskRunning(), "Task should now be running!");
+        REQUIRE_MESSAGE (task.isTaskRunning(), "Task should now be running!");
 
         task.setTimeSliceThreadToUse (&timeSliceThread);
 
@@ -172,22 +161,39 @@ public:
 
         task.setShouldBeRunning (false);
     }
-
-    void runTestTimed() override
-    {
-        beginTest ("Audio Thread Test");
-        audioThreadTest();
-
-        beginTest ("GUI Thread Test");
-        guiThreadTest();
-
-        if constexpr (std::is_same<TaskType, chowdsp::TimeSliceAudioUIBackgroundTask>::value)
-        {
-            beginTest ("Custom TimeSliceThread Test");
-            customTimeSliceThreadTest();
-        }
-    }
 };
 
-static AudioUIBackgroundTaskTest<chowdsp::SingleThreadAudioUIBackgroundTask> singleThreadAudioUiBackgroundTaskTest;
-static AudioUIBackgroundTaskTest<chowdsp::TimeSliceAudioUIBackgroundTask> timeSliceAudioUiBackgroundTaskTest;
+TEST_CASE("Single Thread Audio/UI Background Task Test", "[plugin][utilities]")
+{
+    AudioUIBackgroundTaskTest<chowdsp::SingleThreadAudioUIBackgroundTask> singleThreadTest;
+
+    SECTION("Audio Thread Test")
+    {
+        singleThreadTest.audioThreadTest();
+    }
+
+    SECTION("GUI Thread Test")
+    {
+        singleThreadTest.guiThreadTest();
+    }
+}
+
+TEST_CASE("Time Slice Audio/UI Background Task Test", "[plugin][utilities]")
+{
+    AudioUIBackgroundTaskTest<chowdsp::TimeSliceAudioUIBackgroundTask> timeSliceTest;
+    
+    SECTION("Audio Thread Test")
+    {
+        timeSliceTest.audioThreadTest();
+    }
+
+    SECTION("GUI Thread Test")
+    {
+        timeSliceTest.guiThreadTest();
+    }
+
+    SECTION("Custom TimeSliceThread Test")
+    {
+        timeSliceTest.customTimeSliceThreadTest();
+    }
+}

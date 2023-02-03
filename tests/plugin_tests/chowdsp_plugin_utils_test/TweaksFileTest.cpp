@@ -1,4 +1,4 @@
-#include <TimedUnitTest.h>
+#include <CatchUtils.h>
 #include <chowdsp_plugin_utils/chowdsp_plugin_utils.h>
 
 namespace
@@ -38,24 +38,21 @@ namespace BinaryData
 } // namespace BinaryData
 } // namespace
 
-class TweaksFileTest : public TimedUnitTest
+TEST_CASE("Tweaks File Test", "[plugin][utilities]")
 {
-public:
-    TweaksFileTest() : TimedUnitTest ("Tweaks File Test")
+    SECTION("Write/Read Test")
     {
-    }
-
-    void writeReadTest (juce::Random& rand)
-    {
+        juce::Random rand;
+        
         chowdsp::GenericTweaksFile<false> tweaksFile;
         tweaksFile.initialise (testTweaksFile, 1);
 
         tweaksFile.addProperties ({ { "test_int", 0 }, { "test_string", juce::String {} } });
         tweaksFile.getProperty ("test_float", -1.0f);
 
-        expectEquals (tweaksFile.getProperty<int> ("test_int"), 0, "Initial integer property is incorrect");
-        expectEquals (tweaksFile.getProperty<juce::String> ("test_string"), juce::String {}, "Initial string property is incorrect");
-        expectEquals (tweaksFile.getProperty<float> ("test_float"), -1.0f, "Initial float property is incorrect");
+        REQUIRE_MESSAGE (tweaksFile.getProperty<int> ("test_int") == 0, "Initial integer property is incorrect");
+        REQUIRE_MESSAGE (tweaksFile.getProperty<juce::String> ("test_string") == juce::String {}, "Initial string property is incorrect");
+        REQUIRE_MESSAGE (tweaksFile.getProperty<float> ("test_float") == -1.0f, "Initial float property is incorrect");
 
         for (int i = 0; i < 10; ++i)
         {
@@ -72,15 +69,15 @@ public:
 
             juce::MessageManager::getInstance()->runDispatchLoopUntil (2000);
 
-            expectEquals (tweaksFile.getProperty<int> ("test_int"), newInt, "Integer property is incorrect");
-            expectEquals (tweaksFile.getProperty<juce::String> ("test_string"), newStr, "String property is incorrect");
-            expectEquals (tweaksFile.getProperty<float> ("test_float"), newFloat, "Float property is incorrect");
+            REQUIRE_MESSAGE (tweaksFile.getProperty<int> ("test_int") == newInt, "Integer property is incorrect");
+            REQUIRE_MESSAGE (tweaksFile.getProperty<juce::String> ("test_string") == newStr, "String property is incorrect");
+            REQUIRE_MESSAGE (tweaksFile.getProperty<float> ("test_float") == newFloat, "Float property is incorrect");
         }
 
         testTweaksFile.deleteFile();
     }
 
-    void tweaksFileListenerTest()
+    SECTION("Tweaks File Listener Test")
     {
         chowdsp::GenericTweaksFile<false> tweaksFile;
         tweaksFile.initialise (testTweaksFile, 1);
@@ -88,22 +85,22 @@ public:
         tweaksFile.addProperties ({ { "test_int", 0 }, { "test_string", juce::String {} } });
         tweaksFile.getProperty ("test_float", -1.0f);
 
-        expectEquals (tweaksFile.getProperty<int> ("test_int"), 0, "Initial integer property is incorrect");
-        expectEquals (tweaksFile.getProperty<juce::String> ("test_string"), juce::String {}, "Initial string property is incorrect");
-        expectEquals (tweaksFile.getProperty<float> ("test_float"), -1.0f, "Initial float property is incorrect");
+        REQUIRE_MESSAGE (tweaksFile.getProperty<int> ("test_int") == 0, "Initial integer property is incorrect");
+        REQUIRE_MESSAGE (tweaksFile.getProperty<juce::String> ("test_string") == juce::String {}, "Initial string property is incorrect");
+        REQUIRE_MESSAGE (tweaksFile.getProperty<float> ("test_float") == -1.0f, "Initial float property is incorrect");
 
         static constexpr int newInt = 440;
         static constexpr float newFloat = -110.0f;
 
         bool listenerHit = false;
         auto callback = tweaksFile.addListener (
-            [this, &listenerHit, &tweaksFile] (const std::string_view& name)
+            [&listenerHit, &tweaksFile] (const std::string_view& name)
             {
                 listenerHit = true;
                 if (name == "test_int")
-                    expectEquals (tweaksFile.getProperty<int> ("test_int"), newInt, "Integer property is incorrect");
+                    REQUIRE_MESSAGE (tweaksFile.getProperty<int> ("test_int") == newInt, "Integer property is incorrect");
                 else if (name == "test_float")
-                    expectEquals (tweaksFile.getProperty<float> ("test_float"), newFloat, "Float property is incorrect");
+                    REQUIRE_MESSAGE (tweaksFile.getProperty<float> ("test_float") == newFloat, "Float property is incorrect");
             });
 
         const auto jsonConfig = chowdsp::json {
@@ -114,36 +111,20 @@ public:
 
         juce::MessageManager::getInstance()->runDispatchLoopUntil (2000);
 
-        expectEquals (tweaksFile.getProperty<int> ("test_int"), newInt, "Integer property is incorrect");
-        expectEquals (tweaksFile.getProperty<float> ("test_float"), newFloat, "Float property is incorrect");
-        expect (listenerHit, "Tweaks file listener was never hit!");
+        REQUIRE_MESSAGE (tweaksFile.getProperty<int> ("test_int") == newInt, "Integer property is incorrect");
+        REQUIRE_MESSAGE (tweaksFile.getProperty<float> ("test_float") == newFloat, "Float property is incorrect");
+        REQUIRE_MESSAGE (listenerHit, "Tweaks file listener was never hit!");
 
         testTweaksFile.deleteFile();
     }
 
-    void bakedFileTest()
+    SECTION("Baked File Test")
     {
         chowdsp::GenericTweaksFile<true> tweaksFile;
         tweaksFile.initialise (BinaryData::test_tweaks_file, BinaryData::test_tweaks_fileSize);
 
-        expectEquals (tweaksFile.getProperty<int> ("test_int"), 44, "Integer property is incorrect");
-        expectEquals (tweaksFile.getProperty<juce::String> ("test_string"), juce::String { "blah blah" }, "String property is incorrect");
-        expectEquals (tweaksFile.getProperty<float> ("test_float"), 42.0f, "Float property is incorrect");
+        REQUIRE_MESSAGE (tweaksFile.getProperty<int> ("test_int") == 44, "Integer property is incorrect");
+        REQUIRE_MESSAGE (tweaksFile.getProperty<juce::String> ("test_string") == juce::String { "blah blah" }, "String property is incorrect");
+        REQUIRE_MESSAGE (tweaksFile.getProperty<float> ("test_float") == 42.0f, "Float property is incorrect");
     }
-
-    void runTestTimed() override
-    {
-        auto random = getRandom();
-
-        beginTest ("Write/Read Test");
-        writeReadTest (random);
-
-        beginTest ("Tweaks File Listener Test");
-        tweaksFileListenerTest();
-
-        beginTest ("Baked File Test");
-        bakedFileTest();
-    }
-};
-
-static TweaksFileTest tweaksFileTest;
+}

@@ -1,67 +1,58 @@
-#include <TimedUnitTest.h>
+#include <CatchUtils.h>
 #include <chowdsp_plugin_utils/chowdsp_plugin_utils.h>
 
-class DeferredActionTest : public TimedUnitTest
+static void deferredCounterIncrementTest (bool fakeAudioThread = false)
 {
-public:
-    DeferredActionTest() : TimedUnitTest ("Deferred Action Test", "Threads")
+    struct Counter
     {
-    }
+        int count = 0;
 
-    void deferredCounterIncrementTest (bool fakeAudioThread = false)
-    {
-        struct Counter
+        void increment()
         {
-            explicit Counter (juce::UnitTest& test) : ut (test) {}
-
-            juce::UnitTest& ut;
-            int count = 0;
-
-            void increment()
-            {
-                ut.expect (juce::MessageManager::existsAndIsCurrentThread(), "Deferred action was called from a thread other than the message thread!");
-                count++;
-            }
-        };
-
-        chowdsp::DeferredAction action;
-        Counter counter { *this };
-        std::atomic<int> refCounter { 0 };
-
-        juce::Thread::launch (
-            [&]
-            {
-                for (int i = 0; i < 25; ++i)
-                {
-                    action.call ([&counter]
-                                 { counter.increment(); },
-                                 fakeAudioThread);
-                    refCounter.fetch_add (1);
-                    juce::Thread::sleep (12);
-                }
-            });
-
-        for (int i = 0; i < 25; ++i)
-        {
-            action.call ([&counter]
-                         { counter.increment(); });
-            refCounter.fetch_add (1);
-            juce::MessageManager::getInstance()->runDispatchLoopUntil (15);
+            REQUIRE_MESSAGE (juce::MessageManager::existsAndIsCurrentThread(), "Deferred action was called from a thread other than the message thread!");
+            count++;
         }
+    };
 
-        juce::MessageManager::getInstance()->runDispatchLoopUntil (500); // clear up any remaining async updates
+    chowdsp::DeferredAction action;
+    Counter counter;
+    std::atomic<int> refCounter { 0 };
 
-        expectEquals (counter.count, refCounter.load(), "Final count is incorrect!");
+    juce::Thread::launch (
+        [&]
+        {
+            for (int i = 0; i < 25; ++i)
+            {
+                action.call ([&counter]
+                                { counter.increment(); },
+                                fakeAudioThread);
+                refCounter.fetch_add (1);
+                juce::Thread::sleep (12);
+            }
+        });
+
+    for (int i = 0; i < 25; ++i)
+    {
+        action.call ([&counter]
+                        { counter.increment(); });
+        refCounter.fetch_add (1);
+        juce::MessageManager::getInstance()->runDispatchLoopUntil (15);
     }
 
-    void runTestTimed() override
-    {
-        beginTest ("Deferred Action Test");
-        deferredCounterIncrementTest();
+    juce::MessageManager::getInstance()->runDispatchLoopUntil (500); // clear up any remaining async updates
 
-        beginTest ("Deferred Action from Audio Thread Test");
+    REQUIRE_MESSAGE (counter.count == refCounter.load(), "Final count is incorrect!");
+}
+
+TEST_CASE("Deferred Action Test", "[plugin][utilities]")
+{
+    SECTION("Deferred Action Test")
+    {
+        deferredCounterIncrementTest();
+    }
+
+    SECTION("Deferred Action From Audio Thread Test")
+    {
         deferredCounterIncrementTest (true);
     }
-};
-
-static DeferredActionTest deferredActionTest;
+}
