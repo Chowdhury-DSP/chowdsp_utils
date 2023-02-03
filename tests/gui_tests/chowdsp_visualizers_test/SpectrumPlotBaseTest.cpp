@@ -1,15 +1,11 @@
-#include <TimedUnitTest.h>
-#include <chowdsp_visualizers/chowdsp_visualizers.h>
 #include "VizTestUtils.h"
+#include <chowdsp_visualizers/chowdsp_visualizers.h>
 
-class SpectrumPlotBaseTest : public TimedUnitTest
+TEST_CASE ("Spectrum Plot Base Test", "[visualizers]")
 {
-public:
-    SpectrumPlotBaseTest() : TimedUnitTest ("Spectrum Plot Base Test") {}
-
-    void coordinatesTest()
+    SECTION ("Coordinates")
     {
-        const auto checkCoordinates = [this] (chowdsp::SpectrumPlotParams params)
+        const auto checkCoordinates = [] (chowdsp::SpectrumPlotParams params)
         {
             static constexpr int width = 400;
             static constexpr int height = 300;
@@ -25,17 +21,17 @@ public:
             chowdsp::SpectrumPlotBase component { std::move (params) };
             component.setSize (width, height);
 
-            expectEquals (component.getXCoordinateForFrequency (xMinFreq), 0.0f, "Min freq. x-coord. is incorrect!");
-            expectEquals (component.getXCoordinateForFrequency (xMaxFreq), (float) width, "Max freq. x-coord. is incorrect!");
-            expectEquals (component.getXCoordinateForFrequency (xCenterFreq), (float) width * 0.5f, "Center freq. x-coord. is incorrect!");
+            REQUIRE_MESSAGE (component.getXCoordinateForFrequency (xMinFreq) == 0.0f, "Min freq. x-coord. is incorrect!");
+            REQUIRE_MESSAGE (component.getXCoordinateForFrequency (xMaxFreq) == (float) width, "Max freq. x-coord. is incorrect!");
+            REQUIRE_MESSAGE (component.getXCoordinateForFrequency (xCenterFreq) == (float) width * 0.5f, "Center freq. x-coord. is incorrect!");
 
-            expectEquals (component.getYCoordinateForDecibels (yMinMag), (float) height, "Min mag. y-coord. is incorrect!");
-            expectEquals (component.getYCoordinateForDecibels (yMaxMag), 0.0f, "Max mag. y-coord. is incorrect!");
-            expectEquals (component.getYCoordinateForDecibels (yCenterMag), (float) height * 0.5f, "Center mag. y-coord. is incorrect!");
+            REQUIRE_MESSAGE (component.getYCoordinateForDecibels (yMinMag) == (float) height, "Min mag. y-coord. is incorrect!");
+            REQUIRE_MESSAGE (component.getYCoordinateForDecibels (yMaxMag) == 0.0f, "Max mag. y-coord. is incorrect!");
+            REQUIRE_MESSAGE (component.getYCoordinateForDecibels (yCenterMag) == (float) height * 0.5f, "Center mag. y-coord. is incorrect!");
 
-            expectWithinAbsoluteError (component.getFrequencyForXCoordinate (0.0f), xMinFreq, 1.0e-2f, "Min x-coord. frequency is incorrect!");
-            expectWithinAbsoluteError (component.getFrequencyForXCoordinate ((float) width), xMaxFreq, 1.0e-2f, "Max x-coord. frequency is incorrect!");
-            expectWithinAbsoluteError (component.getFrequencyForXCoordinate ((float) width * 0.5f), xCenterFreq, 1.0e-2f, "Center x-coord. frequency is incorrect!");
+            REQUIRE_MESSAGE (component.getFrequencyForXCoordinate (0.0f) == Catch::Approx { xMinFreq }.margin (1.0e-2f), "Min x-coord. frequency is incorrect!");
+            REQUIRE_MESSAGE (component.getFrequencyForXCoordinate ((float) width) == Catch::Approx { xMaxFreq }.margin (1.0e-2f), "Max x-coord. frequency is incorrect!");
+            REQUIRE_MESSAGE (component.getFrequencyForXCoordinate ((float) width * 0.5f) == Catch::Approx { xCenterFreq }.margin (1.0e-2f), "Center x-coord. frequency is incorrect!");
         };
 
         checkCoordinates ({ 20.0f, 20000.0f, -10.0f, 10.0f });
@@ -43,7 +39,7 @@ public:
         checkCoordinates ({ 100.0f, 5000.0f, -60.0f, 10.0f });
     }
 
-    void drawCoordinatesTest()
+    SECTION ("Draw Coordinates")
     {
         struct TestComp : chowdsp::SpectrumPlotBase
         {
@@ -70,17 +66,6 @@ public:
         //        VizTestUtils::saveImage (testScreenshot, "freq_grid_plot.png");
 
         const auto refScreenshot = VizTestUtils::loadImage ("freq_grid_plot.png");
-        VizTestUtils::compareImages (*this, testScreenshot, refScreenshot);
+        VizTestUtils::compareImages (testScreenshot, refScreenshot);
     }
-
-    void runTestTimed() override
-    {
-        beginTest ("Coordinates Test");
-        coordinatesTest();
-
-        beginTest ("Draw Coordinates Test");
-        drawCoordinatesTest();
-    }
-};
-
-static SpectrumPlotBaseTest spectrumPlotBaseTest;
+}
