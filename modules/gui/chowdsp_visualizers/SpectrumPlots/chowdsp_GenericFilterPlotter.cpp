@@ -1,7 +1,7 @@
 namespace chowdsp
 {
 GenericFilterPlotter::GenericFilterPlotter (const SpectrumPlotBase& plotBase, Params&& plotParams)
-    : params (plotParams),
+    : params (std::move (plotParams)),
       base (plotBase),
       fft (params.fftOrder),
       fftSize (1 << params.fftOrder),
@@ -61,8 +61,8 @@ std::vector<float> GenericFilterPlotter::generateLogSweep (int nSamples, float s
 
     for (size_t i = 0; i < (size_t) nSamples; i++)
     {
-        float phase = 2.0f * (float) M_PI * beta * startFreqHz * (std::pow (endFreqHz / startFreqHz, (float) i / (float) nSamples) - 1.0f);
-        sweepBuffer[i] = std::sin ((phase + (float) M_PI / 180.0f) / sampleRate);
+        float phase = juce::MathConstants<float>::twoPi * beta * startFreqHz * (std::pow (endFreqHz / startFreqHz, (float) i / (float) nSamples) - 1.0f);
+        sweepBuffer[i] = std::sin ((phase + juce::MathConstants<float>::pi / 180.0f) / sampleRate);
     }
     return sweepBuffer;
 }
