@@ -42,12 +42,9 @@ void ModFilterWrapper<PrototypeFilter>::calcCoefs (Args&&... args)
 template <typename PrototypeFilter>
 void ModFilterWrapper<PrototypeFilter>::processBlock (const BufferView<SampleType>& block) noexcept
 {
-    const auto numChannels = (int) block.getNumChannels();
-    const auto numSamples = (int) block.getNumSamples();
-
-    for (int channel = 0; channel < numChannels; ++channel)
+    const auto numSamples = block.getNumSamples();
+    for (auto [channel, sampleData] : buffer_iters::channels (block))
     {
-        auto* sampleData = block.getWritePointer (channel);
         ScopedValue<SampleType> m1 { s1[(size_t) channel] };
         ScopedValue<SampleType> m2 { s2[(size_t) channel] };
 

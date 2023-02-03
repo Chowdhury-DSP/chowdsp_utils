@@ -46,16 +46,12 @@ void PolygonalOscillator<FloatType>::reset (FloatType newPhase) noexcept
 template <typename FloatType>
 void PolygonalOscillator<FloatType>::processBlock (const BufferView<FloatType>& buffer) noexcept
 {
-    const auto numSamples = buffer.getNumSamples();
-    const auto numChannels = buffer.getNumChannels();
-
     const auto initialPhase = phase;
 
-    for (int ch = 0; ch < numChannels; ++ch)
+    const auto numSamples = buffer.getNumSamples();
+    for (auto [_, x] : buffer_iters::channels (buffer))
     {
         phase = initialPhase;
-
-        auto* x = buffer.getWritePointer (ch);
         for (int n = 0; n < numSamples; ++n)
             x[n] += processSample();
     }

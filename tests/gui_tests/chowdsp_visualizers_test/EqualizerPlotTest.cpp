@@ -1,6 +1,5 @@
-#include <TimedUnitTest.h>
-#include <chowdsp_visualizers/chowdsp_visualizers.h>
 #include "VizTestUtils.h"
+#include <chowdsp_visualizers/chowdsp_visualizers.h>
 
 struct TestEQParams : chowdsp::ParamHolder
 {
@@ -58,7 +57,7 @@ struct TestEQComp : chowdsp::EQ::EqualizerPlotWithParameters<4>
                     case 7:
                     default:
                         return Type::LPF2;
-                };
+                }
             })
     {
         setSize (500, 300);
@@ -85,15 +84,10 @@ struct TestEQComp : chowdsp::EQ::EqualizerPlotWithParameters<4>
     }
 };
 
-class EqualizerPlotTest : public TimedUnitTest
+TEST_CASE ("Equalizer Plot Test", "[visualizers][EQ]")
 {
-public:
-    EqualizerPlotTest() : TimedUnitTest ("Equalizer Plot Test") {}
-
-    void runTestTimed() override
+    SECTION ("EQ Plot")
     {
-        beginTest ("EQ Plot Test");
-
         chowdsp::PluginStateImpl<TestEQParams> state {};
 
         TestEQComp plotComp { state };
@@ -124,8 +118,6 @@ public:
         //        VizTestUtils::saveImage (testScreenshot, "eq_response_plot.png");
 
         const auto refScreenshot = VizTestUtils::loadImage ("eq_response_plot.png");
-        VizTestUtils::compareImages (*this, testScreenshot, refScreenshot);
+        VizTestUtils::compareImages (testScreenshot, refScreenshot);
     }
-};
-
-static EqualizerPlotTest equalizerPlotTest;
+}

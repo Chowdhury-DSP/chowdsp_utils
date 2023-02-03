@@ -86,7 +86,7 @@ public:
             &ParamUtils::stringToFloatVal
         };
 
-        FreqHzParameter::Ptr gainParam {
+        GainDBParameter::Ptr gainParam {
             juce::ParameterID { bandParamPrefix + "eq_band_gain", versionHint },
             bandNamePrefix + juce::String (bandIndex + 1) + " Gain",
             gainRange,

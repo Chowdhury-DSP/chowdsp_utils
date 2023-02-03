@@ -27,6 +27,19 @@ public:
         initialise (data, sampleOffset);
     }
 
+    BufferView (SampleType* data, int dataNumSamples, int sampleOffset = 0) : numChannels (1),
+                                                                              numSamples (dataNumSamples)
+    {
+        initialise (&data, sampleOffset);
+    }
+
+    template <typename T = SampleType, std::enable_if_t<std::is_const_v<T>>* = nullptr>
+    BufferView (const SampleType* data, int dataNumSamples, int sampleOffset = 0) : numChannels (1),
+                                                                                    numSamples (dataNumSamples)
+    {
+        initialise (&data, sampleOffset);
+    }
+
     BufferView (Buffer<std::remove_const_t<SampleType>>& buffer, // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
                 int sampleOffset = 0,
                 int bufferNumSamples = -1,
@@ -210,6 +223,8 @@ private:
     template <typename T = SampleType>
     std::enable_if_t<! std::is_const_v<T>, void> initialise (SampleType* const* data, int sampleOffset, int startChannel = 0)
     {
+        jassert (juce::isPositiveAndBelow (numChannels, maxNumChannels));
+        jassert (numSamples > 0);
         for (size_t ch = 0; ch < (size_t) numChannels; ++ch)
             channelPointers[ch] = data[ch + (size_t) startChannel] + sampleOffset;
     }
@@ -217,6 +232,8 @@ private:
     template <typename T = SampleType>
     std::enable_if_t<std::is_const_v<T>, void> initialise (const SampleType* const* data, int sampleOffset, int startChannel = 0)
     {
+        jassert (juce::isPositiveAndBelow (numChannels, maxNumChannels));
+        jassert (numSamples > 0);
         for (size_t ch = 0; ch < (size_t) numChannels; ++ch)
             channelPointers[ch] = data[ch + (size_t) startChannel] + sampleOffset;
     }
@@ -226,7 +243,7 @@ private:
 
     // Assuming we will never need an audio buffer with more than 64 channels.
     // Maybe we'll need to increase this is we're doing high-order ambisonics or something?
-    static constexpr int maxNumChannels = 64;
+    static constexpr int maxNumChannels = CHOWDSP_BUFFER_MAX_NUM_CHANNELS;
     std::array<SampleType*, (size_t) maxNumChannels> channelPointers {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BufferView)

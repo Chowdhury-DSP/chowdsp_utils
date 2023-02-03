@@ -6,9 +6,7 @@ TEMPLATE_TEST_CASE ("SIMD Buffer Copy Test", "[dsp][buffers][simd]", float, doub
     using T = TestType;
 
     using chowdsp::SIMDUtils::all;
-    std::random_device rd;
-    std::mt19937 mt (rd());
-    std::uniform_real_distribution<T> dist ((T) -1, (T) 1);
+    auto minus1To1 = test_utils::RandomFloatGenerator { (T) -1, (T) 1 };
 
     SECTION ("Scalar Buffer to SIMD Buffer")
     {
@@ -17,7 +15,7 @@ TEMPLATE_TEST_CASE ("SIMD Buffer Copy Test", "[dsp][buffers][simd]", float, doub
         for (int ch = 0; ch < scalarBuffer.getNumChannels(); ++ch)
         {
             for (int n = 0; n < scalarBuffer.getNumSamples(); ++n)
-                scalarBuffer.getWritePointer (ch)[n] = dist (mt);
+                scalarBuffer.getWritePointer (ch)[n] = minus1To1();
         }
 
         chowdsp::Buffer<xsimd::batch<T>> simdBuffer { 2, 256 };
@@ -60,7 +58,7 @@ TEMPLATE_TEST_CASE ("SIMD Buffer Copy Test", "[dsp][buffers][simd]", float, doub
             {
                 alignas (chowdsp::SIMDUtils::defaultSIMDAlignment) T vec[xsimd::batch<T>::size];
                 for (int i = 0; i < (int) xsimd::batch<T>::size; ++i)
-                    vec[i] = dist (mt);
+                    vec[i] = minus1To1();
                 simdBuffer.getWritePointer (ch)[n] = xsimd::load_aligned (vec);
             }
         }
@@ -96,7 +94,7 @@ TEMPLATE_TEST_CASE ("SIMD Buffer Copy Test", "[dsp][buffers][simd]", float, doub
         for (int ch = 0; ch < scalarBufferRef.getNumChannels(); ++ch)
         {
             for (int n = 0; n < scalarBufferRef.getNumSamples(); ++n)
-                scalarBufferRef.getWritePointer (ch)[n] = dist (mt);
+                scalarBufferRef.getWritePointer (ch)[n] = minus1To1();
         }
 
         chowdsp::Buffer<T> scalarBufferTest { 3, 128 };

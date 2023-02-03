@@ -140,6 +140,23 @@ TEMPLATE_TEST_CASE ("Buffer Math Test",
         }
     }
 
+    SECTION ("Multiply Buffer Test")
+    {
+        auto&& srcBuffer = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 4800, (NumericType) 1);
+
+        BufferType destBuffer { srcBuffer.getNumChannels(), srcBuffer.getNumSamples() };
+        for (int i = 0; i < destBuffer.getNumSamples(); ++i)
+            destBuffer.getWritePointer (0)[i] = (NumericType) 2;
+        multiplyBufferData (srcBuffer, destBuffer);
+
+        for (int i = 0; i < destBuffer.getNumSamples(); ++i)
+        {
+            const auto actualVal = destBuffer.getReadPointer (0)[i];
+            const auto expVal = srcBuffer.getReadPointer (0)[i];
+            REQUIRE_MESSAGE (actualVal == SIMDApprox<T> (expVal * (NumericType) 2).margin ((NumericType) maxErr), "Copied value is incorrect!");
+        }
+    }
+
     SECTION ("Apply Gain Test")
     {
         auto&& sineBuffer1 = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 4800, (NumericType) 1);

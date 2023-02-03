@@ -1,3 +1,4 @@
+#include <CatchUtils.h>
 #include <juce_graphics/juce_graphics.h>
 
 namespace VizTestUtils
@@ -10,7 +11,7 @@ inline juce::File getImagesDir()
     return imagesDir.getChildFile ("tests/gui_tests/chowdsp_visualizers_test/Images");
 }
 
-inline void saveImage (const juce::Image& testImage, const juce::String& fileName)
+[[maybe_unused]] inline void saveImage (const juce::Image& testImage, const juce::String& fileName)
 {
     juce::File testPNGFile = getImagesDir().getChildFile (fileName);
     testPNGFile.deleteFile();
@@ -29,13 +30,13 @@ inline juce::Image loadImage (const juce::String& fileName)
                                                .getChildFile (fileName));
 }
 
-inline void compareImages (juce::UnitTest& test, const juce::Image& testImage, const juce::Image& refImage)
+inline void compareImages (const juce::Image& testImage, const juce::Image& refImage)
 {
     const auto width = testImage.getWidth();
     const auto height = testImage.getHeight();
 
-    test.expectEquals (width, refImage.getWidth(), "Incorrect image width!");
-    test.expectEquals (height, refImage.getHeight(), "Incorrect image height!");
+    REQUIRE_MESSAGE (width == refImage.getWidth(), "Incorrect image width!");
+    REQUIRE_MESSAGE (height == refImage.getHeight(), "Incorrect image height!");
 
     const auto testImageData = juce::Image::BitmapData { testImage, juce::Image::BitmapData::readOnly };
     const auto refImageData = juce::Image::BitmapData { refImage, juce::Image::BitmapData::readOnly };
@@ -43,7 +44,7 @@ inline void compareImages (juce::UnitTest& test, const juce::Image& testImage, c
     for (int w = 0; w < width; ++w)
     {
         for (int h = 0; h < height; ++h)
-            test.expect (testImageData.getPixelColour (w, h) == refImageData.getPixelColour (w, h));
+            REQUIRE (testImageData.getPixelColour (w, h) == refImageData.getPixelColour (w, h));
     }
 }
 } // namespace VizTestUtils
