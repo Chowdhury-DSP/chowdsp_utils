@@ -61,7 +61,7 @@ TEST_CASE ("Generic Filter Plot Test", "[visualizers]")
 
         TestComponent comp {};
         const auto testScreenshot = comp.createComponentSnapshot ({ 500, 300 });
-//        VizTestUtils::saveImage (testScreenshot, "generic_filter_plot.png");
+        //        VizTestUtils::saveImage (testScreenshot, "generic_filter_plot.png");
 
         const auto refScreenshot = VizTestUtils::loadImage ("generic_filter_plot.png");
         VizTestUtils::compareImages (testScreenshot, refScreenshot);

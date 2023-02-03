@@ -33,15 +33,15 @@ public:
     [[nodiscard]] const auto& getPath() const { return plotPath; }
 
     /** Users should implement this function to perform the filtering process. */
-    std::function<void(const float*, float*, int)> runFilterCallback;
+    std::function<void (const float*, float*, int)> runFilterCallback;
 
     const Params params;
 
 private:
     void computeFrequencyResponse();
 
-    static std::vector<float> generateLogSweep(int nSamples, float sampleRate, float startFreqHz, float endFreqHz);
-    static std::vector<float> fftFreqs(int N, float T);
+    static std::vector<float> generateLogSweep (int nSamples, float sampleRate, float startFreqHz, float endFreqHz);
+    static std::vector<float> fftFreqs (int N, float T);
     static void freqSmooth (const std::vector<float>& magsDB, std::vector<float>& magsSmoothDB, float smFactor = 1.0f / 24.0f);
 
     const SpectrumPlotBase& base;
@@ -57,4 +57,4 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GenericFilterPlotter)
 };
-}
+} // namespace chowdsp
