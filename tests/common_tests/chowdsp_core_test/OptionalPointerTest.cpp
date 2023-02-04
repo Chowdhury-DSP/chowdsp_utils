@@ -63,7 +63,10 @@ TEST_CASE ("Optional Pointer Test", "[common][data-structures]")
         REQUIRE (x->x == 4);
         REQUIRE (x->y == 5);
 
-        x.setOwning (x_owned.release());
+        x.setOwning (nullptr);
+        REQUIRE (x == nullptr);
+
+        x.setOwning (std::move (x_owned));
         REQUIRE (x.isOwner());
         REQUIRE (x->x == 4);
         REQUIRE (x->y == 5);

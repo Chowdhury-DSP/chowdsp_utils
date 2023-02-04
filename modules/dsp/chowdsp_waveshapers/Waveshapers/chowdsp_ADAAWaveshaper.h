@@ -44,9 +44,9 @@ public:
         }
         else
         {
-            lut = OptionalPointer<LookupTableTransform<double>>();
-            lut_AD1 = OptionalPointer<LookupTableTransform<double>>();
-            lut_AD2 = OptionalPointer<LookupTableTransform<double>>();
+            lut.setOwning (std::make_unique<LookupTableTransform<double>>());
+            lut_AD1.setOwning (std::make_unique<LookupTableTransform<double>>());
+            lut_AD2.setOwning (std::make_unique<LookupTableTransform<double>>());
         }
     }
 
