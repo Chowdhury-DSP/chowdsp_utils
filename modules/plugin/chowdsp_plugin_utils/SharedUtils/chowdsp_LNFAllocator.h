@@ -27,9 +27,6 @@ public:
     template <typename LookAndFeelSubclass>
     juce::LookAndFeel* getLookAndFeel()
     {
-        if (containsLookAndFeelType<LookAndFeelSubclass>())
-            return lnfs[getLNFType<LookAndFeelSubclass>()].get();
-
         return addLookAndFeel<LookAndFeelSubclass>();
     }
 
@@ -37,13 +34,12 @@ public:
     template <typename LookAndFeelSubclass>
     juce::LookAndFeel* addLookAndFeel()
     {
-        if (containsLookAndFeelType<LookAndFeelSubclass>())
-            return getLookAndFeel<LookAndFeelSubclass>();
+        auto& lnfCacheEntry = lnfs[getLNFType<LookAndFeelSubclass>()];
+        if (lnfCacheEntry != nullptr)
+            return lnfCacheEntry.get();
 
-        auto lnfType = getLNFType<LookAndFeelSubclass>();
-        lnfs[lnfType] = std::make_unique<LookAndFeelSubclass>();
-
-        return lnfs[lnfType].get();
+        lnfCacheEntry = std::make_unique<LookAndFeelSubclass>();
+        return lnfCacheEntry.get();
     }
 
     /** Checks if the allocator already contains this look and feel */
