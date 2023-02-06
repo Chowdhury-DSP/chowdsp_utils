@@ -6,7 +6,7 @@
 
 struct Params : chowdsp::ParamHolder
 {
-    using BandParams = PrototypeEQ::EQParams::EQBandParams;
+    using BandParams = EQParams::EQBandParams;
 
     inline static const juce::StringArray bandTypeChoices {
         "1-Pole HPF",
@@ -42,7 +42,7 @@ struct Params : chowdsp::ParamHolder
         add (eqParams, linPhaseMode);
     }
 
-    PrototypeEQ::EQParams eqParams {
+    EQParams eqParams {
         {
             BandParams { 0, "eq_band_0", "Band ", 100, bandTypeChoices, 10, 250.0f },
             BandParams { 1, "eq_band_1", "Band ", 100, bandTypeChoices, 10, 1000.0f },
@@ -75,7 +75,7 @@ public:
 private:
     void setEQParams();
 
-    PrototypeEQ::EQParams::EQParameterHandles& eqParamsHandles;
+    EQParams::EQParameterHandles& eqParamsHandles;
 
     PrototypeEQ protoEQ; // the regular EQ
     chowdsp::EQ::LinearPhaseEQ<PrototypeEQ> linPhaseEQ; // the linear phase EQ
