@@ -3,6 +3,7 @@ setup_catch_test(chowdsp_dsp_data_structures_test MODULES chowdsp_dsp_data_struc
 target_sources(chowdsp_dsp_data_structures_test
     PRIVATE
         BufferTest.cpp
+        BufferSpanTest.cpp
         BufferViewTest.cpp
         LookupTableTest.cpp
         RebufferProcessorTest.cpp

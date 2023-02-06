@@ -55,8 +55,8 @@ TEMPLATE_PRODUCT_TEST_CASE ("Buffer Test", "[dsp][buffers][simd]", (chowdsp::Buf
         BufferType buffer { 2, 128 };
         for (auto [_, x] : chowdsp::buffer_iters::channels (buffer))
         {
-            for (int n = 0; n < buffer.getNumSamples(); ++n)
-                x[n] = SampleType (minus1To1());
+            for (auto& x_n : x)
+                x_n = SampleType (minus1To1());
         }
 
         for (int i = 0; i < 2; ++i)
@@ -64,8 +64,8 @@ TEMPLATE_PRODUCT_TEST_CASE ("Buffer Test", "[dsp][buffers][simd]", (chowdsp::Buf
             buffer.clear();
             for (auto [_, x] : chowdsp::buffer_iters::channels (buffer))
             {
-                for (int n = 0; n < buffer.getNumSamples(); ++n)
-                    REQUIRE_MESSAGE (all (x[n] == SampleType (0)), "Buffer was not cleared!");
+                for (auto& x_n : x)
+                    REQUIRE_MESSAGE (all (x_n == SampleType (0)), "Buffer was not cleared!");
             }
         }
     }
@@ -75,8 +75,8 @@ TEMPLATE_PRODUCT_TEST_CASE ("Buffer Test", "[dsp][buffers][simd]", (chowdsp::Buf
         BufferType buffer { 2, 128 };
         for (auto [_, channelData] : chowdsp::buffer_iters::channels (buffer))
         {
-            for (int n = 0; n < buffer.getNumSamples(); ++n)
-                channelData[n] = SampleType (minus1To1());
+            for (auto& sample : channelData)
+                sample = SampleType (minus1To1());
         }
 
         buffer.setCurrentSize (1, 32);
@@ -85,8 +85,8 @@ TEMPLATE_PRODUCT_TEST_CASE ("Buffer Test", "[dsp][buffers][simd]", (chowdsp::Buf
         buffer.setCurrentSize (2, 64);
         for (auto [ch, channelData] : chowdsp::buffer_iters::channels (buffer))
         {
-            for (int n = 0; n < buffer.getNumSamples(); ++n)
-                REQUIRE_MESSAGE (all (channelData[n] == SampleType (0)), "Buffer was not cleared! " << ch << ", " << n);
+            for (auto [n, sample] : chowdsp::enumerate (channelData))
+                REQUIRE_MESSAGE (all (sample == SampleType (0)), "Buffer was not cleared! " << ch << ", " << n);
         }
     }
 
@@ -110,6 +110,6 @@ TEMPLATE_PRODUCT_TEST_CASE ("Buffer Test", "[dsp][buffers][simd]", (chowdsp::Buf
         const BufferType buffer { 2, 33 };
 
         for (auto [_, channelData] : chowdsp::buffer_iters::channels (buffer))
-            REQUIRE (chowdsp::SIMDUtils::isAligned (channelData));
+            REQUIRE (chowdsp::SIMDUtils::isAligned (channelData.data()));
     }
 }

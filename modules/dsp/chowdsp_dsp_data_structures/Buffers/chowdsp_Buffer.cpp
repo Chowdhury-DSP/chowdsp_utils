@@ -68,6 +68,19 @@ const SampleType* Buffer<SampleType>::getReadPointer (int channel) const noexcep
 }
 
 template <typename SampleType>
+nonstd::span<SampleType> Buffer<SampleType>::getWriteSpan (int channel) noexcept
+{
+    hasBeenCleared = false;
+    return { channelPointers[(size_t) channel], (size_t) currentNumSamples };
+}
+
+template <typename SampleType>
+nonstd::span<const SampleType> Buffer<SampleType>::getReadSpan (int channel) const noexcept
+{
+    return { channelPointers[(size_t) channel], (size_t) currentNumSamples };
+}
+
+template <typename SampleType>
 SampleType** Buffer<SampleType>::getArrayOfWritePointers() noexcept
 {
     hasBeenCleared = false;

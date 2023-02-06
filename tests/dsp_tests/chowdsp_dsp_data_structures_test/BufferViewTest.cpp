@@ -12,8 +12,8 @@ void testBufferView (const BufferViewType view, const chowdsp::Buffer<T>& buffer
     for (auto [ch, x] : chowdsp::buffer_iters::channels (buffer))
     {
         const auto* xView = view.getReadPointer (ch);
-        for (int n = 0; n < buffer.getNumSamples(); ++n)
-            REQUIRE_MESSAGE (all (x[n] == xView[n]), "Data is not correct!");
+        for (auto [n, x_n] : chowdsp::enumerate (x))
+            REQUIRE_MESSAGE (all (x_n == xView[n]), "Data is not correct!");
     }
 }
 
@@ -28,11 +28,11 @@ void testBufferViewOffset (const BufferViewType view, const chowdsp::StaticBuffe
     for (auto [ch, x] : chowdsp::buffer_iters::channels (buffer))
     {
         const auto* xView = view.getReadPointer (ch);
-        for (int n = 0; n < offset; ++n)
-            REQUIRE_MESSAGE (all (x[n] == T (0)), "Skipped data is not correct!");
+        for (auto& x_n : x.subspan (0, (size_t) offset))
+            REQUIRE_MESSAGE (all (x_n == T (0)), "Skipped data is not correct!");
 
-        for (int n = offset; n < buffer.getNumSamples(); ++n)
-            REQUIRE_MESSAGE (all (x[n] == xView[n - offset]), "Data in view not correct!");
+        for (auto [n, x_n] : chowdsp::enumerate (x.subspan ((size_t) offset)))
+            REQUIRE_MESSAGE (all (x_n == xView[n]), "Data in view not correct!");
     }
 }
 
@@ -46,8 +46,8 @@ TEMPLATE_TEST_CASE ("Buffer View Test", "[dsp][buffers][simd]", float, double, x
         chowdsp::Buffer<TestType> buffer { 2, 128 };
         for (auto [_, x] : chowdsp::buffer_iters::channels (buffer))
         {
-            for (int n = 0; n < buffer.getNumSamples(); ++n)
-                x[n] = TestType (minus1To1());
+            for (auto& x_n : x)
+                x_n = TestType (minus1To1());
         }
 
         testBufferView<chowdsp::BufferView<TestType>> (buffer, buffer);
@@ -71,8 +71,8 @@ TEMPLATE_TEST_CASE ("Buffer View Test", "[dsp][buffers][simd]", float, double, x
 
         for (auto [_, x] : chowdsp::buffer_iters::channels (view))
         {
-            for (int n = 0; n < view.getNumSamples(); ++n)
-                x[n] = TestType (minus1To1());
+            for (auto& x_n : x)
+                x_n = TestType (minus1To1());
         }
 
         const auto& constBuffer = std::as_const (buffer);
@@ -88,15 +88,15 @@ TEMPLATE_TEST_CASE ("Buffer View Test", "[dsp][buffers][simd]", float, double, x
 
         for (auto [_, xWrite] : chowdsp::buffer_iters::channels (view))
         {
-            for (int n = 0; n < view.getNumSamples(); ++n)
-                xWrite[n] = TestType (minus1To1());
+            for (auto& x_n : xWrite)
+                x_n = TestType (minus1To1());
         }
 
         view.clear();
         for (const auto [_, xRead] : chowdsp::buffer_iters::channels (view))
         {
-            for (int n = 0; n < view.getNumSamples(); ++n)
-                REQUIRE_MESSAGE (all (xRead[n] == TestType (0)), "Data in view not correct!");
+            for (auto& x_n : xRead)
+                REQUIRE_MESSAGE (all (x_n == TestType (0)), "Data in view not correct!");
         }
     }
 
