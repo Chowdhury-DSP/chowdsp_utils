@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ## [UNRELEASED]
 - Added `chowdsp_visualizers` module.
+- Added `chowdsp_presets_v2` module.
+- Added `chowdsp::StringLiteral`.
+- Added `chowdsp::buffer_iters`.
+- `chowdsp::Gain`: Fixed reset() to reset the smoother to the target gain value.
+- BypassProcessor: Added template specialization with no latency compensation.
+- `chowdsp::BufferMath`: Added multiplyBufferData() function.
+- `chowdsp::BufferView`: Added constructor for 1d-array.
+- `chowdsp::LinearPhaseEQ`: Prototype EQs must now define their floating point type.
 - Moved `Version` to `chowdsp` namespace, and made constexpr-able.
 
 ## [2.0.0] 2022-12-22
