@@ -12,7 +12,7 @@ struct LinearPhasePrototypeEQ
 
     using Params = EQParams;
     using FloatType = Float;
-    EQ::EQProcessor<FloatType, numBands, EQBand> eq;
+    EQ::EQProcessor<FloatType, (size_t) numBands, EQBand> eq;
 
     LinearPhasePrototypeEQ() = default;
 
