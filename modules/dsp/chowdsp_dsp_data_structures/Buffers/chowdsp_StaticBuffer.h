@@ -69,6 +69,12 @@ public:
     /** Returns a pointer which can be used to read from a single channel of the buffer. */
     [[nodiscard]] const SampleType* getReadPointer (int channel) const noexcept;
 
+    /** Returns a span which can be used to write to a single channel of the buffer. */
+    [[nodiscard]] nonstd::span<SampleType> getWriteSpan (int channel) noexcept;
+
+    /** Returns a span which can be used to read from a single channel of the buffer. */
+    [[nodiscard]] nonstd::span<const SampleType> getReadSpan (int channel) const noexcept;
+
     /** Returns the entire buffer as an array of pointers to each channel's data. */
     [[nodiscard]] SampleType** getArrayOfWritePointers() noexcept;
 

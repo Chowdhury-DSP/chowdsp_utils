@@ -42,14 +42,13 @@ void ModFilterWrapper<PrototypeFilter>::calcCoefs (Args&&... args)
 template <typename PrototypeFilter>
 void ModFilterWrapper<PrototypeFilter>::processBlock (const BufferView<SampleType>& block) noexcept
 {
-    const auto numSamples = block.getNumSamples();
     for (auto [channel, sampleData] : buffer_iters::channels (block))
     {
         ScopedValue<SampleType> m1 { s1[(size_t) channel] };
         ScopedValue<SampleType> m2 { s2[(size_t) channel] };
 
-        for (int i = 0; i < numSamples; ++i)
-            sampleData[i] = processSample (sampleData[i], m1.get(), m2.get());
+        for (auto& sample : sampleData)
+            sample = processSample (sample, m1.get(), m2.get());
     }
 
 #if JUCE_SNAP_TO_ZERO

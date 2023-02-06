@@ -36,7 +36,6 @@ void TriangleWave<T>::processBlock (const BufferView<T>& buffer) noexcept
     T z_temp = z;
     T phi_temp = phi;
 
-    const auto numSamples = buffer.getNumSamples();
     for (auto [_, data] : buffer_iters::channels (buffer))
     {
         z = z_temp;
@@ -45,8 +44,8 @@ void TriangleWave<T>::processBlock (const BufferView<T>& buffer) noexcept
         ScopedValue _z { z };
         ScopedValue _phi { phi };
 
-        for (int i = 0; i < numSamples; ++i)
-            data[i] += processSampleInternal (_z.get(), _phi.get());
+        for (auto& x_n : data)
+            x_n += processSampleInternal (_z.get(), _phi.get());
     }
 }
 } // namespace chowdsp

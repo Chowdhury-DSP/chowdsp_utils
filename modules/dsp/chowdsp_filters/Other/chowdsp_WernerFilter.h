@@ -107,12 +107,11 @@ public:
     std::enable_if_t<type != WernerFilterType::MultiMode, void>
         processBlock (const BufferView<float>& buffer) noexcept
     {
-        const auto numSamples = buffer.getNumSamples();
         for (auto [ch, x] : buffer_iters::channels (buffer))
         {
             ScopedValue s { state[(size_t) ch] };
-            for (int n = 0; n < numSamples; ++n)
-                x[n] = processSampleInternal<type> (x[n], s.get());
+            for (auto& x_n : x)
+                x_n = processSampleInternal<type> (x_n, s.get());
         }
     }
 
@@ -125,13 +124,12 @@ public:
     std::enable_if_t<type == WernerFilterType::MultiMode, void>
         processBlock (const BufferView<float>& buffer, float mix) noexcept
     {
-        const auto numSamples = buffer.getNumSamples();
         const auto [lpfMult, bpfMult, hpfMult] = calcMixingConstants (mix);
         for (auto [ch, x] : buffer_iters::channels (buffer))
         {
             ScopedValue s { state[(size_t) ch] };
-            for (int n = 0; n < numSamples; ++n)
-                x[n] = processSampleInternal<type> (x[n], s.get(), lpfMult, bpfMult, hpfMult);
+            for (auto& x_n : x)
+                x_n = processSampleInternal<type> (x_n, s.get(), lpfMult, bpfMult, hpfMult);
         }
     }
 

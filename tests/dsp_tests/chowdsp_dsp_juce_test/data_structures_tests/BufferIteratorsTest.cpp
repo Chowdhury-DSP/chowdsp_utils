@@ -35,15 +35,15 @@ TEMPLATE_TEST_CASE ("Buffer Iterators Test",
         int count = 0;
         for (auto [channel, data] : chowdsp::buffer_iters::channels (buffer))
         {
-            for (int i = 0; i < buffer.getNumSamples(); ++i)
-                data[i] = (SampleType) static_cast<float> (count++);
+            for (auto& x_n : data)
+                x_n = (SampleType) static_cast<float> (count++);
         }
     }
 
     int count = 0;
     for (auto [channel, data] : chowdsp::buffer_iters::channels (chowdsp::asConstBuffer (buffer)))
     {
-        for (int i = 0; i < buffer.getNumSamples(); ++i)
-            REQUIRE (chowdsp::SIMDUtils::all ((SampleType) static_cast<float> (count++) == data[i]));
+        for (auto& x_n : data)
+            REQUIRE (chowdsp::SIMDUtils::all ((SampleType) static_cast<float> (count++) == x_n));
     }
 }

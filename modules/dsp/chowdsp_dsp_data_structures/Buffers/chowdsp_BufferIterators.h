@@ -107,9 +107,37 @@ namespace buffer_iters
             auto operator*() const
             {
                 if constexpr (IsConstBufferType<BufferType>)
-                    return std::make_tuple (channelIndex, buffer.getReadPointer (channelIndex));
+                {
+#if CHOWDSP_USING_JUCE
+                    if constexpr (std::is_same_v<BufferType, const juce::AudioBuffer<float>>
+                                  || std::is_same_v<BufferType, const juce::AudioBuffer<double>>)
+                    {
+                        return std::make_tuple (channelIndex,
+                                                nonstd::span { buffer.getReadPointer (channelIndex),
+                                                               (size_t) buffer.getNumSamples() });
+                    }
+                    else
+#endif
+                    {
+                        return std::make_tuple (channelIndex, buffer.getReadSpan (channelIndex));
+                    }
+                }
                 else
-                    return std::make_tuple (channelIndex, buffer.getWritePointer (channelIndex));
+                {
+#if CHOWDSP_USING_JUCE
+                    if constexpr (std::is_same_v<BufferType, juce::AudioBuffer<float>>
+                                  || std::is_same_v<BufferType, juce::AudioBuffer<double>>)
+                    {
+                        return std::make_tuple (channelIndex,
+                                                nonstd::span { buffer.getWritePointer (channelIndex),
+                                                               (size_t) buffer.getNumSamples() });
+                    }
+                    else
+#endif
+                    {
+                        return std::make_tuple (channelIndex, buffer.getWriteSpan (channelIndex));
+                    }
+                }
             }
         };
         struct iterable_wrapper

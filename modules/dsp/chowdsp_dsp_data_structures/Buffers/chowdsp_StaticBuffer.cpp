@@ -55,6 +55,19 @@ const SampleType* StaticBuffer<SampleType, maxNumChannels, maxNumSamples>::getRe
 }
 
 template <typename SampleType, int maxNumChannels, int maxNumSamples>
+nonstd::span<SampleType> StaticBuffer<SampleType, maxNumChannels, maxNumSamples>::getWriteSpan (int channel) noexcept
+{
+    hasBeenCleared = false;
+    return { channelPointers[(size_t) channel], (size_t) currentNumSamples };
+}
+
+template <typename SampleType, int maxNumChannels, int maxNumSamples>
+nonstd::span<const SampleType> StaticBuffer<SampleType, maxNumChannels, maxNumSamples>::getReadSpan (int channel) const noexcept
+{
+    return { channelPointers[(size_t) channel], (size_t) currentNumSamples };
+}
+
+template <typename SampleType, int maxNumChannels, int maxNumSamples>
 SampleType** StaticBuffer<SampleType, maxNumChannels, maxNumSamples>::getArrayOfWritePointers() noexcept
 {
     hasBeenCleared = false;

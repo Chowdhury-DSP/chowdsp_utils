@@ -118,7 +118,7 @@ public:
     {
         const auto numSamples = block.getNumSamples();
         for (auto [channel, channelData] : buffer_iters::channels (block))
-            processBlock (channelData, numSamples, channel);
+            processBlock (channelData.data(), numSamples, channel);
     }
 
     /** Process block of samples with a custom modulation callback which is called every sample */
