@@ -39,14 +39,14 @@ public:
         const auto numSamples = buffer.getNumSamples();
         for (auto [_, channelData] : buffer_iters::channels (buffer))
         {
-            juce::FloatVectorOperations::multiply (channelData, normFactor, numSamples);
-            juce::FloatVectorOperations::clip (channelData, channelData, (T) -1, (T) 1, numSamples);
+            juce::FloatVectorOperations::multiply (channelData.data(), normFactor, numSamples);
+            juce::FloatVectorOperations::clip (channelData.data(), channelData.data(), (T) -1, (T) 1, numSamples);
 
-            FloatVectorOperations::integerPower (exponentData.data(), channelData, degree, numSamples);
+            FloatVectorOperations::integerPower (exponentData.data(), channelData.data(), degree, numSamples);
             juce::FloatVectorOperations::multiply (exponentData.data(), oneOverDeg, numSamples);
-            juce::FloatVectorOperations::subtract (channelData, exponentData.data(), numSamples);
+            juce::FloatVectorOperations::subtract (channelData.data(), exponentData.data(), numSamples);
 
-            juce::FloatVectorOperations::multiply (channelData, invNormFactor, numSamples);
+            juce::FloatVectorOperations::multiply (channelData.data(), invNormFactor, numSamples);
         }
     }
 

@@ -35,14 +35,13 @@ void SawtoothWave<T>::processBlock (const BufferView<T>& buffer) noexcept
     T z_temp = z;
     T phi_temp = phi;
 
-    const auto numSamples = buffer.getNumSamples();
     for (auto [_, data] : buffer_iters::channels (buffer))
     {
         z = z_temp;
         phi = phi_temp;
 
-        for (int i = 0; i < numSamples; ++i)
-            data[i] += processSample();
+        for (auto& x_n : data)
+            x_n += processSample();
     }
 }
 

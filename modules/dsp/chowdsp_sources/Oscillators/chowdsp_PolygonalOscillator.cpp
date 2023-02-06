@@ -47,13 +47,11 @@ template <typename FloatType>
 void PolygonalOscillator<FloatType>::processBlock (const BufferView<FloatType>& buffer) noexcept
 {
     const auto initialPhase = phase;
-
-    const auto numSamples = buffer.getNumSamples();
     for (auto [_, x] : buffer_iters::channels (buffer))
     {
         phase = initialPhase;
-        for (int n = 0; n < numSamples; ++n)
-            x[n] += processSample();
+        for (auto& x_n : x)
+            x_n += processSample();
     }
 }
 } // namespace chowdsp::experimental

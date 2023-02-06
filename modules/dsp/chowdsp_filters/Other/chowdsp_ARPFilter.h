@@ -123,13 +123,12 @@ public:
     template <ARPFilterType type>
     void processBlock (const BufferView<SampleType>& buffer, NumericType notchMix = 0) noexcept
     {
-        const auto numSamples = buffer.getNumSamples();
         for (auto [channel, sampleData] : buffer_iters::channels (buffer))
         {
             ScopedValue s1 { filter.ic1eq[(size_t) channel] };
             ScopedValue s2 { filter.ic2eq[(size_t) channel] };
-            for (int i = 0; i < numSamples; ++i)
-                sampleData[i] = processSampleInternal<type> (sampleData[i], s1.get(), s2.get(), notchMix);
+            for (auto& sample : sampleData)
+                sample = processSampleInternal<type> (sample, s1.get(), s2.get(), notchMix);
         }
 
 #if JUCE_SNAP_TO_ZERO
@@ -147,13 +146,12 @@ public:
     template <ARPFilterType type>
     void processBlock (const BufferView<SampleType>& buffer, const float* notchMix) noexcept
     {
-        const auto numSamples = buffer.getNumSamples();
         for (auto [channel, sampleData] : buffer_iters::channels (buffer))
         {
             ScopedValue s1 { filter.ic1eq[(size_t) channel] };
             ScopedValue s2 { filter.ic2eq[(size_t) channel] };
-            for (int i = 0; i < numSamples; ++i)
-                sampleData[i] = processSampleInternal<type> (sampleData[i], s1.get(), s2.get(), notchMix[i]);
+            for (auto [i, sample] : enumerate (sampleData))
+                sample = processSampleInternal<type> (sample, s1.get(), s2.get(), notchMix[i]);
         }
 
 #if JUCE_SNAP_TO_ZERO

@@ -72,7 +72,7 @@ public:
     {
         const auto numSamples = block.getNumSamples();
         for (const auto [channel, data] : buffer_iters::channels (block))
-            processBlock (data, numSamples, channel);
+            processBlock (data.data(), numSamples, channel);
     }
 
     /**
@@ -96,7 +96,7 @@ public:
     {
         const auto numSamples = block.getNumSamples();
         for (const auto [channel, data] : buffer_iters::channels (block))
-            processBlockBypassed (data, numSamples, channel);
+            processBlockBypassed (data.data(), numSamples, channel);
     }
 
 private:

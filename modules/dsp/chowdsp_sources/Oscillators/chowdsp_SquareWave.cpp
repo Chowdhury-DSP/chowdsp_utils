@@ -39,13 +39,13 @@ void SquareWave<T>::processBlock (const BufferView<T>& buffer) noexcept
     saw2.processBlock (intermediateBuffer);
 
     for (auto [ch, outputData] : buffer_iters::channels (buffer))
-        juce::FloatVectorOperations::add (outputData, intermediateBuffer.getReadPointer (ch), numSamples);
+        juce::FloatVectorOperations::add (outputData.data(), intermediateBuffer.getReadPointer (ch), numSamples);
 
     intermediateBuffer.clear();
     saw1.processBlock (intermediateBuffer);
 
     for (auto [ch, outputData] : buffer_iters::channels (buffer))
-        juce::FloatVectorOperations::subtract (outputData, intermediateBuffer.getReadPointer (ch), numSamples);
+        juce::FloatVectorOperations::subtract (outputData.data(), intermediateBuffer.getReadPointer (ch), numSamples);
 }
 
 #if JUCE_MODULE_AVAILABLE_juce_dsp

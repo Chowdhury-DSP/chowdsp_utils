@@ -209,6 +209,19 @@ public:
     /** Returns a pointer which can be used to read from a single channel of the buffer view. */
     [[nodiscard]] const SampleType* getReadPointer (int channel) const noexcept { return channelPointers[(size_t) channel]; }
 
+    /** Returns a span which can be used to write to a single channel of the buffer view. */
+    template <typename T = SampleType>
+    [[nodiscard]] std::enable_if_t<! std::is_const_v<T>, nonstd::span<SampleType>> getWriteSpan (int channel) const noexcept
+    {
+        return { channelPointers[(size_t) channel], (size_t) numSamples };
+    }
+
+    /** Returns a span which can be used to read from a single channel of the buffer view. */
+    [[nodiscard]] nonstd::span<const SampleType> getReadSpan (int channel) const noexcept
+    {
+        return { channelPointers[(size_t) channel], (size_t) numSamples };
+    }
+
     /** Returns the entire buffer view as an array of pointers to each channel's data. */
     template <typename T = SampleType>
     [[nodiscard]] std::enable_if_t<! std::is_const_v<T>, SampleType* const*> getArrayOfWritePointers() const noexcept

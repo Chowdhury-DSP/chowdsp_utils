@@ -77,8 +77,8 @@ private:
         for (auto [_, data] : buffer_iters::channels (convolutionKernelBuffer))
         {
             juce::Random rand;
-            for (int n = 0; n < kernelSize; ++n)
-                data[n] = rand.nextFloat() * 2.0f - 1.0f;
+            for (auto& sample : data)
+                sample = rand.nextFloat() * 2.0f - 1.0f;
         }
 
         SmoothedBufferValue<float> kernelRamp;
