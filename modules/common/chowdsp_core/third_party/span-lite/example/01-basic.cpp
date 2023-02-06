@@ -5,19 +5,26 @@
 #include <vector>
 #include <iostream>
 
-std::ptrdiff_t size( nonstd::span<const int> spn )
+std::ptrdiff_t size (nonstd::span<const int> spn)
 {
     return spn.size();
 }
 
 int main()
 {
-    int arr[] = { 1, };
+    int arr[] = {
+        1,
+    };
 
-    std::cout <<
-        "C-array:" << size( arr ) <<
-        " array:"  << size( std::array <int, 2>{ 1, 2, } ) <<
-        " vector:" << size( std::vector<int   >{ 1, 2, 3, } );
+    std::cout << "C-array:" << size (arr) << " array:" << size (std::array<int, 2> {
+        1,
+        2,
+    }) << " vector:"
+              << size (std::vector<int> {
+                     1,
+                     2,
+                     3,
+                 });
 }
 
 #if 0

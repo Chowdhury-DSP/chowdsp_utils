@@ -109,8 +109,7 @@ namespace buffer_iters
                 if constexpr (IsConstBufferType<BufferType>)
                 {
 #if CHOWDSP_USING_JUCE
-                    if constexpr (std::is_same_v<BufferType, const juce::AudioBuffer<float>>
-                                  || std::is_same_v<BufferType, const juce::AudioBuffer<double>>)
+                    if constexpr (std::is_same_v<BufferType, const juce::AudioBuffer<float>> || std::is_same_v<BufferType, const juce::AudioBuffer<double>>)
                     {
                         return std::make_tuple (channelIndex,
                                                 nonstd::span { buffer.getReadPointer (channelIndex),
@@ -125,8 +124,7 @@ namespace buffer_iters
                 else
                 {
 #if CHOWDSP_USING_JUCE
-                    if constexpr (std::is_same_v<BufferType, juce::AudioBuffer<float>>
-                                  || std::is_same_v<BufferType, juce::AudioBuffer<double>>)
+                    if constexpr (std::is_same_v<BufferType, juce::AudioBuffer<float>> || std::is_same_v<BufferType, juce::AudioBuffer<double>>)
                     {
                         return std::make_tuple (channelIndex,
                                                 nonstd::span { buffer.getWritePointer (channelIndex),

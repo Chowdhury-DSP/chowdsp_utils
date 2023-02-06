@@ -4,12 +4,12 @@
 TEMPLATE_TEST_CASE ("Buffer Span Test",
                     "[dsp][buffer]",
                     chowdsp::Buffer<float>,
-                    (chowdsp::StaticBuffer<float, 2, 4>))
+                    (chowdsp::StaticBuffer<float, 2, 4>) )
 {
     using BufferType = TestType;
     BufferType buffer { 2, 4 };
 
-    const auto testSpan = [](auto& testBuffer)
+    const auto testSpan = [] (auto& testBuffer)
     {
         {
             auto writeSpan0 = testBuffer.getWriteSpan (0);
