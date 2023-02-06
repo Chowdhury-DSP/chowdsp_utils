@@ -81,6 +81,9 @@ sure to abide by the license of each module, as well as whichever libraries are 
 - `AtomicHelpers`: Useful methods for working with atomics.
 - `MemoryUtils`: Helpful methods to check if blocks of memory alias with each other.
 - `TypeTraits`: Type traits for checking if a class has a given method, if a type is a container, and so on.
+- Includes the following internal dependencies:
+  - [`types_list`](https://github.com/jatinchowdhury18/types_list) (MIT license).
+  - [`span-lite`](https://github.com/martinmoene/span-lite) (BSL-1.0 license).
 
 `chowdsp_json` (BSD)
 - A thin wrapper around [`nlohmann::json`](https://github.com/nlohmann/json) (MIT license, included internally).
@@ -89,9 +92,10 @@ sure to abide by the license of each module, as well as whichever libraries are 
 - A thin wrapper around [`rocket`](https://github.com/tripleslash/rocket) (Public Domain, included internally).
 
 `chowdsp_reflection` (BSD)
-- A thin wrapper around [`boost::pfr`](https://github.com/boostorg/pfr) (Boost license, included internally).
-- A thin wrapper around [`nameof`](https://github.com/Neargye/nameof) (MIT license, included internally).
-- A thin wrapper around [`magic_enum`](https://github.com/Neargye/magic_enum) (MIT license, included internally).
+- Includes the following internal dependencies:
+  - [`boost::pfr`](https://github.com/boostorg/pfr) (Boost license).
+  - [`nameof`](https://github.com/Neargye/nameof) (MIT license).
+  - [`magic_enum`](https://github.com/Neargye/magic_enum) (MIT license).
 
 `chowdsp_serialization` (BSD)
 - Tools for serializing/deserializing data, using JSON or XML formats.
@@ -220,6 +224,9 @@ sure to abide by the license of each module, as well as whichever libraries are 
 
 `chowdsp_presets` (BSD)
 - A system for managing plugin presets.
+
+`chowdsp_preset_v2` (BSD)
+- An updated preset management system, compatible with `chowdsp_plugin_state`.
 
 `chowdsp_version` (BSD)
 - Utilities for managing the version of an app or plugin.
