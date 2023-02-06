@@ -15,8 +15,7 @@ void PrototypeEQ::reset()
     eq.reset();
 }
 
-void PrototypeEQ::processBlock (juce::AudioBuffer<float>& buffer)
+void PrototypeEQ::processBlock (const chowdsp::BufferView<FloatType>& buffer)
 {
-    auto&& block = juce::dsp::AudioBlock<float> { buffer };
-    eq.processBlock (block);
+    eq.processBlock (buffer);
 }

@@ -1,5 +1,3 @@
-#include "chowdsp_LinearPhaseEQ.h"
-
 namespace chowdsp::EQ
 {
 template <typename PrototypeEQ, int defaultFIRLength>
@@ -29,13 +27,14 @@ void LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::prepare (const juce::dsp::Pro
 
     prototypeEQ.prepare ({ spec.sampleRate, (juce::uint32) irSize, 1 });
 
-    irBuffer = juce::AudioBuffer<float> (1, irSize);
+    irBuffer.setMaxSize (1, irSize);
+    irTransferData.resize ((size_t) irSize, 0.0f);
     params = { initialParams };
     updateParams();
 
     engines.clear();
     for (size_t ch = 0; ch < spec.numChannels; ++ch)
-        engines.push_back (std::make_unique<ConvolutionEngine<>> ((size_t) irSize, spec.maximumBlockSize, irBuffer.getWritePointer (0)));
+        engines.push_back (std::make_unique<ConvolutionEngine<>> ((size_t) irSize, spec.maximumBlockSize, irTransferData.data()));
 
     irUpdateState.store (IRUpdateState::Good);
     irTransfer = std::make_unique<IRTransfer> (*engines[0]);
@@ -49,7 +48,7 @@ void LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::hiResTimerCallback()
     if (irUpdateState == IRUpdateState::Needed)
     {
         updateParams();
-        irTransfer->setNewIR (irBuffer.getReadPointer (0));
+        irTransfer->setNewIR (irTransferData.data());
         irUpdateState.store (IRUpdateState::Ready);
     }
 }
@@ -79,19 +78,22 @@ void LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::updateParams()
     // set up IR
     irBuffer.clear();
     auto* irData = irBuffer.getWritePointer (0);
-    irData[irSize / 2 - 1] = 1.0f;
+    irData[irSize / 2 - 1] = (typename PrototypeEQ::FloatType) 1;
 
     // process forwards
     prototypeEQ.reset();
     prototypeEQ.processBlock (irBuffer);
 
     // process backwards
-    irBuffer.reverse (0, irSize);
+    std::reverse (irData, irData + irSize);
     prototypeEQ.reset();
     prototypeEQ.processBlock (irBuffer);
 
-    // halve the IR magnitude sicne we processed it twice
-    IRHelpers::makeHalfMagnitude (irData, irData, irSize, *fft);
+    // transfer from whatever floating-point precision the prototype EQ needs to single-precision
+    std::copy (irData, irData + irSize, irTransferData.begin());
+
+    // halve the IR magnitude since we processed it twice
+    IRHelpers::makeHalfMagnitude (irTransferData.data(), irTransferData.data(), irSize, *fft);
 }
 
 template <typename PrototypeEQ, int defaultFIRLength>
