@@ -8,15 +8,16 @@ const juce::File testTweaksFile = juce::File::getSpecialLocation (juce::File::Sp
 
 constexpr std::string_view randomChars { "0123456789 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" };
 
-juce::String getRandomString (juce::Random& rand)
+juce::String getRandomString()
 {
-    const auto numChars = (int) randomChars.length();
-    const auto stringLen = rand.nextInt ({ 10, 50 });
+    test_utils::RandomIntGenerator randLength{ 10, 50 };
+    test_utils::RandomIntGenerator randChar{ 0, (int) randomChars.length() - 1 };
 
+    const auto stringLen = randLength();
     juce::String str;
     for (int i = 0; i < stringLen; ++i)
     {
-        const auto nextChar = randomChars[(size_t) rand.nextInt (numChars)];
+        const auto nextChar = randomChars[(size_t) randChar()];
         str.append (juce::String::charToString (nextChar), 1);
     }
 
@@ -42,8 +43,6 @@ TEST_CASE("Tweaks File Test", "[plugin][utilities]")
 {
     SECTION("Write/Read Test")
     {
-        juce::Random rand;
-        
         chowdsp::GenericTweaksFile<false> tweaksFile;
         tweaksFile.initialise (testTweaksFile, 1);
 
@@ -54,11 +53,13 @@ TEST_CASE("Tweaks File Test", "[plugin][utilities]")
         REQUIRE_MESSAGE (tweaksFile.getProperty<juce::String> ("test_string") == juce::String {}, "Initial string property is incorrect");
         REQUIRE_MESSAGE (tweaksFile.getProperty<float> ("test_float") == -1.0f, "Initial float property is incorrect");
 
+        test_utils::RandomIntGenerator randInt{ -100, 100 };
+        test_utils::RandomFloatGenerator randFloat{ 0.0f, 1.0f };
         for (int i = 0; i < 10; ++i)
         {
-            const auto newInt = rand.nextInt ({ -100, 100 });
-            const auto newStr = getRandomString (rand);
-            const auto newFloat = rand.nextFloat();
+            const auto newInt = randInt();
+            const auto newStr = getRandomString();
+            const auto newFloat = randFloat();
 
             const auto jsonConfig = chowdsp::json {
                 { "test_int", newInt },
