@@ -169,7 +169,4 @@ void ModalFilterBank<maxNumModes, SampleType>::processWithModulation (const Buff
         }
     }
 }
-
-template <size_t maxNumModes, typename SampleType>
-const SampleType ModalFilterBank<maxNumModes, SampleType>::log1000 = std::log ((SampleType) 1000);
 } // namespace chowdsp

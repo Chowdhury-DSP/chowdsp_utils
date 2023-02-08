@@ -64,7 +64,7 @@ public:
     void processWithModulation (const BufferView<const SampleType>& block, Modulator&& modulator) noexcept;
 
     /** Returns a mono buffer of rendered audio */
-    const auto& getRenderBuffer() const noexcept { return renderBuffer; }
+    BufferView<const SampleType> getRenderBuffer() const noexcept { return renderBuffer; }
 
 private:
     template <typename PerModeFunc, typename PerVecModeFunc>
@@ -84,7 +84,7 @@ private:
     size_t numModesToProcess = maxNumModes;
     size_t numVecModesToProcess = maxNumVecModes;
 
-    const static SampleType log1000;
+    static constexpr SampleType log1000 = gcem::log ((SampleType) 1000);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ModalFilterBank)
 };
