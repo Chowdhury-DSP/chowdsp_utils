@@ -24,8 +24,8 @@ static void deferredCounterIncrementTest (bool fakeAudioThread = false)
             for (int i = 0; i < 25; ++i)
             {
                 action.call ([&counter]
-                                { counter.increment(); },
-                                fakeAudioThread);
+                             { counter.increment(); },
+                             fakeAudioThread);
                 refCounter.fetch_add (1);
                 juce::Thread::sleep (12);
             }
@@ -34,7 +34,7 @@ static void deferredCounterIncrementTest (bool fakeAudioThread = false)
     for (int i = 0; i < 25; ++i)
     {
         action.call ([&counter]
-                        { counter.increment(); });
+                     { counter.increment(); });
         refCounter.fetch_add (1);
         juce::MessageManager::getInstance()->runDispatchLoopUntil (15);
     }
@@ -44,14 +44,14 @@ static void deferredCounterIncrementTest (bool fakeAudioThread = false)
     REQUIRE_MESSAGE (counter.count == refCounter.load(), "Final count is incorrect!");
 }
 
-TEST_CASE("Deferred Action Test", "[plugin][utilities]")
+TEST_CASE ("Deferred Action Test", "[plugin][utilities]")
 {
-    SECTION("Deferred Action Test")
+    SECTION ("Deferred Action Test")
     {
         deferredCounterIncrementTest();
     }
 
-    SECTION("Deferred Action From Audio Thread Test")
+    SECTION ("Deferred Action From Audio Thread Test")
     {
         deferredCounterIncrementTest (true);
     }

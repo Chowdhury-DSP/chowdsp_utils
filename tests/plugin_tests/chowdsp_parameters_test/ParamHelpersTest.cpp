@@ -16,9 +16,9 @@ static void checkRange (const juce::NormalisableRange<float>& range, float start
     REQUIRE_MESSAGE (range.convertTo0to1 (end) == Catch::Approx { 1.0f }.margin (maxErr), "Converting to 0 -> 1 at end is incorrect!");
 }
 
-TEST_CASE("Param Helpers Test", "[plugin][parameters]")
+TEST_CASE ("Param Helpers Test", "[plugin][parameters]")
 {
-    SECTION("Create Normalisable Range Test")
+    SECTION ("Create Normalisable Range Test")
     {
         constexpr float start = 0.05f;
         constexpr float end = 1.5f;
@@ -28,7 +28,7 @@ TEST_CASE("Param Helpers Test", "[plugin][parameters]")
         checkRange (testRange, start, end, centre);
     }
 
-    SECTION("Create Freq. Param Test")
+    SECTION ("Create Freq. Param Test")
     {
         constexpr float start = 200.0f;
         constexpr float end = 20000.0f;
@@ -42,7 +42,7 @@ TEST_CASE("Param Helpers Test", "[plugin][parameters]")
         REQUIRE_MESSAGE (params[0]->getText (0.0f, 1024) == juce::String ("200.00 Hz"), "Hz value string is incorrect!");
     }
 
-    SECTION("Create Percent Param Test")
+    SECTION ("Create Percent Param Test")
     {
         chowdsp::Parameters params;
         createPercentParameter (params, "test", "Test", 0.5f);
@@ -56,7 +56,7 @@ TEST_CASE("Param Helpers Test", "[plugin][parameters]")
         REQUIRE_MESSAGE (params[1]->getText (1.0f, 1024) == juce::String ("100%"), "100% value string is incorrect!");
     }
 
-    SECTION("Create Gain DB Param Test")
+    SECTION ("Create Gain DB Param Test")
     {
         chowdsp::Parameters params;
         createGainDBParameter (params, "test", "Test", -100.0f, 0.0f, -12.0f, -12.0f);
@@ -65,7 +65,7 @@ TEST_CASE("Param Helpers Test", "[plugin][parameters]")
         REQUIRE_MESSAGE (params[0]->getText (1.0f, 1024) == juce::String ("0.00 dB"), "0 dB value string is incorrect!");
     }
 
-    SECTION("Create Time Milliseconds Param Test")
+    SECTION ("Create Time Milliseconds Param Test")
     {
         chowdsp::Parameters params;
         createTimeMsParameter (params, "test", "Test", createNormalisableRange (0.0f, 2000.0f, 200.0f), 0.0f);
@@ -75,7 +75,7 @@ TEST_CASE("Param Helpers Test", "[plugin][parameters]")
         REQUIRE_MESSAGE (params[0]->getText (1.0f, 1024) == juce::String ("2.00 s"), "2 s value string is incorrect!");
     }
 
-    SECTION("Create Ratio Param Test")
+    SECTION ("Create Ratio Param Test")
     {
         chowdsp::Parameters params;
         createRatioParameter (params, "test", "Test", createNormalisableRange (0.5f, 5.0f, 1.0f), 1.0f);
@@ -85,7 +85,7 @@ TEST_CASE("Param Helpers Test", "[plugin][parameters]")
         REQUIRE_MESSAGE (params[0]->getText (1.0f, 1024) == juce::String ("5.00 : 1"), "5 : 1 value string is incorrect!");
     }
 
-    SECTION("Create Enum Param Test")
+    SECTION ("Create Enum Param Test")
     {
         enum Mode
         {

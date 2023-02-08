@@ -4,23 +4,23 @@
 
 using namespace chowdsp::ParamUtils;
 
-TEST_CASE("Parameter Modulation Test", "[plugin][parameters]")
+TEST_CASE ("Parameter Modulation Test", "[plugin][parameters]")
 {
-    SECTION("Check Bool Param Modulation")
+    SECTION ("Check Bool Param Modulation")
     {
         chowdsp::BoolParameter boolParam { "test", "Test", false };
         REQUIRE_MESSAGE (! boolParam.supportsMonophonicModulation(), "Bool Parameters should not support modulation");
         REQUIRE_MESSAGE (! boolParam.supportsPolyphonicModulation(), "Bool Parameters should not support modulation");
     }
 
-    SECTION("Check Choice Param Modulation")
+    SECTION ("Check Choice Param Modulation")
     {
         chowdsp::ChoiceParameter choiceParam { "test", "Test", juce::StringArray { "Choice 1", "Choice 1" }, 0 };
         REQUIRE_MESSAGE (! choiceParam.supportsMonophonicModulation(), "Choice Parameters should not support modulation");
         REQUIRE_MESSAGE (! choiceParam.supportsPolyphonicModulation(), "Choice Parameters should not support modulation");
     }
 
-    SECTION("Check Float Param Modulation")
+    SECTION ("Check Float Param Modulation")
     {
         chowdsp::FloatParameter floatParam { "test", "Test", juce::NormalisableRange { 0.0f, 1.0f }, 0.5f, &floatValToString, &stringToFloatVal };
         REQUIRE_MESSAGE (floatParam.supportsMonophonicModulation(), "Float Parameters should support monophonic modulation");
@@ -35,7 +35,7 @@ TEST_CASE("Parameter Modulation Test", "[plugin][parameters]")
         REQUIRE_MESSAGE (floatParam.getCurrentValue() == 0.25f, "Float parameter modulation is incorrect!");
     }
 
-    SECTION("Check Smooth Buffered Float Param Modulation")
+    SECTION ("Check Smooth Buffered Float Param Modulation")
     {
         chowdsp::FloatParameter floatParam { "test", "Test", juce::NormalisableRange { 0.0f, 1.0f }, 0.5f, &floatValToString, &stringToFloatVal };
 

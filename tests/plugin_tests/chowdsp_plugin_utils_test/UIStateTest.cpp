@@ -2,9 +2,9 @@
 #include <DummyPlugin.h>
 #include <chowdsp_plugin_utils/chowdsp_plugin_utils.h>
 
-TEST_CASE("UI State Test", "[plugin][utilities]")
+TEST_CASE ("UI State Test", "[plugin][utilities]")
 {
-    SECTION("UI State Test")
+    SECTION ("UI State Test")
     {
         static constexpr int defaultWidth = 200;
         static constexpr int defaultHeight = 300;

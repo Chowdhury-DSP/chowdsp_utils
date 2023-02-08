@@ -8,9 +8,9 @@ const juce::String logFileSubDir = "chowdsp/utils_test";
 const juce::String logFileNameRoot = "chowdsp_utils_test_Log_";
 } // namespace
 
-TEST_CASE("Plugin Logger Test", "[plugin][utilities]")
+TEST_CASE ("Plugin Logger Test", "[plugin][utilities]")
 {
-    SECTION("Basic Log Test")
+    SECTION ("Basic Log Test")
     {
         const juce::String testLogString = "This string should be in the log file...";
         const juce::String testNonLogString = "This string should not be in the log file...";
@@ -30,7 +30,7 @@ TEST_CASE("Plugin Logger Test", "[plugin][utilities]")
         REQUIRE_MESSAGE (! logString.contains (testNonLogString), "Test non-log string WAS found in the log file!");
     }
 
-    SECTION("Limit Num Log Files To Test")
+    SECTION ("Limit Num Log Files To Test")
     {
         constexpr int numLoggersAtOnce = 5;
         constexpr int numIters = 20;
@@ -58,7 +58,7 @@ TEST_CASE("Plugin Logger Test", "[plugin][utilities]")
     }
 
 #if ! JUCE_LINUX
-    SECTION("Crash Log Test")
+    SECTION ("Crash Log Test")
     {
         juce::File logFile;
         {

@@ -1,9 +1,9 @@
 #include <CatchUtils.h>
 #include <chowdsp_parameters/chowdsp_parameters.h>
 
-TEST_CASE("Rhythm Parameter Test", "[plugin][parameters]")
+TEST_CASE ("Rhythm Parameter Test", "[plugin][parameters]")
 {
-    SECTION("Rhythm Parameter Test")
+    SECTION ("Rhythm Parameter Test")
     {
         auto&& param = chowdsp::RhythmParameter ("rhythm", "Rhythm");
         REQUIRE_MESSAGE (param.getCurrentChoiceName() == juce::String ("1/4"), "Parameter choice label is incorrect!");

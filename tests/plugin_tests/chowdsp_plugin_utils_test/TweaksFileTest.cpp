@@ -10,8 +10,8 @@ constexpr std::string_view randomChars { "0123456789 ABCDEFGHIJKLMNOPQRSTUVWXYZa
 
 juce::String getRandomString()
 {
-    test_utils::RandomIntGenerator randLength{ 10, 50 };
-    test_utils::RandomIntGenerator randChar{ 0, (int) randomChars.length() - 1 };
+    test_utils::RandomIntGenerator randLength { 10, 50 };
+    test_utils::RandomIntGenerator randChar { 0, (int) randomChars.length() - 1 };
 
     const auto stringLen = randLength();
     juce::String str;
@@ -39,9 +39,9 @@ namespace BinaryData
 } // namespace BinaryData
 } // namespace
 
-TEST_CASE("Tweaks File Test", "[plugin][utilities]")
+TEST_CASE ("Tweaks File Test", "[plugin][utilities]")
 {
-    SECTION("Write/Read Test")
+    SECTION ("Write/Read Test")
     {
         chowdsp::GenericTweaksFile<false> tweaksFile;
         tweaksFile.initialise (testTweaksFile, 1);
@@ -53,8 +53,8 @@ TEST_CASE("Tweaks File Test", "[plugin][utilities]")
         REQUIRE_MESSAGE (tweaksFile.getProperty<juce::String> ("test_string") == juce::String {}, "Initial string property is incorrect");
         REQUIRE_MESSAGE (tweaksFile.getProperty<float> ("test_float") == -1.0f, "Initial float property is incorrect");
 
-        test_utils::RandomIntGenerator randInt{ -100, 100 };
-        test_utils::RandomFloatGenerator randFloat{ 0.0f, 1.0f };
+        test_utils::RandomIntGenerator randInt { -100, 100 };
+        test_utils::RandomFloatGenerator randFloat { 0.0f, 1.0f };
         for (int i = 0; i < 10; ++i)
         {
             const auto newInt = randInt();
@@ -78,7 +78,7 @@ TEST_CASE("Tweaks File Test", "[plugin][utilities]")
         testTweaksFile.deleteFile();
     }
 
-    SECTION("Tweaks File Listener Test")
+    SECTION ("Tweaks File Listener Test")
     {
         chowdsp::GenericTweaksFile<false> tweaksFile;
         tweaksFile.initialise (testTweaksFile, 1);
@@ -119,7 +119,7 @@ TEST_CASE("Tweaks File Test", "[plugin][utilities]")
         testTweaksFile.deleteFile();
     }
 
-    SECTION("Baked File Test")
+    SECTION ("Baked File Test")
     {
         chowdsp::GenericTweaksFile<true> tweaksFile;
         tweaksFile.initialise (BinaryData::test_tweaks_file, BinaryData::test_tweaks_fileSize);

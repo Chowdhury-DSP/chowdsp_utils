@@ -24,11 +24,11 @@ static void checkBuffersEqual (const juce::AudioBuffer<float>& actualBuffer, con
     }
 }
 
-TEST_CASE("Audio File Save/Load Helper Test", "[plugin][utilities]")
+TEST_CASE ("Audio File Save/Load Helper Test", "[plugin][utilities]")
 {
     const auto testBuffer = test_utils::makeNoise (fileNumSamples, test_utils::RandomIntGenerator { 1, 5 }());
 
-    SECTION("Save/Load Test")
+    SECTION ("Save/Load Test")
     {
         const auto testFile = test_utils::ScopedFile { "test_file.wav" };
         chowdsp::AudioFileSaveLoadHelper saveLoadHelper;
@@ -40,7 +40,7 @@ TEST_CASE("Audio File Save/Load Helper Test", "[plugin][utilities]")
         checkBuffersEqual (buffer, testBuffer.toAudioBuffer());
     }
 
-    SECTION("Fail Save Test")
+    SECTION ("Fail Save Test")
     {
         chowdsp::AudioFileSaveLoadHelper saveLoadHelper;
 
@@ -52,7 +52,7 @@ TEST_CASE("Audio File Save/Load Helper Test", "[plugin][utilities]")
         // @TODO: figure out how to test situation where FileOutputStream cannot be created
     }
 
-    SECTION("Fail Load Test")
+    SECTION ("Fail Load Test")
     {
         chowdsp::AudioFileSaveLoadHelper saveLoadHelper;
         auto [buffer, sampleRate] = saveLoadHelper.loadFile (juce::File {});

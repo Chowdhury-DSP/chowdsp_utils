@@ -2,9 +2,9 @@
 #include <chowdsp_plugin_utils/chowdsp_plugin_utils.h>
 #include <chowdsp_gui/chowdsp_gui.h>
 
-TEST_CASE("LNF Allocator Test", "[plugin][utilities]")
+TEST_CASE ("LNF Allocator Test", "[plugin][utilities]")
 {
-    SECTION("Get LookAndFeel Test")
+    SECTION ("Get LookAndFeel Test")
     {
         chowdsp::LNFAllocator allocator;
         auto* lnf = allocator.getLookAndFeel<chowdsp::ChowLNF>();
@@ -13,7 +13,7 @@ TEST_CASE("LNF Allocator Test", "[plugin][utilities]")
         REQUIRE_MESSAGE (lnf == lnf2, "Look and feel pointers should be the same!");
     }
 
-    SECTION("Add LookAndFeel Test")
+    SECTION ("Add LookAndFeel Test")
     {
         chowdsp::LNFAllocator allocator;
         auto* lnf = allocator.addLookAndFeel<chowdsp::ChowLNF>();
@@ -24,7 +24,7 @@ TEST_CASE("LNF Allocator Test", "[plugin][utilities]")
         REQUIRE_MESSAGE (lnf == lnf3, "Look and feel pointers should be the same!");
     }
 
-    SECTION("Contains LookAndFeel Test")
+    SECTION ("Contains LookAndFeel Test")
     {
         chowdsp::LNFAllocator allocator;
         allocator.getLookAndFeel<chowdsp::ChowLNF>();

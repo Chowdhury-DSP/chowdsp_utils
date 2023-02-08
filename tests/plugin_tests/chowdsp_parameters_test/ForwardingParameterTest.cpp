@@ -2,9 +2,9 @@
 #include <DummyPlugin.h>
 #include <chowdsp_parameters/chowdsp_parameters.h>
 
-TEST_CASE("Forwarding Parameter Test", "[plugin][parameters]")
+TEST_CASE ("Forwarding Parameter Test", "[plugin][parameters]")
 {
-    SECTION("Null Parameter Test")
+    SECTION ("Null Parameter Test")
     {
         std::unique_ptr<juce::AudioProcessorParameter> testParam = std::make_unique<chowdsp::ForwardingParameter> ("param", nullptr, "NONE");
 
@@ -24,7 +24,7 @@ TEST_CASE("Forwarding Parameter Test", "[plugin][parameters]")
         REQUIRE_MESSAGE (! modulatableTestParam->supportsPolyphonicModulation(), "Null parameter should not support modulation!");
     }
 
-    SECTION("Non-Null Parameter Test")
+    SECTION ("Non-Null Parameter Test")
     {
         DummyPlugin dummy;
         auto* dummyParam = dummy.getVTS().getParameter ("dummy");
@@ -86,7 +86,7 @@ TEST_CASE("Forwarding Parameter Test", "[plugin][parameters]")
         REQUIRE_MESSAGE (dummyParam->getValue() == Catch::Approx { value2 }.margin (error), "Disconnected internal param value is incorrect!");
     }
 
-    SECTION("Background Thread Test")
+    SECTION ("Background Thread Test")
     {
         DummyPlugin dummy;
         auto* dummyParam = dummy.getVTS().getParameter ("dummy");
@@ -121,7 +121,7 @@ TEST_CASE("Forwarding Parameter Test", "[plugin][parameters]")
             juce::MessageManager::getInstance()->runDispatchLoopUntil (100);
     }
 
-    SECTION("Parameter Modulation Test")
+    SECTION ("Parameter Modulation Test")
     {
         auto&& testParam = std::make_unique<chowdsp::ForwardingParameter> ("param", nullptr, "NONE");
         auto* testParamAsModParam = dynamic_cast<chowdsp::ParamUtils::ModParameterMixin*> (testParam.get());

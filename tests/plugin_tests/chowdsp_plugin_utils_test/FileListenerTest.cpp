@@ -7,9 +7,9 @@ namespace
 const juce::StringArray testStrings { "TEST_1", "TEST_2", "TEST_3" };
 } // namespace
 
-TEST_CASE("File Listener Test", "[plugin][utilities]")
+TEST_CASE ("File Listener Test", "[plugin][utilities]")
 {
-    SECTION("File Change Test")
+    SECTION ("File Change Test")
     {
         test_utils::ScopedFile testFile ("test_file.txt");
         testFile.file.replaceWithText (testStrings[0]);

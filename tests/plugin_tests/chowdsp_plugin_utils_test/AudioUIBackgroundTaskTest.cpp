@@ -9,7 +9,7 @@ constexpr int blockSize = 1 << 19;
 template <typename Task>
 struct SimpleTask : Task
 {
-    explicit SimpleTask () : Task ("Basic Task")
+    explicit SimpleTask() : Task ("Basic Task")
     {
     }
 
@@ -139,7 +139,6 @@ public:
 
         while (! uiThreadFinished)
             juce::Thread::sleep (1);
-    
     }
 
     void customTimeSliceThreadTest()
@@ -163,36 +162,36 @@ public:
     }
 };
 
-TEST_CASE("Single Thread Audio/UI Background Task Test", "[plugin][utilities]")
+TEST_CASE ("Single Thread Audio/UI Background Task Test", "[plugin][utilities]")
 {
     AudioUIBackgroundTaskTest<chowdsp::SingleThreadAudioUIBackgroundTask> singleThreadTest;
 
-    SECTION("Audio Thread Test")
+    SECTION ("Audio Thread Test")
     {
         singleThreadTest.audioThreadTest();
     }
 
-    SECTION("GUI Thread Test")
+    SECTION ("GUI Thread Test")
     {
         singleThreadTest.guiThreadTest();
     }
 }
 
-TEST_CASE("Time Slice Audio/UI Background Task Test", "[plugin][utilities]")
+TEST_CASE ("Time Slice Audio/UI Background Task Test", "[plugin][utilities]")
 {
     AudioUIBackgroundTaskTest<chowdsp::TimeSliceAudioUIBackgroundTask> timeSliceTest;
-    
-    SECTION("Audio Thread Test")
+
+    SECTION ("Audio Thread Test")
     {
         timeSliceTest.audioThreadTest();
     }
 
-    SECTION("GUI Thread Test")
+    SECTION ("GUI Thread Test")
     {
         timeSliceTest.guiThreadTest();
     }
 
-    SECTION("Custom TimeSliceThread Test")
+    SECTION ("Custom TimeSliceThread Test")
     {
         timeSliceTest.customTimeSliceThreadTest();
     }
