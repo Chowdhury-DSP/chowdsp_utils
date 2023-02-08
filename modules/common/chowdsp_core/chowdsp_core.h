@@ -70,6 +70,7 @@ namespace experimental
 } // namespace chowdsp
 
 #include "third_party/types_list/include/types_list/types_list.hpp"
+#include "third_party/span-lite/include/nonstd/span.hpp"
 
 #include "DataStructures/chowdsp_AtomicHelpers.h"
 #include "DataStructures/chowdsp_DoubleBuffer.h"

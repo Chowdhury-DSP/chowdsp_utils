@@ -5,6 +5,7 @@ namespace chowdsp
 /** Helper methods for working with enums */
 namespace EnumHelpers
 {
+#if CHOWDSP_USING_JUCE
     /**
      * Creates a juce::StringArray from the values of an enum class.
      *
@@ -27,5 +28,6 @@ namespace EnumHelpers
 
         return names;
     }
+#endif
 } // namespace EnumHelpers
 } // namespace chowdsp

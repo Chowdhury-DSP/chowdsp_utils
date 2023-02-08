@@ -111,14 +111,13 @@ public:
     template <StateVariableFilterType M = type>
     std::enable_if_t<M != StateVariableFilterType::Crossover, void> processBlock (const BufferView<SampleType>& block) noexcept
     {
-        const auto numSamples = block.getNumSamples();
         for (auto [channel, sampleData] : buffer_iters::channels (block))
         {
             ScopedValue s1 { ic1eq[(size_t) channel] };
             ScopedValue s2 { ic2eq[(size_t) channel] };
 
-            for (int i = 0; i < numSamples; ++i)
-                sampleData[i] = processSampleInternal (sampleData[i], s1.get(), s2.get());
+            for (auto& sample : sampleData)
+                sample = processSampleInternal (sample, s1.get(), s2.get());
         }
 
 #if JUCE_SNAP_TO_ZERO

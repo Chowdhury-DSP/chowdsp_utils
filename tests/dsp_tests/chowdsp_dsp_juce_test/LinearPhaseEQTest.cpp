@@ -13,11 +13,12 @@ struct NotAFilter
     {
         bool onOff;
     };
+    using FloatType = float;
 
     void prepare (const juce::dsp::ProcessSpec&) {}
     void reset() {}
 
-    void processBlock (juce::AudioBuffer<float>& buffer) const
+    void processBlock (const chowdsp::BufferView<float>& buffer) const
     {
         if (! onOff)
             buffer.clear();

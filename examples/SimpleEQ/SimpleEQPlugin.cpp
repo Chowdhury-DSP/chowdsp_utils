@@ -31,13 +31,12 @@ void SimpleEQPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)
 
 PrototypeEQ::Params SimpleEQPlugin::getEQParams() const
 {
-    return PrototypeEQ::EQParams::getEQParameters (eqParamsHandles);
+    return EQParams::getEQParameters (eqParamsHandles);
 }
 
 void SimpleEQPlugin::loadEQParams (const PrototypeEQ::Params& params)
 {
-    juce::ignoreUnused (params);
-    PrototypeEQ::EQParams::loadEQParameters (params, state.params.eqParams);
+    EQParams::loadEQParameters (params, state.params.eqParams);
 }
 
 void SimpleEQPlugin::setEQParams()

@@ -38,18 +38,15 @@ public:
         if (lookupTableCache != nullptr)
         {
             jassert (! lutBaseID.empty()); // lookup table ID must not be empty when using the lookup table cache!
-            lut = &lookupTableCache->addLookupTable<double> (lutBaseID + "_lut");
-            lut_AD1 = &lookupTableCache->addLookupTable<double> (lutBaseID + "_lut_ad1");
-            lut_AD2 = &lookupTableCache->addLookupTable<double> (lutBaseID + "_lut_ad2");
+            lut.setNonOwning (&lookupTableCache->addLookupTable<double> (lutBaseID + "_lut"));
+            lut_AD1.setNonOwning (&lookupTableCache->addLookupTable<double> (lutBaseID + "_lut_ad1"));
+            lut_AD2.setNonOwning (&lookupTableCache->addLookupTable<double> (lutBaseID + "_lut_ad2"));
         }
         else
         {
-            lut_owned = std::make_unique<LookupTableTransform<double>>();
-            lut = lut_owned.get();
-            lut_AD1_owned = std::make_unique<LookupTableTransform<double>>();
-            lut_AD1 = lut_AD1_owned.get();
-            lut_AD2_owned = std::make_unique<LookupTableTransform<double>>();
-            lut_AD2 = lut_AD2_owned.get();
+            lut.setOwning (std::make_unique<LookupTableTransform<double>>());
+            lut_AD1.setOwning (std::make_unique<LookupTableTransform<double>>());
+            lut_AD2.setOwning (std::make_unique<LookupTableTransform<double>>());
         }
     }
 
@@ -279,9 +276,9 @@ private:
         return illCondition ? nlFunc (0.5 * (xBar + _x1)) : (2.0 / delta) * (nlFunc_AD1 (xBar) + (_ad2_x1 - nlFunc_AD2 (xBar)) / delta);
     }
 
-    LookupTableTransform<double>* lut = nullptr;
-    LookupTableTransform<double>* lut_AD1 = nullptr;
-    LookupTableTransform<double>* lut_AD2 = nullptr;
+    OptionalPointer<LookupTableTransform<double>> lut {};
+    OptionalPointer<LookupTableTransform<double>> lut_AD1 {};
+    OptionalPointer<LookupTableTransform<double>> lut_AD2 {};
 
     // state
     std::vector<double> x1;
@@ -298,9 +295,6 @@ private:
     std::vector<std::future<void>> lutLoadingFutures;
 
     LookupTableCache* lookupTableCache = nullptr;
-    std::unique_ptr<LookupTableTransform<double>> lut_owned;
-    std::unique_ptr<LookupTableTransform<double>> lut_AD1_owned;
-    std::unique_ptr<LookupTableTransform<double>> lut_AD2_owned;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ADAAWaveshaper)
 };

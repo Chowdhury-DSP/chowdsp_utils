@@ -4,6 +4,39 @@
 
 namespace chowdsp::EQ
 {
+/** Wraps a chowdsp::EQ::EQProcessor as a prototype EQ for a LinearPhaseEQ */
+template <typename Float, typename EQParams, int numBands, typename EQBand>
+struct LinearPhasePrototypeEQ
+{
+    static_assert (std::is_floating_point_v<Float>, "Float type must be a floating point type!");
+
+    using Params = EQParams;
+    using FloatType = Float;
+    EQ::EQProcessor<FloatType, (size_t) numBands, EQBand> eq;
+
+    LinearPhasePrototypeEQ() = default;
+
+    void setParameters (const Params& eqParams)
+    {
+        Params::setEQParameters (eq, eqParams);
+    }
+
+    void prepare (const juce::dsp::ProcessSpec& spec)
+    {
+        eq.prepare (spec);
+    }
+
+    void reset()
+    {
+        eq.reset();
+    }
+
+    void processBlock (const BufferView<FloatType>& buffer)
+    {
+        eq.processBlock (buffer);
+    }
+};
+
 /**
  * Class for creating a linear phase EQ, using a "prototype" EQ, which is not linear phase.
  *
@@ -57,7 +90,8 @@ private:
 
     std::vector<std::unique_ptr<ConvolutionEngine<>>> engines;
     std::unique_ptr<IRTransfer> irTransfer;
-    juce::AudioBuffer<float> irBuffer;
+    chowdsp::Buffer<typename PrototypeEQ::FloatType> irBuffer;
+    std::vector<float> irTransferData;
 
     double fs = 48000.0;
     int maxBlockSize = 512;

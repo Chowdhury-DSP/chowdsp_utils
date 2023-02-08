@@ -35,15 +35,14 @@ void SineWave<T>::processBlock (const BufferView<T>& buffer) noexcept
     T x1_temp = x1;
     T x2_temp = x2;
 
-    const auto numSamples = buffer.getNumSamples();
     for (auto [_, data] : buffer_iters::channels (buffer))
     {
         x1_temp = x1;
         x2_temp = x2;
 
-        for (int i = 0; i < numSamples; ++i)
+        for (auto& x_n : data)
         {
-            data[i] += x2_temp;
+            x_n += x2_temp;
             x1_temp += eps * x2_temp;
             x2_temp -= eps * x1_temp;
         }

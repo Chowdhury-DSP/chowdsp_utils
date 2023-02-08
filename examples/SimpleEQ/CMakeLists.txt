@@ -11,7 +11,6 @@ target_link_libraries(SimpleEQ
 
 target_sources(SimpleEQ
     PRIVATE
-        PrototypeEQ.cpp
         SimpleEQPlugin.cpp
         PluginEditor.cpp
         FilterPlots.cpp

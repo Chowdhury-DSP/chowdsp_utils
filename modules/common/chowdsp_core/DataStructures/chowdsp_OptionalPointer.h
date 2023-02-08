@@ -40,6 +40,16 @@ struct OptionalPointer
     }
 
     /**
+     * Sets OptionalPointer to point to a new pointer, and take ownership of it.
+     * If the OptionalPointer previously owned some data, that data will be deleted.
+     */
+    void setOwning (std::unique_ptr<T>&& ptr)
+    {
+        owningPtr = std::move (ptr);
+        nonOwningPtr = owningPtr.get();
+    }
+
+    /**
      * Sets OptionalPointer to point to a new pointer, WITHOUT taking ownership of it.
      * If the OptionalPointer previously owned some data, that data will be deleted.
      */
