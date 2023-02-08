@@ -11,7 +11,7 @@ chowdsp::GlobalPluginSettings::SettingProperty test2 { "test2", "TEST" };
 const juce::String settingsFile = "settings_file.settings";
 } // namespace
 
-TEST_CASE("Global Settings Test", "[plugin][utilities]")
+TEST_CASE ("Global Settings Test", "[plugin][utilities]")
 {
     // clean up just in case last test didn't finish!
     {
@@ -20,7 +20,7 @@ TEST_CASE("Global Settings Test", "[plugin][utilities]")
         settings.getSettingsFile().deleteFile();
     }
 
-    SECTION("Add Properties Before Initialisation")
+    SECTION ("Add Properties Before Initialisation")
     {
         chowdsp::GlobalPluginSettings settings;
         settings.addProperties ({ test1, test2 });
@@ -32,7 +32,7 @@ TEST_CASE("Global Settings Test", "[plugin][utilities]")
         settings.getSettingsFile().deleteFile();
     }
 
-    SECTION("Add Properties After Initialisation")
+    SECTION ("Add Properties After Initialisation")
     {
         chowdsp::GlobalPluginSettings settings;
         settings.initialise ("settings_file.settings", 1);
@@ -44,14 +44,14 @@ TEST_CASE("Global Settings Test", "[plugin][utilities]")
         settings.getSettingsFile().deleteFile();
     }
 
-    SECTION("No Initialisation")
+    SECTION ("No Initialisation")
     {
         chowdsp::GlobalPluginSettings settings;
         REQUIRE_MESSAGE (settings.getProperty<int> (test1.first) == 0, "Property should be null!");
         REQUIRE_MESSAGE (settings.getSettingsFile() == juce::File(), "Settings file should not exist!");
     }
 
-    SECTION("Double Initialisation")
+    SECTION ("Double Initialisation")
     {
         chowdsp::GlobalPluginSettings settings;
         settings.initialise (settingsFile, 1);
@@ -67,7 +67,7 @@ TEST_CASE("Global Settings Test", "[plugin][utilities]")
         settings.getSettingsFile().deleteFile();
     }
 
-    SECTION("Corrupt Settings Test")
+    SECTION ("Corrupt Settings Test")
     {
         juce::File settingsFileState;
         {
@@ -98,7 +98,7 @@ TEST_CASE("Global Settings Test", "[plugin][utilities]")
         settingsFileState.deleteFile();
     }
 
-    SECTION("Persistent Settings Test")
+    SECTION ("Persistent Settings Test")
     {
         {
             chowdsp::GlobalPluginSettings settings;
@@ -118,7 +118,7 @@ TEST_CASE("Global Settings Test", "[plugin][utilities]")
         }
     }
 
-    SECTION("Settings Listener Test")
+    SECTION ("Settings Listener Test")
     {
         struct TestListener
         {
@@ -180,7 +180,7 @@ TEST_CASE("Global Settings Test", "[plugin][utilities]")
         settings.getSettingsFile().deleteFile();
     }
 
-    SECTION("Set Wrong Data Type Test")
+    SECTION ("Set Wrong Data Type Test")
     {
         chowdsp::GlobalPluginSettings settings;
         settings.initialise (settingsFile, 1);
@@ -196,7 +196,7 @@ TEST_CASE("Global Settings Test", "[plugin][utilities]")
         REQUIRE_MESSAGE (settings.getProperty<juce::String> (test2.first) == test2.second.get<juce::String>(), "Property 2 is incorrect!");
     }
 
-    SECTION("Wreck Settings File Test")
+    SECTION ("Wreck Settings File Test")
     {
         {
             chowdsp::GlobalPluginSettings settings;
@@ -232,7 +232,7 @@ TEST_CASE("Global Settings Test", "[plugin][utilities]")
      * Primarily tests that the ScopedLock's within GlobalPluginSettings are working as they should
      * Without the ScopedLock's in GlobalPluginSettings this test should have some random failing tests or cause a segmentation fault
      */
-    SECTION("Two Instances Accessing Same File Test")
+    SECTION ("Two Instances Accessing Same File Test")
     {
         chowdsp::SharedPluginSettings pluginSettings;
         pluginSettings->initialise (settingsFile, 1);
@@ -248,7 +248,11 @@ TEST_CASE("Global Settings Test", "[plugin][utilities]")
                     auto propId = "thread1_" + std::to_string (i);
                     chowdsp::GlobalPluginSettings::SettingProperty prop { propId, i };
                     thread1Settings->addProperties ({ prop });
-                    REQUIRE_MESSAGE (thread1Settings->getProperty<int> (prop.first) == prop.second.get<int>(), "Property is incorrect within thread 1");
+                    juce::MessageManager::callAsync (
+                        [test = thread1Settings->getProperty<int> (prop.first) == prop.second.get<int>()]
+                        {
+                            REQUIRE_MESSAGE (test, "Property is incorrect within thread 1");
+                        });
                     juce::Thread::sleep (2); // allow thread 2 to get caught up so both threads are writing/reading at the same time
                 }
                 thread1Finished = true;
@@ -265,7 +269,11 @@ TEST_CASE("Global Settings Test", "[plugin][utilities]")
                     auto propId = "thread2_" + std::to_string (i);
                     chowdsp::GlobalPluginSettings::SettingProperty prop { propId, i };
                     thread2Settings->addProperties ({ prop });
-                    REQUIRE_MESSAGE (thread2Settings->getProperty<int> (prop.first) == prop.second.get<int>(), "Property is incorrect within thread 2");
+                    juce::MessageManager::callAsync (
+                        [test = thread2Settings->getProperty<int> (prop.first) == prop.second.get<int>()]
+                        {
+                            REQUIRE_MESSAGE (test, "Property is incorrect within thread 2");
+                        });
                     juce::Thread::sleep (1);
                 }
                 thread2Finished = true;
@@ -273,6 +281,8 @@ TEST_CASE("Global Settings Test", "[plugin][utilities]")
 
         while (! (thread1Finished && thread2Finished))
             juce::MessageManager::getInstance()->runDispatchLoopUntil (100);
+
+        juce::MessageManager::getInstance()->runDispatchLoopUntil (500); // clean up leftover message loop things
 
         // Check settings were properly written to file
         for (int i = 0; i < 400; ++i)
