@@ -26,19 +26,18 @@ static void checkBuffersEqual (const juce::AudioBuffer<float>& actualBuffer, con
 
 TEST_CASE("Audio File Save/Load Helper Test", "[plugin][utilities]")
 {
-    juce::Random rand;
-    const auto testBuffer = test_utils::makeNoise (rand, fileNumSamples, rand.nextInt ({ 1, 5 }));
+    const auto testBuffer = test_utils::makeNoise (fileNumSamples, test_utils::RandomIntGenerator { 1, 5 }());
 
     SECTION("Save/Load Test")
     {
         const auto testFile = test_utils::ScopedFile { "test_file.wav" };
         chowdsp::AudioFileSaveLoadHelper saveLoadHelper;
 
-        saveLoadHelper.saveBufferToFile (testFile.file, testBuffer, fileSampleRate);
+        saveLoadHelper.saveBufferToFile (testFile.file, testBuffer.toAudioBuffer(), fileSampleRate);
         auto [buffer, sampleRate] = saveLoadHelper.loadFile (testFile.file);
 
         REQUIRE_MESSAGE (sampleRate == fileSampleRate, "Loaded file has incorrect sample rate!");
-        checkBuffersEqual (buffer, testBuffer);
+        checkBuffersEqual (buffer, testBuffer.toAudioBuffer());
     }
 
     SECTION("Fail Save Test")
@@ -47,7 +46,7 @@ TEST_CASE("Audio File Save/Load Helper Test", "[plugin][utilities]")
 
         {
             const auto testFile = juce::File {};
-            REQUIRE_MESSAGE (! saveLoadHelper.saveBufferToFile (testFile, testBuffer, fileSampleRate), "Saving file should fail with no file extension!");
+            REQUIRE_MESSAGE (! saveLoadHelper.saveBufferToFile (testFile, testBuffer.toAudioBuffer(), fileSampleRate), "Saving file should fail with no file extension!");
         }
 
         // @TODO: figure out how to test situation where FileOutputStream cannot be created

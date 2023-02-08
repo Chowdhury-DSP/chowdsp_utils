@@ -46,25 +46,6 @@ namespace juce_utils
     }
 } // namespace juce_utils
 
-inline juce::AudioBuffer<float> makeNoise (juce::Random& rand, int numSamples, int numChannels = 1)
-{
-    juce::AudioBuffer<float> noiseBuffer (numChannels, numSamples);
-
-    for (int ch = 0; ch < numChannels; ++ch)
-        for (int n = 0; n < numSamples; ++n)
-            noiseBuffer.setSample (ch, n, (rand.nextFloat() - 0.5f) * 2.0f);
-
-    return noiseBuffer;
-}
-
-inline juce::AudioBuffer<float> makeNoise (float sampleRate, float lengthSeconds)
-{
-    const int lengthSamples = int (lengthSeconds * sampleRate);
-    juce::Random rand;
-
-    return makeNoise (rand, lengthSamples);
-}
-
 #if JUCE_MODULE_AVAILABLE_chowdsp_dsp_data_structures
 /** Convert from a AudioBuffer to AudioBlock (maybe changing data type...) */
 template <typename T, typename NumericType = chowdsp::SampleTypeHelpers::NumericType<T>>
