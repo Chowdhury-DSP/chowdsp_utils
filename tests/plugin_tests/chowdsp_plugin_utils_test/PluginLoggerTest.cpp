@@ -1,5 +1,5 @@
+#include <CatchUtils.h>
 #include <future>
-#include <TimedUnitTest.h>
 #include <chowdsp_plugin_utils/chowdsp_plugin_utils.h>
 
 namespace
@@ -8,14 +8,9 @@ const juce::String logFileSubDir = "chowdsp/utils_test";
 const juce::String logFileNameRoot = "chowdsp_utils_test_Log_";
 } // namespace
 
-class PluginLoggerTest : public TimedUnitTest
+TEST_CASE ("Plugin Logger Test", "[plugin][utilities]")
 {
-public:
-    PluginLoggerTest() : TimedUnitTest ("Plugin Logger Test")
-    {
-    }
-
-    void basicLogTest()
+    SECTION ("Basic Log Test")
     {
         const juce::String testLogString = "This string should be in the log file...";
         const juce::String testNonLogString = "This string should not be in the log file...";
@@ -31,11 +26,11 @@ public:
         juce::Logger::writeToLog (testNonLogString);
 
         auto logString = logFile.loadFileAsString();
-        expect (logString.contains (testLogString), "Test log string was not found in the log file!");
-        expect (! logString.contains (testNonLogString), "Test non-log string WAS found in the log file!");
+        REQUIRE_MESSAGE (logString.contains (testLogString), "Test log string was not found in the log file!");
+        REQUIRE_MESSAGE (! logString.contains (testNonLogString), "Test non-log string WAS found in the log file!");
     }
 
-    void limitNumLogFilesTest()
+    SECTION ("Limit Num Log Files To Test")
     {
         constexpr int numLoggersAtOnce = 5;
         constexpr int numIters = 20;
@@ -56,13 +51,14 @@ public:
                                                { return std::make_unique<chowdsp::PluginLogger> (logFileSubDir, logFileNameRoot); }));
 
             auto numLogFiles = getNumLogFiles();
-            expectLessOrEqual (numLogFiles, 55, "Too many log files found in logs directory!");
+            REQUIRE_MESSAGE (numLogFiles <= 55, "Too many log files found in logs directory!");
         }
 
         logsDirectory.deleteRecursively();
     }
 
-    void crashLogTest()
+#if ! JUCE_LINUX
+    SECTION ("Crash Log Test")
     {
         juce::File logFile;
         {
@@ -72,10 +68,10 @@ public:
         }
 
         auto logString = logFile.loadFileAsString();
-        expect (logString.contains ("Interrupt signal received!"), "Interrupt signal string not found in log!");
-        expect (logString.contains ("Stack Trace:"), "Stack trace string not found in log!");
-        expect (logString.contains ("Plugin crashing!!!"), "Plugin crashing string not found in log!");
-        expect (! logString.contains ("Exiting gracefully"), "Exit string string WAS found in the log file!");
+        REQUIRE_MESSAGE (logString.contains ("Interrupt signal received!"), "Interrupt signal string not found in log!");
+        REQUIRE_MESSAGE (logString.contains ("Stack Trace:"), "Stack trace string not found in log!");
+        REQUIRE_MESSAGE (logString.contains ("Plugin crashing!!!"), "Plugin crashing string not found in log!");
+        REQUIRE_MESSAGE (! logString.contains ("Exiting gracefully"), "Exit string string WAS found in the log file!");
 
         // the first logger we create after a crash should report the crash...
         {
@@ -83,7 +79,7 @@ public:
             chowdsp::PluginLogger logger { logFileSubDir, logFileNameRoot };
 
             auto newNumTopLevelWindows = juce::TopLevelWindow::getNumTopLevelWindows();
-            expectEquals (newNumTopLevelWindows, prevNumTopLevelWindows + 1, "AlertWindow not created!");
+            REQUIRE_MESSAGE (newNumTopLevelWindows == prevNumTopLevelWindows + 1, "AlertWindow not created!");
 
             // Linux on CI doesn't like trying to open the log file!
             for (int i = 0; i < newNumTopLevelWindows; ++i)
@@ -103,27 +99,12 @@ public:
             chowdsp::PluginLogger logger { logFileSubDir, logFileNameRoot };
 
             auto newNumTopLevelWindows = juce::TopLevelWindow::getNumTopLevelWindows();
-            expectEquals (newNumTopLevelWindows, prevNumTopLevelWindows, "AlertWindow was incorrectly created!");
+            REQUIRE_MESSAGE (newNumTopLevelWindows == prevNumTopLevelWindows, "AlertWindow was incorrectly created!");
         }
     }
-
-    void runTestTimed() override
-    {
-        beginTest ("Basic Log Test");
-        basicLogTest();
-
-        beginTest ("Limit Num Log Files Test");
-        limitNumLogFilesTest();
-
-#if ! JUCE_LINUX
-        beginTest ("Crash Log Test");
-        crashLogTest();
 #endif
 
-        // clean up after ourselves...
-        auto logsDirectory = juce::FileLogger::getSystemLogFileFolder().getChildFile (logFileSubDir);
-        logsDirectory.deleteRecursively();
-    }
-};
-
-static PluginLoggerTest pluginLoggerTest;
+    // clean up after ourselves...
+    auto logsDirectory = juce::FileLogger::getSystemLogFileFolder().getChildFile (logFileSubDir);
+    logsDirectory.deleteRecursively();
+}

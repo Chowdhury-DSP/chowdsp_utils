@@ -1,15 +1,10 @@
+#include <CatchUtils.h>
 #include <DummyPlugin.h>
-#include <TimedUnitTest.h>
 #include <chowdsp_plugin_utils/chowdsp_plugin_utils.h>
 
-class UIStateTest : public TimedUnitTest
+TEST_CASE ("UI State Test", "[plugin][utilities]")
 {
-public:
-    UIStateTest() : TimedUnitTest ("UI State Test")
-    {
-    }
-
-    void uiStateTest()
+    SECTION ("UI State Test")
     {
         static constexpr int defaultWidth = 200;
         static constexpr int defaultHeight = 300;
@@ -23,8 +18,8 @@ public:
             juce::GenericAudioProcessorEditor testComp (plugin);
             uiState.attachToComponent (testComp);
 
-            expectEquals (testComp.getWidth(), defaultWidth, "Default width is not set correctly!");
-            expectEquals (testComp.getHeight(), defaultHeight, "Default height is not set correctly!");
+            REQUIRE_MESSAGE (testComp.getWidth() == defaultWidth, "Default width is not set correctly!");
+            REQUIRE_MESSAGE (testComp.getHeight() == defaultHeight, "Default height is not set correctly!");
 
             testComp.setSize (testWidth, testHeight);
         }
@@ -33,16 +28,8 @@ public:
             juce::GenericAudioProcessorEditor testComp (plugin);
             uiState.attachToComponent (testComp);
 
-            expectEquals (testComp.getWidth(), testWidth, "Restored width is not set correctly!");
-            expectEquals (testComp.getHeight(), testHeight, "Restored height is not set correctly!");
+            REQUIRE_MESSAGE (testComp.getWidth() == testWidth, "Restored width is not set correctly!");
+            REQUIRE_MESSAGE (testComp.getHeight() == testHeight, "Restored height is not set correctly!");
         }
     }
-
-    void runTestTimed() override
-    {
-        beginTest ("UI State Test");
-        uiStateTest();
-    }
-};
-
-static UIStateTest uiStateTest;
+}

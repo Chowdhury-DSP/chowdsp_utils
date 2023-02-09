@@ -1,3 +1,11 @@
+setup_juce_lib(common_tests_lib 
+    juce::juce_gui_basics
+    chowdsp::chowdsp_core
+    chowdsp::chowdsp_serialization
+    chowdsp::chowdsp_json
+    chowdsp::chowdsp_units
+)
+
 add_subdirectory(chowdsp_core_test)
 add_subdirectory(chowdsp_json_test)
 add_subdirectory(chowdsp_serialization_test)

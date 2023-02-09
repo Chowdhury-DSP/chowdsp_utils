@@ -10,9 +10,8 @@ TEST_CASE ("FIR Filter Test", "[dsp][filters]")
         static constexpr double fs = 48000.0;
         static constexpr int blockSize = 512;
         static constexpr int firOrder = 63;
-        auto rand = juce::Random { 123456 };
 
-        auto&& coeffsBuffer = test_utils::makeNoise (rand, firOrder);
+        auto&& coeffsBuffer = test_utils::makeNoise (firOrder);
         auto&& refBuffer = test_utils::juce_utils::makeSineWave (100.0f, (float) fs, blockSize);
         auto&& actualBuffer = juce::AudioBuffer { refBuffer };
 
@@ -51,9 +50,8 @@ TEST_CASE ("FIR Filter Test", "[dsp][filters]")
         static constexpr double fs = 48000.0;
         static constexpr int blockSize = 512;
         static constexpr int firOrder = 63;
-        auto rand = juce::Random { 123456 };
 
-        auto&& coeffsBuffer = test_utils::makeNoise (rand, firOrder);
+        auto&& coeffsBuffer = test_utils::makeNoise (firOrder);
         auto&& refBuffer = test_utils::juce_utils::makeSineWave (100.0f, (float) fs, blockSize);
         auto&& actualBuffer = juce::AudioBuffer { refBuffer };
 

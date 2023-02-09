@@ -1,3 +1,24 @@
+setup_chowdsp_lib(dsp_tests_lib 
+    MODULES
+        chowdsp_dsp_data_structures
+        chowdsp_filters
+        chowdsp_sources
+        chowdsp_dsp_utils
+        chowdsp_math
+        chowdsp_modal_dsp
+        chowdsp_simd
+        chowdsp_waveshapers
+)
+
+setup_juce_lib(dsp_juce_tests_lib
+    juce::juce_dsp
+    chowdsp::chowdsp_dsp_data_structures
+    chowdsp::chowdsp_eq
+    chowdsp::chowdsp_reverb
+    chowdsp::chowdsp_sources
+    chowdsp::chowdsp_plugin_base
+)
+
 add_subdirectory(chowdsp_dsp_data_structures_test)
 add_subdirectory(chowdsp_dsp_juce_test)
 add_subdirectory(chowdsp_dsp_utils_test)
