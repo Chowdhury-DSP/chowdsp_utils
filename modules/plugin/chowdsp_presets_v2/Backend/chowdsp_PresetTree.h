@@ -1,6 +1,6 @@
 #pragma once
 
-namespace chowdsp
+namespace chowdsp::presets
 {
 /** A tree-like data structure for storing presets. */
 class PresetTree

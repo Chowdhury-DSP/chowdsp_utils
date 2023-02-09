@@ -1,6 +1,6 @@
 #include "chowdsp_PresetState.h"
 
-namespace chowdsp
+namespace chowdsp::presets
 {
 PresetState::PresetState() : StateValueBase ("chowdsp_preset_manager_preset_state")
 {

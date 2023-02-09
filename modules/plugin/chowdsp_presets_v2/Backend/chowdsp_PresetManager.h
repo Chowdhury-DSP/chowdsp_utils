@@ -1,6 +1,6 @@
 #pragma once
 
-namespace chowdsp
+namespace chowdsp::presets
 {
 /** A class for managing a plugin's presets system. */
 class PresetManager

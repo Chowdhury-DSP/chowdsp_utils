@@ -4,8 +4,8 @@
 StatefulPlugin::StatefulPlugin() : chowdsp::PluginBase<State> (&undoManager)
 {
     pluginSettings->initialise ("ChowdhuryDSP/Stateful Plugin/.plugin_settings.json");
-    presetManager = std::make_unique<chowdsp::PresetManager> (state, this, ".chowpreset");
-    presetManager->getPresetTree().treeInserter = &chowdsp::PresetTreeInserters::vendorInserter;
+    presetManager = std::make_unique<chowdsp::presets::PresetManager> (state, this, ".chowpreset");
+    presetManager->getPresetTree().treeInserter = &chowdsp::presets::PresetTreeInserters::vendorInserter;
     presetsSettings.emplace (*presetManager,
                              *pluginSettings,
                              juce::File::getSpecialLocation (juce::File::userDocumentsDirectory).getChildFile ("Chowdhury DSP/Presets/Stateful Plugin"));

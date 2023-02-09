@@ -1,6 +1,6 @@
 #include "chowdsp_PresetManager.h"
 
-namespace chowdsp
+namespace chowdsp::presets
 {
 void PresetManager::initializeListeners (ParamHolder& params, ParameterListeners& paramListeners)
 {

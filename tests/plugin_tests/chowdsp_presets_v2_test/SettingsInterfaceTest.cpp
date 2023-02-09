@@ -9,7 +9,7 @@ struct SettingsIParams : chowdsp::ParamHolder
 TEST_CASE ("Settings Interface Test", "[plugin][presets][plugin-settings]")
 {
     chowdsp::PluginStateImpl<SettingsIParams> state {};
-    chowdsp::PresetManager presetMgr { state };
+    chowdsp::presets::PresetManager presetMgr { state };
 
     SECTION ("User Presets Dir Settings")
     {
@@ -20,7 +20,7 @@ TEST_CASE ("Settings Interface Test", "[plugin][presets][plugin-settings]")
         juce::File dummyFile { juce::File::getSpecialLocation (juce::File::userDesktopDirectory).getChildFile ("dummy") };
         dummyFile.create();
 
-        chowdsp::PresetsFrontend::SettingsInterface settingsInterface { presetMgr,
+        chowdsp::presets::frontend::SettingsInterface settingsInterface { presetMgr,
                                                                         pluginSettings,
                                                                         dummyFile };
         REQUIRE (presetMgr.getUserPresetPath() == dummyFile);

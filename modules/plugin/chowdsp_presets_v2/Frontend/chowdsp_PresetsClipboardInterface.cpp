@@ -1,6 +1,6 @@
 #include "chowdsp_PresetsClipboardInterface.h"
 
-namespace chowdsp::PresetsFrontend
+namespace chowdsp::presets::frontend
 {
 ClipboardInterface::ClipboardInterface (PresetManager& manager) : presetManager (manager)
 {

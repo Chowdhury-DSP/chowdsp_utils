@@ -1,6 +1,6 @@
 #pragma once
 
-namespace chowdsp
+namespace chowdsp::presets
 {
 /** A chowdsp::StateValueBase for presets */
 class PresetState : public StateValueBase

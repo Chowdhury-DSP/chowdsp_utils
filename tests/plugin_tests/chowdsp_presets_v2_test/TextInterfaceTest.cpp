@@ -13,9 +13,9 @@ struct TIParams : chowdsp::ParamHolder
 TEST_CASE ("Text Interface Test", "[plugin][presets]")
 {
     chowdsp::PluginStateImpl<TIParams> state {};
-    chowdsp::PresetManager presetMgr { state };
-    presetMgr.addPresets ({ chowdsp::Preset { "Preset0", "Vendor", { { "float", 0.1f } } },
-                            chowdsp::Preset { "Preset1", "Vendor", { { "float", 0.99f } } } });
+    chowdsp::presets::PresetManager presetMgr { state };
+    presetMgr.addPresets ({ chowdsp::presets::Preset { "Preset0", "Vendor", { { "float", 0.1f } } },
+                            chowdsp::presets::Preset { "Preset1", "Vendor", { { "float", 0.99f } } } });
 
     const auto loadPreset = [&presetMgr] (int index)
     {
@@ -25,7 +25,7 @@ TEST_CASE ("Text Interface Test", "[plugin][presets]")
     SECTION ("Preset Change")
     {
         loadPreset (0);
-        chowdsp::PresetsFrontend::TextInterface textInterface { presetMgr };
+        chowdsp::presets::frontend::TextInterface textInterface { presetMgr };
         REQUIRE (textInterface.getPresetText() == "Preset0");
 
         loadPreset (1);
@@ -35,7 +35,7 @@ TEST_CASE ("Text Interface Test", "[plugin][presets]")
     SECTION ("Preset Dirty Change")
     {
         loadPreset (0);
-        chowdsp::PresetsFrontend::TextInterface textInterface { presetMgr };
+        chowdsp::presets::frontend::TextInterface textInterface { presetMgr };
         REQUIRE (textInterface.getPresetText() == "Preset0");
 
         chowdsp::ParameterTypeHelpers::setValue (0.25f, *state.params.floatParam);

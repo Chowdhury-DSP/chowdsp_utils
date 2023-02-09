@@ -1,6 +1,6 @@
 #include "chowdsp_PresetsTextInterface.h"
 
-namespace chowdsp::PresetsFrontend
+namespace chowdsp::presets::frontend
 {
 TextInterface::TextInterface (PresetManager& manager) : presetManager (manager)
 {
