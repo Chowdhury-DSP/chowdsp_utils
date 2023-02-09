@@ -42,7 +42,7 @@ endfunction(setup_catch_lib_test)
 # setup_catch_test(<target-name>)
 #
 # Configures a Catch unit test from chowdsp modules only
-# TODO: Switch to using setup_catch_lib_test with shared static library
+# TODO: Switch to using setup_catch_lib_test with shared static library (chowdsp_rhythm_test)
 function(setup_catch_test target)
     setup_chowdsp_lib(${target}_lib ${ARGV})
     setup_catch_lib_test(${target} ${target}_lib)
@@ -51,7 +51,7 @@ endfunction(setup_catch_test)
 # setup_catch_juce_test(<target-name>)
 #
 # Configures a Catch unit test from JUCE modules (including chowdsp)
-# TODO: Switch to using setup_catch_lib_test with shared static library
+# TODO: Switch to using setup_catch_lib_test with shared static library (visualizers_test, plugin_state_test, presets_v2_test, version_test)
 function(setup_catch_juce_test target)
     add_executable(${target})
     add_test(NAME ${target} COMMAND $<TARGET_FILE:${target}>)
