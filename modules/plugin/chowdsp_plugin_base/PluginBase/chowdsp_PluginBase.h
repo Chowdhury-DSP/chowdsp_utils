@@ -64,7 +64,7 @@ public:
     void changeProgramName (int, const juce::String&) override;
 
 #if JUCE_MODULE_AVAILABLE_chowdsp_presets_v2
-    virtual PresetManager& getPresetManager()
+    virtual presets::PresetManager& getPresetManager()
     {
         return *presetManager;
     }
@@ -130,8 +130,8 @@ protected:
 #endif
 
 #if JUCE_MODULE_AVAILABLE_chowdsp_presets_v2
-    std::unique_ptr<PresetManager> presetManager {};
-    std::unique_ptr<ProgramAdapter::BaseProgramAdapter> programAdaptor = std::make_unique<PresetsProgramAdapter> (presetManager);
+    std::unique_ptr<presets::PresetManager> presetManager {};
+    std::unique_ptr<ProgramAdapter::BaseProgramAdapter> programAdaptor = std::make_unique<presets::frontend::PresetsProgramAdapter> (presetManager);
 #elif JUCE_MODULE_AVAILABLE_chowdsp_presets
     std::unique_ptr<PresetManager> presetManager;
     std::unique_ptr<ProgramAdapter::BaseProgramAdapter> programAdaptor = std::make_unique<ProgramAdapter::PresetsProgramAdapter> (presetManager);

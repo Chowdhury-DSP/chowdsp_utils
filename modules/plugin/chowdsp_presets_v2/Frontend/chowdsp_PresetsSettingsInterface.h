@@ -4,7 +4,7 @@
 
 #include <chowdsp_plugin_utils/chowdsp_plugin_utils.h>
 
-namespace chowdsp::PresetsFrontend
+namespace chowdsp::presets::frontend
 {
 /** Interface for interacting with a presets system from a GlobalPluginSettings object. */
 class SettingsInterface

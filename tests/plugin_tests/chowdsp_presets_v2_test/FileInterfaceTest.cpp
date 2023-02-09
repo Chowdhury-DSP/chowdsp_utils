@@ -14,8 +14,8 @@ struct FileIParams : chowdsp::ParamHolder
 TEST_CASE ("File Interface Test", "[plugin][presets]")
 {
     chowdsp::PluginStateImpl<FileIParams> state {};
-    chowdsp::PresetManager presetMgr { state };
-    chowdsp::PresetsFrontend::FileInterface fileInterface { presetMgr };
+    chowdsp::presets::PresetManager presetMgr { state };
+    chowdsp::presets::frontend::FileInterface fileInterface { presetMgr };
 
     SECTION ("Save Preset")
     {
@@ -33,7 +33,7 @@ TEST_CASE ("File Interface Test", "[plugin][presets]")
     {
         test_utils::ScopedFile file { "preset.preset" };
         {
-            chowdsp::Preset preset { "Name", "Vendor", { { "float", 0.0f } } };
+            chowdsp::presets::Preset preset { "Name", "Vendor", { { "float", 0.0f } } };
             preset.toFile (file);
 
             presetMgr.setDefaultPreset (std::move (preset));
@@ -43,14 +43,14 @@ TEST_CASE ("File Interface Test", "[plugin][presets]")
             fileInterface.resaveCurrentPreset();
         }
 
-        chowdsp::Preset preset { file };
+        chowdsp::presets::Preset preset { file };
         REQUIRE (preset.getState()["float"] == 1.0f);
     }
 
     SECTION ("Delete Current Preset")
     {
         test_utils::ScopedFile file { "preset.preset" };
-        chowdsp::Preset preset { "Name", "Vendor", { { "float", 0.0f } } };
+        chowdsp::presets::Preset preset { "Name", "Vendor", { { "float", 0.0f } } };
         preset.toFile (file);
 
         presetMgr.setDefaultPreset (std::move (preset));

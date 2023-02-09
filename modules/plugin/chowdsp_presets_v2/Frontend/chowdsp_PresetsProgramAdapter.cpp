@@ -1,6 +1,6 @@
 #include "chowdsp_PresetsProgramAdapter.h"
 
-namespace chowdsp
+namespace chowdsp::presets::frontend
 {
 PresetsProgramAdapter::PresetsProgramAdapter (std::unique_ptr<PresetManager>& manager)
     : presetManager (manager)

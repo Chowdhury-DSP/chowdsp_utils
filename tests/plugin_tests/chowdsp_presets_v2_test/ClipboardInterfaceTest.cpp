@@ -18,9 +18,9 @@ TEST_CASE ("Clipboard Interface Test", "[plugin][presets]")
     static constexpr auto val2 = 0.99f;
 
     chowdsp::PluginStateImpl<CIParams> state {};
-    chowdsp::PresetManager presetMgr { state };
-    presetMgr.addPresets ({ chowdsp::Preset { "Preset0", "Vendor", { { "float", val1 } } },
-                            chowdsp::Preset { "Preset1", "Vendor", { { "float", val2 } } } });
+    chowdsp::presets::PresetManager presetMgr { state };
+    presetMgr.addPresets ({ chowdsp::presets::Preset { "Preset0", "Vendor", { { "float", val1 } } },
+                            chowdsp::presets::Preset { "Preset1", "Vendor", { { "float", val2 } } } });
 
     const auto loadPreset = [&presetMgr] (int index)
     {
@@ -32,7 +32,7 @@ TEST_CASE ("Clipboard Interface Test", "[plugin][presets]")
         loadPreset (0);
         REQUIRE (state.params.floatParam->get() == val1);
 
-        chowdsp::PresetsFrontend::ClipboardInterface clipInterface { presetMgr };
+        chowdsp::presets::frontend::ClipboardInterface clipInterface { presetMgr };
         clipInterface.copyCurrentPreset();
 
         loadPreset (1);
@@ -44,7 +44,7 @@ TEST_CASE ("Clipboard Interface Test", "[plugin][presets]")
 
     SECTION ("Empty Paste")
     {
-        chowdsp::PresetsFrontend::ClipboardInterface clipInterface { presetMgr };
+        chowdsp::presets::frontend::ClipboardInterface clipInterface { presetMgr };
         loadPreset (0);
 
         juce::SystemClipboard::copyTextToClipboard ({});
@@ -56,10 +56,10 @@ TEST_CASE ("Clipboard Interface Test", "[plugin][presets]")
 
     SECTION ("Invalid Preset Paste")
     {
-        chowdsp::PresetsFrontend::ClipboardInterface clipInterface { presetMgr };
+        chowdsp::presets::frontend::ClipboardInterface clipInterface { presetMgr };
         loadPreset (0);
 
-        chowdsp::Preset invalid { "Preset1", "", { { "float", val2 } } };
+        chowdsp::presets::Preset invalid { "Preset1", "", { { "float", val2 } } };
         juce::SystemClipboard::copyTextToClipboard (invalid.toJson().dump());
 
         REQUIRE (! clipInterface.tryToPastePreset());

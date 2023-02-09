@@ -1,6 +1,6 @@
 #include "chowdsp_PresetTree.h"
 
-namespace chowdsp
+namespace chowdsp::presets
 {
 namespace PresetTreeInserters
 {

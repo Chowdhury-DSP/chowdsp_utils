@@ -1,6 +1,6 @@
 #include "chowdsp_PresetsMenuInterface.h"
 
-namespace chowdsp::PresetsFrontend
+namespace chowdsp::presets::frontend
 {
 MenuInterface::MenuInterface (PresetManager& manager, FileInterface* fileFace)
     : presetManager (manager), fileInterface (fileFace), clipboardInterface (manager)

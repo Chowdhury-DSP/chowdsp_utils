@@ -4,7 +4,7 @@
 #include <chowdsp_plugin_utils/chowdsp_plugin_utils.h>
 #endif
 
-namespace chowdsp::PresetsFrontend
+namespace chowdsp::presets::frontend
 {
 FileInterface::FileInterface (PresetManager& manager,
                               SettingsInterface* settingsFace)
