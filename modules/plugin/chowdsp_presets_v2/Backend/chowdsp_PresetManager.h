@@ -1,6 +1,6 @@
 #pragma once
 
-namespace chowdsp
+namespace chowdsp::presets
 {
 /** A class for managing a plugin's presets system. */
 class PresetManager
@@ -132,4 +132,4 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetManager)
 };
-} // namespace chowdsp
+} // namespace chowdsp::presets

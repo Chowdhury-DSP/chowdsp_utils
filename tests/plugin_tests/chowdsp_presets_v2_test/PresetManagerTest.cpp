@@ -56,16 +56,16 @@ struct ScopedPresetManager
         state.getParameterListeners().updateBroadcastersFromMessageThread();
     }
 
-    operator chowdsp::PresetManager&() { return manager; } // NOLINT
-    chowdsp::PresetManager* operator->() { return &manager; }
-    const chowdsp::PresetManager* operator->() const { return &manager; }
+    operator chowdsp::presets::PresetManager&() { return manager; } // NOLINT
+    chowdsp::presets::PresetManager* operator->() { return &manager; }
+    const chowdsp::presets::PresetManager* operator->() const { return &manager; }
 
     chowdsp::PluginStateImpl<Params<extraParameter>> state;
-    chowdsp::PresetManager manager { state, nullptr, ".preset", { state.params.boolParam.get() } };
+    chowdsp::presets::PresetManager manager { state, nullptr, ".preset", { state.params.boolParam.get() } };
     test_utils::ScopedFile presetPath { "preset_path" };
 };
 
-static chowdsp::Preset saveUserPreset (const juce::String& file, float val, bool makeDefault = false)
+static chowdsp::presets::Preset saveUserPreset (const juce::String& file, float val, bool makeDefault = false)
 {
     ScopedPresetManager presetMgr {};
     presetMgr.setFloatParam (val);
@@ -74,11 +74,11 @@ static chowdsp::Preset saveUserPreset (const juce::String& file, float val, bool
 
     if (makeDefault)
     {
-        presetMgr->setDefaultPreset (chowdsp::Preset { presetFile });
-        REQUIRE_MESSAGE (chowdsp::Preset { presetFile } == *presetMgr->getDefaultPreset(), "Default preset is incorrect!");
+        presetMgr->setDefaultPreset (chowdsp::presets::Preset { presetFile });
+        REQUIRE_MESSAGE (chowdsp::presets::Preset { presetFile } == *presetMgr->getDefaultPreset(), "Default preset is incorrect!");
     }
 
-    return chowdsp::Preset { presetFile };
+    return chowdsp::presets::Preset { presetFile };
 }
 
 TEST_CASE ("Preset Manager Test", "[plugin][presets][state]")
@@ -256,7 +256,7 @@ TEST_CASE ("Preset Manager Test", "[plugin][presets][state]")
         juce::MemoryBlock state;
         {
             ScopedPresetManager presetMgr {};
-            presetMgr->addPresets ({ chowdsp::Preset { preset } });
+            presetMgr->addPresets ({ chowdsp::presets::Preset { preset } });
             presetMgr.loadPreset (0);
             REQUIRE (presetMgr.getFloatParam() == testValue);
 
@@ -285,7 +285,7 @@ TEST_CASE ("Preset Manager Test", "[plugin][presets][state]")
         ScopedPresetManager presetMgr {};
         presetMgr.state.undoManager = &um;
 
-        presetMgr->addPresets ({ chowdsp::Preset { preset }, chowdsp::Preset { preset2 } });
+        presetMgr->addPresets ({ chowdsp::presets::Preset { preset }, chowdsp::presets::Preset { preset2 } });
         presetMgr.loadPreset (0);
         REQUIRE (presetMgr.getFloatParam() == testValue);
 

@@ -1,6 +1,6 @@
 #include "chowdsp_PresetsProgramAdapter.h"
 
-namespace chowdsp
+namespace chowdsp::presets::frontend
 {
 PresetsProgramAdapter::PresetsProgramAdapter (std::unique_ptr<PresetManager>& manager)
     : presetManager (manager)
@@ -46,4 +46,4 @@ const juce::String PresetsProgramAdapter::getProgramName (int index) // NOSONAR 
 
     return presetForIndex->getName();
 }
-} // namespace chowdsp
+} // namespace chowdsp::presets::frontend

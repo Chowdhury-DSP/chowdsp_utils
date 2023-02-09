@@ -1,6 +1,6 @@
 #include "chowdsp_PresetsMenuInterface.h"
 
-namespace chowdsp::PresetsFrontend
+namespace chowdsp::presets::frontend
 {
 MenuInterface::MenuInterface (PresetManager& manager, FileInterface* fileFace)
     : presetManager (manager), fileInterface (fileFace), clipboardInterface (manager)
@@ -134,4 +134,4 @@ void MenuInterface::refreshPresetsMenu()
     presetsMenu.clear();
     loadPresetsIntoMenu (presetsMenu, presetManager.getPresetTree().getTreeItems(), presetManager);
 }
-} // namespace chowdsp::PresetsFrontend
+} // namespace chowdsp::presets::frontend

@@ -11,10 +11,10 @@ constexpr int arrowPad = 2;
 #endif
 } // namespace
 
-namespace chowdsp
+namespace chowdsp::presets
 {
 PresetsComponent::PresetsComponent (PresetManager& manager,
-                                    PresetsFrontend::FileInterface* fileFace)
+                                    frontend::FileInterface* fileFace)
     : presetManager (manager)
 {
     setColour (textColour, juce::Colours::white);
@@ -22,7 +22,7 @@ PresetsComponent::PresetsComponent (PresetManager& manager,
     setColour (bubbleColour, juce::Colours::grey);
 
     fileInterface = fileFace == nullptr
-                        ? makeOptionalPointer<PresetsFrontend::FileInterface> (presetManager)
+                        ? makeOptionalPointer<frontend::FileInterface> (presetManager)
                         : makeOptionalPointer (fileFace);
 
     if (fileInterface->savePresetCallback == nullptr)
@@ -49,7 +49,7 @@ PresetsComponent::PresetsComponent (PresetManager& manager,
         };
     }
 
-    menuInterface = std::make_unique<PresetsFrontend::MenuInterface> (presetManager, fileInterface.get());
+    menuInterface = std::make_unique<frontend::MenuInterface> (presetManager, fileInterface.get());
 
     presetNameDisplay.setColour (juce::Label::ColourIds::outlineColourId, juce::Colours::transparentBlack);
     presetNameDisplay.setColour (juce::Label::ColourIds::backgroundColourId, juce::Colours::transparentBlack);
@@ -146,7 +146,7 @@ void PresetsComponent::mouseDown (const juce::MouseEvent&)
         juce::PopupMenu menu;
         menuInterface->addPresetsToMenu (menu);
 
-        using Item = PresetsFrontend::MenuInterface::ExtraMenuItems;
+        using Item = frontend::MenuInterface::ExtraMenuItems;
         menuInterface->addExtraMenuItems (menu,
                                           { Item::Separator,
                                             Item::Reset,
@@ -240,4 +240,4 @@ void PresetsComponent::showFailedToLoadPresetMessage (const Preset& preset)
                                              this,
                                              nullptr);
 }
-} // namespace chowdsp
+} // namespace chowdsp::presets

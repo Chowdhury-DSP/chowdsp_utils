@@ -1,6 +1,6 @@
 #pragma once
 
-namespace chowdsp::PresetsFrontend
+namespace chowdsp::presets::frontend
 {
 NextPrevious::NextPrevious (PresetManager& manager) : presetManager (manager)
 {
@@ -50,4 +50,4 @@ bool NextPrevious::goToPreviousPreset()
 {
     return navigateThroughPresets (false);
 }
-} // namespace chowdsp::PresetsFrontend
+} // namespace chowdsp::presets::frontend

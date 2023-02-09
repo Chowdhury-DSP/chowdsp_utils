@@ -1,7 +1,7 @@
 #include "chowdsp_PresetsSettingsInterface.h"
 
 #if JUCE_MODULE_AVAILABLE_chowdsp_plugin_utils
-namespace chowdsp::PresetsFrontend
+namespace chowdsp::presets::frontend
 {
 SettingsInterface::SettingsInterface (PresetManager& manager,
                                       GlobalPluginSettings& settings,
@@ -38,5 +38,5 @@ void SettingsInterface::globalSettingChanged (SettingID settingID)
 
     presetManager.setUserPresetPath (newUserPresetsPath);
 }
-} // namespace chowdsp::PresetsFrontend
+} // namespace chowdsp::presets::frontend
 #endif

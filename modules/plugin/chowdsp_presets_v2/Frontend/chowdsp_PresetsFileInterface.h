@@ -1,6 +1,6 @@
 #pragma once
 
-namespace chowdsp::PresetsFrontend
+namespace chowdsp::presets::frontend
 {
 class SettingsInterface;
 
@@ -60,4 +60,4 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FileInterface)
 };
-} // namespace chowdsp::PresetsFrontend
+} // namespace chowdsp::presets::frontend

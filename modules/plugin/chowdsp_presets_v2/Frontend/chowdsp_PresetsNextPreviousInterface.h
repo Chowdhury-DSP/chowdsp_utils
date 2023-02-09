@@ -1,6 +1,6 @@
 #pragma once
 
-namespace chowdsp::PresetsFrontend
+namespace chowdsp::presets::frontend
 {
 /** Interface for navigating forwards and backwards through the preset tree. */
 class NextPrevious
@@ -32,4 +32,4 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NextPrevious)
 };
-} // namespace chowdsp::PresetsFrontend
+} // namespace chowdsp::presets::frontend

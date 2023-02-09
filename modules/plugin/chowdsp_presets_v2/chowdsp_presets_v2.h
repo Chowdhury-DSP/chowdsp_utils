@@ -33,10 +33,14 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 namespace chowdsp
 {
-/** Interfaces for working with the chowdsp::PresetManager */
-namespace PresetsFrontend
+/** Namespace for chowdsp Presets system */
+namespace presets
 {
-}
+    /** Interfaces for working with the chowdsp::presets::PresetManager */
+    namespace frontend
+    {
+    }
+} // namespace presets
 } // namespace chowdsp
 
 #include "Frontend/chowdsp_PresetsProgramAdapter.h"

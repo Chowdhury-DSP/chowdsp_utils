@@ -8,20 +8,20 @@ struct MenuIParams : chowdsp::ParamHolder
 TEST_CASE ("Menu Interface Test", "[plugin][presets]")
 {
     chowdsp::PluginStateImpl<MenuIParams> state {};
-    chowdsp::PresetManager presetMgr { state };
+    chowdsp::presets::PresetManager presetMgr { state };
 
     SECTION ("Presets Tree Menu")
     {
-        presetMgr.getPresetTree().treeInserter = &chowdsp::PresetTreeInserters::vendorInserter;
+        presetMgr.getPresetTree().treeInserter = &chowdsp::presets::PresetTreeInserters::vendorInserter;
 
         presetMgr.addPresets ({
-            chowdsp::Preset { "Preset4", "Vendor C", { { "param", 0.0f } } },
-            chowdsp::Preset { "Preset2", "Vendor A", { { "param", 0.0f } } },
-            chowdsp::Preset { "Preset3", "Vendor B", { { "param", 0.0f } } },
-            chowdsp::Preset { "Preset1", "Vendor A", { { "param", 0.0f } } },
+            chowdsp::presets::Preset { "Preset4", "Vendor C", { { "param", 0.0f } } },
+            chowdsp::presets::Preset { "Preset2", "Vendor A", { { "param", 0.0f } } },
+            chowdsp::presets::Preset { "Preset3", "Vendor B", { { "param", 0.0f } } },
+            chowdsp::presets::Preset { "Preset1", "Vendor A", { { "param", 0.0f } } },
         });
 
-        chowdsp::PresetsFrontend::MenuInterface menuInterface { presetMgr };
+        chowdsp::presets::frontend::MenuInterface menuInterface { presetMgr };
         {
             juce::PopupMenu menu;
             menuInterface.addPresetsToMenu (menu);
@@ -40,7 +40,7 @@ TEST_CASE ("Menu Interface Test", "[plugin][presets]")
         }
 
         presetMgr.addPresets ({
-            chowdsp::Preset { "Preset0", "Alpha Vendor", { { "param", 0.0f } } },
+            chowdsp::presets::Preset { "Preset0", "Alpha Vendor", { { "param", 0.0f } } },
         });
         {
             juce::PopupMenu menu;
@@ -75,11 +75,11 @@ TEST_CASE ("Menu Interface Test", "[plugin][presets]")
 
     SECTION ("Extra Menu Items")
     {
-        using Items = chowdsp::PresetsFrontend::MenuInterface::ExtraMenuItems;
+        using Items = chowdsp::presets::frontend::MenuInterface::ExtraMenuItems;
 
         // with nothing
         {
-            chowdsp::PresetsFrontend::MenuInterface menuInterface { presetMgr };
+            chowdsp::presets::frontend::MenuInterface menuInterface { presetMgr };
 
             juce::PopupMenu menu;
             menuInterface.addExtraMenuItems (menu, {
@@ -99,8 +99,8 @@ TEST_CASE ("Menu Interface Test", "[plugin][presets]")
 
         // with current preset
         {
-            chowdsp::PresetsFrontend::MenuInterface menuInterface { presetMgr };
-            presetMgr.setDefaultPreset (chowdsp::Preset { "Preset4", "Vendor C", { { "param", 0.0f } } });
+            chowdsp::presets::frontend::MenuInterface menuInterface { presetMgr };
+            presetMgr.setDefaultPreset (chowdsp::presets::Preset { "Preset4", "Vendor C", { { "param", 0.0f } } });
             presetMgr.loadDefaultPreset();
 
             juce::PopupMenu menu;

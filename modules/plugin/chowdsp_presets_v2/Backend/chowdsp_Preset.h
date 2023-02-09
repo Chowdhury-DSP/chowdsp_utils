@@ -2,7 +2,7 @@
 
 #include <chowdsp_version/chowdsp_version.h>
 
-namespace chowdsp
+namespace chowdsp::presets
 {
 /** Information for storing a plugin preset */
 class Preset
@@ -99,4 +99,4 @@ private:
 
     JUCE_LEAK_DETECTOR (Preset)
 };
-} // namespace chowdsp
+} // namespace chowdsp::presets

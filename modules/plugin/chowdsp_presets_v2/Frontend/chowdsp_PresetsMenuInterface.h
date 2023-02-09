@@ -1,6 +1,6 @@
 #pragma once
 
-namespace chowdsp::PresetsFrontend
+namespace chowdsp::presets::frontend
 {
 /** Interface for interacting with a presets systems from a juce::PopupMenu */
 class MenuInterface
@@ -47,4 +47,4 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MenuInterface)
 };
-} // namespace chowdsp::PresetsFrontend
+} // namespace chowdsp::presets::frontend

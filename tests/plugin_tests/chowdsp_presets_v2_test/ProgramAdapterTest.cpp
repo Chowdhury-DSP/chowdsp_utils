@@ -13,8 +13,8 @@ TEST_CASE ("Program Adapter Test", "[plugin][presets]")
 
     SECTION ("No Preset Manager")
     {
-        std::unique_ptr<chowdsp::PresetManager> presetMgr {};
-        chowdsp::PresetsProgramAdapter adapter { presetMgr };
+        std::unique_ptr<chowdsp::presets::PresetManager> presetMgr {};
+        chowdsp::presets::frontend::PresetsProgramAdapter adapter { presetMgr };
 
         REQUIRE (adapter.getNumPrograms() == 1);
         REQUIRE (adapter.getCurrentProgram() == 0);
@@ -24,8 +24,8 @@ TEST_CASE ("Program Adapter Test", "[plugin][presets]")
 
     SECTION ("No Presets")
     {
-        auto presetMgr = std::make_unique<chowdsp::PresetManager> (state);
-        chowdsp::PresetsProgramAdapter adapter { presetMgr };
+        auto presetMgr = std::make_unique<chowdsp::presets::PresetManager> (state);
+        chowdsp::presets::frontend::PresetsProgramAdapter adapter { presetMgr };
 
         REQUIRE (adapter.getNumPrograms() == 0);
         REQUIRE (adapter.getCurrentProgram() == 0);
@@ -36,11 +36,11 @@ TEST_CASE ("Program Adapter Test", "[plugin][presets]")
 
     SECTION ("Get Program Info")
     {
-        auto presetMgr = std::make_unique<chowdsp::PresetManager> (state);
-        chowdsp::PresetsProgramAdapter adapter { presetMgr };
-        presetMgr->addPresets ({ chowdsp::Preset { "A", "Vendor", { { "value", 0 } } },
-                                 chowdsp::Preset { "B", "Vendor", { { "value", 1 } } },
-                                 chowdsp::Preset { "C", "Vendor", { { "value", 2 } } } });
+        auto presetMgr = std::make_unique<chowdsp::presets::PresetManager> (state);
+        chowdsp::presets::frontend::PresetsProgramAdapter adapter { presetMgr };
+        presetMgr->addPresets ({ chowdsp::presets::Preset { "A", "Vendor", { { "value", 0 } } },
+                                 chowdsp::presets::Preset { "B", "Vendor", { { "value", 1 } } },
+                                 chowdsp::presets::Preset { "C", "Vendor", { { "value", 2 } } } });
 
         REQUIRE (adapter.getNumPrograms() == 3);
         REQUIRE (adapter.getProgramName (0) == "A");
@@ -49,23 +49,23 @@ TEST_CASE ("Program Adapter Test", "[plugin][presets]")
         REQUIRE (adapter.getProgramName (3) == "");
     }
 
-    const auto loadPreset = [] (chowdsp::PresetManager& mgr, int index)
+    const auto loadPreset = [] (chowdsp::presets::PresetManager& mgr, int index)
     {
         mgr.loadPreset (*mgr.getPresetTree().getPresetByIndex (index));
     };
 
-    const auto checkPresetIndex = [] (chowdsp::PresetManager& mgr, int expectedIndex)
+    const auto checkPresetIndex = [] (chowdsp::presets::PresetManager& mgr, int expectedIndex)
     {
         REQUIRE (mgr.getCurrentPreset()->getState()["value"] == expectedIndex);
     };
 
     SECTION ("Get Current Program")
     {
-        auto presetMgr = std::make_unique<chowdsp::PresetManager> (state);
-        chowdsp::PresetsProgramAdapter adapter { presetMgr };
-        presetMgr->addPresets ({ chowdsp::Preset { "A", "Vendor", { { "value", 0 } } },
-                                 chowdsp::Preset { "B", "Vendor", { { "value", 1 } } },
-                                 chowdsp::Preset { "C", "Vendor", { { "value", 2 } } } });
+        auto presetMgr = std::make_unique<chowdsp::presets::PresetManager> (state);
+        chowdsp::presets::frontend::PresetsProgramAdapter adapter { presetMgr };
+        presetMgr->addPresets ({ chowdsp::presets::Preset { "A", "Vendor", { { "value", 0 } } },
+                                 chowdsp::presets::Preset { "B", "Vendor", { { "value", 1 } } },
+                                 chowdsp::presets::Preset { "C", "Vendor", { { "value", 2 } } } });
 
         loadPreset (*presetMgr, 0);
         REQUIRE (adapter.getCurrentProgram() == 0);
@@ -79,11 +79,11 @@ TEST_CASE ("Program Adapter Test", "[plugin][presets]")
 
     SECTION ("Set Current Program")
     {
-        auto presetMgr = std::make_unique<chowdsp::PresetManager> (state);
-        chowdsp::PresetsProgramAdapter adapter { presetMgr };
-        presetMgr->addPresets ({ chowdsp::Preset { "A", "Vendor", { { "value", 0 } } },
-                                 chowdsp::Preset { "B", "Vendor", { { "value", 1 } } },
-                                 chowdsp::Preset { "C", "Vendor", { { "value", 2 } } } });
+        auto presetMgr = std::make_unique<chowdsp::presets::PresetManager> (state);
+        chowdsp::presets::frontend::PresetsProgramAdapter adapter { presetMgr };
+        presetMgr->addPresets ({ chowdsp::presets::Preset { "A", "Vendor", { { "value", 0 } } },
+                                 chowdsp::presets::Preset { "B", "Vendor", { { "value", 1 } } },
+                                 chowdsp::presets::Preset { "C", "Vendor", { { "value", 2 } } } });
 
         adapter.setCurrentProgram (0);
         checkPresetIndex (*presetMgr, 0);

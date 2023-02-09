@@ -1,6 +1,6 @@
 #pragma once
 
-namespace chowdsp
+namespace chowdsp::presets
 {
 /** A chowdsp::StateValueBase for presets */
 class PresetState : public StateValueBase
@@ -57,4 +57,4 @@ private:
 bool operator== (const PresetState& presetState, std::nullptr_t);
 bool operator!= (const PresetState& presetState, std::nullptr_t);
 #endif
-} // namespace chowdsp
+} // namespace chowdsp::presets

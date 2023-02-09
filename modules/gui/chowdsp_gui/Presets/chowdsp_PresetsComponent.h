@@ -2,12 +2,12 @@
 
 #include <chowdsp_presets_v2/chowdsp_presets_v2.h>
 
-namespace chowdsp
+namespace chowdsp::presets
 {
 class PresetsComponent : public juce::Component
 {
 public:
-    explicit PresetsComponent (PresetManager& presetManager, PresetsFrontend::FileInterface* fileInterface = nullptr);
+    explicit PresetsComponent (PresetManager& presetManager, frontend::FileInterface* fileInterface = nullptr);
 
     enum ColourIDs
     {
@@ -39,13 +39,13 @@ protected:
     juce::Label presetNameDisplay;
     juce::TextEditor presetNameEditor;
 
-    OptionalPointer<PresetsFrontend::FileInterface> fileInterface {};
-    std::unique_ptr<PresetsFrontend::MenuInterface> menuInterface;
+    OptionalPointer<frontend::FileInterface> fileInterface {};
+    std::unique_ptr<frontend::MenuInterface> menuInterface;
 
-    PresetsFrontend::NextPrevious presetsNextPrevious { presetManager };
-    PresetsFrontend::TextInterface textInterface { presetManager };
+    frontend::NextPrevious presetsNextPrevious { presetManager };
+    frontend::TextInterface textInterface { presetManager };
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetsComponent)
 };
-} // namespace chowdsp
+} // namespace chowdsp::presets

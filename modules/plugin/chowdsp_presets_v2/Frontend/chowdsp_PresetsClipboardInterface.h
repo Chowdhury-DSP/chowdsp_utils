@@ -1,6 +1,6 @@
 #pragma once
 
-namespace chowdsp::PresetsFrontend
+namespace chowdsp::presets::frontend
 {
 /** Interface for interacting with presets from the system clipboard. */
 class ClipboardInterface
@@ -19,4 +19,4 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ClipboardInterface)
 };
-} // namespace chowdsp::PresetsFrontend
+} // namespace chowdsp::presets::frontend

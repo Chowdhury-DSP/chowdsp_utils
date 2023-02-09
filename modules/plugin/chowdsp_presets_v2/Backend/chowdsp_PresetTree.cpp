@@ -1,6 +1,6 @@
 #include "chowdsp_PresetTree.h"
 
-namespace chowdsp
+namespace chowdsp::presets
 {
 namespace PresetTreeInserters
 {
@@ -253,4 +253,4 @@ void PresetTree::refreshPresetIndexes()
                          items);
     totalNumPresets = index;
 }
-} // namespace chowdsp
+} // namespace chowdsp::presets

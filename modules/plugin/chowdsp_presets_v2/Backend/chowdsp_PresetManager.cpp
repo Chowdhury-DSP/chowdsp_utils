@@ -1,6 +1,6 @@
 #include "chowdsp_PresetManager.h"
 
-namespace chowdsp
+namespace chowdsp::presets
 {
 void PresetManager::initializeListeners (ParamHolder& params, ParameterListeners& paramListeners)
 {
@@ -265,4 +265,4 @@ void PresetManager::loadUserPresetsFromFolder (const juce::File& file)
 
     addPresets (std::move (presets), false);
 }
-} // namespace chowdsp
+} // namespace chowdsp::presets

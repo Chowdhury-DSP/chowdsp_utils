@@ -1,6 +1,6 @@
 #include "chowdsp_Preset.h"
 
-namespace chowdsp
+namespace chowdsp::presets
 {
 Preset::Preset (const juce::String& pName,
                 const juce::String& pVendor,
@@ -131,4 +131,4 @@ bool Preset::operator!= (const Preset& other) const noexcept
 {
     return ! (*this == other);
 }
-} // namespace chowdsp
+} // namespace chowdsp::presets

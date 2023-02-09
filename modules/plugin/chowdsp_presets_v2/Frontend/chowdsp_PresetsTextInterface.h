@@ -1,6 +1,6 @@
 #pragma once
 
-namespace chowdsp::PresetsFrontend
+namespace chowdsp::presets::frontend
 {
 /** Interface for getting the text associated with the preset manager's state. */
 class TextInterface
@@ -24,4 +24,4 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TextInterface)
 };
-} // namespace chowdsp::PresetsFrontend
+} // namespace chowdsp::presets::frontend

@@ -2,7 +2,7 @@
 
 #include "../../chowdsp_plugin_base/PluginBase/chowdsp_ProgramAdapter.h"
 
-namespace chowdsp
+namespace chowdsp::presets::frontend
 {
 /** Interface between chowdsp::PresetManager and the juce::AudioProcessor program API */
 class PresetsProgramAdapter : public ProgramAdapter::BaseProgramAdapter
@@ -20,4 +20,4 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetsProgramAdapter)
 };
-} // namespace chowdsp
+} // namespace chowdsp::presets::frontend
