@@ -134,4 +134,4 @@ void MenuInterface::refreshPresetsMenu()
     presetsMenu.clear();
     loadPresetsIntoMenu (presetsMenu, presetManager.getPresetTree().getTreeItems(), presetManager);
 }
-} // namespace chowdsp::PresetsFrontend
+} // namespace chowdsp::presets::frontend

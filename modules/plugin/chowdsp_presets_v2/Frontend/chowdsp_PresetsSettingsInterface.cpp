@@ -38,5 +38,5 @@ void SettingsInterface::globalSettingChanged (SettingID settingID)
 
     presetManager.setUserPresetPath (newUserPresetsPath);
 }
-} // namespace chowdsp::PresetsFrontend
+} // namespace chowdsp::presets::frontend
 #endif

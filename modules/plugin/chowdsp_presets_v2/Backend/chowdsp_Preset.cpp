@@ -131,4 +131,4 @@ bool Preset::operator!= (const Preset& other) const noexcept
 {
     return ! (*this == other);
 }
-} // namespace chowdsp
+} // namespace chowdsp::presets

@@ -46,4 +46,4 @@ const juce::String PresetsProgramAdapter::getProgramName (int index) // NOSONAR 
 
     return presetForIndex->getName();
 }
-} // namespace chowdsp
+} // namespace chowdsp::presets::frontend

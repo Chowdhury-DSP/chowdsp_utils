@@ -240,4 +240,4 @@ void PresetsComponent::showFailedToLoadPresetMessage (const Preset& preset)
                                              this,
                                              nullptr);
 }
-} // namespace chowdsp
+} // namespace chowdsp::presets

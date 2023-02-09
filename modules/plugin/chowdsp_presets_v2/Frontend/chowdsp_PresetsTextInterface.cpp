@@ -29,4 +29,4 @@ void TextInterface::updateText()
 
     presetTextChangedBroadcaster (presetText);
 }
-} // namespace chowdsp::PresetsFrontend
+} // namespace chowdsp::presets::frontend

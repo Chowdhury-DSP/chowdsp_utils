@@ -31,4 +31,4 @@ bool ClipboardInterface::tryToPastePreset()
     }
 }
 
-} // namespace chowdsp::PresetsFrontend
+} // namespace chowdsp::presets::frontend

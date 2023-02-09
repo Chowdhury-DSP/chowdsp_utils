@@ -40,7 +40,7 @@ namespace presets
     namespace frontend
     {
     }
-}
+} // namespace presets
 } // namespace chowdsp
 
 #include "Frontend/chowdsp_PresetsProgramAdapter.h"

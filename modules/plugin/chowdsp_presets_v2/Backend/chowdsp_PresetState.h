@@ -57,4 +57,4 @@ private:
 bool operator== (const PresetState& presetState, std::nullptr_t);
 bool operator!= (const PresetState& presetState, std::nullptr_t);
 #endif
-} // namespace chowdsp
+} // namespace chowdsp::presets

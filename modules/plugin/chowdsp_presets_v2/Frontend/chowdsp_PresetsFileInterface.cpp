@@ -101,4 +101,4 @@ juce::File FileInterface::getFileForPreset (const Preset& preset) const
     jassert (presetManager.getUserPresetPath().isDirectory());
     return presetManager.getUserPresetPath().getChildFile (preset.getName() + presetManager.getPresetFileExtension());
 }
-} // namespace chowdsp::PresetsFrontend
+} // namespace chowdsp::presets::frontend

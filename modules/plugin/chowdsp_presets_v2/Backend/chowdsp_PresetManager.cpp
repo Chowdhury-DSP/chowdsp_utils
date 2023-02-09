@@ -265,4 +265,4 @@ void PresetManager::loadUserPresetsFromFolder (const juce::File& file)
 
     addPresets (std::move (presets), false);
 }
-} // namespace chowdsp
+} // namespace chowdsp::presets

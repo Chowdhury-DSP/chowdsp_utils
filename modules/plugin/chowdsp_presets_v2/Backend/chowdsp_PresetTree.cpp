@@ -253,4 +253,4 @@ void PresetTree::refreshPresetIndexes()
                          items);
     totalNumPresets = index;
 }
-} // namespace chowdsp
+} // namespace chowdsp::presets

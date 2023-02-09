@@ -20,4 +20,4 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetsProgramAdapter)
 };
-} // namespace chowdsp
+} // namespace chowdsp::presets::frontend

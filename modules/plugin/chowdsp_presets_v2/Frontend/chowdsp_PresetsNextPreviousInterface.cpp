@@ -50,4 +50,4 @@ bool NextPrevious::goToPreviousPreset()
 {
     return navigateThroughPresets (false);
 }
-} // namespace chowdsp::PresetsFrontend
+} // namespace chowdsp::presets::frontend

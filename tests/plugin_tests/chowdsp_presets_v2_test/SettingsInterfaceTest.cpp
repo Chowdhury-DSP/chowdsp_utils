@@ -21,8 +21,8 @@ TEST_CASE ("Settings Interface Test", "[plugin][presets][plugin-settings]")
         dummyFile.create();
 
         chowdsp::presets::frontend::SettingsInterface settingsInterface { presetMgr,
-                                                                        pluginSettings,
-                                                                        dummyFile };
+                                                                          pluginSettings,
+                                                                          dummyFile };
         REQUIRE (presetMgr.getUserPresetPath() == dummyFile);
 
         juce::File dir2 { juce::File::getSpecialLocation (juce::File::userDesktopDirectory).getChildFile ("dummy2") };

@@ -103,4 +103,4 @@ namespace PresetTreeInserters
     /** Inserts presets into the tree with sub-trees for each vendor, and sub-sub-trees for each category. */
     Preset& vendorCategoryInserter (Preset&&, std::vector<PresetTree::Item>&, const PresetTree::InsertionHelper&);
 } // namespace PresetTreeInserters
-} // namespace chowdsp
+} // namespace chowdsp::presets
