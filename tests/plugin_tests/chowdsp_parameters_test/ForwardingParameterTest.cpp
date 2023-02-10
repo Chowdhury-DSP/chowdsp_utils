@@ -83,8 +83,7 @@ TEST_CASE ("Forwarding Parameter Test", "[plugin][parameters]")
         constexpr float value2 = 0.2f;
         dummy.undoManager.beginNewTransaction();
         dummy.undoManager.perform (
-            new chowdsp::ParameterAttachmentHelpers::ParameterChangeAction<chowdsp::FloatParameter>
-                { *dummy.getState().params.dummy, dummy.getState().params.dummy->get(), value2, false });
+            new chowdsp::ParameterAttachmentHelpers::ParameterChangeAction<chowdsp::FloatParameter> { *dummy.getState().params.dummy, dummy.getState().params.dummy->get(), value2, false });
         juce::MessageManager::getInstance()->runDispatchLoopUntil (100);
         REQUIRE_MESSAGE (testParam->getValue() == Catch::Approx { value2 }.margin (error), "Forwarded param value set from internal param is incorrect!");
         REQUIRE_MESSAGE (dummyParam->getValue() == Catch::Approx { value2 }.margin (error), "Internal param value set from internal param is incorrect!");
