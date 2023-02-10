@@ -22,9 +22,8 @@ jobs:
       fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
       matrix:
         tests: [
-                "chowdsp_core_test chowdsp_json_test chowdsp_serialization_test chowdsp_units_test", # common_tests_lib
-                "chowdsp_dsp_data_structures_test chowdsp_dsp_utils_test chowdsp_filters_test chowdsp_math_test chowdsp_modal_dsp_test chowdsp_simd_test chowdsp_sources_test chowdsp_waveshapers_test", # dsp_tests_lib
-                "chowdsp_dsp_juce_test", # dsp_juce_tests_lib
+                "chowdsp_core_test chowdsp_json_test chowdsp_serialization_test chowdsp_units_test chowdsp_dsp_juce_test", # common_tests_lib + dsp_juce_tests_lib
+                git "chowdsp_dsp_data_structures_test chowdsp_dsp_utils_test chowdsp_filters_test chowdsp_math_test chowdsp_modal_dsp_test chowdsp_simd_test chowdsp_sources_test chowdsp_waveshapers_test", # dsp_tests_lib
                 "chowdsp_parameters_test chowdsp_plugin_utils_test", # plugin_tests_lib
               ]
         name: [
@@ -36,16 +35,20 @@ jobs:
           - name: "Test"
             os: ubuntu-latest
             cmake_args: "-DCMAKE_BUILD_TYPE=Release"
+            build_type: "Release"
           - name: "Test"
             os: windows-2019
+            build_type: "Release"
           - name: "Coverage"
             os: ubuntu-latest
             cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
             run_coverage: true
+            build_type: "Debug"
           - name: "Coverage"
             os: macos-latest
             cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
             run_coverage: true
+            build_type: "Debug"
 #          - name: "StaticTests"
 #            os: ubuntu-latest
 #            cmake_args: "-DCHOWDSP_ENABLE_STATIC_TESTS=ON"
@@ -118,7 +121,8 @@ jobs:
         shell: bash
         env:
           TEST_TARGETS: ${{ matrix.tests }}
-        run: ctest --test-dir build -R ${TEST_TARGETS// /|}
+          BUILD_TYPE: ${{ matrix.build_type }}
+        run: ctest --test-dir build -C $BUILD_TYPE -R ${TEST_TARGETS// /|} -j 4
 
       - name: "Run Live GUI Test"
         if: matrix.live_gui
