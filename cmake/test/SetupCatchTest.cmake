@@ -20,10 +20,8 @@ function(setup_catch_test_base target)
         COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:${target}>" test-binary
     )
 
-    add_test(
-        NAME ${target}
-        COMMAND $<TARGET_FILE:${target}>
-        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+    catch_discover_tests(${target}
+        TEST_PREFIX ${target}_
     )
 endfunction(setup_catch_test_base)
 
