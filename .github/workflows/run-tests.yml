@@ -23,9 +23,9 @@ jobs:
       matrix:
         tests: [
                 "chowdsp_core_test chowdsp_json_test chowdsp_serialization_test chowdsp_units_test", # common_tests_lib
-                "chowdsp_dsp_data_structures_test chowdsp_dsp_utils_test chowdsp_filters_test chowdsp_math_test chowdsp_modal_dsp_test chowdsp_simd_test chowdsp_sources_test chowdsp_waveshapers_test" # dsp_tests_lib
-                "chowdsp_dsp_juce_test" # dsp_juce_tests_lib
-                "chowdsp_parameters_test chowdsp_plugin_utils_test" # plugin_tests_lib
+                "chowdsp_dsp_data_structures_test chowdsp_dsp_utils_test chowdsp_filters_test chowdsp_math_test chowdsp_modal_dsp_test chowdsp_simd_test chowdsp_sources_test chowdsp_waveshapers_test", # dsp_tests_lib
+                "chowdsp_dsp_juce_test", # dsp_juce_tests_lib
+                "chowdsp_parameters_test chowdsp_plugin_utils_test", # plugin_tests_lib
               ]
         name: [
                 "Test",
