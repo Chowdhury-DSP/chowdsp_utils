@@ -6,7 +6,10 @@ setup_juce_lib(plugin_tests_lib
     chowdsp::chowdsp_plugin_base
     chowdsp::chowdsp_rhythm
     chowdsp::chowdsp_gui
+    chowdsp::chowdsp_plugin_state
     chowdsp::chowdsp_plugin_utils
+    chowdsp::chowdsp_presets_v2
+    chowdsp::chowdsp_version
     clap_juce_extensions
 )
 

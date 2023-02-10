@@ -1,0 +1,4 @@
+ignore:
+  - "modules/plugin/chowdsp_presets"
+  - "modules/gui/chowdsp_foleys"
+  - "**/third_party/**"
