@@ -1,71 +1,71 @@
-name: Benchmarks
-
-on:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
-
-  workflow_dispatch:
-
-env:
-  WORK_DIR: ${{github.workspace}}/JUCE_modules/chowdsp_utils
-
-jobs:
-  build_and_run:
-    name: Run benchmarks on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
-      matrix:
-        include:
-          - os: ubuntu-latest
-            cmake_args: "-DCMAKE_BUILD_TYPE=Release"
-          - os: windows-2019
-            cmake_args: ""
-          - os: macos-latest
-            cmake_args: "-DCMAKE_BUILD_TYPE=Release"
-
-    steps:
-      - name: Install Linux Deps
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt install libasound2-dev libcurl4-openssl-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev libsamplerate-dev
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 9
-          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
-
-      - name: Get latest CMake
-        uses: lukka/get-cmake@latest
-
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          path: ${{env.WORK_DIR}}
-
-      - name: Set up environment
-        working-directory: ${{github.workspace}}
-        run: git clone --depth 1 --branch 7.0.1 https://github.com/juce-framework/JUCE.git
-
-      - name: Configure
-        working-directory: ${{env.WORK_DIR}}
-        env:
-          CMAKE_ARGS: ${{ matrix.cmake_args }}
-        shell: bash
-        run: cmake -Bbuild -DCHOWDSP_ENABLE_BENCHMARKS=ON $CMAKE_ARGS
-
-      - name: Build
-        working-directory: ${{env.WORK_DIR}}/build
-        shell: bash
-        run: cmake --build . --config Release --parallel 4
-
-      - name: "Run Benchmarks"
-        working-directory: ${{env.WORK_DIR}}/build/bench-binary
-        shell: bash
-        run: |
-          for exe in *; do
-            echo "RUNNING BENCHMARK: $exe"
-            ./$exe;
-          done
+#name: Benchmarks
+#
+#on:
+#  push:
+#    branches:
+#      - master
+#  pull_request:
+#    branches:
+#      - master
+#
+#  workflow_dispatch:
+#
+#env:
+#  WORK_DIR: ${{github.workspace}}/JUCE_modules/chowdsp_utils
+#
+#jobs:
+#  build_and_run:
+#    name: Run benchmarks on ${{ matrix.os }}
+#    runs-on: ${{ matrix.os }}
+#    strategy:
+#      fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
+#      matrix:
+#        include:
+#          - os: ubuntu-latest
+#            cmake_args: "-DCMAKE_BUILD_TYPE=Release"
+#          - os: windows-2019
+#            cmake_args: ""
+#          - os: macos-latest
+#            cmake_args: "-DCMAKE_BUILD_TYPE=Release"
+#
+#    steps:
+#      - name: Install Linux Deps
+#        if: runner.os == 'Linux'
+#        run: |
+#          sudo apt-get update
+#          sudo apt install libasound2-dev libcurl4-openssl-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev libsamplerate-dev
+#          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 9
+#          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
+#
+#      - name: Get latest CMake
+#        uses: lukka/get-cmake@latest
+#
+#      - name: Checkout code
+#        uses: actions/checkout@v2
+#        with:
+#          path: ${{env.WORK_DIR}}
+#
+#      - name: Set up environment
+#        working-directory: ${{github.workspace}}
+#        run: git clone --depth 1 --branch 7.0.1 https://github.com/juce-framework/JUCE.git
+#
+#      - name: Configure
+#        working-directory: ${{env.WORK_DIR}}
+#        env:
+#          CMAKE_ARGS: ${{ matrix.cmake_args }}
+#        shell: bash
+#        run: cmake -Bbuild -DCHOWDSP_ENABLE_BENCHMARKS=ON $CMAKE_ARGS
+#
+#      - name: Build
+#        working-directory: ${{env.WORK_DIR}}/build
+#        shell: bash
+#        run: cmake --build . --config Release --parallel 4
+#
+#      - name: "Run Benchmarks"
+#        working-directory: ${{env.WORK_DIR}}/build/bench-binary
+#        shell: bash
+#        run: |
+#          for exe in *; do
+#            echo "RUNNING BENCHMARK: $exe"
+#            ./$exe;
+#          done

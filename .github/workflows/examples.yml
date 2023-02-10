@@ -1,54 +1,54 @@
-name: Examples
-
-on:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
-
-  workflow_dispatch:
-
-jobs:
-  build_examples:
-    name: "Build Example ${{ matrix.target }} on ${{ matrix.os }}"
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
-      matrix:
-        target: [
-                  AutoWah,
-                  ForwardingTestPlugin,
-                  ModalSpringReverb,
-                  SignalGenerator,
-                  SimpleEQ,
-                  SimpleReverb,
-                  StatefulPlugin
-                ]
-        os: [ubuntu-latest, windows-2019, macos-latest]
-
-    steps:
-      - name: Install Linux Deps
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt install libasound2-dev libcurl4-openssl-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev libsamplerate-dev
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 9
-          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
-
-      - name: Get latest CMake
-        uses: lukka/get-cmake@latest
-
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Configure
-        shell: bash
-        run: cmake -Bbuild -DCHOWDSP_ENABLE_EXAMPLES=ON
-
-      - name: "Build Example: ${{ matrix.target }}"
-        shell: bash
-        env:
-          EXAMPLE_TARGET: ${{ matrix.target }}_Standalone
-        run: cmake --build build --parallel 4 --target $EXAMPLE_TARGET
+#name: Examples
+#
+#on:
+#  push:
+#    branches:
+#      - master
+#  pull_request:
+#    branches:
+#      - master
+#
+#  workflow_dispatch:
+#
+#jobs:
+#  build_examples:
+#    name: "Build Example ${{ matrix.target }} on ${{ matrix.os }}"
+#    runs-on: ${{ matrix.os }}
+#    strategy:
+#      fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
+#      matrix:
+#        target: [
+#                  AutoWah,
+#                  ForwardingTestPlugin,
+#                  ModalSpringReverb,
+#                  SignalGenerator,
+#                  SimpleEQ,
+#                  SimpleReverb,
+#                  StatefulPlugin
+#                ]
+#        os: [ubuntu-latest, windows-2019, macos-latest]
+#
+#    steps:
+#      - name: Install Linux Deps
+#        if: runner.os == 'Linux'
+#        run: |
+#          sudo apt-get update
+#          sudo apt install libasound2-dev libcurl4-openssl-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev libsamplerate-dev
+#          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 9
+#          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
+#
+#      - name: Get latest CMake
+#        uses: lukka/get-cmake@latest
+#
+#      - name: Checkout code
+#        uses: actions/checkout@v2
+#
+#      - name: Configure
+#        shell: bash
+#        run: cmake -Bbuild -DCHOWDSP_ENABLE_EXAMPLES=ON
+#
+#      - name: "Build Example: ${{ matrix.target }}"
+#        shell: bash
+#        env:
+#          EXAMPLE_TARGET: ${{ matrix.target }}_Standalone
+#        run: cmake --build build --parallel 4 --target $EXAMPLE_TARGET

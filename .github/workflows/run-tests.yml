@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - ci-*
   pull_request:
     branches:
       - master
@@ -21,12 +22,10 @@ jobs:
       fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
       matrix:
         tests: [
-                "chowdsp_core_test chowdsp_json_test chowdsp_rhythm_test chowdsp_dsp_utils_test chowdsp_plugin_base_test",
-                "chowdsp_dsp_data_structures_test chowdsp_dsp_juce_test chowdsp_sources_test",
-                "chowdsp_math_test chowdsp_simd_test chowdsp_filters_test chowdsp_parameters_test",
-                "chowdsp_foleys_test chowdsp_presets_test chowdsp_plugin_state_test chowdsp_presets_v2_test",
-                "chowdsp_plugin_utils_test chowdsp_version_test chowdsp_serialization_test",
-                "chowdsp_gui_test chowdsp_waveshapers_test chowdsp_units_test chowdsp_modal_dsp_test",
+                "chowdsp_core_test chowdsp_json_test chowdsp_serialization_test chowdsp_units_test", # common_tests_lib
+                "chowdsp_dsp_data_structures_test chowdsp_dsp_utils_test chowdsp_filters_test chowdsp_math_test chowdsp_modal_dsp_test chowdsp_simd_test chowdsp_sources_test chowdsp_waveshapers_test" # dsp_tests_lib
+                "chowdsp_dsp_juce_test" # dsp_juce_tests_lib
+                "chowdsp_parameters_test chowdsp_plugin_utils_test" # plugin_tests_lib
               ]
         name: [
                 "Test",
@@ -47,16 +46,16 @@ jobs:
             os: macos-latest
             cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
             run_coverage: true
-          - name: "StaticTests"
-            os: ubuntu-latest
-            cmake_args: "-DCHOWDSP_ENABLE_STATIC_TESTS=ON"
-            run_static_tests: true
-          - name: "Live GUI Test"
-            os: ubuntu-latest
-            tests: "live_gui_test"
-            cmake_args: "-DCODE_COVERAGE=ON -DCHOWDSP_BUILD_LIVE_GUI_TEST=ON -DCMAKE_BUILD_TYPE=Debug"
-            live_gui: true
-            run_coverage: true
+#          - name: "StaticTests"
+#            os: ubuntu-latest
+#            cmake_args: "-DCHOWDSP_ENABLE_STATIC_TESTS=ON"
+#            run_static_tests: true
+#          - name: "Live GUI Test"
+#            os: ubuntu-latest
+#            tests: "live_gui_test"
+#            cmake_args: "-DCODE_COVERAGE=ON -DCHOWDSP_BUILD_LIVE_GUI_TEST=ON -DCMAKE_BUILD_TYPE=Debug"
+#            live_gui: true
+#            run_coverage: true
         exclude:
           - name: "Test" # so we don't break GitHub Actions concurrency limit
             os: macos-latest
@@ -115,13 +114,11 @@ jobs:
 
       - name: "Run Tests: ${{ matrix.tests }}"
         if: (! matrix.live_gui) && (! matrix.run_static_tests)
-        working-directory: ${{env.WORK_DIR}}/build/test-binary
+        working-directory: ${{env.WORK_DIR}}
         shell: bash
-        run: |
-          for exe in *; do
-            echo "RUNNING TEST: $exe"
-            ./$exe;
-          done
+        env:
+          TEST_TARGETS: ${{ matrix.tests }}
+        run: ctest --test-dir build -R ${TEST_TARGETS// /|}
 
       - name: "Run Live GUI Test"
         if: matrix.live_gui

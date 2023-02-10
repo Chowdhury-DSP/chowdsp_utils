@@ -19,6 +19,14 @@ function(setup_catch_test_base target)
         COMMAND ${CMAKE_COMMAND} -E make_directory test-binary
         COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:${target}>" test-binary
     )
+
+    add_test(
+        NAME ${target}
+        COMMAND $<TARGET_FILE:${target}>
+#        [CONFIGURATIONS <config>...]
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+#        [COMMAND_EXPAND_LISTS]
+    )
 endfunction(setup_catch_test_base)
 
 # setup_catch_lib_test(<target-name> <library-name>)
@@ -26,7 +34,6 @@ endfunction(setup_catch_test_base)
 # Configures a Catch unit test
 function(setup_catch_lib_test target library)
     add_executable(${target})
-    add_test(NAME ${target} COMMAND $<TARGET_FILE:${target}>)
 
     target_link_libraries(${target} PRIVATE ${library})
 
@@ -54,7 +61,6 @@ endfunction(setup_catch_test)
 # TODO: Switch to using setup_catch_lib_test with shared static library (visualizers_test, plugin_state_test, presets_v2_test, version_test)
 function(setup_catch_juce_test target)
     add_executable(${target})
-    add_test(NAME ${target} COMMAND $<TARGET_FILE:${target}>)
 
     target_compile_definitions(${target}
         PRIVATE
