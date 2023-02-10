@@ -31,13 +31,13 @@ TEST_CASE ("Long Press Action Test", "[gui]")
 
     SECTION ("Start and Don't Move Test")
     {
-    checkLongPress (true,
-                    [] (auto& longPress)
-                    {
-                        longPress.startPress (juce::Point<int> {});
-                        longPress.setDragDistance (1.0f);
-                        juce::MessageManager::getInstance()->runDispatchLoopUntil (1000);
-                    });
+        checkLongPress (true,
+                        [] (auto& longPress)
+                        {
+                            longPress.startPress (juce::Point<int> {});
+                            longPress.setDragDistance (1.0f);
+                            juce::MessageManager::getInstance()->runDispatchLoopUntil (1000);
+                        });
     }
 
     SECTION ("Start and Move Too Far Test")
