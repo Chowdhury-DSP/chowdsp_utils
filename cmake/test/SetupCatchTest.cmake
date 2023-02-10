@@ -6,7 +6,7 @@ function(setup_catch_test_base target)
     target_include_directories(${target} PRIVATE ${CMAKE_SOURCE_DIR}/tests/test_utils)
     target_link_libraries(${target}
         PRIVATE
-            Catch2::Catch2
+            Catch2::Catch2WithMain
             juce::juce_recommended_config_flags
             juce::juce_recommended_lto_flags
             juce::juce_recommended_warning_flags
@@ -23,9 +23,7 @@ function(setup_catch_test_base target)
     add_test(
         NAME ${target}
         COMMAND $<TARGET_FILE:${target}>
-#        [CONFIGURATIONS <config>...]
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-#        [COMMAND_EXPAND_LISTS]
     )
 endfunction(setup_catch_test_base)
 
@@ -54,32 +52,6 @@ function(setup_catch_test target)
     setup_chowdsp_lib(${target}_lib ${ARGV})
     setup_catch_lib_test(${target} ${target}_lib)
 endfunction(setup_catch_test)
-
-# setup_catch_juce_test(<target-name>)
-#
-# Configures a Catch unit test from JUCE modules (including chowdsp)
-# TODO: Switch to using setup_catch_lib_test with shared static library (visualizers_test, plugin_state_test, presets_v2_test, version_test)
-function(setup_catch_juce_test target)
-    add_executable(${target})
-
-    target_compile_definitions(${target}
-        PRIVATE
-            JUCE_USE_CURL=0
-            JUCE_WEB_BROWSER=0
-            JUCE_MODAL_LOOPS_PERMITTED=1
-            JUCE_STANDALONE_APPLICATION=1
-    )
-
-    list(REMOVE_AT ARGV 0) # Remove "target" argument
-    target_link_libraries(${target} PRIVATE ${ARGV})
-
-    # set coverage flags if needed
-    if(CODE_COVERAGE)
-        enable_coverage_flags(${target})
-    endif()
-
-    setup_catch_test_base(${target})
-endfunction(setup_catch_juce_test)
 
 # setup_juce_lib(<library-name> <module1> <module2> ...)
 #

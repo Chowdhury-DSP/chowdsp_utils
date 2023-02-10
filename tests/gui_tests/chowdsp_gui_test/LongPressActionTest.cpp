@@ -1,46 +1,47 @@
-#include "TimedUnitTest.h"
-#include "test_utils.h"
+#include <CatchUtils.h>
 #include <chowdsp_gui/chowdsp_gui.h>
 
-class LongPressActionTest : public TimedUnitTest
+template <typename Callback>
+void checkLongPress (bool expectedHit, Callback&& callback, bool shouldBeEnabled = true)
 {
-public:
-    LongPressActionTest() : TimedUnitTest ("Long Press Action Test")
+    bool hasLongPressOccured = false;
+    chowdsp::LongPressActionHelper longPress;
+    longPress.setLongPressSourceTypes ({ juce::MouseInputSource::mouse });
+    longPress.longPressCallback = [&] (juce::Point<int>)
+    { hasLongPressOccured = true; };
+
+    callback (longPress);
+
+    if (expectedHit)
+        REQUIRE_MESSAGE (hasLongPressOccured, "Long press did not occur as expected!");
+    else
+        REQUIRE_MESSAGE (! hasLongPressOccured, "Long press occured when it was not expected!");
+
+    const juce::String enableErrorMessage = "Long-press should " + juce::String (shouldBeEnabled ? "" : "NOT ") + "be enabled!";
+    REQUIRE_MESSAGE (shouldBeEnabled == longPress.isLongPressActionEnabled (juce::MouseInputSource::mouse), enableErrorMessage);
+}
+
+TEST_CASE ("Long Press Action Test", "[gui]")
+{
+    auto createDummyMouseEvent = [] (juce::Component* comp, juce::ModifierKeys mods = {})
     {
+        auto mouseSource = juce::Desktop::getInstance().getMainMouseSource();
+        return juce::MouseEvent { mouseSource, juce::Point<float> {}, mods, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, comp, comp, juce::Time::getCurrentTime(), juce::Point<float> {}, juce::Time::getCurrentTime(), 1, false };
+    };
+
+    SECTION ("Start and Don't Move Test")
+    {
+    checkLongPress (true,
+                    [] (auto& longPress)
+                    {
+                        longPress.startPress (juce::Point<int> {});
+                        longPress.setDragDistance (1.0f);
+                        juce::MessageManager::getInstance()->runDispatchLoopUntil (1000);
+                    });
     }
 
-    template <typename Callback>
-    void checkLongPress (bool expectedHit, Callback&& callback, bool shouldBeEnabled = true)
+    SECTION ("Start and Move Too Far Test")
     {
-        bool hasLongPressOccured = false;
-        chowdsp::LongPressActionHelper longPress;
-        longPress.setLongPressSourceTypes ({ juce::MouseInputSource::mouse });
-        longPress.longPressCallback = [&] (juce::Point<int>)
-        { hasLongPressOccured = true; };
-
-        callback (longPress);
-
-        if (expectedHit)
-            expect (hasLongPressOccured, "Long press did not occur as expected!");
-        else
-            expect (! hasLongPressOccured, "Long press occured when it was not expected!");
-
-        const juce::String enableErrorMessage = "Long-press should " + juce::String (shouldBeEnabled ? "" : "NOT ") + "be enabled!";
-        expect (shouldBeEnabled == longPress.isLongPressActionEnabled (juce::MouseInputSource::mouse), enableErrorMessage);
-    }
-
-    void runTestTimed() override
-    {
-        beginTest ("Start and Don't Move Test");
-        checkLongPress (true,
-                        [] (auto& longPress)
-                        {
-                            longPress.startPress (juce::Point<int> {});
-                            longPress.setDragDistance (1.0f);
-                            juce::MessageManager::getInstance()->runDispatchLoopUntil (1000);
-                        });
-
-        beginTest ("Start and Move Too Far Test");
         checkLongPress (false,
                         [] (auto& longPress)
                         {
@@ -48,37 +49,43 @@ public:
                             longPress.setDragDistance (20.0f);
                             juce::MessageManager::getInstance()->runDispatchLoopUntil (1000);
                         });
+    }
 
-        beginTest ("Start and Abort Test");
+    SECTION ("Start and Abort Test")
+    {
         checkLongPress (false,
-                        [this] (auto& longPress)
+                        [] (auto& longPress)
                         {
                             longPress.startPress (juce::Point<int> {});
-                            expect (longPress.isBeingPressed(), "Press should be started!");
+                            REQUIRE_MESSAGE (longPress.isBeingPressed(), "Press should be started!");
                             juce::MessageManager::getInstance()->runDispatchLoopUntil (100);
                             longPress.abortPress();
                         });
+    }
 
-        beginTest ("Long-Press Disabled Test");
+    SECTION ("Long-Press Disabled Test")
+    {
         checkLongPress (
             false,
-            [this] (auto& longPress)
+            [] (auto& longPress)
             {
                 longPress.setLongPressSourceTypes ({});
                 longPress.startPress (juce::Point<int> {});
 
-                expect (! longPress.isBeingPressed(), "Press should not be started when long-press is disabled!");
+                REQUIRE_MESSAGE (! longPress.isBeingPressed(), "Press should not be started when long-press is disabled!");
 
                 juce::MessageManager::getInstance()->runDispatchLoopUntil (1000);
 
-                expect (! longPress.isLongPressActionEnabled(), "Long-press should be disabled for all sources!");
+                REQUIRE_MESSAGE (! longPress.isLongPressActionEnabled(), "Long-press should be disabled for all sources!");
             },
             false);
+    }
 
-        using namespace test_utils;
-        beginTest ("Component Long-Press Test");
+    using namespace test_utils;
+    SECTION ("Component Long-Press Test")
+    {
         checkLongPress (true,
-                        [=] (auto& longPress)
+                        [&createDummyMouseEvent] (auto& longPress)
                         {
                             juce::Component comp;
                             longPress.setAssociatedComponent (&comp);
@@ -90,10 +97,12 @@ public:
 
                             longPress.setAssociatedComponent (nullptr);
                         });
+    }
 
-        beginTest ("Component Short-Press Test");
+    SECTION ("Component Short-Press Test")
+    {
         checkLongPress (false,
-                        [=] (auto& longPress)
+                        [&createDummyMouseEvent] (auto& longPress)
                         {
                             juce::Component comp;
                             longPress.setAssociatedComponent (&comp);
@@ -105,6 +114,4 @@ public:
                             longPress.setAssociatedComponent (nullptr);
                         });
     }
-};
-
-static LongPressActionTest longPressActionTest;
+}
