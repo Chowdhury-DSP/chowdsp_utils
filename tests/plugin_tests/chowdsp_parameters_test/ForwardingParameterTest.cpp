@@ -1,6 +1,28 @@
 #include <CatchUtils.h>
-#include <DummyPlugin.h>
 #include <chowdsp_parameters/chowdsp_parameters.h>
+#include <chowdsp_plugin_state/chowdsp_plugin_state.h>
+#include <chowdsp_plugin_base/chowdsp_plugin_base.h>
+
+struct FPParams1 : chowdsp::ParamHolder
+{
+    FPParams1()
+    {
+        add (dummy);
+    }
+    chowdsp::PercentParameter::Ptr dummy { "dummy", "Dummy", 0.5f };
+};
+
+struct DummyPlugin : chowdsp::PluginBase<chowdsp::PluginStateImpl<FPParams1>>
+{
+    juce::UndoManager undoManager { 1000 };
+    DummyPlugin() : chowdsp::PluginBase<chowdsp::PluginStateImpl<FPParams1>> (&undoManager)
+    {
+    }
+
+    void releaseResources() override {}
+    void processAudioBlock (juce::AudioBuffer<float>&) override {}
+    juce::AudioProcessorEditor* createEditor() override { return nullptr; }
+};
 
 TEST_CASE ("Forwarding Parameter Test", "[plugin][parameters]")
 {
@@ -27,14 +49,12 @@ TEST_CASE ("Forwarding Parameter Test", "[plugin][parameters]")
     SECTION ("Non-Null Parameter Test")
     {
         DummyPlugin dummy;
-        auto* dummyParam = dummy.getVTS().getParameter ("dummy");
-
-        auto& undoManager = dummy.getUndoManager();
-        auto* forwardingParam = new chowdsp::ForwardingParameter ("param", &undoManager, "NONE");
+        auto* dummyParam = static_cast<juce::AudioProcessorParameter*> (dummy.getState().params.dummy.get());
+        auto* forwardingParam = new chowdsp::ForwardingParameter ("param", &dummy.undoManager, "NONE");
         dummy.addParameter (forwardingParam);
         forwardingParam->setProcessor (&dummy);
 
-        forwardingParam->setParam (dummyParam);
+        forwardingParam->setParam (dummy.getState().params.dummy.get());
         REQUIRE_MESSAGE (forwardingParam->getParam() == dummyParam, "Forwarding Parameter is not pointing to the correct parameter!");
 
         auto* testParam = (juce::AudioProcessorParameter*) forwardingParam;
@@ -43,7 +63,7 @@ TEST_CASE ("Forwarding Parameter Test", "[plugin][parameters]")
         REQUIRE_MESSAGE (testParam->getText (0.2f, 1024) == dummyParam->getText (0.2f, 1024), "Parameter text is incorrect!");
         REQUIRE_MESSAGE (testParam->getValueForText ("0.9") == dummyParam->getValueForText ("0.9"), "Parameter value for text is incorrect!");
 
-        auto& expNorm = dummyParam->getNormalisableRange();
+        auto& expNorm = dummy.getState().params.dummy->getNormalisableRange();
         auto& actualNorm = dynamic_cast<juce::RangedAudioParameter*> (testParam)->getNormalisableRange();
         REQUIRE_MESSAGE (actualNorm.start == expNorm.start, "Range start is incorrect!");
         REQUIRE_MESSAGE (actualNorm.end == expNorm.end, "Range end is incorrect!");
@@ -61,15 +81,15 @@ TEST_CASE ("Forwarding Parameter Test", "[plugin][parameters]")
         REQUIRE_MESSAGE (dummyParam->getValue() == Catch::Approx { value1 }.margin (error), "Internal param value set from forwarded param is incorrect!");
 
         constexpr float value2 = 0.2f;
-        dummyParam->beginChangeGesture();
-        dummyParam->setValueNotifyingHost (value2);
-        juce::MessageManager::getInstance()->runDispatchLoopUntil (100);
-        dummyParam->endChangeGesture();
+        dummy.undoManager.beginNewTransaction();
+        dummy.undoManager.perform (
+            new chowdsp::ParameterAttachmentHelpers::ParameterChangeAction<chowdsp::FloatParameter>
+                { *dummy.getState().params.dummy, dummy.getState().params.dummy->get(), value2, false });
         juce::MessageManager::getInstance()->runDispatchLoopUntil (100);
         REQUIRE_MESSAGE (testParam->getValue() == Catch::Approx { value2 }.margin (error), "Forwarded param value set from internal param is incorrect!");
         REQUIRE_MESSAGE (dummyParam->getValue() == Catch::Approx { value2 }.margin (error), "Internal param value set from internal param is incorrect!");
 
-        undoManager.undo();
+        dummy.undoManager.undo();
         juce::MessageManager::getInstance()->runDispatchLoopUntil (100);
         REQUIRE_MESSAGE (testParam->getValue() == Catch::Approx { value1 }.margin (error), "Forwarded param value set from undo is incorrect!");
         REQUIRE_MESSAGE (dummyParam->getValue() == Catch::Approx { value1 }.margin (error), "Internal param value set from undo is incorrect!");
@@ -89,10 +109,9 @@ TEST_CASE ("Forwarding Parameter Test", "[plugin][parameters]")
     SECTION ("Background Thread Test")
     {
         DummyPlugin dummy;
-        auto* dummyParam = dummy.getVTS().getParameter ("dummy");
+        auto* dummyParam = dummy.getState().params.dummy.get();
 
-        auto& undoManager = dummy.getUndoManager();
-        auto* forwardingParam = new chowdsp::ForwardingParameter ("param", &undoManager, "NONE");
+        auto* forwardingParam = new chowdsp::ForwardingParameter ("param", &dummy.undoManager, "NONE");
         dummy.addParameter (forwardingParam);
         forwardingParam->setProcessor (&dummy);
         forwardingParam->setParam (dummyParam, "Custom Name");
@@ -101,21 +120,23 @@ TEST_CASE ("Forwarding Parameter Test", "[plugin][parameters]")
         REQUIRE_MESSAGE (testParam->getName (1024) == juce::String ("Custom Name"), "Custom parameter name is incorrect!");
 
         std::atomic<bool> threadFinished { false };
-        juce::Thread::launch ([&]
-                              {
-            constexpr float error = 1.0e-6f;
-            constexpr float value1 = 0.8f;
+        juce::Thread::launch (
+            [&]
+            {
+                constexpr float error = 1.0e-6f;
+                constexpr float value1 = 0.8f;
 
-            testParam->setValue (value1);
-            testParam->sendValueChangedMessageToListeners (value1);
+                testParam->setValue (value1);
+                testParam->sendValueChangedMessageToListeners (value1);
 
-            juce::Thread::sleep (100);
+                juce::Thread::sleep (100);
 
-            REQUIRE_MESSAGE (testParam->getValue() == Catch::Approx { value1 }.margin (error), "Forwarded param value set from forwarded param is incorrect!");
-            REQUIRE_MESSAGE (dummyParam->getValue() == Catch::Approx { value1 }.margin (error), "Internal param value set from forwarded param is incorrect!");
+                REQUIRE_MESSAGE (testParam->getValue() == Catch::Approx { value1 }.margin (error), "Forwarded param value set from forwarded param is incorrect!");
+                REQUIRE_MESSAGE (static_cast<juce::AudioProcessorParameter*> (dummyParam)->getValue() == Catch::Approx { value1 }.margin (error), "Internal param value set from forwarded param is incorrect!");
 
-            // do stuff on background thread
-            threadFinished = true; });
+                // do stuff on background thread
+                threadFinished = true;
+            });
 
         while (! threadFinished)
             juce::MessageManager::getInstance()->runDispatchLoopUntil (100);

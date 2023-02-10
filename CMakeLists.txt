@@ -25,6 +25,7 @@ else()
     list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/test)
 
     if(CHOWDSP_ENABLE_TESTING)
+        enable_testing()
         add_subdirectory(tests)
     elseif(CHOWDSP_ENABLE_BENCHMARKS)
         add_subdirectory(bench)

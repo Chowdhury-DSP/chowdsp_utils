@@ -10,6 +10,9 @@ on:
 
   workflow_dispatch:
 
+env:
+  EXAMPLE_TARGETS: "AutoWah_Standalone ForwardingTestPlugin_Standalone ModalSpringReverb_Standalone SignalGenerator_Standalone SimpleEQ_Standalone SimpleReverb_Standalone StatefulPlugin_Standalone"
+
 jobs:
   build_examples:
     name: "Build Example ${{ matrix.target }} on ${{ matrix.os }}"
@@ -17,15 +20,6 @@ jobs:
     strategy:
       fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
       matrix:
-        target: [
-                  AutoWah,
-                  ForwardingTestPlugin,
-                  ModalSpringReverb,
-                  SignalGenerator,
-                  SimpleEQ,
-                  SimpleReverb,
-                  StatefulPlugin
-                ]
         os: [ubuntu-latest, windows-2019, macos-latest]
 
     steps:
@@ -49,6 +43,4 @@ jobs:
 
       - name: "Build Example: ${{ matrix.target }}"
         shell: bash
-        env:
-          EXAMPLE_TARGET: ${{ matrix.target }}_Standalone
-        run: cmake --build build --parallel 4 --target $EXAMPLE_TARGET
+        run: cmake --build build --parallel 4 --target $EXAMPLE_TARGETS

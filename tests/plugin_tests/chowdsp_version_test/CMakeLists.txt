@@ -1,4 +1,4 @@
-setup_catch_juce_test(chowdsp_version_test chowdsp::chowdsp_version)
+setup_catch_lib_test(chowdsp_version_test plugin_tests_lib)
 
 target_sources(chowdsp_version_test
     PRIVATE
