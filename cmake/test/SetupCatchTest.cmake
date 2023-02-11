@@ -20,9 +20,11 @@ function(setup_catch_test_base target)
         COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:${target}>" test-binary
     )
 
-    catch_discover_tests(${target}
-        TEST_PREFIX ${target}_
-    )
+    if(NOT (CMAKE_GENERATOR STREQUAL Xcode))
+        catch_discover_tests(${target}
+            TEST_PREFIX ${target}_
+        )
+    endif()
 endfunction(setup_catch_test_base)
 
 # setup_catch_lib_test(<target-name> <library-name>)
