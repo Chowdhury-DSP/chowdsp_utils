@@ -98,7 +98,7 @@ class EqualizerPlotWithParameters : public EqualizerPlot
 public:
     EqualizerPlotWithParameters (chowdsp::ParameterListeners& listeners,
                                  chowdsp::EQ::StandardEQParameters<numBands>& eqParameters,
-                                 std::function<EQPlotFilterType (int)>&& filterTypeMap,
+                                 const std::function<EQPlotFilterType (int)>& filterTypeMap,
                                  SpectrumPlotParams&& plotParams = {})
         : EqualizerPlot (numBands, std::move (plotParams)),
           eqParams (eqParameters)
