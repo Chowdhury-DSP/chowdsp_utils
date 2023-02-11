@@ -135,7 +135,7 @@ public:
                     listeners.addParameterListener (
                         bandParams.typeParam,
                         chowdsp::ParameterListenerThread::MessageThread,
-                        [this, bandIndex, filterTypeMap = std::move (filterTypeMap)]
+                        [this, bandIndex, filterTypeMap]
                         {
                             updateFilterType (bandIndex, filterTypeMap);
                             updateFilterPlotPath (bandIndex);
@@ -173,7 +173,8 @@ private:
 
     void updateFilterType (int bandIndex, const std::function<EQPlotFilterType (int)>& filterTypeMap) // NOSONAR
     {
-        setFilterType (bandIndex, filterTypeMap (eqParams.eqParams[(size_t) bandIndex].typeParam->getIndex()));
+        const auto& bandTypeParam = eqParams.eqParams[(size_t) bandIndex].typeParam;
+        setFilterType (bandIndex, filterTypeMap (bandTypeParam->getIndex()));
         updateFreqParameter (bandIndex);
         updateQParameter (bandIndex);
         updateGainDBParameter (bandIndex);

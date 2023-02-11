@@ -43,7 +43,8 @@ TEST_CASE ("Spectrum Plot Base Test", "[visualizers]")
     {
         struct TestComp : chowdsp::SpectrumPlotBase
         {
-            TestComp() : chowdsp::SpectrumPlotBase ({ 20.0f, 20000.0f, -30.0f, 30.0f })
+            //            chowdsp::SpectrumPlotParams params ;
+            TestComp() : chowdsp::SpectrumPlotBase ({ 20.0f, 20000.0f, -30.0f, 30.0f, std::log (20000.0f / 20.0f), 60.0f })
             {
                 setSize (500, 300);
             }
