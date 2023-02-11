@@ -1,6 +1,4 @@
-setup_catch_juce_test(chowdsp_presets_v2_test
-    juce::juce_graphics chowdsp::chowdsp_presets_v2 chowdsp::chowdsp_plugin_utils
-)
+setup_catch_lib_test(chowdsp_presets_v2_test plugin_tests_lib)
 
 target_sources(chowdsp_presets_v2_test
     PRIVATE
@@ -17,10 +15,4 @@ target_sources(chowdsp_presets_v2_test
         FileInterfaceTest.cpp
 
         TestPresetBinaryData.cpp
-)
-
-target_compile_definitions(chowdsp_presets_v2_test
-    PRIVATE
-        JucePlugin_Name="TestPlugin"
-        JucePlugin_VersionString="9.9.9"
 )

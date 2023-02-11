@@ -24,6 +24,7 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/../clap-juce-extensions clap_juce_extension
 # include CPM
 include(CPM)
 CPMAddPackage("gh:catchorg/Catch2@3.2.1")
+include(${Catch2_SOURCE_DIR}/extras/Catch.cmake)
 
 option(CODE_COVERAGE "Enable coverage reporting" OFF)
 add_subdirectory(common_tests)

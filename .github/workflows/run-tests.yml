@@ -21,12 +21,10 @@ jobs:
       fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
       matrix:
         tests: [
-                "chowdsp_core_test chowdsp_json_test chowdsp_rhythm_test chowdsp_dsp_utils_test chowdsp_plugin_base_test",
-                "chowdsp_dsp_data_structures_test chowdsp_dsp_juce_test chowdsp_sources_test",
-                "chowdsp_math_test chowdsp_simd_test chowdsp_filters_test chowdsp_parameters_test",
-                "chowdsp_foleys_test chowdsp_presets_test chowdsp_plugin_state_test chowdsp_presets_v2_test",
-                "chowdsp_plugin_utils_test chowdsp_version_test chowdsp_serialization_test",
-                "chowdsp_gui_test chowdsp_waveshapers_test chowdsp_units_test chowdsp_modal_dsp_test",
+                "chowdsp_core_test chowdsp_json_test chowdsp_serialization_test chowdsp_units_test chowdsp_dsp_juce_test", # common_tests_lib + dsp_juce_tests_lib
+                "chowdsp_dsp_data_structures_test chowdsp_dsp_utils_test chowdsp_filters_test chowdsp_math_test chowdsp_modal_dsp_test chowdsp_simd_test chowdsp_sources_test chowdsp_waveshapers_test", # dsp_tests_lib
+                "chowdsp_parameters_test chowdsp_plugin_state_test chowdsp_plugin_utils_test chowdsp_presets_v2_test chowdsp_version_test", # plugin_tests_lib
+                "chowdsp_gui_test chowdsp_visualizers_test", # gui_tests_lib
               ]
         name: [
                 "Test",
@@ -37,28 +35,30 @@ jobs:
           - name: "Test"
             os: ubuntu-latest
             cmake_args: "-DCMAKE_BUILD_TYPE=Release"
+            build_type: "Release"
           - name: "Test"
             os: windows-2019
+            build_type: "Release"
           - name: "Coverage"
             os: ubuntu-latest
             cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
             run_coverage: true
+            build_type: "Debug"
           - name: "Coverage"
             os: macos-latest
             cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
             run_coverage: true
-          - name: "StaticTests"
-            os: ubuntu-latest
-            cmake_args: "-DCHOWDSP_ENABLE_STATIC_TESTS=ON"
-            run_static_tests: true
+            build_type: "Debug"
           - name: "Live GUI Test"
             os: ubuntu-latest
             tests: "live_gui_test"
             cmake_args: "-DCODE_COVERAGE=ON -DCHOWDSP_BUILD_LIVE_GUI_TEST=ON -DCMAKE_BUILD_TYPE=Debug"
             live_gui: true
             run_coverage: true
+            build_type: "Debug"
         exclude:
-          - name: "Test" # so we don't break GitHub Actions concurrency limit
+          # so we don't break GitHub Actions concurrency limit
+          - name: "Test"
             os: macos-latest
           - name: "Coverage"
             os: windows-2019
@@ -106,22 +106,23 @@ jobs:
         run: cmake -Bbuild -DCHOWDSP_ENABLE_TESTING=ON $CMAKE_ARGS
 
       - name: Build
-        if: (! matrix.run_static_tests)
         working-directory: ${{env.WORK_DIR}}/build
         shell: bash
         env:
           TEST_TARGETS: ${{ matrix.tests }}
-        run: cmake --build . --config Release --parallel 4 --target $TEST_TARGETS
+          BUILD_TYPE: ${{ matrix.build_type }}
+        run: cmake --build . --config $BUILD_TYPE --parallel 4 --target $TEST_TARGETS
 
       - name: "Run Tests: ${{ matrix.tests }}"
-        if: (! matrix.live_gui) && (! matrix.run_static_tests)
-        working-directory: ${{env.WORK_DIR}}/build/test-binary
+        if: (! matrix.live_gui)
+        working-directory: ${{env.WORK_DIR}}
         shell: bash
+        env:
+          TEST_TARGETS: ${{ matrix.tests }}
+          BUILD_TYPE: ${{ matrix.build_type }}
         run: |
-          for exe in *; do
-            echo "RUNNING TEST: $exe"
-            ./$exe;
-          done
+          ctest --test-dir build -C $BUILD_TYPE -R ${TEST_TARGETS// /|} --show-only
+          ctest --test-dir build -C $BUILD_TYPE -R ${TEST_TARGETS// /|} -j 4 --output-on-failure
 
       - name: "Run Live GUI Test"
         if: matrix.live_gui
@@ -129,12 +130,6 @@ jobs:
         with:
           run: ./live_gui_test
           working-directory: ${{env.WORK_DIR}}/build/test-binary
-
-      - name: "Run Static Tests"
-        if: matrix.run_static_tests
-        working-directory: ${{env.WORK_DIR}}
-        shell: bash
-        run: cmake --build build --target chowdsp_utils_static_tests
 
       - name: Collect Coverage Data
         if: matrix.run_coverage

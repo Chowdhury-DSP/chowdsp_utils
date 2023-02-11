@@ -1,6 +1,8 @@
 #include <CatchUtils.h>
-#include <DummyPlugin.h>
 #include <chowdsp_plugin_utils/chowdsp_plugin_utils.h>
+
+#if ! JUCE_MODULE_AVAILABLE_chowdsp_plugin_state
+#include <DummyPlugin.h>
 
 TEST_CASE ("UI State Test", "[plugin][utilities]")
 {
@@ -33,3 +35,4 @@ TEST_CASE ("UI State Test", "[plugin][utilities]")
         }
     }
 }
+#endif

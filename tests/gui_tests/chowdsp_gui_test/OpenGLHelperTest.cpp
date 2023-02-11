@@ -1,4 +1,4 @@
-#include <TimedUnitTest.h>
+#include <CatchUtils.h>
 #include <chowdsp_gui/chowdsp_gui.h>
 
 #define CHECK_OPENGL_CONTEXT_TESTS JUCE_MODULE_AVAILABLE_juce_opengl
@@ -21,182 +21,161 @@ std::unique_ptr<juce::Component> getTestComponent()
 }
 } // namespace
 
-class OpenGLHelperTest : public TimedUnitTest
+static void attachToComponentTest (bool detach)
 {
-public:
-    OpenGLHelperTest() : TimedUnitTest ("OpenGL Helper Test")
-    {
-    }
+    chowdsp::OpenGLHelper openGlHelper;
 
-    void attachToComponentTest (bool detach)
-    {
-        chowdsp::OpenGLHelper openGlHelper;
+    auto testComp = getTestComponent();
+    openGlHelper.setComponent (testComp.get());
+    REQUIRE_MESSAGE (openGlHelper.getComponent() == testComp.get(), "Attached component is incorrect!");
 
-        auto testComp = getTestComponent();
-        openGlHelper.setComponent (testComp.get());
-        expect (openGlHelper.getComponent() == testComp.get(), "Attached component is incorrect!");
-
-        openGlHelper.attach();
+    openGlHelper.attach();
 
 #if CHECK_OPENGL_CONTEXT_TESTS
-        auto* myContext = &openGlHelper.getOpenGLContext();
-        auto* actualContext = OpenGLContext::getContextAttachedTo (*testComp);
-        expect (myContext == actualContext, "Incorrect OpenGLContext!");
+    auto* myContext = &openGlHelper.getOpenGLContext();
+    auto* actualContext = OpenGLContext::getContextAttachedTo (*testComp);
+    expect (myContext == actualContext, "Incorrect OpenGLContext!");
 #endif
 
-        if (detach)
-            openGlHelper.detach();
-        else
-            openGlHelper.setComponent (nullptr);
+    if (detach)
+        openGlHelper.detach();
+    else
+        openGlHelper.setComponent (nullptr);
 
 #if CHECK_OPENGL_CONTEXT_TESTS
-        actualContext = OpenGLContext::getContextAttachedTo (*testComp);
-        expect (actualContext == nullptr, "Component OpenGL context should be nullptr!");
+    actualContext = OpenGLContext::getContextAttachedTo (*testComp);
+    REQUIRE_MESSAGE (actualContext == nullptr, "Component OpenGL context should be nullptr!");
 #endif
 
-        if (detach)
-            expect (openGlHelper.getComponent() == testComp.get(), "Attached component is incorrect!");
-        else
-            expect (openGlHelper.getComponent() == nullptr, "Attached component should be nullptr!");
+    if (detach)
+        REQUIRE_MESSAGE (openGlHelper.getComponent() == testComp.get(), "Attached component is incorrect!");
+    else
+        REQUIRE_MESSAGE (openGlHelper.getComponent() == nullptr, "Attached component should be nullptr!");
+}
+
+static void attachToNullTest (bool detach)
+{
+    chowdsp::OpenGLHelper openGlHelper;
+    REQUIRE_MESSAGE (openGlHelper.getComponent() == nullptr, "Attached component should be nullptr!");
+
+    openGlHelper.attach();
+    REQUIRE_MESSAGE (! openGlHelper.isAttached(), "Should not be able to attach to null component!");
+
+    if (detach)
+        openGlHelper.detach();
+
+    auto testComp = getTestComponent();
+    openGlHelper.setComponent (testComp.get());
+
+    if (detach)
+        REQUIRE_MESSAGE (! openGlHelper.isAttached(), "Should NOT be attached!");
+    else
+        REQUIRE_MESSAGE (openGlHelper.isAttached(), "Should be attached!");
+}
+
+TEST_CASE ("OpenGL Helper Test", "[gui][opengl]")
+{
+    SECTION ("Attach To Component Test")
+    {
+        attachToComponentTest (true);
+        attachToComponentTest (false);
     }
 
-    void deletingComponentTest()
+    SECTION ("Deleting Component Test")
     {
         chowdsp::OpenGLHelper openGlHelper;
         {
             auto testComp = getTestComponent();
             openGlHelper.setComponent (testComp.get());
-            expect (openGlHelper.getComponent() == testComp.get(), "Attached component is incorrect!");
+            REQUIRE_MESSAGE (openGlHelper.getComponent() == testComp.get(), "Attached component is incorrect!");
 
             openGlHelper.attach();
 
 #if CHECK_OPENGL_CONTEXT_TESTS
             auto* myContext = &openGlHelper.getOpenGLContext();
             auto* actualContext = OpenGLContext::getContextAttachedTo (*testComp);
-            expect (myContext == actualContext, "Incorrect OpenGLContext!");
+            REQUIRE_MESSAGE (myContext == actualContext, "Incorrect OpenGLContext!");
 #endif
         }
 
-        expect (openGlHelper.getComponent() == nullptr, "Attached component should be nullptr!");
+        REQUIRE_MESSAGE (openGlHelper.getComponent() == nullptr, "Attached component should be nullptr!");
     }
 
-    void deletingHelperTest()
+    SECTION ("Deleting Helper Test")
     {
         auto testComp = getTestComponent();
         {
             chowdsp::OpenGLHelper openGlHelper;
             openGlHelper.setComponent (testComp.get());
-            expect (openGlHelper.getComponent() == testComp.get(), "Attached component is incorrect!");
+            REQUIRE_MESSAGE (openGlHelper.getComponent() == testComp.get(), "Attached component is incorrect!");
 
             openGlHelper.attach();
 
 #if CHECK_OPENGL_CONTEXT_TESTS
             auto* myContext = &openGlHelper.getOpenGLContext();
             auto* actualContext = OpenGLContext::getContextAttachedTo (*testComp);
-            expect (myContext == actualContext, "Incorrect OpenGLContext!");
+            REQUIRE_MESSAGE (myContext == actualContext, "Incorrect OpenGLContext!");
 #endif
         }
 
 #if CHECK_OPENGL_CONTEXT_TESTS
         auto* actualContext = OpenGLContext::getContextAttachedTo (*testComp);
-        expect (actualContext == nullptr, "Component OpenGL context should bt nullptr!");
+        REQUIRE_MESSAGE (actualContext == nullptr, "Component OpenGL context should bt nullptr!");
 #endif
     }
 
-    void doubleAttachTest()
+    SECTION ("Double Attach/Detach Test")
     {
         chowdsp::OpenGLHelper openGlHelper;
 
         auto testComp = getTestComponent();
         openGlHelper.setComponent (testComp.get());
-        expect (openGlHelper.getComponent() == testComp.get(), "Attached component is incorrect!");
+        REQUIRE_MESSAGE (openGlHelper.getComponent() == testComp.get(), "Attached component is incorrect!");
 
         openGlHelper.attach();
-        expect (openGlHelper.isAttached(), "Should be attached!");
+        REQUIRE_MESSAGE (openGlHelper.isAttached(), "Should be attached!");
 
         openGlHelper.attach();
-        expect (openGlHelper.isAttached(), "Should still be attached!");
+        REQUIRE_MESSAGE (openGlHelper.isAttached(), "Should still be attached!");
 
         openGlHelper.detach();
-        expect (! openGlHelper.isAttached(), "Should be detached!");
+        REQUIRE_MESSAGE (! openGlHelper.isAttached(), "Should be detached!");
 
         openGlHelper.detach();
-        expect (! openGlHelper.isAttached(), "Should still be detached!");
+        REQUIRE_MESSAGE (! openGlHelper.isAttached(), "Should still be detached!");
     }
 
-    void newAttachTest()
+    SECTION ("Attach To New Component Test")
     {
         chowdsp::OpenGLHelper openGlHelper;
 
         auto testComp = getTestComponent();
         openGlHelper.setComponent (testComp.get());
-        expect (openGlHelper.getComponent() == testComp.get(), "Attached component is incorrect!");
+        REQUIRE_MESSAGE (openGlHelper.getComponent() == testComp.get(), "Attached component is incorrect!");
 
         openGlHelper.attach();
-        expect (openGlHelper.isAttached(), "Should be attached!");
+        REQUIRE_MESSAGE (openGlHelper.isAttached(), "Should be attached!");
 
         auto testComp2 = getTestComponent();
         openGlHelper.setComponent (testComp2.get());
-        expect (openGlHelper.isAttached(), "Should still be attached!");
+        REQUIRE_MESSAGE (openGlHelper.isAttached(), "Should still be attached!");
     }
 
-    void attachToNullTest (bool detach)
+    SECTION ("Attach To Null Test")
     {
-        chowdsp::OpenGLHelper openGlHelper;
-        expect (openGlHelper.getComponent() == nullptr, "Attached component should be nullptr!");
-
-        openGlHelper.attach();
-        expect (! openGlHelper.isAttached(), "Should not be able to attach to null component!");
-
-        if (detach)
-            openGlHelper.detach();
-
-        auto testComp = getTestComponent();
-        openGlHelper.setComponent (testComp.get());
-
-        if (detach)
-            expect (! openGlHelper.isAttached(), "Should NOT be attached!");
-        else
-            expect (openGlHelper.isAttached(), "Should be attached!");
+        attachToNullTest (true);
+        attachToNullTest (false);
     }
 
-    void checkOpenGLAvailableTest()
+    SECTION ("Check OpenGL Available Test")
     {
         chowdsp::OpenGLHelper openGlHelper;
         auto isOpenGLAvailable = openGlHelper.isOpenGLAvailable();
 
 #if JUCE_MODULE_AVAILABLE_juce_opengl
-        expect (isOpenGLAvailable, "OpenGL should be available on this platform!");
+        REQUIRE_MESSAGE (isOpenGLAvailable, "OpenGL should be available on this platform!");
 #else
-        expect (! isOpenGLAvailable, "OpenGL should not be available on this platform!");
+        REQUIRE_MESSAGE (! isOpenGLAvailable, "OpenGL should not be available on this platform!");
 #endif
     }
-
-    void runTestTimed() override
-    {
-        beginTest ("Attach To Component Test");
-        attachToComponentTest (true);
-        attachToComponentTest (false);
-
-        beginTest ("Deleting Component Test");
-        deletingComponentTest();
-
-        beginTest ("Deleting Helper Test");
-        deletingHelperTest();
-
-        beginTest ("Double Attach/Detach Test");
-        doubleAttachTest();
-
-        beginTest ("Attach To New Component Test");
-        newAttachTest();
-
-        beginTest ("Attach To Null Test");
-        attachToNullTest (true);
-        attachToNullTest (false);
-
-        beginTest ("Check OpenGL Available Test");
-        checkOpenGLAvailableTest();
-    }
-};
-
-static OpenGLHelperTest openGlHelperTest;
+}

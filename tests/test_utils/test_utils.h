@@ -103,11 +103,4 @@ inline void setParameter (juce::AudioProcessorParameter* param, float value)
     param->setValueNotifyingHost (value);
     juce::MessageManager::getInstance()->runDispatchLoopUntil (250);
 }
-
-inline auto createDummyMouseEvent (juce::Component* comp, juce::ModifierKeys mods = {})
-{
-    auto mouseSource = juce::Desktop::getInstance().getMainMouseSource();
-    return juce::MouseEvent { mouseSource, juce::Point<float> {}, mods, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, comp, comp, juce::Time::getCurrentTime(), juce::Point<float> {}, juce::Time::getCurrentTime(), 1, false };
-}
-
 } // namespace test_utils

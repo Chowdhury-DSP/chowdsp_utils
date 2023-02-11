@@ -29,10 +29,7 @@ TEST_CASE ("Generic Filter Plot Test", "[visualizers]")
     {
         struct TestComponent : chowdsp::SpectrumPlotBase
         {
-            TestComponent() : chowdsp::SpectrumPlotBase (chowdsp::SpectrumPlotParams { 20.0f,
-                                                                                       20000.0f,
-                                                                                       -30.0f,
-                                                                                       6.0f }),
+            TestComponent() : chowdsp::SpectrumPlotBase ({ 20.0f, 20000.0f, -30.0f, 6.0f, std::log (20000.0f / 20.0f), 36.0f }),
                               plotter (*this, {})
             {
                 filter.setCutoffFrequency (1000.0f);
