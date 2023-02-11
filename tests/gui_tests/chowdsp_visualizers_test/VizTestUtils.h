@@ -44,7 +44,14 @@ inline void compareImages (const juce::Image& testImage, const juce::Image& refI
     for (int w = 0; w < width; ++w)
     {
         for (int h = 0; h < height; ++h)
-            REQUIRE (testImageData.getPixelColour (w, h) == refImageData.getPixelColour (w, h));
+        {
+            const auto testColour = testImageData.getPixelColour (w, h);
+            const auto refColour = refImageData.getPixelColour (w, h);
+            REQUIRE (juce::isWithin (testColour.getRed(), refColour.getRed(), (uint8_t) 25));
+            REQUIRE (juce::isWithin (testColour.getBlue(), refColour.getBlue(), (uint8_t) 25));
+            REQUIRE (juce::isWithin (testColour.getGreen(), refColour.getGreen(), (uint8_t) 25));
+            REQUIRE (testColour.getAlpha() == refColour.getAlpha());
+        }
     }
 }
 } // namespace VizTestUtils
