@@ -2,7 +2,7 @@ namespace chowdsp
 {
 inline ParamHolder::ParamHolder (const juce::String& phName, bool phIsOwning)
     : name (phName),
-       isOwning (phIsOwning)
+      isOwning (phIsOwning)
 {
 }
 
