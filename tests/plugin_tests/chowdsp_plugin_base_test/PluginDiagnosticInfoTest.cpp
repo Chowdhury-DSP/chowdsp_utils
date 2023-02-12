@@ -1,27 +1,27 @@
-#include <DummyPlugin.h>
-#include <TimedUnitTest.h>
+#include <CatchUtils.h>
+#include <chowdsp_plugin_base/chowdsp_plugin_base.h>
 
-class PluginDiagnosticInfoTest : public TimedUnitTest
+TEST_CASE ("Plugin Diagnostic Info Test", "[plugin]")
 {
-public:
-    PluginDiagnosticInfoTest() : TimedUnitTest ("Plugin Diagnostic Info Test") {}
+    static constexpr auto sampleRate = 44100.0;
+    static constexpr int blockSize = 256;
 
-    void runTestTimed() override
+    struct Params : chowdsp::ParamHolder
     {
-        static constexpr auto sampleRate = 44100.0;
-        static constexpr int blockSize = 256;
+    };
 
-        DummyPlugin plugin;
-        plugin.prepareToPlay (sampleRate, blockSize);
-        const auto diagString = chowdsp::PluginDiagnosticInfo::getDiagnosticsString (plugin);
-        juce::Logger::writeToLog (diagString);
+    struct DummyPlugin : chowdsp::PluginBase<chowdsp::PluginStateImpl<Params>>
+    {
+        void releaseResources() override {}
+        void processAudioBlock (juce::AudioBuffer<float>&) override {}
+        juce::AudioProcessorEditor* createEditor() override { return nullptr; }
+    };
 
-        beginTest ("Name/Version Test");
-        expect (diagString.contains ("Version: DummyPlugin 9.9.9"), "Diag name/version is incorrect!");
+    DummyPlugin plugin;
+    plugin.prepareToPlay (sampleRate, blockSize);
+    const auto diagString = chowdsp::PluginDiagnosticInfo::getDiagnosticsString (plugin);
+    juce::Logger::writeToLog (diagString);
 
-        beginTest ("Sample Rate/Block Size Test");
-        expect (diagString.contains ("running at sample rate 44.1 kHz with block size 256"), "Diag sample rate info is incorrect!");
-    }
-};
-
-static PluginDiagnosticInfoTest pluginDiagnosticInfoTest;
+    REQUIRE_MESSAGE (diagString.contains ("Version: TestPlugin 9.9.9"), "Diag name/version is incorrect!");
+    REQUIRE_MESSAGE (diagString.contains ("running at sample rate 44.1 kHz with block size 256"), "Diag sample rate info is incorrect!");
+}
