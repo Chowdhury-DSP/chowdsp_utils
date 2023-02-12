@@ -2,6 +2,10 @@
 
 namespace chowdsp
 {
+#if JUCE_MODULE_AVAILABLE_chowdsp_plugin_state
+class PluginState;
+#endif
+
 /**
  * Class for forwarding "dynamic" parameters from one processor to another.
  *
@@ -13,6 +17,16 @@ class ForwardingParameter : public juce::RangedAudioParameter,
                             public ParamUtils::ModParameterMixin
 {
 public:
+#if JUCE_MODULE_AVAILABLE_chowdsp_plugin_state
+    /**
+     * Construct a new forwarding parameter.
+     *
+     * @param id            Parameter ID for the <b>forwarded</b> parameter
+     * @param um            UndoManager to use with this parameter
+     * @param defaultName   Name to use when this parameter is not forwarding another one
+     */
+    explicit ForwardingParameter (const ParameterID& id, PluginState& pluginState, const juce::String& defaultName = "Unused");
+#else
     /**
      * Construct a new forwarding parameter.
      *
@@ -21,6 +35,7 @@ public:
      * @param defaultName   Name to use when this parameter is not forwarding another one
      */
     explicit ForwardingParameter (const ParameterID& id, juce::UndoManager* um = nullptr, const juce::String& defaultName = "Unused");
+#endif
     ~ForwardingParameter() override;
 
     /**
@@ -41,6 +56,9 @@ public:
     static void reportParameterInfoChange (juce::AudioProcessor* processor);
 
 private:
+#if JUCE_MODULE_AVAILABLE_chowdsp_plugin_state
+    struct ForwardingAttachment;
+#else
     struct ForwardingAttachment : private juce::AudioProcessorParameter::Listener,
                                   private juce::AsyncUpdater
     {
@@ -64,6 +82,7 @@ private:
         float newValue = 0.0f;
         bool ignoreCallbacks = false;
     };
+#endif
 
     float getValue() const override;
     void setValue (float newValue) override;
@@ -84,8 +103,12 @@ private:
     ParamUtils::ModParameterMixin* internalParamAsModulatable = nullptr;
 
     std::unique_ptr<ForwardingAttachment> attachment;
+#if JUCE_MODULE_AVAILABLE_chowdsp_plugin_state
+    PluginState& pluginState;
+#else
     juce::UndoManager* undoManager;
     juce::SpinLock paramLock;
+#endif
 
     const juce::String defaultName;
     juce::String customName = {};

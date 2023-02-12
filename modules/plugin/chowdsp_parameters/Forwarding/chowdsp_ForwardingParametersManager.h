@@ -20,6 +20,21 @@ template <typename Provider, int totalNumForwardingParameters>
 class ForwardingParametersManager
 {
 public:
+#if JUCE_MODULE_AVAILABLE_chowdsp_plugin_state
+    /** Initializes handles to the forwarding parameters, and connects them to the given processor */
+    explicit ForwardingParametersManager (juce::AudioProcessor& audioProcessor, PluginState& pluginState) : processor (audioProcessor)
+    {
+        for (int i = 0; i < totalNumForwardingParameters; ++i)
+        {
+            auto id = Provider::getForwardingParameterID (i);
+            auto forwardedParam = std::make_unique<ForwardingParameter> (id, pluginState, "Blank");
+
+            forwardedParam->setProcessor (&processor);
+            forwardedParams[(size_t) i] = forwardedParam.get();
+            processor.addParameter (forwardedParam.release());
+        }
+    }
+#else
     /** Initializes handles to the forwarding parameters, and connects them to the given processor */
     explicit ForwardingParametersManager (juce::AudioProcessorValueTreeState& vts) : ForwardingParametersManager (vts.processor)
     {
@@ -38,6 +53,7 @@ public:
             processor.addParameter (forwardedParam.release());
         }
     }
+#endif
 
     ~ForwardingParametersManager()
     {

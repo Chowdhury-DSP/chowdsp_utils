@@ -3,9 +3,9 @@ setup_example_plugin(ForwardingTestPlugin sRvb)
 target_link_libraries(ForwardingTestPlugin
     PRIVATE
         juce::juce_dsp
-        chowdsp_reverb
-        chowdsp_sources
-        chowdsp_plugin_state
+        chowdsp::chowdsp_reverb
+        chowdsp::chowdsp_sources
+        chowdsp::chowdsp_plugin_state
 )
 
 target_sources(ForwardingTestPlugin
