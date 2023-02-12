@@ -21,10 +21,17 @@ struct OptionalPointer
     /** Initializes a null OptionalPointer */
     OptionalPointer() = default;
 
+    /** Creates an optional pointer from a raw pointer, and optionally taking ownership */
+    explicit OptionalPointer (T* ptr, bool shouldOwn = true)
+        : owningPtr (shouldOwn ? ptr : nullptr),
+          nonOwningPtr (shouldOwn ? owningPtr.get() : ptr)
+    {
+    }
+
     /** Creates an owning optional pointer */
-    template <typename... Args>
-    explicit OptionalPointer (Args&&... args)
-        : owningPtr (std::make_unique<T> (std::forward<Args> (args)...)),
+    template <typename Arg1, typename... Args, typename = typename std::enable_if_t<! (std::is_pointer_v<Arg1> && std::is_base_of_v<T, std::remove_pointer_t<Arg1>>)>>
+    explicit OptionalPointer (Arg1&& arg1, Args&&... args)
+        : owningPtr (std::make_unique<T> (std::forward<Arg1> (arg1), std::forward<Args> (args)...)),
           nonOwningPtr (owningPtr.get())
     {
     }
@@ -183,20 +190,4 @@ struct IsOptionalPointerType<OptionalPointer<T>> : std::true_type
 /** True if the type is a chowdsp::OptionalPointer<T> */
 template <typename T>
 static constexpr bool IsOptionalPointer = IsOptionalPointerType<T>::value;
-
-/** Creates a new (non-owning) optional pointer. */
-template <typename T>
-OptionalPointer<T> makeOptionalPointer (T* ptr)
-{
-    OptionalPointer<T> result {};
-    result.setNonOwning (ptr);
-    return result;
-}
-
-/** Creates a new (owning) optional pointer. */
-template <typename T, typename... Args>
-OptionalPointer<T> makeOptionalPointer (Args&&... args)
-{
-    return OptionalPointer<T> { std::forward<Args> (args)... };
-}
 } // namespace chowdsp

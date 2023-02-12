@@ -15,7 +15,7 @@ TEST_CASE ("Optional Pointer Test", "[common][data-structures]")
 
     SECTION ("Owning")
     {
-        auto x = chowdsp::makeOptionalPointer<TestType> (4, 5);
+        auto x = chowdsp::OptionalPointer<TestType> (4, 5);
         REQUIRE (x.isOwner());
         REQUIRE (x->x == 4);
         REQUIRE (x->y == 5);
@@ -27,7 +27,7 @@ TEST_CASE ("Optional Pointer Test", "[common][data-structures]")
     SECTION ("Non-Owning")
     {
         const auto x_owned = std::make_unique<TestType> (4, 5);
-        auto x = chowdsp::makeOptionalPointer<TestType> (x_owned.get());
+        auto x = chowdsp::OptionalPointer<TestType> (x_owned.get(), false);
         REQUIRE (! x.isOwner());
         REQUIRE (x->x == 4);
         REQUIRE (x->y == 5);
@@ -73,6 +73,34 @@ TEST_CASE ("Optional Pointer Test", "[common][data-structures]")
 
         x.setOwning (nullptr);
         REQUIRE (x == nullptr);
+    }
+
+    SECTION ("From Raw Pointer (Owning)")
+    {
+        auto x = chowdsp::OptionalPointer<TestType> (4, 5);
+        REQUIRE (x.isOwner());
+        REQUIRE (x->x == 4);
+        REQUIRE (x->y == 5);
+
+        auto y = chowdsp::OptionalPointer<TestType> (x.release());
+        REQUIRE (! x.isOwner());
+        REQUIRE (y.isOwner());
+        REQUIRE (y->x == 4);
+        REQUIRE (y->y == 5);
+    }
+
+    SECTION ("From Raw Pointer (Non-Owning)")
+    {
+        auto x = chowdsp::OptionalPointer<TestType> (4, 5);
+        REQUIRE (x.isOwner());
+        REQUIRE (x->x == 4);
+        REQUIRE (x->y == 5);
+
+        auto y = chowdsp::OptionalPointer<TestType> (x.get(), false);
+        REQUIRE (x.isOwner());
+        REQUIRE (! y.isOwner());
+        REQUIRE (y->x == 4);
+        REQUIRE (y->y == 5);
     }
 
     SECTION ("Equality with nullptr")

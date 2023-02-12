@@ -20,7 +20,7 @@ PresetState& PresetState::operator= (PresetPtr&& v)
 
 PresetState& PresetState::operator= (const Preset& v)
 {
-    set (makeOptionalPointer (&v));
+    set (PresetPtr { &v, false });
     return *this;
 }
 
@@ -29,7 +29,7 @@ void PresetState::assumeOwnership()
     if (preset.isOwner())
         return;
 
-    preset = makeOptionalPointer<const Preset> (*preset);
+    preset = PresetPtr (*preset);
 }
 
 void PresetState::reset()

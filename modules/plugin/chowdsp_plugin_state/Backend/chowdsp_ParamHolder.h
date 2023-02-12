@@ -6,7 +6,12 @@ namespace chowdsp
 class ParamHolder
 {
 public:
-    explicit ParamHolder (const juce::String& name = {});
+    /**
+     * Creates a ParamHolder. The user might want to name the ParamHolder,
+     * or make it "non-owning" so it doesn't take ownership of the parameter
+     * pointers.
+     */
+    explicit ParamHolder (const juce::String& name = {}, bool isOwning = true);
 
     ParamHolder (ParamHolder&&) noexcept = default;
     ParamHolder& operator= (ParamHolder&&) noexcept = default;
@@ -93,6 +98,7 @@ private:
     std::vector<ParamHolder*> otherParams;
 
     juce::String name;
+    bool isOwning;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParamHolder)
 };

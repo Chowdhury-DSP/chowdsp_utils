@@ -1,6 +1,8 @@
 namespace chowdsp
 {
-inline ParamHolder::ParamHolder (const juce::String& paramHolderName) : name (paramHolderName)
+inline ParamHolder::ParamHolder (const juce::String& phName, bool phIsOwning)
+    : name (phName),
+      isOwning (phIsOwning)
 {
 }
 
@@ -8,9 +10,7 @@ template <typename ParamType, typename... OtherParams>
 std::enable_if_t<std::is_base_of_v<FloatParameter, ParamType>, void>
     ParamHolder::add (OptionalPointer<ParamType>& floatParam, OtherParams&... others)
 {
-    OptionalPointer<FloatParameter> paramPtr {};
-    paramPtr.setOwning (floatParam.release());
-    floatParams.push_back (std::move (paramPtr));
+    floatParams.emplace_back (floatParam.release(), isOwning);
     add (others...);
 }
 
@@ -18,9 +18,7 @@ template <typename ParamType, typename... OtherParams>
 std::enable_if_t<std::is_base_of_v<ChoiceParameter, ParamType>, void>
     ParamHolder::add (OptionalPointer<ParamType>& choiceParam, OtherParams&... others)
 {
-    OptionalPointer<ChoiceParameter> paramPtr {};
-    paramPtr.setOwning (choiceParam.release());
-    choiceParams.push_back (std::move (paramPtr));
+    choiceParams.emplace_back (choiceParam.release(), isOwning);
     add (others...);
 }
 
@@ -28,9 +26,7 @@ template <typename ParamType, typename... OtherParams>
 std::enable_if_t<std::is_base_of_v<BoolParameter, ParamType>, void>
     ParamHolder::add (OptionalPointer<ParamType>& boolParam, OtherParams&... others)
 {
-    OptionalPointer<BoolParameter> paramPtr {};
-    paramPtr.setOwning (boolParam.release());
-    boolParams.push_back (std::move (paramPtr));
+    boolParams.emplace_back (boolParam.release(), isOwning);
     add (others...);
 }
 
