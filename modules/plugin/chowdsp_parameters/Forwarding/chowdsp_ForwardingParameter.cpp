@@ -188,7 +188,11 @@ void ForwardingParameter::setParam (juce::RangedAudioParameter* paramToUse, cons
     if (internalParam != nullptr)
     {
         setValueNotifyingHost (internalParam->getValue());
+#if JUCE_MODULE_AVAILABLE_chowdsp_plugin_state
         attachment = std::make_unique<ForwardingAttachment> (*internalParam, *this, pluginState);
+#else
+        attachment = std::make_unique<ForwardingAttachment> (*internalParam, *this, undoManager);
+#endif
     }
 }
 
