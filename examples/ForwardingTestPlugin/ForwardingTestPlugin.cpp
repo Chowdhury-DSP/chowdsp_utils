@@ -1,7 +1,7 @@
 #include "ForwardingTestPlugin.h"
 #include "PluginEditor.h"
 
-ForwardingTestPlugin::ForwardingTestPlugin() : forwardingParameters (*this)
+ForwardingTestPlugin::ForwardingTestPlugin() : forwardingParameters (*this, state)
 {
     processorChangedCallback = state.addParameterListener (
         state.params.processorChoice,

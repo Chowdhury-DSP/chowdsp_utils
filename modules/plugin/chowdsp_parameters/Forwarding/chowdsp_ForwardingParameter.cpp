@@ -1,5 +1,9 @@
 #include "chowdsp_ForwardingParameter.h"
 
+#if JUCE_MODULE_AVAILABLE_chowdsp_plugin_state
+#include <chowdsp_plugin_state/chowdsp_plugin_state.h>
+#endif
+
 namespace
 {
 const juce::NormalisableRange defaultRange { 0.0f, 1.0f, 0.01f, 1.0f };
@@ -7,6 +11,70 @@ const juce::NormalisableRange defaultRange { 0.0f, 1.0f, 0.01f, 1.0f };
 
 namespace chowdsp
 {
+#if JUCE_MODULE_AVAILABLE_chowdsp_plugin_state
+struct ForwardingParameter::ForwardingAttachment
+    : private juce::AudioProcessorParameter::Listener
+{
+    ForwardingAttachment (juce::RangedAudioParameter& internal,
+                          juce::RangedAudioParameter& forwarding,
+                          PluginState& state)
+        : internalParam (internal),
+          forwardingParam (forwarding),
+          pluginState (state)
+    {
+        internalParam.addListener (this);
+    }
+
+    ~ForwardingAttachment() override
+    {
+        internalParam.removeListener (this);
+    }
+
+    void setNewValue (float value)
+    {
+        // This set function will set the internal value atomically.
+        // the PluginState will then call the relevant listeners from there.
+        internalParam.setValue (value);
+    }
+
+private:
+    void beginGesture()
+    {
+        if (pluginState.undoManager != nullptr)
+            pluginState.undoManager->beginNewTransaction();
+
+        forwardingParam.beginChangeGesture();
+    }
+
+    void endGesture()
+    {
+        forwardingParam.endChangeGesture();
+    }
+
+    void parameterValueChanged (int, float value) override
+    {
+        // Internal parameters should only ever be set from the message thread!
+        // We can enforce this, because we have full control over the internal param.
+        jassert (juce::MessageManager::existsAndIsCurrentThread());
+        forwardingParam.sendValueChangedMessageToListeners (value);
+    }
+
+    void parameterGestureChanged (int, bool gestureIsStarting) override
+    {
+        jassert (juce::MessageManager::existsAndIsCurrentThread());
+        if (gestureIsStarting)
+            beginGesture();
+        else
+            endGesture();
+    }
+
+    juce::RangedAudioParameter& internalParam;
+    juce::RangedAudioParameter& forwardingParam;
+    PluginState& pluginState;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ForwardingAttachment)
+};
+#else
 ForwardingParameter::ForwardingAttachment::ForwardingAttachment (juce::RangedAudioParameter& internal, juce::RangedAudioParameter& forwarding, juce::UndoManager* um)
     : internalParam (internal), forwardingParam (forwarding), undoManager (um)
 {
@@ -67,12 +135,20 @@ void ForwardingParameter::ForwardingAttachment::parameterGestureChanged (int, bo
     else
         endGesture();
 }
+#endif
 
 //=================================================================================
+#if JUCE_MODULE_AVAILABLE_chowdsp_plugin_state
+ForwardingParameter::ForwardingParameter (const ParameterID& id, PluginState& state, const juce::String& thisDefaultName)
+    : juce::RangedAudioParameter (id, thisDefaultName), pluginState (state), defaultName (thisDefaultName)
+{
+}
+#else
 ForwardingParameter::ForwardingParameter (const ParameterID& id, juce::UndoManager* um, const juce::String& thisDefaultName)
     : juce::RangedAudioParameter (id, thisDefaultName), undoManager (um), defaultName (thisDefaultName)
 {
 }
+#endif
 
 ForwardingParameter::~ForwardingParameter()
 {
@@ -93,7 +169,9 @@ void ForwardingParameter::reportParameterInfoChange (juce::AudioProcessor* proce
 
 void ForwardingParameter::setParam (juce::RangedAudioParameter* paramToUse, const juce::String& newName, bool deferHostNotification)
 {
+#if ! JUCE_MODULE_AVAILABLE_chowdsp_plugin_state
     juce::SpinLock::ScopedLockType sl (paramLock);
+#endif
 
     if (internalParam != nullptr)
         attachment.reset();
@@ -110,7 +188,11 @@ void ForwardingParameter::setParam (juce::RangedAudioParameter* paramToUse, cons
     if (internalParam != nullptr)
     {
         setValueNotifyingHost (internalParam->getValue());
+#if JUCE_MODULE_AVAILABLE_chowdsp_plugin_state
+        attachment = std::make_unique<ForwardingAttachment> (*internalParam, *this, pluginState);
+#else
         attachment = std::make_unique<ForwardingAttachment> (*internalParam, *this, undoManager);
+#endif
     }
 }
 
@@ -124,9 +206,11 @@ float ForwardingParameter::getValue() const
 
 void ForwardingParameter::setValue (float newValue)
 {
+#if ! JUCE_MODULE_AVAILABLE_chowdsp_plugin_state
     juce::SpinLock::ScopedTryLockType stl (paramLock);
     if (! stl.isLocked())
         return;
+#endif
 
     if (internalParam != nullptr && internalParam->getValue() != newValue)
         attachment->setNewValue (newValue);

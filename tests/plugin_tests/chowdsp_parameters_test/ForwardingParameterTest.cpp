@@ -12,7 +12,9 @@ struct FPParams1 : chowdsp::ParamHolder
     chowdsp::PercentParameter::Ptr dummy { "dummy", "Dummy", 0.5f };
 };
 
-struct DummyPlugin : chowdsp::PluginBase<chowdsp::PluginStateImpl<FPParams1>>
+using State = chowdsp::PluginStateImpl<FPParams1>;
+
+struct DummyPlugin : chowdsp::PluginBase<State>
 {
     juce::UndoManager undoManager { 1000 };
     DummyPlugin() : chowdsp::PluginBase<chowdsp::PluginStateImpl<FPParams1>> (&undoManager)
@@ -28,7 +30,8 @@ TEST_CASE ("Forwarding Parameter Test", "[plugin][parameters]")
 {
     SECTION ("Null Parameter Test")
     {
-        std::unique_ptr<juce::AudioProcessorParameter> testParam = std::make_unique<chowdsp::ForwardingParameter> ("param", nullptr, "NONE");
+        State state;
+        std::unique_ptr<juce::AudioProcessorParameter> testParam = std::make_unique<chowdsp::ForwardingParameter> ("param", state, "NONE");
 
         testParam->setValue (0.5f);
 
@@ -50,7 +53,7 @@ TEST_CASE ("Forwarding Parameter Test", "[plugin][parameters]")
     {
         DummyPlugin dummy;
         auto* dummyParam = static_cast<juce::AudioProcessorParameter*> (dummy.getState().params.dummy.get());
-        auto* forwardingParam = new chowdsp::ForwardingParameter ("param", &dummy.undoManager, "NONE");
+        auto* forwardingParam = new chowdsp::ForwardingParameter ("param", dummy.getState(), "NONE");
         dummy.addParameter (forwardingParam);
         forwardingParam->setProcessor (&dummy);
 
@@ -110,7 +113,7 @@ TEST_CASE ("Forwarding Parameter Test", "[plugin][parameters]")
         DummyPlugin dummy;
         auto* dummyParam = dummy.getState().params.dummy.get();
 
-        auto* forwardingParam = new chowdsp::ForwardingParameter ("param", &dummy.undoManager, "NONE");
+        auto* forwardingParam = new chowdsp::ForwardingParameter ("param", dummy.getState(), "NONE");
         dummy.addParameter (forwardingParam);
         forwardingParam->setProcessor (&dummy);
         forwardingParam->setParam (dummyParam, "Custom Name");
@@ -143,7 +146,8 @@ TEST_CASE ("Forwarding Parameter Test", "[plugin][parameters]")
 
     SECTION ("Parameter Modulation Test")
     {
-        auto&& testParam = std::make_unique<chowdsp::ForwardingParameter> ("param", nullptr, "NONE");
+        State state;
+        auto&& testParam = std::make_unique<chowdsp::ForwardingParameter> ("param", state, "NONE");
         auto* testParamAsModParam = dynamic_cast<chowdsp::ParamUtils::ModParameterMixin*> (testParam.get());
 
         {
