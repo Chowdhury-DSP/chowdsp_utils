@@ -21,9 +21,10 @@ PresetsComponent::PresetsComponent (PresetManager& manager,
     setColour (backgroundColour, juce::Colours::transparentBlack);
     setColour (bubbleColour, juce::Colours::grey);
 
-    fileInterface = fileFace == nullptr
-                        ? makeOptionalPointer<frontend::FileInterface> (presetManager)
-                        : makeOptionalPointer (fileFace);
+    if (fileFace == nullptr)
+        fileInterface = OptionalPointer<frontend::FileInterface> { presetManager };
+    else
+        fileInterface = OptionalPointer { fileFace, false };
 
     if (fileInterface->savePresetCallback == nullptr)
     {
