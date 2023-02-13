@@ -10,7 +10,7 @@ template <typename ParamType, typename... OtherParams>
 std::enable_if_t<std::is_base_of_v<FloatParameter, ParamType>, void>
     ParamHolder::add (OptionalPointer<ParamType>& floatParam, OtherParams&... others)
 {
-    floatParams.emplace_back (floatParam.release(), isOwning);
+    floatParams.emplace_back (isOwning ? floatParam.release() : floatParam.get(), isOwning);
     add (others...);
 }
 
@@ -18,7 +18,7 @@ template <typename ParamType, typename... OtherParams>
 std::enable_if_t<std::is_base_of_v<ChoiceParameter, ParamType>, void>
     ParamHolder::add (OptionalPointer<ParamType>& choiceParam, OtherParams&... others)
 {
-    choiceParams.emplace_back (choiceParam.release(), isOwning);
+    choiceParams.emplace_back (isOwning ? choiceParam.release() : choiceParam.get(), isOwning);
     add (others...);
 }
 
@@ -26,7 +26,7 @@ template <typename ParamType, typename... OtherParams>
 std::enable_if_t<std::is_base_of_v<BoolParameter, ParamType>, void>
     ParamHolder::add (OptionalPointer<ParamType>& boolParam, OtherParams&... others)
 {
-    boolParams.emplace_back (boolParam.release(), isOwning);
+    boolParams.emplace_back (isOwning ? boolParam.release() : boolParam.get(), isOwning);
     add (others...);
 }
 
