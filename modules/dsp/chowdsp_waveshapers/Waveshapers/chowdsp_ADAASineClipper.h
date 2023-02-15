@@ -5,7 +5,7 @@ namespace chowdsp
 /**
  * Sinusoidal soft clipper, based on the "Soft Sine" saturator in Ableton.
  *
- * Reference: https://www.desmos.com/calculator/hcjherdaqe
+ * Reference: https://www.desmos.com/calculator/rdkdsmrrtr
  */
 template <typename T>
 class ADAASineClipper : public ADAAWaveshaper<T>
