@@ -8,6 +8,7 @@ if (WIN32)
             ADAAHardClipperTest.cpp
             ADAATanhClipperTest.cpp
             ADAASoftClipperTest.cpp
+            ADAASineClipperTest.cpp
     )
 else()
     target_sources(chowdsp_waveshapers_test
@@ -17,6 +18,7 @@ else()
             ADAAHardClipperTest.cpp
             ADAATanhClipperTest.cpp
             ADAASoftClipperTest.cpp
+            ADAASineClipperTest.cpp
             WaveMultiplierTest.cpp
             WestCoastFolderTest.cpp
             LookupTableLoadingTest.cpp

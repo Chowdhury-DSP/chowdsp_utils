@@ -35,3 +35,4 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Waveshapers/chowdsp_WestCoastWavefolder.h"
 #include "Waveshapers/chowdsp_WaveMultiplier.h"
 #include "Waveshapers/chowdsp_SoftClipper.h"
+#include "Waveshapers/chowdsp_ADAASineClipper.h"

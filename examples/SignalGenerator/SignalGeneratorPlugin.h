@@ -47,7 +47,7 @@ struct SignalGenParams : chowdsp::ParamHolder
     chowdsp::ChoiceParameter::Ptr waveshapeParam {
         juce::ParameterID { "waveshape", 100 },
         "Waveshaper",
-        juce::StringArray { "None", "Hard Clip", "Tanh Clip", "Cubic Clip", "9th-Order Clip", "Full Wave Rectify", "West Coast", "Wave Multiply" },
+        juce::StringArray { "None", "Hard Clip", "Tanh Clip", "Cubic Clip", "9th-Order Clip", "Full Wave Rectify", "West Coast", "Wave Multiply", "Sine Clip" },
         0
     };
 };
@@ -92,6 +92,7 @@ private:
     chowdsp::ADAAFullWaveRectifier<float> fullWaveRectifier { &lookupTableCache.get() };
     chowdsp::WestCoastWavefolder<float> westCoastFolder { &lookupTableCache.get() };
     chowdsp::WaveMultiplier<float, 6> waveMultiplyFolder { &lookupTableCache.get() };
+    chowdsp::ADAASineClipper<float> adaaSineClipper { &lookupTableCache.get() };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SignalGeneratorPlugin)
 };
