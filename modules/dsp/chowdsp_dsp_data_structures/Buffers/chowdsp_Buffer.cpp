@@ -41,6 +41,9 @@ void Buffer<SampleType>::setMaxSize (int numChannels, int numSamples)
 template <typename SampleType>
 void Buffer<SampleType>::setCurrentSize (int numChannels, int numSamples) noexcept
 {
+    // trying to set a current size, but we don't have enough memory allocated!
+    jassert (numSamples * numChannels <= (int) rawData.size());
+
     const auto increasingNumChannels = numChannels > currentNumChannels;
     const auto increasingNumSamples = numSamples > currentNumSamples;
 
