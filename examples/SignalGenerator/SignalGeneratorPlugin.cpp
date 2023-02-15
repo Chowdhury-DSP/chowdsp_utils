@@ -20,6 +20,7 @@ void SignalGeneratorPlugin::prepareToPlay (double sampleRate, int samplesPerBloc
     fullWaveRectifier.prepare ((int) spec.numChannels);
     westCoastFolder.prepare ((int) spec.numChannels);
     waveMultiplyFolder.prepare ((int) spec.numChannels);
+    adaaSineClipper.prepare ((int) spec.numChannels);
 
     int resampleRatio = 2;
     for (auto* r : { &resample2, &resample3, &resample4 })
@@ -165,6 +166,10 @@ void SignalGeneratorPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
         else if (waveshapeIndex == 7)
         {
             waveMultiplyFolder.processBlock (upsampledBuffer);
+        }
+        else if (waveshapeIndex == 8)
+        {
+            adaaSineClipper.process (upsampledContext);
         }
 
         if (resampler == nullptr)
