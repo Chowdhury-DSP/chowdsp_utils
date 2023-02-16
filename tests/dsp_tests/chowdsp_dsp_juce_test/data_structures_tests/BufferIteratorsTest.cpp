@@ -76,16 +76,16 @@ TEMPLATE_TEST_CASE ("Buffer Iterators Test",
         BufferType buffer { 2, 70 };
 
         const std::array<SubBlocksTester, 6> testers {
-            SubBlocksTester {0, 0, 32, buffer.getWritePointer (0)},
-            SubBlocksTester {0, 32, 32, buffer.getWritePointer (0) + 32},
-            SubBlocksTester {0, 64, 6, buffer.getWritePointer (0) + 64},
-            SubBlocksTester {1, 0, 32, buffer.getWritePointer (1)},
-            SubBlocksTester {1, 32, 32, buffer.getWritePointer (1) + 32},
-            SubBlocksTester {1, 64, 6, buffer.getWritePointer (1) + 64},
+            SubBlocksTester { 0, 0, 32, buffer.getWritePointer (0) },
+            SubBlocksTester { 0, 32, 32, buffer.getWritePointer (0) + 32 },
+            SubBlocksTester { 0, 64, 6, buffer.getWritePointer (0) + 64 },
+            SubBlocksTester { 1, 0, 32, buffer.getWritePointer (1) },
+            SubBlocksTester { 1, 32, 32, buffer.getWritePointer (1) + 32 },
+            SubBlocksTester { 1, 64, 6, buffer.getWritePointer (1) + 64 },
         };
 
-        testBufferSubBlocks (buffer, testers, std::integral_constant<bool, false>{});
-        testBufferSubBlocks (chowdsp::asConstBuffer (buffer), testers, std::integral_constant<bool, false>{});
+        testBufferSubBlocks (buffer, testers, std::integral_constant<bool, false> {});
+        testBufferSubBlocks (chowdsp::asConstBuffer (buffer), testers, std::integral_constant<bool, false> {});
     }
 
     SECTION ("Sub-Blocks (Channel-wise)")
@@ -93,15 +93,15 @@ TEMPLATE_TEST_CASE ("Buffer Iterators Test",
         BufferType buffer { 2, 70 };
 
         const std::array<SubBlocksTester, 6> testers {
-            SubBlocksTester {0, 0, 32, buffer.getWritePointer (0)},
-            SubBlocksTester {1, 0, 32, buffer.getWritePointer (1)},
-            SubBlocksTester {0, 32, 32, buffer.getWritePointer (0) + 32},
-            SubBlocksTester {1, 32, 32, buffer.getWritePointer (1) + 32},
-            SubBlocksTester {0, 64, 6, buffer.getWritePointer (0) + 64},
-            SubBlocksTester {1, 64, 6, buffer.getWritePointer (1) + 64},
+            SubBlocksTester { 0, 0, 32, buffer.getWritePointer (0) },
+            SubBlocksTester { 1, 0, 32, buffer.getWritePointer (1) },
+            SubBlocksTester { 0, 32, 32, buffer.getWritePointer (0) + 32 },
+            SubBlocksTester { 1, 32, 32, buffer.getWritePointer (1) + 32 },
+            SubBlocksTester { 0, 64, 6, buffer.getWritePointer (0) + 64 },
+            SubBlocksTester { 1, 64, 6, buffer.getWritePointer (1) + 64 },
         };
 
-        testBufferSubBlocks (buffer, testers, std::integral_constant<bool, true>{});
-        testBufferSubBlocks (chowdsp::asConstBuffer (buffer), testers, std::integral_constant<bool, true>{});
+        testBufferSubBlocks (buffer, testers, std::integral_constant<bool, true> {});
+        testBufferSubBlocks (chowdsp::asConstBuffer (buffer), testers, std::integral_constant<bool, true> {});
     }
 }
