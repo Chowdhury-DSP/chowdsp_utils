@@ -21,7 +21,7 @@ TEMPLATE_PRODUCT_TEST_CASE ("Smoothed Buffer Value Test", "[dsp][data-structures
 
     SECTION ("Value Compare Test")
     {
-        auto testSmooth = [=] (auto& ref, auto& comp, FloatType value, int numBlocks)
+        auto testSmooth = [] (auto& ref, auto& comp, FloatType value, int numBlocks)
         {
             ref.setTargetValue (value);
             for (int i = 0; i < numBlocks; ++i)
@@ -54,7 +54,7 @@ TEMPLATE_PRODUCT_TEST_CASE ("Smoothed Buffer Value Test", "[dsp][data-structures
         refSmooth.reset (fs, rampLegnth2);
         testSmooth (refSmooth, compSmooth, (FloatType) val3, 5);
 
-        compSmooth.reset();
+        compSmooth.reset ((FloatType) val3);
         refSmooth2.reset (fs, rampLegnth2);
         refSmooth2.setCurrentAndTargetValue ((FloatType) val3);
         testSmooth (refSmooth2, compSmooth, (FloatType) val4, 5);

@@ -27,6 +27,7 @@ void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::prepare (double fs, in
 {
     sampleRate = fs;
     buffer.resize ((size_t) samplesPerBlock, {});
+    smoother.reset (sampleRate, rampLengthInSeconds);
 
     if (parameterHandle != nullptr)
         reset (parameterHandle->load());
@@ -41,15 +42,27 @@ void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::prepare (double fs, in
 template <typename FloatType, typename ValueSmoothingTypes>
 void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::reset (FloatType resetValue)
 {
-    smoother.setTargetValue (mappingFunction (resetValue));
-    reset();
+    smoother.setCurrentAndTargetValue (mappingFunction (resetValue));
+    isCurrentlySmoothing = false;
 }
 
 template <typename FloatType, typename ValueSmoothingTypes>
 void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::reset()
 {
-    smoother.reset (sampleRate, rampLengthInSeconds);
-    isCurrentlySmoothing = false;
+    if (parameterHandle != nullptr)
+    {
+        reset ((FloatType) parameterHandle->load());
+    }
+#if JUCE_MODULE_AVAILABLE_chowdsp_parameters
+    else if (modulatableParameterHandle != nullptr)
+    {
+        reset ((FloatType) modulatableParameterHandle->getCurrentValue());
+    }
+#endif
+    else
+    {
+        reset (getCurrentValue());
+    }
 }
 
 template <typename FloatType, typename ValueSmoothingTypes>
@@ -57,6 +70,8 @@ void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::setRampLength (double 
 {
     rampLengthInSeconds = rampLengthSeconds;
     reset();
+    smoother.reset (sampleRate, rampLengthInSeconds);
+    isCurrentlySmoothing = false;
 }
 
 template <typename FloatType, typename ValueSmoothingTypes>
