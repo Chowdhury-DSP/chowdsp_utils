@@ -105,14 +105,7 @@ void copyBufferData (const BufferType1& bufferSrc, BufferType2& bufferDest, int 
         jassert (destData != nullptr);
         jassert (srcData != nullptr);
 
-        if constexpr ((! std::is_same_v<SampleType1, SampleType2>) || SampleTypeHelpers::IsSIMDRegister<SampleType1>)
-        {
-            std::copy (srcData + srcStartSample, srcData + srcStartSample + numSamples, destData + destStartSample);
-        }
-        else if constexpr (std::is_floating_point_v<SampleType1>)
-        {
-            juce::FloatVectorOperations::copy (destData + destStartSample, srcData + srcStartSample, numSamples);
-        }
+        std::copy (srcData + srcStartSample, srcData + srcStartSample + numSamples, destData + destStartSample);
     }
 }
 
