@@ -52,8 +52,9 @@ JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 #include "Buffers/chowdsp_Buffer.h"
 #include "Buffers/chowdsp_StaticBuffer.h"
 #include "Buffers/chowdsp_BufferView.h"
-#include "Buffers/chowdsp_BufferIterators.h"
+#include "Buffers/chowdsp_BufferHelpers.h"
 #include "Buffers/chowdsp_SIMDBufferHelpers.h"
+#include "Buffers/chowdsp_BufferIterators.h"
 
 #include "Processors/chowdsp_RebufferedProcessor.h"
 #include "LookupTables/chowdsp_LookupTableTransform.h"

@@ -50,6 +50,31 @@ TEMPLATE_TEST_CASE ("Buffer Iterators Test",
         }
     }
 
+    if constexpr (std::is_same_v<BufferType, chowdsp::Buffer<float>>)
+    {
+        SECTION ("Buffer View Channels")
+        {
+            BufferType buffer { 2, 4 };
+            const chowdsp::BufferView<SampleType> bufferView { buffer };
+
+            {
+                int count = 0;
+                for (auto [channel, data] : chowdsp::buffer_iters::channels (bufferView))
+                {
+                    for (auto& x_n : data)
+                        x_n = (SampleType) static_cast<float> (count++);
+                }
+            }
+
+            int count = 0;
+            for (auto [channel, data] : chowdsp::buffer_iters::channels (chowdsp::asConstBuffer (bufferView)))
+            {
+                for (auto& x_n : data)
+                    REQUIRE (chowdsp::SIMDUtils::all ((SampleType) static_cast<float> (count++) == x_n));
+            }
+        }
+    }
+
     struct SubBlocksTester
     {
         int channel;
@@ -103,5 +128,27 @@ TEMPLATE_TEST_CASE ("Buffer Iterators Test",
 
         testBufferSubBlocks (buffer, testers, std::integral_constant<bool, true> {});
         testBufferSubBlocks (chowdsp::asConstBuffer (buffer), testers, std::integral_constant<bool, true> {});
+    }
+
+    if constexpr (std::is_same_v<BufferType, chowdsp::Buffer<float>>)
+    {
+        SECTION ("Buffer View Sub-Blocks")
+        {
+            BufferType buffer { 2, 70 };
+            const chowdsp::BufferView<SampleType> bufferView { buffer };
+            const chowdsp::BufferView<const SampleType> constBufferView { buffer };
+
+            const std::array<SubBlocksTester, 6> testers {
+                SubBlocksTester { 0, 0, 32, buffer.getWritePointer (0) },
+                SubBlocksTester { 1, 0, 32, buffer.getWritePointer (1) },
+                SubBlocksTester { 0, 32, 32, buffer.getWritePointer (0) + 32 },
+                SubBlocksTester { 1, 32, 32, buffer.getWritePointer (1) + 32 },
+                SubBlocksTester { 0, 64, 6, buffer.getWritePointer (0) + 64 },
+                SubBlocksTester { 1, 64, 6, buffer.getWritePointer (1) + 64 },
+            };
+
+            testBufferSubBlocks (bufferView, testers, std::integral_constant<bool, true> {});
+            testBufferSubBlocks (constBufferView, testers, std::integral_constant<bool, true> {});
+        }
     }
 }
