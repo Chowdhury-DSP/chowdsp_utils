@@ -43,7 +43,7 @@ TEMPLATE_TEST_CASE ("Buffer Iterators Test",
         }
 
         int count = 0;
-        for (auto [channel, data] : chowdsp::buffer_iters::channels (chowdsp::asConstBuffer (buffer)))
+        for (auto [channel, data] : chowdsp::buffer_iters::channels (std::as_const (buffer)))
         {
             for (auto& x_n : data)
                 REQUIRE (chowdsp::SIMDUtils::all ((SampleType) static_cast<float> (count++) == x_n));
@@ -56,6 +56,7 @@ TEMPLATE_TEST_CASE ("Buffer Iterators Test",
         {
             BufferType buffer { 2, 4 };
             const chowdsp::BufferView<SampleType> bufferView { buffer };
+            const chowdsp::BufferView<const SampleType> constBufferView { buffer };
 
             {
                 int count = 0;
@@ -67,10 +68,15 @@ TEMPLATE_TEST_CASE ("Buffer Iterators Test",
             }
 
             int count = 0;
-            for (auto [channel, data] : chowdsp::buffer_iters::channels (chowdsp::asConstBuffer (bufferView)))
+            for (const auto [channel, data] : chowdsp::buffer_iters::channels (constBufferView))
             {
+                const auto ddd = data;
+                REQUIRE (data.size() == bufferView.getNumSamples());
                 for (auto& x_n : data)
-                    REQUIRE (chowdsp::SIMDUtils::all ((SampleType) static_cast<float> (count++) == x_n));
+                {
+                    REQUIRE (chowdsp::SIMDUtils::all ((SampleType) static_cast<float> (count) == x_n));
+                    ++count;
+                }
             }
         }
     }
@@ -110,7 +116,7 @@ TEMPLATE_TEST_CASE ("Buffer Iterators Test",
         };
 
         testBufferSubBlocks (buffer, testers, std::integral_constant<bool, false> {});
-        testBufferSubBlocks (chowdsp::asConstBuffer (buffer), testers, std::integral_constant<bool, false> {});
+        testBufferSubBlocks (std::as_const (buffer), testers, std::integral_constant<bool, false> {});
     }
 
     SECTION ("Sub-Blocks (Channel-wise)")
@@ -127,7 +133,7 @@ TEMPLATE_TEST_CASE ("Buffer Iterators Test",
         };
 
         testBufferSubBlocks (buffer, testers, std::integral_constant<bool, true> {});
-        testBufferSubBlocks (chowdsp::asConstBuffer (buffer), testers, std::integral_constant<bool, true> {});
+        testBufferSubBlocks (std::as_const (buffer), testers, std::integral_constant<bool, true> {});
     }
 
     if constexpr (std::is_same_v<BufferType, chowdsp::Buffer<float>>)

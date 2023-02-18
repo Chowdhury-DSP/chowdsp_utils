@@ -47,7 +47,7 @@ void copyBufferDataTypesTest()
     chowdsp::BufferMath::copyBufferData (buffer, copyBuffer);
 
     int count = 0;
-    for (auto [channel, data] : chowdsp::buffer_iters::channels (chowdsp::asConstBuffer (copyBuffer)))
+    for (auto [channel, data] : chowdsp::buffer_iters::channels (std::as_const (copyBuffer)))
     {
         for (auto& x_n : data)
             REQUIRE (chowdsp::SIMDUtils::all ((T2) static_cast<float> (count++) == x_n));
