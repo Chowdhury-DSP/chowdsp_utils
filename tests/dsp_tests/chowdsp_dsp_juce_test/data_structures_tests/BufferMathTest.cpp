@@ -29,6 +29,31 @@ static void fillBufferWithOnes (BufferType& buffer)
     }
 }
 
+template <typename T1, typename T2>
+void copyBufferDataTypesTest()
+{
+    chowdsp::Buffer<T1> buffer { 2, 4 };
+    chowdsp::Buffer<T2> copyBuffer { 2, 4 };
+
+    {
+        int count = 0;
+        for (auto [channel, data] : chowdsp::buffer_iters::channels (buffer))
+        {
+            for (auto& x_n : data)
+                x_n = (T1) static_cast<float> (count++);
+        }
+    }
+
+    chowdsp::BufferMath::copyBufferData (buffer, copyBuffer);
+
+    int count = 0;
+    for (auto [channel, data] : chowdsp::buffer_iters::channels (std::as_const (copyBuffer)))
+    {
+        for (auto& x_n : data)
+            REQUIRE (chowdsp::SIMDUtils::all ((T2) static_cast<float> (count++) == x_n));
+    }
+}
+
 TEMPLATE_TEST_CASE ("Buffer Math Test",
                     "[dsp][buffers][simd]",
                     (chowdsp::Buffer<float>),
@@ -371,6 +396,15 @@ TEMPLATE_TEST_CASE ("Buffer Math Test",
                 const auto expVal = tanh (bufferRef.getReadPointer (0)[i]);
                 REQUIRE_MESSAGE (actualVal == SIMDApprox<T> (expVal).margin ((NumericType) maxErr), "Value is incorrect!");
             }
+        }
+    }
+
+    if constexpr (std::is_same_v<BufferType, chowdsp::Buffer<float>>)
+    {
+        SECTION ("Copy Buffer Data Types")
+        {
+            copyBufferDataTypesTest<float, double>();
+            copyBufferDataTypesTest<double, float>();
         }
     }
 }

@@ -75,8 +75,10 @@ auto getRMSLevel (const BufferType& buffer, int channel, int startSample, int nu
 template <typename BufferType1, typename BufferType2>
 void copyBufferData (const BufferType1& bufferSrc, BufferType2& bufferDest, int srcStartSample, int destStartSample, int numSamples, int startChannel, int numChannels) noexcept
 {
-    using SampleType = detail::BufferSampleType<BufferType1>;
-    static_assert (std::is_same_v<SampleType, detail::BufferSampleType<BufferType2>>, "Both buffer types must have the same sample type!");
+    using SampleType1 = detail::BufferSampleType<BufferType1>;
+    using SampleType2 = detail::BufferSampleType<BufferType1>;
+    static_assert (std::is_same_v<SampleType1, SampleType2> || (std::is_floating_point_v<SampleType1> && std::is_floating_point_v<SampleType2>),
+                   "Both buffer types must have the same sample type!");
 
     if (numSamples < 0)
     {
@@ -103,14 +105,9 @@ void copyBufferData (const BufferType1& bufferSrc, BufferType2& bufferDest, int 
         jassert (destData != nullptr);
         jassert (srcData != nullptr);
 
-        if constexpr (std::is_floating_point_v<SampleType>)
-        {
-            juce::FloatVectorOperations::copy (destData + destStartSample, srcData + srcStartSample, numSamples);
-        }
-        else if constexpr (SampleTypeHelpers::IsSIMDRegister<SampleType>)
-        {
-            std::copy (srcData + srcStartSample, srcData + srcStartSample + numSamples, destData + destStartSample);
-        }
+        JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4244)
+        std::copy (srcData + srcStartSample, srcData + srcStartSample + numSamples, destData + destStartSample);
+        JUCE_END_IGNORE_WARNINGS_MSVC
     }
 }
 
