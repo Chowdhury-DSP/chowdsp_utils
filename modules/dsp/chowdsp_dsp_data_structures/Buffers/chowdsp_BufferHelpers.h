@@ -84,4 +84,4 @@ static constexpr auto& asConstBuffer (juce::AudioBuffer<SampleType>& buffer)
     return std::as_const (buffer);
 }
 #endif
-}
+} // namespace chowdsp
