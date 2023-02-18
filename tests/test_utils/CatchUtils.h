@@ -128,7 +128,7 @@ inline auto makeNoise (int numSamples, int numChannels = 1)
             x[n] = (FloatType) minus1To1();
     }
 
-    return std::move (noiseBuffer);
+    return noiseBuffer;
 }
 
 inline chowdsp::Buffer<float> makeImpulse (float amplitude, float sampleRate, float lengthSeconds)

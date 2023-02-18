@@ -105,7 +105,9 @@ void copyBufferData (const BufferType1& bufferSrc, BufferType2& bufferDest, int 
         jassert (destData != nullptr);
         jassert (srcData != nullptr);
 
+        JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4244)
         std::copy (srcData + srcStartSample, srcData + srcStartSample + numSamples, destData + destStartSample);
+        JUCE_END_IGNORE_WARNINGS_MSVC
     }
 }
 

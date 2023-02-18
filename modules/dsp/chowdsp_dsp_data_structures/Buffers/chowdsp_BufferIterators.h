@@ -67,7 +67,8 @@ namespace buffer_iters
     }
 
     /** Iterates over a buffer's channels */
-    template <typename SampleType>
+    template <typename SampleType,
+              typename = typename std::enable_if_t<std::is_floating_point_v<SampleType> || SampleTypeHelpers::IsSIMDRegister<SampleType>>>
     constexpr auto channels (const BufferView<SampleType>& buffer)
     {
         return channels<const BufferView<SampleType>> (buffer);
@@ -180,7 +181,10 @@ namespace buffer_iters
      * @tparam subBlockSize The iterator will always supply sub-blocks of this size _or smaller_.
      * @tparam channelWise  If true, the iterator will iterate over the buffer channels first.
      */
-    template <int subBlockSize, bool channelWise = false, typename SampleType>
+    template <int subBlockSize,
+              bool channelWise = false,
+              typename SampleType,
+              typename = typename std::enable_if_t<std::is_floating_point_v<SampleType> || SampleTypeHelpers::IsSIMDRegister<SampleType>>>
     constexpr auto sub_blocks (const BufferView<SampleType>& buffer)
     {
         return sub_blocks<subBlockSize, channelWise, const BufferView<SampleType>> (buffer);
