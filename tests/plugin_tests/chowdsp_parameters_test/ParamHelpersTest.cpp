@@ -89,9 +89,9 @@ TEST_CASE ("Param Helpers Test", "[plugin][parameters]")
     {
         enum Mode
         {
-            Mode_1,
-            Mode_2,
-            Mode_3,
+            Mode_1 = 1,
+            Mode_2 = 2,
+            Mode_3 = 4,
         };
 
         chowdsp::EnumChoiceParameter<Mode> modeParam ("mode", "Mode", Mode::Mode_1);

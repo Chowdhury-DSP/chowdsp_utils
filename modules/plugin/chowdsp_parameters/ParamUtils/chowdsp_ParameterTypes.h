@@ -107,6 +107,10 @@ template <typename EnumType>
 class EnumChoiceParameter : public ChoiceParameter
 {
 public:
+    // Ideally we could use any fully specified enum, but since there's no way to enforce
+    // that, let's stick to "flags" enums.
+    static_assert (magic_enum::detail::is_flags_v<EnumType>, "In order to enforce consistent serialization/deserialization, enum types should be constructed as flags.");
+
     EnumChoiceParameter (const ParameterID& parameterID,
                          const juce::String& parameterName,
                          EnumType defaultChoice,
