@@ -175,6 +175,11 @@ void PresetManager::addPresets (std::vector<Preset>&& presets, bool areFactoryPr
     presetListUpdatedBroadcaster();
 }
 
+Preset PresetManager::getUserPresetForState (const juce::String& presetName, nlohmann::json&& presetState) const
+{
+    return { presetName, userPresetsVendor, std::move (presetState) };
+}
+
 void PresetManager::saveUserPreset (const juce::File& file)
 {
     const auto name = file.getFileNameWithoutExtension();

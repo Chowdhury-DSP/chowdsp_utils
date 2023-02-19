@@ -38,6 +38,9 @@ public:
     /** Adds a vector of presets. */
     void addPresets (std::vector<Preset>&& presets, bool areFactoryPresets = true);
 
+    /** Returns a user preset with the given name and state. */
+    [[nodiscard]] virtual Preset getUserPresetForState (const juce::String& presetName, nlohmann::json&& presetState) const;
+
     /**
      * Saves the plugin's current state to a preset file, and loads the preset.
      * The preset will have the same name as the file.
