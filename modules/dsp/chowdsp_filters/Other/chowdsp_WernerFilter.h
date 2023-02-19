@@ -6,11 +6,11 @@ namespace chowdsp
 {
 enum class WernerFilterType
 {
-    Lowpass2,
-    Bandpass2,
-    Highpass2,
-    Lowpass4,
-    MultiMode, /**< Allows the filter to be interpolated between lowpass, bandpass, and highpass */
+    Lowpass2 = 1,
+    Bandpass2 = 2,
+    Highpass2 = 4,
+    Lowpass4 = 8,
+    MultiMode = 16, /**< Allows the filter to be interpolated between lowpass, bandpass, and highpass */
 };
 
 /**

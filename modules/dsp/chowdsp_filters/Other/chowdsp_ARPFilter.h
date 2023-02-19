@@ -5,10 +5,10 @@ namespace chowdsp
 /** Filter type options for the ARP Filter */
 enum class ARPFilterType
 {
-    Lowpass,
-    Bandpass,
-    Highpass,
-    Notch, /**< The ARP filter notch mode has an extra funky notch offset parameter */
+    Lowpass = 1,
+    Bandpass = 2,
+    Highpass = 4,
+    Notch = 8, /**< The ARP filter notch mode has an extra funky notch offset parameter */
 };
 
 /**
