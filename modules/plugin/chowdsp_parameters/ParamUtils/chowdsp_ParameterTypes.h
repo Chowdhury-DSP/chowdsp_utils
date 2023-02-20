@@ -125,7 +125,7 @@ public:
 
     EnumType get() const noexcept
     {
-        return static_cast<EnumType> (getIndex());
+        return magic_enum::enum_value<EnumType> ((size_t) getIndex());
     }
 
     using Ptr = OptionalPointer<EnumChoiceParameter>;
