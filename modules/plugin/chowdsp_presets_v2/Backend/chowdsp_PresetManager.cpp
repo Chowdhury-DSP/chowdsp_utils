@@ -226,7 +226,6 @@ void PresetManager::loadDefaultPreset()
         loadPreset (*defaultPreset);
 }
 
-
 void PresetManager::setUserPresetPath (const juce::File& file)
 {
     if (file == juce::File())
