@@ -59,6 +59,9 @@ public:
     /** Returns the preset state */
     [[nodiscard]] const auto& getState() const noexcept { return state; }
 
+    /** Field to mark whether or not this is a factory preset. */
+    bool isFactoryPreset = false;
+
     /**
      * Returns true if the two presets are equivalent.
      * Note that this compares the entire preset state.

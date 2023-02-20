@@ -166,13 +166,17 @@ void PresetManager::addPresets (std::vector<Preset>&& presets, bool areFactoryPr
     {
         if (preset.isValid())
         {
-            const auto& justAddedPreset = presetTree.insertPreset (std::move (preset));
-            if (areFactoryPresets)
-                factoryPresets.emplace_back (&justAddedPreset);
+            preset.isFactoryPreset = areFactoryPresets;
+            presetTree.insertPreset (std::move (preset));
         }
     }
 
     presetListUpdatedBroadcaster();
+}
+
+Preset PresetManager::getUserPresetForState (const juce::String& presetName, nlohmann::json&& presetState) const
+{
+    return { presetName, userPresetsVendor, std::move (presetState) };
 }
 
 void PresetManager::saveUserPreset (const juce::File& file)
@@ -209,8 +213,8 @@ void PresetManager::setDefaultPreset (Preset&& newDefaultPreset)
     }
 
     // default preset is not in factory presets, so let's add it!
+    newDefaultPreset.isFactoryPreset = true;
     defaultPreset = &presetTree.insertPreset (std::move (newDefaultPreset));
-    factoryPresets.emplace_back (defaultPreset);
 }
 
 void PresetManager::loadDefaultPreset()
@@ -220,11 +224,6 @@ void PresetManager::loadDefaultPreset()
 
     if (defaultPreset != nullptr)
         loadPreset (*defaultPreset);
-}
-
-bool PresetManager::isFactoryPreset (const Preset& preset) const
-{
-    return std::find (factoryPresets.begin(), factoryPresets.end(), &preset) != factoryPresets.end();
 }
 
 void PresetManager::setUserPresetPath (const juce::File& file)
@@ -260,8 +259,8 @@ void PresetManager::loadUserPresetsFromFolder (const juce::File& file)
     }
 
     // delete old user presets
-    presetTree.removePresets ([this] (const Preset& preset)
-                              { return ! isFactoryPreset (preset); });
+    presetTree.removePresets ([] (const Preset& preset)
+                              { return ! preset.isFactoryPreset; });
 
     addPresets (std::move (presets), false);
 }

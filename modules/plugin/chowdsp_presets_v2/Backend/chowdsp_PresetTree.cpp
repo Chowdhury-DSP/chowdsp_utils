@@ -45,9 +45,8 @@ namespace PresetTreeInserters
         // preset vendor is not currently in the tree, so let's add a new sub-tree
         PresetTree::Item tree;
         tree.tag = tag;
-        auto& insertedPreset = fallbackInserter (std::move (preset), tree.subtree, insertionHelper);
-        insertionHelper.insertItemIntoTree (topLevelItems, std::move (tree));
-        return insertedPreset;
+        auto& insertedTree = insertionHelper.insertItemIntoTree (topLevelItems, std::move (tree));
+        return fallbackInserter (std::move (preset), insertedTree.subtree, insertionHelper);
     }
 
     Preset& vendorInserter (Preset&& preset, std::vector<PresetTree::Item>& topLevelItems, const PresetTree::InsertionHelper& insertionHelper)

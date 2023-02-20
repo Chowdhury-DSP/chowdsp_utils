@@ -63,13 +63,13 @@ void MenuInterface::addExtraMenuItems (juce::PopupMenu& menu, std::initializer_l
         {
             addPresetMenuItem ([this]
                                { fileInterface->resaveCurrentPreset(); },
-                               currentPresetFileExists && ! presetManager.isFactoryPreset (*currentPreset) && hasFileInterface);
+                               currentPresetFileExists && ! (currentPreset->isFactoryPreset) && hasFileInterface);
         }
         else if (itemID == Delete_Preset)
         {
             addPresetMenuItem ([this]
                                { fileInterface->deleteCurrentPreset(); },
-                               currentPresetFileExists && ! presetManager.isFactoryPreset (*currentPreset) && hasFileInterface);
+                               currentPresetFileExists && ! (currentPreset->isFactoryPreset) && hasFileInterface);
         }
         else if (itemID == Copy_Current_Preset)
         {
