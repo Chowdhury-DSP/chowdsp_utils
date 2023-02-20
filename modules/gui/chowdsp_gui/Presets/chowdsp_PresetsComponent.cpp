@@ -185,7 +185,7 @@ void PresetsComponent::saveUserPreset (nlohmann::json&& presetState)
 
     presetNameEditor.onReturnKey = [this, presetState = std::move (presetState)]() mutable
     {
-        Preset preset { presetNameEditor.getText(), presetManager.getUserPresetVendorName(), std::move (presetState) };
+        auto preset = presetManager.getUserPresetForState (presetNameEditor.getText(), std::move (presetState));
         const auto file = fileInterface->getFileForPreset (preset);
 
         if (file.existsAsFile() && ! queryShouldOverwriteFile())

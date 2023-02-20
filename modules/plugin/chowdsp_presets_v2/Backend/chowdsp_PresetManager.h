@@ -38,6 +38,9 @@ public:
     /** Adds a vector of presets. */
     void addPresets (std::vector<Preset>&& presets, bool areFactoryPresets = true);
 
+    /** Returns a user preset with the given name and state. */
+    [[nodiscard]] virtual Preset getUserPresetForState (const juce::String& presetName, nlohmann::json&& presetState) const;
+
     /**
      * Saves the plugin's current state to a preset file, and loads the preset.
      * The preset will have the same name as the file.
@@ -64,9 +67,6 @@ public:
 
     /** Loads the default preset. */
     void loadDefaultPreset();
-
-    /** Returns true if the given preset is a factory preset. */
-    [[nodiscard]] bool isFactoryPreset (const Preset& preset) const;
 
     /** Returns the internal preset tree. */
     [[nodiscard]] auto& getPresetTree() { return presetTree; }
@@ -123,7 +123,6 @@ private:
 
     PresetTree presetTree;
     const Preset* defaultPreset = nullptr;
-    std::vector<const Preset*> factoryPresets {};
 
     juce::File userPresetPath {};
     const juce::String presetFileExt {};
