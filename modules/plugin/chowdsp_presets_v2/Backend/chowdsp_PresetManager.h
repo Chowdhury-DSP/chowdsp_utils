@@ -68,9 +68,6 @@ public:
     /** Loads the default preset. */
     void loadDefaultPreset();
 
-    /** Returns true if the given preset is a factory preset. */
-    [[nodiscard]] bool isFactoryPreset (const Preset& preset) const;
-
     /** Returns the internal preset tree. */
     [[nodiscard]] auto& getPresetTree() { return presetTree; }
 
@@ -126,7 +123,6 @@ private:
 
     PresetTree presetTree;
     const Preset* defaultPreset = nullptr;
-    std::vector<const Preset*> factoryPresets {};
 
     juce::File userPresetPath {};
     const juce::String presetFileExt {};
