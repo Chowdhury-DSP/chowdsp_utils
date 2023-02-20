@@ -119,13 +119,13 @@ public:
             parameterID,
             parameterName,
             EnumHelpers::createStringArray<EnumType> (charMap),
-            static_cast<int> (defaultChoice))
+            static_cast<int> (*magic_enum::enum_index (defaultChoice)))
     {
     }
 
     EnumType get() const noexcept
     {
-        return static_cast<EnumType> (getIndex());
+        return magic_enum::enum_value<EnumType> ((size_t) getIndex());
     }
 
     using Ptr = OptionalPointer<EnumChoiceParameter>;

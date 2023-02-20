@@ -96,9 +96,12 @@ TEST_CASE ("Param Helpers Test", "[plugin][parameters]")
 
         chowdsp::EnumChoiceParameter<Mode> modeParam ("mode", "Mode", Mode::Mode_1);
 
-        REQUIRE_MESSAGE (modeParam.get() == Mode_1, "Default value is incorrect!");
         REQUIRE_MESSAGE (static_cast<juce::RangedAudioParameter&> (modeParam).getText (0.0f, 1024) == juce::String ("Mode 1"), "Mode 1 value string is incorrect!");
         REQUIRE_MESSAGE (static_cast<juce::RangedAudioParameter&> (modeParam).getText (0.5f, 1024) == juce::String ("Mode 2"), "Mode 2 value string is incorrect!");
         REQUIRE_MESSAGE (static_cast<juce::RangedAudioParameter&> (modeParam).getText (1.0f, 1024) == juce::String ("Mode 3"), "Mode 3 value string is incorrect!");
+
+        REQUIRE_MESSAGE (modeParam.get() == Mode_1, "Default value is incorrect!");
+        modeParam.setValueNotifyingHost (1.0f);
+        REQUIRE_MESSAGE (modeParam.get() == Mode_3, "Set value is incorrect!");
     }
 }
