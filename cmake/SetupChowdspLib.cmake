@@ -71,4 +71,9 @@ function(setup_chowdsp_lib lib_name)
         find_package(Threads REQUIRED)
         target_link_libraries(${lib_name} PUBLIC Threads::Threads)
     endif()
+
+    install(
+        TARGETS ${lib_name}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    )
 endfunction(setup_chowdsp_lib)
