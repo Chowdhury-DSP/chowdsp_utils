@@ -4,6 +4,7 @@ inline ParamHolder::ParamHolder (const juce::String& phName, bool phIsOwning)
     : name (phName),
       isOwning (phIsOwning)
 {
+    juce::ignoreUnused (isOwning);
 }
 
 template <typename ParamType, typename... OtherParams>

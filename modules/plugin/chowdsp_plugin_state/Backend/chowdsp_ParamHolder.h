@@ -98,7 +98,7 @@ private:
     std::vector<ParamHolder*> otherParams;
 
     juce::String name;
-    [[maybe_unused]] bool isOwning;
+    bool isOwning;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParamHolder)
 };
