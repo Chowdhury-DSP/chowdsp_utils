@@ -33,7 +33,11 @@ struct SignalGenParams : chowdsp::ParamHolder
     chowdsp::ChoiceParameter::Ptr typeParam {
         juce::ParameterID { "type", 100 },
         "Tone Type",
-        juce::StringArray { "Sine", "Saw", "Square", "Triangle" },
+        juce::StringArray { "Sine",
+                            "Saw",
+                            "Square",
+                            "Triangle",
+                            "Additive Saw" },
         0
     };
 
@@ -47,7 +51,15 @@ struct SignalGenParams : chowdsp::ParamHolder
     chowdsp::ChoiceParameter::Ptr waveshapeParam {
         juce::ParameterID { "waveshape", 100 },
         "Waveshaper",
-        juce::StringArray { "None", "Hard Clip", "Tanh Clip", "Cubic Clip", "9th-Order Clip", "Full Wave Rectify", "West Coast", "Wave Multiply", "Sine Clip" },
+        juce::StringArray { "None",
+                            "Hard Clip",
+                            "Tanh Clip",
+                            "Cubic Clip",
+                            "9th-Order Clip",
+                            "Full Wave Rectify",
+                            "West Coast",
+                            "Wave Multiply",
+                            "Sine Clip" },
         0
     };
 };
@@ -73,6 +85,8 @@ private:
     chowdsp::SawtoothWave<float> saw;
     chowdsp::SquareWave<float> square;
     chowdsp::TriangleWave<float> triangle;
+    static constexpr size_t numHarmonics = 400;
+    chowdsp::AdditiveOscillator<numHarmonics, chowdsp::AdditiveOscSineApprox::AbsApprox> additiveSaw;
     chowdsp::Gain<float> gain;
 
     using AAFilter = chowdsp::ButterworthFilter<12>;

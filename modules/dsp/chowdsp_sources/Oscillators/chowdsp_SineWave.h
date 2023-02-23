@@ -9,6 +9,8 @@ template <typename T>
 class SineWave
 {
 public:
+    using NumericType = SampleTypeHelpers::NumericType<T>;
+
     SineWave() = default;
 
     /** Sets the frequency of the oscillator. */

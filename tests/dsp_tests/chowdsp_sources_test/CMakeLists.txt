@@ -7,4 +7,5 @@ target_sources(chowdsp_sources_test
         SquareTest.cpp
         TriangleTest.cpp
         PolygonalTest.cpp
+        AdditiveOscTest.cpp
 )
