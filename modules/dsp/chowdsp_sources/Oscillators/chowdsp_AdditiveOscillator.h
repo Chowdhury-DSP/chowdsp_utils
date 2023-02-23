@@ -74,7 +74,7 @@ private:
         const auto phiMod = xsimd::fmod (phi + maxNumHarmonics * twoPi, (Vec) twoPi) - pi;
         const auto absPhi = xsimd::abs (phiMod);
 
-        return fourOverPiSq * phiMod * (pi - absPhi);
+        return -fourOverPiSq * phiMod * (pi - absPhi);
     }
 
     template <AdditiveOscSineApprox A = sineApprox>
@@ -91,7 +91,7 @@ private:
         const auto absPhiTimesPiMinusPhi = absPhi * (pi - absPhi);
         const auto numerator = (SampleType) 16 * absPhiTimesPiMinusPhi;
         const auto denominator = fivePiSq - (SampleType) 4 * absPhiTimesPiMinusPhi;
-        return signPhi * numerator / denominator;
+        return -signPhi * numerator / denominator;
     }
 
     template <AdditiveOscSineApprox A = sineApprox>
