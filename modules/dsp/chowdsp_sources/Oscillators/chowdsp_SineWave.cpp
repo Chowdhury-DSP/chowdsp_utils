@@ -3,14 +3,15 @@ namespace chowdsp
 template <typename T>
 void SineWave<T>::setFrequency (T newFrequency) noexcept
 {
+    CHOWDSP_USING_XSIMD_STD (sin);
     freq = newFrequency;
-    eps = 2 * std::sin (juce::MathConstants<T>::pi * newFrequency / fs);
+    eps = 2 * sin (juce::MathConstants<NumericType>::pi * newFrequency / fs);
 }
 
 template <typename T>
 void SineWave<T>::prepare (const juce::dsp::ProcessSpec& spec) noexcept
 {
-    fs = static_cast<T> (spec.sampleRate);
+    fs = static_cast<T> ((NumericType) spec.sampleRate);
     reset();
 }
 
@@ -18,15 +19,17 @@ template <typename T>
 void SineWave<T>::reset() noexcept
 {
     // reset state to be "in phase"
-    x1 = -1.0f;
-    x2 = 0.0f;
+    x1 = (T) -1;
+    x2 = (T) 0;
 }
 
 template <typename T>
 void SineWave<T>::reset (T phase) noexcept
 {
-    x1 = std::sin (phase);
-    x2 = std::cos (phase);
+    CHOWDSP_USING_XSIMD_STD (sin);
+    CHOWDSP_USING_XSIMD_STD (cos);
+    x1 = sin (phase);
+    x2 = cos (phase);
 }
 
 template <typename T>

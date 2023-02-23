@@ -26,6 +26,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Oscillators/chowdsp_SineWave.h"
 #include "Oscillators/chowdsp_SquareWave.h"
 #include "Oscillators/chowdsp_TriangleWave.h"
+#include "Oscillators/chowdsp_AdditiveOscillator.h"
 
 #include "Oscillators/chowdsp_PolygonalOscillator.h"
 

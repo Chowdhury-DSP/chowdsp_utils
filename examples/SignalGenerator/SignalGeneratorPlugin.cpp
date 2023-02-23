@@ -3,6 +3,11 @@
 SignalGeneratorPlugin::SignalGeneratorPlugin()
 {
     freqHzParamSmoothed.setParameterHandle (state.params.freqParam.get());
+
+    float additiveHarmonics[numHarmonics] {};
+    for (auto [i, amp] : chowdsp::enumerate (additiveHarmonics))
+        amp = 1.0f / float (i + 1);
+    additiveSaw.setHarmonicAmplitudes (additiveHarmonics);
 }
 
 void SignalGeneratorPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)
@@ -45,6 +50,7 @@ void SignalGeneratorPlugin::prepareTones (double sampleRate, int maxSamplesPerBl
     saw.prepare (spec);
     square.prepare (spec);
     triangle.prepare (spec);
+    additiveSaw.prepare ((float) sampleRate, maxSamplesPerBlock);
 
     gain.prepare (spec);
 
@@ -193,6 +199,8 @@ void SignalGeneratorPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
         processTone (square);
     else if (typeChoice == 3)
         processTone (triangle);
+    else if (typeChoice == 4)
+        processTone (additiveSaw);
     else
         jassertfalse; // unknown type!
 }
