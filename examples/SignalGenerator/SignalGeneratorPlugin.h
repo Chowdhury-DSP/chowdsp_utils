@@ -86,7 +86,7 @@ private:
     chowdsp::SquareWave<float> square;
     chowdsp::TriangleWave<float> triangle;
     static constexpr size_t numHarmonics = 400;
-    chowdsp::AdditiveOscillator<numHarmonics, float> additiveSaw;
+    chowdsp::AdditiveOscillator<numHarmonics, chowdsp::AdditiveOscSineApprox::AbsApprox> additiveSaw;
     chowdsp::Gain<float> gain;
 
     using AAFilter = chowdsp::ButterworthFilter<12>;

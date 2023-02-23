@@ -1,7 +1,7 @@
 namespace chowdsp
 {
-template <size_t maxNumHarmonics, typename SampleType>
-void AdditiveOscillator<maxNumHarmonics, SampleType>::setHarmonicAmplitudes (const SampleType (&amps)[maxNumHarmonics])
+template <size_t maxNumHarmonics, AdditiveOscSineApprox sineApprox, typename SampleType>
+void AdditiveOscillator<maxNumHarmonics, sineApprox, SampleType>::setHarmonicAmplitudes (const SampleType (&amps)[maxNumHarmonics])
 {
     size_t remainingHarmonics = maxNumHarmonics;
     size_t count = 0;
@@ -22,8 +22,8 @@ void AdditiveOscillator<maxNumHarmonics, SampleType>::setHarmonicAmplitudes (con
     setFrequency (oscFrequency, true);
 }
 
-template <size_t maxNumHarmonics, typename SampleType>
-void AdditiveOscillator<maxNumHarmonics, SampleType>::setFrequency (SampleType frequencyHz, bool force)
+template <size_t maxNumHarmonics, AdditiveOscSineApprox sineApprox, typename SampleType>
+void AdditiveOscillator<maxNumHarmonics, sineApprox, SampleType>::setFrequency (SampleType frequencyHz, bool force)
 {
     if (oscFrequency == frequencyHz && ! force)
         return;
@@ -40,8 +40,8 @@ void AdditiveOscillator<maxNumHarmonics, SampleType>::setFrequency (SampleType f
     }
 }
 
-template <size_t maxNumHarmonics, typename SampleType>
-void AdditiveOscillator<maxNumHarmonics, SampleType>::prepare (double sampleRate, [[maybe_unused]] int samplesPerBlock)
+template <size_t maxNumHarmonics, AdditiveOscSineApprox sineApprox, typename SampleType>
+void AdditiveOscillator<maxNumHarmonics, sineApprox, SampleType>::prepare (double sampleRate, [[maybe_unused]] int samplesPerBlock)
 {
     twoPiOverFs = juce::MathConstants<SampleType>::twoPi / (SampleType) sampleRate;
     nyquistFreq = (SampleType) sampleRate * (SampleType) 0.495;
@@ -49,28 +49,21 @@ void AdditiveOscillator<maxNumHarmonics, SampleType>::prepare (double sampleRate
     setFrequency (oscFrequency, true);
 }
 
-template <size_t maxNumHarmonics, typename SampleType>
-void AdditiveOscillator<maxNumHarmonics, SampleType>::reset (SampleType phase)
+template <size_t maxNumHarmonics, AdditiveOscSineApprox sineApprox, typename SampleType>
+void AdditiveOscillator<maxNumHarmonics, sineApprox, SampleType>::reset (SampleType phase)
 {
-    oscPhase.reset (phase);
+    oscPhase = phase - phaseEps;
+    incrementPhase (oscPhase, phaseEps);
 }
 
-template <size_t maxNumHarmonics, typename SampleType>
-void AdditiveOscillator<maxNumHarmonics, SampleType>::processBlock (const BufferView<SampleType>& buffer) noexcept
+template <size_t maxNumHarmonics, AdditiveOscSineApprox sineApprox, typename SampleType>
+void AdditiveOscillator<maxNumHarmonics, sineApprox, SampleType>::processBlock (const BufferView<SampleType>& buffer) noexcept
 {
+    ScopedValue scopedPhi { oscPhase };
     for (auto& sample : buffer.getWriteSpan (0))
     {
-        auto vecFreqMult = iota;
-
-        Vec result {};
-        for (auto& amp : amplitudesInternal)
-        {
-            result += amp * xsimd::sin (vecFreqMult * oscPhase.phase);
-            vecFreqMult += (SampleType) vecSize;
-        }
-        sample = xsimd::reduce_add (result);
-
-        oscPhase.advance (phaseEps);
+        sample = generateSample (iota, scopedPhi.get(), amplitudesInternal);
+        incrementPhase (scopedPhi.get(), phaseEps);
     }
 
     for (int ch = 1; ch < buffer.getNumChannels(); ++ch)
