@@ -24,7 +24,7 @@ void testAdditiveSine()
 
     chowdsp::AdditiveOscillator<1, approx> osc;
     osc.setHarmonicAmplitudes ({ 1.0f });
-    osc.prepare ((double) fs, 1);
+    osc.prepare ((double) fs);
     osc.setFrequency (freq);
 
     const auto phaseOffest = 0.1f;
@@ -51,7 +51,7 @@ void testAdditiveSaw()
     for (auto [i, amp] : chowdsp::enumerate (additiveHarmonics))
         amp = 1.0f / float (i + 1);
     osc.setHarmonicAmplitudes (additiveHarmonics);
-    osc.prepare ((double) fs, 1);
+    osc.prepare ((double) fs);
     osc.setFrequency (freq);
     osc.setFrequency (freq);
 

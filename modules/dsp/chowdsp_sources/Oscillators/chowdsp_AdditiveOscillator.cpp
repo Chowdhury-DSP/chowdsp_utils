@@ -41,7 +41,7 @@ void AdditiveOscillator<maxNumHarmonics, sineApprox, SampleType>::setFrequency (
 }
 
 template <size_t maxNumHarmonics, AdditiveOscSineApprox sineApprox, typename SampleType>
-void AdditiveOscillator<maxNumHarmonics, sineApprox, SampleType>::prepare (double sampleRate, [[maybe_unused]] int samplesPerBlock)
+void AdditiveOscillator<maxNumHarmonics, sineApprox, SampleType>::prepare (double sampleRate)
 {
     twoPiOverFs = juce::MathConstants<SampleType>::twoPi / (SampleType) sampleRate;
     nyquistFreq = (SampleType) sampleRate * (SampleType) 0.495;
@@ -62,11 +62,11 @@ void AdditiveOscillator<maxNumHarmonics, sineApprox, SampleType>::processBlock (
     ScopedValue scopedPhi { oscPhase };
     for (auto& sample : buffer.getWriteSpan (0))
     {
-        sample = generateSample (iota, scopedPhi.get(), amplitudesInternal);
+        sample += generateSample (iota, scopedPhi.get(), amplitudesInternal);
         incrementPhase (scopedPhi.get(), phaseEps);
     }
 
     for (int ch = 1; ch < buffer.getNumChannels(); ++ch)
-        BufferMath::copyBufferChannels (buffer, buffer, 0, ch);
+        BufferMath::addBufferChannels (buffer, buffer, 0, ch);
 }
 } // namespace chowdsp
