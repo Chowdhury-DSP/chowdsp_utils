@@ -17,6 +17,7 @@ class AdditiveOscillator
 public:
     static_assert (std::is_floating_point_v<SampleType>, "SampleType must be a floating point type!");
 
+    static constexpr auto numHarmonics = maxNumHarmonics;
     using Vec = xsimd::batch<SampleType>;
     static constexpr auto vecSize = Vec::size;
     static constexpr auto maxNumVecSines = Math::ceiling_divide (maxNumHarmonics, vecSize);
@@ -30,7 +31,7 @@ public:
     void setFrequency (SampleType frequencyHz, bool force = false);
 
     /** Prepares the filter bank to process a new audio stream */
-    void prepare (double sampleRate, int samplesPerBlock);
+    void prepare (double sampleRate);
 
     /** Resets the oscillator phase */
     void reset (SampleType phase = (SampleType) 0);

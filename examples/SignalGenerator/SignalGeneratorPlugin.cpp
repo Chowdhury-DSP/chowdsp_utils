@@ -50,7 +50,7 @@ void SignalGeneratorPlugin::prepareTones (double sampleRate, int maxSamplesPerBl
     saw.prepare (spec);
     square.prepare (spec);
     triangle.prepare (spec);
-    additiveSaw.prepare ((float) sampleRate, maxSamplesPerBlock);
+    additiveSaw.prepare ((float) sampleRate);
 
     gain.prepare (spec);
 
