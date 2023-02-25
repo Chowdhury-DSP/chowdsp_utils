@@ -7,16 +7,24 @@ struct BandSplitParams : chowdsp::ParamHolder
 {
     BandSplitParams()
     {
-        add (freqParam,
+        add (freqLowParam,
+             freqHighParam,
              orderParam,
              modeParam);
     }
 
-    chowdsp::FreqHzParameter::Ptr freqParam {
-        juce::ParameterID { "freq", 100 },
-        "Crossover Frequency",
+    chowdsp::FreqHzParameter::Ptr freqLowParam {
+        juce::ParameterID { "freq_low", 100 },
+        "Low Crossover Frequency",
         chowdsp::ParamUtils::createNormalisableRange (20.0f, 20000.0f, 2000.0f),
-        1000.0f
+        200.0f
+    };
+
+    chowdsp::FreqHzParameter::Ptr freqHighParam {
+        juce::ParameterID { "freq_high", 100 },
+        "High Crossover Frequency",
+        chowdsp::ParamUtils::createNormalisableRange (20.0f, 20000.0f, 2000.0f),
+        2000.0f
     };
 
     chowdsp::ChoiceParameter::Ptr orderParam {
@@ -29,7 +37,7 @@ struct BandSplitParams : chowdsp::ParamHolder
     chowdsp::ChoiceParameter::Ptr modeParam {
         juce::ParameterID { "mode", 100 },
         "Mode",
-        juce::StringArray { "Through", "Mute Low", "Mute High" },
+        juce::StringArray { "Through", "Solo Low", "Solo Mid", "Solo High" },
         0
     };
 };
@@ -47,13 +55,14 @@ public:
     juce::AudioProcessorEditor* createEditor() override { return nullptr; }
 
 private:
-    chowdsp::LinkwitzRileyFilter<float, 1> filter1;
-    chowdsp::LinkwitzRileyFilter<float, 2> filter2;
-    chowdsp::LinkwitzRileyFilter<float, 4> filter4;
-    chowdsp::LinkwitzRileyFilter<float, 8> filter8;
-    chowdsp::LinkwitzRileyFilter<float, 12> filter12;
+    chowdsp::ThreeWayCrossoverFilter<float, 1> filter1;
+    chowdsp::ThreeWayCrossoverFilter<float, 2> filter2;
+    chowdsp::ThreeWayCrossoverFilter<float, 4> filter4;
+    chowdsp::ThreeWayCrossoverFilter<float, 8> filter8;
+    chowdsp::ThreeWayCrossoverFilter<float, 12> filter12;
 
     chowdsp::Buffer<float> lowBuffer;
+    chowdsp::Buffer<float> midBuffer;
     chowdsp::Buffer<float> highBuffer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BandSplitPlugin)

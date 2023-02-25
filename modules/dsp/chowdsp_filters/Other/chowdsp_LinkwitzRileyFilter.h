@@ -176,7 +176,7 @@ public:
         highFilter.reset();
     }
 
-    /** Processes the lowpass part of the crossover filter */
+    /** Processes the both bands of the crossover filter */
     [[maybe_unused]] void processBlock (const BufferView<const T>& bufferIn,
                                         const BufferView<T>& bufferLow,
                                         const BufferView<T>& bufferHigh) noexcept
