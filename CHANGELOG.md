@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 - Added `chowdsp::StringLiteral`.
 - Added `chowdsp::buffer_iters`.
 - Added `chowdsp::AdditiveOscillator`.
+- Added `chowdsp::ThreeWayCrossoverFilter`.
 - `chowdsp::Gain`: Fixed reset() to reset the smoother to the target gain value.
 - BypassProcessor: Added template specialization with no latency compensation.
 - `chowdsp::BufferMath`: Added multiplyBufferData() function.
