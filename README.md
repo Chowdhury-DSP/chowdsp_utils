@@ -1,5 +1,6 @@
 # chowdsp_utils
 
+[![Version](https://img.shields.io/github/v/release/Chowdhury-DSP/chowdsp_utils?color=gold&include_prereleases&label=Release&logo=Github)](https://github.com/Chowdhury-DSP/chowdsp_utils/releases/latest)
 [![Test](https://github.com/Chowdhury-DSP/chowdsp_utils/actions/workflows/run-tests.yml/badge.svg)](https://github.com/Chowdhury-DSP/chowdsp_utils/actions/workflows/run-tests.yml)
 [![Examples](https://github.com/Chowdhury-DSP/chowdsp_utils/actions/workflows/examples.yml/badge.svg)](https://github.com/Chowdhury-DSP/chowdsp_utils/actions/workflows/examples.yml)
 [![Benchmarks](https://github.com/Chowdhury-DSP/chowdsp_utils/actions/workflows/bench.yml/badge.svg)](https://github.com/Chowdhury-DSP/chowdsp_utils/actions/workflows/bench.yml)
