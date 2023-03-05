@@ -5,7 +5,7 @@
 
     ID:            chowdsp_gui
     vendor:        Chowdhury DSP
-    version:       2.0.0
+    version:       2.1.0
     name:          ChowDSP GUI Utilities
     description:   Commonly used GUI utilities for ChowDSP plugins
     dependencies:  juce_core, juce_audio_processors, juce_gui_basics, juce_dsp, chowdsp_core

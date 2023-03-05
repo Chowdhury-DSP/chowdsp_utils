@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [UNRELEASED]
+## [2.1.0] 2023-03-04
 - Added `chowdsp_visualizers` module.
 - Added `chowdsp_presets_v2` module.
 - Added `chowdsp::StringLiteral`.

@@ -5,7 +5,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_visualizers
    vendor:        Chowdhury DSP
-   version:       2.0.0
+   version:       2.1.0
    name:          ChowDSP Visualizer Utilities
    description:   UI visualizer components for ChowDSP plugins
    dependencies:  juce_gui_basics, juce_audio_basics, chowdsp_filters

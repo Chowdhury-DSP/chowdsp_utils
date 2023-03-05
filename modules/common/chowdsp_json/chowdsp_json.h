@@ -5,7 +5,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_json
    vendor:        Chowdhury DSP
-   version:       2.0.0
+   version:       2.1.0
    name:          ChowDSP JSON Utilities
    description:   JUCE interface for nlohmann::json
    dependencies:  juce_core
