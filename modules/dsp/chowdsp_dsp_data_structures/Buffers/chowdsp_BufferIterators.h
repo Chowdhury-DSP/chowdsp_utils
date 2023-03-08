@@ -78,7 +78,7 @@ namespace buffer_iters
      * Iterates over a buffer in sub-blocks.
      *
      * @tparam subBlockSize The iterator will always supply sub-blocks of this size _or smaller_.
-     * @tparam channelWise  If true, the iterator will iterate over the buffer channels first.
+     * @tparam channelWise  If true, the iterator will iterate over the buffer channels as the innermost loop.
      */
     template <int subBlockSize, bool channelWise = false, typename BufferType>
     constexpr auto sub_blocks (BufferType& buffer)
@@ -179,7 +179,7 @@ namespace buffer_iters
      * Iterates over a buffer in sub-blocks.
      *
      * @tparam subBlockSize The iterator will always supply sub-blocks of this size _or smaller_.
-     * @tparam channelWise  If true, the iterator will iterate over the buffer channels first.
+     * @tparam channelWise  If true, the iterator will iterate over the buffer channels as the innermost loop.
      */
     template <int subBlockSize,
               bool channelWise = false,
