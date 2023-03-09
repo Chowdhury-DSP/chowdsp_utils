@@ -38,3 +38,5 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "SpectrumPlots/chowdsp_EQFilterPlots.h"
 #include "SpectrumPlots/chowdsp_EqualizerPlot.h"
 #include "SpectrumPlots/chowdsp_GenericFilterPlotter.h"
+
+#include "WaveshaperPlot/chowdsp_WaveshaperPlot.h"
