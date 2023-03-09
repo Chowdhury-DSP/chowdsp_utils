@@ -47,7 +47,7 @@ TEST_CASE ("Waveshaper Plot Test", "[visualizers]")
 {
     TestWaveshapePlotter comp {};
     const auto testScreenshot = comp.createComponentSnapshot ({ 500, 300 });
-    //    VizTestUtils::saveImage (testScreenshot, "waveshaper_plot.png");
+    VizTestUtils::saveImage (testScreenshot, "waveshaper_plot.png");
 
     const auto refScreenshot = VizTestUtils::loadImage ("waveshaper_plot.png");
     VizTestUtils::compareImages (testScreenshot, refScreenshot);
