@@ -3,3 +3,5 @@
 #include "SpectrumPlots/chowdsp_SpectrumPlotBase.cpp"
 #include "SpectrumPlots/chowdsp_EqualizerPlot.cpp"
 #include "SpectrumPlots/chowdsp_GenericFilterPlotter.cpp"
+
+#include "WaveshaperPlot/chowdsp_WaveshaperPlot.cpp"
