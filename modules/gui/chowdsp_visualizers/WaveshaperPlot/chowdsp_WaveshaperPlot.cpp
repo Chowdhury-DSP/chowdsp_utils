@@ -1,6 +1,6 @@
 namespace chowdsp
 {
-WaveshaperPlot::WaveshaperPlot (WaveshaperPlotParams&& plotParams) : params (plotParams) {}
+WaveshaperPlot::WaveshaperPlot (WaveshaperPlotParams&& plotParams) : params (std::move (plotParams)) {}
 
 float WaveshaperPlot::getXCoordinateForAmplitude (float amplitude) const noexcept
 {
