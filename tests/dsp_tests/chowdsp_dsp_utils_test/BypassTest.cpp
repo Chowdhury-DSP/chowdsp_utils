@@ -17,10 +17,6 @@ void processFunc (const chowdsp::BufferView<float>& buffer, BypassType& bypass, 
         return;
 
     blockFunc (buffer);
-    //    auto* x = buffer.getWritePointer (0);
-    //    for (int n = 0; n < nSamples; ++n)
-    //        x[n] = sampleFunc (x[n]);
-
     bypass.processBlockOut (buffer, onOff);
 }
 
