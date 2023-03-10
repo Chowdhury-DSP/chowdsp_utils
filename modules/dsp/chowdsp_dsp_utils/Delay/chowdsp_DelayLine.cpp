@@ -81,6 +81,17 @@ void DelayLine<SampleType, InterpolationType>::prepare (const juce::dsp::Process
 }
 
 template <typename SampleType, typename InterpolationType>
+void DelayLine<SampleType, InterpolationType>::free()
+{
+    this->bufferData.setMaxSize (0, 0);
+
+    this->writePos.clear();
+    this->readPos.clear();
+    this->v.clear();
+    bufferPtrs.clear();
+}
+
+template <typename SampleType, typename InterpolationType>
 void DelayLine<SampleType, InterpolationType>::reset()
 {
     for (auto vec : { &this->writePos, &this->readPos })

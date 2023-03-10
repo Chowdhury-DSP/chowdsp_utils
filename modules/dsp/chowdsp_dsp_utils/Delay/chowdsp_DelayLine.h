@@ -42,6 +42,7 @@ public:
     [[nodiscard]] virtual NumericType getDelay() const = 0;
 
     virtual void prepare (const juce::dsp::ProcessSpec& /* spec */) = 0;
+    virtual void free() = 0;
     virtual void reset() = 0;
 
     virtual void pushSample (int /* channel */, SampleType /* sample */) noexcept = 0;
@@ -112,6 +113,9 @@ public:
     //==============================================================================
     /** Initialises the processor. */
     void prepare (const juce::dsp::ProcessSpec& spec) final;
+
+    /** Frees internal memory. */
+    void free() final;
 
     /** Resets the internal state variables of the processor. */
     void reset() final;
@@ -185,6 +189,19 @@ public:
         auto newReadPtr = this->readPos[(size_t) channel] + totalSize - 1;
         newReadPtr = newReadPtr > totalSize ? newReadPtr - totalSize : newReadPtr;
         this->readPos[(size_t) channel] = newReadPtr;
+    }
+
+    /** Process a block of audio. */
+    void processBlock (const BufferView<SampleType>& buffer)
+    {
+        for (auto [channelIndex, channelData] : buffer_iters::channels (buffer))
+        {
+            for (auto& sample : channelData)
+            {
+                pushSample (channelIndex, sample);
+                sample = popSample (channelIndex);
+            }
+        }
     }
 
     //==============================================================================

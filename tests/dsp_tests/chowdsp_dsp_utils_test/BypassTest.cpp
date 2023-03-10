@@ -9,17 +9,14 @@ constexpr int pulseSpace = 100;
 constexpr float delaySamp = 5.0f;
 } // namespace
 
-template <typename BypassType>
-void processFunc (const chowdsp::BufferView<float>& buffer, BypassType& bypass, std::atomic<float>* onOffParam, const std::function<float (float)>& sampleFunc)
+template <typename BypassType, typename FuncType>
+void processFunc (const chowdsp::BufferView<float>& buffer, BypassType& bypass, std::atomic<float>* onOffParam, FuncType&& blockFunc)
 {
     auto onOff = bypass.toBool (onOffParam);
     if (! bypass.processBlockIn (buffer, onOff))
         return;
 
-    auto* x = buffer.getWritePointer (0);
-    for (int n = 0; n < nSamples; ++n)
-        x[n] = sampleFunc (x[n]);
-
+    blockFunc (buffer);
     bypass.processBlockOut (buffer, onOff);
 }
 
@@ -85,8 +82,14 @@ TEST_CASE ("Bypass Test", "[dsp][misc]")
         for (int i = 0; i < bufferTestNIters; ++i)
         {
             chowdsp::BufferView<float> subBuffer { buffer, i * nSamples, nSamples };
-            processFunc (subBuffer, bypass, &onOffParam, [] (float x)
-                         { return x + 1.0f; });
+            processFunc (subBuffer,
+                         bypass,
+                         &onOffParam,
+                         [] (const chowdsp::BufferView<float>& block)
+                         {
+                             for (auto [ch, data] : chowdsp::buffer_iters::channels (block))
+                                 juce::FloatVectorOperations::add (data.data(), 1.0f, data.size());
+                         });
             onOffParam.store (1.0f - onOffParam.load());
         }
 
@@ -110,14 +113,18 @@ TEST_CASE ("Bypass Test", "[dsp][misc]")
         for (int i = 0; i < delayTestNIters; ++i)
         {
             chowdsp::BufferView<float> subBuffer { buffer, i * nSamples, nSamples };
-            processFunc (subBuffer, bypass, &onOffParam, [&] (float x)
+            processFunc (subBuffer,
+                         bypass,
+                         &onOffParam,
+                         [&] (const chowdsp::BufferView<float>& block)
                          {
-                delay.pushSample (0, x);
-                return delay.popSample (0); });
+                             delay.processBlock (block);
+                         });
 
             if (i % 2 != 0)
                 onOffParam.store (1.0f - onOffParam.load());
         }
+        delay.free();
 
         checkPulseSpacing (buffer.getReadPointer (0), delayTestNIters * nSamples, pulseSpace);
     }
