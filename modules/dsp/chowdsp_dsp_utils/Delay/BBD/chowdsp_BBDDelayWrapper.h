@@ -65,6 +65,13 @@ public:
         }
     }
 
+    /** Frees internal memory */
+    void free() final
+    {
+        inputs.clear();
+        lines.clear();
+    }
+
     /** Resets the state of the delay line */
     void reset() final
     {
