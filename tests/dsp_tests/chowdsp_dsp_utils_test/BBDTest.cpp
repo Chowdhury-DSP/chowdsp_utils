@@ -13,6 +13,7 @@ static void processDelay (double fs, float delaySamples, float* samples, int num
         delay.pushSample (0, samples[i]);
         samples[i] = delay.popSample (0);
     }
+    delay.free();
 }
 
 static int findFirstNonZero (const float* bufferPtr, const int numSamples)
