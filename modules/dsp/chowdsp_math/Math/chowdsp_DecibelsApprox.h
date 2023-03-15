@@ -1,7 +1,13 @@
 namespace chowdsp
 {
+/**
+ * Approximate versions of juce::Decibels.
+ *
+ * Note that these approximations rely on an IEEE Standard 754 floating-point representation.
+ */
 namespace DecibelsApprox
 {
+    /** Approximate version of juce::decibelsToGain */
     template <typename T>
     inline T gainToDecibels (T gain, T minusInfinityDb = SampleTypeHelpers::NumericType<T> (-100))
     {
@@ -11,6 +17,7 @@ namespace DecibelsApprox
                                   minusInfinityDb);
     }
 
+    /** Approximate version of juce::gainToDecibels */
     template <typename T>
     inline T decibelsToGain (T decibels, T minusInfinityDb = SampleTypeHelpers::NumericType<T> (-100))
     {
