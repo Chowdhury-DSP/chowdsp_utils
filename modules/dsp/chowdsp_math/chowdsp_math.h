@@ -40,3 +40,6 @@ JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 #include "Math/chowdsp_Polylogarithm.h"
 #include "Math/chowdsp_BufferMath.h"
 #include "Math/chowdsp_TanhIntegrals.h"
+#include "Math/chowdsp_LogApprox.h"
+#include "Math/chowdsp_PowApprox.h"
+#include "Math/chowdsp_DecibelsApprox.h"
