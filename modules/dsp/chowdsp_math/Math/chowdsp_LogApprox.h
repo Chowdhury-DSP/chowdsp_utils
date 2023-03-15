@@ -1,3 +1,5 @@
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wstrict-aliasing")
+
 namespace chowdsp
 {
 /**
@@ -82,7 +84,7 @@ namespace LogApprox
         const auto vf = reinterpret_cast<const xsimd::batch<float>&> (vfi); // NOSONAR
 
         static constexpr auto log2_base_r = 1.0f / gcem::log2 (Base::template value<float>);
-        return log2_base_r * ((xsimd::batch<float>) e + detail::log2_approx<float> (vf));
+        return log2_base_r * (xsimd::to_float (e) + detail::log2_approx<float> (vf));
     }
 
     /** approximation for log(x) (SIMD 64-bit) */
@@ -96,7 +98,7 @@ namespace LogApprox
         const auto vf = reinterpret_cast<const xsimd::batch<double>&> (vfi); // NOSONAR
 
         static constexpr auto log2_base_r = 1.0 / gcem::log2 (Base::template value<double>);
-        return log2_base_r * ((xsimd::batch<double>) e + detail::log2_approx<double> (vf));
+        return log2_base_r * (xsimd::to_float (e) + detail::log2_approx<double> (vf));
     }
 #endif
 
@@ -113,3 +115,5 @@ namespace LogApprox
     }
 } // namespace LogApprox
 } // namespace chowdsp
+
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE

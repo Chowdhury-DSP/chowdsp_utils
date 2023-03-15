@@ -85,7 +85,7 @@ namespace PowApprox
         const auto f = x - xsimd::to_float (l);
         const auto vi = (l + 127) << 23;
 
-        return reinterpret_cast<const xsimd::batch<float>&> (vi) * detail::pow2_approx<float> (f);
+        return reinterpret_cast<const xsimd::batch<float>&> (vi) * detail::pow2_approx<float> (f); // NOSONAR
     }
 
     /** approximation for pow(Base, x) (SIMD 64-bit) */
@@ -100,7 +100,7 @@ namespace PowApprox
         const auto d = x - xsimd::to_float (l);
         const auto vi = (l + 1023) << 52;
 
-        return reinterpret_cast<const xsimd::batch<double>&> (vi) * detail::pow2_approx<double> (d);
+        return reinterpret_cast<const xsimd::batch<double>&> (vi) * detail::pow2_approx<double> (d); // NOSONAR
     }
 #endif
 
