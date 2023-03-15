@@ -13,7 +13,8 @@ TEMPLATE_TEST_CASE ("Log Approx Test", "[dsp][math][simd]", float, double, xsimd
         for (auto x = (NumericType) -10; x < (NumericType) 10; x += (NumericType) 0.1)
         {
             const auto x_base = std::exp (x);
-            REQUIRE (la::log (x_base) == SIMDApprox<FloatType> { std::log (x_base) }.margin ((NumericType) 0.005));
+            const auto input = (FloatType) x_base;
+            REQUIRE (la::log (input) == SIMDApprox<FloatType> { std::log (x_base) }.margin ((NumericType) 0.005));
         }
     }
 
@@ -22,7 +23,8 @@ TEMPLATE_TEST_CASE ("Log Approx Test", "[dsp][math][simd]", float, double, xsimd
         for (auto x = (NumericType) -10; x < (NumericType) 10; x += (NumericType) 0.1)
         {
             const auto x_base = std::pow ((NumericType) 2, x);
-            REQUIRE (la::log2 (x_base) == SIMDApprox<FloatType> { std::log2 (x_base) }.margin ((NumericType) 0.01));
+            const auto input = (FloatType) x_base;
+            REQUIRE (la::log2 (input) == SIMDApprox<FloatType> { std::log2 (x_base) }.margin ((NumericType) 0.01));
         }
     }
 
@@ -31,7 +33,8 @@ TEMPLATE_TEST_CASE ("Log Approx Test", "[dsp][math][simd]", float, double, xsimd
         for (auto x = (NumericType) -10; x < (NumericType) 10; x += (NumericType) 0.1)
         {
             const auto x_base = std::pow ((NumericType) 10, x);
-            REQUIRE (la::log10 (x_base) == SIMDApprox<FloatType> { std::log10 (x_base) }.margin ((NumericType) 0.005));
+            const auto input = (FloatType) x_base;
+            REQUIRE (la::log10 (input) == SIMDApprox<FloatType> { std::log10 (x_base) }.margin ((NumericType) 0.005));
         }
     }
 }

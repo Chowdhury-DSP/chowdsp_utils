@@ -46,11 +46,11 @@ namespace LogApprox
     template <typename Base = detail::Euler>
     inline float log (float x)
     {
-        const auto vi = reinterpret_cast<int32_t&> (x);
+        const auto vi = reinterpret_cast<int32_t&> (x); // NOSONAR
         const auto ex = vi & 0x7f800000;
         const auto e = (ex >> 23) - 127;
         const auto vfi = (vi - ex) | 0x3f800000;
-        const auto vf = reinterpret_cast<const float&> (vfi);
+        const auto vf = reinterpret_cast<const float&> (vfi); // NOSONAR
 
         static constexpr auto log2_base_r = 1.0f / gcem::log2 (Base::template value<float>);
         return log2_base_r * ((float) e + detail::log2_approx<float> (vf));
@@ -60,11 +60,11 @@ namespace LogApprox
     template <typename Base = detail::Euler>
     inline double log (double x)
     {
-        const auto vi = reinterpret_cast<int64_t&> (x);
+        const auto vi = reinterpret_cast<int64_t&> (x); // NOSONAR
         const auto ex = vi & 0x7ff0000000000000;
         const auto e = (ex >> 52) - 1023;
         const auto vfi = (vi - ex) | 0x3ff0000000000000;
-        const auto vf = reinterpret_cast<const double&> (vfi);
+        const auto vf = reinterpret_cast<const double&> (vfi); // NOSONAR
 
         static constexpr auto log2_base_r = 1.0 / gcem::log2 (Base::template value<double>);
         return log2_base_r * ((double) e + detail::log2_approx<double> (vf));
@@ -75,11 +75,11 @@ namespace LogApprox
     template <typename Base = detail::Euler>
     inline xsimd::batch<float> log (xsimd::batch<float> x)
     {
-        const auto vi = reinterpret_cast<xsimd::batch<int32_t>&> (x);
+        const auto vi = reinterpret_cast<xsimd::batch<int32_t>&> (x); // NOSONAR
         const auto ex = vi & 0x7f800000;
         const auto e = (ex >> 23) - 127;
         const auto vfi = (vi - ex) | 0x3f800000;
-        const auto vf = reinterpret_cast<const xsimd::batch<float>&> (vfi);
+        const auto vf = reinterpret_cast<const xsimd::batch<float>&> (vfi); // NOSONAR
 
         static constexpr auto log2_base_r = 1.0f / gcem::log2 (Base::template value<float>);
         return log2_base_r * ((xsimd::batch<float>) e + detail::log2_approx<float> (vf));
@@ -89,11 +89,11 @@ namespace LogApprox
     template <typename Base = detail::Euler>
     inline xsimd::batch<double> log (xsimd::batch<double> x)
     {
-        const auto vi = reinterpret_cast<xsimd::batch<int64_t>&> (x);
+        const auto vi = reinterpret_cast<xsimd::batch<int64_t>&> (x); // NOSONAR
         const auto ex = vi & 0x7ff0000000000000;
         const auto e = (ex >> 52) - 1023;
         const auto vfi = (vi - ex) | 0x3ff0000000000000;
-        const auto vf = reinterpret_cast<const xsimd::batch<double>&> (vfi);
+        const auto vf = reinterpret_cast<const xsimd::batch<double>&> (vfi); // NOSONAR
 
         static constexpr auto log2_base_r = 1.0 / gcem::log2 (Base::template value<double>);
         return log2_base_r * ((xsimd::batch<double>) e + detail::log2_approx<double> (vf));

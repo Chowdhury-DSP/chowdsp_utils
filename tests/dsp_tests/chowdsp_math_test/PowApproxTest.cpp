@@ -14,7 +14,8 @@ TEMPLATE_TEST_CASE ("Pow Approx Test", "[dsp][math][simd]", float, double, xsimd
         {
             const auto ref = std::exp (x);
             const auto margin = (NumericType) 0.001 * ref;
-            REQUIRE (pa::exp (x) == SIMDApprox<FloatType> { ref }.margin (margin));
+            const auto input = (FloatType) x;
+            REQUIRE (pa::exp (input) == SIMDApprox<FloatType> { ref }.margin (margin));
         }
     }
 
@@ -24,7 +25,8 @@ TEMPLATE_TEST_CASE ("Pow Approx Test", "[dsp][math][simd]", float, double, xsimd
         {
             const auto ref = std::pow ((NumericType) 2, x);
             const auto margin = (NumericType) 0.001 * ref;
-            REQUIRE (pa::pow2 (x) == SIMDApprox<FloatType> { ref }.margin (margin));
+            const auto input = (FloatType) x;
+            REQUIRE (pa::pow2 (input) == SIMDApprox<FloatType> { ref }.margin (margin));
         }
     }
 
@@ -34,7 +36,8 @@ TEMPLATE_TEST_CASE ("Pow Approx Test", "[dsp][math][simd]", float, double, xsimd
         {
             const auto ref = std::pow ((NumericType) 10, x);
             const auto margin = (NumericType) 0.001 * ref;
-            REQUIRE (pa::pow10 (x) == SIMDApprox<FloatType> { ref }.margin (margin));
+            const auto input = (FloatType) x;
+            REQUIRE (pa::pow10 (input) == SIMDApprox<FloatType> { ref }.margin (margin));
         }
     }
 }

@@ -54,7 +54,7 @@ namespace PowApprox
         const auto f = x - (float) l;
         const auto vi = (l + 127) << 23;
 
-        return reinterpret_cast<const float&> (vi) * detail::pow2_approx<float> (f);
+        return reinterpret_cast<const float&> (vi) * detail::pow2_approx<float> (f); // NOSONAR
     }
 
     /** approximation for pow(Base, x) (64-bit) */
@@ -69,7 +69,7 @@ namespace PowApprox
         const auto d = x - (double) l;
         const auto vi = (l + 1023) << 52;
 
-        return reinterpret_cast<const double&> (vi) * detail::pow2_approx<double> (d);
+        return reinterpret_cast<const double&> (vi) * detail::pow2_approx<double> (d); // NOSONAR
     }
 
 #if ! CHOWDSP_NO_XSIMD
@@ -78,10 +78,10 @@ namespace PowApprox
     inline xsimd::batch<float> pow (xsimd::batch<float> x)
     {
         static constexpr auto log2_base = gcem::log2 (Base::template value<float>);
-        x = xsimd::max (-126.0f, log2_base * x);
+        x = xsimd::max (xsimd::broadcast (-126.0f), log2_base * x);
 
         const auto xi = xsimd::to_int (x);
-        const auto l = xsimd::select (xi < 0, xi - 1, xi);
+        const auto l = xsimd::select (xsimd::batch_bool_cast<int32_t> (x < 0.0f), xi - 1, xi);
         const auto f = x - xsimd::to_float (l);
         const auto vi = (l + 127) << 23;
 
@@ -93,10 +93,10 @@ namespace PowApprox
     inline xsimd::batch<double> pow (xsimd::batch<double> x)
     {
         static constexpr auto log2_base = gcem::log2 (Base::template value<double>);
-        x = xsimd::max (-1022.0, log2_base * x);
+        x = xsimd::max (xsimd::broadcast (-1022.0), log2_base * x);
 
         const auto xi = xsimd::to_int (x);
-        const auto l = xsimd::select (xi < 0, xi - 1, xi);
+        const auto l = xsimd::select (xsimd::batch_bool_cast<int64_t> (x < 0.0), xi - 1, xi);
         const auto d = x - xsimd::to_float (l);
         const auto vi = (l + 1023) << 52;
 
