@@ -11,4 +11,7 @@ target_sources(chowdsp_math_test
         JacobiEllipticTest.cpp
         PolylogarithmTest.cpp
         RatioTest.cpp
+        LogApproxTest.cpp
+        PowApproxTest.cpp
+        DecibelsApproxTest.cpp
 )
