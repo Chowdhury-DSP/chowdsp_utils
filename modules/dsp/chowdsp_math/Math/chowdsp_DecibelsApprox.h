@@ -12,7 +12,7 @@ namespace DecibelsApprox
     inline T gainToDecibels (T gain, T minusInfinityDb = SampleTypeHelpers::NumericType<T> (-100))
     {
         CHOWDSP_USING_XSIMD_STD (max);
-        return SIMDUtils::select (gain > T{},
+        return SIMDUtils::select (gain > T {},
                                   max (LogApprox::log10 (gain) * (SampleTypeHelpers::NumericType<T>) 20, minusInfinityDb),
                                   minusInfinityDb);
     }
