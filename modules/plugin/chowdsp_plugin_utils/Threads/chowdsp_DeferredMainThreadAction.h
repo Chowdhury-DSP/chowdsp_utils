@@ -22,7 +22,7 @@ namespace chowdsp
  * real-time thread). This class uses juce::AsyncUpdater, and a lock-free
  * queue to make that happen.
  */
-class DeferredAction : private juce::Timer
+class DeferredAction : public juce::Timer
 {
 public:
     /**
