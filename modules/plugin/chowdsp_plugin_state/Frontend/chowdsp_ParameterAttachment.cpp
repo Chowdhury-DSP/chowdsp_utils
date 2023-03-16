@@ -1,10 +1,12 @@
+#include "chowdsp_ParameterAttachmentHelpers.h"
+
 namespace chowdsp
 {
 template <typename Param, typename Callback>
 ParameterAttachment<Param, Callback>::ParameterAttachment (Param& parameter,
                                                            PluginState& pluginState,
                                                            Callback&& callback)
-    : ParameterAttachment (parameter, pluginState.getParameterListeners(), std::move<Callback> (callback))
+    : ParameterAttachment (parameter, pluginState.getParameterListeners(), std::forward<Callback> (callback))
 {
 }
 
@@ -35,11 +37,21 @@ void ParameterAttachment<Param, Callback>::endGesture()
 }
 
 template <typename Param, typename Callback>
-void ParameterAttachment<Param, Callback>::setValueAsCompleteGesture (ParamElementType newValue)
+void ParameterAttachment<Param, Callback>::setValueAsCompleteGesture (ParamElementType newValue, juce::UndoManager* um)
 {
     callIfParameterValueChanged (newValue,
-                                 [this] (ParamElementType val)
+                                 [this, &um] (ParamElementType val)
                                  {
+                                     if (um != nullptr)
+                                     {
+                                         um->beginNewTransaction();
+                                         um->perform (
+                                             new ParameterAttachmentHelpers::ParameterChangeAction<Param> (
+                                                 param,
+                                                 ParameterTypeHelpers::getValue (param),
+                                                 val));
+                                     }
+
                                      beginGesture();
                                      ParameterTypeHelpers::setValue (val, param);
                                      endGesture();

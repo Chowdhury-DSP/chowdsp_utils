@@ -37,17 +37,6 @@ void ComboBoxAttachment::comboBoxChanged (juce::ComboBox*)
         return;
 
     const auto newValue = comboBox.getSelectedItemIndex();
-
-    if (um != nullptr)
-    {
-        um->beginNewTransaction();
-        um->perform (
-            new ParameterAttachmentHelpers::ParameterChangeAction<ChoiceParameter> (
-                attachment.param,
-                attachment.param.getIndex(),
-                newValue));
-    }
-
-    attachment.setValueAsCompleteGesture (newValue);
+    attachment.setValueAsCompleteGesture (newValue, um);
 }
 } // namespace chowdsp
