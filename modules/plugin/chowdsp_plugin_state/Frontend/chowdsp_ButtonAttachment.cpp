@@ -37,16 +37,6 @@ void ButtonAttachment::buttonClicked (juce::Button*)
         return;
 
     const auto newValue = button.getToggleState();
-    if (um != nullptr)
-    {
-        um->beginNewTransaction();
-        um->perform (
-            new ParameterAttachmentHelpers::ParameterChangeAction<BoolParameter> (
-                attachment.param,
-                attachment.param.get(),
-                newValue));
-    }
-
-    attachment.setValueAsCompleteGesture (newValue);
+    attachment.setValueAsCompleteGesture (newValue, um);
 }
 } // namespace chowdsp

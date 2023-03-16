@@ -38,7 +38,7 @@ public:
      * Call this in the listener callback of the UI control in response
      * to a one-off change in the UI like a button-press.
      */
-    void setValueAsCompleteGesture (ParamElementType newValue);
+    void setValueAsCompleteGesture (ParamElementType newValue, juce::UndoManager* um = nullptr);
 
     /**
      * Updates the parameter value during a gesture.
