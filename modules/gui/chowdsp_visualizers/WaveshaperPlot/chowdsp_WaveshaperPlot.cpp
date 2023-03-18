@@ -19,9 +19,13 @@ void WaveshaperPlot::updatePlotPath()
     jassert (generatePlotCallback != nullptr);
     auto [xBuffer, yBuffer] = generatePlotCallback();
 
-    jassert (! xBuffer.empty() && ! yBuffer.empty());
-    jassert (xBuffer.size() == yBuffer.size());
     plotPath.clear();
+    if (xBuffer.empty() || yBuffer.empty())
+    {
+        return;
+    }
+
+    jassert (xBuffer.size() == yBuffer.size());
     plotPath.preallocateSpace (3 * (int) xBuffer.size());
 
     const auto getPoint = [this] (float xAmp, float yAmp) -> juce::Point<float>
