@@ -49,6 +49,28 @@ TEMPLATE_TEST_CASE ("Buffer Iterators Test",
                 REQUIRE (chowdsp::SIMDUtils::all ((SampleType) static_cast<float> (count++) == x_n));
         }
     }
+    
+    SECTION ("Samples")
+    { 
+        // juce::AudioBuffer<float> buffer(2, 4);
+        BufferType buffer { 2, 4 };
+
+        {
+            int count = 0;
+            for (auto [sample, data] : chowdsp::buffer_iters::samples (buffer))
+            {
+                for (auto& x_n : data)
+                    *x_n = (SampleType) static_cast<float> (count++);
+            }
+        }
+
+        int count = 0;
+        for (auto [sample, data] : chowdsp::buffer_iters::samples (std::as_const (buffer)))
+        {
+            for (auto& x_n : data)
+                REQUIRE (chowdsp::SIMDUtils::all ((SampleType) static_cast<float> (count++) == *x_n));
+        }
+    }
 
     if constexpr (std::is_same_v<BufferType, chowdsp::Buffer<float>>)
     {
