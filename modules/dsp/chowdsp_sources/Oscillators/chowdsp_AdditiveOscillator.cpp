@@ -3,7 +3,7 @@ namespace chowdsp
 template <size_t maxNumHarmonics, AdditiveOscSineApprox sineApprox, typename SampleType>
 void AdditiveOscillator<maxNumHarmonics, sineApprox, SampleType>::setHarmonicAmplitudes (const SampleType (&amps)[maxNumHarmonics])
 {
-    setHarmonicAmplitudes (amps);
+    setHarmonicAmplitudes (nonstd::span<const SampleType> { amps });
 }
 
 template <size_t maxNumHarmonics, AdditiveOscSineApprox sineApprox, typename SampleType>
