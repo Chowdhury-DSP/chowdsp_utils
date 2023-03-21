@@ -27,6 +27,9 @@ public:
     /** Sets the harmonic amplitudes from an array of amplitude values. */
     void setHarmonicAmplitudes (const SampleType (&amps)[maxNumHarmonics]);
 
+    /** Sets the harmonic amplitudes from an array of amplitude values. */
+    void setHarmonicAmplitudes (nonstd::span<const SampleType> amps);
+
     /** Set's the oscillator's fundamental frequency. Harmonics above Nyquist will be automatically filtered out. */
     void setFrequency (SampleType frequencyHz, bool force = false);
 

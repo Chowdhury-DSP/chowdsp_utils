@@ -3,11 +3,19 @@ namespace chowdsp
 template <size_t maxNumHarmonics, AdditiveOscSineApprox sineApprox, typename SampleType>
 void AdditiveOscillator<maxNumHarmonics, sineApprox, SampleType>::setHarmonicAmplitudes (const SampleType (&amps)[maxNumHarmonics])
 {
+    setHarmonicAmplitudes (nonstd::span<const SampleType> { amps });
+}
+
+template <size_t maxNumHarmonics, AdditiveOscSineApprox sineApprox, typename SampleType>
+void AdditiveOscillator<maxNumHarmonics, sineApprox, SampleType>::setHarmonicAmplitudes (nonstd::span<const SampleType> amps)
+{
+    jassert (amps.size() == maxNumHarmonics);
+
     size_t remainingHarmonics = maxNumHarmonics;
     size_t count = 0;
     while (remainingHarmonics >= vecSize)
     {
-        amplitudes[count] = xsimd::load_unaligned (amps + count * vecSize);
+        amplitudes[count] = xsimd::load_unaligned (amps.data() + count * vecSize);
         ++count;
         remainingHarmonics -= vecSize;
     }
@@ -15,7 +23,7 @@ void AdditiveOscillator<maxNumHarmonics, sineApprox, SampleType>::setHarmonicAmp
     if (remainingHarmonics > 0)
     {
         alignas (xsimd::default_arch::alignment()) SampleType arr[vecSize] {};
-        std::copy (std::end (amps) - remainingHarmonics, std::end (amps), std::begin (arr));
+        std::copy (std::end (amps) - (int) remainingHarmonics, std::end (amps), std::begin (arr));
         amplitudes.back() = xsimd::load_aligned (arr);
     }
 
