@@ -49,9 +49,9 @@ TEMPLATE_TEST_CASE ("Buffer Iterators Test",
                 REQUIRE (chowdsp::SIMDUtils::all ((SampleType) static_cast<float> (count++) == x_n));
         }
     }
-    
+
     SECTION ("Samples")
-    { 
+    {
         // juce::AudioBuffer<float> buffer(2, 4);
         BufferType buffer { 2, 4 };
 
