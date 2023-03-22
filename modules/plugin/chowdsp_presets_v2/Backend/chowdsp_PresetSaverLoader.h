@@ -2,6 +2,7 @@
 
 namespace chowdsp::presets
 {
+/** Helper class for saving and loading plugin presets. */
 class PresetSaverLoader
 {
 public:
