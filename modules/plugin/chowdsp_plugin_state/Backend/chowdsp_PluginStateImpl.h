@@ -36,6 +36,12 @@ public:
     template <typename>
     static void deserialize (typename Serializer::DeserializedType serial, PluginStateImpl& object);
 
+    /** Returns the plugin non-parameter state */
+    [[nodiscard]] NonParamState& getNonParameters() override;
+
+    /** Returns the plugin non-parameter state */
+    [[nodiscard]] const NonParamState& getNonParameters() const override;
+
     ParameterState params;
     NonParameterState nonParams;
 

@@ -84,4 +84,16 @@ void PluginStateImpl<ParameterState, NonParameterState, Serializer>::deserialize
     Serializer::template deserialize<Serializer, NonParamState> (Serializer::getChildElement (serial, nonParamStateChildIndex), object.nonParams);
     Serializer::template deserialize<Serializer, ParamHolder> (Serializer::getChildElement (serial, paramStateChildIndex), object.params);
 }
+
+template <typename ParameterState, typename NonParameterState, typename Serializer>
+NonParamState& PluginStateImpl<ParameterState, NonParameterState, Serializer>::getNonParameters()
+{
+    return nonParams;
+}
+
+template <typename ParameterState, typename NonParameterState, typename Serializer>
+const NonParamState& PluginStateImpl<ParameterState, NonParameterState, Serializer>::getNonParameters() const
+{
+    return nonParams;
+}
 } // namespace chowdsp

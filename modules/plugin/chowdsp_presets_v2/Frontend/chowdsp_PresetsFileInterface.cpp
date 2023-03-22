@@ -15,7 +15,7 @@ FileInterface::FileInterface (PresetManager& manager,
 void FileInterface::savePreset()
 {
     jassert (savePresetCallback != nullptr);
-    savePresetCallback (presetManager.savePresetState());
+    savePresetCallback (presetManager.getSaveLoadHelper().savePresetState());
 }
 
 void FileInterface::resaveCurrentPreset()
@@ -28,7 +28,7 @@ void FileInterface::resaveCurrentPreset()
         Preset {
             currentPreset->getName(),
             currentPreset->getVendor(),
-            presetManager.savePresetState(),
+            presetManager.getSaveLoadHelper().savePresetState(),
             currentPreset->getCategory(),
             currentPreset->getPresetFile() });
 }

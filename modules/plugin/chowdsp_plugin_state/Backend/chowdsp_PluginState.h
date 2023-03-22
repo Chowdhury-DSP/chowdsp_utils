@@ -67,6 +67,12 @@ public:
     /** Returns the plugin state's parameters */
     [[nodiscard]] const ParamHolder& getParameters() const { return *params; }
 
+    /** Returns the plugin non-parameter state */
+    [[nodiscard]] virtual NonParamState& getNonParameters() = 0;
+
+    /** Returns the plugin non-parameter state */
+    [[nodiscard]] virtual const NonParamState& getNonParameters() const = 0;
+
     /** Calls an action on the main thread via chowdsp::DeferredAction */
     template <typename Callable>
     void callOnMainThread (Callable&& func, bool couldBeAudioThread = false)
