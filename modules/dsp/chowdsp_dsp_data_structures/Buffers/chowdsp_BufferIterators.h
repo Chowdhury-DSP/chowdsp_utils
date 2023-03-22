@@ -189,6 +189,97 @@ namespace buffer_iters
     {
         return sub_blocks<subBlockSize, channelWise, const BufferView<SampleType>> (buffer);
     }
+
+    /** sample type helper*/
+    namespace sample_type
+    {
+        template <typename BufferType>
+        struct BufferSampleTypeHelper
+        {
+            using Type = std::remove_const_t<typename BufferType::Type>;
+        };
+
+#if CHOWDSP_USING_JUCE
+        template <>
+        struct BufferSampleTypeHelper<juce::AudioBuffer<float>>
+        {
+            using Type = float;
+        };
+
+        template <>
+        struct BufferSampleTypeHelper<juce::AudioBuffer<double>>
+        {
+            using Type = double;
+        };
+#endif
+
+        /** Template helper for getting the sample type from a buffer. */
+        template <typename BufferType>
+        using BufferSampleType = typename BufferSampleTypeHelper<BufferType>::Type;
+    } // namespace sample_type
+
+
+    /** Iterates over a buffer's samples*/
+    template <typename BufferType>
+    constexpr auto samples (BufferType& buffer)
+    {
+        struct iterator
+        {
+            using SampleType = sample_type::BufferSampleType<std::remove_const_t<BufferType>>;
+            using SamplePtrType = typename std::conditional_t<IsConstBufferType<BufferType>, const SampleType*, SampleType*>;
+
+            BufferType& buffer;
+            int sampleIndex;
+            SamplePtrType channelData[CHOWDSP_BUFFER_MAX_NUM_CHANNELS];
+
+            bool operator!= (const iterator& other) const
+            {
+                return &buffer != &other.buffer || sampleIndex != other.sampleIndex;
+            }
+
+            void operator++()
+            {
+                ++sampleIndex;
+            }
+
+            auto operator*()
+            {
+                if constexpr (IsConstBufferType<BufferType>)
+                {
+#if CHOWDSP_USING_JUCE
+                    for (int channel { 0 }; channel < buffer.getNumChannels(); channel++)
+                    {
+                        channelData[channel] = &buffer.getReadPointer (channel)[sampleIndex];
+                    }
+
+                    auto channelSpan = nonstd::span { std::as_const (channelData), (size_t) buffer.getNumChannels() };
+
+                    return std::make_tuple (sampleIndex, channelSpan); 
+                } else 
+                {
+                    for (int channel { 0 }; channel < buffer.getNumChannels(); channel++)
+                    {
+                        channelData[channel] = &buffer.getWritePointer (channel)[sampleIndex];
+                    }
+
+                    auto channelSpan = nonstd::span { std::as_const (channelData), (size_t) buffer.getNumChannels() };
+
+                    return std::make_tuple (sampleIndex, channelSpan);
+                }
+#endif
+            }
+        };
+
+        struct iterable_wrapper
+        {
+            BufferType& buffer;
+            auto begin() { return iterator { buffer, 0 }; }
+            auto end() { return iterator { buffer, buffer.getNumSamples() }; }
+        };
+        return iterable_wrapper { buffer };
+    }
+
+
 } // namespace buffer_iters
 
 } // namespace chowdsp
