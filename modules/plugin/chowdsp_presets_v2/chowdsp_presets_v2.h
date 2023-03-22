@@ -29,6 +29,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Backend/chowdsp_Preset.h"
 #include "Backend/chowdsp_PresetState.h"
 #include "Backend/chowdsp_PresetTree.h"
+#include "Backend/chowdsp_PresetSaverLoader.h"
 #include "Backend/chowdsp_PresetManager.h"
 
 namespace chowdsp

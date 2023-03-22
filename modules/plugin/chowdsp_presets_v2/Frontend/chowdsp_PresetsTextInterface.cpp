@@ -5,10 +5,10 @@ namespace chowdsp::presets::frontend
 TextInterface::TextInterface (PresetManager& manager) : presetManager (manager)
 {
     listeners += {
-        presetManager.presetChangedBroadcaster.connect ([this]
-                                                        { updateText(); }),
-        presetManager.presetDirtyStatusBroadcaster.connect ([this]
-                                                            { updateText(); }),
+        presetManager.getSaveLoadHelper().presetChangedBroadcaster.connect ([this]
+                                                                            { updateText(); }),
+        presetManager.getSaveLoadHelper().presetDirtyStatusBroadcaster.connect ([this]
+                                                                                { updateText(); }),
     };
 
     updateText();

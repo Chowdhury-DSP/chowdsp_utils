@@ -7,33 +7,21 @@ class PresetManager
 {
 public:
     /** Creates a PresetManager for a given plugin state. */
-    template <typename PluginStateType>
-    explicit PresetManager (PluginStateType& state,
+    explicit PresetManager (PluginState& state,
                             juce::AudioProcessor* plugin = nullptr,
                             const juce::String& presetFileExtension = ".preset",
                             std::vector<juce::RangedAudioParameter*>&& presetAgnosticParams = {},
-                            PresetTree::InsertionHelper&& insertionHelper = { nullptr, nullptr, nullptr })
-        : processor (plugin),
-          pluginState (state),
-          presetAgnosticParameters (std::move (presetAgnosticParams)),
-          presetTree (&currentPreset, std::move (insertionHelper)),
-          presetFileExt (presetFileExtension)
-    {
-        jassert (presetFileExt[0] == '.'); // invalid file extension!
-        state.nonParams.addStateValues ({ &currentPreset, &isPresetDirty });
-        initializeListeners (state.params, state.getParameterListeners());
-    }
-
+                            PresetTree::InsertionHelper&& insertionHelper = { nullptr, nullptr, nullptr });
     virtual ~PresetManager() = default;
 
     /** Loads a preset by reference. */
-    void loadPreset (const Preset& preset);
+    void loadPreset (const Preset& preset) { saverLoader.loadPreset (preset); }
 
     /** Returns the currently loaded preset, or nullptr if no preset is loaded. */
-    [[nodiscard]] const Preset* getCurrentPreset() const { return currentPreset.get(); }
+    [[nodiscard]] const Preset* getCurrentPreset() const { return saverLoader.getCurrentPreset(); }
 
     /** Returns true if the currently loaded preset is "dirty". */
-    [[nodiscard]] bool getIsPresetDirty() const noexcept { return isPresetDirty.get(); }
+    [[nodiscard]] bool getIsPresetDirty() const noexcept { return saverLoader.getIsPresetDirty(); }
 
     /** Adds a vector of presets. */
     void addPresets (std::vector<Preset>&& presets, bool areFactoryPresets = true);
@@ -49,12 +37,6 @@ public:
 
     /** Saves the given preset to a preset file, and loads the preset */
     void saveUserPreset (const juce::File& file, Preset&& preset);
-
-    /**
-     * Returns a json object containing the plugin's preset state.
-     * Override this if your presets need custom state-saving behaviour
-     */
-    virtual nlohmann::json savePresetState();
 
     /**
      * Selects a preset to be the default preset.
@@ -89,45 +71,26 @@ public:
     /** Loads a set of user presets from the given folder path. */
     virtual void loadUserPresetsFromFolder (const juce::File& file);
 
-    /** Called whenever the preset lsit has changed. */
+    /** Returns the PresetSaverLoader  */
+    auto& getSaveLoadHelper() { return saverLoader; }
+
+    /** Called whenever the preset list has changed. */
     Broadcaster<void()> presetListUpdatedBroadcaster {};
 
-    /** Called when the current preset has changed. */
-    Broadcaster<void()> presetChangedBroadcaster {};
-
-    /** Called whenever the current preset's "dirty" status has changed. */
-    Broadcaster<void()> presetDirtyStatusBroadcaster {};
-
 protected:
-    /** Override this if your presets need custom state-loading behaviour */
-    virtual void loadPresetState (const nlohmann::json& state);
-
-    /** Returns true if the given parameter is preset-agnostic */
-    [[nodiscard]] bool isPresetAgnosticParameter (const juce::RangedAudioParameter& param) const;
-
     /** Override this to support backwards compatibility for user presets */
     [[nodiscard]] virtual Preset loadUserPresetFromFile (const juce::File& file);
 
-    PresetState currentPreset;
-    StateValue<bool> isPresetDirty { "chowdsp_is_preset_dirty", false };
     juce::String userPresetsVendor { "User" };
 
+    PresetSaverLoader saverLoader;
+
 private:
-    void initializeListeners (ParamHolder& params, ParameterListeners& listeners);
-
-    juce::AudioProcessor* processor = nullptr;
-    chowdsp::PluginState& pluginState;
-
-    const std::vector<juce::RangedAudioParameter*> presetAgnosticParameters {};
-    chowdsp::ScopedCallbackList listeners;
-
     PresetTree presetTree;
     const Preset* defaultPreset = nullptr;
 
     juce::File userPresetPath {};
     const juce::String presetFileExt {};
-
-    bool areWeInTheMidstOfAPresetChange = false;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetManager)
 };

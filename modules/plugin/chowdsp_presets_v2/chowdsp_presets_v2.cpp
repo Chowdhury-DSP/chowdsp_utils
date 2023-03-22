@@ -3,6 +3,7 @@
 #include "Backend/chowdsp_Preset.cpp"
 #include "Backend/chowdsp_PresetState.cpp"
 #include "Backend/chowdsp_PresetTree.cpp"
+#include "Backend/chowdsp_PresetSaverLoader.cpp"
 #include "Backend/chowdsp_PresetManager.cpp"
 
 #include "Frontend/chowdsp_PresetsProgramAdapter.cpp"

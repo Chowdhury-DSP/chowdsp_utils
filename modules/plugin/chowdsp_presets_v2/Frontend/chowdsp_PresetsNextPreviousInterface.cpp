@@ -4,9 +4,8 @@ namespace chowdsp::presets::frontend
 {
 NextPrevious::NextPrevious (PresetManager& manager) : presetManager (manager)
 {
-    presetChangedCallback = presetManager.presetChangedBroadcaster
-                                .connect ([this]
-                                          { updateCurrentPresetIndex(); });
+    presetChangedCallback = presetManager.getSaveLoadHelper().presetChangedBroadcaster.connect ([this]
+                                                                                                { updateCurrentPresetIndex(); });
     updateCurrentPresetIndex();
 }
 
