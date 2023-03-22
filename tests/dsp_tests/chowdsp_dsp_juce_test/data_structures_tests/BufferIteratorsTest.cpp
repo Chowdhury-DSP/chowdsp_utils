@@ -64,7 +64,7 @@ TEMPLATE_TEST_CASE ("Buffer Iterators Test",
         }
 
         int count = 0;
-        for (auto [sample, data] : chowdsp::buffer_iters::samples (std::as_const(buffer)))
+        for (auto [sample, data] : chowdsp::buffer_iters::samples (std::as_const (buffer)))
         {
             for (auto& x_n : data)
                 REQUIRE (chowdsp::SIMDUtils::all ((SampleType) static_cast<float> (count++) == *x_n));

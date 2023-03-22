@@ -218,7 +218,6 @@ namespace buffer_iters
         using BufferSampleType = typename BufferSampleTypeHelper<BufferType>::Type;
     } // namespace sample_type
 
-
     /** Iterates over a buffer's samples*/
     template <typename BufferType>
     constexpr auto samples (BufferType& buffer)
@@ -254,8 +253,9 @@ namespace buffer_iters
 
                     auto channelSpan = nonstd::span { std::as_const (channelData), (size_t) buffer.getNumChannels() };
 
-                    return std::make_tuple (sampleIndex, channelSpan); 
-                } else 
+                    return std::make_tuple (sampleIndex, channelSpan);
+                }
+                else
                 {
                     for (int channel { 0 }; channel < buffer.getNumChannels(); channel++)
                     {
@@ -278,7 +278,6 @@ namespace buffer_iters
         };
         return iterable_wrapper { buffer };
     }
-
 
 } // namespace buffer_iters
 
