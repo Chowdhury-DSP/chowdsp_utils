@@ -190,7 +190,11 @@ namespace buffer_iters
         return sub_blocks<subBlockSize, channelWise, const BufferView<SampleType>> (buffer);
     }
 
-    /** sample type helper*/
+    /**
+     * sample type helper
+     *
+     * @TODO (Jatin): this is currently a duplicate of the same class in chowdsp::BufferMath::detail
+     */
     namespace sample_type
     {
         template <typename BufferType>
@@ -245,7 +249,6 @@ namespace buffer_iters
             {
                 if constexpr (IsConstBufferType<BufferType>)
                 {
-#if CHOWDSP_USING_JUCE
                     for (int channel { 0 }; channel < buffer.getNumChannels(); channel++)
                     {
                         channelData[channel] = &buffer.getReadPointer (channel)[sampleIndex];
@@ -266,7 +269,6 @@ namespace buffer_iters
 
                     return std::make_tuple (sampleIndex, channelSpan);
                 }
-#endif
             }
         };
 
@@ -280,5 +282,4 @@ namespace buffer_iters
     }
 
 } // namespace buffer_iters
-
 } // namespace chowdsp

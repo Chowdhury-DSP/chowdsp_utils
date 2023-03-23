@@ -59,7 +59,7 @@ TEMPLATE_TEST_CASE ("Buffer Iterators Test",
             for (auto [sample, data] : chowdsp::buffer_iters::samples (buffer))
             {
                 for (auto& x_n : data)
-                    *x_n = static_cast<float> (count++);
+                    *x_n = (SampleType) static_cast<float> (count++);
             }
         }
 
@@ -91,8 +91,7 @@ TEMPLATE_TEST_CASE ("Buffer Iterators Test",
             int count = 0;
             for (const auto [channel, data] : chowdsp::buffer_iters::channels (constBufferView))
             {
-                const auto ddd = data;
-                REQUIRE (data.size() == bufferView.getNumSamples());
+                REQUIRE ((int) data.size() == bufferView.getNumSamples());
                 for (auto& x_n : data)
                 {
                     REQUIRE (chowdsp::SIMDUtils::all ((SampleType) static_cast<float> (count) == x_n));
