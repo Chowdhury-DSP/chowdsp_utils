@@ -60,6 +60,10 @@ JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 #include "LookupTables/chowdsp_LookupTableTransform.h"
 #include "LookupTables/chowdsp_LookupTableCache.h"
 
+#if ! JUCE_TEENSY // needs moodycamel dependency
+#include "Other/chowdsp_UIToAudioPipeline.h"
+#endif
+
 #if JUCE_MODULE_AVAILABLE_juce_dsp
 #include "Processors/chowdsp_COLAProcessor.h"
 #endif
