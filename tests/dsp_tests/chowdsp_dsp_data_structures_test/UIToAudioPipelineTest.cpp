@@ -22,6 +22,9 @@ TEST_CASE ("UI-to-Audio Pipeline Test", "[dsp][data-structures]")
 
                     std::this_thread::sleep_for (std::chrono::milliseconds (3));
                 }
+                const auto* object = pipeline.read();
+                REQUIRE (object != nullptr);
+                mostRecentReadData = *object;
                 REQUIRE (mostRecentReadData == mostRecentWriteData);
             });
 
