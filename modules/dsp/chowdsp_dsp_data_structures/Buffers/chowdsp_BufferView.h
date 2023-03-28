@@ -236,7 +236,7 @@ private:
     template <typename T = SampleType>
     std::enable_if_t<! std::is_const_v<T>, void> initialise (SampleType* const* data, int sampleOffset, int startChannel = 0)
     {
-        jassert (juce::isPositiveAndBelow (numChannels, maxNumChannels));
+        jassert (juce::isPositiveAndNotGreaterThan (numChannels, maxNumChannels));
         jassert (numSamples > 0);
         for (size_t ch = 0; ch < (size_t) numChannels; ++ch)
             channelPointers[ch] = data[ch + (size_t) startChannel] + sampleOffset;
@@ -245,7 +245,7 @@ private:
     template <typename T = SampleType>
     std::enable_if_t<std::is_const_v<T>, void> initialise (const SampleType* const* data, int sampleOffset, int startChannel = 0)
     {
-        jassert (juce::isPositiveAndBelow (numChannels, maxNumChannels));
+        jassert (juce::isPositiveAndNotGreaterThan (numChannels, maxNumChannels));
         jassert (numSamples > 0);
         for (size_t ch = 0; ch < (size_t) numChannels; ++ch)
             channelPointers[ch] = data[ch + (size_t) startChannel] + sampleOffset;
