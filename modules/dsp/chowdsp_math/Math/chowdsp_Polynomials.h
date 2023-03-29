@@ -15,7 +15,7 @@ using P = decltype (T {} * X {});
  * Coefficients should be given in the form { a_n, a_n-1, ..., a_1, a_0 }
  */
 template <int ORDER, typename T, typename X>
-constexpr P<T, X> naive (const T (&coeffs)[ORDER + 1], const X& x)
+constexpr P<T, X> naive (const T (&coeffs)[ORDER + 1], X x)
 {
     CHOWDSP_USING_XSIMD_STD (pow);
 
@@ -32,7 +32,7 @@ constexpr P<T, X> naive (const T (&coeffs)[ORDER + 1], const X& x)
  * https://en.wikipedia.org/wiki/Horner%27s_method
  */
 template <int ORDER, typename T, typename X>
-constexpr P<T, X> horner (const T (&coeffs)[ORDER + 1], const X& x)
+constexpr P<T, X> horner (const T (&coeffs)[ORDER + 1], X x)
 {
     P<T, X> b = coeffs[0];
     for (int n = 1; n <= ORDER; ++n)
@@ -47,7 +47,7 @@ constexpr P<T, X> horner (const T (&coeffs)[ORDER + 1], const X& x)
  * https://en.wikipedia.org/wiki/Estrin%27s_scheme
  */
 template <int ORDER, typename T, typename X>
-constexpr P<T, X> estrin (const T (&coeffs)[ORDER + 1], const X& x)
+constexpr P<T, X> estrin (const T (&coeffs)[ORDER + 1], X x)
 {
     if constexpr (ORDER <= 1) // base case
     {

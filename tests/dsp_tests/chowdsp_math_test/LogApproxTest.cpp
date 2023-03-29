@@ -3,38 +3,45 @@
 
 namespace la = chowdsp::LogApprox;
 
+template <typename T>
+T pow10 (T x)
+{
+    return std::pow ((T) 10, x);
+}
+
 TEMPLATE_TEST_CASE ("Log Approx Test", "[dsp][math][simd]", float, double, xsimd::batch<float>, xsimd::batch<double>)
 {
     using FloatType = TestType;
     using NumericType = chowdsp::SampleTypeHelpers::NumericType<FloatType>;
 
-    SECTION ("Log (base-e)")
+    const auto tester = [] (NumericType (*refFuncExp) (NumericType), NumericType (*refFuncLog) (NumericType), FloatType (*testFunc) (FloatType), NumericType margin)
     {
         for (auto x = (NumericType) -10; x < (NumericType) 10; x += (NumericType) 0.1)
         {
-            const auto x_base = std::exp (x);
+            const auto x_base = refFuncExp (x);
             const auto input = (FloatType) x_base;
-            REQUIRE (la::log (input) == SIMDApprox<FloatType> { std::log (x_base) }.margin ((NumericType) 0.005));
+            REQUIRE (testFunc (input) == SIMDApprox<FloatType> { refFuncLog (x_base) }.margin (margin));
         }
+    };
+
+    SECTION ("Log (base-e)")
+    {
+        tester (&std::exp, &std::log, &la::log<FloatType, 1>, (NumericType) 0.06);
+        tester (&std::exp, &std::log, &la::log<FloatType, 2>, (NumericType) 0.007);
+        tester (&std::exp, &std::log, &la::log<FloatType, 3>, (NumericType) 0.005);
     }
 
     SECTION ("Log (base-2)")
     {
-        for (auto x = (NumericType) -10; x < (NumericType) 10; x += (NumericType) 0.1)
-        {
-            const auto x_base = std::pow ((NumericType) 2, x);
-            const auto input = (FloatType) x_base;
-            REQUIRE (la::log2 (input) == SIMDApprox<FloatType> { std::log2 (x_base) }.margin ((NumericType) 0.01));
-        }
+        tester (&std::exp2, &std::log2, &la::log2<FloatType, 1>, (NumericType) 0.09);
+        tester (&std::exp2, &std::log2, &la::log2<FloatType, 2>, (NumericType) 0.01);
+        tester (&std::exp2, &std::log2, &la::log2<FloatType, 3>, (NumericType) 0.007);
     }
 
     SECTION ("Log (base-10)")
     {
-        for (auto x = (NumericType) -10; x < (NumericType) 10; x += (NumericType) 0.1)
-        {
-            const auto x_base = std::pow ((NumericType) 10, x);
-            const auto input = (FloatType) x_base;
-            REQUIRE (la::log10 (input) == SIMDApprox<FloatType> { std::log10 (x_base) }.margin ((NumericType) 0.005));
-        }
+        tester (&pow10, &std::log10, &la::log10<FloatType, 1>, (NumericType) 0.06);
+        tester (&pow10, &std::log10, &la::log10<FloatType, 2>, (NumericType) 0.007);
+        tester (&pow10, &std::log10, &la::log10<FloatType, 3>, (NumericType) 0.005);
     }
 }
