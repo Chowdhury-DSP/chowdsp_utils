@@ -56,7 +56,7 @@ constexpr P<T, X> estrin (const T (&coeffs)[ORDER + 1], X x)
     else
     {
         P<T, X> temp[ORDER / 2 + 1];
-        for (int n = ORDER; n >= 0; n -= 2)
+        for (int n = ORDER; n > 0; n -= 2)
             temp[n / 2] = coeffs[n] + coeffs[n - 1] * x;
 
         if constexpr (ORDER % 2 == 0) // even order polynomial
