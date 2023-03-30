@@ -60,7 +60,7 @@ public:
             pointer->~T();
 
             pointer = nullptr;
-            std::fill (std::begin (data), std::end (data), std::byte{});
+            std::fill (std::begin (data), std::end (data), std::byte {});
         }
     }
 
