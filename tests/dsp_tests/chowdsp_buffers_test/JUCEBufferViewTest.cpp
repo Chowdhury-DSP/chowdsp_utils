@@ -29,7 +29,7 @@ static void processBufferView (const chowdsp::BufferView<T>& buffer)
     }
 }
 
-TEST_CASE ("Buffer View Test", "[dsp][buffers]")
+TEST_CASE ("JUCE Buffer View Test", "[dsp][buffers]")
 {
     const auto rand = Catch::Generators::random (-1.0f, 1.0f);
 

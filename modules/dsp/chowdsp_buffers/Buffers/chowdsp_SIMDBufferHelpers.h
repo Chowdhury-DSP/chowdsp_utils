@@ -23,7 +23,7 @@ template <typename T1, typename T2>
 
     const auto numSamples = scalarBuffer.getNumSamples();
     const auto numScalarChannels = scalarBuffer.getNumChannels();
-    const auto numSIMDChannels = Math::ceiling_divide (numScalarChannels, vecSize);
+    const auto numSIMDChannels = buffers_detail::ceiling_divide (numScalarChannels, vecSize);
 
     const auto interleaveSamples = [numSamples] (const T1** source, T2* dest, int numChannels)
     {
