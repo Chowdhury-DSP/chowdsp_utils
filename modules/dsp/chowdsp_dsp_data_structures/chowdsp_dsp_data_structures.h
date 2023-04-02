@@ -46,7 +46,6 @@ JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 #include "third_party/moodycamel/concurrentqueue.h"
 #endif
 
-#include "Other/chowdsp_ScopedValue.h"
 #include "Other/chowdsp_SmoothedBufferValue.h"
 
 #include "Buffers/chowdsp_Buffer.h"
