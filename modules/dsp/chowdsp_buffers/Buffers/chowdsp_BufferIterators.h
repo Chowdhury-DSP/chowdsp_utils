@@ -201,7 +201,29 @@ namespace buffer_iters
 
             BufferType& buffer;
             int sampleIndex;
-            SamplePtrType channelData[CHOWDSP_BUFFER_MAX_NUM_CHANNELS];
+
+            iterator (BufferType& _buffer, int _sampleIndex)
+                : buffer (_buffer),
+                  sampleIndex (_sampleIndex),
+                  numChannels (buffer.getNumChannels())
+            {
+                for (int channel { 0 }; channel < numChannels; ++channel)
+                {
+                    if constexpr (! IsConstBuffer<BufferType>)
+                        channelPtrs[channel] = buffer.getWritePointer (channel);
+                    else
+                        channelPtrs[channel] = buffer.getReadPointer (channel);
+                }
+            }
+
+            const int numChannels = 0;
+            SamplePtrType channelPtrs[CHOWDSP_BUFFER_MAX_NUM_CHANNELS] {};
+
+#if CHOWDSP_NO_XSIMD
+            alignas (16) SampleType channelData[CHOWDSP_BUFFER_MAX_NUM_CHANNELS];
+#else
+            alignas (xsimd::batch<SampleTypeHelpers::NumericType<SampleType>>::arch_type::alignment()) SampleType channelData[CHOWDSP_BUFFER_MAX_NUM_CHANNELS];
+#endif
 
             bool operator!= (const iterator& other) const
             {
@@ -210,32 +232,31 @@ namespace buffer_iters
 
             void operator++()
             {
+                if constexpr (! IsConstBuffer<BufferType>)
+                {
+                    for (int channel { 0 }; channel < numChannels; ++channel)
+                        *channelPtrs[channel] = channelData[channel];
+                }
+
                 ++sampleIndex;
+                for (int channel { 0 }; channel < numChannels; ++channel)
+                    channelPtrs[channel]++;
             }
 
             auto operator*()
             {
+                for (int channel { 0 }; channel < numChannels; ++channel)
+                    channelData[channel] = *channelPtrs[channel];
+
                 if constexpr (IsConstBuffer<BufferType>)
                 {
-                    for (int channel { 0 }; channel < buffer.getNumChannels(); channel++)
-                    {
-                        channelData[channel] = &buffer.getReadPointer (channel)[sampleIndex];
-                    }
-
-                    auto channelSpan = nonstd::span { std::as_const (channelData), (size_t) buffer.getNumChannels() };
-
-                    return std::make_tuple (sampleIndex, channelSpan);
+                    return std::make_tuple (sampleIndex,
+                                            nonstd::span<const SampleType> { channelData, (size_t) numChannels });
                 }
                 else
                 {
-                    for (int channel { 0 }; channel < buffer.getNumChannels(); channel++)
-                    {
-                        channelData[channel] = &buffer.getWritePointer (channel)[sampleIndex];
-                    }
-
-                    auto channelSpan = nonstd::span { std::as_const (channelData), (size_t) buffer.getNumChannels() };
-
-                    return std::make_tuple (sampleIndex, channelSpan);
+                    return std::make_tuple (sampleIndex,
+                                            nonstd::span<SampleType> { channelData, (size_t) numChannels });
                 }
             }
         };
