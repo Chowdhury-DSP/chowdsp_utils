@@ -20,16 +20,16 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 #pragma once
 
-   //STL includes
+//STL includes
 #include <array>
 #include <unordered_map>
 
-   //JUCE includes
+//JUCE includes
 #include <chowdsp_simd/chowdsp_simd.h>
 #include <chowdsp_buffers/chowdsp_buffers.h>
 #include <chowdsp_math/chowdsp_math.h>
 
-   // third-party includes
+// third-party includes
 #if ! JUCE_TEENSY // readerwriterqueue does not compile with the Teensy toolchain
 #include "third_party/moodycamel/readerwriterqueue.h"
 #include "third_party/moodycamel/concurrentqueue.h"
