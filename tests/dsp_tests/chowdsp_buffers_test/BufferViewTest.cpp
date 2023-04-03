@@ -1,5 +1,5 @@
 #include <CatchUtils.h>
-#include <chowdsp_dsp_data_structures/chowdsp_dsp_data_structures.h>
+#include <chowdsp_buffers/chowdsp_buffers.h>
 
 template <typename BufferViewType, typename T>
 void testBufferView (const BufferViewType view, const chowdsp::Buffer<T>& buffer)

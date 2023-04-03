@@ -8,8 +8,8 @@ namespace buffer_detail
     template <typename ElementType, size_t arraySize, size_t alignment = SIMDUtils::defaultSIMDAlignment>
     struct AlignedArray
     {
-        ElementType* data() noexcept { return array; }
-        const ElementType* data() const noexcept { return array; }
+        [[nodiscard]] ElementType* data() noexcept { return array; }
+        [[nodiscard]] const ElementType* data() const noexcept { return array; }
 
     private:
         alignas (alignment) ElementType array[arraySize] {};

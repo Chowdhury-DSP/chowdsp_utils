@@ -5,35 +5,6 @@ namespace chowdsp
 /** Math operations for working with audio buffers */
 namespace BufferMath
 {
-#ifndef DOXYGEN
-    namespace detail
-    {
-        template <typename BufferType>
-        struct BufferSampleTypeHelper
-        {
-            using Type = std::remove_const_t<typename BufferType::Type>;
-        };
-
-#if CHOWDSP_USING_JUCE
-        template <>
-        struct BufferSampleTypeHelper<juce::AudioBuffer<float>>
-        {
-            using Type = float;
-        };
-
-        template <>
-        struct BufferSampleTypeHelper<juce::AudioBuffer<double>>
-        {
-            using Type = double;
-        };
-#endif
-
-        /** Template helper for getting the sample type from a buffer. */
-        template <typename BufferType>
-        using BufferSampleType = typename BufferSampleTypeHelper<BufferType>::Type;
-    } // namespace detail
-#endif // DOXYGEN
-
     /** Computes the absolute magnitude of the buffer. */
     template <typename BufferType>
     auto getMagnitude (const BufferType& buffer, int startSample = 0, int numSamples = -1, int channel = -1) noexcept;
@@ -95,14 +66,14 @@ namespace BufferMath
      * value is passed, a "default" normalization value of 1 / bufferSrc.getNumChannels()
      * will be applied.
      */
-    template <typename BufferType1, typename BufferType2, typename FloatType = SampleTypeHelpers::NumericType<detail::BufferSampleType<BufferType1>>>
+    template <typename BufferType1, typename BufferType2, typename FloatType = SampleTypeHelpers::NumericType<BufferSampleType<BufferType1>>>
     void sumToMono (const BufferType1& bufferSrc, BufferType2& bufferDest, FloatType normGain = (FloatType) -1);
 
     /**
      * If the buffer contains any Infs, NaNs, or values larger than the ceiling,
      * this method will clear the buffer and return false.
      */
-    template <typename BufferType, typename FloatType = detail::BufferSampleType<BufferType>>
+    template <typename BufferType, typename FloatType = BufferSampleType<BufferType>>
     bool sanitizeBuffer (BufferType& buffer, FloatType ceiling = (FloatType) 100) noexcept;
 
     /** Applies a function to every sample in the buffer. */
@@ -115,21 +86,21 @@ namespace BufferMath
 
 #if ! CHOWDSP_NO_XSIMD
     /** Applies a SIMD/scalar function to every sample in the buffer. */
-    template <typename BufferType, typename FunctionType, typename FloatType = detail::BufferSampleType<BufferType>>
+    template <typename BufferType, typename FunctionType, typename FloatType = BufferSampleType<BufferType>>
     std::enable_if_t<std::is_floating_point_v<FloatType>, void> applyFunctionSIMD (BufferType& buffer, FunctionType&& function) noexcept;
 
     /** Applies a SIMD/scalar function to every sample in the buffer and stores the result in another buffer. */
-    template <typename BufferType1, typename BufferType2, typename FunctionType, typename FloatType = detail::BufferSampleType<BufferType1>>
+    template <typename BufferType1, typename BufferType2, typename FunctionType, typename FloatType = BufferSampleType<BufferType1>>
     std::enable_if_t<std::is_floating_point_v<FloatType>, void>
         applyFunctionSIMD (const BufferType1& bufferSrc, BufferType2& bufferDest, FunctionType&& function) noexcept;
 
     /** Applies a SIMD or scalar function to every sample in the buffer. */
-    template <typename BufferType, typename SIMDFunctionType, typename ScalarFunctionType, typename FloatType = detail::BufferSampleType<BufferType>>
+    template <typename BufferType, typename SIMDFunctionType, typename ScalarFunctionType, typename FloatType = BufferSampleType<BufferType>>
     std::enable_if_t<std::is_floating_point_v<FloatType>, void>
         applyFunctionSIMD (BufferType& buffer, SIMDFunctionType&& simdFunction, ScalarFunctionType&& scalarFunction) noexcept;
 
     /** Applies a SIMD or scalar function to every sample in the buffer and stores the result in another buffer. */
-    template <typename BufferType1, typename BufferType2, typename SIMDFunctionType, typename ScalarFunctionType, typename FloatType = detail::BufferSampleType<BufferType1>>
+    template <typename BufferType1, typename BufferType2, typename SIMDFunctionType, typename ScalarFunctionType, typename FloatType = BufferSampleType<BufferType1>>
     std::enable_if_t<std::is_floating_point_v<FloatType>, void>
         applyFunctionSIMD (const BufferType1& bufferSrc, BufferType2& bufferDest, SIMDFunctionType&& simdFunction, ScalarFunctionType&& scalarFunction) noexcept;
 #endif

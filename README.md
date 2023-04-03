@@ -82,6 +82,9 @@ sure to abide by the license of each module, as well as whichever libraries are 
 - `AtomicHelpers`: Useful methods for working with atomics.
 - `MemoryUtils`: Helpful methods to check if blocks of memory alias with each other.
 - `TypeTraits`: Type traits for checking if a class has a given method, if a type is a container, and so on.
+- `ScopedValue`: A stack value that writes its value back to a more permanent variable when it goes out of scope.
+- `OptionalPointer`: A pointer which may or may not own the data it points to.
+- `LocalPointer`: An owning pointer which constructs the object it points to using its own local memory.
 - Includes the following internal dependencies:
   - [`types_list`](https://github.com/jatinchowdhury18/types_list) (MIT license).
   - [`span-lite`](https://github.com/martinmoene/span-lite) (BSL-1.0 license).
@@ -103,11 +106,15 @@ sure to abide by the license of each module, as well as whichever libraries are 
 
 ### DSP Modules
 
+`chowdsp_buffers` (GPLv3)
+- `Buffer`: A basic audio buffer, which supports SIMD data types.
+- `StaticBuffer`: A basic audio buffer using local (rather than heap-allocated) memory.
+- `BufferView`: A non-owning "view" over the data in an audio buffer (compatible with `juce::AudioBuffer`).
+- `buffer_iters`: Handy C++ iterators for iterating over buffers in different ways.
+
 `chowdsp_dsp_data_structures` (GPLv3)
-- `Buffer`/`StaticBuffer`/`BufferView`: Basic data structures for storing audio.
 - `LookupTableTransform`: Some modifications on `juce::dsp::LookupTableTransform`.
 - `LookupTableCache`: A cache for storing lookup tables, so they don't need to be re-computed.
-- `ScopedValue`: A stack value that writes its value back to a more permanent variable when it goes out of scope.
 - `SmoothedBufferValue`: A buffered version of `juce::SmoothedValue`.
 - `COLAProcessor`: A base class for doing Constant Overlap-Add processing.
 - `RebufferedProcessor`: A processor which rebuffers the input to have a constant block size.

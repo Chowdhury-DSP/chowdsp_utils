@@ -11,6 +11,7 @@ target_sources(chowdsp_core_test
         IteratorsTest.cpp
         OptionalPointerTest.cpp
         LocalPointerTest.cpp
+        ScopedValueTest.cpp
         StringLiteralTest.cpp
         VectorHelpersTest.cpp
 )

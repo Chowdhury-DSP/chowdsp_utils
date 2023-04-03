@@ -27,15 +27,13 @@ public:
         initialise (data, sampleOffset);
     }
 
-    BufferView (SampleType* data, int dataNumSamples, int sampleOffset = 0) : numChannels (1),
-                                                                              numSamples (dataNumSamples)
+    BufferView (SampleType* data, int dataNumSamples, int sampleOffset = 0) : numSamples (dataNumSamples)
     {
         initialise (&data, sampleOffset);
     }
 
     template <typename T = SampleType, std::enable_if_t<std::is_const_v<T>>* = nullptr>
-    BufferView (const SampleType* data, int dataNumSamples, int sampleOffset = 0) : numChannels (1),
-                                                                                    numSamples (dataNumSamples)
+    BufferView (const SampleType* data, int dataNumSamples, int sampleOffset = 0) : numSamples (dataNumSamples)
     {
         initialise (&data, sampleOffset);
     }
@@ -153,7 +151,7 @@ public:
     }
 
 #if JUCE_MODULE_AVAILABLE_juce_dsp
-    BufferView (const juce::dsp::AudioBlock<std::remove_const_t<SampleType>>& block, // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
+    BufferView (const AudioBlock<std::remove_const_t<SampleType>>& block, // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
                 int sampleOffset = 0,
                 int bufferNumSamples = -1,
                 int startChannel = 0,
@@ -166,7 +164,7 @@ public:
     }
 
     template <typename T = SampleType, std::enable_if_t<std::is_const_v<T>>* = nullptr>
-    BufferView (const juce::dsp::AudioBlock<const SampleType>& block, // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
+    BufferView (const AudioBlock<const SampleType>& block, // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
                 int sampleOffset = 0,
                 int bufferNumSamples = -1,
                 int startChannel = 0,
@@ -251,7 +249,7 @@ private:
             channelPointers[ch] = data[ch + (size_t) startChannel] + sampleOffset;
     }
 
-    const int numChannels;
+    const int numChannels = 1;
     const int numSamples;
 
     // Assuming we will never need an audio buffer with more than 64 channels.

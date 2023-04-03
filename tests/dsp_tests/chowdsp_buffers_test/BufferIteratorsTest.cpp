@@ -1,17 +1,17 @@
 #include <CatchUtils.h>
 #include <chowdsp_dsp_data_structures/chowdsp_dsp_data_structures.h>
 
-static_assert (! chowdsp::IsConstBufferType<chowdsp::Buffer<float>>);
-static_assert (! chowdsp::IsConstBufferType<chowdsp::Buffer<float>&>);
-static_assert (chowdsp::IsConstBufferType<const chowdsp::Buffer<float>>);
-static_assert (chowdsp::IsConstBufferType<const chowdsp::Buffer<float>&>);
+static_assert (! chowdsp::IsConstBuffer<chowdsp::Buffer<float>>);
+static_assert (! chowdsp::IsConstBuffer<chowdsp::Buffer<float>&>);
+static_assert (chowdsp::IsConstBuffer<const chowdsp::Buffer<float>>);
+static_assert (chowdsp::IsConstBuffer<const chowdsp::Buffer<float>&>);
 
-static_assert (! chowdsp::IsConstBufferType<chowdsp::BufferView<float>>);
-static_assert (! chowdsp::IsConstBufferType<chowdsp::BufferView<float>&>);
-static_assert (! chowdsp::IsConstBufferType<const chowdsp::BufferView<float>>);
-static_assert (! chowdsp::IsConstBufferType<const chowdsp::BufferView<float>&>);
-static_assert (chowdsp::IsConstBufferType<const chowdsp::BufferView<const float>>);
-static_assert (chowdsp::IsConstBufferType<const chowdsp::BufferView<const float>&>);
+static_assert (! chowdsp::IsConstBuffer<chowdsp::BufferView<float>>);
+static_assert (! chowdsp::IsConstBuffer<chowdsp::BufferView<float>&>);
+static_assert (! chowdsp::IsConstBuffer<const chowdsp::BufferView<float>>);
+static_assert (! chowdsp::IsConstBuffer<const chowdsp::BufferView<float>&>);
+static_assert (chowdsp::IsConstBuffer<const chowdsp::BufferView<const float>>);
+static_assert (chowdsp::IsConstBuffer<const chowdsp::BufferView<const float>&>);
 
 TEMPLATE_TEST_CASE ("Buffer Iterators Test",
                     "[dsp][buffers][simd]",
@@ -27,7 +27,7 @@ TEMPLATE_TEST_CASE ("Buffer Iterators Test",
                     (juce::AudioBuffer<double>) )
 {
     using BufferType = TestType;
-    using SampleType = chowdsp::BufferMath::detail::BufferSampleType<BufferType>;
+    using SampleType = chowdsp::BufferSampleType<BufferType>;
 
     SECTION ("Channels")
     {
@@ -59,7 +59,7 @@ TEMPLATE_TEST_CASE ("Buffer Iterators Test",
             for (auto [sample, data] : chowdsp::buffer_iters::samples (buffer))
             {
                 for (auto& x_n : data)
-                    *x_n = (SampleType) static_cast<float> (count++);
+                    x_n = (SampleType) static_cast<float> (count++);
             }
         }
 
@@ -67,7 +67,7 @@ TEMPLATE_TEST_CASE ("Buffer Iterators Test",
         for (auto [sample, data] : chowdsp::buffer_iters::samples (std::as_const (buffer)))
         {
             for (auto& x_n : data)
-                REQUIRE (chowdsp::SIMDUtils::all ((SampleType) static_cast<float> (count++) == *x_n));
+                REQUIRE (chowdsp::SIMDUtils::all ((SampleType) static_cast<float> (count++) == x_n));
         }
     }
 
