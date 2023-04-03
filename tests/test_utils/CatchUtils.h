@@ -10,8 +10,8 @@
 #include <chowdsp_simd/chowdsp_simd.h>
 #endif
 
-#if JUCE_MODULE_AVAILABLE_chowdsp_buffers
-#include <chowdsp_buffers/chowdsp_buffers.h>
+#if JUCE_MODULE_AVAILABLE_chowdsp_dsp_data_structures
+#include <chowdsp_dsp_data_structures/chowdsp_dsp_data_structures.h>
 #endif
 
 // Helper for using Catch's REQUIRE with a custom failure message
@@ -103,7 +103,7 @@ inline auto makeSineWave (NumericType frequency, NumericType sampleRate, int len
         x[n] = std::sin (juce::MathConstants<NumericType>::twoPi * frequency * (NumericType) n / sampleRate);
 
     for (int ch = 1; ch < numChannels; ++ch)
-        juce::FloatVectorOperations::copy (sineBuffer.getWritePointer (ch), sineBuffer.getReadPointer (0), lengthSamples);
+        chowdsp::BufferMath::copyBufferChannels (sineBuffer, sineBuffer, 0, ch);
 
     return sineBuffer;
 }

@@ -25,7 +25,7 @@ namespace buffer_iters
 
             auto operator*() const
             {
-                if constexpr (IsConstBufferType<BufferType>)
+                if constexpr (IsConstBuffer<BufferType>)
                 {
 #if CHOWDSP_USING_JUCE
                     if constexpr (std::is_same_v<BufferType, const juce::AudioBuffer<float>> || std::is_same_v<BufferType, const juce::AudioBuffer<double>>)
@@ -124,7 +124,7 @@ namespace buffer_iters
             {
                 const auto startSample = buffer.getNumSamples() - samplesRemaining;
                 const auto activeSubBlockSize = (size_t) juce::jmin (subBlockSize, samplesRemaining);
-                if constexpr (IsConstBufferType<BufferType>)
+                if constexpr (IsConstBuffer<BufferType>)
                 {
 #if CHOWDSP_USING_JUCE
                     if constexpr (std::is_same_v<BufferType, const juce::AudioBuffer<float>> || std::is_same_v<BufferType, const juce::AudioBuffer<double>>)
@@ -190,46 +190,14 @@ namespace buffer_iters
         return sub_blocks<subBlockSize, channelWise, const BufferView<SampleType>> (buffer);
     }
 
-    /**
-     * sample type helper
-     *
-     * @TODO (Jatin): this is currently a duplicate of the same class in chowdsp::BufferMath::detail
-     */
-    namespace sample_type
-    {
-        template <typename BufferType>
-        struct BufferSampleTypeHelper
-        {
-            using Type = std::remove_const_t<typename BufferType::Type>;
-        };
-
-#if CHOWDSP_USING_JUCE
-        template <>
-        struct BufferSampleTypeHelper<juce::AudioBuffer<float>>
-        {
-            using Type = float;
-        };
-
-        template <>
-        struct BufferSampleTypeHelper<juce::AudioBuffer<double>>
-        {
-            using Type = double;
-        };
-#endif
-
-        /** Template helper for getting the sample type from a buffer. */
-        template <typename BufferType>
-        using BufferSampleType = typename BufferSampleTypeHelper<BufferType>::Type;
-    } // namespace sample_type
-
     /** Iterates over a buffer's samples*/
     template <typename BufferType>
     constexpr auto samples (BufferType& buffer)
     {
         struct iterator
         {
-            using SampleType = sample_type::BufferSampleType<std::remove_const_t<BufferType>>;
-            using SamplePtrType = typename std::conditional_t<IsConstBufferType<BufferType>, const SampleType*, SampleType*>;
+            using SampleType = BufferSampleType<std::remove_const_t<BufferType>>;
+            using SamplePtrType = typename std::conditional_t<IsConstBuffer<BufferType>, const SampleType*, SampleType*>;
 
             BufferType& buffer;
             int sampleIndex;
@@ -247,7 +215,7 @@ namespace buffer_iters
 
             auto operator*()
             {
-                if constexpr (IsConstBufferType<BufferType>)
+                if constexpr (IsConstBuffer<BufferType>)
                 {
                     for (int channel { 0 }; channel < buffer.getNumChannels(); channel++)
                     {
