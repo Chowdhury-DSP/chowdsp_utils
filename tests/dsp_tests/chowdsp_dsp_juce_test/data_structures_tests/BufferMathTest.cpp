@@ -68,7 +68,7 @@ TEMPLATE_TEST_CASE ("Buffer Math Test",
                     (juce::AudioBuffer<double>) )
 {
     using BufferType = TestType;
-    using T = detail::BufferSampleType<BufferType>;
+    using T = chowdsp::BufferSampleType<BufferType>;
     using NumericType = chowdsp::SampleTypeHelpers::NumericType<T>;
     static constexpr auto maxErr = 1.0e-6;
 

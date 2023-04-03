@@ -22,7 +22,7 @@ void Buffer<SampleType>::setMaxSize (int numChannels, int numSamples)
 #if ! CHOWDSP_NO_XSIMD
     static constexpr auto vec_size = (int) xsimd::batch<SampleType>::size;
     if constexpr (std::is_floating_point_v<SampleType>)
-        numSamplesPadded = Math::ceiling_divide (numSamples, vec_size) * vec_size;
+        numSamplesPadded = buffers_detail::ceiling_divide (numSamples, vec_size) * vec_size;
 #endif
 
     rawData.clear();

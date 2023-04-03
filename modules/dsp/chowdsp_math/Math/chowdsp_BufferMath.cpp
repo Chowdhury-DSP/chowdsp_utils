@@ -6,7 +6,7 @@ auto getMagnitude (const BufferType& buffer, int startSample, int numSamples, in
     if (numSamples < 0)
         numSamples = buffer.getNumSamples() - startSample;
 
-    using SampleType = detail::BufferSampleType<BufferType>;
+    using SampleType = BufferSampleType<BufferType>;
     auto getChannelMagnitude = [&buffer, startSample, numSamples] (int ch)
     {
         const auto* channelData = buffer.getReadPointer (ch);
@@ -42,7 +42,7 @@ auto getMagnitude (const BufferType& buffer, int startSample, int numSamples, in
 template <typename BufferType>
 auto getRMSLevel (const BufferType& buffer, int channel, int startSample, int numSamples) noexcept
 {
-    using SampleType = detail::BufferSampleType<BufferType>;
+    using SampleType = BufferSampleType<BufferType>;
 
     if (numSamples < 0)
         numSamples = buffer.getNumSamples() - startSample;
@@ -75,8 +75,8 @@ auto getRMSLevel (const BufferType& buffer, int channel, int startSample, int nu
 template <typename BufferType1, typename BufferType2>
 void copyBufferData (const BufferType1& bufferSrc, BufferType2& bufferDest, int srcStartSample, int destStartSample, int numSamples, int startChannel, int numChannels) noexcept
 {
-    using SampleType1 = detail::BufferSampleType<BufferType1>;
-    using SampleType2 = detail::BufferSampleType<BufferType1>;
+    using SampleType1 = BufferSampleType<BufferType1>;
+    using SampleType2 = BufferSampleType<BufferType2>;
     static_assert (std::is_same_v<SampleType1, SampleType2> || (std::is_floating_point_v<SampleType1> && std::is_floating_point_v<SampleType2>),
                    "Both buffer types must have the same sample type!");
 
@@ -114,8 +114,8 @@ void copyBufferData (const BufferType1& bufferSrc, BufferType2& bufferDest, int 
 template <typename BufferType1, typename BufferType2>
 void copyBufferChannels (const BufferType1& bufferSrc, BufferType2& bufferDest, int srcChannel, int destChannel) noexcept
 {
-    using SampleType = detail::BufferSampleType<BufferType1>;
-    static_assert (std::is_same_v<SampleType, detail::BufferSampleType<BufferType2>>, "Both buffer types must have the same sample type!");
+    using SampleType = BufferSampleType<BufferType1>;
+    static_assert (std::is_same_v<SampleType, BufferSampleType<BufferType2>>, "Both buffer types must have the same sample type!");
 
     jassert (bufferSrc.getNumSamples() == bufferDest.getNumSamples());
     const auto numSamples = bufferSrc.getNumSamples();
@@ -136,8 +136,8 @@ void copyBufferChannels (const BufferType1& bufferSrc, BufferType2& bufferDest, 
 template <typename BufferType1, typename BufferType2>
 void addBufferData (const BufferType1& bufferSrc, BufferType2& bufferDest, int srcStartSample, int destStartSample, int numSamples, int startChannel, int numChannels) noexcept
 {
-    using SampleType = detail::BufferSampleType<BufferType1>;
-    static_assert (std::is_same_v<SampleType, detail::BufferSampleType<BufferType2>>, "Both buffer types must have the same sample type!");
+    using SampleType = BufferSampleType<BufferType1>;
+    static_assert (std::is_same_v<SampleType, BufferSampleType<BufferType2>>, "Both buffer types must have the same sample type!");
 
     if (numSamples < 0)
     {
@@ -179,8 +179,8 @@ void addBufferData (const BufferType1& bufferSrc, BufferType2& bufferDest, int s
 template <typename BufferType1, typename BufferType2>
 void addBufferChannels (const BufferType1& bufferSrc, BufferType2& bufferDest, int srcChannel, int destChannel) noexcept
 {
-    using SampleType = detail::BufferSampleType<BufferType1>;
-    static_assert (std::is_same_v<SampleType, detail::BufferSampleType<BufferType2>>, "Both buffer types must have the same sample type!");
+    using SampleType = BufferSampleType<BufferType1>;
+    static_assert (std::is_same_v<SampleType, BufferSampleType<BufferType2>>, "Both buffer types must have the same sample type!");
 
     jassert (bufferSrc.getNumSamples() == bufferDest.getNumSamples());
     const auto numSamples = bufferSrc.getNumSamples();
@@ -206,8 +206,8 @@ void addBufferChannels (const BufferType1& bufferSrc, BufferType2& bufferDest, i
 template <typename BufferType1, typename BufferType2>
 void multiplyBufferData (const BufferType1& bufferSrc, BufferType2& bufferDest, int srcStartSample, int destStartSample, int numSamples, int startChannel, int numChannels) noexcept
 {
-    using SampleType = detail::BufferSampleType<BufferType1>;
-    static_assert (std::is_same_v<SampleType, detail::BufferSampleType<BufferType2>>, "Both buffer types must have the same sample type!");
+    using SampleType = BufferSampleType<BufferType1>;
+    static_assert (std::is_same_v<SampleType, BufferSampleType<BufferType2>>, "Both buffer types must have the same sample type!");
 
     if (numSamples < 0)
     {
@@ -254,8 +254,8 @@ void applyGain (BufferType& buffer, FloatType gain) noexcept
 template <typename BufferType1, typename BufferType2, typename FloatType>
 void applyGain (const BufferType1& bufferSrc, BufferType2& bufferDest, FloatType gain) noexcept
 {
-    using SampleType = detail::BufferSampleType<BufferType1>;
-    static_assert (std::is_same_v<SampleType, detail::BufferSampleType<BufferType2>>, "Both buffer types must have the same sample type!");
+    using SampleType = BufferSampleType<BufferType1>;
+    static_assert (std::is_same_v<SampleType, BufferSampleType<BufferType2>>, "Both buffer types must have the same sample type!");
 
     const auto numChannels = bufferSrc.getNumChannels();
     const auto numSamples = bufferSrc.getNumSamples();
@@ -296,8 +296,8 @@ void applyGainSmoothed (const BufferType1& bufferSrc, BufferType2& bufferDest, S
         return;
     }
 
-    using SampleType = detail::BufferSampleType<BufferType1>;
-    static_assert (std::is_same_v<SampleType, detail::BufferSampleType<BufferType2>>, "Both buffer types must have the same sample type!");
+    using SampleType = BufferSampleType<BufferType1>;
+    static_assert (std::is_same_v<SampleType, BufferSampleType<BufferType2>>, "Both buffer types must have the same sample type!");
 
     const auto numChannels = bufferSrc.getNumChannels();
     const auto numSamples = bufferSrc.getNumSamples();
@@ -332,8 +332,8 @@ void applyGainSmoothedBuffer (const BufferType1& bufferSrc, BufferType2& bufferD
         return;
     }
 
-    using SampleType = detail::BufferSampleType<BufferType1>;
-    static_assert (std::is_same_v<SampleType, detail::BufferSampleType<BufferType2>>, "Both buffer types must have the same sample type!");
+    using SampleType = BufferSampleType<BufferType1>;
+    static_assert (std::is_same_v<SampleType, BufferSampleType<BufferType2>>, "Both buffer types must have the same sample type!");
 
     const auto numChannels = bufferSrc.getNumChannels();
     const auto numSamples = bufferSrc.getNumSamples();
@@ -359,8 +359,8 @@ void applyGainSmoothedBuffer (const BufferType1& bufferSrc, BufferType2& bufferD
 template <typename BufferType1, typename BufferType2, typename FloatType>
 void sumToMono (const BufferType1& bufferSrc, BufferType2& bufferDest, FloatType normGain)
 {
-    using SampleType = detail::BufferSampleType<BufferType1>;
-    static_assert (std::is_same_v<SampleType, detail::BufferSampleType<BufferType2>>, "Both buffer types must have the same sample type!");
+    using SampleType = BufferSampleType<BufferType1>;
+    static_assert (std::is_same_v<SampleType, BufferSampleType<BufferType2>>, "Both buffer types must have the same sample type!");
 
     const auto numInChannels = bufferSrc.getNumChannels();
     [[maybe_unused]] const auto numSamples = bufferSrc.getNumSamples();
@@ -435,8 +435,8 @@ void applyFunction (BufferType& buffer, FunctionType&& function) noexcept
 template <typename BufferType1, typename BufferType2, typename FunctionType>
 void applyFunction (const BufferType1& bufferSrc, BufferType2& bufferDest, FunctionType&& function) noexcept
 {
-    using SampleType = detail::BufferSampleType<BufferType1>;
-    static_assert (std::is_same_v<SampleType, detail::BufferSampleType<BufferType2>>, "Both buffer types must have the same sample type!");
+    using SampleType = BufferSampleType<BufferType1>;
+    static_assert (std::is_same_v<SampleType, BufferSampleType<BufferType2>>, "Both buffer types must have the same sample type!");
 
     const auto numChannels = bufferSrc.getNumChannels();
     const auto numSamples = bufferSrc.getNumSamples();
@@ -488,8 +488,8 @@ std::enable_if_t<std::is_floating_point_v<FloatType>, void>
                    "which cannot be guaranteed with juce::AudioBuffer!");
 #endif
 
-    using SampleType = detail::BufferSampleType<BufferType1>;
-    static_assert (std::is_same_v<SampleType, detail::BufferSampleType<BufferType2>>, "Both buffer types must have the same sample type!");
+    using SampleType = BufferSampleType<BufferType1>;
+    static_assert (std::is_same_v<SampleType, BufferSampleType<BufferType2>>, "Both buffer types must have the same sample type!");
 
     const auto numChannels = bufferSrc.getNumChannels();
     const auto numSamples = bufferSrc.getNumSamples();
