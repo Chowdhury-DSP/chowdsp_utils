@@ -146,4 +146,10 @@ void Noise<T>::process (const ProcessContext& context) noexcept
     outBlock += randBlock;
 }
 
+template <typename T>
+void Noise<T>::processBlock (const BufferView<T>& buffer) noexcept
+{
+    auto&& block = buffer.toAudioBlock();
+    process (juce::dsp::ProcessContextReplacing<float> { block });
+}
 } // namespace chowdsp

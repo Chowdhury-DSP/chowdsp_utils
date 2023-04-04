@@ -37,7 +37,7 @@ public:
     void setNoiseType (NoiseType newType) noexcept { type = newType; }
 
     /** Returns the current noise profile */
-    NoiseType getNoiseType() const noexcept { return type; }
+    [[nodiscard]] NoiseType getNoiseType() const noexcept { return type; }
 
     /** Called before processing starts. */
     void prepare (const juce::dsp::ProcessSpec& spec) noexcept;
@@ -51,6 +51,9 @@ public:
     /** Processes the input and output buffers supplied in the processing context. */
     template <typename ProcessContext>
     void process (const ProcessContext& context) noexcept;
+
+    /** Adds noise to a buffer of audio data. */
+    void processBlock (const BufferView<T>& buffer) noexcept;
 
 private:
     T processSample (T) { return (T) 0; } // hide from dsp::Gain

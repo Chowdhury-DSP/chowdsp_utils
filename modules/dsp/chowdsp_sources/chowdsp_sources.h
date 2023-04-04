@@ -34,6 +34,11 @@ BEGIN_JUCE_MODULE_DECLARATION
 #if JUCE_MODULE_AVAILABLE_juce_dsp
 #include "Other/chowdsp_Noise.h"
 
+#if JUCE_MODULE_AVAILABLE_chowdsp_filters
+#include <chowdsp_filters/chowdsp_filters.h>
+#include "Other/chowdsp_NoiseSynth.h"
+#endif
+
 #if JUCE_MODULE_AVAILABLE_chowdsp_dsp_utils
 #include <chowdsp_dsp_utils/chowdsp_dsp_utils.h>
 #include "Other/chowdsp_RepitchedSource.h"
