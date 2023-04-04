@@ -4,13 +4,13 @@
 TEST_CASE ("Noise Synth Test", "[dsp][sources]")
 {
     static constexpr auto fs = 48000.0;
-    static constexpr int blockSize = 256;
+    static constexpr int blockSize = 2048;
 
     chowdsp::NoiseSynth<128> synth;
     synth.prepare ({ fs, (uint32_t) blockSize, 1 });
 
     std::array<float, 128> magnitudes {};
-    std::fill (magnitudes.begin(), magnitudes.begin() + 64, 1.0f);
+    std::fill (magnitudes.begin(), magnitudes.begin() + 32, 1.0f);
     chowdsp::Buffer<float> buffer { 1, blockSize };
     synth.process (buffer, magnitudes);
 
@@ -19,10 +19,9 @@ TEST_CASE ("Noise Synth Test", "[dsp][sources]")
     fftInOut.resize (2 * blockSize, 0.0f);
 
     juce::FloatVectorOperations::copy (fftInOut.data(), buffer.getReadPointer (0), blockSize);
-    fft.performFrequencyOnlyForwardTransform (fftInOut.data());
+    fft.performFrequencyOnlyForwardTransform (fftInOut.data(), true);
 
-    const auto lowBandMag = std::accumulate (fftInOut.begin(), fftInOut.begin() + blockSize / 2, 0.0f);
-    const auto highBandMag = std::accumulate (fftInOut.begin() + blockSize / 2, fftInOut.begin() + blockSize, 0.0f);
-    std::cout << std::endl;
-
+    const auto lowBandMag = std::accumulate (fftInOut.begin(), fftInOut.begin() + blockSize / 4, 0.0f);
+    const auto highBandMag = std::accumulate (fftInOut.begin() + blockSize / 4, fftInOut.begin() + blockSize / 2, 0.0f);
+    REQUIRE (lowBandMag / highBandMag > 50.0f);
 }

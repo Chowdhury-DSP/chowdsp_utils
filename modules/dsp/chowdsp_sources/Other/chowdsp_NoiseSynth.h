@@ -34,8 +34,7 @@ public:
 
         // apply window + make causal
         juce::FloatVectorOperations::multiply (irData.data(), window.data(), fftInOut.data(), nFilterCoeffs);
-        std::rotate (irData.begin(), irData.begin() + nFilterCoeffs / 2, irData.end());
-//        FloatVectorOperations::rotate (irData.data(), nFilterCoeffs / 2, (int) irData.size(), fftInOut.data()); // using fftInOut as scratch data for the rotation
+        FloatVectorOperations::rotate (irData.data(), nFilterCoeffs / 2, (int) irData.size(), fftInOut.data()); // using fftInOut as scratch data for the rotation
 
         // these coefficients are linear phase... maybe we should try to do some sort of latency compensation?
         noiseSynthFilter.setCoefficients (irData.data());
