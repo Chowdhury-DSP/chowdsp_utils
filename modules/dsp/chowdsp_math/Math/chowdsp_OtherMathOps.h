@@ -96,5 +96,11 @@ namespace Math
     {
         return x * rsqrt (x * x + (T) 1);
     }
+
+    /** Returns true if the given number is a power of two. */
+    constexpr bool isPowerOfTwo (int n)
+    {
+        return (n & (n - 1)) == 0;
+    }
 } // namespace Math
 } // namespace chowdsp

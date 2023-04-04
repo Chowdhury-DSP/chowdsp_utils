@@ -9,16 +9,6 @@ namespace chowdsp
 /** Useful matrix operations */
 namespace MatrixOps
 {
-#ifndef DOXYGEN
-    namespace detail
-    {
-        constexpr bool isPowerOfTwo (int n)
-        {
-            return (n & (n - 1)) == 0;
-        }
-    } // namespace detail
-#endif
-
     /**
      * Methods for implementing a Householder mixing matrix.
      * Inspired by: https://github.com/Signalsmith-Audio/reverb-example-code/blob/main/mix-matrix.h
@@ -105,7 +95,7 @@ namespace MatrixOps
     private:
         using NumericType = SampleTypeHelpers::NumericType<FloatType>;
         static constexpr NumericType scalingFactor = gcem::sqrt ((NumericType) 1 / NumericType (size * SampleTypeHelpers::TypeTraits<FloatType>::Size));
-        static_assert (detail::isPowerOfTwo (size * SampleTypeHelpers::TypeTraits<FloatType>::Size), "Hadamard matrix dimension must be a power of 2!");
+        static_assert (Math::isPowerOfTwo (size * SampleTypeHelpers::TypeTraits<FloatType>::Size), "Hadamard matrix dimension must be a power of 2!");
 
     public:
         /** Perform unscaled Hadamard transformation using recursion */

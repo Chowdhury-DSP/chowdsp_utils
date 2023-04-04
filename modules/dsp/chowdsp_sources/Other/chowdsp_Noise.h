@@ -52,6 +52,9 @@ public:
     template <typename ProcessContext>
     void process (const ProcessContext& context) noexcept;
 
+    /** Adds noise to a buffer of audio data. */
+    void processBlock (const BufferView<T>& buffer) noexcept;
+
 private:
     T processSample (T) { return (T) 0; } // hide from dsp::Gain
 

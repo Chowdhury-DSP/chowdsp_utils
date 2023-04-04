@@ -92,4 +92,19 @@ TEST_CASE ("Other Math Ops Test", "[dsp][math][simd]")
     SECTION ("Sigmoid Test [double]") { sigmoidTest (double {}); }
     SECTION ("Sigmoid Test [SIMD float]") { sigmoidTest (xsimd::batch<float> {}); }
     SECTION ("Sigmoid Test [SIMD double]") { sigmoidTest (xsimd::batch<double> {}); }
+
+    SECTION ("Power Of Two Test")
+    {
+        static_assert (chowdsp::Math::isPowerOfTwo (1));
+        static_assert (chowdsp::Math::isPowerOfTwo (2));
+        static_assert (chowdsp::Math::isPowerOfTwo (4));
+        static_assert (chowdsp::Math::isPowerOfTwo (8));
+        static_assert (chowdsp::Math::isPowerOfTwo (256));
+        static_assert (chowdsp::Math::isPowerOfTwo (8192));
+        static_assert (! chowdsp::Math::isPowerOfTwo (3));
+        static_assert (! chowdsp::Math::isPowerOfTwo (5));
+        static_assert (! chowdsp::Math::isPowerOfTwo (11));
+        static_assert (! chowdsp::Math::isPowerOfTwo (255));
+        static_assert (! chowdsp::Math::isPowerOfTwo (1023));
+    }
 }
