@@ -7,6 +7,7 @@ template <int nFilterCoeffs = 128>
 class NoiseSynth
 {
     static_assert (Math::isPowerOfTwo (nFilterCoeffs));
+
 public:
     NoiseSynth() = default;
 
@@ -80,4 +81,4 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NoiseSynth)
 };
-}
+} // namespace chowdsp
