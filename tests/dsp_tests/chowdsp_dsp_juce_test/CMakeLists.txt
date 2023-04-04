@@ -13,6 +13,7 @@ target_sources(chowdsp_dsp_juce_test
 
         # Sources Tests
         source_tests/NoiseTest.cpp
+        source_tests/NoiseSynthTest.cpp
         source_tests/RepitchedSourceTest.cpp
 
         DiffuserTest.cpp
