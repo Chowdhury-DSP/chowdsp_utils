@@ -363,4 +363,22 @@ TEMPLATE_TEST_CASE ("FloatVectorOperations Test", "[dsp][math]", float, double)
             }
         }
     }
+
+    SECTION ("Rotate Test")
+    {
+        for (auto [numValues, rotate] : chowdsp::zip<std::initializer_list<size_t>, std::initializer_list<int>> ({ 2, 14, 15, 100, 101 }, { 1, 7, 7, 51, 52 }))
+        {
+            std::vector<TestType> data (numValues, (TestType) 0);
+            std::iota (data.begin(), data.end(), 0.0f);
+
+            std::vector<TestType> refData { data.begin(), data.end() };
+            std::rotate (refData.begin(), refData.begin() + rotate, refData.end());
+
+            std::vector<TestType> scratchData ((size_t) rotate);
+            chowdsp::FloatVectorOperations::rotate (data.data(), rotate, (int) numValues, scratchData.data());
+
+            for (auto [exp, actual] : chowdsp::zip (refData, data))
+                REQUIRE (actual == exp);
+        }
+    }
 }
