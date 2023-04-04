@@ -62,5 +62,19 @@ namespace FloatVectorOperations
     /** Counts the number of Inf values in the input data */
     [[maybe_unused]] int countInfs (const double* src, int numValues) noexcept;
 
+    /**
+     * Equivalent implementation to std::rotate, but without allocating memory.
+     *
+     * scratchData must point to at least numToRotate values.
+     */
+    [[maybe_unused]] void rotate (float* data, int numToRotate, int totalNumValues, float* scratchData) noexcept;
+
+    /**
+     * Equivalent implementation to std::rotate, but without allocating memory.
+     *
+     * scratchData must point to at least numToRotate values.
+     */
+    [[maybe_unused]] void rotate (double* data, int numToRotate, int totalNumValues, double* scratchData) noexcept;
+
 } // namespace FloatVectorOperations
 } // namespace chowdsp
