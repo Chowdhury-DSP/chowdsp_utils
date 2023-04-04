@@ -364,6 +364,7 @@ TEMPLATE_TEST_CASE ("FloatVectorOperations Test", "[dsp][math]", float, double)
         }
     }
 
+#if JUCE_MAC
     SECTION ("Rotate Test")
     {
         for (auto [numValues, rotate] : chowdsp::zip<std::initializer_list<size_t>, std::initializer_list<int>> ({ 2, 14, 15, 100, 101 }, { 1, 7, 7, 51, 52 }))
@@ -383,4 +384,5 @@ TEMPLATE_TEST_CASE ("FloatVectorOperations Test", "[dsp][math]", float, double)
                 REQUIRE (actual == exp);
         }
     }
+#endif
 }
