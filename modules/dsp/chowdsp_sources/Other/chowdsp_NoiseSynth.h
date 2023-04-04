@@ -62,9 +62,9 @@ private:
     static constexpr auto fftOrder = Math::log2<nFilterCoeffs>();
     juce::dsp::FFT fft { fftOrder };
 
-    const std::array<float, nFilterCoeffs> window = []
+    const std::array<float, (size_t) nFilterCoeffs> window = []
     {
-        std::array<float, nFilterCoeffs> w;
+        std::array<float, (size_t) nFilterCoeffs> w;
         // basic Hann window...
         for (auto [idx, val] : enumerate (w))
             val = 0.5f * (1.0f - std::cos (juce::MathConstants<float>::twoPi * (float) idx / (float) nFilterCoeffs));
@@ -73,8 +73,8 @@ private:
         return w;
     }();
 
-    std::array<float, nFilterCoeffs * 2> fftInOut;
-    std::array<float, nFilterCoeffs> irData;
+    std::array<float, (size_t) nFilterCoeffs * 2> fftInOut;
+    std::array<float, (size_t) nFilterCoeffs> irData;
 
     Noise<float> noiseSynthSource;
     FIRFilter<float> noiseSynthFilter;

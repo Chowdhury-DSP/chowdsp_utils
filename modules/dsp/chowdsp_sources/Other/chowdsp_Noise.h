@@ -37,7 +37,7 @@ public:
     void setNoiseType (NoiseType newType) noexcept { type = newType; }
 
     /** Returns the current noise profile */
-    NoiseType getNoiseType() const noexcept { return type; }
+    [[nodiscard]] NoiseType getNoiseType() const noexcept { return type; }
 
     /** Called before processing starts. */
     void prepare (const juce::dsp::ProcessSpec& spec) noexcept;
