@@ -182,8 +182,8 @@ public:
                                         const BufferView<T>& bufferHigh) noexcept
     {
         // no pointer aliasing!!
-        jassert (bufferIn.getArrayOfReadPointers() != bufferLow.getArrayOfReadPointers());
-        jassert (bufferIn.getArrayOfReadPointers() != bufferHigh.getArrayOfReadPointers());
+        jassert (bufferIn.getReadPointer (0) != bufferLow.getReadPointer (0));
+        jassert (bufferIn.getReadPointer (0) != bufferHigh.getReadPointer (0));
 
         const auto&& inBlock = bufferIn.toAudioBlock();
         auto&& lowBlock = bufferLow.toAudioBlock();
