@@ -30,14 +30,14 @@ public:
 
         ObjectPtr uiObject;
         uiObject.ptr = object.release();
-        uiToLiveQueue.enqueue (uiObject);
+        uiToLiveQueue.enqueue (uiToLiveProducerToken, uiObject);
     }
 
     /** Reads the latest object from the pipeline from the audio thread. */
     const ObjectType* read()
     {
         ObjectPtr objectFromUI {};
-        if (uiToLiveQueue.try_dequeue (objectFromUI))
+        if (uiToLiveQueue.try_dequeue_from_producer (uiToLiveProducerToken, objectFromUI))
         {
             ObjectPtr deadObject {};
             deadObject.ptr = liveObject.release();
@@ -53,7 +53,7 @@ private:
         ObjectPtr deadObject {};
         while (liveToDeadQueue.try_dequeue (deadObject))
             deadObject.kill();
-        while (uiToLiveQueue.try_dequeue (deadObject))
+        while (uiToLiveQueue.try_dequeue_from_producer (uiToLiveProducerToken, deadObject))
             deadObject.kill();
     }
 
@@ -71,7 +71,8 @@ private:
     };
 
     std::unique_ptr<ObjectType> liveObject; // object to use on the audio thread
-    moodycamel::ReaderWriterQueue<ObjectPtr, 4> uiToLiveQueue; // pipeline from UI to audio thread
+    moodycamel::ConcurrentQueue<ObjectPtr> uiToLiveQueue { 4 }; // pipeline from UI to audio thread
+    moodycamel::ProducerToken uiToLiveProducerToken { uiToLiveQueue };
     moodycamel::ReaderWriterQueue<ObjectPtr, 4> liveToDeadQueue; // pipeline from audio thread to destruction
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UIToAudioPipeline)
