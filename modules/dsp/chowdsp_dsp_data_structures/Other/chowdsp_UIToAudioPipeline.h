@@ -37,7 +37,7 @@ public:
     const ObjectType* read()
     {
         ObjectPtr objectFromUI {};
-        if (uiToLiveQueue. try_dequeue_from_producer (uiToLiveProducerToken, objectFromUI))
+        if (uiToLiveQueue.try_dequeue_from_producer (uiToLiveProducerToken, objectFromUI))
         {
             ObjectPtr deadObject {};
             deadObject.ptr = liveObject.release();
