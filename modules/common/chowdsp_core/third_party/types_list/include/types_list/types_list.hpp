@@ -5,6 +5,18 @@
 
 namespace types_list
 {
+/** Can be used to call a lambda for every type in a type list */
+template <typename TypesList, typename ForEachAction, size_t typeIndex = 0, size_t numTypesLeft = TypesList::count>
+static constexpr void forEach (ForEachAction&& forEachAction)
+{
+    if constexpr (numTypesLeft > 0)
+    {
+        forEachAction (std::integral_constant<std::size_t, typeIndex>());
+        forEach<TypesList, ForEachAction, typeIndex + 1, numTypesLeft - 1> (
+            std::forward<ForEachAction> (forEachAction));
+    }
+}
+
 namespace detail
 {
     template <typename TypesList, typename OtherListType, size_t typeIndex = 0, size_t numTypesLeft = OtherListType::count>
@@ -37,7 +49,21 @@ namespace detail
     {
         using TupleTypesList = TypesList;
     };
-}
+
+    template <typename TypesList, typename Type>
+    static constexpr int indexOf()
+    {
+        int result = -1;
+        forEach<TypesList> (
+            [&result] (auto typeIndex)
+            {
+                using TypeAtIndex = typename TypesList::template AtIndex<typeIndex>;
+                if constexpr (std::is_same_v<Type, TypeAtIndex>)
+                    result = (int) typeIndex;
+            });
+        return result;
+    }
+} // namespace detail
 
 /** Template object that can be used as a list of types */
 template <typename... Ts>
@@ -52,6 +78,10 @@ struct TypesList
     /** Can be used to access the type at a given index in the list. */
     template <size_t I>
     using AtIndex = std::tuple_element_t<I, Types>;
+
+    /** Returns the index of a given type in the list. Returns -1 if the type is not present in the list. */
+    template <typename T>
+    static constexpr int IndexOf = detail::indexOf<TypesList, T>();
 
     /** True if the argument type is present in the list. */
     template <typename T>
@@ -73,16 +103,4 @@ struct TypesList
 /** Constructs a TypesList from a tuple */
 template <typename TupleType>
 using TupleList = typename detail::TupleHelpers<TypesList<>, TupleType>::TupleTypesList;
-
-/** Can be used to call a lambda for every type in a type list */
-template<typename TypesList, typename ForEachAction, size_t typeIndex = 0, size_t numTypesLeft = TypesList::count>
-static constexpr void forEach (ForEachAction&& forEachAction)
-{
-    if constexpr (numTypesLeft > 0)
-    {
-        forEachAction(std::integral_constant<std::size_t, typeIndex>());
-        forEach<TypesList, ForEachAction, typeIndex + 1, numTypesLeft - 1>(std::forward<ForEachAction>(forEachAction));
-    }
-}
-}
-
+} // namespace types_list

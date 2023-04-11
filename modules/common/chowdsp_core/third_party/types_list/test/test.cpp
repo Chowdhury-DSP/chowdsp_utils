@@ -29,12 +29,10 @@ TEST_CASE ("Types List Test")
             Type1,
             Type2>;
 
-        static constexpr auto typeNames = []
-        {
+        static constexpr auto typeNames = [] {
             std::array<std::string_view, List::count> names {};
             types_list::forEach<List> (
-                [&names] (auto index)
-                {
+                [&names] (auto index) {
                     names[index] = List::AtIndex<index>::name;
                 });
             return names;
@@ -74,5 +72,12 @@ TEST_CASE ("Types List Test")
     {
         static_assert (std::is_same_v<types_list::TypesList<int, float>, types_list::TupleList<std::tuple<int, float>>>);
         static_assert (std::is_same_v<types_list::TypesList<int, float>::Types, std::tuple<int, float>>);
+    }
+
+    SECTION ("IndexOf Test")
+    {
+        static_assert (types_list::TypesList<int, float>::IndexOf<int> == (int) 0);
+        static_assert (types_list::TypesList<int, float>::IndexOf<float> == (int) 1);
+        static_assert (types_list::TypesList<int, float>::IndexOf<double> == (int) -1);
     }
 }
