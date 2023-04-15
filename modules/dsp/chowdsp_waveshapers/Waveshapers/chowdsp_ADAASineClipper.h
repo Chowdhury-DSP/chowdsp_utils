@@ -7,11 +7,11 @@ namespace chowdsp
  *
  * Reference: https://www.desmos.com/calculator/rdkdsmrrtr
  */
-template <typename T>
-class ADAASineClipper : public ADAAWaveshaper<T>
+template <typename T, ADAAWaveshaperMode mode = ADAAWaveshaperMode::MinusX>
+class ADAASineClipper : public ADAAWaveshaper<T, mode>
 {
 public:
-    explicit ADAASineClipper (LookupTableCache* lutCache = nullptr, T range = (T) 10, int N = 1 << 18) : ADAAWaveshaper<T> (lutCache, "chowdsp_sine_clipper")
+    explicit ADAASineClipper (LookupTableCache* lutCache = nullptr, T range = (T) 10, int N = 1 << 18) : ADAAWaveshaper<T, mode> (lutCache, "chowdsp_sine_clipper")
     {
         using chowdsp::Math::sign;
         using chowdsp::Power::ipow;

@@ -7,10 +7,10 @@ constexpr int N = 1000;
 constexpr float maxErr = 1.0e-1f;
 } // namespace Constants
 
-template <int degree>
-void processTest (chowdsp::LookupTableCache& lutCache)
+template <int degree, chowdsp::ADAAWaveshaperMode mode>
+void processTest (chowdsp::LookupTableCache& lutCache, bool processBuffer = true)
 {
-    chowdsp::ADAASoftClipper<float, degree> clipper { &lutCache };
+    chowdsp::ADAASoftClipper<float, degree, mode> clipper { &lutCache };
     clipper.prepare (1);
 
     chowdsp::Buffer<float> testBuffer (1, Constants::N);
@@ -22,7 +22,18 @@ void processTest (chowdsp::LookupTableCache& lutCache)
         expYs[i] = chowdsp::SoftClipper<degree, float>::processSample (testX);
     }
 
-    clipper.processBlock (testBuffer);
+    if (processBuffer)
+    {
+        clipper.processBlock (testBuffer);
+    }
+    else
+    {
+        for (auto [channel, channelData] : chowdsp::buffer_iters::channels (testBuffer))
+        {
+            for (auto& x : channelData)
+                x = clipper.processSample (x, channel);
+        }
+    }
 
     for (int i = 1; i < Constants::N; ++i)
     {
@@ -35,10 +46,12 @@ TEST_CASE ("ADAA Soft Clipper Test", "[dsp][waveshapers]")
 {
     chowdsp::LookupTableCache lutCache;
 
-    processTest<3> (lutCache);
-    processTest<3> (lutCache);
-    processTest<5> (lutCache);
-    processTest<9> (lutCache);
+    using Mode = chowdsp::ADAAWaveshaperMode;
+    processTest<3, Mode::Direct> (lutCache, false);
+    lutCache.clearCache();
+    processTest<3, Mode::MinusX> (lutCache);
+    processTest<5, Mode::Direct> (lutCache);
+    processTest<9, Mode::MinusX> (lutCache, false);
 
     lutCache.clearCache();
 }

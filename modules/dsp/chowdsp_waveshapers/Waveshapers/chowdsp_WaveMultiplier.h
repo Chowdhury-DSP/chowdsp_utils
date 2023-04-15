@@ -21,7 +21,7 @@ namespace chowdsp
  *
  * Reference: https://electro-music.com/forum/phpbb-files/schem_cgs113_vcm2_194.gif
  */
-template <typename T, size_t nStages = 6>
+template <typename T, size_t nStages = 6, ADAAWaveshaperMode mode = ADAAWaveshaperMode::MinusX>
 class WaveMultiplier
 {
 public:
@@ -69,7 +69,7 @@ public:
     }
 
 private:
-    struct FolderCell : public ADAAWaveshaper<T>
+    struct FolderCell : public ADAAWaveshaper<T, mode>
     {
         FolderCell() = default;
 
@@ -98,7 +98,7 @@ private:
             using namespace TanhIntegrals;
             using Power::ipow;
 
-            ADAAWaveshaper<T>::initialise (
+            ADAAWaveshaper<T, mode>::initialise (
                 [&] (auto x)
                 {
                     return (2.0 / D) * std::tanh (x * D) - B * x;
