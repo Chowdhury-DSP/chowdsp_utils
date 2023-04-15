@@ -29,10 +29,12 @@ TEST_CASE ("Types List Test")
             Type1,
             Type2>;
 
-        static constexpr auto typeNames = [] {
+        static constexpr auto typeNames = []
+        {
             std::array<std::string_view, List::count> names {};
             types_list::forEach<List> (
-                [&names] (auto index) {
+                [&names] (auto index)
+                {
                     names[index] = List::AtIndex<index>::name;
                 });
             return names;

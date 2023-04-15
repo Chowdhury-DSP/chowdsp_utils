@@ -9,11 +9,11 @@ namespace chowdsp
  *
  * Derivation: https://www.desmos.com/calculator/jxnfvgqrvs
  */
-template <typename T>
-class ADAAFullWaveRectifier : public ADAAWaveshaper<T>
+template <typename T, ADAAWaveshaperMode mode = ADAAWaveshaperMode::MinusX>
+class ADAAFullWaveRectifier : public ADAAWaveshaper<T, mode>
 {
 public:
-    explicit ADAAFullWaveRectifier (LookupTableCache* lutCache = nullptr, T range = (T) 10, int N = 1 << 17) : ADAAWaveshaper<T> (lutCache, "hard_clipper")
+    explicit ADAAFullWaveRectifier (LookupTableCache* lutCache = nullptr, T range = (T) 10, int N = 1 << 17) : ADAAWaveshaper<T, mode> (lutCache, "hard_clipper")
     {
         using Math::sign;
         this->initialise (

@@ -4,13 +4,20 @@
 
 namespace chowdsp
 {
+/** Mode to use for evaluating ADAA */
+enum class ADAAWaveshaperMode
+{
+    Direct = 0, /**< Uses ADAA to evaluate f(x) */
+    MinusX, /**< Uses ADAA to evaluate f(x) - x, and then adds x back in afterwards. */
+};
+
 /**
  * Waveshaper using second-order ADAA, with lookup-tables for speed.
  *
  * Note that this processor will always add exactly one sample of latency
  * to the signal, _even_ when bypassed.
  */
-template <typename T, typename illConditionTolerance = ScientificRatio<1, -2>, bool compensateHighFreqs = false>
+template <typename T, ADAAWaveshaperMode mode = ADAAWaveshaperMode::MinusX, typename illConditionTolerance = ScientificRatio<1, -2>, bool compensateHighFreqs = false>
 class ADAAWaveshaper
 {
 public:
@@ -62,27 +69,45 @@ public:
         // load lookup tables asynchronously
         if (lut->initialiseIfNotAlreadyInitialised())
             lutLoadingFutures.push_back (std::async (std::launch::async, [&, func = std::forward<FuncType> (nlFunc), minVal, maxVal, N]
-                                                     { lut->initialise ([&func] (auto x)
-                                                                        { return func ((double) x); },
-                                                                        minVal,
-                                                                        maxVal,
-                                                                        (size_t) N); }));
+                                                     { lut->initialise (
+                                                           [&func] (auto x)
+                                                           {
+                                                               if constexpr (mode == ADAAWaveshaperMode::Direct)
+                                                                   return func ((double) x);
+                                                               else if constexpr (mode == ADAAWaveshaperMode::MinusX)
+                                                                   return func ((double) x) - (double) x;
+                                                           },
+                                                           minVal,
+                                                           maxVal,
+                                                           (size_t) N); }));
 
         if (lut_AD1->initialiseIfNotAlreadyInitialised())
             lutLoadingFutures.push_back (std::async (std::launch::async, [&, funcD1 = std::forward<FuncTypeD1> (nlFuncD1), minVal, maxVal, N]
-                                                     { lut_AD1->initialise ([&funcD1] (auto x)
-                                                                            { return funcD1 ((double) x); },
-                                                                            2 * minVal,
-                                                                            2 * maxVal,
-                                                                            4 * (size_t) N); }));
+                                                     { lut_AD1->initialise (
+                                                           [&funcD1] (auto x)
+                                                           {
+                                                               if constexpr (mode == ADAAWaveshaperMode::Direct)
+                                                                   return funcD1 ((double) x);
+                                                               else if constexpr (mode == ADAAWaveshaperMode::MinusX)
+                                                                   return funcD1 ((double) x) - 0.5 * Power::ipow<2> ((double) x); // + 0.5;
+                                                           },
+                                                           minVal,
+                                                           maxVal,
+                                                           2 * (size_t) N); }));
 
         if (lut_AD2->initialiseIfNotAlreadyInitialised())
             lutLoadingFutures.push_back (std::async (std::launch::async, [&, funcD2 = std::forward<FuncTypeD2> (nlFuncD2), minVal, maxVal, N]
-                                                     { lut_AD2->initialise ([&funcD2] (auto x)
-                                                                            { return funcD2 ((double) x); },
-                                                                            4 * minVal,
-                                                                            4 * maxVal,
-                                                                            16 * (size_t) N); }));
+                                                     { lut_AD2->initialise (
+                                                           [&funcD2] (auto x)
+                                                           {
+                                                               if constexpr (mode == ADAAWaveshaperMode::Direct)
+                                                                   return funcD2 ((double) x);
+                                                               else if constexpr (mode == ADAAWaveshaperMode::MinusX)
+                                                                   return funcD2 ((double) x) - (1.0 / 6.0) * Power::ipow<3> ((double) x); //+ 0.5 * (double) x;
+                                                           },
+                                                           minVal,
+                                                           maxVal,
+                                                           4 * (size_t) N); }));
     }
 
     /** Prepares the waveshaper for a given number of channels. */
@@ -130,7 +155,10 @@ public:
 
         bool illCondition = std::abs (x - x2[ch]) < TOL;
         const auto d1 = calcD1 (x, x1[ch], ad2_x0[ch], ad2_x1[ch]);
-        const auto y = T (illCondition ? fallback (x, x1[ch], x2[ch], ad2_x1[ch]) : (2.0 / (x - x2[ch])) * (d1 - d2[ch]));
+        auto y = T (illCondition ? fallback (x, x1[ch], x2[ch], ad2_x1[ch]) : (2.0 / (x - x2[ch])) * (d1 - d2[ch]));
+
+        if constexpr (mode == ADAAWaveshaperMode::MinusX)
+            y += (T) x1[ch];
 
         // update state
         d2[ch] = d1;
@@ -163,6 +191,9 @@ public:
             bool illCondition = std::abs (x - _x2.get()) < TOL;
             const auto d1 = calcD1 (x, _x1.get(), _ad2_x0.get(), _ad2_x1.get());
             output[n] = T (illCondition ? fallback (x, _x1.get(), _x2.get(), _ad2_x1.get()) : (2.0 / (x - _x2.get())) * (d1 - _d2.get()));
+
+            if constexpr (mode == ADAAWaveshaperMode::MinusX)
+                output[n] += (T) _x1.get();
 
             // update state
             _d2.get() = d1;
