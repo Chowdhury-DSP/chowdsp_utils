@@ -9,8 +9,8 @@ namespace chowdsp
  *
  * Derivation: https://www.desmos.com/calculator/fvu6zrubon
  */
-template <typename T, int degree = 3>
-class ADAASoftClipper : public ADAAWaveshaper<T>
+template <typename T, int degree = 3, ADAAWaveshaperMode mode = ADAAWaveshaperMode::MinusX>
+class ADAASoftClipper : public ADAAWaveshaper<T, mode>
 {
 public:
     static_assert (degree % 2 == 1 && degree > 2, "Degree must be an odd integer, larger than 2!");

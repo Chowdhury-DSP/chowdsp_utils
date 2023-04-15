@@ -7,8 +7,8 @@ namespace chowdsp
  *
  * Note that this processor adds one sample of latency to the signal.
  */
-template <typename T>
-class ADAAHardClipper : public ADAAWaveshaper<T>
+template <typename T, ADAAWaveshaperMode mode = ADAAWaveshaperMode::MinusX>
+class ADAAHardClipper : public ADAAWaveshaper<T, mode>
 {
 public:
     explicit ADAAHardClipper (LookupTableCache* lutCache = nullptr, T range = (T) 10, int N = 1 << 17) : ADAAWaveshaper<T> (lutCache, "chowdsp_hard_clipper")

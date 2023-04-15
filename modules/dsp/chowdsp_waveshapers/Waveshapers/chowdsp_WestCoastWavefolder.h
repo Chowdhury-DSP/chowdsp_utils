@@ -15,8 +15,8 @@ namespace chowdsp
  * Reference paper: http://www.dafx17.eca.ed.ac.uk/papers/DAFx17_paper_82.pdf
  * Derivation: https://www.desmos.com/calculator/o4j8apf9t5
  */
-template <typename T>
-class WestCoastWavefolder : public ADAAWaveshaper<T>
+template <typename T, ADAAWaveshaperMode mode = ADAAWaveshaperMode::MinusX>
+class WestCoastWavefolder : public ADAAWaveshaper<T, mode>
 {
 public:
     explicit WestCoastWavefolder (LookupTableCache* lutCache = nullptr, T range = (T) 10, int N = 1 << 17) : ADAAWaveshaper<T> (lutCache, "chowdsp_west_coast_folder")
