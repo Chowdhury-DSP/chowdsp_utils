@@ -132,7 +132,15 @@ TEMPLATE_TEST_CASE ("Serialization Test", "[common][serialization]", chowdsp::JS
             double z = -3.0;
         };
 
-        test_utils::ScopedFile testFile { "serial_test.test" };
+        const auto fileName = []
+        {
+            if constexpr (std::is_same_v<Serializer, chowdsp::XMLSerializer>)
+                return "serial_test.xml";
+            if constexpr (std::is_same_v<Serializer, chowdsp::JSONSerializer>)
+                return "serial_test.json";
+        }();
+
+        test_utils::ScopedFile testFile { fileName };
         testFile.file.create();
         chowdsp::Serialization::serialize<Serializer> (Test {}, testFile.file);
 
