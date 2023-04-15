@@ -15,7 +15,7 @@ class ADAASoftClipper : public ADAAWaveshaper<T, mode>
 public:
     static_assert (degree % 2 == 1 && degree > 2, "Degree must be an odd integer, larger than 2!");
 
-    explicit ADAASoftClipper (LookupTableCache* lutCache = nullptr, T range = (T) 10, int N = 1 << 17) : ADAAWaveshaper<T> (lutCache, "chowdsp_soft_clipper_" + std::to_string (degree))
+    explicit ADAASoftClipper (LookupTableCache* lutCache = nullptr, T range = (T) 10, int N = 1 << 17) : ADAAWaveshaper<T, mode> (lutCache, "chowdsp_soft_clipper_" + std::to_string (degree))
     {
         using Math::sign, Power::ipow;
         static constexpr auto D = (double) degree;

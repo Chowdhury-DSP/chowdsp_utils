@@ -19,7 +19,7 @@ template <typename T, ADAAWaveshaperMode mode = ADAAWaveshaperMode::MinusX>
 class WestCoastWavefolder : public ADAAWaveshaper<T, mode>
 {
 public:
-    explicit WestCoastWavefolder (LookupTableCache* lutCache = nullptr, T range = (T) 10, int N = 1 << 17) : ADAAWaveshaper<T> (lutCache, "chowdsp_west_coast_folder")
+    explicit WestCoastWavefolder (LookupTableCache* lutCache = nullptr, T range = (T) 10, int N = 1 << 17) : ADAAWaveshaper<T, mode> (lutCache, "chowdsp_west_coast_folder")
     {
         static constexpr std::array<FolderCell, 5> cells {
             FolderCell { 0.8333, 0.5, 0.6, -12.0 },
