@@ -8,7 +8,7 @@ namespace chowdsp
 enum class ADAAWaveshaperMode
 {
     Direct = 0, /**< Uses ADAA to evaluate f(x) */
-    MinusX,     /**< Uses ADAA to evaluate f(x) - x, and then adds x back in afterwards. */
+    MinusX, /**< Uses ADAA to evaluate f(x) - x, and then adds x back in afterwards. */
 };
 
 /**
