@@ -74,7 +74,11 @@ void checkOpenGLStats (juce::OpenGLContext& ctx, int& openGLMajorVersion, int& o
         false);
 
     while (waiting)
+#if JUCE_MODAL_LOOPS_PERMITTED
         juce::MessageManager::getInstance()->runDispatchLoopUntil (100);
+#else
+        juce::Thread::sleep (100);
+#endif
 }
 } // namespace
 #endif
