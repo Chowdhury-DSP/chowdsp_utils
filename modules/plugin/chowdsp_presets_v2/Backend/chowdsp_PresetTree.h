@@ -15,7 +15,7 @@ public:
     };
 
     explicit PresetTree (PresetState* presetState = nullptr, InsertionHelper&& insertionHelper = { nullptr, nullptr, nullptr });
-    ~PresetTree();
+    ~PresetTree() override = default;
 
     /**
      * Method for inserting presets into the tree.

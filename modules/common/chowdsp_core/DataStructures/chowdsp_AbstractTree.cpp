@@ -100,8 +100,8 @@ void AbstractTree<ElementType>::removeElement (const ElementType& element)
 template <typename ElementType>
 void AbstractTree<ElementType>::removeElements (std::function<bool (const ElementType&)>&& elementsToRemove)
 {
-    abstract_tree_detail::removeElementsGeneric ([&elementsToRemove] (const Node& node)
-                                                 { return node.leaf.has_value() && elementsToRemove (*node.leaf); },
+    abstract_tree_detail::removeElementsGeneric ([remover = std::move (elementsToRemove)] (const Node& node)
+                                                 { return node.leaf.has_value() && remover (*node.leaf); },
                                                  [this] (const Node& node)
                                                  { onDelete (node); },
                                                  nodes);
@@ -139,7 +139,7 @@ ElementType* AbstractTree<ElementType>::getElementByIndex (int index)
 template <typename ElementType>
 const ElementType* AbstractTree<ElementType>::getElementByIndex (int index) const
 {
-    return const_cast<AbstractTree&> (*this).getElementByIndex (index);
+    return const_cast<AbstractTree&> (*this).getElementByIndex (index); // NOSONAR
 }
 
 template <typename ElementType>
@@ -173,7 +173,7 @@ ElementType* AbstractTree<ElementType>::findElement (const ElementType& element)
 template <typename ElementType>
 const ElementType* AbstractTree<ElementType>::findElement (const ElementType& element) const
 {
-    return const_cast<AbstractTree&> (*this).findElement (element);
+    return const_cast<AbstractTree&> (*this).findElement (element); // NOSONAR
 }
 
 template <typename ElementType>

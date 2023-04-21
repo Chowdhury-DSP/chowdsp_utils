@@ -112,8 +112,6 @@ PresetTree::PresetTree (PresetState* currentPresetState, InsertionHelper&& inser
         };
 }
 
-PresetTree::~PresetTree() = default;
-
 Preset& PresetTree::insertElementInternal (Preset&& element, std::vector<Node>& topLevelNodes)
 {
     return treeInserter (std::move (element), topLevelNodes, insertHelper);
