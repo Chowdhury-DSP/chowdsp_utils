@@ -36,7 +36,7 @@ struct ScopedPresetManager
 
     void loadPreset (int index)
     {
-        manager.loadPreset (*manager.getPresetTree().getPresetByIndex (index));
+        manager.loadPreset (*manager.getPresetTree().getElementByIndex (index));
     }
 
     void setFloatParam (float newValue)
@@ -214,16 +214,16 @@ TEST_CASE ("Preset Manager Test", "[plugin][presets][state]")
         dummyFile.create();
 
         ScopedPresetManager presetMgr { userPresetsDir1 };
-        REQUIRE_MESSAGE (*presetMgr->getPresetTree().getPresetByIndex (0) == preset1, "User preset loaded from folder is incorrect!");
+        REQUIRE_MESSAGE (*presetMgr->getPresetTree().getElementByIndex (0) == preset1, "User preset loaded from folder is incorrect!");
 
         presetMgr->setUserPresetPath ({});
-        REQUIRE_MESSAGE (*presetMgr->getPresetTree().getPresetByIndex (0) == preset1, "User presets should not change when loading null file as preset path!");
+        REQUIRE_MESSAGE (*presetMgr->getPresetTree().getElementByIndex (0) == preset1, "User presets should not change when loading null file as preset path!");
 
         test_utils::ScopedFile userPresetsDir2 { "user_presets2" };
         userPresetsDir2.file.createDirectory();
         preset2.toFile (userPresetsDir2.file.getChildFile (preset2.getPresetFile().getFileName()));
         presetMgr->setUserPresetPath (userPresetsDir2);
-        REQUIRE_MESSAGE (*presetMgr->getPresetTree().getPresetByIndex (0) == preset2, "User presets not loaded correctly after changing user preset path!");
+        REQUIRE_MESSAGE (*presetMgr->getPresetTree().getElementByIndex (0) == preset2, "User presets not loaded correctly after changing user preset path!");
     }
 
     SECTION ("Null State Test")

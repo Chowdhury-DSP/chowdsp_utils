@@ -103,16 +103,16 @@ void MenuInterface::addExtraMenuItems (juce::PopupMenu& menu, std::initializer_l
     }
 }
 
-static void loadPresetsIntoMenu (juce::PopupMenu& menu, const std::vector<PresetTree::Item>& presetTree, PresetManager& presetMgr)
+static void loadPresetsIntoMenu (juce::PopupMenu& menu, const std::vector<PresetTree::Node>& presetTree, PresetManager& presetMgr)
 {
     for (const auto& item : presetTree)
     {
-        if (item.preset.has_value())
+        if (item.leaf.has_value())
         {
             juce::PopupMenu::Item menuItem;
             menuItem.itemID = -1;
-            menuItem.text = item.preset->getName();
-            menuItem.action = [&presetMgr, &preset = std::as_const (*item.preset)]
+            menuItem.text = item.leaf->getName();
+            menuItem.action = [&presetMgr, &preset = std::as_const (*item.leaf)]
             {
                 presetMgr.loadPreset (preset);
             };
@@ -132,6 +132,6 @@ static void loadPresetsIntoMenu (juce::PopupMenu& menu, const std::vector<Preset
 void MenuInterface::refreshPresetsMenu()
 {
     presetsMenu.clear();
-    loadPresetsIntoMenu (presetsMenu, presetManager.getPresetTree().getTreeItems(), presetManager);
+    loadPresetsIntoMenu (presetsMenu, presetManager.getPresetTree().getNodes(), presetManager);
 }
 } // namespace chowdsp::presets::frontend
