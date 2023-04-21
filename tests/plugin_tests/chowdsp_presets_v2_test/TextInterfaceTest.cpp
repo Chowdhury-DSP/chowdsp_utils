@@ -19,7 +19,7 @@ TEST_CASE ("Text Interface Test", "[plugin][presets]")
 
     const auto loadPreset = [&presetMgr] (int index)
     {
-        presetMgr.loadPreset (*presetMgr.getPresetTree().getPresetByIndex (index));
+        presetMgr.loadPreset (*presetMgr.getPresetTree().getElementByIndex (index));
     };
 
     SECTION ("Preset Change")

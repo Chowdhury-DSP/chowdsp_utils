@@ -51,7 +51,7 @@ TEST_CASE ("Program Adapter Test", "[plugin][presets]")
 
     const auto loadPreset = [] (chowdsp::presets::PresetManager& mgr, int index)
     {
-        mgr.loadPreset (*mgr.getPresetTree().getPresetByIndex (index));
+        mgr.loadPreset (*mgr.getPresetTree().getElementByIndex (index));
     };
 
     const auto checkPresetIndex = [] (chowdsp::presets::PresetManager& mgr, int expectedIndex)

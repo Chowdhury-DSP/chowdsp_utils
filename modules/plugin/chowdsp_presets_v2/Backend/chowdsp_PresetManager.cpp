@@ -21,7 +21,7 @@ void PresetManager::addPresets (std::vector<Preset>&& presets, bool areFactoryPr
         if (preset.isValid())
         {
             preset.isFactoryPreset = areFactoryPresets;
-            presetTree.insertPreset (std::move (preset));
+            presetTree.insertElement (std::move (preset));
         }
     }
 
@@ -49,7 +49,7 @@ void PresetManager::saveUserPreset (const juce::File& file, Preset&& preset) // 
     preset.toFile (file);
     loadUserPresetsFromFolder (getUserPresetPath());
 
-    if (auto* justSavedPreset = presetTree.findPreset (preset))
+    if (const auto* justSavedPreset = presetTree.findElement (preset))
         loadPreset (*justSavedPreset);
     else
         jassertfalse; // preset was not saved correctly!
@@ -60,7 +60,7 @@ void PresetManager::setDefaultPreset (Preset&& newDefaultPreset)
     // default preset must be a valid preset!
     jassert (newDefaultPreset.isValid());
 
-    if (const auto* foundDefaultPreset = presetTree.findPreset (newDefaultPreset))
+    if (const auto* foundDefaultPreset = presetTree.findElement (newDefaultPreset))
     {
         defaultPreset = foundDefaultPreset;
         return;
@@ -68,7 +68,7 @@ void PresetManager::setDefaultPreset (Preset&& newDefaultPreset)
 
     // default preset is not in factory presets, so let's add it!
     newDefaultPreset.isFactoryPreset = true;
-    defaultPreset = &presetTree.insertPreset (std::move (newDefaultPreset));
+    defaultPreset = &presetTree.insertElement (std::move (newDefaultPreset));
 }
 
 void PresetManager::loadDefaultPreset()
@@ -113,8 +113,8 @@ void PresetManager::loadUserPresetsFromFolder (const juce::File& file)
     }
 
     // delete old user presets
-    presetTree.removePresets ([] (const Preset& preset)
-                              { return ! preset.isFactoryPreset; });
+    presetTree.removeElements ([] (const Preset& preset)
+                               { return ! preset.isFactoryPreset; });
 
     addPresets (std::move (presets), false);
 }
