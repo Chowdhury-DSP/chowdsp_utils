@@ -38,7 +38,7 @@ TEST_CASE ("Abstract Tree Test", "[common][data-structures]")
     const std::vector<std::string> foods { "alfalfa", "apples", "beets", "donuts" };
 
     StringTree tree;
-    tree.insertElements (std::vector { foods });
+    tree.insertElements (std::vector<std::string> { foods });
     REQUIRE (tree.size() == 4);
 
     SECTION ("Insertion")

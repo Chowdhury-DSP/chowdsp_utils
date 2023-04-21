@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <vector>
 
 namespace chowdsp
@@ -20,7 +21,7 @@ public:
     };
 
     AbstractTree() = default;
-    ~AbstractTree() = default;
+    virtual ~AbstractTree() = default;
 
     /**
      * Inserts an element into the tree.
