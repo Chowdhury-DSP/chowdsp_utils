@@ -66,6 +66,12 @@ public:
     [[nodiscard]] const ElementType* findElement (const ElementType& element) const;
 
     template <typename Callable>
+    void doForAllNodes (Callable&& callable);
+
+    template <typename Callable>
+    void doForAllNodes (Callable&& callable) const;
+
+    template <typename Callable>
     void doForAllElements (Callable&& callable);
 
     template <typename Callable>

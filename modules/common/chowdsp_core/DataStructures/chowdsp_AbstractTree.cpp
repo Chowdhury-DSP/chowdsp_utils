@@ -178,6 +178,20 @@ const ElementType* AbstractTree<ElementType>::findElement (const ElementType& el
 
 template <typename ElementType>
 template <typename Callable>
+void AbstractTree<ElementType>::doForAllNodes (Callable&& callable)
+{
+    abstract_tree_detail::doForAllNodes (std::forward<Callable> (callable), nodes);
+}
+
+template <typename ElementType>
+template <typename Callable>
+void AbstractTree<ElementType>::doForAllNodes (Callable&& callable) const
+{
+    abstract_tree_detail::doForAllNodes (std::forward<Callable> (callable), nodes);
+}
+
+template <typename ElementType>
+template <typename Callable>
 void AbstractTree<ElementType>::doForAllElements (Callable&& callable)
 {
     abstract_tree_detail::doForAllNodes ([c = std::forward<Callable> (callable)] (auto& node)
