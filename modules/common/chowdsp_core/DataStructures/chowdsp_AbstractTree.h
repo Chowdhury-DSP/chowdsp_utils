@@ -42,7 +42,7 @@ public:
     void removeElement (const ElementType& element);
 
     /** Removes elements that meet the given criterion. */
-    void removeElements (std::function<bool (const ElementType&)>&& elementsToRemove);
+    void removeElements (const std::function<bool (const ElementType&)>& elementsToRemove);
 
     /** Removes all elements from the tree. */
     void clear();

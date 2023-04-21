@@ -98,10 +98,10 @@ void AbstractTree<ElementType>::removeElement (const ElementType& element)
 }
 
 template <typename ElementType>
-void AbstractTree<ElementType>::removeElements (std::function<bool (const ElementType&)>&& elementsToRemove)
+void AbstractTree<ElementType>::removeElements (const std::function<bool (const ElementType&)>& elementsToRemove)
 {
-    abstract_tree_detail::removeElementsGeneric ([remover = std::move (elementsToRemove)] (const Node& node)
-                                                 { return node.leaf.has_value() && remover (*node.leaf); },
+    abstract_tree_detail::removeElementsGeneric ([&elementsToRemove] (const Node& node)
+                                                 { return node.leaf.has_value() && elementsToRemove (*node.leaf); },
                                                  [this] (const Node& node)
                                                  { onDelete (node); },
                                                  nodes);
