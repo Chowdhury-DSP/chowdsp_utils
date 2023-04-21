@@ -17,13 +17,13 @@ void NextPrevious::updateCurrentPresetIndex()
         return;
     }
 
-    currentPresetIndex = presetManager.getPresetTree().getIndexForPreset (*presetManager.getCurrentPreset());
+    currentPresetIndex = presetManager.getPresetTree().getIndexForElement (*presetManager.getCurrentPreset());
 }
 
 bool NextPrevious::navigateThroughPresets (bool forward)
 {
     const auto& presetTree = presetManager.getPresetTree();
-    const auto numAvailablePresets = presetTree.getTotalNumberOfPresets();
+    const auto numAvailablePresets = presetTree.size();
     if (currentPresetIndex < 0 || numAvailablePresets <= currentPresetIndex)
         return false;
 
@@ -31,7 +31,7 @@ bool NextPrevious::navigateThroughPresets (bool forward)
     if (wrapAtEndOfTree)
         nextPresetIndex = juce::negativeAwareModulo (nextPresetIndex, numAvailablePresets);
 
-    if (auto* nextPreset = presetTree.getPresetByIndex (nextPresetIndex))
+    if (auto* nextPreset = presetTree.getElementByIndex (nextPresetIndex))
     {
         presetManager.loadPreset (*nextPreset);
         return true;

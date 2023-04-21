@@ -12,7 +12,7 @@ int PresetsProgramAdapter::getNumPrograms()
     if (presetManager == nullptr)
         return BaseProgramAdapter::getNumPrograms();
 
-    return presetManager->getPresetTree().getTotalNumberOfPresets();
+    return presetManager->getPresetTree().size();
 }
 
 int PresetsProgramAdapter::getCurrentProgram()
@@ -20,7 +20,7 @@ int PresetsProgramAdapter::getCurrentProgram()
     if (presetManager == nullptr || presetManager->getCurrentPreset() == nullptr)
         return BaseProgramAdapter::getCurrentProgram();
 
-    return presetManager->getPresetTree().getIndexForPreset (*presetManager->getCurrentPreset());
+    return presetManager->getPresetTree().getIndexForElement (*presetManager->getCurrentPreset());
 }
 
 void PresetsProgramAdapter::setCurrentProgram (int index)
@@ -28,7 +28,7 @@ void PresetsProgramAdapter::setCurrentProgram (int index)
     if (presetManager == nullptr)
         return BaseProgramAdapter::setCurrentProgram (index);
 
-    const auto presetForIndex = presetManager->getPresetTree().getPresetByIndex (index);
+    const auto presetForIndex = presetManager->getPresetTree().getElementByIndex (index);
     if (presetForIndex == nullptr)
         return BaseProgramAdapter::setCurrentProgram (index);
 
@@ -40,7 +40,7 @@ const juce::String PresetsProgramAdapter::getProgramName (int index) // NOSONAR 
     if (presetManager == nullptr)
         return BaseProgramAdapter::getProgramName (index);
 
-    const auto presetForIndex = presetManager->getPresetTree().getPresetByIndex (index);
+    const auto presetForIndex = presetManager->getPresetTree().getElementByIndex (index);
     if (presetForIndex == nullptr)
         return BaseProgramAdapter::getProgramName (index);
 

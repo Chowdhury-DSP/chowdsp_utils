@@ -24,7 +24,7 @@ TEST_CASE ("Clipboard Interface Test", "[plugin][presets]")
 
     const auto loadPreset = [&presetMgr] (int index)
     {
-        presetMgr.loadPreset (*presetMgr.getPresetTree().getPresetByIndex (index));
+        presetMgr.loadPreset (*presetMgr.getPresetTree().getElementByIndex (index));
     };
 
     SECTION ("Copy/Paste")
