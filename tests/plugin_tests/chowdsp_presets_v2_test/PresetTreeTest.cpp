@@ -202,7 +202,7 @@ TEST_CASE ("Preset Tree Test", "[plugin][presets]")
         REQUIRE (presetTree.getNodes().size() == 2);
 
         presetTree.removeElements ([] (const chowdsp::presets::Preset& preset)
-                                  { return preset.getVendor() == "Jatin"; });
+                                   { return preset.getVendor() == "Jatin"; });
 
         REQUIRE (presetTree.getNodes().size() == 1);
         REQUIRE (presetTree.size() == 2);

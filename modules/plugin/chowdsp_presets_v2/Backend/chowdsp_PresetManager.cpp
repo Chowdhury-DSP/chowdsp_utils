@@ -114,7 +114,7 @@ void PresetManager::loadUserPresetsFromFolder (const juce::File& file)
 
     // delete old user presets
     presetTree.removeElements ([] (const Preset& preset)
-                              { return ! preset.isFactoryPreset; });
+                               { return ! preset.isFactoryPreset; });
 
     addPresets (std::move (presets), false);
 }
