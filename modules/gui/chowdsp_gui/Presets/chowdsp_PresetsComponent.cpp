@@ -162,6 +162,7 @@ void PresetsComponent::mouseDown (const juce::MouseEvent&)
                                             Item::Go_to_User_Presets_Folder,
                                             Item::Choose_User_Presets_Folder });
 
+        menu.setLookAndFeel (&getLookAndFeel());
         menu.showMenuAsync (juce::PopupMenu::Options {}
                                 .withTargetComponent (this)
                                 .withStandardItemHeight (proportionOfHeight (0.75f)));
