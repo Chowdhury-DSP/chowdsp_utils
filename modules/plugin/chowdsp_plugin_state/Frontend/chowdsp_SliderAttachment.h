@@ -28,6 +28,9 @@ public:
     /** Sets the initial value of the slider */
     void setValue (float newValue);
 
+    /** Returns the attached parameter */
+    [[nodiscard]] const FloatParameter& getParameter() const { return attachment.param; };
+
 private:
     void sliderValueChanged (juce::Slider*) override;
     void sliderDragStarted (juce::Slider*) override;

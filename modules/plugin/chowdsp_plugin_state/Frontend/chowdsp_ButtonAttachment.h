@@ -28,6 +28,9 @@ public:
     /** Sets the initial value of the button */
     void setValue (bool newValue);
 
+    /** Returns the attached parameter */
+    [[nodiscard]] const BoolParameter& getParameter() const { return attachment.param; };
+
 private:
     void buttonClicked (juce::Button*) override;
 

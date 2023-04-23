@@ -28,6 +28,9 @@ public:
     /** Sets the initial value of the box */
     void setValue (int newValue);
 
+    /** Returns the attached parameter */
+    [[nodiscard]] const ChoiceParameter& getParameter() const { return attachment.param; };
+
 private:
     void comboBoxChanged (juce::ComboBox*) override;
 
