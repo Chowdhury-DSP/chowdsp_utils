@@ -29,7 +29,7 @@ public:
     void setValue (float newValue);
 
     /** Returns the attached parameter */
-    [[nodiscard]] const FloatParameter& getParameter() const { return attachment.param; };
+    [[nodiscard]] const FloatParameter& getParameter() const { return attachment.param; }
 
 private:
     void sliderValueChanged (juce::Slider*) override;
