@@ -84,6 +84,7 @@ namespace experimental
 #include "DataStructures/chowdsp_GraphicsHelpers.h"
 #include "DataStructures/chowdsp_ScopedValue.h"
 #include "DataStructures/chowdsp_StringLiteral.h"
+#include "DataStructures/chowdsp_SmallVector.h"
 #include "DataStructures/chowdsp_AbstractTree.h"
 
 #include "Functional/chowdsp_Bindings.h"
