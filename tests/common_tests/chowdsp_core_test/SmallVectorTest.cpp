@@ -181,7 +181,7 @@ TEST_CASE ("Small Vector Test", "[common][data-structures]")
             REQUIRE (ref == actual);
     }
 
-    SECTION ("Copy construction")
+    SECTION ("Copy Construction Test")
     {
         chowdsp::SmallVector<std::string, 4> vec { "john", "paul", "george", "ringo" };
         chowdsp::SmallVector<std::string, 4> vec2 { vec };
@@ -190,7 +190,7 @@ TEST_CASE ("Small Vector Test", "[common][data-structures]")
             REQUIRE (ref == actual);
     }
 
-    SECTION ("Copy assign")
+    SECTION ("Copy Assign Test")
     {
         chowdsp::SmallVector<std::string, 2> vec { "john", "paul", "george", "ringo" };
         const auto vec2 = vec.operator= (vec);
@@ -199,7 +199,7 @@ TEST_CASE ("Small Vector Test", "[common][data-structures]")
             REQUIRE (ref == actual);
     }
 
-    SECTION ("Move construction")
+    SECTION ("Move Construction Test")
     {
         std::array<std::string, 4> beatles { "john", "paul", "george", "ringo" };
         chowdsp::SmallVector<std::string, 4> vec { beatles.begin(), beatles.end() };
@@ -209,7 +209,7 @@ TEST_CASE ("Small Vector Test", "[common][data-structures]")
             REQUIRE (ref == actual);
     }
 
-    SECTION ("Copy assign")
+    SECTION ("Move Assign Test")
     {
         std::array<std::string, 4> beatles { "john", "paul", "george", "ringo" };
         chowdsp::SmallVector<std::string, 2> vec { beatles.begin(), beatles.end() };
@@ -219,7 +219,7 @@ TEST_CASE ("Small Vector Test", "[common][data-structures]")
             REQUIRE (ref == actual);
     }
 
-    SECTION ("Front/Back/Data (small)")
+    SECTION ("Front/Back/Data (small) Test")
     {
         chowdsp::SmallVector<std::string, 4> vec { "john", "paul", "george", "ringo" };
         REQUIRE (vec.front() == "john");
@@ -230,7 +230,7 @@ TEST_CASE ("Small Vector Test", "[common][data-structures]")
         REQUIRE (*std::as_const (vec).data() == "john");
     }
 
-    SECTION ("Front/Back/Data (large)")
+    SECTION ("Front/Back/Data (large) Test")
     {
         chowdsp::SmallVector<std::string, 2> vec { "john", "paul", "george", "ringo" };
         REQUIRE (vec.front() == "john");
@@ -241,7 +241,7 @@ TEST_CASE ("Small Vector Test", "[common][data-structures]")
         REQUIRE (*std::as_const (vec).data() == "john");
     }
 
-    SECTION ("Reserve")
+    SECTION ("Reserve Test")
     {
         chowdsp::SmallVector<int, 4> vec {};
         REQUIRE (vec.capacity() == 4);
@@ -256,7 +256,7 @@ TEST_CASE ("Small Vector Test", "[common][data-structures]")
         REQUIRE (vec.capacity() == 4);
     }
 
-    SECTION ("Clear")
+    SECTION ("Clear Test")
     {
         chowdsp::SmallVector<int, 4> vec { 1, 2, 3 };
         vec.resize (3);
@@ -274,5 +274,165 @@ TEST_CASE ("Small Vector Test", "[common][data-structures]")
 
         vec.clear();
         REQUIRE (vec.empty());
+    }
+
+    SECTION ("Insert/Emplace Single Value Test")
+    {
+        chowdsp::SmallVector<double, 4> vec { 1.0, 2.0 };
+
+        vec.insert (vec.begin() + 1, 1.5);
+        REQUIRE (vec.size() == 3);
+        REQUIRE (vec[1] == 1.5);
+
+        vec.insert (vec.begin() + 1, 1.25);
+        REQUIRE (vec.size() == 4);
+        REQUIRE (vec[1] == 1.25);
+
+        vec.insert (vec.begin() + 3, 1.75);
+        REQUIRE (vec.size() == 5);
+        REQUIRE (vec[3] == 1.75);
+    }
+
+    SECTION ("Insert Copy Single Value Test")
+    {
+        std::string _1_5 = "1.5";
+        std::string _1_25 = "1.25";
+        std::string _1_75 = "1.75";
+        chowdsp::SmallVector<std::string, 4> vec { "1.0", "2.0" };
+
+        vec.insert (vec.begin() + 1, _1_5);
+        REQUIRE (vec.size() == 3);
+        REQUIRE (vec[1] == _1_5);
+
+        vec.insert (vec.begin() + 1, _1_25);
+        REQUIRE (vec.size() == 4);
+        REQUIRE (vec[1] == _1_25);
+
+        vec.insert (vec.begin() + 3, _1_75);
+        REQUIRE (vec.size() == 5);
+        REQUIRE (vec[3] == _1_75);
+    }
+
+    SECTION ("Insert Range Test")
+    {
+        std::array<double, 4> decimals { 1.2, 1.4, 1.6, 1.8 };
+        {
+            chowdsp::SmallVector<double, 6> vec { 1.0, 2.0 };
+            vec.insert (vec.begin() + 1, decimals.begin(), decimals.end());
+            REQUIRE (vec.size() == 6);
+            REQUIRE (vec[1] == 1.2);
+            REQUIRE (vec[3] == 1.6);
+            REQUIRE (vec[5] == 2.0);
+        }
+        {
+            chowdsp::SmallVector<double, 8> vec { 1.0, 2.0 };
+            vec.insert (vec.begin() + 1, decimals.begin(), decimals.end());
+            REQUIRE (vec.size() == 6);
+            REQUIRE (vec[1] == 1.2);
+            REQUIRE (vec[3] == 1.6);
+            REQUIRE (vec[5] == 2.0);
+        }
+        {
+            chowdsp::SmallVector<double, 2> vec { 1.0, 2.0 };
+            vec.insert (vec.begin() + 1, { 1.2, 1.4, 1.6, 1.8 });
+            REQUIRE (vec.size() == 6);
+            REQUIRE (vec[1] == 1.2);
+            REQUIRE (vec[3] == 1.6);
+            REQUIRE (vec[5] == 2.0);
+        }
+    }
+
+    SECTION ("Insert Multiple of Same Test")
+    {
+        {
+            chowdsp::SmallVector<double, 2> vec { 1.0, 2.0 };
+            vec.insert (vec.begin() + 1, 3, 1.5);
+            REQUIRE (vec.size() == 5);
+            REQUIRE (vec[1] == 1.5);
+            REQUIRE (vec[3] == 1.5);
+            REQUIRE (vec[4] == 2.0);
+        }
+        {
+            chowdsp::SmallVector<double, 8> vec { 1.0, 2.0 };
+            vec.insert (vec.begin() + 1, 3, 1.5);
+            REQUIRE (vec.size() == 5);
+            REQUIRE (vec[1] == 1.5);
+            REQUIRE (vec[3] == 1.5);
+            REQUIRE (vec[4] == 2.0);
+        }
+    }
+
+    SECTION ("Erase Test")
+    {
+        {
+            chowdsp::SmallVector<int, 2> vec { 1, 2, 3, 4, 5 };
+
+            vec.erase (vec.begin() + 2);
+            REQUIRE (vec.size() == 4);
+            REQUIRE (vec[0] == 1);
+            REQUIRE (vec[1] == 2);
+            REQUIRE (vec[2] == 4);
+            REQUIRE (vec[3] == 5);
+
+            const auto shouldBeEnd = vec.erase (vec.begin() + 3);
+            REQUIRE (vec.end() == shouldBeEnd);
+            REQUIRE (vec.size() == 3);
+            REQUIRE (vec[0] == 1);
+            REQUIRE (vec[1] == 2);
+            REQUIRE (vec[2] == 4);
+        }
+
+        {
+            chowdsp::SmallVector<int, 5> vec { 1, 2, 3, 4, 5 };
+
+            vec.erase (vec.begin() + 2);
+            REQUIRE (vec.size() == 4);
+            REQUIRE (vec[0] == 1);
+            REQUIRE (vec[1] == 2);
+            REQUIRE (vec[2] == 4);
+            REQUIRE (vec[3] == 5);
+
+            const auto shouldBeEnd = vec.erase (vec.begin() + 3);
+            REQUIRE (vec.end() == shouldBeEnd);
+            REQUIRE (vec.size() == 3);
+            REQUIRE (vec[0] == 1);
+            REQUIRE (vec[1] == 2);
+            REQUIRE (vec[2] == 4);
+        }
+    }
+
+    SECTION ("Erase Range Test")
+    {
+        {
+            chowdsp::SmallVector<int, 2> vec { 1, 2, 3, 4, 5 };
+
+            vec.erase (vec.begin() + 1, vec.begin() + 3);
+            REQUIRE (vec.size() == 3);
+            REQUIRE (vec[0] == 1);;
+            REQUIRE (vec[1] == 4);
+            REQUIRE (vec[2] == 5);
+
+            const auto shouldBeEnd = vec.erase (vec.begin() + 2, vec.end());
+            REQUIRE (vec.end() == shouldBeEnd);
+            REQUIRE (vec.size() == 2);
+            REQUIRE (vec[0] == 1);
+            REQUIRE (vec[1] == 4);
+        }
+
+        {
+            chowdsp::SmallVector<int, 5> vec { 1, 2, 3, 4, 5 };
+
+            vec.erase (vec.begin() + 1, vec.begin() + 3);
+            REQUIRE (vec.size() == 3);
+            REQUIRE (vec[0] == 1);;
+            REQUIRE (vec[1] == 4);
+            REQUIRE (vec[2] == 5);
+
+            const auto shouldBeEnd = vec.erase (vec.begin() + 2, vec.end());
+            REQUIRE (vec.end() == shouldBeEnd);
+            REQUIRE (vec.size() == 2);
+            REQUIRE (vec[0] == 1);
+            REQUIRE (vec[1] == 4);
+        }
     }
 }

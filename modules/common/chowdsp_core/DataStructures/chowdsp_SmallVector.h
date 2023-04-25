@@ -12,14 +12,7 @@ namespace chowdsp
  * the data will remain in dynamic storage.
  *
  * The following methods from std::vector are not implemented:
- *   - insert (single value copy)
- *   - insert (single value move)
- *   - insert (range)
- *   - insert (initializer list)
- *   - emplace
- *   - erase (single value)
- *   - erase (range)
- *   - swap (not sure I'm going to do this one)
+ *   - swap
  *   - comparison operators
  *   - overloads for std::erase and std::erase_if
  */
@@ -269,26 +262,143 @@ public:
         internal_vector.clear();
     }
 
-    //    iterator insert (const_iterator pos, const T& value)
-    //    {
-    //        if (usingArray)
-    //        {
-    //            const auto insert_index = pos - internal_array.begin();
-    //            if (internal_array_size_used + 1 <= head_size)
-    //            {
-    //                for (size_t idx = internal_array_size_used; idx > insert_index; --idx)
-    //                    internal_array[idx] = std::move (internal_array[idx-1]);
-    //                internal_array[insert_index] = value;
-    //                internal_array_size_used++;
-    //                return internal_array.begin() + insert_index;
-    //            }
-    //
-    //            move_to_vector();
-    //            pos = internal_vector.begin() + insert_index;
-    //        }
-    //
-    //        return internal_vector.insert (pos, value);
-    //    }
+    iterator insert (const_iterator pos, const T& value)
+    {
+        const auto insert_index = size_t (pos - begin());
+        if (usingArray)
+        {
+            if (internal_array_size_used + 1 <= head_size)
+            {
+                for (size_t idx = internal_array_size_used; idx > insert_index; --idx)
+                    internal_array[idx] = std::move (internal_array[idx - 1]);
+                internal_array[insert_index] = value;
+                internal_array_size_used++;
+                return internal_array.begin() + insert_index;
+            }
+
+            move_to_vector();
+        }
+
+        internal_vector.insert (internal_vector.begin() + (int) insert_index, value);
+        return internal_vector.data() + insert_index;
+    }
+
+    iterator insert (const_iterator pos, T&& value)
+    {
+        return emplace (pos, std::move (value));
+    }
+
+    iterator insert (const_iterator pos, size_t count, const T& value)
+    {
+        const auto insert_index = size_t (pos - begin());
+        if (usingArray)
+        {
+            if (internal_array_size_used + count <= head_size)
+            {
+                for (size_t idx = internal_array_size_used + count - 1; idx > insert_index + count - 1; --idx)
+                    internal_array[idx] = std::move (internal_array[idx - count]);
+                std::fill (internal_array.begin() + insert_index, internal_array.begin() + insert_index + count, value);
+                internal_array_size_used += count;
+                return internal_array.begin() + insert_index;
+            }
+
+            move_to_vector();
+        }
+
+        internal_vector.insert (internal_vector.begin() + (int) insert_index, count, value);
+        return internal_vector.data() + insert_index;
+    }
+
+    template <class InputIt>
+    iterator insert (const_iterator pos, InputIt first, InputIt last)
+    {
+        const auto num_to_insert = size_t (last - first);
+        const auto insert_index = size_t (pos - begin());
+        if (usingArray)
+        {
+            if (internal_array_size_used + num_to_insert <= head_size)
+            {
+                for (size_t idx = internal_array_size_used + num_to_insert - 1; idx > insert_index + num_to_insert - 1; --idx)
+                    internal_array[idx] = std::move (internal_array[idx - num_to_insert]);
+                std::copy (first, last, internal_array.begin() + insert_index);
+                internal_array_size_used += num_to_insert;
+                return internal_array.begin() + insert_index;
+            }
+
+            move_to_vector();
+        }
+
+        internal_vector.insert (internal_vector.begin() + (int) insert_index, first, last);
+        return internal_vector.data() + insert_index;
+    }
+
+    iterator insert (const_iterator pos, std::initializer_list<T> ilist)
+    {
+        return insert (pos, ilist.begin(), ilist.end());
+    }
+
+    iterator emplace (const_iterator pos, T&& value)
+    {
+        const auto insert_index = size_t (pos - begin());
+        if (usingArray)
+        {
+            if (internal_array_size_used + 1 <= head_size)
+            {
+                for (size_t idx = internal_array_size_used; idx > insert_index; --idx)
+                    internal_array[idx] = std::move (internal_array[idx - 1]);
+                internal_array[insert_index] = std::move (value);
+                internal_array_size_used++;
+                return internal_array.begin() + insert_index;
+            }
+
+            move_to_vector();
+        }
+
+        internal_vector.emplace (internal_vector.begin() + (int) insert_index, std::move (value));
+        return internal_vector.data() + insert_index;
+    }
+
+    iterator erase (iterator pos)
+    {
+        return erase (static_cast<const_iterator> (pos));
+    }
+
+    iterator erase (const_iterator pos)
+    {
+        const auto erase_index = size_t (pos - begin());
+        if (usingArray)
+        {
+            for (size_t idx = erase_index; idx < internal_array_size_used - 1; ++idx)
+                internal_array[idx] = std::move (internal_array[idx + 1]);
+            internal_array_size_used--;
+            return internal_array.begin() + erase_index;
+        }
+
+        internal_vector.erase (internal_vector.begin() + (int) erase_index);
+        return internal_vector.data() + erase_index;
+    }
+
+    iterator erase (iterator first, iterator last)
+    {
+        return erase (static_cast<const_iterator> (first), static_cast<const_iterator> (last));
+    }
+
+    iterator erase (const_iterator first, const_iterator last)
+    {
+        const auto num_to_erase = size_t (last - first);
+        const auto first_erase_index = size_t (first - begin());
+        if (usingArray)
+        {
+            for (size_t idx = first_erase_index; idx < internal_array_size_used - num_to_erase; ++idx)
+                internal_array[idx] = std::move (internal_array[idx + num_to_erase]);
+            internal_array_size_used -= num_to_erase;
+            return internal_array.begin() + first_erase_index;
+        }
+
+        internal_vector.erase (internal_vector.begin() + (int) first_erase_index,
+                               internal_vector.begin() + (int) first_erase_index + (int) num_to_erase);
+        return internal_vector.data() + first_erase_index;
+    }
 
     void push_back (const T& value)
     {
