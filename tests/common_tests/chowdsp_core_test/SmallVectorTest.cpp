@@ -408,7 +408,8 @@ TEST_CASE ("Small Vector Test", "[common][data-structures]")
 
             vec.erase (vec.begin() + 1, vec.begin() + 3);
             REQUIRE (vec.size() == 3);
-            REQUIRE (vec[0] == 1);;
+            REQUIRE (vec[0] == 1);
+            ;
             REQUIRE (vec[1] == 4);
             REQUIRE (vec[2] == 5);
 
@@ -424,7 +425,8 @@ TEST_CASE ("Small Vector Test", "[common][data-structures]")
 
             vec.erase (vec.begin() + 1, vec.begin() + 3);
             REQUIRE (vec.size() == 3);
-            REQUIRE (vec[0] == 1);;
+            REQUIRE (vec[0] == 1);
+            ;
             REQUIRE (vec[1] == 4);
             REQUIRE (vec[2] == 5);
 

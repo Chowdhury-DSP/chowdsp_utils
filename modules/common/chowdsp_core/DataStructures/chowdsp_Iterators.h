@@ -105,6 +105,7 @@ class reverse
 {
 private:
     T& iterable_;
+
 public:
     explicit reverse (T& iterable) : iterable_ { iterable } {}
     [[nodiscard]] auto begin() const { return std::rbegin (iterable_); }
