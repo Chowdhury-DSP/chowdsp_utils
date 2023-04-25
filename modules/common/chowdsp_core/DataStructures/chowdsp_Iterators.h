@@ -98,4 +98,17 @@ constexpr auto zip (T&& iterableT, S&& iterableS)
     };
     return iterable_wrapper { std::forward<T> (iterableT), std::forward<S> (iterableS) };
 }
+
+/** Iterates over a container in reverse */
+template <typename T>
+class reverse
+{
+private:
+    T& iterable_;
+
+public:
+    explicit reverse (T& iterable) : iterable_ { iterable } {}
+    [[nodiscard]] auto begin() const { return std::rbegin (iterable_); }
+    [[nodiscard]] auto end() const { return std::rend (iterable_); }
+};
 } // namespace chowdsp
