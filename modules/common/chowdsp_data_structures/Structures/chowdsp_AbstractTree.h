@@ -23,6 +23,11 @@ public:
     AbstractTree() = default;
     virtual ~AbstractTree() = default;
 
+    AbstractTree (const AbstractTree&) = default;
+    AbstractTree& operator=(const AbstractTree&) = default;
+    AbstractTree (AbstractTree&&) noexcept = default;
+    AbstractTree& operator=(AbstractTree&&) noexcept = default;
+
     /**
      * Inserts an element into the tree.
      * Calling this invalidates any existing element indices.
@@ -89,8 +94,6 @@ private:
 
     std::vector<Node> nodes;
     int totalNumElements = 0;
-
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AbstractTree)
 };
 } // namespace chowdsp
 

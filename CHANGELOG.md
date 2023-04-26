@@ -4,10 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## [UNRELEASED]
 - Refactored `chowdsp_buffers` module out of `chowdsp_dsp_data_structures`.
-- Added math approximations: `chowdsp::LogApprox`, `chowdsp::PowApprox`, and `chowdsp::DecibelsApprox`.
+- Refactored `chowdsp_data_structures` module out of `chowdsp_core`, and added new data structures.
 - Added `chowdsp::buffer_iters::samples`.
 - Added `chowdsp::UIToAudioPipeline`.
-- Added `chowdsp::LocalPointer`.
+- Added `chowdsp::NoiseSynth`.
+- Added math approximations: `chowdsp::LogApprox`, `chowdsp::PowApprox`, and `chowdsp::DecibelsApprox`.
 - `chowdsp_visualizers`: Added `WaveshaperPlot`.
 - `chowds::DelayLine`: Added `free()` and `processBlock()` methods.
 - `chowdsp_presets_v2`: Refactored preset save/load logic into `chowdsp::PresetSaverLoader`.

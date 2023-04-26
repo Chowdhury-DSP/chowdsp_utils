@@ -1,5 +1,5 @@
 #include <CatchUtils.h>
-#include <chowdsp_core/chowdsp_core.h>
+#include <chowdsp_data_structures/chowdsp_data_structures.h>
 
 TEST_CASE ("Tuple Helpers Test", "[common][data-structures]")
 {
