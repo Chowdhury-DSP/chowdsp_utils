@@ -24,9 +24,9 @@ public:
     virtual ~AbstractTree() = default;
 
     AbstractTree (const AbstractTree&) = default;
-    AbstractTree& operator=(const AbstractTree&) = default;
+    AbstractTree& operator= (const AbstractTree&) = default;
     AbstractTree (AbstractTree&&) noexcept = default;
-    AbstractTree& operator=(AbstractTree&&) noexcept = default;
+    AbstractTree& operator= (AbstractTree&&) noexcept = default;
 
     /**
      * Inserts an element into the tree.
