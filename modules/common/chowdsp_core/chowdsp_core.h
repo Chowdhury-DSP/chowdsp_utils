@@ -74,17 +74,9 @@ namespace experimental
 #include "third_party/span-lite/include/nonstd/span.hpp"
 
 #include "DataStructures/chowdsp_AtomicHelpers.h"
-#include "DataStructures/chowdsp_DoubleBuffer.h"
-#include "DataStructures/chowdsp_TupleHelpers.h"
-#include "DataStructures/chowdsp_VectorHelpers.h"
 #include "DataStructures/chowdsp_StringHelpers.h"
-#include "DataStructures/chowdsp_Iterators.h"
-#include "DataStructures/chowdsp_OptionalPointer.h"
-#include "DataStructures/chowdsp_LocalPointer.h"
 #include "DataStructures/chowdsp_GraphicsHelpers.h"
 #include "DataStructures/chowdsp_ScopedValue.h"
-#include "DataStructures/chowdsp_StringLiteral.h"
-#include "DataStructures/chowdsp_AbstractTree.h"
 
 #include "Functional/chowdsp_Bindings.h"
 #include "Memory/chowdsp_MemoryAliasing.h"

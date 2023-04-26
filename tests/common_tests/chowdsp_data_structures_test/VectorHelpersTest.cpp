@@ -1,5 +1,5 @@
 #include <CatchUtils.h>
-#include <chowdsp_core/chowdsp_core.h>
+#include <chowdsp_data_structures/chowdsp_data_structures.h>
 #include <numeric>
 
 TEST_CASE ("Vector Helpers Test", "[common][data-structures]")
