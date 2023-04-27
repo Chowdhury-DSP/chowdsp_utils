@@ -273,7 +273,7 @@ public:
                     internal_array[idx] = std::move (internal_array[idx - 1]);
                 internal_array[insert_index] = value;
                 internal_array_size_used++;
-                return internal_array.begin() + insert_index;
+                return internal_array.data() + insert_index;
             }
 
             move_to_vector();
