@@ -8,7 +8,7 @@ BEGIN_JUCE_MODULE_DECLARATION
    version:       2.1.0
    name:          ChowDSP Math Utilities
    description:   Math utilities for ChowDSP plugins
-   dependencies:  chowdsp_simd
+   dependencies:  chowdsp_data_structures, chowdsp_simd
 
    website:       https://ccrma.stanford.edu/~jatin/chowdsp
    license:       BSD 3-clause
@@ -22,6 +22,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 #include <numeric>
 
+#include <chowdsp_data_structures/chowdsp_data_structures.h>
 #include <chowdsp_simd/chowdsp_simd.h>
 
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wimplicit-int-float-conversion")

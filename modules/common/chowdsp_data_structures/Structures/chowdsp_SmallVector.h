@@ -518,7 +518,5 @@ private:
     std::vector<T> internal_vector {};
 
     bool usingArray = true;
-
-    JUCE_LEAK_DETECTOR (SmallVector)
 };
 } // namespace chowdsp
