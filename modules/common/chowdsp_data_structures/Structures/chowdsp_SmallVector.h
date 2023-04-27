@@ -159,7 +159,7 @@ public:
     const_iterator begin() const noexcept
     {
         if (usingArray)
-            return internal_array.begin();
+            return internal_array.data();
         return static_cast<const_iterator> (&(*internal_vector.begin()));
     }
 
@@ -173,7 +173,7 @@ public:
     const_iterator end() const noexcept
     {
         if (usingArray)
-            return internal_array.begin() + internal_array_size_used;
+            return internal_array.data() + internal_array_size_used;
         return static_cast<const_iterator> (&(*internal_vector.end()));
     }
 
