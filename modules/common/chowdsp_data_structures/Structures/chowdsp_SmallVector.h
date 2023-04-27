@@ -180,28 +180,28 @@ public:
     reverse_iterator rbegin() noexcept
     {
         if (usingArray)
-            return internal_array.rend() - (typename reverse_iterator::difference_type) internal_array_size_used;
+            return static_cast<reverse_iterator> (internal_array.data() + internal_array_size_used);
         return static_cast<reverse_iterator> (internal_vector.data() + internal_vector.size());
     }
 
     const_reverse_iterator rbegin() const noexcept
     {
         if (usingArray)
-            return internal_array.rend() - (typename reverse_iterator::difference_type) internal_array_size_used;
+            return static_cast<const_reverse_iterator> (internal_array.data() + internal_array_size_used);
         return static_cast<const_reverse_iterator> (internal_vector.data() + internal_vector.size());
     }
 
     reverse_iterator rend() noexcept
     {
         if (usingArray)
-            return internal_array.rend();
+            return static_cast<reverse_iterator> (internal_array.data());
         return static_cast<reverse_iterator> (internal_vector.data());
     }
 
     const_reverse_iterator rend() const noexcept
     {
         if (usingArray)
-            return internal_array.rend();
+            return static_cast<const_reverse_iterator> (internal_array.data());
         return static_cast<const_reverse_iterator> (internal_vector.data());
     }
 
