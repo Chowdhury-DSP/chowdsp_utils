@@ -299,7 +299,7 @@ public:
                     internal_array[idx] = std::move (internal_array[idx - count]);
                 std::fill (internal_array.begin() + insert_index, internal_array.begin() + insert_index + count, value);
                 internal_array_size_used += count;
-                return internal_array.begin() + insert_index;
+                return internal_array.data() + insert_index;
             }
 
             move_to_vector();
@@ -322,7 +322,7 @@ public:
                     internal_array[idx] = std::move (internal_array[idx - num_to_insert]);
                 std::copy (first, last, internal_array.begin() + insert_index);
                 internal_array_size_used += num_to_insert;
-                return internal_array.begin() + insert_index;
+                return internal_array.data() + insert_index;
             }
 
             move_to_vector();
@@ -348,7 +348,7 @@ public:
                     internal_array[idx] = std::move (internal_array[idx - 1]);
                 internal_array[insert_index] = std::move (value);
                 internal_array_size_used++;
-                return internal_array.begin() + insert_index;
+                return internal_array.data() + insert_index;
             }
 
             move_to_vector();
@@ -371,7 +371,7 @@ public:
             for (size_t idx = erase_index; idx < internal_array_size_used - 1; ++idx)
                 internal_array[idx] = std::move (internal_array[idx + 1]);
             internal_array_size_used--;
-            return internal_array.begin() + erase_index;
+            return internal_array.data() + erase_index;
         }
 
         internal_vector.erase (internal_vector.begin() + (int) erase_index);
@@ -392,7 +392,7 @@ public:
             for (size_t idx = first_erase_index; idx < internal_array_size_used - num_to_erase; ++idx)
                 internal_array[idx] = std::move (internal_array[idx + num_to_erase]);
             internal_array_size_used -= num_to_erase;
-            return internal_array.begin() + first_erase_index;
+            return internal_array.data() + first_erase_index;
         }
 
         internal_vector.erase (internal_vector.begin() + (int) first_erase_index,
