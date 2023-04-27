@@ -166,7 +166,7 @@ public:
     iterator end() noexcept
     {
         if (usingArray)
-            return internal_array.begin() + internal_array_size_used;
+            return internal_array.data() + internal_array_size_used;
         return static_cast<iterator> (&(*internal_vector.end()));
     }
 
