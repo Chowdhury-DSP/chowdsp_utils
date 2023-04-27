@@ -2,6 +2,7 @@ juce_add_modules(
     ALIAS_NAMESPACE chowdsp
 
     ${PROJECT_SOURCE_DIR}/modules/common/chowdsp_core
+    ${PROJECT_SOURCE_DIR}/modules/common/chowdsp_data_structures
     ${PROJECT_SOURCE_DIR}/modules/common/chowdsp_json
     ${PROJECT_SOURCE_DIR}/modules/common/chowdsp_listeners
     ${PROJECT_SOURCE_DIR}/modules/common/chowdsp_reflection

@@ -1,5 +1,6 @@
 #include <juce_dsp/juce_dsp.h>
 #include <chowdsp_core/chowdsp_core.h>
+#include <chowdsp_data_structures/chowdsp_data_structures.h>
 #include <chowdsp_json/chowdsp_json.h>
 #include <chowdsp_listeners/chowdsp_listeners.h>
 #include <chowdsp_reflection/chowdsp_reflection.h>

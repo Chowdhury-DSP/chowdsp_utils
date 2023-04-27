@@ -152,57 +152,57 @@ public:
     iterator begin() noexcept
     {
         if (usingArray)
-            return internal_array.begin();
+            return internal_array.data();
         return static_cast<iterator> (&(*internal_vector.begin()));
     }
 
     const_iterator begin() const noexcept
     {
         if (usingArray)
-            return internal_array.begin();
+            return internal_array.data();
         return static_cast<const_iterator> (&(*internal_vector.begin()));
     }
 
     iterator end() noexcept
     {
         if (usingArray)
-            return internal_array.begin() + internal_array_size_used;
+            return internal_array.data() + internal_array_size_used;
         return static_cast<iterator> (&(*internal_vector.end()));
     }
 
     const_iterator end() const noexcept
     {
         if (usingArray)
-            return internal_array.begin() + internal_array_size_used;
+            return internal_array.data() + internal_array_size_used;
         return static_cast<const_iterator> (&(*internal_vector.end()));
     }
 
     reverse_iterator rbegin() noexcept
     {
         if (usingArray)
-            return internal_array.rend() - (typename reverse_iterator::difference_type) internal_array_size_used;
-        return static_cast<reverse_iterator> (&(*internal_vector.rbegin()));
+            return static_cast<reverse_iterator> (internal_array.data() + internal_array_size_used);
+        return static_cast<reverse_iterator> (internal_vector.data() + internal_vector.size());
     }
 
     const_reverse_iterator rbegin() const noexcept
     {
         if (usingArray)
-            return internal_array.rend() - (typename reverse_iterator::difference_type) internal_array_size_used;
-        return static_cast<const_reverse_iterator> (&(*internal_vector.rbegin()));
+            return static_cast<const_reverse_iterator> (internal_array.data() + internal_array_size_used);
+        return static_cast<const_reverse_iterator> (internal_vector.data() + internal_vector.size());
     }
 
     reverse_iterator rend() noexcept
     {
         if (usingArray)
-            return internal_array.rend();
-        return static_cast<reverse_iterator> (&(*internal_vector.rend()));
+            return static_cast<reverse_iterator> (internal_array.data());
+        return static_cast<reverse_iterator> (internal_vector.data());
     }
 
     const_reverse_iterator rend() const noexcept
     {
         if (usingArray)
-            return internal_array.rend();
-        return static_cast<const_reverse_iterator> (&(*internal_vector.rend()));
+            return static_cast<const_reverse_iterator> (internal_array.data());
+        return static_cast<const_reverse_iterator> (internal_vector.data());
     }
 
     [[nodiscard]] bool empty() const noexcept
@@ -273,7 +273,7 @@ public:
                     internal_array[idx] = std::move (internal_array[idx - 1]);
                 internal_array[insert_index] = value;
                 internal_array_size_used++;
-                return internal_array.begin() + insert_index;
+                return internal_array.data() + insert_index;
             }
 
             move_to_vector();
@@ -299,7 +299,7 @@ public:
                     internal_array[idx] = std::move (internal_array[idx - count]);
                 std::fill (internal_array.begin() + insert_index, internal_array.begin() + insert_index + count, value);
                 internal_array_size_used += count;
-                return internal_array.begin() + insert_index;
+                return internal_array.data() + insert_index;
             }
 
             move_to_vector();
@@ -322,7 +322,7 @@ public:
                     internal_array[idx] = std::move (internal_array[idx - num_to_insert]);
                 std::copy (first, last, internal_array.begin() + insert_index);
                 internal_array_size_used += num_to_insert;
-                return internal_array.begin() + insert_index;
+                return internal_array.data() + insert_index;
             }
 
             move_to_vector();
@@ -348,7 +348,7 @@ public:
                     internal_array[idx] = std::move (internal_array[idx - 1]);
                 internal_array[insert_index] = std::move (value);
                 internal_array_size_used++;
-                return internal_array.begin() + insert_index;
+                return internal_array.data() + insert_index;
             }
 
             move_to_vector();
@@ -371,7 +371,7 @@ public:
             for (size_t idx = erase_index; idx < internal_array_size_used - 1; ++idx)
                 internal_array[idx] = std::move (internal_array[idx + 1]);
             internal_array_size_used--;
-            return internal_array.begin() + erase_index;
+            return internal_array.data() + erase_index;
         }
 
         internal_vector.erase (internal_vector.begin() + (int) erase_index);
@@ -392,7 +392,7 @@ public:
             for (size_t idx = first_erase_index; idx < internal_array_size_used - num_to_erase; ++idx)
                 internal_array[idx] = std::move (internal_array[idx + num_to_erase]);
             internal_array_size_used -= num_to_erase;
-            return internal_array.begin() + first_erase_index;
+            return internal_array.data() + first_erase_index;
         }
 
         internal_vector.erase (internal_vector.begin() + (int) first_erase_index,
@@ -518,7 +518,5 @@ private:
     std::vector<T> internal_vector {};
 
     bool usingArray = true;
-
-    JUCE_LEAK_DETECTOR (SmallVector)
 };
 } // namespace chowdsp

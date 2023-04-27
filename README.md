@@ -77,17 +77,20 @@ sure to abide by the license of each module, as well as whichever libraries are 
 ### Common Modules
 
 `chowdsp_core` (BSD)
-- `DoubleBuffer`: A circular buffer which always maintains a contiguous block of data.
-- `TupleHelpers`: Useful methods for working with tuple-like data structures.
 - `AtomicHelpers`: Useful methods for working with atomics.
 - `MemoryUtils`: Helpful methods to check if blocks of memory alias with each other.
 - `TypeTraits`: Type traits for checking if a class has a given method, if a type is a container, and so on.
 - `ScopedValue`: A stack value that writes its value back to a more permanent variable when it goes out of scope.
-- `OptionalPointer`: A pointer which may or may not own the data it points to.
-- `LocalPointer`: An owning pointer which constructs the object it points to using its own local memory.
 - Includes the following internal dependencies:
   - [`types_list`](https://github.com/jatinchowdhury18/types_list) (MIT license).
   - [`span-lite`](https://github.com/martinmoene/span-lite) (BSL-1.0 license).
+
+`chowdsp_data_structures` (BSD)
+- `DoubleBuffer`: A circular buffer which always maintains a contiguous block of data.
+- `TupleHelpers`: Useful methods for working with tuple-like data structures.
+- `OptionalPointer`: A pointer which may or may not own the data it points to.
+- `LocalPointer`: An owning pointer which constructs the object it points to using its own local memory.
+- `SmallVector`: A mostly STL-compatible vector implementation, with a small-string-style optimization.
 
 `chowdsp_json` (BSD)
 - A thin wrapper around [`nlohmann::json`](https://github.com/nlohmann/json) (MIT license, included internally).

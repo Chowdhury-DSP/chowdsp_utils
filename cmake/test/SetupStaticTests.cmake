@@ -12,6 +12,7 @@ target_compile_definitions(static_test_dummy_executable PRIVATE
 
 target_link_libraries(static_test_dummy_executable PRIVATE
     chowdsp_core
+    chowdsp_data_structures
     chowdsp_json
     chowdsp_listeners
     chowdsp_reflection

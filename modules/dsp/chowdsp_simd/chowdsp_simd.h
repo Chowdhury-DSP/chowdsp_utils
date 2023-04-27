@@ -36,6 +36,10 @@ BEGIN_JUCE_MODULE_DECLARATION
 #endif
 #endif
 
+#if CHOWDSP_USING_JUCE
+#include <juce_audio_basics/juce_audio_basics.h>
+#endif
+
 #if ! CHOWDSP_NO_XSIMD
 
 // Third-party includes

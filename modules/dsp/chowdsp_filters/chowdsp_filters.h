@@ -8,7 +8,7 @@ BEGIN_JUCE_MODULE_DECLARATION
    version:       2.1.0
    name:          ChowDSP Filters
    description:   Filter classes for ChowDSP plugins
-   dependencies:  chowdsp_core, chowdsp_dsp_data_structures, chowdsp_math
+   dependencies:  chowdsp_data_structures, chowdsp_dsp_data_structures, chowdsp_math
 
    website:       https://ccrma.stanford.edu/~jatin/chowdsp
    license:       GPLv3
@@ -20,7 +20,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 #pragma once
 
-#include <chowdsp_core/chowdsp_core.h>
+#include <chowdsp_data_structures/chowdsp_data_structures.h>
 #include <chowdsp_dsp_data_structures/chowdsp_dsp_data_structures.h>
 #include <chowdsp_math/chowdsp_math.h>
 

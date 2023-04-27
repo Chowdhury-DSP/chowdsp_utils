@@ -1,0 +1,35 @@
+/*
+==============================================================================
+
+BEGIN_JUCE_MODULE_DECLARATION
+
+   ID:            chowdsp_data_structures
+   vendor:        Chowdhury DSP
+   version:       2.1.0
+   name:          ChowDSP Data Structures
+   description:   C++ data structures for other ChowDSP modules
+   dependencies:  chowdsp_core
+
+   website:       https://ccrma.stanford.edu/~jatin/chowdsp
+   license:       BSD 3-Clause
+
+   END_JUCE_MODULE_DECLARATION
+
+==============================================================================
+*/
+
+#pragma once
+
+#include <chowdsp_core/chowdsp_core.h>
+
+#include "Structures/chowdsp_DoubleBuffer.h"
+#include "Structures/chowdsp_LocalPointer.h"
+#include "Structures/chowdsp_OptionalPointer.h"
+#include "Structures/chowdsp_SmallVector.h"
+#include "Structures/chowdsp_StringLiteral.h"
+
+#include "Helpers/chowdsp_Iterators.h"
+#include "Helpers/chowdsp_TupleHelpers.h"
+#include "Helpers/chowdsp_VectorHelpers.h"
+
+#include "Structures/chowdsp_AbstractTree.h"
