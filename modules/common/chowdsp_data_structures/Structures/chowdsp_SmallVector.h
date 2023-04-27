@@ -152,7 +152,7 @@ public:
     iterator begin() noexcept
     {
         if (usingArray)
-            return internal_array.begin();
+            return internal_array.data();
         return static_cast<iterator> (&(*internal_vector.begin()));
     }
 
