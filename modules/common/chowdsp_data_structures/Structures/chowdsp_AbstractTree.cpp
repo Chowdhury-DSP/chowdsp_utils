@@ -3,8 +3,8 @@ namespace chowdsp
 #ifndef DOXYGEN
 namespace abstract_tree_detail
 {
-    template <typename Callable, typename Node>
-    void doForAllNodes (Callable&& callable, std::vector<Node>& nodes)
+    template <typename Callable, typename Node, typename Alloc>
+    void doForAllNodes (Callable&& callable, std::vector<Node, Alloc>& nodes)
     {
         for (auto& node : nodes)
         {
@@ -15,8 +15,8 @@ namespace abstract_tree_detail
         }
     }
 
-    template <typename Callable, typename Node>
-    void doForAllNodes (Callable&& callable, const std::vector<Node>& nodes)
+    template <typename Callable, typename Node, typename Alloc>
+    void doForAllNodes (Callable&& callable, const std::vector<Node, Alloc>& nodes)
     {
         for (auto& node : nodes)
         {
@@ -27,8 +27,8 @@ namespace abstract_tree_detail
         }
     }
 
-    template <typename DeleteChecker, typename OnDeleteAction, typename Node>
-    static void removeElementsGeneric (DeleteChecker&& shouldDeleteElement, OnDeleteAction&& onDeleteAction, std::vector<Node>& nodes)
+    template <typename DeleteChecker, typename OnDeleteAction, typename Node, typename Alloc>
+    static void removeElementsGeneric (DeleteChecker&& shouldDeleteElement, OnDeleteAction&& onDeleteAction, std::vector<Node, Alloc>& nodes)
     {
         VectorHelpers::erase_if (
             nodes,
