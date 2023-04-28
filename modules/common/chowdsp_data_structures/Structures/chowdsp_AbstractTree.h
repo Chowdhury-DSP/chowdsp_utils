@@ -16,7 +16,7 @@ public:
         std::optional<ElementType> leaf {};
         int leafIndex = -1;
 
-        using NodeAllocator = short_alloc<Node, 8192, 8>;
+        using NodeAllocator = short_alloc::short_alloc<Node, 8192, 8>;
         using NodeArena = typename NodeAllocator::arena_type;
         std::vector<Node, typename Node::NodeAllocator> subtree {};
         std::string tag;

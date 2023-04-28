@@ -27,6 +27,9 @@
 #include <cstddef>
 #include <cstdint>
 
+namespace short_alloc
+{
+
 template <std::size_t N, std::size_t alignment = alignof (std::max_align_t)>
 class arena
 {
@@ -158,5 +161,6 @@ inline bool
 {
     return ! (x == y);
 }
+} // namespace short_alloc
 
 #endif // SHORT_ALLOC_H
