@@ -3,9 +3,9 @@
 
 struct StringTree : chowdsp::AbstractTree<std::string>
 {
-    static Node& insertString (std::string&& element, std::vector<Node>& nodes)
+    static Node& insertString (std::string&& element, NodeVector& nodes, chowdsp::AbstractTree<std::string>& tree)
     {
-        Node newNode {};
+        auto newNode = tree.createEmptyNode();
         newNode.leaf = std::move (element);
         return *chowdsp::VectorHelpers::insert_sorted (nodes,
                                                        std::move (newNode),
@@ -15,21 +15,21 @@ struct StringTree : chowdsp::AbstractTree<std::string>
                                                        });
     }
 
-    std::string& insertElementInternal (std::string&& element, std::vector<Node>& topLevelNodes) override
+    std::string& insertElementInternal (std::string&& element, NodeVector& topLevelNodes) override
     {
         for (auto& node : topLevelNodes)
         {
             if (node.tag == std::string { element[0] })
-                return *insertString (std::move (element), node.subtree).leaf;
+                return *insertString (std::move (element), node.subtree, *this).leaf;
         }
 
-        Node newSubTreeNode {};
+        auto newSubTreeNode = createEmptyNode();
         newSubTreeNode.tag = std::string { element[0] };
         auto& insertedSubTreeNode = *chowdsp::VectorHelpers::insert_sorted (topLevelNodes,
                                                                             std::move (newSubTreeNode),
                                                                             [] (const Node& el1, const Node& el2)
                                                                             { return el1.tag < el2.tag; });
-        return *insertString (std::move (element), insertedSubTreeNode.subtree).leaf;
+        return *insertString (std::move (element), insertedSubTreeNode.subtree, *this).leaf;
     }
 };
 

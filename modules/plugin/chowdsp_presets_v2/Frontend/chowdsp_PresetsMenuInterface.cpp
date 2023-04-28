@@ -103,7 +103,7 @@ void MenuInterface::addExtraMenuItems (juce::PopupMenu& menu, std::initializer_l
     }
 }
 
-static void loadPresetsIntoMenu (juce::PopupMenu& menu, const std::vector<PresetTree::Node>& presetTree, PresetManager& presetMgr)
+static void loadPresetsIntoMenu (juce::PopupMenu& menu, const PresetTree::NodeVector& presetTree, PresetManager& presetMgr)
 {
     for (const auto& item : presetTree)
     {

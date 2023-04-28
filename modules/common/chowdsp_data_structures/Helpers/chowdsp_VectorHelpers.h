@@ -8,15 +8,15 @@ namespace chowdsp
 namespace VectorHelpers
 {
     /** Inserts an element into a sorted vector, with a custom comparison operator. */
-    template <typename T, typename Pred>
-    typename std::vector<T>::iterator insert_sorted (std::vector<T>& vec, T&& item, Pred pred)
+    template <typename T, typename Alloc, typename Pred>
+    typename std::vector<T, Alloc>::iterator insert_sorted (std::vector<T, Alloc>& vec, T&& item, Pred pred)
     {
         return vec.insert (std::upper_bound (vec.begin(), vec.end(), item, pred), item);
     }
 
     /** Inserts an element into a sorted vector, with the standard comparison operator. */
-    template <typename T>
-    typename std::vector<T>::iterator insert_sorted (std::vector<T>& vec, T&& item)
+    template <typename T, typename Alloc>
+    typename std::vector<T, Alloc>::iterator insert_sorted (std::vector<T, Alloc>& vec, T&& item)
     {
         return vec.insert (std::upper_bound (vec.begin(), vec.end(), item, std::less<T> {}), item);
     }

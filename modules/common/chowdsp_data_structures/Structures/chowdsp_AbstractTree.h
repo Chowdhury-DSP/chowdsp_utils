@@ -16,9 +16,15 @@ public:
         std::optional<ElementType> leaf {};
         int leafIndex = -1;
 
-        std::vector<Node> subtree {};
+        using NodeAllocator = short_alloc<Node, 8192, 8>;
+        using NodeArena = typename NodeAllocator::arena_type;
+        std::vector<Node, typename Node::NodeAllocator> subtree {};
         std::string tag;
+
+        explicit Node (NodeArena& arena) : subtree (arena) {}
     };
+
+    using NodeVector = typename std::vector<Node, typename Node::NodeAllocator>;
 
     AbstractTree() = default;
     virtual ~AbstractTree() = default;
@@ -85,14 +91,21 @@ public:
     [[nodiscard]] auto& getNodes() { return nodes; }
     [[nodiscard]] const auto& getNodes() const { return nodes; }
 
+    Node createEmptyNode()
+    {
+        return Node { nodeArena };
+    }
+
 protected:
-    virtual ElementType& insertElementInternal (ElementType&& element, std::vector<Node>& topLevelNodes) = 0;
+    virtual ElementType& insertElementInternal (ElementType&& element, NodeVector& topLevelNodes) = 0;
     virtual void onDelete (const Node& /*nodeBeingDeleted*/) {}
+
+    typename Node::NodeArena nodeArena;
 
 private:
     void refreshElementIndexes();
 
-    std::vector<Node> nodes;
+    NodeVector nodes { nodeArena };
     int totalNumElements = 0;
 };
 } // namespace chowdsp

@@ -11,7 +11,7 @@ public:
     {
         std::function<bool (const juce::String&, const juce::String&)> tagSortMethod = nullptr;
         std::function<bool (const Preset&, const Preset&)> presetSortMethod = nullptr;
-        std::function<Node&(std::vector<Node>&, Node&&)> insertNodeIntoTree = nullptr;
+        std::function<Node&(NodeVector&, Node&&)> insertNodeIntoTree = nullptr;
     };
 
     explicit PresetTree (PresetState* presetState = nullptr, InsertionHelper&& insertionHelper = { nullptr, nullptr, nullptr });
@@ -22,10 +22,10 @@ public:
      *
      * Uses PresetTreeInserters::flatInserter by default.
      */
-    std::function<Preset&(Preset&&, std::vector<Node>&, const InsertionHelper&)> treeInserter;
+    std::function<Preset&(Preset&&, NodeVector&, Node::NodeArena&, const InsertionHelper&)> treeInserter;
 
 protected:
-    Preset& insertElementInternal (Preset&& element, std::vector<Node>& topLevelNodes) override;
+    Preset& insertElementInternal (Preset&& element, NodeVector& topLevelNodes) override;
     void onDelete (const Node& nodeBeingDeleted) override;
 
 private:
@@ -45,15 +45,15 @@ namespace PresetTreeInserters
     bool defaultPresetComparator (const Preset&, const Preset&);
 
     /** Inserts all presets into the tree as a flat list. */
-    Preset& flatInserter (Preset&&, std::vector<PresetTree::Node>&, const PresetTree::InsertionHelper&);
+    Preset& flatInserter (Preset&&, PresetTree::NodeVector&, PresetTree::Node::NodeArena&, const PresetTree::InsertionHelper&);
 
     /** Inserts presets into the tree with sub-trees for each vendor. */
-    Preset& vendorInserter (Preset&&, std::vector<PresetTree::Node>&, const PresetTree::InsertionHelper&);
+    Preset& vendorInserter (Preset&&, PresetTree::NodeVector&, PresetTree::Node::NodeArena&, const PresetTree::InsertionHelper&);
 
     /** Inserts presets into the tree with sub-trees for each category. */
-    Preset& categoryInserter (Preset&&, std::vector<PresetTree::Node>&, const PresetTree::InsertionHelper&);
+    Preset& categoryInserter (Preset&&, PresetTree::NodeVector&, PresetTree::Node::NodeArena&, const PresetTree::InsertionHelper&);
 
     /** Inserts presets into the tree with sub-trees for each vendor, and sub-sub-trees for each category. */
-    Preset& vendorCategoryInserter (Preset&&, std::vector<PresetTree::Node>&, const PresetTree::InsertionHelper&);
+    Preset& vendorCategoryInserter (Preset&&, PresetTree::NodeVector&, PresetTree::Node::NodeArena&, const PresetTree::InsertionHelper&);
 } // namespace PresetTreeInserters
 } // namespace chowdsp::presets
