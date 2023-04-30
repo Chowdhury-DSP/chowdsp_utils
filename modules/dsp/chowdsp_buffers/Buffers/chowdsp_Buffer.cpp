@@ -13,10 +13,9 @@ void Buffer<SampleType>::setMaxSize (int numChannels, int numSamples)
 {
     // Make sure we don't have any null internal buffers
     jassert (juce::isPositiveAndNotGreaterThan (numChannels, maxNumChannels));
-    jassert (numSamples > 0);
 
     numChannels = juce::jmax (numChannels, 1);
-    numSamples = juce::jmax (numSamples, 1);
+    numSamples = juce::jmax (numSamples, 0);
 
     int numSamplesPadded = numSamples;
 #if ! CHOWDSP_NO_XSIMD
