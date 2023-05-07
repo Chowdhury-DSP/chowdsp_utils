@@ -18,9 +18,8 @@ struct SecondsUnit : AbsoluteUnit<T>
         return val / (T) Scale::multiplier;
     }
 
-    static constexpr std::string_view baseName = "s";
-    static constexpr std::array<char, 2> nameData { Scale::prefix, 's' };
-    static constexpr std::string_view name = { nameData.data(), nameData.size() };
+    static constexpr auto prefix { Scale::prefix };
+    static constexpr std::string_view name = "s";
 };
 
 using Seconds = SecondsUnit<>;
@@ -46,6 +45,7 @@ struct SamplesUnit : RelativeUnit<T, FSType>
         return static_cast<T> (static_cast<SampleRateType> (val) * sampleRate);
     }
 
+    static constexpr std::string_view prefix = "";
     static constexpr std::string_view name = "samples";
 };
 
@@ -138,7 +138,7 @@ private:
 template <typename Unit>
 std::ostream& operator<< (std::ostream& os, const Time<Unit>& time)
 {
-    return os << time.value() << " " << Unit::name;
+    return os << time.value() << " " << Unit::prefix << Unit::name;
 }
 
 template <typename Unit, typename OtherUnit>
