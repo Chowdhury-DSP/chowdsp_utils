@@ -21,64 +21,65 @@ struct RelativeUnit
 /** Helper structs for metric-style units */
 namespace Metric
 {
+    using namespace std::string_view_literals;
     struct Peta
     {
         static constexpr auto multiplier = 1.0e15;
-        static constexpr auto prefix = 'P';
+        static constexpr auto prefix = "P"sv;
     };
 
     struct Tera
     {
         static constexpr auto multiplier = 1.0e12;
-        static constexpr auto prefix = 'T';
+        static constexpr auto prefix = "T"sv;
     };
 
     struct Giga
     {
         static constexpr auto multiplier = 1.0e9;
-        static constexpr auto prefix = 'G';
+        static constexpr auto prefix = "G"sv;
     };
 
     struct Mega
     {
         static constexpr auto multiplier = 1.0e6;
-        static constexpr auto prefix = 'M';
+        static constexpr auto prefix = "M"sv;
     };
 
     struct Kilo
     {
         static constexpr auto multiplier = 1.0e3;
-        static constexpr auto prefix = 'k';
+        static constexpr auto prefix = "k"sv;
     };
 
     struct Unit
     {
         static constexpr auto multiplier = 1.0;
-        static constexpr char prefix = {};
+        static constexpr std::string_view prefix = {};
     };
 
     struct Milli
     {
         static constexpr auto multiplier = 1.0e-3;
-        static constexpr auto prefix = 'm';
+        static constexpr auto prefix = "m"sv;
     };
 
     struct Micro
     {
         static constexpr auto multiplier = 1.0e-6;
-        static constexpr char prefix = 'u'; // @TODO: how can we use 'μ' here instead?
+        static constexpr auto prefix = "μ"sv; // @TODO: how can we use 'μ' here instead?
     };
 
     struct Nano
     {
         static constexpr auto multiplier = 1.0e-9;
-        static constexpr auto prefix = 'n';
+        static constexpr auto prefix = "n"sv;
     };
 
     struct Pico
     {
         static constexpr auto multiplier = 1.0e-12;
-        static constexpr auto prefix = 'p';
+        static constexpr auto prefix = "p"sv;
     };
 
     struct Femto
