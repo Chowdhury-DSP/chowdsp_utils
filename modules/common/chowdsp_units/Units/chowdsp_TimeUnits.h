@@ -45,7 +45,7 @@ struct SamplesUnit : RelativeUnit<T, FSType>
         return static_cast<T> (static_cast<SampleRateType> (val) * sampleRate);
     }
 
-    static constexpr std::string_view prefix = "";
+    static constexpr std::string_view prefix {};
     static constexpr std::string_view name = "samples";
 };
 
