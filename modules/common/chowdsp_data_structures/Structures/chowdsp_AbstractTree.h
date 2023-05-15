@@ -14,7 +14,7 @@ public:
     struct Node
     {
         std::optional<ElementType> leaf {};
-        int leafIndex = -1;
+        int leafIndex = -1; // Internal use only!
 
         using NodeAllocator = short_alloc::short_alloc<Node, 8192, 8>;
         using NodeArena = typename NodeAllocator::arena_type;
@@ -37,6 +37,9 @@ public:
     /**
      * Inserts an element into the tree.
      * Calling this invalidates any existing element indices.
+     *
+     * Note that if you need to insert a bunch of elements,
+     * the insertElements() method will be significantly faster.
      */
     ElementType& insertElement (ElementType&& elementToInsert);
 

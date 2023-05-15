@@ -29,6 +29,7 @@ function(setup_benchmark target file)
             # Any Clang
             if(CMAKE_CXX_COMPILER_ID MATCHES "^AppleClang$")
                 # Apple Clang only
+                target_link_libraries(${target} PUBLIC "-framework Accelerate")
             endif()
         elseif(CMAKE_CXX_COMPILER_ID MATCHES "^GNU$")
            # GCC only
