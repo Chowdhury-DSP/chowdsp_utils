@@ -35,3 +35,4 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Helpers/chowdsp_VectorHelpers.h"
 
 #include "Structures/chowdsp_AbstractTree.h"
+#include "Structures/chowdsp_BucketArray.h"
