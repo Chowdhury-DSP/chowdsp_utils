@@ -48,7 +48,7 @@ TEST_CASE ("Bucket Array Test", "[common][data-structures]")
         REQUIRE (lmnop->str == "lmnop");
         REQUIRE (array.find (lmnop_loc)->str == "lmnop");
 
-//        REQUIRE (array.find (array.get_locator (nullptr)) == nullptr);
+        //        REQUIRE (array.find (array.get_locator (nullptr)) == nullptr);
     }
 
     SECTION ("Get Locator")
@@ -98,7 +98,8 @@ TEST_CASE ("Bucket Array Test", "[common][data-structures]")
             REQUIRE (accum == "abcdefghijklmnop");
         }
 
-        array.doForAll ([] (TestType& item) { item.str.clear(); });
+        array.doForAll ([] (TestType& item)
+                        { item.str.clear(); });
         std::string accum {};
         std::as_const (array).doForAll ([&accum] (const TestType& item)
                                         { accum += item.str; });
