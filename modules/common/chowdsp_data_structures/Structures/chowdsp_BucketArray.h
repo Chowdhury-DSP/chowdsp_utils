@@ -16,10 +16,10 @@ class BucketArray
     struct BucketItem
     {
         std::array<std::byte, sizeof (T)> raw_data;
-        T* data() { return reinterpret_cast<T*> (raw_data.data()); }
-        const T* data() const { return reinterpret_cast<const T*> (raw_data.data()); }
-        T& item() { return reinterpret_cast<T&> (*raw_data.data()); }
-        const T& item() const { return reinterpret_cast<const T&> (*raw_data.data()); }
+        T* data() { return reinterpret_cast<T*> (raw_data.data()); } // NOSONAR
+        const T* data() const { return reinterpret_cast<const T*> (raw_data.data()); } // NOSONAR
+        T& item() { return *data(); }
+        const T& item() const { return *data(); }
     };
 
 public:
@@ -51,14 +51,13 @@ public:
     /** Deletes any items in the array, and deallocates all memory being used. */
     void reset()
     {
-        for (auto* bucket : all_buckets)
+        for (auto& bucket : all_buckets)
         {
             for (auto [item, is_occupied] : zip (bucket->items, bucket->occupied))
             {
                 if (is_occupied)
                     item.item().~T();
             }
-            delete bucket;
         }
 
         all_buckets.clear();
@@ -94,7 +93,7 @@ public:
         if (locator.bucket_index >= all_buckets.size() || locator.slot_index >= items_per_bucket)
             return nullptr;
 
-        auto* bucket = all_buckets[locator.bucket_index];
+        auto& bucket = all_buckets[locator.bucket_index];
         jassert (bucket->occupied[locator.slot_index] == true);
         return bucket->items[locator.slot_index].data();
     }
@@ -105,7 +104,7 @@ public:
      */
     BucketLocator get_locator (const T* item) const
     {
-        for (const auto* bucket : all_buckets)
+        for (const auto& bucket : all_buckets)
         {
             for (const auto [idx, bucket_item] : enumerate (bucket->items))
             {
@@ -122,7 +121,7 @@ public:
     template <typename Action>
     void doForAll (Action&& action)
     {
-        for (auto* bucket : all_buckets)
+        for (auto& bucket : all_buckets)
         {
             for (auto [bucket_item, is_occupied] : zip (bucket->items, bucket->occupied))
             {
@@ -137,7 +136,7 @@ public:
     template <typename Action>
     void doForAll (Action&& action) const
     {
-        for (const auto* bucket : all_buckets)
+        for (const auto& bucket : all_buckets)
         {
             for (const auto [bucket_item, is_occupied] : zip (bucket->items, bucket->occupied))
             {
@@ -165,7 +164,7 @@ public:
             return;
         }
 
-        auto* bucket = all_buckets[locator.bucket_index];
+        auto& bucket = all_buckets[locator.bucket_index];
         jassert (bucket->occupied[locator.slot_index] == true);
 
         const auto was_full = (bucket->count == items_per_bucket);
@@ -182,8 +181,8 @@ public:
         if (was_full)
         {
             // if this bucket was full, it shouldn't be in unfull_buckets!
-            jassert (std::find (unfull_buckets.begin(), unfull_buckets.end(), bucket) == unfull_buckets.end());
-            unfull_buckets.push_back (bucket);
+            jassert (std::find (unfull_buckets.begin(), unfull_buckets.end(), bucket.get()) == unfull_buckets.end());
+            unfull_buckets.push_back (bucket.get());
         }
     }
 
@@ -236,22 +235,22 @@ private:
         return std::make_pair (locator, memory);
     }
 
-    Bucket* add_bucket()
+    void add_bucket()
     {
+        // we shouldn't be adding a bucket if there's some unfull buckets out there!
         jassert (unfull_buckets.size() == 0);
 
-        auto* new_bucket = new Bucket {}; // TODO: use custom allocator
-        new_bucket->bucket_index = all_buckets.size();
+        const auto new_bucket_index = all_buckets.size();
+        auto& new_bucket = all_buckets.emplace_back();
+        new_bucket = std::make_unique<Bucket>();
+        new_bucket->bucket_index = new_bucket_index;
 
-        all_buckets.push_back (new_bucket);
-        unfull_buckets.push_back (new_bucket);
-
-        return new_bucket;
+        unfull_buckets.push_back (new_bucket.get());
     }
 
     size_t count = 0;
 
-    std::vector<Bucket*> all_buckets;
+    std::vector<std::unique_ptr<Bucket>> all_buckets;
     std::vector<Bucket*> unfull_buckets;
 };
 } // namespace chowdsp
