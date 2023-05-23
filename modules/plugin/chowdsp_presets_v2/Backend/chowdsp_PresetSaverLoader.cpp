@@ -70,9 +70,9 @@ void PresetSaverLoader::loadPreset (const Preset& preset)
 {
     struct ChangePresetAction : juce::UndoableAction
     {
-        explicit ChangePresetAction (PresetSaverLoader& sl, const Preset& preset)
+        explicit ChangePresetAction (PresetSaverLoader& sl, Preset&& preset)
             : saverLoader (sl),
-              performPreset (preset),
+              performPreset (std::move (preset)),
               undoPreset (saverLoader.currentPreset->getName(),
                           saverLoader.currentPreset->getVendor(),
                           saverLoader.savePresetState(),
@@ -98,13 +98,13 @@ void PresetSaverLoader::loadPreset (const Preset& preset)
         int getSizeInUnits() override { return (int) sizeof (*this); }
 
         PresetSaverLoader& saverLoader;
-        const Preset& performPreset;
+        const Preset performPreset;
         const Preset undoPreset;
         const bool previousStateWasDirty = false;
     };
 
     pluginState.callOnMainThread (
-        [this, &preset]
+        [this, preset = preset] () mutable
         {
             if (currentPreset == nullptr || pluginState.undoManager == nullptr)
             {
@@ -113,7 +113,7 @@ void PresetSaverLoader::loadPreset (const Preset& preset)
             }
 
             pluginState.undoManager->beginNewTransaction ("Loading preset: " + preset.getName());
-            pluginState.undoManager->perform (std::make_unique<ChangePresetAction> (*this, preset).release());
+            pluginState.undoManager->perform (std::make_unique<ChangePresetAction> (*this, std::move (preset)).release());
         });
 }
 
