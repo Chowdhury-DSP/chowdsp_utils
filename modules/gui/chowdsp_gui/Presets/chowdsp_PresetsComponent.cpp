@@ -208,13 +208,16 @@ void PresetsComponent::hidePresetNameEditor()
 
 bool PresetsComponent::queryShouldDeletePreset (const Preset& preset)
 {
-    return juce::NativeMessageBox::showOkCancelBox (juce::AlertWindow::WarningIcon,
-                                                    "Preset Deletion Warning!",
-                                                    "Are you sure you want to delete the following preset? "
-                                                    "This action cannot be undone!\n"
-                                                        + preset.getName(),
-                                                    this,
-                                                    nullptr);
+    const auto result = juce::NativeMessageBox::showOkCancelBox (juce::AlertWindow::WarningIcon,
+                                                                 "Preset Deletion Warning!",
+                                                                 "Are you sure you want to delete the following preset? "
+                                                                 "This action cannot be undone!\n"
+                                                                     + preset.getName(),
+                                                                 this,
+                                                                 nullptr);
+
+    // For the "Ok/Cancel" box, button 0 is the "OK" button
+    return result == 0;
 }
 
 bool PresetsComponent::queryShouldOverwriteFile()
