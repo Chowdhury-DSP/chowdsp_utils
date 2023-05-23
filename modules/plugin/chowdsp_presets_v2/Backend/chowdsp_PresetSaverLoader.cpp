@@ -104,7 +104,7 @@ void PresetSaverLoader::loadPreset (const Preset& preset)
     };
 
     pluginState.callOnMainThread (
-        [this, preset = preset] () mutable
+        [this, preset = preset]() mutable
         {
             if (currentPreset == nullptr || pluginState.undoManager == nullptr)
             {
