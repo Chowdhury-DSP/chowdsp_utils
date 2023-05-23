@@ -108,7 +108,7 @@ void PresetSaverLoader::loadPreset (const Preset& preset)
         {
             if (currentPreset == nullptr || pluginState.undoManager == nullptr)
             {
-                currentPreset = preset;
+                currentPreset = OptionalPointer<const Preset> { std::move (preset) };
                 return;
             }
 
