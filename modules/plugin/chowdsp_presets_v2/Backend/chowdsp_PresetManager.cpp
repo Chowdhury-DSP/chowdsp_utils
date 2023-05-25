@@ -16,6 +16,12 @@ PresetManager::PresetManager (PluginState& state,
 
 void PresetManager::addPresets (std::vector<Preset>&& presets, bool areFactoryPresets)
 {
+    if (areFactoryPresets)
+    {
+        factoryPresets.clear();
+        factoryPresets.reserve (presets.size());
+    }
+
     for (auto& preset : std::move (presets))
     {
         if (preset.isValid())
