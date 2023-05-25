@@ -28,8 +28,8 @@ protected:
     void colourChanged() override;
     virtual void saveUserPreset (nlohmann::json&& presetState);
 
-    virtual bool queryShouldDeletePreset (const Preset&);
-    virtual bool queryShouldOverwriteFile();
+    virtual void confirmAndDeletePreset (const Preset& presetToDelete, std::function<void (const Preset&)>&& presetDeleter);
+    virtual void confirmAndOverwritePresetFile (const juce::File&, Preset&&, std::function<void (const juce::File&, Preset&&)>&& presetSaver);
     virtual void showFailedToLoadPresetMessage (const Preset&);
 
     PresetManager& presetManager;

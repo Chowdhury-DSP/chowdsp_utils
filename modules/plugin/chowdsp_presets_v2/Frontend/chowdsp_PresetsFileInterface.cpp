@@ -38,13 +38,21 @@ void FileInterface::deleteCurrentPreset()
     const auto* currentPreset = presetManager.getCurrentPreset();
     jassert (currentPreset != nullptr && currentPreset->getPresetFile().existsAsFile() && ! (currentPreset->isFactoryPreset));
 
-    if (checkDeletePresetCallback != nullptr && ! checkDeletePresetCallback (*currentPreset))
-        return;
+    auto presetDeleter = [this] (const Preset& presetToDelete)
+    {
+        presetToDelete.getPresetFile().deleteFile();
+        if (presetManager.getDefaultPreset() != nullptr)
+            presetManager.loadPreset (*presetManager.getDefaultPreset());
+        presetManager.loadUserPresetsFromFolder (presetManager.getUserPresetPath());
+    };
 
-    currentPreset->getPresetFile().deleteFile();
-    if (presetManager.getDefaultPreset() != nullptr)
-        presetManager.loadPreset (*presetManager.getDefaultPreset());
-    presetManager.loadUserPresetsFromFolder (presetManager.getUserPresetPath());
+    if (confirmAndDeletePresetCallback == nullptr)
+    {
+        presetDeleter (*currentPreset);
+        return;
+    }
+
+    confirmAndDeletePresetCallback (*currentPreset, std::move (presetDeleter));
 }
 
 void FileInterface::loadPresetFromFile()

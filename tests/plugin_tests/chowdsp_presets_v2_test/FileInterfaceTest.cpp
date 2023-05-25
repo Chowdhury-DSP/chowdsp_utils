@@ -56,8 +56,11 @@ TEST_CASE ("File Interface Test", "[plugin][presets]")
         presetMgr.setDefaultPreset (std::move (preset));
         presetMgr.loadDefaultPreset();
 
-        fileInterface.checkDeletePresetCallback = [] (const auto&)
-        { return true; };
+        fileInterface.confirmAndDeletePresetCallback = [](const chowdsp::presets::Preset& p,
+                                                           std::function<void (const chowdsp::presets::Preset&)>&& presetDeleter)
+        {
+            presetDeleter (p);
+        };
         fileInterface.deleteCurrentPreset();
         REQUIRE (! file.file.existsAsFile());
     }
