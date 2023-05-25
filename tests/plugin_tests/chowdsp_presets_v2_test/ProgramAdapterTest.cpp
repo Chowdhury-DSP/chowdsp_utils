@@ -27,9 +27,9 @@ TEST_CASE ("Program Adapter Test", "[plugin][presets]")
         auto presetMgr = std::make_unique<chowdsp::presets::PresetManager> (state);
         chowdsp::presets::frontend::PresetsProgramAdapter adapter { presetMgr };
 
-        REQUIRE (adapter.getNumPrograms() == 0);
+        REQUIRE (adapter.getNumPrograms() == 1);
         REQUIRE (adapter.getCurrentProgram() == 0);
-        REQUIRE (adapter.getProgramName (0).isEmpty());
+        REQUIRE (adapter.getProgramName (0) == "User Preset");
         adapter.setCurrentProgram (0);
         REQUIRE (presetMgr->getCurrentPreset() == nullptr);
     }
@@ -42,11 +42,12 @@ TEST_CASE ("Program Adapter Test", "[plugin][presets]")
                                  chowdsp::presets::Preset { "B", "Vendor", { { "value", 1 } } },
                                  chowdsp::presets::Preset { "C", "Vendor", { { "value", 2 } } } });
 
-        REQUIRE (adapter.getNumPrograms() == 3);
+        REQUIRE (adapter.getNumPrograms() == 4);
         REQUIRE (adapter.getProgramName (0) == "A");
         REQUIRE (adapter.getProgramName (1) == "B");
         REQUIRE (adapter.getProgramName (2) == "C");
-        REQUIRE (adapter.getProgramName (3) == "");
+        REQUIRE (adapter.getProgramName (3) == "User Preset");
+        REQUIRE (adapter.getProgramName (4) == "");
     }
 
     const auto loadPreset = [] (chowdsp::presets::PresetManager& mgr, int index)

@@ -12,7 +12,7 @@ int PresetsProgramAdapter::getNumPrograms()
     if (presetManager == nullptr)
         return BaseProgramAdapter::getNumPrograms();
 
-    return presetManager->getPresetTree().size();
+    return (int) presetManager->getFactoryPresets().size() + 1;
 }
 
 int PresetsProgramAdapter::getCurrentProgram()
@@ -20,7 +20,12 @@ int PresetsProgramAdapter::getCurrentProgram()
     if (presetManager == nullptr || presetManager->getCurrentPreset() == nullptr)
         return BaseProgramAdapter::getCurrentProgram();
 
-    return presetManager->getPresetTree().getIndexForElement (*presetManager->getCurrentPreset());
+    const auto& factoryPresets = presetManager->getFactoryPresets();
+    const auto presetsIter = std::find (factoryPresets.begin(), factoryPresets.end(), *presetManager->getCurrentPreset());
+    if (presetsIter != factoryPresets.end())
+        return (int) std::distance (factoryPresets.begin(), presetsIter);
+
+    return (int) factoryPresets.size();
 }
 
 void PresetsProgramAdapter::setCurrentProgram (int index)
@@ -28,11 +33,11 @@ void PresetsProgramAdapter::setCurrentProgram (int index)
     if (presetManager == nullptr)
         return BaseProgramAdapter::setCurrentProgram (index);
 
-    const auto presetForIndex = presetManager->getPresetTree().getElementByIndex (index);
-    if (presetForIndex == nullptr)
+    const auto& factoryPresets = presetManager->getFactoryPresets();
+    if (index >= (int) factoryPresets.size() || index < 0)
         return BaseProgramAdapter::setCurrentProgram (index);
 
-    presetManager->loadPreset (*presetForIndex);
+    presetManager->loadPreset (factoryPresets[(size_t) index]);
 }
 
 const juce::String PresetsProgramAdapter::getProgramName (int index) // NOSONAR NOLINT(readability-const-return-type)
@@ -40,10 +45,13 @@ const juce::String PresetsProgramAdapter::getProgramName (int index) // NOSONAR 
     if (presetManager == nullptr)
         return BaseProgramAdapter::getProgramName (index);
 
-    const auto presetForIndex = presetManager->getPresetTree().getElementByIndex (index);
-    if (presetForIndex == nullptr)
+    const auto& factoryPresets = presetManager->getFactoryPresets();
+    if (index > (int) factoryPresets.size() || index < 0)
         return BaseProgramAdapter::getProgramName (index);
 
-    return presetForIndex->getName();
+    if (index == (int) factoryPresets.size())
+        return "User Preset";
+
+    return factoryPresets[(size_t) index].getName();
 }
 } // namespace chowdsp::presets::frontend
