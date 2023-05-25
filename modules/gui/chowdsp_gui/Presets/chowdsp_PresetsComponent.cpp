@@ -34,11 +34,11 @@ PresetsComponent::PresetsComponent (PresetManager& manager,
         };
     }
 
-    if (fileInterface->checkDeletePresetCallback == nullptr)
+    if (fileInterface->confirmAndDeletePresetCallback == nullptr)
     {
-        fileInterface->checkDeletePresetCallback = [this] (const Preset& preset)
+        fileInterface->confirmAndDeletePresetCallback = [this] (const Preset& preset, std::function<void (const Preset&)>&& presetDeleter)
         {
-            return queryShouldDeletePreset (preset); // NOSONAR
+            confirmAndDeletePreset (preset, std::move (presetDeleter)); // NOSONAR
         };
     }
 
@@ -188,15 +188,17 @@ void PresetsComponent::saveUserPreset (nlohmann::json&& presetState)
     {
         auto preset = presetManager.getUserPresetForState (presetNameEditor.getText(), std::move (presetState));
         const auto file = fileInterface->getFileForPreset (preset);
+        hidePresetNameEditor();
 
-        if (file.existsAsFile() && ! queryShouldOverwriteFile())
+        if (! file.existsAsFile())
         {
-            hidePresetNameEditor();
+            presetManager.saveUserPreset (file, std::move (preset));
             return;
         }
 
-        presetManager.saveUserPreset (file, std::move (preset));
-        hidePresetNameEditor();
+        // the file already exists, so we want to confirm that the user wants to overwrite the file before saving
+        confirmAndOverwritePresetFile (file, std::move (preset), [this] (const juce::File& presetFile, Preset&& p)
+                                       { presetManager.saveUserPreset (presetFile, std::move (p)); });
     };
 }
 
@@ -206,27 +208,36 @@ void PresetsComponent::hidePresetNameEditor()
     presetNameEditor.setVisible (false);
 }
 
-bool PresetsComponent::queryShouldDeletePreset (const Preset& preset)
+void PresetsComponent::confirmAndDeletePreset (const Preset& presetToDelete, std::function<void (const Preset&)>&& presetDeleter)
 {
-    const auto result = juce::NativeMessageBox::showOkCancelBox (juce::AlertWindow::WarningIcon,
-                                                                 "Preset Deletion Warning!",
-                                                                 "Are you sure you want to delete the following preset? "
-                                                                 "This action cannot be undone!\n"
-                                                                     + preset.getName(),
-                                                                 this,
-                                                                 nullptr);
-
-    // For the "Ok/Cancel" box, button 0 is the "OK" button
-    return result == 0;
+    juce::NativeMessageBox::showOkCancelBox (juce::AlertWindow::WarningIcon,
+                                             "Preset Deletion Warning!",
+                                             "Are you sure you want to delete the following preset? "
+                                             "This action cannot be undone!\n"
+                                                 + presetToDelete.getName(),
+                                             this,
+                                             juce::ModalCallbackFunction::create (
+                                                 [&presetToDelete, deleter = std::move (presetDeleter)] (int result)
+                                                 {
+                                                     if (result == 1)
+                                                         deleter (presetToDelete);
+                                                 }));
 }
 
-bool PresetsComponent::queryShouldOverwriteFile()
+void PresetsComponent::confirmAndOverwritePresetFile (const juce::File& presetFile,
+                                                      Preset&& preset,
+                                                      std::function<void (const juce::File&, Preset&&)>&& presetSaver)
 {
-    return juce::NativeMessageBox::showOkCancelBox (juce::AlertWindow::WarningIcon,
-                                                    "Preset Overwrite Warning!",
-                                                    "Saving this preset will overwrite an existing file. Are you sure you want to continue?",
-                                                    this,
-                                                    nullptr);
+    juce::NativeMessageBox::showOkCancelBox (juce::AlertWindow::WarningIcon,
+                                             "Preset Overwrite Warning!",
+                                             "Saving this preset will overwrite an existing file. Are you sure you want to continue?",
+                                             this,
+                                             juce::ModalCallbackFunction::create (
+                                                 [presetFile, preset = std::move (preset), saver = std::move (presetSaver)] (int result) mutable
+                                                 {
+                                                     if (result == 1)
+                                                         saver (presetFile, std::move (preset));
+                                                 }));
 }
 
 void PresetsComponent::showFailedToLoadPresetMessage (const Preset& preset)
