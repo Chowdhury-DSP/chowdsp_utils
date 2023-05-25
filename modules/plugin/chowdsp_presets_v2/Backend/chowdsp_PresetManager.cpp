@@ -16,11 +16,19 @@ PresetManager::PresetManager (PluginState& state,
 
 void PresetManager::addPresets (std::vector<Preset>&& presets, bool areFactoryPresets)
 {
+    if (areFactoryPresets)
+    {
+        factoryPresets.clear();
+        factoryPresets.reserve (presets.size());
+    }
+
     for (auto& preset : std::move (presets))
     {
         if (preset.isValid())
         {
             preset.isFactoryPreset = areFactoryPresets;
+            if (areFactoryPresets)
+                factoryPresets.emplace_back (preset);
             presetTree.insertElement (std::move (preset));
         }
     }
@@ -66,8 +74,6 @@ void PresetManager::setDefaultPreset (Preset&& newDefaultPreset)
         return;
     }
 
-    // default preset is not in factory presets, so let's add it!
-    newDefaultPreset.isFactoryPreset = true;
     defaultPreset = &presetTree.insertElement (std::move (newDefaultPreset));
 }
 

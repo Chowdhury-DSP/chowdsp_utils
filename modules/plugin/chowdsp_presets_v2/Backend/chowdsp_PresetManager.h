@@ -23,7 +23,7 @@ public:
     /** Returns true if the currently loaded preset is "dirty". */
     [[nodiscard]] bool getIsPresetDirty() const noexcept { return saverLoader.getIsPresetDirty(); }
 
-    /** Adds a vector of presets. */
+    /** Adds a vector of presets. Note that all factory presets should be added at once (and only once). */
     void addPresets (std::vector<Preset>&& presets, bool areFactoryPresets = true);
 
     /** Returns a user preset with the given name and state. */
@@ -56,6 +56,9 @@ public:
     /** Returns the internal preset tree. */
     [[nodiscard]] const auto& getPresetTree() const { return presetTree; }
 
+    /** Returns a vector of factory presets. */
+    [[nodiscard]] const auto& getFactoryPresets() const { return factoryPresets; }
+
     /** Set's the user preset path. This will force any user presets to be re-scanned. */
     void setUserPresetPath (const juce::File& file);
 
@@ -87,6 +90,7 @@ protected:
 
 private:
     PresetTree presetTree;
+    std::vector<Preset> factoryPresets;
     const Preset* defaultPreset = nullptr;
 
     juce::File userPresetPath {};
