@@ -40,7 +40,7 @@ public:
     std::function<void (nlohmann::json&&)> savePresetCallback;
 
     /** Called to check if the user _actually_ wants to delete a preset. */
-    std::function<bool (const Preset&)> checkDeletePresetCallback;
+    std::function<void (const Preset&, std::function<void (const Preset&)>&&)> confirmAndDeletePresetCallback;
 
     /** Called when a preset fails to load. Note that the supplied preset may not be valid. */
     std::function<void (const Preset&)> failedToLoadPresetCallback;
@@ -51,13 +51,14 @@ public:
     /** Returns true if a SettingsInterface has been supplied. */
     [[nodiscard]] bool hasSettingsInterface() const noexcept { return settingsInterface != nullptr; }
 
-private:
+protected:
     PresetManager& presetManager;
 
     std::shared_ptr<juce::FileChooser> fileChooser;
 
     SettingsInterface* settingsInterface = nullptr;
 
+private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FileInterface)
 };
 } // namespace chowdsp::presets::frontend
