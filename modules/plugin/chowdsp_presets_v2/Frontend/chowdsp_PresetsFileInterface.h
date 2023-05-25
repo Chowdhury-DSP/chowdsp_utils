@@ -40,7 +40,7 @@ public:
     std::function<void (nlohmann::json&&)> savePresetCallback;
 
     /** Called to check if the user _actually_ wants to delete a preset. */
-    std::function<void (const Preset&, std::function<void(const Preset&)>&&)> confirmAndDeletePresetCallback;
+    std::function<void (const Preset&, std::function<void (const Preset&)>&&)> confirmAndDeletePresetCallback;
 
     /** Called when a preset fails to load. Note that the supplied preset may not be valid. */
     std::function<void (const Preset&)> failedToLoadPresetCallback;
