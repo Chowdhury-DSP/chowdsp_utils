@@ -73,9 +73,6 @@ public:
         const auto numChannels = buffer.getNumChannels();
         const auto numSamples = buffer.getNumSamples();
 
-        // Downsampler must be used on blocks with sizes that are integer multiples of the downsampling ratio!
-        jassert (numSamples % ratio == 0);
-
         for (int ch = 0; ch < numChannels; ++ch)
             process (buffer.getReadPointer (ch), usBuffer.getWritePointer (ch), ch, numSamples);
     }
