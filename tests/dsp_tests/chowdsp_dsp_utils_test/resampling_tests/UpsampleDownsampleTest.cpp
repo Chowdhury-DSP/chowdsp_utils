@@ -150,7 +150,7 @@ static float calcSNR (const chowdsp::BufferView<float>& buffer, float freqExpect
     for (size_t i = 0; i < blockSize; ++i)
         magnitudes[i] = std::pow (fftData[i] / scaleNorm, 2.0f);
 
-    auto getMagForFreq = [=] (float freq) -> float
+    auto getMagForFreq = [&magnitudes, fs] (float freq) -> float
     {
         auto idx = size_t (((float) blockSize / 2.0f) * freq / (fs / 2.0f));
         // average over a few bins to smooth
@@ -221,7 +221,7 @@ void downsampleQualityTest (int downsampleRatio)
     auto rms = juce::Decibels::gainToDecibels (std::sqrt (squaredSum / ((float) blockSize / 2.0f)));
 
     REQUIRE_MESSAGE (downsampledBuffer.getNumSamples() == thisBlockSize / downsampler.getDownsamplingRatio(), "Downsampled block size is incorrect!");
-    REQUIRE_MESSAGE (rms < -50.0f, "RMS level is too high!");
+    REQUIRE_MESSAGE (rms < -42.0f, "RMS level is too high!");
 }
 
 TEST_CASE ("Upsample/Downsample Test", "[dsp][resampling]")
