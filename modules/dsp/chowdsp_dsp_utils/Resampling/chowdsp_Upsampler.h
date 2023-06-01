@@ -63,13 +63,18 @@ public:
     /** Process a block of data */
     BufferView<T> process (const BufferView<const T>& block) noexcept
     {
-        const auto numChannels = block.getNumChannels();
-        const auto numSamples = block.getNumSamples();
+        process (block, upsampledBuffer);
+        return { upsampledBuffer, 0, block.getNumSamples() * ratio };
+    }
+
+    /** Process a block of data, and stores the result in the given dsBuffer. */
+    void process (const BufferView<const T>& buffer, const BufferView<T>& usBuffer) noexcept
+    {
+        const auto numChannels = buffer.getNumChannels();
+        const auto numSamples = buffer.getNumSamples();
 
         for (int ch = 0; ch < numChannels; ++ch)
-            process (block.getReadPointer (ch), upsampledBuffer.getWritePointer (ch), ch, numSamples);
-
-        return { upsampledBuffer, 0, numSamples * ratio };
+            process (buffer.getReadPointer (ch), usBuffer.getWritePointer (ch), ch, numSamples);
     }
 
 private:

@@ -59,6 +59,8 @@ public:
             auto y = aaFilter.processSample (data[n], channel);
             downsampledData[startSample] = y;
         }
+
+        juce::FloatVectorOperations::multiply (downsampledData, (T) ratio, numSamples * ratio);
     }
 
     /**
@@ -67,16 +69,24 @@ public:
      */
     BufferView<T> process (const BufferView<const T>& block) noexcept
     {
-        const auto numChannels = block.getNumChannels();
-        const auto numSamples = block.getNumSamples();
+        process (block, downsampledBuffer);
+        return { downsampledBuffer, 0, block.getNumSamples() / ratio };
+    }
+
+    /**
+     * Process a block of data, and stores the result in the given dsBuffer.
+     * Note that the block size must be an integer multiple of the downsampling ratio.
+     */
+    void process (const BufferView<const T>& buffer, const BufferView<T>& dsBuffer) noexcept
+    {
+        const auto numChannels = buffer.getNumChannels();
+        const auto numSamples = buffer.getNumSamples();
 
         // Downsampler must be used on blocks with sizes that are integer multiples of the downsampling ratio!
         jassert (numSamples % ratio == 0);
 
         for (int ch = 0; ch < numChannels; ++ch)
-            process (block.getReadPointer (ch), downsampledBuffer.getWritePointer (ch), ch, numSamples);
-
-        return { downsampledBuffer, 0, numSamples / ratio };
+            process (buffer.getReadPointer (ch), dsBuffer.getWritePointer (ch), ch, numSamples);
     }
 
 private:
