@@ -51,7 +51,7 @@ public:
         if constexpr (Order == 1)
         {
             lowCutFilter.processBlock (bufferIn, bufferLow, bufferMid);
-            chowdsp::BufferMath::copyBufferData (bufferMid, tempBuffer); // Order-1 LR filter does not allow pointer aliasing, so we copy to a temp buffer here.
+            BufferMath::copyBufferData (bufferMid, tempBuffer); // Order-1 LR filter does not allow pointer aliasing, so we copy to a temp buffer here.
             highCutFilter.processBlock (tempBuffer, bufferMid, bufferHigh);
         }
         else
@@ -62,7 +62,7 @@ public:
             // an allpass LR-filter with the same crossover as the high-cut frequency
             // this puts the low band back in-phase with the high- and mid-bands.
             apHighCutFilter.processBlock (bufferLow, bufferLow, tempBuffer);
-            chowdsp::BufferMath::addBufferData (tempBuffer, bufferLow);
+            BufferMath::addBufferData (tempBuffer, bufferLow);
         }
     }
 
