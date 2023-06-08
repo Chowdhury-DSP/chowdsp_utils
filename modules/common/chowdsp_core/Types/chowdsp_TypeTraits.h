@@ -181,5 +181,7 @@ namespace TypeTraits
  * An empty struct intended to be used with std::conditional_t
  * to effectively "disable" some member of a struct/class.
  */
-struct NullType {};
+struct NullType
+{
+};
 } // namespace chowdsp
