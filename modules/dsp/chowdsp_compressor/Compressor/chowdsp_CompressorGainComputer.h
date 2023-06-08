@@ -37,7 +37,7 @@ public:
         if (newModeIndex != modeIndex)
         {
             jassert (juce::isPositiveAndBelow (newModeIndex, GainComputerTypes::count));
-            modeIndex = juce::jlimit (0, GainComputerTypes::count - 1, newModeIndex);
+            modeIndex = juce::jlimit ((size_t) 0, GainComputerTypes::count - 1, newModeIndex);
             recalcConstants();
         }
     }

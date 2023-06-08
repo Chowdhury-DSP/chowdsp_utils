@@ -5,6 +5,7 @@
 
 namespace chowdsp::compressor
 {
+/** Generic UI component for implementing a gain reduction meter */
 class GainReductionMeter : public juce::Component,
                            private juce::Timer
 {
@@ -31,12 +32,13 @@ public:
 
     void paint (juce::Graphics& g) override;
 
-private:
+protected:
     void timerCallback() override { repaint(); }
 
     BackgroundTask& task;
     juce::SmoothedValue<float> gainReductionSmoother;
 
+private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GainReductionMeter)
 };
 }

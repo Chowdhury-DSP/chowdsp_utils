@@ -20,7 +20,7 @@ public:
     void setMode (size_t newModeIndex)
     {
         jassert (juce::isPositiveAndBelow (newModeIndex, LevelDetectorTypes::count));
-        modeIndex = juce::jlimit (0, LevelDetectorTypes::count - 1, newModeIndex);
+        modeIndex = juce::jlimit ((size_t) 0, LevelDetectorTypes::count - 1, newModeIndex);
     }
 
     /** Sets the attack time in milliseconds */
