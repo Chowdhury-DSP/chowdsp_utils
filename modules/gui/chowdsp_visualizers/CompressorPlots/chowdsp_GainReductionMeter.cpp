@@ -6,7 +6,7 @@ namespace chowdsp::compressor
 {
 constexpr int meterFps = 30; // @TUNE: select meter frame rate here
 
-int getYForDB (float dB, int height)
+static int getYForDB (float dB, int height)
 {
     constexpr auto maxDB = 1.0f;
     constexpr auto minDB = -31.0f;
@@ -46,7 +46,9 @@ void GainReductionMeter::BackgroundTask::runTask (const juce::AudioBuffer<float>
         compressedLevelPeak = ballisticsFilter.processSample (1, std::abs (compressedData[n]));
     }
 
+    std::cout << "Input level peak: " << inputLevelPeak << ", Compressed level peak: " << compressedLevelPeak << std::endl;
     gainReductionDB = (inputLevelPeak == 0.0f) ? 0.0f : juce::Decibels::gainToDecibels (compressedLevelPeak / inputLevelPeak);
+    std::cout << "Gain reduction dB: " << gainReductionDB.load() << std::endl;
 }
 
 void GainReductionMeter::BackgroundTask::pushBufferData (const chowdsp::BufferView<const float>& buffer, bool isInput)

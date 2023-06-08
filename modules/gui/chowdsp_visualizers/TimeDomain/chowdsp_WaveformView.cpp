@@ -103,7 +103,7 @@ void WaveformView<numChannels>::pushBuffer (const BufferView<const SampleType>& 
 
 template <int numChannels>
 template <typename SampleType>
-void WaveformView<numChannels>::pushChannel (int channelIndex, const std::span<const SampleType>& channelData) noexcept
+void WaveformView<numChannels>::pushChannel (int channelIndex, const nonstd::span<const SampleType>& channelData) noexcept
 {
     channels[(size_t) channelIndex].pushSamples (channelData.data(), (int) channelData.size());
 }

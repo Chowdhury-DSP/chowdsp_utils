@@ -36,7 +36,7 @@ public:
     void pushBuffer (const BufferView<const SampleType>& buffer) noexcept;
 
     template <typename SampleType>
-    void pushChannel (int channelIndex, const std::span<const SampleType>& channelData) noexcept;
+    void pushChannel (int channelIndex, const nonstd::span<const SampleType>& channelData) noexcept;
 
     void paint (juce::Graphics& g) override;
     virtual void paintChannel (int channelIndex, juce::Graphics&, juce::Rectangle<float> bounds, const juce::Range<float>* levels, int numLevels, int nextSample);
