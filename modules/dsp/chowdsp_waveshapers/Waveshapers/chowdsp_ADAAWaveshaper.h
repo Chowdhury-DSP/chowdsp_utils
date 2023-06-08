@@ -318,7 +318,7 @@ private:
     std::vector<double> ad2_x1;
     std::vector<double> d2;
 
-    using CompensationFilter = std::conditional_t<compensateHighFreqs, PeakingFilter<double, CoefficientCalculators::CoefficientCalculationMode::Decramped>, std::nullptr_t>;
+    using CompensationFilter = std::conditional_t<compensateHighFreqs, PeakingFilter<double, CoefficientCalculators::CoefficientCalculationMode::Decramped>, NullType>;
     CompensationFilter compFilter {};
 
     static constexpr auto TOL = illConditionTolerance::template value<double>;
