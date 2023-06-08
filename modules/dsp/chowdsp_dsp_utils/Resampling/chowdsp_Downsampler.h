@@ -10,7 +10,7 @@ namespace chowdsp
  * @tparam T                        Data type to process
  * @tparam AntiAliasingFilterType   Filter type to use for an anti-aliasing filter, for example chowdsp::ButterworthFilter<8>
  */
-template <typename T, typename AntiAliasingFilterType>
+template <typename T, typename AntiAliasingFilterType, bool allocateInternalBuffer = true>
 class Downsampler
 {
 public:
@@ -20,7 +20,8 @@ public:
     void prepare (juce::dsp::ProcessSpec spec, int downsampleRatio)
     {
         ratio = downsampleRatio;
-        downsampledBuffer.setMaxSize ((int) spec.numChannels, (int) spec.maximumBlockSize / ratio);
+        if constexpr (allocateInternalBuffer)
+            downsampledBuffer.setMaxSize ((int) spec.numChannels, (int) spec.maximumBlockSize / ratio);
 
         aaFilter.prepare ((int) spec.numChannels);
 
@@ -34,7 +35,8 @@ public:
     void reset()
     {
         aaFilter.reset();
-        downsampledBuffer.clear();
+        if constexpr (allocateInternalBuffer)
+            downsampledBuffer.clear();
     }
 
     /** Returns the current downsampling ratio */
@@ -67,7 +69,9 @@ public:
      * Process a block of data.
      * Note that the block size must be an integer multiple of the downsampling ratio.
      */
-    BufferView<T> process (const BufferView<const T>& block) noexcept
+    template <bool internalAlloc = allocateInternalBuffer>
+    std::enable_if_t<internalAlloc, BufferView<T>>
+        process (const BufferView<const T>& block) noexcept
     {
         process (block, downsampledBuffer);
         return { downsampledBuffer, 0, block.getNumSamples() / ratio };
@@ -93,7 +97,10 @@ private:
     int ratio = 1;
     AntiAliasingFilterType aaFilter;
 
-    Buffer<T> downsampledBuffer;
+    struct NoBuffer
+    {
+    };
+    std::conditional_t<allocateInternalBuffer, Buffer<T>, NullType> downsampledBuffer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Downsampler)
 };

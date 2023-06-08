@@ -8,7 +8,7 @@ namespace chowdsp
  * @tparam T                        Data type to process
  * @tparam AntiImagingFilterType    Filter type to use for an anti-imaging filter, for example chowdsp::ButterworthFilter<8>
  */
-template <typename T, typename AntiImagingFilterType>
+template <typename T, typename AntiImagingFilterType, bool allocateInternalBuffer = true>
 class Upsampler
 {
 public:
@@ -18,7 +18,8 @@ public:
     void prepare (juce::dsp::ProcessSpec spec, int upsampleRatio)
     {
         ratio = upsampleRatio;
-        upsampledBuffer.setMaxSize ((int) spec.numChannels, (int) spec.maximumBlockSize * ratio);
+        if constexpr (allocateInternalBuffer)
+            upsampledBuffer.setMaxSize ((int) spec.numChannels, (int) spec.maximumBlockSize * ratio);
 
         aiFilter.prepare ((int) spec.numChannels);
 
@@ -32,7 +33,8 @@ public:
     void reset()
     {
         aiFilter.reset();
-        upsampledBuffer.clear();
+        if constexpr (allocateInternalBuffer)
+            upsampledBuffer.clear();
     }
 
     /** Returns the current upsampling ratio */
@@ -61,7 +63,9 @@ public:
     }
 
     /** Process a block of data */
-    BufferView<T> process (const BufferView<const T>& block) noexcept
+    template <bool internalAlloc = allocateInternalBuffer>
+    std::enable_if_t<internalAlloc, BufferView<T>>
+        process (const BufferView<const T>& block) noexcept
     {
         process (block, upsampledBuffer);
         return { upsampledBuffer, 0, block.getNumSamples() * ratio };
@@ -81,7 +85,7 @@ private:
     int ratio = 1;
     AntiImagingFilterType aiFilter; // anti-imaging filter
 
-    Buffer<T> upsampledBuffer;
+    std::conditional_t<allocateInternalBuffer, Buffer<T>, NullType> upsampledBuffer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Upsampler)
 };
