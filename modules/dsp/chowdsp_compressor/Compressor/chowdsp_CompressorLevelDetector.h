@@ -2,9 +2,10 @@
 
 namespace chowdsp::compressor
 {
+/** Variadic level detector to be used in a compressor. */
 template <typename SampleType,
           typename LevelDetectorTypes = types_list::TypesList<PeakDetector, PeakRtTDetector, RMSDetector>,
-          typename LevelDetectorVisualizer = std::nullopt_t>
+          typename LevelDetectorVisualizer = NullType>
 class CompressorLevelDetector
 {
 public:
@@ -18,9 +19,11 @@ public:
      */
     void setMode (size_t newModeIndex)
     {
-        modeIndex = newModeIndex;
+        jassert (juce::isPositiveAndBelow (newModeIndex, LevelDetectorTypes::count));
+        modeIndex = juce::jlimit (0, LevelDetectorTypes::count - 1, newModeIndex);
     }
 
+    /** Sets the attack time in milliseconds */
     void setAttackMs (SampleType newAttackMs)
     {
         TupleHelpers::visit_at (detectors,
@@ -32,6 +35,7 @@ public:
         b0_a = (SampleType) 1 - a1_a;
     }
 
+    /** Sets the release time in milliseconds */
     void setReleaseMs (float newReleaseMs)
     {
         TupleHelpers::visit_at (detectors,
@@ -43,14 +47,16 @@ public:
         b0_r = (SampleType) 1 - a1_r;
     }
 
+    /** Sets the threshold level in Decibels */
     void setThresholdDB (float newThresholdDB)
     {
         thresholdLinearGain = juce::Decibels::decibelsToGain (newThresholdDB);
     }
 
+    /** Prepares the level detector to process an audio stream */
     void prepare (double sampleRate, int samplesPerBlock)
     {
-        if (! std::is_same_v<LevelDetectorVisualizer, std::nullopt_t>)
+        if (! std::is_same_v<LevelDetectorVisualizer, NullType>)
         {
             levelDetectorViz.setBufferSize (int (levelDetectorViz.secondsToVisualize * sampleRate / (double) samplesPerBlock));
             levelDetectorViz.setSamplesPerBlock (samplesPerBlock);
@@ -61,14 +67,19 @@ public:
         reset();
     }
 
+    /** Reset's the level detector state */
     void reset()
     {
         z1 = (SampleType) 0;
     }
 
+    /**
+     * Processes a mono buffer. If a multi-channel buffer is passed in,
+     * only the first channel will be used.
+     */
     void processBlock (const BufferView<float>& buffer) noexcept
     {
-        if (! std::is_same_v<LevelDetectorVisualizer, std::nullopt_t>)
+        if (! std::is_same_v<LevelDetectorVisualizer, NullType>)
             levelDetectorViz.pushChannel (0, buffer.getReadSpan (0));
 
         TupleHelpers::visit_at (detectors,
@@ -82,7 +93,7 @@ public:
                                                       thresholdLinearGain);
                                 });
 
-        if (! std::is_same_v<LevelDetectorVisualizer, std::nullopt_t>)
+        if (! std::is_same_v<LevelDetectorVisualizer, NullType>)
             levelDetectorViz.pushChannel (1, buffer.getReadSpan (0));
     }
 

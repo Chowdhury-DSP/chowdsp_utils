@@ -2,6 +2,7 @@
 
 namespace chowdsp::compressor
 {
+/** Internal gain computer parameters */
 template <typename T>
 struct GainComputerParams
 {
@@ -13,6 +14,7 @@ struct GainComputerParams
     bool applyAutoMakeup;
 };
 
+/** Gain computer for a feed-forward compressor */
 template <typename T>
 struct FeedForwardCompGainComputer
 {
@@ -68,6 +70,7 @@ struct FeedForwardCompGainComputer
     T aFF;
 };
 
+/** Gain computer for a feed-back compressor */
 template <typename T>
 struct FeedBackCompGainComputer
 {

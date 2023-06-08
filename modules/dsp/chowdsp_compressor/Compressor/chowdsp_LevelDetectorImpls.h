@@ -2,6 +2,7 @@
 
 namespace chowdsp::compressor
 {
+/** Simple attack/release coefficients */
 template <typename T>
 struct BallisticCoeffs
 {
@@ -9,6 +10,7 @@ struct BallisticCoeffs
     T b0;
 };
 
+/** A return-to-zero peak detector */
 struct PeakDetector
 {
     template <typename T>
@@ -37,6 +39,7 @@ struct PeakDetector
     }
 };
 
+/** A return-to-threshold peak detector */
 struct PeakRtTDetector
 {
     template <typename T>
@@ -66,6 +69,7 @@ struct PeakRtTDetector
     }
 };
 
+/** An RMS level detector */
 struct RMSDetector
 {
     template <typename T>

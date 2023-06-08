@@ -2,7 +2,8 @@
 
 namespace chowdsp::compressor
 {
-template <typename SampleType, typename LevelDetector, typename GainComputer, typename GainReductionMeterTask = std::nullopt_t>
+/** A multi-channel compressor with monophonic gain reduction. */
+template <typename SampleType, typename LevelDetector, typename GainComputer, typename GainReductionMeterTask = NullType>
 class MonoCompressor
 {
 public:
@@ -18,6 +19,7 @@ public:
         bool autoMakeup = false;
     } params;
 
+    /** Prepares the compressor to an audio stream */
     void prepare (const juce::dsp::ProcessSpec& spec)
     {
         levelDetector.prepare (spec.sampleRate, (int) spec.maximumBlockSize);
@@ -26,10 +28,11 @@ public:
         levelDetectBuffer.setMaxSize (1, (int) spec.maximumBlockSize);
         gainComputerBuffer.setMaxSize (1, (int) spec.maximumBlockSize);
 
-        if constexpr (! std::is_same_v<GainReductionMeterTask, std::nullopt_t>)
-            gainReductionMeterTask.prepare (spec.sampleRate, (int) spec.maximumBlockSize, 2);
+        if constexpr (! std::is_same_v<GainReductionMeterTask, NullType>)
+            gainReductionMeterTask.prepare (spec.sampleRate, (int) spec.maximumBlockSize, (int) spec.numChannels);
     }
 
+    /** Processes a block of audio */
     void processBlock (const BufferView<SampleType>& mainBuffer, const BufferView<const SampleType>& keyInputBuffer) noexcept
     {
         const auto numChannels = mainBuffer.getNumChannels();
@@ -51,13 +54,13 @@ public:
         gainComputerBuffer.setCurrentSize (1, numSamples);
         gainComputer.processBlock (levelDetectBuffer, gainComputerBuffer, params.autoMakeup);
 
-        if constexpr (! std::is_same_v<GainReductionMeterTask, std::nullopt_t>)
+        if constexpr (! std::is_same_v<GainReductionMeterTask, NullType>)
             gainReductionMeterTask.pushBufferData (mainBuffer, true);
 
         for (int ch = 0; ch < numChannels; ++ch)
             juce::FloatVectorOperations::multiply (mainBuffer.getWritePointer (ch), gainComputerBuffer.getReadPointer (0), numSamples);
 
-        if constexpr (! std::is_same_v<GainReductionMeterTask, std::nullopt_t>)
+        if constexpr (! std::is_same_v<GainReductionMeterTask, NullType>)
             gainReductionMeterTask.pushBufferData (mainBuffer, false);
     }
 

@@ -2,12 +2,16 @@
 
 namespace chowdsp::compressor
 {
-template <typename SampleType, typename GainComputerTypes = types_list::TypesList<FeedForwardCompGainComputer<SampleType>, FeedBackCompGainComputer<SampleType>>>
+/** Variadic gain computer intended to be used in a compressor */
+template <typename SampleType,
+          typename GainComputerTypes = types_list::TypesList<FeedForwardCompGainComputer<SampleType>,
+                                                             FeedBackCompGainComputer<SampleType>>>
 class GainComputer
 {
 public:
     GainComputer() = default;
 
+    /** Prepares the gain computer to process and audio stream. */
     void prepare (double sampleRate, int samplesPerBlock)
     {
         threshSmooth.setRampLength (0.05);
@@ -17,21 +21,28 @@ public:
         ratioSmooth.prepare (sampleRate, samplesPerBlock);
     }
 
+    /** Reset's the processor state. */
     void reset()
     {
         threshSmooth.reset (juce::Decibels::decibelsToGain (threshDB));
         ratioSmooth.reset (ratio);
     }
 
+    /**
+     * Sets the index of the gain computer type to use,
+     * based on the index in the template types_list.
+     */
     void setMode (size_t newModeIndex)
     {
         if (newModeIndex != modeIndex)
         {
-            modeIndex = newModeIndex;
+            jassert (juce::isPositiveAndBelow (newModeIndex, GainComputerTypes::count));
+            modeIndex = juce::jlimit (0, GainComputerTypes::count - 1, newModeIndex);
             recalcConstants();
         }
     }
 
+    /** Sets the gain computer threshold in Decibels */
     void setThreshold (SampleType newThreshDB)
     {
         if (threshDB != newThreshDB)
@@ -41,6 +52,7 @@ public:
         }
     }
 
+    /** Sets the gain computer ratio */
     void setRatio (SampleType newRatio)
     {
         if (ratio != newRatio)
@@ -50,6 +62,7 @@ public:
         }
     }
 
+    /** Sets the gain computer knee in Decibels */
     void setKnee (SampleType newKneeDB)
     {
         if (kneeDB != newKneeDB)
@@ -60,6 +73,12 @@ public:
         }
     }
 
+    /**
+     * Processes a stream of audio data.
+     * The levelBuffer should contain a level signal that is always greater than zero.
+     * Calling this method will fill the gainBuffer with a set ig "gain" values,
+     * which can be multiplied by the audio signal to apply compression.
+     */
     void processBlock (const BufferView<const SampleType>& levelBuffer, const BufferView<SampleType>& gainBuffer, bool applyAutoMakeup) noexcept
     {
         jassert (levelBuffer.getNumSamples() == gainBuffer.getNumSamples());
