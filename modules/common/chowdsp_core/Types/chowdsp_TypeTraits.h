@@ -176,4 +176,10 @@ namespace TypeTraits
     static constexpr auto IsMapLike = is_maplike_detail::is_mappish_impl<T>::value;
 
 } // namespace TypeTraits
+
+/**
+ * An empty struct intended to be used with std::conditional_t
+ * to effectively "disable" some member of a struct/class.
+ */
+struct NullType {};
 } // namespace chowdsp
