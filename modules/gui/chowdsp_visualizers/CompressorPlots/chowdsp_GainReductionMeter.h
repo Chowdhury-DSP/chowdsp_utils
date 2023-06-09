@@ -41,6 +41,6 @@ protected:
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GainReductionMeter)
 };
-}
+} // namespace chowdsp::compressor
 
 #endif // JUCE_MODULE_AVAILABLE_chowdsp_plugin_utils && JUCE_MODULE_AVAILABLE_juce_dsp

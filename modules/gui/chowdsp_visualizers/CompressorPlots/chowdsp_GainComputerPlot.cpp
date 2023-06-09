@@ -61,4 +61,4 @@ void GainComputerPlot::paint (juce::Graphics& g)
     g.setColour (juce::Colours::red);
     g.strokePath (plotPath, juce::PathStrokeType { 2.0f });
 }
-}
+} // namespace chowdsp::compressor

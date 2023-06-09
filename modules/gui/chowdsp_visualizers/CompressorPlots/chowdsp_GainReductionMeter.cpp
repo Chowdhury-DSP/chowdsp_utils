@@ -133,6 +133,6 @@ void GainReductionMeter::paint (juce::Graphics& g)
     auto gainRedRect = juce::Rectangle { (float) meterXpad, gainRedTop, (float) meterWidth, gainRedBottom - gainRedTop };
     g.fillRect (gainRedRect);
 }
-}
+} // namespace chowdsp::compressor
 
 #endif // JUCE_MODULE_AVAILABLE_chowdsp_plugin_utils && JUCE_MODULE_AVAILABLE_juce_dsp

@@ -48,4 +48,4 @@ void LevelDetectorVisualizer::paintChannel (int channelIndex, juce::Graphics& g,
         g.strokePath (path, juce::PathStrokeType { 2.5f });
     }
 }
-}
+} // namespace chowdsp::compressor
