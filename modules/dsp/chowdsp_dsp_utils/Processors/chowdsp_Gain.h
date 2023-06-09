@@ -63,7 +63,7 @@ public:
 
 private:
     SmoothedBufferValue<NumericType> gain;
-    NumericType gainTargetLinear;
+    NumericType gainTargetLinear = (NumericType) 0;
     double sampleRate = 0, rampDurationSeconds = 0;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Gain)
