@@ -22,7 +22,7 @@ public:
     void setSamplesPerBlock (int newNumInputSamplesPerBlock) noexcept;
 
     /** Returns the prepared buffer size. */
-    int getSamplesPerBlock() const noexcept { return inputSamplesPerBlock; }
+    [[nodiscard]] int getSamplesPerBlock() const noexcept { return inputSamplesPerBlock; }
 
     /** Clears the contents of the buffers. */
     void clear();
@@ -63,7 +63,7 @@ private:
 
     int numSamples { 1024 };
     int inputSamplesPerBlock { 256 };
-    std::array<ChannelInfo, numChannels> channels { ChannelInfo { *this, numSamples }, ChannelInfo { *this, numSamples } };
+    std::array<ChannelInfo, (size_t) numChannels> channels { ChannelInfo { *this, numSamples }, ChannelInfo { *this, numSamples } };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WaveformView)
 };

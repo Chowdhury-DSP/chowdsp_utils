@@ -17,7 +17,7 @@ public:
         void prepareTask (double sampleRate, int samplesPerBlock, int& requestedBlockSize, int& waitMs) override;
         void runTask (const juce::AudioBuffer<float>& data) override;
 
-        float getGainReductionDB() const;
+        [[nodiscard]] float getGainReductionDB() const;
 
         void pushBufferData (const BufferView<const float>& buffer, bool isInput);
 

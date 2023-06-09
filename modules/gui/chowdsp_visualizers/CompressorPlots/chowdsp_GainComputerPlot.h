@@ -9,10 +9,10 @@ public:
     GainComputerPlot() = default;
 
     /** Converts a Decibel value to a x-coordinate */
-    float decibelsToXCoord (float dB) const;
+    [[nodiscard]] float decibelsToXCoord (float dB) const;
 
     /** Converts a Decibel value to a y-coordinate */
-    float decibelsToYCoord (float dB) const;
+    [[nodiscard]] float decibelsToYCoord (float dB) const;
 
     /** Sets the gain computer threshold in Decibels */
     void setThreshold (float newThreshDB) { threshDB = newThreshDB; }
@@ -26,13 +26,14 @@ public:
         float xMax = 6.0f;
         float yMin = -30.0f;
         float yMax = 6.0f;
-    } params;
+    };
+    Params params;
 
 protected:
     void paint (juce::Graphics& g) override;
 
     float threshDB = 0.0f;
-    juce::Path plotPath;
+    juce::Path plotPath {};
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GainComputerPlot)

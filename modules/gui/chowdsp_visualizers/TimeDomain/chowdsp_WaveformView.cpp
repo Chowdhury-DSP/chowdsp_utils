@@ -54,7 +54,7 @@ template <int numChannels>
 WaveformView<numChannels>::WaveformView()
 {
     startTimerHz (30);
-    setOpaque (false); // @TODO: this is probably bad, since it might make the parent(s) repaint whenever this is repainted
+    setOpaque (false);
 }
 
 template <int numChannels>
@@ -97,8 +97,8 @@ template <typename SampleType>
 void WaveformView<numChannels>::pushBuffer (const BufferView<const SampleType>& buffer) noexcept
 {
     jassert (buffer.getNumChannels() == (int) channels.size());
-    for (int ch = 0; ch < (int) channels.size(); ++ch)
-        pushChannel ((int) ch, buffer.getReadSpan ((int) ch));
+    for (auto [ch, channelData] : buffer_iters::channels (buffer))
+        pushChannel ((int) ch, channelData);
 }
 
 template <int numChannels>
