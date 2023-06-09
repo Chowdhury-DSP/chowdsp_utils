@@ -76,10 +76,10 @@ public:
     /**
      * Processes a stream of audio data.
      * The levelBuffer should contain a level signal that is always greater than zero.
-     * Calling this method will fill the gainBuffer with a set ig "gain" values,
+     * Calling this method will fill the gainBuffer with a set of "gain" values,
      * which can be multiplied by the audio signal to apply compression.
      */
-    void processBlock (const BufferView<const SampleType>& levelBuffer, const BufferView<SampleType>& gainBuffer, bool applyAutoMakeup) noexcept
+    void processBlock (const BufferView<const SampleType>& levelBuffer, const BufferView<SampleType>& gainBuffer) noexcept
     {
         jassert (levelBuffer.getNumSamples() == gainBuffer.getNumSamples());
 
@@ -89,18 +89,35 @@ public:
 
         TupleHelpers::visit_at (computers,
                                 modeIndex,
-                                [this, &levelBuffer, &gainBuffer, applyAutoMakeup] (auto& computer)
+                                [this, &levelBuffer, &gainBuffer] (auto& computer)
                                 {
                                     computer.process (levelBuffer,
                                                       gainBuffer,
                                                       {
-                                                          threshSmooth.getSmoothedBuffer(),
-                                                          ratioSmooth.getSmoothedBuffer(),
+                                                          threshSmooth,
+                                                          ratioSmooth,
                                                           kneeDB,
                                                           kneeLower,
                                                           kneeUpper,
-                                                          applyAutoMakeup,
                                                       });
+                                });
+    }
+
+    /** Applies the gain computer's auto-makeup gain to the buffer */
+    void applyAutoMakeup (const BufferView<SampleType>& buffer)
+    {
+        TupleHelpers::visit_at (computers,
+                                modeIndex,
+                                [this, &buffer] (auto& computer)
+                                {
+                                    computer.applyAutoMakeup (buffer,
+                                                              {
+                                                                  threshSmooth,
+                                                                  ratioSmooth,
+                                                                  kneeDB,
+                                                                  kneeLower,
+                                                                  kneeUpper,
+                                                              });
                                 });
     }
 

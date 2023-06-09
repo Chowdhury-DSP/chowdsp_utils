@@ -6,12 +6,11 @@ namespace chowdsp::compressor
 template <typename T>
 struct GainComputerParams
 {
-    const T* threshSmoothData;
-    const T* ratioSmoothData;
+    const SmoothedBufferValue<T, juce::ValueSmoothingTypes::Multiplicative>& threshSmooth;
+    const SmoothedBufferValue<T, juce::ValueSmoothingTypes::Multiplicative>& ratioSmooth;
     T kneeDB;
     T kneeLower;
     T kneeUpper;
-    bool applyAutoMakeup;
 };
 
 /** Gain computer for a feed-forward compressor */
@@ -28,14 +27,17 @@ struct FeedForwardCompGainComputer
         const auto numChannels = gainBuffer.getNumChannels();
         const auto numSamples = gainBuffer.getNumSamples();
 
+        const auto threshSmoothData = params.threshSmooth.getSmoothedBuffer();
+        const auto ratioSmoothData = params.ratioSmooth.getSmoothedBuffer();
+
         for (int ch = 0; ch < numChannels; ++ch)
         {
             auto xData = levelBuffer.getReadSpan (ch);
             auto yData = gainBuffer.getWriteSpan (ch);
             for (size_t n = 0; n < (size_t) numSamples; ++n)
             {
-                const auto curThresh = params.threshSmoothData[n];
-                const auto curRatio = params.ratioSmoothData[n];
+                const auto curThresh = threshSmoothData[n];
+                const auto curRatio = ratioSmoothData[n];
 
                 const auto xAbs = std::abs (xData[n]);
                 if (xAbs <= params.kneeLower) // below thresh
@@ -54,16 +56,33 @@ struct FeedForwardCompGainComputer
                     yData[n] = juce::Decibels::decibelsToGain (gainDB);
                 }
             }
+        }
+    }
 
-            if (params.applyAutoMakeup)
+    void applyAutoMakeup (const BufferView<T>& buffer, const GainComputerParams<T>& params) noexcept
+    {
+        const auto numChannels = buffer.getNumChannels();
+        const auto numSamples = buffer.getNumSamples();
+
+        if (params.threshSmooth.isSmoothing() || params.ratioSmooth.isSmoothing())
+        {
+            const auto threshSmoothData = params.threshSmooth.getSmoothedBuffer();
+            const auto ratioSmoothData = params.ratioSmooth.getSmoothedBuffer();
+            for (auto [ch, bufferData] : buffer_iters::channels (buffer))
             {
-                for (size_t n = 0; n < (size_t) numSamples; ++n)
+                for (auto [n, sample] : enumerate (bufferData))
                 {
-                    const auto curThresh = params.threshSmoothData[n];
-                    const auto curRatio = params.ratioSmoothData[n];
-                    yData[n] *= std::pow ((T) 1 / curThresh, (T) 1 - ((T) 1 / curRatio));
+                    const auto curThresh = threshSmoothData[n];
+                    const auto curRatio = ratioSmoothData[n];
+                    sample *= std::pow ((T) 1 / curThresh, (T) 1 - ((T) 1 / curRatio));
                 }
             }
+        }
+        else
+        {
+            const auto curThresh = params.threshSmooth.getCurrentValue();
+            const auto curRatio = params.ratioSmooth.getCurrentValue();
+            BufferMath::applyGain (buffer, std::pow ((T) 1 / curThresh, (T) 1 - ((T) 1 / curRatio)));
         }
     }
 
@@ -84,14 +103,17 @@ struct FeedBackCompGainComputer
         const auto numChannels = gainBuffer.getNumChannels();
         const auto numSamples = gainBuffer.getNumSamples();
 
+        const auto threshSmoothData = params.threshSmooth.getSmoothedBuffer();
+        const auto ratioSmoothData = params.ratioSmooth.getSmoothedBuffer();
+
         for (int ch = 0; ch < numChannels; ++ch)
         {
             auto xData = levelBuffer.getReadSpan (ch);
             auto yData = gainBuffer.getWriteSpan (ch);
             for (size_t n = 0; n < (size_t) numSamples; ++n)
             {
-                const auto curThresh = params.threshSmoothData[n];
-                const auto curRatio = params.ratioSmoothData[n];
+                const auto curThresh = threshSmoothData[n];
+                const auto curRatio = ratioSmoothData[n];
 
                 const auto xAbs = std::abs (xData[n]);
                 if (xAbs <= params.kneeLower) // below thresh
@@ -109,19 +131,36 @@ struct FeedBackCompGainComputer
                     yData[n] = juce::Decibels::decibelsToGain (gainDB);
                 }
             }
+        }
+    }
 
-            if (params.applyAutoMakeup)
+    void applyAutoMakeup (const BufferView<T>& buffer, const GainComputerParams<T>& params) noexcept
+    {
+        const auto numChannels = buffer.getNumChannels();
+        const auto numSamples = buffer.getNumSamples();
+
+        if (params.threshSmooth.isSmoothing() || params.ratioSmooth.isSmoothing())
+        {
+            const auto threshSmoothData = params.threshSmooth.getSmoothedBuffer();
+            const auto ratioSmoothData = params.ratioSmooth.getSmoothedBuffer();
+            for (auto [ch, bufferData] : buffer_iters::channels (buffer))
             {
-                for (size_t n = 0; n < (size_t) numSamples; ++n)
+                for (auto [n, sample] : enumerate (bufferData))
                 {
-                    const auto curThresh = params.threshSmoothData[n];
-                    const auto curRatio = params.ratioSmoothData[n];
-                    yData[n] *= std::pow ((T) 1 / curThresh, curRatio - (T) 1);
+                    const auto curThresh = threshSmoothData[n];
+                    const auto curRatio = ratioSmoothData[n];
+                    sample *= std::pow ((T) 1 / curThresh, curRatio - (T) 1);
                 }
             }
+        }
+        else
+        {
+            const auto curThresh = params.threshSmooth.getCurrentValue();
+            const auto curRatio = params.ratioSmooth.getCurrentValue();
+            BufferMath::applyGain (buffer, std::pow ((T) 1 / curThresh, curRatio - (T) 1));
         }
     }
 
     T aFB;
 };
-}
+} // namespace chowdsp::compressor

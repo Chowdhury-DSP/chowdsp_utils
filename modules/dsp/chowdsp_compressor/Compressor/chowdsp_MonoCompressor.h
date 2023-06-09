@@ -52,7 +52,7 @@ public:
         levelDetector.processBlock (levelDetectBuffer);
 
         gainComputerBuffer.setCurrentSize (1, numSamples);
-        gainComputer.processBlock (levelDetectBuffer, gainComputerBuffer, params.autoMakeup);
+        gainComputer.processBlock (levelDetectBuffer, gainComputerBuffer);
 
         if constexpr (! std::is_same_v<GainReductionMeterTask, NullType>)
             gainReductionMeterTask.pushBufferData (mainBuffer, true);
@@ -62,6 +62,9 @@ public:
 
         if constexpr (! std::is_same_v<GainReductionMeterTask, NullType>)
             gainReductionMeterTask.pushBufferData (mainBuffer, false);
+
+        if (params.autoMakeup)
+            gainComputer.applyAutoMakeup (mainBuffer);
     }
 
     LevelDetector levelDetector;

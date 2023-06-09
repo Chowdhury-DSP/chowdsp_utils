@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [UNRELEASED]
 - Refactored `chowdsp_buffers` module out of `chowdsp_dsp_data_structures`.
 - Refactored `chowdsp_data_structures` module out of `chowdsp_core`, and added new data structures.
+- Added `chowdsp_compressor` module.
 - Added `chowdsp::buffer_iters::samples`.
 - Added `chowdsp::UIToAudioPipeline`.
 - Added `chowdsp::NoiseSynth`.

@@ -56,7 +56,7 @@ public:
     /** Prepares the level detector to process an audio stream */
     void prepare (double sampleRate, int samplesPerBlock)
     {
-        if (! std::is_same_v<LevelDetectorVisualizer, NullType>)
+        if constexpr (! std::is_same_v<LevelDetectorVisualizer, NullType>)
         {
             levelDetectorViz.setBufferSize (int (levelDetectorViz.secondsToVisualize * sampleRate / (double) samplesPerBlock));
             levelDetectorViz.setSamplesPerBlock (samplesPerBlock);
@@ -79,7 +79,7 @@ public:
      */
     void processBlock (const BufferView<float>& buffer) noexcept
     {
-        if (! std::is_same_v<LevelDetectorVisualizer, NullType>)
+        if constexpr (! std::is_same_v<LevelDetectorVisualizer, NullType>)
             levelDetectorViz.pushChannel (0, buffer.getReadSpan (0));
 
         TupleHelpers::visit_at (detectors,
@@ -93,7 +93,7 @@ public:
                                                       thresholdLinearGain);
                                 });
 
-        if (! std::is_same_v<LevelDetectorVisualizer, NullType>)
+        if constexpr (! std::is_same_v<LevelDetectorVisualizer, NullType>)
             levelDetectorViz.pushChannel (1, buffer.getReadSpan (0));
     }
 

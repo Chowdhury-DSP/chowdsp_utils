@@ -20,6 +20,7 @@ setup_juce_lib(dsp_juce_tests_lib
 )
 
 add_subdirectory(chowdsp_buffers_test)
+add_subdirectory(chowdsp_compressor_test)
 add_subdirectory(chowdsp_dsp_data_structures_test)
 add_subdirectory(chowdsp_dsp_juce_test)
 add_subdirectory(chowdsp_dsp_utils_test)
