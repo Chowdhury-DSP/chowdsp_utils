@@ -39,4 +39,10 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "SpectrumPlots/chowdsp_EqualizerPlot.h"
 #include "SpectrumPlots/chowdsp_GenericFilterPlotter.h"
 
+#include "TimeDomain/chowdsp_WaveformView.h"
+
 #include "WaveshaperPlot/chowdsp_WaveshaperPlot.h"
+
+#include "CompressorPlots/chowdsp_GainReductionMeter.h"
+#include "CompressorPlots/chowdsp_GainComputerPlot.h"
+#include "CompressorPlots/chowdsp_LevelDetectorVisualizer.h"

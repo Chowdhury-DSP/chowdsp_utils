@@ -19,6 +19,7 @@ target_link_libraries(static_test_dummy_executable PRIVATE
     chowdsp_serialization
     chowdsp_units
     chowdsp_buffers
+    chowdsp_compressor
     chowdsp_dsp_data_structures
     chowdsp_dsp_utils
     chowdsp_eq

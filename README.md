@@ -117,6 +117,11 @@ sure to abide by the license of each module, as well as whichever libraries are 
 - `BufferView`: A non-owning "view" over the data in an audio buffer (compatible with `juce::AudioBuffer`).
 - `buffer_iters`: Handy C++ iterators for iterating over buffers in different ways.
 
+`chowdsp_compressor` (GPLv3)
+- `LevelDetector`: A multi-modal level detector.
+- `GainComputer`: A multi-modal compressor gain computer.
+- `MonoCompressor`: A simple compressor with monophonic gain reduction.
+
 `chowdsp_dsp_data_structures` (GPLv3)
 - `LookupTableTransform`: Some modifications on `juce::dsp::LookupTableTransform`.
 - `LookupTableCache`: A cache for storing lookup tables, so they don't need to be re-computed.

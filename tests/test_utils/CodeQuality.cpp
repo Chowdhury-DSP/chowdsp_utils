@@ -7,6 +7,7 @@
 #include <chowdsp_serialization/chowdsp_serialization.h>
 #include <chowdsp_units/chowdsp_units.h>
 #include <chowdsp_buffers/chowdsp_buffers.h>
+#include <chowdsp_compressor/chowdsp_compressor.h>
 #include <chowdsp_dsp_data_structures/chowdsp_dsp_data_structures.h>
 #include <chowdsp_dsp_utils/chowdsp_dsp_utils.h>
 #include <chowdsp_eq/chowdsp_eq.h>
