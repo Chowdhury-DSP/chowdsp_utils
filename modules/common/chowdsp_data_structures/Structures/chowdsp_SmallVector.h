@@ -20,6 +20,8 @@ template <typename T, size_t head_size>
 class SmallVector
 {
 public:
+    static_assert (std::is_default_constructible<T>::value, "SmallVector currently only supports default-constructible types");
+
     using value_type = T;
     using allocator_type = typename std::vector<T>::allocator_type;
     using size_type = size_t;
@@ -441,6 +443,7 @@ public:
         {
             if (internal_array_size_used + 1 <= head_size)
             {
+                internal_array[internal_array_size_used].~T();
                 new (&internal_array[internal_array_size_used]) T (args...);
                 internal_array_size_used++;
                 return internal_array[internal_array_size_used - 1];

@@ -29,7 +29,10 @@ public:
         TupleHelpers::visit_at (detectors,
                                 modeIndex,
                                 [&newAttackMs] (auto& detector)
-                                { detector.modifyAttack (newAttackMs); });
+                                {
+                                    if constexpr (HasModifyAttack<std::decay_t<decltype (detector)>>)
+                                        detector.modifyAttack (newAttackMs);
+                                });
 
         a1_a = std::exp ((SampleType) -1 / (fs * newAttackMs * (SampleType) 0.001));
         b0_a = (SampleType) 1 - a1_a;
@@ -41,7 +44,10 @@ public:
         TupleHelpers::visit_at (detectors,
                                 modeIndex,
                                 [&newReleaseMs] (auto& detector)
-                                { detector.modifyRelease (newReleaseMs); });
+                                {
+                                    if constexpr (HasModifyRelease<std::decay_t<decltype (detector)>>)
+                                        detector.modifyRelease (newReleaseMs);
+                                });
 
         a1_r = std::exp ((SampleType) -1 / (fs * newReleaseMs * (SampleType) 0.001));
         b0_r = (SampleType) 1 - a1_r;
@@ -115,6 +121,9 @@ private:
     SampleType z1 = (SampleType) 0;
 
     typename LevelDetectorTypes::Types detectors;
+
+    CHOWDSP_CHECK_HAS_METHOD (HasModifyAttack, modifyAttack, SampleType {})
+    CHOWDSP_CHECK_HAS_METHOD (HasModifyRelease, modifyRelease, SampleType {})
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CompressorLevelDetector)
 };

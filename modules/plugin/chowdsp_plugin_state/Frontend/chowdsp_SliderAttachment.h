@@ -23,20 +23,24 @@ public:
                       juce::Slider& paramSlider,
                       juce::UndoManager* undoManager);
 
+    SliderAttachment() = default;
+    SliderAttachment (SliderAttachment&&) noexcept = default;
+    SliderAttachment& operator= (SliderAttachment&&) noexcept = default;
+
     ~SliderAttachment() override;
 
     /** Sets the initial value of the slider */
     void setValue (float newValue);
 
     /** Returns the attached parameter */
-    [[nodiscard]] const FloatParameter& getParameter() const { return attachment.param; }
+    [[nodiscard]] const FloatParameter* getParameter() const { return attachment.param; }
 
 private:
     void sliderValueChanged (juce::Slider*) override;
     void sliderDragStarted (juce::Slider*) override;
     void sliderDragEnded (juce::Slider*) override;
 
-    juce::Slider& slider;
+    juce::Slider* slider = nullptr;
     ParameterAttachment<FloatParameter,
                         ParameterAttachmentHelpers::SetValueCallback<SliderAttachment>>
         attachment;

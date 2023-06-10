@@ -134,7 +134,8 @@ private:
                                 modeIndex,
                                 [this] (auto& computer)
                                 {
-                                    computer.recalcConstants (ratio, kneeDB);
+                                    if constexpr (HasRecalcConstants<std::decay_t<decltype (computer)>>)
+                                        computer.recalcConstants (ratio, kneeDB);
                                 });
     }
 
@@ -149,6 +150,8 @@ private:
 
     size_t modeIndex = 0;
     typename GainComputerTypes::Types computers;
+
+    CHOWDSP_CHECK_HAS_METHOD (HasRecalcConstants, recalcConstants, SampleType {}, SampleType {})
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GainComputer)
 };

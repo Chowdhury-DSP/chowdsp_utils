@@ -11,19 +11,19 @@ SliderAttachment::SliderAttachment (FloatParameter& param,
                                     ParameterListeners& listeners,
                                     juce::Slider& paramSlider,
                                     juce::UndoManager* undoManager)
-    : slider (paramSlider),
+    : slider (&paramSlider),
       attachment (param, listeners, ParameterAttachmentHelpers::SetValueCallback { *this }),
       um (undoManager)
 {
-    slider.valueFromTextFunction = [&p = static_cast<juce::RangedAudioParameter&> (param)] (const juce::String& text)
+    slider->valueFromTextFunction = [&p = static_cast<juce::RangedAudioParameter&> (param)] (const juce::String& text)
     {
         return (double) p.convertFrom0to1 (p.getValueForText (text));
     };
-    slider.textFromValueFunction = [&p = static_cast<juce::RangedAudioParameter&> (param)] (double value)
+    slider->textFromValueFunction = [&p = static_cast<juce::RangedAudioParameter&> (param)] (double value)
     {
         return p.getText (p.convertTo0to1 ((float) value), 0);
     };
-    slider.setDoubleClickReturnValue (true, param.convertFrom0to1 (param.getDefaultValue()));
+    slider->setDoubleClickReturnValue (true, param.convertFrom0to1 (param.getDefaultValue()));
 
     auto range = param.getNormalisableRange(); // NOSONAR
 
@@ -65,22 +65,26 @@ SliderAttachment::SliderAttachment (FloatParameter& param,
     newRange.skew = range.skew;
     newRange.symmetricSkew = range.symmetricSkew;
 
-    slider.setNormalisableRange (newRange);
+    slider->setNormalisableRange (newRange);
 
     setValue (param.get());
-    slider.valueChanged();
-    slider.addListener (this);
+    slider->valueChanged();
+    slider->addListener (this);
 }
 
 SliderAttachment::~SliderAttachment()
 {
-    slider.removeListener (this);
+    if (slider != nullptr)
+        slider->removeListener (this);
 }
 
 void SliderAttachment::setValue (float newValue)
 {
-    juce::ScopedValueSetter svs { skipSliderChangedCallback, true };
-    slider.setValue (newValue, juce::sendNotificationSync);
+    if (slider != nullptr)
+    {
+        juce::ScopedValueSetter svs { skipSliderChangedCallback, true };
+        slider->setValue (newValue, juce::sendNotificationSync);
+    }
 }
 
 void SliderAttachment::sliderValueChanged (juce::Slider*)
@@ -88,12 +92,12 @@ void SliderAttachment::sliderValueChanged (juce::Slider*)
     if (skipSliderChangedCallback)
         return;
 
-    attachment.setValueAsPartOfGesture ((float) slider.getValue());
+    attachment.setValueAsPartOfGesture ((float) slider->getValue());
 }
 
 void SliderAttachment::sliderDragStarted (juce::Slider*)
 {
-    valueAtStartOfGesture = attachment.param.get();
+    valueAtStartOfGesture = attachment.param->get();
     attachment.beginGesture();
 }
 
@@ -104,9 +108,9 @@ void SliderAttachment::sliderDragEnded (juce::Slider*)
         um->beginNewTransaction();
         um->perform (
             new ParameterAttachmentHelpers::ParameterChangeAction<FloatParameter> (
-                attachment.param,
+                *attachment.param,
                 valueAtStartOfGesture,
-                attachment.param.get()));
+                attachment.param->get()));
     }
 
     attachment.endGesture();
