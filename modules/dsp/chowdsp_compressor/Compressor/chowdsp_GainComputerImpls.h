@@ -61,9 +61,6 @@ struct FeedForwardCompGainComputer
 
     void applyAutoMakeup (const BufferView<T>& buffer, const GainComputerParams<T>& params) noexcept
     {
-        const auto numChannels = buffer.getNumChannels();
-        const auto numSamples = buffer.getNumSamples();
-
         if (params.threshSmooth.isSmoothing() || params.ratioSmooth.isSmoothing())
         {
             const auto threshSmoothData = params.threshSmooth.getSmoothedBuffer();
@@ -136,9 +133,6 @@ struct FeedBackCompGainComputer
 
     void applyAutoMakeup (const BufferView<T>& buffer, const GainComputerParams<T>& params) noexcept
     {
-        const auto numChannels = buffer.getNumChannels();
-        const auto numSamples = buffer.getNumSamples();
-
         if (params.threshSmooth.isSmoothing() || params.ratioSmooth.isSmoothing())
         {
             const auto threshSmoothData = params.threshSmooth.getSmoothedBuffer();

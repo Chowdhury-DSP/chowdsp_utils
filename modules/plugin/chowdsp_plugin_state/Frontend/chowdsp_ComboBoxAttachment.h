@@ -23,18 +23,22 @@ public:
                         juce::ComboBox& combo,
                         juce::UndoManager* undoManager);
 
+    ComboBoxAttachment() = default;
+    ComboBoxAttachment (ComboBoxAttachment&&) noexcept = default;
+    ComboBoxAttachment& operator= (ComboBoxAttachment&&) noexcept = default;
+
     ~ComboBoxAttachment() override;
 
     /** Sets the initial value of the box */
     void setValue (int newValue);
 
     /** Returns the attached parameter */
-    [[nodiscard]] const ChoiceParameter& getParameter() const { return attachment.param; }
+    [[nodiscard]] const ChoiceParameter* getParameter() const { return attachment.param; }
 
 private:
     void comboBoxChanged (juce::ComboBox*) override;
 
-    juce::ComboBox& comboBox;
+    juce::ComboBox* comboBox = nullptr;
     ParameterAttachment<ChoiceParameter,
                         ParameterAttachmentHelpers::SetValueCallback<ComboBoxAttachment>>
         attachment;

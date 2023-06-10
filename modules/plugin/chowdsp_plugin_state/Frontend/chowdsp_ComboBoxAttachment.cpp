@@ -11,24 +11,28 @@ ComboBoxAttachment::ComboBoxAttachment (ChoiceParameter& param,
                                         ParameterListeners& listeners,
                                         juce::ComboBox& combo,
                                         juce::UndoManager* undoManager)
-    : comboBox (combo),
+    : comboBox (&combo),
       attachment (param, listeners, ParameterAttachmentHelpers::SetValueCallback { *this }),
       um (undoManager)
 {
-    comboBox.addItemList (param.choices, 1);
+    comboBox->addItemList (param.choices, 1);
     setValue (param.getIndex());
-    comboBox.addListener (this);
+    comboBox->addListener (this);
 }
 
 ComboBoxAttachment::~ComboBoxAttachment()
 {
-    comboBox.removeListener (this);
+    if (comboBox != nullptr)
+        comboBox->removeListener (this);
 }
 
 void ComboBoxAttachment::setValue (int newValue)
 {
-    juce::ScopedValueSetter svs { skipBoxChangedCallback, true };
-    comboBox.setSelectedItemIndex (newValue, juce::sendNotificationSync);
+    if (comboBox != nullptr)
+    {
+        juce::ScopedValueSetter svs { skipBoxChangedCallback, true };
+        comboBox->setSelectedItemIndex (newValue, juce::sendNotificationSync);
+    }
 }
 
 void ComboBoxAttachment::comboBoxChanged (juce::ComboBox*)
@@ -36,7 +40,7 @@ void ComboBoxAttachment::comboBoxChanged (juce::ComboBox*)
     if (skipBoxChangedCallback)
         return;
 
-    const auto newValue = comboBox.getSelectedItemIndex();
+    const auto newValue = comboBox->getSelectedItemIndex();
     attachment.setValueAsCompleteGesture (newValue, um);
 }
 } // namespace chowdsp

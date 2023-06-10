@@ -31,13 +31,13 @@ void GainReductionMeter::BackgroundTask::prepareTask (double sampleRate, int sam
     waitMs = int (1000.0 / (double) meterFps);
 }
 
-void GainReductionMeter::BackgroundTask::runTask (const juce::AudioBuffer<float>& data)
+void GainReductionMeter::BackgroundTask::runTask (const juce::AudioBuffer<float>& taskData)
 {
-    jassert (data.getNumChannels() == 2);
-    const auto numSamples = data.getNumSamples();
+    jassert (taskData.getNumChannels() == 2);
+    const auto numSamples = taskData.getNumSamples();
 
-    const auto* inputData = data.getReadPointer (0);
-    const auto* compressedData = data.getReadPointer (1);
+    const auto* inputData = taskData.getReadPointer (0);
+    const auto* compressedData = taskData.getReadPointer (1);
 
     float inputLevelPeak = 0.0f, compressedLevelPeak = 0.0f;
     for (int n = 0; n < numSamples; ++n)
@@ -46,9 +46,7 @@ void GainReductionMeter::BackgroundTask::runTask (const juce::AudioBuffer<float>
         compressedLevelPeak = ballisticsFilter.processSample (1, std::abs (compressedData[n]));
     }
 
-    std::cout << "Input level peak: " << inputLevelPeak << ", Compressed level peak: " << compressedLevelPeak << std::endl;
     gainReductionDB = (inputLevelPeak == 0.0f) ? 0.0f : juce::Decibels::gainToDecibels (compressedLevelPeak / inputLevelPeak);
-    std::cout << "Gain reduction dB: " << gainReductionDB.load() << std::endl;
 }
 
 void GainReductionMeter::BackgroundTask::pushBufferData (const chowdsp::BufferView<const float>& buffer, bool isInput)

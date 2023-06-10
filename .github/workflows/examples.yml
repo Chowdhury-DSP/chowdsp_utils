@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 env:
-  EXAMPLE_TARGETS: "ForwardingTestPlugin_Standalone ModalSpringReverb_Standalone SimpleEQ_Standalone StatefulPlugin_Standalone"
+  EXAMPLE_TARGETS: "ForwardingTestPlugin_Standalone ModalSpringReverb_Standalone SimpleEQ_Standalone StatefulPlugin_Standalone ExampleCompressor_Standalone"
 
 jobs:
   build_examples:

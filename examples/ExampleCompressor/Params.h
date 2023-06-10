@@ -16,6 +16,7 @@ enum class LevelDetectorMode
     Peak = 1,
     RMS = 2,
     PeakRtT = 4,
+    SlowPeak = 8,
 };
 
 enum class Architecture

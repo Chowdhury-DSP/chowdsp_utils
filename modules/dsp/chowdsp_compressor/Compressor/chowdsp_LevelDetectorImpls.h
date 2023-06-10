@@ -14,16 +14,6 @@ struct BallisticCoeffs
 struct PeakDetector
 {
     template <typename T>
-    void modifyAttack (T& /* attackMs */)
-    {
-    }
-
-    template <typename T>
-    void modifyRelease (T& /* releaseMs */)
-    {
-    }
-
-    template <typename T>
     static void process (const BufferView<T>& buffer, const BallisticCoeffs<T>& attackCoeffs, const BallisticCoeffs<T>& releaseCoeffs, T* z, T /* thresholdGain */) noexcept
     {
         for (auto [ch, data] : buffer_iters::channels (buffer))
@@ -42,16 +32,6 @@ struct PeakDetector
 /** A return-to-threshold peak detector */
 struct PeakRtTDetector
 {
-    template <typename T>
-    void modifyAttack (T& /* attackMs */)
-    {
-    }
-
-    template <typename T>
-    void modifyRelease (T& /* releaseMs */)
-    {
-    }
-
     template <typename T>
     static void process (const BufferView<T>& buffer, const BallisticCoeffs<T>& attackCoeffs, const BallisticCoeffs<T>& releaseCoeffs, T* z, T thresholdGain) noexcept
     {
@@ -72,16 +52,6 @@ struct PeakRtTDetector
 /** An RMS level detector */
 struct RMSDetector
 {
-    template <typename T>
-    void modifyAttack (T& /* attackMs */)
-    {
-    }
-
-    template <typename T>
-    void modifyRelease (T& /* releaseMs */)
-    {
-    }
-
     template <typename T>
     static void process (const BufferView<T>& buffer, const BallisticCoeffs<T>& attackCoeffs, const BallisticCoeffs<T>& releaseCoeffs, T* z, T /* thresholdGain */) noexcept
     {

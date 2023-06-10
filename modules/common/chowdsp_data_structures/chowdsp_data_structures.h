@@ -27,6 +27,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Structures/chowdsp_DoubleBuffer.h"
 #include "Structures/chowdsp_LocalPointer.h"
 #include "Structures/chowdsp_OptionalPointer.h"
+#include "Structures/chowdsp_RawObject.h"
 #include "Structures/chowdsp_SmallVector.h"
 #include "Structures/chowdsp_StringLiteral.h"
 
