@@ -20,7 +20,7 @@ template <typename T, size_t head_size>
 class SmallVector
 {
 public:
-    static_assert (std::is_default_constructible<T>::value, "SmallVector currently only supports default-constructible types");
+    static_assert (std::is_default_constructible_v<T>, "SmallVector currently only supports default-constructible types");
 
     using value_type = T;
     using allocator_type = typename std::vector<T>::allocator_type;
