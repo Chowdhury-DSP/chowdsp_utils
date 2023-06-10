@@ -14,6 +14,8 @@ void ExampleCompressorPlugin::processAudioBlock (juce::AudioBuffer<float>& buffe
     compressor.params.ratio = state.params.ratio->getCurrentValue(),
     compressor.params.kneeDB = state.params.knee->getCurrentValue(),
     compressor.params.autoMakeup = state.params.autoMakeup->get(),
+    compressor.levelDetector.setMode ((size_t) state.params.levelDetectorMode->getIndex());
+    compressor.gainComputer.setMode ((size_t) state.params.architecture->getIndex());
     compressor.processBlock (buffer, buffer);
 }
 

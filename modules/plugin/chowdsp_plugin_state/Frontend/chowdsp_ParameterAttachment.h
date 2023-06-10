@@ -17,6 +17,10 @@ public:
                          ParameterListeners& listeners,
                          Callback&& callback);
 
+    ParameterAttachment() = default;
+    ParameterAttachment (ParameterAttachment&&) noexcept = default;
+    ParameterAttachment& operator= (ParameterAttachment&&) noexcept = default;
+
     using ParamElementType = ParameterTypeHelpers::ParameterElementType<ParamType>;
 
     /**
@@ -47,7 +51,7 @@ public:
      */
     void setValueAsPartOfGesture (ParamElementType newValue);
 
-    ParamType& param;
+    ParamType* param = nullptr;
 
 private:
     template <typename Func>

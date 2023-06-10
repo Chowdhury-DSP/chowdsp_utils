@@ -11,24 +11,28 @@ ButtonAttachment::ButtonAttachment (BoolParameter& param,
                                     ParameterListeners& listeners,
                                     juce::Button& paramButton,
                                     juce::UndoManager* undoManager)
-    : button (paramButton),
+    : button (&paramButton),
       attachment (param, listeners, ParameterAttachmentHelpers::SetValueCallback { *this }),
       um (undoManager)
 {
-    button.setButtonText (param.name);
+    button->setButtonText (param.name);
     setValue (param.get());
-    button.addListener (this);
+    button->addListener (this);
 }
 
 ButtonAttachment::~ButtonAttachment()
 {
-    button.removeListener (this);
+    if (button != nullptr)
+        button->removeListener (this);
 }
 
 void ButtonAttachment::setValue (bool newValue)
 {
-    juce::ScopedValueSetter svs { skipClickCallback, true };
-    button.setToggleState (newValue, juce::sendNotificationSync);
+    if (button != nullptr)
+    {
+        juce::ScopedValueSetter svs { skipClickCallback, true };
+        button->setToggleState (newValue, juce::sendNotificationSync);
+    }
 }
 
 void ButtonAttachment::buttonClicked (juce::Button*)
@@ -36,7 +40,7 @@ void ButtonAttachment::buttonClicked (juce::Button*)
     if (skipClickCallback)
         return;
 
-    const auto newValue = button.getToggleState();
+    const auto newValue = button->getToggleState();
     attachment.setValueAsCompleteGesture (newValue, um);
 }
 } // namespace chowdsp

@@ -23,18 +23,22 @@ public:
                       juce::Button& paramButton,
                       juce::UndoManager* undoManager);
 
+    ButtonAttachment() = default;
+    ButtonAttachment (ButtonAttachment&&) noexcept = default;
+    ButtonAttachment& operator= (ButtonAttachment&&) noexcept = default;
+
     ~ButtonAttachment() override;
 
     /** Sets the initial value of the button */
     void setValue (bool newValue);
 
     /** Returns the attached parameter */
-    [[nodiscard]] const BoolParameter& getParameter() const { return attachment.param; }
+    [[nodiscard]] const BoolParameter* getParameter() const { return attachment.param; }
 
 private:
     void buttonClicked (juce::Button*) override;
 
-    juce::Button& button;
+    juce::Button* button = nullptr;
     ParameterAttachment<BoolParameter,
                         ParameterAttachmentHelpers::SetValueCallback<ButtonAttachment>>
         attachment;

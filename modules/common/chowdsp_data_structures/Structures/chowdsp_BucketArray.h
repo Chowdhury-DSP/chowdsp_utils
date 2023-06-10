@@ -13,20 +13,11 @@ namespace chowdsp
 template <typename T, size_t items_per_bucket>
 class BucketArray
 {
-    struct BucketItem
-    {
-        std::array<std::byte, sizeof (T)> raw_data;
-        T* data() { return reinterpret_cast<T*> (raw_data.data()); } // NOSONAR
-        const T* data() const { return reinterpret_cast<const T*> (raw_data.data()); } // NOSONAR
-        T& item() { return *data(); }
-        const T& item() const { return *data(); }
-    };
-
 public:
     struct Bucket
     {
         std::array<bool, items_per_bucket> occupied {};
-        std::array<BucketItem, items_per_bucket> items {};
+        std::array<RawObject<T>, items_per_bucket> items {};
 
         size_t lowest_maybe_not_occupied = 0; // Index that _may_ not be occupied, to decrease search space when adding elements.
         size_t bucket_index = 0;
@@ -56,7 +47,7 @@ public:
             for (auto [item, is_occupied] : zip (bucket->items, bucket->occupied))
             {
                 if (is_occupied)
-                    item.item().~T();
+                    item.destruct();
             }
         }
 
@@ -169,7 +160,7 @@ public:
 
         const auto was_full = (bucket->count == items_per_bucket);
 
-        bucket->items[locator.slot_index].item().~T();
+        bucket->items[locator.slot_index].destruct();
         bucket->occupied[locator.slot_index] = false;
 
         if (locator.slot_index < bucket->lowest_maybe_not_occupied)
@@ -211,7 +202,7 @@ private:
         bucket->lowest_maybe_not_occupied = slot_index + 1;
         jassert (bucket->count <= items_per_bucket);
 
-        auto* memory = new (bucket->items[slot_index].data()) T (std::forward<ConstructorArgs> (args)...);
+        auto* memory = bucket->items[slot_index].construct (std::forward<ConstructorArgs> (args)...);
         count++;
 
         if (bucket->count == items_per_bucket)

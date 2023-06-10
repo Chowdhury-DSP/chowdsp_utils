@@ -46,7 +46,7 @@ void PluginEditor::GainComputerEditor::updatePlot()
     gainComputer.setKnee (pluginParams->knee->get());
     gainComputer.reset();
 
-    gainComputer.processBlock (inputBuffer, outputBuffer, false);
+    gainComputer.processBlock (inputBuffer, outputBuffer);
 
     plot.setThreshold (pluginParams->threshold->get());
     plot.updatePlotPath (inputBuffer.getReadSpan (0), outputBuffer.getReadSpan (0));
