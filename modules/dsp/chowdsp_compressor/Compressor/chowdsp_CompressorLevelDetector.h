@@ -31,7 +31,7 @@ public:
                                 [&newAttackMs] (auto& detector)
                                 {
                                     if constexpr (HasModifyAttack<std::decay_t<decltype (detector)>>)
-                                        detector.modifyAttack (newAttackMs);
+                                        newAttackMs = detector.modifyAttack (newAttackMs);
                                 });
 
         a1_a = std::exp ((SampleType) -1 / (fs * newAttackMs * (SampleType) 0.001));
@@ -46,7 +46,7 @@ public:
                                 [&newReleaseMs] (auto& detector)
                                 {
                                     if constexpr (HasModifyRelease<std::decay_t<decltype (detector)>>)
-                                        detector.modifyRelease (newReleaseMs);
+                                        newReleaseMs = detector.modifyRelease (newReleaseMs);
                                 });
 
         a1_r = std::exp ((SampleType) -1 / (fs * newReleaseMs * (SampleType) 0.001));
@@ -105,6 +105,9 @@ public:
 
     LevelDetectorVisualizer levelDetectorViz;
 
+    CHOWDSP_CHECK_HAS_METHOD (HasModifyAttack, modifyAttack, SampleType {})
+    CHOWDSP_CHECK_HAS_METHOD (HasModifyRelease, modifyRelease, SampleType {})
+
 private:
     // Attack coeffs
     SampleType a1_a = (SampleType) 0;
@@ -122,8 +125,7 @@ private:
 
     typename LevelDetectorTypes::Types detectors;
 
-    CHOWDSP_CHECK_HAS_METHOD (HasModifyAttack, modifyAttack, SampleType {})
-    CHOWDSP_CHECK_HAS_METHOD (HasModifyRelease, modifyRelease, SampleType {})
+
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CompressorLevelDetector)
 };
