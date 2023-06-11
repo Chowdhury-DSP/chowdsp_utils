@@ -16,7 +16,7 @@ class Downsampler
 public:
     Downsampler() = default;
 
-    /** Prepares the downsampler to process signal at a given upsampling ratio */
+    /** Prepares the downsampler to process signal at a given downsampling ratio */
     void prepare (juce::dsp::ProcessSpec spec, int downsampleRatio)
     {
         ratio = downsampleRatio;
@@ -62,7 +62,7 @@ public:
             downsampledData[startSample] = y;
         }
 
-        juce::FloatVectorOperations::multiply (downsampledData, (T) ratio, numSamples * ratio);
+        juce::FloatVectorOperations::multiply (downsampledData, (T) ratio, numSamples / ratio);
     }
 
     /**
