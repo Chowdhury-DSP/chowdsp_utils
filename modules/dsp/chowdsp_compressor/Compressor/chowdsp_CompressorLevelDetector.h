@@ -8,6 +8,8 @@ template <typename SampleType,
           typename LevelDetectorVisualizer = NullType>
 class CompressorLevelDetector
 {
+    static constexpr bool isMultiModal = types_list::IsTypesList<LevelDetectorTypes>;
+
 public:
     CompressorLevelDetector() = default;
 
@@ -17,7 +19,8 @@ public:
      *
      * This method should be called _before_ setting the other parameters.
      */
-    void setMode (size_t newModeIndex)
+    template <bool hasModes = isMultiModal>
+    std::enable_if_t<hasModes, void> setMode (size_t newModeIndex)
     {
         jassert (juce::isPositiveAndBelow (newModeIndex, LevelDetectorTypes::count));
         modeIndex = juce::jlimit ((size_t) 0, LevelDetectorTypes::count - 1, newModeIndex);
@@ -26,13 +29,21 @@ public:
     /** Sets the attack time in milliseconds */
     void setAttackMs (SampleType newAttackMs)
     {
-        TupleHelpers::visit_at (detectors,
-                                modeIndex,
-                                [&newAttackMs] (auto& detector)
-                                {
-                                    if constexpr (HasModifyAttack<std::decay_t<decltype (detector)>>)
-                                        newAttackMs = detector.modifyAttack (newAttackMs);
-                                });
+        if constexpr (isMultiModal)
+        {
+            TupleHelpers::visit_at (detectors,
+                                    modeIndex,
+                                    [&newAttackMs] (auto& detector)
+                                    {
+                                        if constexpr (HasModifyAttack<std::decay_t<decltype (detector)>>)
+                                            newAttackMs = detector.modifyAttack (newAttackMs);
+                                    });
+        }
+        else
+        {
+            if constexpr (HasModifyAttack<std::decay_t<decltype (detectors)>>)
+                newAttackMs = detectors.modifyAttack (newAttackMs);
+        }
 
         a1_a = std::exp ((SampleType) -1 / (fs * newAttackMs * (SampleType) 0.001));
         b0_a = (SampleType) 1 - a1_a;
@@ -41,13 +52,21 @@ public:
     /** Sets the release time in milliseconds */
     void setReleaseMs (float newReleaseMs)
     {
-        TupleHelpers::visit_at (detectors,
-                                modeIndex,
-                                [&newReleaseMs] (auto& detector)
-                                {
-                                    if constexpr (HasModifyRelease<std::decay_t<decltype (detector)>>)
-                                        newReleaseMs = detector.modifyRelease (newReleaseMs);
-                                });
+        if constexpr (isMultiModal)
+        {
+            TupleHelpers::visit_at (detectors,
+                                    modeIndex,
+                                    [&newReleaseMs] (auto& detector)
+                                    {
+                                        if constexpr (HasModifyRelease<std::decay_t<decltype (detector)>>)
+                                            newReleaseMs = detector.modifyRelease (newReleaseMs);
+                                    });
+        }
+        else
+        {
+            if constexpr (HasModifyRelease<std::decay_t<decltype (detectors)>>)
+                newReleaseMs = detectors.modifyRelease (newReleaseMs);
+        }
 
         a1_r = std::exp ((SampleType) -1 / (fs * newReleaseMs * (SampleType) 0.001));
         b0_r = (SampleType) 1 - a1_r;
@@ -88,16 +107,27 @@ public:
         if constexpr (! std::is_same_v<LevelDetectorVisualizer, NullType>)
             levelDetectorViz.pushChannel (0, buffer.getReadSpan (0));
 
-        TupleHelpers::visit_at (detectors,
-                                modeIndex,
-                                [this, &buffer] (auto& detector)
-                                {
-                                    detector.process (buffer,
-                                                      { a1_a, b0_a },
-                                                      { a1_r, b0_r },
-                                                      &z1,
-                                                      thresholdLinearGain);
-                                });
+        if constexpr (isMultiModal)
+        {
+            TupleHelpers::visit_at (detectors,
+                                    modeIndex,
+                                    [this, &buffer] (auto& detector)
+                                    {
+                                        detector.process (buffer,
+                                                          { a1_a, b0_a },
+                                                          { a1_r, b0_r },
+                                                          &z1,
+                                                          thresholdLinearGain);
+                                    });
+        }
+        else
+        {
+            detectors.process (buffer,
+                               { a1_a, b0_a },
+                               { a1_r, b0_r },
+                               &z1,
+                               thresholdLinearGain);
+        }
 
         if constexpr (! std::is_same_v<LevelDetectorVisualizer, NullType>)
             levelDetectorViz.pushChannel (1, buffer.getReadSpan (0));
@@ -123,7 +153,7 @@ private:
 
     SampleType z1 = (SampleType) 0;
 
-    typename LevelDetectorTypes::Types detectors;
+    types_list::TypesWrapper<LevelDetectorTypes> detectors;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CompressorLevelDetector)
 };
