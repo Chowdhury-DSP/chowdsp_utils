@@ -146,7 +146,7 @@ namespace TypeTraits
         CHOWDSP_CHECK_HAS_METHOD (HasEnd, end, )
 
         template <typename T>
-        static constexpr auto has_begin_end_v = HasBegin<T>&& HasEnd<T>;
+        static constexpr auto has_begin_end_v = HasBegin<T> && HasEnd<T>;
     } // namespace is_iterable_detail
 #endif // DOXYGEN
 
@@ -183,5 +183,9 @@ namespace TypeTraits
  */
 struct NullType
 {
+    template <typename... Ts>
+    explicit NullType (Ts&&...)
+    {
+    }
 };
 } // namespace chowdsp
