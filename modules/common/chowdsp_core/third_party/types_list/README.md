@@ -3,7 +3,7 @@
 [![Tests (Ubuntu)](https://github.com/jatinchowdhury18/types_list/workflows/ubuntu/badge.svg)](https://github.com/jatinchowdhury18/types_list/actions/workflows/ubuntu.yml)
 [![Tests (Mac)](https://github.com/jatinchowdhury18/types_list/workflows/macos/badge.svg)](https://github.com/jatinchowdhury18/types_list/actions/workflows/macos.yml)
 [![Tests (Windows)](https://github.com/jatinchowdhury18/types_list/workflows/windows/badge.svg)](https://github.com/jatinchowdhury18/types_list/actions/workflows/windows.yml)
-[![License](https://img.shields.io/github/license/Neargye/nameof.svg)](LICENSE)
+[![License](https://img.shields.io/github/license/jatinchowdhury18/types_list.svg)](LICENSE)
 [![Compiler explorer](https://img.shields.io/badge/compiler_explorer-online-blue.svg)](https://godbolt.org/z/dsz9GzzP6)
 
 A types_list template object for C++17 and later.
@@ -71,10 +71,10 @@ CPMAddPackage(
 
 ## Compiler compatibility
 
-* Clang/LLVM >= 6
-* MSVC++ >= 14.11 / Visual Studio >= 2017
-* Xcode >= 10
-* GCC >= 7
+* Clang/LLVM >= 9
+* Visual Studio >= 2019
+* Xcode >= 11
+* GCC >= 9
 
 ## License
 

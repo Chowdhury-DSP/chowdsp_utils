@@ -183,5 +183,9 @@ namespace TypeTraits
  */
 struct NullType
 {
+    template <typename... Ts>
+    explicit NullType (Ts&&...)
+    {
+    }
 };
 } // namespace chowdsp

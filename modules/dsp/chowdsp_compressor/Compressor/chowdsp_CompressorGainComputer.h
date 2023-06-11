@@ -8,6 +8,8 @@ template <typename SampleType,
                                                              FeedBackCompGainComputer<SampleType>>>
 class GainComputer
 {
+    static constexpr bool isMultiModal = types_list::IsTypesList<GainComputerTypes>;
+
 public:
     GainComputer() = default;
 
@@ -32,7 +34,8 @@ public:
      * Sets the index of the gain computer type to use,
      * based on the index in the template types_list.
      */
-    void setMode (size_t newModeIndex)
+    template <bool hasModes = isMultiModal>
+    std::enable_if_t<hasModes, void> setMode (size_t newModeIndex)
     {
         if (newModeIndex != modeIndex)
         {
@@ -87,38 +90,67 @@ public:
         threshSmooth.process (juce::Decibels::decibelsToGain (threshDB), numSamples);
         ratioSmooth.process (ratio, numSamples);
 
-        TupleHelpers::visit_at (computers,
-                                modeIndex,
-                                [this, &levelBuffer, &gainBuffer] (auto& computer)
-                                {
-                                    computer.process (levelBuffer,
-                                                      gainBuffer,
-                                                      {
-                                                          threshSmooth,
-                                                          ratioSmooth,
-                                                          kneeDB,
-                                                          kneeLower,
-                                                          kneeUpper,
-                                                      });
-                                });
+        if constexpr (isMultiModal)
+        {
+            TupleHelpers::visit_at (computers,
+                                    modeIndex,
+                                    [this, &levelBuffer, &gainBuffer] (auto& computer)
+                                    {
+                                        computer.process (levelBuffer,
+                                                          gainBuffer,
+                                                          {
+                                                              threshSmooth,
+                                                              ratioSmooth,
+                                                              kneeDB,
+                                                              kneeLower,
+                                                              kneeUpper,
+                                                          });
+                                    });
+        }
+        else
+        {
+            computers.process (levelBuffer,
+                               gainBuffer,
+                               {
+                                   threshSmooth,
+                                   ratioSmooth,
+                                   kneeDB,
+                                   kneeLower,
+                                   kneeUpper,
+                               });
+        }
     }
 
     /** Applies the gain computer's auto-makeup gain to the buffer */
     void applyAutoMakeup (const BufferView<SampleType>& buffer)
     {
-        TupleHelpers::visit_at (computers,
-                                modeIndex,
-                                [this, &buffer] (auto& computer)
-                                {
-                                    computer.applyAutoMakeup (buffer,
-                                                              {
-                                                                  threshSmooth,
-                                                                  ratioSmooth,
-                                                                  kneeDB,
-                                                                  kneeLower,
-                                                                  kneeUpper,
-                                                              });
-                                });
+        if constexpr (isMultiModal)
+        {
+            TupleHelpers::visit_at (computers,
+                                    modeIndex,
+                                    [this, &buffer] (auto& computer)
+                                    {
+                                        computer.applyAutoMakeup (buffer,
+                                                                  {
+                                                                      threshSmooth,
+                                                                      ratioSmooth,
+                                                                      kneeDB,
+                                                                      kneeLower,
+                                                                      kneeUpper,
+                                                                  });
+                                    });
+        }
+        else
+        {
+            computers.applyAutoMakeup (buffer,
+                                       {
+                                           threshSmooth,
+                                           ratioSmooth,
+                                           kneeDB,
+                                           kneeLower,
+                                           kneeUpper,
+                                       });
+        }
     }
 
 private:
@@ -130,13 +162,21 @@ private:
 
     void recalcConstants()
     {
-        TupleHelpers::visit_at (computers,
-                                modeIndex,
-                                [this] (auto& computer)
-                                {
-                                    if constexpr (HasRecalcConstants<std::decay_t<decltype (computer)>>)
-                                        computer.recalcConstants (ratio, kneeDB);
-                                });
+        if constexpr (isMultiModal)
+        {
+            TupleHelpers::visit_at (computers,
+                                    modeIndex,
+                                    [this] (auto& computer)
+                                    {
+                                        if constexpr (HasRecalcConstants<std::decay_t<decltype (computer)>>)
+                                            computer.recalcConstants (ratio, kneeDB);
+                                    });
+        }
+        else
+        {
+            if constexpr (HasRecalcConstants<GainComputerTypes>)
+                computers.recalcConstants (ratio, kneeDB);
+        }
     }
 
     SampleType threshDB = (SampleType) 0;
@@ -148,8 +188,8 @@ private:
     SampleType kneeUpper = (SampleType) 1;
     SampleType kneeLower = (SampleType) 1;
 
-    size_t modeIndex = 0;
-    typename GainComputerTypes::Types computers;
+    std::conditional_t<isMultiModal, size_t, NullType> modeIndex { 0 };
+    types_list::TypesWrapper<GainComputerTypes> computers;
 
     CHOWDSP_CHECK_HAS_METHOD (HasRecalcConstants, recalcConstants, SampleType {}, SampleType {})
 
