@@ -150,7 +150,8 @@ private:
 
         auto complement = [] (auto kx)
         {
-            return std::pow ((1.0 - kx) * (1.0 + kx), 0.5);
+            using T_kx = decltype (kx);
+            return std::pow ((T_kx (1.0) - kx) * (T_kx (1.0) + kx), 0.5);
         };
 
         const auto k = std::sqrt (m);
@@ -186,7 +187,7 @@ private:
             const auto knext = ks[i + 1];
 
             const auto wn = wns.back();
-            const auto wnext = ((double) 2 * wn / ((1.0 + knext) * (1.0 + complement (kn * wn))));
+            const auto wnext = ((double) 2 * wn / ((1.0 + knext) * (std::complex<double> (1.0) + complement (kn * wn))));
             wns.push_back (wnext);
         }
 
