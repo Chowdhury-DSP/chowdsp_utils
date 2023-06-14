@@ -61,8 +61,6 @@ public:
             auto y = aaFilter.processSample (data[n], channel);
             downsampledData[startSample] = y;
         }
-
-        juce::FloatVectorOperations::multiply (downsampledData, (T) ratio, numSamples / ratio);
     }
 
     /**
