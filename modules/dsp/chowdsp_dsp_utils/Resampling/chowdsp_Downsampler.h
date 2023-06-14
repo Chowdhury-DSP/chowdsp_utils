@@ -74,7 +74,7 @@ public:
         process (const BufferView<const T>& block) noexcept
     {
         process (block, downsampledBuffer);
-        return { downsampledBuffer, 0, block.getNumSamples() / ratio };
+        return { downsampledBuffer, 0, block.getNumSamples() / ratio, 0, block.getNumChannels() };
     }
 
     /**

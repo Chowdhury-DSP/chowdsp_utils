@@ -68,7 +68,7 @@ public:
         process (const BufferView<const T>& block) noexcept
     {
         process (block, upsampledBuffer);
-        return { upsampledBuffer, 0, block.getNumSamples() * ratio };
+        return { upsampledBuffer, 0, block.getNumSamples() * ratio, 0, block.getNumChannels() };
     }
 
     /** Process a block of data, and stores the result in the given dsBuffer. */
