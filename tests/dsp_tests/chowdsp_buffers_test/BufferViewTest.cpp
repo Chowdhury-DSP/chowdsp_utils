@@ -121,4 +121,20 @@ TEMPLATE_TEST_CASE ("Buffer View Test", "[dsp][buffers][simd]", float, double, x
             testBuffer (chowdsp::BufferView<const float> { data, 5, 5 }, 5.0f);
         }
     }
+
+    SECTION ("Copy Constructor Test")
+    {
+        chowdsp::Buffer<TestType> buffer { 1, 32 };
+        chowdsp::BufferView<TestType> buffer_view { buffer };
+
+        {
+            chowdsp::BufferView<TestType> buffer_view_copy { buffer_view }; // NOLINT
+            REQUIRE (buffer_view.getReadPointer (0) == buffer_view_copy.getReadPointer (0));
+        }
+
+        {
+            chowdsp::BufferView<TestType> buffer_view_copy = buffer_view; // NOLINT
+            REQUIRE (buffer_view.getReadPointer (0) == buffer_view_copy.getReadPointer (0));
+        }
+    }
 }

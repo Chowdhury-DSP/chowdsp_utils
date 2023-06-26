@@ -14,6 +14,10 @@ public:
     /** The sample type used by the buffer */
     using Type = SampleType;
 
+    BufferView& operator= (const BufferView<SampleType>&) = delete;
+    BufferView (BufferView<SampleType>&&) = delete;
+    BufferView& operator= (BufferView<SampleType>&&) = delete;
+
     BufferView (SampleType* const* data, int dataNumChannels, int dataNumSamples, int sampleOffset = 0) : numChannels (dataNumChannels),
                                                                                                           numSamples (dataNumSamples)
     {
@@ -256,7 +260,5 @@ private:
     // Maybe we'll need to increase this is we're doing high-order ambisonics or something?
     static constexpr int maxNumChannels = CHOWDSP_BUFFER_MAX_NUM_CHANNELS;
     std::array<SampleType*, (size_t) maxNumChannels> channelPointers {};
-
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BufferView)
 };
 } // namespace chowdsp
