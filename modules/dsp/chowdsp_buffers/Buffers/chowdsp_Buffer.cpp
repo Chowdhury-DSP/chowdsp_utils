@@ -97,26 +97,30 @@ const SampleType** Buffer<SampleType>::getArrayOfReadPointers() const noexcept
 
 #if CHOWDSP_USING_JUCE
 template <typename SampleType>
-juce::AudioBuffer<SampleType> Buffer<SampleType>::toAudioBuffer()
+template <typename T>
+std::enable_if_t<buffer_detail::IsFloatOrDouble<T>, juce::AudioBuffer<SampleType>> Buffer<SampleType>::toAudioBuffer()
 {
     return { getArrayOfWritePointers(), currentNumChannels, currentNumSamples };
 }
 
 template <typename SampleType>
-juce::AudioBuffer<SampleType> Buffer<SampleType>::toAudioBuffer() const
+template <typename T>
+std::enable_if_t<buffer_detail::IsFloatOrDouble<T>, juce::AudioBuffer<SampleType>> Buffer<SampleType>::toAudioBuffer() const
 {
     return { const_cast<SampleType* const*> (getArrayOfReadPointers()), currentNumChannels, currentNumSamples }; // NOSONAR
 }
 
 #if JUCE_MODULE_AVAILABLE_juce_dsp
 template <typename SampleType>
-AudioBlock<SampleType> Buffer<SampleType>::toAudioBlock()
+template <typename T>
+std::enable_if_t<buffer_detail::IsFloatOrDouble<T>, AudioBlock<SampleType>> Buffer<SampleType>::toAudioBlock()
 {
     return { getArrayOfWritePointers(), (size_t) currentNumChannels, (size_t) currentNumSamples };
 }
 
 template <typename SampleType>
-AudioBlock<const SampleType> Buffer<SampleType>::toAudioBlock() const
+template <typename T>
+std::enable_if_t<buffer_detail::IsFloatOrDouble<T>, AudioBlock<const SampleType>> Buffer<SampleType>::toAudioBlock() const
 {
     return { getArrayOfReadPointers(), (size_t) currentNumChannels, (size_t) currentNumSamples };
 }
@@ -135,6 +139,19 @@ void Buffer<SampleType>::clear() noexcept
 
 template class Buffer<float>;
 template class Buffer<double>;
+#if CHOWDSP_USING_JUCE
+template juce::AudioBuffer<float> Buffer<float>::toAudioBuffer<float>();
+template juce::AudioBuffer<double> Buffer<double>::toAudioBuffer<double>();
+template juce::AudioBuffer<float> Buffer<float>::toAudioBuffer<float>() const;
+template juce::AudioBuffer<double> Buffer<double>::toAudioBuffer<double>() const;
+#if JUCE_MODULE_AVAILABLE_juce_dsp
+template AudioBlock<float> Buffer<float>::toAudioBlock<float>();
+template AudioBlock<double> Buffer<double>::toAudioBlock<double>();
+template AudioBlock<const float> Buffer<float>::toAudioBlock<float>() const;
+template AudioBlock<const double> Buffer<double>::toAudioBlock<double>() const;
+#endif
+#endif
+
 #if ! CHOWDSP_NO_XSIMD
 template class Buffer<xsimd::batch<float>>;
 template class Buffer<xsimd::batch<double>>;

@@ -5,8 +5,11 @@ namespace chowdsp
 #ifndef DOXYGEN
 namespace buffer_detail
 {
+    template <typename T>
+    static constexpr bool IsFloatOrDouble = std::is_same_v<T, float> || std::is_same_v<T, double>;
+
     template <typename SampleType>
-    std::enable_if_t<std::is_floating_point_v<SampleType>, void>
+    std::enable_if_t<IsFloatOrDouble<SampleType>, void>
         clear (SampleType** channelData, int startChannel, int endChannel, int startSample, int endSample) noexcept
     {
         for (int ch = startChannel; ch < endChannel; ++ch)
@@ -14,7 +17,7 @@ namespace buffer_detail
     }
 
     template <typename SampleType>
-    std::enable_if_t<SampleTypeHelpers::IsSIMDRegister<SampleType>, void>
+    std::enable_if_t<! IsFloatOrDouble<SampleType>, void>
         clear (SampleType** channelData, int startChannel, int endChannel, int startSample, int endSample) noexcept
     {
         for (int ch = startChannel; ch < endChannel; ++ch)
@@ -93,17 +96,21 @@ public:
 
 #if CHOWDSP_USING_JUCE
     /** Constructs a juce::AudioBuffer from the data in this buffer */
-    [[nodiscard]] juce::AudioBuffer<SampleType> toAudioBuffer();
+    template <typename T = SampleType>
+    [[nodiscard]] std::enable_if_t<buffer_detail::IsFloatOrDouble<T>, juce::AudioBuffer<SampleType>> toAudioBuffer();
 
     /** Constructs a juce::AudioBuffer from the data in this buffer */
-    [[nodiscard]] juce::AudioBuffer<SampleType> toAudioBuffer() const;
+    template <typename T = SampleType>
+    [[nodiscard]] std::enable_if_t<buffer_detail::IsFloatOrDouble<T>, juce::AudioBuffer<SampleType>> toAudioBuffer() const;
 
 #if JUCE_MODULE_AVAILABLE_juce_dsp
     /** Constructs a juce::dsp::AudioBlock from the data in this buffer */
-    [[nodiscard]] AudioBlock<SampleType> toAudioBlock();
+    template <typename T = SampleType>
+    [[nodiscard]] std::enable_if_t<buffer_detail::IsFloatOrDouble<T>, AudioBlock<SampleType>> toAudioBlock();
 
     /** Constructs a juce::dsp::AudioBlock from the data in this buffer */
-    [[nodiscard]] AudioBlock<const SampleType> toAudioBlock() const;
+    template <typename T = SampleType>
+    [[nodiscard]] std::enable_if_t<buffer_detail::IsFloatOrDouble<T>, AudioBlock<const SampleType>> toAudioBlock() const;
 #endif
 #endif
 
