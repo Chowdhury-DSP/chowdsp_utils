@@ -140,15 +140,15 @@ void Buffer<SampleType>::clear() noexcept
 template class Buffer<float>;
 template class Buffer<double>;
 #if CHOWDSP_USING_JUCE
-template juce::AudioBuffer<float> Buffer<float>::toAudioBuffer();
-template juce::AudioBuffer<double> Buffer<double>::toAudioBuffer();
-template juce::AudioBuffer<float> Buffer<float>::toAudioBuffer() const;
-template juce::AudioBuffer<double> Buffer<double>::toAudioBuffer() const;
+template juce::AudioBuffer<float> Buffer<float>::toAudioBuffer<float>();
+template juce::AudioBuffer<double> Buffer<double>::toAudioBuffer<double>();
+template juce::AudioBuffer<float> Buffer<float>::toAudioBuffer<float>() const;
+template juce::AudioBuffer<double> Buffer<double>::toAudioBuffer<double>() const;
 #if JUCE_MODULE_AVAILABLE_juce_dsp
-template AudioBlock<float> Buffer<float>::toAudioBlock();
-template AudioBlock<double> Buffer<double>::toAudioBlock();
-template AudioBlock<const float> Buffer<float>::toAudioBlock() const;
-template AudioBlock<const double> Buffer<double>::toAudioBlock() const;
+template AudioBlock<float> Buffer<float>::toAudioBlock<float>();
+template AudioBlock<double> Buffer<double>::toAudioBlock<double>();
+template AudioBlock<const float> Buffer<float>::toAudioBlock<float>() const;
+template AudioBlock<const double> Buffer<double>::toAudioBlock<double>() const;
 #endif
 #endif
 
