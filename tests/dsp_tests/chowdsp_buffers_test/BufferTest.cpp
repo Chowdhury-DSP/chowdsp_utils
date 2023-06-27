@@ -7,7 +7,7 @@ template class chowdsp::Buffer<int>;
 template <typename T>
 using TestStaticBuffer = chowdsp::StaticBuffer<T, 2, 128>;
 
-TEMPLATE_PRODUCT_TEST_CASE ("Buffer Test", "[dsp][buffers][simd]", (chowdsp::Buffer, TestStaticBuffer), (float, double, xsimd::batch<float>, xsimd::batch<double>, int, std::string) )
+TEMPLATE_PRODUCT_TEST_CASE ("Buffer Test", "[dsp][buffers][simd]", (chowdsp::Buffer, TestStaticBuffer), (float, double, xsimd::batch<float>, xsimd::batch<double>, int, std::string))
 {
     using BufferType = TestType;
     using SampleType = typename BufferType::Type;
@@ -111,7 +111,7 @@ TEMPLATE_PRODUCT_TEST_CASE ("Buffer Test", "[dsp][buffers][simd]", (chowdsp::Buf
         REQUIRE (buffer.getArrayOfReadPointers() != nullptr);
     }
 
-    if constexpr (! (std::is_same_v<SampleType, int> || std::is_same_v<SampleType, std::string>))
+    if constexpr (! (std::is_same_v<SampleType, int> || std::is_same_v<SampleType, std::string>) )
     {
         SECTION ("Alignment Test")
         {
