@@ -80,5 +80,6 @@ namespace experimental
 #include "DataStructures/chowdsp_ScopedValue.h"
 
 #include "Functional/chowdsp_Bindings.h"
+#include "Functional/chowdsp_EndOfScopeAction.h"
 #include "Memory/chowdsp_MemoryAliasing.h"
 #include "Types/chowdsp_TypeTraits.h"
