@@ -12,6 +12,12 @@ struct EndOfScopeAction
     explicit EndOfScopeAction (Func&& func) : f (std::move (func)) {}
     ~EndOfScopeAction() { f(); }
 
+    EndOfScopeAction (const EndOfScopeAction&) = delete;
+    EndOfScopeAction& operator= (const EndOfScopeAction&) = delete;
+
+    EndOfScopeAction (EndOfScopeAction&&) noexcept = default;
+    EndOfScopeAction& operator= (EndOfScopeAction&&) noexcept = default;
+
 private:
     Func f;
 };
@@ -20,6 +26,6 @@ private:
 template <typename Func>
 [[nodiscard]] EndOfScopeAction<Func> runAtEndOfScope (Func&& f)
 {
-    return EndOfScopeAction { std::move (f) };
+    return EndOfScopeAction { std::forward<Func> (f) };
 }
 } // namespace chowdsp
