@@ -7,6 +7,7 @@ target_sources(chowdsp_core_test
         TypesListTest.cpp
         BindingsTest.cpp
         ScopedValueTest.cpp
+        EndOfScopeActionTest.cpp
 )
 
 target_compile_features(chowdsp_core_test PRIVATE cxx_std_20)
