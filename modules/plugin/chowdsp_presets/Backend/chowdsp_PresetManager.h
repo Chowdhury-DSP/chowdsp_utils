@@ -68,8 +68,14 @@ public:
     /** Returns the user's preset configuration file */
     [[nodiscard]] juce::File getUserPresetConfigFile() const;
 
+    /** Returns the user's preset configuration file */
+    [[nodiscard]] static juce::File getUserPresetConfigFile (const juce::String& presetConfigFilePath);
+
     /** Returns the user's preset directory */
     [[nodiscard]] juce::File getUserPresetPath() const;
+
+    /** Returns the user's preset directory */
+    [[nodiscard]] static juce::File getUserPresetPath (const juce::String& presetConfigFilePath);
 
     /** Set's the user's preset directory */
     void setUserPresetPath (const juce::File& file);

@@ -226,8 +226,13 @@ void PresetManager::setUserPresetConfigFile (const juce::String& presetConfigFil
 
 juce::File PresetManager::getUserPresetConfigFile() const
 {
+    return getUserPresetConfigFile (userPresetConfigPath);
+}
+
+juce::File PresetManager::getUserPresetConfigFile (const juce::String& presetConfigFilePath)
+{
     juce::File updatePresetFile = juce::File::getSpecialLocation (juce::File::userApplicationDataDirectory);
-    return updatePresetFile.getChildFile (userPresetConfigPath);
+    return updatePresetFile.getChildFile (presetConfigFilePath);
 }
 
 void PresetManager::setUserPresetPath (const juce::File& file)
@@ -244,7 +249,12 @@ void PresetManager::setUserPresetPath (const juce::File& file)
 
 juce::File PresetManager::getUserPresetPath() const
 {
-    auto userPresetConfigFile = getUserPresetConfigFile();
+    return getUserPresetPath (userPresetConfigPath);
+}
+
+juce::File PresetManager::getUserPresetPath (const juce::String& presetConfigFilePath)
+{
+    auto userPresetConfigFile = getUserPresetConfigFile (presetConfigFilePath);
     if (userPresetConfigFile.existsAsFile())
         return userPresetConfigFile.loadFileAsString();
 
