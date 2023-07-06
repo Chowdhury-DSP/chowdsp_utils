@@ -13,6 +13,13 @@ public:
     juce::Colour audioColour = juce::Colours::dodgerblue;
     juce::Colour levelColour = juce::Colours::red;
 
+    struct Params
+    {
+        float yMin = -1.0f;
+        float yMax = 1.0f;
+    };
+    Params params;
+
 protected:
     void paintChannel (int channelIndex,
                        juce::Graphics& g,

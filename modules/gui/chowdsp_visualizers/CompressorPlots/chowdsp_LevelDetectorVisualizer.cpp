@@ -26,15 +26,15 @@ void LevelDetectorVisualizer::paintChannel (int channelIndex, juce::Graphics& g,
         path.lineTo ((float) i, -(levels[(nextSample + i) % numLevels].getStart()));
 
     path.applyTransform (juce::AffineTransform::fromTargetPoints (0.0f,
-                                                                  -1.0f,
+                                                                  -params.yMax,
                                                                   area.getX(),
                                                                   area.getY(),
                                                                   0.0f,
-                                                                  1.0f,
+                                                                  -params.yMin,
                                                                   area.getX(),
                                                                   area.getBottom(),
                                                                   (float) numLevels,
-                                                                  -1.0f,
+                                                                  -params.yMax,
                                                                   area.getRight(),
                                                                   area.getY()));
 
