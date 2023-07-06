@@ -19,10 +19,10 @@ public:
     /** Set's the user preset path as a plugin setting. */
     void setUserPresetsPath (const juce::File& userPresetsPath);
 
+    static constexpr SettingID userPresetsDirID = "chowdsp_presets_user_presets_dir";
+
 private:
     void globalSettingChanged (SettingID);
-
-    static constexpr SettingID userPresetsDirID = "chowdsp_presets_user_presets_dir";
 
     PresetManager& presetManager;
     GlobalPluginSettings& pluginSettings;

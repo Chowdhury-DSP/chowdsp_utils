@@ -13,14 +13,18 @@ void GlobalPluginSettings::SettingsFileListener::listenerFileChanged()
     globalSettings.loadSettingsFromFile();
 }
 
+juce::File GlobalPluginSettings::getSettingsFile (const juce::String& settingsFilePath)
+{
+    return juce::File::getSpecialLocation (juce::File::userApplicationDataDirectory).getChildFile (settingsFilePath);
+}
+
 void GlobalPluginSettings::initialise (const juce::String& settingsFile, int timerSeconds)
 {
     if (fileListener != nullptr)
         return; // already initialised!
 
     const juce::ScopedLock sl (lock);
-    auto settingsDir = juce::File::getSpecialLocation (juce::File::userApplicationDataDirectory);
-    fileListener = std::make_unique<SettingsFileListener> (settingsDir.getChildFile (settingsFile), timerSeconds, *this);
+    fileListener = std::make_unique<SettingsFileListener> (getSettingsFile (settingsFile), timerSeconds, *this);
     if (! loadSettingsFromFile())
         writeSettingsToFile();
 }

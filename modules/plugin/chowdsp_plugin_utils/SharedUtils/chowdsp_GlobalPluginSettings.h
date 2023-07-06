@@ -83,6 +83,11 @@ public:
     /** Returns the file be used to store the global settings */
     [[nodiscard]] juce::File getSettingsFile() const noexcept;
 
+    /** Returns the file be used to store the global settings */
+    static juce::File getSettingsFile (const juce::String& settingsFilePath);
+
+    static constexpr SettingID settingsTag = "plugin_settings";
+
 private:
     bool loadSettingsFromFile();
     void writeSettingsToFile() const;
@@ -100,8 +105,6 @@ private:
 
     Broadcaster<void (SettingID)> globalSettingChangedBroadcaster;
     std::unordered_map<SettingID, std::forward_list<std::pair<void*, ScopedCallback>>> callbacks;
-
-    static constexpr SettingID settingsTag = "plugin_settings";
 
     juce::CriticalSection lock;
 
