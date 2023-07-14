@@ -63,6 +63,7 @@ public:
         // Downsampler must be used on blocks with sizes that are integer multiples of the downsampling ratio!
         jassert (numSamples % ratio == 0);
 
+#if ! JUCE_TEENSY
         if (numSamples <= 4096)
         {
             JUCE_BEGIN_IGNORE_WARNINGS_MSVC (6255 6386)
@@ -73,6 +74,7 @@ public:
             JUCE_END_IGNORE_WARNINGS_MSVC
         }
         else
+#endif
         {
             for (int n = 0; n < numSamples / ratio; ++n)
             {
