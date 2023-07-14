@@ -43,6 +43,14 @@ public:
     }
 
     /** Process block of samples */
+    void processBlock (const FloatType* inputBlock, FloatType* outputBlock, const int numSamples, const int channel = 0) noexcept
+    {
+        secondOrderSections[0].processBlock (outputBlock, inputBlock, numSamples, channel);
+        for (size_t i = 1; i < secondOrderSections.size(); ++i)
+            secondOrderSections[i].processBlock (outputBlock, numSamples, channel);
+    }
+
+    /** Process block of samples */
     void processBlock (const BufferView<FloatType>& block) noexcept
     {
         for (auto& sos : secondOrderSections)
@@ -66,7 +74,7 @@ public:
     }
 
 protected:
-    std::array<IIRFilter<2, FloatType>, (size_t) order / 2> secondOrderSections;
+    std::array<IIRFilter<2, FloatType>, (size_t) order / 2> secondOrderSections {};
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SOSFilter)

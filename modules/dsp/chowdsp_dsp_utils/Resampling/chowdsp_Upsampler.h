@@ -49,6 +49,15 @@ public:
      */
     void process (const T* data, T* upsampledData, const int channel, const int numSamples) noexcept
     {
+        if (ratio == 1)
+        {
+            if (data == upsampledData)
+                return;
+
+            juce::FloatVectorOperations::copy (upsampledData, data, numSamples);
+            return;
+        }
+
         for (int n = 0; n < numSamples; ++n)
         {
             int startSample = n * ratio;

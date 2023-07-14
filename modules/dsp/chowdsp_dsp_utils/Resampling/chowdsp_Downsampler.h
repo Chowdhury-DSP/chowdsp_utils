@@ -51,15 +51,38 @@ public:
      */
     void process (const T* data, T* downsampledData, const int channel, const int numSamples) noexcept
     {
+        if (ratio == 1)
+        {
+            if (data == downsampledData)
+                return;
+
+            juce::FloatVectorOperations::copy (downsampledData, data, numSamples);
+            return;
+        }
+
         // Downsampler must be used on blocks with sizes that are integer multiples of the downsampling ratio!
         jassert (numSamples % ratio == 0);
 
-        for (int n = 0; n < numSamples; ++n)
+        if (numSamples <= 4096)
         {
-            int startSample = n / ratio;
-
-            auto y = aaFilter.processSample (data[n], channel);
-            downsampledData[startSample] = y;
+            JUCE_BEGIN_IGNORE_WARNINGS_MSVC (6255 6386)
+            auto filteredData = (T*) alloca ((size_t) numSamples * sizeof (T));
+            aaFilter.processBlock (data, filteredData, numSamples, channel);
+            for (int n = 0; n < numSamples / ratio; ++n)
+                downsampledData[n] = filteredData[(n + 1) * ratio - 1];
+            JUCE_END_IGNORE_WARNINGS_MSVC
+        }
+        else
+        {
+            for (int n = 0; n < numSamples / ratio; ++n)
+            {
+                for (int i = 0; i < ratio - 1; ++i)
+                {
+                    auto _ = aaFilter.processSample (data[n * ratio + i], channel);
+                    juce::ignoreUnused (_);
+                }
+                downsampledData[n] = aaFilter.processSample (data[(n + 1) * ratio - 1], channel);
+            }
         }
     }
 
