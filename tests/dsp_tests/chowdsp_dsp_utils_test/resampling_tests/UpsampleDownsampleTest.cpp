@@ -209,23 +209,40 @@ void downsampleQualityTest (int downsampleRatio)
     chowdsp::Downsampler<float, FilterType> downsampler;
     downsampler.prepare ({ (double) downsampleRatio * _sampleRate, (juce::uint32) downsampleRatio * (juce::uint32) blockSize, 1 }, downsampleRatio);
 
-    constexpr float testFreq = 42000.0f;
+    static constexpr float testFreq = 42000.0f;
     auto thisBlockSize = downsampleRatio * (int) blockSize;
     auto sineBuffer = test_utils::makeSineWave (testFreq, (float) downsampleRatio * (float) _sampleRate, thisBlockSize);
-    auto downsampledBuffer = processInSubBlocks (downsampler, sineBuffer, downsampleRatio * 256);
-
-    float squaredSum = 0.0f;
-    for (int n = 0; n < (int) blockSize / downsampleRatio; ++n)
-        squaredSum += std::pow (downsampledBuffer.getReadPointer (0)[n], 2.0f);
-
-    auto rms = juce::Decibels::gainToDecibels (std::sqrt (squaredSum / ((float) blockSize / 2.0f)));
+    auto downsampledBuffer = processInSubBlocks (downsampler, sineBuffer, downsampleRatio * 2048);
 
     REQUIRE_MESSAGE (downsampledBuffer.getNumSamples() == thisBlockSize / downsampler.getDownsamplingRatio(), "Downsampled block size is incorrect!");
-    REQUIRE_MESSAGE (rms < -42.0f, "RMS level is too high!");
+    if (downsampleRatio > 1)
+    {
+        float squaredSum = 0.0f;
+        for (int n = 0; n < (int) blockSize / downsampleRatio; ++n)
+            squaredSum += std::pow (downsampledBuffer.getReadPointer (0)[n], 2.0f);
+
+        auto rms = juce::Decibels::gainToDecibels (std::sqrt (squaredSum / ((float) blockSize / 2.0f)));
+
+        REQUIRE_MESSAGE (rms < -42.0f, "RMS level is too high!");
+    }
+    else
+    {
+        for (auto [ch, dsData] : chowdsp::buffer_iters::channels (std::as_const (downsampledBuffer)))
+        {
+            auto sineData = sineBuffer.getReadSpan (ch);
+            for (auto [dsSample, sineSample] : chowdsp::zip (dsData, sineData))
+                REQUIRE (std:: abs (sineSample - dsSample) < 1.0e-6f);
+        }
+    }
 }
 
 TEST_CASE ("Upsample/Downsample Test", "[dsp][resampling]")
 {
+    SECTION ("Upsample 1x Quality Test")
+    {
+        upsampleQualityTest<chowdsp::ButterworthFilter<4>> (1);
+    }
+
     SECTION ("Upsample 2x Quality Test")
     {
         upsampleQualityTest<chowdsp::ButterworthFilter<4>> (2);
@@ -244,6 +261,11 @@ TEST_CASE ("Upsample/Downsample Test", "[dsp][resampling]")
     SECTION ("Upsample 4x Elliptic Quality Test")
     {
         upsampleQualityTest<chowdsp::EllipticFilter<12>> (4);
+    }
+
+    SECTION ("Downsample 1x Quality Test")
+    {
+        downsampleQualityTest<chowdsp::ButterworthFilter<4>> (1);
     }
 
     SECTION ("Downsample 2x Quality Test")
