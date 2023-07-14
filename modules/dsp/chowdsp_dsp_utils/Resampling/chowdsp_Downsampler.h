@@ -118,9 +118,6 @@ private:
     int ratio = 1;
     AntiAliasingFilterType aaFilter;
 
-    struct NoBuffer
-    {
-    };
     std::conditional_t<allocateInternalBuffer, Buffer<T>, NullType> downsampledBuffer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Downsampler)
