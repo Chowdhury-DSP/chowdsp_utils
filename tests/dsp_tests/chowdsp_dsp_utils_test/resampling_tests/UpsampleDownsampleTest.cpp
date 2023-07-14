@@ -231,7 +231,7 @@ void downsampleQualityTest (int downsampleRatio)
         {
             auto sineData = sineBuffer.getReadSpan (ch);
             for (auto [dsSample, sineSample] : chowdsp::zip (dsData, sineData))
-                REQUIRE (std:: abs (sineSample - dsSample) < 1.0e-6f);
+                REQUIRE (std::abs (sineSample - dsSample) < 1.0e-6f);
         }
     }
 }
