@@ -17,7 +17,7 @@ Version::Version (const juce::String& versionStr)
     juce::StringArray tokens;
     int numTokens = tokens.addTokens (trimmedStr, ".", "");
     jassert (numTokens == 3);
-    juce::ignoreUnused (numTokens);
+    juce::ignoreUnused (numTokens, numDots);
 
     major = tokens[0].getIntValue();
     minor = tokens[1].getIntValue();
