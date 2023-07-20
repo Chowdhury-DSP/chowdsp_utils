@@ -217,13 +217,13 @@ private:
         {
             fs = (float) spec.sampleRate;
             for (auto& filter : lowBandHighCut)
-                filter.prepare (spec);
+                filter.prepare ((int) spec.numChannels);
             for (auto& filter : midBandLowCut)
-                filter.prepare (spec);
+                filter.prepare ((int) spec.numChannels);
             for (auto& filter : midBandHighCut)
-                filter.prepare (spec);
+                filter.prepare ((int) spec.numChannels);
             for (auto& filter : highBandLowCut)
-                filter.prepare (spec);
+                filter.prepare ((int) spec.numChannels);
         }
 
         void setLowCrossoverFrequency (float freqHz)
