@@ -83,6 +83,7 @@ JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 #include "Convolution/chowdsp_ConvolutionEngine.h"
 #include "Convolution/chowdsp_IRTransfer.h"
 #include "Convolution/chowdsp_IRHelpers.h"
+#include "Processors/chowdsp_LinearPhase3WayCrossover.h"
 
 // resamplers
 #include "Resampling/chowdsp_VariableOversampling.h"
