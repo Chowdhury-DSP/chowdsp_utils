@@ -41,6 +41,7 @@ public:
     void paint (juce::Graphics& g) override;
     virtual void paintChannel (int channelIndex, juce::Graphics&, juce::Rectangle<float> bounds, const juce::Range<float>* levels, int numLevels, int nextSample);
     void visibilityChanged() override;
+    juce::Colour backgroundColour = juce::Colours::whitesmoke;
 
 protected:
     void timerCallback() override { repaint(); }
