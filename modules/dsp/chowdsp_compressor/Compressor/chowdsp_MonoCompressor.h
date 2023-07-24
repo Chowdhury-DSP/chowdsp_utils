@@ -29,7 +29,11 @@ public:
         gainComputerBuffer.setMaxSize (1, (int) spec.maximumBlockSize);
 
         if constexpr (! std::is_same_v<GainReductionMeterTask, NullType>)
-            gainReductionMeterTask.prepare (spec.sampleRate, (int) spec.maximumBlockSize, (int) spec.numChannels);
+        {
+            // The gain reduction meter always needs to be prepared for 2 channels,
+            // one for the input buffer, and one for the output buffer.
+            gainReductionMeterTask.prepare (spec.sampleRate, (int) spec.maximumBlockSize, 2);
+        }
     }
 
     /** Processes a block of audio */
