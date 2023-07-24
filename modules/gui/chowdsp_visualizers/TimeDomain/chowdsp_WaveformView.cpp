@@ -111,7 +111,7 @@ void WaveformView<numChannels>::pushChannel (int channelIndex, const nonstd::spa
 template <int numChannels>
 void WaveformView<numChannels>::paint (juce::Graphics& g)
 {
-    g.fillAll (juce::Colours::whitesmoke);
+    g.fillAll (backgroundColour);
 
     auto bounds = getLocalBounds().toFloat();
     for (auto [ch, c] : chowdsp::enumerate (channels))
