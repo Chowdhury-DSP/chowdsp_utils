@@ -20,13 +20,13 @@ public:
     ~PopupMenuHelper() override;
 
     /** You can assign a lambda to this callback object to fill in the popup menu about to be shown */
-    std::function<void (juce::PopupMenu&, juce::PopupMenu::Options&)> popupMenuCallback = [] (juce::PopupMenu&, juce::PopupMenu::Options&) {}; // NOSONAR
+    std::function<void (juce::PopupMenu&, juce::PopupMenu::Options&, juce::Point<int>)> popupMenuCallback = [] (juce::PopupMenu&, juce::PopupMenu::Options&, juce::Point<int>) {}; // NOSONAR
 
     /** Sets a component to listen for mouse actions on, or nullptr to not listen for mouse actions */
     void setAssociatedComponent (juce::Component* comp);
 
     /** Use this method to manually trigger the popup menu */
-    void showPopupMenu();
+    void showPopupMenu (juce::Point<int> position);
 
     /** Returns true if long-press actions should trigger popup menus for any input source */
     [[nodiscard]] bool isLongPressEnabled() const { return longPress.isLongPressActionEnabled(); }

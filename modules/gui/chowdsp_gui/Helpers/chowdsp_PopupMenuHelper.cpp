@@ -8,8 +8,8 @@ PopupMenuHelper::PopupMenuHelper() : PopupMenuHelper (LongPressActionHelper::Par
 
 PopupMenuHelper::PopupMenuHelper (const LongPressActionHelper::Parameters& params) : longPress (params)
 {
-    longPress.longPressCallback = [this] (juce::Point<int>)
-    { showPopupMenu(); };
+    longPress.longPressCallback = [this] (juce::Point<int> mouseDownPosition)
+    { showPopupMenu (mouseDownPosition); };
 }
 
 PopupMenuHelper::~PopupMenuHelper()
@@ -29,7 +29,7 @@ void PopupMenuHelper::setAssociatedComponent (juce::Component* comp)
         component->addMouseListener (this, false);
 }
 
-void PopupMenuHelper::showPopupMenu()
+void PopupMenuHelper::showPopupMenu (juce::Point<int> position)
 {
     juce::PopupMenu menu;
     juce::PopupMenu::Options options;
@@ -39,14 +39,14 @@ void PopupMenuHelper::showPopupMenu()
 
     options = options.withTargetScreenArea (juce::Rectangle<int> {}.withPosition (juce::Desktop::getMousePosition()));
 
-    popupMenuCallback (menu, options);
+    popupMenuCallback (menu, options, position);
     menu.showMenuAsync (options);
 }
 
 void PopupMenuHelper::mouseDown (const juce::MouseEvent& e)
 {
     if (e.mods.isPopupMenu())
-        showPopupMenu();
+        showPopupMenu (e.getMouseDownPosition());
 }
 
 } // namespace chowdsp
