@@ -9,7 +9,7 @@ void checkPopupMenu (bool expectedHit, Callback&& callback)
 
     juce::Component comp;
     chowdsp::PopupMenuHelper popupMenu;
-    popupMenu.popupMenuCallback = [&] (juce::PopupMenu&, juce::PopupMenu::Options&)
+    popupMenu.popupMenuCallback = [&] (juce::PopupMenu&, juce::PopupMenu::Options&, juce::Point<int>)
     { hasPopupMenuShown = true; };
     popupMenu.setAssociatedComponent (&comp);
 
