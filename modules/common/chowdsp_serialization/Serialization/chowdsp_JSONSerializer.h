@@ -114,6 +114,18 @@ public:
     }
 
     template <typename T>
+    static T serializeEnumType (T x)
+    {
+        return serializeArithmeticType (x);
+    }
+
+    template <typename T>
+    static T deserializeEnumType (const json& serial)
+    {
+        return deserializeArithmeticType<T> (serial);
+    }
+
+    template <typename T>
     static const T& serializeString (const T& x)
     {
         return x;
