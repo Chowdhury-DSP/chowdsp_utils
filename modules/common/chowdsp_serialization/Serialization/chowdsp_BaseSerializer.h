@@ -79,7 +79,7 @@ class BaseSerializer
     static constexpr auto IsContainerNotMapOrString = TypeTraits::IsIterable<T> && ! IsString<T> && ! TypeTraits::IsMapLike<T>;
 
     template <typename T>
-    static constexpr auto IsNotDirectlySerializable = ! std::is_arithmetic_v<T> && ! IsString<T> && ! TypeTraits::IsIterable<T> && ! IsPoint<T>;
+    static constexpr auto IsNotDirectlySerializable = ! std::is_arithmetic_v<T> && ! std::is_enum_v<T> && ! IsString<T> && ! TypeTraits::IsIterable<T> && ! IsPoint<T>;
 
     template <typename T>
     static constexpr auto HasCustomSerialization = serialization_detail::HasCustomSerializer<T>;
@@ -109,6 +109,22 @@ public:
         deserialize (DeserialType<Serializer> serial, T& x)
     {
         x = Serializer::template deserializeArithmeticType<T> (serial);
+    }
+
+    /** Serializer for enum types */
+    template <typename Serializer, typename T>
+    static std::enable_if_t<std::is_enum_v<T>, SerialType<Serializer>>
+        serialize (T x)
+    {
+        return Serializer::serializeEnumType (x);
+    }
+
+    /** Deserializer for enum types */
+    template <typename Serializer, typename T>
+    static std::enable_if_t<std::is_enum_v<T>, void>
+        deserialize (DeserialType<Serializer> serial, T& x)
+    {
+        x = Serializer::template deserializeEnumType<T> (serial);
     }
 
     /** Serializer for string types */
