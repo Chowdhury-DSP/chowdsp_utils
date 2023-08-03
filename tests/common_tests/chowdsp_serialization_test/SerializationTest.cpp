@@ -60,6 +60,31 @@ TEMPLATE_TEST_CASE ("Serialization Test", "[common][serialization]", chowdsp::JS
         REQUIRE_MESSAGE (pfr::eq_fields (test, Test {}), "Serialization/Deserialization is incorrect");
     }
 
+    SECTION ("Enum Test")
+    {
+        enum class TestEnum
+        {
+            Zero,
+            One,
+            Two,
+            Three,
+        };
+
+        struct Test
+        {
+            TestEnum x = TestEnum::Two;
+        };
+
+        Test test;
+        auto res = chowdsp::Serialization::serialize<Serializer> (test);
+        INFO (Serializer::toString (res));
+
+        test.x = TestEnum::Three;
+        chowdsp::Serialization::deserialize<Serializer> (res, test);
+
+        REQUIRE_MESSAGE (pfr::eq_fields (test, Test {}), "Serialization/Deserialization is incorrect");
+    }
+
     SECTION ("String Test")
     {
         struct Test

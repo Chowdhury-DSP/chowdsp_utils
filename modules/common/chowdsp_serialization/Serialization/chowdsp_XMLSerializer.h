@@ -121,6 +121,18 @@ public:
     }
 
     template <typename T>
+    static SerializedType serializeEnumType (T x)
+    {
+        return serializeArithmeticType (static_cast<int> (x));
+    }
+
+    template <typename T>
+    static T deserializeEnumType (DeserializedType serial)
+    {
+        return static_cast<T> (deserializeArithmeticType<int> (serial));
+    }
+
+    template <typename T>
     static SerializedType serializeString (const T& x)
     {
         auto element = createBaseElement();
