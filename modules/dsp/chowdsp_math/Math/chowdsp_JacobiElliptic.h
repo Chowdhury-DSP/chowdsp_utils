@@ -51,15 +51,15 @@ namespace jacobi
         k = std::sqrt (k);
 
         // Special cases first:
-        if (x == (T) 0)
+        if (juce::exactlyEqual (x, (T) 0))
         {
             return std::make_tuple ((T) 0, (T) 1, (T) 1);
         }
-        if (k == (T) 0)
+        if (juce::exactlyEqual (k, (T) 0))
         {
             return std::make_tuple (std::sin (x), std::cos (x), (T) 1);
         }
-        if (k == (T) 1)
+        if (juce::exactlyEqual (k, (T) 1))
         {
             const auto cn_dn = (T) 1 / std::cosh (x);
             return std::make_tuple (std::tanh (x), cn_dn, cn_dn);

@@ -67,7 +67,7 @@ TEST_CASE ("Plugin Base Test", "[plugin]")
         bool midiBehaviour = dummy1.acceptsMidi() || dummy1.producesMidi() || dummy1.isMidiEffect();
         REQUIRE_MESSAGE (! midiBehaviour, "MIDI behaviour incorrect!");
 
-        REQUIRE_MESSAGE (dummy1.getTailLengthSeconds() == 0.0, "Tail length incorrect!");
+        REQUIRE_MESSAGE (juce::exactlyEqual (dummy1.getTailLengthSeconds(), 0.0), "Tail length incorrect!");
 
         REQUIRE_MESSAGE (dummy1.getNumPrograms() > 0, "Num programs is to low!");
         dummy1.setCurrentProgram (0);

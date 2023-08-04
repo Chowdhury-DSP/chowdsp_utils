@@ -274,7 +274,7 @@ public:
     */
     void setTargetValue (FloatType newValue) noexcept
     {
-        if (newValue == this->target)
+        if (approximatelyEqual (newValue, this->target))
             return;
 
         if (stepsToTarget <= 0)

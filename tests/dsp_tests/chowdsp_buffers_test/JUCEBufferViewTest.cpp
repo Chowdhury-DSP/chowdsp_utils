@@ -13,7 +13,7 @@ void testBufferView (const BufferViewType& bufferView, const juce::AudioBuffer<f
         auto* x = buffer.getReadPointer (ch);
         auto* xView = bufferView.getReadPointer (ch);
         for (int n = 0; n < buffer.getNumSamples(); ++n)
-            REQUIRE_MESSAGE (xView[n] == x[n], "Sample " + juce::String (n) + " is incorrect");
+            REQUIRE_MESSAGE (juce::exactlyEqual (xView[n], x[n]), "Sample " + juce::String (n) + " is incorrect");
     }
 }
 
@@ -85,7 +85,7 @@ TEST_CASE ("JUCE Buffer View Test", "[dsp][buffers]")
         {
             auto* x = juceBuffer.getReadPointer (ch);
             for (int n = 0; n < juceBuffer.getNumSamples(); ++n)
-                REQUIRE_MESSAGE (x[n] == 4.0f, "Sample " + juce::String (n) + " is incorrect");
+                REQUIRE_MESSAGE (juce::exactlyEqual (x[n], 4.0f), "Sample " + juce::String (n) + " is incorrect");
         }
     }
 }

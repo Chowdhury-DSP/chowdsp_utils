@@ -51,7 +51,7 @@ TEST_CASE ("Tweaks File Test", "[plugin][utilities]")
 
         REQUIRE_MESSAGE (tweaksFile.getProperty<int> ("test_int") == 0, "Initial integer property is incorrect");
         REQUIRE_MESSAGE (tweaksFile.getProperty<juce::String> ("test_string") == juce::String {}, "Initial string property is incorrect");
-        REQUIRE_MESSAGE (tweaksFile.getProperty<float> ("test_float") == -1.0f, "Initial float property is incorrect");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (tweaksFile.getProperty<float> ("test_float"), -1.0f), "Initial float property is incorrect");
 
         test_utils::RandomIntGenerator randInt { -100, 100 };
         test_utils::RandomFloatGenerator randFloat { 0.0f, 1.0f };
@@ -72,7 +72,7 @@ TEST_CASE ("Tweaks File Test", "[plugin][utilities]")
 
             REQUIRE_MESSAGE (tweaksFile.getProperty<int> ("test_int") == newInt, "Integer property is incorrect");
             REQUIRE_MESSAGE (tweaksFile.getProperty<juce::String> ("test_string") == newStr, "String property is incorrect");
-            REQUIRE_MESSAGE (tweaksFile.getProperty<float> ("test_float") == newFloat, "Float property is incorrect");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (tweaksFile.getProperty<float> ("test_float"), newFloat), "Float property is incorrect");
         }
 
         testTweaksFile.deleteFile();
@@ -88,7 +88,7 @@ TEST_CASE ("Tweaks File Test", "[plugin][utilities]")
 
         REQUIRE_MESSAGE (tweaksFile.getProperty<int> ("test_int") == 0, "Initial integer property is incorrect");
         REQUIRE_MESSAGE (tweaksFile.getProperty<juce::String> ("test_string") == juce::String {}, "Initial string property is incorrect");
-        REQUIRE_MESSAGE (tweaksFile.getProperty<float> ("test_float") == -1.0f, "Initial float property is incorrect");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (tweaksFile.getProperty<float> ("test_float"), -1.0f), "Initial float property is incorrect");
 
         static constexpr int newInt = 440;
         static constexpr float newFloat = -110.0f;
@@ -101,7 +101,7 @@ TEST_CASE ("Tweaks File Test", "[plugin][utilities]")
                 if (name == "test_int")
                     REQUIRE_MESSAGE (tweaksFile.getProperty<int> ("test_int") == newInt, "Integer property is incorrect");
                 else if (name == "test_float")
-                    REQUIRE_MESSAGE (tweaksFile.getProperty<float> ("test_float") == newFloat, "Float property is incorrect");
+                    REQUIRE_MESSAGE (juce::approximatelyEqual (tweaksFile.getProperty<float> ("test_float"), newFloat), "Float property is incorrect");
             });
 
         const auto jsonConfig = chowdsp::json {
@@ -113,7 +113,7 @@ TEST_CASE ("Tweaks File Test", "[plugin][utilities]")
         juce::MessageManager::getInstance()->runDispatchLoopUntil (2000);
 
         REQUIRE_MESSAGE (tweaksFile.getProperty<int> ("test_int") == newInt, "Integer property is incorrect");
-        REQUIRE_MESSAGE (tweaksFile.getProperty<float> ("test_float") == newFloat, "Float property is incorrect");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (tweaksFile.getProperty<float> ("test_float"), newFloat), "Float property is incorrect");
         REQUIRE_MESSAGE (listenerHit, "Tweaks file listener was never hit!");
 
         testTweaksFile.deleteFile();
@@ -126,6 +126,6 @@ TEST_CASE ("Tweaks File Test", "[plugin][utilities]")
 
         REQUIRE_MESSAGE (tweaksFile.getProperty<int> ("test_int") == 44, "Integer property is incorrect");
         REQUIRE_MESSAGE (tweaksFile.getProperty<juce::String> ("test_string") == juce::String { "blah blah" }, "String property is incorrect");
-        REQUIRE_MESSAGE (tweaksFile.getProperty<float> ("test_float") == 42.0f, "Float property is incorrect");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (tweaksFile.getProperty<float> ("test_float"), 42.0f), "Float property is incorrect");
     }
 }

@@ -14,7 +14,7 @@ void wrapTest()
     std::vector<T> expected { -2, -3, -4, -5, 4, 5, 0, -1 };
     const auto* actual = buffer.data();
     for (int i = 0; i < buffer.size(); ++i)
-        REQUIRE_MESSAGE (actual[i] == expected[(size_t) i], "Incorrect value at index " << std::to_string (i));
+        REQUIRE_MESSAGE (juce::exactlyEqual (actual[i], expected[(size_t) i]), "Incorrect value at index " << std::to_string (i));
 }
 
 template <typename T>
@@ -49,15 +49,15 @@ void wrapAndClearTest()
     const auto* testData = buffer.data ((int) data.size());
     for (int i = 0; i < buffer.size() / 2; ++i)
     {
-        REQUIRE_MESSAGE (testData[i] == lastData[(size_t) i], "Incorrect value at index " << std::to_string (i));
+        REQUIRE_MESSAGE (juce::exactlyEqual (testData[i], lastData[(size_t) i]), "Incorrect value at index " << std::to_string (i));
 
         auto secondIdx = i + buffer.size() / 2;
-        REQUIRE_MESSAGE (testData[secondIdx] == secondToLastData[(size_t) i], "Incorrect value at index " << std::to_string (secondIdx));
+        REQUIRE_MESSAGE (juce::exactlyEqual (testData[secondIdx], secondToLastData[(size_t) i]), "Incorrect value at index " << std::to_string (secondIdx));
     }
 
     buffer.clear();
     for (int i = 0; i < buffer.size(); ++i)
-        REQUIRE_MESSAGE (testData[i] == (T) 0, "Erroneous non-zero value at index " << std::to_string (i));
+        REQUIRE_MESSAGE (juce::exactlyEqual (testData[i], (T) 0), "Erroneous non-zero value at index " << std::to_string (i));
 }
 
 TEST_CASE ("Double Buffer Test", "[common][data-structures]")

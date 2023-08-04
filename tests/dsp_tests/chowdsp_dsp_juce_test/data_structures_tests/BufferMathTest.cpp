@@ -1,8 +1,10 @@
-#include <CatchUtils.h>
-#include <catch2/generators/catch_generators_all.hpp>
 #include <chowdsp_dsp_data_structures/chowdsp_dsp_data_structures.h>
 
 using namespace chowdsp::BufferMath;
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wfloat-equal")
+
+#include <CatchUtils.h>
+#include <catch2/generators/catch_generators_all.hpp>
 
 template <typename T, typename BufferType>
 static void fillBufferWithOnes (BufferType& buffer)
@@ -408,3 +410,5 @@ TEMPLATE_TEST_CASE ("Buffer Math Test",
         }
     }
 }
+
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE

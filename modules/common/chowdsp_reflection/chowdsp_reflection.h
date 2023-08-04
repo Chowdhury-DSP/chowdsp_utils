@@ -24,7 +24,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include <chowdsp_core/chowdsp_core.h>
 
 // third party includes
-JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wzero-as-null-pointer-constant")
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wzero-as-null-pointer-constant", "-Wfloat-equal")
 #include "third_party/pfr/include/pfr.hpp"
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 

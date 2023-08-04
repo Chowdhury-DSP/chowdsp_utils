@@ -39,8 +39,10 @@ struct StateValue : StateValueBase
     /** Sets a new value */
     void set (T v)
     {
+        JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wfloat-equal")
         if (v == currentValue)
             return;
+        JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
         currentValue = v;
         changeBroadcaster();

@@ -11,10 +11,10 @@ TEST_CASE ("Atomic Helpers Test", "[common][data-structures]")
         {
             std::atomic<float> f { 0.0f };
             REQUIRE_MESSAGE (compareExchange (f, 0.0f, 1.0f), "Compare/Exchange should return true!");
-            REQUIRE_MESSAGE (f.load() == 1.0f, "Compare/Exchange value update is incorrect!");
+            REQUIRE_MESSAGE (juce::exactlyEqual (f.load(), 1.0f), "Compare/Exchange value update is incorrect!");
 
             REQUIRE_MESSAGE (! compareExchange (f, 0.0f, 1.0f), "Compare/Exchange should return false!");
-            REQUIRE_MESSAGE (f.load() == 1.0f, "Compare/Exchange value update is happening on false case!");
+            REQUIRE_MESSAGE (juce::exactlyEqual (f.load(), 1.0f), "Compare/Exchange value update is happening on false case!");
         }
 
         {

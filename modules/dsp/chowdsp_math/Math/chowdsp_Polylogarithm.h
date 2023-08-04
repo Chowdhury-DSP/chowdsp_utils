@@ -42,7 +42,7 @@ namespace Polylogarithm
             r = -PI_ * PI_ / (T) 6 + l * ((T) 0.5 * l - std::log (-x));
             s = (T) 1;
         }
-        else if (x == (T) -1)
+        else if (juce::exactlyEqual (x, (T) -1))
         {
             return -PI_ * PI_ / (T) 12;
         }
@@ -53,7 +53,7 @@ namespace Polylogarithm
             r = (T) -0.5 * l * l;
             s = (T) -1;
         }
-        else if (x == (T) 0)
+        else if (juce::exactlyEqual (x, (T) 0))
         {
             return (T) 0;
         }
@@ -69,7 +69,7 @@ namespace Polylogarithm
             r = PI_ * PI_ / (T) 6 - std::log (x) * std::log (y);
             s = (T) -1;
         }
-        else if (x == (T) 1)
+        else if (juce::exactlyEqual (x, (T) 1))
         {
             return PI_ * PI_ / (T) 6;
         }

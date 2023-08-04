@@ -51,7 +51,7 @@ namespace RhythmUtils
 
         constexpr bool operator== (const Rhythm& other) const
         {
-            return tempoFactor == other.tempoFactor;
+            return juce::exactlyEqual (tempoFactor, other.tempoFactor);
         }
 
         constexpr bool operator!= (const Rhythm& other) const

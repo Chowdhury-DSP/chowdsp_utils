@@ -112,6 +112,6 @@ TEST_CASE ("Bucket Array Test", "[common][data-structures]")
         [[maybe_unused]] const auto [loc4, elem4] = array.emplace (4.0f);
         [[maybe_unused]] const auto [loc10, elem10] = array.emplace (10.0f);
         REQUIRE (array.size() == 2);
-        REQUIRE (elem4->x == 4.0f);
+        REQUIRE (juce::exactlyEqual (elem4->x, 4.0f));
     }
 }

@@ -76,7 +76,7 @@ template <typename Func>
 void ParameterAttachment<Param, Callback>::callIfParameterValueChanged (ParamElementType newValue,
                                                                         Func&& func)
 {
-    if (param != nullptr && ParameterTypeHelpers::getValue (*param) != newValue)
+    if (param != nullptr && ! juce::approximatelyEqual (ParameterTypeHelpers::getValue (*param), newValue))
         func (newValue);
 }
 } // namespace chowdsp

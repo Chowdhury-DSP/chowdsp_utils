@@ -21,13 +21,13 @@ TEST_CASE ("Spectrum Plot Base Test", "[visualizers]")
             chowdsp::SpectrumPlotBase component { std::move (params) };
             component.setSize (width, height);
 
-            REQUIRE_MESSAGE (component.getXCoordinateForFrequency (xMinFreq) == 0.0f, "Min freq. x-coord. is incorrect!");
-            REQUIRE_MESSAGE (component.getXCoordinateForFrequency (xMaxFreq) == (float) width, "Max freq. x-coord. is incorrect!");
-            REQUIRE_MESSAGE (component.getXCoordinateForFrequency (xCenterFreq) == (float) width * 0.5f, "Center freq. x-coord. is incorrect!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (component.getXCoordinateForFrequency (xMinFreq), 0.0f), "Min freq. x-coord. is incorrect!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (component.getXCoordinateForFrequency (xMaxFreq), (float) width), "Max freq. x-coord. is incorrect!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (component.getXCoordinateForFrequency (xCenterFreq), (float) width * 0.5f), "Center freq. x-coord. is incorrect!");
 
-            REQUIRE_MESSAGE (component.getYCoordinateForDecibels (yMinMag) == (float) height, "Min mag. y-coord. is incorrect!");
-            REQUIRE_MESSAGE (component.getYCoordinateForDecibels (yMaxMag) == 0.0f, "Max mag. y-coord. is incorrect!");
-            REQUIRE_MESSAGE (component.getYCoordinateForDecibels (yCenterMag) == (float) height * 0.5f, "Center mag. y-coord. is incorrect!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (component.getYCoordinateForDecibels (yMinMag), (float) height), "Min mag. y-coord. is incorrect!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (component.getYCoordinateForDecibels (yMaxMag), 0.0f), "Max mag. y-coord. is incorrect!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (component.getYCoordinateForDecibels (yCenterMag), (float) height * 0.5f), "Center mag. y-coord. is incorrect!");
 
             REQUIRE_MESSAGE (component.getFrequencyForXCoordinate (0.0f) == Catch::Approx { xMinFreq }.margin (1.0e-2f), "Min x-coord. frequency is incorrect!");
             REQUIRE_MESSAGE (component.getFrequencyForXCoordinate ((float) width) == Catch::Approx { xMaxFreq }.margin (1.0e-2f), "Max x-coord. frequency is incorrect!");

@@ -57,6 +57,32 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "JUCEHelpers/dsp/juce_LookupTable.h"
 #include "JUCEHelpers/dsp/juce_FastMathApproximations.h"
 #endif
+#elif JUCE_VERSION < 0x070006
+namespace juce
+{
+/** Returns true if the two numbers are approximately equal. This is useful for floating-point
+  and double comparisons.
+*/
+template <typename Type>
+bool approximatelyEqual (Type a, Type b) noexcept
+{
+    return std::abs (a - b) <= (std::numeric_limits<Type>::epsilon() * std::max (a, b))
+           || std::abs (a - b) < std::numeric_limits<Type>::min();
+}
+
+/** Equivalent to operator==, but suppresses float-equality warnings.
+
+  This allows code to be explicit about float-equality checks that are known to have the correct
+  semantics.
+*/
+template <typename Type>
+constexpr bool exactlyEqual (Type a, Type b)
+{
+    JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wfloat-equal")
+    return a == b;
+    JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+}
+} // namespace juce
 #endif // CHOWDSP_USING_JUCE
 #endif // DOXYGEN
 

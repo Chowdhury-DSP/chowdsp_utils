@@ -23,7 +23,7 @@ TEST_CASE ("Preset Test", "[plugin][presets]")
         REQUIRE_MESSAGE (filePreset.getPresetFile().getFullPathName() == testFile.file.getFullPathName(), "Preset file is incorrect!");
 
         auto compareVal = filePreset.getState()[testTag].get<float>();
-        REQUIRE_MESSAGE (compareVal == testValue, "Saved value is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (compareVal, (float) testValue), "Saved value is incorrect!");
     }
 
     SECTION ("Invalid Preset")

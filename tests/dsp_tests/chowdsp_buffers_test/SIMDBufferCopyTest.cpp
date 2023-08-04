@@ -35,11 +35,10 @@ TEMPLATE_TEST_CASE ("SIMD Buffer Copy Test", "[dsp][buffers][simd]", float, doub
                 for (int i = 0; i < (int) xsimd::batch<T>::size; ++i)
                 {
                     const auto scalarChIndex = ch * (int) xsimd::batch<T>::size + i;
-                    REQUIRE_MESSAGE (simdBuffer
-                                             .getReadPointer (ch)[n]
-                                             .get ((size_t) i)
-                                         == (scalarChIndex < scalarBuffer.getNumChannels() ? scalarBuffer.getReadPointer (scalarChIndex)[n]
-                                                                                           : 0.0f),
+                    REQUIRE_MESSAGE (juce::exactlyEqual (simdBuffer.getReadPointer (ch)[n].get ((size_t) i),
+                                                         scalarChIndex < scalarBuffer.getNumChannels()
+                                                             ? scalarBuffer.getReadPointer (scalarChIndex)[n]
+                                                             : 0.0f),
                                      std::string ("Failure at channel ") + std::to_string (ch)
                                          + std::string (", sample ") + std::to_string (n)
                                          + std::string (", index ") + std::to_string (i));
@@ -78,9 +77,9 @@ TEMPLATE_TEST_CASE ("SIMD Buffer Copy Test", "[dsp][buffers][simd]", float, doub
         {
             for (int n = 0; n < scalarBuffer.getNumSamples(); ++n)
             {
-                REQUIRE_MESSAGE (scalarBuffer.getReadPointer (ch)[n]
-                                     == simdBuffer.getReadPointer (ch / (int) xsimd::batch<T>::size)[n]
-                                            .get ((size_t) ch % xsimd::batch<T>::size),
+                REQUIRE_MESSAGE (juce::exactlyEqual (scalarBuffer.getReadPointer (ch)[n],
+                                                     simdBuffer.getReadPointer (ch / (int) xsimd::batch<T>::size)[n]
+                                                         .get ((size_t) ch % xsimd::batch<T>::size)),
                                  std::string ("Failure at channel ") + std::to_string (ch)
                                      + std::string (", sample ") + std::to_string (n));
             }
@@ -114,8 +113,8 @@ TEMPLATE_TEST_CASE ("SIMD Buffer Copy Test", "[dsp][buffers][simd]", float, doub
         {
             for (int n = 0; n < scalarBufferTest.getNumSamples(); ++n)
             {
-                REQUIRE_MESSAGE (scalarBufferTest.getReadPointer (ch)[n]
-                                     == scalarBufferRef.getReadPointer (ch)[n] * 2.0f,
+                REQUIRE_MESSAGE (juce::exactlyEqual (scalarBufferTest.getReadPointer (ch)[n],
+                                                     scalarBufferRef.getReadPointer (ch)[n] * 2.0f),
                                  std::string ("Failure at channel ") + std::to_string (ch)
                                      + std::string (", sample ") + std::to_string (n));
             }

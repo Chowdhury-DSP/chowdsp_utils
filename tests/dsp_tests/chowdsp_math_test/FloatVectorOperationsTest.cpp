@@ -381,7 +381,7 @@ TEMPLATE_TEST_CASE ("FloatVectorOperations Test", "[dsp][math]", float, double)
             chowdsp::FloatVectorOperations::rotate (data.data(), rotate, (int) numValues, scratchData.data());
 
             for (auto [exp, actual] : chowdsp::zip (refData, data))
-                REQUIRE (actual == exp);
+                REQUIRE (juce::approximatelyEqual (actual, exp));
         }
     }
 #endif

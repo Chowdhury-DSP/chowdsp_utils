@@ -30,11 +30,11 @@ TEMPLATE_PRODUCT_TEST_CASE ("Smoothed Buffer Value Test", "[dsp][data-structures
                 const auto* smoothData = comp.getSmoothedBuffer();
 
                 for (int n = 0; n < maxBlockSize; ++n)
-                    REQUIRE_MESSAGE (smoothData[n] == ref.getNextValue(), "SmoothedValue was inaccurate!");
+                    REQUIRE_MESSAGE (juce::approximatelyEqual (smoothData[n], ref.getNextValue()), "SmoothedValue was inaccurate!");
 
-                REQUIRE_MESSAGE (comp.getCurrentValue() == ref.getCurrentValue(), "Current value is innacurate!");
+                REQUIRE_MESSAGE (juce::approximatelyEqual (comp.getCurrentValue(), ref.getCurrentValue()), "Current value is innacurate!");
 
-                const auto isActuallySmoothing = smoothData[0] != smoothData[maxBlockSize - 1];
+                const auto isActuallySmoothing = ! juce::approximatelyEqual (smoothData[0], smoothData[maxBlockSize - 1]);
                 REQUIRE_MESSAGE (comp.isSmoothing() == isActuallySmoothing, "SmoothedBufferValue is not smoothing correctly!");
             }
         };

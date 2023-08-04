@@ -6,9 +6,11 @@ void TriangleWave<T>::setFrequency (T newFrequency) noexcept
     freq = newFrequency;
     deltaPhase = (T) 2 * freq / fs;
 
+    JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wfloat-equal")
     // scale by zero if freq == 0, to avoid divide by zero issue
     waveformPreservingScale = fs / ((T) 2 * freq);
     waveformPreservingScale = SIMDUtils::select (freq == (T) 0, (T) 0, waveformPreservingScale);
+    JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 }
 
 template <typename T>

@@ -40,9 +40,9 @@ TEST_CASE ("Polygonal Test", "[dsp][sources]")
         testOsc.setFrequency (testFreq);
         testOsc.setOrder (polygonOrder);
         testOsc.setTeeth (polygonTeeth);
-        REQUIRE_MESSAGE (testOsc.getFrequency() == testFreq, "Set frequency is incorrect!");
-        REQUIRE_MESSAGE (testOsc.getOrder() == polygonOrder, "Set Order is incorrect!");
-        REQUIRE_MESSAGE (testOsc.getTeeth() == polygonTeeth, "Set Teeth is incorrect!");
+        REQUIRE_MESSAGE (juce::exactlyEqual (testOsc.getFrequency(), testFreq), "Set frequency is incorrect!");
+        REQUIRE_MESSAGE (juce::exactlyEqual (testOsc.getOrder(), polygonOrder), "Set Order is incorrect!");
+        REQUIRE_MESSAGE (juce::exactlyEqual (testOsc.getTeeth(), polygonTeeth), "Set Teeth is incorrect!");
 
         for (int i = 0; i < 20; ++i)
         {
@@ -71,9 +71,9 @@ TEST_CASE ("Polygonal Test", "[dsp][sources]")
         testOsc.setFrequency (testFreq);
         testOsc.setOrder (polygonOrder);
         testOsc.setTeeth (polygonTeeth);
-        REQUIRE_MESSAGE (testOsc.getFrequency().get (0) == testFreq, "Set frequency is incorrect!");
-        REQUIRE_MESSAGE (testOsc.getOrder().get (0) == polygonOrder, "Set Order is incorrect!");
-        REQUIRE_MESSAGE (testOsc.getTeeth().get (0) == polygonTeeth, "Set Teeth is incorrect!");
+        REQUIRE_MESSAGE (juce::exactlyEqual (testOsc.getFrequency().get (0), testFreq), "Set frequency is incorrect!");
+        REQUIRE_MESSAGE (juce::exactlyEqual (testOsc.getOrder().get (0), polygonOrder), "Set Order is incorrect!");
+        REQUIRE_MESSAGE (juce::exactlyEqual (testOsc.getTeeth().get (0), polygonTeeth), "Set Teeth is incorrect!");
 
         for (int i = 0; i < 20; ++i)
         {
@@ -124,6 +124,6 @@ TEST_CASE ("Polygonal Test", "[dsp][sources]")
         testOsc.setFrequency (0.0f);
 
         for (int i = 0; i < 10; ++i)
-            REQUIRE_MESSAGE (testOsc.processSample() == 0.0f, "Zero Hz output is non-zero!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (testOsc.processSample(), 0.0f), "Zero Hz output is non-zero!");
     }
 }
