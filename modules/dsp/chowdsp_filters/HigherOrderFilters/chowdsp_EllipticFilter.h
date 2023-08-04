@@ -157,12 +157,12 @@ private:
         const auto k = std::sqrt (m);
 
         jassert (k <= 1.0); // k is ill-formed
-        if (k == 1.0)
+        if (juce::exactlyEqual (k, 1.0))
             return std::atanh (w);
 
         std::vector<double> ks { k };
         int nIter = 0;
-        while (ks.back() != 0.0)
+        while (! juce::exactlyEqual (ks.back(), 0.0))
         {
             const auto k_ = ks.back();
             const auto k_p = complement (k_);

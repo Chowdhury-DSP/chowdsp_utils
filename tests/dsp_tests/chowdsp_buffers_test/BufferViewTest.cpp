@@ -1,5 +1,7 @@
-#include <CatchUtils.h>
 #include <chowdsp_buffers/chowdsp_buffers.h>
+
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wfloat-equal")
+#include <CatchUtils.h>
 
 template <typename BufferViewType, typename T>
 void testBufferView (const BufferViewType view, const chowdsp::Buffer<T>& buffer)
@@ -138,3 +140,4 @@ TEMPLATE_TEST_CASE ("Buffer View Test", "[dsp][buffers][simd]", float, double, x
         }
     }
 }
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE

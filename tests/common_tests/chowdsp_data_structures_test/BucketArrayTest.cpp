@@ -1,6 +1,8 @@
 #include <CatchUtils.h>
 #include <chowdsp_data_structures/chowdsp_data_structures.h>
 
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wmissing-field-initializers")
+
 struct TestType
 {
     std::string str;
@@ -115,3 +117,4 @@ TEST_CASE ("Bucket Array Test", "[common][data-structures]")
         REQUIRE (juce::exactlyEqual (elem4->x, 4.0f));
     }
 }
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE
