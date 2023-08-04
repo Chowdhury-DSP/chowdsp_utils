@@ -11,7 +11,7 @@ TEST_CASE ("Linear Transforms Test", "[dsp][filters]")
             chowdsp::LinearTransforms::transformFeedback<1, float, false> (b, a, 0.5f);
 
             REQUIRE (juce::approximatelyEqual (b[0], 0.5f));
-            REQUIRE (juce::approximatelyEqual (b[1],-1.0f));
+            REQUIRE (juce::approximatelyEqual (b[1], -1.0f));
             REQUIRE (juce::approximatelyEqual (a[0], 0.25f));
             REQUIRE (juce::approximatelyEqual (a[1], 1.5f));
         }
