@@ -55,7 +55,7 @@ PresetsComp::PresetsComp (PresetManager& presetManager) : manager (presetManager
         button.setTitle ("Go to " + juce::String (forward ? "next" : "previous") + " preset");
         button.setColour (juce::ComboBox::outlineColourId, juce::Colours::transparentBlack);
         button.setColour (juce::TextButton::buttonColourId, juce::Colours::transparentBlack);
-        button.onClick = [this]
+        button.onClick = [this, forward]
         { goToNextPreset (forward); };
     };
 
@@ -157,6 +157,8 @@ void PresetsComp::presetListUpdated()
 #if ! JUCE_IOS
     optionID = addPresetFolderOptions (optionID);
 #endif
+
+    juce::ignoreUnused (optionID);
 }
 
 int PresetsComp::createPresetsMenu (int optionID)
@@ -351,7 +353,7 @@ void PresetsComp::chooseUserPresetFolder (const std::function<void()>& onFinish)
     constexpr auto folderChooserFlags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectDirectories;
     fileChooser = std::make_shared<juce::FileChooser> ("Choose User Preset Folder");
     {
-        fileChooser->launchAsync (folderChooserFlags, [this] (const juce::FileChooser& chooser)
+        fileChooser->launchAsync (folderChooserFlags, [this, onFinish] (const juce::FileChooser& chooser)
                                   {
             manager.setUserPresetPath (chooser.getResult());
 
@@ -377,7 +379,7 @@ void PresetsComp::saveUserPreset()
         if (presetPath == juce::File() || ! presetPath.isDirectory())
         {
             presetPath.deleteRecursively();
-            chooseUserPresetFolder ([this]
+            chooseUserPresetFolder ([this, presetName]
                                     { savePresetFile (presetName + presetExt); });
         }
         else
