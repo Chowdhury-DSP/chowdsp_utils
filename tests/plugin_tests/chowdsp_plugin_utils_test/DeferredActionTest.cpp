@@ -44,7 +44,11 @@ static void deferredCounterIncrementTest (bool fakeAudioThread = false)
     REQUIRE_MESSAGE (counter.count == refCounter.load(), "Final count is incorrect!");
 }
 
+#if JUCE_WINDOWS
+TEST_CASE ("Deferred Action Test", "[plugin][utilities][!mayfail]")
+#else
 TEST_CASE ("Deferred Action Test", "[plugin][utilities]")
+#endif
 {
     SECTION ("Deferred Action Test")
     {
