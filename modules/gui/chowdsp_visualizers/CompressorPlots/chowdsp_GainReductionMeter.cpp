@@ -46,7 +46,7 @@ void GainReductionMeter::BackgroundTask::runTask (const juce::AudioBuffer<float>
         compressedLevelPeak = ballisticsFilter.processSample (1, std::abs (compressedData[n]));
     }
 
-    gainReductionDB = (inputLevelPeak == 0.0f) ? 0.0f : juce::Decibels::gainToDecibels (compressedLevelPeak / inputLevelPeak);
+    gainReductionDB = juce::approximatelyEqual (inputLevelPeak, 0.0f) ? 0.0f : juce::Decibels::gainToDecibels (compressedLevelPeak / inputLevelPeak);
 }
 
 void GainReductionMeter::BackgroundTask::pushBufferData (const chowdsp::BufferView<const float>& buffer, bool isInput)
@@ -117,7 +117,7 @@ void GainReductionMeter::paint (juce::Graphics& g)
                           .withLeft (meterWidth * 7 / 4);
 
         auto dbString = juce::String (dbLevel, 0);
-        if (dbLevel == 0.0f)
+        if (juce::approximatelyEqual (dbLevel, 0.0f))
             dbString += " dB";
 
         g.drawFittedText (dbString, dbRect, juce::Justification::centredLeft, 1);
