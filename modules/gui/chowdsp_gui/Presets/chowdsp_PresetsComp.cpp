@@ -48,14 +48,14 @@ PresetsComp::PresetsComp (PresetManager& presetManager) : manager (presetManager
     presetNameEditor.setMultiLine (false, false);
     presetNameEditor.setJustification (juce::Justification::centred);
 
-    auto setupNextPrevButton = [=] (juce::DrawableButton& button, bool forward)
+    auto setupNextPrevButton = [this] (juce::DrawableButton& button, bool forward)
     {
         addAndMakeVisible (button);
         button.setWantsKeyboardFocus (false);
         button.setTitle ("Go to " + juce::String (forward ? "next" : "previous") + " preset");
         button.setColour (juce::ComboBox::outlineColourId, juce::Colours::transparentBlack);
         button.setColour (juce::TextButton::buttonColourId, juce::Colours::transparentBlack);
-        button.onClick = [=]
+        button.onClick = [this]
         { goToNextPreset (forward); };
     };
 
@@ -175,7 +175,7 @@ int PresetsComp::createPresetsMenu (int optionID)
 
         juce::PopupMenu::Item presetItem { preset.getName() };
         presetItem.itemID = presetID + 1;
-        presetItem.action = [=, &preset]
+        presetItem.action = [this, &preset]
         {
             updatePresetBoxText();
             manager.loadPreset (preset);
@@ -351,7 +351,7 @@ void PresetsComp::chooseUserPresetFolder (const std::function<void()>& onFinish)
     constexpr auto folderChooserFlags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectDirectories;
     fileChooser = std::make_shared<juce::FileChooser> ("Choose User Preset Folder");
     {
-        fileChooser->launchAsync (folderChooserFlags, [=] (const juce::FileChooser& chooser)
+        fileChooser->launchAsync (folderChooserFlags, [this] (const juce::FileChooser& chooser)
                                   {
             manager.setUserPresetPath (chooser.getResult());
 
@@ -368,7 +368,7 @@ void PresetsComp::saveUserPreset()
     presetNameEditor.grabKeyboardFocus();
     presetNameEditor.setHighlightedRegion ({ 0, 100 });
 
-    presetNameEditor.onReturnKey = [=]
+    presetNameEditor.onReturnKey = [this]
     {
         presetNameEditor.setVisible (false);
 
@@ -377,7 +377,7 @@ void PresetsComp::saveUserPreset()
         if (presetPath == juce::File() || ! presetPath.isDirectory())
         {
             presetPath.deleteRecursively();
-            chooseUserPresetFolder ([=]
+            chooseUserPresetFolder ([this]
                                     { savePresetFile (presetName + presetExt); });
         }
         else
@@ -386,13 +386,13 @@ void PresetsComp::saveUserPreset()
         }
     };
 
-    presetNameEditor.onEscapeKey = [=]
+    presetNameEditor.onEscapeKey = [this]
     {
         presetNameEditor.setVisible (false);
         updatePresetBoxText();
     };
 
-    presetNameEditor.onFocusLost = [=]
+    presetNameEditor.onFocusLost = [this]
     {
         presetNameEditor.setVisible (false);
         updatePresetBoxText();

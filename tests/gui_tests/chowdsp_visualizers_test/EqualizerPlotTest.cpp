@@ -115,7 +115,7 @@ TEST_CASE ("Equalizer Plot Test", "[visualizers][EQ]")
         juce::MessageManager::getInstance()->runDispatchLoopUntil (100);
 
         const auto testScreenshot = plotComp.createComponentSnapshot ({ 500, 300 });
-        //        VizTestUtils::saveImage (testScreenshot, "eq_response_plot.png");
+        // VizTestUtils::saveImage (testScreenshot, "eq_response_plot.png");
 
         const auto refScreenshot = VizTestUtils::loadImage ("eq_response_plot.png");
         VizTestUtils::compareImages (testScreenshot, refScreenshot);

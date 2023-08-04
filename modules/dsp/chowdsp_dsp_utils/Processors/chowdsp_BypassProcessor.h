@@ -36,7 +36,7 @@ public:
     /** Converts a parameter handle to a boolean */
     static bool toBool (const std::atomic<float>* param)
     {
-        return static_cast<bool> (param->load());
+        return ! juce::approximatelyEqual (param->load(), 0.0f);
     }
 
     /** Allocated required memory, and resets the property */
@@ -74,7 +74,7 @@ public:
     /** Converts a parameter handle to a boolean */
     static bool toBool (const std::atomic<float>* param)
     {
-        return static_cast<bool> (param->load());
+        return ! juce::approximatelyEqual (param->load(), 0.0f);
     }
 
     /** Allocated required memory, and resets the property */

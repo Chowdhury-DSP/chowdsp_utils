@@ -37,7 +37,10 @@ public:
     [[nodiscard]] double getRampDurationSeconds() const noexcept { return rampDurationSeconds; }
 
     /** Returns true if the current value is currently being interpolated. */
-    [[nodiscard]] bool isSmoothing() const noexcept { return gain.isSmoothing() || gainTargetLinear != gain.getCurrentValue(); }
+    [[nodiscard]] bool isSmoothing() const noexcept
+    {
+        return gain.isSmoothing() || ! juce::approximatelyEqual (gainTargetLinear, gain.getCurrentValue());
+    }
 
     //==============================================================================
     /** Called before processing starts. */

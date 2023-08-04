@@ -21,7 +21,7 @@ TEST_CASE ("Time Units Test", "[common][units]")
         constexpr auto tt_samples = Time<Samples> { 1000.0f, 1000.0f };
         constexpr auto ttt_sec = Time<Seconds> { tt_samples };
         constexpr auto ttt_samples = Time<Samples> { ttt_sec, 500.0f };
-        REQUIRE_MESSAGE (ttt_samples.value() == 500.0f, ttt_samples << " should be equal to " << 500.0f);
+        REQUIRE_MESSAGE (juce::approximatelyEqual (ttt_samples.value(), 500.0f), ttt_samples << " should be equal to " << 500.0f);
     }
 
     SECTION ("Integer Samples")

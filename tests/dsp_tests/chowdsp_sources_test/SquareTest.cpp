@@ -111,6 +111,6 @@ TEST_CASE ("Square Test", "[dsp][sources]")
         testOsc.setFrequency (0.0f);
 
         for (int i = 0; i < 10; ++i)
-            REQUIRE_MESSAGE (testOsc.processSample() == 0.0f, "Zero Hz output is non-zero!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (testOsc.processSample(), 0.0f), "Zero Hz output is non-zero!");
     }
 }

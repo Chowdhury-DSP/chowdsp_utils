@@ -19,7 +19,7 @@ TEST_CASE ("Generic Filter Plot Test", "[visualizers]")
         };
 
         const auto [freqAxis, magAxis] = plotter.plotFilterMagnitudeResponse();
-        REQUIRE (freqAxis.size() == (1 << plotter.params.fftOrder) / 2 + 1);
+        REQUIRE (freqAxis.size() == size_t (1 << plotter.params.fftOrder) / 2 + 1);
         REQUIRE (magAxis.size() == freqAxis.size());
         for (auto& mag : magAxis)
             REQUIRE (juce::approximatelyEqual (mag, 0.0f));
@@ -58,7 +58,7 @@ TEST_CASE ("Generic Filter Plot Test", "[visualizers]")
 
         TestComponent comp {};
         const auto testScreenshot = comp.createComponentSnapshot ({ 500, 300 });
-        //        VizTestUtils::saveImage (testScreenshot, "generic_filter_plot.png");
+        // VizTestUtils::saveImage (testScreenshot, "generic_filter_plot.png");
 
         const auto refScreenshot = VizTestUtils::loadImage ("generic_filter_plot.png");
         VizTestUtils::compareImages (testScreenshot, refScreenshot);
