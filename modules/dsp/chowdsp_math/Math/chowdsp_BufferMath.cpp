@@ -378,7 +378,7 @@ void sumToMono (const BufferType1& bufferSrc, BufferType2& bufferDest, FloatType
         addBufferChannels (bufferSrc, bufferDest, ch, 0);
 
     // apply normalization gain
-    if (normGain != (FloatType) 1)
+    if (! juce::exactlyEqual (normGain, (FloatType) 1))
     {
         if constexpr (std::is_floating_point_v<SampleType>)
         {

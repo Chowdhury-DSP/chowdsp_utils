@@ -25,7 +25,7 @@ void ParameterListeners::updateBroadcastersFromMessageThread()
     jassert (juce::MessageManager::existsAndIsCurrentThread());
     for (const auto [index, paramInfo] : enumerate (paramInfoList))
     {
-        if (paramInfo.paramCookie->getValue() == paramInfo.value)
+        if (juce::approximatelyEqual (paramInfo.paramCookie->getValue(), paramInfo.value))
             continue;
 
         paramInfo.value = paramInfo.paramCookie->getValue();
