@@ -61,6 +61,6 @@ TEST_CASE ("Diffuser Test", "[dsp][reverb]")
             sumAfterReset += chowdsp::FloatVectorOperations::accumulate (outVec, nChannels);
         }
 
-        REQUIRE_MESSAGE (sumAfterReset == 0.0f, "State was not cleared after reset!");
+        REQUIRE_MESSAGE (juce::exactlyEqual (sumAfterReset, 0.0f), "State was not cleared after reset!");
     }
 }

@@ -36,7 +36,7 @@ TEST_CASE ("Audio File Save/Load Helper Test", "[plugin][utilities]")
         saveLoadHelper.saveBufferToFile (testFile.file, testBuffer.toAudioBuffer(), fileSampleRate);
         auto [buffer, sampleRate] = saveLoadHelper.loadFile (testFile.file);
 
-        REQUIRE_MESSAGE (sampleRate == fileSampleRate, "Loaded file has incorrect sample rate!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (sampleRate, fileSampleRate), "Loaded file has incorrect sample rate!");
         checkBuffersEqual (buffer, testBuffer.toAudioBuffer());
     }
 
@@ -58,6 +58,6 @@ TEST_CASE ("Audio File Save/Load Helper Test", "[plugin][utilities]")
         auto [buffer, sampleRate] = saveLoadHelper.loadFile (juce::File {});
 
         REQUIRE_MESSAGE ((buffer.getNumChannels() == 0 && buffer.getNumSamples() == 0), "Buffer should be empty!");
-        REQUIRE_MESSAGE (sampleRate == 0.0, "Sample rate should be zero!");
+        REQUIRE_MESSAGE (juce::exactlyEqual (sampleRate, 0.0), "Sample rate should be zero!");
     }
 }

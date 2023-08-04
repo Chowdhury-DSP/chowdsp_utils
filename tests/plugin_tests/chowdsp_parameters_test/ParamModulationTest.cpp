@@ -25,14 +25,14 @@ TEST_CASE ("Parameter Modulation Test", "[plugin][parameters]")
         chowdsp::FloatParameter floatParam { "test", "Test", juce::NormalisableRange { 0.0f, 1.0f }, 0.5f, &floatValToString, &stringToFloatVal };
         REQUIRE_MESSAGE (floatParam.supportsMonophonicModulation(), "Float Parameters should support monophonic modulation");
         REQUIRE_MESSAGE (! floatParam.supportsPolyphonicModulation(), "Float Parameters should not support polyphonic modulation");
-        REQUIRE_MESSAGE (floatParam.getDefaultValue() == 0.5f, "Float parameter default value is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (floatParam.getDefaultValue(), 0.5f), "Float parameter default value is incorrect!");
 
         floatParam.applyMonophonicModulation (0.25);
-        REQUIRE_MESSAGE ((float) floatParam == 0.75f, "Float parameter modulation is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual ((float) floatParam, 0.75f), "Float parameter modulation is incorrect!");
 
         floatParam.setValueNotifyingHost (1.0f);
         floatParam.applyMonophonicModulation (-0.75);
-        REQUIRE_MESSAGE (floatParam.getCurrentValue() == 0.25f, "Float parameter modulation is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (floatParam.getCurrentValue(), 0.25f), "Float parameter modulation is incorrect!");
     }
 
     SECTION ("Check Smooth Buffered Float Param Modulation")
@@ -47,15 +47,15 @@ TEST_CASE ("Parameter Modulation Test", "[plugin][parameters]")
         smoothedParam.setRampLength ((double) blockSize / fs);
         smoothedParam.prepare (fs, blockSize);
 
-        REQUIRE_MESSAGE (smoothedParam.getCurrentValue() == 0.5f, "Initial smoothed value is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (smoothedParam.getCurrentValue(), 0.5f), "Initial smoothed value is incorrect!");
 
         floatParam.applyMonophonicModulation (0.5);
         smoothedParam.process (blockSize);
-        REQUIRE_MESSAGE (smoothedParam.getCurrentValue() == 1.0f, "Smoothed value after modulation is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (smoothedParam.getCurrentValue(), 1.0f), "Smoothed value after modulation is incorrect!");
 
         floatParam.setValueNotifyingHost (1.0f);
         floatParam.applyMonophonicModulation (-0.75);
         smoothedParam.process (blockSize);
-        REQUIRE_MESSAGE (floatParam.getCurrentValue() == 0.25f, "Smoothed value after parameter change and modulation is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (floatParam.getCurrentValue(), 0.25f), "Smoothed value after parameter change and modulation is incorrect!");
     }
 }

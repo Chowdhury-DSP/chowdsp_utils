@@ -95,10 +95,10 @@ TEST_CASE ("Preset Manager Test", "[plugin][presets][state]")
         presetMgr->saveUserPreset (presetFile);
 
         presetMgr.setFloatParam (dummyValue);
-        REQUIRE_MESSAGE (presetMgr.getFloatParam() == dummyValue, "Changed value is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (presetMgr.getFloatParam(), dummyValue), "Changed value is incorrect!");
 
         presetMgr.loadPreset (0);
-        REQUIRE_MESSAGE (presetMgr.getFloatParam() == testValue, "Preset value is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (presetMgr.getFloatParam(), testValue), "Preset value is incorrect!");
     }
 
     SECTION ("Factory Presets")
@@ -108,9 +108,8 @@ TEST_CASE ("Preset Manager Test", "[plugin][presets][state]")
 
         ScopedPresetManager presetMgr {};
         presetMgr->addPresets ({ preset });
-
         presetMgr.loadPreset (0);
-        REQUIRE_MESSAGE (presetMgr.getFloatParam() == testValue, "Preset value is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (presetMgr.getFloatParam(), testValue), "Preset value is incorrect!");
     }
 
     SECTION ("Preset Agnostic Params")
@@ -138,16 +137,16 @@ TEST_CASE ("Preset Manager Test", "[plugin][presets][state]")
         auto preset = saveUserPreset ("test.preset", testValue);
 
         ScopedPresetManager<true> presetMgr {};
-        REQUIRE_MESSAGE (presetMgr.state.params.extraParam->get() == defaultValue, "Initial value is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (presetMgr.state.params.extraParam->get(), defaultValue), "Initial value is incorrect!");
 
         chowdsp::ParameterTypeHelpers::setValue (extraValue, *presetMgr.state.params.extraParam);
         presetMgr.state.getParameterListeners().updateBroadcastersFromMessageThread();
-        REQUIRE_MESSAGE (presetMgr.state.params.extraParam->get() == extraValue, "Set value is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (presetMgr.state.params.extraParam->get(), extraValue), "Set value is incorrect!");
         REQUIRE_MESSAGE (presetMgr->getIsPresetDirty(), "Preset dirty after set value is incorrect!");
 
         presetMgr->addPresets ({ preset });
         presetMgr.loadPreset (0);
-        REQUIRE_MESSAGE (presetMgr.state.params.extraParam->get() == defaultValue, "Reset value is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (presetMgr.state.params.extraParam->get(), defaultValue), "Reset value is incorrect!");
     }
 
     SECTION ("Dirty Presets")
@@ -196,7 +195,7 @@ TEST_CASE ("Preset Manager Test", "[plugin][presets][state]")
 
         presetMgr.setFloatParam (otherValue);
         presetMgr->loadDefaultPreset();
-        REQUIRE_MESSAGE (presetMgr.getFloatParam() == testValue, "Preset value is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (presetMgr.getFloatParam(), testValue), "Preset value is incorrect!");
     }
 
     SECTION ("User Presets")
@@ -235,14 +234,14 @@ TEST_CASE ("Preset Manager Test", "[plugin][presets][state]")
             ScopedPresetManager presetMgr {};
 
             presetMgr.setFloatParam (otherValue);
-            REQUIRE (presetMgr.getFloatParam() == otherValue);
+            REQUIRE (juce::approximatelyEqual (presetMgr.getFloatParam(), otherValue));
 
             presetMgr.state.serialize (state);
         }
 
         ScopedPresetManager presetMgr {};
         presetMgr.state.deserialize (state);
-        REQUIRE_MESSAGE (presetMgr.getFloatParam() == otherValue, "Preset state is overriding parameter state!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (presetMgr.getFloatParam(), otherValue), "Preset state is overriding parameter state!");
         REQUIRE (presetMgr->getCurrentPreset() == nullptr);
         REQUIRE (presetMgr->getIsPresetDirty());
     }
@@ -258,17 +257,17 @@ TEST_CASE ("Preset Manager Test", "[plugin][presets][state]")
             ScopedPresetManager presetMgr {};
             presetMgr->addPresets ({ chowdsp::presets::Preset { preset } });
             presetMgr.loadPreset (0);
-            REQUIRE (presetMgr.getFloatParam() == testValue);
+            REQUIRE (juce::approximatelyEqual (presetMgr.getFloatParam(), testValue));
 
             presetMgr.setFloatParam (otherValue);
-            REQUIRE (presetMgr.getFloatParam() == otherValue);
+            REQUIRE (juce::approximatelyEqual (presetMgr.getFloatParam(), otherValue));
 
             presetMgr.state.serialize (state);
         }
 
         ScopedPresetManager presetMgr {};
         presetMgr.state.deserialize (state);
-        REQUIRE_MESSAGE (presetMgr.getFloatParam() == otherValue, "Preset state is overriding parameter state!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (presetMgr.getFloatParam(), otherValue), "Preset state is overriding parameter state!");
         REQUIRE (*presetMgr->getCurrentPreset() == preset);
         REQUIRE (presetMgr->getIsPresetDirty());
     }
@@ -287,24 +286,24 @@ TEST_CASE ("Preset Manager Test", "[plugin][presets][state]")
 
         presetMgr->addPresets ({ chowdsp::presets::Preset { preset }, chowdsp::presets::Preset { preset2 } });
         presetMgr.loadPreset (0);
-        REQUIRE (presetMgr.getFloatParam() == testValue);
+        REQUIRE (juce::approximatelyEqual (presetMgr.getFloatParam(), testValue));
 
         presetMgr.setFloatParam (dirtyVal);
-        REQUIRE (presetMgr.getFloatParam() == dirtyVal);
+        REQUIRE (juce::approximatelyEqual (presetMgr.getFloatParam(), dirtyVal));
         REQUIRE (presetMgr->getIsPresetDirty());
 
         presetMgr.loadPreset (1);
-        REQUIRE (presetMgr.getFloatParam() == testValue2);
+        REQUIRE (juce::approximatelyEqual (presetMgr.getFloatParam(), testValue2));
         REQUIRE (! presetMgr->getIsPresetDirty());
 
         REQUIRE (um.canUndo());
         REQUIRE (um.undo());
         REQUIRE (presetMgr->getIsPresetDirty());
-        REQUIRE (presetMgr.getFloatParam() == dirtyVal);
+        REQUIRE (juce::approximatelyEqual (presetMgr.getFloatParam(), dirtyVal));
 
         REQUIRE (um.canRedo());
         REQUIRE (um.redo());
         REQUIRE (! presetMgr->getIsPresetDirty());
-        REQUIRE (presetMgr.getFloatParam() == testValue2);
+        REQUIRE (juce::approximatelyEqual (presetMgr.getFloatParam(), testValue2));
     }
 }

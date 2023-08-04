@@ -7,8 +7,10 @@ void SawtoothWave<T>::setFrequency (T newFrequency) noexcept
     deltaPhase = (T) 2 * freq / fs;
 
     // scale by zero if freq == 0, to avoid divide by zero issue
+    JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wfloat-equal")
     waveformPreservingScale = fs / ((T) 4 * freq);
     waveformPreservingScale = SIMDUtils::select (freq == (T) 0, (T) 0, waveformPreservingScale);
+    JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 }
 
 template <typename T>

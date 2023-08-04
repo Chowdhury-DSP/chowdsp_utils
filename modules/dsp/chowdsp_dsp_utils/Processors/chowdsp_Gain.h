@@ -26,7 +26,7 @@ public:
     /** Sets the length of the ramp used for smoothing gain changes. */
     void setRampDurationSeconds (double newDurationSeconds) noexcept
     {
-        if (rampDurationSeconds != newDurationSeconds)
+        if (! juce::approximatelyEqual (rampDurationSeconds, newDurationSeconds))
         {
             rampDurationSeconds = newDurationSeconds;
             gain.setRampLength (rampDurationSeconds);

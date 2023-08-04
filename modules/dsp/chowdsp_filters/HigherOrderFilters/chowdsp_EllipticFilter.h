@@ -223,7 +223,7 @@ private:
 
         const auto eps = std::sqrt (eps_sq);
         const auto ck1_sq = eps_sq / pow10m1 (0.1 * (double) stopBandAttenuationDB);
-        jassert (ck1_sq != 0); // "Cannot design a filter with given rp and rs specifications."
+        jassert (! juce::exactlyEqual (ck1_sq, 0.0)); // "Cannot design a filter with given rp and rs specifications."
 
         const auto val0 = ellipticK (std::sqrt (ck1_sq));
         const auto m = ellipdeg ((double) order, ck1_sq);

@@ -22,12 +22,12 @@ TEST_CASE ("Slider Attachment Test", "[plugin][state][attachments]")
         juce::Slider slider;
         chowdsp::SliderAttachment attach { param, state, slider };
 
-        REQUIRE_MESSAGE (slider.getValue() == (double) param->get(), "Incorrect slider value after setup!");
-        REQUIRE_MESSAGE (slider.getRange().getStart() == 0.0, "Slider range start is incorrect!");
-        REQUIRE_MESSAGE (slider.getRange().getEnd() == 1.0, "Slider range end is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (slider.getValue(), (double) param->get()), "Incorrect slider value after setup!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (slider.getRange().getStart(), 0.0), "Slider range start is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (slider.getRange().getEnd(), 1.0), "Slider range end is incorrect!");
 
         REQUIRE_MESSAGE (slider.textFromValueFunction (param->get()) == param->getCurrentValueAsText(), "Slider text from value function is incorrect!");
-        REQUIRE_MESSAGE (slider.valueFromTextFunction (param->getCurrentValueAsText()) == (double) param->get(), "Slider value from text function is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (slider.valueFromTextFunction (param->getCurrentValueAsText()), (double) param->get()), "Slider value from text function is incorrect!");
     }
 
     SECTION ("Slider Change Test")
@@ -45,7 +45,7 @@ TEST_CASE ("Slider Attachment Test", "[plugin][state][attachments]")
             slider.setValue ((double) newValue, juce::sendNotificationSync);
         }
 
-        REQUIRE_MESSAGE (param->get() == newValue, "Parameter value after slider drag is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (param->get(), newValue), "Parameter value after slider drag is incorrect!");
     }
 
     SECTION ("Host Change Test")
@@ -60,8 +60,7 @@ TEST_CASE ("Slider Attachment Test", "[plugin][state][attachments]")
 
         chowdsp::ParameterTypeHelpers::setValue (newValue, *param);
         state.getParameterListeners().updateBroadcastersFromMessageThread();
-
-        REQUIRE_MESSAGE (slider.getValue() == (double) newValue, "Slider value after parameter change is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (slider.getValue(), (double) newValue), "Slider value after parameter change is incorrect!");
     }
 
     SECTION ("With Undo/Redo Test")
@@ -82,15 +81,15 @@ TEST_CASE ("Slider Attachment Test", "[plugin][state][attachments]")
             slider.setValue ((double) newValue, juce::sendNotificationSync);
         }
 
-        REQUIRE_MESSAGE (param->get() == newValue, "Parameter value after slider drag is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (param->get(), newValue), "Parameter value after slider drag is incorrect!");
         REQUIRE_MESSAGE (um.canUndo(), "Slider drag is not creating undoable action!");
 
         um.undo();
-        REQUIRE_MESSAGE (param->get() == originalValue, "Parameter value after undo action is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (param->get(), originalValue), "Parameter value after undo action is incorrect!");
         REQUIRE_MESSAGE (um.canRedo(), "Slider drag undo is not creating redoable action!");
 
         um.redo();
-        REQUIRE_MESSAGE (param->get() == newValue, "Parameter value after redo action is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (param->get(), newValue), "Parameter value after redo action is incorrect!");
     }
 }
 

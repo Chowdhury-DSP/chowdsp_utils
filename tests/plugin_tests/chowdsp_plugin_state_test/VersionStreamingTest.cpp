@@ -65,9 +65,9 @@ TEST_CASE ("Version Streaming Test", "[plugin][state][version]")
     SECTION ("Apply Version Streaming to Non-Parameters")
     {
         NonParams nonParams;
-        REQUIRE (nonParams.editorSize == 1.0f);
+        REQUIRE (juce::approximatelyEqual (nonParams.editorSize.get(), 1.0f));
         nonParams.versionStreamingCallback ("1.0.0"_v);
-        REQUIRE (nonParams.editorSize == 1.5f);
+        REQUIRE (juce::approximatelyEqual (nonParams.editorSize.get(), 1.5f));
     }
 
     SECTION ("Version Streaming with State Serialization")
@@ -87,9 +87,9 @@ TEST_CASE ("Version Streaming Test", "[plugin][state][version]")
         // check new state
         State state {};
         REQUIRE (state.params.innerParams.param->get() == false);
-        REQUIRE (state.nonParams.editorSize == 1.0f);
+        REQUIRE (juce::approximatelyEqual (state.nonParams.editorSize.get(), 1.0f));
         state.deserialize (stateBlock);
         REQUIRE (state.params.innerParams.param->get() == true);
-        REQUIRE (state.nonParams.editorSize == 1.5f);
+        REQUIRE (juce::approximatelyEqual (state.nonParams.editorSize.get(), 1.5f));
     }
 }

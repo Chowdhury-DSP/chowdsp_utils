@@ -1,5 +1,7 @@
-#include <CatchUtils.h>
 #include <chowdsp_dsp_utils/chowdsp_dsp_utils.h>
+
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wfloat-equal")
+#include <CatchUtils.h>
 
 TEMPLATE_TEST_CASE ("Level Detector Test", "[dsp][misc]", float, double)
 {
@@ -99,3 +101,5 @@ TEMPLATE_TEST_CASE ("Level Detector Test", "[dsp][misc]", float, double)
         }
     }
 }
+
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE

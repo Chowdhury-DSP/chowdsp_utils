@@ -22,7 +22,7 @@ TEST_CASE ("Generic Filter Plot Test", "[visualizers]")
         REQUIRE (freqAxis.size() == (1 << plotter.params.fftOrder) / 2 + 1);
         REQUIRE (magAxis.size() == freqAxis.size());
         for (auto& mag : magAxis)
-            REQUIRE (mag == 0.0f);
+            REQUIRE (juce::approximatelyEqual (mag, 0.0f));
     }
 
     SECTION ("Filter Plot Test")

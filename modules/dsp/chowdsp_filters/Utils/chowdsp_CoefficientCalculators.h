@@ -50,6 +50,7 @@ namespace CoefficientCalculators
     void calcFirstOrderShelf (T (&b)[2], T (&a)[2], T lowGain, T highGain, T fc, NumericType fs)
     {
         // reduce to simple gain element
+        JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wfloat-equal")
         if (SIMDUtils::all (lowGain == highGain))
         {
             b[0] = lowGain;
@@ -58,6 +59,7 @@ namespace CoefficientCalculators
             a[1] = (T) 0;
             return;
         }
+        JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
         CHOWDSP_USING_XSIMD_STD (sqrt);
         CHOWDSP_USING_XSIMD_STD (tan);

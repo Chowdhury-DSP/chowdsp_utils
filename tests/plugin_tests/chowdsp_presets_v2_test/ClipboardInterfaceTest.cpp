@@ -30,16 +30,16 @@ TEST_CASE ("Clipboard Interface Test", "[plugin][presets]")
     SECTION ("Copy/Paste")
     {
         loadPreset (0);
-        REQUIRE (state.params.floatParam->get() == val1);
+        REQUIRE (juce::approximatelyEqual (state.params.floatParam->get(), val1));
 
         chowdsp::presets::frontend::ClipboardInterface clipInterface { presetMgr };
         clipInterface.copyCurrentPreset();
 
         loadPreset (1);
-        REQUIRE (state.params.floatParam->get() == val2);
+        REQUIRE (juce::approximatelyEqual (state.params.floatParam->get(), val2));
 
         REQUIRE (clipInterface.tryToPastePreset());
-        REQUIRE (state.params.floatParam->get() == val1);
+        REQUIRE (juce::approximatelyEqual (state.params.floatParam->get(), val1));
     }
 
     SECTION ("Empty Paste")
@@ -51,7 +51,7 @@ TEST_CASE ("Clipboard Interface Test", "[plugin][presets]")
 
         REQUIRE (! clipInterface.tryToPastePreset());
         REQUIRE (presetMgr.getCurrentPreset()->getName() == "Preset0");
-        REQUIRE (state.params.floatParam->get() == val1);
+        REQUIRE (juce::approximatelyEqual (state.params.floatParam->get(), val1));
     }
 
     SECTION ("Invalid Preset Paste")
@@ -64,7 +64,7 @@ TEST_CASE ("Clipboard Interface Test", "[plugin][presets]")
 
         REQUIRE (! clipInterface.tryToPastePreset());
         REQUIRE (presetMgr.getCurrentPreset()->getName() == "Preset0");
-        REQUIRE (state.params.floatParam->get() == val1);
+        REQUIRE (juce::approximatelyEqual (state.params.floatParam->get(), val1));
     }
 }
 
