@@ -16,10 +16,10 @@ TEST_CASE ("Matrix Ops Test", "[dsp][math][simd]")
         chowdsp::MatrixOps::HouseHolder<float, size>::inPlace (data.data());
 
         for (auto& x : data)
-            REQUIRE_MESSAGE (x == -1.0f, "Householder ouput is incorrect!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (x, -1.0f), "Householder ouput is incorrect!");
 
         for (auto& x : data2)
-            REQUIRE_MESSAGE (x == -1.0f, "Householder out-of-place ouput is incorrect!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (x, -1.0f), "Householder out-of-place ouput is incorrect!");
     }
 
     SECTION ("Householder Scalar Odd Test")
@@ -34,10 +34,10 @@ TEST_CASE ("Matrix Ops Test", "[dsp][math][simd]")
         chowdsp::MatrixOps::HouseHolder<float, size>::inPlace (data.data());
 
         for (auto& x : data)
-            REQUIRE_MESSAGE (x == -1.0f, "Householder ouput is incorrect!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (x, -1.0f), "Householder ouput is incorrect!");
 
         for (auto& x : data2)
-            REQUIRE_MESSAGE (x == -1.0f, "Householder out-of-place ouput is incorrect!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (x, -1.0f), "Householder out-of-place ouput is incorrect!");
     }
 
     SECTION ("Householder Vector Test")
@@ -60,9 +60,9 @@ TEST_CASE ("Matrix Ops Test", "[dsp][math][simd]")
 
         chowdsp::MatrixOps::Hadamard<float, size>::inPlace (data.data());
 
-        REQUIRE_MESSAGE (data[0] == (float) size / (float) sqrt (size), "Hadamard value 0 is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (data[0], (float) size / (float) sqrt (size)), "Hadamard value 0 is incorrect!");
         for (size_t i = 1; i < size; ++i)
-            REQUIRE_MESSAGE (data[i] == 0.0f, "Hadamard output is incorrect!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (data[i], 0.0f), "Hadamard output is incorrect!");
     }
 
     SECTION ("Hadamard Scalar Test Small")
@@ -74,9 +74,9 @@ TEST_CASE ("Matrix Ops Test", "[dsp][math][simd]")
 
         chowdsp::MatrixOps::Hadamard<float, size>::inPlace (data.data());
 
-        REQUIRE_MESSAGE (data[0] == (float) size / (float) sqrt (size), "Hadamard value 0 is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (data[0], (float) size / (float) sqrt (size)), "Hadamard value 0 is incorrect!");
         for (size_t i = 1; i < size; ++i)
-            REQUIRE_MESSAGE (data[i] == 0.0f, "Hadamard output is incorrect!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (data[i], 0.0f), "Hadamard output is incorrect!");
     }
 
     SECTION ("Hadamard Scalar Test Large")
@@ -88,9 +88,9 @@ TEST_CASE ("Matrix Ops Test", "[dsp][math][simd]")
 
         chowdsp::MatrixOps::Hadamard<float, size>::inPlace (data.data());
 
-        REQUIRE_MESSAGE (data[0] == (float) size / (float) sqrt (size), "Hadamard value 0 is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (data[0], (float) size / (float) sqrt (size)), "Hadamard value 0 is incorrect!");
         for (size_t i = 1; i < size; ++i)
-            REQUIRE_MESSAGE (data[i] == 0.0f, "Hadamard output is incorrect!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (data[i], 0.0f), "Hadamard output is incorrect!");
     }
 
     SECTION ("Hadamard Vector Test")
@@ -101,12 +101,12 @@ TEST_CASE ("Matrix Ops Test", "[dsp][math][simd]")
         std::fill (data.begin(), data.end(), 1.0f);
         chowdsp::MatrixOps::Hadamard<VecType, size>::inPlace (data.data());
 
-        REQUIRE_MESSAGE (data[0].get (0) == float (size * VecType ::size) / (float) sqrt (size * VecType::size), "Hadamard value 0 is incorrect!");
-        REQUIRE_MESSAGE (data[0].get (1) == 0.0f, "Hadamard output is incorrect!");
-        REQUIRE_MESSAGE (data[0].get (2) == 0.0f, "Hadamard output is incorrect!");
-        REQUIRE_MESSAGE (data[0].get (3) == 0.0f, "Hadamard output is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (data[0].get (0), float (size * VecType ::size) / (float) sqrt (size * VecType::size)), "Hadamard value 0 is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (data[0].get (1), 0.0f), "Hadamard output is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (data[0].get (2), 0.0f), "Hadamard output is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (data[0].get (3), 0.0f), "Hadamard output is incorrect!");
         for (size_t i = 1; i < size; ++i)
             for (size_t j = 0; j < VecType::size; ++j)
-                REQUIRE_MESSAGE (data[i].get (j) == 0.0f, "Hadamard output is incorrect!");
+                REQUIRE_MESSAGE (juce::approximatelyEqual (data[i].get (j), 0.0f), "Hadamard output is incorrect!");
     }
 }

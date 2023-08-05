@@ -55,7 +55,7 @@ public:
 
     [[nodiscard]] std::vector<foleys::SettableProperty> getSettableProperties() const override
     {
-        std::function<void (juce::ComboBox&)> createAssetFilesMenuLambda = [=] (juce::ComboBox&)
+        std::function<void (juce::ComboBox&)> createAssetFilesMenuLambda = [this] (juce::ComboBox&)
         {
             magicBuilder.getMagicState().createAssetFilesMenu();
         };

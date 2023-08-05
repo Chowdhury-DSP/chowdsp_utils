@@ -1,5 +1,7 @@
-#include <CatchUtils.h>
 #include <chowdsp_dsp_data_structures/chowdsp_dsp_data_structures.h>
+
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wfloat-equal")
+#include <CatchUtils.h>
 
 static_assert (! chowdsp::IsConstBuffer<chowdsp::Buffer<float>>);
 static_assert (! chowdsp::IsConstBuffer<chowdsp::Buffer<float>&>);
@@ -178,3 +180,4 @@ TEMPLATE_TEST_CASE ("Buffer Iterators Test",
         }
     }
 }
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE

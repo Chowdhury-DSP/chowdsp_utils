@@ -1,6 +1,9 @@
 #include <CatchUtils.h>
-#include <chowdsp_units/chowdsp_units.h>
 
+#include <juce_core/juce_core.h>
+
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wfloat-equal")
+#include <chowdsp_units/chowdsp_units.h>
 using namespace chowdsp::Units;
 
 TEST_CASE ("Time Units Test", "[common][units]")
@@ -10,7 +13,7 @@ TEST_CASE ("Time Units Test", "[common][units]")
         constexpr auto tt_seconds = Time<Seconds> { 0.1f };
         constexpr Time<MilliSeconds> tt_milliseconds = tt_seconds;
         static_assert (tt_milliseconds.value() == 100.0f);
-        REQUIRE_MESSAGE (tt_milliseconds.value() == 100.0f, tt_milliseconds << " should be equal to " << 100.0f);
+        REQUIRE_MESSAGE (juce::approximatelyEqual (tt_milliseconds.value(), 100.0f), tt_milliseconds << " should be equal to " << 100.0f);
     }
 
     SECTION ("Samples To Seconds (and back)")
@@ -18,7 +21,7 @@ TEST_CASE ("Time Units Test", "[common][units]")
         constexpr auto tt_samples = Time<Samples> { 1000.0f, 1000.0f };
         constexpr auto ttt_sec = Time<Seconds> { tt_samples };
         constexpr auto ttt_samples = Time<Samples> { ttt_sec, 500.0f };
-        REQUIRE_MESSAGE (ttt_samples.value() == 500.0f, ttt_samples << " should be equal to " << 500.0f);
+        REQUIRE_MESSAGE (juce::approximatelyEqual (ttt_samples.value(), 500.0f), ttt_samples << " should be equal to " << 500.0f);
     }
 
     SECTION ("Integer Samples")
@@ -66,3 +69,4 @@ TEST_CASE ("Time Units Test", "[common][units]")
         REQUIRE (t_microseconds < tt_seconds);
     }
 }
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE

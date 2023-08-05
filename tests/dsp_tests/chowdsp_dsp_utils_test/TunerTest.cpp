@@ -41,7 +41,7 @@ TEST_CASE ("Tuner Test", "[dsp][misc]")
         chowdsp::BufferMath::applyGain (buffer, 0.001f);
         tuner.process (buffer.getReadPointer (0));
 
-        REQUIRE_MESSAGE (tuner.getCurrentFrequencyHz() == 1.0f, "Tuner frequency should read 1.0 Hz for silence!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (tuner.getCurrentFrequencyHz(), 1.0f), "Tuner frequency should read 1.0 Hz for silence!");
     }
 
     SECTION ("100 Hz Test")

@@ -282,15 +282,15 @@ TEST_CASE ("Small Vector Test", "[common][data-structures]")
 
         vec.insert (vec.begin() + 1, 1.5);
         REQUIRE (vec.size() == 3);
-        REQUIRE (vec[1] == 1.5);
+        REQUIRE (juce::exactlyEqual (vec[1], 1.5));
 
         vec.insert (vec.begin() + 1, 1.25);
         REQUIRE (vec.size() == 4);
-        REQUIRE (vec[1] == 1.25);
+        REQUIRE (juce::exactlyEqual (vec[1], 1.25));
 
         vec.insert (vec.begin() + 3, 1.75);
         REQUIRE (vec.size() == 5);
-        REQUIRE (vec[3] == 1.75);
+        REQUIRE (juce::exactlyEqual (vec[3], 1.75));
     }
 
     SECTION ("Insert Copy Single Value Test")
@@ -320,25 +320,25 @@ TEST_CASE ("Small Vector Test", "[common][data-structures]")
             chowdsp::SmallVector<double, 6> vec { 1.0, 2.0 };
             vec.insert (vec.begin() + 1, decimals.begin(), decimals.end());
             REQUIRE (vec.size() == 6);
-            REQUIRE (vec[1] == 1.2);
-            REQUIRE (vec[3] == 1.6);
-            REQUIRE (vec[5] == 2.0);
+            REQUIRE (juce::exactlyEqual (vec[1], 1.2));
+            REQUIRE (juce::exactlyEqual (vec[3], 1.6));
+            REQUIRE (juce::exactlyEqual (vec[5], 2.0));
         }
         {
             chowdsp::SmallVector<double, 8> vec { 1.0, 2.0 };
             vec.insert (vec.begin() + 1, decimals.begin(), decimals.end());
             REQUIRE (vec.size() == 6);
-            REQUIRE (vec[1] == 1.2);
-            REQUIRE (vec[3] == 1.6);
-            REQUIRE (vec[5] == 2.0);
+            REQUIRE (juce::exactlyEqual (vec[1], 1.2));
+            REQUIRE (juce::exactlyEqual (vec[3], 1.6));
+            REQUIRE (juce::exactlyEqual (vec[5], 2.0));
         }
         {
             chowdsp::SmallVector<double, 2> vec { 1.0, 2.0 };
             vec.insert (vec.begin() + 1, { 1.2, 1.4, 1.6, 1.8 });
             REQUIRE (vec.size() == 6);
-            REQUIRE (vec[1] == 1.2);
-            REQUIRE (vec[3] == 1.6);
-            REQUIRE (vec[5] == 2.0);
+            REQUIRE (juce::exactlyEqual (vec[1], 1.2));
+            REQUIRE (juce::exactlyEqual (vec[3], 1.6));
+            REQUIRE (juce::exactlyEqual (vec[5], 2.0));
         }
     }
 
@@ -348,17 +348,17 @@ TEST_CASE ("Small Vector Test", "[common][data-structures]")
             chowdsp::SmallVector<double, 2> vec { 1.0, 2.0 };
             vec.insert (vec.begin() + 1, 3, 1.5);
             REQUIRE (vec.size() == 5);
-            REQUIRE (vec[1] == 1.5);
-            REQUIRE (vec[3] == 1.5);
-            REQUIRE (vec[4] == 2.0);
+            REQUIRE (juce::exactlyEqual (vec[1], 1.5));
+            REQUIRE (juce::exactlyEqual (vec[3], 1.5));
+            REQUIRE (juce::exactlyEqual (vec[4], 2.0));
         }
         {
             chowdsp::SmallVector<double, 8> vec { 1.0, 2.0 };
             vec.insert (vec.begin() + 1, 3, 1.5);
             REQUIRE (vec.size() == 5);
-            REQUIRE (vec[1] == 1.5);
-            REQUIRE (vec[3] == 1.5);
-            REQUIRE (vec[4] == 2.0);
+            REQUIRE (juce::exactlyEqual (vec[1], 1.5));
+            REQUIRE (juce::exactlyEqual (vec[3], 1.5));
+            REQUIRE (juce::exactlyEqual (vec[4], 2.0));
         }
     }
 

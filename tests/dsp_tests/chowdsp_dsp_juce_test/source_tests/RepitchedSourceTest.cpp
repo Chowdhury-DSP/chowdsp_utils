@@ -38,7 +38,7 @@ TEST_CASE ("Repitched Source Test", "[dsp][sources][resampling]")
         sineProc.prepare ({ fs, (juce::uint32) blockSize, 1 });
         sineProc.sine.setFrequency (sineFreq);
         sineProc.setRepitchFactor (repitchFactor);
-        REQUIRE_MESSAGE (sineProc.getRepitchFactor() == repitchFactor, "Set repitch factor is incorrect!");
+        REQUIRE_MESSAGE (juce::exactlyEqual (sineProc.getRepitchFactor(), repitchFactor), "Set repitch factor is incorrect!");
 
         chowdsp::TunerProcessor<float> tuner;
         tuner.prepare (fs);

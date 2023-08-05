@@ -103,12 +103,12 @@ void BypassProcessor<SampleType, DelayInterpType, std::enable_if_t<! std::is_sam
 template <typename SampleType, typename DelayInterpType>
 void BypassProcessor<SampleType, DelayInterpType, std::enable_if_t<! std::is_same_v<DelayInterpType, std::nullptr_t>>>::setLatencySamplesInternal (NumericType delaySamples)
 {
-    if (delaySamples == prevDelay)
+    if (juce::approximatelyEqual (delaySamples, prevDelay))
         return;
 
     compDelay.setDelay ((NumericType) delaySamples);
 
-    if (delaySamples == 0)
+    if (juce::approximatelyEqual (delaySamples, (NumericType) 0))
         compDelay.reset();
 
     prevDelay = delaySamples;
@@ -126,7 +126,7 @@ bool BypassProcessor<SampleType, DelayInterpType, std::enable_if_t<! std::is_sam
 
     auto doDelayOp = [] (auto& sampleBuffer, auto& delay, DelayOp op)
     {
-        if (delay.getDelay() == NumericType (0))
+        if (juce::approximatelyEqual (delay.getDelay(), NumericType (0)))
             return;
 
         for (int ch = 0; ch < sampleBuffer.getNumChannels(); ++ch)

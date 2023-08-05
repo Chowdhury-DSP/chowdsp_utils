@@ -135,22 +135,22 @@ TEST_CASE ("Polynomials Test", "[dsp][math][simd]")
         {
             float testArr[4];
             chowdsp::Polynomials::antiderivative<2> ({ 1.0f, 2.0f, 1.0f }, testArr, -1.0f);
-            REQUIRE_MESSAGE (testArr[0] == 1.0f / 3.0f, "Degree 3 is incorrect!");
-            REQUIRE_MESSAGE (testArr[1] == 1.0f, "Degree 2 is incorrect!");
-            REQUIRE_MESSAGE (testArr[2] == 1.0f, "Degree 1 is incorrect!");
-            REQUIRE_MESSAGE (testArr[3] == -1.0f, "Degree 0 is incorrect!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (testArr[0], 1.0f / 3.0f), "Degree 3 is incorrect!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (testArr[1], 1.0f), "Degree 2 is incorrect!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (testArr[2], 1.0f), "Degree 1 is incorrect!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (testArr[3], -1.0f), "Degree 0 is incorrect!");
         }
 
         {
             double testArr[7];
             chowdsp::Polynomials::antiderivative<5> ({ 10.0, 2.0, 1.0, 0.0, -3.0, -2.5 }, testArr);
-            REQUIRE_MESSAGE (testArr[0] == 10.0 / 6.0, "Degree 6 is incorrect!");
-            REQUIRE_MESSAGE (testArr[1] == 2.0 / 5.0, "Degree 5 is incorrect!");
-            REQUIRE_MESSAGE (testArr[2] == 1.0 / 4.0, "Degree 4 is incorrect!");
-            REQUIRE_MESSAGE (testArr[3] == 0.0, "Degree 3 is incorrect!");
-            REQUIRE_MESSAGE (testArr[4] == -3.0 / 2.0, "Degree 2 is incorrect!");
-            REQUIRE_MESSAGE (testArr[5] == -2.5, "Degree 1 is incorrect!");
-            REQUIRE_MESSAGE (testArr[6] == 0.0, "Degree 0 is incorrect!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (testArr[0], 10.0 / 6.0), "Degree 6 is incorrect!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (testArr[1], 2.0 / 5.0), "Degree 5 is incorrect!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (testArr[2], 1.0 / 4.0), "Degree 4 is incorrect!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (testArr[3], 0.0), "Degree 3 is incorrect!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (testArr[4], -3.0 / 2.0), "Degree 2 is incorrect!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (testArr[5], -2.5), "Degree 1 is incorrect!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (testArr[6], 0.0), "Degree 0 is incorrect!");
         }
     }
 
@@ -159,18 +159,18 @@ TEST_CASE ("Polynomials Test", "[dsp][math][simd]")
         {
             float testArr[2];
             chowdsp::Polynomials::derivative<2> ({ 1.0f, 2.0f, 1.0f }, testArr);
-            REQUIRE_MESSAGE (testArr[0] == 2.0f, "Degree 1 is incorrect!");
-            REQUIRE_MESSAGE (testArr[1] == 2.0f, "Degree 0 is incorrect!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (testArr[0], 2.0f), "Degree 1 is incorrect!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (testArr[1], 2.0f), "Degree 0 is incorrect!");
         }
 
         {
             double testArr[5];
             chowdsp::Polynomials::derivative<5> ({ 10.0, 2.0, 1.0, 0.0, -3.0, -2.5 }, testArr);
-            REQUIRE_MESSAGE (testArr[0] == 50.0, "Degree 4 is incorrect!");
-            REQUIRE_MESSAGE (testArr[1] == 8.0, "Degree 3 is incorrect!");
-            REQUIRE_MESSAGE (testArr[2] == 3.0, "Degree 2 is incorrect!");
-            REQUIRE_MESSAGE (testArr[3] == 0.0, "Degree 1 is incorrect!");
-            REQUIRE_MESSAGE (testArr[4] == -3.0, "Degree 0 is incorrect!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (testArr[0], 50.0), "Degree 4 is incorrect!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (testArr[1], 8.0), "Degree 3 is incorrect!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (testArr[2], 3.0), "Degree 2 is incorrect!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (testArr[3], 0.0), "Degree 1 is incorrect!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (testArr[4], -3.0), "Degree 0 is incorrect!");
         }
     }
 }

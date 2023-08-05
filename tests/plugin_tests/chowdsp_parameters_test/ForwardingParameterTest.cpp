@@ -36,13 +36,13 @@ TEST_CASE ("Forwarding Parameter Test", "[plugin][parameters]")
         testParam->setValue (0.5f);
 
         REQUIRE_MESSAGE (testParam->getName (1024) == juce::String ("NONE"), "Parameter name is incorrect!");
-        REQUIRE_MESSAGE (testParam->getValue() == 0.0f, "Parameter value is incorrect!");
-        REQUIRE_MESSAGE (testParam->getDefaultValue() == 0.0f, "Default parameter value is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (testParam->getValue(), 0.0f), "Parameter value is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (testParam->getDefaultValue(), 0.0f), "Default parameter value is incorrect!");
         REQUIRE_MESSAGE (testParam->getText (0.2f, 1024) == juce::String(), "Parameter text is incorrect!");
-        REQUIRE_MESSAGE (testParam->getValueForText ("0.9") == 0.0f, "Parameter value for text is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (testParam->getValueForText ("0.9"), 0.0f), "Parameter value for text is incorrect!");
 
         auto& norm = dynamic_cast<juce::RangedAudioParameter*> (testParam.get())->getNormalisableRange();
-        REQUIRE_MESSAGE (norm.interval == 0.01f, "Parameter normalization is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (norm.interval, 0.01f), "Parameter normalization is incorrect!");
 
         auto* modulatableTestParam = dynamic_cast<chowdsp::ParamUtils::ModParameterMixin*> (testParam.get());
         REQUIRE_MESSAGE (! modulatableTestParam->supportsMonophonicModulation(), "Null parameter should not support modulation!");
@@ -62,16 +62,16 @@ TEST_CASE ("Forwarding Parameter Test", "[plugin][parameters]")
 
         auto* testParam = (juce::AudioProcessorParameter*) forwardingParam;
         REQUIRE_MESSAGE (testParam->getName (1024) == dummyParam->getName (1024), "Parameter name is incorrect!");
-        REQUIRE_MESSAGE (testParam->getDefaultValue() == dummyParam->getDefaultValue(), "Default parameter value is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (testParam->getDefaultValue(), dummyParam->getDefaultValue()), "Default parameter value is incorrect!");
         REQUIRE_MESSAGE (testParam->getText (0.2f, 1024) == dummyParam->getText (0.2f, 1024), "Parameter text is incorrect!");
-        REQUIRE_MESSAGE (testParam->getValueForText ("0.9") == dummyParam->getValueForText ("0.9"), "Parameter value for text is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (testParam->getValueForText ("0.9"), dummyParam->getValueForText ("0.9")), "Parameter value for text is incorrect!");
 
         auto& expNorm = dummy.getState().params.dummy->getNormalisableRange();
         auto& actualNorm = dynamic_cast<juce::RangedAudioParameter*> (testParam)->getNormalisableRange();
-        REQUIRE_MESSAGE (actualNorm.start == expNorm.start, "Range start is incorrect!");
-        REQUIRE_MESSAGE (actualNorm.end == expNorm.end, "Range end is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (actualNorm.start, expNorm.start), "Range start is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (actualNorm.end, expNorm.end), "Range end is incorrect!");
 
-        REQUIRE_MESSAGE (testParam->getValue() == dummyParam->getValue(), "Initial parameter value is incorrect!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (testParam->getValue(), dummyParam->getValue()), "Initial parameter value is incorrect!");
 
         constexpr float error = 1.0e-6f;
         constexpr float value1 = 0.8f;
@@ -160,9 +160,9 @@ TEST_CASE ("Forwarding Parameter Test", "[plugin][parameters]")
             REQUIRE_MESSAGE (! testParamAsModParam->supportsMonophonicModulation(), "juce::AudioParameterFloat should not support modulation!");
             REQUIRE_MESSAGE (! testParamAsModParam->supportsPolyphonicModulation(), "juce::AudioParameterFloat should not support modulation!");
 
-            REQUIRE_MESSAGE (forwardParam->get() == defaultValue, "Parameter has incorrect value before parameter modulation!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (forwardParam->get(), defaultValue), "Parameter has incorrect value before parameter modulation!");
             testParamAsModParam->applyMonophonicModulation ((double) modulationAmount); // should have no effect, since the parameter doesn't support modulation!
-            REQUIRE_MESSAGE (forwardParam->get() == defaultValue, "Parameter has incorrect value after parameter modulation!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (forwardParam->get(), defaultValue), "Parameter has incorrect value after parameter modulation!");
 
             testParam->setParam (nullptr);
         }
@@ -191,9 +191,9 @@ TEST_CASE ("Forwarding Parameter Test", "[plugin][parameters]")
             REQUIRE_MESSAGE (testParamAsModParam->supportsMonophonicModulation(), "chowdsp::FloatParameter should support monophonic modulation!");
             REQUIRE_MESSAGE (! testParamAsModParam->supportsPolyphonicModulation(), "chowdsp::FloatParameter should not support polyphonic modulation!");
 
-            REQUIRE_MESSAGE (forwardParam->getCurrentValue() == defaultValue, "Parameter has incorrect value before parameter modulation!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (forwardParam->getCurrentValue(), defaultValue), "Parameter has incorrect value before parameter modulation!");
             testParamAsModParam->applyMonophonicModulation ((double) modulationAmount);
-            REQUIRE_MESSAGE (forwardParam->getCurrentValue() == defaultValue + modulationAmount, "Parameter has incorrect value after parameter modulation!");
+            REQUIRE_MESSAGE (juce::approximatelyEqual (forwardParam->getCurrentValue(), defaultValue + modulationAmount), "Parameter has incorrect value after parameter modulation!");
 
             testParam->setParam (nullptr);
         }

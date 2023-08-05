@@ -157,12 +157,12 @@ private:
         const auto k = std::sqrt (m);
 
         jassert (k <= 1.0); // k is ill-formed
-        if (k == 1.0)
+        if (juce::exactlyEqual (k, 1.0))
             return std::atanh (w);
 
         std::vector<double> ks { k };
         int nIter = 0;
-        while (ks.back() != 0.0)
+        while (! juce::exactlyEqual (ks.back(), 0.0))
         {
             const auto k_ = ks.back();
             const auto k_p = complement (k_);
@@ -223,7 +223,7 @@ private:
 
         const auto eps = std::sqrt (eps_sq);
         const auto ck1_sq = eps_sq / pow10m1 (0.1 * (double) stopBandAttenuationDB);
-        jassert (ck1_sq != 0); // "Cannot design a filter with given rp and rs specifications."
+        jassert (! juce::exactlyEqual (ck1_sq, 0.0)); // "Cannot design a filter with given rp and rs specifications."
 
         const auto val0 = ellipticK (std::sqrt (ck1_sq));
         const auto m = ellipdeg ((double) order, ck1_sq);

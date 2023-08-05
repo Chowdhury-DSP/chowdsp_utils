@@ -1,30 +1,31 @@
 /*
-  ==============================================================================
+==============================================================================
 
-   This file is part of the JUCE library.
-   Copyright (c) 2020 - Raw Material Software Limited
+ This file is part of the JUCE library.
+ Copyright (c) 2022 - Raw Material Software Limited
 
-   JUCE is an open source library subject to commercial or open-source
-   licensing.
+ JUCE is an open source library subject to commercial or open-source
+ licensing.
 
-   The code included in this file is provided under the terms of the ISC license
-   http://www.isc.org/downloads/software-support-policy/isc-license. Permission
-   To use, copy, modify, and/or distribute this software for any purpose with or
-   without fee is hereby granted provided that the above copyright notice and
-   this permission notice appear in all copies.
+ The code included in this file is provided under the terms of the ISC license
+ http://www.isc.org/downloads/software-support-policy/isc-license. Permission
+ To use, copy, modify, and/or distribute this software for any purpose with or
+ without fee is hereby granted provided that the above copyright notice and
+ this permission notice appear in all copies.
 
-   JUCE IS PROVIDED "AS IS" WITHOUT ANY WARRANTY, AND ALL WARRANTIES, WHETHER
-   EXPRESSED OR IMPLIED, INCLUDING MERCHANTABILITY AND FITNESS FOR PURPOSE, ARE
-   DISCLAIMED.
+ JUCE IS PROVIDED "AS IS" WITHOUT ANY WARRANTY, AND ALL WARRANTIES, WHETHER
+ EXPRESSED OR IMPLIED, INCLUDING MERCHANTABILITY AND FITNESS FOR PURPOSE, ARE
+ DISCLAIMED.
 
-  ==============================================================================
+==============================================================================
 */
 
 namespace juce
 {
+
 //==============================================================================
 /*
-    This file sets up some handy mathematical typdefs and functions.
+  This file sets up some handy mathematical typdefs and functions.
 */
 
 //==============================================================================
@@ -57,10 +58,10 @@ using uint64 = unsigned long long;
 
 #ifndef DOXYGEN
 /** A macro for creating 64-bit literals.
-     Historically, this was needed to support portability with MSVC6, and is kept here
-     so that old code will still compile, but nowadays every compiler will support the
-     LL and ULL suffixes, so you should use those in preference to this macro.
- */
+   Historically, this was needed to support portability with MSVC6, and is kept here
+   so that old code will still compile, but nowadays every compiler will support the
+   LL and ULL suffixes, so you should use those in preference to this macro.
+*/
 #define literal64bit(longLiteral) (longLiteral##LL)
 #endif
 
@@ -84,6 +85,29 @@ using pointer_sized_uint = unsigned int;
 #if JUCE_WINDOWS && ! JUCE_MINGW
 using ssize_t = pointer_sized_int;
 #endif
+
+/** Returns true if the two numbers are approximately equal. This is useful for floating-point
+  and double comparisons.
+*/
+template <typename Type>
+bool approximatelyEqual (Type a, Type b) noexcept
+{
+    return std::abs (a - b) <= (std::numeric_limits<Type>::epsilon() * std::max (a, b))
+           || std::abs (a - b) < std::numeric_limits<Type>::min();
+}
+
+/** Equivalent to operator==, but suppresses float-equality warnings.
+
+  This allows code to be explicit about float-equality checks that are known to have the correct
+  semantics.
+*/
+template <typename Type>
+constexpr bool exactlyEqual (Type a, Type b)
+{
+    JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wfloat-equal")
+    return a == b;
+    JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+}
 
 //==============================================================================
 // Some indispensable min/max functions
@@ -131,7 +155,7 @@ constexpr Type jmin (Type a, Type b, Type c, Type d)
 }
 
 /** Remaps a normalised value (between 0 and 1) to a target range.
-    This effectively returns (targetRangeMin + value0To1 * (targetRangeMax - targetRangeMin)).
+  This effectively returns (targetRangeMin + value0To1 * (targetRangeMax - targetRangeMin)).
 */
 template <typename Type>
 constexpr Type jmap (Type value0To1, Type targetRangeMin, Type targetRangeMax)
@@ -143,19 +167,19 @@ constexpr Type jmap (Type value0To1, Type targetRangeMin, Type targetRangeMax)
 template <typename Type>
 Type jmap (Type sourceValue, Type sourceRangeMin, Type sourceRangeMax, Type targetRangeMin, Type targetRangeMax)
 {
-    jassert (sourceRangeMax != sourceRangeMin); // mapping from a range of zero will produce NaN!
+    jassert (! approximatelyEqual (sourceRangeMax, sourceRangeMin)); // mapping from a range of zero will produce NaN!
     return targetRangeMin + ((targetRangeMax - targetRangeMin) * (sourceValue - sourceRangeMin)) / (sourceRangeMax - sourceRangeMin);
 }
 
 /** Remaps a normalised value (between 0 and 1) to a logarithmic target range.
 
-    The entire target range must be greater than zero.
+  The entire target range must be greater than zero.
 
-    @see mapFromLog10
+  @see mapFromLog10
 
-    @code
-    mapToLog10 (0.5, 0.4, 40.0) == 4.0
-    @endcode
+  @code
+  mapToLog10 (0.5, 0.4, 40.0) == 4.0
+  @endcode
 */
 template <typename Type>
 Type mapToLog10 (Type value0To1, Type logRangeMin, Type logRangeMax)
@@ -171,13 +195,13 @@ Type mapToLog10 (Type value0To1, Type logRangeMin, Type logRangeMax)
 
 /** Remaps a logarithmic value in a target range to a normalised value (between 0 and 1).
 
-    The entire target range must be greater than zero.
+  The entire target range must be greater than zero.
 
-    @see mapToLog10
+  @see mapToLog10
 
-    @code
-    mapFromLog10 (4.0, 0.4, 40.0) == 0.5
-    @endcode
+  @code
+  mapFromLog10 (4.0, 0.4, 40.0) == 0.5
+  @endcode
 */
 template <typename Type>
 Type mapFromLog10 (Type valueInLogRange, Type logRangeMin, Type logRangeMax)
@@ -263,19 +287,19 @@ void findMinAndMax (const Type* values, int numValues, Type& lowest, Type& highe
 //==============================================================================
 /** Constrains a value to keep it within a given range.
 
-    This will check that the specified value lies between the lower and upper bounds
-    specified, and if not, will return the nearest value that would be in-range. Effectively,
-    it's like calling jmax (lowerLimit, jmin (upperLimit, value)).
+  This will check that the specified value lies between the lower and upper bounds
+  specified, and if not, will return the nearest value that would be in-range. Effectively,
+  it's like calling jmax (lowerLimit, jmin (upperLimit, value)).
 
-    Note that it expects that lowerLimit <= upperLimit. If this isn't true,
-    the results will be unpredictable.
+  Note that it expects that lowerLimit <= upperLimit. If this isn't true,
+  the results will be unpredictable.
 
-    @param lowerLimit           the minimum value to return
-    @param upperLimit           the maximum value to return
-    @param valueToConstrain     the value to try to return
-    @returns    the closest value to valueToConstrain which lies between lowerLimit
-                and upperLimit (inclusive)
-    @see jmin, jmax, jmap
+  @param lowerLimit           the minimum value to return
+  @param upperLimit           the maximum value to return
+  @param valueToConstrain     the value to try to return
+  @returns    the closest value to valueToConstrain which lies between lowerLimit
+              and upperLimit (inclusive)
+  @see jmin, jmax, jmap
 */
 template <typename Type>
 Type jlimit (Type lowerLimit,
@@ -290,9 +314,9 @@ Type jlimit (Type lowerLimit,
 }
 
 /** Returns true if a value is at least zero, and also below a specified upper limit.
-    This is basically a quicker way to write:
-    @code valueToTest >= 0 && valueToTest < upperLimit
-    @endcode
+  This is basically a quicker way to write:
+  @code valueToTest >= 0 && valueToTest < upperLimit
+  @endcode
 */
 template <typename Type1, typename Type2>
 bool isPositiveAndBelow (Type1 valueToTest, Type2 upperLimit) noexcept
@@ -309,9 +333,9 @@ bool isPositiveAndBelow (int valueToTest, Type upperLimit) noexcept
 }
 
 /** Returns true if a value is at least zero, and also less than or equal to a specified upper limit.
-    This is basically a quicker way to write:
-    @code valueToTest >= 0 && valueToTest <= upperLimit
-    @endcode
+  This is basically a quicker way to write:
+  @code valueToTest >= 0 && valueToTest <= upperLimit
+  @endcode
 */
 template <typename Type1, typename Type2>
 bool isPositiveAndNotGreaterThan (Type1 valueToTest, Type2 upperLimit) noexcept
@@ -328,22 +352,12 @@ bool isPositiveAndNotGreaterThan (int valueToTest, Type upperLimit) noexcept
 }
 
 /** Computes the absolute difference between two values and returns true if it is less than or equal
-    to a given tolerance, otherwise it returns false.
+  to a given tolerance, otherwise it returns false.
 */
 template <typename Type>
 bool isWithin (Type a, Type b, Type tolerance) noexcept
 {
     return std::abs (a - b) <= tolerance;
-}
-
-/** Returns true if the two numbers are approximately equal. This is useful for floating-point
-    and double comparisons.
-*/
-template <typename Type>
-bool approximatelyEqual (Type a, Type b) noexcept
-{
-    return std::abs (a - b) <= (std::numeric_limits<Type>::epsilon() * std::max (a, b))
-           || std::abs (a - b) < std::numeric_limits<Type>::min();
 }
 
 //==============================================================================
@@ -354,12 +368,12 @@ void ignoreUnused (Types&&...) noexcept
 }
 
 /** Handy function for getting the number of elements in a simple const C array.
-    E.g.
-    @code
-    static int myArray[] = { 1, 2, 3 };
+  E.g.
+  @code
+  static int myArray[] = { 1, 2, 3 };
 
-    int numElements = numElementsInArray (myArray) // returns 3
-    @endcode
+  int numElements = numElementsInArray (myArray) // returns 3
+  @endcode
 */
 template <typename Type, size_t N>
 constexpr int numElementsInArray (Type (&)[N]) noexcept
@@ -371,7 +385,7 @@ constexpr int numElementsInArray (Type (&)[N]) noexcept
 // Some useful maths functions that aren't always present with all compilers and build settings.
 
 /** Using juce_hypot is easier than dealing with the different types of hypot function
-    that are provided by the various platforms and compilers. */
+  that are provided by the various platforms and compilers. */
 template <typename Type>
 Type juce_hypot (Type a, Type b) noexcept
 {
@@ -397,7 +411,7 @@ inline float juce_hypot (float a, float b) noexcept
 //==============================================================================
 /** Commonly used mathematical constants
 
-    @tags{Core}
+  @tags{Core}
 */
 template <typename FloatType>
 struct MathConstants
@@ -442,7 +456,7 @@ constexpr FloatType radiansToDegrees (FloatType radians) noexcept
 
 //==============================================================================
 /** The isfinite() method seems to vary between platforms, so this is a
-    platform-independent function for it.
+  platform-independent function for it.
 */
 template <typename NumericType>
 bool juce_isfinite (NumericType) noexcept
@@ -480,13 +494,13 @@ inline bool juce_isfinite (double value) noexcept
 
 /** Fast floating-point-to-integer conversion.
 
-    This is faster than using the normal c++ cast to convert a float to an int, and
-    it will round the value to the nearest integer, rather than rounding it down
-    like the normal cast does.
+  This is faster than using the normal c++ cast to convert a float to an int, and
+  it will round the value to the nearest integer, rather than rounding it down
+  like the normal cast does.
 
-    Note that this routine gets its speed at the expense of some accuracy, and when
-    rounding values whose floating point component is exactly 0.5, odd numbers and
-    even numbers will be rounded up or down differently.
+  Note that this routine gets its speed at the expense of some accuracy, and when
+  rounding values whose floating point component is exactly 0.5, odd numbers and
+  even numbers will be rounded up or down differently.
 */
 template <typename FloatType>
 int roundToInt (const FloatType value) noexcept
@@ -523,8 +537,8 @@ inline int roundToInt (int value) noexcept
 
 /** Fast floating-point-to-integer conversion.
 
-    This is a slightly slower and slightly more accurate version of roundToInt(). It works
-    fine for values above zero, but negative numbers are rounded the wrong way.
+  This is a slightly slower and slightly more accurate version of roundToInt(). It works
+  fine for values above zero, but negative numbers are rounded the wrong way.
 */
 inline int roundToIntAccurate (double value) noexcept
 {
@@ -538,9 +552,9 @@ inline int roundToIntAccurate (double value) noexcept
 //==============================================================================
 /** Truncates a positive floating-point number to an unsigned int.
 
-    This is generally faster than static_cast<unsigned int> (std::floor (x))
-    but it only works for positive numbers small enough to be represented as an
-    unsigned int.
+  This is generally faster than static_cast<unsigned int> (std::floor (x))
+  but it only works for positive numbers small enough to be represented as an
+  unsigned int.
 */
 template <typename FloatType>
 unsigned int truncatePositiveToUnsignedInt (FloatType value) noexcept
@@ -573,13 +587,13 @@ inline int nextPowerOfTwo (int n) noexcept
 }
 
 /** Returns the index of the highest set bit in a (non-zero) number.
-    So for n=3 this would return 1, for n=7 it returns 2, etc.
-    An input value of 0 is illegal!
+  So for n=3 this would return 1, for n=7 it returns 2, etc.
+  An input value of 0 is illegal!
 */
 int findHighestSetBit (uint32 n) noexcept;
 
 /** Returns the number of bits in a 32-bit integer. */
-inline int countNumberOfBits (uint32 n) noexcept
+constexpr int countNumberOfBits (uint32 n) noexcept
 {
     n -= ((n >> 1) & 0x55555555);
     n = (((n >> 2) & 0x33333333) + (n & 0x33333333));
@@ -590,13 +604,13 @@ inline int countNumberOfBits (uint32 n) noexcept
 }
 
 /** Returns the number of bits in a 64-bit integer. */
-inline int countNumberOfBits (uint64 n) noexcept
+constexpr int countNumberOfBits (uint64 n) noexcept
 {
     return countNumberOfBits ((uint32) n) + countNumberOfBits ((uint32) (n >> 32));
 }
 
 /** Performs a modulo operation, but can cope with the dividend being negative.
-    The divisor must be greater than zero.
+  The divisor must be greater than zero.
 */
 template <typename IntegerType>
 IntegerType negativeAwareModulo (IntegerType dividend, const IntegerType divisor) noexcept
@@ -615,29 +629,29 @@ inline constexpr NumericType square (NumericType n) noexcept
 
 //==============================================================================
 /** Writes a number of bits into a memory buffer at a given bit index.
-    The buffer is treated as a sequence of 8-bit bytes, and the value is encoded in little-endian order,
-    so for example if startBit = 10, and numBits = 11 then the lower 6 bits of the value would be written
-    into bits 2-8 of targetBuffer[1], and the upper 5 bits of value into bits 0-5 of targetBuffer[2].
+  The buffer is treated as a sequence of 8-bit bytes, and the value is encoded in little-endian order,
+  so for example if startBit = 10, and numBits = 11 then the lower 6 bits of the value would be written
+  into bits 2-8 of targetBuffer[1], and the upper 5 bits of value into bits 0-5 of targetBuffer[2].
 
-    @see readLittleEndianBitsInBuffer
+  @see readLittleEndianBitsInBuffer
 */
 void writeLittleEndianBitsInBuffer (void* targetBuffer, uint32 startBit, uint32 numBits, uint32 value) noexcept;
 
 /** Reads a number of bits from a buffer at a given bit index.
-    The buffer is treated as a sequence of 8-bit bytes, and the value is encoded in little-endian order,
-    so for example if startBit = 10, and numBits = 11 then the lower 6 bits of the result would be read
-    from bits 2-8 of sourceBuffer[1], and the upper 5 bits of the result from bits 0-5 of sourceBuffer[2].
+  The buffer is treated as a sequence of 8-bit bytes, and the value is encoded in little-endian order,
+  so for example if startBit = 10, and numBits = 11 then the lower 6 bits of the result would be read
+  from bits 2-8 of sourceBuffer[1], and the upper 5 bits of the result from bits 0-5 of sourceBuffer[2].
 
-    @see writeLittleEndianBitsInBuffer
+  @see writeLittleEndianBitsInBuffer
 */
 uint32 readLittleEndianBitsInBuffer (const void* sourceBuffer, uint32 startBit, uint32 numBits) noexcept;
 
 //==============================================================================
 #if JUCE_INTEL || DOXYGEN
 /** This macro can be applied to a float variable to check whether it contains a denormalised
-     value, and to normalise it if necessary.
-     On CPUs that aren't vulnerable to denormalisation problems, this will have no effect.
- */
+   value, and to normalise it if necessary.
+   On CPUs that aren't vulnerable to denormalisation problems, this will have no effect.
+*/
 #define JUCE_UNDENORMALISE(x) \
     {                         \
         (x) += 0.1f;          \
@@ -653,16 +667,16 @@ uint32 readLittleEndianBitsInBuffer (const void* sourceBuffer, uint32 startBit, 
 namespace TypeHelpers
 {
     /** The ParameterType struct is used to find the best type to use when passing some kind
-        of object as a parameter.
+      of object as a parameter.
 
-        Of course, this is only likely to be useful in certain esoteric template situations.
+      Of course, this is only likely to be useful in certain esoteric template situations.
 
-        E.g. "myFunction (typename TypeHelpers::ParameterType<int>::type, typename TypeHelpers::ParameterType<MyObject>::type)"
-        would evaluate to "myfunction (int, const MyObject&)", keeping any primitive types as
-        pass-by-value, but passing objects as a const reference, to avoid copying.
+      E.g. "myFunction (typename TypeHelpers::ParameterType<int>::type, typename TypeHelpers::ParameterType<MyObject>::type)"
+      would evaluate to "myfunction (int, const MyObject&)", keeping any primitive types as
+      pass-by-value, but passing objects as a const reference, to avoid copying.
 
-        @tags{Core}
-    */
+      @tags{Core}
+  */
     template <typename Type>
     struct ParameterType
     {
@@ -748,29 +762,18 @@ namespace TypeHelpers
 #endif
 
     /** These templates are designed to take a type, and if it's a double, they return a double
-        type; for anything else, they return a float type.
+      type; for anything else, they return a float type.
 
-        @tags{Core}
-    */
+      @tags{Core}
+  */
     template <typename Type>
-    struct SmallestFloatType
-    {
-        using type = float;
-    };
-
-#ifndef DOXYGEN
-    template <>
-    struct SmallestFloatType<double>
-    {
-        using type = double;
-    };
-#endif
+    using SmallestFloatType = std::conditional_t<std::is_same_v<Type, double>, double, float>;
 
     /** These templates are designed to take an integer type, and return an unsigned int
-        version with the same size.
+      version with the same size.
 
-        @tags{Core}
-    */
+      @tags{Core}
+  */
     template <int bytes>
     struct UnsignedTypeWithSize
     {

@@ -23,12 +23,12 @@ TEMPLATE_TEST_CASE ("Buffer Span Test",
 
         {
             auto readSpan0 = testBuffer.getReadSpan (0);
-            REQUIRE (std::accumulate (readSpan0.begin(), readSpan0.end(), 0.0f) == 4.0f);
+            REQUIRE (juce::exactlyEqual (std::accumulate (readSpan0.begin(), readSpan0.end(), 0.0f), 4.0f));
         }
 
         {
             auto readSpan1 = testBuffer.getReadSpan (1);
-            REQUIRE (std::accumulate (readSpan1.begin(), readSpan1.end(), 0.0f) == 8.0f);
+            REQUIRE (juce::exactlyEqual (std::accumulate (readSpan1.begin(), readSpan1.end(), 0.0f), 8.0f));
         }
     };
 

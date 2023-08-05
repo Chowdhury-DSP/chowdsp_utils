@@ -15,14 +15,14 @@ TEST_CASE ("Local Pointer Test", "[common][data-structures]")
             std::array<float, 2> data {};
         };
         ptr.emplace (5.0f, 6.0f);
-        REQUIRE (ptr->data[0] == 5.0f);
-        REQUIRE (ptr->data[1] == 6.0f);
+        REQUIRE (juce::exactlyEqual (ptr->data[0], 5.0f));
+        REQUIRE (juce::exactlyEqual (ptr->data[1], 6.0f));
 
         ptr->data[0] = 7.0f;
-        REQUIRE (std::as_const (ptr)->data[0] == 7.0f);
+        REQUIRE (juce::exactlyEqual (std::as_const (ptr)->data[0], 7.0f));
 
         (*ptr).data[1] = 8.0f;
-        REQUIRE ((*std::as_const (ptr)).data[1] == 8.0f);
+        REQUIRE (juce::exactlyEqual ((*std::as_const (ptr)).data[1], 8.0f));
 
         ptr.reset();
         REQUIRE (ptr == nullptr);

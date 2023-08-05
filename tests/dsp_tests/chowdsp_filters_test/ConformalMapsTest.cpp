@@ -52,7 +52,7 @@ TEST_CASE ("Conformal Maps Test", "[dsp][filters]")
             float a[2] {};
             chowdsp::ConformalMaps::Transform<float, 1>::alpha (b, a, bs, as, 2.0f * fs, 0.0f, fs);
 
-            REQUIRE_MESSAGE (b[0] == -b[1], "BE should map zero at DC to zero at DC");
+            REQUIRE_MESSAGE (juce::exactlyEqual (b[0], -b[1]), "BE should map zero at DC to zero at DC");
             REQUIRE_MESSAGE (std::abs (a[1]) < 0.01f, "BE should map high-frequency pole to near zero");
         }
 

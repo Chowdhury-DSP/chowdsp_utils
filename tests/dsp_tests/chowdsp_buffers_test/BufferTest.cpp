@@ -1,6 +1,8 @@
-#include <CatchUtils.h>
 #include <chowdsp_buffers/chowdsp_buffers.h>
 #include <chowdsp_buffers/Buffers/chowdsp_Buffer.cpp>
+
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wfloat-equal")
+#include <CatchUtils.h>
 
 template class chowdsp::Buffer<int>;
 
@@ -122,3 +124,4 @@ TEMPLATE_PRODUCT_TEST_CASE ("Buffer Test", "[dsp][buffers][simd]", (chowdsp::Buf
         }
     }
 }
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE

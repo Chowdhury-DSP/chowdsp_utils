@@ -87,9 +87,9 @@ TEMPLATE_TEST_CASE ("Modal Filter Test", "[dsp][modal][simd]", float, double, xs
         filter.processBlock (buffer.data(), (int) buffer.size());
 
         if constexpr (std::is_floating_point_v<T>)
-            REQUIRE_MESSAGE (filter.getFreq() == (NumericType) testFreq2, "Modal filter frequency is incorrect");
+            REQUIRE_MESSAGE (juce::exactlyEqual (filter.getFreq(), (NumericType) testFreq2), "Modal filter frequency is incorrect");
         else
-            REQUIRE_MESSAGE (filter.getFreq().get (0) == (NumericType) testFreq2, "Modal filter frequency is incorrect");
+            REQUIRE_MESSAGE (juce::exactlyEqual (filter.getFreq().get (0), (NumericType) testFreq2), "Modal filter frequency is incorrect");
 
         auto mag = juce::Decibels::gainToDecibels (getMagnitude (buffer));
         REQUIRE_MESSAGE ((mag - refMag) < (NumericType) -24.0f, "Modal filter is resonating at an incorrect frequency.");
@@ -123,6 +123,8 @@ TEMPLATE_TEST_CASE ("Modal Filter Test", "[dsp][modal][simd]", float, double, xs
         const auto actual = filter.processSample ((T) 1);
         const auto expected = std::sin (initialPhase);
 
+        JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wfloat-equal")
         REQUIRE_MESSAGE (chowdsp::SIMDUtils::all (actual == expected), "Incorrect initial phase!");
+        JUCE_END_IGNORE_WARNINGS_GCC_LIKE
     }
 }

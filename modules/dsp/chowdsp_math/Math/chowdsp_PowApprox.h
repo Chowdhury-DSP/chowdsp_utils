@@ -1,3 +1,5 @@
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wstrict-aliasing")
+
 namespace chowdsp
 {
 /**
@@ -157,3 +159,4 @@ namespace PowApprox
     }
 } // namespace PowApprox
 } // namespace chowdsp
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE

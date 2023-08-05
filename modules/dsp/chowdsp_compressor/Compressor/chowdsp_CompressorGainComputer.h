@@ -48,7 +48,7 @@ public:
     /** Sets the gain computer threshold in Decibels */
     void setThreshold (SampleType newThreshDB)
     {
-        if (threshDB != newThreshDB)
+        if (! juce::approximatelyEqual (threshDB, newThreshDB))
         {
             threshDB = newThreshDB;
             recalcKnees();
@@ -58,7 +58,7 @@ public:
     /** Sets the gain computer ratio */
     void setRatio (SampleType newRatio)
     {
-        if (ratio != newRatio)
+        if (! juce::approximatelyEqual (ratio, newRatio))
         {
             ratio = newRatio;
             recalcConstants();
@@ -68,7 +68,7 @@ public:
     /** Sets the gain computer knee in Decibels */
     void setKnee (SampleType newKneeDB)
     {
-        if (kneeDB != newKneeDB)
+        if (! juce::approximatelyEqual (kneeDB, newKneeDB))
         {
             kneeDB = newKneeDB;
             recalcKnees();

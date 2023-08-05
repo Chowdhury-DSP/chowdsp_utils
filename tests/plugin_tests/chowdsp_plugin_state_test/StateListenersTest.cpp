@@ -19,7 +19,7 @@ TEST_CASE ("State Listeners Test", "[plugin][state][listeners]")
             {
                 REQUIRE_MESSAGE (juce::MessageManager::getInstance()->isThisTheMessageThread(),
                                  "Listener called on a thread other than the message thread!");
-                REQUIRE_MESSAGE (pct->getCurrentValue() == mostRecentParamValue,
+                REQUIRE_MESSAGE (juce::exactlyEqual (pct->getCurrentValue(), mostRecentParamValue),
                                  "Parameter has the incorrect value when the listener is called!");
                 listenerCount++;
             });
@@ -49,7 +49,7 @@ TEST_CASE ("State Listeners Test", "[plugin][state][listeners]")
             chowdsp::ParameterListenerThread::AudioThread,
             [&listenerCount, &pct, &mostRecentParamValue]
             {
-                REQUIRE_MESSAGE (pct->getCurrentValue() == mostRecentParamValue,
+                REQUIRE_MESSAGE (juce::exactlyEqual (pct->getCurrentValue(), mostRecentParamValue),
                                  "Parameter has the incorrect value when the listener is called!");
                 listenerCount++;
             });

@@ -76,7 +76,20 @@ template <typename Func>
 void ParameterAttachment<Param, Callback>::callIfParameterValueChanged (ParamElementType newValue,
                                                                         Func&& func)
 {
-    if (param != nullptr && ParameterTypeHelpers::getValue (*param) != newValue)
-        func (newValue);
+    if (param == nullptr)
+        return;
+
+    if constexpr (std::is_floating_point_v<ParamElementType>)
+    {
+        if (juce::approximatelyEqual (ParameterTypeHelpers::getValue (*param), newValue))
+            return;
+    }
+    else
+    {
+        if (ParameterTypeHelpers::getValue (*param) == newValue)
+            return;
+    }
+
+    func (newValue);
 }
 } // namespace chowdsp

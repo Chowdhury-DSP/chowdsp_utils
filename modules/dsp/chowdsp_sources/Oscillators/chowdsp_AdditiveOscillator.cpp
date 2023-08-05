@@ -33,7 +33,7 @@ void AdditiveOscillator<maxNumHarmonics, sineApprox, SampleType>::setHarmonicAmp
 template <size_t maxNumHarmonics, AdditiveOscSineApprox sineApprox, typename SampleType>
 void AdditiveOscillator<maxNumHarmonics, sineApprox, SampleType>::setFrequency (SampleType frequencyHz, bool force)
 {
-    if (oscFrequency == frequencyHz && ! force)
+    if (juce::approximatelyEqual (oscFrequency, frequencyHz) && ! force)
         return;
 
     oscFrequency = frequencyHz;

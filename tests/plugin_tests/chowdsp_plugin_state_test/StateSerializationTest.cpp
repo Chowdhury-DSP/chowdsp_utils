@@ -158,8 +158,8 @@ TEST_CASE ("State Serialization Test", "[plugin][state]")
         um.beginNewTransaction();
         um.perform (new DummyAction {});
         state.deserialize (block);
-        REQUIRE_MESSAGE (state.params.levelParams.percent->get() == percentVal, "Percent value is incorrect");
-        REQUIRE_MESSAGE (state.params.levelParams.gain->get() == gainVal, "Gain value is incorrect");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (state.params.levelParams.percent->get(), percentVal), "Percent value is incorrect");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (state.params.levelParams.gain->get(), gainVal), "Gain value is incorrect");
         REQUIRE_MESSAGE (state.params.mode->getIndex() == choiceVal, "Choice value is incorrect");
         REQUIRE_MESSAGE (state.params.onOff->get() == boolVal, "Bool value is incorrect");
         REQUIRE_MESSAGE (! um.canUndo(), "Undo manager was not cleared after loading new state!");
@@ -239,12 +239,12 @@ TEST_CASE ("State Serialization Test", "[plugin][state]")
 
         StateWithTripleOfSameType state {};
         state.deserialize (block);
-        REQUIRE_MESSAGE (state.params.levelParams1.percent->get() == percentVal1, "Percent value 1 is incorrect");
-        REQUIRE_MESSAGE (state.params.levelParams1.gain->get() == gainVal1, "Gain value 1 is incorrect");
-        REQUIRE_MESSAGE (state.params.levelParams2.percent->get() == percentVal2, "Percent value 2 is incorrect");
-        REQUIRE_MESSAGE (state.params.levelParams2.gain->get() == gainVal2, "Gain value 2 is incorrect");
-        REQUIRE_MESSAGE (state.params.levelParams3.percent->get() == 0.5f, "Percent value 3 is incorrect");
-        REQUIRE_MESSAGE (state.params.levelParams3.gain->get() == 0.0f, "Gain value 3 is incorrect");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (state.params.levelParams1.percent->get(), percentVal1), "Percent value 1 is incorrect");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (state.params.levelParams1.gain->get(), gainVal1), "Gain value 1 is incorrect");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (state.params.levelParams2.percent->get(), percentVal2), "Percent value 2 is incorrect");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (state.params.levelParams2.gain->get(), gainVal2), "Gain value 2 is incorrect");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (state.params.levelParams3.percent->get(), 0.5f), "Percent value 3 is incorrect");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (state.params.levelParams3.gain->get(), 0.0f), "Gain value 3 is incorrect");
         REQUIRE_MESSAGE (state.params.mode->getIndex() == choiceVal, "Choice value is incorrect");
         REQUIRE_MESSAGE (state.params.onOff->get() == boolVal, "Bool value is incorrect");
     }

@@ -57,6 +57,22 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "JUCEHelpers/dsp/juce_LookupTable.h"
 #include "JUCEHelpers/dsp/juce_FastMathApproximations.h"
 #endif
+#elif JUCE_VERSION < 0x070006
+namespace juce
+{
+/** Equivalent to operator==, but suppresses float-equality warnings.
+
+  This allows code to be explicit about float-equality checks that are known to have the correct
+  semantics.
+*/
+template <typename Type>
+constexpr bool exactlyEqual (Type a, Type b)
+{
+    JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wfloat-equal")
+    return a == b;
+    JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+}
+} // namespace juce
 #endif // CHOWDSP_USING_JUCE
 #endif // DOXYGEN
 

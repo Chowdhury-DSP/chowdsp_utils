@@ -1,5 +1,7 @@
 #pragma once
 
+JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324)
+
 namespace chowdsp
 {
 /**
@@ -78,3 +80,5 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UIToAudioPipeline)
 };
 } // namespace chowdsp
+
+JUCE_END_IGNORE_WARNINGS_MSVC

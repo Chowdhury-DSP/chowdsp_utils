@@ -77,6 +77,7 @@ TEST_CASE ("Plugin Logger Test", "[plugin][utilities]")
         {
             auto prevNumTopLevelWindows = juce::TopLevelWindow::getNumTopLevelWindows();
             chowdsp::PluginLogger logger { logFileSubDir, logFileNameRoot };
+            juce::MessageManager::getInstance()->runDispatchLoopUntil (100);
 
             auto newNumTopLevelWindows = juce::TopLevelWindow::getNumTopLevelWindows();
             REQUIRE_MESSAGE (newNumTopLevelWindows == prevNumTopLevelWindows + 1, "AlertWindow not created!");

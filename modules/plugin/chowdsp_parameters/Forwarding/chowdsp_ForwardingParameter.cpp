@@ -212,7 +212,7 @@ void ForwardingParameter::setValue (float newValue)
         return;
 #endif
 
-    if (internalParam != nullptr && internalParam->getValue() != newValue)
+    if (internalParam != nullptr && ! juce::approximatelyEqual (internalParam->getValue(), newValue))
         attachment->setNewValue (newValue);
 }
 

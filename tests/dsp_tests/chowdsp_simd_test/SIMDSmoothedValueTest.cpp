@@ -1,7 +1,8 @@
-#include <CatchUtils.h>
 #include <chowdsp_simd/chowdsp_simd.h>
-
 using namespace chowdsp::SIMDUtils;
+
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wfloat-equal")
+#include <CatchUtils.h>
 
 //static CommonSmoothedValueTests<float, juce::ValueSmoothingTypes::Linear> floatSIMDSmoothTest;
 //static CommonSmoothedValueTests<double, juce::ValueSmoothingTypes::Multiplicative> doubleSIMDSmoothTest;
@@ -156,3 +157,4 @@ TEMPLATE_PRODUCT_TEST_CASE ("Common Smoothed Value Tests", "[dsp][simd]", SIMDSm
         }
     }
 }
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE

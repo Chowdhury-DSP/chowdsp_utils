@@ -33,7 +33,7 @@ TEMPLATE_TEST_CASE ("Smoothed Buffer Value Test",
                 const auto* smoothData = comp.getSmoothedBuffer();
 
                 for (int n = 0; n < maxBlockSize; ++n)
-                    REQUIRE_MESSAGE (smoothData[n] == mapFunc (ref.getNextValue()), "SmoothedValue was inaccurate!");
+                    REQUIRE_MESSAGE (juce::approximatelyEqual (smoothData[n], mapFunc (ref.getNextValue())), "SmoothedValue was inaccurate!");
             }
 
             REQUIRE_MESSAGE (comp.isSmoothing() == ref.isSmoothing(), "SmoothedBufferValue is not smoothing correctly!");

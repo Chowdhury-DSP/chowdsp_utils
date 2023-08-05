@@ -27,8 +27,8 @@ TEST_CASE ("Panner Test", "[dsp][misc]")
         auto leftMag = chowdsp::BufferMath::getMagnitude (buffer, 0, nSamples, 0);
         auto rightMag = chowdsp::BufferMath::getMagnitude (buffer, 0, nSamples, 1);
 
-        REQUIRE (leftMag == 2.0f); // expect both channels summed into left channel
-        REQUIRE (rightMag == 0.0f); // expect silence on right channel
+        REQUIRE (juce::approximatelyEqual (leftMag, 2.0f)); // expect both channels summed into left channel
+        REQUIRE (juce::approximatelyEqual (rightMag, 0.0f)); // expect silence on right channel
     }
 
     SECTION ("Single-sample Test")
@@ -52,8 +52,8 @@ TEST_CASE ("Panner Test", "[dsp][misc]")
         auto leftMag = chowdsp::BufferMath::getMagnitude (buffer, 0, nSamples, 0);
         auto rightMag = chowdsp::BufferMath::getMagnitude (buffer, 0, nSamples, 1);
 
-        REQUIRE (leftMag == 0.0f); // expect silenSecondsce on left channel
-        REQUIRE (rightMag == 2.0f); // expect both channels summed to right channel
+        REQUIRE (juce::approximatelyEqual (leftMag, 0.0f)); // expect silenSecondsce on left channel
+        REQUIRE (juce::approximatelyEqual (rightMag, 2.0f)); // expect both channels summed to right channel
     }
 
     SECTION ("Center Test")
