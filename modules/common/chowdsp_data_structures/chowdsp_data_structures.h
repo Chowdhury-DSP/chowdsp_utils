@@ -29,6 +29,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Structures/chowdsp_OptionalPointer.h"
 #include "Structures/chowdsp_RawObject.h"
 #include "Structures/chowdsp_SmallVector.h"
+#include "Structures/chowdsp_StackAllocator.h"
 #include "Structures/chowdsp_StringLiteral.h"
 
 #include "Helpers/chowdsp_Iterators.h"
