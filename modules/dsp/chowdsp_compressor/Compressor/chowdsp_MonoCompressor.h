@@ -17,6 +17,7 @@ public:
         float ratio = 1.0f;
         float kneeDB = 6.0f;
         bool autoMakeup = false;
+        float autoMakeupTargetDB = 0.0f;
     } params;
 
     /** Prepares the compressor to an audio stream */
@@ -68,7 +69,7 @@ public:
             gainReductionMeterTask.pushBufferData (mainBuffer, false);
 
         if (params.autoMakeup)
-            gainComputer.applyAutoMakeup (mainBuffer);
+            gainComputer.applyAutoMakeup (mainBuffer, params.autoMakeupTargetDB);
     }
 
     LevelDetector levelDetector;

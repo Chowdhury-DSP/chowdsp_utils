@@ -11,6 +11,7 @@ struct GainComputerParams
     T kneeDB;
     T kneeLower;
     T kneeUpper;
+    T makeupGainTarget = (T) 1; // linear gain
 };
 
 /** Gain computer for a feed-forward compressor */
@@ -71,7 +72,7 @@ struct FeedForwardCompGainComputer
                 {
                     const auto curThresh = threshSmoothData[n];
                     const auto curRatio = ratioSmoothData[n];
-                    sample *= std::pow ((T) 1 / curThresh, (T) 1 - ((T) 1 / curRatio));
+                    sample *= std::pow ((T) params.makeupGainTarget / curThresh, (T) 1 - ((T) 1 / curRatio));
                 }
             }
         }
@@ -79,7 +80,7 @@ struct FeedForwardCompGainComputer
         {
             const auto curThresh = params.threshSmooth.getCurrentValue();
             const auto curRatio = params.ratioSmooth.getCurrentValue();
-            BufferMath::applyGain (buffer, std::pow ((T) 1 / curThresh, (T) 1 - ((T) 1 / curRatio)));
+            BufferMath::applyGain (buffer, std::pow ((T) params.makeupGainTarget / curThresh, (T) 1 - ((T) 1 / curRatio)));
         }
     }
 
@@ -143,7 +144,7 @@ struct FeedBackCompGainComputer
                 {
                     const auto curThresh = threshSmoothData[n];
                     const auto curRatio = ratioSmoothData[n];
-                    sample *= std::pow ((T) 1 / curThresh, curRatio - (T) 1);
+                    sample *= std::pow ((T) params.makeupGainTarget / curThresh, curRatio - (T) 1);
                 }
             }
         }
@@ -151,7 +152,7 @@ struct FeedBackCompGainComputer
         {
             const auto curThresh = params.threshSmooth.getCurrentValue();
             const auto curRatio = params.ratioSmooth.getCurrentValue();
-            BufferMath::applyGain (buffer, std::pow ((T) 1 / curThresh, curRatio - (T) 1));
+            BufferMath::applyGain (buffer, std::pow ((T) params.makeupGainTarget / curThresh, curRatio - (T) 1));
         }
     }
 
