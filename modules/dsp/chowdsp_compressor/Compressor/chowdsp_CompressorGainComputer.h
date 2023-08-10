@@ -122,13 +122,14 @@ public:
     }
 
     /** Applies the gain computer's auto-makeup gain to the buffer */
-    void applyAutoMakeup (const BufferView<SampleType>& buffer)
+    void applyAutoMakeup (const BufferView<SampleType>& buffer, SampleType autoMakeupTargetDB = (SampleType) 0)
     {
+        const auto targetGainLinear = juce::Decibels::decibelsToGain (autoMakeupTargetDB);
         if constexpr (isMultiModal)
         {
             TupleHelpers::visit_at (computers,
                                     modeIndex,
-                                    [this, &buffer] (auto& computer)
+                                    [this, &buffer, targetGainLinear] (auto& computer)
                                     {
                                         computer.applyAutoMakeup (buffer,
                                                                   {
@@ -137,6 +138,7 @@ public:
                                                                       kneeDB,
                                                                       kneeLower,
                                                                       kneeUpper,
+                                                                      targetGainLinear,
                                                                   });
                                     });
         }
@@ -149,6 +151,7 @@ public:
                                            kneeDB,
                                            kneeLower,
                                            kneeUpper,
+                                           targetGainLinear,
                                        });
         }
     }
