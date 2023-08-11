@@ -22,7 +22,7 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            cmake_args: "-DCMAKE_CXX_COMPILER=g++11 -DCMAKE_BUILD_TYPE=Release"
+            cmake_args: "-DCMAKE_BUILD_TYPE=Release"
 #          - os: windows-2019
 #            cmake_args: ""
 #          - os: macos-latest
