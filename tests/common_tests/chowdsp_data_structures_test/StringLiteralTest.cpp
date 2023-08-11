@@ -8,18 +8,24 @@ TEST_CASE ("String Literal Test", "[common][data-structures]")
     {
         static constexpr auto sl1 = chowdsp::StringLiteral { "TEST" };
         STATIC_REQUIRE (sl1.data()[0] == 'T');
+        STATIC_REQUIRE (std::is_same_v<std::remove_cv_t<decltype (sl1)>, chowdsp::StringLiteral<5>>);
 
         const auto slCopy = sl1;
         REQUIRE (slCopy.size() == 4);
 
         const auto slMoved = std::move (slCopy);
         REQUIRE (slMoved.size() == 4);
+
+        static constexpr auto c1 = chowdsp::StringLiteral<1> { 'a' };
+        STATIC_REQUIRE (c1.size() == 1);
+        STATIC_REQUIRE (c1.data()[0] == 'a');
     }
 
     SECTION ("Equality")
     {
         const auto sl1 = chowdsp::StringLiteral { "TEST" };
         const auto sl2 = chowdsp::StringLiteral { "TES2" };
+
         REQUIRE (sl1 == "TEST");
         REQUIRE ("TEST" == sl1);
         REQUIRE (sl1 != "TES");

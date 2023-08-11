@@ -31,13 +31,29 @@ struct PluginParameterState : chowdsp::ParamHolder
 
 struct PluginNonParameterState : chowdsp::NonParamState
 {
+    enum class YesNo
+    {
+        Yes,
+        No
+    };
+
     PluginNonParameterState()
     {
         addStateValues ({ &editorWidth, &editorHeight });
+
+        for (size_t i = 0; i < 4; ++i)
+        {
+            yesNoNames[i] = chowdsp::StringLiteral { "yes_no" } + chowdsp::StringLiteral<1> { char ('0' + i) };
+            yesNoVals.emplace_back (yesNoNames[i], YesNo::No);
+        }
+        addStateValues<YesNo> ({ yesNoVals.begin(), yesNoVals.end() });
     }
 
     chowdsp::StateValue<int> editorWidth { "editor_width", 300 };
     chowdsp::StateValue<int> editorHeight { "editor_height", 500 };
+
+    std::array<chowdsp::StringLiteral<8>, 8> yesNoNames {};
+    chowdsp::SmallVector<chowdsp::StateValue<YesNo>, 8> yesNoVals;
 };
 
 using State = chowdsp::PluginStateImpl<PluginParameterState, PluginNonParameterState>;
