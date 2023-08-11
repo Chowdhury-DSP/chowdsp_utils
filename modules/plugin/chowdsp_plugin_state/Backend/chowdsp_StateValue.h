@@ -24,6 +24,14 @@ struct StateValue : StateValueBase
 {
     using element_type = T;
 
+    /** Default constructor */
+    StateValue()
+        : StateValueBase ({}),
+          defaultValue (T {}),
+          currentValue (defaultValue)
+    {
+    }
+
     /** Constructs the value with a name and default value */
     StateValue (std::string_view valueName, T defaultVal)
         : StateValueBase (valueName),
@@ -31,6 +39,9 @@ struct StateValue : StateValueBase
           currentValue (defaultValue)
     {
     }
+
+    StateValue (StateValue&&) noexcept = default;
+    StateValue& operator= (StateValue&&) noexcept = default;
 
     /** Returns the value */
     T get() const noexcept { return currentValue; }

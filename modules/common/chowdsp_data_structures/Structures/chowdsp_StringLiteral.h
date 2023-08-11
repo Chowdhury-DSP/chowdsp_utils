@@ -42,6 +42,11 @@ public:
     constexpr StringLiteral (StringLiteral&&) noexcept = default;
     constexpr StringLiteral& operator= (StringLiteral&&) noexcept = default;
 
+    explicit constexpr StringLiteral (char letter)
+        : StringLiteral (&letter, std::integral_constant<size_t, 1> {})
+    {
+    }
+
     constexpr StringLiteral (const char (&str)[N]) // NOSONAR NOLINT(google-explicit-constructor)
         : StringLiteral (str, std::integral_constant<size_t, N - 1> {})
     {

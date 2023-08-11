@@ -10,8 +10,11 @@ setup_juce_lib(plugin_tests_lib
     chowdsp::chowdsp_plugin_utils
     chowdsp::chowdsp_presets_v2
     chowdsp::chowdsp_version
-    clap_juce_extensions
 )
+
+if(TARGET clap_juce_extensions)
+    target_link_libraries(plugin_tests_lib PUBLIC clap_juce_extensions)
+endif()
 
 target_compile_definitions(plugin_tests_lib
     PUBLIC
