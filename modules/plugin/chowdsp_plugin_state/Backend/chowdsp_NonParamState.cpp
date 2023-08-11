@@ -6,6 +6,14 @@ inline void NonParamState::addStateValues (const std::initializer_list<StateValu
     validateStateValues();
 }
 
+template <typename T>
+inline void NonParamState::addStateValues (nonstd::span<StateValue<T>> newStateValues)
+{
+    for (auto& val : newStateValues)
+        values.push_back (&val);
+    validateStateValues();
+}
+
 inline void NonParamState::validateStateValues() const
 {
     std::vector<std::string_view> stateValueNames;
