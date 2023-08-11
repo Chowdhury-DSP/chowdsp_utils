@@ -22,7 +22,7 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            cmake_args: "-DCMAKE_BUILD_TYPE=Release"
+            cmake_args: "-DCMAKE_CXX_COMPILER=g++11 -DCMAKE_BUILD_TYPE=Release"
 #          - os: windows-2019
 #            cmake_args: ""
 #          - os: macos-latest
@@ -34,8 +34,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt install libasound2-dev libcurl4-openssl-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev libsamplerate-dev
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 9
-          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
 
       - name: Get latest CMake
         uses: lukka/get-cmake@latest
