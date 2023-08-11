@@ -6,13 +6,25 @@ inline void NonParamState::addStateValues (const std::initializer_list<StateValu
     validateStateValues();
 }
 
+template <typename T>
+inline void NonParamState::addStateValues (nonstd::span<StateValue<T>> newStateValues)
+{
+    for (auto& val : newStateValues)
+        values.push_back (&val);
+    validateStateValues();
+}
+
 inline void NonParamState::validateStateValues() const
 {
     std::vector<std::string_view> stateValueNames;
     for (const auto& value : values)
     {
+        // State value name must not be empty
+        jassert (! value->name.empty());
+
         // Duplicate state value names are not allowed!
         jassert (std::find (stateValueNames.begin(), stateValueNames.end(), value->name) == stateValueNames.end());
+
         stateValueNames.emplace_back (value->name);
     }
 

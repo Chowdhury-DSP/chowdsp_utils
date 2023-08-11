@@ -11,13 +11,12 @@ public:
     NonParamState (NonParamState&&) noexcept = default;
     NonParamState& operator= (NonParamState&&) noexcept = default;
 
-    /**
-     * Adds more state values to this state.
-     *
-     * This method is mostly for internal use, as it is preferred
-     * to add state values in the constructor.
-     */
+    /** Adds more state values to this state. */
     void addStateValues (const std::initializer_list<StateValueBase*>& newStateValues);
+
+    /** Adds more state values to this state. */
+    template <typename T>
+    void addStateValues (nonstd::span<StateValue<T>> newStateValues);
 
     /** Custom serializer */
     template <typename Serializer>
