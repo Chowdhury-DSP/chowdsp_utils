@@ -18,8 +18,20 @@ message(STATUS "VERSION for JUCE: ${juce_version}")
 
 # Set up JUCE modules
 include(AddJUCEModules)
-juce_add_module(${CMAKE_SOURCE_DIR}/../foleys_gui_magic)
-add_subdirectory(${CMAKE_SOURCE_DIR}/../clap-juce-extensions clap_juce_extensions EXCLUDE_FROM_ALL)
+
+if(EXISTS "${CMAKE_SOURCE_DIR}/../foleys_gui_magic/foleys_gui_magic.h")
+    message(STATUS "Found dependency: foleys_gui_magic")
+    juce_add_module(${CMAKE_SOURCE_DIR}/../foleys_gui_magic)
+else()
+    message(STATUS "Missing optional dependency: foleys_gui_magic")
+endif()
+
+if(EXISTS "${CMAKE_SOURCE_DIR}/../clap-juce-extensions/CMakeLists.txt")
+    message(STATUS "Found dependency: clap-juce-extension")
+    add_subdirectory(${CMAKE_SOURCE_DIR}/../clap-juce-extensions clap_juce_extensions EXCLUDE_FROM_ALL)
+else()
+    message(STATUS "Missing optional dependency: clap-juce-extension")
+endif()
 
 # include CPM
 include(CPM)
