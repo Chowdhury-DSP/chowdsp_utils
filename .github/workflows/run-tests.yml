@@ -34,14 +34,14 @@ jobs:
         include:
           - name: "Test"
             os: ubuntu-latest
-            cmake_args: "-DCMAKE_CXX_COMPILER=g++11 -DCMAKE_BUILD_TYPE=Release"
+            cmake_args: "-DCMAKE_BUILD_TYPE=Release"
             build_type: "Release"
           - name: "Test"
             os: windows-2019
             build_type: "Release"
           - name: "Coverage"
             os: ubuntu-latest
-            cmake_args: "-DCMAKE_CXX_COMPILER=g++11 -DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
+            cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
             run_coverage: true
             build_type: "Debug"
           - name: "Coverage"
@@ -52,7 +52,7 @@ jobs:
           - name: "Live GUI Test"
             os: ubuntu-latest
             tests: "live_gui_test"
-            cmake_args: "-DCMAKE_CXX_COMPILER=g++11 -DCODE_COVERAGE=ON -DCHOWDSP_BUILD_LIVE_GUI_TEST=ON -DCMAKE_BUILD_TYPE=Debug"
+            cmake_args: "-DCODE_COVERAGE=ON -DCHOWDSP_BUILD_LIVE_GUI_TEST=ON -DCMAKE_BUILD_TYPE=Debug"
             live_gui: true
             run_coverage: true
             build_type: "Debug"
