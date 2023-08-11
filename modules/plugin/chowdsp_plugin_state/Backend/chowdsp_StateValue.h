@@ -27,7 +27,7 @@ struct StateValue : StateValueBase
     /** Default constructor */
     StateValue()
         : StateValueBase ({}),
-          defaultValue (T{}),
+          defaultValue (T {}),
           currentValue (defaultValue)
     {
     }
