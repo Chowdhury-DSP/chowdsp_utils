@@ -79,4 +79,28 @@ TEST_CASE ("Atomic Helpers Test", "[common][data-structures]")
         thread1.join();
         thread2.join();
     }
+
+    SECTION ("Fetch Or")
+    {
+        bool x = false;
+        std::atomic_bool x_atomic { false };
+
+        x |= true;
+        chowdsp::AtomicHelpers::fetch_or (x_atomic, true);
+        REQUIRE (x == x_atomic.load());
+
+        REQUIRE ((x | false) == chowdsp::AtomicHelpers::fetch_or (x_atomic, false));
+    }
+
+    SECTION ("Fetch And")
+    {
+        bool x = false;
+        std::atomic_bool x_atomic { false };
+
+        x &= true;
+        chowdsp::AtomicHelpers::fetch_and (x_atomic, true);
+        REQUIRE (x == x_atomic.load());
+
+        REQUIRE ((x & false) == chowdsp::AtomicHelpers::fetch_and (x_atomic, false));
+    }
 }
