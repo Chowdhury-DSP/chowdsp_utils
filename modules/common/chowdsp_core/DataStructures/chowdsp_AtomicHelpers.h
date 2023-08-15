@@ -21,6 +21,30 @@ namespace AtomicHelpers
     {
         return compareExchange (atomic_val, compareVal, ! compareVal);
     }
+
+    /**
+     * Implementation of std::fetch_or implemented for std::atomic_bool
+     *
+     * Reference: https://stackoverflow.com/questions/29390247/stdatomicbool-fetch-and-and-fetch-or-realization
+     */
+    inline bool fetch_or (std::atomic_bool& atom, bool val)
+    {
+        bool bRes = ! val;
+        atom.compare_exchange_strong (bRes, true);
+        return bRes;
+    }
+
+    /**
+     * Implementation of std::fetch_and implemented for std::atomic_bool
+     *
+     * Reference: https://stackoverflow.com/questions/29390247/stdatomicbool-fetch-and-and-fetch-or-realization
+     */
+    inline bool fetch_and (std::atomic_bool& atom, bool val)
+    {
+        bool bRes = true;
+        atom.compare_exchange_strong (bRes, val);
+        return bRes;
+    }
 } // namespace AtomicHelpers
 
 /**
