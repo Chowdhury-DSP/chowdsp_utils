@@ -78,6 +78,11 @@ public:
         return find_and_occupy_empty_slot (std::forward<Args...> (args...));
     }
 
+    std::pair<BucketLocator, T*> emplace()
+    {
+        return find_and_occupy_empty_slot();
+    }
+
     /** Returns an element found by the given locator. */
     T* find (BucketLocator locator)
     {
