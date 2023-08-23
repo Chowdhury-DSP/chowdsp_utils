@@ -111,4 +111,100 @@ public:
     [[nodiscard]] auto begin() const { return std::rbegin (iterable_); }
     [[nodiscard]] auto end() const { return std::rend (iterable_); }
 };
+
+#ifndef DOXYGEN
+namespace zip_multi_detail
+{
+    template <typename T>
+    struct make_iter
+    {
+        using type = decltype (std::begin (std::declval<T&>()));
+    };
+
+    template <typename... T>
+    struct make_iters
+    {
+        using type = std::tuple<typename make_iter<T>::type...>;
+    };
+
+    template <typename... T>
+    using make_iters_t = typename make_iters<T...>::type;
+
+    template <typename... T, size_t... I>
+    auto make_refs (const std::tuple<T...>& t, std::index_sequence<I...>)
+    {
+        return std::tie (*std::get<I> (t)...);
+    }
+
+    template <typename... T>
+    auto make_refs (const std::tuple<T...>& t)
+    {
+        return make_refs<T...> (t, std::make_index_sequence<sizeof...(T)> {});
+    }
+
+    template <typename... T, size_t... I>
+    auto make_begin_iters (const std::tuple<T...>& t, std::index_sequence<I...>)
+    {
+        return std::make_tuple (std::begin (std::get<I> (t))...);
+    }
+
+    template <typename... T>
+    auto make_begin_iters (const std::tuple<T...>& t)
+    {
+        return make_begin_iters<T...> (t, std::make_index_sequence<sizeof...(T)> {});
+    }
+
+    template <typename... T, size_t... I>
+    auto make_end_iters (const std::tuple<T...>& t, std::index_sequence<I...>)
+    {
+        return std::make_tuple (std::end (std::get<I> (t))...);
+    }
+
+    template <typename... T>
+    auto make_end_iters (const std::tuple<T...>& t)
+    {
+        return make_end_iters<T...> (t, std::make_index_sequence<sizeof...(T)> {});
+    }
+} // namespace zip_multi_detail
+#endif // DOXYGEN
+
+template <typename... T, typename Iters = typename zip_multi_detail::make_iters<T...>::type>
+constexpr auto zip_multi (T&... iterables)
+{
+    struct iterator
+    {
+        Iters iters;
+        bool operator!= (const iterator& other) const
+        {
+            bool areAnyEqual = false;
+            TupleHelpers::forEachInTuple (
+                [&] (const auto& iter, auto idx)
+                {
+                    areAnyEqual |= (iter == std::get<idx> (other.iters));
+                },
+                iters);
+            return ! areAnyEqual;
+        }
+        void operator++()
+        {
+            TupleHelpers::forEachInTuple ([] (auto& iter, size_t)
+                                          { ++iter; },
+                                          iters);
+        }
+        auto operator*() const { return zip_multi_detail::make_refs (iters); }
+    };
+    struct iterable_wrapper
+    {
+        std::tuple<T&...> titerable;
+        auto begin()
+        {
+            return iterator { zip_multi_detail::make_begin_iters (titerable) };
+        }
+        auto end()
+        {
+            return iterator { zip_multi_detail::make_end_iters (titerable) };
+        }
+    };
+    return iterable_wrapper { std::tie (iterables...) };
+}
 } // namespace chowdsp

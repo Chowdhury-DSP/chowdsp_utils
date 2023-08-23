@@ -160,3 +160,98 @@ TEST_CASE ("Zip")
         }
     }
 }
+
+TEST_CASE ("Zip-Multi")
+{
+    SECTION ("ZIP with Self")
+    {
+        auto selfzip = [] (const auto& v)
+        {
+            int ct = 0;
+            for (const auto& [a, b, c, d] : chowdsp::zip_multi (v, v, v, v))
+            {
+                REQUIRE (a == b);
+                REQUIRE (a == c);
+                REQUIRE (a == d);
+                ct++;
+            }
+            REQUIRE (ct == (int) v.size());
+        };
+        selfzip (std::vector<int> { 1, 2, 3 });
+        selfzip (std::vector<int>());
+        selfzip (std::string ("hello world"));
+        selfzip (std::array<int, 3> { 3, 2, 4 });
+    }
+    SECTION ("Simple Set of Vectors")
+    {
+        std::vector<int> v0 { 0, 1, 2 },
+            v1 { 0, 2, 4 },
+            v2 { 0, 3, 6 },
+            v3 { 0, 4, 8 };
+        for (const auto& [a, b, c, d] : chowdsp::zip_multi (v0, v1, v2, v3))
+        {
+            REQUIRE (a * 2 == b);
+            REQUIRE (a * 3 == c);
+            REQUIRE (a * 4 == d);
+        }
+    }
+
+    SECTION ("Filling Arrays")
+    {
+        const std::array<int, 6> x_int { 0, 1, 2, 3, 4, 5 };
+        std::array<float, 6> x_float;
+        std::array<double, 6> x_double;
+        for (auto [int_val, float_val, double_val] : chowdsp::zip_multi (x_int, x_float, x_double))
+        {
+            float_val = static_cast<float> (int_val);
+            double_val = static_cast<double> (int_val);
+        }
+        for (auto [int_val, float_val, double_val] : chowdsp::zip_multi (x_int, x_float, x_double))
+        {
+            REQUIRE (int_val == (float) float_val);
+            REQUIRE (int_val == (double) double_val);
+        }
+    }
+
+    SECTION ("Varying Lengths")
+    {
+        std::vector<int> v0 { 0, 2, 4 }, v1 { 0, 1, 2, 3, 4, 5 };
+
+        int ct { 0 };
+        for (const auto& [a, b] : chowdsp::zip_multi (v0, v1))
+        {
+            REQUIRE (a == b * 2);
+            ct++;
+        }
+        REQUIRE (ct == (int) std::min (v0.size(), v1.size()));
+
+        ct = 0;
+        for (const auto& [a, b] : chowdsp::zip_multi (v1, v0))
+        {
+            REQUIRE (a * 2 == b);
+            ct++;
+        }
+        REQUIRE (ct == (int) std::min (v0.size(), v1.size()));
+
+        std::array<int, 3> t2 {};
+        for (const auto& [a, _, b] : chowdsp::zip_multi (v0, t2, "ace ventura"))
+        {
+            REQUIRE (a + 'a' == b);
+        }
+    }
+
+    SECTION ("ZIP with Empty")
+    {
+        std::vector<int> test { 0, 1, 2 }, empty;
+        for (const auto& [a, b] : chowdsp::zip_multi (test, empty))
+        {
+            juce::ignoreUnused (a, b);
+            REQUIRE (false);
+        }
+        for (const auto& [a, b] : chowdsp::zip_multi (empty, test))
+        {
+            juce::ignoreUnused (a, b);
+            REQUIRE (false);
+        }
+    }
+}
