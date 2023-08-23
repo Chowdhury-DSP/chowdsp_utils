@@ -168,6 +168,10 @@ namespace zip_multi_detail
 } // namespace zip_multi_detail
 #endif // DOXYGEN
 
+/**
+ * Similar to iterators::zip(), except that it supports iterating over
+ * more than 2 containers at a time.
+ */
 template <typename... T, typename Iters = typename zip_multi_detail::make_iters<T...>::type>
 constexpr auto zip_multi (T&... iterables)
 {
