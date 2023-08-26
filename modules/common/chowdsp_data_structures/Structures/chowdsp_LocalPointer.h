@@ -2,6 +2,8 @@
 
 namespace chowdsp
 {
+JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324) // structure was padded due to alignment specifier
+
 /**
  * A generic "owning" pointer constructed using local storage.
  *
@@ -13,7 +15,7 @@ namespace chowdsp
  * Make sure that no other type (e.g. std::unique_ptr) tries to take ownership
  * of the pointer being stored here, since that will result in a double-delete.
  */
-template <typename T, size_t MaxSize>
+template <typename T, size_t MaxSize, size_t Alignment = 0>
 class LocalPointer
 {
 public:
@@ -83,31 +85,33 @@ public:
     [[nodiscard]] const T& operator*() const { return *get(); }
 
 private:
-    alignas (16) std::array<std::byte, MaxSize> data {};
+    alignas (Alignment) std::array<std::byte, MaxSize> data {};
     T* pointer = nullptr;
 };
 
-template <typename T, size_t N>
-bool operator== (const LocalPointer<T, N>& p1, std::nullptr_t)
+template <typename T, size_t N, size_t A>
+bool operator== (const LocalPointer<T, N, A>& p1, std::nullptr_t)
 {
     return p1.get() == nullptr;
 }
 
-template <typename T, size_t N>
-bool operator!= (const LocalPointer<T, N>& p1, std::nullptr_t)
+template <typename T, size_t N, size_t A>
+bool operator!= (const LocalPointer<T, N, A>& p1, std::nullptr_t)
 {
     return p1.get() != nullptr;
 }
 
-template <typename T, size_t N>
-bool operator== (std::nullptr_t, const LocalPointer<T, N>& p2)
+template <typename T, size_t N, size_t A>
+bool operator== (std::nullptr_t, const LocalPointer<T, N, A>& p2)
 {
     return nullptr == p2.get();
 }
 
-template <typename T, size_t N>
-bool operator!= (std::nullptr_t, const LocalPointer<T, N>& p2)
+template <typename T, size_t N, size_t A>
+bool operator!= (std::nullptr_t, const LocalPointer<T, N, A>& p2)
 {
     return nullptr != p2.get();
 }
+
+JUCE_END_IGNORE_WARNINGS_MSVC
 } // namespace chowdsp
