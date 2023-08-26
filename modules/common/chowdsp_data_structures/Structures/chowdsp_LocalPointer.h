@@ -25,8 +25,18 @@ public:
 
     LocalPointer (const LocalPointer&) = delete;
     LocalPointer& operator= (const LocalPointer&) = delete;
-    LocalPointer (LocalPointer&&) noexcept = default;
-    LocalPointer& operator= (LocalPointer&&) noexcept = default;
+    LocalPointer (LocalPointer&& other) noexcept
+    {
+        // move construction is only valid if the pointer is null!
+        jassert (pointer == nullptr);
+        jassert (other.pointer == nullptr);
+    }
+    LocalPointer& operator= (LocalPointer&& other) noexcept
+    {
+        // move assignment is only valid if the pointer is null!
+        jassert (pointer == nullptr);
+        jassert (other.pointer == nullptr);
+    }
 
     /**
      * Constructs an instance using in place memory.
@@ -73,8 +83,8 @@ public:
     [[nodiscard]] const T& operator*() const { return *get(); }
 
 private:
+    alignas (16) std::array<std::byte, MaxSize> data {};
     T* pointer = nullptr;
-    std::array<std::byte, MaxSize> data {};
 };
 
 template <typename T, size_t N>
