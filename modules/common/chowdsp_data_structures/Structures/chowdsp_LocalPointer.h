@@ -27,13 +27,13 @@ public:
 
     LocalPointer (const LocalPointer&) = delete;
     LocalPointer& operator= (const LocalPointer&) = delete;
-    LocalPointer (LocalPointer&& other) noexcept
+    LocalPointer ([[maybe_unused]] LocalPointer&& other) noexcept
     {
         // move construction is only valid if the pointer is null!
         jassert (pointer == nullptr);
         jassert (other.pointer == nullptr);
     }
-    LocalPointer& operator= (LocalPointer&& other) noexcept
+    LocalPointer& operator= ([[maybe_unused]] LocalPointer&& other) noexcept
     {
         // move assignment is only valid if the pointer is null!
         jassert (pointer == nullptr);
