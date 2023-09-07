@@ -36,7 +36,7 @@ public:
     void* allocate_bytes (size_t num_bytes, size_t alignment = 1) noexcept
     {
         auto* pointer = juce::snapPointerToAlignment (raw_data.data() + bytes_used, alignment);
-        const auto bytes_increment = std::distance (raw_data.data() + bytes_used, pointer + num_bytes);
+        const auto bytes_increment = static_cast<size_t> (std::distance (raw_data.data() + bytes_used, pointer + num_bytes));
 
         if (bytes_used + bytes_increment > raw_data.size())
             return nullptr;
