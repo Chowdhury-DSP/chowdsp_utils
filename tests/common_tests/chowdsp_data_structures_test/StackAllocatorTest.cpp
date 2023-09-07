@@ -30,6 +30,12 @@ TEST_CASE ("Stack Allocator Test", "[common][data-structures]")
 
     REQUIRE (allocator.get_bytes_used() == 120);
 
+    // aligned allocation
+    {
+        auto* some_data = allocator.allocate<float> (1, 16);
+        REQUIRE (juce::snapPointerToAlignment (some_data, 16) == some_data);
+    }
+
     // overfull allocation
     REQUIRE (allocator.allocate<double> (100) == nullptr);
 

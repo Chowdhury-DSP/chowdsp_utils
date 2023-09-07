@@ -33,21 +33,23 @@ public:
     [[nodiscard]] size_t get_bytes_used() const noexcept { return bytes_used; }
 
     /** Allocates a given number of bytes */
-    void* allocate_bytes (size_t num_bytes) noexcept
+    void* allocate_bytes (size_t num_bytes, size_t alignment = 1) noexcept
     {
-        if (bytes_used + num_bytes > raw_data.size())
+        auto* pointer = juce::snapPointerToAlignment (raw_data.data() + bytes_used, alignment);
+        const auto bytes_increment = static_cast<size_t> (std::distance (raw_data.data() + bytes_used, pointer + num_bytes));
+
+        if (bytes_used + bytes_increment > raw_data.size())
             return nullptr;
 
-        auto* pointer = raw_data.data() + bytes_used;
-        bytes_used += num_bytes;
+        bytes_used += bytes_increment;
         return pointer;
     }
 
     /** Allocates space for some number of objects of type T */
     template <typename T, typename IntType>
-    T* allocate (IntType num_Ts) noexcept
+    T* allocate (IntType num_Ts, size_t alignment = alignof (T)) noexcept
     {
-        return static_cast<T*> (allocate_bytes ((size_t) num_Ts * sizeof (T)));
+        return static_cast<T*> (allocate_bytes ((size_t) num_Ts * sizeof (T), alignment));
     }
 
     /** Returns a pointer to the internal buffer with a given offset in bytes */

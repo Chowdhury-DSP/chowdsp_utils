@@ -813,4 +813,14 @@ namespace TypeHelpers
 [[deprecated ("Use std::abs() instead.")]] inline int64 abs64 (int64 n) noexcept { return std::abs (n); }
 #endif
 
+/** A handy function to round up a pointer to the nearest multiple of a given number of bytes.
+    alignmentBytes must be a power of two. */
+template <typename Type, typename IntegerType>
+inline Type* snapPointerToAlignment (Type* basePointer, IntegerType alignmentBytes) noexcept
+{
+    // This method is actually in juce_Memory.h, but I didn't want to copy the whole file,
+    // so I'm putting it here for now.
+    // - Jatin
+    return (Type*) ((((size_t) basePointer) + (alignmentBytes - 1)) & ~(alignmentBytes - 1));
+}
 } // namespace juce
