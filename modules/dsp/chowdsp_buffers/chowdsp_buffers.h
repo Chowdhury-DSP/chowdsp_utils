@@ -11,7 +11,7 @@ BEGIN_JUCE_MODULE_DECLARATION
    dependencies:  chowdsp_simd
 
    website:       https://ccrma.stanford.edu/~jatin/chowdsp
-   license:       GPLv3
+   license:       BSD 3-Clause
 
    END_JUCE_MODULE_DECLARATION
 

@@ -111,7 +111,7 @@ sure to abide by the license of each module, as well as whichever libraries are 
 
 ### DSP Modules
 
-`chowdsp_buffers` (GPLv3)
+`chowdsp_buffers` (BSD)
 - `Buffer`: A basic audio buffer, which supports SIMD data types.
 - `StaticBuffer`: A basic audio buffer using local (rather than heap-allocated) memory.
 - `BufferView`: A non-owning "view" over the data in an audio buffer (compatible with `juce::AudioBuffer`).
