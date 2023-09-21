@@ -341,6 +341,7 @@ template <typename BufferType,
               >>
 BufferView (BufferType&, Ts...) -> BufferView<const double>;
 
+#if ! CHOWDSP_NO_XSIMD
 /** Template deduction guide for Buffer<xsimd::batch<float>> -> BufferView<const xsimd::batch<float>> */
 template <typename BufferType,
           typename... Ts,
@@ -368,4 +369,5 @@ template <typename BufferType,
           typename = std::enable_if_t<
               std::is_same_v<BufferType, const Buffer<xsimd::batch<double>>> || (std::is_const_v<BufferType> && detail::is_static_buffer_v<std::remove_const_t<BufferType>, xsimd::batch<double>>)>>
 BufferView (BufferType&, Ts...) -> BufferView<const xsimd::batch<double>>;
+#endif // ! CHOWDSP_NO_XSIMD
 } // namespace chowdsp
