@@ -141,3 +141,73 @@ TEMPLATE_TEST_CASE ("Buffer View Test", "[dsp][buffers][simd]", float, double, x
     }
 }
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+
+TEMPLATE_TEST_CASE ("Buffer View Template Deduction Test", "[dsp][buffers][simd]", float, double, xsimd::batch<float>, xsimd::batch<double>)
+{
+    SECTION ("1D Raw Data")
+    {
+        TestType* data = nullptr;
+        chowdsp::BufferView buffer_view { data, 0 };
+        STATIC_REQUIRE (std::is_same_v<decltype (buffer_view), chowdsp::BufferView<TestType>>);
+
+        const TestType* data_const = nullptr;
+        chowdsp::BufferView buffer_view_const { data_const, 0 };
+        STATIC_REQUIRE (std::is_same_v<decltype (buffer_view_const), chowdsp::BufferView<const TestType>>);
+    }
+
+    SECTION ("2D Raw Data")
+    {
+        TestType* const* data = nullptr;
+        chowdsp::BufferView buffer_view { data, 0, 0 };
+        STATIC_REQUIRE (std::is_same_v<decltype (buffer_view), chowdsp::BufferView<TestType>>);
+
+        const TestType* const* data_const = nullptr;
+        chowdsp::BufferView buffer_view_const { data_const, 0, 0 };
+        STATIC_REQUIRE (std::is_same_v<decltype (buffer_view_const), chowdsp::BufferView<const TestType>>);
+    }
+
+    SECTION ("chowdsp::Buffer")
+    {
+        chowdsp::Buffer<TestType> buffer;
+        chowdsp::BufferView buffer_view { buffer };
+        STATIC_REQUIRE (std::is_same_v<decltype (buffer_view), chowdsp::BufferView<TestType>>);
+
+        chowdsp::BufferView buffer_view_const { std::as_const (buffer), 0, -1, 0, -1 };
+        STATIC_REQUIRE (std::is_same_v<decltype (buffer_view_const), chowdsp::BufferView<const TestType>>);
+    }
+
+    SECTION ("chowdsp::StaticBuffer")
+    {
+        chowdsp::StaticBuffer<TestType, 1, 1> buffer;
+        chowdsp::BufferView buffer_view { buffer };
+        STATIC_REQUIRE (std::is_same_v<decltype (buffer_view), chowdsp::BufferView<TestType>>);
+
+        const chowdsp::StaticBuffer<TestType, 1, 1> buffer_const;
+        chowdsp::BufferView buffer_view_const { buffer_const };
+        STATIC_REQUIRE (std::is_same_v<decltype (buffer_view_const), chowdsp::BufferView<const TestType>>);
+    }
+
+    if constexpr (std::is_floating_point_v<TestType>)
+    {
+        SECTION ("juce::AudioBuffer")
+        {
+            juce::AudioBuffer<TestType> buffer;
+            chowdsp::BufferView buffer_view { buffer };
+            STATIC_REQUIRE (std::is_same_v<decltype (buffer_view), chowdsp::BufferView<TestType>>);
+
+            chowdsp::BufferView buffer_view_const { std::as_const (buffer), 0, -1, 0, -1 };
+            STATIC_REQUIRE (std::is_same_v<decltype (buffer_view_const), chowdsp::BufferView<const TestType>>);
+        }
+
+        SECTION ("juce::dsp::AudioBlock")
+        {
+            juce::dsp::AudioBlock<TestType> buffer;
+            chowdsp::BufferView buffer_view { buffer };
+            STATIC_REQUIRE (std::is_same_v<decltype (buffer_view), chowdsp::BufferView<TestType>>);
+
+            juce::dsp::AudioBlock<const TestType> buffer_const;
+            chowdsp::BufferView buffer_view_const { std::as_const (buffer_const), 0, -1, 0, -1 };
+            STATIC_REQUIRE (std::is_same_v<decltype (buffer_view_const), chowdsp::BufferView<const TestType>>);
+        }
+    }
+}
