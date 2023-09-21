@@ -289,8 +289,7 @@ namespace detail
 template <typename BufferType,
           typename... Ts,
           typename = std::enable_if_t<
-              std::is_same_v<BufferType, Buffer<float>>
-              || detail::is_static_buffer_v<BufferType, float>
+              std::is_same_v<BufferType, Buffer<float>> || detail::is_static_buffer_v<BufferType, float>
 #if CHOWDSP_USING_JUCE
               || std::is_same_v<BufferType, juce::AudioBuffer<float>>
 #if JUCE_MODULE_AVAILABLE_juce_dsp
@@ -304,8 +303,7 @@ BufferView (BufferType&, Ts...) -> BufferView<float>;
 template <typename BufferType,
           typename... Ts,
           typename = std::enable_if_t<
-              std::is_same_v<BufferType, const Buffer<float>>
-              || (std::is_const_v<BufferType> && detail::is_static_buffer_v<std::remove_const_t<BufferType>, float>)
+              std::is_same_v<BufferType, const Buffer<float>> || (std::is_const_v<BufferType> && detail::is_static_buffer_v<std::remove_const_t<BufferType>, float>)
 #if CHOWDSP_USING_JUCE
               || std::is_same_v<BufferType, const juce::AudioBuffer<float>>
 #if JUCE_MODULE_AVAILABLE_juce_dsp
@@ -319,8 +317,7 @@ BufferView (BufferType&, Ts...) -> BufferView<const float>;
 template <typename BufferType,
           typename... Ts,
           typename = std::enable_if_t<
-              std::is_same_v<BufferType, Buffer<double>>
-              || detail::is_static_buffer_v<BufferType, double>
+              std::is_same_v<BufferType, Buffer<double>> || detail::is_static_buffer_v<BufferType, double>
 #if CHOWDSP_USING_JUCE
               || std::is_same_v<BufferType, juce::AudioBuffer<double>>
 #if JUCE_MODULE_AVAILABLE_juce_dsp
@@ -334,8 +331,7 @@ BufferView (BufferType&, Ts...) -> BufferView<double>;
 template <typename BufferType,
           typename... Ts,
           typename = std::enable_if_t<
-              std::is_same_v<BufferType, const Buffer<double>>
-              || (std::is_const_v<BufferType> && detail::is_static_buffer_v<std::remove_const_t<BufferType>, double>)
+              std::is_same_v<BufferType, const Buffer<double>> || (std::is_const_v<BufferType> && detail::is_static_buffer_v<std::remove_const_t<BufferType>, double>)
 #if CHOWDSP_USING_JUCE
               || std::is_same_v<BufferType, const juce::AudioBuffer<double>>
 #if JUCE_MODULE_AVAILABLE_juce_dsp
@@ -349,31 +345,27 @@ BufferView (BufferType&, Ts...) -> BufferView<const double>;
 template <typename BufferType,
           typename... Ts,
           typename = std::enable_if_t<
-              std::is_same_v<BufferType, Buffer<xsimd::batch<float>>>
-              || detail::is_static_buffer_v<BufferType, xsimd::batch<float>>>>
+              std::is_same_v<BufferType, Buffer<xsimd::batch<float>>> || detail::is_static_buffer_v<BufferType, xsimd::batch<float>>>>
 BufferView (BufferType&, Ts...) -> BufferView<xsimd::batch<float>>;
 
 /** Template deduction guide for const Buffer<xsimd::batch<float>> -> BufferView<const xsimd::batch<float>> */
 template <typename BufferType,
           typename... Ts,
           typename = std::enable_if_t<
-              std::is_same_v<BufferType, const Buffer<xsimd::batch<float>>>
-              || (std::is_const_v<BufferType> && detail::is_static_buffer_v<std::remove_const_t<BufferType>, xsimd::batch<float>>)>>
+              std::is_same_v<BufferType, const Buffer<xsimd::batch<float>>> || (std::is_const_v<BufferType> && detail::is_static_buffer_v<std::remove_const_t<BufferType>, xsimd::batch<float>>)>>
 BufferView (BufferType&, Ts...) -> BufferView<const xsimd::batch<float>>;
 
 /** Template deduction guide for Buffer<xsimd::batch<double>> -> BufferView<const xsimd::batch<double>> */
 template <typename BufferType,
           typename... Ts,
           typename = std::enable_if_t<
-              std::is_same_v<BufferType, Buffer<xsimd::batch<double>>>
-              || detail::is_static_buffer_v<BufferType, xsimd::batch<double>>>>
+              std::is_same_v<BufferType, Buffer<xsimd::batch<double>>> || detail::is_static_buffer_v<BufferType, xsimd::batch<double>>>>
 BufferView (BufferType&, Ts...) -> BufferView<xsimd::batch<double>>;
 
 /** Template deduction guide for const Buffer<xsimd::batch<double>> -> BufferView<const xsimd::batch<double>> */
 template <typename BufferType,
           typename... Ts,
           typename = std::enable_if_t<
-              std::is_same_v<BufferType, const Buffer<xsimd::batch<double>>>
-              || (std::is_const_v<BufferType> && detail::is_static_buffer_v<std::remove_const_t<BufferType>, xsimd::batch<double>>)>>
+              std::is_same_v<BufferType, const Buffer<xsimd::batch<double>>> || (std::is_const_v<BufferType> && detail::is_static_buffer_v<std::remove_const_t<BufferType>, xsimd::batch<double>>)>>
 BufferView (BufferType&, Ts...) -> BufferView<const xsimd::batch<double>>;
 } // namespace chowdsp
