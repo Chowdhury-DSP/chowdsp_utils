@@ -289,7 +289,6 @@ namespace CoefficientCalculators
                 return;
             }
 
-
             const auto [p0, p1, p2, A0, A1, A2] = VicanekHelpers::computeVicanekPolesAngular (wc, qValAdj, fs, a);
 
             const auto G2 = Power::ipow<2> (gain);

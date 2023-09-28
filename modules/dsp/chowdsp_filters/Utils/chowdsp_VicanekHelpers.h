@@ -92,7 +92,7 @@ namespace VicanekHelpers
         const auto sqrtB0 = sqrt (B0);
         const auto sqrtB1 = sqrt (B1);
         const auto W = (T) 0.5 * (sqrtB0 + sqrtB1);
-//        B2 = max (B2, -W * W);
+        //        B2 = max (B2, -W * W);
 
         jassert (SIMDUtils::all (W * W + B2 >= (T) 0));
         b[0] = (T) 0.5 * (W + sqrt (W * W + B2));
