@@ -282,23 +282,48 @@ namespace CoefficientCalculators
         }
         else if constexpr (mode == CoefficientCalculationMode::Decramped)
         {
-            const auto qValAdj = VicanekHelpers::clampQVicanek (SIMDUtils::select (gain >= (T) 1, qVal, qVal * (T) 0.5));
+            qVal = VicanekHelpers::clampQVicanek (qVal);
             if (SIMDUtils::any (fc < (T) 1000))
             {
                 calcPeakingFilter<T, NumericType, CoefficientCalculationMode::Standard> (b, a, fc, qVal, gain, fs);
                 return;
             }
 
-            const auto [p0, p1, p2, A0, A1, A2] = VicanekHelpers::computeVicanekPolesAngular (wc, qValAdj, fs, a);
+            using SIMDUtils::select;
 
-            const auto G2 = Power::ipow<2> (gain);
+            const auto g = select (gain < (T) 1, (T) 1 / gain, gain);
+            T a_copy[3] {};
+            T b_copy[3] {};
+
+            const auto [p0, p1, p2, A0, A1, A2] = VicanekHelpers::computeVicanekPolesAngular (wc, qVal, fs, a_copy);
+
+            const auto G2 = Power::ipow<2> (g);
             const auto R1 = (A0 * p0 + A1 * p1 + A2 * p2) * G2;
             const auto R2 = (-A0 + A1 + (T) 4 * (p0 - p1) * A2) * G2;
             const auto B0 = A0;
             const auto B2 = (R1 - R2 * p1 - B0) / ((T) 4 * p1 * p1);
             const auto B1 = R2 + B0 + (T) 4 * (p1 - p0) * B2;
 
-            VicanekHelpers::computeVicanekBiquadNumerator (B0, B1, B2, b);
+            VicanekHelpers::computeVicanekBiquadNumerator (B0, B1, B2, b_copy);
+
+            // In order to match q-values with the Standard coefficient calculator,
+            // we need to invert the coefficients, if the gain is less than 1.
+            // The Vicanek paper asserts that the zeros will be inside the unit circle, so we
+            // can safely invert the coefficients without having to worry about stability.
+            a[0] = select (gain < (T) 1, b_copy[0], a_copy[0]);
+            a[1] = select (gain < (T) 1, b_copy[1], a_copy[1]);
+            a[2] = select (gain < (T) 1, b_copy[2], a_copy[2]);
+            b[0] = select (gain < (T) 1, a_copy[0], b_copy[0]);
+            b[1] = select (gain < (T) 1, a_copy[1], b_copy[1]);
+            b[2] = select (gain < (T) 1, a_copy[2], b_copy[2]);
+
+            const auto a_norm = (T) 1 / a[0];
+            a[0] = (T) 1;
+            a[1] *= a_norm;
+            a[2] *= a_norm;
+            b[0] *= a_norm;
+            b[1] *= a_norm;
+            b[2] *= a_norm;
         }
     }
 
@@ -431,6 +456,8 @@ namespace CoefficientCalculators
             //
             // Things get a bit hairy numerically when we have a large boost near Nyquist, so we always
             // compute the "cut" case of the filter, and invert the coefficients if necessary.
+            // The Vicanek paper asserts that the zeros will be inside the unit circle, so we can safely
+            // invert the coefficients without having to worry about stability.
 
             CHOWDSP_USING_XSIMD_STD (sqrt);
             CHOWDSP_USING_XSIMD_STD (exp);
