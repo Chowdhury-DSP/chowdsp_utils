@@ -13,8 +13,8 @@ namespace VicanekHelpers
         CHOWDSP_USING_XSIMD_STD (max);
         CHOWDSP_USING_XSIMD_STD (min);
 
-        static constexpr auto lowerBound = NumericType (std::is_same_v<NumericType, float> ? 0.55 : 0.5);
-        static constexpr auto upperBound = NumericType (std::is_same_v<NumericType, float> ? 4.94 : 27.0);
+        static constexpr auto lowerBound = NumericType (0.1);
+        static constexpr auto upperBound = NumericType (30.0);
 
         // Vicanek method has numerical problems for Q-values outside of this range
         jassert (SIMDUtils::all (qVal >= (T) lowerBound));
@@ -31,13 +31,14 @@ namespace VicanekHelpers
         CHOWDSP_USING_XSIMD_STD (cos);
         CHOWDSP_USING_XSIMD_STD (cosh);
         using Power::ipow;
+        using SIMDUtils::select;
 
         const auto inv2Q = (T) 0.5 / qVal;
 
         const auto expmqw = exp (-inv2Q * w0);
-        const auto cos_arg = sqrt ((T) 1 - ipow<2> (inv2Q)) * w0;
+        const auto cos_cosh_arg = select (inv2Q <= (T) 1, sqrt ((T) 1 - ipow<2> (inv2Q)), sqrt (ipow<2> (inv2Q) - (T) 1)) * w0;
         a[0] = (T) 1;
-        a[1] = -(T) 2 * expmqw * SIMDUtils::select (inv2Q <= (T) 1, cos (cos_arg), cosh (-cos_arg));
+        a[1] = -(T) 2 * expmqw * select (inv2Q <= (T) 1, cos (cos_cosh_arg), cosh (cos_cosh_arg));
         a[2] = ipow<2> (expmqw);
     }
 
@@ -86,11 +87,13 @@ namespace VicanekHelpers
     [[maybe_unused]] inline void computeVicanekBiquadNumerator (T B0, T B1, T B2, T (&b)[3])
     {
         CHOWDSP_USING_XSIMD_STD (sqrt);
+        CHOWDSP_USING_XSIMD_STD (max);
 
         const auto sqrtB0 = sqrt (B0);
         const auto sqrtB1 = sqrt (B1);
         const auto W = (T) 0.5 * (sqrtB0 + sqrtB1);
 
+        jassert (SIMDUtils::all (W * W + B2 >= (T) 0));
         b[0] = (T) 0.5 * (W + sqrt (W * W + B2));
         b[1] = (T) 0.5 * (sqrtB0 - sqrtB1);
         b[2] = -B2 / ((T) 4 * b[0]);

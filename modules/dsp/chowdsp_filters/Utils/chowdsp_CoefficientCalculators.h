@@ -289,16 +289,41 @@ namespace CoefficientCalculators
                 return;
             }
 
-            const auto [p0, p1, p2, A0, A1, A2] = VicanekHelpers::computeVicanekPolesAngular (wc, qVal, fs, a);
+            using SIMDUtils::select;
 
-            const auto G2 = Power::ipow<2> (gain);
+            const auto g = select (gain < (T) 1, (T) 1 / gain, gain);
+            T a_copy[3] {};
+            T b_copy[3] {};
+
+            const auto [p0, p1, p2, A0, A1, A2] = VicanekHelpers::computeVicanekPolesAngular (wc, qVal, fs, a_copy);
+
+            const auto G2 = Power::ipow<2> (g);
             const auto R1 = (A0 * p0 + A1 * p1 + A2 * p2) * G2;
             const auto R2 = (-A0 + A1 + (T) 4 * (p0 - p1) * A2) * G2;
             const auto B0 = A0;
             const auto B2 = (R1 - R2 * p1 - B0) / ((T) 4 * p1 * p1);
             const auto B1 = R2 + B0 + (T) 4 * (p1 - p0) * B2;
 
-            VicanekHelpers::computeVicanekBiquadNumerator (B0, B1, B2, b);
+            VicanekHelpers::computeVicanekBiquadNumerator (B0, B1, B2, b_copy);
+
+            // In order to match q-values with the Standard coefficient calculator,
+            // we need to invert the coefficients, if the gain is less than 1.
+            // The Vicanek paper asserts that the zeros will be inside the unit circle, so we
+            // can safely invert the coefficients without having to worry about stability.
+            a[0] = select (gain < (T) 1, b_copy[0], a_copy[0]);
+            a[1] = select (gain < (T) 1, b_copy[1], a_copy[1]);
+            a[2] = select (gain < (T) 1, b_copy[2], a_copy[2]);
+            b[0] = select (gain < (T) 1, a_copy[0], b_copy[0]);
+            b[1] = select (gain < (T) 1, a_copy[1], b_copy[1]);
+            b[2] = select (gain < (T) 1, a_copy[2], b_copy[2]);
+
+            const auto a_norm = (T) 1 / a[0];
+            a[0] = (T) 1;
+            a[1] *= a_norm;
+            a[2] *= a_norm;
+            b[0] *= a_norm;
+            b[1] *= a_norm;
+            b[2] *= a_norm;
         }
     }
 
@@ -340,33 +365,53 @@ namespace CoefficientCalculators
             CHOWDSP_USING_XSIMD_STD (sqrt);
             CHOWDSP_USING_XSIMD_STD (exp);
             using Power::ipow;
+            using SIMDUtils::select;
+
+            const auto g = select (gain < (T) 1, (T) 1 / gain, gain);
+            T a_copy[3] {};
+            T b_copy[3] {};
 
             const auto w0 = wc / fs;
-            const auto Alpha = sqrt (gain);
+            const auto Alpha = sqrt (g);
             const auto invAlpha = (T) 1 / Alpha;
             const auto Beta = sqrt (Alpha) / ((T) 2 * qVal);
             const auto BetaSq = ipow<2> (Beta);
 
             const auto expBw_A = exp (-Beta * w0 * invAlpha);
-            const auto cos_arg = sqrt (Alpha - BetaSq) * w0 * invAlpha;
-            a[0] = (T) 1;
-            a[1] = -(T) 2 * expBw_A * SIMDUtils::select (BetaSq <= Alpha, cos (cos_arg), cosh (-cos_arg));
-            a[2] = ipow<2> (expBw_A);
+            const auto cos_cosh_arg = select (BetaSq <= Alpha, sqrt (Alpha - BetaSq), sqrt (BetaSq - Alpha)) * w0 * invAlpha;
+            a_copy[0] = (T) 1;
+            a_copy[1] = -(T) 2 * expBw_A * select (BetaSq <= Alpha, cos (cos_cosh_arg), cosh (cos_cosh_arg));
+            a_copy[2] = ipow<2> (expBw_A);
 
             const auto f0 = juce::MathConstants<NumericType>::twoPi / w0;
             const auto w_N_Sq = ipow<2> ((T) 0.5 * f0);
             const auto C = ipow<2> (Beta * f0); // = (2*Beta)^2 w_N^2
-            const auto G2 = gain * (ipow<2> (Alpha - w_N_Sq) + C) / (ipow<2> (1 - Alpha * w_N_Sq) + C);
+            const auto G2 = g * (ipow<2> (Alpha - w_N_Sq) + C) / (ipow<2> (1 - Alpha * w_N_Sq) + C);
 
             const auto [p0, p1, p2] = VicanekHelpers::computeVicanekPhiVals (w0);
-            const auto [A0, A1, A2] = VicanekHelpers::computeVicanekAVals (a);
+            const auto [A0, A1, A2] = VicanekHelpers::computeVicanekAVals (a_copy);
 
-            const auto R1 = (A0 * p0 + A1 * p1 + A2 * p2) * gain;
-            const auto B0 = A0 * ipow<2> (gain);
+            const auto R1 = (A0 * p0 + A1 * p1 + A2 * p2) * g;
+            const auto B0 = A0 * ipow<2> (g);
             const auto B1 = A1 * G2;
             const auto B2 = (R1 - B0 * p0 - B1 * p1) / p2;
 
-            VicanekHelpers::computeVicanekBiquadNumerator (B0, B1, B2, b);
+            VicanekHelpers::computeVicanekBiquadNumerator (B0, B1, B2, b_copy);
+
+            a[0] = select (gain < (T) 1, b_copy[0], a_copy[0]);
+            a[1] = select (gain < (T) 1, b_copy[1], a_copy[1]);
+            a[2] = select (gain < (T) 1, b_copy[2], a_copy[2]);
+            b[0] = select (gain < (T) 1, a_copy[0], b_copy[0]);
+            b[1] = select (gain < (T) 1, a_copy[1], b_copy[1]);
+            b[2] = select (gain < (T) 1, a_copy[2], b_copy[2]);
+
+            const auto a_norm = (T) 1 / a[0];
+            a[0] = (T) 1;
+            a[1] *= a_norm;
+            a[2] *= a_norm;
+            b[0] *= a_norm;
+            b[1] *= a_norm;
+            b[2] *= a_norm;
         }
     }
 
@@ -409,38 +454,60 @@ namespace CoefficientCalculators
             // - We can derive the squared gain at the Nyquist frequency (G2), so then B1 = A1 * G2
             // - Finally, we can match the gain at the cutoff frequency (like with the peaking filter), which gives us B2
             //
-            // I think we might be able to get a better fit by matching the slope of the gain at the cutoff
-            // frequency rather than the gain at Nyquist, but I haven't gotten that to work out just yet.
+            // Things get a bit hairy numerically when we have a large boost near Nyquist, so we always
+            // compute the "cut" case of the filter, and invert the coefficients if necessary.
+            // The Vicanek paper asserts that the zeros will be inside the unit circle, so we can safely
+            // invert the coefficients without having to worry about stability.
 
             CHOWDSP_USING_XSIMD_STD (sqrt);
             CHOWDSP_USING_XSIMD_STD (exp);
             using Power::ipow;
+            using SIMDUtils::select;
+
+            const auto g = select (gain > (T) 1, (T) 1 / gain, gain);
+            T a_copy[3] {};
+            T b_copy[3] {};
 
             const auto w0 = wc / fs;
-            const auto Alpha = sqrt (gain);
+            const auto Alpha = sqrt (g);
             const auto Beta = sqrt (Alpha) / ((T) 2 * qVal);
             const auto BetaSq = ipow<2> (Beta);
 
             const auto expBw = exp (-Beta * w0);
-            const auto cos_arg = sqrt (Alpha - BetaSq) * w0;
-            a[0] = (T) 1;
-            a[1] = -(T) 2 * expBw * SIMDUtils::select (BetaSq <= Alpha, cos (cos_arg), cosh (-cos_arg));
-            a[2] = ipow<2> (expBw);
+            const auto cos_cosh_arg = select (BetaSq <= Alpha, sqrt (Alpha - BetaSq), sqrt (BetaSq - Alpha)) * w0;
+            a_copy[0] = (T) 1;
+            a_copy[1] = -(T) 2 * expBw * SIMDUtils::select (BetaSq <= Alpha, cos (cos_cosh_arg), cosh (cos_cosh_arg));
+            a_copy[2] = ipow<2> (expBw);
 
             const auto f0 = juce::MathConstants<NumericType>::twoPi / w0;
-            const auto w_N_Sq = ipow<2> ((T) 0.5 * f0);
+            const auto w_N_Sq = ipow<2> ((T) 0.49 * f0);
             const auto C = ipow<2> (Beta * f0); // = (2*Beta)^2 w_N^2
-            const auto G2 = gain * (ipow<2> (1 - Alpha * w_N_Sq) + C) / (ipow<2> (Alpha - w_N_Sq) + C);
+            const auto Gn2 = g * (ipow<2> (1 - Alpha * w_N_Sq) + C) / (ipow<2> (Alpha - w_N_Sq) + C);
 
             const auto [p0, p1, p2] = VicanekHelpers::computeVicanekPhiVals (w0);
-            const auto [A0, A1, A2] = VicanekHelpers::computeVicanekAVals (a);
+            const auto [A0, A1, A2] = VicanekHelpers::computeVicanekAVals (a_copy);
 
-            const auto R1 = (A0 * p0 + A1 * p1 + A2 * p2) * gain;
+            const auto R1 = (A0 * p0 + A1 * p1 + A2 * p2) * g;
             const auto B0 = A0;
-            const auto B1 = A1 * G2;
+            const auto B1 = A1 * Gn2;
             const auto B2 = (R1 - B0 * p0 - B1 * p1) / p2;
 
-            VicanekHelpers::computeVicanekBiquadNumerator (B0, B1, B2, b);
+            VicanekHelpers::computeVicanekBiquadNumerator (B0, B1, B2, b_copy);
+
+            a[0] = select (gain > (T) 1, b_copy[0], a_copy[0]);
+            a[1] = select (gain > (T) 1, b_copy[1], a_copy[1]);
+            a[2] = select (gain > (T) 1, b_copy[2], a_copy[2]);
+            b[0] = select (gain > (T) 1, a_copy[0], b_copy[0]);
+            b[1] = select (gain > (T) 1, a_copy[1], b_copy[1]);
+            b[2] = select (gain > (T) 1, a_copy[2], b_copy[2]);
+
+            const auto a_norm = (T) 1 / a[0];
+            a[0] = (T) 1;
+            a[1] *= a_norm;
+            a[2] *= a_norm;
+            b[0] *= a_norm;
+            b[1] *= a_norm;
+            b[2] *= a_norm;
         }
     }
 } // namespace CoefficientCalculators
