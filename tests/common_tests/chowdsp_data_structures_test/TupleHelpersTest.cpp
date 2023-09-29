@@ -7,9 +7,9 @@ TEST_CASE ("Tuple Helpers Test", "[common][data-structures]")
     {
         std::tuple<float, float, int, int> ints;
 
-        chowdsp::TupleHelpers::forEachInTuple ([] (auto& x, size_t i)
-                                               { x = (std::remove_reference_t<decltype (x)>) i; },
-                                               ints);
+        chowdsp::forEachInTuple ([] (auto& x, size_t i)
+                                 { x = (std::remove_reference_t<decltype (x)>) i; },
+                                 ints);
 
         chowdsp::TupleHelpers::forEachInTuple ([] (auto& x, size_t i)
                                                { REQUIRE (juce::exactlyEqual (x, (std::remove_reference_t<decltype (x)>) i)); },
@@ -32,10 +32,10 @@ TEST_CASE ("Tuple Helpers Test", "[common][data-structures]")
 
         std::tuple<Test1, Test2> tuple;
 
-        chowdsp::TupleHelpers::visit_at (tuple, 0, [] (auto& x)
-                                         { x.set (4); });
-        chowdsp::TupleHelpers::visit_at (tuple, 1, [] (auto& x)
-                                         { x.set (5); });
+        chowdsp::visit_at (tuple, 0, [] (auto& x)
+                           { x.set (4); });
+        chowdsp::visit_at (tuple, 1, [] (auto& x)
+                           { x.set (5); });
 
         REQUIRE (std::get<0> (tuple).x == 4);
         REQUIRE (juce::exactlyEqual (std::get<1> (tuple).x, 5.0f));
