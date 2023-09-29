@@ -146,7 +146,7 @@ namespace TypeTraits
         CHOWDSP_CHECK_HAS_METHOD (HasEnd, end, )
 
         template <typename T>
-        static constexpr auto has_begin_end_v = HasBegin<T> && HasEnd<T>;
+        static constexpr auto has_begin_end_v = HasBegin<T>&& HasEnd<T>;
     } // namespace is_iterable_detail
 #endif // DOXYGEN
 
@@ -197,10 +197,7 @@ namespace TypeTraits
 
     /** True if type T can be iterated over like an STL container */
     template <typename T>
-    static constexpr auto IsVectorLike = IsIterable<T>
-                                         && is_vector_detail::is_insertable<T>::value
-                                         && is_vector_detail::is_pushable<T>::value
-                                         && is_vector_detail::is_popable<T>::value;
+    static constexpr auto IsVectorLike = IsIterable<T>&& is_vector_detail::is_insertable<T>::value&& is_vector_detail::is_pushable<T>::value&& is_vector_detail::is_popable<T>::value;
 
 #ifndef DOXYGEN
     namespace is_maplike_detail

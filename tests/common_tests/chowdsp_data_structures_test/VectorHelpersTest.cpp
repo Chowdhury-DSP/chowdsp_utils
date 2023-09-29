@@ -2,7 +2,7 @@
 #include <chowdsp_data_structures/chowdsp_data_structures.h>
 #include <numeric>
 
-TEMPLATE_TEST_CASE ("Vector Helpers Test", "[common][data-structures]", std::vector<int>, (chowdsp::SmallVector<int, 4>))
+TEMPLATE_TEST_CASE ("Vector Helpers Test", "[common][data-structures]", std::vector<int>, (chowdsp::SmallVector<int, 4>) )
 {
     using Vector = TestType;
 

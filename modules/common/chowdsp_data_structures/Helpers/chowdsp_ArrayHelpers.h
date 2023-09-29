@@ -16,7 +16,7 @@ namespace make_array_detail
     template <typename T, size_t... Is, typename Maker>
     constexpr std::array<T, sizeof...(Is)> make_array_lambda (std::index_sequence<Is...>, Maker&& maker)
     {
-        return {(T{maker(Is)})...};
+        return { (T { maker (Is) })... };
     }
 } // namespace make_array_detail
 #endif
