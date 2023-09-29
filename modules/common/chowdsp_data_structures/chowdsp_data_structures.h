@@ -32,6 +32,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Structures/chowdsp_StackAllocator.h"
 #include "Structures/chowdsp_StringLiteral.h"
 
+#include "Helpers/chowdsp_ArrayHelpers.h"
 #include "Helpers/chowdsp_TupleHelpers.h"
 #include "Helpers/chowdsp_VectorHelpers.h"
 #include "Helpers/chowdsp_Iterators.h"

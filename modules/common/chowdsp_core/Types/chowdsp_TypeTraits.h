@@ -146,13 +146,61 @@ namespace TypeTraits
         CHOWDSP_CHECK_HAS_METHOD (HasEnd, end, )
 
         template <typename T>
-        static constexpr auto has_begin_end_v = HasBegin<T>&& HasEnd<T>;
+        static constexpr auto has_begin_end_v = HasBegin<T> && HasEnd<T>;
     } // namespace is_iterable_detail
 #endif // DOXYGEN
 
     /** True if type T can be iterated over like an STL container */
     template <typename T>
     static constexpr auto IsIterable = is_iterable_detail::has_begin_end_v<T>;
+
+#ifndef DOXYGEN
+    namespace is_vector_detail
+    {
+        template <typename T, typename U = void>
+        struct is_insertable
+        {
+            static constexpr auto value = false;
+        };
+
+        template <typename T>
+        struct is_insertable<T, std::void_t<typename T::value_type, typename T::const_iterator, decltype (std::declval<T&>().insert (std::declval<typename T::const_iterator>(), std::declval<typename T::value_type&&>()))>>
+        {
+            static constexpr auto value = true;
+        };
+
+        template <typename T, typename U = void>
+        struct is_pushable
+        {
+            static constexpr auto value = false;
+        };
+
+        template <typename T>
+        struct is_pushable<T, std::void_t<typename T::value_type, decltype (std::declval<T&>().push_back (std::declval<const typename T::value_type&>()))>>
+        {
+            static constexpr auto value = true;
+        };
+
+        template <typename T, typename U = void>
+        struct is_popable
+        {
+            static constexpr auto value = false;
+        };
+
+        template <typename T>
+        struct is_popable<T, std::void_t<decltype (std::declval<T&>().pop_back())>>
+        {
+            static constexpr auto value = true;
+        };
+    } // namespace is_vector_detail
+#endif // DOXYGEN
+
+    /** True if type T can be iterated over like an STL container */
+    template <typename T>
+    static constexpr auto IsVectorLike = IsIterable<T>
+                                         && is_vector_detail::is_insertable<T>::value
+                                         && is_vector_detail::is_pushable<T>::value
+                                         && is_vector_detail::is_popable<T>::value;
 
 #ifndef DOXYGEN
     namespace is_maplike_detail

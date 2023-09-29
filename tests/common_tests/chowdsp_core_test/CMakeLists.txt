@@ -5,6 +5,7 @@ target_sources(chowdsp_core_test
         AtomicHelpersTest.cpp
         MemoryAliasingTest.cpp
         TypesListTest.cpp
+        TypeTraitsTest.cpp
         BindingsTest.cpp
         ScopedValueTest.cpp
         EndOfScopeActionTest.cpp
