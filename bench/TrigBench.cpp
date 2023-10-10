@@ -31,17 +31,21 @@ static constexpr auto data_m10pi_10pi = []
     }                                          \
     BENCHMARK (name)->MinTime (1)
 
-#define TRIG_BENCH(name, op)                  \
-    TRIG_BENCH_RANGE (name ## _mpi_pi, data_mpi_pi, op); \
-    TRIG_BENCH_RANGE (name ## _m10pi_10pi, data_m10pi_10pi, op)
+#define TRIG_BENCH(name, op_mpi_pi, op_full_range)            \
+    TRIG_BENCH_RANGE (name##_mpi_pi, data_mpi_pi, op_mpi_pi); \
+    TRIG_BENCH_RANGE (name##_m10pi_10pi, data_m10pi_10pi, op_full_range)
 
-#define SIN_BENCH(name, op) \
-    TRIG_BENCH(name ## _sin, { \
-                            const auto s = op (x); \
-                            benchmark::DoNotOptimize (s);\
-                            })
+#define SIN_BENCH(name, op_mpi_pi, op_full_range) \
+    TRIG_BENCH (                                  \
+        name##_sin, { \
+                            const auto s = op_mpi_pi (x); \
+                            benchmark::DoNotOptimize (s); }, { \
+                            const auto s = op_full_range (x); \
+                            benchmark::DoNotOptimize (s); })
 
-SIN_BENCH (std, std::sin);
-SIN_BENCH (juce, juce::dsp::FastMathApproximations::sin);
+SIN_BENCH (std, std::sin, std::sin);
+SIN_BENCH (juce, juce::dsp::FastMathApproximations::sin, std::sin); // JUCE approximation is range-limited
+SIN_BENCH (bhaskara, chowdsp::TrigApprox::sin_bhaskara_mpi_pi, chowdsp::TrigApprox::sin_bhaskara);
+SIN_BENCH (order1, chowdsp::TrigApprox::sin_1st_order_mpi_pi, chowdsp::TrigApprox::sin_1st_order);
 
 BENCHMARK_MAIN();
