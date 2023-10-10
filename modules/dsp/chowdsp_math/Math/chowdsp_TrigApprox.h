@@ -4,6 +4,10 @@ namespace chowdsp
 {
 /**
  * Approximation functions for trigonometric functions.
+ *
+ * References:
+ * - Sine plots: https://www.desmos.com/calculator/rnsmcx6wb5
+ * - Taylor polynomials for sine triple-angle approx.: https://www.wolframcloud.com/env/chowdsp/sin_approx.nb
  */
 namespace TrigApprox
 {
@@ -124,6 +128,7 @@ namespace TrigApprox
         return four_over_pi_sq * x * (pi - abs_x);
     }
 
+    /** Full-range first-order sine approximation. */
     template <typename T>
     T sin_1st_order (T x)
     {
@@ -158,6 +163,7 @@ namespace TrigApprox
         return sin_o3 * ((NumericType) 3 + (NumericType) -4 * sin_o3 * sin_o3);
     }
 
+    /** Full-range triple-angle sine approximation. */
     template <int order = 7, typename T = float>
     T sin_3angle (T x)
     {
@@ -165,10 +171,9 @@ namespace TrigApprox
     }
 
     // @TODO:
-    // - triple-angle approximations
-    // - better docs
     // - cosine
     // - sine/cosine together
-    // - tests
+    // - more tests
+    // - combined sine function with enum template?
 } // namespace TrigApprox
 } // namespace chowdsp
