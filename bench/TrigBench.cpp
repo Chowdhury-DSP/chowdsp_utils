@@ -47,5 +47,9 @@ SIN_BENCH (std, std::sin, std::sin);
 SIN_BENCH (juce, juce::dsp::FastMathApproximations::sin, std::sin); // JUCE approximation is range-limited
 SIN_BENCH (bhaskara, chowdsp::TrigApprox::sin_bhaskara_mpi_pi, chowdsp::TrigApprox::sin_bhaskara);
 SIN_BENCH (order1, chowdsp::TrigApprox::sin_1st_order_mpi_pi, chowdsp::TrigApprox::sin_1st_order);
+SIN_BENCH (tri_angle_9, chowdsp::TrigApprox::sin_3angle_mpi_pi<9>, chowdsp::TrigApprox::sin_3angle<9>);
+SIN_BENCH (tri_angle_7, chowdsp::TrigApprox::sin_3angle_mpi_pi<7>, chowdsp::TrigApprox::sin_3angle<7>);
+SIN_BENCH (tri_angle_5, chowdsp::TrigApprox::sin_3angle_mpi_pi<5>, chowdsp::TrigApprox::sin_3angle<5>);
+SIN_BENCH (tri_angle_3, chowdsp::TrigApprox::sin_3angle_mpi_pi<3>, chowdsp::TrigApprox::sin_3angle<3>);
 
 BENCHMARK_MAIN();
