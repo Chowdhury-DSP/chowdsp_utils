@@ -43,6 +43,7 @@ JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 #include "Math/chowdsp_LogApprox.h"
 #include "Math/chowdsp_PowApprox.h"
 #include "Math/chowdsp_DecibelsApprox.h"
+#include "Math/chowdsp_TrigApprox.h"
 
 #if JUCE_MODULE_AVAILABLE_chowdsp_buffers
 #include <chowdsp_buffers/chowdsp_buffers.h>
