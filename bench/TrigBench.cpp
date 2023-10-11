@@ -82,8 +82,8 @@ const auto std_sin_cos = [] (float x)
 };
 
 SIN_COS_BENCH (std, std_sin_cos, std_sin_cos);
-SIN_COS_BENCH (tri_angle_7_8, (chowdsp::TrigApprox::sin_cos_3angle_mpi_pi<7, 8>), (chowdsp::TrigApprox::sin_cos_3angle<7, 8>));
-SIN_COS_BENCH (tri_angle_5_6, (chowdsp::TrigApprox::sin_cos_3angle_mpi_pi<5, 6>), (chowdsp::TrigApprox::sin_cos_3angle<5, 6>));
-SIN_COS_BENCH (tri_angle_3_4, (chowdsp::TrigApprox::sin_cos_3angle_mpi_pi<3, 4>), (chowdsp::TrigApprox::sin_cos_3angle<3, 4>));
+SIN_COS_BENCH (tri_angle_7_8, (chowdsp::TrigApprox::sin_cos_3angle_mpi_pi<7, 8>), (chowdsp::TrigApprox::sin_cos_3angle<7, 8>) );
+SIN_COS_BENCH (tri_angle_5_6, (chowdsp::TrigApprox::sin_cos_3angle_mpi_pi<5, 6>), (chowdsp::TrigApprox::sin_cos_3angle<5, 6>) );
+SIN_COS_BENCH (tri_angle_3_4, (chowdsp::TrigApprox::sin_cos_3angle_mpi_pi<3, 4>), (chowdsp::TrigApprox::sin_cos_3angle<3, 4>) );
 
 BENCHMARK_MAIN();
