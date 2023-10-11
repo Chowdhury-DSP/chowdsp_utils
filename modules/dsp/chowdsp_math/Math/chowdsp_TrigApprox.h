@@ -23,11 +23,13 @@ namespace TrigApprox
             return T ((int) x);
         }
 
+#if ! CHOWDSP_NO_XSIMD
         template <typename T>
         xsimd::batch<T> truncate (xsimd::batch<T> x)
         {
             return xsimd::to_float (xsimd::to_int (x));
         }
+#endif
 
         /** Fast method to wrap a value into the range [-pi, pi] */
         template <typename T>
