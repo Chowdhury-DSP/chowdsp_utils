@@ -43,14 +43,14 @@ static constexpr auto data_m10pi_10pi = []
                             const auto s = op_full_range (x); \
                             benchmark::DoNotOptimize (s); })
 
-//SIN_BENCH (std, std::sin, std::sin);
-//SIN_BENCH (juce, juce::dsp::FastMathApproximations::sin, std::sin); // JUCE approximation is range-limited
-//SIN_BENCH (bhaskara, chowdsp::TrigApprox::sin_bhaskara_mpi_pi, chowdsp::TrigApprox::sin_bhaskara);
-//SIN_BENCH (order1, chowdsp::TrigApprox::sin_1st_order_mpi_pi, chowdsp::TrigApprox::sin_1st_order);
-//SIN_BENCH (tri_angle_9, chowdsp::TrigApprox::sin_3angle_mpi_pi<9>, chowdsp::TrigApprox::sin_3angle<9>);
-//SIN_BENCH (tri_angle_7, chowdsp::TrigApprox::sin_3angle_mpi_pi<7>, chowdsp::TrigApprox::sin_3angle<7>);
-//SIN_BENCH (tri_angle_5, chowdsp::TrigApprox::sin_3angle_mpi_pi<5>, chowdsp::TrigApprox::sin_3angle<5>);
-//SIN_BENCH (tri_angle_3, chowdsp::TrigApprox::sin_3angle_mpi_pi<3>, chowdsp::TrigApprox::sin_3angle<3>);
+SIN_BENCH (std, std::sin, std::sin);
+SIN_BENCH (juce, juce::dsp::FastMathApproximations::sin, std::sin); // JUCE approximation is range-limited
+SIN_BENCH (bhaskara, chowdsp::TrigApprox::sin_bhaskara_mpi_pi, chowdsp::TrigApprox::sin_bhaskara);
+SIN_BENCH (order1, chowdsp::TrigApprox::sin_1st_order_mpi_pi, chowdsp::TrigApprox::sin_1st_order);
+SIN_BENCH (tri_angle_9, chowdsp::TrigApprox::sin_3angle_mpi_pi<9>, chowdsp::TrigApprox::sin_3angle<9>);
+SIN_BENCH (tri_angle_7, chowdsp::TrigApprox::sin_3angle_mpi_pi<7>, chowdsp::TrigApprox::sin_3angle<7>);
+SIN_BENCH (tri_angle_5, chowdsp::TrigApprox::sin_3angle_mpi_pi<5>, chowdsp::TrigApprox::sin_3angle<5>);
+SIN_BENCH (tri_angle_3, chowdsp::TrigApprox::sin_3angle_mpi_pi<3>, chowdsp::TrigApprox::sin_3angle<3>);
 
 #define COS_BENCH(name, op_mpi_pi, op_full_range) \
     TRIG_BENCH (                                  \
@@ -60,13 +60,13 @@ static constexpr auto data_m10pi_10pi = []
                             const auto c = op_full_range (x); \
                             benchmark::DoNotOptimize (c); })
 
-//COS_BENCH (std, std::cos, std::cos);
-//COS_BENCH (juce, juce::dsp::FastMathApproximations::cos, std::cos); // JUCE approximation is range-limited
-//COS_BENCH (bhaskara, chowdsp::TrigApprox::cos_bhaskara_mpi_pi, chowdsp::TrigApprox::cos_bhaskara);
-//COS_BENCH (order1, chowdsp::TrigApprox::cos_1st_order_mpi_pi, chowdsp::TrigApprox::cos_1st_order);
-//COS_BENCH (tri_angle_8, chowdsp::TrigApprox::cos_3angle_mpi_pi<8>, chowdsp::TrigApprox::cos_3angle<8>);
-//COS_BENCH (tri_angle_6, chowdsp::TrigApprox::cos_3angle_mpi_pi<6>, chowdsp::TrigApprox::cos_3angle<6>);
-//COS_BENCH (tri_angle_4, chowdsp::TrigApprox::cos_3angle_mpi_pi<4>, chowdsp::TrigApprox::cos_3angle<4>);
+COS_BENCH (std, std::cos, std::cos);
+COS_BENCH (juce, juce::dsp::FastMathApproximations::cos, std::cos); // JUCE approximation is range-limited
+COS_BENCH (bhaskara, chowdsp::TrigApprox::cos_bhaskara_mpi_pi, chowdsp::TrigApprox::cos_bhaskara);
+COS_BENCH (order1, chowdsp::TrigApprox::cos_1st_order_mpi_pi, chowdsp::TrigApprox::cos_1st_order);
+COS_BENCH (tri_angle_8, chowdsp::TrigApprox::cos_3angle_mpi_pi<8>, chowdsp::TrigApprox::cos_3angle<8>);
+COS_BENCH (tri_angle_6, chowdsp::TrigApprox::cos_3angle_mpi_pi<6>, chowdsp::TrigApprox::cos_3angle<6>);
+COS_BENCH (tri_angle_4, chowdsp::TrigApprox::cos_3angle_mpi_pi<4>, chowdsp::TrigApprox::cos_3angle<4>);
 
 #define SIN_COS_BENCH(name, op_mpi_pi, op_full_range) \
     TRIG_BENCH (                                      \

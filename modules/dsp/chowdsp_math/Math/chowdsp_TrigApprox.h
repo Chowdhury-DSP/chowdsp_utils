@@ -7,6 +7,7 @@ namespace chowdsp
  *
  * References:
  * - Sine plots: https://www.desmos.com/calculator/rnsmcx6wb5
+ * - Cosine plots: https://www.desmos.com/calculator/tgt3dejrgr
  */
 namespace TrigApprox
 {
@@ -313,8 +314,6 @@ namespace TrigApprox
     /**
      * Combined sine/cosine approximation, using the triple-angle
      * approximations described above.
-     *
-     * Order should
      */
     template <int sin_order = 7, int cos_order = 6, typename T = float>
     auto sin_cos_3angle_mpi_pi (T x)
@@ -337,7 +336,7 @@ namespace TrigApprox
         return std::make_tuple (s, c);
     }
 
-    /** Full-range triple-angle sine approximation. */
+    /** Full-range triple-angle sine/cosine approximation. */
     template <int sin_order = 7, int cos_order = 6, typename T = float>
     auto sin_cos_3angle (T x)
     {
