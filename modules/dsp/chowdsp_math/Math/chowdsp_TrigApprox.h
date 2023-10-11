@@ -83,7 +83,6 @@ namespace TrigApprox
             }
             else if constexpr (order == 3)
             {
-
                 const auto s1 = NumericType (1) + NumericType (-1.57763153266e-1) * theta_sq;
                 return theta * s1;
             }
@@ -96,8 +95,6 @@ namespace TrigApprox
          * minimize max error.
          *
          * Reference: https://www.wolframcloud.com/env/chowdsp/cos_approx.nb
-         *
-         * @TODO: I think I can get the error for these down a bit lower, just need some more math/Mathematica tricks
          */
         template <typename T, int order>
         T cos_o3 ([[maybe_unused]] T theta, T theta_sq, [[maybe_unused]] T theta_quad)
@@ -107,19 +104,19 @@ namespace TrigApprox
 
             if constexpr (order == 8)
             {
-                const auto c1 = (NumericType) -0.5 + (NumericType) 4.1666570372109e-2 * theta_sq;
-                const auto c2 = (NumericType) -1.3884536712849e-3 + (NumericType) 2.4185513623303e-5 * theta_sq;
+                const auto c1 = (NumericType) -0.5 + (NumericType) 4.16666094252e-2 * theta_sq;
+                const auto c2 = (NumericType) -1.38854590421e-3 + (NumericType) 2.42367173361e-5 * theta_sq;
                 return (NumericType) 1 + theta_sq * (c1 + c2 * theta_quad);
             }
             else if constexpr (order == 6)
             {
-                const auto c1 = (NumericType) -0.5 + (NumericType) 4.165121515e-2 * theta_sq;
-                const auto c2 = (NumericType) -1.348103430e-3 * theta_quad;
+                const auto c1 = (NumericType) -0.5 + (NumericType) 4.16527333677e-2 * theta_sq;
+                const auto c2 = (NumericType) -1.34931392239e-3 * theta_quad;
                 return (NumericType) 1 + theta_sq * (c1 + c2);
             }
             else if constexpr (order == 4)
             {
-                const auto c1 = (NumericType) -0.5 + (NumericType) 4.017380231e-2 * theta_sq;
+                const auto c1 = (NumericType) -0.5 + (NumericType) 4.01730450758e-2 * theta_sq;
                 return (NumericType) 1 + theta_sq * c1;
             }
         }
@@ -280,15 +277,15 @@ namespace TrigApprox
     }
 
     /**
-     * Sine approximation using a Taylor approximation on the
+     * Cosine approximation using a Taylor approximation on the
      * range [-pi/3, pi/3], expanded to [-pi, pi] using the
      * triple angle formula.
      *
      * The approximation is parameterized on the order of
      * the Taylor approximation, which _must_ be an odd integer.
      *
-     * Max error (8th-order): 8.7e-9
-     * Max error (6th-order): 2.82e-6
+     * Max error (8th-order): 7.25e-9
+     * Max error (6th-order): 2.24e-6
      * Max error (4th-order): 7.93e-4
      */
     template <int order = 6, typename T = float>
@@ -306,11 +303,45 @@ namespace TrigApprox
         return cos_o3 * ((NumericType) -3 + (NumericType) 4 * cos_o3 * cos_o3);
     }
 
-    /** Full-range triple-angle sine approximation. */
+    /** Full-range triple-angle cosine approximation. */
     template <int order = 6, typename T = float>
     T cos_3angle (T x)
     {
         return cos_3angle_mpi_pi<order, T> (detail::fast_mod_mpi_pi (x));
+    }
+
+    /**
+     * Combined sine/cosine approximation, using the triple-angle
+     * approximations described above.
+     *
+     * Order should
+     */
+    template <int sin_order = 7, int cos_order = 6, typename T = float>
+    auto sin_cos_3angle_mpi_pi (T x)
+    {
+        using NumericType = SampleTypeHelpers::NumericType<T>;
+        [[maybe_unused]] static constexpr auto pi = juce::MathConstants<NumericType>::pi;
+        jassert (SIMDUtils::all (x <= pi)
+                 && SIMDUtils::all (x >= -pi));
+
+        const auto theta_o3 = x * NumericType (1.0 / 3.0);
+        const auto theta_o3_sq = theta_o3 * theta_o3;
+        const auto theta_o3_quad = theta_o3_sq * theta_o3_sq;
+
+        const auto sin_o3 = detail::sin_o3<T, sin_order> (theta_o3, theta_o3_sq, theta_o3_quad);
+        const auto s = sin_o3 * ((NumericType) 3 + (NumericType) -4 * sin_o3 * sin_o3);
+
+        const auto cos_o3 = detail::cos_o3<T, cos_order> (theta_o3, theta_o3_sq, theta_o3_quad);
+        const auto c = cos_o3 * ((NumericType) -3 + (NumericType) 4 * cos_o3 * cos_o3);
+
+        return std::make_tuple (s, c);
+    }
+
+    /** Full-range triple-angle sine approximation. */
+    template <int sin_order = 7, int cos_order = 6, typename T = float>
+    auto sin_cos_3angle (T x)
+    {
+        return sin_cos_3angle_mpi_pi<sin_order, cos_order, T> (detail::fast_mod_mpi_pi (x));
     }
 
     // @TODO:
