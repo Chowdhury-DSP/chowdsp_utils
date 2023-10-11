@@ -343,9 +343,5 @@ namespace TrigApprox
     {
         return sin_cos_3angle_mpi_pi<sin_order, cos_order, T> (detail::fast_mod_mpi_pi (x));
     }
-
-    // @TODO:
-    // - sine/cosine together
-    // - combined sine function with enum template?
 } // namespace TrigApprox
 } // namespace chowdsp
