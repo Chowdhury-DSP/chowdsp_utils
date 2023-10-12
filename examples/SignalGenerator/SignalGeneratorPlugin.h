@@ -91,11 +91,11 @@ private:
 
     using AAFilter = chowdsp::ButterworthFilter<12>;
     juce::AudioBuffer<float> upsampledBuffer;
-    chowdsp::Downsampler<float, AAFilter> resample2;
-    chowdsp::Downsampler<float, AAFilter> resample3;
-    chowdsp::Downsampler<float, AAFilter> resample4;
+    chowdsp::Downsampler<float, AAFilter, false> resample2;
+    chowdsp::Downsampler<float, AAFilter, false> resample3;
+    chowdsp::Downsampler<float, AAFilter, false> resample4;
 
-    chowdsp::Downsampler<float, AAFilter>* resampler = nullptr;
+    chowdsp::Downsampler<float, AAFilter, false>* resampler = nullptr;
     int previousUpSampleChoice = 0;
 
     chowdsp::SharedLookupTableCache lookupTableCache;
@@ -107,6 +107,8 @@ private:
     chowdsp::WestCoastWavefolder<float> westCoastFolder { &lookupTableCache.get() };
     chowdsp::WaveMultiplier<float, 6> waveMultiplyFolder { &lookupTableCache.get() };
     chowdsp::ADAASineClipper<float> adaaSineClipper { &lookupTableCache.get() };
+
+    chowdsp::OvershootLimiter<float> clipGuard { 64 };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SignalGeneratorPlugin)
 };
