@@ -50,7 +50,7 @@
         static_assert (sizeof (No) != sizeof (Yes), "Yes and No have the same size on this platform, undefined behaviour will ensue!"); \
                                                                                                                                         \
         template <typename C>                                                                                                           \
-        static Yes test (decltype (C().Method (__VA_ARGS__))*);                                                                         \
+        static Yes test (decltype (std::declval<C>().Method (__VA_ARGS__))*);                                                                         \
                                                                                                                                         \
         template <typename C>                                                                                                           \
         static No test (...);                                                                                                           \
@@ -117,10 +117,10 @@
         static_assert (sizeof (No) != sizeof (Yes), "Yes and No have the same size on this platform, undefined behaviour will ensue!"); \
                                                                                                                                         \
         template <typename C>                                                                                                           \
-        static std::enable_if_t<std::is_member_pointer_v<decltype (&C::Member)>, Yes> test (decltype (C().Member)*);                    \
+        static std::enable_if_t<std::is_member_pointer_v<decltype (&C::Member)>, Yes> test (decltype (std::declval<C>().Member)*);                    \
                                                                                                                                         \
         template <typename C>                                                                                                           \
-        static std::enable_if_t<! std::is_member_pointer_v<decltype (&C::Member)>, No> test (decltype (C().Member)*);                   \
+        static std::enable_if_t<! std::is_member_pointer_v<decltype (&C::Member)>, No> test (decltype (std::declval<C>().Member)*);                   \
                                                                                                                                         \
         template <typename C>                                                                                                           \
         static No test (...);                                                                                                           \
