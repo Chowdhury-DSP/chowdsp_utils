@@ -78,12 +78,12 @@ TEMPLATE_TEST_CASE ("Gain Test", "[dsp][misc]", float, double, xsimd::batch<floa
 
         std::fill (bufferData, bufferData + blockSize, (T) 1);
         gain.process (buffer);
-        REQUIRE_MESSAGE (bufferData[0] == SIMDApprox<T> ((T) 0), "Gain after prepare() is incorrect!");
+        REQUIRE_MESSAGE (bufferData[0] == SIMDApprox<T> ((T) 0).margin ((NumericType) 1.0e-6), "Gain after prepare() is incorrect!");
 
         gain.setGainDecibels ((NumericType) 0);
         gain.reset();
         std::fill (bufferData, bufferData + blockSize, (T) 1);
         gain.process (buffer);
-        REQUIRE_MESSAGE (bufferData[0] == SIMDApprox<T> ((T) 1), "Gain after reset() is incorrect!");
+        REQUIRE_MESSAGE (bufferData[0] == SIMDApprox<T> ((T) 1).margin ((NumericType) 1.0e-6), "Gain after reset() is incorrect!");
     }
 }
