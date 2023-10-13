@@ -9,7 +9,7 @@
  * static_assert(HasToString<MyClass>, "MyClass must have a static toString(int) method!");
  * @endcode
  */
-#define CHOWDSP_CHECK_HAS_STATIC_METHOD(Name, Method, ...)                                                                              \
+#define CHOWDSP_CHECK_HAS_STATIC_METHOD(Name, Method)                                                                                   \
     template <typename _T>                                                                                                              \
     class Test_##Name                                                                                                                   \
     {                                                                                                                                   \
@@ -18,7 +18,7 @@
         static_assert (sizeof (No) != sizeof (Yes), "Yes and No have the same size on this platform, undefined behaviour will ensue!"); \
                                                                                                                                         \
         template <typename C>                                                                                                           \
-        static Yes test (decltype (C::Method (__VA_ARGS__))*);                                                                          \
+        static Yes test (decltype (&C::Method));                                                                                        \
                                                                                                                                         \
         template <typename C>                                                                                                           \
         static No test (...);                                                                                                           \
