@@ -98,4 +98,5 @@ namespace experimental
 #include "Functional/chowdsp_Bindings.h"
 #include "Functional/chowdsp_EndOfScopeAction.h"
 #include "Memory/chowdsp_MemoryAliasing.h"
+#include "Types/chowdsp_TypeHasCheckers.h"
 #include "Types/chowdsp_TypeTraits.h"
