@@ -63,8 +63,8 @@ TEST_CASE ("Type Checkers Test", "[common][types]")
     SECTION ("Has Static Method")
     {
         STATIC_REQUIRE (HasStaticGetName<Type_With_No_Name> == false);
-//        STATIC_REQUIRE (HasStaticGetName<Type_With_Get_Name> == false);
-//        STATIC_REQUIRE (HasStaticGetName<Type_With_Get_Name_And_Ctor> == false);
+        //        STATIC_REQUIRE (HasStaticGetName<Type_With_Get_Name> == false);
+        //        STATIC_REQUIRE (HasStaticGetName<Type_With_Get_Name_And_Ctor> == false);
         STATIC_REQUIRE (HasStaticGetName<Type_With_Static_Get_Name> == true);
     }
 }
