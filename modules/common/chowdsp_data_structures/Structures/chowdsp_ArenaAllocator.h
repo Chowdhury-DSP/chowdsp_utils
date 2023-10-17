@@ -4,17 +4,23 @@
 
 namespace chowdsp
 {
-/** A simple stack allocator */
-class StackAllocator
+/** A simple arena allocator */
+class ArenaAllocator
 {
 public:
-    StackAllocator() = default;
+    ArenaAllocator() = default;
 
-    StackAllocator (const StackAllocator&) = delete;
-    StackAllocator& operator= (const StackAllocator&) = delete;
+    /** Constructs the arena with an initial allocated size. */
+    explicit ArenaAllocator (size_t size_in_bytes)
+    {
+        reset (size_in_bytes);
+    }
 
-    StackAllocator (StackAllocator&&) noexcept = default;
-    StackAllocator& operator= (StackAllocator&&) noexcept = default;
+    ArenaAllocator (const ArenaAllocator&) = delete;
+    ArenaAllocator& operator= (const ArenaAllocator&) = delete;
+
+    ArenaAllocator (ArenaAllocator&&) noexcept = default;
+    ArenaAllocator& operator= (ArenaAllocator&&) noexcept = default;
 
     /** Re-allocates the internal buffer with a given number of bytes */
     void reset (size_t new_size_bytes)
@@ -64,20 +70,20 @@ public:
      * Once the frame goes out of scope, the allocator will be reset
      * to whatever it's state was at the beginning of the frame.
      */
-    struct StackAllocatorFrame
+    struct ArenaAllocatorFrame
     {
-        explicit StackAllocatorFrame (StackAllocator& allocator)
+        explicit ArenaAllocatorFrame (ArenaAllocator& allocator)
             : alloc (allocator),
               bytes_used_at_start (alloc.bytes_used)
         {
         }
 
-        ~StackAllocatorFrame()
+        ~ArenaAllocatorFrame()
         {
             alloc.bytes_used = bytes_used_at_start;
         }
 
-        StackAllocator& alloc;
+        ArenaAllocator& alloc;
         const size_t bytes_used_at_start;
     };
 

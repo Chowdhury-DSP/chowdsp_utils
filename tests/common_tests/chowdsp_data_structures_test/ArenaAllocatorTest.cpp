@@ -1,10 +1,9 @@
 #include <CatchUtils.h>
 #include <chowdsp_data_structures/chowdsp_data_structures.h>
 
-TEST_CASE ("Stack Allocator Test", "[common][data-structures]")
+TEST_CASE ("Arena Allocator Test", "[common][data-structures]")
 {
-    chowdsp::StackAllocator allocator;
-    allocator.reset (150);
+    chowdsp::ArenaAllocator allocator { 150 };
 
     // allocate doubles
     {
@@ -22,7 +21,7 @@ TEST_CASE ("Stack Allocator Test", "[common][data-structures]")
 
     // allocate with stack frame
     {
-        chowdsp::StackAllocator::StackAllocatorFrame frame { allocator };
+        chowdsp::ArenaAllocator::ArenaAllocatorFrame frame { allocator };
         auto* some_chars = allocator.allocate<char> (30);
         juce::ignoreUnused (some_chars);
         REQUIRE (allocator.get_bytes_used() == 150);
