@@ -10,7 +10,7 @@ target_sources(chowdsp_data_structures_test
         LocalPointerTest.cpp
         OptionalPointerTest.cpp
         SmallVectorTest.cpp
-        StackAllocatorTest.cpp
+        ArenaAllocatorTest.cpp
         StringLiteralTest.cpp
         TupleHelpersTest.cpp
         VectorHelpersTest.cpp
