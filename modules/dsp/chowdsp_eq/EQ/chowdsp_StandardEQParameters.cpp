@@ -2,7 +2,9 @@
 namespace chowdsp::EQ
 {
 template <size_t NumBands>
-StandardEQParameters<NumBands>::StandardEQParameters (EQParameterHandles&& paramHandles) : eqParams (std::move (paramHandles))
+StandardEQParameters<NumBands>::StandardEQParameters (EQParameterHandles&& paramHandles, const juce::String& name)
+    : ParamHolder (name),
+      eqParams (std::move (paramHandles))
 {
     for (auto& bandParams : eqParams)
     {

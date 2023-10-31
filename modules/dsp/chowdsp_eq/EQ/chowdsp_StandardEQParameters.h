@@ -101,7 +101,7 @@ public:
     using EQParameterHandles = std::array<EQBandParams, NumBands>;
 
     /** Constructor */
-    explicit StandardEQParameters (EQParameterHandles&& paramHandles);
+    explicit StandardEQParameters (EQParameterHandles&& paramHandles, const juce::String& name = {});
 
     /** Parameter handles */
     EQParameterHandles eqParams;
