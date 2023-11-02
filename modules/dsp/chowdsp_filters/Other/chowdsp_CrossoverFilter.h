@@ -7,6 +7,7 @@ template <typename T, int Order, int NumBands>
 class CrossoverFilter
 {
     static_assert (NumBands > 2, "NumBands must be > 2!");
+
 public:
     CrossoverFilter() = default;
 
@@ -162,4 +163,4 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CrossoverFilter)
 };
-}
+} // namespace chowdsp
