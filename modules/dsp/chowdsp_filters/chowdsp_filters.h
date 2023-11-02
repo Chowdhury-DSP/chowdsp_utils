@@ -49,4 +49,5 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Other/chowdsp_WernerFilter.h"
 #include "Other/chowdsp_ARPFilter.h"
 #include "Other/chowdsp_LinkwitzRileyFilter.h"
+#include "Other/chowdsp_CrossoverFilter.h"
 #include "Other/chowdsp_ThreeWayCrossoverFilter.h"

@@ -1,6 +1,12 @@
 namespace chowdsp::EQ
 {
 template <typename PrototypeEQ, int defaultFIRLength>
+LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::~LinearPhaseEQ()
+{
+    stopTimer();
+}
+
+template <typename PrototypeEQ, int defaultFIRLength>
 int LinearPhaseEQ<PrototypeEQ, defaultFIRLength>::getIRSize (double sampleRate)
 {
     int irSize = defaultFIRLength; // default IR size
