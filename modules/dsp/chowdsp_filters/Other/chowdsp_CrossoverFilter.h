@@ -67,20 +67,20 @@ public:
 
         if constexpr (Order == 1)
         {
-            auto lowerBandBuffers = buffersOut.template first<NumBands - 1>();
+            auto lowerBandBuffers = buffersOut.template first<(size_t) NumBands - 1>();
             lowerBandsCrossover.processBlock (bufferIn, lowerBandBuffers);
             BufferMath::copyBufferData (lowerBandBuffers.back(), tempBuffer); // Order-1 LR filter does not allow pointer aliasing, so we copy to a temp buffer here.
             highCutFilter.processBlock (tempBuffer, lowerBandBuffers.back(), buffersOut.back());
         }
         else
         {
-            auto lowerBandBuffers = buffersOut.template first<NumBands - 1>();
+            auto lowerBandBuffers = buffersOut.template first<(size_t) NumBands - 1>();
             lowerBandsCrossover.processBlock (bufferIn, lowerBandBuffers);
             highCutFilter.processBlock (lowerBandBuffers.back(), lowerBandBuffers.back(), buffersOut.back());
 
             // an allpass LR-filter with the same crossover as the high-cut frequency
             // this puts the low band back in-phase with the high- and mid-bands.
-            for (auto [buffer, filter] : chowdsp::zip (buffersOut.template first<NumBands - 2>(), apHighCutFilter))
+            for (auto [buffer, filter] : chowdsp::zip (buffersOut.template first<(size_t) NumBands - 2>(), apHighCutFilter))
             {
                 filter.processBlock (buffer, buffer, tempBuffer);
                 BufferMath::addBufferData (tempBuffer, buffer);
@@ -102,7 +102,7 @@ public:
 private:
     CrossoverFilter<T, Order, NumBands - 1> lowerBandsCrossover {};
     LinkwitzRileyFilter<T, Order> highCutFilter {};
-    std::array<LinkwitzRileyFilter<T, Order>, NumBands - 2> apHighCutFilter {};
+    std::array<LinkwitzRileyFilter<T, Order>, (size_t) NumBands - 2> apHighCutFilter {};
 
     Buffer<T> tempBuffer {};
 
