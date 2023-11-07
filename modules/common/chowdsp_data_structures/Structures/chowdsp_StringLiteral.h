@@ -27,15 +27,11 @@ namespace sl_detail
 
 /** A string-literal wrapper type. */
 template <size_t N>
-class StringLiteral
+struct StringLiteral
 {
     std::array<char, N> chars {};
     size_t actual_size = 0;
 
-    template <size_t NN, size_t MM>
-    friend constexpr StringLiteral<NN + MM> operator+ (const StringLiteral<NN>&, const StringLiteral<MM>&);
-
-public:
     constexpr StringLiteral() = default;
     constexpr StringLiteral (const StringLiteral&) = default;
     constexpr StringLiteral& operator= (const StringLiteral&) = default;
@@ -48,7 +44,7 @@ public:
     }
 
     constexpr StringLiteral (const char (&str)[N]) // NOSONAR NOLINT(google-explicit-constructor)
-        : StringLiteral (str, std::integral_constant<size_t, N - 1> {})
+        : StringLiteral (str, std::integral_constant<size_t, N-1> {})
     {
     }
 
@@ -151,6 +147,24 @@ constexpr bool operator!= (const std::string_view& lhs, const StringLiteral<N>& 
 {
     return ! (lhs == rhs);
 }
+
+#if (defined(__cplusplus) && __cplusplus >= 202002L) || (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L)
+namespace string_literals
+{
+    template <StringLiteral sl>
+    constexpr auto operator"" _sl()
+    {
+        return sl;
+    }
+
+    template <char... str>
+    constexpr auto operator"" _sl()
+    {
+        constexpr char str_array[] { str..., '\0' };
+        return StringLiteral { str_array };
+    }
+}
+#endif
 } // namespace chowdsp
 
 JUCE_END_IGNORE_WARNINGS_MSVC
