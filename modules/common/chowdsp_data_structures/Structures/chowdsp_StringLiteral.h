@@ -44,7 +44,7 @@ struct StringLiteral
     }
 
     constexpr StringLiteral (const char (&str)[N]) // NOSONAR NOLINT(google-explicit-constructor)
-        : StringLiteral (str, std::integral_constant<size_t, N-1> {})
+        : StringLiteral (str, std::integral_constant<size_t, N - 1> {})
     {
     }
 
@@ -163,7 +163,7 @@ namespace string_literals
         constexpr char str_array[] { str..., '\0' };
         return StringLiteral { str_array };
     }
-}
+} // namespace string_literals
 #endif
 } // namespace chowdsp
 
