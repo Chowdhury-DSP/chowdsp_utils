@@ -2,11 +2,13 @@
 #include <CatchUtils.h>
 #include <chowdsp_data_structures/chowdsp_data_structures.h>
 
+using namespace chowdsp::string_literals;
+
 TEST_CASE ("String Literal Test", "[common][data-structures]")
 {
     SECTION ("Construction")
     {
-        static constexpr auto sl1 = chowdsp::StringLiteral { "TEST" };
+        static constexpr auto sl1 = "TEST"_sl;
         STATIC_REQUIRE (sl1.data()[0] == 'T');
         STATIC_REQUIRE (std::is_same_v<std::remove_cv_t<decltype (sl1)>, chowdsp::StringLiteral<5>>);
 
@@ -75,5 +77,11 @@ TEST_CASE ("String Literal Test", "[common][data-structures]")
         static constexpr chowdsp::StringLiteral sl { "BLAH" };
         const auto sl2 = sl + " BLAH!";
         REQUIRE (sl2 == "BLAH BLAH!");
+    }
+
+    SECTION ("Numbers")
+    {
+        static constexpr auto fifteen = 15_sl;
+        REQUIRE (fifteen == "15"_sl);
     }
 }

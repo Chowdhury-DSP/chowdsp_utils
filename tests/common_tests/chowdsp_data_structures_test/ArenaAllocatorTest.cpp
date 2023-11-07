@@ -32,7 +32,7 @@ TEST_CASE ("Arena Allocator Test", "[common][data-structures]")
     // aligned allocation
     {
         auto* some_data = allocator.allocate<float> (1, 16);
-        REQUIRE (juce::snapPointerToAlignment (some_data, 16) == some_data);
+        REQUIRE (juce::snapPointerToAlignment (some_data, (size_t) 16) == some_data);
     }
 
     // overfull allocation
