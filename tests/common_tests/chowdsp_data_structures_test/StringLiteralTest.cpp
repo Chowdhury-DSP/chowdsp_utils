@@ -8,7 +8,7 @@ TEST_CASE ("String Literal Test", "[common][data-structures]")
 {
     SECTION ("Construction")
     {
-        static constexpr auto sl1 = "TEST"_sl;
+        static constexpr auto sl1 = chowdsp::StringLiteral { "TEST" };
         STATIC_REQUIRE (sl1.data()[0] == 'T');
         STATIC_REQUIRE (std::is_same_v<std::remove_cv_t<decltype (sl1)>, chowdsp::StringLiteral<5>>);
 
@@ -82,6 +82,6 @@ TEST_CASE ("String Literal Test", "[common][data-structures]")
     SECTION ("Numbers")
     {
         static constexpr auto fifteen = 15_sl;
-        REQUIRE (fifteen == "15"_sl);
+        REQUIRE (fifteen == chowdsp::StringLiteral { "15" });
     }
 }
