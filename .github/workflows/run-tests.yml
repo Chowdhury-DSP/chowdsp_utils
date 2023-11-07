@@ -30,14 +30,14 @@ jobs:
                 "Test",
                 "Coverage",
               ]
-        os: [ubuntu-latest, windows-2019, macos-latest]
+        os: [ubuntu-latest, windows-2022, macos-latest]
         include:
           - name: "Test"
             os: ubuntu-latest
             cmake_args: "-DCMAKE_BUILD_TYPE=Release"
             build_type: "Release"
           - name: "Test"
-            os: windows-2019
+            os: windows-2022
             build_type: "Release"
           - name: "Coverage"
             os: ubuntu-latest
@@ -61,7 +61,7 @@ jobs:
           - name: "Test"
             os: macos-latest
           - name: "Coverage"
-            os: windows-2019
+            os: windows-2022
 
     steps:
       - name: Install Linux Deps
