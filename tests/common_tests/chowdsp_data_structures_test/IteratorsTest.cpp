@@ -199,8 +199,8 @@ TEST_CASE ("Zip-Multi")
     SECTION ("Filling Arrays")
     {
         const std::array<int, 6> x_int { 0, 1, 2, 3, 4, 5 };
-        std::array<float, 6> x_float;
-        std::array<double, 6> x_double;
+        std::array<float, 6> x_float {};
+        std::array<double, 6> x_double {};
         for (auto [int_val, float_val, double_val] : chowdsp::zip_multi (x_int, x_float, x_double))
         {
             float_val = static_cast<float> (int_val);
@@ -208,8 +208,8 @@ TEST_CASE ("Zip-Multi")
         }
         for (auto [int_val, float_val, double_val] : chowdsp::zip_multi (x_int, x_float, x_double))
         {
-            REQUIRE (int_val == (float) float_val);
-            REQUIRE (int_val == (double) double_val);
+            REQUIRE (juce::exactlyEqual ((float) int_val, float_val));
+            REQUIRE (juce::exactlyEqual ((double) int_val, double_val));
         }
     }
 
