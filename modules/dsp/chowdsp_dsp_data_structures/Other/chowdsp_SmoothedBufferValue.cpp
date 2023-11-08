@@ -12,7 +12,7 @@ void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::setParameterHandle (st
 }
 
 template <typename FloatType, typename ValueSmoothingTypes>
-void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::setParameterHandle ([[maybe_unused]] FloatParameter* handle)
+void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::setParameterHandle ([[maybe_unused]] const FloatParameter* handle)
 {
     parameterHandle = nullptr;
 

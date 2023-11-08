@@ -47,7 +47,7 @@ public:
       * If it returns false, you can safely skip all other
       * processing.
       */
-    bool processBlockIn (const BufferView<SampleType>& buffer, bool onOffParam);
+    bool processBlockIn (const BufferView<const SampleType>& buffer, bool onOffParam);
 
     /**
       * Call this at the end of your processBlock().
@@ -101,7 +101,7 @@ public:
       * If it returns false, you can safely skip all other
       * processing.
       */
-    bool processBlockIn (const BufferView<SampleType>& buffer, bool onOffParam);
+    bool processBlockIn (const BufferView<const SampleType>& buffer, bool onOffParam);
 
     /**
       * Call this at the end of your processBlock().

@@ -8,7 +8,7 @@ void BypassProcessor<SampleType, DelayInterpType, std::enable_if_t<std::is_same_
 }
 
 template <typename SampleType, typename DelayInterpType>
-bool BypassProcessor<SampleType, DelayInterpType, std::enable_if_t<std::is_same_v<DelayInterpType, std::nullptr_t>>>::processBlockIn (const BufferView<SampleType>& block, bool onOffParam)
+bool BypassProcessor<SampleType, DelayInterpType, std::enable_if_t<std::is_same_v<DelayInterpType, std::nullptr_t>>>::processBlockIn (const BufferView<const SampleType>& block, bool onOffParam)
 {
     if (! onOffParam && ! prevOnOffParam)
     {
@@ -115,7 +115,7 @@ void BypassProcessor<SampleType, DelayInterpType, std::enable_if_t<! std::is_sam
 }
 
 template <typename SampleType, typename DelayInterpType>
-bool BypassProcessor<SampleType, DelayInterpType, std::enable_if_t<! std::is_same_v<DelayInterpType, std::nullptr_t>>>::processBlockIn (const BufferView<SampleType>& block, bool onOffParam)
+bool BypassProcessor<SampleType, DelayInterpType, std::enable_if_t<! std::is_same_v<DelayInterpType, std::nullptr_t>>>::processBlockIn (const BufferView<const SampleType>& block, bool onOffParam)
 {
     enum class DelayOp
     {

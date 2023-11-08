@@ -44,7 +44,7 @@ public:
      *
      * @param handle A parameter handle to use for smoothing
      */
-    void setParameterHandle (FloatParameter* handle);
+    void setParameterHandle (const FloatParameter* handle);
 
     /** Prepare the smoother to process samples with a given sample rate and block size. */
     void prepare (double sampleRate, int samplesPerBlock);
@@ -102,7 +102,7 @@ private:
 
     std::atomic<float>* parameterHandle = nullptr;
 
-    FloatParameter* modulatableParameterHandle = nullptr;
+    const FloatParameter* modulatableParameterHandle = nullptr;
 
     double sampleRate = 48000.0;
     double rampLengthInSeconds = 0.05;
