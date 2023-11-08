@@ -14,6 +14,9 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
+    /** Returns nullptr if no component is found for the given parameter */
+    [[nodiscard]] juce::Component* getComponentForParameter (const juce::RangedAudioParameter&);
+
 private:
     struct Pimpl;
     std::unique_ptr<Pimpl> pimpl;
@@ -40,9 +43,9 @@ public:
         view.setBounds (getLocalBounds());
     }
 
-private:
     ParametersView view;
 
+private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParametersViewEditor)
 };
 } // namespace chowdsp

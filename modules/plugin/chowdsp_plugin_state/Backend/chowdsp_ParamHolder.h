@@ -6,6 +6,9 @@ namespace chowdsp
 class ParamHolder
 {
 public:
+    /** Convenient alias for a Parameter ID */
+    using PID = juce::ParameterID;
+
     /**
      * Creates a ParamHolder. The user might want to name the ParamHolder,
      * or make it "non-owning" so it doesn't take ownership of the parameter
