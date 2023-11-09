@@ -1,5 +1,3 @@
-#if ! CHOWDSP_NO_XSIMD
-
 #pragma once
 
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wsign-conversion")
@@ -108,7 +106,11 @@ private:
     int paddedOrder = 0;
     std::vector<int> zPtr;
 
+#if CHOWDSP_NO_XSIMD
+    std::vector<FloatType> coefficients;
+#else
     std::vector<FloatType, xsimd::default_allocator<FloatType>> coefficients;
+#endif
     std::vector<std::vector<FloatType>> state;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FIRFilter)
@@ -116,5 +118,3 @@ private:
 } // namespace chowdsp
 
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
-
-#endif // ! CHOWDSP_NO_XSIMD
