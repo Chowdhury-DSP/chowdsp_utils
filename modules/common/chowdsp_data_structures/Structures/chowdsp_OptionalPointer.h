@@ -189,5 +189,5 @@ struct IsOptionalPointerType<OptionalPointer<T>> : std::true_type
 
 /** True if the type is a chowdsp::OptionalPointer<T> */
 template <typename T>
-static constexpr bool IsOptionalPointer = IsOptionalPointerType<T>::value;
+static constexpr bool IsOptionalPointer = is_specialization_of_v<T, OptionalPointer>;
 } // namespace chowdsp

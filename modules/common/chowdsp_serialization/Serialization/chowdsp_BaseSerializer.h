@@ -61,18 +61,8 @@ class BaseSerializer
     static constexpr auto IsString = std::is_same_v<T, std::string> || std::is_same_v<T, juce::String>;
 
 #if JUCE_MODULE_AVAILABLE_juce_graphics
-    template <class T>
-    struct IsJucePointType : std::false_type
-    {
-    };
-
-    template <class T>
-    struct IsJucePointType<juce::Point<T>> : std::true_type
-    {
-    };
-
     template <typename T>
-    static constexpr auto IsPoint = IsJucePointType<T>::value;
+    static constexpr auto IsPoint = is_specialization_of_v<T, juce::Point>;
 #endif
 
     template <typename T>
