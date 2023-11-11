@@ -89,17 +89,21 @@ namespace TypeTraits
 } // namespace TypeTraits
 
 /** Return true if the complete type is a specialization of the outer type */
-template<typename CompleteType, template<typename...> class OuterType>
+template <typename CompleteType, template <typename...> class OuterType>
 struct is_specialization_of;
 
-template<typename CompleteType, template<typename...> class OuterType>
-struct is_specialization_of final : std::false_type {};
+template <typename CompleteType, template <typename...> class OuterType>
+struct is_specialization_of final : std::false_type
+{
+};
 
-template<template<typename...> class OuterType, typename... TypeArgs>
-struct is_specialization_of<OuterType<TypeArgs...>, OuterType> final: std::true_type {};
+template <template <typename...> class OuterType, typename... TypeArgs>
+struct is_specialization_of<OuterType<TypeArgs...>, OuterType> final : std::true_type
+{
+};
 
 /** Return true if the complete type is a specialization of the outer type */
-template<typename CompleteType, template<typename...> class OuterType>
+template <typename CompleteType, template <typename...> class OuterType>
 static constexpr bool is_specialization_of_v = is_specialization_of<CompleteType, OuterType>::value;
 
 /**

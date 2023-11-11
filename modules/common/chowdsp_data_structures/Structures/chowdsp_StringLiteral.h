@@ -79,7 +79,7 @@ struct StringLiteral
         jassert (N >= actual_size);
 
         // temporary copy so we don't have to leave room for the null terminator added by snprintf
-        std::array<char, N+1> temp_str;
+        std::array<char, N + 1> temp_str;
         if constexpr (std::is_signed_v<IntType>)
             std::snprintf (temp_str.data(), temp_str.size(), "%lld", static_cast<int64_t> (int_value));
         else
