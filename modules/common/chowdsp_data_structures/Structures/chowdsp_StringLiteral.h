@@ -22,6 +22,19 @@ namespace sl_detail
         return d_first;
     }
 #endif
+
+    /** Counts the string length needed to contain a number. */
+    template <typename Int>
+    size_t num_str_len (Int number)
+    {
+        size_t digits = (number > 0) ? 0 : 1;
+        while (number)
+        {
+            number /= 10;
+            digits++;
+        }
+        return digits;
+    }
 } // namespace sl_detail
 #endif
 
@@ -57,6 +70,23 @@ struct StringLiteral
     }
 
     [[nodiscard]] constexpr std::string_view toStringView() const { return { data(), size() }; }
+
+    template <typename IntType, typename = typename std::enable_if_t<std::is_integral_v<IntType>>>
+    constexpr explicit StringLiteral (IntType int_value)
+        : actual_size (sl_detail::num_str_len (int_value))
+    {
+        // N is not large enough to hold this number!
+        jassert (N >= actual_size);
+
+        // temporary copy so we don't have to leave room for the null terminator added by snprintf
+        std::array<char, N+1> temp_str;
+        if constexpr (std::is_signed_v<IntType>)
+            std::snprintf (temp_str.data(), temp_str.size(), "%lld", static_cast<int64_t> (int_value));
+        else
+            std::snprintf (temp_str.data(), temp_str.size(), "%llu", static_cast<uint64_t> (int_value));
+
+        sl_detail::copy (temp_str.begin(), temp_str.begin() + actual_size, chars.begin());
+    }
     constexpr operator std::string_view() const { return toStringView(); } // NOSONAR NOLINT(google-explicit-constructor)
     [[nodiscard]] std::string toString() const { return { data(), size() }; }
     operator std::string() const { return toString(); } // NOSONAR NOLINT(google-explicit-constructor)

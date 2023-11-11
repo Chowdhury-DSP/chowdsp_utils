@@ -39,11 +39,11 @@ struct PluginNonParameterState : chowdsp::NonParamState
 
     PluginNonParameterState()
     {
-        addStateValues ({ &editorWidth, &editorHeight });
+        addStateValues ({ &editorWidth, &editorHeight, &atomicThing });
 
         for (size_t i = 0; i < 4; ++i)
         {
-            yesNoNames[i] = chowdsp::StringLiteral { "yes_no" } + chowdsp::StringLiteral<1> { char ('0' + i) };
+            yesNoNames[i] = chowdsp::StringLiteral { "yes_no" } + chowdsp::StringLiteral<1> { i };
             yesNoVals.emplace_back (yesNoNames[i], YesNo::No);
         }
         addStateValues<YesNo> ({ yesNoVals.begin(), yesNoVals.end() });
@@ -51,6 +51,7 @@ struct PluginNonParameterState : chowdsp::NonParamState
 
     chowdsp::StateValue<int> editorWidth { "editor_width", 300 };
     chowdsp::StateValue<int> editorHeight { "editor_height", 500 };
+    chowdsp::StateValue<std::atomic_int, int> atomicThing { "something_atomic", 12 };
 
     std::array<chowdsp::StringLiteral<8>, 8> yesNoNames {};
     chowdsp::SmallVector<chowdsp::StateValue<YesNo>, 8> yesNoVals;
@@ -185,12 +186,14 @@ TEST_CASE ("State Serialization Test", "[plugin][state]")
     {
         static constexpr int width = 200;
         static constexpr int height = 150;
+        static constexpr int atomic = 24;
 
         juce::MemoryBlock block;
         {
             State state;
             state.nonParams.editorWidth = width;
             state.nonParams.editorHeight = height;
+            state.nonParams.atomicThing = atomic;
             state.serialize (block);
         }
 
@@ -198,6 +201,7 @@ TEST_CASE ("State Serialization Test", "[plugin][state]")
         state.deserialize (block);
         REQUIRE_MESSAGE (state.nonParams.editorWidth.get() == width, "Editor width is incorrect");
         REQUIRE_MESSAGE (state.nonParams.editorHeight.get() == height, "Editor height is incorrect");
+        REQUIRE_MESSAGE (state.nonParams.atomicThing.get() == atomic, "Atomic thing is incorrect");
     }
 
     SECTION ("Added Parameter Test")
