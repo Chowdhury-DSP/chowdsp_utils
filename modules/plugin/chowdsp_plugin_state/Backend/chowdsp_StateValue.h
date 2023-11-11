@@ -6,6 +6,7 @@ namespace chowdsp
 struct StateValueBase
 {
     explicit StateValueBase (std::string_view valueName) : name (valueName) {}
+    StateValueBase (const StateValueBase&) = default;
     virtual ~StateValueBase() = default;
 
     virtual void reset() {}
@@ -13,27 +14,27 @@ struct StateValueBase
     virtual void serialize (JSONSerializer::SerializedType&) const {}
     virtual void deserialize (JSONSerializer::DeserializedType) {}
 
-    const std::string_view name;
-    Broadcaster<void()> changeBroadcaster;
+    const std::string_view name {};
+    Broadcaster<void()> changeBroadcaster {};
 };
 #endif
 
 /** A stateful value that can be used to hold some non-parameter state */
-template <typename T>
+template <typename T, typename element_type_ = T>
 struct StateValue : StateValueBase
 {
-    using element_type = T;
+    using element_type = element_type_;
 
     /** Default constructor */
     StateValue()
         : StateValueBase ({}),
-          defaultValue (T {}),
+          defaultValue (element_type {}),
           currentValue (defaultValue)
     {
     }
 
     /** Constructs the value with a name and default value */
-    StateValue (std::string_view valueName, T defaultVal)
+    StateValue (std::string_view valueName, element_type defaultVal)
         : StateValueBase (valueName),
           defaultValue (defaultVal),
           currentValue (defaultValue)
@@ -44,11 +45,11 @@ struct StateValue : StateValueBase
     StateValue& operator= (StateValue&&) noexcept = default;
 
     /** Returns the value */
-    T get() const noexcept { return currentValue; }
-    operator T() const noexcept { return get(); } // NOSONAR NOLINT(google-explicit-constructor): we want to be able to do implicit conversion
+    element_type get() const noexcept { return currentValue; }
+    operator element_type() const noexcept { return get(); } // NOSONAR NOLINT(google-explicit-constructor): we want to be able to do implicit conversion
 
     /** Sets a new value */
-    void set (T v)
+    void set (element_type v)
     {
         JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wfloat-equal")
         if (v == currentValue)
@@ -59,7 +60,7 @@ struct StateValue : StateValueBase
         changeBroadcaster();
     }
 
-    StateValue& operator= (T v)
+    StateValue& operator= (element_type v)
     {
         set (v);
         return *this;
@@ -80,7 +81,7 @@ struct StateValue : StateValueBase
         deserialize<JSONSerializer> (deserial, *this);
     }
 
-    const T defaultValue;
+    const element_type defaultValue;
 
 private:
     template <typename Serializer>
@@ -93,7 +94,7 @@ private:
     template <typename Serializer>
     static void deserialize (typename Serializer::DeserializedType deserial, StateValue& value)
     {
-        T val {};
+        element_type val {};
         Serialization::deserialize<Serializer> (deserial, val);
         value.set (val);
     }

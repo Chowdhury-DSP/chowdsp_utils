@@ -83,5 +83,9 @@ TEST_CASE ("String Literal Test", "[common][data-structures]")
     {
         static constexpr auto fifteen = 15_sl;
         REQUIRE (fifteen == chowdsp::StringLiteral { "15" });
+
+        REQUIRE (chowdsp::StringLiteral<2> { (int) 15 } == chowdsp::StringLiteral { "15" });
+        REQUIRE (chowdsp::StringLiteral<2> { (size_t) 15 } == chowdsp::StringLiteral { "15" });
+        REQUIRE (chowdsp::StringLiteral<3> { (int) -15 } == chowdsp::StringLiteral { "-15" });
     }
 }
