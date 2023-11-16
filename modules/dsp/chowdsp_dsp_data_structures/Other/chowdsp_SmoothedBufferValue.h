@@ -46,8 +46,14 @@ public:
      */
     void setParameterHandle (const FloatParameter* handle);
 
-    /** Prepare the smoother to process samples with a given sample rate and block size. */
-    void prepare (double sampleRate, int samplesPerBlock);
+    /**
+     * Prepare the smoother to process samples with a given sample rate
+     * and block size.
+     *
+     * If you're planning to use the SmoothedBuffer with an arena allocator,
+     * set useInternalVector to false.
+     */
+    void prepare (double sampleRate, int samplesPerBlock, bool useInternalVector = true);
 
     /** Resets the state of the smoother with a given value. */
     void reset (FloatType resetValue);
@@ -69,18 +75,20 @@ public:
 
     /**
      * Process smoothing for the current parameter handle.
-     * Please don't call this function if the parameter handle has nt been set!
+     * Please don't call this function if the parameter handle hasn't been set!
      */
     void process (int numSamples);
+    void process (int numSamples, ArenaAllocator& alloc);
 
     /**
      * Process smoothing for the input value.
      * If smoothing an audio parameter, it is recommended to use a parameter handle instead!
      */
     void process (FloatType value, int numSamples);
+    void process (FloatType value, int numSamples, ArenaAllocator& alloc);
 
     /** Returns a pointer to the current smoothed buffer. */
-    [[nodiscard]] const FloatType* getSmoothedBuffer() const { return buffer.data(); }
+    [[nodiscard]] const FloatType* getSmoothedBuffer() const { return bufferData; }
 
     /**
      * Optional mapping function to map from the set value to the smoothed value.
@@ -97,6 +105,8 @@ private:
 #else
     std::vector<FloatType> buffer;
 #endif
+    FloatType* bufferData;
+
     juce::SmoothedValue<FloatType, ValueSmoothingType> smoother;
     bool isCurrentlySmoothing = false;
 
