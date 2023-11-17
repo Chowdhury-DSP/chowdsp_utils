@@ -105,7 +105,7 @@ private:
 #else
     std::vector<FloatType> buffer;
 #endif
-    FloatType* bufferData;
+    FloatType* bufferData = nullptr;
 
     juce::SmoothedValue<FloatType, ValueSmoothingType> smoother;
     bool isCurrentlySmoothing = false;

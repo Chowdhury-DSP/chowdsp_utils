@@ -146,7 +146,7 @@ template <typename T1, typename T2 = T1>
 template <typename T1, typename T2 = T1>
 [[maybe_unused]] static void copyFromSIMDBuffer (const Buffer<xsimd::batch<T2>>& simdBuffer, Buffer<T1>& scalarBuffer) noexcept
 {
-    copyFromSIMDBuffer (simdBuffer, static_cast<const BufferView<T1>&> (scalarBuffer));
+    copyFromSIMDBuffer<T1, T2> (simdBuffer, static_cast<const BufferView<T1>&> (scalarBuffer));
 }
 #endif // ! CHOWDSP_NO_XSIMD
 } // namespace chowdsp
