@@ -4,10 +4,11 @@ namespace chowdsp
 {
 template <typename Param, typename Callback>
 ParameterAttachment<Param, Callback>::ParameterAttachment (Param& parameter,
-                                                           PluginState& pluginState,
+                                                           PluginState& plugState,
                                                            Callback&& callback)
-    : ParameterAttachment (parameter, pluginState.getParameterListeners(), std::forward<Callback> (callback))
+    : ParameterAttachment (parameter, plugState.getParameterListeners(), std::forward<Callback> (callback))
 {
+    pluginState = &plugState;
 }
 
 template <typename Param, typename Callback>
@@ -28,14 +29,14 @@ ParameterAttachment<Param, Callback>::ParameterAttachment (Param& parameter,
 template <typename Param, typename Callback>
 void ParameterAttachment<Param, Callback>::beginGesture()
 {
-    if (param != nullptr)
+    if (param != nullptr && pluginState != nullptr && pluginState->processor != nullptr)
         param->beginChangeGesture();
 }
 
 template <typename Param, typename Callback>
 void ParameterAttachment<Param, Callback>::endGesture()
 {
-    if (param != nullptr)
+    if (param != nullptr && pluginState != nullptr && pluginState->processor != nullptr)
         param->endChangeGesture();
 }
 

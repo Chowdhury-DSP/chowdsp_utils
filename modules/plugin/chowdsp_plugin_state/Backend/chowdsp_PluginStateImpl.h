@@ -20,7 +20,7 @@ public:
     explicit PluginStateImpl (juce::UndoManager* um = nullptr);
 
     /** Constructs the state and adds all the state parameters to the given processor */
-    explicit PluginStateImpl (juce::AudioProcessor& processor, juce::UndoManager* um = nullptr);
+    explicit PluginStateImpl (juce::AudioProcessor& proc, juce::UndoManager* um = nullptr);
 
     /** Serializes the plugin state to the given MemoryBlock */
     void serialize (juce::MemoryBlock& data) const override;
