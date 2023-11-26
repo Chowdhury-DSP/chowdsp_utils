@@ -17,10 +17,11 @@ public:
 
     /** Initialises the plugin state with a given set of parameters. */
     void initialise (ParamHolder& parameters,
-                     juce::AudioProcessor* processor = nullptr,
+                     juce::AudioProcessor* proc = nullptr,
                      juce::UndoManager* um = nullptr)
     {
         params = &parameters;
+        processor = proc;
         undoManager = um;
         listeners.emplace (parameters);
         if (processor != nullptr)
@@ -80,6 +81,7 @@ public:
         mainThreadAction.call (std::forward<Callable> (func), couldBeAudioThread);
     }
 
+    juce::AudioProcessor* processor = nullptr;
     juce::UndoManager* undoManager = nullptr;
 
 private:
