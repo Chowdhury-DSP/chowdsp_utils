@@ -91,4 +91,15 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginState)
 };
+
+/** A "dummy" plugin state that does absolutely nothing! */
+struct DummyPluginState : PluginState
+{
+    void serialize (juce::MemoryBlock&) const override {}
+    void deserialize (const juce::MemoryBlock&) override {}
+
+    NonParamState non_params {};
+    [[nodiscard]] NonParamState& getNonParameters() override { return non_params; }
+    [[nodiscard]] const NonParamState& getNonParameters() const override { return non_params; }
+};
 } // namespace chowdsp
