@@ -16,9 +16,9 @@ public:
 
     BufferView() = default;
 
-    BufferView& operator= (const BufferView<SampleType>&) = default;
-    BufferView (BufferView<SampleType>&&) noexcept = default;
-    BufferView& operator= (BufferView<SampleType>&&) noexcept = default;
+    BufferView& operator= (const BufferView&) = default;
+    BufferView (BufferView&&) noexcept = default;
+    BufferView& operator= (BufferView&&) noexcept = default;
 
     BufferView (SampleType* const* data, int dataNumChannels, int dataNumSamples, int sampleOffset = 0) : numChannels (dataNumChannels),
                                                                                                           numSamples (dataNumSamples)

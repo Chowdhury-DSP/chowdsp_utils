@@ -53,7 +53,7 @@ public:
         gainComputer.setRatio (params.ratio);
 
         levelDetectBuffer.setCurrentSize (1, numSamples);
-        chowdsp::BufferMath::sumToMono (keyInputBuffer, levelDetectBuffer);
+        BufferMath::sumToMono (keyInputBuffer, levelDetectBuffer);
         levelDetector.processBlock (levelDetectBuffer);
 
         gainComputerBuffer.setCurrentSize (1, numSamples);
