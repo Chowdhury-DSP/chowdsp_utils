@@ -45,8 +45,7 @@ public:
                 newAttackMs = detectors.modifyAttack (newAttackMs);
         }
 
-        a1_a = std::exp ((SampleType) -1 / (fs * newAttackMs * (SampleType) 0.001));
-        b0_a = (SampleType) 1 - a1_a;
+        computeBallisticCoeffs (newAttackMs, fs);
     }
 
     /** Sets the release time in milliseconds */
@@ -68,8 +67,7 @@ public:
                 newReleaseMs = detectors.modifyRelease (newReleaseMs);
         }
 
-        a1_r = std::exp ((SampleType) -1 / (fs * newReleaseMs * (SampleType) 0.001));
-        b0_r = (SampleType) 1 - a1_r;
+        computeBallisticCoeffs (newReleaseMs, fs);
     }
 
     /** Sets the threshold level in Decibels */

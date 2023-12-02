@@ -10,6 +10,16 @@ struct BallisticCoeffs
     T b0;
 };
 
+/** Computes ballistic coefficients for a given attack/release time */
+template <typename T>
+BallisticCoeffs<T> computeBallisticCoeffs (T timeMs, T fs)
+{
+    BallisticCoeffs<T> coeffs {};
+    coeffs.a1 = std::exp ((T) -1 / (fs * timeMs * (T) 0.001));
+    coeffs.b0 = (T) 1 - coeffs.a1;
+    return coeffs;
+}
+
 /** A return-to-zero peak detector */
 struct PeakDetector
 {
