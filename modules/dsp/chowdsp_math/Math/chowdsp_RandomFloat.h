@@ -51,6 +51,7 @@ namespace RandomUtils
         return static_cast<double> (seed >> 11) / 9007199254740992.0;
     }
 
+#if ! CHOWDSP_NO_XSIMD
     inline xsimd::batch<float> rng_0_1 (xsimd::batch<uint32_t>& seed)
     {
         seed = seed * 196314165UL + 907633515UL;
@@ -62,6 +63,7 @@ namespace RandomUtils
         seed = seed * 6364136223846793005ULL + 1442695040888963407ULL;
         return xsimd::batch_cast<double> (seed >> 11) / 9007199254740992.0;
     }
+#endif
 
     constexpr float rng_m1_1 (uint32_t& seed)
     {
@@ -77,6 +79,7 @@ namespace RandomUtils
         return static_cast<double> (temp) / 9007199254740992.0;
     }
 
+#if ! CHOWDSP_NO_XSIMD
     inline xsimd::batch<float> rng_m1_1 (xsimd::batch<uint32_t>& seed)
     {
         seed = seed * 196314165UL + 907633515UL;
@@ -90,6 +93,7 @@ namespace RandomUtils
         auto temp = xsimd::batch_cast<int64_t> (seed >> 10) - 9007199254740992LL;
         return xsimd::batch_cast<double> (temp) / 9007199254740992.0;
     }
+#endif
 } // namespace RandomUtils
 
 /**
