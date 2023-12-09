@@ -45,7 +45,9 @@ public:
                 newAttackMs = detectors.modifyAttack (newAttackMs);
         }
 
-        computeBallisticCoeffs (newAttackMs, fs);
+        const auto coeffs = computeBallisticCoeffs (newAttackMs, fs);
+        a1_a = coeffs.a1;
+        b0_a = coeffs.b0;
     }
 
     /** Sets the release time in milliseconds */
@@ -67,7 +69,9 @@ public:
                 newReleaseMs = detectors.modifyRelease (newReleaseMs);
         }
 
-        computeBallisticCoeffs (newReleaseMs, fs);
+        const auto coeffs = computeBallisticCoeffs (newReleaseMs, fs);
+        a1_r = coeffs.a1;
+        b0_r = coeffs.b0;
     }
 
     /** Sets the threshold level in Decibels */
