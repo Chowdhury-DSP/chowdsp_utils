@@ -90,7 +90,7 @@ namespace RandomUtils
         auto temp = xsimd::batch_cast<int64_t> (seed >> 10) - 9007199254740992LL;
         return xsimd::batch_cast<double> (temp) / 9007199254740992.0;
     }
-}
+} // namespace RandomUtils
 
 /**
  * Wrapper class for generating random floating-point numbers.
@@ -112,7 +112,7 @@ public:
     {
     }
 
-    T operator() ()
+    T operator()()
     {
         if constexpr (twoSided)
             return RandomUtils::rng_m1_1 (seed);
@@ -127,8 +127,8 @@ public:
     }
 
 private:
-    Basis seed{};
+    Basis seed {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (RandomFloat)
 };
-}
+} // namespace chowdsp
