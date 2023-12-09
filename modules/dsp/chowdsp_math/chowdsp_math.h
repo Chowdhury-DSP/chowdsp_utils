@@ -37,6 +37,7 @@ JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 #include "Math/chowdsp_MatrixOps.h"
 #include "Math/chowdsp_Polynomials.h"
 #include "Math/chowdsp_Power.h"
+#include "Math/chowdsp_RandomFloat.h"
 #include "Math/chowdsp_JacobiElliptic.h"
 #include "Math/chowdsp_Polylogarithm.h"
 #include "Math/chowdsp_TanhIntegrals.h"

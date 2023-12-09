@@ -15,4 +15,5 @@ target_sources(chowdsp_math_test
         PowApproxTest.cpp
         DecibelsApproxTest.cpp
         TrigApproxTest.cpp
+        RandomFloatTest.cpp
 )
