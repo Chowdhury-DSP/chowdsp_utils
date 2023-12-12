@@ -21,6 +21,10 @@ public:
 
         std::vector<float> oneFilterCoeffs (coeffsPerFilter);
 
+#if JUCE_TEENSY
+        bufferPtrs.resize ((size_t) interpolationFactor);
+#endif
+
         buffers.clear();
         buffers.reserve ((size_t) interpolationFactor);
         filters.clear();
@@ -53,7 +57,9 @@ public:
         const auto interpolationFactor = (int) filters.size();
 
         // set up sub-buffer pointers
+#if ! JUCE_TEENSY
         auto* bufferPtrs = static_cast<T**> (alloca (sizeof (T*) * (size_t) interpolationFactor));
+#endif
         for (size_t filterIndex = 0; filterIndex < (size_t) interpolationFactor; ++filterIndex)
             bufferPtrs[filterIndex] = buffers[filterIndex].getWritePointer (channel);
 
@@ -86,5 +92,9 @@ private:
     std::vector<FIRFilter<T>> filters {};
 
     std::vector<Buffer<T>> buffers {};
+
+#if JUCE_TEENSY
+    std::vector<T*> bufferPtrs {};
+#endif
 };
 } // namespace chowdsp
