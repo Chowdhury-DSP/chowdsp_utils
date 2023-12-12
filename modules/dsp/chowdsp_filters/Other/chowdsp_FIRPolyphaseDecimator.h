@@ -22,6 +22,10 @@ public:
 
         std::vector<float> oneFilterCoeffs (coeffsPerFilter);
 
+#if JUCE_TEENSY
+        bufferPtrs.resize ((size_t) decimationFactor);
+#endif
+
         buffers.clear();
         buffers.reserve ((size_t) decimationFactor);
         overlapState = std::vector<T> ((size_t) numChannels * (size_t) decimationFactor, T {});
@@ -57,7 +61,9 @@ public:
         const auto numSamplesOut = numSamplesIn / decimationFactor;
 
         // set up sub-buffer pointers
+#if ! JUCE_TEENSY
         auto* bufferPtrs = static_cast<T**> (alloca (sizeof (T*) * (size_t) decimationFactor));
+#endif
         for (size_t filterIndex = 0; filterIndex < (size_t) decimationFactor; ++filterIndex)
             bufferPtrs[filterIndex] = buffers[filterIndex].getWritePointer (channel);
         auto* channelOverlapState = overlapState.data() + (size_t) channel * (size_t) decimationFactor;
@@ -104,5 +110,9 @@ private:
 
     std::vector<Buffer<T>> buffers {};
     std::vector<T> overlapState {};
+
+#if JUCE_TEENSY
+    std::vector<T*> bufferPtrs {};
+#endif
 };
 } // namespace chowdsp
