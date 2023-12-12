@@ -47,6 +47,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Other/chowdsp_HilbertFilter.h"
 #include "Other/chowdsp_FIRFilter.h"
 #include "Other/chowdsp_FIRPolyphaseDecimator.h"
+#include "Other/chowdsp_FIRPolyphaseInterpolator.h"
 #include "Other/chowdsp_WernerFilter.h"
 #include "Other/chowdsp_ARPFilter.h"
 #include "Other/chowdsp_LinkwitzRileyFilter.h"

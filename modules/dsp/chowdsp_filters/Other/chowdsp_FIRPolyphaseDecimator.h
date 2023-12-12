@@ -14,9 +14,9 @@ public:
     FIRPolyphaseDecimator () = default;
 
     /** Prepares the filter to process a stream of data, with the given configuration and filter coefficients. */
-    void prepare (int decimationFactor, int numChannels, int maxBlockSize, const nonstd::span<const T> coeffs)
+    void prepare (int decimationFactor, int numChannels, int maxBlockSizeIn, const nonstd::span<const T> coeffs)
     {
-        jassert (maxBlockSize % decimationFactor == 0);
+        jassert (maxBlockSizeIn % decimationFactor == 0);
         const auto numCoeffs = coeffs.size();
         const auto coeffsPerFilter = Math::ceiling_divide (numCoeffs, (size_t) decimationFactor);
 
@@ -29,7 +29,7 @@ public:
         filters.reserve ((size_t) decimationFactor);
         for (int i = 0; i < decimationFactor; ++i)
         {
-            buffers.emplace_back (numChannels, maxBlockSize / decimationFactor);
+            buffers.emplace_back (numChannels, maxBlockSizeIn / decimationFactor);
 
             auto& filter = filters.emplace_back (coeffsPerFilter);
             filter.prepare (numChannels);
@@ -44,7 +44,12 @@ public:
         }
     }
 
-    /** Processes a block of data. */
+    /**
+     * Processes a block of data.
+     *
+     * inBlock should have a size of numSamplesIn, and outBlock should have a size of
+     * numSamplesIn / decimationFactor.
+     */
     void processBlock (const T* inBlock, T* outBlock, const int numSamplesIn, const int channel = 0) noexcept
     {
         const auto decimationFactor = (int) filters.size();
@@ -79,7 +84,11 @@ public:
             juce::FloatVectorOperations::add (outBlock, bufferPtrs[filterIndex], numSamplesOut);
     }
 
-    /** Processes a block of data. */
+    /**
+     * Processes a block of data.
+     *
+     * bufferOut should have a size of bufferIn.getNumSamples() / decimationFactor.
+     */
     void processBlock (const BufferView<const T>& bufferIn, const BufferView<T>& bufferOut) noexcept
     {
         jassert (bufferIn.getNumChannels() == bufferOut.getNumChannels());
