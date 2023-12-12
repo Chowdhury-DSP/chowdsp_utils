@@ -30,7 +30,7 @@ void testFilter (Filter& filt, std::vector<float> freqs, std::vector<float> mags
         testFrequency (freqs[i], mags[i], errs[i], "Incorrect gain at " + messages[i] + " frequency.");
 }
 
-TEMPLATE_TEST_CASE ("Chebyshev II Filter Test", "[dsp][filters]", float)
+TEMPLATE_TEST_CASE ("Chebyshev II Filter Test", "[dsp][filters][anti-aliasing]", float)
 {
     using T = TestType;
     using FilterType = chowdsp::ChebyshevFilterType;
