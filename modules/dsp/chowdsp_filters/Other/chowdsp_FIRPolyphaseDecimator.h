@@ -95,7 +95,5 @@ private:
 
     std::vector<Buffer<T>> buffers{};
     std::vector<T> overlapState {};
-
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FIRPolyphaseDecimator)
 };
 }

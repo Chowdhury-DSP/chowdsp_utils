@@ -75,6 +75,28 @@ static auto makeChowFIRChoices()
 
 auto chowFIRChoices = makeChowFIRChoices();
 
+static auto makeChowPolyphaseDecimFIR (int order)
+{
+    const auto coefsData = bench_utils::makeRandomVector<float> (order);
+
+    chowdsp::FIRPolyphaseDecimator<float> filter {};
+    filter.prepare (2, 1, blockSize, coefsData);
+
+    return filter;
+}
+
+static auto makeChowPolyphaseDecimFIRChoices()
+{
+    std::unordered_map<int, chowdsp::FIRPolyphaseDecimator<float>> choices;
+
+    for (int order = startOrder; order <= endOrder; order *= orderMult)
+        choices.emplace (std::make_pair (order, makeChowPolyphaseDecimFIR (order)));
+
+    return choices;
+}
+
+auto chowPolyphaseDecimFIRChoices = makeChowPolyphaseDecimFIRChoices();
+
 static auto makeAudioBuffer()
 {
     auto bufferData = bench_utils::makeRandomVector<float> (blockSize);
@@ -114,10 +136,19 @@ static void ChowFIR (benchmark::State& state)
     auto& fir = chowFIRChoices[(int) state.range (0)];
     for (auto _ : state)
     {
-        auto&& audioBlock = juce::dsp::AudioBlock<float> { audioBuffer };
-        fir.processBlock (audioBlock);
+        fir.processBlock (audioBuffer);
     }
 }
 BENCHMARK (ChowFIR)->MinTime (1)->RangeMultiplier (orderMult)->Range (startOrder, endOrder);
+
+static void ChowPolyphaseFIR (benchmark::State& state)
+{
+    auto& fir = chowPolyphaseDecimFIRChoices[(int) state.range (0)];
+    for (auto _ : state)
+    {
+        fir.processBlock (audioBuffer, audioBuffer);
+    }
+}
+BENCHMARK (ChowPolyphaseFIR)->MinTime (1)->RangeMultiplier (orderMult)->Range (startOrder, endOrder);
 
 BENCHMARK_MAIN();
