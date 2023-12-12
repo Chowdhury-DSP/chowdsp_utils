@@ -11,7 +11,7 @@ template <typename T>
 class FIRPolyphaseDecimator
 {
 public:
-    FIRPolyphaseDecimator () = default;
+    FIRPolyphaseDecimator() = default;
 
     /** Prepares the filter to process a stream of data, with the given configuration and filter coefficients. */
     void prepare (int decimationFactor, int numChannels, int maxBlockSizeIn, const nonstd::span<const T> coeffs)
@@ -24,7 +24,7 @@ public:
 
         buffers.clear();
         buffers.reserve ((size_t) decimationFactor);
-        overlapState = std::vector<T> ((size_t) numChannels * (size_t) decimationFactor, T{});
+        overlapState = std::vector<T> ((size_t) numChannels * (size_t) decimationFactor, T {});
         filters.clear();
         filters.reserve ((size_t) decimationFactor);
         for (int i = 0; i < decimationFactor; ++i)
@@ -34,11 +34,11 @@ public:
             auto& filter = filters.emplace_back (coeffsPerFilter);
             filter.prepare (numChannels);
 
-            std::fill (oneFilterCoeffs.begin(), oneFilterCoeffs.end(), T{});
+            std::fill (oneFilterCoeffs.begin(), oneFilterCoeffs.end(), T {});
             for (size_t j = 0; j < coeffsPerFilter; ++j)
             {
                 const auto index = (size_t) i + j * (size_t) decimationFactor;
-                oneFilterCoeffs[j] = index >= coeffs.size() ? T{} : coeffs[index];
+                oneFilterCoeffs[j] = index >= coeffs.size() ? T {} : coeffs[index];
             }
             filter.setCoefficients (oneFilterCoeffs.data());
         }
@@ -100,9 +100,9 @@ public:
     }
 
 private:
-    std::vector<FIRFilter<T>> filters{};
+    std::vector<FIRFilter<T>> filters {};
 
-    std::vector<Buffer<T>> buffers{};
+    std::vector<Buffer<T>> buffers {};
     std::vector<T> overlapState {};
 };
-}
+} // namespace chowdsp

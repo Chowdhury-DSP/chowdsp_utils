@@ -32,11 +32,11 @@ public:
             auto& filter = filters.emplace_back (coeffsPerFilter);
             filter.prepare (numChannels);
 
-            std::fill (oneFilterCoeffs.begin(), oneFilterCoeffs.end(), T{});
+            std::fill (oneFilterCoeffs.begin(), oneFilterCoeffs.end(), T {});
             for (size_t j = 0; j < coeffsPerFilter; ++j)
             {
                 const auto index = (size_t) i + j * (size_t) interpolationFactor;
-                oneFilterCoeffs[j] = index >= coeffs.size() ? T{} : coeffs[index];
+                oneFilterCoeffs[j] = index >= coeffs.size() ? T {} : coeffs[index];
             }
             filter.setCoefficients (oneFilterCoeffs.data());
         }
@@ -83,8 +83,8 @@ public:
     }
 
 private:
-    std::vector<FIRFilter<T>> filters{};
+    std::vector<FIRFilter<T>> filters {};
 
-    std::vector<Buffer<T>> buffers{};
+    std::vector<Buffer<T>> buffers {};
 };
-}
+} // namespace chowdsp
