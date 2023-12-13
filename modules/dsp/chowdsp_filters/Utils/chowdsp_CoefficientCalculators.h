@@ -480,7 +480,7 @@ namespace CoefficientCalculators
             a_copy[2] = ipow<2> (expBw);
 
             const auto f0 = juce::MathConstants<NumericType>::twoPi / w0;
-            const auto w_N_Sq = ipow<2> ((T) 0.49 * f0);
+            const auto w_N_Sq = ipow<2> ((T) (NumericType) 0.49 * f0);
             const auto C = ipow<2> (Beta * f0); // = (2*Beta)^2 w_N^2
             const auto Gn2 = g * (ipow<2> (1 - Alpha * w_N_Sq) + C) / (ipow<2> (Alpha - w_N_Sq) + C);
 
