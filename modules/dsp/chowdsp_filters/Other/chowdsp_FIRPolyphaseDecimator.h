@@ -35,7 +35,7 @@ public:
         {
             buffers.emplace_back (numChannels, maxBlockSizeIn / decimationFactor);
 
-            auto& filter = filters.emplace_back (coeffsPerFilter);
+            auto& filter = filters.emplace_back ((int) coeffsPerFilter);
             filter.prepare (numChannels);
 
             std::fill (oneFilterCoeffs.begin(), oneFilterCoeffs.end(), T {});
@@ -99,7 +99,7 @@ public:
     {
         jassert (bufferIn.getNumChannels() == bufferOut.getNumChannels());
         const auto numSamples = bufferIn.getNumSamples();
-        jassert (numSamples == bufferOut.getNumSamples() / (int) filters.size());
+        jassert (numSamples == bufferOut.getNumSamples() * (int) filters.size());
 
         for (auto [ch, dataIn] : buffer_iters::channels (bufferIn))
             processBlock (dataIn.data(), bufferOut.getWritePointer (ch), numSamples, ch);
