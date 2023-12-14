@@ -33,7 +33,7 @@ public:
         {
             buffers.emplace_back (numChannels, maxBlockSizeIn);
 
-            auto& filter = filters.emplace_back (coeffsPerFilter);
+            auto& filter = filters.emplace_back ((int) coeffsPerFilter);
             filter.prepare (numChannels);
 
             std::fill (oneFilterCoeffs.begin(), oneFilterCoeffs.end(), T {});
