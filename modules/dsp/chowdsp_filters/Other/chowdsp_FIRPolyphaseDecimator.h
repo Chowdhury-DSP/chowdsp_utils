@@ -99,7 +99,7 @@ public:
     {
         jassert (bufferIn.getNumChannels() == bufferOut.getNumChannels());
         const auto numSamples = bufferIn.getNumSamples();
-        jassert (numSamples == bufferOut.getNumSamples() / (int) filters.size());
+        jassert (numSamples == bufferOut.getNumSamples() * (int) filters.size());
 
         for (auto [ch, dataIn] : buffer_iters::channels (bufferIn))
             processBlock (dataIn.data(), bufferOut.getWritePointer (ch), numSamples, ch);

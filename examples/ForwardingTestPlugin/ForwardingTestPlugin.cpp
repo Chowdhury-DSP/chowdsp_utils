@@ -38,11 +38,12 @@ void ForwardingTestPlugin::prepareToPlay (double sampleRate, int samplesPerBlock
     polygonalOsc.prepareToPlay (sampleRate, samplesPerBlock);
     bandSplit.prepareToPlay (sampleRate, samplesPerBlock);
     plateReverb.prepareToPlay (sampleRate, samplesPerBlock);
+    polyphaseOversampling.prepareToPlay (sampleRate, samplesPerBlock);
 }
 
 void ForwardingTestPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
 {
-    juce::MidiBuffer midi;
+    juce::MidiBuffer midi {};
     if (auto* processor = getProcessorForIndex (state.params.processorChoice->getIndex()))
     {
         processor->processBlock (buffer, midi);
@@ -76,6 +77,9 @@ juce::AudioProcessor* ForwardingTestPlugin::getProcessorForIndex (int index)
 
     if (index == 7)
         return &plateReverb;
+
+    if (index == 8)
+        return &polyphaseOversampling;
 
     return nullptr;
 }

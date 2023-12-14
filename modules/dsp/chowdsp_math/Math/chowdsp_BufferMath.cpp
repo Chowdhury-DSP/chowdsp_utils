@@ -507,7 +507,7 @@ std::enable_if_t<std::is_floating_point_v<FloatType>, void>
 #endif
 
     static constexpr auto vecSize = (int) xsimd::batch<FloatType>::size;
-    auto numVecOps = numSamples / vecSize;
+    const auto numVecOps = numSamples / vecSize;
     const auto leftoverValues = numSamples % vecSize;
 
     for (int ch = 0; ch < numChannels; ++ch)
@@ -515,7 +515,8 @@ std::enable_if_t<std::is_floating_point_v<FloatType>, void>
         const auto* dataIn = bufferSrc.getReadPointer (ch);
         auto* dataOut = bufferDest.getWritePointer (ch);
 
-        while (--numVecOps >= 0)
+        auto channelVecOps = numVecOps;
+        while (--channelVecOps >= 0)
         {
             xsimd::store_aligned (dataOut, simdFunction (xsimd::load_aligned (dataIn)));
             dataIn += vecSize;
