@@ -5,6 +5,73 @@ namespace chowdsp
 /** Iterators for iterating over buffers */
 namespace buffer_iters
 {
+#ifndef DOXYGEN
+    namespace detail
+    {
+        template <typename BufferType>
+        auto getWriteSpan (BufferType& buffer, int channelIndex)
+        {
+#if CHOWDSP_USING_JUCE
+            if constexpr (std::is_same_v<BufferType, juce::AudioBuffer<float>> || std::is_same_v<BufferType, juce::AudioBuffer<double>>)
+                return nonstd::span { buffer.getWritePointer (channelIndex), (size_t) buffer.getNumSamples() };
+            else
+#endif
+                return buffer.getWriteSpan (channelIndex);
+        }
+
+        template <typename BufferType>
+        auto getWriteSubSpan (BufferType& buffer, int channelIndex, int start, size_t size)
+        {
+#if CHOWDSP_USING_JUCE
+            if constexpr (std::is_same_v<BufferType, juce::AudioBuffer<float>> || std::is_same_v<BufferType, juce::AudioBuffer<double>>)
+                return nonstd::span { buffer.getWritePointer (channelIndex) + start, size };
+            else
+#endif
+                return buffer.getWriteSpan (channelIndex).subspan ((size_t) start, size);
+        }
+
+        template <typename BufferType>
+        auto getReadSpan (BufferType& buffer, int channelIndex)
+        {
+#if CHOWDSP_USING_JUCE
+            if constexpr (std::is_same_v<BufferType, const juce::AudioBuffer<float>> || std::is_same_v<BufferType, const juce::AudioBuffer<double>>)
+                return nonstd::span { buffer.getReadPointer (channelIndex), (size_t) buffer.getNumSamples() };
+            else
+#endif
+                return buffer.getReadSpan (channelIndex);
+        }
+
+        template <typename BufferType>
+        auto getReadSubSpan (BufferType& buffer, int channelIndex, int start, size_t size)
+        {
+#if CHOWDSP_USING_JUCE
+            if constexpr (std::is_same_v<BufferType, const juce::AudioBuffer<float>> || std::is_same_v<BufferType, const juce::AudioBuffer<double>>)
+                return nonstd::span { buffer.getReadPointer (channelIndex) + start, size };
+            else
+#endif
+                return buffer.getReadSpan (channelIndex).subspan ((size_t) start, size);
+        }
+
+        template <typename BufferType>
+        auto getSpan (BufferType& buffer, int channelIndex)
+        {
+            if constexpr (IsConstBuffer<BufferType>)
+                return getReadSpan (buffer, channelIndex);
+            else
+                return getWriteSpan (buffer, channelIndex);
+        }
+
+        template <typename BufferType>
+        auto getSubSpan (BufferType& buffer, int channelIndex, int start, size_t size)
+        {
+            if constexpr (IsConstBuffer<BufferType>)
+                return getReadSubSpan (buffer, channelIndex, start, size);
+            else
+                return getWriteSubSpan (buffer, channelIndex, start, size);
+        }
+    } // namespace detail
+#endif
+
     /** Iterates over a buffer's channels */
     template <typename BufferType>
     constexpr auto channels (BufferType& buffer)
@@ -25,36 +92,7 @@ namespace buffer_iters
 
             auto operator*() const
             {
-                if constexpr (IsConstBuffer<BufferType>)
-                {
-#if CHOWDSP_USING_JUCE
-                    if constexpr (std::is_same_v<BufferType, const juce::AudioBuffer<float>> || std::is_same_v<BufferType, const juce::AudioBuffer<double>>)
-                    {
-                        return std::make_tuple (channelIndex,
-                                                nonstd::span { buffer.getReadPointer (channelIndex),
-                                                               (size_t) buffer.getNumSamples() });
-                    }
-                    else
-#endif
-                    {
-                        return std::make_tuple (channelIndex, buffer.getReadSpan (channelIndex));
-                    }
-                }
-                else
-                {
-#if CHOWDSP_USING_JUCE
-                    if constexpr (std::is_same_v<BufferType, juce::AudioBuffer<float>> || std::is_same_v<BufferType, juce::AudioBuffer<double>>)
-                    {
-                        return std::make_tuple (channelIndex,
-                                                nonstd::span { buffer.getWritePointer (channelIndex),
-                                                               (size_t) buffer.getNumSamples() });
-                    }
-                    else
-#endif
-                    {
-                        return std::make_tuple (channelIndex, buffer.getWriteSpan (channelIndex));
-                    }
-                }
+                return std::make_tuple (channelIndex, detail::getSpan (buffer, channelIndex));
             }
         };
         struct iterable_wrapper
@@ -64,14 +102,6 @@ namespace buffer_iters
             auto end() { return iterator { buffer, buffer.getNumChannels() }; }
         };
         return iterable_wrapper { buffer };
-    }
-
-    /** Iterates over a buffer's channels */
-    template <typename SampleType,
-              typename = typename std::enable_if_t<std::is_floating_point_v<SampleType> || SampleTypeHelpers::IsSIMDRegister<SampleType>>>
-    constexpr auto channels (const BufferView<SampleType>& buffer)
-    {
-        return channels<const BufferView<SampleType>> (buffer);
     }
 
     /**
@@ -124,46 +154,9 @@ namespace buffer_iters
             {
                 const auto startSample = buffer.getNumSamples() - samplesRemaining;
                 const auto activeSubBlockSize = (size_t) juce::jmin (subBlockSize, samplesRemaining);
-                if constexpr (IsConstBuffer<BufferType>)
-                {
-#if CHOWDSP_USING_JUCE
-                    if constexpr (std::is_same_v<BufferType, const juce::AudioBuffer<float>> || std::is_same_v<BufferType, const juce::AudioBuffer<double>>)
-                    {
-                        return std::make_tuple (channelIndex,
-                                                startSample,
-                                                nonstd::span {
-                                                    buffer.getReadPointer (channelIndex) + startSample,
-                                                    activeSubBlockSize });
-                    }
-                    else
-#endif
-                    {
-                        return std::make_tuple (channelIndex,
-                                                startSample,
-                                                buffer.getReadSpan (channelIndex)
-                                                    .subspan ((size_t) startSample, activeSubBlockSize));
-                    }
-                }
-                else
-                {
-#if CHOWDSP_USING_JUCE
-                    if constexpr (std::is_same_v<BufferType, juce::AudioBuffer<float>> || std::is_same_v<BufferType, juce::AudioBuffer<double>>)
-                    {
-                        return std::make_tuple (channelIndex,
-                                                startSample,
-                                                nonstd::span {
-                                                    buffer.getWritePointer (channelIndex) + startSample,
-                                                    activeSubBlockSize });
-                    }
-                    else
-#endif
-                    {
-                        return std::make_tuple (channelIndex,
-                                                startSample,
-                                                buffer.getWriteSpan (channelIndex)
-                                                    .subspan ((size_t) startSample, activeSubBlockSize));
-                    }
-                }
+                return std::make_tuple (channelIndex,
+                                        startSample,
+                                        detail::getSubSpan (buffer, channelIndex, startSample, activeSubBlockSize));
             }
         };
         struct iterable_wrapper
@@ -175,21 +168,6 @@ namespace buffer_iters
         return iterable_wrapper { buffer };
     }
 
-    /**
-     * Iterates over a buffer in sub-blocks.
-     *
-     * @tparam subBlockSize The iterator will always supply sub-blocks of this size _or smaller_.
-     * @tparam channelWise  If true, the iterator will iterate over the buffer channels as the innermost loop.
-     */
-    template <int subBlockSize,
-              bool channelWise = false,
-              typename SampleType,
-              typename = typename std::enable_if_t<std::is_floating_point_v<SampleType> || SampleTypeHelpers::IsSIMDRegister<SampleType>>>
-    constexpr auto sub_blocks (const BufferView<SampleType>& buffer)
-    {
-        return sub_blocks<subBlockSize, channelWise, const BufferView<SampleType>> (buffer);
-    }
-
     /** Iterates over a buffer's samples*/
     template <typename BufferType>
     constexpr auto samples (BufferType& buffer)
@@ -197,10 +175,10 @@ namespace buffer_iters
         struct iterator
         {
             using SampleType = BufferSampleType<std::remove_const_t<BufferType>>;
-            using SamplePtrType = typename std::conditional_t<IsConstBuffer<BufferType>, const SampleType*, SampleType*>;
+            using SamplePtrType = std::conditional_t<IsConstBuffer<BufferType>, const SampleType*, SampleType*>;
 
             BufferType& buffer;
-            int sampleIndex;
+            int sampleIndex {};
 
             iterator (BufferType& _buffer, int _sampleIndex)
                 : buffer (_buffer),
@@ -220,9 +198,9 @@ namespace buffer_iters
             SamplePtrType channelPtrs[CHOWDSP_BUFFER_MAX_NUM_CHANNELS] {};
 
 #if CHOWDSP_NO_XSIMD
-            alignas (16) SampleType channelData[CHOWDSP_BUFFER_MAX_NUM_CHANNELS];
+            alignas (16) SampleType channelData[CHOWDSP_BUFFER_MAX_NUM_CHANNELS] {};
 #else
-            alignas (xsimd::batch<SampleTypeHelpers::NumericType<SampleType>>::arch_type::alignment()) SampleType channelData[CHOWDSP_BUFFER_MAX_NUM_CHANNELS];
+            alignas (xsimd::batch<SampleTypeHelpers::NumericType<SampleType>>::arch_type::alignment()) SampleType channelData[CHOWDSP_BUFFER_MAX_NUM_CHANNELS] {};
 #endif
 
             bool operator!= (const iterator& other) const
@@ -240,7 +218,7 @@ namespace buffer_iters
 
                 ++sampleIndex;
                 for (int channel { 0 }; channel < numChannels; ++channel)
-                    channelPtrs[channel]++;
+                    ++channelPtrs[channel];
             }
 
             auto operator*()
@@ -270,5 +248,42 @@ namespace buffer_iters
         return iterable_wrapper { buffer };
     }
 
+    /** Iterates over a buffer's channels */
+    template <typename BufferType1, typename BufferType2>
+    constexpr auto zip_channels (BufferType1& buffer1, BufferType2& buffer2)
+    {
+        struct iterator
+        {
+            BufferType1& buffer1;
+            BufferType2& buffer2;
+            int channelIndex;
+            bool operator!= (const iterator& other) const
+            {
+                return &buffer1 != &other.buffer1 || &buffer2 != &other.buffer2 || channelIndex != other.channelIndex;
+            }
+
+            void operator++()
+            {
+                ++channelIndex;
+            }
+
+            auto operator*() const
+            {
+                return std::make_tuple (channelIndex,
+                                        detail::getSpan (buffer1, channelIndex),
+                                        detail::getSpan (buffer2, channelIndex));
+            }
+        };
+        struct iterable_wrapper
+        {
+            BufferType1& buffer1;
+            BufferType2& buffer2;
+            auto begin() { return iterator { buffer1, buffer2, 0 }; }
+            auto end() { return iterator { buffer1,
+                                           buffer2,
+                                           std::min (buffer1.getNumChannels(), buffer2.getNumChannels()) }; }
+        };
+        return iterable_wrapper { buffer1, buffer2 };
+    }
 } // namespace buffer_iters
 } // namespace chowdsp

@@ -73,6 +73,39 @@ TEMPLATE_TEST_CASE ("Buffer Iterators Test",
         }
     }
 
+    SECTION ("Zip Channels")
+    {
+        BufferType buffer1 { 2, 4 };
+        BufferType buffer2 { 1, 2 };
+
+        {
+            int count = 0;
+            for (auto [channel, data1, data2] : chowdsp::buffer_iters::zip_channels (buffer1, buffer2))
+            {
+                REQUIRE (channel == 0);
+                REQUIRE (data1.size() == 4);
+                REQUIRE (data2.size() == 2);
+                for (auto [x_n, y_n] : chowdsp::zip (data1, data2))
+                {
+                    x_n = (SampleType) static_cast<float> (count);
+                    y_n = (SampleType) static_cast<float> (count);
+                    ++count;
+                }
+            }
+        }
+
+        int count = 0;
+        for (auto [channel, data1, data2] : chowdsp::buffer_iters::zip_channels (std::as_const (buffer1), std::as_const (buffer2)))
+        {
+            for (auto [x_n, y_n] : chowdsp::zip (data1, data2))
+            {
+                REQUIRE (chowdsp::SIMDUtils::all ((SampleType) static_cast<float> (count) == x_n));
+                REQUIRE (chowdsp::SIMDUtils::all (x_n == y_n));
+                ++count;
+            }
+        }
+    }
+
     if constexpr (std::is_same_v<BufferType, chowdsp::Buffer<float>>)
     {
         SECTION ("Buffer View Channels")
@@ -99,6 +132,44 @@ TEMPLATE_TEST_CASE ("Buffer Iterators Test",
                     REQUIRE (chowdsp::SIMDUtils::all ((SampleType) static_cast<float> (count) == x_n));
                     ++count;
                 }
+            }
+        }
+    }
+
+    SECTION ("Buffer View Zip Channels")
+    {
+        BufferType buffer1 { 2, 4 };
+        BufferType buffer2 { 1, 2 };
+        const chowdsp::BufferView<SampleType> bufferView1 { buffer1 };
+        const chowdsp::BufferView<const SampleType> constBufferView1 { buffer1 };
+        const chowdsp::BufferView<SampleType> bufferView2 { buffer2 };
+        const chowdsp::BufferView<const SampleType> constBufferView2 { buffer2 };
+
+        {
+            int count = 0;
+            for (auto [channel, data1, data2] : chowdsp::buffer_iters::zip_channels (bufferView1, bufferView2))
+            {
+                REQUIRE (channel == 0);
+                REQUIRE (data1.size() == 4);
+                REQUIRE (data2.size() == 2);
+                for (auto [x_n, y_n] : chowdsp::zip (data1, data2))
+                {
+                    x_n = (SampleType) static_cast<float> (count);
+                    y_n = (SampleType) static_cast<float> (count);
+                    ++count;
+                }
+            }
+        }
+
+        int count = 0;
+        for (auto [channel, data1, data2] : chowdsp::buffer_iters::zip_channels (std::as_const (constBufferView1),
+                                                                                 std::as_const (constBufferView2)))
+        {
+            for (auto [x_n, y_n] : chowdsp::zip (data1, data2))
+            {
+                REQUIRE (chowdsp::SIMDUtils::all ((SampleType) static_cast<float> (count) == x_n));
+                REQUIRE (chowdsp::SIMDUtils::all (x_n == y_n));
+                ++count;
             }
         }
     }

@@ -33,12 +33,12 @@ static void decimationFilterCompare (int filterOrder, int decimationFactor, int 
     decimatorFilter.processBlock (chowdsp::BufferView { bufferIn, halfSamples, halfSamples },
                                   chowdsp::BufferView { testBufferOut, halfSamples / decimationFactor, halfSamples / decimationFactor });
 
-    for (int ch = 0; ch < numChannels; ++ch)
+    for (const auto [ch, refData, testData] : chowdsp::buffer_iters::zip_channels (std::as_const (referenceBufferOut),
+                                                                                   std::as_const (testBufferOut)))
     {
-        for (int n = 0; n < numSamples / decimationFactor; ++n)
+        for (const auto [n, test] : chowdsp::enumerate (testData))
         {
-            const auto ref = referenceBufferOut.getReadPointer (ch)[n * decimationFactor];
-            const auto test = testBufferOut.getReadPointer (ch)[n];
+            const auto ref = refData[n * (size_t) decimationFactor];
             REQUIRE (test == Catch::Approx { ref }.margin (1.0e-6));
         }
     }
