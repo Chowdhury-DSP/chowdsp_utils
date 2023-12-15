@@ -85,6 +85,22 @@ public:
         return serial;
     }
 
+    /** Serializer for serial type */
+    template <typename Serializer, typename T>
+    static std::enable_if_t<std::is_same_v<T, SerialType<Serializer>>, SerialType<Serializer>>
+        serialize (T x)
+    {
+        return x;
+    }
+
+    /** Deserializer for serial types */
+    template <typename Serializer, typename T>
+    static std::enable_if_t<std::is_same_v<T, SerialType<Serializer>>, void>
+        deserialize (DeserialType<Serializer> serial, T& x)
+    {
+        x = serial;
+    }
+
     /** Serializer for arithmetic types */
     template <typename Serializer, typename T>
     static std::enable_if_t<std::is_arithmetic_v<T>, SerialType<Serializer>>
@@ -164,7 +180,7 @@ public:
 
     /** Serializer for container types */
     template <typename Serializer, typename T>
-    static std::enable_if_t<IsContainerNotMapOrString<T>, SerialType<Serializer>>
+    static std::enable_if_t<IsContainerNotMapOrString<T> && ! std::is_same_v<T, SerialType<Serializer>>, SerialType<Serializer>>
         serialize (const T& container)
     {
         auto serial = Serializer::createBaseElement();
