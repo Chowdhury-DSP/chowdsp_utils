@@ -29,7 +29,10 @@ public:
         raw_data.resize (new_size_bytes, {});
     }
 
-    /** Resets the allocator */
+    /**
+     * Moves the allocator "stack pointer" back to zero,
+     * effectively "reclaiming" all allocated memory.
+     */
     void clear() noexcept
     {
         bytes_used = 0;
@@ -70,15 +73,15 @@ public:
      * Once the frame goes out of scope, the allocator will be reset
      * to whatever it's state was at the beginning of the frame.
      */
-    struct ArenaAllocatorFrame
+    struct Frame
     {
-        explicit ArenaAllocatorFrame (ArenaAllocator& allocator)
+        explicit Frame (ArenaAllocator& allocator)
             : alloc (allocator),
               bytes_used_at_start (alloc.bytes_used)
         {
         }
 
-        ~ArenaAllocatorFrame()
+        ~Frame()
         {
             alloc.bytes_used = bytes_used_at_start;
         }
@@ -86,6 +89,15 @@ public:
         ArenaAllocator& alloc;
         const size_t bytes_used_at_start;
     };
+
+    /** Deprecated alias for arena allocator frame */
+    using ArenaAllocatorFrame [[deprecated]] = Frame;
+
+    /** Creates a frame for this allocator */
+    auto create_frame()
+    {
+        return Frame { *this };
+    }
 
 private:
     std::vector<std::byte> raw_data {};

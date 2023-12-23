@@ -21,7 +21,7 @@ TEST_CASE ("Arena Allocator Test", "[common][data-structures]")
 
     // allocate with stack frame
     {
-        chowdsp::ArenaAllocator::ArenaAllocatorFrame frame { allocator };
+        const auto frame = allocator.create_frame();
         auto* some_chars = allocator.allocate<char> (30);
         juce::ignoreUnused (some_chars);
         REQUIRE (allocator.get_bytes_used() == 150);
