@@ -11,6 +11,7 @@ target_sources(chowdsp_data_structures_test
         OptionalPointerTest.cpp
         SmallVectorTest.cpp
         ArenaAllocatorTest.cpp
+        ChainedArenaAllocatorTest.cpp
         StringLiteralTest.cpp
         TupleHelpersTest.cpp
         VectorHelpersTest.cpp
