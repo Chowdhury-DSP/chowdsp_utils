@@ -88,6 +88,7 @@ template <typename FloatType, typename ValueSmoothingTypes>
 void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::process (int numSamples, ArenaAllocator& alloc)
 {
     bufferData = alloc.allocate<FloatType> (numSamples, bufferAlignment);
+    jassert (bufferData != nullptr); // arena allocator is out of memory!
     process (numSamples);
 }
 
@@ -116,6 +117,7 @@ template <typename FloatType, typename ValueSmoothingTypes>
 void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::process (FloatType value, int numSamples, ArenaAllocator& alloc)
 {
     bufferData = alloc.allocate<FloatType> (numSamples, bufferAlignment);
+    jassert (bufferData != nullptr); // arena allocator is out of memory!
     process (value, numSamples);
 }
 
