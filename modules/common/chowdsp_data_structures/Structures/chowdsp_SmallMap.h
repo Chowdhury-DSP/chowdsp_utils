@@ -24,7 +24,7 @@ public:
     SmallMap& operator= (SmallMap&&) noexcept = default;
 
     /** Initializes a map with an initial state. */
-    explicit SmallMap (std::initializer_list<value_type> init)
+    SmallMap (std::initializer_list<value_type> init) // NOLINT
     {
         reserve (init.size());
         for (auto& [key, value] : init)
