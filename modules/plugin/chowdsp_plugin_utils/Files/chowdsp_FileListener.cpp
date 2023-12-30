@@ -5,12 +5,14 @@ namespace chowdsp
 FileListener::FileListener (const juce::File& file, int timerSeconds) : fileToListenTo (file)
 {
     fileModificationTime = fileToListenTo.getLastModificationTime().toMilliseconds();
-    startTimer (timerSeconds * 1000);
+    if (timerSeconds > 0)
+        startTimer (timerSeconds * 1000);
 }
 
 FileListener::~FileListener()
 {
-    stopTimer();
+    if (isTimerRunning())
+        stopTimer();
 }
 
 void FileListener::timerCallback()

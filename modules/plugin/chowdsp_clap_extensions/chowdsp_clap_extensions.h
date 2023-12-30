@@ -44,4 +44,8 @@ namespace CLAPExtensions
 // LCOV_EXCL_START
 #include "ParameterExtensions/chowdsp_ModParamMixin.h"
 #include "PluginExtensions/chowdsp_CLAPInfoExtensions.h"
+
+#if JUCE_MODULE_AVAILABLE_chowdsp_presets_v2
+#include "PresetExtensions/chowdsp_CLAPPresetDiscoveryProviders.h"
+#endif
 // LCOV_EXCL_END

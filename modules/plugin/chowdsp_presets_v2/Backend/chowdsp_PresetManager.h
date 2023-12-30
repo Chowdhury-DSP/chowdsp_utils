@@ -17,6 +17,11 @@ public:
     /** Loads a preset by reference. */
     void loadPreset (const Preset& preset) { saverLoader.loadPreset (preset); }
 
+#if HAS_CLAP_JUCE_EXTENSIONS
+    /** Loads a preset based on information provided by the CLAP preset-load extension. */
+    virtual bool loadCLAPPreset (uint32_t location_kind, const char* location, const char* load_key) noexcept;
+#endif
+
     /** Returns the currently loaded preset, or nullptr if no preset is loaded. */
     [[nodiscard]] const Preset* getCurrentPreset() const { return saverLoader.getCurrentPreset(); }
 
