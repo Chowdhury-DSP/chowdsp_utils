@@ -18,9 +18,9 @@ public:
     using value_type = std::pair<const KeyType, ValueType>;
 
     SmallMap() = default;
-    SmallMap(const SmallMap&) = default;
+    SmallMap (const SmallMap&) = default;
     SmallMap& operator= (const SmallMap&) = default;
-    SmallMap(SmallMap&&) noexcept = default;
+    SmallMap (SmallMap&&) noexcept = default;
     SmallMap& operator= (SmallMap&&) noexcept = default;
 
     /** Initializes a map with an initial state. */
@@ -174,4 +174,4 @@ private:
     std::vector<KeyType> keys {};
     std::vector<ValueType> values {};
 };
-}
+} // namespace chowdsp
