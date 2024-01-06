@@ -37,6 +37,12 @@ public:
         return y;
     }
 
+    /** Returns a single-sample sin/cosine pair. */
+    inline auto processSampleQuadrature() noexcept
+    {
+        return std::make_pair (processSample(), -x1);
+    }
+
     /** Processes a block of samples. */
     void processBlock (const BufferView<T>& buffer) noexcept;
 
