@@ -144,14 +144,14 @@ public:
         std::copy (newA, &newA[order + 1], a);
     }
 
-protected:
-    FloatType a[order + 1];
-    FloatType b[order + 1];
-    std::vector<std::array<FloatType, order + 1>> z;
+    FloatType a[order + 1]; // raw feedback "a" coefficients
+    FloatType b[order + 1]; // raw feedforward "b" coefficients
+    std::vector<std::array<FloatType, order + 1>> z; // filter state (per-channel)
 
     template <typename PrototypeFilter>
     friend class ModFilterWrapper;
 
+    /** Process a sample with a given filter state */
     inline FloatType processSample1stOrder (const FloatType& x, FloatType& z1) noexcept
     {
         FloatType y = z1 + x * b[0];
@@ -159,6 +159,7 @@ protected:
         return y;
     }
 
+    /** Process a sample with a given filter state */
     inline FloatType processSample2ndOrder (const FloatType& x, FloatType& z1, FloatType& z2) noexcept
     {
         FloatType y = z1 + x * b[0];
