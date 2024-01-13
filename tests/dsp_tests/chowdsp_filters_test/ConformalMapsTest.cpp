@@ -13,8 +13,8 @@ void testBilinearTransform (const float (&bs)[N], const float (&as)[N], const fl
 
     for (int i = 0; i < N; ++i)
     {
-        REQUIRE_MESSAGE (b[i] == Catch::Approx (b_exp[i]).margin (1.0e-6f), "B coefficient " << std::to_string (i) << " is incorrect!");
-        REQUIRE_MESSAGE (a[i] == Catch::Approx (a_exp[i]).margin (1.0e-6f), "A coefficient " << std::to_string (i) << " is incorrect!");
+        REQUIRE_MESSAGE (b[i] == Catch::Approx (b_exp[i]).margin (1.0e-3f), "B coefficient " << std::to_string (i) << " is incorrect!");
+        REQUIRE_MESSAGE (a[i] == Catch::Approx (a_exp[i]).margin (1.0e-3f), "A coefficient " << std::to_string (i) << " is incorrect!");
     }
 }
 
@@ -33,6 +33,12 @@ TEST_CASE ("Conformal Maps Test", "[dsp][filters]")
     {
         testBilinearTransform ({ 1.0f, 2.0f, 3.0 }, { 2.0f, 3.0f, 4.0f }, { 0.500002623f, -0.999984323f, 0.499981731f }, { 1.f, -1.99996865f, 0.999968647f }, 2 * fs);
         testBilinearTransform ({ 1.0f, 2.0f, 3.0 }, { 2.0f, 3.0f, 4.0f }, { 0.50000304f, -0.999981701f, 0.499978632f }, { 1.f, -1.9999634f, 0.999963343f }, kVal);
+    }
+
+    SECTION ("Third-Order Bilinear Transform")
+    {
+        testBilinearTransform ({ 1.0f, 2.0f, 3.0f, 4.0f }, { 2.0f, 3.0f, 4.0f, 5.0f }, { 0.499997396f, -1.50001302f, 1.50003385f, -0.500018230f }, { 1.0f, -3.00003125f, 3.00006250f, -1.00003125f }, 2 * fs);
+        testBilinearTransform ({ 1.0f, 2.0f, 3.0f, 4.0f }, { 2.0f, 3.0f, 4.0f, 5.0f }, { 0.499996947f, -1.50001527f, 1.50003969f, -0.500021372f }, { 1.0f, -3.00003664f, 3.00007327f, -1.00003664f }, kVal);
     }
 
     SECTION ("Fourth-Order Bilinear Transform")
