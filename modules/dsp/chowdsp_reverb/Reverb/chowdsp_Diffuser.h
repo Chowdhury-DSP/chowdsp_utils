@@ -79,7 +79,7 @@ private:
     int delayWritePointer = 0;
     std::array<FloatType, (size_t) nChannels> delayReadPointers;
 
-    alignas (xsimd::default_arch::alignment()) std::array<FloatType, (size_t) nChannels> outData;
+    alignas (SIMDUtils::defaultSIMDAlignment) std::array<FloatType, (size_t) nChannels> outData;
 
     FloatType fsOver1000 = FloatType (48000 / 1000);
 
