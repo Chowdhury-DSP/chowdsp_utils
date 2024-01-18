@@ -82,13 +82,15 @@ namespace MatrixOps
             outOfPlace (FloatType* out, const FloatType* in)
         {
             FloatType sum {};
-            for (int i = 0; i < size; ++i) {
+            for (int i = 0; i < size; ++i)
+            {
                 sum += in[i];
             }
 
             sum *= multiplier;
 
-            for (int i = 0; i < size; ++i) {
+            for (int i = 0; i < size; ++i)
+            {
                 out[i] = in[i] + sum;
             }
         }
