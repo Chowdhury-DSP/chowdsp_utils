@@ -69,6 +69,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Processors/chowdsp_Gain.h"
 #include "Processors/chowdsp_LevelDetector.h"
 #include "Processors/chowdsp_Panner.h"
+#include "Processors/chowdsp_WidthPanner.h"
 #include "Processors/chowdsp_TunerProcessor.h"
 #include "Processors/chowdsp_OvershootLimiter.h"
 
