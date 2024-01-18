@@ -32,7 +32,7 @@ struct DefaultFDNConfig
     static const FloatType* doFeedbackProcess (DefaultFDNConfig& fdnConfig, const FloatType* data);
 
 protected:
-    alignas (xsimd::default_arch::alignment()) std::array<FloatType, (size_t) nChannels> fbData;
+    alignas (SIMDUtils::defaultSIMDAlignment) std::array<FloatType, (size_t) nChannels> fbData;
 
 private:
     std::array<ShelfFilter<FloatType>, (size_t) nChannels> shelfs;
@@ -112,7 +112,7 @@ private:
 
     FDNConfig fdnConfig;
 
-    alignas (xsimd::default_arch::alignment()) std::array<FloatType, (size_t) nChannels> outData;
+    alignas (SIMDUtils::defaultSIMDAlignment) std::array<FloatType, (size_t) nChannels> outData;
 
     FloatType fsOver1000 = FloatType (48000 / 1000);
 

@@ -42,7 +42,9 @@ namespace Reverb
 } // namespace Reverb
 } // namespace chowdsp
 
+#if JUCE_MODULE_AVAILABLE_juce_dsp
 #include "Reverb/chowdsp_ConvolutionDiffuser.h"
+#endif
 #include "Reverb/chowdsp_Diffuser.h"
 #include "Reverb/chowdsp_FDN.h"
 
