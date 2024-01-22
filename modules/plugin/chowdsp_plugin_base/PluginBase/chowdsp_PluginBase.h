@@ -317,6 +317,7 @@ bool PluginBase<P>::supportsParameterModulation() const
 #endif
 }
 
+#if HAS_CLAP_JUCE_EXTENSIONS && JUCE_MODULE_AVAILABLE_chowdsp_presets_v2
 template <class P>
 bool PluginBase<P>::presetLoadFromLocation (uint32_t location_kind, const char* location, const char* load_key) noexcept
 {
@@ -324,4 +325,5 @@ bool PluginBase<P>::presetLoadFromLocation (uint32_t location_kind, const char* 
         return false;
     return presetManager->loadCLAPPreset (location_kind, location, load_key);
 }
+#endif
 } // namespace chowdsp
