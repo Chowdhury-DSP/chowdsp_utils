@@ -11,7 +11,7 @@ JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
 namespace chowdsp::presets::discovery
 {
-EmbeddedPresetsProvider::EmbeddedPresetsProvider (const clap_plugin_id& this_plug_id,
+EmbeddedPresetsProvider::EmbeddedPresetsProvider (const clap_universal_plugin_id& this_plug_id,
                                                   const clap_preset_discovery_provider_descriptor& desc,
                                                   const clap_preset_discovery_location& location,
                                                   const clap_preset_discovery_indexer* indexer)
@@ -59,7 +59,7 @@ bool EmbeddedPresetsProvider::getMetadata (uint32_t location_kind,
 }
 
 //==============================================================================
-FilePresetsProvider::FilePresetsProvider (const clap_plugin_id& this_plug_id,
+FilePresetsProvider::FilePresetsProvider (const clap_universal_plugin_id& this_plug_id,
                                           const clap_preset_discovery_provider_descriptor& desc,
                                           const clap_preset_discovery_filetype& filetype,
                                           const clap_preset_discovery_indexer* indexer)
@@ -108,8 +108,8 @@ bool FilePresetsProvider::getMetadata (uint32_t location_kind,
             metadata_receiver->add_feature (metadata_receiver, preset.getCategory().toRawUTF8());
 
         metadata_receiver->set_timestamps (metadata_receiver,
-                                           (clap_timestamp_t) userPresetFile.getCreationTime().toMilliseconds() / 1000,
-                                           (clap_timestamp_t) userPresetFile.getLastModificationTime().toMilliseconds() / 1000);
+                                           (clap_timestamp) userPresetFile.getCreationTime().toMilliseconds() / 1000,
+                                           (clap_timestamp) userPresetFile.getLastModificationTime().toMilliseconds() / 1000);
     }
 
     return true;

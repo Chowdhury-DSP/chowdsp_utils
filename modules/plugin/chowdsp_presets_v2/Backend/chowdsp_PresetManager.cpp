@@ -133,6 +133,21 @@ void PresetManager::loadUserPresetsFromFolder (const juce::File& file)
     addPresets (std::move (presets), false);
 }
 
+void PresetManager::loadPreset (const Preset& preset)
+{
+    saverLoader.loadPreset (preset);
+
+#if HAS_CLAP_JUCE_EXTENSIONS
+    if (preset.getPresetFile() == juce::File {})
+        clapPresetLoadedBroadcaster (CLAP_PRESET_DISCOVERY_LOCATION_PLUGIN,
+                                     nullptr,
+                                     preset.getName().toRawUTF8());
+    clapPresetLoadedBroadcaster (CLAP_PRESET_DISCOVERY_LOCATION_FILE,
+                                 preset.getPresetFile().getFullPathName().toRawUTF8(),
+                                 nullptr);
+#endif
+}
+
 #if HAS_CLAP_JUCE_EXTENSIONS
 bool PresetManager::loadCLAPPreset (uint32_t location_kind, const char* location, const char* load_key) noexcept
 {

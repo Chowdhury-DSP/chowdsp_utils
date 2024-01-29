@@ -24,10 +24,10 @@ using CLAPPresetsProviderBase =
 /** A CLAP preset provider for presets that are embedded in the plugin's binary data. */
 struct EmbeddedPresetsProvider : CLAPPresetsProviderBase
 {
-    const clap_plugin_id& this_plugin_id;
+    const clap_universal_plugin_id& this_plugin_id;
     const clap_preset_discovery_location& discoveryLocation {};
 
-    EmbeddedPresetsProvider (const clap_plugin_id& this_plug_id,
+    EmbeddedPresetsProvider (const clap_universal_plugin_id& this_plug_id,
                              const clap_preset_discovery_provider_descriptor& desc,
                              const clap_preset_discovery_location& location,
                              const clap_preset_discovery_indexer* indexer);
@@ -44,11 +44,11 @@ struct EmbeddedPresetsProvider : CLAPPresetsProviderBase
 /** A CLAP preset provider for presets that are stored in the user's filesystem. */
 struct FilePresetsProvider : CLAPPresetsProviderBase
 {
-    const clap_plugin_id& this_plugin_id;
+    const clap_universal_plugin_id& this_plugin_id;
     const clap_preset_discovery_filetype& presets_filetype;
     clap_preset_discovery_location discoveryLocation {};
 
-    FilePresetsProvider (const clap_plugin_id& this_plug_id,
+    FilePresetsProvider (const clap_universal_plugin_id& this_plug_id,
                          const clap_preset_discovery_provider_descriptor& desc,
                          const clap_preset_discovery_filetype& filetype,
                          const clap_preset_discovery_indexer* indexer);
