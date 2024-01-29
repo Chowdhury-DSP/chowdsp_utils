@@ -84,7 +84,7 @@ public:
      */
     void processBlock (const BufferView<const SampleType>& levelBuffer,
                        const BufferView<SampleType>& gainBuffer,
-                       ArenaAllocator* arena = nullptr) noexcept
+                       ArenaAllocator<>* arena = nullptr) noexcept
     {
         jassert (levelBuffer.getNumSamples() == gainBuffer.getNumSamples());
 

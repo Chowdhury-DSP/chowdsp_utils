@@ -78,14 +78,14 @@ public:
      * Please don't call this function if the parameter handle hasn't been set!
      */
     void process (int numSamples);
-    void process (int numSamples, ArenaAllocator& alloc);
+    void process (int numSamples, ArenaAllocator<>& alloc);
 
     /**
      * Process smoothing for the input value.
      * If smoothing an audio parameter, it is recommended to use a parameter handle instead!
      */
     void process (FloatType value, int numSamples);
-    void process (FloatType value, int numSamples, ArenaAllocator& alloc);
+    void process (FloatType value, int numSamples, ArenaAllocator<>& alloc);
 
     /** Returns a pointer to the current smoothed buffer. */
     [[nodiscard]] const FloatType* getSmoothedBuffer() const { return bufferData; }
