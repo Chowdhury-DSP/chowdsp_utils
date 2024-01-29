@@ -44,8 +44,8 @@ public:
     {
         return true;
     }
-    int noteNameCount() noexcept override { return 0; }
-    bool noteNameGet (int /*index*/, clap_note_name* /*noteName*/) noexcept override { return false; }
+    uint32_t noteNameCount() noexcept override { return 0; }
+    bool noteNameGet (uint32_t /*index*/, clap_note_name* /*noteName*/) noexcept override { return false; }
 #endif
 
 private:
