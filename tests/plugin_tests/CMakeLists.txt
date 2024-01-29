@@ -13,7 +13,11 @@ setup_juce_lib(plugin_tests_lib
 )
 
 if(TARGET clap_juce_extensions)
-    target_link_libraries(plugin_tests_lib PUBLIC clap_juce_extensions)
+    target_link_libraries(plugin_tests_lib
+        PUBLIC
+            clap_juce_extensions
+            chowdsp::chowdsp_clap_extensions
+    )
 endif()
 
 target_compile_definitions(plugin_tests_lib
