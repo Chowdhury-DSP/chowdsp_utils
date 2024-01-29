@@ -5,6 +5,7 @@
 namespace chowdsp
 {
 /** A simple arena allocator */
+template <typename MemoryResourceType = std::vector<std::byte>>
 class ArenaAllocator
 {
 public:
@@ -100,7 +101,7 @@ public:
     }
 
 private:
-    std::vector<std::byte> raw_data {};
+    MemoryResourceType raw_data {};
     size_t bytes_used = 0;
 };
 } // namespace chowdsp
