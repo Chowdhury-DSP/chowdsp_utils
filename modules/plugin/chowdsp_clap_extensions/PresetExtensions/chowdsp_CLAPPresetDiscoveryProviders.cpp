@@ -3,7 +3,7 @@
 #include <chowdsp_presets_v2/chowdsp_presets_v2.h>
 
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wunused-parameter")
-JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4100)
+JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4100 4127)
 #include <clap/helpers/preset-discovery-provider.hh>
 #include <clap/helpers/preset-discovery-provider.hxx>
 JUCE_END_IGNORE_WARNINGS_MSVC
