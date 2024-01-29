@@ -117,7 +117,7 @@ public:
     virtual juce::String getWrapperTypeString() const;
     bool supportsParameterModulation() const;
 
-#if 1 // HAS_CLAP_JUCE_EXTENSIONS && JUCE_MODULE_AVAILABLE_chowdsp_presets_v2
+#if HAS_CLAP_JUCE_EXTENSIONS && JUCE_MODULE_AVAILABLE_chowdsp_presets_v2
     bool supportsPresetLoad() const noexcept override
     {
         return presetManager != nullptr;
