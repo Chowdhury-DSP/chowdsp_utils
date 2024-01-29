@@ -21,7 +21,7 @@ public:
     /** Loads a preset based on information provided by the CLAP preset-load extension. */
     virtual bool loadCLAPPreset (uint32_t location_kind, const char* location, const char* load_key) noexcept;
 
-    Broadcaster<void(uint32_t location_kind, const char* location, const char* load_key)> clapPresetLoadedBroadcaster {};
+    Broadcaster<void (uint32_t location_kind, const char* location, const char* load_key)> clapPresetLoadedBroadcaster {};
 #endif
 
     /** Returns the currently loaded preset, or nullptr if no preset is loaded. */

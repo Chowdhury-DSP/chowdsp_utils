@@ -1,6 +1,5 @@
 #pragma once
 
-
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wunused-parameter")
 JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4100)
 #include <clap/helpers/preset-discovery-provider.hh>

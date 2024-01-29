@@ -118,7 +118,10 @@ public:
     bool supportsParameterModulation() const;
 
 #if HAS_CLAP_JUCE_EXTENSIONS && JUCE_MODULE_AVAILABLE_chowdsp_presets_v2
-    bool supportsPresetLoad() const noexcept override { return presetManager != nullptr; }
+    bool supportsPresetLoad() const noexcept override
+    {
+        return presetManager != nullptr;
+    }
     bool presetLoadFromLocation (uint32_t location_kind, const char* location, const char* load_key) noexcept override;
 #endif
 
