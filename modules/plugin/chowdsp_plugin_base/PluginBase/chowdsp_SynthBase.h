@@ -35,7 +35,6 @@ public:
         this->magicState.processMidiBuffer (midi, buffer.getNumSamples(), true);
 #endif
 
-        buffer.clear();
         processSynth (buffer, midi);
     }
 
