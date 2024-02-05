@@ -19,7 +19,10 @@ public:
 
     using Ptr = OptionalPointer<RhythmParameter>;
 
-    /** Returns the length of time associated with the current rhythm for a given BPM in seconds */
+    /** Returns the currently selected rhythm. */
+    RhythmUtils::Rhythm getRhythm() const;
+
+    /** Returns the length of time associated with the current rhythm for a given BPM in seconds. */
     double getRhythmTimeSeconds (double tempoBPM) const;
 
 private:

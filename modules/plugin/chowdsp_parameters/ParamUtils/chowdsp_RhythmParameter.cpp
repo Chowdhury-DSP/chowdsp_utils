@@ -13,10 +13,15 @@ RhythmParameter::RhythmParameter (const ParameterID& parameterID,
 {
 }
 
-double RhythmParameter::getRhythmTimeSeconds (double tempoBPM) const
+RhythmUtils::Rhythm RhythmParameter::getRhythm() const
 {
     const auto currentRhythmIndex = getIndex();
-    return rhythmChoices[(size_t) currentRhythmIndex].getTimeSeconds (tempoBPM);
+    return rhythmChoices[(size_t) currentRhythmIndex];
+}
+
+double RhythmParameter::getRhythmTimeSeconds (double tempoBPM) const
+{
+    return getRhythm().getTimeSeconds (tempoBPM);
 }
 
 juce::StringArray RhythmParameter::makeParameterChoiceList (const std::vector<RhythmUtils::Rhythm>& rhythms)
