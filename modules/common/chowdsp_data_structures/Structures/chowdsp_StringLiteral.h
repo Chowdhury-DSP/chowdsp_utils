@@ -25,7 +25,7 @@ namespace sl_detail
 
     /** Counts the string length needed to contain a number. */
     template <typename Int>
-    size_t num_str_len (Int number)
+    constexpr size_t num_str_len (Int number)
     {
         size_t digits = (number > 0) ? 0 : 1;
         while (number)
