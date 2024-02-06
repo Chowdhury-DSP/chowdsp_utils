@@ -25,7 +25,7 @@ namespace sl_detail
 
     /** Counts the string length needed to contain a number. */
     template <typename Int>
-    size_t num_str_len (Int number)
+    constexpr size_t num_str_len (Int number)
     {
         size_t digits = (number > 0) ? 0 : 1;
         while (number)
@@ -34,6 +34,26 @@ namespace sl_detail
             digits++;
         }
         return digits;
+    }
+
+    constexpr void uint_to_str (char* str, size_t size, uint64_t value)
+    {
+        size_t i = size;
+        while (i > 0)
+        {
+            str[i - 1] = static_cast<char> ('0' + (value % 10));
+            value /= 10;
+            i--;
+        }
+    }
+
+    constexpr void sint_to_str (char* str, size_t size, int64_t value)
+    {
+        if (value >= 0)
+            return uint_to_str (str, size, static_cast<uint64_t> (value));
+
+        str[0] = '-';
+        uint_to_str (str + 1, size - 1, static_cast<uint64_t> (-value));
     }
 } // namespace sl_detail
 #endif
@@ -78,14 +98,10 @@ struct StringLiteral
         // N is not large enough to hold this number!
         jassert (N >= actual_size);
 
-        // temporary copy so we don't have to leave room for the null terminator added by snprintf
-        std::array<char, N + 1> temp_str;
         if constexpr (std::is_signed_v<IntType>)
-            std::snprintf (temp_str.data(), temp_str.size(), "%lld", static_cast<int64_t> (int_value));
+            sl_detail::sint_to_str (chars.data(), actual_size, static_cast<int64_t> (int_value));
         else
-            std::snprintf (temp_str.data(), temp_str.size(), "%llu", static_cast<uint64_t> (int_value));
-
-        sl_detail::copy (temp_str.begin(), temp_str.begin() + actual_size, chars.begin());
+            sl_detail::uint_to_str (chars.data(), actual_size, static_cast<uint64_t> (int_value));
     }
     constexpr operator std::string_view() const { return toStringView(); } // NOSONAR NOLINT(google-explicit-constructor)
     [[nodiscard]] std::string toString() const { return { data(), size() }; }
@@ -181,15 +197,14 @@ constexpr bool operator!= (const std::string_view& lhs, const StringLiteral<N>& 
 #if (defined(__cplusplus) && __cplusplus >= 202002L) || (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L)
 namespace string_literals
 {
-    // MSVC doesn't support this yet :(
-    //    template <StringLiteral sl>
-    //    constexpr auto operator"" _sl()
-    //    {
-    //        return sl;
-    //    }
+    template <StringLiteral sl>
+    constexpr auto operator"" _sl()
+    {
+        return sl;
+    }
 
     template <char... str>
-    constexpr auto operator"" _sl()
+    constexpr auto operator"" _sl_n()
     {
         constexpr char str_array[] { str..., '\0' };
         return StringLiteral { str_array };
