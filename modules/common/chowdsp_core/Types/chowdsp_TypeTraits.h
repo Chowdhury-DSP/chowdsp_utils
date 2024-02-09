@@ -12,7 +12,7 @@ namespace TypeTraits
         CHOWDSP_CHECK_HAS_METHOD (HasEnd, end, )
 
         template <typename T>
-        static constexpr auto has_begin_end_v = HasBegin<T>&& HasEnd<T>;
+        static constexpr auto has_begin_end_v = HasBegin<T> && HasEnd<T>;
     } // namespace is_iterable_detail
 #endif // DOXYGEN
 
@@ -63,7 +63,7 @@ namespace TypeTraits
 
     /** True if type T can be iterated over like an STL container */
     template <typename T>
-    static constexpr auto IsVectorLike = IsIterable<T>&& is_vector_detail::is_insertable<T>::value&& is_vector_detail::is_pushable<T>::value&& is_vector_detail::is_popable<T>::value;
+    static constexpr auto IsVectorLike = IsIterable<T> && is_vector_detail::is_insertable<T>::value && is_vector_detail::is_pushable<T>::value && is_vector_detail::is_popable<T>::value;
 
 #ifndef DOXYGEN
     namespace is_maplike_detail
@@ -105,6 +105,18 @@ struct is_specialization_of<OuterType<TypeArgs...>, OuterType> final : std::true
 /** Return true if the complete type is a specialization of the outer type */
 template <typename CompleteType, template <typename...> class OuterType>
 static constexpr bool is_specialization_of_v = is_specialization_of<CompleteType, OuterType>::value;
+
+template <typename T>
+struct is_complete_type
+{
+    template <typename U>
+    static auto test (U*) -> std::integral_constant<bool, sizeof (U) == sizeof (U)>;
+    static auto test (...) -> std::false_type;
+    static constexpr auto value = ! std::is_same_v<decltype (test (static_cast<T*> (nullptr))), std::false_type>;
+};
+
+template <typename T>
+static constexpr auto is_complete_type_v = is_complete_type<T>::value;
 
 /**
  * An empty struct intended to be used with std::conditional_t

@@ -4,6 +4,19 @@ namespace chowdsp
 {
 JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324) // structure was padded due to alignment specifier
 
+#ifndef DOXYGEN
+namespace local_pointer_detail
+{
+    template <typename T>
+    constexpr size_t get_alignment()
+    {
+        if constexpr (is_complete_type_v<T>)
+            return alignof (T);
+        return 8;
+    }
+} // namespace local_pointer_detail
+#endif
+
 /**
  * A generic "owning" pointer constructed using local storage.
  *
@@ -15,7 +28,7 @@ JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324) // structure was padded due to alignment 
  * Make sure that no other type (e.g. std::unique_ptr) tries to take ownership
  * of the pointer being stored here, since that will result in a double-delete.
  */
-template <typename T, size_t MaxSize, size_t Alignment = 0>
+template <typename T, size_t MaxSize, size_t Alignment = local_pointer_detail::get_alignment<T>()>
 class LocalPointer
 {
 public:
@@ -27,19 +40,18 @@ public:
 
     LocalPointer (const LocalPointer&) = delete;
     LocalPointer& operator= (const LocalPointer&) = delete;
-    LocalPointer (LocalPointer&& other) noexcept
+    LocalPointer ([[maybe_unused]] LocalPointer&& other) noexcept
     {
         // move construction is only valid if the pointer is null!
         jassert (pointer == nullptr);
         jassert (other.pointer == nullptr);
-        juce::ignoreUnused (other);
     }
-    LocalPointer& operator= (LocalPointer&& other) noexcept
+    LocalPointer& operator= ([[maybe_unused]] LocalPointer&& other) noexcept
     {
         // move assignment is only valid if the pointer is null!
         jassert (pointer == nullptr);
         jassert (other.pointer == nullptr);
-        juce::ignoreUnused (other);
+        return *this;
     }
 
     /**
@@ -52,6 +64,8 @@ public:
     C* emplace (Args&&... args)
     {
         static_assert (MaxSize >= sizeof (C), "Type is too large to fit into MaxSize bytes!");
+        static_assert (Alignment % alignof (C) == 0, "Type alignments are incompatible!");
+
         reset();
         pointer = new (data.data()) C (std::forward<Args> (args)...);
         return reinterpret_cast<C*> (pointer);
