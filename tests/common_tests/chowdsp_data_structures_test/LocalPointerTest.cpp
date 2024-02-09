@@ -85,23 +85,28 @@ TEST_CASE ("Local Pointer Test", "[common][data-structures]")
         REQUIRE (childPtr->yy == 46);
     }
 
+    JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324 4319)
+    static constexpr size_t testAlignment = 32;
     SECTION ("Alignment Known")
     {
-        struct alignas (32) Test
+        struct alignas (testAlignment) Test
         {
         };
         chowdsp::LocalPointer<Test, 64> ptr;
         ptr.emplace();
-        REQUIRE (juce::snapPointerToAlignment (ptr.get(), 32ul) == ptr.get());
+        const auto alignedPtr = juce::snapPointerToAlignment (ptr.get(), testAlignment);
+        REQUIRE (alignedPtr == ptr.get());
     }
 
     SECTION ("Alignment Forward Declared")
     {
-        chowdsp::LocalPointer<struct Test, 64, 32> ptr;
-        struct alignas (32) Test
+        chowdsp::LocalPointer<struct Test, 64, testAlignment> ptr;
+        struct alignas (testAlignment) Test
         {
         };
         ptr.emplace();
-        REQUIRE (juce::snapPointerToAlignment (ptr.get(), 32ul) == ptr.get());
+        const auto alignedPtr = juce::snapPointerToAlignment (ptr.get(), testAlignment);
+        REQUIRE (alignedPtr == ptr.get());
     }
+    JUCE_END_IGNORE_WARNINGS_MSVC
 }

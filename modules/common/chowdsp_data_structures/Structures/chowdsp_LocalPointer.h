@@ -40,17 +40,19 @@ public:
 
     LocalPointer (const LocalPointer&) = delete;
     LocalPointer& operator= (const LocalPointer&) = delete;
-    LocalPointer ([[maybe_unused]] LocalPointer&& other) noexcept
+    LocalPointer (LocalPointer&& other) noexcept
     {
         // move construction is only valid if the pointer is null!
         jassert (pointer == nullptr);
         jassert (other.pointer == nullptr);
+        juce::ignoreUnused (other);
     }
-    LocalPointer& operator= ([[maybe_unused]] LocalPointer&& other) noexcept
+    LocalPointer& operator= (LocalPointer&& other) noexcept
     {
         // move assignment is only valid if the pointer is null!
         jassert (pointer == nullptr);
         jassert (other.pointer == nullptr);
+        juce::ignoreUnused (other);
         return *this;
     }
 
