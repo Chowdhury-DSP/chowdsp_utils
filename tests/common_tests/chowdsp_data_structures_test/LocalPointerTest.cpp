@@ -84,4 +84,20 @@ TEST_CASE ("Local Pointer Test", "[common][data-structures]")
         REQUIRE (ptr->xx == 45);
         REQUIRE (childPtr->yy == 46);
     }
+
+    SECTION ("Alignment Known")
+    {
+        struct alignas (32) Test {};
+        chowdsp::LocalPointer<Test, 64> ptr;
+        ptr.emplace();
+        REQUIRE (juce::snapPointerToAlignment (ptr.get(), 32ul) == ptr.get());
+    }
+
+    SECTION ("Alignment Forward Declared")
+    {
+        chowdsp::LocalPointer<struct Test, 64, 32> ptr;
+        struct alignas (32) Test {};
+        ptr.emplace();
+        REQUIRE (juce::snapPointerToAlignment (ptr.get(), 32ul) == ptr.get());
+    }
 }
