@@ -106,6 +106,18 @@ struct is_specialization_of<OuterType<TypeArgs...>, OuterType> final : std::true
 template <typename CompleteType, template <typename...> class OuterType>
 static constexpr bool is_specialization_of_v = is_specialization_of<CompleteType, OuterType>::value;
 
+template <typename T>
+struct is_complete_type
+{
+    template <typename U>
+    static auto test (U*) -> std::integral_constant<bool, sizeof (U) == sizeof (U)>;
+    static auto test (...) -> std::false_type;
+    static constexpr auto value = ! std::is_same_v<decltype (test (static_cast<T*> (nullptr))), std::false_type>;
+};
+
+template <typename T>
+static constexpr auto is_complete_type_v = is_complete_type<T>::value;
+
 /**
  * An empty struct intended to be used with std::conditional_t
  * to effectively "disable" some member of a struct/class.
