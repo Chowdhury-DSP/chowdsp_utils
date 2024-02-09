@@ -24,7 +24,9 @@ TEST_CASE ("Type Traits Test", "[common][types]")
     STATIC_REQUIRE (IsMapLike<std::map<int, int>>);
     STATIC_REQUIRE_FALSE (IsMapLike<std::vector<int>>);
 
-    struct A {};
+    struct A
+    {
+    };
     struct B;
     STATIC_REQUIRE (chowdsp::is_complete_type_v<A>);
     STATIC_REQUIRE_FALSE (chowdsp::is_complete_type_v<B>);
