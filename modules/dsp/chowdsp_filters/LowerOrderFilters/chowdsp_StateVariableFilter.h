@@ -202,7 +202,7 @@ public:
         return processSampleInternal (inputValue, ic1eq[(size_t) channel], ic2eq[(size_t) channel]);
     }
 
-private:
+    /** Internal use only! */
     inline auto processSampleInternal (SampleType x, SampleType& s1, SampleType& s2) noexcept
     {
         const auto [v0, v1, v2] = processCore (x, s1, s2);
@@ -237,6 +237,7 @@ private:
         }
     }
 
+    /** Internal use only! */
     inline auto processCore (SampleType x, SampleType& s1, SampleType& s2) noexcept
     {
         const auto v3 = x - s2;
@@ -251,10 +252,12 @@ private:
         return std::make_tuple (v0, v1, v2);
     }
 
+    std::vector<SampleType> ic1eq, ic2eq; // state variables
+
+private:
     SampleType cutoffFrequency, resonance, gain; // parameters
     SampleType g0, k0, A, sqrtA; // parameter intermediate values
     SampleType a1, a2, a3, ak, k0A, Asq; // coefficients
-    std::vector<SampleType> ic1eq, ic2eq; // state variables
 
     NumericType lowpassMult { 0 }, bandpassMult { 0 }, highpassMult { 0 };
 
