@@ -18,12 +18,6 @@ class ScopedValue
 public:
     explicit ScopedValue (T& val) : value (val), ref (val) {}
 
-    ScopedValue (const ScopedValue&) = delete;
-    ScopedValue& operator= (const ScopedValue&) = delete;
-
-    ScopedValue (ScopedValue&&) = default;
-    ScopedValue& operator= (ScopedValue&&) = default;
-
     ~ScopedValue() { ref = value; }
 
     /** Returns a reference to the value */
@@ -32,5 +26,7 @@ public:
 private:
     T value;
     T& ref;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ScopedValue)
 };
 } // namespace chowdsp
