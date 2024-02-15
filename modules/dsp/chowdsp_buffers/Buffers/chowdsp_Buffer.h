@@ -28,8 +28,13 @@ namespace buffer_detail
 
 /**
  * An audio sample buffer that allocates its own memory.
+ *
+ * By default each buffer channel will be aligned to the appropriate SIMD
+ * byte boundary, unless CHOWDSP_NO_XSIMD is enabled. If you would like to
+ * provide a custom alignment, you can specify the alignment as the second
+ * template argument.
  */
-template <typename SampleType>
+template <typename SampleType, size_t alignment = 0>
 class Buffer
 {
 public:
@@ -43,10 +48,10 @@ public:
     Buffer (int numChannels, int numSamples);
 
     /** Move constructor */
-    Buffer (Buffer<SampleType>&&) noexcept = default;
+    Buffer (Buffer&&) noexcept = default;
 
     /** Move assignment */
-    Buffer<SampleType>& operator= (Buffer<SampleType>&&) noexcept = default;
+    Buffer& operator= (Buffer&&) noexcept = default;
 
     /**
      * Sets the maximum size that this buffer can have, and sets the current size as well.
@@ -116,11 +121,13 @@ public:
 
 private:
 #if ! CHOWDSP_NO_XSIMD
-    using Allocator = xsimd::default_allocator<SampleType>;
+    using Allocator = std::conditional_t<alignment == 0,
+                                         xsimd::default_allocator<SampleType>,
+                                         xsimd::aligned_allocator<SampleType, alignment>>;
 #else
     using Allocator = std::allocator<SampleType>;
 #endif
-    std::vector<SampleType, Allocator> rawData;
+    std::vector<SampleType, Allocator> rawData {};
 
     int currentNumChannels = 0;
     int currentNumSamples = 0;
