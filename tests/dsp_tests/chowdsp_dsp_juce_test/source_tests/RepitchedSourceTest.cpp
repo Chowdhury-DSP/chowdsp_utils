@@ -24,9 +24,10 @@ TEST_CASE ("Repitched Source Test", "[dsp][sources][resampling]")
             sine.prepare (spec);
         }
 
-        void processRepitched (juce::dsp::AudioBlock<float>& block) override
+        void processRepitched (const chowdsp::BufferView<float>& buffer) override
         {
-            sine.process (juce::dsp::ProcessContextReplacing<float> { block });
+            buffer.clear();
+            sine.processBlock (buffer);
         }
     };
 
@@ -51,9 +52,12 @@ TEST_CASE ("Repitched Source Test", "[dsp][sources][resampling]")
             for (int i = 0; i < numSamples; i += blockSize)
             {
                 const auto samplesToProcess = juce::jmin (blockSize, numSamples - i);
-                auto&& block = sineProc.process (samplesToProcess);
+                auto resampledBuffer = chowdsp::BufferView<const float> { sineProc.process (samplesToProcess) };
 
-                buffer.copyFrom (0, i, block.getChannelPointer (0), samplesToProcess);
+                buffer.copyFrom (0,
+                                 i,
+                                 resampledBuffer.getReadPointer (0),
+                                 samplesToProcess);
             }
 
             tuner.process (buffer.getReadPointer (0));
