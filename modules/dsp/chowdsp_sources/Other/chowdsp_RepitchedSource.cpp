@@ -22,7 +22,7 @@ void RepitchedSource<ResamplingType>::prepare (const juce::dsp::ProcessSpec& spe
     const auto resampledMaxBlockSize = (int) std::ceil (maxRepitchFactor * (float) spec.maximumBlockSize);
     prepareRepitched ({ spec.sampleRate, (juce::uint32) resampledMaxBlockSize, spec.numChannels });
 
-    resampledBuffer.setSize ((int) spec.numChannels, resampledMaxBlockSize);
+    resampledBuffer.setMaxSize ((int) spec.numChannels, resampledMaxBlockSize);
 }
 
 template <typename ResamplingType>
@@ -33,15 +33,14 @@ void RepitchedSource<ResamplingType>::reset()
 }
 
 template <typename ResamplingType>
-AudioBlock<float> RepitchedSource<ResamplingType>::process (int numSamples) noexcept
+BufferView<float> RepitchedSource<ResamplingType>::process (int numSamples) noexcept
 {
     const auto resampleRatio = 1.0f / resampler.getResampleRatio();
     auto resampledNumSamples = (int) std::ceil (resampleRatio * (float) numSamples);
-    resampledBuffer.setSize (resampledBuffer.getNumChannels(), resampledNumSamples, false, false, true);
+    resampledBuffer.setCurrentSize (resampledBuffer.getNumChannels(), resampledNumSamples);
     resampledBuffer.clear();
 
-    auto&& block = AudioBlock<float> { resampledBuffer };
-    processRepitched (block);
-    return resampler.process (block).toAudioBlock();
+    processRepitched (resampledBuffer);
+    return resampler.process (resampledBuffer);
 }
 } // namespace chowdsp
