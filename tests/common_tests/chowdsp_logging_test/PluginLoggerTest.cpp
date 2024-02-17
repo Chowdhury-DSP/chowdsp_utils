@@ -1,6 +1,7 @@
+#include <chowdsp_logging/chowdsp_logging.h>
+#include <juce_gui_basics/juce_gui_basics.h>
 #include <CatchUtils.h>
 #include <future>
-#include <chowdsp_plugin_utils/chowdsp_plugin_utils.h>
 
 namespace
 {
@@ -8,7 +9,7 @@ const juce::String logFileSubDir = "chowdsp/utils_test";
 const juce::String logFileNameRoot = "chowdsp_utils_test_Log_";
 } // namespace
 
-TEST_CASE ("Plugin Logger Test", "[plugin][utilities]")
+TEST_CASE ("Plugin Logger Test", "[common][logs]")
 {
     SECTION ("Basic Log Test")
     {
@@ -64,7 +65,10 @@ TEST_CASE ("Plugin Logger Test", "[plugin][utilities]")
         {
             chowdsp::PluginLogger logger { logFileSubDir, logFileNameRoot };
             logFile = logger.getLogFile();
-            chowdsp::PluginLogger::handleCrashWithSignal (44);
+            int signal = 44;
+            JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wint-to-void-pointer-cast")
+            chowdsp::LogFileHelpers::signalHandler ((void*) signal);
+            JUCE_END_IGNORE_WARNINGS_GCC_LIKE
         }
 
         auto logString = logFile.loadFileAsString();
