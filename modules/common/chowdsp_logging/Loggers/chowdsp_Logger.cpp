@@ -50,7 +50,7 @@ Logger::~Logger()
     {
         logger.internal_logger.flush();
     }
-    catch (const spdlog::spdlog_ex& ex)
+    catch ([[maybe_unused]] const spdlog::spdlog_ex& ex)
     {
         jassertfalse;
     }
