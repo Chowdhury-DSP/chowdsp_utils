@@ -7,18 +7,20 @@ PluginLogger::PluginLogger (const juce::String& logFileSubDir, const juce::Strin
 {
 }
 
-PluginLogger::PluginLogger (LogFileParams loggerParams) : params (std::move (loggerParams))
+PluginLogger::PluginLogger (LogFileParams loggerParams)
+    : params (std::move (loggerParams))
 {
     using namespace LogFileHelpers;
+    using namespace CrashLogHelpers;
 
     auto&& pastLogFiles = getLogFilesSorted (params);
     pruneOldLogFiles (pastLogFiles, params);
-    checkLogFilesForCrashes (pastLogFiles, params);
+    checkLogFilesForCrashes (pastLogFiles, crashLogAnalysisCallback);
 
     fileLogger.reset (juce::FileLogger::createDateStampedLogger (params.logFileSubDir,
-                                                                    params.logFileNameRoot,
-                                                   params.logFileExtension,
-                                                      toString (openString)));
+                                                                 params.logFileNameRoot,
+                                                                 params.logFileExtension,
+                                                                 toString (openString)));
     juce::Logger::setCurrentLogger (fileLogger.get());
 
     juce::SystemStats::setApplicationCrashHandler (signalHandler);

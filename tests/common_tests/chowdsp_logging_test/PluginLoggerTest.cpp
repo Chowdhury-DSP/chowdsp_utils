@@ -9,8 +9,10 @@ const juce::String logFileSubDir = "chowdsp/utils_test";
 const juce::String logFileNameRoot = "chowdsp_utils_test_Log_";
 } // namespace
 
-TEST_CASE ("Plugin Logger Test", "[common][logs]")
+TEMPLATE_TEST_CASE ("Plugin Logger Test", "[common][logs]", chowdsp::PluginLogger, chowdsp::Logger)
 {
+    using Logger = TestType;
+
     SECTION ("Basic Log Test")
     {
         const juce::String testLogString = "This string should be in the log file...";
@@ -18,7 +20,7 @@ TEST_CASE ("Plugin Logger Test", "[common][logs]")
 
         juce::File logFile;
         {
-            chowdsp::PluginLogger logger { logFileSubDir, logFileNameRoot };
+            Logger logger { logFileSubDir, logFileNameRoot };
             juce::Logger::writeToLog (testLogString);
 
             logFile = logger.getLogFile();
@@ -44,12 +46,12 @@ TEST_CASE ("Plugin Logger Test", "[common][logs]")
 
         for (int i = 0; i < numIters; ++i)
         {
-            using LoggerPtr = std::unique_ptr<chowdsp::PluginLogger>;
+            using LoggerPtr = std::unique_ptr<Logger>;
             std::vector<std::future<LoggerPtr>> futures;
             futures.reserve (numLoggersAtOnce);
             for (int j = 0; j < numLoggersAtOnce; ++j)
                 futures.push_back (std::async (std::launch::async, []
-                                               { return std::make_unique<chowdsp::PluginLogger> (logFileSubDir, logFileNameRoot); }));
+                                               { return std::make_unique<Logger> (logFileSubDir, logFileNameRoot); }));
 
             auto numLogFiles = getNumLogFiles();
             REQUIRE_MESSAGE (numLogFiles <= 55, "Too many log files found in logs directory!");
@@ -63,11 +65,11 @@ TEST_CASE ("Plugin Logger Test", "[common][logs]")
     {
         juce::File logFile;
         {
-            chowdsp::PluginLogger logger { logFileSubDir, logFileNameRoot };
+            Logger logger { logFileSubDir, logFileNameRoot };
             logFile = logger.getLogFile();
             int signal = 44;
             JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wint-to-void-pointer-cast")
-            chowdsp::LogFileHelpers::signalHandler ((void*) signal);
+            chowdsp::CrashLogHelpers::signalHandler ((void*) signal);
             JUCE_END_IGNORE_WARNINGS_GCC_LIKE
         }
 
@@ -80,7 +82,7 @@ TEST_CASE ("Plugin Logger Test", "[common][logs]")
         // the first logger we create after a crash should report the crash...
         {
             auto prevNumTopLevelWindows = juce::TopLevelWindow::getNumTopLevelWindows();
-            chowdsp::PluginLogger logger { logFileSubDir, logFileNameRoot };
+            Logger logger { logFileSubDir, logFileNameRoot };
             juce::MessageManager::getInstance()->runDispatchLoopUntil (100);
 
             auto newNumTopLevelWindows = juce::TopLevelWindow::getNumTopLevelWindows();
@@ -101,7 +103,7 @@ TEST_CASE ("Plugin Logger Test", "[common][logs]")
         // the next logger should not!
         {
             auto prevNumTopLevelWindows = juce::TopLevelWindow::getNumTopLevelWindows();
-            chowdsp::PluginLogger logger { logFileSubDir, logFileNameRoot };
+            Logger logger { logFileSubDir, logFileNameRoot };
 
             auto newNumTopLevelWindows = juce::TopLevelWindow::getNumTopLevelWindows();
             REQUIRE_MESSAGE (newNumTopLevelWindows == prevNumTopLevelWindows, "AlertWindow was incorrectly created!");

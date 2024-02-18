@@ -18,10 +18,12 @@ public:
 
     [[nodiscard]] const juce::File& getLogFile() const { return fileLogger->getLogFile(); }
 
-private:
-    const LogFileParams params;
+    CrashLogHelpers::CrashLogAnalysisCallback crashLogAnalysisCallback = &CrashLogHelpers::defaultCrashLogAnalyzer;
 
-    std::unique_ptr<juce::FileLogger> fileLogger;
+private:
+    const LogFileParams params {};
+
+    std::unique_ptr<juce::FileLogger> fileLogger {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginLogger)
 };

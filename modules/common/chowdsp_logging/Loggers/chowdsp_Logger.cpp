@@ -19,29 +19,32 @@ static juce::File getSystemLogFileFolder()
 Logger::Logger (LogFileParams loggerParams) : params (loggerParams)
 {
     using namespace LogFileHelpers;
+    using namespace CrashLogHelpers;
 
     auto&& pastLogFiles = getLogFilesSorted (params);
     pruneOldLogFiles (pastLogFiles, params);
-    checkLogFilesForCrashes (pastLogFiles, params);
+    checkLogFilesForCrashes (pastLogFiles, crashLogAnalysisCallback);
 
-    const auto log_file = getSystemLogFileFolder()
-                              .getChildFile (params.logFileSubDir)
-                              .getChildFile (params.logFileNameRoot
-                                             + juce::Time::getCurrentTime()
-                                                   .formatted ("%Y-%m-%d_%H-%M-%S"))
-                              .withFileExtension (params.logFileExtension)
-                              .getNonexistentSibling();
+    log_file = getSystemLogFileFolder()
+                   .getChildFile (params.logFileSubDir)
+                   .getChildFile (params.logFileNameRoot
+                                  + juce::Time::getCurrentTime()
+                                        .formatted ("%Y-%m-%d_%H-%M-%S"))
+                   .withFileExtension (params.logFileExtension)
+                   .getNonexistentSibling();
 
     file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt> (log_file.getFullPathName().toStdString(),
                                                                      false);
+    logger.internal_logger.sinks().push_back (file_sink);
 
-    juce::Logger::setCurrentLogger (&internal_logger);
+    juce::Logger::setCurrentLogger (&logger);
 
     juce::SystemStats::setApplicationCrashHandler (signalHandler);
 }
 
 Logger::~Logger()
 {
+    logger.internal_logger.flush();
     LogFileHelpers::shutdownLogger();
 }
 } // namespace chowdsp
