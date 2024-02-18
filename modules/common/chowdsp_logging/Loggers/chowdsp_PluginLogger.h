@@ -12,29 +12,18 @@ namespace chowdsp
 class PluginLogger
 {
 public:
-    struct LoggerParams
-    {
-        juce::String logFileSubDir;
-        juce::String logFileNameRoot;
-        juce::String logFileExtension = ".log";
-        int maxNumLogFiles = 50;
-        std::function<void (const juce::File&)> crashLogAnalysisCallback = [] (const juce::File& logFile)
-        { PluginLogger::defaultCrashLogAnalyzer (logFile); };
-    };
-
     PluginLogger (const juce::String& logFileSubDir, const juce::String& logFileNameRoot);
-    explicit PluginLogger (LoggerParams loggerParams);
+    explicit PluginLogger (LogFileParams loggerParams);
     ~PluginLogger();
 
     [[nodiscard]] const juce::File& getLogFile() const { return fileLogger->getLogFile(); }
-    static void handleCrashWithSignal (int signal);
+
+    CrashLogHelpers::CrashLogAnalysisCallback crashLogAnalysisCallback = &CrashLogHelpers::defaultCrashLogAnalyzer;
 
 private:
-    static void defaultCrashLogAnalyzer (const juce::File& logFile);
+    const LogFileParams params {};
 
-    const LoggerParams params;
-
-    std::unique_ptr<juce::FileLogger> fileLogger;
+    std::unique_ptr<juce::FileLogger> fileLogger {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginLogger)
 };

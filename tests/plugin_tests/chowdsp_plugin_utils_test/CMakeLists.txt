@@ -6,7 +6,6 @@ target_sources(chowdsp_plugin_utils_test PRIVATE
     DeferredActionTest.cpp
     FileListenerTest.cpp
     GlobalSettingsTest.cpp
-    PluginLoggerTest.cpp
     LNFAllocatorTest.cpp
     UIStateTest.cpp
     TweaksFileTest.cpp

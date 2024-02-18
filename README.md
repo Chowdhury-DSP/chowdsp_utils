@@ -100,6 +100,9 @@ sure to abide by the license of each module, as well as whichever libraries are 
 `chowdsp_listeners` (BSD)
 - A thin wrapper around [`rocket`](https://github.com/tripleslash/rocket) (Public Domain, included internally).
 
+`chowdsp_logging` (BSD)
+- A thin wrapper around [`spdlog`](https://github.com/gabime/spdlog) (MIT License, included internally).
+
 `chowdsp_reflection` (BSD)
 - Includes the following internal dependencies:
   - [`boost::pfr`](https://github.com/boostorg/pfr) (Boost license).
