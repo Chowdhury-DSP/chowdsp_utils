@@ -16,7 +16,7 @@ static juce::File getSystemLogFileFolder()
 #endif
 }
 
-Logger::Logger (LogFileParams loggerParams) : params (loggerParams)
+Logger::Logger (const LogFileParams& loggerParams) : params (loggerParams)
 {
     using namespace LogFileHelpers;
     using namespace CrashLogHelpers;
@@ -45,7 +45,14 @@ Logger::Logger (LogFileParams loggerParams) : params (loggerParams)
 
 Logger::~Logger()
 {
-    logger.internal_logger.flush();
+    try
+    {
+        logger.internal_logger.flush();
+    }
+    catch (const spdlog::spdlog_ex &ex)
+    {
+        jassertfalse;
+    }
     LogFileHelpers::shutdownLogger();
 }
 } // namespace chowdsp
