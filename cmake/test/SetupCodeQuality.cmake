@@ -22,6 +22,7 @@ target_link_libraries(chowdsp_utils_codeql PRIVATE
     chowdsp::chowdsp_listeners
     chowdsp::chowdsp_reflection
     chowdsp::chowdsp_serialization
+    chowdsp::chowdsp_logging
     chowdsp::chowdsp_units
     chowdsp::chowdsp_buffers
     chowdsp::chowdsp_compressor
