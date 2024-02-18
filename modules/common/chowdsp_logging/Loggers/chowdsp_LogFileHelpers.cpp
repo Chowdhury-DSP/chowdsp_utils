@@ -29,7 +29,7 @@ namespace LogFileHelpers
             return logFiles;
 
         const auto numLogFiles = logFilesDir.getNumberOfChildFiles (juce::File::findFiles, logFileWildcard);
-        logFiles.reserve (numLogFiles);
+        logFiles.reserve (static_cast<size_t> (numLogFiles));
 
         for (const auto& entry : juce::RangedDirectoryIterator (logFilesDir, false, logFileWildcard))
         {
