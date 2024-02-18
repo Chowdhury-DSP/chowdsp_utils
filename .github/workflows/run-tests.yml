@@ -119,7 +119,7 @@ jobs:
           BUILD_TYPE: ${{ matrix.build_type }}
         run: |
           ctest --test-dir build -C $BUILD_TYPE -R ${TEST_TARGETS// /|} --show-only
-          ctest --test-dir build -C $BUILD_TYPE -R ${TEST_TARGETS// /|} -j 4 --output-on-failure
+          ctest --test-dir build -C $BUILD_TYPE -R ${TEST_TARGETS// /|} -j 4 --no-tests=error --output-on-failure
 
       - name: "Run Live GUI Test"
         if: matrix.live_gui

@@ -58,4 +58,4 @@ jobs:
           TEST_TARGETS: ${{ matrix.tests }}
         run: |
           ctest --test-dir build -C Release -R ${TEST_TARGETS// /|} --show-only
-          ctest --test-dir build -C Release -R ${TEST_TARGETS// /|} -j 4 --output-on-failure
+          ctest --test-dir build -C Release -R ${TEST_TARGETS// /|} -j 4 --no-tests=error --output-on-failure
