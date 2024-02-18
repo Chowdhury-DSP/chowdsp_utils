@@ -19,7 +19,7 @@ jobs:
       fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
       matrix:
         tests: ["chowdsp_buffers_test chowdsp_dsp_data_structures_test chowdsp_dsp_juce_test chowdsp_dsp_utils_test chowdsp_sources_test chowdsp_math_test chowdsp_simd_test chowdsp_filters_test chowdsp_waveshapers_test chowdsp_modal_dsp_test chowdsp_compressor_test"]
-        os: [macos-latest]
+        os: [macos-14]
 
     steps:
       - name: Get latest CMake
@@ -41,7 +41,7 @@ jobs:
       - name: Configure
         working-directory: ${{env.WORK_DIR}}
         shell: bash
-        run: cmake -Bbuild -DCHOWDSP_ENABLE_TESTING=ON -GXcode -DCMAKE_OSX_ARCHITECTURES=arm64
+        run: cmake -Bbuild -DCHOWDSP_ENABLE_TESTING=ON -DCMAKE_OSX_ARCHITECTURES=arm64
 
       - name: Build
         working-directory: ${{env.WORK_DIR}}/build
@@ -49,3 +49,12 @@ jobs:
         env:
           TEST_TARGETS: ${{ matrix.tests }}
         run: cmake --build . --config Release --parallel 4 --target $TEST_TARGETS | xcpretty
+
+      - name: "Run Tests: ${{ matrix.tests }}"
+        working-directory: ${{env.WORK_DIR}}
+        shell: bash
+        env:
+          TEST_TARGETS: ${{ matrix.tests }}
+        run: |
+          ctest --test-dir build -C Release -R ${TEST_TARGETS// /|} --show-only
+          ctest --test-dir build -C Release -R ${TEST_TARGETS// /|} -j 4 --no-tests=error --output-on-failure

@@ -21,7 +21,7 @@ jobs:
       fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
       matrix:
         tests: [
-                "chowdsp_core_test chowdsp_data_structures_test chowdsp_json_test chowdsp_serialization_test chowdsp_units_test chowdsp_buffers_test chowdsp_dsp_juce_test", # common_tests_lib + dsp_juce_tests_lib
+                "chowdsp_core_test chowdsp_data_structures_test chowdsp_json_test chowdsp_serialization_test chowdsp_logging_test chowdsp_units_test chowdsp_buffers_test chowdsp_dsp_juce_test", # common_tests_lib + dsp_juce_tests_lib
                 "chowdsp_dsp_data_structures_test chowdsp_dsp_utils_test chowdsp_filters_test chowdsp_math_test chowdsp_modal_dsp_test chowdsp_simd_test chowdsp_sources_test chowdsp_waveshapers_test chowdsp_compressor_test", # dsp_tests_lib
                 "chowdsp_parameters_test chowdsp_plugin_state_test chowdsp_plugin_base_test chowdsp_plugin_utils_test chowdsp_presets_v2_test chowdsp_version_test", # plugin_tests_lib
                 "chowdsp_gui_test chowdsp_visualizers_test", # gui_tests_lib
@@ -119,7 +119,7 @@ jobs:
           BUILD_TYPE: ${{ matrix.build_type }}
         run: |
           ctest --test-dir build -C $BUILD_TYPE -R ${TEST_TARGETS// /|} --show-only
-          ctest --test-dir build -C $BUILD_TYPE -R ${TEST_TARGETS// /|} -j 4 --output-on-failure
+          ctest --test-dir build -C $BUILD_TYPE -R ${TEST_TARGETS// /|} -j 4 --no-tests=error --output-on-failure
 
       - name: "Run Live GUI Test"
         if: matrix.live_gui

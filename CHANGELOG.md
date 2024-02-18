@@ -6,14 +6,34 @@ All notable changes to this project will be documented in this file.
 - Refactored `chowdsp_buffers` module out of `chowdsp_dsp_data_structures`.
 - Refactored `chowdsp_data_structures` module out of `chowdsp_core`, and added new data structures.
 - Added `chowdsp_compressor` module.
-- Added `chowdsp::buffer_iters::samples`.
+- Added `chowdsp_logging` module.
+- Added `chowdsp::zip_multi`.
+- Added `chowdsp::buffer_iters::samples` and `chowdsp::buffer_iters::zip_channels`.
+- Added `chowdsp::ArenaAllocator` and `chowdsp::ChainedArenaAllocator`.
 - Added `chowdsp::UIToAudioPipeline`.
+- Added `chowdsp::CrossoverFilter`.
 - Added `chowdsp::NoiseSynth`.
-- Added math approximations: `chowdsp::LogApprox`, `chowdsp::PowApprox`, and `chowdsp::DecibelsApprox`.
+- Added `chowdsp::OvershootLimiter`.
+- Added `chowdsp::make_array`.
+- Added `chowdsp::EndOfScopeAction` and `chowdsp::runAtEndOfScope`.
+- Added `chowdsp::RandomFloat`.
+- Added `chowdsp::FIRPolyphaseInterpolator` and `chowdsp::FIRPolyphaseDecimator`.
+- Added `chowdsp::SmallMap`.
+- Added `chowdsp::WidthPanner`.
 - `chowdsp_visualizers`: Added `WaveshaperPlot`.
+- `chowdsp_buffers`: Improved constructor and type compatibility.
+- `chowdsp_dsp_utils`: Optimized `chowdsp::Upsampler` and `chowdsp::Downsampler`.
+- `chowdsp_serialization`: Added specializations for serializing enums and json.
+- `chowdsp_clap_extensions`: Added helpers for preset discovery.
 - `chowds::DelayLine`: Added `free()` and `processBlock()` methods.
+- `chowdsp::SynthBase`: No longer clears the audio buffer before passing it into `processSnyth()`.
 - `chowdsp_presets_v2`: Refactored preset save/load logic into `chowdsp::PresetSaverLoader`.
+- `chowdsp::CoefficientCalculationMode::Decramped`: Improved stability for decramped filters with low Q.
+- `chowdsp::StringLiteral`: Improved construction.
+- `chowdsp::SineWave`: Added `processSampleQuadrature()`.
 - `chowdsp::Polynomials::estrin`: Fixed address sanitizer error.
+- Improved memory alignment handling for structures that deal with low-level memory.
+- Improved compatibility for targets without SIMD support.
 
 ## [2.1.0] 2023-03-04
 - Added `chowdsp_visualizers` module.
