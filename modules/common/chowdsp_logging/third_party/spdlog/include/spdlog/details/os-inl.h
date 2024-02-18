@@ -22,7 +22,7 @@
 #include <thread>
 
 #ifdef _WIN32
-    #include <spdlog/details/windows_include.h>
+    #include "../details/windows_include.h"
     #include <fileapi.h>  // for FlushFileBuffers
     #include <io.h>       // for _get_osfhandle, _isatty, _fileno
     #include <process.h>  // for _get_pid

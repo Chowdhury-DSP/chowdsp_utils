@@ -47,8 +47,6 @@
 #include "Files/chowdsp_FileListener.h"
 #include "Files/chowdsp_TweaksFile.h"
 
-#include "Logging/chowdsp_PluginLogger.h"
-
 #include "SharedUtils/chowdsp_GlobalPluginSettings.h"
 #include "SharedUtils/chowdsp_LNFAllocator.h"
 
