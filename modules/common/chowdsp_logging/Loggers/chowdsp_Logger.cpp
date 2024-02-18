@@ -36,6 +36,7 @@ Logger::Logger (LogFileParams loggerParams) : params (loggerParams)
     file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt> (log_file.getFullPathName().toStdString(),
                                                                      false);
     logger.internal_logger.sinks().push_back (file_sink);
+    logger.internal_logger.info ("Starting log file: " + log_file.getFullPathName().toStdString());
 
     juce::Logger::setCurrentLogger (&logger);
 
