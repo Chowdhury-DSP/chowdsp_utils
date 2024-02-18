@@ -69,8 +69,8 @@ public:
     }
 
     std::unique_ptr<periodic_worker> &get_flusher() {
-        std::lock_guard<std::mutex> lock(flusher_mutex_); 
-        return periodic_flusher_; 
+        std::lock_guard<std::mutex> lock(flusher_mutex_);
+        return periodic_flusher_;
     }
 
     void set_error_handler(err_handler handler);
