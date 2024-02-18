@@ -11,6 +11,9 @@ const juce::String logFileNameRoot = "chowdsp_utils_test_Log_";
 
 TEMPLATE_TEST_CASE ("Plugin Logger Test", "[common][logs]", chowdsp::PluginLogger, chowdsp::Logger)
 {
+    juce::InterProcessLock mutex { "plugin_logger_lock" };
+    juce::GenericScopedLock lock { mutex };
+
     using Logger = TestType;
 
     SECTION ("Basic Log Test")

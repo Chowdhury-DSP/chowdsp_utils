@@ -32,6 +32,7 @@ Logger::Logger (const LogFileParams& loggerParams) : params (loggerParams)
                                         .formatted ("%Y-%m-%d_%H-%M-%S"))
                    .withFileExtension (params.logFileExtension)
                    .getNonexistentSibling();
+    log_file.create();
 
     file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt> (log_file.getFullPathName().toStdString(),
                                                                      false);
