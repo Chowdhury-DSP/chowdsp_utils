@@ -5,7 +5,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_dsp_data_structures
    vendor:        Chowdhury DSP
-   version:       2.1.0
+   version:       2.2.0
    name:          ChowDSP DSP Data Structures
    description:   DSP data structures for ChowDSP plugins
    dependencies:  chowdsp_simd, chowdsp_buffers, chowdsp_math

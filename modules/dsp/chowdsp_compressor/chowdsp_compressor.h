@@ -5,7 +5,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_compressor
    vendor:        Chowdhury DSP
-   version:       2.1.0
+   version:       2.2.0
    name:          ChowDSP Compressor
    description:   Tools for building a compressor
    dependencies:  chowdsp_dsp_data_structures

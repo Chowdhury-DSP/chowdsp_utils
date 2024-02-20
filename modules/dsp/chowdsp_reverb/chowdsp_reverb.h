@@ -5,7 +5,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_reverb
    vendor:        Chowdhury DSP
-   version:       2.1.0
+   version:       2.2.0
    name:          ChowDSP Reverb
    description:   Reverb utilities for ChowDSP plugins
    dependencies:  chowdsp_dsp_utils
