@@ -63,6 +63,19 @@ namespace LogFileHelpers
     void shutdownLogger (int signal)
     {
         juce::Logger::writeToLog (toString (signal == 0 ? exitString : crashString));
+
+        if (auto* logger = dynamic_cast<BaseLogger*> (juce::Logger::getCurrentLogger()))
+        {
+            try
+            {
+                logger->internal_logger.flush();
+            }
+            catch ([[maybe_unused]] const spdlog::spdlog_ex& ex)
+            {
+                jassertfalse;
+            }
+        }
+
         juce::Logger::setCurrentLogger (nullptr);
     }
 } // namespace LogFileHelpers

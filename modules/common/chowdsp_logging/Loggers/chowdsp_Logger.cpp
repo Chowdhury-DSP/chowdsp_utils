@@ -46,14 +46,6 @@ Logger::Logger (const LogFileParams& loggerParams) : params (loggerParams)
 
 Logger::~Logger()
 {
-    try
-    {
-        logger.internal_logger.flush();
-    }
-    catch ([[maybe_unused]] const spdlog::spdlog_ex& ex)
-    {
-        jassertfalse;
-    }
     LogFileHelpers::shutdownLogger();
 }
 } // namespace chowdsp
