@@ -5,7 +5,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_math
    vendor:        Chowdhury DSP
-   version:       2.1.0
+   version:       2.2.0
    name:          ChowDSP Math Utilities
    description:   Math utilities for ChowDSP plugins
    dependencies:  chowdsp_data_structures, chowdsp_simd
