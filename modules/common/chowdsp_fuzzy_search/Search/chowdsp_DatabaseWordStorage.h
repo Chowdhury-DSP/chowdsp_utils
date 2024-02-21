@@ -13,7 +13,8 @@ struct WordStorage
 
     std::vector<char> wordData {}; // all characters from a word, in order in memory
     std::vector<search_helpers::WordHist> wordHist {}; // a tiny histogram per word
-    std::vector<WordView> wordMap {}; // map to find index from word
+    std::vector<WordView> wordViewList {}; // map to find index from word
+    std::unordered_map<std::string, size_t> wordMap;
 
     [[nodiscard]] std::string_view getString (WordView wordView) const noexcept
     {
@@ -24,6 +25,7 @@ struct WordStorage
     {
         wordData.clear();
         wordHist.clear();
+        wordViewList.clear();
         wordMap.clear();
     }
 
@@ -31,21 +33,19 @@ struct WordStorage
     {
         wordData.reserve (wordCount * 8);
         wordHist.reserve (wordCount);
+        wordViewList.reserve (wordCount);
         wordMap.reserve (wordCount);
     }
 
-    [[nodiscard]] auto getWordCount() const noexcept { return wordMap.size(); }
+    [[nodiscard]] auto getWordCount() const noexcept { return wordViewList.size(); }
 
     [[nodiscard]] int addWord (std::string_view word)
     {
         // if exist, return index
-        for (const auto [idx, wordView] : enumerate (wordMap))
-        {
-            if (word == getString (wordView))
-                return static_cast<int> (idx);
-        }
+        if (auto found = wordMap.find (std::string { word }); found != wordMap.end())
+            return static_cast<int> (found->second);
 
-        const auto newWordIndex = static_cast<int> (wordMap.size());
+        const auto newWordIndex = static_cast<int> (wordViewList.size());
 
         // add to data
         const auto wordStart = static_cast<uint32_t> (wordData.size());
@@ -53,11 +53,12 @@ struct WordStorage
 
         // add word view
         const auto newWordView = WordView { wordStart, static_cast<uint32_t> (wordData.size()) };
-        wordMap.emplace_back (newWordView);
         wordHist.emplace_back (word);
+        wordViewList.emplace_back (newWordView);
+        wordMap.insert ({ std::string { getString (newWordView) }, newWordIndex });
 
         // return word-index
         return newWordIndex;
     }
 };
-} // namespace chowdsp
+} // namespace chowdsp::search_database

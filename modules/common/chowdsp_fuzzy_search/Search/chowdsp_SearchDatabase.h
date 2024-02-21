@@ -18,7 +18,7 @@ public:
         float score;
     };
 
-private:
+public:
     struct WordFromField
     {
         int wordIndex = -1; // in global list
@@ -27,8 +27,8 @@ private:
 
         WordFromField() = default;
 
-        WordFromField (int wIndex, int fIndex, int wordIndexInField)
-            : wordIndex (wIndex), fieldIndex (fIndex), wordIndexInField (wordIndexInField)
+        WordFromField (int wIndex, int fIndex, int wIndexInField)
+            : wordIndex (wIndex), fieldIndex (fIndex), wordIndexInField (wIndexInField)
         {
         }
 
@@ -61,9 +61,9 @@ private:
 
         TempResult() = default;
 
-        TempResult (float score, int entryIndex)
+        TempResult (float _score, int _entryIndex)
         {
-            set (score, entryIndex);
+            set (_score, _entryIndex);
         }
 
         void set (float newScore, int newEntryIndex)
@@ -99,7 +99,7 @@ private:
         const search_helpers::WordPairHist qHist2 { queryWord }; // calculate fancy letter-pair histogram
 
         // visit every word in memory-order
-        for (auto [i, wordView] : enumerate (ws.wordMap))
+        for (auto [i, wordView] : enumerate (ws.wordViewList))
         {
             if (qHist.canSkip (ws.wordHist[i]))
             {
@@ -269,7 +269,7 @@ public:
             {
                 // add the word ( de-dup happens here )
                 int wordIndex = wordStorage.addWord (word);
-                search_helpers::toLower (wordStorage.getString (wordStorage.wordMap[(size_t) wordIndex]));
+                search_helpers::toLower (wordStorage.getString (wordStorage.wordViewList[(size_t) wordIndex]));
                 entryWords.emplace_back (wordIndex, static_cast<int> (fieldIndex), static_cast<int> (wordIndexInField));
             }
         }

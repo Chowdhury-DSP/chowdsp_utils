@@ -12,9 +12,9 @@ TEST_CASE ("Database Word Storage Test", "[common][search]")
     REQUIRE (wordStorage.addWord ("test") == 0);
     REQUIRE (wordStorage.addWord ("fork") == 2);
 
-    REQUIRE (wordStorage.getString (wordStorage.wordMap[0]) == "test");
-    REQUIRE (wordStorage.getString (wordStorage.wordMap[1]) == "blah");
-    REQUIRE (wordStorage.getString (wordStorage.wordMap[2]) == "fork");
+    REQUIRE (wordStorage.getString (wordStorage.wordViewList[0]) == "test");
+    REQUIRE (wordStorage.getString (wordStorage.wordViewList[1]) == "blah");
+    REQUIRE (wordStorage.getString (wordStorage.wordViewList[2]) == "fork");
 
     REQUIRE (wordStorage.getWordCount() == 3);
 }
@@ -105,10 +105,10 @@ TEST_CASE ("Basic Search Test", "[common][search]")
 #if ! JUCE_DEBUG
 #include "TestData.h"
 
-TEST_CASE ("Test with a large database", "[common][search]")
+TEST_CASE ("Test With Large Database", "[common][search]")
 {
     chowdsp::SearchDatabase<size_t, 5> f;
-    f.resetEntries (std::size (entries));
+    f.resetEntries (std::size (entries), 100'000);
 
     const auto t1 = std::chrono::steady_clock::now();
     for (const auto [idx, e] : chowdsp::enumerate (entries))
@@ -119,6 +119,8 @@ TEST_CASE ("Test with a large database", "[common][search]")
 
     REQUIRE (f.countEntries() == std::size (entries));
 
+    std::cout << f.countEntries() << std::endl;
+    std::cout << f.wordStorage.wordViewList.size() << std::endl;
     std::cout << "FillDB Time: " << fp_ms.count() << " ms\n";
 }
 #endif

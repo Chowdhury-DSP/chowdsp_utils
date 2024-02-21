@@ -438,4 +438,4 @@ static inline float scoreQueryWordToWord (const WordPairHist& hist, std::string_
     float score = scoreLev (query, word);
     return score;
 }
-}; // namespace chowdsp::search_helpers
+} // namespace chowdsp::search_helpers
