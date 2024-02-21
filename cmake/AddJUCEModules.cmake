@@ -8,6 +8,7 @@ juce_add_modules(
     ${PROJECT_SOURCE_DIR}/modules/common/chowdsp_reflection
     ${PROJECT_SOURCE_DIR}/modules/common/chowdsp_serialization
     ${PROJECT_SOURCE_DIR}/modules/common/chowdsp_logging
+    ${PROJECT_SOURCE_DIR}/modules/common/chowdsp_fuzzy_search
     ${PROJECT_SOURCE_DIR}/modules/common/chowdsp_units
 
     ${PROJECT_SOURCE_DIR}/modules/dsp/chowdsp_buffers
