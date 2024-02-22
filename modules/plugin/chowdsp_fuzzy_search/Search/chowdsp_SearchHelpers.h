@@ -168,7 +168,7 @@ namespace detail
 
 inline void toLower (const nonstd::span<char>& s)
 {
-    for (char & i : s)
+    for (char& i : s)
         i = static_cast<char> (std::tolower (i));
 }
 

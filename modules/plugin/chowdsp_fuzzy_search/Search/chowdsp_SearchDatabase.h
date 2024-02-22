@@ -32,7 +32,7 @@ private:
         {
         }
 
-        bool operator< (const WordFromField& other) const
+        bool operator<(const WordFromField& other) const
         {
             if (wordIndex != other.wordIndex)
                 return wordIndex < other.wordIndex;
@@ -72,7 +72,7 @@ private:
             entryIndex = newEntryIndex;
         }
 
-        bool operator< (const TempResult& other) const
+        bool operator<(const TempResult& other) const
         {
             return score > other.score; // reversed to sort high score on top
         }
@@ -270,7 +270,7 @@ public:
         {
             auto arenaFrame = searchArena.create_frame();
 
-            auto fieldStringCopy = copy_string  (field);
+            auto fieldStringCopy = copy_string (field);
             auto words = search_helpers::splitString (fieldStringCopy, searchArena);
 
             // iterate words in this field
