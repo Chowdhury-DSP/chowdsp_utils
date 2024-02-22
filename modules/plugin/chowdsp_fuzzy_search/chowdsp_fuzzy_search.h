@@ -7,7 +7,7 @@ BEGIN_JUCE_MODULE_DECLARATION
    vendor:        Chowdhury DSP
    version:       2.2.0
    name:          ChowDSP Fuzzy Search
-   description:   ChowDSP module for searching strings using fuzzy search
+   description:   ChowDSP module useful for doing fuzzy searches on databases of tagged presets or similar
    dependencies:  chowdsp_core, chowdsp_data_structures
 
    website:       https://ccrma.stanford.edu/~jatin/chowdsp

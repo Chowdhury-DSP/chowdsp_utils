@@ -8,7 +8,6 @@ juce_add_modules(
     ${PROJECT_SOURCE_DIR}/modules/common/chowdsp_reflection
     ${PROJECT_SOURCE_DIR}/modules/common/chowdsp_serialization
     ${PROJECT_SOURCE_DIR}/modules/common/chowdsp_logging
-    ${PROJECT_SOURCE_DIR}/modules/common/chowdsp_fuzzy_search
     ${PROJECT_SOURCE_DIR}/modules/common/chowdsp_units
 
     ${PROJECT_SOURCE_DIR}/modules/dsp/chowdsp_buffers
@@ -32,6 +31,7 @@ juce_add_modules(
     ${PROJECT_SOURCE_DIR}/modules/plugin/chowdsp_plugin_utils
     ${PROJECT_SOURCE_DIR}/modules/plugin/chowdsp_clap_extensions
     ${PROJECT_SOURCE_DIR}/modules/plugin/chowdsp_plugin_state
+    ${PROJECT_SOURCE_DIR}/modules/plugin/chowdsp_fuzzy_search
 
     ${PROJECT_SOURCE_DIR}/modules/gui/chowdsp_gui
     ${PROJECT_SOURCE_DIR}/modules/gui/chowdsp_foleys

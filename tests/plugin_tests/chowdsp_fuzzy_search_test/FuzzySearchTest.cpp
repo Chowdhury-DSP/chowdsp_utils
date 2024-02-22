@@ -103,7 +103,6 @@ TEST_CASE ("Basic Search Test", "[common][search]")
     }
 }
 
-#if 1 // ! JUCE_DEBUG
 #include "TestData.h"
 
 TEST_CASE ("Test With Large Database", "[common][search]")
@@ -111,18 +110,20 @@ TEST_CASE ("Test With Large Database", "[common][search]")
     chowdsp::SearchDatabase<size_t, 5> f;
     f.resetEntries (std::size (entries), 8'000);
 
-    const auto t1 = std::chrono::steady_clock::now();
-    for (const auto [idx, e] : chowdsp::enumerate (entries))
-        f.addEntry (idx, { e.brand, e.modslug, e.modname, e.moddesc, e.tags });
+    {
+        const auto t1 = std::chrono::steady_clock::now();
+        for (const auto [idx, e] : chowdsp::enumerate (entries))
+            f.addEntry (idx, { e.brand, e.modslug, e.modname, e.moddesc, e.tags });
 
-    const auto t2 = std::chrono::steady_clock::now();
-    std::chrono::duration<double, std::milli> fp_ms = t2 - t1;
+        const auto t2 = std::chrono::steady_clock::now();
+        std::chrono::duration<double, std::milli> fp_ms = t2 - t1;
 
-    REQUIRE (f.countEntries() == std::size (entries));
+        REQUIRE (f.countEntries() == std::size (entries));
 
-    // std::cout << f.countEntries() << std::endl;
-    // std::cout << f.wordStorage.wordViewList.size() << std::endl;
-    std::cout << "FillDB Time: " << fp_ms.count() << " ms\n";
+        // std::cout << f.countEntries() << std::endl;
+        // std::cout << f.wordStorage.wordViewList.size() << std::endl;
+        std::cout << "FillDB Time: " << fp_ms.count() << " ms\n";
+    }
 
     f.prepareForSearch();
     f.setWeights ({
@@ -134,7 +135,7 @@ TEST_CASE ("Test With Large Database", "[common][search]")
     });
     f.setThreshold (0.5f);
 
-    const auto q = [&f] (std::string_view qs, int expected_results_count)
+    const auto q = [&f] (std::string_view qs, size_t expected_results_count)
     {
         const auto t1 = std::chrono::steady_clock::now();
         const auto res = f.search (qs);
@@ -160,4 +161,3 @@ TEST_CASE ("Test With Large Database", "[common][search]")
     q ("S&H", 23);
     q ("Switch", 195);
 }
-#endif

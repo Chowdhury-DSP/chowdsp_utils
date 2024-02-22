@@ -9,6 +9,7 @@ setup_juce_lib(plugin_tests_lib
     chowdsp::chowdsp_plugin_state
     chowdsp::chowdsp_plugin_utils
     chowdsp::chowdsp_presets_v2
+    chowdsp::chowdsp_fuzzy_search
     chowdsp::chowdsp_version
 )
 
@@ -33,3 +34,4 @@ add_subdirectory(chowdsp_presets_v2_test)
 add_subdirectory(chowdsp_plugin_base_test)
 add_subdirectory(chowdsp_plugin_utils_test)
 add_subdirectory(chowdsp_plugin_state_test)
+add_subdirectory(chowdsp_fuzzy_search_test)

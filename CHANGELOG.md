@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [UNRELEASED]
+- Added `chowdsp_fuzzy_search` module.
+
 ## [2.2.0] 2024-02-19
 - Refactored `chowdsp_buffers` module out of `chowdsp_dsp_data_structures`.
 - Refactored `chowdsp_data_structures` module out of `chowdsp_core`, and added new data structures.
