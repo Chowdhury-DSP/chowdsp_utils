@@ -5,6 +5,7 @@
 TEST_CASE ("Database Word Storage Test", "[common][search]")
 {
     chowdsp::search_database::WordStorage wordStorage;
+    wordStorage.reserve (10);
 
     REQUIRE (wordStorage.addWord ("test") == 0);
     REQUIRE (wordStorage.addWord ("test") == 0);
@@ -102,13 +103,13 @@ TEST_CASE ("Basic Search Test", "[common][search]")
     }
 }
 
-#if ! JUCE_DEBUG
+#if 1 // ! JUCE_DEBUG
 #include "TestData.h"
 
 TEST_CASE ("Test With Large Database", "[common][search]")
 {
     chowdsp::SearchDatabase<size_t, 5> f;
-    f.resetEntries (std::size (entries), 100'000);
+    f.resetEntries (std::size (entries), 8'000);
 
     const auto t1 = std::chrono::steady_clock::now();
     for (const auto [idx, e] : chowdsp::enumerate (entries))
@@ -119,8 +120,44 @@ TEST_CASE ("Test With Large Database", "[common][search]")
 
     REQUIRE (f.countEntries() == std::size (entries));
 
-    std::cout << f.countEntries() << std::endl;
-    std::cout << f.wordStorage.wordViewList.size() << std::endl;
+    // std::cout << f.countEntries() << std::endl;
+    // std::cout << f.wordStorage.wordViewList.size() << std::endl;
     std::cout << "FillDB Time: " << fp_ms.count() << " ms\n";
+
+    f.prepareForSearch();
+    f.setWeights ({
+        1.0f, // brand
+        0.9f, // modslug
+        1.0f, // modname
+        0.9f, // moddesc
+        1.0f, // tags
+    });
+    f.setThreshold (0.5f);
+
+    const auto q = [&f] (std::string_view qs, int expected_results_count)
+    {
+        const auto t1 = std::chrono::steady_clock::now();
+        const auto res = f.search (qs);
+        const auto t2 = std::chrono::steady_clock::now();
+        std::chrono::duration<double, std::milli> fp_ms = t2 - t1;
+
+        REQUIRE (res.size() == expected_results_count);
+        std::cout << "Query: \"" << qs << "\" Time: " << fp_ms.count() << "ms #Results: " << res.size() << "\n";
+    };
+
+    q ("vcv", 123);
+    q ("rvrb", 28);
+    q ("revrb", 41);
+    q ("vca", 101);
+    q ("vcf", 95);
+    q ("vco", 132);
+    q ("multi band", 98);
+    q ("multiband", 138);
+    q ("midimap", 83);
+    q ("midi map", 7);
+    q ("kick", 56);
+    q ("FMOP", 53);
+    q ("S&H", 23);
+    q ("Switch", 195);
 }
 #endif

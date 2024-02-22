@@ -18,7 +18,7 @@ public:
         float score;
     };
 
-public:
+private:
     struct WordFromField
     {
         int wordIndex = -1; // in global list
@@ -107,7 +107,8 @@ public:
             }
             else
             {
-                perWordScores[i] = search_helpers::scoreQueryWordToWord (qHist2, queryWord, ws.getString (wordView));
+                const auto word = ws.getString (wordView);
+                perWordScores[i] = search_helpers::scoreQueryWordToWord (qHist2, queryWord, word);
             }
         }
     }
@@ -220,6 +221,13 @@ public:
         }
     }
 
+    std::string_view copy_string (std::string_view s) const
+    {
+        auto* sc_data = searchArena.allocate<char> (s.size());
+        std::copy (s.begin(), s.end(), sc_data);
+        return { sc_data, s.size() };
+    }
+
 public:
     SearchDatabase()
     {
@@ -252,8 +260,6 @@ public:
 
     void addEntry (Key key, const std::array<std::string_view, numFields>& fields)
     {
-        auto arenaFrame = searchArena.create_frame();
-
         // create entry
         Entry e;
         e.key = key;
@@ -262,14 +268,17 @@ public:
         // iterate fields
         for (const auto [fieldIndex, field] : enumerate (fields))
         {
-            auto words = search_helpers::splitString (field, searchArena);
+            auto arenaFrame = searchArena.create_frame();
+
+            auto fieldStringCopy = copy_string  (field);
+            auto words = search_helpers::splitString (fieldStringCopy, searchArena);
 
             // iterate words in this field
             for (const auto [wordIndexInField, word] : enumerate (words))
             {
                 // add the word ( de-dup happens here )
+                search_helpers::toLower (word);
                 int wordIndex = wordStorage.addWord (word);
-                search_helpers::toLower (wordStorage.getString (wordStorage.wordViewList[(size_t) wordIndex]));
                 entryWords.emplace_back (wordIndex, static_cast<int> (fieldIndex), static_cast<int> (wordIndexInField));
             }
         }
@@ -328,17 +337,9 @@ public:
 
         searchArena.clear(); // this will invalidate the previuosly returned results!
 
-        // std::vector<Result> resultsWithKey;
-        //
-        // // mirrors all entries
-        // _tempResults.resize (_entries.size());
-        // _tempResultsOrderPenalty.resize (_entries.size());
-
         // 0. prepare query (query-string -> query-words)
-        auto queryStringCopy = searchArena.allocate<char> (queryString.size());
-        std::copy (queryString.begin(), queryString.end(), queryStringCopy);
-        auto queryStringView = std::string_view { queryStringCopy, queryString.size() };
-        auto queryWords = search_helpers::splitString (queryStringView, searchArena);
+        auto queryStringCopy = copy_string (queryString);
+        auto queryWords = search_helpers::splitString (queryStringCopy, searchArena);
         for (auto queryWord : queryWords)
             search_helpers::toLower (queryWord);
 
