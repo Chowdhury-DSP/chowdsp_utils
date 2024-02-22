@@ -2,9 +2,10 @@
 
 namespace chowdsp::search_database
 {
-/** helper struct to store words in "flat" memory */
+/** Storage for a set of words in "flat" memory */
 struct WordStorage
 {
+    /** A "view" into a word in the flat buffer */
     struct WordView
     {
         uint32_t start = 0;
@@ -14,13 +15,18 @@ struct WordStorage
     std::vector<char> wordData {}; // all characters from a word, in order in memory
     std::vector<search_helpers::WordHist> wordHist {}; // a tiny histogram per word
     std::vector<WordView> wordViewList {}; // map to find index from word
-    std::unordered_map<std::string, size_t> wordMap;
+    std::unordered_map<std::string, size_t> wordMap {};
 
+    /**
+     * Gets a std::string_view from a WordView.
+     * This method does not perform any additional validation.
+     */
     [[nodiscard]] std::string_view getString (WordView wordView) const noexcept
     {
         return { wordData.data() + wordView.start, wordView.end - wordView.start };
     }
 
+    /** Clears the storage. */
     void clear()
     {
         wordData.clear();
@@ -29,16 +35,22 @@ struct WordStorage
         wordMap.clear();
     }
 
+    /** Reserves memory for a given number of words. */
     void reserve (size_t wordCount)
     {
-        wordData.reserve (wordCount * 8);
+        wordData.reserve (wordCount * 8); // assuming ~8 characters per word
         wordHist.reserve (wordCount);
         wordViewList.reserve (wordCount);
         wordMap.reserve (wordCount);
     }
 
+    /** Returns the number of words currently in storage. */
     [[nodiscard]] auto getWordCount() const noexcept { return wordViewList.size(); }
 
+    /**
+     * Adds a word to the storage, and returns the "index"
+     * at which the word can be found in the `wordViewList`.
+     */
     [[nodiscard]] int addWord (std::string_view word)
     {
         // if exist, return index

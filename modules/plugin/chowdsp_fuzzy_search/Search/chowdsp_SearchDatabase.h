@@ -5,13 +5,24 @@
 
 namespace chowdsp
 {
+/**
+ * A search database containing a series of tagged entries.
+ *
+ * The user can add entries to the database at any time using `addEntry()`.
+ * Once the database has been filled, the user can enter "search" mode by
+ * calling `prepareForSearch()`, and then call `search` as needed to retrieve search results.
+ *
+ * Note that `prepareForSearch()` must be called before calling `search()`,
+ * after new entries are added to the database.
+ *
+ * \tparam Key The "key" type used by the database.
+ * \tparam numFields The number of "tag" fields that each entry has.
+ */
 template <typename Key = std::string, size_t numFields = 1>
 class SearchDatabase
 {
 public:
-    // ------------------------------------------------------
-    // public struct, used for returning the results
-
+    /** The result type returned to the user. */
     struct Result
     {
         Key key;
@@ -82,11 +93,11 @@ private:
     struct Entry
     {
         Key key;
-        SmallVector<WordFromField, numFields * 5> words; // index into words from strings
+        SmallVector<WordFromField, numFields * 5> words {}; // index into words from strings
     };
 
     // =======================================================
-    search_database::WordStorage wordStorage;
+    search_database::WordStorage wordStorage {};
     std::vector<Entry> entries;
     std::array<float, numFields> fieldWeights;
     float threshold = 0.1f;
@@ -221,7 +232,7 @@ private:
         }
     }
 
-    std::string_view copy_string (std::string_view s) const
+    [[nodiscard]] std::string_view copy_string (std::string_view s) const
     {
         auto* sc_data = searchArena.allocate<char> (s.size());
         std::copy (s.begin(), s.end(), sc_data);
@@ -234,6 +245,7 @@ public:
         resetEntries();
     }
 
+    /** Clears any entries currently in the database. */
     void resetEntries (size_t entriesToReserve = 100, size_t wordsToReserve = 1000, size_t arenaSize = 1 << 14)
     {
         wordStorage.clear();
@@ -247,6 +259,7 @@ public:
         searchArena.reset (arenaSize);
     }
 
+    /** Prepares the database to process new search queries. */
     void prepareForSearch()
     {
         const auto numBytesNeededForSearch =
@@ -258,6 +271,7 @@ public:
         searchArena.reset (numBytesNeededForSearch);
     }
 
+    /** Adds a new entry to the database. */
     void addEntry (Key key, const std::array<std::string_view, numFields>& fields)
     {
         // create entry
@@ -312,25 +326,29 @@ public:
         entries.push_back (e);
     }
 
+    /** Returns the number of entries currently stored in the database. */
     auto countEntries() const
     {
         return entries.size();
     }
 
-    // each field can have a weight
+    /** Sets the "weights" given to each field. */
     void setWeights (const std::array<float, numFields>& newFieldWeights)
     {
         fieldWeights = newFieldWeights;
     }
 
-    // any search-result scoring below this will not be returned from the search
+    /** Any search-result scoring below the threshold will not be returned from the search. */
     void setThreshold (float newThreshold)
     {
         threshold = newThreshold;
     }
 
-    // returns a big list of results ( sorted and with a score )
-    nonstd::span<const Result> search (std::string_view queryString) const
+    /**
+     * Returns a list of search results (sorted and with a score).
+     * Note that the list is only valid until the next call to `search()`.
+     */
+    [[nodiscard]] nonstd::span<const Result> search (std::string_view queryString) const
     {
         if (queryString.size() > 100)
             return {}; // upper bound!
