@@ -90,14 +90,14 @@ TEMPLATE_TEST_CASE ("Buffer Math Test",
 
     SECTION ("RMS Test")
     {
-        auto&& sineBuffer = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 4800, (NumericType) 1);
+        auto&& sineBuffer = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 1024, (NumericType) 1);
         REQUIRE_MESSAGE (getRMSLevel (sineBuffer, 0) == SIMDApprox<T> ((T) (NumericType) 0.7071).margin ((NumericType) maxErr),
                          "RMS of a sine wave is incorrect!");
     }
 
     SECTION ("Copy Buffer Test")
     {
-        auto&& srcBuffer = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 4800, (NumericType) 1);
+        auto&& srcBuffer = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 1024, (NumericType) 1);
 
         BufferType destBuffer { srcBuffer.getNumChannels(), srcBuffer.getNumSamples() };
         copyBufferData (srcBuffer, destBuffer);
@@ -130,7 +130,7 @@ TEMPLATE_TEST_CASE ("Buffer Math Test",
 
     SECTION ("Add Buffer Test")
     {
-        auto&& srcBuffer = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 4800, (NumericType) 1);
+        auto&& srcBuffer = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 1024, (NumericType) 1);
 
         BufferType destBuffer { srcBuffer.getNumChannels(), srcBuffer.getNumSamples() };
         for (int i = 0; i < destBuffer.getNumSamples(); ++i)
@@ -169,7 +169,7 @@ TEMPLATE_TEST_CASE ("Buffer Math Test",
 
     SECTION ("Multiply Buffer Test")
     {
-        auto&& srcBuffer = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 4800, (NumericType) 1);
+        auto&& srcBuffer = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 1024, (NumericType) 1);
 
         BufferType destBuffer { srcBuffer.getNumChannels(), srcBuffer.getNumSamples() };
         for (int i = 0; i < destBuffer.getNumSamples(); ++i)
@@ -186,8 +186,8 @@ TEMPLATE_TEST_CASE ("Buffer Math Test",
 
     SECTION ("Apply Gain Test")
     {
-        auto&& sineBuffer1 = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 4800, (NumericType) 1);
-        auto&& sineBuffer2 = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 4800, (NumericType) 1);
+        auto&& sineBuffer1 = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 1024, (NumericType) 1);
+        auto&& sineBuffer2 = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 1024, (NumericType) 1);
 
         applyGain (sineBuffer1, (NumericType) 2);
 
@@ -203,8 +203,8 @@ TEMPLATE_TEST_CASE ("Buffer Math Test",
     {
         for (auto target : { (NumericType) 0, (NumericType) 1 })
         {
-            auto&& sineBuffer1 = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 4800, (NumericType) 1);
-            auto&& sineBuffer2 = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 4800, (NumericType) 1);
+            auto&& sineBuffer1 = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 1024, (NumericType) 1);
+            auto&& sineBuffer2 = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 1024, (NumericType) 1);
 
             juce::SmoothedValue<NumericType> sm1;
             sm1.setCurrentAndTargetValue ((NumericType) 0);
@@ -231,8 +231,8 @@ TEMPLATE_TEST_CASE ("Buffer Math Test",
     {
         for (auto target : { (NumericType) 0, (NumericType) -1 })
         {
-            auto&& sineBuffer1 = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 4800, (NumericType) 1);
-            auto&& sineBuffer2 = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 4800, (NumericType) 1);
+            auto&& sineBuffer1 = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 1024, (NumericType) 1);
+            auto&& sineBuffer2 = test_utils::makeSineWave<T> ((NumericType) 100, (NumericType) 1024, (NumericType) 1);
 
             chowdsp::SmoothedBufferValue<NumericType> sm1;
             sm1.prepare ((NumericType) 48000, sineBuffer1.getNumSamples());
