@@ -31,6 +31,7 @@ juce_add_modules(
     ${PROJECT_SOURCE_DIR}/modules/plugin/chowdsp_plugin_utils
     ${PROJECT_SOURCE_DIR}/modules/plugin/chowdsp_clap_extensions
     ${PROJECT_SOURCE_DIR}/modules/plugin/chowdsp_plugin_state
+    ${PROJECT_SOURCE_DIR}/modules/plugin/chowdsp_fuzzy_search
 
     ${PROJECT_SOURCE_DIR}/modules/gui/chowdsp_gui
     ${PROJECT_SOURCE_DIR}/modules/gui/chowdsp_foleys
