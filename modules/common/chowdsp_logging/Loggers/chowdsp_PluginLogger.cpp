@@ -11,8 +11,8 @@ PluginLogger::PluginLogger (const juce::String& logFileSubDir,
 }
 
 PluginLogger::PluginLogger (LogFileParams loggerParams, CrashLogHelpers::CrashLogAnalysisCallback&& callback)
-    : crashLogAnalysisCallback (callback),
-      params (std::move (loggerParams))
+    : params (std::move (loggerParams)),
+      crashLogAnalysisCallback (callback)
 {
     using namespace LogFileHelpers;
     using namespace CrashLogHelpers;

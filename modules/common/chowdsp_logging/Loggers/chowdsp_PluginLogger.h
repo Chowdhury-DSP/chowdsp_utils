@@ -15,15 +15,15 @@ public:
     PluginLogger (const juce::String& logFileSubDir,
                   const juce::String& logFileNameRoot,
                   CrashLogHelpers::CrashLogAnalysisCallback&& callback = &CrashLogHelpers::defaultCrashLogAnalyzer);
-    explicit PluginLogger (LogFileParams loggerParams, CrashLogHelpers::CrashLogAnalysisCallback&& callback = &CrashLogHelpers::defaultCrashLogAnalyzer);
+    explicit PluginLogger (LogFileParams loggerParams,
+                           CrashLogHelpers::CrashLogAnalysisCallback&& callback = &CrashLogHelpers::defaultCrashLogAnalyzer);
     ~PluginLogger();
 
     [[nodiscard]] const juce::File& getLogFile() const { return fileLogger->getLogFile(); }
 
-    const CrashLogHelpers::CrashLogAnalysisCallback crashLogAnalysisCallback;
-
 private:
     const LogFileParams params {};
+    const CrashLogHelpers::CrashLogAnalysisCallback crashLogAnalysisCallback;
 
     std::unique_ptr<juce::FileLogger> fileLogger {};
 

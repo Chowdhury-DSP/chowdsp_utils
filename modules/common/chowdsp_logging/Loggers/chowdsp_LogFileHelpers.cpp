@@ -70,13 +70,36 @@ namespace LogFileHelpers
             {
                 logger->internal_logger.flush();
             }
+            // LCOV_EXCL_START
             catch ([[maybe_unused]] const spdlog::spdlog_ex& ex)
             {
                 jassertfalse;
             }
+            // LCOV_EXCL_END
         }
 
         juce::Logger::setCurrentLogger (nullptr);
     }
+
+    static juce::File getSystemLogFileFolder()
+    {
+#if JUCE_MAC
+        return { "~/Library/Logs" };
+#else
+        return juce::File::getSpecialLocation (juce::File::userApplicationDataDirectory);
+#endif
+    }
+
 } // namespace LogFileHelpers
+
+juce::File LogFileParams::getLogFile (const LogFileParams& params)
+{
+    return LogFileHelpers::getSystemLogFileFolder()
+        .getChildFile (params.logFileSubDir)
+        .getChildFile (params.logFileNameRoot
+                       + juce::Time::getCurrentTime()
+                             .formatted ("%Y-%m-%d_%H-%M-%S"))
+        .withFileExtension (params.logFileExtension)
+        .getNonexistentSibling();
+}
 } // namespace chowdsp
