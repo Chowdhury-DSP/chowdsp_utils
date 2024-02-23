@@ -6,14 +6,14 @@ Logger::Logger (const juce::String& logFileSubDir,
                 const juce::String& logFileNameRoot,
                 CrashLogHelpers::CrashLogAnalysisCallback&& callback)
     : Logger (LogFileParams { logFileSubDir, logFileNameRoot },
-              std::forward<CrashLogHelpers::CrashLogAnalysisCallback> (callback))
+              std::move (callback))
 {
 }
 
 Logger::Logger (const LogFileParams& loggerParams,
                 CrashLogHelpers::CrashLogAnalysisCallback&& callback)
     : params (loggerParams),
-      crashLogAnalysisCallback (callback)
+      crashLogAnalysisCallback (std::move (callback))
 {
     using namespace LogFileHelpers;
     using namespace CrashLogHelpers;
