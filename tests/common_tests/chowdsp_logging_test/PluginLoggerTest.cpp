@@ -64,7 +64,6 @@ TEMPLATE_TEST_CASE ("Plugin Logger Test", "[common][logs]", chowdsp::PluginLogge
         logsDirectory.deleteRecursively();
     }
 
-#if ! JUCE_LINUX
     SECTION ("Crash Log Test")
     {
         juce::File logFile;
@@ -77,43 +76,36 @@ TEMPLATE_TEST_CASE ("Plugin Logger Test", "[common][logs]", chowdsp::PluginLogge
             JUCE_END_IGNORE_WARNINGS_GCC_LIKE
         }
 
-        auto logString = logFile.loadFileAsString();
-        REQUIRE_MESSAGE (logString.contains ("Interrupt signal received!"), "Interrupt signal string not found in log!");
-        REQUIRE_MESSAGE (logString.contains ("Stack Trace:"), "Stack trace string not found in log!");
-        REQUIRE_MESSAGE (logString.contains ("Plugin crashing!!!"), "Plugin crashing string not found in log!");
-        REQUIRE_MESSAGE (! logString.contains ("Exiting gracefully"), "Exit string string WAS found in the log file!");
+        const auto testLogFileHasCrash = [] (const juce::File& logFileWithCrash)
+        {
+            auto logString = logFileWithCrash.loadFileAsString();
+            REQUIRE_MESSAGE (logString.contains ("Interrupt signal received!"), "Interrupt signal string not found in log!");
+            REQUIRE_MESSAGE (logString.contains ("Stack Trace:"), "Stack trace string not found in log!");
+            REQUIRE_MESSAGE (logString.contains ("Plugin crashing!!!"), "Plugin crashing string not found in log!");
+            REQUIRE_MESSAGE (! logString.contains ("Exiting gracefully"), "Exit string string WAS found in the log file!");
+        };
+
+        testLogFileHasCrash (logFile);
+
+        int callbacksCount = 0;
+        const auto crashLogCallback = [&callbacksCount, testLogFileHasCrash] (const juce::File& crashLogFile)
+        {
+            callbacksCount++;
+            testLogFileHasCrash (crashLogFile);
+        };
 
         // the first logger we create after a crash should report the crash...
         {
-            auto prevNumTopLevelWindows = juce::TopLevelWindow::getNumTopLevelWindows();
-            Logger logger { logFileSubDir, logFileNameRoot };
-            juce::MessageManager::getInstance()->runDispatchLoopUntil (100);
-
-            auto newNumTopLevelWindows = juce::TopLevelWindow::getNumTopLevelWindows();
-            REQUIRE_MESSAGE (newNumTopLevelWindows == prevNumTopLevelWindows + 1, "AlertWindow not created!");
-
-            // Linux on CI doesn't like trying to open the log file!
-            for (int i = 0; i < newNumTopLevelWindows; ++i)
-            {
-                if (auto* alertWindow = dynamic_cast<juce::AlertWindow*> (juce::TopLevelWindow::getTopLevelWindow (i)))
-                {
-                    alertWindow->triggerButtonClick ("Show Log File");
-                    juce::MessageManager::getInstance()->runDispatchLoopUntil (100);
-                    break;
-                }
-            }
+            Logger logger { logFileSubDir, logFileNameRoot, crashLogCallback };
+            REQUIRE (callbacksCount == 1);
         }
 
         // the next logger should not!
         {
-            auto prevNumTopLevelWindows = juce::TopLevelWindow::getNumTopLevelWindows();
-            Logger logger { logFileSubDir, logFileNameRoot };
-
-            auto newNumTopLevelWindows = juce::TopLevelWindow::getNumTopLevelWindows();
-            REQUIRE_MESSAGE (newNumTopLevelWindows == prevNumTopLevelWindows, "AlertWindow was incorrectly created!");
+            Logger logger { logFileSubDir, logFileNameRoot, crashLogCallback };
+            REQUIRE (callbacksCount == 1);
         }
     }
-#endif
 
     // clean up after ourselves...
     auto logsDirectory = juce::FileLogger::getSystemLogFileFolder().getChildFile (logFileSubDir);

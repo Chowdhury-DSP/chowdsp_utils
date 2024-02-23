@@ -42,7 +42,10 @@ public:
     /** Returns the number of bytes currently being used */
     [[nodiscard]] size_t get_bytes_used() const noexcept { return bytes_used; }
 
-    /** Allocates a given number of bytes */
+    /**
+     * Allocates a given number of bytes.
+     * The returned memory will be un-initialized, so be sure to clear it manually if needed.
+     */
     void* allocate_bytes (size_t num_bytes, size_t alignment = 1) noexcept
     {
         auto* pointer = juce::snapPointerToAlignment (raw_data.data() + bytes_used, alignment);
@@ -55,7 +58,10 @@ public:
         return pointer;
     }
 
-    /** Allocates space for some number of objects of type T */
+    /**
+     * Allocates space for some number of objects of type T
+     * The returned memory will be un-initialized, so be sure to clear it manually if needed.
+     */
     template <typename T, typename IntType>
     T* allocate (IntType num_Ts, size_t alignment = alignof (T)) noexcept
     {

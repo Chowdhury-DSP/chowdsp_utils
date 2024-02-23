@@ -2,6 +2,7 @@
 
 namespace chowdsp::CrashLogHelpers
 {
+// LCOV_EXCL_START
 void defaultCrashLogAnalyzer (const juce::File& logFile)
 {
 #if JUCE_MODULE_AVAILABLE_juce_gui_basics
@@ -34,6 +35,7 @@ void defaultCrashLogAnalyzer (const juce::File& logFile)
     jassertfalse; // Implement your own!
 #endif
 }
+// LCOV_EXCL_END
 
 constexpr std::string_view crashString = "Plugin crashing!!!";
 constexpr std::string_view crashExaminedString = "The crash in this log file is now being examined!";
