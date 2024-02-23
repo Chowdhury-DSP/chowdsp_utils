@@ -12,13 +12,15 @@ namespace chowdsp
 class PluginLogger
 {
 public:
-    PluginLogger (const juce::String& logFileSubDir, const juce::String& logFileNameRoot);
-    explicit PluginLogger (LogFileParams loggerParams);
+    PluginLogger (const juce::String& logFileSubDir,
+                  const juce::String& logFileNameRoot,
+                  CrashLogHelpers::CrashLogAnalysisCallback&& callback = &CrashLogHelpers::defaultCrashLogAnalyzer);
+    explicit PluginLogger (LogFileParams loggerParams, CrashLogHelpers::CrashLogAnalysisCallback&& callback = &CrashLogHelpers::defaultCrashLogAnalyzer);
     ~PluginLogger();
 
     [[nodiscard]] const juce::File& getLogFile() const { return fileLogger->getLogFile(); }
 
-    CrashLogHelpers::CrashLogAnalysisCallback crashLogAnalysisCallback = &CrashLogHelpers::defaultCrashLogAnalyzer;
+    const CrashLogHelpers::CrashLogAnalysisCallback crashLogAnalysisCallback;
 
 private:
     const LogFileParams params {};

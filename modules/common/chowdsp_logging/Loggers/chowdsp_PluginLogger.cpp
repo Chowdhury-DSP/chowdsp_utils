@@ -2,13 +2,17 @@
 
 namespace chowdsp
 {
-PluginLogger::PluginLogger (const juce::String& logFileSubDir, const juce::String& logFileNameRoot)
-    : PluginLogger (LogFileParams { logFileSubDir, logFileNameRoot })
+PluginLogger::PluginLogger (const juce::String& logFileSubDir,
+                            const juce::String& logFileNameRoot,
+                            CrashLogHelpers::CrashLogAnalysisCallback&& callback)
+    : PluginLogger (LogFileParams { logFileSubDir, logFileNameRoot },
+                    std::forward<CrashLogHelpers::CrashLogAnalysisCallback> (callback))
 {
 }
 
-PluginLogger::PluginLogger (LogFileParams loggerParams)
-    : params (std::move (loggerParams))
+PluginLogger::PluginLogger (LogFileParams loggerParams, CrashLogHelpers::CrashLogAnalysisCallback&& callback)
+    : crashLogAnalysisCallback (callback),
+      params (std::move (loggerParams))
 {
     using namespace LogFileHelpers;
     using namespace CrashLogHelpers;
