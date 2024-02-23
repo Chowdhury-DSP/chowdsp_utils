@@ -180,16 +180,12 @@ private:
                 const float currScore = scoreEntry (e, bestIndex, perWordScores);
                 tempResults[i].score = currScore;
                 tempResults[i].entryIndex = static_cast<int> (i);
-                jassert (tempResults[i].entryIndex < 1000);
                 tempResultsOrderPenalty[i].bestIndex = bestIndex;
                 tempResultsOrderPenalty[i].misses = 0;
             }
         }
         else
         {
-            for (const auto& tempResult : tempResults)
-                jassert (tempResult.entryIndex < 100);
-
             const float kEpsilon = 0.001f;
 
             // multiply
@@ -222,9 +218,6 @@ private:
                 float newScore = prevScore * currScore;
                 tempResults[i].score = newScore;
             }
-
-            for (const auto& tempResult : tempResults)
-                jassert (tempResult.entryIndex < 100);
         }
     }
 
@@ -374,13 +367,7 @@ public:
 
             // 3. score each entry
             scoreEveryEntry (qi, perWordScores, tempResults, tempResultsOrderPenalty);
-
-            for (const auto& tempResult : tempResults)
-                jassert (tempResult.entryIndex < 100);
         }
-
-        for (const auto& tempResult : tempResults)
-            jassert (tempResult.entryIndex < 100);
 
         if (queryWords.size() > 1)
         {
@@ -405,14 +392,8 @@ public:
         for (size_t i = 1; i < queryWords.size(); ++i)
             thresholdCorrected *= threshold;
 
-        for (const auto& tempResult : tempResults)
-            jassert (tempResult.entryIndex < 100);
-
         // sort all that remain
         std::sort (tempResults.begin(), tempResults.end());
-
-        for (const auto& tempResult : tempResults)
-            jassert (tempResult.entryIndex < 100);
 
         // finally copy to the result vector
         auto resultsWithKey = nonstd::span { searchArena.allocate<Result> (tempResults.size()), tempResults.size() };
