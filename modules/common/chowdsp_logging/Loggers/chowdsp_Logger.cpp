@@ -2,21 +2,18 @@
 
 namespace chowdsp
 {
-Logger::Logger (const juce::String& logFileSubDir, const juce::String& logFileNameRoot)
-    : Logger (LogFileParams { logFileSubDir, logFileNameRoot })
+Logger::Logger (const juce::String& logFileSubDir,
+                const juce::String& logFileNameRoot,
+                CrashLogHelpers::CrashLogAnalysisCallback&& callback)
+    : Logger (LogFileParams { logFileSubDir, logFileNameRoot },
+              std::move (callback))
 {
 }
 
-static juce::File getSystemLogFileFolder()
-{
-#if JUCE_MAC
-    return juce::File ("~/Library/Logs");
-#else
-    return juce::File::getSpecialLocation (juce::File::userApplicationDataDirectory);
-#endif
-}
-
-Logger::Logger (const LogFileParams& loggerParams) : params (loggerParams)
+Logger::Logger (const LogFileParams& loggerParams,
+                CrashLogHelpers::CrashLogAnalysisCallback&& callback)
+    : params (loggerParams),
+      crashLogAnalysisCallback (std::move (callback))
 {
     using namespace LogFileHelpers;
     using namespace CrashLogHelpers;
@@ -25,13 +22,7 @@ Logger::Logger (const LogFileParams& loggerParams) : params (loggerParams)
     pruneOldLogFiles (pastLogFiles, params);
     checkLogFilesForCrashes (pastLogFiles, crashLogAnalysisCallback);
 
-    log_file = getSystemLogFileFolder()
-                   .getChildFile (params.logFileSubDir)
-                   .getChildFile (params.logFileNameRoot
-                                  + juce::Time::getCurrentTime()
-                                        .formatted ("%Y-%m-%d_%H-%M-%S"))
-                   .withFileExtension (params.logFileExtension)
-                   .getNonexistentSibling();
+    log_file = LogFileParams::getLogFile (params);
     log_file.create();
 
     file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt> (log_file.getFullPathName().toStdString(),

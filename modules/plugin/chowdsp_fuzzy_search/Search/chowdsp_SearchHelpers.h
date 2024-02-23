@@ -184,6 +184,7 @@ inline nonstd::span<std::string_view> splitString (std::string_view s, ArenaAllo
     if (stringSplitData == nullptr)
         return {};
     auto ss = nonstd::span { stringSplitData, s.size() };
+    std::fill (ss.begin(), ss.end(), std::string_view {});
     size_t ss_index = 0;
 
     size_t left = 0;

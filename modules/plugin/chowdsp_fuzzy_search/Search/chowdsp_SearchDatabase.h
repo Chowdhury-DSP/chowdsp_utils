@@ -72,17 +72,6 @@ private:
 
         TempResult() = default;
 
-        TempResult (float _score, int _entryIndex)
-        {
-            set (_score, _entryIndex);
-        }
-
-        void set (float newScore, int newEntryIndex)
-        {
-            score = newScore;
-            entryIndex = newEntryIndex;
-        }
-
         bool operator<(const TempResult& other) const
         {
             return score > other.score; // reversed to sort high score on top
@@ -184,13 +173,13 @@ private:
     {
         if (pass < 1)
         {
-            // set
             for (size_t i = 0; i < tempResults.size(); ++i)
             {
                 const Entry& e = entries[i];
                 int bestIndex = 0;
                 const float currScore = scoreEntry (e, bestIndex, perWordScores);
-                tempResults[i].set (currScore, (int) i); // also sets the index
+                tempResults[i].score = currScore;
+                tempResults[i].entryIndex = static_cast<int> (i);
                 tempResultsOrderPenalty[i].bestIndex = bestIndex;
                 tempResultsOrderPenalty[i].misses = 0;
             }
@@ -363,8 +352,14 @@ public:
 
         // 1. loop over each word in query
         auto perWordScores = nonstd::span { searchArena.allocate<float> (wordStorage.getWordCount()), wordStorage.getWordCount() };
+        std::fill (perWordScores.begin(), perWordScores.end(), 0.0f);
+
         auto tempResults = nonstd::span { searchArena.allocate<TempResult> (entries.size()), entries.size() };
+        std::fill (tempResults.begin(), tempResults.end(), TempResult {});
+
         auto tempResultsOrderPenalty = nonstd::span { searchArena.allocate<TempResultOrderPenalty> (entries.size()), entries.size() };
+        std::fill (tempResultsOrderPenalty.begin(), tempResultsOrderPenalty.end(), TempResultOrderPenalty {});
+
         for (const auto [qi, queryWord] : enumerate (queryWords))
         {
             // 2. score every word against this query-word

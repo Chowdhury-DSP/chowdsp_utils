@@ -24,7 +24,10 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include <chowdsp_data_structures/chowdsp_data_structures.h>
 
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wswitch-enum",
-                                     "-Wfloat-equal")
+                                     "-Wfloat-equal",
+                                     "-Wextra-semi",
+                                     "-Wc++20-compat",
+                                     "-Wlanguage-extension-token")
 
 #include "third_party/spdlog/include/spdlog/spdlog.h"
 #include "third_party/spdlog/include/spdlog/sinks/stdout_color_sinks.h"

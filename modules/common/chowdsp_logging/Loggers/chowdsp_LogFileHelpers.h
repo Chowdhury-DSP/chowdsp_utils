@@ -11,6 +11,8 @@ struct LogFileParams
     juce::String logFileNameRoot {};
     juce::String logFileExtension = ".log";
     size_t maxNumLogFiles = 50;
+
+    static juce::File getLogFile (const LogFileParams&);
 };
 
 #ifndef DOXYGEN
