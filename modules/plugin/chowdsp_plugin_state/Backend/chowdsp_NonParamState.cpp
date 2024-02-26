@@ -50,7 +50,7 @@ void NonParamState::deserialize (typename Serializer::DeserializedType deserial,
         for (int i = 0; i < numNamesAndVals; i += 2)
         {
             const auto name = Serializer::getChildElement (deserial, i).template get<std::string_view>();
-            const auto valueDeserial = Serializer::getChildElement (deserial, i + 1);
+            const auto& valueDeserial = Serializer::getChildElement (deserial, i + 1);
             for (auto& value : state.values)
             {
                 if (name == value->name)
@@ -67,10 +67,13 @@ void NonParamState::deserialize (typename Serializer::DeserializedType deserial,
     }
 
     // set all un-matched objects to their default values
-    for (auto& value : state.values)
+    if (! namesThatHaveBeenDeserialized.empty())
     {
-        if (std::find (namesThatHaveBeenDeserialized.begin(),namesThatHaveBeenDeserialized.end(), value->name) == namesThatHaveBeenDeserialized.end())
-            value->reset();
+        for (auto& value : state.values)
+        {
+            if (std::find (namesThatHaveBeenDeserialized.begin(),namesThatHaveBeenDeserialized.end(), value->name) == namesThatHaveBeenDeserialized.end())
+                value->reset();
+        }
     }
 }
 } // namespace chowdsp

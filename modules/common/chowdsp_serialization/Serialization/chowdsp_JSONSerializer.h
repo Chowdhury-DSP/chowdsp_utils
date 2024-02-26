@@ -73,12 +73,14 @@ public:
         parent.push_back (std::move (newChild));
     }
 
-    static auto getChildElement (const json& parent, int index)
+    inline static const json defaultJson {};
+
+    static const auto& getChildElement (const json& parent, int index)
     {
         if (! juce::isPositiveAndBelow (index, parent.size()))
         {
             jassertfalse;
-            return json {};
+            return defaultJson;
         }
 
         return parent[(size_t) index];

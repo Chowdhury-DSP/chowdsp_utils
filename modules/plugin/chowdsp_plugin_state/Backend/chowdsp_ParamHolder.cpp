@@ -160,7 +160,7 @@ void ParamHolder::deserialize (typename Serializer::DeserializedType deserial, P
         for (int i = 0; i < numParamIDsAndVals; i += 2)
         {
             const auto paramID = Serializer::getChildElement (deserial, i).template get<std::string_view>();
-            const auto paramDeserial = Serializer::getChildElement (deserial, i + 1);
+            const auto& paramDeserial = Serializer::getChildElement (deserial, i + 1);
 
             auto paramPtrIter = paramHolder.allParamsMap.find (std::string { paramID });
             if (paramPtrIter == paramHolder.allParamsMap.end())
@@ -191,15 +191,18 @@ void ParamHolder::deserialize (typename Serializer::DeserializedType deserial, P
     }
 
     // set all un-matched objects to their default values
-    paramHolder.doForAllParameters (
-        [&paramIDsThatHaveBeenDeserialized] (auto& param, size_t)
-        {
-            if (std::find (paramIDsThatHaveBeenDeserialized.begin(),
-                           paramIDsThatHaveBeenDeserialized.end(),
-                           std::string_view { param.paramID.toRawUTF8(), param.paramID.getNumBytesAsUTF8() })
-                == paramIDsThatHaveBeenDeserialized.end())
-                ParameterTypeHelpers::resetParameter (param);
-        });
+    if (! paramIDsThatHaveBeenDeserialized.empty())
+    {
+        paramHolder.doForAllParameters (
+            [&paramIDsThatHaveBeenDeserialized] (auto& param, size_t)
+            {
+                if (std::find (paramIDsThatHaveBeenDeserialized.begin(),
+                               paramIDsThatHaveBeenDeserialized.end(),
+                               std::string_view { param.paramID.toRawUTF8(), param.paramID.getNumBytesAsUTF8() })
+                    == paramIDsThatHaveBeenDeserialized.end())
+                    ParameterTypeHelpers::resetParameter (param);
+            });
+    }
 }
 
 inline void ParamHolder::applyVersionStreaming (const Version& version)
