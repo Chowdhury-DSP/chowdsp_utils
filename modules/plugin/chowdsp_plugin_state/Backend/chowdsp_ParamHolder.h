@@ -35,9 +35,8 @@ public:
         add (OptionalPointer<ParamType>& boolParam, OtherParams&... others);
 
     /** Adds parameters to the ParamHolder. */
-    template <typename ParamType, typename... OtherParams>
-    std::enable_if_t<std::is_base_of_v<ParamHolder, ParamType>, void>
-        add (ParamType& paramHolder, OtherParams&... others);
+    template <typename... OtherParams>
+    void add (ParamHolder& paramHolder, OtherParams&... others);
 
     /** Adds parameters to the ParamHolder. */
     template <typename ParamContainerType, typename... OtherParams>
@@ -99,6 +98,9 @@ private:
     std::vector<OptionalPointer<ChoiceParameter>> choiceParams;
     std::vector<OptionalPointer<BoolParameter>> boolParams;
     std::vector<ParamHolder*> otherParams;
+
+    using ParamPtrVariant = std::variant<FloatParameter*, ChoiceParameter*, BoolParameter*>;
+    std::unordered_map<std::string, ParamPtrVariant> allParamsMap {};
 
     juce::String name;
     bool isOwning;
