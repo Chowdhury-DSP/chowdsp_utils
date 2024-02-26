@@ -71,7 +71,7 @@ void NonParamState::deserialize (typename Serializer::DeserializedType deserial,
     {
         for (auto& value : state.values)
         {
-            if (std::find (namesThatHaveBeenDeserialized.begin(),namesThatHaveBeenDeserialized.end(), value->name) == namesThatHaveBeenDeserialized.end())
+            if (std::find (namesThatHaveBeenDeserialized.begin(), namesThatHaveBeenDeserialized.end(), value->name) == namesThatHaveBeenDeserialized.end())
                 value->reset();
         }
     }
