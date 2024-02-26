@@ -153,21 +153,20 @@ typename Serializer::SerializedType ParamHolder::serialize (const ParamHolder& p
 template <typename Serializer>
 void ParamHolder::deserialize (typename Serializer::DeserializedType deserial, ParamHolder& paramHolder)
 {
-    juce::StringArray paramIDsThatHaveBeenDeserialized {};
+    std::vector<std::string_view> paramIDsThatHaveBeenDeserialized {};
     if (const auto numParamIDsAndVals = Serializer::getNumChildElements (deserial); numParamIDsAndVals % 2 == 0)
     {
-        paramIDsThatHaveBeenDeserialized.ensureStorageAllocated (numParamIDsAndVals / 2);
+        paramIDsThatHaveBeenDeserialized.reserve (static_cast<size_t> (numParamIDsAndVals) / 2);
         for (int i = 0; i < numParamIDsAndVals; i += 2)
         {
-            juce::String paramID {};
-            Serialization::deserialize<Serializer> (Serializer::getChildElement (deserial, i), paramID);
+            const auto paramID = Serializer::getChildElement (deserial, i).template get<std::string_view>();
             const auto paramDeserial = Serializer::getChildElement (deserial, i + 1);
 
-            auto paramPtrIter = paramHolder.allParamsMap.find (paramID.toStdString());
+            auto paramPtrIter = paramHolder.allParamsMap.find (std::string { paramID });
             if (paramPtrIter == paramHolder.allParamsMap.end())
                 continue;
 
-            paramIDsThatHaveBeenDeserialized.add (paramID);
+            paramIDsThatHaveBeenDeserialized.push_back (paramID);
             [&paramDeserial] (const ParamPtrVariant& paramPtr)
             {
                 const auto deserializeParam = [] (auto* param, auto& pd)
@@ -183,7 +182,7 @@ void ParamHolder::deserialize (typename Serializer::DeserializedType deserial, P
                     deserializeParam (*boolParamPtr, paramDeserial);
                 else
                     jassertfalse; // bad variant access?
-            } (paramPtrIter->second);
+            }(paramPtrIter->second);
         }
     }
     else
@@ -195,7 +194,10 @@ void ParamHolder::deserialize (typename Serializer::DeserializedType deserial, P
     paramHolder.doForAllParameters (
         [&paramIDsThatHaveBeenDeserialized] (auto& param, size_t)
         {
-            if (! paramIDsThatHaveBeenDeserialized.contains (param.paramID))
+            if (std::find (paramIDsThatHaveBeenDeserialized.begin(),
+                           paramIDsThatHaveBeenDeserialized.end(),
+                           std::string_view { param.paramID.toRawUTF8(), param.paramID.getNumBytesAsUTF8() })
+                == paramIDsThatHaveBeenDeserialized.end())
                 ParameterTypeHelpers::resetParameter (param);
         });
 }
