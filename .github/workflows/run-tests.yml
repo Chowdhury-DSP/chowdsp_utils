@@ -38,25 +38,25 @@ jobs:
             build_type: "Release"
           - name: "Test"
             os: windows-2022
-            build_type: "Release"
             cmake_args: "-DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl -G\"Ninja Multi-Config\""
+            build_type: "Release"
           - name: "Coverage"
             os: ubuntu-22.04
             cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
-            run_coverage: true
             build_type: "Debug"
+            run_coverage: true
           - name: "Coverage"
             os: macos-13
             cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
-            run_coverage: true # (this is breaking for some reason @TODO)
             build_type: "Debug"
+            run_coverage: true # (this is breaking for some reason @TODO)
           - name: "Live GUI Test"
             os: ubuntu-22.04
             tests: "live_gui_test"
             cmake_args: "-DCODE_COVERAGE=ON -DCHOWDSP_BUILD_LIVE_GUI_TEST=ON -DCMAKE_BUILD_TYPE=Debug"
+            build_type: "Debug"
             live_gui: true
             run_coverage: true
-            build_type: "Debug"
         exclude:
           # so we don't break GitHub Actions concurrency limit
           - name: "Test"
