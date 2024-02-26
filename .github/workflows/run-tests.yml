@@ -39,18 +39,19 @@ jobs:
           - name: "Test"
             os: windows-2022
             build_type: "Release"
+            cmake_args: -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl -G"Ninja Multi-Config"
           - name: "Coverage"
-            os: ubuntu-latest
+            os: ubuntu-22.04
             cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
             run_coverage: true
             build_type: "Debug"
           - name: "Coverage"
-            os: macos-latest
+            os: macos-13
             cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
 #            run_coverage: true (this is breaking for some reason @TODO)
             build_type: "Debug"
           - name: "Live GUI Test"
-            os: ubuntu-latest
+            os: ubuntu-22.04
             tests: "live_gui_test"
             cmake_args: "-DCODE_COVERAGE=ON -DCHOWDSP_BUILD_LIVE_GUI_TEST=ON -DCMAKE_BUILD_TYPE=Debug"
             live_gui: true
@@ -79,6 +80,18 @@ jobs:
         run: |
           export HOMEBREW_NO_AUTO_UPDATE=1
           brew install lcov
+
+      - name: Install Ninja
+        if: runner.os == 'Windows'
+        uses: seanmiddleditch/gha-setup-ninja@master
+
+      - name: Add msbuild to PATH
+        if: runner.os == 'Windows'
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup MSVC devcmd
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
 
       - name: Get latest CMake
         uses: lukka/get-cmake@latest
