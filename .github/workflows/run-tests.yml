@@ -26,6 +26,11 @@ jobs:
                 "chowdsp_parameters_test chowdsp_plugin_state_test chowdsp_plugin_base_test chowdsp_plugin_utils_test chowdsp_presets_v2_test chowdsp_version_test chowdsp_fuzzy_search_test", # plugin_tests_lib
                 "chowdsp_gui_test chowdsp_visualizers_test", # gui_tests_lib
               ]
+        name: [
+                "Test",
+                "Coverage",
+              ]
+        os: [ubuntu-22.04, windows-2022, macos-13]
         include:
           - name: "Test"
             os: ubuntu-22.04
@@ -52,6 +57,12 @@ jobs:
             build_type: "Debug"
             live_gui: true
             run_coverage: true
+        exclude:
+          # so we don't break GitHub Actions concurrency limit
+          - name: "Test"
+            os: macos-13
+          - name: "Coverage"
+            os: windows-2022
 
     steps:
       - name: Vars Chec
