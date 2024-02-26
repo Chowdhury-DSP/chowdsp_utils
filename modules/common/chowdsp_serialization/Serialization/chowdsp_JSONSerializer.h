@@ -73,14 +73,15 @@ public:
         parent.push_back (std::move (newChild));
     }
 
-    inline static const json defaultJson {};
+    /** If no child element is available, this "empty" JSON object will be returned by default. */
+    inline static const json defaultJsonDeserial {};
 
     static const auto& getChildElement (const json& parent, int index)
     {
         if (! juce::isPositiveAndBelow (index, parent.size()))
         {
             jassertfalse;
-            return defaultJson;
+            return defaultJsonDeserial;
         }
 
         return parent[(size_t) index];
