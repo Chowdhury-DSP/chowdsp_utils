@@ -25,6 +25,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include <chowdsp_listeners/chowdsp_listeners.h>
 #include <chowdsp_version/chowdsp_version.h>
 #include <chowdsp_parameters/chowdsp_parameters.h>
+#include <variant>
 
 JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324) // struct was padded warning
 
