@@ -16,7 +16,7 @@ env:
 jobs:
   clang_tidy:
     name: "Run Code Quality Check: clang-tidy"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Install Linux Deps
@@ -60,7 +60,7 @@ jobs:
 
   sonar_scan:
     name: "Run Code Quality Check: sonar-scan"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     env:
       BUILD_WRAPPER_OUT_DIR: build_wrapper_output_directory # Directory where build-wrapper output will be placed
 
@@ -110,7 +110,7 @@ jobs:
 
   code_ql:
     name: "Run Code Quality Check: CodeQL"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     if: ${{ github.event_name == 'push' }}
 
     steps:
