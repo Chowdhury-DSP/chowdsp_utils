@@ -65,100 +65,101 @@ jobs:
             os: windows-2022
 
     steps:
-      - name: Vars Chec
+      - name: Vars Check
         run: |
           echo OS: ${{ matrix.os }}
           echo cmake_args: ${{ matrix.cmake_args }}
           echo build_type: ${{ matrix.build_type }}
           echo run_coverage: ${{ matrix.run_coverage }}
+          echo tests: ${{ matrix.tests }}
 
-      # - name: Install Linux Deps
-      #   if: runner.os == 'Linux'
-      #   run: |
-      #     sudo apt-get update
-      #     sudo apt install libasound2-dev libcurl4-openssl-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev libsamplerate-dev
+      - name: Install Linux Deps
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt install libasound2-dev libcurl4-openssl-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev libsamplerate-dev
 
-      # - name: Install lcov (Linux)
-      #   if: matrix.run_coverage && runner.os == 'Linux'
-      #   run: sudo apt install lcov
+      - name: Install lcov (Linux)
+        if: matrix.run_coverage && runner.os == 'Linux'
+        run: sudo apt install lcov
 
-      # - name: Install lcov (Mac)
-      #   if: matrix.run_coverage && runner.os == 'MacOS'
-      #   run: |
-      #     export HOMEBREW_NO_AUTO_UPDATE=1
-      #     brew install lcov
+      - name: Install lcov (Mac)
+        if: matrix.run_coverage && runner.os == 'MacOS'
+        run: |
+          export HOMEBREW_NO_AUTO_UPDATE=1
+          brew install lcov
 
-      # - name: Install Ninja
-      #   if: runner.os == 'Windows'
-      #   uses: seanmiddleditch/gha-setup-ninja@master
+      - name: Install Ninja
+        if: runner.os == 'Windows'
+        uses: seanmiddleditch/gha-setup-ninja@master
 
-      # - name: Add msbuild to PATH
-      #   if: runner.os == 'Windows'
-      #   uses: microsoft/setup-msbuild@v2
+      - name: Add msbuild to PATH
+        if: runner.os == 'Windows'
+        uses: microsoft/setup-msbuild@v2
 
-      # - name: Setup MSVC devcmd
-      #   if: runner.os == 'Windows'
-      #   uses: ilammy/msvc-dev-cmd@v1
+      - name: Setup MSVC devcmd
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
 
-      # - name: Get latest CMake
-      #   uses: lukka/get-cmake@latest
+      - name: Get latest CMake
+        uses: lukka/get-cmake@latest
 
-      # - name: Checkout code
-      #   uses: actions/checkout@v2
-      #   with:
-      #     path: ${{env.WORK_DIR}}
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          path: ${{env.WORK_DIR}}
 
-      # - name: Set up environment
-      #   working-directory: ${{github.workspace}}
-      #   run: |
-      #     git clone --depth 1 --branch 7.0.6 https://github.com/juce-framework/JUCE.git
-      #     cd JUCE_modules
-      #     git clone --single-branch --branch main --recursive https://github.com/free-audio/clap-juce-extensions.git
+      - name: Set up environment
+        working-directory: ${{github.workspace}}
+        run: |
+          git clone --depth 1 --branch 7.0.6 https://github.com/juce-framework/JUCE.git
+          cd JUCE_modules
+          git clone --single-branch --branch main --recursive https://github.com/free-audio/clap-juce-extensions.git
 
-      # - name: Configure
-      #   working-directory: ${{env.WORK_DIR}}
-      #   shell: bash
-      #   run: cmake -Bbuild -DCHOWDSP_ENABLE_TESTING=ON ${{ matrix.cmake_args }}
+      - name: Configure
+        working-directory: ${{env.WORK_DIR}}
+        shell: bash
+        run: cmake -Bbuild -DCHOWDSP_ENABLE_TESTING=ON ${{ matrix.cmake_args }}
 
-      # - name: Build
-      #   working-directory: ${{env.WORK_DIR}}/build
-      #   shell: bash
-      #   run: cmake --build . --config ${{ matrix.build_type }} --parallel 4 --target ${{ matrix.tests }}
+      - name: Build
+        working-directory: ${{env.WORK_DIR}}/build
+        shell: bash
+        run: cmake --build . --config ${{ matrix.build_type }} --parallel 4 --target ${{ matrix.tests }}
 
-      # - name: "Run Tests: ${{ matrix.tests }}"
-      #   if: (! matrix.live_gui)
-      #   working-directory: ${{env.WORK_DIR}}
-      #   shell: bash
-      #   env:
-      #     TEST_TARGETS: ${{ matrix.tests }}
-      #     BUILD_TYPE: ${{ matrix.build_type }}
-      #   run: |
-      #     ctest --test-dir build -C $BUILD_TYPE -R ${TEST_TARGETS// /|} --show-only
-      #     ctest --test-dir build -C $BUILD_TYPE -R ${TEST_TARGETS// /|} -j 4 --no-tests=error --output-on-failure
+      - name: "Run Tests: ${{ matrix.tests }}"
+        if: (! matrix.live_gui)
+        working-directory: ${{env.WORK_DIR}}
+        shell: bash
+        env:
+          TEST_TARGETS: ${{ matrix.tests }}
+          BUILD_TYPE: ${{ matrix.build_type }}
+        run: |
+          ctest --test-dir build -C $BUILD_TYPE -R ${TEST_TARGETS// /|} --show-only
+          ctest --test-dir build -C $BUILD_TYPE -R ${TEST_TARGETS// /|} -j 4 --no-tests=error --output-on-failure
 
-      # - name: "Run Live GUI Test"
-      #   if: matrix.live_gui
-      #   uses: GabrielBB/xvfb-action@v1
-      #   with:
-      #     run: ./live_gui_test
-      #     working-directory: ${{env.WORK_DIR}}/build/test-binary
+      - name: "Run Live GUI Test"
+        if: matrix.live_gui
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          run: ./live_gui_test
+          working-directory: ${{env.WORK_DIR}}/build/test-binary
 
-      # - name: Collect Coverage Data
-      #   if: matrix.run_coverage
-      #   working-directory: ${{env.WORK_DIR}}
-      #   shell: bash
-      #   run: |
-      #     lcov --directory . --capture --output-file coverage.info
-      #     lcov --remove coverage.info '/usr/*' "${HOME}"'/.cache/*' '/Applications/Xcode*' '*JUCE/modules*' '*foleys_*' '*chowdsp_utils/tests*' '*third_party*' '*chowdsp_foleys*' '*chowdsp_core/JUCEHelpers*' --output-file coverage.info
+      - name: Collect Coverage Data
+        if: matrix.run_coverage
+        working-directory: ${{env.WORK_DIR}}
+        shell: bash
+        run: |
+          lcov --directory . --capture --output-file coverage.info
+          lcov --remove coverage.info '/usr/*' "${HOME}"'/.cache/*' '/Applications/Xcode*' '*JUCE/modules*' '*foleys_*' '*chowdsp_utils/tests*' '*third_party*' '*chowdsp_foleys*' '*chowdsp_core/JUCEHelpers*' --output-file coverage.info
 
-      # - name: Report Coverage Data
-      #   if: matrix.run_coverage
-      #   working-directory: ${{env.WORK_DIR}}
-      #   shell: bash
-      #   run: lcov --list coverage.info
+      - name: Report Coverage Data
+        if: matrix.run_coverage
+        working-directory: ${{env.WORK_DIR}}
+        shell: bash
+        run: lcov --list coverage.info
 
-      # - name: Upload Coverage Data
-      #   if: matrix.run_coverage
-      #   working-directory: ${{env.WORK_DIR}}
-      #   shell: bash
-      #   run: bash <(curl -s https://codecov.io/bash) -f coverage.info || echo "Codecov did not collect coverage reports"
+      - name: Upload Coverage Data
+        if: matrix.run_coverage
+        working-directory: ${{env.WORK_DIR}}
+        shell: bash
+        run: bash <(curl -s https://codecov.io/bash) -f coverage.info || echo "Codecov did not collect coverage reports"
