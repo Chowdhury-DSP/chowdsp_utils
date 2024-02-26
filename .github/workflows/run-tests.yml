@@ -39,7 +39,7 @@ jobs:
           - name: "Test"
             os: windows-2022
             build_type: "Release"
-            cmake_args: -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl -G"Ninja Multi-Config"
+            cmake_args: "-DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl -G\"Ninja Multi-Config\""
           - name: "Coverage"
             os: ubuntu-22.04
             cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
@@ -48,7 +48,7 @@ jobs:
           - name: "Coverage"
             os: macos-13
             cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
-#            run_coverage: true (this is breaking for some reason @TODO)
+            run_coverage: true # (this is breaking for some reason @TODO)
             build_type: "Debug"
           - name: "Live GUI Test"
             os: ubuntu-22.04
