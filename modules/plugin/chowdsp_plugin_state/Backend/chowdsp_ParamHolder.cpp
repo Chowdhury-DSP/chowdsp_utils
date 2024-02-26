@@ -11,7 +11,8 @@ template <typename ParamType, typename... OtherParams>
 std::enable_if_t<std::is_base_of_v<FloatParameter, ParamType>, void>
     ParamHolder::add (OptionalPointer<ParamType>& floatParam, OtherParams&... others)
 {
-    floatParams.emplace_back (isOwning ? floatParam.release() : floatParam.get(), isOwning);
+    auto& param = floatParams.emplace_back (isOwning ? floatParam.release() : floatParam.get(), isOwning);
+    allParamsMap.insert ({ param->paramID.toStdString(), param.get() });
     add (others...);
 }
 
@@ -19,7 +20,8 @@ template <typename ParamType, typename... OtherParams>
 std::enable_if_t<std::is_base_of_v<ChoiceParameter, ParamType>, void>
     ParamHolder::add (OptionalPointer<ParamType>& choiceParam, OtherParams&... others)
 {
-    choiceParams.emplace_back (isOwning ? choiceParam.release() : choiceParam.get(), isOwning);
+    auto& param = choiceParams.emplace_back (isOwning ? choiceParam.release() : choiceParam.get(), isOwning);
+    allParamsMap.insert ({ param->paramID.toStdString(), param.get() });
     add (others...);
 }
 
@@ -27,15 +29,17 @@ template <typename ParamType, typename... OtherParams>
 std::enable_if_t<std::is_base_of_v<BoolParameter, ParamType>, void>
     ParamHolder::add (OptionalPointer<ParamType>& boolParam, OtherParams&... others)
 {
-    boolParams.emplace_back (isOwning ? boolParam.release() : boolParam.get(), isOwning);
+    auto& param = boolParams.emplace_back (isOwning ? boolParam.release() : boolParam.get(), isOwning);
+    allParamsMap.insert ({ param->paramID.toStdString(), param.get() });
     add (others...);
 }
 
-template <typename ParamType, typename... OtherParams>
-std::enable_if_t<std::is_base_of_v<ParamHolder, ParamType>, void>
-    ParamHolder::add (ParamType& paramHolder, OtherParams&... others)
+template <typename... OtherParams>
+void ParamHolder::add (ParamHolder& paramHolder, OtherParams&... others)
 {
     otherParams.push_back (&paramHolder);
+    allParamsMap.merge (paramHolder.allParamsMap);
+    jassert (paramHolder.allParamsMap.empty()); // assuming no duplicate parameter IDs, all the parameters should be moved in the merge!
     add (others...);
 }
 
@@ -152,22 +156,34 @@ void ParamHolder::deserialize (typename Serializer::DeserializedType deserial, P
     juce::StringArray paramIDsThatHaveBeenDeserialized {};
     if (const auto numParamIDsAndVals = Serializer::getNumChildElements (deserial); numParamIDsAndVals % 2 == 0)
     {
+        paramIDsThatHaveBeenDeserialized.ensureStorageAllocated (numParamIDsAndVals / 2);
         for (int i = 0; i < numParamIDsAndVals; i += 2)
         {
             juce::String paramID {};
             Serialization::deserialize<Serializer> (Serializer::getChildElement (deserial, i), paramID);
             const auto paramDeserial = Serializer::getChildElement (deserial, i + 1);
-            paramHolder.doForAllParameters (
-                [paramDeserial,
-                 &paramID = std::as_const (paramID),
-                 &paramIDsThatHaveBeenDeserialized] (auto& param, size_t)
+
+            auto paramPtrIter = paramHolder.allParamsMap.find (paramID.toStdString());
+            if (paramPtrIter == paramHolder.allParamsMap.end())
+                continue;
+
+            paramIDsThatHaveBeenDeserialized.add (paramID);
+            [&paramDeserial] (const ParamPtrVariant& paramPtr)
+            {
+                const auto deserializeParam = [] (auto* param, auto& pd)
                 {
-                    if (param.paramID == paramID)
-                    {
-                        ParameterTypeHelpers::deserializeParameter<Serializer> (paramDeserial, param);
-                        paramIDsThatHaveBeenDeserialized.add (paramID);
-                    }
-                });
+                    ParameterTypeHelpers::deserializeParameter<Serializer> (pd, *param);
+                };
+
+                if (auto* floatParamPtr = std::get_if<FloatParameter*> (&paramPtr))
+                    deserializeParam (*floatParamPtr, paramDeserial);
+                else if (auto* choiceParamPtr = std::get_if<ChoiceParameter*> (&paramPtr))
+                    deserializeParam (*choiceParamPtr, paramDeserial);
+                else if (auto* boolParamPtr = std::get_if<BoolParameter*> (&paramPtr))
+                    deserializeParam (*boolParamPtr, paramDeserial);
+                else
+                    jassertfalse; // bad variant access?
+            } (paramPtrIter->second);
         }
     }
     else
