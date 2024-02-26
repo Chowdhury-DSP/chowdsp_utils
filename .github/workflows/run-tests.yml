@@ -116,10 +116,7 @@ jobs:
       - name: Build
         working-directory: ${{env.WORK_DIR}}/build
         shell: bash
-        env:
-          TEST_TARGETS: ${{ matrix.tests }}
-          BUILD_TYPE: ${{ matrix.build_type }}
-        run: cmake --build . --config $BUILD_TYPE --parallel 4 --target $TEST_TARGETS
+        run: cmake --build . --config ${{ matrix.build_type }} --parallel 4 --target ${{ matrix.tests }}
 
       - name: "Run Tests: ${{ matrix.tests }}"
         if: (! matrix.live_gui)
