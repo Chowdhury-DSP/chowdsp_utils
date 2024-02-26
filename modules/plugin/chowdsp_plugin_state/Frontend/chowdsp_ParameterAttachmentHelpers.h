@@ -28,10 +28,12 @@ namespace ParameterAttachmentHelpers
         explicit ParameterChangeAction (ParamType& parameter,
                                         ValueType oldVal,
                                         ValueType newVal,
+                                        juce::AudioProcessor* processor = nullptr,
                                         bool skipFirstTime = true)
             : param (parameter),
               oldValue (oldVal),
               newValue (newVal),
+              proc (processor),
               firstTime (skipFirstTime)
         {
         }
@@ -59,14 +61,19 @@ namespace ParameterAttachmentHelpers
     private:
         void setParameterValue (ValueType val)
         {
-            param.beginChangeGesture();
+            if (proc != nullptr)
+                param.beginChangeGesture();
+
             ParameterTypeHelpers::setValue (val, param);
-            param.endChangeGesture();
+
+            if (proc != nullptr)
+                param.endChangeGesture();
         }
 
         ParamType& param;
         const ValueType oldValue;
         const ValueType newValue;
+        juce::AudioProcessor* proc = nullptr;
         bool firstTime = true;
     };
 } // namespace ParameterAttachmentHelpers

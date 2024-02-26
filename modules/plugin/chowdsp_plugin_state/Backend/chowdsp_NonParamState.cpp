@@ -43,20 +43,20 @@ typename Serializer::SerializedType NonParamState::serialize (const NonParamStat
 template <typename Serializer>
 void NonParamState::deserialize (typename Serializer::DeserializedType deserial, const NonParamState& state)
 {
-    juce::StringArray namesThatHaveBeenDeserialized {};
+    std::vector<std::string_view> namesThatHaveBeenDeserialized {};
     if (const auto numNamesAndVals = Serializer::getNumChildElements (deserial); numNamesAndVals % 2 == 0)
     {
+        namesThatHaveBeenDeserialized.reserve (static_cast<size_t> (numNamesAndVals) / 2);
         for (int i = 0; i < numNamesAndVals; i += 2)
         {
-            juce::String name {};
-            Serialization::deserialize<Serializer> (Serializer::getChildElement (deserial, i), name);
-            const auto valueDeserial = Serializer::getChildElement (deserial, i + 1);
+            const auto name = Serializer::getChildElement (deserial, i).template get<std::string_view>();
+            const auto& valueDeserial = Serializer::getChildElement (deserial, i + 1);
             for (auto& value : state.values)
             {
-                if (name == toString (value->name))
+                if (name == value->name)
                 {
                     value->deserialize (valueDeserial);
-                    namesThatHaveBeenDeserialized.add (name);
+                    namesThatHaveBeenDeserialized.push_back (name);
                 }
             }
         }
@@ -67,10 +67,13 @@ void NonParamState::deserialize (typename Serializer::DeserializedType deserial,
     }
 
     // set all un-matched objects to their default values
-    for (auto& value : state.values)
+    if (! namesThatHaveBeenDeserialized.empty())
     {
-        if (! namesThatHaveBeenDeserialized.contains (toString (value->name)))
-            value->reset();
+        for (auto& value : state.values)
+        {
+            if (std::find (namesThatHaveBeenDeserialized.begin(), namesThatHaveBeenDeserialized.end(), value->name) == namesThatHaveBeenDeserialized.end())
+                value->reset();
+        }
     }
 }
 } // namespace chowdsp

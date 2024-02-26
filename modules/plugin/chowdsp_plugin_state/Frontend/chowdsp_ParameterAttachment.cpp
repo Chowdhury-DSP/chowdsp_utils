@@ -53,7 +53,8 @@ void ParameterAttachment<Param, Callback>::setValueAsCompleteGesture (ParamEleme
                                              new ParameterAttachmentHelpers::ParameterChangeAction<Param> (
                                                  *param,
                                                  ParameterTypeHelpers::getValue (*param),
-                                                 val));
+                                                 val,
+                                                 pluginState == nullptr ? nullptr : pluginState->processor));
                                      }
 
                                      beginGesture();
