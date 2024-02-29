@@ -17,6 +17,7 @@ TEST_CASE ("Gain Computer Test", "[dsp][compressor]")
     chowdsp::SmoothedBufferValue<float, juce::ValueSmoothingTypes::Multiplicative> threshSmooth;
     chowdsp::SmoothedBufferValue<float, juce::ValueSmoothingTypes::Multiplicative> ratioSmooth;
     //prepare and process thresh smooth
+    threshSmooth.mappingFunction = [] (float x) { return juce::Decibels::decibelsToGain (x); };
     threshSmooth.prepare(fs, blockSize);
     threshSmooth.setRampLength(rampLength);
     threshSmooth.reset(-12.0f);

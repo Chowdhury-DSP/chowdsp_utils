@@ -67,7 +67,7 @@ TEMPLATE_PRODUCT_TEST_CASE ("Smoothed Buffer Value Test", "[dsp][data-structures
         testSmooth (refSmooth2, compSmooth, (FloatType) val4, 5);
     }
 
-    SECTION ("Arena Allocator Test")
+    SECTION ("Arena Allocator Interface Test")
     {
         chowdsp::ArenaAllocator<> arena {maxBlockSize * sizeof(FloatType)};
 
