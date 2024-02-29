@@ -3,9 +3,9 @@ project(chowdsp_utils VERSION 2.2.0)
 set(CMAKE_CXX_STANDARD 17)
 include(CTest)
 
-option(CHOWDSP_ENABLE_TESTING "Enable testing for chowdsp modules" OFF)
-option(CHOWDSP_ENABLE_BENCHMARKS "Enable benchmarks for chowdsp modules" OFF)
-option(CHOWDSP_ENABLE_EXAMPLES "Enable examples for chowdsp modules" OFF)
+option(CHOWDSP_ENABLE_TESTING "Enable testing for chowdsp modules" ON)
+option(CHOWDSP_ENABLE_BENCHMARKS "Enable benchmarks for chowdsp modules" ON)
+option(CHOWDSP_ENABLE_EXAMPLES "Enable examples for chowdsp modules" ON)
 
 if(NOT (CHOWDSP_ENABLE_TESTING OR CHOWDSP_ENABLE_BENCHMARKS OR CHOWDSP_ENABLE_EXAMPLES))
     # Add CMake utils
