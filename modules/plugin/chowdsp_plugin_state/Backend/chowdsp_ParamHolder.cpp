@@ -60,6 +60,15 @@ std::enable_if_t<TypeTraits::IsIterable<ParamContainerType>, void>
     return numParams;
 }
 
+inline void ParamHolder::clear()
+{
+    allParamsMap.clear();
+    floatParams.clear();
+    choiceParams.clear();
+    boolParams.clear();
+    otherParams.clear();
+}
+
 template <typename ParamContainersCallable, typename ParamHolderCallable>
 void ParamHolder::doForAllParameterContainers (ParamContainersCallable&& paramContainersCallable, ParamHolderCallable&& paramHolderCallable)
 {

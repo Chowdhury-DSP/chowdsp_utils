@@ -46,6 +46,9 @@ public:
     /** Counts all the parameters held internally. */
     [[nodiscard]] int count() const noexcept;
 
+    /** Clears any parameters currently in the ParamHolder. */
+    void clear();
+
     /** Connects all the parameters to an AudioProcessor */
     void connectParametersToProcessor (juce::AudioProcessor& processor);
 
