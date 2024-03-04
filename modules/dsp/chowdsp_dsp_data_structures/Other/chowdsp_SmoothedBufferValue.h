@@ -78,14 +78,28 @@ public:
      * Please don't call this function if the parameter handle hasn't been set!
      */
     void process (int numSamples);
-    void process (int numSamples, ArenaAllocator<>& alloc);
+
+    template <typename Arena>
+    void process (int numSamples, ArenaAllocator<Arena>& alloc)
+    {
+        bufferData = alloc.template allocate<FloatType> (numSamples, bufferAlignment);
+        jassert (bufferData != nullptr); // arena allocator is out of memory!
+        process (numSamples);
+    }
 
     /**
      * Process smoothing for the input value.
      * If smoothing an audio parameter, it is recommended to use a parameter handle instead!
      */
     void process (FloatType value, int numSamples);
-    void process (FloatType value, int numSamples, ArenaAllocator<>& alloc);
+
+    template <typename Arena>
+    void process (FloatType value, int numSamples, ArenaAllocator<Arena>& alloc)
+    {
+        bufferData = alloc.template allocate<FloatType> (numSamples, bufferAlignment);
+        jassert (bufferData != nullptr); // arena allocator is out of memory!
+        process (value, numSamples);
+    }
 
     /** Returns a pointer to the current smoothed buffer. */
     [[nodiscard]] const FloatType* getSmoothedBuffer() const { return bufferData; }
@@ -116,6 +130,12 @@ private:
 
     double sampleRate = 48000.0;
     double rampLengthInSeconds = 0.05;
+
+#if ! CHOWDSP_NO_XSIMD
+    static constexpr auto bufferAlignment = xsimd::default_arch::alignment();
+#else
+    static constexpr size_t bufferAlignment = 16;
+#endif
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SmoothedBufferValue)
 };
