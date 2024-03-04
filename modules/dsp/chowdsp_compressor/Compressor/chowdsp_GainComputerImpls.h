@@ -72,6 +72,9 @@ struct FeedForwardCompGainComputer
                 {
                     const auto curThresh = threshSmoothData[n];
                     const auto curRatio = ratioSmoothData[n];
+//                    //accounts for the case where isSmoothing() is false for either threshSmooth or ratioSmooth
+//                    const auto curThresh = params.threshSmooth.isSmoothing() ? params.threshSmooth.getSmoothedBuffer()[n] : params.threshSmooth.getCurrentValue();
+//                    const auto curRatio = params.ratioSmooth.isSmoothing() ? params.ratioSmooth.getSmoothedBuffer()[n] : params.ratioSmooth.getCurrentValue();
                     sample *= std::pow ((T) params.makeupGainTarget / curThresh, (T) 1 - ((T) 1 / curRatio));
                 }
             }

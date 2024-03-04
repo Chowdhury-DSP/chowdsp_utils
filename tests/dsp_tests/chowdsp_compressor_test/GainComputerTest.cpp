@@ -1,5 +1,6 @@
 #include <CatchUtils.h>
 #include <iostream>
+#include <iomanip>
 #include <chowdsp_compressor/chowdsp_compressor.h>
 
 namespace chow_comp = chowdsp::compressor;
@@ -13,35 +14,59 @@ TEST_CASE ("Gain Computer Test", "[dsp][compressor]")
     static constexpr int blockSize = 8;
     static constexpr double rampLength = 0.125;
     static constexpr std::array<float, blockSize> dbsToTest { -30.0f, -20.0f, -15.0f, -12.0f, -9.0f, -6.0f, 0.0f, 6.0f };
+    static constexpr std::array<float, blockSize> autoMakeupTest { 4.0f, -3.0103f, 4.0f, -3.0103f, 4.0f, -3.0103f, 4.0f, -3.0103f };
+    static constexpr std::array<float, blockSize> autoMakeupTestVariable { -2.875f ,-2.75f, -2.625f, -2.5f, -2.375f, -2.25f, -2.125f, -2.0f };
 
-    chowdsp::SmoothedBufferValue<float, juce::ValueSmoothingTypes::Multiplicative> threshSmooth;
+    chowdsp::SmoothedBufferValue<float, juce::ValueSmoothingTypes::Multiplicative> threshSmoothFixed;
+    chowdsp::SmoothedBufferValue<float, juce::ValueSmoothingTypes::Multiplicative> threshSmoothVariable;
     chowdsp::SmoothedBufferValue<float, juce::ValueSmoothingTypes::Multiplicative> ratioSmooth;
+
     //prepare and process thresh smooth
-    threshSmooth.prepare(fs, blockSize);
-    threshSmooth.setRampLength(rampLength);
-    threshSmooth.reset(-12.0f);
-    threshSmooth.process(-18.0f, blockSize);
+    threshSmoothFixed.prepare(fs, blockSize);
+    threshSmoothFixed.reset(static_cast<float> (juce::Decibels::decibelsToGain (-6.0f)));
+
+    threshSmoothVariable.prepare(fs, blockSize);
+    threshSmoothVariable.setRampLength(0.000167);
+    threshSmoothVariable.reset(static_cast<float> (juce::Decibels::decibelsToGain (-6.0f)));
+    threshSmoothVariable.process(static_cast<float> (juce::Decibels::decibelsToGain (-4.0)), blockSize);
 
     //prepare and process ratio smooth
     ratioSmooth.prepare(fs, blockSize);
-    ratioSmooth.setRampLength(rampLength);
     ratioSmooth.reset(2.0f);
-    ratioSmooth.process(4.0f, blockSize);
 
-    chowdsp::compressor::GainComputerParams<float> gainComputerParams {
-        threshSmooth,
+    chowdsp::compressor::GainComputerParams<float> gainComputerParamsFixed {
+        threshSmoothFixed,
         ratioSmooth,
-        6.0f,
-        -12.0f,
-        -18.0f
+        0.0f,
+        0.0f,
+        0.0f
+    };
+
+    chowdsp::compressor::GainComputerParams<float> gainComputerParamsVariable {
+        threshSmoothVariable,
+        ratioSmooth,
+        0.0f,
+        0.0f,
+        0.0f
     };
 
     GainComputer gainComputer;
     gainComputer.prepare (fs, blockSize);
 
+    auto dBToGain = [&] (const std::array<float, blockSize>& dbBuffer, chowdsp::StaticBuffer<float, 1, blockSize>& gainBuffer)
+    {
+        for (auto [n, gainSample] : chowdsp::enumerate (gainBuffer.getWriteSpan (0)))
+            gainSample = juce::Decibels::decibelsToGain(dbBuffer[n]);
+    };
+
     chowdsp::StaticBuffer<float, 1, blockSize> inBuffer { 1, blockSize };
-    for (auto [n, sample] : chowdsp::enumerate (inBuffer.getWriteSpan (0)))
-        sample = juce::Decibels::decibelsToGain (dbsToTest[n]);
+    dBToGain (dbsToTest, inBuffer);
+
+    chowdsp::StaticBuffer<float, 1, blockSize> autoMakeupTestBuffer { 1, blockSize };
+    dBToGain (autoMakeupTest, autoMakeupTestBuffer);
+
+    chowdsp::StaticBuffer<float, 1, blockSize> autoMakeupTestVariableBuffer { 1, blockSize };
+    dBToGain (autoMakeupTestVariable, autoMakeupTestVariableBuffer);
 
     gainComputer.setThreshold (-12.0f);
     gainComputer.setRatio (4.0f);
@@ -49,11 +74,11 @@ TEST_CASE ("Gain Computer Test", "[dsp][compressor]")
     gainComputer.reset();
 
     chowdsp::StaticBuffer<float, 1, blockSize> outBuffer { 1, blockSize };
-    chowdsp::StaticBuffer<float, 1, blockSize> gainBuffer { 1, blockSize };
+    chowdsp::StaticBuffer<float, 1, blockSize> inverseGainBuffer { 1, blockSize };
 
-    const auto checkData = [&outBuffer] (const std::array<float, blockSize>& dbExpected)
+    const auto checkData = [&] (const std::array<float, blockSize>& dbExpected, chowdsp::StaticBuffer<float, 1, blockSize>& buffer)
     {
-        for (auto [n, sample] : chowdsp::enumerate (outBuffer.getReadSpan (0)))
+        for (auto [n, sample] : chowdsp::enumerate (buffer.getReadSpan (0)))
         {
             const auto dbActual = juce::Decibels::gainToDecibels (sample);
             REQUIRE (dbActual == Catch::Approx { dbExpected[n] }.margin (0.1f));
@@ -64,7 +89,7 @@ TEST_CASE ("Gain Computer Test", "[dsp][compressor]")
     {
         gainComputer.setMode (0);
         gainComputer.processBlock (inBuffer, outBuffer);
-        checkData ({ 0.0f, 0.0f, 0.0f, -0.5f, -2.25f, -4.5f, -9.0f, -13.5f });
+        checkData ({ 0.0f, 0.0f, 0.0f, -0.5f, -2.25f, -4.5f, -9.0f, -13.5f }, outBuffer);
     }
 
     SECTION ("Feed-Forward w/ Makeup")
@@ -72,14 +97,14 @@ TEST_CASE ("Gain Computer Test", "[dsp][compressor]")
         gainComputer.setMode (0);
         gainComputer.processBlock (inBuffer, outBuffer);
         gainComputer.applyAutoMakeup (outBuffer);
-        checkData ({ 9.0f, 9.0f, 9.0f, 8.5f, 6.75f, 4.5f, 0.0f, -4.5f });
+        checkData ({ 9.0f, 9.0f, 9.0f, 8.5f, 6.75f, 4.5f, 0.0f, -4.5f }, outBuffer);
     }
 
     SECTION ("Feed-Back")
     {
         gainComputer.setMode (1);
         gainComputer.processBlock (inBuffer, outBuffer);
-        checkData ({ 0.0f, 0.0f, 0.0f, -2.25f, -9.0f, -18.0f, -36.0f, -54.0f });
+        checkData ({ 0.0f, 0.0f, 0.0f, -2.25f, -9.0f, -18.0f, -36.0f, -54.0f }, outBuffer);
     }
 
     SECTION ("Feed-Back w/ Makeup")
@@ -87,30 +112,22 @@ TEST_CASE ("Gain Computer Test", "[dsp][compressor]")
         gainComputer.setMode (1);
         gainComputer.processBlock (inBuffer, outBuffer);
         gainComputer.applyAutoMakeup (outBuffer);
-        checkData ({ 36.0f, 36.0f, 36.0f, 33.75f, 27.0f, 18.0f, 0.0f, -18.0f });
+        checkData ({ 36.0f, 36.0f, 36.0f, 33.75f, 27.0f, 18.0f, 0.0f, -18.0f }, outBuffer);
     }
 
-    SECTION ("Feed-Forward Comp Gain Computer Apply Auto Makeup")
+    SECTION("feed-forward apply auto make up with fixed threshold and ratio")
     {
-        chowdsp::compressor::FeedForwardCompGainComputer<float> feedForwardCompGainComputer{};
-        //calculate gain adjustment based on the level of the input buffer
-        feedForwardCompGainComputer.process(inBuffer, gainBuffer, gainComputerParams);
-        //multiply input buffer by gain adjustment buffer
-        for (auto [n, sampleCompressed] : chowdsp::enumerate (inBuffer.getWriteSpan(0)))
-        {
-            sampleCompressed *= gainBuffer.getReadSpan (0)[n];
-            std::cout << sampleCompressed << " ";
-        }
-        //Apply auto makeup to the compressed buffer
-        feedForwardCompGainComputer.applyAutoMakeup(inBuffer, gainComputerParams);
-        //verify the correctness of applyAutoMakeup
+        chowdsp::compressor::FeedForwardCompGainComputer<float> feedForwardCompGainComputerFixed{};
+        feedForwardCompGainComputerFixed.applyAutoMakeup(autoMakeupTestBuffer, gainComputerParamsFixed);
+        checkData ({ 7.0103f, 0.0f, 7.0103f, 0.0f, 7.0103f, 0.0f, 7.0103f, 0.0f}, autoMakeupTestBuffer);
     }
 
-//    SECTION ("Feed-Back Camp Gain Computer w/ Makeup")
-//    {
-//        chowdsp::compressor::FeedBackCompGainComputer<float> feedBackCompGainComputer{};
-//        feedBackCompGainComputer.process(inBuffer, gainBuffer, gainComputerParams);
-//        feedBackCompGainComputer.applyAutoMakeup(inBuffer, gainComputerParams);
-//        //checkData(//expected dBs)
-//    }
+    SECTION("feed-forward apply auto make up with variable threshold and fixed ratio")
+    {
+        chowdsp::compressor::FeedForwardCompGainComputer<float> feedForwardCompGainComputerVariable{};
+        feedForwardCompGainComputerVariable.applyAutoMakeup(autoMakeupTestVariableBuffer, gainComputerParamsVariable);
+        for (auto [n, makeupSample] : chowdsp::enumerate (autoMakeupTestVariableBuffer.getReadSpan (0)))
+            std::cout << juce::Decibels::gainToDecibels(makeupSample) << " ";
+        checkData ({0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}, autoMakeupTestVariableBuffer);
+    }
 }
