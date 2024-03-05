@@ -25,6 +25,7 @@ TEST_CASE ("Gain Computer Test", "[dsp][compressor]")
     threshSmoothFixed.mappingFunction = [] (float x) { return juce::Decibels::decibelsToGain (x); };
     threshSmoothFixed.prepare(fs, blockSize);
     threshSmoothFixed.reset(-6.0f);
+    threshSmoothFixed.process (threshSmoothFixed.getCurrentValue(), blockSize);
 
     threshSmoothVariable.mappingFunction = [] (float x) { return juce::Decibels::decibelsToGain (x); };
     threshSmoothVariable.prepare(fs, blockSize);
@@ -32,10 +33,10 @@ TEST_CASE ("Gain Computer Test", "[dsp][compressor]")
     threshSmoothVariable.reset(-6.0f);
     threshSmoothVariable.process(-4.0, blockSize);
 
-
     //prepare and process ratio smooth
     ratioSmooth.prepare(fs, blockSize);
     ratioSmooth.reset(2.0f);
+    ratioSmooth.process (ratioSmooth.getCurrentValue(), blockSize);
 
     chowdsp::compressor::GainComputerParams<float> gainComputerParamsFixed {
         threshSmoothFixed,
