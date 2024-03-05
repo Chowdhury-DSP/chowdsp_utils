@@ -41,7 +41,7 @@ TEMPLATE_TEST_CASE ("First Order Filters Test", "[dsp][filters][simd]", float, d
 
     SECTION ("First Order HPF Test")
     {
-        chowdsp::FirstOrderHPF<T> hpFilter;
+        chowdsp::FirstOrderHPF<T, 1> hpFilter;
         hpFilter.prepare ({ Constants::fs, 128, 1 });
         hpFilter.calcCoefs ((T) Constants::fc, (NumericType) Constants::fs);
 

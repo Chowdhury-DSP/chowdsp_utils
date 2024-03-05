@@ -38,22 +38,33 @@ JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 #define CHOWDSP_BUFFER_MAX_NUM_CHANNELS 32
 #endif
 
+namespace chowdsp
+{
+constexpr auto dynamicChannelCount = std::numeric_limits<size_t>::max();
+
+#ifdef CHOWDSP_PROCESSOR_DEFAULT_CHANNEL_COUNT
+constexpr auto defaultChannelCount = CHOWDSP_PROCESSOR_DEFAULT_CHANNEL_COUNT;
+#else
+constexpr auto defaultChannelCount = dynamicChannelCount;
+#endif
+
 #ifndef DOXYGEN
 namespace buffers_detail
 {
-/**
- * Divides two numbers and rounds up if there is a remainder.
- *
- * This is often useful for figuring out haw many SIMD registers are needed
- * to contain a given number of scalar values.
-*/
-template <typename T>
-constexpr T ceiling_divide (T num, T den)
-{
-    return (num + den - 1) / den;
-}
+    /**
+     * Divides two numbers and rounds up if there is a remainder.
+     *
+     * This is often useful for figuring out haw many SIMD registers are needed
+     * to contain a given number of scalar values.
+    */
+    template <typename T>
+    constexpr T ceiling_divide (T num, T den)
+    {
+        return (num + den - 1) / den;
+    }
 } // namespace buffers_detail
 #endif
+} // namespace chowdsp
 
 #include "Buffers/chowdsp_Buffer.h"
 #include "Buffers/chowdsp_StaticBuffer.h"

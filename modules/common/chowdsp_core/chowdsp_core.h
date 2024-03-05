@@ -55,7 +55,9 @@ BEGIN_JUCE_MODULE_DECLARATION
 #if ! JUCE_MODULE_AVAILABLE_juce_dsp
 #include "JUCEHelpers/dsp/juce_ProcessSpec.h"
 #include "JUCEHelpers/dsp/juce_LookupTable.h"
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE("-Wimplicit-const-int-float-conversion")
 #include "JUCEHelpers/dsp/juce_FastMathApproximations.h"
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 #endif
 #elif JUCE_VERSION < 0x070006
 namespace juce

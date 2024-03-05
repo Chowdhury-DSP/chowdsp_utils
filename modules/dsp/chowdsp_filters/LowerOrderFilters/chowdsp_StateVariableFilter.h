@@ -22,7 +22,7 @@ enum class StateVariableFilterType
  *
  * Reference: https://cytomic.com/files/dsp/SvfLinearTrapAllOutputs.pdf
  */
-template <typename SampleType, StateVariableFilterType type>
+template <typename SampleType, StateVariableFilterType type, size_t maxChannelCount = defaultChannelCount>
 class StateVariableFilter
 {
 public:
@@ -252,7 +252,8 @@ public:
         return std::make_tuple (v0, v1, v2);
     }
 
-    std::vector<SampleType> ic1eq, ic2eq; // state variables
+    using State = std::conditional_t<maxChannelCount == dynamicChannelCount, std::vector<SampleType>, std::array<SampleType, maxChannelCount>>;
+    State ic1eq {}, ic2eq {}; // state variables
 
 private:
     SampleType cutoffFrequency, resonance, gain; // parameters
@@ -270,40 +271,40 @@ private:
 };
 
 /** Convenient alias for an SVF lowpass filter. */
-template <typename SampleType = float>
-using SVFLowpass = StateVariableFilter<SampleType, StateVariableFilterType::Lowpass>;
+template <typename SampleType = float, size_t maxChannelCount = defaultChannelCount>
+using SVFLowpass = StateVariableFilter<SampleType, StateVariableFilterType::Lowpass, maxChannelCount>;
 
 /** Convenient alias for an SVF highpass filter. */
-template <typename SampleType = float>
-using SVFHighpass = StateVariableFilter<SampleType, StateVariableFilterType::Highpass>;
+template <typename SampleType = float, size_t maxChannelCount = defaultChannelCount>
+using SVFHighpass = StateVariableFilter<SampleType, StateVariableFilterType::Highpass, maxChannelCount>;
 
 /** Convenient alias for an SVF bandpass filter. */
-template <typename SampleType = float>
-using SVFBandpass = StateVariableFilter<SampleType, StateVariableFilterType::Bandpass>;
+template <typename SampleType = float, size_t maxChannelCount = defaultChannelCount>
+using SVFBandpass = StateVariableFilter<SampleType, StateVariableFilterType::Bandpass, maxChannelCount>;
 
 /** Convenient alias for an SVF allpass filter. */
-template <typename SampleType = float>
-using SVFAllpass = StateVariableFilter<SampleType, StateVariableFilterType::Allpass>;
+template <typename SampleType = float, size_t maxChannelCount = defaultChannelCount>
+using SVFAllpass = StateVariableFilter<SampleType, StateVariableFilterType::Allpass, maxChannelCount>;
 
 /** Convenient alias for an SVF notch filter. */
-template <typename SampleType = float>
-using SVFNotch = StateVariableFilter<SampleType, StateVariableFilterType::Notch>;
+template <typename SampleType = float, size_t maxChannelCount = defaultChannelCount>
+using SVFNotch = StateVariableFilter<SampleType, StateVariableFilterType::Notch, maxChannelCount>;
 
 /** Convenient alias for an SVF bell filter. */
-template <typename SampleType = float>
-using SVFBell = StateVariableFilter<SampleType, StateVariableFilterType::Bell>;
+template <typename SampleType = float, size_t maxChannelCount = defaultChannelCount>
+using SVFBell = StateVariableFilter<SampleType, StateVariableFilterType::Bell, maxChannelCount>;
 
 /** Convenient alias for an SVF low-shelf filter. */
-template <typename SampleType = float>
-using SVFLowShelf = StateVariableFilter<SampleType, StateVariableFilterType::LowShelf>;
+template <typename SampleType = float, size_t maxChannelCount = defaultChannelCount>
+using SVFLowShelf = StateVariableFilter<SampleType, StateVariableFilterType::LowShelf, maxChannelCount>;
 
 /** Convenient alias for an SVF high-shelf filter. */
-template <typename SampleType = float>
-using SVFHighShelf = StateVariableFilter<SampleType, StateVariableFilterType::HighShelf>;
+template <typename SampleType = float, size_t maxChannelCount = defaultChannelCount>
+using SVFHighShelf = StateVariableFilter<SampleType, StateVariableFilterType::HighShelf, maxChannelCount>;
 
 /** Convenient alias for an SVF multi-mode filter. */
-template <typename SampleType = float>
-using SVFMultiMode = StateVariableFilter<SampleType, StateVariableFilterType::MultiMode>;
+template <typename SampleType = float, size_t maxChannelCount = defaultChannelCount>
+using SVFMultiMode = StateVariableFilter<SampleType, StateVariableFilterType::MultiMode, maxChannelCount>;
 } // namespace chowdsp
 
 #include "chowdsp_StateVariableFilter.cpp"

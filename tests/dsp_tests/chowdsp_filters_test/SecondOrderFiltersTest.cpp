@@ -67,7 +67,7 @@ TEMPLATE_TEST_CASE_SIG ("Second Order Filters Test", "[dsp][filters][simd]", ((t
     SECTION ("Second Order BPF Test")
     {
         using namespace Constants;
-        chowdsp::SecondOrderBPF<T, Mode> filter;
+        chowdsp::SecondOrderBPF<T, Mode, 2> filter;
 
         for (auto fc : fc_vals)
         {
@@ -109,7 +109,7 @@ TEMPLATE_TEST_CASE_SIG ("Second Order Filters Test", "[dsp][filters][simd]", ((t
     SECTION ("Peaking Filter Test")
     {
         using namespace Constants;
-        chowdsp::PeakingFilter<T, Mode> filter;
+        chowdsp::PeakingFilter<T, Mode, 1> filter;
 
         for (auto fc : fc_vals)
         {
