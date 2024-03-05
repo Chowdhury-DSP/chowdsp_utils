@@ -36,24 +36,41 @@ JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 /** The max number of channels that can fit in a chowdsp::Buffer or chowdsp::BufferView */
 #ifndef CHOWDSP_BUFFER_MAX_NUM_CHANNELS
 #define CHOWDSP_BUFFER_MAX_NUM_CHANNELS 32
+#else
+// If we have a max number of channels, we can use that to set the default max channel count
+#ifndef CHOWDSP_PROCESSOR_DEFAULT_CHANNEL_COUNT
+#define CHOWDSP_PROCESSOR_DEFAULT_CHANNEL_COUNT CHOWDSP_BUFFER_MAX_NUM_CHANNELS
+#endif
+#endif
+
+namespace chowdsp
+{
+constexpr auto dynamicChannelCount = std::numeric_limits<size_t>::max();
+
+/** The default channel count to use for multi-channel processors */
+#ifdef CHOWDSP_PROCESSOR_DEFAULT_CHANNEL_COUNT
+constexpr auto defaultChannelCount = CHOWDSP_PROCESSOR_DEFAULT_CHANNEL_COUNT;
+#else
+constexpr auto defaultChannelCount = dynamicChannelCount;
 #endif
 
 #ifndef DOXYGEN
 namespace buffers_detail
 {
-/**
- * Divides two numbers and rounds up if there is a remainder.
- *
- * This is often useful for figuring out haw many SIMD registers are needed
- * to contain a given number of scalar values.
-*/
-template <typename T>
-constexpr T ceiling_divide (T num, T den)
-{
-    return (num + den - 1) / den;
-}
+    /**
+     * Divides two numbers and rounds up if there is a remainder.
+     *
+     * This is often useful for figuring out haw many SIMD registers are needed
+     * to contain a given number of scalar values.
+    */
+    template <typename T>
+    constexpr T ceiling_divide (T num, T den)
+    {
+        return (num + den - 1) / den;
+    }
 } // namespace buffers_detail
 #endif
+} // namespace chowdsp
 
 #include "Buffers/chowdsp_Buffer.h"
 #include "Buffers/chowdsp_StaticBuffer.h"
