@@ -14,8 +14,10 @@ TEST_CASE ("Gain Computer Test", "[dsp][compressor]")
     static constexpr int blockSize = 8;
     static constexpr double rampLength = 0.125;
     static constexpr std::array<float, blockSize> dbsToTest { -30.0f, -20.0f, -15.0f, -12.0f, -9.0f, -6.0f, 0.0f, 6.0f };
-    static constexpr std::array<float, blockSize> autoMakeupTest { 4.0f, -3.0103f, 4.0f, -3.0103f, 4.0f, -3.0103f, 4.0f, -3.0103f };
+    static constexpr std::array<float, blockSize> autoMakeupTest { 4.0f, -3.0f, 4.0f, -3.0f, 4.0f, -3.0f, 4.0f, -3.0f };
     static constexpr std::array<float, blockSize> autoMakeupTestVariable { -2.875f ,-2.75f, -2.625f, -2.5f, -2.375f, -2.25f, -2.125f, -2.0f };
+    static constexpr std::array<float, blockSize> autoMakeupTestFeedBackFixed { -6.0f ,4.0f, -6.0f, 4.0f, -6.0f, 4.0f, -6.0f, 4.0f,};
+    static constexpr std::array<float, blockSize> autoMakeupTestFeedBackVariable { -5.75f, -5.5f, -5.25f, -5.0f, -4.75f, -4.49f, -4.24f, -4.0f };
 
     chowdsp::SmoothedBufferValue<float, juce::ValueSmoothingTypes::Multiplicative> threshSmoothFixed;
     chowdsp::SmoothedBufferValue<float, juce::ValueSmoothingTypes::Multiplicative> threshSmoothVariable;
@@ -38,6 +40,11 @@ TEST_CASE ("Gain Computer Test", "[dsp][compressor]")
     ratioSmooth.reset(2.0f);
     ratioSmooth.process (ratioSmooth.getCurrentValue(), blockSize);
 
+    const auto smoothThresh = threshSmoothVariable.getSmoothedBuffer();
+    std::cout << std::setprecision(8) << std::endl;
+    for (int i = 0; i < blockSize; i++)
+        std::cout << smoothThresh[i] << " ";
+    std::cout << std::endl;
     chowdsp::compressor::GainComputerParams<float> gainComputerParamsFixed {
         threshSmoothFixed,
         ratioSmooth,
@@ -71,6 +78,12 @@ TEST_CASE ("Gain Computer Test", "[dsp][compressor]")
 
     chowdsp::StaticBuffer<float, 1, blockSize> autoMakeupTestVariableBuffer { 1, blockSize };
     dBToGain (autoMakeupTestVariable, autoMakeupTestVariableBuffer);
+
+    chowdsp::StaticBuffer<float, 1, blockSize> autoMakeupTestFeedBackFixedBuffer { 1, blockSize };
+    dBToGain (autoMakeupTestFeedBackFixed, autoMakeupTestFeedBackFixedBuffer);
+
+    chowdsp::StaticBuffer<float, 1, blockSize> autoMakeupTestFeedBackVariableBuffer { 1, blockSize };
+    dBToGain (autoMakeupTestFeedBackVariable, autoMakeupTestFeedBackVariableBuffer);
 
     gainComputer.setThreshold (-12.0f);
     gainComputer.setRatio (4.0f);
@@ -123,15 +136,27 @@ TEST_CASE ("Gain Computer Test", "[dsp][compressor]")
     {
         chowdsp::compressor::FeedForwardCompGainComputer<float> feedForwardCompGainComputerFixed{};
         feedForwardCompGainComputerFixed.applyAutoMakeup(autoMakeupTestBuffer, gainComputerParamsFixed);
-        checkData ({ 7.0103f, 0.0f, 7.0103f, 0.0f, 7.0103f, 0.0f, 7.0103f, 0.0f}, autoMakeupTestBuffer);
+        checkData ({ 7.0f, 0.0f, 7.0f, 0.0f, 7.0f, 0.0f, 7.0f, 0.0f}, autoMakeupTestBuffer);
     }
 
     SECTION("feed-forward apply auto make up with variable threshold and fixed ratio")
     {
         chowdsp::compressor::FeedForwardCompGainComputer<float> feedForwardCompGainComputerVariable{};
         feedForwardCompGainComputerVariable.applyAutoMakeup(autoMakeupTestVariableBuffer, gainComputerParamsVariable);
-        for (auto [n, makeupSample] : chowdsp::enumerate (autoMakeupTestVariableBuffer.getReadSpan (0)))
-            std::cout << juce::Decibels::gainToDecibels(makeupSample) << " ";
         checkData ({0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}, autoMakeupTestVariableBuffer);
+    }
+
+    SECTION("feed-back apply auto make up with fixed threshold and ratio")
+    {
+        chowdsp::compressor::FeedBackCompGainComputer<float> feedBackCompGainComputerFixed{};
+        feedBackCompGainComputerFixed.applyAutoMakeup(autoMakeupTestFeedBackFixedBuffer, gainComputerParamsFixed);
+        checkData ({ 0.0f, 10.0f, 0.0f, 10.0f, 0.0f, 10.0f, 0.0f, 10.0f}, autoMakeupTestFeedBackFixedBuffer);
+    }
+
+    SECTION("feed-back apply auto make up with variable threshold and fixed ratio")
+    {
+        chowdsp::compressor::FeedBackCompGainComputer<float> feedBackCompGainComputerVariable{};
+        feedBackCompGainComputerVariable.applyAutoMakeup(autoMakeupTestFeedBackVariableBuffer, gainComputerParamsVariable);
+        checkData ({0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}, autoMakeupTestFeedBackVariableBuffer);
     }
 }
