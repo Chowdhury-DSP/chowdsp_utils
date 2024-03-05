@@ -8,8 +8,8 @@ namespace chowdsp
  * First-order lowpass filter (-6 dB / octave).
  * This filter can be used to model an ideal RC lowpwass filter.
  */
-template <typename T>
-class FirstOrderLPF final : public IIRFilter<1, T>
+template <typename T, size_t maxChannelCount = defaultChannelCount>
+class FirstOrderLPF final : public IIRFilter<1, T, maxChannelCount>
 {
 public:
     using NumericType = SampleTypeHelpers::ProcessorNumericType<FirstOrderLPF>;
@@ -35,8 +35,8 @@ private:
  * First-order highpass filter (-6 dB / octave).
  * This filter can be used to model an ideal RC highpass filter.
  */
-template <typename T>
-class FirstOrderHPF final : public IIRFilter<1, T>
+template <typename T, size_t maxChannelCount = defaultChannelCount>
+class FirstOrderHPF final : public IIRFilter<1, T, maxChannelCount>
 {
 public:
     using NumericType = SampleTypeHelpers::ProcessorNumericType<FirstOrderHPF>;
@@ -62,8 +62,8 @@ private:
  * A first order shelving filter, with a set gain at DC,
  * a set gain at high frequencies, and a transition frequency.
  */
-template <typename T = float>
-class ShelfFilter final : public IIRFilter<1, T>
+template <typename T = float, size_t maxChannelCount = defaultChannelCount>
+class ShelfFilter final : public IIRFilter<1, T, maxChannelCount>
 {
 public:
     using NumericType = SampleTypeHelpers::ProcessorNumericType<ShelfFilter>;

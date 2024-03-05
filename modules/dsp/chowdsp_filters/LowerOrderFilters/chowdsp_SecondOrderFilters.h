@@ -5,8 +5,10 @@
 namespace chowdsp
 {
 /** Second-order lowpass filter. */
-template <typename T, CoefficientCalculators::CoefficientCalculationMode mode = CoefficientCalculators::CoefficientCalculationMode::Standard>
-class SecondOrderLPF final : public IIRFilter<2, T>
+template <typename T,
+          CoefficientCalculators::CoefficientCalculationMode mode = CoefficientCalculators::CoefficientCalculationMode::Standard,
+          size_t maxChannelCount = defaultChannelCount>
+class SecondOrderLPF final : public IIRFilter<2, T, maxChannelCount>
 {
 public:
     using NumericType = SampleTypeHelpers::ProcessorNumericType<SecondOrderLPF>;
@@ -29,8 +31,10 @@ private:
 };
 
 /** Second-order highpass filter. */
-template <typename T, CoefficientCalculators::CoefficientCalculationMode mode = CoefficientCalculators::CoefficientCalculationMode::Standard>
-class SecondOrderHPF final : public IIRFilter<2, T>
+template <typename T,
+          CoefficientCalculators::CoefficientCalculationMode mode = CoefficientCalculators::CoefficientCalculationMode::Standard,
+          size_t maxChannelCount = defaultChannelCount>
+class SecondOrderHPF final : public IIRFilter<2, T, maxChannelCount>
 {
 public:
     using NumericType = SampleTypeHelpers::ProcessorNumericType<SecondOrderHPF>;
@@ -53,8 +57,10 @@ private:
 };
 
 /** Second-order bandpass filter. */
-template <typename T, CoefficientCalculators::CoefficientCalculationMode mode = CoefficientCalculators::CoefficientCalculationMode::Standard>
-class SecondOrderBPF final : public IIRFilter<2, T>
+template <typename T,
+          CoefficientCalculators::CoefficientCalculationMode mode = CoefficientCalculators::CoefficientCalculationMode::Standard,
+          size_t maxChannelCount = defaultChannelCount>
+class SecondOrderBPF final : public IIRFilter<2, T, maxChannelCount>
 {
 public:
     using NumericType = SampleTypeHelpers::ProcessorNumericType<SecondOrderBPF>;
@@ -77,8 +83,10 @@ private:
 };
 
 /** Second-order notch filter. */
-template <typename T, CoefficientCalculators::CoefficientCalculationMode mode = CoefficientCalculators::CoefficientCalculationMode::Standard>
-class NotchFilter final : public IIRFilter<2, T>
+template <typename T,
+          CoefficientCalculators::CoefficientCalculationMode mode = CoefficientCalculators::CoefficientCalculationMode::Standard,
+          size_t maxChannelCount = defaultChannelCount>
+class NotchFilter final : public IIRFilter<2, T, maxChannelCount>
 {
 public:
     using NumericType = SampleTypeHelpers::ProcessorNumericType<NotchFilter>;
@@ -101,8 +109,10 @@ private:
 };
 
 /** Second-order peaking filter. */
-template <typename T, CoefficientCalculators::CoefficientCalculationMode mode = CoefficientCalculators::CoefficientCalculationMode::Standard>
-class PeakingFilter final : public IIRFilter<2, T>
+template <typename T,
+          CoefficientCalculators::CoefficientCalculationMode mode = CoefficientCalculators::CoefficientCalculationMode::Standard,
+          size_t maxChannelCount = defaultChannelCount>
+class PeakingFilter final : public IIRFilter<2, T, maxChannelCount>
 {
 public:
     using NumericType = SampleTypeHelpers::ProcessorNumericType<PeakingFilter>;
@@ -136,8 +146,10 @@ private:
 };
 
 /** Second-order low-shelf filter. */
-template <typename T, CoefficientCalculators::CoefficientCalculationMode mode = CoefficientCalculators::CoefficientCalculationMode::Standard>
-class LowShelfFilter final : public IIRFilter<2, T>
+template <typename T,
+          CoefficientCalculators::CoefficientCalculationMode mode = CoefficientCalculators::CoefficientCalculationMode::Standard,
+          size_t maxChannelCount = defaultChannelCount>
+class LowShelfFilter final : public IIRFilter<2, T, maxChannelCount>
 {
 public:
     using NumericType = SampleTypeHelpers::ProcessorNumericType<LowShelfFilter>;
@@ -171,8 +183,10 @@ private:
 };
 
 /** Second-order high-shelf filter. */
-template <typename T, CoefficientCalculators::CoefficientCalculationMode mode = CoefficientCalculators::CoefficientCalculationMode::Standard>
-class HighShelfFilter final : public IIRFilter<2, T>
+template <typename T,
+          CoefficientCalculators::CoefficientCalculationMode mode = CoefficientCalculators::CoefficientCalculationMode::Standard,
+          size_t maxChannelCount = defaultChannelCount>
+class HighShelfFilter final : public IIRFilter<2, T, maxChannelCount>
 {
 public:
     using NumericType = SampleTypeHelpers::ProcessorNumericType<HighShelfFilter>;
