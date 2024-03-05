@@ -36,12 +36,18 @@ JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 /** The max number of channels that can fit in a chowdsp::Buffer or chowdsp::BufferView */
 #ifndef CHOWDSP_BUFFER_MAX_NUM_CHANNELS
 #define CHOWDSP_BUFFER_MAX_NUM_CHANNELS 32
+#else
+// If we have a max number of channels, we can use that to set the default max channel count
+#ifndef CHOWDSP_PROCESSOR_DEFAULT_CHANNEL_COUNT
+#define CHOWDSP_PROCESSOR_DEFAULT_CHANNEL_COUNT CHOWDSP_BUFFER_MAX_NUM_CHANNELS
+#endif
 #endif
 
 namespace chowdsp
 {
 constexpr auto dynamicChannelCount = std::numeric_limits<size_t>::max();
 
+/** The default channel count to use for multi-channel processors */
 #ifdef CHOWDSP_PROCESSOR_DEFAULT_CHANNEL_COUNT
 constexpr auto defaultChannelCount = CHOWDSP_PROCESSOR_DEFAULT_CHANNEL_COUNT;
 #else
