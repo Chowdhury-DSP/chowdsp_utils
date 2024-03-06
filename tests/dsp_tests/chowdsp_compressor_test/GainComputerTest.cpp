@@ -18,8 +18,10 @@ TEST_CASE ("Gain Computer Test", "[dsp][compressor]")
     static constexpr std::array<float, blockSize> autoMakeupTestVariable { -2.875f ,-2.75f, -2.625f, -2.5f, -2.375f, -2.25f, -2.125f, -2.0f };
     static constexpr std::array<float, blockSize> autoMakeupTestFeedBackFixed { -6.0f ,4.0f, -6.0f, 4.0f, -6.0f, 4.0f, -6.0f, 4.0f,};
     static constexpr std::array<float, blockSize> autoMakeupTestFeedBackVariable { -5.75f, -5.5f, -5.25f, -5.0f, -4.75f, -4.49f, -4.24f, -4.0f };
+    static constexpr std::array<float, blockSize> autoMakeupTestCompressed { 16.0f, 16.0f, 16.0f, 16.0f, 16.0f, 16.0f, 16.0f, 16.0f };
 
     chowdsp::SmoothedBufferValue<float, juce::ValueSmoothingTypes::Multiplicative> threshSmoothFixed;
+    chowdsp::SmoothedBufferValue<float, juce::ValueSmoothingTypes::Multiplicative> threshSmoothCompressed;
     chowdsp::SmoothedBufferValue<float, juce::ValueSmoothingTypes::Multiplicative> threshSmoothVariable;
     chowdsp::SmoothedBufferValue<float, juce::ValueSmoothingTypes::Multiplicative> ratioSmooth;
 
@@ -35,16 +37,16 @@ TEST_CASE ("Gain Computer Test", "[dsp][compressor]")
     threshSmoothVariable.reset(-6.0f);
     threshSmoothVariable.process(-4.0, blockSize);
 
+    threshSmoothCompressed.mappingFunction = [] (float x) { return juce::Decibels::decibelsToGain (x); };
+    threshSmoothCompressed.prepare(fs, blockSize);
+    threshSmoothCompressed.reset(-3.0f);
+    threshSmoothCompressed.process (threshSmoothFixed.getCurrentValue(), blockSize);
+
     //prepare and process ratio smooth
     ratioSmooth.prepare(fs, blockSize);
     ratioSmooth.reset(2.0f);
     ratioSmooth.process (ratioSmooth.getCurrentValue(), blockSize);
 
-    const auto smoothThresh = threshSmoothVariable.getSmoothedBuffer();
-    std::cout << std::setprecision(8) << std::endl;
-    for (int i = 0; i < blockSize; i++)
-        std::cout << smoothThresh[i] << " ";
-    std::cout << std::endl;
     chowdsp::compressor::GainComputerParams<float> gainComputerParamsFixed {
         threshSmoothFixed,
         ratioSmooth,
@@ -55,6 +57,14 @@ TEST_CASE ("Gain Computer Test", "[dsp][compressor]")
 
     chowdsp::compressor::GainComputerParams<float> gainComputerParamsVariable {
         threshSmoothVariable,
+        ratioSmooth,
+        0.0f,
+        0.0f,
+        0.0f
+    };
+
+    chowdsp::compressor::GainComputerParams<float> gainComputerParamsCompressed {
+        threshSmoothCompressed,
         ratioSmooth,
         0.0f,
         0.0f,
@@ -84,6 +94,9 @@ TEST_CASE ("Gain Computer Test", "[dsp][compressor]")
 
     chowdsp::StaticBuffer<float, 1, blockSize> autoMakeupTestFeedBackVariableBuffer { 1, blockSize };
     dBToGain (autoMakeupTestFeedBackVariable, autoMakeupTestFeedBackVariableBuffer);
+
+    chowdsp::StaticBuffer<float, 1, blockSize> autoMakeupTestCompressedBuffer { 1, blockSize };
+    dBToGain (autoMakeupTestCompressed, autoMakeupTestCompressedBuffer);
 
     gainComputer.setThreshold (-12.0f);
     gainComputer.setRatio (4.0f);
@@ -158,5 +171,17 @@ TEST_CASE ("Gain Computer Test", "[dsp][compressor]")
         chowdsp::compressor::FeedBackCompGainComputer<float> feedBackCompGainComputerVariable{};
         feedBackCompGainComputerVariable.applyAutoMakeup(autoMakeupTestFeedBackVariableBuffer, gainComputerParamsVariable);
         checkData ({0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}, autoMakeupTestFeedBackVariableBuffer);
+    }
+
+    SECTION("feed-forward apply compression and auto make up with fixed threshold and ratio")
+    {
+        chowdsp::compressor::FeedForwardCompGainComputer<float> feedForwardGainComputerCompressed{};
+        feedForwardGainComputerCompressed.process(autoMakeupTestCompressedBuffer, outBuffer, gainComputerParamsCompressed);
+        for (auto [n , outSample] : chowdsp::enumerate(autoMakeupTestCompressedBuffer.getWriteSpan(0)))
+            outSample *= outBuffer.getReadSpan(0)[n];
+        checkData ({-9.5f, -9.5f, -9.5f, -9.5f, -9.5f, -9.5f, -9.5f, -9.5f}, outBuffer); // gain reduction buffer
+        checkData ({6.5f, 6.5f, 6.5f, 6.5f, 6.5f, 6.5f, 6.5f, 6.5f}, autoMakeupTestCompressedBuffer); //compressed signal
+        feedForwardGainComputerCompressed.applyAutoMakeup(autoMakeupTestCompressedBuffer, gainComputerParamsCompressed);
+        checkData ({8.0f, 8.0f, 8.0f, 8.0f, 8.0f, 8.0f, 8.0f, 8.0f}, autoMakeupTestCompressedBuffer); //compressed signal with makeup gain
     }
 }

@@ -55,7 +55,7 @@ public:
      */
     void prepare (double sampleRate, int samplesPerBlock, bool useInternalVector = true);
 
-    /** Resets the state of the smoother with a given value. */
+    /** Resets the state of the smoother with a given value. Expects the value in linear gain */
     void reset (FloatType resetValue);
 
     /** Resets the state of the smoother. */
