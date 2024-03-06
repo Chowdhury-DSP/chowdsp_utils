@@ -69,7 +69,7 @@ TEMPLATE_PRODUCT_TEST_CASE ("Smoothed Buffer Value Test", "[dsp][data-structures
 
     SECTION ("Arena Allocator Interface Test")
     {
-        chowdsp::ArenaAllocator<> arena {maxBlockSize * sizeof(FloatType)};
+        chowdsp::ArenaAllocator<> arena { maxBlockSize * sizeof (FloatType) };
 
         chowdsp::SmoothedBufferValue<FloatType, SmoothingType> arenaSmooth;
         juce::SmoothedValue<FloatType, SmoothingType> refSmooth, refSmooth2;
@@ -78,8 +78,8 @@ TEMPLATE_PRODUCT_TEST_CASE ("Smoothed Buffer Value Test", "[dsp][data-structures
         arenaSmooth.setRampLength (rampLegnth1);
         refSmooth.reset (fs, rampLegnth1);
 
-        refSmooth.setCurrentAndTargetValue((FloatType) val1);
-        arenaSmooth.reset((FloatType) val1);
+        refSmooth.setCurrentAndTargetValue ((FloatType) val1);
+        arenaSmooth.reset ((FloatType) val1);
         testSmooth (refSmooth, arenaSmooth, (FloatType) val2, 5, arena);
 
         arenaSmooth.setRampLength (rampLegnth2);
