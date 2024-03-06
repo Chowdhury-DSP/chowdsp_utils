@@ -40,7 +40,7 @@ TEST_CASE ("Gain Computer Test", "[dsp][compressor]")
     threshSmoothCompressed.mappingFunction = [] (float x) { return juce::Decibels::decibelsToGain (x); };
     threshSmoothCompressed.prepare(fs, blockSize);
     threshSmoothCompressed.reset(-3.0f);
-    threshSmoothCompressed.process (threshSmoothFixed.getCurrentValue(), blockSize);
+    threshSmoothCompressed.process (threshSmoothCompressed.getCurrentValue(), blockSize);
 
     //prepare and process ratio smooth
     ratioSmooth.prepare(fs, blockSize);
@@ -80,6 +80,7 @@ TEST_CASE ("Gain Computer Test", "[dsp][compressor]")
             gainSample = juce::Decibels::decibelsToGain(dbBuffer[n]);
     };
 
+    //convert input buffers to linear gain
     chowdsp::StaticBuffer<float, 1, blockSize> inBuffer { 1, blockSize };
     dBToGain (dbsToTest, inBuffer);
 
@@ -104,7 +105,6 @@ TEST_CASE ("Gain Computer Test", "[dsp][compressor]")
     gainComputer.reset();
 
     chowdsp::StaticBuffer<float, 1, blockSize> outBuffer { 1, blockSize };
-    chowdsp::StaticBuffer<float, 1, blockSize> inverseGainBuffer { 1, blockSize };
 
     const auto checkData = [&] (const std::array<float, blockSize>& dbExpected, chowdsp::StaticBuffer<float, 1, blockSize>& buffer)
     {
@@ -145,35 +145,35 @@ TEST_CASE ("Gain Computer Test", "[dsp][compressor]")
         checkData ({ 36.0f, 36.0f, 36.0f, 33.75f, 27.0f, 18.0f, 0.0f, -18.0f }, outBuffer);
     }
 
-    SECTION("feed-forward apply auto make up with fixed threshold and ratio")
+    SECTION("Feed-Forward Apply Auto Makeup w/ Fixed Threshold and Ratio")
     {
         chowdsp::compressor::FeedForwardCompGainComputer<float> feedForwardCompGainComputerFixed{};
         feedForwardCompGainComputerFixed.applyAutoMakeup(autoMakeupTestBuffer, gainComputerParamsFixed);
         checkData ({ 7.0f, 0.0f, 7.0f, 0.0f, 7.0f, 0.0f, 7.0f, 0.0f}, autoMakeupTestBuffer);
     }
 
-    SECTION("feed-forward apply auto make up with variable threshold and fixed ratio")
+    SECTION("Feed-Forward Apply Auto Makeup w/ Variable Threshold and Ratio")
     {
         chowdsp::compressor::FeedForwardCompGainComputer<float> feedForwardCompGainComputerVariable{};
         feedForwardCompGainComputerVariable.applyAutoMakeup(autoMakeupTestVariableBuffer, gainComputerParamsVariable);
         checkData ({0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}, autoMakeupTestVariableBuffer);
     }
 
-    SECTION("feed-back apply auto make up with fixed threshold and ratio")
+    SECTION("Feed-Back Apply Auto Makeup w/ Fixed Threshold and Ratio")
     {
         chowdsp::compressor::FeedBackCompGainComputer<float> feedBackCompGainComputerFixed{};
         feedBackCompGainComputerFixed.applyAutoMakeup(autoMakeupTestFeedBackFixedBuffer, gainComputerParamsFixed);
         checkData ({ 0.0f, 10.0f, 0.0f, 10.0f, 0.0f, 10.0f, 0.0f, 10.0f}, autoMakeupTestFeedBackFixedBuffer);
     }
 
-    SECTION("feed-back apply auto make up with variable threshold and fixed ratio")
+    SECTION("Feed-Back Apply Auto Makeup w/ Variable Threshold and Ratio")
     {
         chowdsp::compressor::FeedBackCompGainComputer<float> feedBackCompGainComputerVariable{};
         feedBackCompGainComputerVariable.applyAutoMakeup(autoMakeupTestFeedBackVariableBuffer, gainComputerParamsVariable);
         checkData ({0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}, autoMakeupTestFeedBackVariableBuffer);
     }
 
-    SECTION("feed-forward apply compression and auto make up with fixed threshold and ratio")
+    SECTION("Feed-Back Apply Compression and Auto Makeup w/ Fixed Threshold and Ratio")
     {
         chowdsp::compressor::FeedForwardCompGainComputer<float> feedForwardGainComputerCompressed{};
         feedForwardGainComputerCompressed.process(autoMakeupTestCompressedBuffer, outBuffer, gainComputerParamsCompressed);
