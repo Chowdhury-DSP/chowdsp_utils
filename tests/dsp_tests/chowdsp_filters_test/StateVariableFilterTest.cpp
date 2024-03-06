@@ -45,7 +45,7 @@ TEMPLATE_TEST_CASE ("State Variable Filter Test", "[dsp][filters][simd]", float,
     SECTION ("Second Order HPF Test")
     {
         using namespace Constants;
-        chowdsp::SVFHighpass<T> filter;
+        chowdsp::SVFHighpass<T, 1> filter;
         filter.prepare ({ (double) fs, 2048, 1 });
         filter.setCutoffFrequency ((T) fc);
         filter.setQValue ((T) Qval);

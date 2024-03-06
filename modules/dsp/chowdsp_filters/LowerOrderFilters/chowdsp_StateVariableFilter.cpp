@@ -2,17 +2,17 @@
 
 namespace chowdsp
 {
-template <typename SampleType, StateVariableFilterType type>
-StateVariableFilter<SampleType, type>::StateVariableFilter()
+template <typename SampleType, StateVariableFilterType type, size_t maxChannelCount>
+StateVariableFilter<SampleType, type, maxChannelCount>::StateVariableFilter()
 {
     setCutoffFrequency (static_cast<NumericType> (1000.0));
     setQValue (static_cast<NumericType> (1.0 / juce::MathConstants<double>::sqrt2));
     setGain (static_cast<NumericType> (1.0));
 }
 
-template <typename SampleType, StateVariableFilterType type>
+template <typename SampleType, StateVariableFilterType type, size_t maxChannelCount>
 template <bool shouldUpdate>
-void StateVariableFilter<SampleType, type>::setCutoffFrequency (SampleType newCutoffFrequencyHz)
+void StateVariableFilter<SampleType, type, maxChannelCount>::setCutoffFrequency (SampleType newCutoffFrequencyHz)
 {
     jassert (SIMDUtils::all (newCutoffFrequencyHz >= static_cast<NumericType> (0)));
     jassert (SIMDUtils::all (newCutoffFrequencyHz < static_cast<NumericType> (sampleRate * 0.5)));
@@ -27,9 +27,9 @@ void StateVariableFilter<SampleType, type>::setCutoffFrequency (SampleType newCu
         update();
 }
 
-template <typename SampleType, StateVariableFilterType type>
+template <typename SampleType, StateVariableFilterType type, size_t maxChannelCount>
 template <bool shouldUpdate>
-void StateVariableFilter<SampleType, type>::setQValue (SampleType newResonance)
+void StateVariableFilter<SampleType, type, maxChannelCount>::setQValue (SampleType newResonance)
 {
     jassert (SIMDUtils::all (newResonance > static_cast<NumericType> (0)));
 
@@ -41,9 +41,9 @@ void StateVariableFilter<SampleType, type>::setQValue (SampleType newResonance)
         update();
 }
 
-template <typename SampleType, StateVariableFilterType type>
+template <typename SampleType, StateVariableFilterType type, size_t maxChannelCount>
 template <bool shouldUpdate>
-void StateVariableFilter<SampleType, type>::setGain (SampleType newGainLinear)
+void StateVariableFilter<SampleType, type, maxChannelCount>::setGain (SampleType newGainLinear)
 {
     jassert (SIMDUtils::all (newGainLinear > static_cast<NumericType> (0)));
 
@@ -59,17 +59,17 @@ void StateVariableFilter<SampleType, type>::setGain (SampleType newGainLinear)
         update();
 }
 
-template <typename SampleType, StateVariableFilterType type>
+template <typename SampleType, StateVariableFilterType type, size_t maxChannelCount>
 template <bool shouldUpdate>
-void StateVariableFilter<SampleType, type>::setGainDecibels (SampleType newGainDecibels)
+void StateVariableFilter<SampleType, type, maxChannelCount>::setGainDecibels (SampleType newGainDecibels)
 {
     setGain<shouldUpdate> (SIMDUtils::decibelsToGain (newGainDecibels));
 }
 
-template <typename SampleType, StateVariableFilterType type>
+template <typename SampleType, StateVariableFilterType type, size_t maxChannelCount>
 template <StateVariableFilterType M>
 std::enable_if_t<M == StateVariableFilterType::MultiMode, void>
-    StateVariableFilter<SampleType, type>::setMode (NumericType mode)
+    StateVariableFilter<SampleType, type, maxChannelCount>::setMode (NumericType mode)
 {
     lowpassMult = (NumericType) 1 - (NumericType) 2 * juce::jmin ((NumericType) 0.5, mode);
     bandpassMult = (NumericType) 1 - std::abs ((NumericType) 2 * (mode - (NumericType) 0.5));
@@ -84,31 +84,38 @@ std::enable_if_t<M == StateVariableFilterType::MultiMode, void>
     bandpassMult *= juce::MathConstants<NumericType>::sqrt2;
 }
 
-template <typename SampleType, StateVariableFilterType type>
-void StateVariableFilter<SampleType, type>::prepare (const juce::dsp::ProcessSpec& spec)
+template <typename SampleType, StateVariableFilterType type, size_t maxChannelCount>
+void StateVariableFilter<SampleType, type, maxChannelCount>::prepare (const juce::dsp::ProcessSpec& spec)
 {
     jassert (spec.sampleRate > 0);
     jassert (spec.numChannels > 0);
 
     sampleRate = spec.sampleRate;
 
-    ic1eq.resize (spec.numChannels);
-    ic2eq.resize (spec.numChannels);
+    if constexpr (maxChannelCount == dynamicChannelCount)
+    {
+        ic1eq.resize (spec.numChannels);
+        ic2eq.resize (spec.numChannels);
+    }
+    else
+    {
+        jassert (spec.numChannels <= maxChannelCount);
+    }
 
     reset();
 
     setCutoffFrequency (cutoffFrequency);
 }
 
-template <typename SampleType, StateVariableFilterType type>
-void StateVariableFilter<SampleType, type>::reset()
+template <typename SampleType, StateVariableFilterType type, size_t maxChannelCount>
+void StateVariableFilter<SampleType, type, maxChannelCount>::reset()
 {
     for (auto v : { &ic1eq, &ic2eq })
         std::fill (v->begin(), v->end(), static_cast<SampleType> (0));
 }
 
-template <typename SampleType, StateVariableFilterType type>
-void StateVariableFilter<SampleType, type>::snapToZero() noexcept // NOSONAR (cannot be const)
+template <typename SampleType, StateVariableFilterType type, size_t maxChannelCount>
+void StateVariableFilter<SampleType, type, maxChannelCount>::snapToZero() noexcept // NOSONAR (cannot be const)
 {
 #if JUCE_SNAP_TO_ZERO
     for (auto v : { &ic1eq, &ic2eq })
@@ -117,8 +124,8 @@ void StateVariableFilter<SampleType, type>::snapToZero() noexcept // NOSONAR (ca
 #endif
 }
 
-template <typename SampleType, StateVariableFilterType type>
-void StateVariableFilter<SampleType, type>::update()
+template <typename SampleType, StateVariableFilterType type, size_t maxChannelCount>
+void StateVariableFilter<SampleType, type, maxChannelCount>::update()
 {
     SampleType g, k;
     if constexpr (type == FilterType::Bell)

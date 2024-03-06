@@ -8,7 +8,7 @@ namespace chowdsp
  * Uses Transposed Direct Form II:
  * https://ccrma.stanford.edu/~jos/fp/Transposed_Direct_Forms.html
  */
-template <size_t order, typename FloatType = float>
+template <size_t order, typename FloatType = float, size_t maxChannelCount = defaultChannelCount>
 class IIRFilter
 {
 public:
@@ -30,13 +30,16 @@ public:
     /** Prepares the filter for processing a new number of channels */
     void prepare (const juce::dsp::ProcessSpec& spec)
     {
-        prepare ((int) spec.numChannels);
+        prepare (static_cast<int> (spec.numChannels));
     }
 
     /** Prepares the filter for processing a new number of channels */
-    void prepare (int numChannels)
+    void prepare ([[maybe_unused]] int numChannels)
     {
-        z.resize (numChannels);
+        if constexpr (maxChannelCount == dynamicChannelCount)
+            z.resize (numChannels);
+        else
+            jassert (numChannels <= maxChannelCount);
     }
 
     /** Reset filter state */
@@ -146,7 +149,10 @@ public:
 
     FloatType a[order + 1]; // raw feedback "a" coefficients
     FloatType b[order + 1]; // raw feedforward "b" coefficients
-    std::vector<std::array<FloatType, order + 1>> z; // filter state (per-channel)
+
+    using ChannelState = std::array<FloatType, order + 1>;
+    using State = std::conditional_t<maxChannelCount == dynamicChannelCount, std::vector<ChannelState>, std::array<ChannelState, maxChannelCount>>;
+    State z; // filter state (per-channel)
 
     template <typename PrototypeFilter>
     friend class ModFilterWrapper;

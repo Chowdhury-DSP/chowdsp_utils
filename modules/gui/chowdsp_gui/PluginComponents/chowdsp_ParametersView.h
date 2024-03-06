@@ -9,6 +9,7 @@ class ParametersView : public juce::Component
 {
 public:
     explicit ParametersView (PluginState& pluginState, ParamHolder& params);
+    explicit ParametersView (ParameterListeners& paramListeners, ParamHolder& params);
     ~ParametersView() override;
 
     void paint (juce::Graphics&) override;
