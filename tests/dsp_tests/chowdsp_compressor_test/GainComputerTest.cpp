@@ -14,7 +14,16 @@ TEST_CASE ("Gain Computer Test", "[dsp][compressor]")
     static constexpr std::array<float, blockSize> dbsToTest { -30.0f, -20.0f, -15.0f, -12.0f, -9.0f, -6.0f, 0.0f, 6.0f };
     static constexpr std::array<float, blockSize> autoMakeupTest { 4.0f, -3.0f, 4.0f, -3.0f, 4.0f, -3.0f, 4.0f, -3.0f };
     static constexpr std::array<float, blockSize> autoMakeupTestVariable { -2.875f, -2.75f, -2.625f, -2.5f, -2.375f, -2.25f, -2.125f, -2.0f };
-    static constexpr std::array<float, blockSize> autoMakeupTestFeedBackFixed { -6.0f, 4.0f, -6.0f, 4.0f, -6.0f, 4.0f, -6.0f, 4.0f,};
+    static constexpr std::array<float, blockSize> autoMakeupTestFeedBackFixed {
+        -6.0f,
+        4.0f,
+        -6.0f,
+        4.0f,
+        -6.0f,
+        4.0f,
+        -6.0f,
+        4.0f,
+    };
     static constexpr std::array<float, blockSize> autoMakeupTestFeedBackVariable { -5.75f, -5.5f, -5.25f, -5.0f, -4.75f, -4.49f, -4.24f, -4.0f };
     static constexpr std::array<float, blockSize> autoMakeupTestCompressed { 16.0f, 16.0f, 16.0f, 16.0f, 16.0f, 16.0f, 16.0f, 16.0f };
 
@@ -24,16 +33,18 @@ TEST_CASE ("Gain Computer Test", "[dsp][compressor]")
     chowdsp::SmoothedBufferValue<float, juce::ValueSmoothingTypes::Multiplicative> ratioSmooth;
 
     //prepare and process thresh smooth
-    threshSmoothFixed.mappingFunction = [] (float x) { return juce::Decibels::decibelsToGain (x); };
+    threshSmoothFixed.mappingFunction = [] (float x)
+    { return juce::Decibels::decibelsToGain (x); };
     threshSmoothFixed.prepare (fs, blockSize);
     threshSmoothFixed.reset (-6.0f);
     threshSmoothFixed.process (threshSmoothFixed.getCurrentValue(), blockSize);
 
-    threshSmoothVariable.mappingFunction = [] (float x) { return juce::Decibels::decibelsToGain (x); };
-    threshSmoothVariable.prepare(fs, blockSize);
-    threshSmoothVariable.setRampLength(rampLength);
-    threshSmoothVariable.reset(-6.0f);
-    threshSmoothVariable.process(-4.0, blockSize);
+    threshSmoothVariable.mappingFunction = [] (float x)
+    { return juce::Decibels::decibelsToGain (x); };
+    threshSmoothVariable.prepare (fs, blockSize);
+    threshSmoothVariable.setRampLength (rampLength);
+    threshSmoothVariable.reset (-6.0f);
+    threshSmoothVariable.process (-4.0, blockSize);
 
     threshSmoothCompressed.mappingFunction = [] (float x)
     { return juce::Decibels::decibelsToGain (x); };
