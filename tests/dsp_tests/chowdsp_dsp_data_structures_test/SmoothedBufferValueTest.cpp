@@ -25,8 +25,8 @@ TEMPLATE_PRODUCT_TEST_CASE ("Smoothed Buffer Value Test", "[dsp][data-structures
         ref.setTargetValue (value);
         for (int i = 0; i < numBlocks; ++i)
         {
-            if (arena != std::nullopt)
-                comp.process (value, maxBlockSize, arena.value());
+            if (arena)
+                comp.process (value, maxBlockSize, arena->get());
             else
                 comp.process (value, maxBlockSize);
             const auto* smoothData = comp.getSmoothedBuffer();
@@ -39,7 +39,7 @@ TEMPLATE_PRODUCT_TEST_CASE ("Smoothed Buffer Value Test", "[dsp][data-structures
 
             const auto isActuallySmoothing = ! juce::approximatelyEqual (smoothData[0], smoothData[maxBlockSize - 1]);
             REQUIRE_MESSAGE (comp.isSmoothing() == isActuallySmoothing, "SmoothedBufferValue is not smoothing correctly!");
-            if (arena.has_value())
+            if (arena)
                 arena->get().clear();
         }
     };
