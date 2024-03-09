@@ -11,7 +11,8 @@ SimpleEQPlugin::SimpleEQPlugin()
         [] (auto typeIndex)
         {
             using TypeAtIndex = EQFilterChoices::AtIndex<typeIndex>;
-            juce::Logger::writeToLog (chowdsp::toString (NAMEOF_TYPE (TypeAtIndex)) + ", " + Params::bandTypeChoices[typeIndex]);
+            juce::Logger::writeToLog (chowdsp::toString (NAMEOF_TYPE (TypeAtIndex))
+                                      + ", " + Params::bandTypeChoices[static_cast<int> (typeIndex)]);
         });
 
     linPhaseEQ.updatePrototypeEQParameters = [] (auto& eq, auto& eqParams)
