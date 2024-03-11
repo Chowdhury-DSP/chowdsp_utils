@@ -27,7 +27,9 @@ public:
     void reset (size_t new_size_bytes)
     {
         clear();
-        raw_data.resize (new_size_bytes, {});
+
+        if constexpr (MemoryResourceTypeHasResize<MemoryResourceType>)
+            raw_data.resize (new_size_bytes, {});
     }
 
     /**
@@ -109,5 +111,7 @@ public:
 private:
     MemoryResourceType raw_data {};
     size_t bytes_used = 0;
+
+    CHOWDSP_CHECK_HAS_METHOD (MemoryResourceTypeHasResize, resize, std::declval<size_t>())
 };
 } // namespace chowdsp
