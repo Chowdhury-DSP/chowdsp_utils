@@ -2,7 +2,7 @@
 
 namespace chowdsp
 {
-class Logger
+class Logger : private juce::Timer
 {
 public:
     Logger (const juce::String& logFileSubDir,
@@ -17,6 +17,8 @@ public:
     const LogFileParams params;
 
 private:
+    void timerCallback() override;
+
     CrashLogHelpers::CrashLogAnalysisCallback crashLogAnalysisCallback = &CrashLogHelpers::defaultCrashLogAnalyzer;
 
     juce::File log_file {};

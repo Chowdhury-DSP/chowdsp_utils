@@ -60,23 +60,27 @@ namespace LogFileHelpers
         }
     }
 
+    void flushLogger (BaseLogger* logger)
+    {
+        try
+        {
+            logger->internal_logger.flush();
+        }
+        // LCOV_EXCL_START
+        catch ([[maybe_unused]] const spdlog::spdlog_ex& ex)
+        {
+            logger->internal_logger.error (std::string { "Unable to flush logger! " } + ex.what());
+            jassertfalse;
+        }
+        // LCOV_EXCL_END
+    }
+
     void shutdownLogger (int signal)
     {
         juce::Logger::writeToLog (toString (signal == 0 ? exitString : crashString));
 
         if (auto* logger = dynamic_cast<BaseLogger*> (juce::Logger::getCurrentLogger()))
-        {
-            try
-            {
-                logger->internal_logger.flush();
-            }
-            // LCOV_EXCL_START
-            catch ([[maybe_unused]] const spdlog::spdlog_ex& ex)
-            {
-                jassertfalse;
-            }
-            // LCOV_EXCL_END
-        }
+            flushLogger (logger);
 
         juce::Logger::setCurrentLogger (nullptr);
     }
