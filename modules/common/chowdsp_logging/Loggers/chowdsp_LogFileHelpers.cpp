@@ -69,7 +69,7 @@ namespace LogFileHelpers
         // LCOV_EXCL_START
         catch ([[maybe_unused]] const spdlog::spdlog_ex& ex)
         {
-            logger->internal_logger.error (std::string { "Unable to flush logger! " } + ex.what());
+            DBG (std::string { "Unable to flush logger! " } + ex.what());
             jassertfalse;
         }
         // LCOV_EXCL_END
