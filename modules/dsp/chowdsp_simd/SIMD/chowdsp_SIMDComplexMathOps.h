@@ -18,7 +18,7 @@ inline xsimd::batch<Type> SIMDComplexMulImag (const xsimd::batch<std::complex<Ty
 
 /** SIMDComplex implementation of std::pow */
 template <typename BaseType, typename OtherType>
-inline std::enable_if_t<std::is_same_v<chowdsp::SampleTypeHelpers::NumericType<OtherType>, BaseType>, xsimd::batch<std::complex<BaseType>>>
+inline std::enable_if_t<std::is_same_v<SampleTypeHelpers::NumericType<OtherType>, BaseType>, xsimd::batch<std::complex<BaseType>>>
     pow (const xsimd::batch<std::complex<BaseType>>& a, OtherType x)
 {
     auto absa = xsimd::abs (a);
@@ -31,7 +31,7 @@ inline std::enable_if_t<std::is_same_v<chowdsp::SampleTypeHelpers::NumericType<O
 
 /** SIMDComplex implementation of std::pow */
 template <typename BaseType, typename OtherType>
-inline std::enable_if_t<std::is_same_v<chowdsp::SampleTypeHelpers::NumericType<OtherType>, BaseType>, xsimd::batch<std::complex<BaseType>>>
+inline std::enable_if_t<std::is_same_v<SampleTypeHelpers::NumericType<OtherType>, BaseType>, xsimd::batch<std::complex<BaseType>>>
     pow (OtherType a, const xsimd::batch<std::complex<BaseType>>& z)
 {
     // same as the complex/complex xsimd implementation, except that we can skip calling arg()!
