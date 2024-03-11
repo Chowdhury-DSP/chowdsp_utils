@@ -103,6 +103,24 @@ public:
         return arena_count;
     }
 
+    /**
+     * Returns the total number of bytes currently being used
+     * by this allocator.
+     *
+     * Note that due to the design of the allocator, not all
+     * of the available bytes may be used at any given time.
+     * As such, the allocator's "load factor" can be computed
+     * as: get_total_bytes_used() / (get_arena_count() * arena_size_bytes)
+     */
+    [[nodiscard]] size_t get_total_bytes_used() const noexcept
+    {
+        size_t bytes_count = 0;
+        for (auto arena_iter = arenas.begin(); arena_iter != current_arena; ++arena_iter)
+            bytes_count += arena_iter->get_bytes_used();
+        bytes_count += current_arena->get_bytes_used();
+        return bytes_count;
+    }
+
     struct Frame
     {
         explicit Frame (ChainedArenaAllocator& allocator)
