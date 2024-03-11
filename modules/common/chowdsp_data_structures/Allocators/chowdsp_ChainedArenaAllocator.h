@@ -81,7 +81,7 @@ public:
     template <typename T, typename IntType>
     T* data (IntType offset_bytes) noexcept
     {
-        return get_current_arena().data<T> (offset_bytes);
+        return get_current_arena().template data<T> (offset_bytes);
     }
 
     /** Returns the arena currently being used */
