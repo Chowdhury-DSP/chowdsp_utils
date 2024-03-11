@@ -8,7 +8,7 @@ template <typename MemoryResourceType = std::vector<std::byte>>
 class ChainedArenaAllocator
 {
 public:
-    using ArenaAllocator = ArenaAllocator<MemoryResourceType>;
+    using BaseArena = ArenaAllocator<MemoryResourceType>;
 
     ChainedArenaAllocator()
     {
@@ -85,7 +85,7 @@ public:
     }
 
     /** Returns the arena currently being used */
-    ArenaAllocator& get_current_arena()
+    BaseArena& get_current_arena()
     {
         jassert (current_arena != arenas.end());
         return *current_arena;
@@ -136,8 +136,8 @@ public:
         }
 
         ChainedArenaAllocator& alloc;
-        const typename std::forward_list<ArenaAllocator>::iterator arena_at_start;
-        typename ArenaAllocator::Frame arena_frame;
+        const typename std::forward_list<BaseArena>::iterator arena_at_start;
+        typename BaseArena::Frame arena_frame;
     };
 
     /** Creates a frame for this allocator */
@@ -164,8 +164,8 @@ private:
         get_current_arena().clear();
     }
 
-    std::forward_list<ArenaAllocator> arenas {};
-    typename std::forward_list<ArenaAllocator>::iterator current_arena {};
+    std::forward_list<BaseArena> arenas {};
+    typename std::forward_list<BaseArena>::iterator current_arena {};
     size_t arena_size_bytes = 0;
     size_t arena_count = 0;
 };
