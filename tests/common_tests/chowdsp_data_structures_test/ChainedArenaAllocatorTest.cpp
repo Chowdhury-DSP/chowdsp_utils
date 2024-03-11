@@ -1,7 +1,7 @@
 #include <CatchUtils.h>
 #include <chowdsp_data_structures/chowdsp_data_structures.h>
 
-TEMPLATE_TEST_CASE ("Chained Arena Allocator Test", "[common][data-structures]", (std::vector<std::byte>), (std::array<std::byte, 100>))
+TEMPLATE_TEST_CASE ("Chained Arena Allocator Test", "[common][data-structures]", (std::vector<std::byte>), (std::array<std::byte, 100>) )
 {
     using MemoryResourceType = TestType;
 
