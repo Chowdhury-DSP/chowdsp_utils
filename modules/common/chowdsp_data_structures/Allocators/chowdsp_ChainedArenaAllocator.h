@@ -4,10 +4,17 @@
 
 namespace chowdsp
 {
+template <typename MemoryResourceType = std::vector<std::byte>>
 class ChainedArenaAllocator
 {
 public:
-    ChainedArenaAllocator() = default;
+    using ArenaAllocator = ArenaAllocator<MemoryResourceType>;
+
+    ChainedArenaAllocator()
+    {
+        if (MemoryResourceType test_mrt {}; test_mrt.size() > 0)
+            reset (test_mrt.size());
+    }
 
     /** Constructs the arena with an initial allocated size. */
     explicit ChainedArenaAllocator (size_t size_in_bytes)
@@ -78,7 +85,7 @@ public:
     }
 
     /** Returns the arena currently being used */
-    ArenaAllocator<>& get_current_arena()
+    ArenaAllocator& get_current_arena()
     {
         jassert (current_arena != arenas.end());
         return *current_arena;
@@ -111,8 +118,8 @@ public:
         }
 
         ChainedArenaAllocator& alloc;
-        const std::forward_list<ArenaAllocator<>>::iterator arena_at_start;
-        ArenaAllocator<>::Frame arena_frame;
+        const typename std::forward_list<ArenaAllocator>::iterator arena_at_start;
+        typename ArenaAllocator::Frame arena_frame;
     };
 
     /** Creates a frame for this allocator */
@@ -139,8 +146,8 @@ private:
         get_current_arena().clear();
     }
 
-    std::forward_list<ArenaAllocator<>> arenas {};
-    std::forward_list<ArenaAllocator<>>::iterator current_arena {};
+    std::forward_list<ArenaAllocator> arenas {};
+    typename std::forward_list<ArenaAllocator>::iterator current_arena {};
     size_t arena_size_bytes = 0;
     size_t arena_count = 0;
 };
