@@ -33,10 +33,19 @@ Logger::Logger (const LogFileParams& loggerParams,
     juce::Logger::setCurrentLogger (&logger);
 
     juce::SystemStats::setApplicationCrashHandler (signalHandler);
+
+    if (loggerParams.flushPeriodMilliseconds > 0)
+        startTimer (loggerParams.flushPeriodMilliseconds);
 }
 
 Logger::~Logger()
 {
+    stopTimer();
     LogFileHelpers::shutdownLogger();
+}
+
+void Logger::timerCallback()
+{
+    LogFileHelpers::flushLogger (&logger);
 }
 } // namespace chowdsp
