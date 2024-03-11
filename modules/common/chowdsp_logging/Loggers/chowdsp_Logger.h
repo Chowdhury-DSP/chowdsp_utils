@@ -10,7 +10,7 @@ public:
             CrashLogHelpers::CrashLogAnalysisCallback&& callback = &CrashLogHelpers::defaultCrashLogAnalyzer);
     explicit Logger (const LogFileParams& loggerParams,
                      CrashLogHelpers::CrashLogAnalysisCallback&& callback = &CrashLogHelpers::defaultCrashLogAnalyzer);
-    ~Logger();
+    ~Logger() override;
 
     [[nodiscard]] const juce::File& getLogFile() const { return log_file; }
 
