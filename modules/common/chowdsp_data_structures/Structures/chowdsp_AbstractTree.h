@@ -27,7 +27,8 @@ public:
         {
             size_t bucket_index;
             size_t slot_index;
-        } locator;
+        };
+        Locator locator;
     };
 
     AbstractTree();
@@ -95,8 +96,8 @@ public:
 
     Node* createEmptyNode();
 
-    Node& getRootNode() noexcept { return root_node; }
-    const Node& getRootNode() const noexcept { return root_node; }
+    [[nodiscard]] Node& getRootNode() noexcept { return root_node; }
+    [[nodiscard]] const Node& getRootNode() const noexcept { return root_node; }
 
 protected:
     virtual ElementType& insertElementInternal (ElementType&& element, Node& root_node) = 0;
