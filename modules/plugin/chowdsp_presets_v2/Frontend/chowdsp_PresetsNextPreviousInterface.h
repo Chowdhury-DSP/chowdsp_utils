@@ -21,14 +21,10 @@ public:
     bool goToPreviousPreset();
 
 private:
-    void updateCurrentPresetIndex();
     bool navigateThroughPresets (bool forward);
 
     PresetManager& presetManager;
     bool wrapAtEndOfTree = true;
-
-    int currentPresetIndex = -1;
-    ScopedCallback presetChangedCallback;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NextPrevious)
 };

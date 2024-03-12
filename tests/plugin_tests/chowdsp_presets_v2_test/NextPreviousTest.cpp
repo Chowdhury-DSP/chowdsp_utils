@@ -30,10 +30,18 @@ TEST_CASE ("Next/Previous Test", "[plugin][presets]")
         REQUIRE (nextPrev.goToPreviousPreset() == false);
     }
 
-    const auto loadPreset = [] (chowdsp::presets::PresetManager& mgr, int index)
+    SECTION ("With External Preset")
     {
-        mgr.loadPreset (*mgr.getPresetTree().getElementByIndex (index));
-    };
+        chowdsp::presets::PresetManager presetMgr { state };
+        presetMgr.addPresets ({ chowdsp::presets::Preset { "A", "Vendor", { { "value", 0 } } },
+                                chowdsp::presets::Preset { "B", "Vendor", { { "value", 1 } } },
+                                chowdsp::presets::Preset { "C", "Vendor", { { "value", 2 } } } });
+        presetMgr.loadPreset ({ "Blah", "Blah Vendor", { { "value", 1000 } } });
+
+        chowdsp::presets::frontend::NextPrevious nextPrev { presetMgr };
+        REQUIRE (nextPrev.goToNextPreset() == false);
+        REQUIRE (nextPrev.goToPreviousPreset() == false);
+    }
 
     const auto checkPresetIndex = [] (chowdsp::presets::PresetManager& mgr, int expectedIndex)
     {
@@ -51,7 +59,7 @@ TEST_CASE ("Next/Previous Test", "[plugin][presets]")
         nextPrev.setShouldWrapAtEndOfList (false);
         REQUIRE (nextPrev.willWrapAtEndOFList() == false);
 
-        loadPreset (presetMgr, 0);
+        presetMgr.loadPreset (*presetMgr.getPresetTree().getRootNode().first_child->leaf);
         checkPresetIndex (presetMgr, 0);
 
         REQUIRE (nextPrev.goToPreviousPreset() == false);
@@ -76,18 +84,20 @@ TEST_CASE ("Next/Previous Test", "[plugin][presets]")
         checkPresetIndex (presetMgr, 0);
     }
 
-    SECTION ("With Wrapping")
+    SECTION ("With Wrapping and Nesting")
     {
         chowdsp::presets::PresetManager presetMgr { state };
-        presetMgr.addPresets ({ chowdsp::presets::Preset { "A", "Vendor", { { "value", 0 } } },
-                                chowdsp::presets::Preset { "B", "Vendor", { { "value", 1 } } },
-                                chowdsp::presets::Preset { "C", "Vendor", { { "value", 2 } } } });
+        presetMgr.getPresetTree().treeInserter = &chowdsp::presets::PresetTreeInserters::vendorInserter;
+
+        presetMgr.addPresets ({ chowdsp::presets::Preset { "A", "A Vendor", { { "value", 0 } } },
+                                chowdsp::presets::Preset { "B", "B Vendor", { { "value", 1 } } },
+                                chowdsp::presets::Preset { "C", "C Vendor", { { "value", 2 } } } });
 
         chowdsp::presets::frontend::NextPrevious nextPrev { presetMgr };
         nextPrev.setShouldWrapAtEndOfList (true);
         REQUIRE (nextPrev.willWrapAtEndOFList() == true);
 
-        loadPreset (presetMgr, 0);
+        presetMgr.loadPreset (*presetMgr.getPresetTree().getRootNode().first_child->first_child->leaf);
         checkPresetIndex (presetMgr, 0);
 
         REQUIRE (nextPrev.goToNextPreset() == true);

@@ -50,11 +50,6 @@ TEST_CASE ("Program Adapter Test", "[plugin][presets]")
         REQUIRE (adapter.getProgramName (4) == "");
     }
 
-    const auto loadPreset = [] (chowdsp::presets::PresetManager& mgr, int index)
-    {
-        mgr.loadPreset (*mgr.getPresetTree().getElementByIndex (index));
-    };
-
     const auto checkPresetIndex = [] (chowdsp::presets::PresetManager& mgr, int expectedIndex)
     {
         REQUIRE (mgr.getCurrentPreset()->getState()["value"] == expectedIndex);
@@ -68,13 +63,13 @@ TEST_CASE ("Program Adapter Test", "[plugin][presets]")
                                  chowdsp::presets::Preset { "B", "Vendor", { { "value", 1 } } },
                                  chowdsp::presets::Preset { "C", "Vendor", { { "value", 2 } } } });
 
-        loadPreset (*presetMgr, 0);
+        presetMgr->loadPreset (*presetMgr->getPresetTree().getRootNode().first_child->leaf);
         REQUIRE (adapter.getCurrentProgram() == 0);
 
-        loadPreset (*presetMgr, 1);
+        presetMgr->loadPreset (*presetMgr->getPresetTree().getRootNode().first_child->next_sibling->leaf);
         REQUIRE (adapter.getCurrentProgram() == 1);
 
-        loadPreset (*presetMgr, 2);
+        presetMgr->loadPreset (*presetMgr->getPresetTree().getRootNode().first_child->next_sibling->next_sibling->leaf);
         REQUIRE (adapter.getCurrentProgram() == 2);
     }
 

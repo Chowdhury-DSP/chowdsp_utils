@@ -1,7 +1,6 @@
 #pragma once
 
 #include <optional>
-#include <vector>
 
 namespace chowdsp
 {
@@ -10,27 +9,32 @@ template <typename ElementType>
 class AbstractTree
 {
 public:
-    /** Node type used by the tree internally. */
     struct Node
     {
-        std::optional<ElementType> leaf {};
-        int leafIndex = -1; // Internal use only!
+        std::optional<ElementType> leaf { std::nullopt };
 
-        using NodeAllocator = short_alloc::short_alloc<Node, 8192, 8>;
-        using NodeArena = typename NodeAllocator::arena_type;
-        std::vector<Node, typename Node::NodeAllocator> subtree {};
-        std::string tag;
+        Node* parent {}; // slot for parent in hierarchy
+        Node* first_child {}; // slot for first child in hierarchy
+        Node* last_child {}; // slot for last child in hierarchy
+        Node* next_sibling {}; // slot for next sibling in hierarchy
+        Node* prev_sibling {}; // slot for previous sibling in hierarchy
+        Node* next_linear {}; // slot for linked list through all nodes
+        Node* prev_linear {}; // slot for linked list through all nodes
 
-        explicit Node (NodeArena& arena) : subtree (arena) {}
+        std::string tag {};
+
+        struct Locator // bucket array locator
+        {
+            size_t bucket_index;
+            size_t slot_index;
+        } locator;
     };
 
-    using NodeVector = typename std::vector<Node, typename Node::NodeAllocator>;
+    AbstractTree();
+    virtual ~AbstractTree();
 
-    AbstractTree() = default;
-    virtual ~AbstractTree() = default;
-
-    AbstractTree (const AbstractTree&) = default;
-    AbstractTree& operator= (const AbstractTree&) = default;
+    AbstractTree (const AbstractTree&) = delete;
+    AbstractTree& operator= (const AbstractTree&) = delete;
     AbstractTree (AbstractTree&&) noexcept = default;
     AbstractTree& operator= (AbstractTree&&) noexcept = default;
 
@@ -49,29 +53,27 @@ public:
      */
     void insertElements (std::vector<ElementType>&& elements);
 
-    /** Removes a element by index. */
-    void removeElement (int index);
+    template <typename Comparator>
+    static void insertNodeSorted (Node& parent, Node* new_node, Comparator&& comparator);
+
+    /** Removes a node. */
+    void removeNode (Node& node);
 
     /** Removes a element by value. */
     void removeElement (const ElementType& element);
 
-    /** Removes elements that meet the given criterion. */
-    void removeElements (const std::function<bool (const ElementType&)>& elementsToRemove);
+    /**
+     * Removes elements that meet the given criterion.
+     * Callable should have the form `bool (const ElementType&)`.
+     */
+    template <typename Callable>
+    void removeElements (const Callable& elementsToRemove);
 
     /** Removes all elements from the tree. */
     void clear();
 
     /** Returns the total number of elements contained in this tree. */
-    [[nodiscard]] int size() const { return totalNumElements; }
-
-    /** Returns a pointer to an element by index, or nullptr if the index is out of range. */
-    [[nodiscard]] ElementType* getElementByIndex (int index);
-
-    /** Returns a pointer to an element by index, or nullptr if the index is out of range. */
-    [[nodiscard]] const ElementType* getElementByIndex (int index) const;
-
-    /** Returns the index of an element, or -1 if the element is not present in the tree. */
-    [[nodiscard]] int getIndexForElement (const ElementType& element) const;
+    [[nodiscard]] int size() const { return count; }
 
     /** Checks if the tree currently contains an element. If true, then return the element, else return nullptr. */
     [[nodiscard]] ElementType* findElement (const ElementType& element);
@@ -91,25 +93,22 @@ public:
     template <typename Callable>
     void doForAllElements (Callable&& callable) const;
 
-    [[nodiscard]] auto& getNodes() { return nodes; }
-    [[nodiscard]] const auto& getNodes() const { return nodes; }
+    Node* createEmptyNode();
 
-    Node createEmptyNode()
-    {
-        return Node { nodeArena };
-    }
+    Node& getRootNode() noexcept { return root_node; }
+    const Node& getRootNode() const noexcept { return root_node; }
 
 protected:
-    virtual ElementType& insertElementInternal (ElementType&& element, NodeVector& topLevelNodes) = 0;
+    virtual ElementType& insertElementInternal (ElementType&& element, Node& root_node) = 0;
     virtual void onDelete (const Node& /*nodeBeingDeleted*/) {}
 
-    typename Node::NodeArena nodeArena;
-
 private:
-    void refreshElementIndexes();
+    BucketArray<Node, 32> nodes;
 
-    NodeVector nodes { nodeArena };
-    int totalNumElements = 0;
+    Node root_node {};
+    int count = 0;
+
+    Node* last_node = &root_node;
 };
 } // namespace chowdsp
 
