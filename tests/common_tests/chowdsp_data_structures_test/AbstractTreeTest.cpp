@@ -120,6 +120,14 @@ TEST_CASE ("Abstract Tree Test", "[common][data-structures]")
         tree.removeElements ([] (const std::string& el)
                              { return ! el.empty(); });
         REQUIRE (tree.size() == 0);
+
+        tree.insertElement ("mussels");
+        REQUIRE (tree.size() == 1);
+        REQUIRE (tree.getRootNode().first_child->tag == "m");
+        REQUIRE (tree.getRootNode().first_child->first_child->leaf == "mussels");
+
+        auto* found = tree.findElement ("mussels");
+        REQUIRE (found != nullptr);
     }
 
     SECTION ("Find Success")

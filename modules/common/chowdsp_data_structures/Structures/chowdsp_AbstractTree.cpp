@@ -83,6 +83,9 @@ void AbstractTree<ElementType>::removeNode (Node& node)
     // we don't need to check if node.prev_linear is nullptr, because the root node is never deleted!
     node.prev_linear->next_linear = node.next_linear;
 
+    if (last_node == &node)
+        last_node = node.prev_linear;
+
     if (node.parent->first_child == node.parent->last_child)
     {
         node.parent->first_child = nullptr;
@@ -96,9 +99,6 @@ void AbstractTree<ElementType>::removeNode (Node& node)
         if (node.parent->last_child == &node)
             node.parent->last_child = node.prev_sibling;
     }
-
-    if (last_node == &node)
-        last_node = node.prev_linear;
 
     nodes.remove ({ node.locator.bucket_index, node.locator.slot_index });
 }
