@@ -11,45 +11,52 @@ struct DataTree : chowdsp::AbstractTree<FakeData>
     static constexpr std::string_view negativeTag = "negative";
     static constexpr std::string_view zeroTag = "zero";
 
-    static Node& insertOneElement (FakeData&& element, NodeVector& nodes, chowdsp::AbstractTree<FakeData>& tree)
+    static Node& insertOneElement (FakeData&& element, Node& parent, AbstractTree& tree)
     {
-        auto newNode = tree.createEmptyNode();
-        newNode.leaf = std::move (element);
-        return *nodes.insert (nodes.end(), std::move (newNode));
+        auto* new_node = tree.createEmptyNode();
+        new_node->leaf = std::move (element);
+        new_node->prev_sibling = parent.last_child;
+        if (parent.last_child != nullptr)
+            parent.last_child->next_sibling = new_node;
+        parent.last_child = new_node;
+        return *new_node;
     }
 
     static Node& insertElementIntoNewSubtree (FakeData&& element,
-                                              NodeVector& topLevelNodes,
-                                              chowdsp::AbstractTree<FakeData>& tree,
+                                              Node& parent,
+                                              AbstractTree& tree,
                                               std::string_view tag)
     {
-        auto newSubTreeNode = tree.createEmptyNode();
-        newSubTreeNode.tag = std::string { tag };
-        auto& insertedSubTreeNode = *topLevelNodes.insert (topLevelNodes.end(), std::move (newSubTreeNode));
-        return insertOneElement (std::move (element), insertedSubTreeNode.subtree, tree);
+        auto* new_sub_tree_node = tree.createEmptyNode();
+        new_sub_tree_node->tag = std::string { tag };
+        new_sub_tree_node->prev_sibling = parent.last_child;
+        if (parent.last_child != nullptr)
+            parent.last_child->next_sibling = new_sub_tree_node;
+        parent.last_child = new_sub_tree_node;
+        return insertOneElement (std::move (element), *new_sub_tree_node, tree);
     }
 
-    FakeData& insertElementInternal (FakeData&& element, NodeVector& topLevelNodes) override
+    FakeData& insertElementInternal (FakeData&& element, Node& root) override
     {
-        for (auto& node : topLevelNodes)
+        for (auto* iter = root.first_child; iter != nullptr; iter = iter->next_sibling)
         {
-            if (node.tag == positiveTag && element[0] > 0)
-                return *insertOneElement (std::move (element), node.subtree, *this).leaf;
+            if (iter->tag == positiveTag && element[0] > 0)
+                return *insertOneElement (std::move (element), *iter, *this).leaf;
 
-            if (node.tag == negativeTag && element[0] < 0)
-                return *insertOneElement (std::move (element), node.subtree, *this).leaf;
+            if (iter->tag == negativeTag && element[0] < 0)
+                return *insertOneElement (std::move (element), *iter, *this).leaf;
 
-            if (node.tag == zeroTag && element[0] == 0)
-                return *insertOneElement (std::move (element), node.subtree, *this).leaf;
+            if (iter->tag == zeroTag && element[0] == 0)
+                return *insertOneElement (std::move (element), *iter, *this).leaf;
         }
 
         if (element[0] > 0)
-            return *insertElementIntoNewSubtree (std::move (element), topLevelNodes, *this, positiveTag).leaf;
+            return *insertElementIntoNewSubtree (std::move (element), root, *this, positiveTag).leaf;
 
         if (element[0] < 0)
-            return *insertElementIntoNewSubtree (std::move (element), topLevelNodes, *this, negativeTag).leaf;
+            return *insertElementIntoNewSubtree (std::move (element), root, *this, negativeTag).leaf;
 
-        return *insertElementIntoNewSubtree (std::move (element), topLevelNodes, *this, zeroTag).leaf;
+        return *insertElementIntoNewSubtree (std::move (element), root, *this, zeroTag).leaf;
     }
 };
 
@@ -230,7 +237,17 @@ static void accessTree (benchmark::State& state)
 
     for (auto _ : state)
     {
-        (*tree.getElementByIndex (25))[0]++;
+        int iter_count = 0;
+        for (auto* iter = &tree.getRootNode(); iter != nullptr; iter = iter->next_sibling)
+        {
+            if (iter_count == 25)
+            {
+                (*iter->leaf)[0]++;
+                benchmark::DoNotOptimize ((*iter->leaf)[0]);
+                break;
+            }
+            iter_count++;
+        }
     }
 }
 BENCHMARK (accessTree)->MinTime (0.5);
