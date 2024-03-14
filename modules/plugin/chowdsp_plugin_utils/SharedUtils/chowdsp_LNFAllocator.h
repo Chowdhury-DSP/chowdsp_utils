@@ -36,10 +36,10 @@ public:
     {
         auto& lnfCacheEntry = lnfs[getLNFType<LookAndFeelSubclass>()];
         if (lnfCacheEntry != nullptr)
-            return reinterpret_cast<LookAndFeelSubclass*> (lnfCacheEntry.get());
+            return reinterpret_cast<LookAndFeelSubclass*> (lnfCacheEntry.get()); // NOSONAR
 
         lnfCacheEntry = std::make_unique<LookAndFeelSubclass>();
-        return reinterpret_cast<LookAndFeelSubclass*> (lnfCacheEntry.get());
+        return dynamic_cast<LookAndFeelSubclass*> (lnfCacheEntry.get());
     }
 
     /** Checks if the allocator already contains this look and feel */
