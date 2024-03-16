@@ -30,6 +30,7 @@ namespace LogFileHelpers
     // delete old log files to keep the total number of log files below the max!
     void pruneOldLogFiles (FileArray& logFiles, const LogFileParams& params);
 
+    void flushLogger (BaseLogger* logger);
     void shutdownLogger (int signal = 0);
 } // namespace LogFileHelpers
 #endif // DOXYGEN

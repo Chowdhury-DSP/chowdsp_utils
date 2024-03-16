@@ -36,9 +36,9 @@ JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wswitch-enum",
 
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
+#include "Loggers/chowdsp_BaseLogger.h"
 #include "Loggers/chowdsp_LogFileHelpers.h"
 #include "Loggers/chowdsp_CrashLogHelpers.h"
-#include "Loggers/chowdsp_BaseLogger.h"
 #include "Loggers/chowdsp_Logger.h"
 
 // legacy
