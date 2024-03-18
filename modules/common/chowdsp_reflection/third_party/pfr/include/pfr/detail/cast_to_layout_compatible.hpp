@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2022 Antony Polukhin
+// Copyright (c) 2016-2023 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,11 +7,11 @@
 #define PFR_DETAIL_CAST_TO_LAYOUT_COMPATIBLE_HPP
 #pragma once
 
-#include "config.hpp"
+#include "detail/config.hpp"
 
 #include <type_traits>
-#include <utility> // metaprogramming stuff
-#include "rvalue_t.hpp"
+#include <utility>      // metaprogramming stuff
+#include "detail/rvalue_t.hpp"
 
 namespace pfr { namespace detail {
 
