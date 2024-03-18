@@ -1,32 +1,29 @@
-// Copyright (c) 2016-2022 Antony Polukhin
+// Copyright (c) 2016-2023 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+
 #ifndef PFR_DETAIL_CORE17_HPP
 #define PFR_DETAIL_CORE17_HPP
+#pragma once
 
 #include "core17_generated.hpp"
 #include "fields_count.hpp"
 #include "for_each_field_impl.hpp"
 #include "rvalue_t.hpp"
 
-namespace pfr
-{
-namespace detail
-{
+namespace pfr { namespace detail {
 
 #ifndef _MSC_VER // MSVC fails to compile the following code, but compiles the structured bindings in core17_generated.hpp
-    struct do_not_define_std_tuple_size_for_me
-    {
-        bool test1 = true;
-    };
+struct do_not_define_std_tuple_size_for_me {
+    bool test1 = true;
+};
 
-    template <class T>
-    constexpr bool do_structured_bindings_work() noexcept
-    { // ******************************************* IN CASE OF ERROR READ THE FOLLOWING LINES IN pfr/detail/core17.hpp FILE:
-        T val{};
-    const auto& [a] = val; // ******************************************* IN CASE OF ERROR READ THE FOLLOWING LINES IN pfr/detail/core17.hpp FILE:
+template <class T>
+constexpr bool do_structured_bindings_work() noexcept { // ******************************************* IN CASE OF ERROR READ THE FOLLOWING LINES IN pfr/detail/core17.hpp FILE:
+    T val{};
+    auto& [a] = val; // ******************************************* IN CASE OF ERROR READ THE FOLLOWING LINES IN pfr/detail/core17.hpp FILE:
 
     /****************************************************************************
     *
@@ -60,7 +57,7 @@ constexpr auto tie_as_tuple(T& val) noexcept {
 }
 
 template <class T, class F, std::size_t... I>
-void for_each_field_dispatcher(T& t, F&& f, std::index_sequence<I...>) {
+constexpr void for_each_field_dispatcher(T& t, F&& f, std::index_sequence<I...>) {
     static_assert(
         !std::is_union<T>::value,
         "====================> Boost.PFR: For safety reasons it is forbidden to reflect unions. See `Reflection of unions` section in the docs for more info."

@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2022 Antony Polukhin
+// Copyright (c) 2016-2023 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,7 +10,7 @@
 #include "config.hpp"
 
 #include "sequence_tuple.hpp"
-#include <iosfwd> // stream operators
+#include <iosfwd>       // stream operators
 #include <iomanip>
 
 #if defined(__has_include)
