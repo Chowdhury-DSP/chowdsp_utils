@@ -12,7 +12,8 @@
 */
 #include <pfr/core.hpp>
 
-struct foo {            // defining structure
+struct foo
+{ // defining structure
     int some_integer;
     char c;
 };
@@ -20,23 +21,29 @@ struct foo {            // defining structure
 /*`
     We can access fields of that structure by index:
 */
-foo f {777, '!'};
-auto& r1 = pfr::get<0>(f); // accessing field with index 0, returns reference to `foo::some_integer`
-auto& r2 = pfr::get<1>(f); // accessing field with index 1, returns reference to `foo::c`
+foo f { 777, '!' };
+auto& r1 = pfr::get<0> (f); // accessing field with index 0, returns reference to `foo::some_integer`
+auto& r2 = pfr::get<1> (f); // accessing field with index 1, returns reference to `foo::c`
 //] [/pfr_example_get]
 
+int main()
+{
+    if (r1 != 777)
+        return 1;
+    if (r2 != '!')
+        return 2;
 
-int main() {
-    if (r1 != 777) return 1;
-    if (r2 != '!') return 2;
-    
     r1 = 42;
     r2 = 'A';
 
-    if (r1 != 42) return 3;
-    if (r2 != 'A') return 4;
-    if (f.some_integer != 42) return 5;
-    if (f.c != 'A') return 6;
+    if (r1 != 42)
+        return 3;
+    if (r2 != 'A')
+        return 4;
+    if (f.some_integer != 42)
+        return 5;
+    if (f.c != 'A')
+        return 6;
 
     return 0;
 }
