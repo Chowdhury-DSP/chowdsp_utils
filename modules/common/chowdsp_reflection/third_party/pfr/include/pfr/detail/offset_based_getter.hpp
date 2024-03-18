@@ -1,5 +1,5 @@
 // Copyright (c) 2017-2018 Chris Beck
-// Copyright (c) 2019-2022 Antony Polukhin
+// Copyright (c) 2019-2023 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -12,24 +12,21 @@
 
 #include <type_traits>
 #include <utility>
-#include <memory> // std::addressof
+#include <memory>  // std::addressof
 #include "sequence_tuple.hpp"
 #include "rvalue_t.hpp"
 #include "size_t_.hpp"
 
-namespace pfr
-{
-namespace detail
-{
 
-    // Our own implementation of std::aligned_storage. On godbolt with MSVC, I have compilation errors
-    // using the standard version, it seems the compiler cannot generate default ctor.
+namespace pfr { namespace detail {
 
-    template <std::size_t s, std::size_t a>
-    struct internal_aligned_storage
-    {
-        alignas (a) char storage_[s];
-    };
+// Our own implementation of std::aligned_storage. On godbolt with MSVC, I have compilation errors
+// using the standard version, it seems the compiler cannot generate default ctor.
+
+template<std::size_t s, std::size_t a>
+struct internal_aligned_storage {
+   alignas(a) char storage_[s];
+};
 
 // Metafunction that replaces tuple<T1, T2, T3, ...> with
 // tuple<std::aligned_storage_t<sizeof(T1), alignof(T1)>, std::aligned_storage<sizeof(T2), alignof(T2)>, ...>
@@ -45,7 +42,7 @@ struct tuple_of_aligned_storage<sequence_tuple::tuple<Ts...>> {
   using type = sequence_tuple::tuple<internal_aligned_storage<sizeof(Ts),
 #if defined(__GNUC__) && __GNUC__ < 8 && !defined(__x86_64__) && !defined(__CYGWIN__)
       // Before GCC-8 the `alignof` was returning the optimal alignment rather than the minimal one.
-      // We have to adjust the alignemnt because otherwise we get the wrong offset.
+      // We have to adjust the alignment because otherwise we get the wrong offset.
       (alignof(Ts) > 4 ? 4 : alignof(Ts))
 #else
       alignof(Ts)
