@@ -16,7 +16,7 @@ ParameterAttachment<Param, Callback>::ParameterAttachment (Param& parameter,
                                                            ParameterListeners& listeners,
                                                            Callback&& callback)
     : param (&parameter),
-      updateCallback (std::forward<Callback> (callback))
+      updateCallback (std::move (callback))
 {
     valueChangedCallback = listeners.addParameterListener (*param,
                                                            ParameterListenerThread::MessageThread,
