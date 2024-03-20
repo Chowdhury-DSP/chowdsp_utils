@@ -96,7 +96,9 @@ struct StringLiteral
         : actual_size (sl_detail::num_str_len (int_value))
     {
         // N is not large enough to hold this number!
+#if __cplusplus >= 202002L || _MSVC_LANG >= 202002L
         jassert (N >= actual_size);
+#endif
 
         if constexpr (std::is_signed_v<IntType>)
             sl_detail::sint_to_str (chars.data(), actual_size, static_cast<int64_t> (int_value));
