@@ -20,10 +20,10 @@ ParameterAttachment<Param, Callback>::ParameterAttachment (Param& parameter,
 {
     valueChangedCallback = listeners.addParameterListener (*param,
                                                            ParameterListenerThread::MessageThread,
-                                                           [this, c = std::move (callback)]() mutable
+                                                           [this]() mutable
                                                            {
                                                                if (param != nullptr)
-                                                                   c (ParameterTypeHelpers::getValue (*param));
+                                                                   updateCallback (ParameterTypeHelpers::getValue (*param));
                                                            });
 }
 
@@ -77,8 +77,8 @@ void ParameterAttachment<Param, Callback>::setValueAsPartOfGesture (ParamElement
 template <typename Param, typename Callback>
 void ParameterAttachment<Param, Callback>::manuallyTriggerUpdate() const
 {
-    if (param != nullptr && updateCallback.hasValue())
-        (*updateCallback) (ParameterTypeHelpers::getValue (*param));
+    if (param != nullptr)
+        updateCallback (ParameterTypeHelpers::getValue (*param));
 }
 
 template <typename Param, typename Callback>

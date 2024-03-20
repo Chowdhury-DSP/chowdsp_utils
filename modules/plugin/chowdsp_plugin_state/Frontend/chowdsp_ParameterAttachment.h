@@ -63,7 +63,7 @@ private:
     template <typename Func>
     void callIfParameterValueChanged (ParamElementType newValue, Func&& func);
 
-    juce::Optional<Callback> updateCallback;
+    Callback updateCallback {};
     ScopedCallback valueChangedCallback;
 
     JUCE_LEAK_DETECTOR (ParameterAttachment)

@@ -9,7 +9,8 @@ namespace ParameterAttachmentHelpers
     template <typename Attachment>
     struct SetValueCallback
     {
-        explicit SetValueCallback (Attachment& a) : attach (a) {}
+        SetValueCallback() = default;
+        explicit SetValueCallback (Attachment& a) : attach (&a) {}
         SetValueCallback (const SetValueCallback&) = default;
         SetValueCallback& operator= (const SetValueCallback&) = default;
         SetValueCallback (SetValueCallback&&) noexcept = default;
@@ -18,10 +19,10 @@ namespace ParameterAttachmentHelpers
         template <typename T>
         void operator() (T val)
         {
-            attach.setValue (val);
+            attach->setValue (val);
         }
 
-        Attachment& attach;
+        Attachment* attach = nullptr;
     };
 
     template <typename ParamType>

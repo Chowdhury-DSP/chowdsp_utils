@@ -364,17 +364,19 @@ TEST_CASE ("Custom Parameter Attachment Test", "[state][attachments]")
 
     using State = chowdsp::PluginStateImpl<Params>;
 
-    SECTION ("Setup Test")
-    {
-        State state;
-        auto& param = state.params.param;
+    State state;
+    auto& param = state.params.param;
 
-        juce::Component comp;
-        chowdsp::ParameterAttachment<chowdsp::BoolParameter> attach { param, state, [&comp] (bool val) { comp.setVisible (val); } };
+    juce::Component comp;
+    chowdsp::ParameterAttachment<chowdsp::BoolParameter> attach { param, state, [&comp] (bool val)
+                                                                  { comp.setVisible (val); } };
 
-        REQUIRE (! comp.isVisible());
+    REQUIRE (! comp.isVisible());
 
-        attach.manuallyTriggerUpdate();
-        REQUIRE (comp.isVisible());
-    }
+    attach.manuallyTriggerUpdate();
+    REQUIRE (comp.isVisible());
+
+    chowdsp::ParameterTypeHelpers::setValue (false, *param);
+    state.getParameterListeners().updateBroadcastersFromMessageThread();
+    REQUIRE (! comp.isVisible());
 }
