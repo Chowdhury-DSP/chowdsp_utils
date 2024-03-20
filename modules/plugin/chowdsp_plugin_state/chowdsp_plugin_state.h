@@ -40,6 +40,7 @@ JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324) // struct was padded warning
 
 #include "Frontend/chowdsp_ParameterAttachment.h"
 #include "Frontend/chowdsp_SliderAttachment.h"
+#include "Frontend/chowdsp_SliderChoiceAttachment.h"
 #include "Frontend/chowdsp_ComboBoxAttachment.h"
 #include "Frontend/chowdsp_ButtonAttachment.h"
 

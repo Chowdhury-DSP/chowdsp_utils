@@ -122,10 +122,10 @@ public:
                          EnumType defaultChoice,
                          const std::initializer_list<std::pair<char, char>>& charMap = { { '_', ' ' } })
         : ChoiceParameter (
-              parameterID,
-              parameterName,
-              EnumHelpers::createStringArray<EnumType> (charMap),
-              static_cast<int> (*magic_enum::enum_index (defaultChoice)))
+            parameterID,
+            parameterName,
+            EnumHelpers::createStringArray<EnumType> (charMap),
+            static_cast<int> (*magic_enum::enum_index (defaultChoice)))
     {
     }
 
