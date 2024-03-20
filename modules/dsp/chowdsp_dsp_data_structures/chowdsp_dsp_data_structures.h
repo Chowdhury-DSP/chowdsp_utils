@@ -29,10 +29,37 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include <chowdsp_buffers/chowdsp_buffers.h>
 #include <chowdsp_math/chowdsp_math.h>
 
+
+/** Config: CHOWDSP_USE_MOODYCAMEL_READERWRITERQUEUE_FROM_INCLUDE_PATH
+    If your project already has moodycamel's readerwriterqueue.h in its
+    include paths, define this to use that instead of the internally
+    available header.
+*/
+#ifndef CHOWDSP_USE_MOODYCAMEL_READERWRITERQUEUE_FROM_INCLUDE_PATH
+#define CHOWDSP_USE_MOODYCAMEL_READERWRITERQUEUE_FROM_INCLUDE_PATH 0
+#endif
+
+/** Config: CHOWDSP_USE_MOODYCAMEL_CONCURRENTQUEUE_FROM_INCLUDE_PATH
+    If your project already has moodycamel's concurrentqueue.h in its
+    include paths, define this to use that instead of the internally
+    available header.
+*/
+#ifndef CHOWDSP_USE_MOODYCAMEL_CONCURRENTQUEUE_FROM_INCLUDE_PATH
+#define CHOWDSP_USE_MOODYCAMEL_CONCURRENTQUEUE_FROM_INCLUDE_PATH 0
+#endif
+
 // third-party includes
 #if ! JUCE_TEENSY // readerwriterqueue does not compile with the Teensy toolchain
-#include "third_party/moodycamel/readerwriterqueue.h"
-#include "third_party/moodycamel/concurrentqueue.h"
+    #if CHOWDSP_USE_MOODYCAMEL_READERWRITERQUEUE_FROM_INCLUDE_PATH
+        #include <readerwriterqueue.h>
+    #else
+        #include "third_party/moodycamel/readerwriterqueue.h"
+    #endif
+    #if CHOWDSP_USE_MOODYCAMEL_CONCURRENTQUEUE_FROM_INCLUDE_PATH
+        #include <concurrentqueue.h>
+    #else
+        #include "third_party/moodycamel/concurrentqueue.h"
+    #endif
 #endif
 
 #include "Other/chowdsp_SmoothedBufferValue.h"
