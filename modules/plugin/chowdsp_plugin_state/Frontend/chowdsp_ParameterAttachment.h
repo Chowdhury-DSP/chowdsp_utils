@@ -18,6 +18,8 @@ public:
                          Callback&& callback);
 
     ParameterAttachment() = default;
+    ParameterAttachment (const ParameterAttachment&) = default;
+    ParameterAttachment& operator= (const ParameterAttachment&) = default;
     ParameterAttachment (ParameterAttachment&&) noexcept = default;
     ParameterAttachment& operator= (ParameterAttachment&&) noexcept = default;
 
@@ -51,6 +53,9 @@ public:
      */
     void setValueAsPartOfGesture (ParamElementType newValue);
 
+    /** Manually triggers an update as though the parameter has changed. */
+    void manuallyTriggerUpdate() const;
+
     ParamType* param = nullptr;
     PluginState* pluginState = nullptr;
 
@@ -58,9 +63,10 @@ private:
     template <typename Func>
     void callIfParameterValueChanged (ParamElementType newValue, Func&& func);
 
+    juce::Optional<Callback> updateCallback;
     ScopedCallback valueChangedCallback;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParameterAttachment)
+    JUCE_LEAK_DETECTOR (ParameterAttachment)
 };
 } // namespace chowdsp
 
