@@ -86,13 +86,19 @@ class ChoiceParameter : public juce::AudioParameterChoice,
 {
 public:
     ChoiceParameter (const ParameterID& parameterID, const juce::String& parameterName, const juce::StringArray& parameterChoices, int defaultItemIndex)
-        : juce::AudioParameterChoice (parameterID, parameterName, parameterChoices, defaultItemIndex)
+        : juce::AudioParameterChoice (parameterID, parameterName, parameterChoices, defaultItemIndex),
+          defaultChoiceIndex (defaultItemIndex)
     {
     }
 
     using Ptr = OptionalPointer<ChoiceParameter>;
 
+    /** Returns the default value for the parameter. */
+    int getDefaultIndex() const noexcept { return defaultChoiceIndex; }
+
 private:
+    const int defaultChoiceIndex = 0;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ChoiceParameter)
 };
 
@@ -116,10 +122,10 @@ public:
                          EnumType defaultChoice,
                          const std::initializer_list<std::pair<char, char>>& charMap = { { '_', ' ' } })
         : ChoiceParameter (
-            parameterID,
-            parameterName,
-            EnumHelpers::createStringArray<EnumType> (charMap),
-            static_cast<int> (*magic_enum::enum_index (defaultChoice)))
+              parameterID,
+              parameterName,
+              EnumHelpers::createStringArray<EnumType> (charMap),
+              static_cast<int> (*magic_enum::enum_index (defaultChoice)))
     {
     }
 
