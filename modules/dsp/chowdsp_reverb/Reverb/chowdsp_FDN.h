@@ -3,10 +3,11 @@
 namespace chowdsp::Reverb
 {
 /** Default configuration for a feedback delay network */
-template <typename FloatType, int nChannels>
+template <typename FloatType, int nChannels, typename StorageType = FloatType>
 struct DefaultFDNConfig
 {
     using Float = FloatType;
+    using FloatStorageType = StorageType;
     static constexpr auto NChannels = nChannels;
 
     /** Prepares any internal processors */
@@ -51,7 +52,7 @@ class FDN
     using FloatType = typename FDNConfig::Float;
     static constexpr auto nChannels = FDNConfig::NChannels;
 
-    using DelayType = StaticDelayBuffer<FloatType, DelayInterpType, delayBufferSize>;
+    using DelayType = StaticDelayBuffer<FloatType, DelayInterpType, delayBufferSize, typename FDNConfig::FloatStorageType>;
 
 public:
     FDN() = default;
