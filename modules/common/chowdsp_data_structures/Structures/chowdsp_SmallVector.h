@@ -260,7 +260,11 @@ public:
     void clear() noexcept
     {
         if (usingArray)
+        {
             internal_array_size_used = 0;
+            for (auto& elem : internal_array)
+                elem.~T();
+        }
         internal_vector.clear();
     }
 

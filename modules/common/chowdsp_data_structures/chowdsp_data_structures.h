@@ -25,6 +25,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "third_party/short_alloc.h"
 
 #include "Structures/chowdsp_DoubleBuffer.h"
+#include "Structures/chowdsp_DestructiblePointer.h"
 #include "Structures/chowdsp_LocalPointer.h"
 #include "Structures/chowdsp_OptionalPointer.h"
 #include "Structures/chowdsp_RawObject.h"
