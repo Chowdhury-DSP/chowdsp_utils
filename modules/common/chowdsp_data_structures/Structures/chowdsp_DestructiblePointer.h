@@ -92,4 +92,4 @@ bool operator!= (std::nullptr_t, const DestructiblePointer<T>& p2)
 {
     return nullptr != p2.get();
 }
-}
+} // namespace chowdsp

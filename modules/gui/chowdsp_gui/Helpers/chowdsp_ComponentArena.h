@@ -64,4 +64,4 @@ public:
 private:
     SmallVector<DestructiblePointer<juce::Component>, approx_component_count> component_list {};
 };
-}
+} // namespace chowdsp
