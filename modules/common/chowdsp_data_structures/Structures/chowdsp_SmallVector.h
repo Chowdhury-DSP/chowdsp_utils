@@ -260,7 +260,15 @@ public:
     void clear() noexcept
     {
         if (usingArray)
+        {
+            internal_needs_destruction = make_array<bool, head_size> (true);
+            for (size_t i = 0; i < internal_array_size_used; ++i)
+            {
+                internal_array[i].~T();
+                internal_needs_destruction[i] = false;
+            }
             internal_array_size_used = 0;
+        }
         internal_vector.clear();
     }
 
@@ -443,7 +451,8 @@ public:
         {
             if (internal_array_size_used + 1 <= head_size)
             {
-                internal_array[internal_array_size_used].~T();
+                if (internal_needs_destruction[internal_array_size_used])
+                    internal_array[internal_array_size_used].~T();
                 new (&internal_array[internal_array_size_used]) T (args...);
                 internal_array_size_used++;
                 return internal_array[internal_array_size_used - 1];
@@ -517,6 +526,7 @@ private:
 
     std::array<T, head_size> internal_array {};
     size_t internal_array_size_used = 0;
+    std::array<bool, head_size> internal_needs_destruction = make_array<bool, head_size> (true);
 
     std::vector<T> internal_vector {};
 

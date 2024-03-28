@@ -8,7 +8,7 @@
     version:       2.1.0
     name:          ChowDSP GUI Utilities
     description:   Commonly used GUI utilities for ChowDSP plugins
-    dependencies:  juce_core, juce_audio_processors, juce_gui_basics, chowdsp_core
+    dependencies:  juce_core, juce_audio_processors, juce_gui_basics, chowdsp_core, chowdsp_data_structures
 
     website:       https://ccrma.stanford.edu/~jatin/chowdsp
     license:       GPLv3
@@ -33,6 +33,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include <chowdsp_core/chowdsp_core.h>
+#include <chowdsp_data_structures/chowdsp_data_structures.h>
 
 #if JUCE_MODULE_AVAILABLE_juce_opengl && CHOWDSP_ENABLE_OPEN_GL_CONTEXT
 #define CHOWDSP_OPENGL_IS_AVAILABLE 1
@@ -45,6 +46,7 @@
 
 #include "LookAndFeel/chowdsp_ChowLNF.h"
 
+#include "Helpers/chowdsp_ComponentArena.h"
 #include "Helpers/chowdsp_LongPressActionHelper.h"
 #include "Helpers/chowdsp_PopupMenuHelper.h"
 #include "Helpers/chowdsp_OpenGLHelper.h"
