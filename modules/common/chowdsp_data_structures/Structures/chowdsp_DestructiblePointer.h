@@ -15,7 +15,7 @@ template <typename T>
 struct DestructiblePointer
 {
     DestructiblePointer() = default;
-    DestructiblePointer (T* ptr) : pointer (ptr) {}
+    DestructiblePointer (T* ptr) : pointer (ptr) {} // NOLINT(google-explicit-constructor)
     DestructiblePointer (const DestructiblePointer&) = delete;
     DestructiblePointer& operator= (const DestructiblePointer&) = delete;
     DestructiblePointer (DestructiblePointer&& other) noexcept : pointer (other.pointer)
