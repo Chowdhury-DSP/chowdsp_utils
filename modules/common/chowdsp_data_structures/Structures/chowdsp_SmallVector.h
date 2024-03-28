@@ -261,9 +261,9 @@ public:
     {
         if (usingArray)
         {
+            for (size_t i = 0; i < internal_array_size_used; ++i)
+                internal_array[i].~T();
             internal_array_size_used = 0;
-            for (auto& elem : internal_array)
-                elem.~T();
         }
         internal_vector.clear();
     }
@@ -447,7 +447,6 @@ public:
         {
             if (internal_array_size_used + 1 <= head_size)
             {
-                internal_array[internal_array_size_used].~T();
                 new (&internal_array[internal_array_size_used]) T (args...);
                 internal_array_size_used++;
                 return internal_array[internal_array_size_used - 1];
