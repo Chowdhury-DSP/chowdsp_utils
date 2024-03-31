@@ -17,6 +17,14 @@ public:
         reset (size_in_bytes);
     }
 
+    template <typename OtherMemoryResourceType,
+    typename ThisMemoryResourceType = MemoryResourceType, std::enable_if_t<std::is_same_v<ThisMemoryResourceType, nonstd::span<std::byte>>>* = nullptr>
+    ArenaAllocator (ArenaAllocator<OtherMemoryResourceType>& other) // NOLINT
+        : raw_data { other.raw_data },
+          bytes_used { other.bytes_used }
+    {
+    }
+
     ArenaAllocator (const ArenaAllocator&) = delete;
     ArenaAllocator& operator= (const ArenaAllocator&) = delete;
 
@@ -41,8 +49,17 @@ public:
         bytes_used = 0;
     }
 
-    /** Returns the number of bytes currently being used */
+    /** Returns the number of bytes currently being used. */
     [[nodiscard]] size_t get_bytes_used() const noexcept { return bytes_used; }
+
+    /** Returns the total number of bytes the allocator manages. */
+    [[nodiscard]] size_t get_total_num_bytes() const noexcept { return raw_data.size(); }
+
+    /** Returns a reference to the allocator's internal memory resource. */
+    [[nodiscard]] auto& get_memory_resource() { return raw_data; }
+
+    /** Returns a reference to the allocator's internal memory resource. */
+    [[nodiscard]] const auto& get_memory_resource() const { return raw_data; }
 
     /**
      * Allocates a given number of bytes.
@@ -99,9 +116,6 @@ public:
         const size_t bytes_used_at_start;
     };
 
-    /** Deprecated alias for arena allocator frame */
-    using ArenaAllocatorFrame [[deprecated]] = Frame;
-
     /** Creates a frame for this allocator */
     auto create_frame()
     {
@@ -110,8 +124,15 @@ public:
 
 private:
     MemoryResourceType raw_data {};
-    size_t bytes_used = 0;
+    size_t bytes_used_internal = 0;
+    size_t& bytes_used = bytes_used_internal;
+
+    template <typename>
+    friend class ArenaAllocator;
 
     CHOWDSP_CHECK_HAS_METHOD (MemoryResourceTypeHasResize, resize, std::declval<size_t>())
 };
+
+/** Convenient alias for a "non-owning" arena. */
+using ArenaAllocatorView = ArenaAllocator<nonstd::span<std::byte>>;
 } // namespace chowdsp
