@@ -4,7 +4,22 @@
 
 namespace chowdsp
 {
-#if defined(_MSC_VER)
+#if JUCE_TEENSY
+
+/** MSVC-compatible implementation of aligned_alloc */
+[[nodiscard]] inline void* aligned_alloc ([[maybe_unused]] size_t alignment, size_t size)
+{
+    // @TODO
+    return malloc (size + alignment);
+}
+
+/** MSVC-compatible implementation of aligned_free */
+inline void aligned_free (void* data)
+{
+    free (data);
+}
+
+#elif defined(_MSC_VER)
 
 /** MSVC-compatible implementation of aligned_alloc */
 [[nodiscard]] inline void* aligned_alloc (size_t alignment, size_t size)
