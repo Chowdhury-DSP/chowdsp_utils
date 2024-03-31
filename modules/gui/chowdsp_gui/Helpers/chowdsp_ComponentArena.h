@@ -59,7 +59,7 @@ public:
         allocator.clear();
     }
 
-    ChainedArenaAllocator<std::array<std::byte, arena_chunk_size_bytes>> allocator {};
+    ChainedArenaAllocator allocator { arena_chunk_size_bytes };
 
 private:
     SmallVector<DestructiblePointer<juce::Component>, approx_component_count> component_list {};

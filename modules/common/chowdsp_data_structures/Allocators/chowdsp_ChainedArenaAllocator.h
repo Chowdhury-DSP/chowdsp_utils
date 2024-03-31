@@ -4,17 +4,10 @@
 
 namespace chowdsp
 {
-template <typename MemoryResourceType = std::vector<std::byte>>
 class ChainedArenaAllocator
 {
 public:
-    using BaseArena = ArenaAllocator<MemoryResourceType>;
-
-    ChainedArenaAllocator()
-    {
-        if (MemoryResourceType test_mrt {}; test_mrt.size() > 0)
-            reset (test_mrt.size());
-    }
+    ChainedArenaAllocator() = default;
 
     /** Constructs the arena with an initial allocated size. */
     explicit ChainedArenaAllocator (size_t size_in_bytes)
@@ -28,6 +21,11 @@ public:
     ChainedArenaAllocator (ChainedArenaAllocator&&) noexcept = default;
     ChainedArenaAllocator& operator= (ChainedArenaAllocator&&) noexcept = default;
 
+    ~ChainedArenaAllocator()
+    {
+        free_arenas();
+    }
+
     /**
      * Selects the size used for each of the internal arena allocators,
      * and "resets" the allocator back to a single arena with that size.
@@ -36,10 +34,12 @@ public:
     {
         arena_size_bytes = head_arena_size_bytes;
 
+        free_arenas();
         arenas.clear();
 
         arenas.emplace_front (arena_size_bytes);
         current_arena = arenas.begin();
+        allocate_current_arena (arena_size_bytes);
         arena_count = 1;
     }
 
@@ -85,7 +85,7 @@ public:
     }
 
     /** Returns the arena currently being used */
-    BaseArena& get_current_arena()
+    ArenaAllocatorView& get_current_arena()
     {
         jassert (current_arena != arenas.end());
         return *current_arena;
@@ -110,7 +110,7 @@ public:
      * Note that due to the design of the allocator, not all
      * of the available bytes may be used at any given time.
      * As such, the allocator's "load factor" can be computed
-     * as: get_total_bytes_used() / (get_arena_count() * arena_size_bytes)
+     * as: get_total_bytes_used() / get_total_bytes_allocated()
      */
     [[nodiscard]] size_t get_total_bytes_used() const noexcept
     {
@@ -118,6 +118,14 @@ public:
         for (auto arena_iter = arenas.begin(); arena_iter != current_arena; ++arena_iter)
             bytes_count += arena_iter->get_bytes_used();
         bytes_count += current_arena->get_bytes_used();
+        return bytes_count;
+    }
+
+    [[nodiscard]] size_t get_total_bytes_allocated() const noexcept
+    {
+        size_t bytes_count = 0;
+        for (const auto& arena : arenas)
+            bytes_count += arena.get_total_num_bytes();
         return bytes_count;
     }
 
@@ -136,8 +144,8 @@ public:
         }
 
         ChainedArenaAllocator& alloc;
-        const typename std::forward_list<BaseArena>::iterator arena_at_start;
-        typename BaseArena::Frame arena_frame;
+        const std::forward_list<ArenaAllocatorView>::iterator arena_at_start;
+        ArenaAllocatorView::Frame arena_frame;
     };
 
     /** Creates a frame for this allocator */
@@ -149,14 +157,14 @@ public:
 private:
     void add_arena_to_chain()
     {
-        const auto prev_arena = current_arena;
-        current_arena++;
+        const auto prev_arena = current_arena++;
 
         // if we've reached the end of the list, then we need to
         // add a new arena to the chain (starting after the previous arena)
         if (current_arena == arenas.end())
         {
-            current_arena = arenas.emplace_after (prev_arena, arena_size_bytes);
+            current_arena = arenas.emplace_after (prev_arena);
+            allocate_current_arena (arena_size_bytes);
             arena_count++;
             return;
         }
@@ -164,8 +172,22 @@ private:
         get_current_arena().clear();
     }
 
-    std::forward_list<BaseArena> arenas {};
-    typename std::forward_list<BaseArena>::iterator current_arena {};
+    void allocate_current_arena (size_t num_bytes)
+    {
+        current_arena->get_memory_resource() = {
+            static_cast<std::byte*> (aligned_alloc (64, num_bytes)),
+            num_bytes,
+        };
+    }
+
+    void free_arenas()
+    {
+        for (auto& arena : arenas)
+            aligned_free (arena.get_memory_resource().data());
+    }
+
+    std::forward_list<ArenaAllocatorView> arenas {};
+    std::forward_list<ArenaAllocatorView>::iterator current_arena {};
     size_t arena_size_bytes = 0;
     size_t arena_count = 0;
 };
