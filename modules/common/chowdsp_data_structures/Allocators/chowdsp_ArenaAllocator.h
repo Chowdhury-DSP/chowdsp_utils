@@ -57,7 +57,9 @@ public:
 
     /** Returns a reference to the allocator's internal memory resource. */
     [[nodiscard]] auto& get_memory_resource() { return raw_data; }
-    [[nodiscard]] auto& get_memory_resource() const { return raw_data; }
+
+    /** Returns a reference to the allocator's internal memory resource. */
+    [[nodiscard]] const auto& get_memory_resource() const { return raw_data; }
 
     /**
      * Allocates a given number of bytes.
@@ -131,5 +133,6 @@ private:
     CHOWDSP_CHECK_HAS_METHOD (MemoryResourceTypeHasResize, resize, std::declval<size_t>())
 };
 
+/** Convenient alias for a "non-owning" arena. */
 using ArenaAllocatorView = ArenaAllocator<nonstd::span<std::byte>>;
 } // namespace chowdsp

@@ -110,7 +110,7 @@ public:
      * Note that due to the design of the allocator, not all
      * of the available bytes may be used at any given time.
      * As such, the allocator's "load factor" can be computed
-     * as: get_total_bytes_used() / get_total_bytes_allocated()
+     * as: get_total_bytes_used() / get_total_bytes()
      */
     [[nodiscard]] size_t get_total_bytes_used() const noexcept
     {
@@ -121,7 +121,11 @@ public:
         return bytes_count;
     }
 
-    [[nodiscard]] size_t get_total_bytes_allocated() const noexcept
+    /**
+     * Returns the total number of bytes being managed by
+     * this allocator.
+     */
+    [[nodiscard]] size_t get_total_bytes() const noexcept
     {
         size_t bytes_count = 0;
         for (const auto& arena : arenas)
