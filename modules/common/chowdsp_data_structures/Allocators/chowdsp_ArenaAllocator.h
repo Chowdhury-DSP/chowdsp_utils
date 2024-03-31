@@ -18,7 +18,8 @@ public:
     }
 
     template <typename OtherMemoryResourceType,
-    typename ThisMemoryResourceType = MemoryResourceType, std::enable_if_t<std::is_same_v<ThisMemoryResourceType, nonstd::span<std::byte>>>* = nullptr>
+              typename ThisMemoryResourceType = MemoryResourceType,
+              std::enable_if_t<std::is_same_v<ThisMemoryResourceType, nonstd::span<std::byte>>>* = nullptr>
     ArenaAllocator (ArenaAllocator<OtherMemoryResourceType>& other) // NOLINT
         : raw_data { other.raw_data },
           bytes_used { other.bytes_used }

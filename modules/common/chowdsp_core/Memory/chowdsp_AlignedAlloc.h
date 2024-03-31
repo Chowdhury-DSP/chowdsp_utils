@@ -4,7 +4,7 @@
 
 namespace chowdsp
 {
-#if defined (_MSC_VER)
+#if defined(_MSC_VER)
 
 /** MSVC-compatible implementation of aligned_alloc */
 [[nodiscard]] inline void* aligned_alloc (size_t alignment, size_t size)
@@ -33,4 +33,4 @@ inline void aligned_free (void* data)
 }
 
 #endif
-}
+} // namespace chowdsp
