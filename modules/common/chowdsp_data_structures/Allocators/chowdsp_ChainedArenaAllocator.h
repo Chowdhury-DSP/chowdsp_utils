@@ -178,9 +178,11 @@ private:
 
     void allocate_current_arena (size_t num_bytes)
     {
+        static constexpr size_t arena_alignment = 64;
+        const auto num_bytes_padded = arena_alignment * ((num_bytes + arena_alignment - 1) / arena_alignment);
         current_arena->get_memory_resource() = {
-            static_cast<std::byte*> (aligned_alloc (64, num_bytes)),
-            num_bytes,
+            static_cast<std::byte*> (aligned_alloc (arena_alignment, num_bytes_padded)),
+            num_bytes_padded,
         };
     }
 

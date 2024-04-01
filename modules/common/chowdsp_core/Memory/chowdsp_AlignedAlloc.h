@@ -38,7 +38,10 @@ inline void aligned_free (void* data)
 /** MSVC-compatible implementation of aligned_alloc */
 [[nodiscard]] inline void* aligned_alloc (size_t alignment, size_t size)
 {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunguarded-availability-new"
     return std::aligned_alloc (alignment, size);
+#pragma clang diagnostic pop
 }
 
 /** MSVC-compatible implementation of aligned_free */
