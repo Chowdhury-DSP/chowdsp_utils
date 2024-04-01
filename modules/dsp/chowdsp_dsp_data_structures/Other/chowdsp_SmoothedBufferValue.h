@@ -79,10 +79,9 @@ public:
      */
     void process (int numSamples);
 
-    template <typename Arena>
-    void process (int numSamples, ArenaAllocator<Arena>& alloc)
+    void process (int numSamples, ArenaAllocatorView alloc)
     {
-        bufferData = alloc.template allocate<FloatType> (numSamples, bufferAlignment);
+        bufferData = alloc.allocate<FloatType> (numSamples, bufferAlignment);
         jassert (bufferData != nullptr); // arena allocator is out of memory!
         process (numSamples);
     }
@@ -93,10 +92,9 @@ public:
      */
     void process (FloatType value, int numSamples);
 
-    template <typename Arena>
-    void process (FloatType value, int numSamples, ArenaAllocator<Arena>& alloc)
+    void process (FloatType value, int numSamples, ArenaAllocatorView alloc)
     {
-        bufferData = alloc.template allocate<FloatType> (numSamples, bufferAlignment);
+        bufferData = alloc.allocate<FloatType> (numSamples, bufferAlignment);
         jassert (bufferData != nullptr); // arena allocator is out of memory!
         process (value, numSamples);
     }
