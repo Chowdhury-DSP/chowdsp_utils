@@ -28,6 +28,8 @@ static const PresetTree::Node* getNextOrPreviousPresetNode (const PresetTree::No
     auto* nextParent = getNextOrPreviousPresetNode (node->parent, forward);
     if (nextParent == nullptr)
         return nullptr;
+    if (nextParent->leaf.has_value())
+        return nextParent;
 
     return forward ? nextParent->first_child : nextParent->last_child;
 }
@@ -50,11 +52,11 @@ bool NextPrevious::navigateThroughPresets (bool forward)
             return false;
 
         nextPresetNode = &presetTree.getRootNode();
-        while (! nextPresetNode->leaf.has_value())
-            nextPresetNode = forward ? nextPresetNode->first_child : nextPresetNode->last_child;
     }
 
-    jassert (nextPresetNode->leaf.has_value());
+    while (! nextPresetNode->leaf.has_value())
+        nextPresetNode = forward ? nextPresetNode->first_child : nextPresetNode->last_child;
+
     presetManager.loadPreset (*nextPresetNode->leaf);
     return true;
 }

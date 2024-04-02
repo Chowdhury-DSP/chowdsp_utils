@@ -89,9 +89,12 @@ TEST_CASE ("Next/Previous Test", "[plugin][presets]")
         chowdsp::presets::PresetManager presetMgr { state };
         presetMgr.getPresetTree().treeInserter = &chowdsp::presets::PresetTreeInserters::vendorInserter;
 
-        presetMgr.addPresets ({ chowdsp::presets::Preset { "A", "A Vendor", { { "value", 0 } } },
-                                chowdsp::presets::Preset { "B", "B Vendor", { { "value", 1 } } },
-                                chowdsp::presets::Preset { "C", "C Vendor", { { "value", 2 } } } });
+        presetMgr.addPresets ({
+            chowdsp::presets::Preset { "A", "A Vendor", { { "value", 0 } } },
+            chowdsp::presets::Preset { "B", "B Vendor", { { "value", 1 } } },
+            chowdsp::presets::Preset { "C", "C Vendor", { { "value", 2 } } },
+            chowdsp::presets::Preset { "D", "", { { "value", 3 } } },
+        });
 
         chowdsp::presets::frontend::NextPrevious nextPrev { presetMgr };
         nextPrev.setShouldWrapAtEndOfList (true);
@@ -107,7 +110,13 @@ TEST_CASE ("Next/Previous Test", "[plugin][presets]")
         checkPresetIndex (presetMgr, 2);
 
         REQUIRE (nextPrev.goToNextPreset() == true);
+        checkPresetIndex (presetMgr, 3);
+
+        REQUIRE (nextPrev.goToNextPreset() == true);
         checkPresetIndex (presetMgr, 0);
+
+        REQUIRE (nextPrev.goToPreviousPreset() == true);
+        checkPresetIndex (presetMgr, 3);
 
         REQUIRE (nextPrev.goToPreviousPreset() == true);
         checkPresetIndex (presetMgr, 2);
