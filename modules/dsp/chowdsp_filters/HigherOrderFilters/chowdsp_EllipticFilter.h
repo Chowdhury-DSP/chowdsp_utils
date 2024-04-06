@@ -41,11 +41,9 @@ public:
      */
     void calcCoefs (FloatType fc, FloatType qVal, NumericType fs)
     {
-        juce::ignoreUnused (qVal);
-
-        FloatType bCoefs[3], bOppCoefs[3], aCoefs[3];
-        auto calcBaseCoefficients = [&] (FloatType stageFreqOff, FloatType stageQ)
+        auto calcCoefsForQ = [&] (FloatType stageFreqOff, FloatType stageQ, FloatType stageLPGain, size_t stageOrder)
         {
+            FloatType bCoefs[3], bOppCoefs[3], aCoefs[3];
             switch (type)
             {
                 case EllipticFilterType::Lowpass:
@@ -57,11 +55,6 @@ public:
                     CoefficientCalculators::calcSecondOrderHPF<FloatType, NumericType, false> (bCoefs, aCoefs, fc / stageFreqOff, stageQ, fs, fc);
                     break;
             }
-        };
-
-        auto calcCoefsForQ = [&] (FloatType stageFreqOff, FloatType stageQ, FloatType stageLPGain, size_t stageOrder)
-        {
-            calcBaseCoefficients (stageFreqOff, stageQ);
 
             for (size_t i = 0; i < 3; ++i)
                 bCoefs[i] = bOppCoefs[i] + stageLPGain * bCoefs[i];
@@ -268,9 +261,9 @@ private:
         }
     }
 
-    std::array<NumericType, NFilters> freqOffsets;
-    std::array<NumericType, NFilters> qVals;
-    std::array<NumericType, NFilters> lpGains;
+    std::array<NumericType, NFilters> freqOffsets {};
+    std::array<NumericType, NFilters> qVals {};
+    std::array<NumericType, NFilters> lpGains {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EllipticFilter)
 };
