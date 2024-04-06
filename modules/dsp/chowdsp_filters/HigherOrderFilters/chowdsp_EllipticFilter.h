@@ -44,22 +44,17 @@ public:
         auto calcCoefsForQ = [&] (FloatType stageFreqOff, FloatType stageQ, FloatType stageLPGain, size_t stageOrder)
         {
             FloatType bCoefs[3], bOppCoefs[3], aCoefs[3];
-            auto calcBaseCoefficients = [&] (FloatType stageFreqOff, FloatType stageQ)
+            switch (type)
             {
-                switch (type)
-                {
-                    case EllipticFilterType::Lowpass:
-                        CoefficientCalculators::calcSecondOrderLPF<FloatType, NumericType, false> (bCoefs, aCoefs, fc * stageFreqOff, stageQ, fs, fc);
-                        CoefficientCalculators::calcSecondOrderHPF<FloatType, NumericType, false> (bOppCoefs, aCoefs, fc * stageFreqOff, stageQ, fs, fc);
-                        break;
-                    case EllipticFilterType::Highpass:
-                        CoefficientCalculators::calcSecondOrderLPF<FloatType, NumericType, false> (bOppCoefs, aCoefs, fc / stageFreqOff, stageQ, fs, fc);
-                        CoefficientCalculators::calcSecondOrderHPF<FloatType, NumericType, false> (bCoefs, aCoefs, fc / stageFreqOff, stageQ, fs, fc);
-                        break;
-                }
-            };
-
-            calcBaseCoefficients (stageFreqOff, stageQ);
+                case EllipticFilterType::Lowpass:
+                    CoefficientCalculators::calcSecondOrderLPF<FloatType, NumericType, false> (bCoefs, aCoefs, fc * stageFreqOff, stageQ, fs, fc);
+                    CoefficientCalculators::calcSecondOrderHPF<FloatType, NumericType, false> (bOppCoefs, aCoefs, fc * stageFreqOff, stageQ, fs, fc);
+                    break;
+                case EllipticFilterType::Highpass:
+                    CoefficientCalculators::calcSecondOrderLPF<FloatType, NumericType, false> (bOppCoefs, aCoefs, fc / stageFreqOff, stageQ, fs, fc);
+                    CoefficientCalculators::calcSecondOrderHPF<FloatType, NumericType, false> (bCoefs, aCoefs, fc / stageFreqOff, stageQ, fs, fc);
+                    break;
+            }
 
             for (size_t i = 0; i < 3; ++i)
                 bCoefs[i] = bOppCoefs[i] + stageLPGain * bCoefs[i];
