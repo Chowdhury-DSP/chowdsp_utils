@@ -145,9 +145,9 @@ private:
         }
     }
 
-    std::array<NumericType, NFilters> freqOffsets;
-    std::array<NumericType, NFilters> qVals;
-    std::array<NumericType, NFilters> lpGains;
+    std::array<NumericType, NFilters> freqOffsets {};
+    std::array<NumericType, NFilters> qVals {};
+    std::array<NumericType, NFilters> lpGains {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ChebyshevIIFilter)
 };
