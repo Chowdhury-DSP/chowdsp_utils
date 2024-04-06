@@ -143,8 +143,8 @@ public:
     /** Set coefficients to new values */
     void setCoefs (const FloatType (&newB)[order + 1], const FloatType (&newA)[order + 1])
     {
-        std::copy (newB, &newB[order + 1], b);
-        std::copy (newA, &newA[order + 1], a);
+        std::copy (std::begin (newB), std::end (newB), std::begin (b));
+        std::copy (std::begin (newA), std::end (newA), std::begin (a));
     }
 
     FloatType a[order + 1]; // raw feedback "a" coefficients

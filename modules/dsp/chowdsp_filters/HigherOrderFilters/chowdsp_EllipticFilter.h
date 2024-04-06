@@ -41,26 +41,24 @@ public:
      */
     void calcCoefs (FloatType fc, FloatType qVal, NumericType fs)
     {
-        juce::ignoreUnused (qVal);
-
-        FloatType bCoefs[3], bOppCoefs[3], aCoefs[3];
-        auto calcBaseCoefficients = [&] (FloatType stageFreqOff, FloatType stageQ)
-        {
-            switch (type)
-            {
-                case EllipticFilterType::Lowpass:
-                    CoefficientCalculators::calcSecondOrderLPF<FloatType, NumericType, false> (bCoefs, aCoefs, fc * stageFreqOff, stageQ, fs, fc);
-                    CoefficientCalculators::calcSecondOrderHPF<FloatType, NumericType, false> (bOppCoefs, aCoefs, fc * stageFreqOff, stageQ, fs, fc);
-                    break;
-                case EllipticFilterType::Highpass:
-                    CoefficientCalculators::calcSecondOrderLPF<FloatType, NumericType, false> (bOppCoefs, aCoefs, fc / stageFreqOff, stageQ, fs, fc);
-                    CoefficientCalculators::calcSecondOrderHPF<FloatType, NumericType, false> (bCoefs, aCoefs, fc / stageFreqOff, stageQ, fs, fc);
-                    break;
-            }
-        };
-
         auto calcCoefsForQ = [&] (FloatType stageFreqOff, FloatType stageQ, FloatType stageLPGain, size_t stageOrder)
         {
+            FloatType bCoefs[3], bOppCoefs[3], aCoefs[3];
+            auto calcBaseCoefficients = [&] (FloatType stageFreqOff, FloatType stageQ)
+            {
+                switch (type)
+                {
+                    case EllipticFilterType::Lowpass:
+                        CoefficientCalculators::calcSecondOrderLPF<FloatType, NumericType, false> (bCoefs, aCoefs, fc * stageFreqOff, stageQ, fs, fc);
+                        CoefficientCalculators::calcSecondOrderHPF<FloatType, NumericType, false> (bOppCoefs, aCoefs, fc * stageFreqOff, stageQ, fs, fc);
+                        break;
+                    case EllipticFilterType::Highpass:
+                        CoefficientCalculators::calcSecondOrderLPF<FloatType, NumericType, false> (bOppCoefs, aCoefs, fc / stageFreqOff, stageQ, fs, fc);
+                        CoefficientCalculators::calcSecondOrderHPF<FloatType, NumericType, false> (bCoefs, aCoefs, fc / stageFreqOff, stageQ, fs, fc);
+                        break;
+                }
+            };
+
             calcBaseCoefficients (stageFreqOff, stageQ);
 
             for (size_t i = 0; i < 3; ++i)
