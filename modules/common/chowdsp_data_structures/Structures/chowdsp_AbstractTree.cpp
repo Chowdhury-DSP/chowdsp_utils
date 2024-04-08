@@ -9,7 +9,8 @@ AbstractTree<ElementType, DerivedType>::AbstractTree()
 template <typename ElementType, typename DerivedType>
 AbstractTree<ElementType, DerivedType>::~AbstractTree()
 {
-    clear();
+    doForAllNodes ([] (Node& node)
+                   { node.~Node(); });
 }
 
 template <typename ElementType, typename DerivedType>
