@@ -123,7 +123,7 @@ static void loadPresetsIntoMenu (juce::PopupMenu& menu, const PresetTree::Node& 
             juce::PopupMenu subMenu {};
             loadPresetsIntoMenu (subMenu, *node, presetMgr);
             if (subMenu.containsAnyActiveItems())
-                menu.addSubMenu (node->tag, subMenu);
+                menu.addSubMenu (toString (node->tag), subMenu);
         }
     }
 }

@@ -4,7 +4,7 @@ namespace chowdsp::presets
 {
 namespace PresetTreeInserters
 {
-    bool defaultTagComparator (const juce::String& first, const juce::String& second)
+    bool defaultTagComparator (std::string_view first, std::string_view second)
     {
         return first.compare (second) < 0;
     }
@@ -34,8 +34,9 @@ namespace PresetTreeInserters
                               TagGetter&& tagGetter,
                               FallbackInserter&& fallbackInserter = &flatInserter)
     {
-        const auto tag = tagGetter (preset);
-        if (tag.isEmpty())
+        const juce::String& tagString = tagGetter (preset);
+        const auto tag = std::string_view { tagString.toRawUTF8(), tagString.getNumBytesAsUTF8() };
+        if (tag.empty())
         {
             // no category, so just add this to the top-level list
             return fallbackInserter (std::move (preset), tree, root, insertionHelper);
@@ -49,7 +50,7 @@ namespace PresetTreeInserters
 
         // preset vendor is not currently in the tree, so let's add a new sub-tree
         auto* subTree = tree.createEmptyNode();
-        subTree->tag = tag.toStdString();
+        subTree->tag = tree.allocateTag (tag);
         insertionHelper.insertNodeIntoTree (root, subTree);
         return fallbackInserter (std::move (preset), tree, *subTree, insertionHelper);
     }
@@ -130,9 +131,9 @@ PresetTree::PresetTree (PresetState* currentPresetState, InsertionHelper&& inser
     }
 }
 
-Preset& PresetTree::insertElementInternal (Preset&& element, Node& root)
+Preset& PresetTree::insertElementInternal (PresetTree& self, Preset&& element, Node& root)
 {
-    return treeInserter (std::move (element), *this, root, insertHelper);
+    return self.treeInserter (std::move (element), self, root, self.insertHelper);
 }
 
 void PresetTree::onDelete (const Node& nodeBeingDeleted)

@@ -5,13 +5,14 @@
 namespace chowdsp
 {
 /** An abstracted tree-like data structure (not a Binary Tree) */
-template <typename ElementType>
+template <typename ElementType, typename DerivedType>
 class AbstractTree
 {
 public:
     struct Node
     {
         std::optional<ElementType> leaf { std::nullopt };
+        std::string_view tag {};
 
         Node* parent {}; // slot for parent in hierarchy
         Node* first_child {}; // slot for first child in hierarchy
@@ -20,15 +21,6 @@ public:
         Node* prev_sibling {}; // slot for previous sibling in hierarchy
         Node* next_linear {}; // slot for linked list through all nodes
         Node* prev_linear {}; // slot for linked list through all nodes
-
-        std::string tag {};
-
-        struct Locator // bucket array locator
-        {
-            size_t bucket_index;
-            size_t slot_index;
-        };
-        Locator locator;
     };
 
     AbstractTree();
@@ -39,19 +31,10 @@ public:
     AbstractTree (AbstractTree&&) noexcept = default;
     AbstractTree& operator= (AbstractTree&&) noexcept = default;
 
-    /**
-     * Inserts an element into the tree.
-     * Calling this invalidates any existing element indices.
-     *
-     * Note that if you need to insert a bunch of elements,
-     * the insertElements() method will be significantly faster.
-     */
+    /** Inserts an element into the tree. */
     ElementType& insertElement (ElementType&& elementToInsert);
 
-    /**
-     * Inserts a bunch of elements into the tree.
-     * Calling this invalidates any existing element indices.
-     */
+    /** Inserts a bunch of elements into the tree. */
     void insertElements (std::vector<ElementType>&& elements);
 
     template <typename Comparator>
@@ -94,18 +77,21 @@ public:
     template <typename Callable>
     void doForAllElements (Callable&& callable) const;
 
+    /** Creates a new empty node in the tree's memory arena. */
     Node* createEmptyNode();
+
+    /** Allocates a new tag in the tree's memory arena. */
+    std::string_view allocateTag (std::string_view str);
 
     [[nodiscard]] Node& getRootNode() noexcept { return root_node; }
     [[nodiscard]] const Node& getRootNode() const noexcept { return root_node; }
 
 protected:
-    virtual ElementType& insertElementInternal (ElementType&& element, Node& root_node) = 0;
     virtual void onDelete (const Node& /*nodeBeingDeleted*/) {}
 
-private:
-    BucketArray<Node, 32> nodes;
+    ChainedArenaAllocator allocator { 64 * sizeof (Node) };
 
+private:
     Node root_node {};
     int count = 0;
 

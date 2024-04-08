@@ -39,13 +39,13 @@ public:
     [[nodiscard]] bool isValid() const;
 
     /** Returns the name of the preset */
-    [[nodiscard]] juce::String getName() const noexcept { return name; }
+    [[nodiscard]] const juce::String& getName() const noexcept { return name; }
 
     /** Returns the name of the vendor that created this preset */
-    [[nodiscard]] juce::String getVendor() const noexcept { return vendor; }
+    [[nodiscard]] const juce::String& getVendor() const noexcept { return vendor; }
 
     /** Returns the name of the preset category */
-    [[nodiscard]] juce::String getCategory() const noexcept { return category; }
+    [[nodiscard]] const juce::String& getCategory() const noexcept { return category; }
 
     /** Returns the version of the plugin that was used to create this preset */
     [[nodiscard]] Version getVersion() const noexcept { return version; }
@@ -54,7 +54,7 @@ public:
      * Returns the file path where this preset was loaded from.
      * If the preset was not loaded from a file, this will return an empty path.
      */
-    [[nodiscard]] juce::File getPresetFile() const noexcept { return file; }
+    [[nodiscard]] const juce::File& getPresetFile() const noexcept { return file; }
 
     /** Returns the preset state */
     [[nodiscard]] const auto& getState() const noexcept { return state; }
