@@ -1,9 +1,9 @@
 #include <CatchUtils.h>
 #include <chowdsp_data_structures/chowdsp_data_structures.h>
 
-struct StringTree : chowdsp::AbstractTree<std::string>
+struct StringTree : chowdsp::AbstractTree<std::string, StringTree>
 {
-    static Node& insert_string (std::string&& element, Node& parent_node, chowdsp::AbstractTree<std::string>& tree)
+    static Node& insert_string (std::string&& element, Node& parent_node, AbstractTree& tree)
     {
         auto* new_node = tree.createEmptyNode();
         new_node->leaf = std::move (element);
@@ -13,19 +13,19 @@ struct StringTree : chowdsp::AbstractTree<std::string>
         return *new_node;
     }
 
-    std::string& insertElementInternal (std::string&& element, Node& root) override
+    static std::string& insertElementInternal (StringTree& self, std::string&& element, Node& root)
     {
         for (auto* iter = root.first_child; iter != nullptr; iter = iter->next_sibling)
         {
-            if (iter->tag == std::string { element[0] })
-                return *insert_string (std::move (element), *iter, *this).leaf;
+            if (iter->tag == std::string_view { element.data(), 1 })
+                return *insert_string (std::move (element), *iter, self).leaf;
         }
 
-        auto* new_sub_tree = createEmptyNode();
-        new_sub_tree->tag = std::string { element[0] };
+        auto* new_sub_tree = self.createEmptyNode();
+        new_sub_tree->tag = self.allocateTag ({ element.data(), 1 });
         insertNodeSorted (root, new_sub_tree, [] (const Node& el1, const Node& el2)
                           { return el1.tag < el2.tag; });
-        return *insert_string (std::move (element), *new_sub_tree, *this).leaf;
+        return *insert_string (std::move (element), *new_sub_tree, self).leaf;
     }
 };
 

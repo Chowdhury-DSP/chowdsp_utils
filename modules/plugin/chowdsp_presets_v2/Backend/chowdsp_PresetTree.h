@@ -3,13 +3,13 @@
 namespace chowdsp::presets
 {
 /** A tree-like data structure for storing presets. */
-class PresetTree : public AbstractTree<Preset>
+class PresetTree : public AbstractTree<Preset, PresetTree>
 {
 public:
     /** Methods for sorting and inserting presets into the tree. */
     struct InsertionHelper
     {
-        std::function<bool (const juce::String&, const juce::String&)> tagSortMethod = nullptr;
+        std::function<bool (std::string_view, std::string_view)> tagSortMethod = nullptr;
         std::function<bool (const Preset&, const Preset&)> presetSortMethod = nullptr;
         std::function<void (Node& parent, Node* newNode)> insertNodeIntoTree = nullptr;
     };
@@ -22,10 +22,12 @@ public:
      *
      * Uses PresetTreeInserters::flatInserter by default.
      */
-    std::function<Preset&(Preset&&, PresetTree&, Node& root, const InsertionHelper&)> treeInserter;
+    std::function<Preset&(Preset&&, PresetTree&, Node& root, const InsertionHelper&)> treeInserter{};
+
+    /** For internal use only! */
+    static Preset& insertElementInternal (PresetTree& self, Preset&& element, Node& root);
 
 protected:
-    Preset& insertElementInternal (Preset&& element, Node& root) override;
     void onDelete (const Node& nodeBeingDeleted) override;
 
 private:
@@ -39,7 +41,7 @@ private:
 namespace PresetTreeInserters
 {
     /** Default comparator for sorting tags. */
-    bool defaultTagComparator (const juce::String&, const juce::String&);
+    bool defaultTagComparator (std::string_view, std::string_view);
 
     /** Default comparator for sorting presets. */
     bool defaultPresetComparator (const Preset&, const Preset&);
