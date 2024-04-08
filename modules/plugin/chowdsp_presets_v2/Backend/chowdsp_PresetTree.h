@@ -22,7 +22,7 @@ public:
      *
      * Uses PresetTreeInserters::flatInserter by default.
      */
-    std::function<Preset&(Preset&&, PresetTree&, Node& root, const InsertionHelper&)> treeInserter{};
+    std::function<Preset&(Preset&&, PresetTree&, Node& root, const InsertionHelper&)> treeInserter {};
 
     /** For internal use only! */
     static Preset& insertElementInternal (PresetTree& self, Preset&& element, Node& root);
