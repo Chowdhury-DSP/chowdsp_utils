@@ -1,32 +1,40 @@
 namespace chowdsp
 {
-template <typename ElementType>
-AbstractTree<ElementType>::AbstractTree() = default;
-
-template <typename ElementType>
-AbstractTree<ElementType>::~AbstractTree()
+template <typename ElementType, typename DerivedType>
+AbstractTree<ElementType, DerivedType>::AbstractTree()
 {
     clear();
 }
 
-template <typename ElementType>
-ElementType& AbstractTree<ElementType>::insertElement (ElementType&& elementToInsert)
+template <typename ElementType, typename DerivedType>
+AbstractTree<ElementType, DerivedType>::~AbstractTree()
 {
-    count++;
-    return insertElementInternal (std::move (elementToInsert), root_node);
+    doForAllNodes ([] (Node& node)
+                   { node.~Node(); });
 }
 
-template <typename ElementType>
-void AbstractTree<ElementType>::insertElements (std::vector<ElementType>&& elements)
+template <typename ElementType, typename DerivedType>
+ElementType& AbstractTree<ElementType, DerivedType>::insertElement (ElementType&& elementToInsert)
+{
+    count++;
+    return DerivedType::insertElementInternal (static_cast<DerivedType&> (*this),
+                                               std::move (elementToInsert),
+                                               root_node);
+}
+
+template <typename ElementType, typename DerivedType>
+void AbstractTree<ElementType, DerivedType>::insertElements (std::vector<ElementType>&& elements)
 {
     count += static_cast<int> (elements.size());
     for (auto& element : std::move (elements))
-        insertElementInternal (std::move (element), root_node);
+        DerivedType::insertElementInternal (static_cast<DerivedType&> (*this),
+                                            std::move (element),
+                                            root_node);
 }
 
-template <typename ElementType>
+template <typename ElementType, typename DerivedType>
 template <typename Comparator>
-void AbstractTree<ElementType>::insertNodeSorted (Node& parent, Node* new_node, Comparator&& comparator)
+void AbstractTree<ElementType, DerivedType>::insertNodeSorted (Node& parent, Node* new_node, Comparator&& comparator)
 {
     new_node->parent = &parent;
 
@@ -63,8 +71,8 @@ void AbstractTree<ElementType>::insertNodeSorted (Node& parent, Node* new_node, 
     parent.last_child = new_node;
 }
 
-template <typename ElementType>
-void AbstractTree<ElementType>::removeNode (Node& node)
+template <typename ElementType, typename DerivedType>
+void AbstractTree<ElementType, DerivedType>::removeNode (Node& node)
 {
     if (node.parent == nullptr)
         return; // this is the root node! please don't delete me :(
@@ -100,11 +108,11 @@ void AbstractTree<ElementType>::removeNode (Node& node)
             node.parent->last_child = node.prev_sibling;
     }
 
-    nodes.remove ({ node.locator.bucket_index, node.locator.slot_index });
+    node.~Node();
 }
 
-template <typename ElementType>
-void AbstractTree<ElementType>::removeElement (const ElementType& element)
+template <typename ElementType, typename DerivedType>
+void AbstractTree<ElementType, DerivedType>::removeElement (const ElementType& element)
 {
     for (auto* node = &root_node; node != nullptr; node = node->next_linear)
     {
@@ -116,9 +124,9 @@ void AbstractTree<ElementType>::removeElement (const ElementType& element)
     }
 }
 
-template <typename ElementType>
+template <typename ElementType, typename DerivedType>
 template <typename Callable>
-void AbstractTree<ElementType>::removeElements (const Callable& elementsToRemove)
+void AbstractTree<ElementType, DerivedType>::removeElements (const Callable& elementsToRemove)
 {
     // This algorithm assumes that a child node has always been allocated _after_
     // its parent. If later on we make it possible to "move" nodes, then this may
@@ -138,15 +146,17 @@ void AbstractTree<ElementType>::removeElements (const Callable& elementsToRemove
     }
 }
 
-template <typename ElementType>
-void AbstractTree<ElementType>::clear()
+template <typename ElementType, typename DerivedType>
+void AbstractTree<ElementType, DerivedType>::clear()
 {
+    doForAllNodes ([] (Node& node)
+                   { node.~Node(); });
+    allocator.reset (64 * sizeof (Node));
     count = 0;
-    nodes.reset();
 }
 
-template <typename ElementType>
-ElementType* AbstractTree<ElementType>::findElement (const ElementType& element)
+template <typename ElementType, typename DerivedType>
+ElementType* AbstractTree<ElementType, DerivedType>::findElement (const ElementType& element)
 {
     ElementType* result = nullptr;
     doForAllElements (
@@ -158,31 +168,31 @@ ElementType* AbstractTree<ElementType>::findElement (const ElementType& element)
     return result;
 }
 
-template <typename ElementType>
-const ElementType* AbstractTree<ElementType>::findElement (const ElementType& element) const
+template <typename ElementType, typename DerivedType>
+const ElementType* AbstractTree<ElementType, DerivedType>::findElement (const ElementType& element) const
 {
     return const_cast<AbstractTree&> (*this).findElement (element); // NOSONAR
 }
 
-template <typename ElementType>
+template <typename ElementType, typename DerivedType>
 template <typename Callable>
-void AbstractTree<ElementType>::doForAllNodes (Callable&& callable)
+void AbstractTree<ElementType, DerivedType>::doForAllNodes (Callable&& callable)
 {
     for (auto* iter = &root_node; iter != nullptr; iter = iter->next_linear)
         callable (*iter);
 }
 
-template <typename ElementType>
+template <typename ElementType, typename DerivedType>
 template <typename Callable>
-void AbstractTree<ElementType>::doForAllNodes (Callable&& callable) const
+void AbstractTree<ElementType, DerivedType>::doForAllNodes (Callable&& callable) const
 {
     for (auto* iter = &root_node; iter != nullptr; iter = iter->next_linear)
         callable (*iter);
 }
 
-template <typename ElementType>
+template <typename ElementType, typename DerivedType>
 template <typename Callable>
-void AbstractTree<ElementType>::doForAllElements (Callable&& callable)
+void AbstractTree<ElementType, DerivedType>::doForAllElements (Callable&& callable)
 {
     doForAllNodes (
         [c = std::forward<Callable> (callable)] (Node& node)
@@ -192,9 +202,9 @@ void AbstractTree<ElementType>::doForAllElements (Callable&& callable)
         });
 }
 
-template <typename ElementType>
+template <typename ElementType, typename DerivedType>
 template <typename Callable>
-void AbstractTree<ElementType>::doForAllElements (Callable&& callable) const
+void AbstractTree<ElementType, DerivedType>::doForAllElements (Callable&& callable) const
 {
     doForAllNodes (
         [c = std::forward<Callable> (callable)] (const Node& node)
@@ -204,18 +214,23 @@ void AbstractTree<ElementType>::doForAllElements (Callable&& callable) const
         });
 }
 
-template <typename ElementType>
-typename AbstractTree<ElementType>::Node* AbstractTree<ElementType>::createEmptyNode()
+template <typename ElementType, typename DerivedType>
+typename AbstractTree<ElementType, DerivedType>::Node* AbstractTree<ElementType, DerivedType>::createEmptyNode()
 {
-    auto [locator, new_node] = nodes.emplace();
-
-    new_node->locator.bucket_index = locator.bucket_index;
-    new_node->locator.slot_index = locator.slot_index;
+    auto* new_node = new (allocator.allocate<Node> (1)) Node {};
 
     last_node->next_linear = new_node;
     new_node->prev_linear = last_node;
     last_node = new_node;
 
     return new_node;
+}
+
+template <typename ElementType, typename DerivedType>
+std::string_view AbstractTree<ElementType, DerivedType>::allocateTag (std::string_view str)
+{
+    auto* str_data = allocator.allocate<char> (str.size());
+    std::copy (str.begin(), str.end(), str_data);
+    return { str_data, str.size() }; // NOLINT NOSONAR
 }
 } // namespace chowdsp
