@@ -28,7 +28,7 @@ std::string_view vformat (ArenaType& arena, fmt::string_view format_str, fmt::fo
 {
     using FormatAllocator = STLArenaAllocator<char, ArenaType>;
     FormatAllocator alloc { arena };
-    fmt::basic_memory_buffer<char, 0, FormatAllocator> buffer { alloc };
+    fmt::basic_memory_buffer<char, 1, FormatAllocator> buffer { alloc };
     fmt::vformat_to (std::back_inserter (buffer), format_str, args);
     return { buffer.data(), buffer.size() };
 }

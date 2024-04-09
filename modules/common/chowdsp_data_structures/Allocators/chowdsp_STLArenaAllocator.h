@@ -15,7 +15,8 @@ struct STLArenaAllocator
     }
 
     template <class U>
-    STLArenaAllocator (const STLArenaAllocator<U, ArenaType>& other) noexcept : arena (other.arena) // NOLINT
+    explicit STLArenaAllocator (const STLArenaAllocator<U, ArenaType>& other) noexcept
+        : arena (other.arena)
     {
     }
 
@@ -30,7 +31,7 @@ struct STLArenaAllocator
         return static_cast<T*> (arena.allocate_bytes (n, alignof (T)));
     }
 
-    void deallocate (T*, std::size_t)
+    void deallocate (T*, std::size_t) const
     {
         // no-op...
         // memory will be re-claimed when the arena is cleared.
