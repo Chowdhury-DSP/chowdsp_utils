@@ -79,10 +79,10 @@ namespace LogFileHelpers
     {
         juce::Logger::writeToLog (toString (signal == 0 ? exitString : crashString));
 
-        if (auto* logger = dynamic_cast<BaseLogger*> (juce::Logger::getCurrentLogger()))
+        if (auto* logger = get_global_logger())
             flushLogger (logger);
 
-        juce::Logger::setCurrentLogger (nullptr);
+        set_global_logger (nullptr);
     }
 
     static juce::File getSystemLogFileFolder()

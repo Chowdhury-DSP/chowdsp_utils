@@ -6,6 +6,9 @@ struct BaseLogger : juce::Logger
 {
     spdlog::logger internal_logger { "chowdsp_log" };
     spdlog::sink_ptr console_sink {};
+    Broadcaster<void (const juce::String&)> onLogMessage {};
+    ChainedArenaAllocator arena { 8192 };
+    static BaseLogger* global_logger;
 
     BaseLogger()
     {
@@ -20,6 +23,11 @@ struct BaseLogger : juce::Logger
     void logMessage (const juce::String& message) override
     {
         internal_logger.info (message.toStdString());
+        onLogMessage (message);
+        arena.clear();
     }
 };
+
+void set_global_logger (BaseLogger*);
+BaseLogger* get_global_logger();
 } // namespace chowdsp

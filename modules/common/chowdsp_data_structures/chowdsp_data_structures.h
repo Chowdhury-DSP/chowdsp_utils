@@ -39,6 +39,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 #include "Allocators/chowdsp_ArenaAllocator.h"
 #include "Allocators/chowdsp_ChainedArenaAllocator.h"
+#include "Allocators/chowdsp_STLArenaAllocator.h"
 
 #include "Structures/chowdsp_BucketArray.h"
 #include "Structures/chowdsp_AbstractTree.h"
