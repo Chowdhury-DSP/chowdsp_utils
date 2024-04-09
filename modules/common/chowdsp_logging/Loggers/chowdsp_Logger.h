@@ -16,7 +16,7 @@ public:
 
     const LogFileParams params;
 
-private:
+protected:
     void timerCallback() override;
 
     CrashLogHelpers::CrashLogAnalysisCallback crashLogAnalysisCallback = &CrashLogHelpers::defaultCrashLogAnalyzer;
@@ -26,6 +26,7 @@ private:
 
     BaseLogger logger;
 
+private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Logger)
 };
 } // namespace chowdsp

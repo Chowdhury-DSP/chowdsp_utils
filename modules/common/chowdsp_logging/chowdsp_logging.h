@@ -8,7 +8,7 @@ BEGIN_JUCE_MODULE_DECLARATION
    version:       2.2.0
    name:          ChowDSP Logging
    description:   ChowDSP Logging module
-   dependencies:  chowdsp_core, chowdsp_data_structures
+   dependencies:  chowdsp_core, chowdsp_data_structures, chowdsp_listeners
 
    website:       https://ccrma.stanford.edu/~jatin/chowdsp
    license:       BSD 3-Clause
@@ -22,6 +22,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 #include <chowdsp_core/chowdsp_core.h>
 #include <chowdsp_data_structures/chowdsp_data_structures.h>
+#include <chowdsp_listeners/chowdsp_listeners.h>
 
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wswitch-enum",
                                      "-Wfloat-equal",
@@ -40,6 +41,7 @@ JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 #include "Loggers/chowdsp_LogFileHelpers.h"
 #include "Loggers/chowdsp_CrashLogHelpers.h"
 #include "Loggers/chowdsp_Logger.h"
+#include "Loggers/chowdsp_FormatHelpers.h"
 
 // legacy
 #include "Loggers/chowdsp_PluginLogger.h"
