@@ -27,6 +27,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wswitch-enum",
                                      "-Wfloat-equal",
                                      "-Wextra-semi",
+                                     "-Wzero-length-array",
                                      "-Wc++20-compat",
                                      "-Wlanguage-extension-token")
 

@@ -2,6 +2,7 @@
 
 namespace chowdsp
 {
+/** A (mostly) STL-conforming allocator backed by a memory arena of your choosing. */
 template <class T, typename ArenaType>
 struct STLArenaAllocator
 {
@@ -18,15 +19,21 @@ struct STLArenaAllocator
     {
     }
 
+    template <typename U>
+    struct rebind
+    {
+        using other = STLArenaAllocator<U, ArenaType>;
+    };
+
     T* allocate (std::size_t n)
     {
-        auto* ptr = static_cast<T*> (arena.allocate_bytes (n, alignof (T)));
-        return ptr;
+        return static_cast<T*> (arena.allocate_bytes (n, alignof (T)));
     }
 
     void deallocate (T*, std::size_t)
     {
         // no-op...
+        // memory will be re-claimed when the arena is cleared.
     }
 };
 
@@ -41,4 +48,4 @@ constexpr bool operator!= (const STLArenaAllocator<T, Arena>& x, const STLArenaA
 {
     return ! (x == y);
 }
-}
+} // namespace chowdsp

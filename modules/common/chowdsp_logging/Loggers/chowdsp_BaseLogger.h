@@ -28,6 +28,9 @@ struct BaseLogger : juce::Logger
     }
 };
 
+/** Set's a (static) logger to be used globally. */
 void set_global_logger (BaseLogger*);
+
+/** Returns the global logger, or nullptr if none has been set. */
 BaseLogger* get_global_logger();
 } // namespace chowdsp
