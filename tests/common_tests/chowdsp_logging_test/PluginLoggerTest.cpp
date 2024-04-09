@@ -26,6 +26,7 @@ TEMPLATE_TEST_CASE ("Plugin Logger Test", "[common][logs]", chowdsp::PluginLogge
         {
             Logger logger { logFileSubDir, logFileNameRoot };
             juce::Logger::writeToLog (testLogString);
+            chowdsp::log ("The magic number is: {}", 18);
 
             logFile = logger.getLogFile();
         }
@@ -34,6 +35,8 @@ TEMPLATE_TEST_CASE ("Plugin Logger Test", "[common][logs]", chowdsp::PluginLogge
 
         auto logString = logFile.loadFileAsString();
         REQUIRE_MESSAGE (logString.contains (testLogString), "Test log string was not found in the log file!");
+        if (std::is_same_v<Logger, chowdsp::Logger>)
+            REQUIRE_MESSAGE (logString.contains ("The magic number is: 18"), "Test log string was not found in the log file!");
         REQUIRE_MESSAGE (! logString.contains (testNonLogString), "Test non-log string WAS found in the log file!");
     }
 

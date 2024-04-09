@@ -24,6 +24,9 @@ else()
     list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
     list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/test)
 
+    # Useful for testing with address sanitizer:
+    # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -g")
+
     if(CHOWDSP_ENABLE_TESTING)
         enable_testing()
         add_subdirectory(tests)

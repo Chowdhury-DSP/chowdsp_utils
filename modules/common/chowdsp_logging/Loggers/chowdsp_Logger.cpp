@@ -30,7 +30,7 @@ Logger::Logger (const LogFileParams& loggerParams,
     logger.internal_logger.sinks().push_back (file_sink);
     logger.internal_logger.info ("Starting log file: " + log_file.getFullPathName().toStdString());
 
-    juce::Logger::setCurrentLogger (&logger);
+    set_global_logger (&logger);
 
     juce::SystemStats::setApplicationCrashHandler (signalHandler);
 
