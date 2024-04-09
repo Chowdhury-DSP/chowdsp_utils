@@ -14,4 +14,4 @@ BaseLogger* get_global_logger()
 {
     return BaseLogger::global_logger;
 }
-}
+} // namespace chowdsp
