@@ -20,16 +20,16 @@ public:
     using Ptr = OptionalPointer<RhythmParameter>;
 
     /** Returns the currently selected rhythm. */
-    RhythmUtils::Rhythm getRhythm() const;
+    [[nodiscard]] RhythmUtils::Rhythm getRhythm() const;
 
     /** Returns the length of time associated with the current rhythm for a given BPM in seconds. */
-    double getRhythmTimeSeconds (double tempoBPM) const;
+    [[nodiscard]] double getRhythmTimeSeconds (double tempoBPM) const;
+
+    const std::vector<RhythmUtils::Rhythm> rhythmChoices;
 
 private:
     static juce::StringArray makeParameterChoiceList (const std::vector<RhythmUtils::Rhythm>& rhythms);
     static int getDefaultParameterChoice (const std::vector<RhythmUtils::Rhythm>& rhythms, const RhythmUtils::Rhythm& defaultRhythm);
-
-    const std::vector<RhythmUtils::Rhythm> rhythmChoices;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (RhythmParameter)
 };
