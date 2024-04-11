@@ -135,19 +135,24 @@ void PresetManager::loadUserPresetsFromFolder (const juce::File& file)
 
 void PresetManager::loadPreset (const Preset& preset)
 {
+#if HAS_CLAP_JUCE_EXTENSIONS
+    const auto presetFile = preset.getPresetFile();
+    const auto presetName = preset.getName();
+#endif
+
     saverLoader.loadPreset (preset);
 
 #if HAS_CLAP_JUCE_EXTENSIONS
-    if (preset.getPresetFile() == juce::File {})
+    if (presetFile == juce::File {})
     {
         clapPresetLoadedBroadcaster (CLAP_PRESET_DISCOVERY_LOCATION_PLUGIN,
                                      nullptr,
-                                     preset.getName().toRawUTF8());
+                                     presetName.toRawUTF8());
     }
     else
     {
         clapPresetLoadedBroadcaster (CLAP_PRESET_DISCOVERY_LOCATION_FILE,
-                                     preset.getPresetFile().getFullPathName().toRawUTF8(),
+                                     presetFile.getFullPathName().toRawUTF8(),
                                      nullptr);
     }
 #endif
