@@ -94,10 +94,13 @@ void BypassProcessor<SampleType,
 template <typename SampleType, typename DelayInterpType>
 void BypassProcessor<SampleType,
                      DelayInterpType,
-                     std::enable_if_t<! std::is_same_v<DelayInterpType, NullType>>>::prepare (const juce::dsp::ProcessSpec& spec, bool onOffParam)
+                     std::enable_if_t<! std::is_same_v<DelayInterpType, NullType>>>::prepare (const juce::dsp::ProcessSpec& spec,
+                                                                                              bool onOffParam,
+                                                                                              bool useInternalBuffer)
 {
     prevOnOffParam = onOffParam;
-    fadeBuffer.setMaxSize ((int) spec.numChannels, (int) spec.maximumBlockSize);
+    if (useInternalBuffer)
+        fadeBuffer.setMaxSize ((int) spec.numChannels, (int) spec.maximumBlockSize);
 
     compDelay.prepare (spec); // sample rate does not matter
 }
@@ -138,7 +141,9 @@ void BypassProcessor<SampleType,
 template <typename SampleType, typename DelayInterpType>
 bool BypassProcessor<SampleType,
                      DelayInterpType,
-                     std::enable_if_t<! std::is_same_v<DelayInterpType, NullType>>>::processBlockIn (const BufferView<SampleType>& block, bool onOffParam)
+                     std::enable_if_t<! std::is_same_v<DelayInterpType, NullType>>>::processBlockIn (const BufferView<SampleType>& block,
+                                                                                                     bool onOffParam,
+                                                                                                     std::optional<ArenaAllocatorView> arena)
 {
     enum class DelayOp
     {
@@ -184,9 +189,13 @@ bool BypassProcessor<SampleType,
 
     if (onOffParam != prevOnOffParam)
     {
-        fadeBuffer.setCurrentSize (block.getNumChannels(), block.getNumSamples());
-        BufferMath::copyBufferData (block, fadeBuffer);
-        doDelayOp (fadeBuffer, compDelay, DelayOp::Pop);
+        if (arena.has_value())
+            fadeBufferView = make_temp_buffer<SampleType> (*arena, block.getNumChannels(), block.getNumSamples());
+        else
+            fadeBufferView = BufferView { fadeBuffer, 0, block.getNumSamples(), 0, block.getNumChannels() };
+
+        BufferMath::copyBufferData (block, fadeBufferView);
+        doDelayOp (fadeBufferView, compDelay, DelayOp::Pop);
 
         if (onOffParam && latencySampleCount < 0)
             latencySampleCount = (int) compDelay.getDelay();
@@ -247,7 +256,7 @@ void BypassProcessor<SampleType,
     for (int ch = 0; ch < numChannels; ++ch)
     {
         auto* blockPtr = block.getWritePointer (ch);
-        const auto* fadePtr = fadeBuffer.getReadPointer (ch);
+        const auto* fadePtr = fadeBufferView.getReadPointer (ch);
 
         fadeOutputBuffer (blockPtr, fadePtr, startSample, numSamples);
     }
