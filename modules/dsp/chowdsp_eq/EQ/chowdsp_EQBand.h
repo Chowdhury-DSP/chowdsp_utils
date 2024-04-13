@@ -58,11 +58,7 @@ public:
     void reset();
 
     /** Processes an buffer of samples. */
-    void processBlock (const BufferView<FloatType>& buffer) noexcept;
-
-    /** Processes an audio context */
-    template <typename ProcessContext>
-    void process (const ProcessContext& context) noexcept;
+    void processBlock (const BufferView<FloatType>& buffer, ArenaAllocatorView arena) noexcept;
 
 private:
     template <typename FilterType, typename T = FloatType, size_t N = FilterType::Order>
@@ -92,8 +88,6 @@ private:
     int filterType = 0, prevFilterType = 0;
 
     NumericType fs = NumericType (44100.0);
-
-    Buffer<FloatType> fadeBuffer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EQBandBase)
 };

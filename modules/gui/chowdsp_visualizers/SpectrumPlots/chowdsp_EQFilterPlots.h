@@ -273,8 +273,8 @@ struct HigherOrderLPFPlot : EQFilterPlot
 
 private:
     LPF1Plot extraPlot;
-    std::array<SecondOrderFilterPlot, size_t (order / 2)> plots;
-    static constexpr auto butterQVals = chowdsp::QValCalcs::butterworth_Qs<float, order>();
+    std::array<SecondOrderFilterPlot, size_t (order / 2)> plots {};
+    static constexpr auto butterQVals = QValCalcs::butterworth_Qs<float, order>();
 };
 
 /** Plotting helper for higher-order HPFs. */
@@ -318,7 +318,7 @@ struct HigherOrderHPFPlot : EQFilterPlot
 
 private:
     HPF1Plot extraPlot;
-    std::array<SecondOrderFilterPlot, size_t (order / 2)> plots;
-    static constexpr auto butterQVals = chowdsp::QValCalcs::butterworth_Qs<float, order>();
+    std::array<SecondOrderFilterPlot, size_t (order / 2)> plots {};
+    static constexpr auto butterQVals = QValCalcs::butterworth_Qs<float, order>();
 };
 } // namespace chowdsp::EQ

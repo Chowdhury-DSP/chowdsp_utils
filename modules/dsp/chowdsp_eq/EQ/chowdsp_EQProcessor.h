@@ -64,6 +64,8 @@ private:
     std::array<BypassProcessor<FloatType>, numBands> bypasses;
     std::array<bool, numBands> onOffs = { false };
 
+    ArenaAllocator<> arena;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EQProcessor)
 };
 } // namespace chowdsp::EQ
