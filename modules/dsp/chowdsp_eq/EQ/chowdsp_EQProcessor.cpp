@@ -51,12 +51,12 @@ void EQProcessor<FloatType, numBands, EQBandType>::prepare (const juce::dsp::Pro
     for (size_t i = 0; i < numBands; ++i)
     {
         bands[i].prepare (spec);
-        bypasses[i].prepare (spec, onOffs[i]);
+        bypasses[i].prepare (spec, onOffs[i], false);
     }
 
     const auto paddedChannelSize = Math::ceiling_divide (static_cast<size_t> (spec.maximumBlockSize), SIMDUtils::defaultSIMDAlignment) * SIMDUtils::defaultSIMDAlignment;
     const auto requiredMemoryBytes = paddedChannelSize * sizeof (FloatType) * 3 // per-band smoothed values
-                                     + paddedChannelSize * spec.numChannels * sizeof (FloatType) // per-band fade buffers
+                                     + paddedChannelSize * spec.numChannels * sizeof (FloatType) * 2 // per-band fade and bypass buffers
                                      + 32; // extra padding
     arena.reset (requiredMemoryBytes);
 }
@@ -73,7 +73,8 @@ void EQProcessor<FloatType, numBands, EQBandType>::processBlock (const BufferVie
 {
     for (size_t i = 0; i < numBands; ++i)
     {
-        if (! bypasses[i].processBlockIn (block, onOffs[i]))
+        const auto frame = arena.create_frame();
+        if (! bypasses[i].processBlockIn (block, onOffs[i], arena))
         {
             bands[i].reset();
             continue;
