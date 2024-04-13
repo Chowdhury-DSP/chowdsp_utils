@@ -382,7 +382,7 @@ template <typename T>
 BufferView<T> make_temp_buffer (ArenaAllocatorView arena, int num_channels, int num_samples)
 {
     std::array<T*, CHOWDSP_BUFFER_MAX_NUM_CHANNELS> channel_pointers {};
-    for (int ch = 0; ch < num_channels; ++ch)
+    for (size_t ch = 0; ch < static_cast<size_t> (num_channels); ++ch)
     {
         channel_pointers[ch] = arena.allocate<T> (num_samples, SIMDUtils::defaultSIMDAlignment);
         jassert (channel_pointers[ch] != nullptr);

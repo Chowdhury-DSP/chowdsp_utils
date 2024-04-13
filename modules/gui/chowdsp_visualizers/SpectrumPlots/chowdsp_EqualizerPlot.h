@@ -39,10 +39,11 @@ enum class EQPlotFilterType
 };
 
 /** UI component for plotting EQ filter frequency responses. */
+template <size_t numBands>
 class EqualizerPlot : public SpectrumPlotBase
 {
 public:
-    explicit EqualizerPlot (int numBands, SpectrumPlotParams&& params = {});
+    explicit EqualizerPlot (SpectrumPlotParams&& plotParams);
 
     /** Sets the filter type for a given band. */
     void setFilterType (int bandIndex, EQPlotFilterType type);
@@ -78,118 +79,44 @@ private:
 
     struct BandPlotInfo
     {
-        std::unique_ptr<EQFilterPlot> plot;
-        juce::Path plotPath;
+        LocalPointer<EQFilterPlot, 512> plot {};
+        std::optional<EQPlotFilterType> type {};
+        juce::Path plotPath {};
         std::vector<float> plotData {};
     };
 
-    std::vector<BandPlotInfo> filterPlots;
-    juce::Path masterFilterPlotPath;
+    std::array<BandPlotInfo, numBands> filterPlots {};
+    juce::Path masterFilterPlotPath {};
 
-    std::vector<bool> filtersActiveFlags;
+    std::array<bool, numBands> filtersActiveFlags {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EqualizerPlot)
 };
 
 #if JUCE_MODULE_AVAILABLE_chowdsp_plugin_state && JUCE_MODULE_AVAILABLE_chowdsp_eq
 template <size_t numBands>
-class EqualizerPlotWithParameters : public EqualizerPlot
+class EqualizerPlotWithParameters : public EqualizerPlot<numBands>
 {
 public:
-    EqualizerPlotWithParameters (chowdsp::ParameterListeners& listeners,
-                                 chowdsp::EQ::StandardEQParameters<numBands>& eqParameters,
+    EqualizerPlotWithParameters (ParameterListeners& listeners,
+                                 EQ::StandardEQParameters<numBands>& eqParameters,
                                  const std::function<EQPlotFilterType (int)>& filterTypeMap,
-                                 SpectrumPlotParams&& plotParams = {})
-        : EqualizerPlot (numBands, std::move (plotParams)),
-          eqParams (eqParameters)
-    {
-        for (const auto [index, bandParams] : chowdsp::enumerate (eqParams.eqParams))
-        {
-            const auto bandIndex = (int) index;
-            callbacks +=
-                {
-                    listeners.addParameterListener (
-                        bandParams.freqParam,
-                        chowdsp::ParameterListenerThread::MessageThread,
-                        [this, bandIndex]
-                        {
-                            updateFreqParameter (bandIndex);
-                            updateFilterPlotPath (bandIndex);
-                        }),
-                    listeners.addParameterListener (
-                        bandParams.qParam,
-                        chowdsp::ParameterListenerThread::MessageThread,
-                        [this, bandIndex]
-                        {
-                            updateQParameter (bandIndex);
-                            updateFilterPlotPath (bandIndex);
-                        }),
-                    listeners.addParameterListener (
-                        bandParams.gainParam,
-                        chowdsp::ParameterListenerThread::MessageThread,
-                        [this, bandIndex]
-                        {
-                            updateGainDBParameter (bandIndex);
-                            updateFilterPlotPath (bandIndex);
-                        }),
-                    listeners.addParameterListener (
-                        bandParams.typeParam,
-                        chowdsp::ParameterListenerThread::MessageThread,
-                        [this, bandIndex, filterTypeMap]
-                        {
-                            updateFilterType (bandIndex, filterTypeMap);
-                            updateFilterPlotPath (bandIndex);
-                        }),
-                    listeners.addParameterListener (
-                        bandParams.onOffParam,
-                        chowdsp::ParameterListenerThread::MessageThread,
-                        [this, bandIndex]
-                        {
-                            updateFilterOnOff (bandIndex);
-                            updateFilterPlotPath (bandIndex);
-                        })
-                };
-
-            updateFilterType (bandIndex, filterTypeMap);
-            updateFilterOnOff (bandIndex);
-        }
-    }
+                                 SpectrumPlotParams&& plotParams = {});
 
 private:
-    void updateFreqParameter (int bandIndex)
-    {
-        setCutoffParameter (bandIndex, eqParams.eqParams[(size_t) bandIndex].freqParam->get());
-    }
+    void updateFreqParameter (int bandIndex);
+    void updateQParameter (int bandIndex);
+    void updateGainDBParameter (int bandIndex);
+    void updateFilterType (int bandIndex, const std::function<EQPlotFilterType (int)>& filterTypeMap); // NOSONAR
+    void updateFilterOnOff (int bandIndex);
 
-    void updateQParameter (int bandIndex)
-    {
-        setQParameter (bandIndex, eqParams.eqParams[(size_t) bandIndex].qParam->get());
-    }
+    EQ::StandardEQParameters<numBands>& eqParams;
 
-    void updateGainDBParameter (int bandIndex)
-    {
-        setGainDBParameter (bandIndex, eqParams.eqParams[(size_t) bandIndex].gainParam->get());
-    }
-
-    void updateFilterType (int bandIndex, const std::function<EQPlotFilterType (int)>& filterTypeMap) // NOSONAR
-    {
-        const auto& bandTypeParam = eqParams.eqParams[(size_t) bandIndex].typeParam;
-        setFilterType (bandIndex, filterTypeMap (bandTypeParam->getIndex()));
-        updateFreqParameter (bandIndex);
-        updateQParameter (bandIndex);
-        updateGainDBParameter (bandIndex);
-    }
-
-    void updateFilterOnOff (int bandIndex)
-    {
-        setFilterActive (bandIndex, eqParams.eqParams[(size_t) bandIndex].onOffParam->get());
-    }
-
-    chowdsp::EQ::StandardEQParameters<numBands>& eqParams;
-
-    chowdsp::ScopedCallbackList callbacks;
+    ScopedCallbackList callbacks {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EqualizerPlotWithParameters)
 };
 #endif
 } // namespace chowdsp::EQ
+
+#include "chowdsp_EqualizerPlot.cpp"
