@@ -39,9 +39,6 @@ void EQBandBase<FloatType, FilterChoicesTuple>::prepare (const juce::dsp::Proces
 {
     fs = (NumericType) spec.sampleRate;
 
-    fadeBuffer.setMaxSize ((int) spec.numChannels, (int) spec.maximumBlockSize);
-    fadeBuffer.clear();
-
     TupleHelpers::forEachInTuple (
         [spec] (auto& filter, size_t)
         {
@@ -58,7 +55,7 @@ void EQBandBase<FloatType, FilterChoicesTuple>::prepare (const juce::dsp::Proces
 
     for (auto* smoother : { &freqSmooth, &qSmooth, &gainSmooth })
     {
-        smoother->prepare (spec.sampleRate, (int) spec.maximumBlockSize);
+        smoother->prepare (spec.sampleRate, (int) spec.maximumBlockSize, false);
         smoother->setRampLength (0.05);
     }
 
@@ -278,24 +275,26 @@ void EQBandBase<FloatType, FilterChoicesTuple>::fadeBuffers (const FloatType* fa
 }
 
 template <typename FloatType, typename FilterChoicesTuple>
-void EQBandBase<FloatType, FilterChoicesTuple>::processBlock (const BufferView<FloatType>& buffer) noexcept
+void EQBandBase<FloatType, FilterChoicesTuple>::processBlock (const BufferView<FloatType>& buffer, ArenaAllocatorView arena) noexcept
 {
     const auto numChannels = buffer.getNumChannels();
     const auto numSamples = buffer.getNumSamples();
+    const auto frame = arena.create_frame();
 
-    freqSmooth.process (freqHzHandle, numSamples);
-    qSmooth.process (qHandle, numSamples);
-    gainSmooth.process (gainHandle, numSamples);
+    freqSmooth.process (freqHzHandle, numSamples, arena);
+    qSmooth.process (qHandle, numSamples, arena);
+    gainSmooth.process (gainHandle, numSamples, arena);
 
     const auto needsFade = filterType != prevFilterType;
+    BufferView<FloatType> fadeBuffer {};
     if (needsFade)
     {
-        fadeBuffer.setCurrentSize (numChannels, numSamples);
+        fadeBuffer = make_temp_buffer<FloatType> (arena, numChannels, numSamples);
         BufferMath::copyBufferData (buffer, fadeBuffer);
     }
 
     TupleHelpers::forEachInTuple (
-        [this, &buffer] (auto& filter, size_t filterIndex)
+        [this, &buffer, &fadeBuffer] (auto& filter, size_t filterIndex)
         {
             if ((int) filterIndex == filterType)
             {
@@ -320,62 +319,4 @@ void EQBandBase<FloatType, FilterChoicesTuple>::processBlock (const BufferView<F
 
     prevFilterType = filterType;
 }
-
-template <typename FloatType, typename FilterChoicesTuple>
-template <typename ProcessContext>
-void EQBandBase<FloatType, FilterChoicesTuple>::process (const ProcessContext& context) noexcept
-{
-    const auto& inputBlock = context.getInputBlock();
-    auto& block = context.getOutputBlock();
-    const auto numChannels = block.getNumChannels();
-    const auto numSamples = (int) block.getNumSamples();
-
-    jassert (inputBlock.getNumChannels() == numChannels);
-    jassert (inputBlock.getNumSamples() == (size_t) numSamples);
-
-    freqSmooth.process (freqHzHandle, numSamples);
-    qSmooth.process (qHandle, numSamples);
-    gainSmooth.process (gainHandle, numSamples);
-
-    // the filters will need to do in-place processing anyway, so let's just copy the blocks here
-    if (context.usesSeparateInputAndOutputBlocks())
-        block.copyFrom (inputBlock);
-
-    if (context.isBypassed)
-    {
-        reset();
-        return;
-    }
-
-    const auto needsFade = filterType != prevFilterType;
-    if (needsFade)
-        BufferMath::copyBufferData (block, fadeBuffer, 0, numSamples, 0, numChannels);
-
-    TupleHelpers::forEachInTuple (
-        [this, &block] (auto& filter, size_t filterIndex)
-        {
-            if ((int) filterIndex == filterType)
-            {
-                processFilterChannel (filter, block);
-            }
-            else if ((int) filterIndex == prevFilterType)
-            {
-                processFilterChannel (filter, fadeBuffer);
-                filter.reset();
-            }
-        },
-        filters);
-
-    if (needsFade)
-    {
-        for (size_t channel = 0; channel < numChannels; ++channel)
-        {
-            auto* blockPtr = block.getChannelPointer (channel);
-            fadeBuffers (blockPtr, fadeBuffer.getReadPointer ((int) channel), blockPtr, numSamples);
-        }
-    }
-
-    prevFilterType = filterType;
-}
-
 } // namespace chowdsp::EQ

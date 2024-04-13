@@ -100,6 +100,14 @@ void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::process (int numSample
 }
 
 template <typename FloatType, typename ValueSmoothingTypes>
+void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::process (int numSamples, ArenaAllocatorView alloc)
+{
+    bufferData = alloc.allocate<FloatType> (numSamples, bufferAlignment);
+    jassert (bufferData != nullptr); // arena allocator is out of memory!
+    process (numSamples);
+}
+
+template <typename FloatType, typename ValueSmoothingTypes>
 void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::process (FloatType value, int numSamples)
 {
     const auto mappedValue = mappingFunction (value);
@@ -115,6 +123,14 @@ void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::process (FloatType val
     isCurrentlySmoothing = true;
     for (int n = 0; n < numSamples; ++n)
         bufferData[n] = smoother.getNextValue();
+}
+
+template <typename FloatType, typename ValueSmoothingTypes>
+void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::process (FloatType value, int numSamples, ArenaAllocatorView alloc)
+{
+    bufferData = alloc.allocate<FloatType> (numSamples, bufferAlignment);
+    jassert (bufferData != nullptr); // arena allocator is out of memory!
+    process (value, numSamples);
 }
 
 template class SmoothedBufferValue<float, juce::ValueSmoothingTypes::Linear>;

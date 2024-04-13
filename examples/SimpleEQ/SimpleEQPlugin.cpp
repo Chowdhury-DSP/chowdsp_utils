@@ -63,7 +63,7 @@ void SimpleEQPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
     // any thread, but we'll do it on the audio thread here.
     setEQParams();
 
-    if (state.params.linPhaseMode.get())
+    if (state.params.linPhaseMode->get())
     {
         // Linear phase mode is on: processing the linear phase EQ here!
         linPhaseEQ.processBlock (buffer);

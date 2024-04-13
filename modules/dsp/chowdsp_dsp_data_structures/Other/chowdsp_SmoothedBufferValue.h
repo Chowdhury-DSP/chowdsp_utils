@@ -79,12 +79,7 @@ public:
      */
     void process (int numSamples);
 
-    void process (int numSamples, ArenaAllocatorView alloc)
-    {
-        bufferData = alloc.allocate<FloatType> (numSamples, bufferAlignment);
-        jassert (bufferData != nullptr); // arena allocator is out of memory!
-        process (numSamples);
-    }
+    void process (int numSamples, ArenaAllocatorView alloc);
 
     /**
      * Process smoothing for the input value.
@@ -92,12 +87,7 @@ public:
      */
     void process (FloatType value, int numSamples);
 
-    void process (FloatType value, int numSamples, ArenaAllocatorView alloc)
-    {
-        bufferData = alloc.allocate<FloatType> (numSamples, bufferAlignment);
-        jassert (bufferData != nullptr); // arena allocator is out of memory!
-        process (value, numSamples);
-    }
+    void process (FloatType value, int numSamples, ArenaAllocatorView alloc);
 
     /** Returns a pointer to the current smoothed buffer. */
     [[nodiscard]] const FloatType* getSmoothedBuffer() const { return bufferData; }
