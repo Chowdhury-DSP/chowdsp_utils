@@ -22,11 +22,11 @@ namespace chowdsp
  * }
  * ```
  */
-template <typename SampleType, typename DelayInterpType = std::nullptr_t, typename = void>
+template <typename SampleType, typename DelayInterpType = NullType, typename = void>
 class BypassProcessor;
 
 template <typename SampleType, typename DelayInterpType>
-class BypassProcessor<SampleType, DelayInterpType, std::enable_if_t<std::is_same_v<DelayInterpType, std::nullptr_t>>>
+class BypassProcessor<SampleType, DelayInterpType, std::enable_if_t<std::is_same_v<DelayInterpType, NullType>>>
 {
 public:
     using NumericType = SampleTypeHelpers::NumericType<SampleType>;
@@ -64,7 +64,7 @@ private:
 };
 
 template <typename SampleType, typename DelayInterpType>
-class BypassProcessor<SampleType, DelayInterpType, std::enable_if_t<! std::is_same_v<DelayInterpType, std::nullptr_t>>>
+class BypassProcessor<SampleType, DelayInterpType, std::enable_if_t<! std::is_same_v<DelayInterpType, NullType>>>
 {
 public:
     using NumericType = SampleTypeHelpers::NumericType<SampleType>;

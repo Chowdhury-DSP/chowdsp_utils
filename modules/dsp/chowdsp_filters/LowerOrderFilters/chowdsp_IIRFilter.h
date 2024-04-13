@@ -39,7 +39,7 @@ public:
         if constexpr (maxChannelCount == dynamicChannelCount)
             z.resize (numChannels);
         else
-            jassert (numChannels <= maxChannelCount);
+            jassert (numChannels <= static_cast<int> (maxChannelCount));
     }
 
     /** Reset filter state */
