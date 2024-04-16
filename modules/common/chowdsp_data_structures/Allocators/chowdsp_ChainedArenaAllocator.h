@@ -133,6 +133,7 @@ public:
         return bytes_count;
     }
 
+    /** Merges another allocator into this one, and invalidates the other allocator. */
     void merge (ChainedArenaAllocator& allocator_to_merge)
     {
         if (allocator_to_merge.arena_count == 0)
