@@ -67,4 +67,31 @@ TEST_CASE ("Chained Arena Allocator Test", "[common][data-structures]")
         REQUIRE (allocator.get_arena_count() == 2);
         REQUIRE (allocator.get_arenas().front().get_bytes_used() == 0);
     }
+
+    SECTION ("Merge")
+    {
+        chowdsp::ChainedArenaAllocator alloc1 { 128 };
+        chowdsp::ChainedArenaAllocator alloc2 { 128 };
+        chowdsp::ChainedArenaAllocator alloc3 {};
+
+        alloc1.allocate<float> (24);
+        alloc1.allocate<float> (24);
+        alloc2.allocate<float> (24);
+        alloc2.allocate<float> (24);
+        alloc2.allocate<float> (24);
+
+        alloc1.clear();
+        alloc2.clear();
+
+        chowdsp::ChainedArenaAllocator merge_alloc {};
+        const auto arena_count = alloc1.get_arena_count() + alloc2.get_arena_count() + alloc3.get_arena_count();
+        const auto* old_arena = &alloc1.get_current_arena();
+        merge_alloc.merge (alloc1);
+        alloc2.allocate<float> (24);
+        alloc2.allocate<float> (24);
+        merge_alloc.merge (alloc2);
+        merge_alloc.merge (alloc3);
+        REQUIRE (merge_alloc.get_arena_count() == arena_count);
+        REQUIRE (&merge_alloc.get_current_arena() == old_arena);
+    }
 }

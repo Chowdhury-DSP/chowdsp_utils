@@ -133,6 +133,45 @@ public:
         return bytes_count;
     }
 
+    /** Merges another allocator into this one, and invalidates the other allocator. */
+    void merge (ChainedArenaAllocator& allocator_to_merge)
+    {
+        if (allocator_to_merge.arena_count == 0)
+            return; // no work to do!
+
+        // both arenas must have the same head size!
+        jassert (arena_size_bytes == 0 || arena_size_bytes == allocator_to_merge.arena_size_bytes);
+
+        if (arena_count == 0)
+        {
+            *this = std::move (allocator_to_merge);
+            return;
+        }
+
+        size_t new_arena_count = 0;
+        auto merge_iter = allocator_to_merge.arenas.begin();
+        for (; merge_iter != allocator_to_merge.current_arena; ++merge_iter)
+        {
+            arenas.push_front (std::move (*merge_iter));
+            new_arena_count++;
+        }
+
+        jassert (merge_iter == allocator_to_merge.current_arena);
+        arenas.push_front (std::move (*merge_iter));
+        new_arena_count++;
+        merge_iter++;
+
+        for (; merge_iter != allocator_to_merge.arenas.end(); ++merge_iter)
+        {
+            arenas.insert_after (current_arena, std::move (*merge_iter));
+            new_arena_count++;
+        }
+
+        arena_count += new_arena_count;
+
+        allocator_to_merge = {};
+    }
+
     struct Frame
     {
         explicit Frame (ChainedArenaAllocator& allocator)
