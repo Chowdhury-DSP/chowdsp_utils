@@ -161,6 +161,7 @@ public:
     }
 
 #if JUCE_MODULE_AVAILABLE_juce_dsp
+    template <typename T = SampleType, std::enable_if_t<std::is_floating_point_v<T>>* = nullptr>
     BufferView (const AudioBlock<std::remove_const_t<SampleType>>& block, // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
                 int sampleOffset = 0,
                 int bufferNumSamples = -1,
@@ -173,7 +174,7 @@ public:
             channelPointers[ch] = block.getChannelPointer (ch + (size_t) startChannel) + sampleOffset;
     }
 
-    template <typename T = SampleType, std::enable_if_t<std::is_const_v<T>>* = nullptr>
+    template <typename T = SampleType, std::enable_if_t<std::is_const_v<T> && std::is_floating_point_v<T>>* = nullptr>
     BufferView (const AudioBlock<const SampleType>& block, // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
                 int sampleOffset = 0,
                 int bufferNumSamples = -1,
