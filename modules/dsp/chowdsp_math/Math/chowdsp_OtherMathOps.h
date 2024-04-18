@@ -47,6 +47,15 @@ namespace Math
     }
 
     /**
+     * Rounds a number up to the nearest multiple of the given multiplier.
+     */
+    template <typename T>
+    constexpr T round_to_next_multiple (T value, T multiplier)
+    {
+        return ceiling_divide (value, multiplier) * multiplier;
+    }
+
+    /**
      * Returns 1 if the input is positive, -1 if the input is negative,
      * and 0 if the input is zero.
      */

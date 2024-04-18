@@ -54,7 +54,7 @@ void EQProcessor<FloatType, numBands, EQBandType>::prepare (const juce::dsp::Pro
         bypasses[i].prepare (spec, onOffs[i], false);
     }
 
-    const auto paddedChannelSize = Math::ceiling_divide (static_cast<size_t> (spec.maximumBlockSize), SIMDUtils::defaultSIMDAlignment) * SIMDUtils::defaultSIMDAlignment;
+    const auto paddedChannelSize = Math::round_to_next_multiple (static_cast<size_t> (spec.maximumBlockSize), SIMDUtils::defaultSIMDAlignment);
     const auto requiredMemoryBytes = paddedChannelSize * sizeof (FloatType) * 3 // per-band smoothed values
                                      + paddedChannelSize * spec.numChannels * sizeof (FloatType) * 2 // per-band fade and bypass buffers
                                      + 32; // extra padding
