@@ -37,6 +37,16 @@ TEST_CASE ("Other Math Ops Test", "[dsp][math][simd]")
         REQUIRE_MESSAGE (chowdsp::Math::ceiling_divide (9, 4) == 3, "Ceiling divide 9 / 4 should equal 3");
     }
 
+    SECTION ("Next Multiple Test")
+    {
+        STATIC_REQUIRE (chowdsp::Math::round_to_next_multiple (3, 4) == 4);
+        STATIC_REQUIRE (chowdsp::Math::round_to_next_multiple (4, 4) == 4);
+        STATIC_REQUIRE (chowdsp::Math::round_to_next_multiple (5, 4) == 8);
+        STATIC_REQUIRE (chowdsp::Math::round_to_next_multiple (7, 4) == 8);
+        STATIC_REQUIRE (chowdsp::Math::round_to_next_multiple (8, 4) == 8);
+        STATIC_REQUIRE (chowdsp::Math::round_to_next_multiple (9, 4) == 12);
+    }
+
     SECTION ("Signum Test")
     {
         REQUIRE_MESSAGE (chowdsp::Math::sign (-1) == -1, "Signum of negative number is incorrect!");
