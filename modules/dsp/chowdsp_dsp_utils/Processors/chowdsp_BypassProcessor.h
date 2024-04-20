@@ -70,7 +70,7 @@ class BypassProcessor<SampleType, DelayInterpType, std::enable_if_t<! std::is_sa
 public:
     using NumericType = SampleTypeHelpers::NumericType<SampleType>;
 
-    BypassProcessor() = default;
+    explicit BypassProcessor (int maxLatencySamples = 1 << 18);
 
     /** Converts a parameter handle to a boolean */
     static bool toBool (const std::atomic<float>* param)
@@ -119,7 +119,8 @@ private:
     Buffer<SampleType> fadeBuffer;
     BufferView<SampleType> fadeBufferView;
 
-    DelayLine<SampleType, DelayInterpType> compDelay { 1 << 18 }; // max latency = 2^18 = 262144 samples
+    int maximumLatencySamples = 0;
+    std::optional<DelayLine<SampleType, DelayInterpType>> compDelay { std::nullopt };
     NumericType prevDelay {};
     int latencySampleCount = -1;
 

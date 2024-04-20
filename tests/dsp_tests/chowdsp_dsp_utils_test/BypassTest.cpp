@@ -87,7 +87,7 @@ TEST_CASE ("Bypass Test", "[dsp][misc]")
         auto arenaView = chowdsp::ArenaAllocatorView { arena };
         for (auto& arenaPtr : std::vector<chowdsp::ArenaAllocatorView*> { nullptr, &arenaView })
         {
-            chowdsp::BypassProcessor<float> bypass;
+            chowdsp::BypassProcessor<float> bypass {};
             std::atomic<float> onOffParam { 0.0f };
             bypass.prepare ({ fs,
                               (juce::uint32) nSamples,
@@ -123,7 +123,7 @@ TEST_CASE ("Bypass Test", "[dsp][misc]")
         auto arenaView = chowdsp::ArenaAllocatorView { arena };
         for (auto& arenaPtr : std::vector<chowdsp::ArenaAllocatorView*> { nullptr, &arenaView })
         {
-            chowdsp::BypassProcessor<float, chowdsp::DelayLineInterpolationTypes::Linear> bypass;
+            chowdsp::BypassProcessor<float, chowdsp::DelayLineInterpolationTypes::Linear> bypass { static_cast<int> (std::ceil (delaySamp)) };
             std::atomic<float> onOffParam { 0.0f };
             bypass.prepare ({ fs,
                               (juce::uint32) nSamples,
