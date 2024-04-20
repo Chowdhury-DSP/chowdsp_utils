@@ -95,7 +95,7 @@ template <typename SampleType, typename DelayInterpType>
 BypassProcessor<SampleType,
                 DelayInterpType,
                 std::enable_if_t<! std::is_same_v<DelayInterpType, NullType>>>::BypassProcessor (int maxLatencySamples)
-                    : maximumLatencySamples (maxLatencySamples)
+    : maximumLatencySamples (maxLatencySamples)
 {
 }
 
