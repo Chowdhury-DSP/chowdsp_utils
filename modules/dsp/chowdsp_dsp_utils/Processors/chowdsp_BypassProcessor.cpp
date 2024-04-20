@@ -92,6 +92,14 @@ void BypassProcessor<SampleType,
 
 //===========================================================
 template <typename SampleType, typename DelayInterpType>
+BypassProcessor<SampleType,
+                DelayInterpType,
+                std::enable_if_t<! std::is_same_v<DelayInterpType, NullType>>>::BypassProcessor (int maxLatencySamples)
+    : maximumLatencySamples (maxLatencySamples)
+{
+}
+
+template <typename SampleType, typename DelayInterpType>
 void BypassProcessor<SampleType,
                      DelayInterpType,
                      std::enable_if_t<! std::is_same_v<DelayInterpType, NullType>>>::prepare (const juce::dsp::ProcessSpec& spec,
@@ -102,7 +110,8 @@ void BypassProcessor<SampleType,
     if (useInternalBuffer)
         fadeBuffer.setMaxSize ((int) spec.numChannels, (int) spec.maximumBlockSize);
 
-    compDelay.prepare (spec); // sample rate does not matter
+    compDelay.emplace (maximumLatencySamples + static_cast<int> (spec.maximumBlockSize));
+    compDelay->prepare (spec); // sample rate does not matter
 }
 
 template <typename SampleType, typename DelayInterpType>
@@ -130,10 +139,10 @@ void BypassProcessor<SampleType,
     if (juce::approximatelyEqual (delaySamples, prevDelay))
         return;
 
-    compDelay.setDelay ((NumericType) delaySamples);
+    compDelay->setDelay ((NumericType) delaySamples);
 
     if (juce::approximatelyEqual (delaySamples, (NumericType) 0))
-        compDelay.reset();
+        compDelay->reset();
 
     prevDelay = delaySamples;
 }
@@ -179,11 +188,11 @@ bool BypassProcessor<SampleType,
         }
     };
 
-    doDelayOp (block, compDelay, DelayOp::Push);
+    doDelayOp (block, *compDelay, DelayOp::Push);
 
     if (! onOffParam && ! prevOnOffParam)
     {
-        doDelayOp (block, compDelay, DelayOp::Pop);
+        doDelayOp (block, *compDelay, DelayOp::Pop);
         return false;
     }
 
@@ -195,14 +204,14 @@ bool BypassProcessor<SampleType,
             fadeBufferView = BufferView { fadeBuffer, 0, block.getNumSamples(), 0, block.getNumChannels() };
 
         BufferMath::copyBufferData (block, fadeBufferView);
-        doDelayOp (fadeBufferView, compDelay, DelayOp::Pop);
+        doDelayOp (fadeBufferView, *compDelay, DelayOp::Pop);
 
         if (onOffParam && latencySampleCount < 0)
-            latencySampleCount = (int) compDelay.getDelay();
+            latencySampleCount = (int) compDelay->getDelay();
     }
     else
     {
-        doDelayOp (block, compDelay, DelayOp::Toss);
+        doDelayOp (block, *compDelay, DelayOp::Toss);
     }
 
     return true;
