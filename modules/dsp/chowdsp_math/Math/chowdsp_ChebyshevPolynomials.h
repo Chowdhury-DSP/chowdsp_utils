@@ -23,6 +23,7 @@ namespace cheby_detail
 } // namespace cheby_detail
 #endif
 
+/** Recursively computes a Chebyshev polynomial given two previous Chebyshev polynomials */
 template <typename T, int max_order = 32>
 constexpr auto chebyshev_polynomial_recurse (const Polynomial<T, max_order, poly_order_ascending>& cheby_n1,
                                              const Polynomial<T, max_order, poly_order_ascending>& cheby_n2)
@@ -34,6 +35,7 @@ constexpr auto chebyshev_polynomial_recurse (const Polynomial<T, max_order, poly
     return cheby_n;
 }
 
+/** Computes a Chebyshev polynomial of a given order. */
 template <typename T, int order, int max_order = 32>
 constexpr auto chebyshev_polynomial()
 {
