@@ -31,14 +31,14 @@ namespace LogApprox
                 constexpr auto beta = (T) -1.098865286222744;
                 constexpr auto gamma = (T) 3.148297929334117;
                 constexpr auto zeta = (T) -2.213475204444817;
-                return chowdsp::Polynomials::estrin<3> ({ alpha, beta, gamma, zeta }, x);
+                return Polynomials::estrin<3> (Polynomial<T, 3> { { alpha, beta, gamma, zeta } }, x);
             }
             else if constexpr (order == 2)
             {
                 constexpr auto beta = (T) -0.33985;
                 constexpr auto gamma = (T) 2.01955;
                 constexpr auto zeta = (T) -1.6797;
-                return chowdsp::Polynomials::estrin<2> ({ beta, gamma, zeta }, x);
+                return Polynomials::estrin<2> (Polynomial<T, 2> { { beta, gamma, zeta } }, x);
             }
             else if constexpr (order == 1)
             {
@@ -59,14 +59,14 @@ namespace LogApprox
                 constexpr auto beta = (T) -1.098865286222744;
                 constexpr auto gamma = (T) 3.148297929334117;
                 constexpr auto zeta = (T) -2.213475204444817;
-                return chowdsp::Polynomials::estrin<3> ({ alpha, beta, gamma, zeta }, x);
+                return Polynomials::estrin<3> (Polynomial<T, 3> { { alpha, beta, gamma, zeta } }, x);
             }
             else if constexpr (order == 2)
             {
                 constexpr auto beta = (T) -0.33985;
                 constexpr auto gamma = (T) 2.01955;
                 constexpr auto zeta = (T) -1.6797;
-                return chowdsp::Polynomials::estrin<2> ({ beta, gamma, zeta }, x);
+                return Polynomials::estrin<2> (Polynomial<T, 2> { { beta, gamma, zeta } }, x);
             }
             else if constexpr (order == 1)
             {
