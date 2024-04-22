@@ -148,7 +148,7 @@ TEST_CASE ("Polynomials Test", "[dsp][math][simd]")
         }
 
         {
-            static constexpr auto poly = chowdsp::Polynomial<double, 5, chowdsp::poly_order_ascending> { { -2.5, -3.0, 0.0, 1.0, 2.0, 10.0  } };
+            static constexpr auto poly = chowdsp::Polynomial<double, 5, chowdsp::poly_order_ascending> { { -2.5, -3.0, 0.0, 1.0, 2.0, 10.0 } };
             const auto test = chowdsp::Polynomials::antiderivative<5, double> (poly);
             REQUIRE_MESSAGE (juce::approximatelyEqual (test.coeffs[6], 10.0 / 6.0), "Degree 6 is incorrect!");
             REQUIRE_MESSAGE (juce::approximatelyEqual (test.coeffs[5], 2.0 / 5.0), "Degree 5 is incorrect!");
@@ -170,7 +170,7 @@ TEST_CASE ("Polynomials Test", "[dsp][math][simd]")
         }
 
         {
-            static constexpr auto poly = chowdsp::Polynomial<double, 5, chowdsp::poly_order_ascending> { { -2.5, -3.0, 0.0, 1.0, 2.0, 10.0  } };
+            static constexpr auto poly = chowdsp::Polynomial<double, 5, chowdsp::poly_order_ascending> { { -2.5, -3.0, 0.0, 1.0, 2.0, 10.0 } };
             const auto test = chowdsp::Polynomials::derivative<5, double> (poly);
             REQUIRE_MESSAGE (juce::approximatelyEqual (test.coeffs[4], 50.0), "Degree 4 is incorrect!");
             REQUIRE_MESSAGE (juce::approximatelyEqual (test.coeffs[3], 8.0), "Degree 3 is incorrect!");

@@ -9,13 +9,17 @@ namespace chowdsp
  * Type tag to denote a polynomial stored with coefficients in descending order,
  * i.e. { a_n, a_n-1, ..., a_1, a_0 }.
  */
-struct poly_order_descending {};
+struct poly_order_descending
+{
+};
 
 /**
  * Type tag to denote a polynomial stored with coefficients in ascending order,
  * i.e. { a_0, a_1, ..., a_n-1, a_n }.
  */
-struct poly_order_ascending {};
+struct poly_order_ascending
+{
+};
 
 /** An array wrapper for polynomial coefficients, stored in either ascending or descending order. */
 template <typename T, size_t poly_order, typename storage_mode = poly_order_descending>
@@ -26,7 +30,7 @@ struct Polynomial
 
     Polynomial() = default;
 
-    constexpr Polynomial (const std::array<T, num_coeffs>& init_coeffs, [[maybe_unused]] storage_mode tag = storage_mode{}) // NOLINT(*-explicit-constructor)
+    constexpr Polynomial (const std::array<T, num_coeffs>& init_coeffs, [[maybe_unused]] storage_mode tag = storage_mode {}) // NOLINT(*-explicit-constructor)
     {
         set_coefficients (init_coeffs);
     }
@@ -47,14 +51,14 @@ struct Polynomial
         coeffs = new_coeffs;
     }
 };
-}
+} // namespace chowdsp
 
 /** Useful methods for working with and evaluating polynomials */
 namespace chowdsp::Polynomials
 {
-using chowdsp::Polynomial;
 using chowdsp::poly_order_ascending;
 using chowdsp::poly_order_descending;
+using chowdsp::Polynomial;
 
 /** Useful template type representing the product of two other types. */
 template <typename T, typename X>
@@ -117,7 +121,7 @@ constexpr P<T, X> horner (const Polynomial<T, poly_order, poly_order_ascending>&
 {
     P<T, X> b = poly.coeffs.back();
     for (int n = poly_order; n > 0; --n)
-        b = b * x + poly.coeffs[n-1];
+        b = b * x + poly.coeffs[n - 1];
 
     return b;
 }
