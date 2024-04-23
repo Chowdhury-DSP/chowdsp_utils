@@ -46,7 +46,7 @@ void EQProcessor<FloatType, numBands, EQBandType>::setBandOnOff (int band, bool 
 }
 
 template <typename FloatType, size_t numBands, typename EQBandType>
-void EQProcessor<FloatType, numBands, EQBandType>::prepare (const juce::dsp::ProcessSpec& spec)
+void EQProcessor<FloatType, numBands, EQBandType>::prepare (const juce::dsp::ProcessSpec& spec, bool useInternalArena)
 {
     for (size_t i = 0; i < numBands; ++i)
     {
@@ -55,10 +55,11 @@ void EQProcessor<FloatType, numBands, EQBandType>::prepare (const juce::dsp::Pro
     }
 
     const auto paddedChannelSize = Math::round_to_next_multiple (static_cast<size_t> (spec.maximumBlockSize), SIMDUtils::defaultSIMDAlignment);
-    const auto requiredMemoryBytes = paddedChannelSize * sizeof (FloatType) * 3 // per-band smoothed values
-                                     + paddedChannelSize * spec.numChannels * sizeof (FloatType) * 2 // per-band fade and bypass buffers
-                                     + 32; // extra padding
-    arena.reset (requiredMemoryBytes);
+    requiredMemoryBytes = paddedChannelSize * sizeof (FloatType) * 3 // per-band smoothed values
+                          + paddedChannelSize * spec.numChannels * sizeof (FloatType) * 2; // per-band fade and bypass buffers
+
+    if (useInternalArena)
+        internalArena.reset (requiredMemoryBytes + 32);
 }
 
 template <typename FloatType, size_t numBands, typename EQBandType>
@@ -70,6 +71,12 @@ void EQProcessor<FloatType, numBands, EQBandType>::reset()
 
 template <typename FloatType, size_t numBands, typename EQBandType>
 void EQProcessor<FloatType, numBands, EQBandType>::processBlock (const BufferView<FloatType>& block) noexcept
+{
+    processBlock (block, internalArena);
+}
+
+template <typename FloatType, size_t numBands, typename EQBandType>
+void EQProcessor<FloatType, numBands, EQBandType>::processBlock (const BufferView<FloatType>& block, ArenaAllocatorView arena) noexcept
 {
     for (size_t i = 0; i < numBands; ++i)
     {
