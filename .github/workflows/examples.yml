@@ -29,6 +29,12 @@ jobs:
           sudo apt-get update
           sudo apt install libasound2-dev libcurl4-openssl-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev libsamplerate-dev
 
+      - name: Set Xcode version
+        if: runner.os == 'MacOS'
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '15.2'
+
       - name: Get latest CMake
         uses: lukka/get-cmake@latest
 
