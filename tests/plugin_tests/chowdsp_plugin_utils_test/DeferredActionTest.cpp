@@ -17,6 +17,7 @@ static void deferredCounterIncrementTest (bool fakeAudioThread = false)
     chowdsp::DeferredAction action;
     Counter counter;
     std::atomic<int> refCounter { 0 };
+    std::atomic_bool isFinished { false };
 
     juce::Thread::launch (
         [&]
@@ -29,6 +30,7 @@ static void deferredCounterIncrementTest (bool fakeAudioThread = false)
                 refCounter.fetch_add (1);
                 juce::Thread::sleep (12);
             }
+            isFinished.store (true);
         });
 
     for (int i = 0; i < 25; ++i)
@@ -39,16 +41,13 @@ static void deferredCounterIncrementTest (bool fakeAudioThread = false)
         juce::MessageManager::getInstance()->runDispatchLoopUntil (15);
     }
 
-    juce::MessageManager::getInstance()->runDispatchLoopUntil (500); // clear up any remaining async updates
+    while (! isFinished.load())
+        juce::MessageManager::getInstance()->runDispatchLoopUntil (500); // clear up any remaining async updates
 
     REQUIRE_MESSAGE (counter.count == refCounter.load(), "Final count is incorrect!");
 }
 
-#if JUCE_WINDOWS
-TEST_CASE ("Deferred Action Test", "[plugin][utilities][!mayfail]")
-#else
 TEST_CASE ("Deferred Action Test", "[plugin][utilities]")
-#endif
 {
     SECTION ("Deferred Action Test")
     {
