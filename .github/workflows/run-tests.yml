@@ -143,6 +143,7 @@ jobs:
         run: lcov --list coverage.info
 
       - name: Upload coverage to Codecov
+        if: matrix.run_coverage
         uses: codecov/codecov-action@v4
         with:
           fail_ci_if_error: true
