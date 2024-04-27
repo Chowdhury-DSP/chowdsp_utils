@@ -31,7 +31,7 @@ struct PeakDetector
                          T* z,
                          T /* thresholdGain */) noexcept
     {
-        jassert (inBuffer.getNumChannels() == outBuffer.getNumSamples());
+        jassert (inBuffer.getNumChannels() == outBuffer.getNumChannels());
         jassert (inBuffer.getNumSamples() == outBuffer.getNumSamples());
 
         for (auto [ch, inData, outData] : buffer_iters::zip_channels (inBuffer, outBuffer))
