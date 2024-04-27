@@ -142,8 +142,11 @@ jobs:
         shell: bash
         run: lcov --list coverage.info
 
-      - name: Upload Coverage Data
-        if: matrix.run_coverage
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
         working-directory: ${{env.WORK_DIR}}
-        shell: bash
-        run: bash <(curl -s https://codecov.io/bash) -f coverage.info || echo "Codecov did not collect coverage reports"
+        with:
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.info
+          verbose: true
