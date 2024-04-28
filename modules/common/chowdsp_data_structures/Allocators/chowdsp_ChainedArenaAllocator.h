@@ -147,6 +147,8 @@ public:
         if (arena_list.count == 0)
         {
             *this = std::move (allocator_to_merge);
+            allocator_to_merge.current_arena = nullptr;
+            allocator_to_merge.arena_list = {};
             return;
         }
 
@@ -169,6 +171,8 @@ public:
 
         arena_list.count += arena_add_count;
 
+        allocator_to_merge.current_arena = nullptr;
+        allocator_to_merge.arena_list = {};
         allocator_to_merge = {};
     }
 
@@ -242,12 +246,12 @@ private:
 
         num_bytes += sizeof (ArenaNode);
         const auto num_bytes_padded = arena_alignment * ((num_bytes + arena_alignment - 1) / arena_alignment);
-        auto* data = aligned_alloc (arena_alignment, num_bytes_padded);
+        auto* data = static_cast<std::byte*> (aligned_alloc (arena_alignment, num_bytes_padded));
 
         auto* arena_node = new (data) ArenaNode {};
         arena_node->raw_data_start = data;
         arena_node->get_memory_resource() = {
-            reinterpret_cast<std::byte*> (data) + sizeof (ArenaNode),
+            data + sizeof (ArenaNode),
             num_bytes_padded - sizeof (ArenaNode),
         };
         return arena_node;
@@ -255,7 +259,7 @@ private:
 
     struct ArenaNode : ArenaAllocatorView
     {
-        void* raw_data_start = nullptr;
+        std::byte* raw_data_start = nullptr;
         ArenaNode* next = nullptr;
     };
 
