@@ -146,7 +146,8 @@ public:
         // if our arena is empty, just make this arena into the other arena!
         if (arena_list.count == 0)
         {
-            *this = std::move (allocator_to_merge);
+            current_arena = allocator_to_merge.current_arena;
+            arena_list = allocator_to_merge.arena_list;
             allocator_to_merge.current_arena = nullptr;
             allocator_to_merge.arena_list = {};
             return;
