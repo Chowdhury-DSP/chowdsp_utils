@@ -12,13 +12,13 @@ TEST_CASE ("Chained Arena Allocator Test", "[common][data-structures]")
             auto* some_doubles = allocator.allocate<double> (10);
             REQUIRE ((void*) some_doubles == allocator.template data<void> (0));
             REQUIRE (allocator.get_arena_count() == 1);
-            REQUIRE (allocator.get_arenas().front().get_bytes_used() == 80);
+            REQUIRE (allocator.get_arenas().head->get_bytes_used() == 80);
 
             auto* some_more_doubles = allocator.allocate<double> (10);
             REQUIRE (some_more_doubles != nullptr);
             REQUIRE (allocator.get_arena_count() == 2);
-            REQUIRE (allocator.get_arenas().front().get_bytes_used() == 80);
-            REQUIRE ((allocator.get_arenas().begin()++)->get_bytes_used() == 80);
+            REQUIRE (allocator.get_arenas().head->get_bytes_used() == 80);
+            REQUIRE ((allocator.get_arenas().head->next)->get_bytes_used() == 80);
             REQUIRE (allocator.get_total_bytes_used() == 160);
         }
 
@@ -35,14 +35,14 @@ TEST_CASE ("Chained Arena Allocator Test", "[common][data-structures]")
         {
             auto* some_doubles = allocator.allocate<double> (10);
             REQUIRE ((void*) some_doubles == allocator.template data<void> (0));
-            REQUIRE (allocator.get_arenas().front().get_bytes_used() == 80);
+            REQUIRE (allocator.get_arenas().head->get_bytes_used() == 80);
             REQUIRE (allocator.get_total_bytes_used() == 80);
 
             auto* some_more_doubles = allocator.allocate<double> (10);
             REQUIRE (some_more_doubles != nullptr);
             REQUIRE (allocator.get_arena_count() == 2);
-            REQUIRE (allocator.get_arenas().front().get_bytes_used() == 80);
-            REQUIRE ((allocator.get_arenas().begin()++)->get_bytes_used() == 80);
+            REQUIRE (allocator.get_arenas().head->get_bytes_used() == 80);
+            REQUIRE ((allocator.get_arenas().head->next)->get_bytes_used() == 80);
             REQUIRE (allocator.get_total_bytes_used() == 160);
         }
     }
@@ -55,17 +55,17 @@ TEST_CASE ("Chained Arena Allocator Test", "[common][data-structures]")
             auto* some_doubles = allocator.allocate<double> (10);
             REQUIRE ((void*) some_doubles == allocator.template data<void> (0));
             REQUIRE (allocator.get_arena_count() == 1);
-            REQUIRE (allocator.get_arenas().front().get_bytes_used() == 80);
+            REQUIRE (allocator.get_arenas().head->get_bytes_used() == 80);
 
             auto* some_more_doubles = allocator.allocate<double> (10);
             REQUIRE (some_more_doubles != nullptr);
             REQUIRE (allocator.get_arena_count() == 2);
-            REQUIRE (allocator.get_arenas().front().get_bytes_used() == 80);
-            REQUIRE ((allocator.get_arenas().begin()++)->get_bytes_used() == 80);
+            REQUIRE (allocator.get_arenas().head->get_bytes_used() == 80);
+            REQUIRE ((allocator.get_arenas().head->next)->get_bytes_used() == 80);
         }
 
         REQUIRE (allocator.get_arena_count() == 2);
-        REQUIRE (allocator.get_arenas().front().get_bytes_used() == 0);
+        REQUIRE (allocator.get_arenas().head->get_bytes_used() == 0);
     }
 
     SECTION ("Merge")
