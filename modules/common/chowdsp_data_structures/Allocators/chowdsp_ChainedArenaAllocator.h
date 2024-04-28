@@ -8,6 +8,7 @@ class ChainedArenaAllocator
 {
     struct ArenaNode;
     struct ArenaList;
+
 public:
     ChainedArenaAllocator() = default;
 
