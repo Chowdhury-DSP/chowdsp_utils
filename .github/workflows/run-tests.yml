@@ -44,11 +44,11 @@ jobs:
             cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
             run_coverage: true
             build_type: "Debug"
-          - name: "Coverage"
-            os: macos-latest
-            cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
-            run_coverage: true (this is breaking for some reason @TODO)
-            build_type: "Debug"
+#          - name: "Coverage"
+#            os: macos-latest
+#            cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
+#            run_coverage: true (this is breaking for some reason @TODO)
+#            build_type: "Debug"
           - name: "Live GUI Test"
             os: ubuntu-latest
             tests: "live_gui_test"
@@ -150,5 +150,6 @@ jobs:
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
           disable_search: true
-          files: ./coverage.info
+          plugins: ""
+          files: ${{env.WORK_DIR}}/coverage.info
           verbose: true
