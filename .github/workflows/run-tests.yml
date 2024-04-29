@@ -47,7 +47,7 @@ jobs:
           - name: "Coverage"
             os: macos-latest
             cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
-#            run_coverage: true (this is breaking for some reason @TODO)
+            run_coverage: true (this is breaking for some reason @TODO)
             build_type: "Debug"
           - name: "Live GUI Test"
             os: ubuntu-latest
@@ -149,5 +149,8 @@ jobs:
           working-directory: ${{env.WORK_DIR}}
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
+          plugin: gcov
+          codecov_yml_path: ./codecov.yml
           files: ./coverage.info
+          directory: ./modules
           verbose: true
