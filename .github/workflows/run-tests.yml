@@ -146,7 +146,8 @@ jobs:
         if: matrix.run_coverage
         uses: codecov/codecov-action@v4
         with:
+          working-directory: ${{env.WORK_DIR}}
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: ${{env.WORK_DIR}}/coverage.info
+          files: ./coverage.info
           verbose: true
