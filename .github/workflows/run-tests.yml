@@ -133,7 +133,7 @@ jobs:
         working-directory: ${{env.WORK_DIR}}
         shell: bash
         run: |
-          lcov --directory . --no-branch-coverage --capture --output-file coverage.info
+          lcov --directory . --ignore-errors gcov --capture --output-file coverage.info
           lcov --remove coverage.info '/usr/*' "${HOME}"'/.cache/*' '/Applications/Xcode*' '*build/*' '*JUCE/modules*' '*foleys_*' '*chowdsp_utils/tests*' '*third_party*' '*chowdsp_foleys*' '*chowdsp_core/JUCEHelpers*' --output-file coverage.info
 
       - name: Report Coverage Data
