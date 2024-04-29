@@ -4,3 +4,5 @@ ignore:
   - "modules/gui/chowdsp_foleys"
   - "modules/gui/chowdsp_gui/Presets"
   - "**/third_party/**"
+  - "build/**"
+  - "tests/**"

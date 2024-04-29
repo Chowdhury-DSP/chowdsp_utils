@@ -44,11 +44,11 @@ jobs:
             cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
             run_coverage: true
             build_type: "Debug"
-          - name: "Coverage"
-            os: macos-latest
-            cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
+#          - name: "Coverage"
+#            os: macos-latest
+#            cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
 #            run_coverage: true (this is breaking for some reason @TODO)
-            build_type: "Debug"
+#            build_type: "Debug"
           - name: "Live GUI Test"
             os: ubuntu-latest
             tests: "live_gui_test"
@@ -59,6 +59,8 @@ jobs:
         exclude:
           # so we don't break GitHub Actions concurrency limit
           - name: "Test"
+            os: macos-latest
+          - name: "Coverage"
             os: macos-latest
           - name: "Coverage"
             os: windows-2022
@@ -134,7 +136,7 @@ jobs:
         shell: bash
         run: |
           lcov --directory . --capture --output-file coverage.info
-          lcov --remove coverage.info '/usr/*' "${HOME}"'/.cache/*' '/Applications/Xcode*' '*JUCE/modules*' '*foleys_*' '*chowdsp_utils/tests*' '*third_party*' '*chowdsp_foleys*' '*chowdsp_core/JUCEHelpers*' --output-file coverage.info
+          lcov --remove coverage.info '/usr/*' "${HOME}"'/.cache/*' '/Applications/Xcode*' '*chowdsp_utils/build/*' '*JUCE/modules*' '*foleys_*' '*chowdsp_utils/tests*' '*third_party*' '*chowdsp_foleys*' '*chowdsp_core/JUCEHelpers*' --output-file coverage.info
 
       - name: Report Coverage Data
         if: matrix.run_coverage
@@ -146,7 +148,9 @@ jobs:
         if: matrix.run_coverage
         uses: codecov/codecov-action@v4
         with:
+          working-directory: ${{env.WORK_DIR}}
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ${{env.WORK_DIR}}/coverage.info
+          codecov_yml_path: ${{env.WORK_DIR}}/codecov.yml
           verbose: true
