@@ -30,17 +30,17 @@ jobs:
                 "Test",
                 "Coverage",
               ]
-        os: [ubuntu-latest, windows-2022, macos-latest]
+        os: [ubuntu-22.04, windows-2022, macos-14]
         include:
           - name: "Test"
-            os: ubuntu-latest
+            os: ubuntu-22.04
             cmake_args: "-DCMAKE_BUILD_TYPE=Release"
             build_type: "Release"
           - name: "Test"
             os: windows-2022
             build_type: "Release"
           - name: "Coverage"
-            os: ubuntu-latest
+            os: ubuntu-22.04
             cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
             run_coverage: true
             build_type: "Debug"
@@ -50,7 +50,7 @@ jobs:
 #            run_coverage: true (this is breaking for some reason @TODO)
 #            build_type: "Debug"
           - name: "Live GUI Test"
-            os: ubuntu-latest
+            os: ubuntu-22.04
             tests: "live_gui_test"
             cmake_args: "-DCODE_COVERAGE=ON -DCHOWDSP_BUILD_LIVE_GUI_TEST=ON -DCMAKE_BUILD_TYPE=Debug"
             live_gui: true
@@ -59,9 +59,9 @@ jobs:
         exclude:
           # so we don't break GitHub Actions concurrency limit
           - name: "Test"
-            os: macos-latest
+            os: macos-14
           - name: "Coverage"
-            os: macos-latest
+            os: macos-14
           - name: "Coverage"
             os: windows-2022
 
