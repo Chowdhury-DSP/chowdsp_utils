@@ -40,13 +40,13 @@ template <typename T, size_t order, size_t max_order = 32>
 constexpr auto chebyshev_polynomial()
 {
     if constexpr (order == 0)
-        return cheby_detail::cheby0<T, 32>();
+        return cheby_detail::cheby0<T, max_order>();
 
     if constexpr (order == 1)
-        return cheby_detail::cheby1<T, 32>();
+        return cheby_detail::cheby1<T, max_order>();
 
-    auto cheby_n2 = cheby_detail::cheby0<T, 32>();
-    auto cheby_n1 = cheby_detail::cheby1<T, 32>();
+    auto cheby_n2 = cheby_detail::cheby0<T, max_order>();
+    auto cheby_n1 = cheby_detail::cheby1<T, max_order>();
     auto cheby_n = Polynomial<T, max_order, poly_order_ascending> {};
     for (size_t i = 2; i <= order; ++i)
     {
