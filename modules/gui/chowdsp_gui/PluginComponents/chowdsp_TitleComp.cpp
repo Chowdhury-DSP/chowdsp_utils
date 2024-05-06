@@ -10,7 +10,11 @@ TitleComp::TitleComp()
 
 void TitleComp::paint (juce::Graphics& g)
 {
+#if JUCE_VERSION < 0x080000
     g.setFont (juce::Font (font).boldened());
+#else
+    g.setFont (juce::Font { juce::FontOptions { font, juce::Font::bold } });
+#endif
     auto curFont = g.getCurrentFont();
     auto b = getLocalBounds();
 

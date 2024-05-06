@@ -60,7 +60,11 @@ void ChowLNF::drawToggleButton (juce::Graphics& g, juce::ToggleButton& button, b
     drawTickBox (g, button, 4.0f, ((float) button.getHeight() - tickWidth) * 0.5f, tickWidth, tickWidth, button.getToggleState(), button.isEnabled(), shouldDrawButtonAsHighlighted, shouldDrawButtonAsDown);
 
     g.setColour (button.findColour (juce::ToggleButton::textColourId));
+#if JUCE_VERSION < 0x080000
     g.setFont (juce::Font (fontSize).boldened());
+#else
+    g.setFont (juce::Font { juce::FontOptions { fontSize, juce::Font::bold } });
+#endif
 
     if (! button.isEnabled())
         g.setOpacity (0.5f);
@@ -80,7 +84,11 @@ void ChowLNF::positionComboBoxText (juce::ComboBox& box, juce::Label& label)
 
 void ChowLNF::createTabTextLayout (const juce::TabBarButton& button, float length, float depth, juce::Colour colour, juce::TextLayout& textLayout)
 {
+#if JUCE_VERSION < 0x080000
     juce::Font font (depth * 0.45f, juce::Font::bold);
+#else
+    juce::Font font { juce::FontOptions { depth * 0.45f, juce::Font::bold } };
+#endif
     font.setUnderline (button.hasKeyboardFocus (false));
 
     juce::AttributedString s;
@@ -240,7 +248,11 @@ juce::Label* ChowLNF::createSliderTextBox (juce::Slider& slider)
     if (style == juce::Slider::LinearHorizontal)
         l->setJustificationType (juce::Justification::left);
 
+#if JUCE_VERSION < 0x080000
     l->setFont ((float) slider.getTextBoxHeight());
+#else
+    l->setFont (juce::FontOptions { (float) slider.getTextBoxHeight() });
+#endif
 
     return l;
 }
