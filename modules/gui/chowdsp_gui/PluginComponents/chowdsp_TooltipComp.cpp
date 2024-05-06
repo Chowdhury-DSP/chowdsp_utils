@@ -19,7 +19,11 @@ void TooltipComponent::paint (juce::Graphics& g)
     {
         auto b = getLocalBounds();
 
+#if JUCE_VERSION < 0x080000
         g.setFont (juce::Font (17.0f).boldened());
+#else
+        g.setFont (juce::Font { juce::FontOptions { 17.0f, juce::Font::bold } });
+#endif
         if (name.isNotEmpty())
         {
             g.setColour (findColour (nameColourID));
