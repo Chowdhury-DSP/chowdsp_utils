@@ -42,6 +42,9 @@ public:
     /** Allocated required memory, and resets the property */
     void prepare (const juce::dsp::ProcessSpec& spec, bool onOffParam, bool useInternalBuffer = true);
 
+    /** Reset's the processor state. */
+    void reset (bool onOffParam) { prevOnOffParam = onOffParam; }
+
     /**
       * Call this at the start of your processBlock().
       * If it returns false, you can safely skip all other

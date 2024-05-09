@@ -67,6 +67,8 @@ void EQProcessor<FloatType, numBands, EQBandType>::reset()
 {
     for (auto& band : bands)
         band.reset();
+    for (auto [bypass, bandOnOff] : zip (bypasses, onOffs))
+        bypass.reset (bandOnOff);
 }
 
 template <typename FloatType, size_t numBands, typename EQBandType>
