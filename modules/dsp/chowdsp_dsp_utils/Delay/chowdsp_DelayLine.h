@@ -70,6 +70,9 @@ public:
         std::copy (other.readPos.begin(), other.readPos.end(), readPos.begin());
     }
 
+    [[nodiscard]] BufferView<SampleType> getRawDelayBuffer() { return bufferData; }
+    [[nodiscard]] BufferView<const SampleType> getRawDelayBuffer() const { return bufferData; }
+
 protected:
     Buffer<SampleType> bufferData;
     std::vector<SampleType> v;
