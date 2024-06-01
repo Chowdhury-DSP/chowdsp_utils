@@ -5,6 +5,7 @@ SliderChoiceAttachment::SliderChoiceAttachment (ChoiceParameter& param,
                                                 juce::Slider& paramSlider)
     : SliderChoiceAttachment (param, pluginState.getParameterListeners(), paramSlider, pluginState.undoManager)
 {
+    attachment.pluginState = &pluginState;
 }
 
 SliderChoiceAttachment::SliderChoiceAttachment (ChoiceParameter& param,
@@ -63,14 +64,16 @@ void SliderChoiceAttachment::sliderDragStarted (juce::Slider*)
 
 void SliderChoiceAttachment::sliderDragEnded (juce::Slider*)
 {
-    if (um != nullptr)
+    const auto valueAtEndOfGesture = attachment.param->getIndex();
+    if (um != nullptr && valueAtEndOfGesture != valueAtStartOfGesture)
     {
         um->beginNewTransaction();
         um->perform (
             new ParameterAttachmentHelpers::ParameterChangeAction<ChoiceParameter> (
                 *attachment.param,
                 valueAtStartOfGesture,
-                attachment.param->getIndex()));
+                valueAtEndOfGesture,
+                attachment.pluginState == nullptr ? nullptr : attachment.pluginState->processor));
     }
 
     attachment.endGesture();
