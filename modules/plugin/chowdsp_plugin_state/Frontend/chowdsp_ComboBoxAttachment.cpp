@@ -5,6 +5,7 @@ ComboBoxAttachment::ComboBoxAttachment (ChoiceParameter& param,
                                         juce::ComboBox& combo)
     : ComboBoxAttachment (param, pluginState.getParameterListeners(), combo, pluginState.undoManager)
 {
+    attachment.pluginState = &pluginState;
 }
 
 ComboBoxAttachment::ComboBoxAttachment (ChoiceParameter& param,

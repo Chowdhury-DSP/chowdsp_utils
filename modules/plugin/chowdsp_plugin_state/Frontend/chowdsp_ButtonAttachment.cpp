@@ -5,6 +5,7 @@ ButtonAttachment::ButtonAttachment (BoolParameter& param,
                                     juce::Button& paramButton)
     : ButtonAttachment (param, pluginState.getParameterListeners(), paramButton, pluginState.undoManager)
 {
+    attachment.pluginState = &pluginState;
 }
 
 ButtonAttachment::ButtonAttachment (BoolParameter& param,

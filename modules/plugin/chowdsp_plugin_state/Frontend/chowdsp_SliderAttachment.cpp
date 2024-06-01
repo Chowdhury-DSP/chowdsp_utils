@@ -5,6 +5,7 @@ SliderAttachment::SliderAttachment (FloatParameter& param,
                                     juce::Slider& paramSlider)
     : SliderAttachment (param, pluginState.getParameterListeners(), paramSlider, pluginState.undoManager)
 {
+    attachment.pluginState = &pluginState;
 }
 
 SliderAttachment::SliderAttachment (FloatParameter& param,
