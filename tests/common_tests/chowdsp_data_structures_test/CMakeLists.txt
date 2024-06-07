@@ -17,6 +17,7 @@ target_sources(chowdsp_data_structures_test
         VectorHelpersTest.cpp
         SmallMapTest.cpp
         STLArenaAllocatorTest.cpp
+        RawObjectTest.cpp
 )
 
 target_compile_features(chowdsp_data_structures_test PRIVATE cxx_std_20)

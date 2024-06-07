@@ -4,19 +4,6 @@ namespace chowdsp
 {
 JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324) // structure was padded due to alignment specifier
 
-#ifndef DOXYGEN
-namespace local_pointer_detail
-{
-    template <typename T>
-    constexpr size_t get_alignment()
-    {
-        if constexpr (is_complete_type_v<T>)
-            return alignof (T);
-        return 8;
-    }
-} // namespace local_pointer_detail
-#endif
-
 /**
  * A generic "owning" pointer constructed using local storage.
  *
@@ -28,7 +15,7 @@ namespace local_pointer_detail
  * Make sure that no other type (e.g. std::unique_ptr) tries to take ownership
  * of the pointer being stored here, since that will result in a double-delete.
  */
-template <typename T, size_t MaxSize, size_t Alignment = local_pointer_detail::get_alignment<T>()>
+template <typename T, size_t MaxSize, size_t Alignment = raw_object_detail::get_alignment<T>()>
 class LocalPointer
 {
 public:
