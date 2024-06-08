@@ -138,7 +138,7 @@ TEST_CASE ("Abstract Tree Test", "[common][data-structures]")
 
     SECTION ("Find Fail")
     {
-        auto* found = std::as_const (tree).findElement ("bologna");
+        [[maybe_unused]] auto* found = std::as_const (tree).findElement ("bologna");
         jassert (found == nullptr);
     }
 

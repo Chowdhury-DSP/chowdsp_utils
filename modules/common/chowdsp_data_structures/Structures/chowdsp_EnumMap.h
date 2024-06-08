@@ -1,6 +1,6 @@
 #pragma once
 
-#if JUCE_MODULE_AVAILABLE_chowdsp_reflection
+#if 1 // JUCE_MODULE_AVAILABLE_chowdsp_reflection
 #include <chowdsp_reflection/chowdsp_reflection.h>
 
 namespace chowdsp
@@ -18,16 +18,11 @@ struct EnumMap
             insert_or_assign (key, value);
     }
 
-    EnumMap (const EnumMap&) = delete;
-    EnumMap& operator= (const EnumMap&) = delete;
+    constexpr EnumMap (const EnumMap&) = delete;
+    constexpr EnumMap& operator= (const EnumMap&) = delete;
 
-    EnumMap (EnumMap&& other) noexcept = delete;
-    EnumMap& operator= (EnumMap&& other) noexcept = delete;
-
-    ~EnumMap()
-    {
-        // TODO
-    }
+    constexpr EnumMap (EnumMap&& other) noexcept = default;
+    constexpr EnumMap& operator= (EnumMap&& other) noexcept = default;
 
     [[nodiscard]] constexpr bool empty() const noexcept
     {
@@ -55,7 +50,7 @@ struct EnumMap
         return enum_count;
     }
 
-    constexpr void insert_or_assign (Key key, T value)
+    constexpr void insert_or_assign (Key key, T value) noexcept
     {
         storage[get_index (key)] = value;
     }
@@ -68,28 +63,101 @@ struct EnumMap
         return *opt;
     }
 
-    [[nodiscard]] constexpr T& at (Key key)
+    [[nodiscard]] constexpr std::optional<T>& at (Key key)
     {
-        // @TODO: what if this returns std::nullopt?
-        return *storage[get_index (key)];
+        return storage[get_index (key)];
     }
 
-    [[nodiscard]] constexpr const T& at (Key key) const
+    [[nodiscard]] constexpr const std::optional<T>& at (Key key) const
     {
-        // @TODO: what if this returns std::nullopt?
-        return *storage[get_index (key)];
+        return storage[get_index (key)];
     }
 
-    [[nodiscard]] constexpr T& operator[] (Key key)
+    [[nodiscard]] constexpr T& operator[] (Key key) noexcept
     {
-        // @TODO: should we or should we not null-check here?
-        return at (key);
+        return *at (key);
     }
 
-    [[nodiscard]] constexpr const T& operator[] (Key key) const
+    [[nodiscard]] constexpr const T& operator[] (Key key) const noexcept
     {
-        // @TODO: should we or should we not null-check here?
-        return at (key);
+        return *at (key);
+    }
+
+    constexpr void erase (Key key)
+    {
+        at (key).reset();
+    }
+
+    [[nodiscard]] constexpr bool contains (Key key) const noexcept
+    {
+        return at (key).has_value();
+    }
+
+    template <typename Storage, bool is_const = false>
+    struct iterator
+    {
+        size_t index;
+        std::conditional_t<is_const, typename Storage::const_iterator, typename Storage::iterator> iter;
+        Key key;
+
+        bool operator!= (const iterator& other) const
+        {
+            return iter != other.iter;
+        }
+
+        void operator++()
+        {
+            do
+            {
+                ++index;
+                ++iter;
+            }
+            while (! iter->has_value() && index < std::tuple_size_v<Storage>);
+
+            if (index < std::tuple_size_v<Storage>)
+                key = magic_enum::enum_value<Key> (index);
+        }
+
+        auto operator*() const
+        {
+            return std::tie (key, *(*iter));
+        }
+    };
+
+    constexpr auto begin() noexcept
+    {
+        return iterator<decltype(storage)> {
+            0,
+            storage.begin(),
+            magic_enum::enum_value<Key> (0),
+        };
+    }
+
+    constexpr auto begin() const noexcept
+    {
+        return iterator<decltype(storage), true> {
+            0,
+            storage.cbegin(),
+            magic_enum::enum_value<Key> (0),
+        };
+    }
+
+    constexpr auto end() noexcept
+    {
+        return iterator<decltype(storage)> {
+            enum_count,
+            storage.end(),
+            {},
+        };
+    }
+
+    constexpr auto end() const noexcept
+    {
+        return iterator<decltype(storage), true> {
+            enum_count,
+            storage.cend(),
+            {},
+        };
     }
 
 private:
