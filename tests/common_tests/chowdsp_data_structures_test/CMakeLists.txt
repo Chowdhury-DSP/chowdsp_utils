@@ -18,6 +18,7 @@ target_sources(chowdsp_data_structures_test
         SmallMapTest.cpp
         STLArenaAllocatorTest.cpp
         RawObjectTest.cpp
+        EnumMapTest.cpp
 )
 
 target_compile_features(chowdsp_data_structures_test PRIVATE cxx_std_20)
