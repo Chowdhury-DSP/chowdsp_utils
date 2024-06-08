@@ -1,4 +1,5 @@
 #pragma once
+#include <juce_core/zip/zlib/zconf.h>
 
 #if 1 // JUCE_MODULE_AVAILABLE_chowdsp_reflection
 #include <chowdsp_reflection/chowdsp_reflection.h>
@@ -50,6 +51,12 @@ struct EnumMap
         return enum_count;
     }
 
+    constexpr void clear()
+    {
+        for (auto& opt : storage)
+            opt.reset();
+    }
+
     constexpr void insert_or_assign (Key key, T value) noexcept
     {
         storage[get_index (key)] = value;
@@ -60,6 +67,14 @@ struct EnumMap
     {
         auto& opt = storage[get_index (key)];
         opt.emplace (std::forward<Args> (args)...);
+        return *opt;
+    }
+
+    template <typename C = T>
+    constexpr std::enable_if_t<std::is_default_constructible_v<C>, T&> emplace (Key key)
+    {
+        auto& opt = storage[get_index (key)];
+        opt.emplace();
         return *opt;
     }
 
@@ -111,8 +126,7 @@ struct EnumMap
             {
                 ++index;
                 ++iter;
-            }
-            while (! iter->has_value() && index < std::tuple_size_v<Storage>);
+            } while (! iter->has_value() && index < std::tuple_size_v<Storage>);
 
             if (index < std::tuple_size_v<Storage>)
                 key = magic_enum::enum_value<Key> (index);
@@ -126,7 +140,7 @@ struct EnumMap
 
     constexpr auto begin() noexcept
     {
-        return iterator<decltype(storage)> {
+        return iterator<decltype (storage)> {
             0,
             storage.begin(),
             magic_enum::enum_value<Key> (0),
@@ -135,7 +149,7 @@ struct EnumMap
 
     constexpr auto begin() const noexcept
     {
-        return iterator<decltype(storage), true> {
+        return iterator<decltype (storage), true> {
             0,
             storage.cbegin(),
             magic_enum::enum_value<Key> (0),
@@ -144,7 +158,7 @@ struct EnumMap
 
     constexpr auto end() noexcept
     {
-        return iterator<decltype(storage)> {
+        return iterator<decltype (storage)> {
             enum_count,
             storage.end(),
             {},
@@ -153,7 +167,7 @@ struct EnumMap
 
     constexpr auto end() const noexcept
     {
-        return iterator<decltype(storage), true> {
+        return iterator<decltype (storage), true> {
             enum_count,
             storage.cend(),
             {},
