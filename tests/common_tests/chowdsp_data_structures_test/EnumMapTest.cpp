@@ -45,11 +45,13 @@ TEST_CASE ("Enum Map Test", "[common][data-structures]")
         chowdsp::EnumMap<Food, int> map {};
         map.insert_or_assign (Food::Apple, 22);
         map.emplace (Food::Green_Beans, 23);
+        map.emplace (Food::Egg);
 
         REQUIRE (! map.empty());
-        REQUIRE (map.size() == 2);
+        REQUIRE (map.size() == 3);
         REQUIRE (*map.at (Food::Apple) == 22);
         REQUIRE (map[Food::Green_Beans] == 23);
+        REQUIRE (map[Food::Egg] == 0);
         REQUIRE (*std::as_const (map).at (Food::Apple) == 22);
         REQUIRE (std::as_const (map)[Food::Green_Beans] == 23);
         REQUIRE (map.at (Food::Banana) == std::nullopt);
@@ -59,6 +61,9 @@ TEST_CASE ("Enum Map Test", "[common][data-structures]")
 
         REQUIRE (map.contains (Food::Apple));
         REQUIRE (! map.contains (Food::Green_Beans));
+
+        map.clear();
+        REQUIRE (map.empty());
     }
 
     SECTION ("Iteration")

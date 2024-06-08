@@ -1,11 +1,11 @@
 #pragma once
-#include <juce_core/zip/zlib/zconf.h>
 
-#if 1 // JUCE_MODULE_AVAILABLE_chowdsp_reflection
+#if JUCE_MODULE_AVAILABLE_chowdsp_reflection
 #include <chowdsp_reflection/chowdsp_reflection.h>
 
 namespace chowdsp
 {
+/** A map-like container designed to be used with enum keys. */
 template <typename Key, typename T>
 struct EnumMap
 {
