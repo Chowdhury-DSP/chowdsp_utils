@@ -42,7 +42,7 @@ TEST_CASE ("Raw Object Test", "[common][data-structures]")
     {
         const auto get_empty = []
         {
-            return chowdsp::RawObject<std::string>{};
+            return chowdsp::RawObject<std::string> {};
         };
 
         const auto get = []
@@ -53,7 +53,7 @@ TEST_CASE ("Raw Object Test", "[common][data-structures]")
         };
 
         JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wpessimizing-move")
-        auto string { std::move(get_empty()) };
+        auto string { std::move (get_empty()) };
         JUCE_END_IGNORE_WARNINGS_GCC_LIKE
         string.construct ("constructed after move");
         REQUIRE (string.item().size() == 22);
@@ -66,6 +66,5 @@ TEST_CASE ("Raw Object Test", "[common][data-structures]")
 
     SECTION ("Move Assignable")
     {
-
     }
 }

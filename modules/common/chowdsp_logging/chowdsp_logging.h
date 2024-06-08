@@ -30,7 +30,7 @@ JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wswitch-enum",
                                      "-Wdeprecated-declarations",
                                      "-Wc++20-compat",
                                      "-Wlanguage-extension-token")
-JUCE_BEGIN_IGNORE_WARNINGS_MSVC(4996)
+JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4996)
 
 #include "third_party/spdlog/include/spdlog/spdlog.h"
 #include "third_party/spdlog/include/spdlog/sinks/stdout_color_sinks.h"

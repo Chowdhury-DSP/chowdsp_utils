@@ -99,12 +99,15 @@ struct RawObject
         item().~T();
     }
 
-    alignas(alignment_bytes) std::array<std::byte, size_bytes> raw_data {};
+    alignas (alignment_bytes) std::array<std::byte, size_bytes> raw_data {};
 #if JUCE_DEBUG
     bool is_initialized = false;
 #endif
 
-    T* data() { return reinterpret_cast<T*> (raw_data.data()); } // NOSONAR
+    T* data()
+    {
+        return reinterpret_cast<T*> (raw_data.data());
+    } // NOSONAR
     const T* data() const { return reinterpret_cast<const T*> (raw_data.data()); } // NOSONAR
     T& item() { return *data(); }
     const T& item() const { return *data(); }
