@@ -37,6 +37,8 @@ public:
 
     const Params params;
 
+    juce::CriticalSection pathMutex {};
+
 private:
     void computeFrequencyResponse();
 
