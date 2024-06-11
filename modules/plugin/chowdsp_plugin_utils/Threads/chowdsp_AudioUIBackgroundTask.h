@@ -32,12 +32,12 @@ namespace detail
         void startTask();
         void stopTask();
 
-    private:
         struct TimeSliceThread : juce::TimeSliceThread
         {
             TimeSliceThread() : juce::TimeSliceThread ("Audio UI Background Thread") {}
         };
 
+    private:
         juce::SharedResourcePointer<TimeSliceThread> sharedTimeSliceThread;
         juce::TimeSliceThread* timeSliceThreadToUse = sharedTimeSliceThread;
     };
