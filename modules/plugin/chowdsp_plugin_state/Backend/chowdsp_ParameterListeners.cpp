@@ -12,7 +12,6 @@ ParameterListeners::ParameterListeners (ParamHolder& parameters,
         {
             auto* rangedParam = static_cast<juce::RangedAudioParameter*> (&param);
             const auto index = parentProcessor != nullptr ? static_cast<size_t> (rangedParam->getParameterIndex()) : indexInParamHolder;
-            juce::Logger::writeToLog ("Loading parameter listener index: " + juce::String { index });
             paramInfoList[index] = ParamInfo { rangedParam, rangedParam->getValue() };
 
             if (parentProcessor != nullptr)
@@ -35,9 +34,6 @@ void ParameterListeners::parameterValueChanged (int paramIndex, float newValue)
 
     auto index = static_cast<size_t> (paramIndex);
     auto& paramInfo = paramInfoList[index];
-    if (juce::approximatelyEqual (newValue, paramInfo.value))
-        return;
-
     paramInfo.value = newValue;
     audioThreadBroadcastQueue.try_enqueue ([this, i = index]
                                            { callAudioThreadBroadcaster (i); });
