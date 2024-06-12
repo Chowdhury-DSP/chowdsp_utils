@@ -23,9 +23,9 @@ public:
         params = &parameters;
         processor = proc;
         undoManager = um;
-        listeners.emplace (parameters);
         if (processor != nullptr)
             parameters.connectParametersToProcessor (*processor);
+        listeners.emplace (parameters, processor);
     }
 
     /** Serializes the plugin state to the given MemoryBlock */

@@ -28,11 +28,15 @@ enum class ParameterListenerThread
 };
 
 /** Utility class to manage a set of parameter listeners. */
-class ParameterListeners : private juce::Timer
+class ParameterListeners : private juce::Timer,
+                           private juce::AudioProcessorParameter::Listener
 {
 public:
     /** Initialises the listeners with a set of parameters. */
-    explicit ParameterListeners (ParamHolder& parameters, int intervalMilliseconds = 10);
+    explicit ParameterListeners (ParamHolder& parameters,
+                                 const juce::AudioProcessor* parentProcessor = nullptr,
+                                 int intervalMilliseconds = 20);
+    ~ParameterListeners() override;
 
     /**
      * Runs any queued listeners on the audio thread.
@@ -70,11 +74,14 @@ public:
 private:
     void callMessageThreadBroadcaster (size_t index);
     void callAudioThreadBroadcaster (size_t index);
+
     void timerCallback() override;
+    void parameterValueChanged (int, float) override;
+    void parameterGestureChanged (int, bool) override {}
 
     struct ParamInfo
     {
-        const juce::RangedAudioParameter* paramCookie = nullptr;
+        juce::RangedAudioParameter* paramCookie = nullptr;
         float value = 0.0f;
     };
 
