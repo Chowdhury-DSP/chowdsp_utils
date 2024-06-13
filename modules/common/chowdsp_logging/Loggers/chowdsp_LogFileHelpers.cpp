@@ -8,17 +8,6 @@ namespace chowdsp
 {
 namespace LogFileHelpers
 {
-    struct LogFileComparator
-    {
-        static int compareElements (juce::File first, juce::File second) // NOLINT(performance-unnecessary-value-param): JUCE sort needs copies for some reason
-        {
-            const auto firstTime = first.getLastModificationTime().toMilliseconds();
-            const auto secondTime = second.getLastModificationTime().toMilliseconds();
-
-            return firstTime < secondTime;
-        }
-    };
-
     FileArray getLogFilesSorted (const LogFileParams& params)
     {
         const juce::String logFileWildcard = "*" + params.logFileExtension;
@@ -39,7 +28,7 @@ namespace LogFileHelpers
                                           {
                                               const auto lhsTime = lhs.getLastModificationTime().toMilliseconds();
                                               const auto rhsTime = rhs.getLastModificationTime().toMilliseconds();
-                                              return lhsTime < rhsTime;
+                                              return lhsTime > rhsTime;
                                           });
         }
 
