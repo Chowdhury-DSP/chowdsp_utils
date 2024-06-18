@@ -236,6 +236,13 @@ struct ParametersView::Pimpl
 ParametersView::ParametersView (PluginState& pluginState, ParamHolder& params)
     : ParametersView (pluginState.getParameterListeners(), params)
 {
+    if (pluginState.processor != nullptr)
+    {
+        versionInfoText = pluginState.processor->getName();
+#if defined JucePlugin_VersionString
+        versionInfoText += " " + currentPluginVersion.getVersionString();
+#endif
+    }
 }
 
 ParametersView::ParametersView (ParameterListeners& listeners, ParamHolder& params)
@@ -246,6 +253,7 @@ ParametersView::ParametersView (ParameterListeners& listeners, ParamHolder& para
     setOpaque (true);
     addAndMakeVisible (pimpl->view);
 
+    viewport->setScrollBarsShown (true, false);
     setSize (viewport->getViewedComponent()->getWidth() + viewport->getVerticalScrollBar().getWidth(),
              juce::jlimit (125, 400, viewport->getViewedComponent()->getHeight()));
 }
@@ -255,6 +263,14 @@ ParametersView::~ParametersView() = default;
 void ParametersView::paint (juce::Graphics& g)
 {
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
+
+    if (versionInfoText.isNotEmpty())
+    {
+        g.setColour (juce::Colours::white);
+        const auto textHeight = juce::jmin (proportionOfHeight (0.05f), 16);
+        g.setFont (static_cast<float> (textHeight));
+        g.drawFittedText (versionInfoText, getLocalBounds().removeFromBottom (textHeight), juce::Justification::left, 1);
+    }
 }
 
 void ParametersView::resized()
