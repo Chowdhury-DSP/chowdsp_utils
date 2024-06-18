@@ -236,6 +236,13 @@ struct ParametersView::Pimpl
 ParametersView::ParametersView (PluginState& pluginState, ParamHolder& params)
     : ParametersView (pluginState.getParameterListeners(), params)
 {
+    if (pluginState.processor != nullptr)
+    {
+        versionInfoText = pluginState.processor->getName();
+#if defined JucePlugin_VersionString
+        versionInfoText += " " + currentPluginVersion.getVersionString();
+#endif
+    }
 }
 
 ParametersView::ParametersView (ParameterListeners& listeners, ParamHolder& params)
@@ -246,6 +253,7 @@ ParametersView::ParametersView (ParameterListeners& listeners, ParamHolder& para
     setOpaque (true);
     addAndMakeVisible (pimpl->view);
 
+    viewport->setScrollBarsShown (true, false);
     setSize (viewport->getViewedComponent()->getWidth() + viewport->getVerticalScrollBar().getWidth(),
              juce::jlimit (125, 400, viewport->getViewedComponent()->getHeight()));
 }
@@ -254,12 +262,31 @@ ParametersView::~ParametersView() = default;
 
 void ParametersView::paint (juce::Graphics& g)
 {
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
+    auto backgroundColour = getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId);
+    g.fillAll (backgroundColour);
+
+    if (versionInfoText.isNotEmpty())
+    {
+        const auto textHeight = juce::jmin (proportionOfHeight (0.05f), 20);
+        auto textArea = getLocalBounds().removeFromBottom (textHeight);
+        g.setColour (backgroundColour.darker (0.8f));
+        g.fillRect (textArea);
+
+        g.setColour (juce::Colours::white);
+        g.setFont (0.8f * static_cast<float> (textHeight));
+        g.drawFittedText (versionInfoText, textArea, juce::Justification::left, 1);
+    }
 }
 
 void ParametersView::resized()
 {
-    pimpl->view.setBounds (getLocalBounds());
+    auto b = getLocalBounds();
+    if (versionInfoText.isNotEmpty())
+    {
+        const auto textHeight = juce::jmin (proportionOfHeight (0.05f), 20);
+        b.removeFromBottom (textHeight);
+    }
+    pimpl->view.setBounds (b);
 }
 
 juce::Component* ParametersView::getComponentForParameter (const juce::RangedAudioParameter& param)
