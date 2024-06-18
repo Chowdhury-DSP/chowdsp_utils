@@ -37,12 +37,12 @@ TEST_CASE ("Abstract Tree Test", "[common][data-structures]")
     tree.insertElements (std::vector { foods });
     REQUIRE (tree.size() == 4);
 
-    // SECTION ("Clear")
-    // {
-    //     tree.clear();
-    //     REQUIRE (tree.size() == 0);
-    // }
-    //
+    SECTION ("Clear")
+    {
+        tree.clear();
+        REQUIRE (tree.size() == 0);
+    }
+
     // SECTION ("Insertion")
     // {
     //     tree.insertElement ("almonds");

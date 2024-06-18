@@ -73,23 +73,23 @@ TEST_CASE ("Enum Map Test", "[common][data-structures]")
             { Food::Green_Beans, 23 },
         };
 
-        // size_t iter = 0;
-        // for (const auto& [key, val] : std::as_const (map))
-        // {
-        //     jassert (iter < 2);
-        //     if (iter == 0)
-        //     {
-        //         REQUIRE (key == Food::Apple);
-        //         REQUIRE (val == 22);
-        //     }
-        //     else
-        //     {
-        //         REQUIRE (key == Food::Green_Beans);
-        //         REQUIRE (val == 23);
-        //     }
-        //     ++iter;
-        // }
-        //
+        size_t iter = 0;
+        for (const auto& [key, val] : std::as_const (map))
+        {
+            jassert (iter < 2);
+            if (iter == 0)
+            {
+                REQUIRE (key == Food::Apple);
+                REQUIRE (val == 22);
+            }
+            else
+            {
+                REQUIRE (key == Food::Green_Beans);
+                REQUIRE (val == 23);
+            }
+            ++iter;
+        }
+
         // iter = 0;
         // for (auto [key, val] : map)
         //     val = (int) iter++;

@@ -9,8 +9,8 @@ TEST_CASE ("STL Arena Allocator Test", "[common][data-structures]")
     using Alloc = chowdsp::STLArenaAllocator<int, Arena>;
     Alloc alloc { arena };
 
-    // using custom_vector = std::vector<int, Alloc>;
-    // custom_vector vec { { 1, 2, 3, 4 }, alloc };
+    using custom_vector = std::vector<int, Alloc>;
+    custom_vector vec { { 1, 2, 3, 4 }, alloc };
     // REQUIRE (vec.size() == 4);
     // REQUIRE (vec.front() == 1);
     // REQUIRE (vec.back() == 4);
