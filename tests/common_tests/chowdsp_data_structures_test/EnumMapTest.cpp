@@ -40,32 +40,32 @@ TEST_CASE ("Enum Map Test", "[common][data-structures]")
         STATIC_REQUIRE (map.at (Food::Banana) == std::nullopt);
     }
 
-    // SECTION ("Insertion/Erasure")
-    // {
-    //     chowdsp::EnumMap<Food, int> map {};
-    //     map.insert_or_assign (Food::Apple, 22);
-    //     map.emplace (Food::Green_Beans, 23);
-    //     map.emplace (Food::Egg);
-    //
-    //     REQUIRE (! map.empty());
-    //     REQUIRE (map.size() == 3);
-    //     REQUIRE (*map.at (Food::Apple) == 22);
-    //     REQUIRE (map[Food::Green_Beans] == 23);
-    //     REQUIRE (map[Food::Egg] == 0);
-    //     REQUIRE (*std::as_const (map).at (Food::Apple) == 22);
-    //     REQUIRE (std::as_const (map)[Food::Green_Beans] == 23);
-    //     REQUIRE (map.at (Food::Banana) == std::nullopt);
-    //
-    //     map.erase (Food::Green_Beans);
-    //     REQUIRE (map.at (Food::Green_Beans) == std::nullopt);
-    //
-    //     REQUIRE (map.contains (Food::Apple));
-    //     REQUIRE (! map.contains (Food::Green_Beans));
-    //
-    //     map.clear();
-    //     REQUIRE (map.empty());
-    // }
-    //
+    SECTION ("Insertion/Erasure")
+    {
+        chowdsp::EnumMap<Food, int> map {};
+        map.insert_or_assign (Food::Apple, 22);
+        map.emplace (Food::Green_Beans, 23);
+        map.emplace (Food::Egg);
+
+        REQUIRE (! map.empty());
+        REQUIRE (map.size() == 3);
+        REQUIRE (*map.at (Food::Apple) == 22);
+        REQUIRE (map[Food::Green_Beans] == 23);
+        REQUIRE (map[Food::Egg] == 0);
+        REQUIRE (*std::as_const (map).at (Food::Apple) == 22);
+        REQUIRE (std::as_const (map)[Food::Green_Beans] == 23);
+        REQUIRE (map.at (Food::Banana) == std::nullopt);
+
+        map.erase (Food::Green_Beans);
+        REQUIRE (map.at (Food::Green_Beans) == std::nullopt);
+
+        REQUIRE (map.contains (Food::Apple));
+        REQUIRE (! map.contains (Food::Green_Beans));
+
+        map.clear();
+        REQUIRE (map.empty());
+    }
+
     // SECTION ("Iteration")
     // {
     //     chowdsp::EnumMap<Food, int> map {

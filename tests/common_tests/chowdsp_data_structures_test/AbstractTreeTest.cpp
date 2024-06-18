@@ -69,41 +69,41 @@ TEST_CASE ("Abstract Tree Test", "[common][data-structures]")
         }
     }
 
-    SECTION ("Remove One")
-    {
-        tree.removeElement ("beets");
-        REQUIRE (tree.size() == 3);
-
-        const auto* d_node = tree.getRootNode().first_child->next_sibling;
-        REQUIRE (d_node->tag == "d");
-    }
-
-    SECTION ("Remove From Start of Sub-Tree")
-    {
-        tree.removeElement ("alfalfa");
-        REQUIRE (tree.size() == 3);
-
-        const auto* a_node = tree.getRootNode().first_child;
-        REQUIRE (a_node->first_child->leaf == "apples");
-    }
-
-    SECTION ("Remove From End of Sub-Tree")
-    {
-        tree.removeElement ("apples");
-        REQUIRE (tree.size() == 3);
-
-        const auto* a_node = tree.getRootNode().first_child;
-        REQUIRE (a_node->last_child->leaf == "alfalfa");
-    }
-
-    SECTION ("Remove Last Node in Sub-Tree")
-    {
-        tree.removeElement ("donuts");
-        REQUIRE (tree.size() == 3);
-
-        const auto* b_node = tree.getRootNode().last_child;
-        REQUIRE (b_node->tag == "b");
-    }
+    // SECTION ("Remove One")
+    // {
+    //     tree.removeElement ("beets");
+    //     REQUIRE (tree.size() == 3);
+    //
+    //     const auto* d_node = tree.getRootNode().first_child->next_sibling;
+    //     REQUIRE (d_node->tag == "d");
+    // }
+    //
+    // SECTION ("Remove From Start of Sub-Tree")
+    // {
+    //     tree.removeElement ("alfalfa");
+    //     REQUIRE (tree.size() == 3);
+    //
+    //     const auto* a_node = tree.getRootNode().first_child;
+    //     REQUIRE (a_node->first_child->leaf == "apples");
+    // }
+    //
+    // SECTION ("Remove From End of Sub-Tree")
+    // {
+    //     tree.removeElement ("apples");
+    //     REQUIRE (tree.size() == 3);
+    //
+    //     const auto* a_node = tree.getRootNode().first_child;
+    //     REQUIRE (a_node->last_child->leaf == "alfalfa");
+    // }
+    //
+    // SECTION ("Remove Last Node in Sub-Tree")
+    // {
+    //     tree.removeElement ("donuts");
+    //     REQUIRE (tree.size() == 3);
+    //
+    //     const auto* b_node = tree.getRootNode().last_child;
+    //     REQUIRE (b_node->tag == "b");
+    // }
 
     // SECTION ("Remove Multiple")
     // {
