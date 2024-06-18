@@ -43,31 +43,31 @@ TEST_CASE ("Abstract Tree Test", "[common][data-structures]")
         REQUIRE (tree.size() == 0);
     }
 
-    // SECTION ("Insertion")
-    // {
-    //     tree.insertElement ("almonds");
-    //     REQUIRE (tree.size() == 5);
-    //
-    //     {
-    //         const auto* a_node = tree.getRootNode().first_child;
-    //         REQUIRE (a_node->tag == "a");
-    //         REQUIRE (a_node->first_child->leaf == "alfalfa");
-    //         REQUIRE (a_node->first_child->next_sibling->leaf == "almonds");
-    //         REQUIRE (a_node->first_child->next_sibling->next_sibling->leaf == "apples");
-    //     }
-    //
-    //     tree.insertElement ("acai");
-    //     REQUIRE (tree.size() == 6);
-    //
-    //     {
-    //         const auto* a_node = tree.getRootNode().first_child;
-    //         REQUIRE (a_node->tag == "a");
-    //         REQUIRE (a_node->first_child->leaf == "acai");
-    //         REQUIRE (a_node->first_child->next_sibling->leaf == "alfalfa");
-    //         REQUIRE (a_node->first_child->next_sibling->next_sibling->leaf == "almonds");
-    //         REQUIRE (a_node->first_child->next_sibling->next_sibling->next_sibling->leaf == "apples");
-    //     }
-    // }
+    SECTION ("Insertion")
+    {
+        tree.insertElement ("almonds");
+        REQUIRE (tree.size() == 5);
+
+        // {
+        //     const auto* a_node = tree.getRootNode().first_child;
+        //     REQUIRE (a_node->tag == "a");
+        //     REQUIRE (a_node->first_child->leaf == "alfalfa");
+        //     REQUIRE (a_node->first_child->next_sibling->leaf == "almonds");
+        //     REQUIRE (a_node->first_child->next_sibling->next_sibling->leaf == "apples");
+        // }
+        //
+        // tree.insertElement ("acai");
+        // REQUIRE (tree.size() == 6);
+        //
+        // {
+        //     const auto* a_node = tree.getRootNode().first_child;
+        //     REQUIRE (a_node->tag == "a");
+        //     REQUIRE (a_node->first_child->leaf == "acai");
+        //     REQUIRE (a_node->first_child->next_sibling->leaf == "alfalfa");
+        //     REQUIRE (a_node->first_child->next_sibling->next_sibling->leaf == "almonds");
+        //     REQUIRE (a_node->first_child->next_sibling->next_sibling->next_sibling->leaf == "apples");
+        // }
+    }
 
     // SECTION ("Remove One")
     // {

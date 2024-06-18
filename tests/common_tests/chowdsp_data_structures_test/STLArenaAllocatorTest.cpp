@@ -11,9 +11,9 @@ TEST_CASE ("STL Arena Allocator Test", "[common][data-structures]")
 
     using custom_vector = std::vector<int, Alloc>;
     custom_vector vec { { 1, 2, 3, 4 }, alloc };
-    // REQUIRE (vec.size() == 4);
-    // REQUIRE (vec.front() == 1);
-    // REQUIRE (vec.back() == 4);
+    REQUIRE (vec.size() == 4);
+    REQUIRE (vec.front() == 1);
+    REQUIRE (vec.back() == 4);
 
     // vec.push_back (5);
     // REQUIRE (vec.size() == 5);
