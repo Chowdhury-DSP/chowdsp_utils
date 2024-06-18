@@ -15,10 +15,10 @@ TEST_CASE ("STL Arena Allocator Test", "[common][data-structures]")
     REQUIRE (vec.front() == 1);
     REQUIRE (vec.back() == 4);
 
-    // vec.push_back (5);
-    // REQUIRE (vec.size() == 5);
-    // REQUIRE (vec.back() == 5);
-    //
+    vec.push_back (5);
+    REQUIRE (vec.size() == 5);
+    REQUIRE (vec.back() == 5);
+
     // vec.erase (vec.begin());
     // REQUIRE (vec.size() == 4);
     // vec.insert (vec.begin(), 0);

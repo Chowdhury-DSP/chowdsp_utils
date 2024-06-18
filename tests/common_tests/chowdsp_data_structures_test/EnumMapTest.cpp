@@ -93,7 +93,7 @@ TEST_CASE ("Enum Map Test", "[common][data-structures]")
         iter = 0;
         for (auto [key, val] : map)
             val = static_cast<int> (iter++);
-        // REQUIRE (map[Food::Apple] == 0);
-        // REQUIRE (map[Food::Green_Beans] == 1);
+        REQUIRE (map[Food::Apple] == 0);
+        REQUIRE (map[Food::Green_Beans] == 1);
     }
 }
