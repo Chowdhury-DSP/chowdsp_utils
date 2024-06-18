@@ -1,8 +1,6 @@
 #include <CatchUtils.h>
 #include <chowdsp_data_structures/chowdsp_data_structures.h>
 
-#if ! JUCE_WINDOWS // @TODO
-
 struct StringTree : chowdsp::AbstractTree<std::string, StringTree>
 {
     static Node& insert_string (std::string&& element, Node& parent_node, AbstractTree& tree)
@@ -161,4 +159,3 @@ TEST_CASE ("Abstract Tree Test", "[common][data-structures]")
             });
     }
 }
-#endif

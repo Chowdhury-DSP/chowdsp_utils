@@ -28,7 +28,7 @@ struct STLArenaAllocator
 
     T* allocate (std::size_t n)
     {
-        return static_cast<T*> (arena.allocate_bytes (n, alignof (T)));
+        return static_cast<T*> (arena.allocate_bytes (n * sizeof (T), alignof (T)));
     }
 
     void deallocate (T*, std::size_t) const
