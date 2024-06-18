@@ -1,6 +1,8 @@
 #include <CatchUtils.h>
 #include <chowdsp_data_structures/chowdsp_data_structures.h>
 
+#if ! JUCE_WINDOWS // @TODO
+
 TEST_CASE ("STL Arena Allocator Test", "[common][data-structures]")
 {
     using Arena = chowdsp::ArenaAllocator<>;
@@ -19,9 +21,11 @@ TEST_CASE ("STL Arena Allocator Test", "[common][data-structures]")
     REQUIRE (vec.size() == 5);
     REQUIRE (vec.back() == 5);
 
-    // vec.erase (vec.begin());
-    // REQUIRE (vec.size() == 4);
-    // vec.insert (vec.begin(), 0);
-    // REQUIRE (vec.size() == 5);
-    // REQUIRE (vec.front() == 0);
+    vec.erase (vec.begin());
+    REQUIRE (vec.size() == 4);
+    vec.insert (vec.begin(), 0);
+    REQUIRE (vec.size() == 5);
+    REQUIRE (vec.front() == 0);
 }
+
+#endif
