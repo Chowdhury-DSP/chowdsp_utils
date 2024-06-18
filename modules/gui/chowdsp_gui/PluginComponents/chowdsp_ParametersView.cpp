@@ -283,7 +283,7 @@ void ParametersView::resized()
     auto b = getLocalBounds();
     if (versionInfoText.isNotEmpty())
     {
-        const auto textHeight = juce::jmin (proportionOfHeight (0.05f), 16);
+        const auto textHeight = juce::jmin (proportionOfHeight (0.05f), 20);
         b.removeFromBottom (textHeight);
     }
     pimpl->view.setBounds (b);
