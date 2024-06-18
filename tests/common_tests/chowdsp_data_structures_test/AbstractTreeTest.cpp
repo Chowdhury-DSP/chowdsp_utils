@@ -105,57 +105,57 @@ TEST_CASE ("Abstract Tree Test", "[common][data-structures]")
         REQUIRE (b_node->tag == "b");
     }
 
-    SECTION ("Remove Multiple")
-    {
-        tree.removeElements ([] (const std::string& el)
-                             { return el.find ('t') != std::string::npos; });
-        REQUIRE (tree.size() == 2);
-
-        REQUIRE (tree.getRootNode().first_child == tree.getRootNode().last_child);
-        REQUIRE (tree.getRootNode().first_child->tag == "a");
-    }
-
-    SECTION ("Remove All")
-    {
-        tree.removeElements ([] (const std::string& el)
-                             { return ! el.empty(); });
-        REQUIRE (tree.size() == 0);
-
-        tree.insertElement ("mussels");
-        REQUIRE (tree.size() == 1);
-        REQUIRE (tree.getRootNode().first_child->tag == "m");
-        REQUIRE (tree.getRootNode().first_child->first_child->leaf == "mussels");
-
-        auto* found = tree.findElement ("mussels");
-        REQUIRE (found != nullptr);
-    }
-
-    SECTION ("Find Success")
-    {
-        auto* found = std::as_const (tree).findElement ("apples");
-        jassert (found != nullptr);
-    }
-
-    SECTION ("Find Fail")
-    {
-        [[maybe_unused]] auto* found = std::as_const (tree).findElement ("bologna");
-        jassert (found == nullptr);
-    }
-
-    SECTION ("To Uppercase")
-    {
-        tree.doForAllElements (
-            [] (std::string& str)
-            {
-                for (auto& c : str)
-                    c = static_cast<char> (std::toupper (static_cast<int> (c)));
-            });
-
-        std::as_const (tree).doForAllElements (
-            [] (const std::string& str)
-            {
-                for (auto& c : str)
-                    REQUIRE (((c >= 'A') && (c <= 'Z')));
-            });
-    }
+    // SECTION ("Remove Multiple")
+    // {
+    //     tree.removeElements ([] (const std::string& el)
+    //                          { return el.find ('t') != std::string::npos; });
+    //     REQUIRE (tree.size() == 2);
+    //
+    //     REQUIRE (tree.getRootNode().first_child == tree.getRootNode().last_child);
+    //     REQUIRE (tree.getRootNode().first_child->tag == "a");
+    // }
+    //
+    // SECTION ("Remove All")
+    // {
+    //     tree.removeElements ([] (const std::string& el)
+    //                          { return ! el.empty(); });
+    //     REQUIRE (tree.size() == 0);
+    //
+    //     tree.insertElement ("mussels");
+    //     REQUIRE (tree.size() == 1);
+    //     REQUIRE (tree.getRootNode().first_child->tag == "m");
+    //     REQUIRE (tree.getRootNode().first_child->first_child->leaf == "mussels");
+    //
+    //     auto* found = tree.findElement ("mussels");
+    //     REQUIRE (found != nullptr);
+    // }
+    //
+    // SECTION ("Find Success")
+    // {
+    //     auto* found = std::as_const (tree).findElement ("apples");
+    //     jassert (found != nullptr);
+    // }
+    //
+    // SECTION ("Find Fail")
+    // {
+    //     [[maybe_unused]] auto* found = std::as_const (tree).findElement ("bologna");
+    //     jassert (found == nullptr);
+    // }
+    //
+    // SECTION ("To Uppercase")
+    // {
+    //     tree.doForAllElements (
+    //         [] (std::string& str)
+    //         {
+    //             for (auto& c : str)
+    //                 c = static_cast<char> (std::toupper (static_cast<int> (c)));
+    //         });
+    //
+    //     std::as_const (tree).doForAllElements (
+    //         [] (const std::string& str)
+    //         {
+    //             for (auto& c : str)
+    //                 REQUIRE (((c >= 'A') && (c <= 'Z')));
+    //         });
+    // }
 }

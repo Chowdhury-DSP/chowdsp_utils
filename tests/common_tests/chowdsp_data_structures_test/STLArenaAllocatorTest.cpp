@@ -4,7 +4,7 @@
 TEST_CASE ("STL Arena Allocator Test", "[common][data-structures]")
 {
     using Arena = chowdsp::ArenaAllocator<>;
-    Arena arena { 128 };
+    Arena arena { 512 };
 
     using Alloc = chowdsp::STLArenaAllocator<int, Arena>;
     Alloc alloc { arena };
