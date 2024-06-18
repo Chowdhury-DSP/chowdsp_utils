@@ -126,7 +126,7 @@ struct EnumMap
             {
                 ++index;
                 ++iter;
-            } while (! iter->has_value() && index < std::tuple_size_v<Storage>);
+            } while (index < std::tuple_size_v<Storage> && ! iter->has_value());
 
             if (index < std::tuple_size_v<Storage>)
                 key = magic_enum::enum_value<Key> (index);

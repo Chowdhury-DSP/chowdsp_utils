@@ -38,7 +38,7 @@ jobs:
             build_type: "Release"
           - name: "Test"
             os: windows-2022
-            build_type: "Release"
+            build_type: "Debug"
           - name: "Coverage"
             os: ubuntu-22.04
             cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"

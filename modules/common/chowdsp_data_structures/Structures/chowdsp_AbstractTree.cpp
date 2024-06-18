@@ -10,7 +10,7 @@ template <typename ElementType, typename DerivedType>
 AbstractTree<ElementType, DerivedType>::~AbstractTree()
 {
     doForAllNodes ([] (Node& node)
-                   { node.~Node(); });
+                   { node.leaf.reset(); });
 }
 
 template <typename ElementType, typename DerivedType>
@@ -108,7 +108,7 @@ void AbstractTree<ElementType, DerivedType>::removeNode (Node& node)
             node.parent->last_child = node.prev_sibling;
     }
 
-    node.~Node();
+    node.leaf.reset();
 }
 
 template <typename ElementType, typename DerivedType>
@@ -150,9 +150,10 @@ template <typename ElementType, typename DerivedType>
 void AbstractTree<ElementType, DerivedType>::clear()
 {
     doForAllNodes ([] (Node& node)
-                   { node.~Node(); });
+                   { node.leaf.reset(); });
     allocator.reset (64 * sizeof (Node));
     count = 0;
+    root_node = {};
 }
 
 template <typename ElementType, typename DerivedType>
