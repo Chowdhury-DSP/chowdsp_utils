@@ -262,20 +262,31 @@ ParametersView::~ParametersView() = default;
 
 void ParametersView::paint (juce::Graphics& g)
 {
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
+    auto backgroundColour = getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId);
+    g.fillAll (backgroundColour);
 
     if (versionInfoText.isNotEmpty())
     {
+        const auto textHeight = juce::jmin (proportionOfHeight (0.05f), 20);
+        auto textArea = getLocalBounds().removeFromBottom (textHeight);
+        g.setColour (backgroundColour.darker (0.8f));
+        g.fillRect (textArea);
+
         g.setColour (juce::Colours::white);
-        const auto textHeight = juce::jmin (proportionOfHeight (0.05f), 16);
-        g.setFont (static_cast<float> (textHeight));
-        g.drawFittedText (versionInfoText, getLocalBounds().removeFromBottom (textHeight), juce::Justification::left, 1);
+        g.setFont (0.8f * static_cast<float> (textHeight));
+        g.drawFittedText (versionInfoText, textArea, juce::Justification::left, 1);
     }
 }
 
 void ParametersView::resized()
 {
-    pimpl->view.setBounds (getLocalBounds());
+    auto b = getLocalBounds();
+    if (versionInfoText.isNotEmpty())
+    {
+        const auto textHeight = juce::jmin (proportionOfHeight (0.05f), 16);
+        b.removeFromBottom (textHeight);
+    }
+    pimpl->view.setBounds (b);
 }
 
 juce::Component* ParametersView::getComponentForParameter (const juce::RangedAudioParameter& param)
