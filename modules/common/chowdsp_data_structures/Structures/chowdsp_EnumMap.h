@@ -13,37 +13,26 @@ struct EnumMap
 
     EnumMap() = default;
 
-    constexpr EnumMap (std::initializer_list<std::pair<Key, T>> init)
+    EnumMap (std::initializer_list<std::pair<Key, T>> init)
     {
         for (auto& [key, value] : init)
             insert_or_assign (key, value);
     }
 
-    constexpr EnumMap (const EnumMap&) = delete;
-    constexpr EnumMap& operator= (const EnumMap&) = delete;
+    EnumMap (const EnumMap&) = delete;
+    EnumMap& operator= (const EnumMap&) = delete;
 
-    constexpr EnumMap (EnumMap&& other) noexcept = default;
-    constexpr EnumMap& operator= (EnumMap&& other) noexcept = default;
+    EnumMap (EnumMap&& other) noexcept = default;
+    EnumMap& operator= (EnumMap&& other) noexcept = default;
 
-    [[nodiscard]] constexpr bool empty() const noexcept
+    [[nodiscard]] bool empty() const noexcept
     {
-        for (auto& opt : storage)
-        {
-            if (opt.has_value())
-                return false;
-        }
-        return true;
+        return init_flags.none();
     }
 
-    [[nodiscard]] constexpr size_t size() const noexcept
+    [[nodiscard]] size_t size() const noexcept
     {
-        size_t count = 0;
-        for (auto& opt : storage)
-        {
-            if (opt.has_value())
-                count++;
-        }
-        return count;
+        return init_flags.count();
     }
 
     [[nodiscard]] static constexpr size_t max_size() noexcept
@@ -51,73 +40,103 @@ struct EnumMap
         return enum_count;
     }
 
-    constexpr void clear()
+    void clear()
     {
-        for (auto& opt : storage)
-            opt.reset();
+        for (auto [idx, object] : enumerate (storage))
+        {
+            if (init_flags[idx])
+                object.destruct();
+        }
+        init_flags.reset();
     }
 
-    constexpr void insert_or_assign (Key key, T value) noexcept
+    void insert_or_assign (Key key, T value) noexcept
     {
-        storage[get_index (key)] = value;
+        auto idx = get_index (key);
+        if (init_flags[idx])
+            storage[idx].destruct();
+
+        storage[idx].construct (value);
+        init_flags[idx] = true;
     }
 
     template <typename... Args>
-    constexpr T& emplace (Key key, Args&&... args)
+    T& emplace (Key key, Args&&... args)
     {
-        auto& opt = storage[get_index (key)];
-        opt.emplace (std::forward<Args> (args)...);
-        return *opt;
+        auto idx = get_index (key);
+        auto& object = storage[idx];
+        if (init_flags[idx])
+            object.destruct();
+
+        object.construct (std::forward<Args> (args)...);
+        init_flags[idx] = true;
+        return object.item();
     }
 
     template <typename C = T>
-    constexpr std::enable_if_t<std::is_default_constructible_v<C>, T&> emplace (Key key)
+    std::enable_if_t<std::is_default_constructible_v<C>, T&> emplace (Key key)
     {
-        auto& opt = storage[get_index (key)];
-        opt.emplace();
-        return *opt;
+        auto idx = get_index (key);
+        auto& object = storage[idx];
+        if (init_flags[idx])
+            object.destruct();
+
+        object.construct();
+        init_flags[idx] = true;
+        return object.item();
     }
 
-    [[nodiscard]] constexpr std::optional<T>& at (Key key)
+    [[nodiscard]] OptionalRef<T> at (Key key)
     {
-        return storage[get_index (key)];
+        auto idx = get_index (key);
+        if (! init_flags[idx])
+            return std::nullopt;
+        return storage[idx].item();
     }
 
-    [[nodiscard]] constexpr const std::optional<T>& at (Key key) const
+    [[nodiscard]] OptionalRef<const T> at (Key key) const
     {
-        return storage[get_index (key)];
+        auto idx = get_index (key);
+        if (! init_flags[idx])
+            return std::nullopt;
+        return storage[idx].item();
     }
 
-    [[nodiscard]] constexpr T& operator[] (Key key) noexcept
+    [[nodiscard]] T& operator[] (Key key) noexcept
     {
-        return *at (key);
+        return storage[get_index (key)].item();
     }
 
-    [[nodiscard]] constexpr const T& operator[] (Key key) const noexcept
+    [[nodiscard]] const T& operator[] (Key key) const noexcept
     {
-        return *at (key);
+        return storage[get_index (key)].item();
     }
 
-    constexpr void erase (Key key)
+    void erase (Key key)
     {
-        at (key).reset();
+        auto idx = get_index (key);
+        if (init_flags[idx])
+        {
+            storage[idx].destruct();
+            init_flags[idx] = false;
+        }
     }
 
-    [[nodiscard]] constexpr bool contains (Key key) const noexcept
+    [[nodiscard]] bool contains (Key key) const noexcept
     {
-        return at (key).has_value();
+        return init_flags[get_index (key)];
     }
 
-    template <typename Storage, bool is_const = false>
+    template <bool is_const = false>
     struct iterator
     {
         size_t index;
-        std::conditional_t<is_const, typename Storage::const_iterator, typename Storage::iterator> iter;
+        std::conditional_t<is_const, const EnumMap&, EnumMap&> map;
         Key key;
 
         bool operator!= (const iterator& other) const
         {
-            return iter != other.iter;
+            return &map == &other.map && index != other.index;
         }
 
         void operator++()
@@ -125,60 +144,60 @@ struct EnumMap
             do
             {
                 ++index;
-                ++iter;
-            } while (index < std::tuple_size_v<Storage> && ! iter->has_value());
+            } while (index < enum_count && ! map.init_flags[index]);
 
-            if (index < std::tuple_size_v<Storage>)
+            if (index < enum_count)
                 key = magic_enum::enum_value<Key> (index);
         }
 
         auto operator*() const
         {
-            return std::tie (key, *(*iter));
+            return std::tie (key, map.storage[index].item());
         }
     };
 
-    constexpr auto begin() noexcept
+    auto begin() noexcept
     {
-        return iterator<decltype (storage)> {
+        return iterator<> {
             0,
-            storage.begin(),
+            *this,
             magic_enum::enum_value<Key> (0),
         };
     }
 
-    constexpr auto begin() const noexcept
+    auto begin() const noexcept
     {
-        return iterator<decltype (storage), true> {
+        return iterator<true> {
             0,
-            storage.cbegin(),
+            *this,
             magic_enum::enum_value<Key> (0),
         };
     }
 
-    constexpr auto end() noexcept
+    auto end() noexcept
     {
-        return iterator<decltype (storage)> {
+        return iterator<> {
             enum_count,
-            storage.end(),
+            *this,
             {},
         };
     }
 
-    constexpr auto end() const noexcept
+    auto end() const noexcept
     {
-        return iterator<decltype (storage), true> {
+        return iterator<true> {
             enum_count,
-            storage.cend(),
+            *this,
             {},
         };
     }
 
 private:
     static constexpr auto enum_count = magic_enum::enum_count<Key>();
-    std::array<std::optional<T>, enum_count> storage;
+    std::array<RawObject<T>, enum_count> storage {};
+    std::bitset<enum_count> init_flags {};
 
-    constexpr size_t get_index (Key k) const
+    size_t get_index (Key k) const
     {
         return *magic_enum::enum_index (k);
     }

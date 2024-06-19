@@ -62,4 +62,46 @@ public:
 
     const T& value_or (const T& other) const { return has_value() ? *ptr : other; }
 };
+
+template <typename T>
+bool operator== (const OptionalRef<T>& p1, const OptionalRef<T>& p2)
+{
+    if (p1.has_value() != p2.has_value())
+        return false;
+
+    if (! p1.has_value())
+        return true; // both nullopt
+
+    return p1.value() == p2.value();
+}
+
+template <typename T>
+bool operator!= (const OptionalRef<T>& p1, const OptionalRef<T>& p2)
+{
+    return ! (p1 == p2);
+}
+
+template <typename T>
+bool operator== (const OptionalRef<T>& p1, std::nullopt_t)
+{
+    return ! p1.has_value();
+}
+
+template <typename T>
+bool operator!= (const OptionalRef<T>& p1, std::nullopt_t)
+{
+    return p1.has_value();
+}
+
+template <typename T>
+bool operator== (std::nullopt_t, const OptionalRef<T>& p1)
+{
+    return ! p1.has_value();
+}
+
+template <typename T>
+bool operator!= (std::nullopt_t, const OptionalRef<T>& p1)
+{
+    return p1.has_value();
+}
 } // namespace chowdsp

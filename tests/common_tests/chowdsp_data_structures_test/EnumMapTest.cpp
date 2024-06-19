@@ -26,18 +26,18 @@ TEST_CASE ("Enum Map Test", "[common][data-structures]")
 
     SECTION ("Construct/Access")
     {
-        constexpr chowdsp::EnumMap<Food, int> map {
+        chowdsp::EnumMap<Food, int> map {
             { Food::Apple, 22 },
             { Food::Green_Beans, 23 },
         };
 
-        STATIC_REQUIRE (! map.empty());
-        STATIC_REQUIRE (map.size() == 2);
-        STATIC_REQUIRE (*map.at (Food::Apple) == 22);
-        STATIC_REQUIRE (map[Food::Green_Beans] == 23);
-        STATIC_REQUIRE (*std::as_const (map).at (Food::Apple) == 22);
-        STATIC_REQUIRE (std::as_const (map)[Food::Green_Beans] == 23);
-        STATIC_REQUIRE (map.at (Food::Banana) == std::nullopt);
+        REQUIRE (! map.empty());
+        REQUIRE (map.size() == 2);
+        REQUIRE (*map.at (Food::Apple) == 22);
+        REQUIRE (map[Food::Green_Beans] == 23);
+        REQUIRE (*std::as_const (map).at (Food::Apple) == 22);
+        REQUIRE (std::as_const (map)[Food::Green_Beans] == 23);
+        REQUIRE (map.at (Food::Banana) == std::nullopt);
     }
 
     SECTION ("Insertion/Erasure")
