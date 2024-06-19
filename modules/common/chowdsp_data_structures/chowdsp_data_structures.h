@@ -20,6 +20,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 #pragma once
 
+#include <bitset>
 #include <chowdsp_core/chowdsp_core.h>
 
 #include "third_party/short_alloc.h"
