@@ -170,9 +170,16 @@ OptionalRef<ElementType> AbstractTree<ElementType, DerivedType>::findElement (co
 }
 
 template <typename ElementType, typename DerivedType>
-const OptionalRef<ElementType> AbstractTree<ElementType, DerivedType>::findElement (const ElementType& element) const
+OptionalRef<const ElementType> AbstractTree<ElementType, DerivedType>::findElement (const ElementType& element) const
 {
-    return const_cast<AbstractTree&> (*this).findElement (element); // NOSONAR
+    OptionalRef<const ElementType> result {};
+    doForAllElements (
+        [&result, element] (const ElementType& candidate)
+        {
+            if (element == candidate)
+                result = candidate;
+        });
+    return result;
 }
 
 template <typename ElementType, typename DerivedType>

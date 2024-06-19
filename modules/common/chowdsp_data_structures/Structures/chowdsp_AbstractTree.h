@@ -63,7 +63,7 @@ public:
     [[nodiscard]] OptionalRef<ElementType> findElement (const ElementType& element);
 
     /** Checks if the tree currently contains an element. If true, then return the element, else return nullptr. */
-    [[nodiscard]] const OptionalRef<ElementType> findElement (const ElementType& element) const;
+    [[nodiscard]] OptionalRef<const ElementType> findElement (const ElementType& element) const;
 
     template <typename Callable>
     void doForAllNodes (Callable&& callable);
