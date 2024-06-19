@@ -72,7 +72,7 @@ bool operator== (const OptionalRef<T>& p1, const OptionalRef<T>& p2)
     if (! p1.has_value())
         return true; // both nullopt
 
-    return p1.value() == p2.value();
+    return *p1 == *p2;
 }
 
 template <typename T>
@@ -103,5 +103,31 @@ template <typename T>
 bool operator!= (std::nullopt_t, const OptionalRef<T>& p1)
 {
     return p1.has_value();
+}
+
+template <typename T>
+bool operator== (const OptionalRef<T>& p1, const T& p2)
+{
+    if (! p1.has_value())
+        return false;
+    return *p1 == p2;
+}
+
+template <typename T>
+bool operator!= (const OptionalRef<T>& p1, const T& p2)
+{
+    return ! (p1 == p2);
+}
+
+template <typename T>
+bool operator== (const T& p2, const OptionalRef<T>& p1)
+{
+    return p1 == p2;
+}
+
+template <typename T>
+bool operator!= (const T& p2, const OptionalRef<T>& p1)
+{
+    return p1 != p2;
 }
 } // namespace chowdsp

@@ -72,4 +72,23 @@ TEST_CASE ("OptionalRef Test", "[common][data-structures]")
         x_opt = std::nullopt;
         REQUIRE (x_opt.value_or (-10) == -10);
     }
+
+    SECTION ("equality")
+    {
+        int x_copy = 42;
+        int y = -1000;
+        REQUIRE (chowdsp::OptionalRef<int> {} == chowdsp::OptionalRef<int> {});
+        REQUIRE (x_opt == chowdsp::OptionalRef { x_copy });
+        REQUIRE (x_opt != chowdsp::OptionalRef { y });
+        REQUIRE (x_opt != chowdsp::OptionalRef<int> {});
+        REQUIRE (x_opt != std::nullopt);
+        REQUIRE (std::nullopt != x_opt);
+        REQUIRE (std::nullopt == chowdsp::OptionalRef<int> {});
+        REQUIRE (chowdsp::OptionalRef<int> {} == std::nullopt);
+        REQUIRE (100 != chowdsp::OptionalRef<int>{});
+        REQUIRE (x_opt == 42);
+        REQUIRE (x_opt != 100);
+        REQUIRE (42 == x_opt);
+        REQUIRE (100 != x_opt);
+    }
 }
