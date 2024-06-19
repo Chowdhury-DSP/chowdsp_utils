@@ -85,7 +85,7 @@ TEST_CASE ("OptionalRef Test", "[common][data-structures]")
         REQUIRE (std::nullopt != x_opt);
         REQUIRE (std::nullopt == chowdsp::OptionalRef<int> {});
         REQUIRE (chowdsp::OptionalRef<int> {} == std::nullopt);
-        REQUIRE (100 != chowdsp::OptionalRef<int>{});
+        REQUIRE (100 != chowdsp::OptionalRef<int> {});
         REQUIRE (x_opt == 42);
         REQUIRE (x_opt != 100);
         REQUIRE (42 == x_opt);

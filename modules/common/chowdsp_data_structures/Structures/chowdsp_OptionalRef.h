@@ -22,7 +22,7 @@ public:
     OptionalRef (OptionalRef&&) noexcept = default;
     OptionalRef& operator= (OptionalRef&&) noexcept = default;
 
-    OptionalRef (std::nullopt_t)// NOLINT(google-explicit-constructor)
+    OptionalRef (std::nullopt_t) // NOLINT(google-explicit-constructor)
     {
     }
 

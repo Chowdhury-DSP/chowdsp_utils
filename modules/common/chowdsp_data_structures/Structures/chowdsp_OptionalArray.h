@@ -132,4 +132,4 @@ public:
         return iterator<true> { N, *this };
     }
 };
-}
+} // namespace chowdsp
