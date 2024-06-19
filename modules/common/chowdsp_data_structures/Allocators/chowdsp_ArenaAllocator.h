@@ -2,6 +2,10 @@
 
 #include <vector>
 
+#ifndef ARENA_ALLOCATOR_DEBUG
+#define ARENA_ALLOCATOR_DEBUG JUCE_DEBUG
+#endif
+
 namespace chowdsp
 {
 /** A simple arena allocator */
@@ -47,6 +51,10 @@ public:
      */
     void clear() noexcept
     {
+#if ARENA_ALLOCATOR_DEBUG
+        std::fill (raw_data.begin(), raw_data.begin() + bytes_used, std::byte { 0xDD });
+        std::fill (raw_data.begin() + bytes_used, raw_data.end(), std::byte { 0x00 });
+#endif
         bytes_used = 0;
     }
 
