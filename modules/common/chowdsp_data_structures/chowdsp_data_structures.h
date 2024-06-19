@@ -20,6 +20,9 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 #pragma once
 
+#include <bitset>
+#include <optional>
+
 #include <chowdsp_core/chowdsp_core.h>
 
 #include "third_party/short_alloc.h"
@@ -36,7 +39,9 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Structures/chowdsp_OptionalPointer.h"
 #include "Structures/chowdsp_SmallVector.h"
 #include "Structures/chowdsp_StringLiteral.h"
+#include "Structures/chowdsp_OptionalRef.h"
 #include "Structures/chowdsp_EnumMap.h"
+#include "Structures/chowdsp_OptionalArray.h"
 
 #include "Allocators/chowdsp_ArenaAllocator.h"
 #include "Allocators/chowdsp_ChainedArenaAllocator.h"

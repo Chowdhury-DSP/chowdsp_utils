@@ -157,22 +157,29 @@ void AbstractTree<ElementType, DerivedType>::clear()
 }
 
 template <typename ElementType, typename DerivedType>
-ElementType* AbstractTree<ElementType, DerivedType>::findElement (const ElementType& element)
+OptionalRef<ElementType> AbstractTree<ElementType, DerivedType>::findElement (const ElementType& element)
 {
-    ElementType* result = nullptr;
+    OptionalRef<ElementType> result {};
     doForAllElements (
         [&result, element] (ElementType& candidate)
         {
             if (element == candidate)
-                result = &candidate;
+                result = candidate;
         });
     return result;
 }
 
 template <typename ElementType, typename DerivedType>
-const ElementType* AbstractTree<ElementType, DerivedType>::findElement (const ElementType& element) const
+OptionalRef<const ElementType> AbstractTree<ElementType, DerivedType>::findElement (const ElementType& element) const
 {
-    return const_cast<AbstractTree&> (*this).findElement (element); // NOSONAR
+    OptionalRef<const ElementType> result {};
+    doForAllElements (
+        [&result, element] (const ElementType& candidate)
+        {
+            if (element == candidate)
+                result = candidate;
+        });
+    return result;
 }
 
 template <typename ElementType, typename DerivedType>

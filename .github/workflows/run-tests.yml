@@ -44,11 +44,10 @@ jobs:
             cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
             run_coverage: true
             build_type: "Debug"
-#          - name: "Coverage"
-#            os: macos-latest
-#            cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
-#            run_coverage: true (this is breaking for some reason @TODO)
-#            build_type: "Debug"
+          - name: "Test"
+            os: macos-14
+            cmake_args: "-DCMAKE_BUILD_TYPE=Debug"
+            build_type: "Debug"
           - name: "Live GUI Test"
             os: ubuntu-22.04
             tests: "live_gui_test"
@@ -58,8 +57,6 @@ jobs:
             build_type: "Debug"
         exclude:
           # so we don't break GitHub Actions concurrency limit
-          - name: "Test"
-            os: macos-14
           - name: "Coverage"
             os: macos-14
           - name: "Coverage"

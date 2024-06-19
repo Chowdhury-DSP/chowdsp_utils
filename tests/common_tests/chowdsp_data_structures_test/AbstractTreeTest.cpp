@@ -126,20 +126,20 @@ TEST_CASE ("Abstract Tree Test", "[common][data-structures]")
         REQUIRE (tree.getRootNode().first_child->tag == "m");
         REQUIRE (tree.getRootNode().first_child->first_child->leaf == "mussels");
 
-        auto* found = tree.findElement ("mussels");
-        REQUIRE (found != nullptr);
+        auto found = tree.findElement ("mussels");
+        REQUIRE (found);
     }
 
     SECTION ("Find Success")
     {
-        auto* found = std::as_const (tree).findElement ("apples");
-        jassert (found != nullptr);
+        auto found = std::as_const (tree).findElement ("apples");
+        jassert (found);
     }
 
     SECTION ("Find Fail")
     {
-        [[maybe_unused]] auto* found = std::as_const (tree).findElement ("bologna");
-        jassert (found == nullptr);
+        [[maybe_unused]] auto found = std::as_const (tree).findElement ("bologna");
+        jassert (! found);
     }
 
     SECTION ("To Uppercase")
