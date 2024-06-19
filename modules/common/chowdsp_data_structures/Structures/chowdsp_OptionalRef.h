@@ -2,6 +2,14 @@
 
 namespace chowdsp
 {
+/**
+ * This class is basically an implementation of std::optional<T&>.
+ * Under the hood, it's basically just a pointer but with an
+ * optional-like interface.
+ *
+ * Make sure that an OptionalRef never holds on to a reference
+ * past the lifetime of the referenced object.
+ */
 template <typename T>
 class OptionalRef
 {
@@ -106,7 +114,7 @@ bool operator!= (std::nullopt_t, const OptionalRef<T>& p1)
 }
 
 template <typename T>
-bool operator== (const OptionalRef<T>& p1, const T& p2)
+bool operator== (const OptionalRef<T>& p1, const std::remove_cv_t<T>& p2)
 {
     if (! p1.has_value())
         return false;
@@ -114,19 +122,19 @@ bool operator== (const OptionalRef<T>& p1, const T& p2)
 }
 
 template <typename T>
-bool operator!= (const OptionalRef<T>& p1, const T& p2)
+bool operator!= (const OptionalRef<T>& p1, const std::remove_cv_t<T>& p2)
 {
     return ! (p1 == p2);
 }
 
 template <typename T>
-bool operator== (const T& p2, const OptionalRef<T>& p1)
+bool operator== (const std::remove_cv_t<T>& p2, const OptionalRef<T>& p1)
 {
     return p1 == p2;
 }
 
 template <typename T>
-bool operator!= (const T& p2, const OptionalRef<T>& p1)
+bool operator!= (const std::remove_cv_t<T>& p2, const OptionalRef<T>& p1)
 {
     return p1 != p2;
 }
