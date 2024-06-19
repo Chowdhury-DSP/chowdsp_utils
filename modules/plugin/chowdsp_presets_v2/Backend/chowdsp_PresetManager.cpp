@@ -65,7 +65,7 @@ void PresetManager::saveUserPreset (const juce::File& file, Preset&& preset) // 
     preset.toFile (file);
     loadUserPresetsFromFolder (getUserPresetPath());
 
-    if (const auto* justSavedPreset = presetTree.findElement (preset))
+    if (const auto justSavedPreset = presetTree.findElement (preset))
         loadPreset (*justSavedPreset);
     else
         jassertfalse; // preset was not saved correctly!
@@ -76,9 +76,9 @@ void PresetManager::setDefaultPreset (Preset&& newDefaultPreset)
     // default preset must be a valid preset!
     jassert (newDefaultPreset.isValid());
 
-    if (const auto* foundDefaultPreset = presetTree.findElement (newDefaultPreset))
+    if (const auto foundDefaultPreset = presetTree.findElement (newDefaultPreset))
     {
-        defaultPreset = foundDefaultPreset;
+        defaultPreset = &foundDefaultPreset.value();
         return;
     }
 
