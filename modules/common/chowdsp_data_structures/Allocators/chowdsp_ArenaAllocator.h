@@ -52,8 +52,8 @@ public:
     void clear() noexcept
     {
 #if ARENA_ALLOCATOR_DEBUG
-        std::fill (raw_data.begin(), raw_data.begin() + bytes_used, std::byte { 0xDD });
-        std::fill (raw_data.begin() + bytes_used, raw_data.end(), std::byte { 0x00 });
+        std::fill (raw_data.begin(), raw_data.begin() + static_cast<int> (bytes_used), std::byte { 0xDD });
+        std::fill (raw_data.begin() + static_cast<int> (bytes_used), raw_data.end(), std::byte { 0x00 });
 #endif
         bytes_used = 0;
     }
