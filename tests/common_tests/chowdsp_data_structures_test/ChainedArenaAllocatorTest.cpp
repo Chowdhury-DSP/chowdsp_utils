@@ -22,9 +22,6 @@ TEST_CASE ("Chained Arena Allocator Test", "[common][data-structures]")
             REQUIRE (allocator.get_total_bytes_used() == 160);
         }
 
-        // overfull allocation
-        REQUIRE (allocator.template allocate<double> (200) == nullptr);
-
         // clear allocator
         allocator.clear();
         REQUIRE (allocator.get_arena_count() == 2);
@@ -45,6 +42,15 @@ TEST_CASE ("Chained Arena Allocator Test", "[common][data-structures]")
             REQUIRE ((allocator.get_arenas().head->next)->get_bytes_used() == 80);
             REQUIRE (allocator.get_total_bytes_used() == 160);
         }
+    }
+
+    SECTION ("Overful Allocation")
+    {
+        REQUIRE (allocator.template allocate<double> (200) != nullptr);
+        REQUIRE (allocator.template allocate<double> (200) != nullptr);
+        REQUIRE (allocator.get_total_bytes_used() == 3200 + 2 * 24);
+        REQUIRE (allocator.get_total_bytes() == 3200 + 144);
+        allocator.clear();
     }
 
     SECTION ("Usage with Frame")
@@ -89,6 +95,8 @@ TEST_CASE ("Chained Arena Allocator Test", "[common][data-structures]")
         merge_alloc.merge (alloc1);
         alloc2.allocate<float> (24);
         alloc2.allocate<float> (24);
+        alloc2.allocate<float> (48);
+        alloc2.allocate<float> (48);
         merge_alloc.merge (alloc2);
         merge_alloc.merge (alloc3);
         REQUIRE (merge_alloc.get_arena_count() == arena_count);
