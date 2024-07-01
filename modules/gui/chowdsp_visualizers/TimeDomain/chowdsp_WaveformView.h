@@ -64,7 +64,10 @@ private:
 
     int numSamples { 1024 };
     int inputSamplesPerBlock { 256 };
-    std::array<ChannelInfo, (size_t) numChannels> channels { ChannelInfo { *this, numSamples }, ChannelInfo { *this, numSamples } };
+    std::array<ChannelInfo, (size_t) numChannels> channels {
+        make_array_lambda<ChannelInfo, (size_t) numChannels> ([this] (size_t)
+                                                              { return ChannelInfo { *this, numSamples }; })
+    };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WaveformView)
 };
