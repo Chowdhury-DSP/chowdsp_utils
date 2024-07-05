@@ -6,6 +6,7 @@ target_link_libraries(SimpleReverb
         chowdsp::chowdsp_reverb
         chowdsp::chowdsp_sources
         chowdsp::chowdsp_plugin_state
+        chowdsp::chowdsp_gui
 )
 
 target_sources(SimpleReverb

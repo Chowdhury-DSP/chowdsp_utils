@@ -8,8 +8,8 @@ namespace chowdsp
 class ParametersView : public juce::Component
 {
 public:
-    explicit ParametersView (PluginState& pluginState, ParamHolder& params);
-    explicit ParametersView (ParameterListeners& paramListeners, ParamHolder& params);
+    ParametersView (PluginState& pluginState, ParamHolder& params);
+    ParametersView (ParameterListeners& paramListeners, ParamHolder& params);
     ~ParametersView() override;
 
     void paint (juce::Graphics&) override;
@@ -31,6 +31,12 @@ private:
 class ParametersViewEditor : public juce::AudioProcessorEditor
 {
 public:
+    template <typename PluginType>
+    explicit ParametersViewEditor (PluginType& plugin)
+        : ParametersViewEditor (plugin, plugin.getState(), plugin.getState().params)
+    {
+    }
+
     ParametersViewEditor (juce::AudioProcessor& proc, PluginState& pluginState, ParamHolder& params)
         : juce::AudioProcessorEditor (proc),
           view (pluginState, params)

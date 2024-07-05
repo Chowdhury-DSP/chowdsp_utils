@@ -1,3 +1,4 @@
+#include <chowdsp_gui/chowdsp_gui.h>
 #include "SignalGeneratorPlugin.h"
 
 SignalGeneratorPlugin::SignalGeneratorPlugin()
@@ -218,7 +219,7 @@ void SignalGeneratorPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
 
 juce::AudioProcessorEditor* SignalGeneratorPlugin::createEditor()
 {
-    return new juce::GenericAudioProcessorEditor (*this);
+    return new chowdsp::ParametersViewEditor { *this };
 }
 
 #if ! CHOWDSP_BUILDING_FORWARDING_TEST_PLUGIN
