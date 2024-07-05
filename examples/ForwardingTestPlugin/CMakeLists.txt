@@ -7,6 +7,7 @@ target_link_libraries(ForwardingTestPlugin
         chowdsp::chowdsp_sources
         chowdsp::chowdsp_dsp_utils
         chowdsp::chowdsp_plugin_state
+        chowdsp::chowdsp_gui
 )
 
 target_sources(ForwardingTestPlugin
