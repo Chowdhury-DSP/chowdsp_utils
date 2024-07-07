@@ -14,7 +14,7 @@ std::string_view alloc_string (Arena& arena, const std::string_view& str)
     auto* data = arena.template allocate<char> (str.size());
     std::copy (str.begin(), str.end(), data);
     return std::string_view { data, str.size() }; // NOLINT
-};
+}
 
 #if CHOWDSP_USING_JUCE
 template <typename Arena>
