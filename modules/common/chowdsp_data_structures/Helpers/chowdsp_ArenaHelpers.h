@@ -3,7 +3,7 @@
 namespace chowdsp::arena
 {
 template <typename T, typename I, typename Arena>
-std::span<T> make_span (Arena& arena, I size, size_t alignment = alignof (T))
+nonstd::span<T> make_span (Arena& arena, I size, size_t alignment = alignof (T))
 {
     return { arena.template allocate<T> (size, alignment), static_cast<size_t> (size) };
 }
