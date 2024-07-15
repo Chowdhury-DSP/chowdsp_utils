@@ -285,8 +285,8 @@ public:
             paramName,
             (paramRange.interval = snapToInt ? 1.0f : paramRange.interval, paramRange),
             defaultValue,
-            [snapToInt] (float value)
-            { return ParamUtils::semitonesValToString (value, snapToInt); },
+            [snapToInt] (float val)
+            { return ParamUtils::semitonesValToString (val, snapToInt); },
             &ParamUtils::stringToSemitonesVal)
     {
     }
