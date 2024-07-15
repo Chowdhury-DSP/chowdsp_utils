@@ -122,10 +122,10 @@ public:
                          EnumType defaultChoice,
                          const std::initializer_list<std::pair<char, char>>& charMap = { { '_', ' ' } })
         : ChoiceParameter (
-              parameterID,
-              parameterName,
-              EnumHelpers::createStringArray<EnumType> (charMap),
-              static_cast<int> (*magic_enum::enum_index (defaultChoice)))
+            parameterID,
+            parameterName,
+            EnumHelpers::createStringArray<EnumType> (charMap),
+            static_cast<int> (*magic_enum::enum_index (defaultChoice)))
     {
     }
 
@@ -280,9 +280,14 @@ public:
                         juce::NormalisableRange<float> paramRange,
                         float defaultValue,
                         bool snapToInt = false)
-        : FloatParameter (parameterID, paramName, (paramRange.interval = snapToInt ? 1.0f : paramRange.interval, paramRange), defaultValue, [snapToInt] (float value)
-                          { return ParamUtils::semitonesValToString (value, snapToInt); },
-                          &ParamUtils::stringToSemitonesVal)
+        : FloatParameter (
+            parameterID,
+            paramName,
+            (paramRange.interval = snapToInt ? 1.0f : paramRange.interval, paramRange),
+            defaultValue,
+            [snapToInt] (float value)
+            { return ParamUtils::semitonesValToString (value, snapToInt); },
+            &ParamUtils::stringToSemitonesVal)
     {
     }
 
