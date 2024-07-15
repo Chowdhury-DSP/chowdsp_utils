@@ -55,6 +55,18 @@ juce::String timeMsValToString (float timeMsVal)
 
 float stringToTimeMsVal (const juce::String& s) { return s.getFloatValue(); }
 
+juce::String semitonesValToString (float semitonesVal, bool snapToInt)
+{
+    auto semitonesStr = snapToInt
+                            ? juce::String (static_cast<int> (semitonesVal)) + " st"
+                            : juce::String (semitonesVal, 2, false) + " st";
+    if (semitonesVal > 0.0f)
+        semitonesStr = "+" + semitonesStr;
+    return semitonesStr;
+}
+
+float stringToSemitonesVal (const juce::String& s) { return s.getFloatValue(); }
+
 juce::String floatValToString (float floatVal)
 {
     return floatValToStringDecimal<2> (floatVal);
