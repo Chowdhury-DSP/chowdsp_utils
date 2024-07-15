@@ -270,4 +270,30 @@ public:
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (RatioParameter)
 };
+
+/** A float parameter which specifically stores a semitones value. */
+class SemitonesParameter : public FloatParameter
+{
+public:
+    SemitonesParameter (const ParameterID& parameterID,
+                        const juce::String& paramName,
+                        juce::NormalisableRange<float> paramRange,
+                        float defaultValue,
+                        bool snapToInt = false)
+        : FloatParameter (
+            parameterID,
+            paramName,
+            (paramRange.interval = snapToInt ? 1.0f : paramRange.interval, paramRange),
+            defaultValue,
+            [snapToInt] (float val)
+            { return ParamUtils::semitonesValToString (val, snapToInt); },
+            &ParamUtils::stringToSemitonesVal)
+    {
+    }
+
+    using Ptr = OptionalPointer<RatioParameter>;
+
+private:
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SemitonesParameter)
+};
 } // namespace chowdsp

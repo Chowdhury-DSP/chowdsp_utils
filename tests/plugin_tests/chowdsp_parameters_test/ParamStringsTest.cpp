@@ -41,6 +41,18 @@ TEST_CASE ("Param Strings Test", "[plugin][parameters]")
         REQUIRE_MESSAGE (juce::approximatelyEqual (stringToTimeMsVal ("200 ms"), 200.0f), "Incorrect milliseconds value!");
     }
 
+    SECTION ("Semitones Param Test")
+    {
+        REQUIRE (semitonesValToString (10.0f, false) == juce::String ("+10.00 st"));
+        REQUIRE (semitonesValToString (10.0f, true) == juce::String ("+10 st"));
+        REQUIRE (semitonesValToString (10.1f, true) == juce::String ("+10 st"));
+        REQUIRE (semitonesValToString (0.0f, true) == juce::String ("0 st"));
+        REQUIRE (semitonesValToString (0.0f, false) == juce::String ("0.00 st"));
+        REQUIRE (semitonesValToString (-5.0f, false) == juce::String ("-5.00 st"));
+        REQUIRE (semitonesValToString (-5.0f, true) == juce::String ("-5 st"));
+        REQUIRE (juce::approximatelyEqual (stringToSemitonesVal ("9 st"), 9.0f));
+    }
+
     SECTION ("Float Param Test")
     {
         REQUIRE_MESSAGE (floatValToString (10.0f) == juce::String ("10.00"), "Incorrect float string!");
