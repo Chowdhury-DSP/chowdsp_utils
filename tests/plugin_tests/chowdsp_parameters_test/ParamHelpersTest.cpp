@@ -104,4 +104,19 @@ TEST_CASE ("Param Helpers Test", "[plugin][parameters]")
         modeParam.setValueNotifyingHost (1.0f);
         REQUIRE_MESSAGE (modeParam.get() == Mode_3, "Set value is incorrect!");
     }
+
+    SECTION ("Create Semitones Param Test")
+    {
+        chowdsp::SemitonesParameter semitonesContinuousParam { "st_continuous", "Semitones", juce::NormalisableRange { -12.0f, 12.0f }, 0.0f };
+        chowdsp::SemitonesParameter semitonesDiscreteParam { "st_discrete", "Semitones", juce::NormalisableRange { -12.0f, 12.0f }, 0.0f, true };
+
+        REQUIRE (static_cast<juce::RangedAudioParameter&> (semitonesContinuousParam).getText (0.5f, 1024) == juce::String ("0.00 st"));
+        REQUIRE (static_cast<juce::RangedAudioParameter&> (semitonesDiscreteParam).getText (0.5f, 1024) == juce::String ("0 st"));
+
+        REQUIRE (static_cast<juce::RangedAudioParameter&> (semitonesContinuousParam).getText (0.0f, 1024) == juce::String ("-12.00 st"));
+        REQUIRE (static_cast<juce::RangedAudioParameter&> (semitonesDiscreteParam).getText (0.0f, 1024) == juce::String ("-12 st"));
+
+        REQUIRE (static_cast<juce::RangedAudioParameter&> (semitonesContinuousParam).getText (1.0f, 1024) == juce::String ("+12.00 st"));
+        REQUIRE (static_cast<juce::RangedAudioParameter&> (semitonesDiscreteParam).getText (1.0f, 1024) == juce::String ("+12 st"));
+    }
 }

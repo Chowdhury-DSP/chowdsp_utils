@@ -17,6 +17,9 @@ float stringToRatioVal (const juce::String& s);
 juce::String timeMsValToString (float timeMsVal);
 float stringToTimeMsVal (const juce::String& s);
 
+juce::String semitonesValToString (float semitonesVal, bool snapToInt);
+float stringToSemitonesVal (const juce::String& s);
+
 juce::String floatValToString (float floatVal);
 template <int NumDecimalPlaces>
 juce::String floatValToStringDecimal (float floatVal)

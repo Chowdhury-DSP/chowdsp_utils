@@ -122,10 +122,10 @@ public:
                          EnumType defaultChoice,
                          const std::initializer_list<std::pair<char, char>>& charMap = { { '_', ' ' } })
         : ChoiceParameter (
-            parameterID,
-            parameterName,
-            EnumHelpers::createStringArray<EnumType> (charMap),
-            static_cast<int> (*magic_enum::enum_index (defaultChoice)))
+              parameterID,
+              parameterName,
+              EnumHelpers::createStringArray<EnumType> (charMap),
+              static_cast<int> (*magic_enum::enum_index (defaultChoice)))
     {
     }
 
@@ -269,5 +269,26 @@ public:
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (RatioParameter)
+};
+
+/** A float parameter which specifically stores a semitones value. */
+class SemitonesParameter : public FloatParameter
+{
+public:
+    SemitonesParameter (const ParameterID& parameterID,
+                        const juce::String& paramName,
+                        juce::NormalisableRange<float> paramRange,
+                        float defaultValue,
+                        bool snapToInt = false)
+        : FloatParameter (parameterID, paramName, (paramRange.interval = snapToInt ? 1.0f : paramRange.interval, paramRange), defaultValue, [snapToInt] (float value)
+                          { return ParamUtils::semitonesValToString (value, snapToInt); },
+                          &ParamUtils::stringToSemitonesVal)
+    {
+    }
+
+    using Ptr = OptionalPointer<RatioParameter>;
+
+private:
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SemitonesParameter)
 };
 } // namespace chowdsp
