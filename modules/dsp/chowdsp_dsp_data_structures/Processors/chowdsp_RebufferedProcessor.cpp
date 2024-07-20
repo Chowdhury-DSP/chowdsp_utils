@@ -75,6 +75,10 @@ void RebufferedProcessor<FloatType>::processInternal (const BufferView<FloatType
             bufferCount = 0;
             writeBufferIndex = 1 - writeBufferIndex;
         }
+        else
+        {
+            nextBufferProgress (static_cast<double> (bufferCount) / static_cast<double> (rebufferSize));
+        }
     }
 }
 

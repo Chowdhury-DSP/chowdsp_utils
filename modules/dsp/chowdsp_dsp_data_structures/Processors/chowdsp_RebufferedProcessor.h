@@ -36,6 +36,8 @@ protected:
     /** Child classes should implement this method to perform the rebuffered processing */
     virtual void processRebufferedBlock (const BufferView<FloatType>& buffer) = 0;
 
+    virtual void nextBufferProgress (double) {}
+
 private:
     void processInternal (const BufferView<FloatType>& buffer);
     void pullOutputSignal (const BufferView<FloatType>& buffer, int startSample, int samplesToRead) const;
