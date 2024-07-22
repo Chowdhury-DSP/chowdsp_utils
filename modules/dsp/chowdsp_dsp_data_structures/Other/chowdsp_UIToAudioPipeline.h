@@ -36,7 +36,7 @@ public:
     }
 
     /** Reads the latest object from the pipeline from the audio thread. */
-    const ObjectType* read()
+    ObjectType* read()
     {
         ObjectPtr objectFromUI {};
         if (uiToLiveQueue.try_dequeue_from_producer (uiToLiveProducerToken, objectFromUI))
