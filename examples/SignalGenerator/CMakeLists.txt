@@ -14,3 +14,6 @@ target_sources(SignalGenerator
     PRIVATE
         SignalGeneratorPlugin.cpp
 )
+
+include(AddDiagnosticInfo)
+add_diagnostic_info(SignalGenerator)

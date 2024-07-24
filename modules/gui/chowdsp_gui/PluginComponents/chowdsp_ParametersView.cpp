@@ -241,6 +241,9 @@ ParametersView::ParametersView (PluginState& pluginState, ParamHolder& params)
         versionInfoText = pluginState.processor->getName();
 #if defined JucePlugin_VersionString
         versionInfoText += " " + currentPluginVersion.getVersionString();
+#if defined CHOWDSP_PLUGIN_GIT_COMMIT_HASH
+        versionInfoText += "-" + juce::String { CHOWDSP_PLUGIN_GIT_COMMIT_HASH };
+#endif
 #endif
     }
 }
