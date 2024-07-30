@@ -138,7 +138,10 @@ Preset& PresetTree::insertElementInternal (PresetTree& self, Preset&& element, N
 
 void PresetTree::onDelete (const Node& nodeBeingDeleted)
 {
-    if (presetState != nullptr && presetState->get() != nullptr && *presetState->get() == *nodeBeingDeleted.leaf)
+    if (presetState != nullptr
+        && presetState->get() != nullptr
+        && nodeBeingDeleted.leaf.has_value()
+        && *presetState->get() == *nodeBeingDeleted.leaf)
         presetState->assumeOwnership();
 }
 } // namespace chowdsp::presets
