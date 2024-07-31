@@ -246,6 +246,8 @@ ParametersView::ParametersView (PluginState& pluginState, ParamHolder& params)
 #endif
 #endif
     }
+
+    ParametersView::resized();
 }
 
 ParametersView::ParametersView (ParameterListeners& listeners, ParamHolder& params)
