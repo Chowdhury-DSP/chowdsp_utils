@@ -275,6 +275,7 @@ private:
 class SemitonesParameter : public FloatParameter
 {
 public:
+    JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wcomma")
     SemitonesParameter (const ParameterID& parameterID,
                         const juce::String& paramName,
                         juce::NormalisableRange<float> paramRange,
@@ -290,6 +291,7 @@ public:
             &ParamUtils::stringToSemitonesVal)
     {
     }
+    JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
     using Ptr = OptionalPointer<SemitonesParameter>;
 
