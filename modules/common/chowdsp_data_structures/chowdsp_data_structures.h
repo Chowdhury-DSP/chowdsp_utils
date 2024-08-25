@@ -48,6 +48,8 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Allocators/chowdsp_STLArenaAllocator.h"
 #include "Helpers/chowdsp_ArenaHelpers.h"
 
+#include "Allocators/chowdsp_PoolAllocator.h"
+
 #include "Structures/chowdsp_BucketArray.h"
 #include "Structures/chowdsp_AbstractTree.h"
 #include "Structures/chowdsp_SmallMap.h"
