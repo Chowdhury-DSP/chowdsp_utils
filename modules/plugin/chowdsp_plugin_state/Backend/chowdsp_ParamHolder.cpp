@@ -38,7 +38,7 @@ template <typename ParamType, typename... OtherParams>
 std::enable_if_t<std::is_base_of_v<FloatParameter, ParamType>, void>
     ParamHolder::add (const OptionalPointer<ParamType>& floatParam, OtherParams&... others)
 {
-    jassert (isOwning);
+    jassert (! isOwning);
     add (const_cast<OptionalPointer<ParamType>&> (floatParam), others...);
 }
 
@@ -46,7 +46,7 @@ template <typename ParamType, typename... OtherParams>
 std::enable_if_t<std::is_base_of_v<ChoiceParameter, ParamType>, void>
     ParamHolder::add (const OptionalPointer<ParamType>& choiceParam, OtherParams&... others)
 {
-    jassert (isOwning);
+    jassert (! isOwning);
     add (const_cast<OptionalPointer<ParamType>&> (choiceParam), others...);
 }
 
@@ -54,7 +54,7 @@ template <typename ParamType, typename... OtherParams>
 std::enable_if_t<std::is_base_of_v<BoolParameter, ParamType>, void>
     ParamHolder::add (const OptionalPointer<ParamType>& boolParam, OtherParams&... others)
 {
-    jassert (isOwning);
+    jassert (! isOwning);
     add (const_cast<OptionalPointer<ParamType>&> (boolParam), others...);
 }
 
