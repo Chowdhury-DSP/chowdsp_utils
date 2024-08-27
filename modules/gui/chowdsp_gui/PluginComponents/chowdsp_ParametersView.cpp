@@ -100,7 +100,8 @@ namespace parameters_view_detail
 
             parameterName.setBounds (area.removeFromLeft (parameterName
                                                               .getFont()
-                                                              .getStringWidth (parameterName.getText()) * 11 / 10));
+                                                              .getStringWidth (parameterName.getText())
+                                                          * 11 / 10));
             parameterComp->setBounds (area);
         }
 
