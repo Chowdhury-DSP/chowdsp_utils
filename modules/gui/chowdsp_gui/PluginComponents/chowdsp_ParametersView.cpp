@@ -88,10 +88,6 @@ namespace parameters_view_detail
             parameterName.setInterceptsMouseClicks (false, false);
             addAndMakeVisible (parameterName);
 
-            parameterLabel.setText (parameter.getLabel(), juce::dontSendNotification);
-            parameterLabel.setInterceptsMouseClicks (false, false);
-            addAndMakeVisible (parameterLabel);
-
             addAndMakeVisible (*(parameterComp = createParameterComp (listeners)));
             setComponentID (parameterComp->getComponentID());
 
@@ -102,14 +98,16 @@ namespace parameters_view_detail
         {
             auto area = getLocalBounds();
 
-            parameterName.setBounds (area.removeFromLeft (100));
-            parameterLabel.setBounds (area.removeFromRight (50));
+            parameterName.setBounds (area.removeFromLeft (parameterName
+                                                              .getFont()
+                                                              .getStringWidth (parameterName.getText())
+                                                          * 11 / 10));
             parameterComp->setBounds (area);
         }
 
     private:
         juce::RangedAudioParameter& parameter;
-        juce::Label parameterName, parameterLabel;
+        juce::Label parameterName;
         std::unique_ptr<juce::Component> parameterComp;
 
         std::unique_ptr<juce::Component> createParameterComp (ParameterListeners& listeners) const
@@ -183,6 +181,7 @@ struct ParametersView::Pimpl
     Pimpl (ParamHolder& params, ParameterListeners& listeners)
         : groupItem (params, listeners)
     {
+        view.setIndentSize (5);
         const auto numIndents = getNumIndents (groupItem);
         const auto width = 400 + view.getIndentSize() * numIndents;
 

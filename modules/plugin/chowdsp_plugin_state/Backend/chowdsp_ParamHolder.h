@@ -35,6 +35,21 @@ public:
         add (OptionalPointer<ParamType>& boolParam, OtherParams&... others);
 
     /** Adds parameters to the ParamHolder. */
+    template <typename ParamType, typename... OtherParams>
+    std::enable_if_t<std::is_base_of_v<FloatParameter, ParamType>, void>
+        add (const OptionalPointer<ParamType>& floatParam, OtherParams&... others);
+
+    /** Adds parameters to the ParamHolder. */
+    template <typename ParamType, typename... OtherParams>
+    std::enable_if_t<std::is_base_of_v<ChoiceParameter, ParamType>, void>
+        add (const OptionalPointer<ParamType>& choiceParam, OtherParams&... others);
+
+    /** Adds parameters to the ParamHolder. */
+    template <typename ParamType, typename... OtherParams>
+    std::enable_if_t<std::is_base_of_v<BoolParameter, ParamType>, void>
+        add (const OptionalPointer<ParamType>& boolParam, OtherParams&... others);
+
+    /** Adds parameters to the ParamHolder. */
     template <typename... OtherParams>
     void add (ParamHolder& paramHolder, OtherParams&... others);
 

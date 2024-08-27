@@ -32,7 +32,8 @@ public:
 
     ~PoolAllocator()
     {
-        aligned_free (backing_buffer.data());
+        if (backing_buffer.data() != nullptr)
+            aligned_free (backing_buffer.data());
     }
 
     /** Re-allocates the allocator's backing buffer to fit some number of chunks. */
