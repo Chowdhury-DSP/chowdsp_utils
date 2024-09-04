@@ -7,7 +7,5 @@ target_sources(chowdsp_gui_test PRIVATE
     WindowInPluginTest.cpp
     HostContextProviderTest.cpp
     ComponentArenaTest.cpp
-
-#    OversamplingMenuTest.cpp
-#    PresetsCompTest.cpp
+    ParametersViewTest.cpp
 )
