@@ -1,7 +1,7 @@
 #include "VizTestUtils.h"
 #include <chowdsp_visualizers/chowdsp_visualizers.h>
 
-    struct TestWaveshapePlotter : juce::Component
+struct TestWaveshapePlotter : juce::Component
 {
     TestWaveshapePlotter()
         : plot ({})
