@@ -34,11 +34,9 @@ TEST_CASE ("Gain Computer Plot Test", "[visualizers][compressor]")
     gainComputer.processBlock (inputBuffer, outputBuffer);
     plot.updatePlotPath (inputBuffer.getReadSpan (0), outputBuffer.getReadSpan (0));
 
-#if JUCE_MAC
     const auto testScreenshot = plot.createComponentSnapshot ({ width, height });
     // VizTestUtils::saveImage (testScreenshot, "gain_computer_plot.png");
 
     const auto refScreenshot = VizTestUtils::loadImage ("gain_computer_plot.png");
     VizTestUtils::compareImages (testScreenshot, refScreenshot);
-#endif
 }

@@ -1,4 +1,4 @@
-#include "VizTestUtils.h"
+\#include "VizTestUtils.h"
 #include <chowdsp_visualizers/chowdsp_visualizers.h>
 
 struct TestWaveshapePlotter : juce::Component

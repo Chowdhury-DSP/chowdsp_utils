@@ -26,12 +26,10 @@ TEST_CASE ("Level Detector Test", "[visualizers][compressor]")
         visualizer.pushChannel (1, nonstd::span<const float> { buffer });
     }
 
-#if JUCE_MAC
     visualizer.setSize (width, height);
     const auto testScreenshot = visualizer.createComponentSnapshot ({ width, height });
     // VizTestUtils::saveImage (testScreenshot, "level_detector.png");
 
     const auto refScreenshot = VizTestUtils::loadImage ("level_detector.png");
     VizTestUtils::compareImages (testScreenshot, refScreenshot);
-#endif
 }

@@ -23,12 +23,10 @@ TEST_CASE ("Waveform View Test", "[visualizers]")
         waveform.pushBuffer (chowdsp::BufferView<const float> { buffer.data(), block_size });
     }
 
-#if JUCE_MAC
     waveform.setSize (width, height);
     const auto testScreenshot = waveform.createComponentSnapshot ({ width, height });
     // VizTestUtils::saveImage (testScreenshot, "waveform_view.png");
 
     const auto refScreenshot = VizTestUtils::loadImage ("waveform_view.png");
     VizTestUtils::compareImages (testScreenshot, refScreenshot);
-#endif
 }
