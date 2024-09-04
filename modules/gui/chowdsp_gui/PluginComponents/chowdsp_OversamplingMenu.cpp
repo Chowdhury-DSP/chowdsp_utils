@@ -1,6 +1,8 @@
 #include <chowdsp_dsp_utils/chowdsp_dsp_utils.h>
 #include "chowdsp_OversamplingMenu.h"
 
+// LCOV_EXCL_START
+
 namespace chowdsp
 {
 template <typename OSType, typename ComboBoxType>
@@ -186,3 +188,5 @@ void OversamplingMenu<OSType, ComboBoxType>::generateComboBoxMenu()
 template class OversamplingMenu<VariableOversampling<float>>;
 template class OversamplingMenu<VariableOversampling<double>>;
 } // namespace chowdsp
+
+// LCOV_EXCL_END
