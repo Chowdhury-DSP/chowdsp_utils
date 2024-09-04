@@ -35,6 +35,27 @@ TEST_CASE ("JSON Test", "[common][json]")
         testFile.deleteFile();
     }
 
+    SECTION ("JSON Bad File Test")
+    {
+        chowdsp::json jTest = {
+            { "pi", 3.141 },
+            { "happy", true },
+            { "name", "Niels" },
+            { "nothing", nullptr },
+            { "answer", { { "everything", 42 } } },
+            { "list", { 1, 0, 2 } },
+            { "object", { { "currency", "USD" }, { "value", 42.99 } } }
+        };
+
+        const auto testFolder = juce::File::getSpecialLocation (juce::File::userHomeDirectory).getChildFile ("test");
+        testFolder.createDirectory();
+        testFolder.getChildFile ("test.txt").create();
+
+        chowdsp::JSONUtils::toFile (jTest, testFolder, 4); // 4 space indent
+        REQUIRE (testFolder.isDirectory());
+        testFolder.deleteRecursively();
+    }
+
     SECTION ("JSON Memory Block Test")
     {
         chowdsp::json jTest = {

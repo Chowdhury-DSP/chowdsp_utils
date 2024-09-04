@@ -1,4 +1,5 @@
 ignore:
+  - "modules/common/chowdsp_core/JUCEHelpers/**"
   - "modules/plugin/chowdsp_presets/**/*.h"
   - "modules/plugin/chowdsp_presets/**/*.cpp"
   - "modules/gui/chowdsp_foleys"
