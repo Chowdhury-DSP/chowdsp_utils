@@ -7,4 +7,5 @@ target_sources(chowdsp_visualizers_test PRIVATE
     GenericFilterPlotTest.cpp
     WaveshaperPlotTest.cpp
     WaveformViewTest.cpp
+    LevelDetectorTest.cpp
 )
