@@ -1,7 +1,7 @@
 #include "VizTestUtils.h"
 #include <chowdsp_visualizers/chowdsp_visualizers.h>
 
-TEST_CASE ("Level Detector Test", "[visualizers]")
+TEST_CASE ("Level Detector Test", "[visualizers][compressor]")
 {
     static constexpr int width = 500;
     static constexpr int height = 300;

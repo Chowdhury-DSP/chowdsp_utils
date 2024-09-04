@@ -8,4 +8,5 @@ target_sources(chowdsp_visualizers_test PRIVATE
     WaveshaperPlotTest.cpp
     WaveformViewTest.cpp
     LevelDetectorTest.cpp
+    GainComputerPlotTest.cpp
 )
