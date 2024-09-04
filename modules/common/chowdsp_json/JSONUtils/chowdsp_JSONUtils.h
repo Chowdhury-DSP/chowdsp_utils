@@ -54,8 +54,10 @@ namespace JSONUtils
         }
         else
         {
+            // LCOV_EXCL_START
             // unable to create an output stream for this file
             jassertfalse;
+            // LCOV_EXCL_END
         }
     }
 
