@@ -206,20 +206,18 @@ TEST_CASE ("CLAP Presets Discovery Test", "[plugin][presets][clap]")
             .vendor = "ChowDSP",
             .url = "https://chowdsp.com",
             .version = "0.0.0",
-            .declare_location = [] ([[maybe_unused]] const clap_preset_discovery_indexer* test_indexer,
-                                    const clap_preset_discovery_location_t* test_location) -> bool
-            {
-                REQUIRE (juce::String { test_location->location } == get_presets_folder().getFullPathName());
-                return true;
-            },
             .declare_filetype = [] ([[maybe_unused]] const struct clap_preset_discovery_indexer* test_indexer,
                                     const clap_preset_discovery_filetype_t* test_filetype) -> bool
             {
                 REQUIRE (test_filetype == &filetype);
                 return true;
             },
-            .declare_soundpack = nullptr,
-            .get_extension = nullptr,
+            .declare_location = [] ([[maybe_unused]] const clap_preset_discovery_indexer* test_indexer,
+                                    const clap_preset_discovery_location_t* test_location) -> bool
+            {
+                REQUIRE (juce::String { test_location->location } == get_presets_folder().getFullPathName());
+                return true;
+            },
         };
 
         FilePresetsProvider provider {
