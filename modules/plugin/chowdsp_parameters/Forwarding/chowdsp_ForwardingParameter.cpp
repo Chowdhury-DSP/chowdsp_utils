@@ -215,7 +215,7 @@ void ForwardingParameter::setValue (float newValue)
     juce::SpinLock::ScopedTryLockType stl (paramLock);
     if (! stl.isLocked())
         return;
-    // LCOV_EXCL_END
+        // LCOV_EXCL_END
 #endif
 
     if (internalParam != nullptr && ! juce::approximatelyEqual (internalParam->getValue(), newValue))
