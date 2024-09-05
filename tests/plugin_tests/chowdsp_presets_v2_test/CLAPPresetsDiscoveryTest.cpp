@@ -4,6 +4,9 @@
 
 #include "TestPresetBinaryData.h"
 
+#if JUCE_LINUX || JUCE_MAC
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wmissing-field-initializers", "-Wpedantic")
+
 TEST_CASE ("CLAP Presets Discovery Test", "[plugin][presets][clap]")
 {
     SECTION ("Embedded Presets Discovery")
@@ -259,12 +262,6 @@ TEST_CASE ("CLAP Presets Discovery Test", "[plugin][presets][clap]")
                     const auto* r_data = static_cast<ReceiverData*> (test_receiver->receiver_data);
                     REQUIRE (juce::String { creator } == r_data->p->getVendor());
                 },
-                .add_feature = [] (const struct clap_preset_discovery_metadata_receiver* test_receiver,
-                                   const char* feature) -> void
-                {
-                    const auto* r_data = static_cast<ReceiverData*> (test_receiver->receiver_data);
-                    REQUIRE (juce::String { feature } == r_data->p->getCategory());
-                },
                 .set_timestamps = [] (const struct clap_preset_discovery_metadata_receiver* test_receiver,
                                       clap_timestamp creation_time,
                                       clap_timestamp modification_time) -> void
@@ -272,6 +269,12 @@ TEST_CASE ("CLAP Presets Discovery Test", "[plugin][presets][clap]")
                     const auto* r_data = static_cast<ReceiverData*> (test_receiver->receiver_data);
                     REQUIRE (creation_time == (clap_timestamp) r_data->preset_file->getCreationTime().toMilliseconds() / 1000);
                     REQUIRE (modification_time == (clap_timestamp) r_data->preset_file->getLastModificationTime().toMilliseconds() / 1000);
+                },
+                .add_feature = [] (const struct clap_preset_discovery_metadata_receiver* test_receiver,
+                                   const char* feature) -> void
+                {
+                    const auto* r_data = static_cast<ReceiverData*> (test_receiver->receiver_data);
+                    REQUIRE (juce::String { feature } == r_data->p->getCategory());
                 },
             };
 
@@ -364,3 +367,6 @@ TEST_CASE ("CLAP Presets Discovery Test", "[plugin][presets][clap]")
         }
     }
 }
+
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+#endif // JUCE_LINUX || JUCE_MAC
