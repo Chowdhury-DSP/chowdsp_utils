@@ -113,7 +113,7 @@ TEST_CASE ("Preset Test", "[plugin][presets]")
 
         REQUIRE_MESSAGE (testPreset.getName() == "Name", "BinaryData preset name is incorrect!");
         REQUIRE_MESSAGE (testPreset.getVendor() == "Vendor", "BinaryData preset vendor is incorrect!");
-        REQUIRE_MESSAGE (testPreset.getCategory() == "", "Preset category incorrect!");
+        REQUIRE_MESSAGE (testPreset.getCategory() == "DRUM", "Preset category incorrect!");
         REQUIRE_MESSAGE (testPreset.getState()["tag"] == 0.0f, "Preset state incorrect!");
         REQUIRE_MESSAGE (testPreset.getVersion().getVersionString() == JucePlugin_VersionString, "Preset version incorrect!");
     }

@@ -9,7 +9,7 @@
 namespace BinaryData
 {
 extern const char* test_preset_preset;
-const int test_preset_presetSize = 246;
+const int test_preset_presetSize = 250;
 
 // Number of elements in the namedResourceList and originalFileNames arrays.
 const int namedResourceListSize = 1;

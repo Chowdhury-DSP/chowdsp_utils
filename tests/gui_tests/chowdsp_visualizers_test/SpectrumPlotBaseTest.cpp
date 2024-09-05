@@ -62,13 +62,11 @@ TEST_CASE ("Spectrum Plot Base Test", "[visualizers]")
             }
         };
 
-#if JUCE_MAC
         TestComp comp {};
         const auto testScreenshot = comp.createComponentSnapshot ({ 500, 300 });
         // VizTestUtils::saveImage (testScreenshot, "freq_grid_plot.png");
 
         const auto refScreenshot = VizTestUtils::loadImage ("freq_grid_plot.png");
         VizTestUtils::compareImages (testScreenshot, refScreenshot);
-#endif
     }
 }

@@ -9,7 +9,7 @@ namespace BinaryData
 //================== test_preset.preset ==================
 static const unsigned char temp_binary_data_0[] =
     "{\n"
-    "    \"category\": \"\",\n"
+    "    \"category\": \"DRUM\",\n"
     "    \"extra_info\": null,\n"
     "    \"name\": \"Name\",\n"
     "    \"plugin\": \"TestPlugin\",\n"
