@@ -14,5 +14,7 @@ target_sources(chowdsp_presets_v2_test
         MenuInterfaceTest.cpp
         FileInterfaceTest.cpp
 
+        CLAPPresetsDiscoveryTest.cpp
+
         TestPresetBinaryData.cpp
 )
