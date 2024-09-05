@@ -23,7 +23,7 @@ EmbeddedPresetsProvider::EmbeddedPresetsProvider (const clap_universal_plugin_id
     jassert (discoveryLocation.location == nullptr);
 }
 
-std::vector<Preset> EmbeddedPresetsProvider::getPresets() { return {}; }
+std::vector<Preset> EmbeddedPresetsProvider::getPresets() { return {}; } // LCOV_EXCL_LINE
 
 bool EmbeddedPresetsProvider::init() noexcept
 {

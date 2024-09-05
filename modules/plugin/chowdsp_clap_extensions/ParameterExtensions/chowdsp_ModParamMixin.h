@@ -1,5 +1,7 @@
 #pragma once
 
+// LCOV_EXCL_START
+
 namespace chowdsp::ParamUtils
 {
 /** Mixin for parameters that recognize some form of modulation. */
@@ -18,3 +20,5 @@ struct ModParameterMixin : public clap_juce_extensions::clap_juce_parameter_capa
     }
 };
 } // namespace chowdsp::ParamUtils
+
+// LCOV_EXCL_END

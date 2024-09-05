@@ -114,12 +114,10 @@ TEST_CASE ("Equalizer Plot Test", "[visualizers][EQ]")
         chowdsp::ParameterTypeHelpers::setValue (false, *state.params.testEQParams.eqParams[3].onOffParam);
         juce::MessageManager::getInstance()->runDispatchLoopUntil (100);
 
-#if JUCE_MAC
         const auto testScreenshot = plotComp.createComponentSnapshot ({ 500, 300 });
         // VizTestUtils::saveImage (testScreenshot, "eq_response_plot.png");
 
         const auto refScreenshot = VizTestUtils::loadImage ("eq_response_plot.png");
         VizTestUtils::compareImages (testScreenshot, refScreenshot);
-#endif
     }
 }
