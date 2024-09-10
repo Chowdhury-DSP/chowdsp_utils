@@ -1,5 +1,7 @@
 #pragma once
 
+#include <variant>
+
 namespace chowdsp
 {
 /**
