@@ -3,6 +3,8 @@
 
 TEST_CASE ("Small Vector Test", "[common][data-structures]")
 {
+    STATIC_REQUIRE (sizeof (chowdsp::SmallVector<int, 8>) < 2 * sizeof (std::array<int, 8>));
+
     SECTION ("Push/Pop Test")
     {
         chowdsp::SmallVector<int, 2> vec;
