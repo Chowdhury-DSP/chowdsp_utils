@@ -510,7 +510,7 @@ private:
             for (size_t count = 0; count < internal_array().array_size_used; ++count)
                 moving.push_back (std::move (internal_array().array[count]));
         }
-        internal_data = moving;
+        internal_data = std::move (moving);
     }
 
     void move_to_array()
@@ -526,7 +526,7 @@ private:
             for (size_t count = 0; count < moving.array_size_used; ++count)
                 moving.array[count] = std::move (internal_vector()[count]);
         }
-        internal_data = moving;
+        internal_data = std::move (moving);
     }
 
     [[nodiscard]] bool usingArray() const noexcept
