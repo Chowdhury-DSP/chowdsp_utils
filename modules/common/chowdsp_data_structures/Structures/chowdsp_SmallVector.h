@@ -410,7 +410,7 @@ public:
         }
 
         internal_vector().erase (internal_vector().begin() + (int) first_erase_index,
-                               internal_vector().begin() + (int) first_erase_index + (int) num_to_erase);
+                                 internal_vector().begin() + (int) first_erase_index + (int) num_to_erase);
         return internal_vector().data() + first_erase_index;
     }
 
@@ -483,13 +483,13 @@ public:
 
         if (count <= head_size)
         {
-            internal_data = ArrayStuff{};
+            internal_data = ArrayStuff {};
             internal_array().array_size_used = count;
             std::fill (internal_array().array.begin(), internal_array().array.begin() + count, value);
         }
         else
         {
-            internal_data = std::vector<T>{};
+            internal_data = std::vector<T> {};
             internal_vector().resize (count, value);
         }
     }
