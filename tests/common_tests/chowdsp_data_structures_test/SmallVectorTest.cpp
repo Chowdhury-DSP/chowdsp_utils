@@ -3,6 +3,9 @@
 
 TEST_CASE ("Small Vector Test", "[common][data-structures]")
 {
+    // STATIC_REQUIRE (sizeof (chowdsp::SmallVector<int, 20>) == sizeof (std::array<int, 20>));
+    // STATIC_REQUIRE (sizeof (chowdsp::SmallVector<int, 20>) == sizeof (std::vector<int>));
+
     SECTION ("Push/Pop Test")
     {
         chowdsp::SmallVector<int, 2> vec;
