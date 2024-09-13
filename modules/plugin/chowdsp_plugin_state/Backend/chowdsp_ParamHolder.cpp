@@ -137,7 +137,7 @@ size_t ParamHolder::doForAllParameters (Callable&& callable, size_t index) const
 template <typename Serializer>
 typename Serializer::SerializedType ParamHolder::serialize (const ParamHolder& paramHolder)
 {
-    auto serial = Serializer::createBaseElement();
+    auto serial = Serializer::createBaseElement(paramHolder.name);
     paramHolder.doForAllParameters (
         [&serial] (auto& param, size_t)
         {
@@ -149,22 +149,27 @@ typename Serializer::SerializedType ParamHolder::serialize (const ParamHolder& p
 template <typename Serializer>
 void ParamHolder::deserialize (typename Serializer::DeserializedType deserial, ParamHolder& paramHolder)
 {
+
     juce::StringArray paramIDsThatHaveBeenDeserialized {};
-    if (const auto numParamIDsAndVals = Serializer::getNumChildElements (deserial); numParamIDsAndVals % 2 == 0)
+    if (const auto numParamIDsAndVals = Serializer::getNumAttributes (deserial))
     {
-        for (int i = 0; i < numParamIDsAndVals; i += 2)
+        for (int i = 0; i < numParamIDsAndVals; i += 1)
         {
             juce::String paramID {};
-            Serialization::deserialize<Serializer> (Serializer::getChildElement (deserial, i), paramID);
-            const auto paramDeserial = Serializer::getChildElement (deserial, i + 1);
+            paramID = Serializer::getAttributeName (deserial, i);
+//DBG("PArAMID" + paramID);
+            //Serialization::deserialize<Serializer> (, paramID);
+//const auto paramDeserial = Serializer::getAttribute (deserial,paramID);
+
+
             paramHolder.doForAllParameters (
-                [paramDeserial,
+                [&deserial,
                  &paramID = std::as_const (paramID),
                  &paramIDsThatHaveBeenDeserialized] (auto& param, size_t)
                 {
                     if (param.paramID == paramID)
                     {
-                        ParameterTypeHelpers::deserializeParameter<Serializer> (paramDeserial, param);
+                        ParameterTypeHelpers::deserializeParameter<Serializer> (deserial, param);
                         paramIDsThatHaveBeenDeserialized.add (paramID);
                     }
                 });
@@ -175,6 +180,10 @@ void ParamHolder::deserialize (typename Serializer::DeserializedType deserial, P
         jassertfalse; // state loading error
     }
 
+    for(auto id: paramIDsThatHaveBeenDeserialized)
+    {
+        DBG("deserialzied " + id);
+    }
     // set all un-matched objects to their default values
     paramHolder.doForAllParameters (
         [&paramIDsThatHaveBeenDeserialized] (auto& param, size_t)

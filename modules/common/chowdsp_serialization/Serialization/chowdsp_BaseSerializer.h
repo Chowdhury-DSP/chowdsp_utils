@@ -15,12 +15,25 @@ namespace serialization_detail
         using DeserializedType = const json&;
 
         static auto createBaseElement() { return SerializedType {}; }
+        static auto createBaseElement(juce::String id) { return SerializedType {}; }
         static void addChildElement (SerializedType&, SerializedType&&) {} //NOSONAR
         static auto getChildElement (DeserializedType, int) { return false; }
-        static int getNumChildElements (DeserializedType) { return 0; }
+        static auto getChildElement (DeserializedType, juce::String) { return false; }
 
-        template <typename, typename C>
-        static SerializedType serialize (const C&)
+        static int getNumChildElements (DeserializedType) { return 0; }
+        static int getNumAttributes (DeserializedType) { return 0; }
+        static juce::String getAttributeName (DeserializedType, int i) { return ""; }
+
+        static auto getAttribute (DeserializedType, juce::String id) { return false; }
+
+        template <typename SerializedType , typename C>
+        static SerializedType serialize (const C&, SerializedType t, juce::String id)
+        {
+            return {};
+        }
+
+        template <typename SerializedType , typename C>
+        static SerializedType serialize (const C&, SerializedType t)
         {
             return {};
         }
@@ -33,6 +46,11 @@ namespace serialization_detail
 
         template <typename, typename C>
         static void deserialize (DeserializedType, C&)
+        {
+        }
+
+        template <typename, typename C>
+        static void deserialize (juce::String, C&)
         {
         }
     };
@@ -95,81 +113,155 @@ public:
         return serial;
     }
 
-    /** Serializer for arithmetic types */
+//    /** Serializer for arithmetic types */
+//    template <typename Serializer, typename T>
+//    static std::enable_if_t<std::is_arithmetic_v<T>, SerialType<Serializer>>
+//        serialize (T x)
+//    {
+//        return Serializer::serializeArithmeticType (x);
+//    }
+//    /** Deserializer for arithmetic types */
+//    template <typename Serializer, typename T>
+//    static std::enable_if_t<std::is_arithmetic_v<T>, void>
+//    deserialize (DeserialType<Serializer> serial, T& x)
+//    {
+//        x = Serializer::template deserializeArithmeticType<T> (serial);
+//    }
+
+    /** Serializes an arithmetic type. */
     template <typename Serializer, typename T>
     static std::enable_if_t<std::is_arithmetic_v<T>, SerialType<Serializer>>
-        serialize (T x)
+    serialize(SerialType<Serializer>& parent, juce::String id, T x)
     {
-        return Serializer::serializeArithmeticType (x);
+        return Serializer::serializeArithmeticType(parent, id, x);
     }
 
-    /** Deserializer for arithmetic types */
+    /** Deserializes an arithmetic type. */
     template <typename Serializer, typename T>
-    static std::enable_if_t<std::is_arithmetic_v<T>, void>
-        deserialize (DeserialType<Serializer> serial, T& x)
+    static std::enable_if_t<std::is_arithmetic_v<T>, T>
+    deserialize(DeserialType<Serializer> serial, juce::String id,T& x)
     {
-        x = Serializer::template deserializeArithmeticType<T> (serial);
+        x = Serializer::template deserializeArithmeticType<T>(serial, id);
     }
 
-    /** Serializer for enum types */
+
+
+
+
+
+    /** Serializes an enum type. */
     template <typename Serializer, typename T>
-    static std::enable_if_t<std::is_enum_v<T>, SerialType<Serializer>>
-        serialize (T x)
+    static SerialType<Serializer> serializeEnumType(SerialType<Serializer>& parent, juce::String id, T x)
     {
-        return Serializer::serializeEnumType (x);
+        return Serializer::serializeEnumType(parent, id, x);
     }
 
-    /** Deserializer for enum types */
+    /** Deserializes an enum type. */
     template <typename Serializer, typename T>
-    static std::enable_if_t<std::is_enum_v<T>, void>
-        deserialize (DeserialType<Serializer> serial, T& x)
+    static T deserializeEnumType(DeserialType<Serializer> serial, juce::String id, T& x)
     {
-        x = Serializer::template deserializeEnumType<T> (serial);
+        x = Serializer::template deserializeEnumType<T>(serial, id);
     }
 
-    /** Serializer for string types */
+//    /** Serializer for enum types */
+//    template <typename Serializer, typename T>
+//    static std::enable_if_t<std::is_enum_v<T>, SerialType<Serializer>>
+//        serialize (T x)
+//    {
+//        return Serializer::serializeEnumType (x);
+//    }
+//
+//    /** Deserializer for enum types */
+//    template <typename Serializer, typename T>
+//    static std::enable_if_t<std::is_enum_v<T>, void>
+//        deserialize (DeserialType<Serializer> serial, T& x) {
+//        x = Serializer::template deserializeEnumType<T> (serial);
+//    }
+
+//    /** Serializer for string types */
+//    template <typename Serializer, typename T>
+//    static std::enable_if_t<IsString<T>, SerialType<Serializer>>
+//        serialize (const T& x)
+//    {
+//        return Serializer::serializeString (x);
+//    }
+//
+//    /** Deserializer for string types */
+//    template <typename Serializer, typename T>
+//    static std::enable_if_t<IsString<T>, void>
+//        deserialize (DeserialType<Serializer> serial, T& x)
+//    {
+//        x = Serializer::template deserializeString<T> (serial);
+//    }
+    /** Serializes a string. */
     template <typename Serializer, typename T>
-    static std::enable_if_t<IsString<T>, SerialType<Serializer>>
-        serialize (const T& x)
+    static std::enable_if_t<std::is_same_v<T, std::string> || std::is_same_v<T, juce::String>, SerialType<Serializer>>
+    serializeString(SerialType<Serializer>& parent, juce::String id, const T& x)
     {
-        return Serializer::serializeString (x);
+        return Serializer::serializeString(parent, id, x);
     }
 
-    /** Deserializer for string types */
+    /** Deserializes a string. */
     template <typename Serializer, typename T>
-    static std::enable_if_t<IsString<T>, void>
-        deserialize (DeserialType<Serializer> serial, T& x)
+    static std::enable_if_t<std::is_same_v<T, std::string> || std::is_same_v<T, juce::String>, T>
+    deserializeString(DeserialType<Serializer> serial, juce::String id, T& x)
     {
-        x = Serializer::template deserializeString<T> (serial);
+        x = Serializer::template deserializeString<T>(serial, id);
     }
 
 #if JUCE_MODULE_AVAILABLE_juce_graphics
-    /** Serializer for juce::Point types */
-    template <typename Serializer, typename T>
-    static std::enable_if_t<IsPoint<T>, SerialType<Serializer>>
-        serialize (const T& point)
-    {
-        auto serial = Serializer::createBaseElement();
-        Serializer::addChildElement (serial, serialize<Serializer> (point.x));
-        Serializer::addChildElement (serial, serialize<Serializer> (point.y));
-        return serial;
-    }
+//    /** Serializer for juce::Point types */
+//    template <typename Serializer, typename T>
+//    static std::enable_if_t<IsPoint<T>, SerialType<Serializer>>
+//        serialize (const T& point)
+//    {
+//        auto serial = Serializer::createBaseElement();
+//        Serializer::addChildElement (serial, serialize<Serializer> (point.x));
+//        Serializer::addChildElement (serial, serialize<Serializer> (point.y));
+//        return serial;
+//    }
 
-    /** Deserializer for juce::Point types */
-    template <typename Serializer, typename T>
-    static std::enable_if_t<IsPoint<T>, void>
-        deserialize (DeserialType<Serializer> serial, T& point)
-    {
-        if (Serializer::getNumChildElements (serial) != 2)
+//    /** Deserializer for juce::Point types */
+//    template <typename Serializer, typename T>
+//    static std::enable_if_t<IsPoint<T>, void>
+//        deserialize (DeserialType<Serializer> serial, T& point)
+//    {
+//        if (Serializer::getNumChildElements (serial) != 2)
+//        {
+//            jassertfalse; // the serialized data does not contain the correct number of elements to fill this array!
+//            point = {};
+//            return;
+//        }
+//
+//        deserialize<Serializer> (Serializer::getChildElement (serial, 0), point.x);
+//        deserialize<Serializer> (Serializer::getChildElement (serial, 1), point.y);
+//    }
+
+        /** Serializer for juce::Point types */
+        template <typename Serializer, typename T>
+        static std::enable_if_t<IsPoint<T>, SerialType<Serializer>>
+        serialize (const T& point, SerialType<Serializer> &parent)
         {
-            jassertfalse; // the serialized data does not contain the correct number of elements to fill this array!
-            point = {};
-            return;
+
+            Serializer::addChildElement (parent, "x", (point.x) );
+            Serializer::addChildElement (parent, "y" (point.y));
+            return parent;
         }
 
-        deserialize<Serializer> (Serializer::getChildElement (serial, 0), point.x);
-        deserialize<Serializer> (Serializer::getChildElement (serial, 1), point.y);
-    }
+        /** Deserializer for juce::Point types */
+        template <typename Serializer, typename T>
+        static std::enable_if_t<IsPoint<T>, void>
+        deserialize (DeserialType<Serializer> serial, T& point) {
+            if (Serializer::getNumChildElements(serial) != 2) {
+                jassertfalse; // the serialized data does not contain the correct number of elements to fill this array!
+                point = {};
+                return;
+            }
+            point.x = Serializer::template deserializeArithmeticType<int>(serial, "point_x");
+            point.y = Serializer::template deserializeArithmeticType<int>(serial, "point_y");
+
+        }
+
 #endif
 
     /** Serializer for container types */
@@ -279,6 +371,13 @@ public:
         return T::template serialize<Serializer> (object);
     }
 
+
+/** Serializer for types with custom serialization behaviour */
+        template <typename Serializer, typename T>
+        static std::enable_if_t<HasCustomSerialization<T>, SerialType<Serializer>> serialize (const T& object, SerialType<Serializer>& parent)
+        {
+            return T::template serialize<Serializer> (object, parent);
+        }
     /** Deserializer for types with custom deserialization behaviour */
     template <typename Serializer, typename T>
     static std::enable_if_t<HasCustomDeserialization<T>, void> deserialize (DeserialType<Serializer> serial, T& object)

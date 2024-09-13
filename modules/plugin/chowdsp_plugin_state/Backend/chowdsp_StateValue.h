@@ -13,6 +13,8 @@ struct StateValueBase
     virtual void serialize (JSONSerializer::SerializedType&) const {}
     virtual void deserialize (JSONSerializer::DeserializedType) {}
 
+    virtual void serialize (XMLSerializer::SerializedType&) const {}
+    virtual void deserialize (XMLSerializer::DeserializedType) {}
     const std::string_view name;
     Broadcaster<void()> changeBroadcaster;
 };
@@ -68,36 +70,68 @@ struct StateValue : StateValueBase
     /** Resets the value to its default state */
     void reset() override { set (defaultValue); }
 
-    /** JSON Serializer */
-    void serialize (JSONSerializer::SerializedType& serial) const override
+
+
+    /** XML Serializer */
+    void serialize (XMLSerializer::SerializedType& serial) const override
     {
-        serialize<JSONSerializer> (serial, *this);
+        serialize<XMLSerializer> (serial, *this);
     }
 
-    /** JSON Deserializer */
-    void deserialize (JSONSerializer::DeserializedType deserial) override
+    /** XML Deserializer */
+    void deserialize (XMLSerializer::DeserializedType deserial) override
     {
-        deserialize<JSONSerializer> (deserial, *this);
+
+        deserialize<XMLSerializer> (deserial, *this);
     }
+//    /** JSON Serializer */
+//    void serialize (JSONSerializer::SerializedType& serial) const override
+//    {
+//        serialize<JSONSerializer> (serial, *this);
+//    }
+//
+//    /** JSON Deserializer */
+//    void deserialize (JSONSerializer::DeserializedType deserial) override
+//    {
+//        deserialize<JSONSerializer> (deserial, *this);
+//    }
 
     const T defaultValue;
 
 private:
-    template <typename Serializer>
-    static void serialize (typename Serializer::SerializedType& serial, const StateValue& value)
-    {
-        Serializer::addChildElement (serial, value.name);
-        Serializer::addChildElement (serial, Serialization::serialize<Serializer> (value.get()));
-    }
+
+        template <typename Serializer>
+        static std::enable_if_t<std::is_same_v<Serializer, XMLSerializer>, void>
+        serialize (typename Serializer::SerializedType& serial,const StateValue& value) {
+            Serializer::addChildElement (serial, toString(value.name), value.get());
+
+        }
+        template <typename Serializer>
+        static std::enable_if_t<std::is_same_v<Serializer, JSONSerializer>, void>
+        serialize (typename Serializer::SerializedType& serial, const StateValue& value)
+        {
+            Serializer::addChildElement (serial, toString(value.name));
+            Serializer::addChildElement (serial, Serialization::serialize<Serializer> (value.get()));
+        }
 
     template <typename Serializer>
-    static void deserialize (typename Serializer::DeserializedType deserial, StateValue& value)
+    static std::enable_if_t<std::is_same_v<Serializer, JSONSerializer>, void>
+  deserialize (typename Serializer::DeserializedType deserial, StateValue& value)
     {
         T val {};
         Serialization::deserialize<Serializer> (deserial, val);
         value.set (val);
     }
 
+    template <typename Serializer>
+    static std::enable_if_t<std::is_same_v<Serializer, XMLSerializer>, void>
+    deserialize (typename Serializer::DeserializedType deserial, StateValue& value)
+    {
+        T val {};
+//std::unique_ptr<juce::XmlElement> xmlElementPtr(const_cast<juce::XmlElement*>(deserial));
+        Serialization::deserialize<Serializer> (deserial, val);
+        value.set (val);
+    }
     T currentValue;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StateValue)
