@@ -48,7 +48,7 @@ struct OptionalPointer
      * Sets OptionalPointer to point to a new pointer, and take ownership of it.
      * If the OptionalPointer previously owned some data, that data will be deleted.
      */
-    void setOwning (std::unique_ptr<T>&& ptr)
+    void setOwning (std::unique_ptr<T>&& ptr) // NOSONAR
     {
         invalidate();
         pointer.set (ptr.release(), Owning);
@@ -95,7 +95,7 @@ struct OptionalPointer
     void invalidate()
     {
         if (isOwner())
-            delete pointer.get_ptr();
+            delete pointer.get_ptr(); // NOSONAR
         pointer.set (nullptr);
     }
 

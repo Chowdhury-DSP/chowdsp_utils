@@ -27,35 +27,38 @@ public:
 
         void set (ElementType* new_leaf)
         {
-            ptr.set (reinterpret_cast<Void*> (new_leaf), Leaf);
+            jassert (! has_value());
+            ptr.set (reinterpret_cast<Void*> (new_leaf), Leaf); // NOSONAR
         }
 
         void set_tag (std::string_view* new_tag)
         {
-            ptr.set (reinterpret_cast<Void*> (new_tag), Tag);
+            jassert (! has_value());
+            ptr.set (reinterpret_cast<Void*> (new_tag), Tag); // NOSONAR
         }
 
-        ElementType& leaf()
+        [[nodiscard]] ElementType& leaf()
         {
             jassert (has_value());
-            return *(reinterpret_cast<ElementType*> (ptr.get_ptr()));
+            return *(reinterpret_cast<ElementType*> (ptr.get_ptr())); // NOSONAR
         }
 
-        const ElementType& leaf() const
+        [[nodiscard]] const ElementType& leaf() const
         {
             jassert (has_value());
-            return *(reinterpret_cast<const ElementType*> (ptr.get_ptr()));
+            return *(reinterpret_cast<const ElementType*> (ptr.get_ptr())); // NOSONAR
         }
 
         [[nodiscard]] std::string_view tag() const
         {
-            return *(reinterpret_cast<const std::string_view*> (ptr.get_ptr()));
+            jassert (is_tag());
+            return *(reinterpret_cast<const std::string_view*> (ptr.get_ptr())); // NOSONAR
         }
 
         void destroy()
         {
             if (has_value())
-                leaf().~ElementType();
+                leaf().~ElementType(); // NOSONAR
             ptr.set (nullptr, Empty);
         }
 
@@ -82,7 +85,7 @@ public:
         Node* next_linear {}; // slot for linked list through all nodes
     };
 
-    AbstractTree();
+    explicit AbstractTree (size_t num_nodes_reserved = 64);
     virtual ~AbstractTree();
 
     AbstractTree (const AbstractTree&) = delete;
@@ -136,13 +139,10 @@ public:
     template <typename Callable>
     void doForAllElements (Callable&& callable) const;
 
-    /** Creates a new empty node in the tree's memory arena. */
-    Node* createEmptyNode();
-
+    /** Creates a new tag node in the tree's memory arena. */
     Node* createTagNode (std::string_view str);
 
-    Node* createTagNode (std::string_view* str);
-
+    /** Creates a new leaf node in the tree's memory arena. */
     template <typename C = ElementType, typename... Args>
     Node* createLeafNode (Args&&... args)
     {
@@ -160,13 +160,22 @@ public:
     [[nodiscard]] Node& getRootNode() noexcept { return root_node; }
     [[nodiscard]] const Node& getRootNode() const noexcept { return root_node; }
 
+    /**
+     * Reserves memory for some number of nodes.
+     * NOTE: this must be called while the tree is empty.
+     */
     void reserve (size_t num_nodes);
-    void freeArena();
+
+    /**
+     * Shrinks the tree's memory arena down to the reserved size.
+     * NOTE: this must be called while the tree is empty.
+     */
+    void shrinkArena();
 
 protected:
     virtual void onDelete (const Node& /*nodeBeingDeleted*/) {}
 
-    ChainedArenaAllocator allocator { 64 * sizeof (Node) };
+    ChainedArenaAllocator allocator {};
 
 private:
     Node root_node {};

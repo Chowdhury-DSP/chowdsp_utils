@@ -1,8 +1,9 @@
 namespace chowdsp
 {
 template <typename ElementType, typename DerivedType>
-AbstractTree<ElementType, DerivedType>::AbstractTree()
+AbstractTree<ElementType, DerivedType>::AbstractTree (size_t num_nodes_reserved)
 {
+    reserve (num_nodes_reserved);
     clear();
 }
 
@@ -227,31 +228,6 @@ void AbstractTree<ElementType, DerivedType>::doForAllElements (Callable&& callab
 }
 
 template <typename ElementType, typename DerivedType>
-typename AbstractTree<ElementType, DerivedType>::Node* AbstractTree<ElementType, DerivedType>::createEmptyNode()
-{
-    auto* new_node = new (allocator.allocate<Node> (1)) Node {};
-
-    last_node->next_linear = new_node;
-    last_node = new_node;
-
-    return new_node;
-}
-
-template <typename ElementType, typename DerivedType>
-typename AbstractTree<ElementType, DerivedType>::Node* AbstractTree<ElementType, DerivedType>::createTagNode (std::string_view* str)
-{
-    auto* bytes = (std::byte*) allocator.allocate_bytes (sizeof (Node), alignof (Node));
-
-    auto* new_node = new (bytes) Node {};
-    last_node->next_linear = new_node;
-    last_node = new_node;
-
-    new_node->value.set_tag (str);
-
-    return new_node;
-}
-
-template <typename ElementType, typename DerivedType>
 typename AbstractTree<ElementType, DerivedType>::Node* AbstractTree<ElementType, DerivedType>::createTagNode (std::string_view str)
 {
     auto* bytes = (std::byte*) allocator.allocate_bytes (sizeof (Node) + sizeof (std::string_view) + alignof (std::string_view) + str.size(), alignof (Node));
@@ -279,11 +255,11 @@ void AbstractTree<ElementType, DerivedType>::reserve (size_t num_nodes)
         jassertfalse;
         return;
     }
-    allocator.reset (num_nodes * sizeof (Node));
+    allocator.reset (num_nodes * (sizeof (Node) + sizeof (ElementType) + alignof (ElementType)));
 }
 
 template <typename ElementType, typename DerivedType>
-void AbstractTree<ElementType, DerivedType>::freeArena()
+void AbstractTree<ElementType, DerivedType>::shrinkArena()
 {
     if (count > 0)
     {

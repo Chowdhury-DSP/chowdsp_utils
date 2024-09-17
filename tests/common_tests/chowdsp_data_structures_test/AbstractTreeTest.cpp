@@ -3,6 +3,8 @@
 
 struct StringTree : chowdsp::AbstractTree<std::string, StringTree>
 {
+    using AbstractTree::AbstractTree;
+
     static Node& insert_string (std::string&& element, Node& parent_node, AbstractTree& tree)
     {
         auto* new_node = tree.createLeafNode (std::move (element));
@@ -25,13 +27,18 @@ struct StringTree : chowdsp::AbstractTree<std::string, StringTree>
                           { return el1.value.tag() < el2.value.tag(); });
         return insert_string (std::move (element), *new_sub_tree, self).value.leaf();
     }
+
+    auto& get_allocator()
+    {
+        return allocator;
+    }
 };
 
 TEST_CASE ("Abstract Tree Test", "[common][data-structures]")
 {
     const std::vector<std::string> foods { "alfalfa", "apples", "beets", "donuts" };
 
-    StringTree tree;
+    StringTree tree { 7 };
     tree.insertElements (std::vector { foods });
     REQUIRE (tree.size() == 4);
 
@@ -43,6 +50,10 @@ TEST_CASE ("Abstract Tree Test", "[common][data-structures]")
 
     SECTION ("Insertion")
     {
+        REQUIRE (tree.get_allocator().get_arena_count() == 1);
+        tree.reserve (6); // should jassert!
+        REQUIRE (tree.get_allocator().get_arena_count() == 1);
+
         tree.insertElement ("almonds");
         REQUIRE (tree.size() == 5);
 
@@ -65,6 +76,14 @@ TEST_CASE ("Abstract Tree Test", "[common][data-structures]")
             REQUIRE (a_node->first_child->next_sibling->next_sibling->value.leaf() == "almonds");
             REQUIRE (a_node->first_child->next_sibling->next_sibling->next_sibling->value.leaf() == "apples");
         }
+
+        REQUIRE (tree.get_allocator().get_arena_count() == 2);
+        tree.shrinkArena(); // should jassert!
+        REQUIRE (tree.get_allocator().get_arena_count() == 2);
+        tree.clear();
+        REQUIRE (tree.get_allocator().get_arena_count() == 2);
+        tree.shrinkArena();
+        REQUIRE (tree.get_allocator().get_arena_count() == 1);
     }
 
     SECTION ("Remove One")
