@@ -63,13 +63,13 @@ TEST_CASE ("Program Adapter Test", "[plugin][presets]")
                                  chowdsp::presets::Preset { "B", "Vendor", { { "value", 1 } } },
                                  chowdsp::presets::Preset { "C", "Vendor", { { "value", 2 } } } });
 
-        presetMgr->loadPreset (*presetMgr->getPresetTree().getRootNode().first_child->leaf);
+        presetMgr->loadPreset (presetMgr->getPresetTree().getRootNode().first_child->value.leaf());
         REQUIRE (adapter.getCurrentProgram() == 0);
 
-        presetMgr->loadPreset (*presetMgr->getPresetTree().getRootNode().first_child->next_sibling->leaf);
+        presetMgr->loadPreset (presetMgr->getPresetTree().getRootNode().first_child->next_sibling->value.leaf());
         REQUIRE (adapter.getCurrentProgram() == 1);
 
-        presetMgr->loadPreset (*presetMgr->getPresetTree().getRootNode().first_child->next_sibling->next_sibling->leaf);
+        presetMgr->loadPreset (presetMgr->getPresetTree().getRootNode().first_child->next_sibling->next_sibling->value.leaf());
         REQUIRE (adapter.getCurrentProgram() == 2);
     }
 

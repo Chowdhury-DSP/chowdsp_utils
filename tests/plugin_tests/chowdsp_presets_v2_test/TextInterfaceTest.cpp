@@ -19,17 +19,17 @@ TEST_CASE ("Text Interface Test", "[plugin][presets]")
 
     SECTION ("Preset Change")
     {
-        presetMgr.loadPreset (*presetMgr.getPresetTree().getRootNode().first_child->leaf);
+        presetMgr.loadPreset (presetMgr.getPresetTree().getRootNode().first_child->value.leaf());
         chowdsp::presets::frontend::TextInterface textInterface { presetMgr };
         REQUIRE (textInterface.getPresetText() == "Preset0");
 
-        presetMgr.loadPreset (*presetMgr.getPresetTree().getRootNode().first_child->next_sibling->leaf);
+        presetMgr.loadPreset (presetMgr.getPresetTree().getRootNode().first_child->next_sibling->value.leaf());
         REQUIRE (textInterface.getPresetText() == "Preset1");
     }
 
     SECTION ("Preset Dirty Change")
     {
-        presetMgr.loadPreset (*presetMgr.getPresetTree().getRootNode().first_child->leaf);
+        presetMgr.loadPreset (presetMgr.getPresetTree().getRootNode().first_child->value.leaf());
         chowdsp::presets::frontend::TextInterface textInterface { presetMgr };
         REQUIRE (textInterface.getPresetText() == "Preset0");
 
@@ -37,7 +37,7 @@ TEST_CASE ("Text Interface Test", "[plugin][presets]")
         state.getParameterListeners().updateBroadcastersFromMessageThread();
         REQUIRE (textInterface.getPresetText() == "Preset0*");
 
-        presetMgr.loadPreset (*presetMgr.getPresetTree().getRootNode().first_child->next_sibling->leaf);
+        presetMgr.loadPreset (presetMgr.getPresetTree().getRootNode().first_child->next_sibling->value.leaf());
         REQUIRE (textInterface.getPresetText() == "Preset1");
     }
 }

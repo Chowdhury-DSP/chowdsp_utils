@@ -9,10 +9,70 @@ template <typename ElementType, typename DerivedType>
 class AbstractTree
 {
 public:
+    struct ValuePtr
+    {
+        struct alignas (8) Void
+        {
+        };
+        PackedPointer<Void> ptr { nullptr, Empty };
+
+        ValuePtr() = default;
+
+        enum : uint8_t
+        {
+            Empty = 0,
+            Leaf = 1,
+            Tag = 2,
+        };
+
+        void set (ElementType* new_leaf)
+        {
+            ptr.set (reinterpret_cast<Void*> (new_leaf), Leaf);
+        }
+
+        void set_tag (std::string_view* new_tag)
+        {
+            ptr.set (reinterpret_cast<Void*> (new_tag), Tag);
+        }
+
+        ElementType& leaf()
+        {
+            jassert (has_value());
+            return *(reinterpret_cast<ElementType*> (ptr.get_ptr()));
+        }
+
+        const ElementType& leaf() const
+        {
+            jassert (has_value());
+            return *(reinterpret_cast<const ElementType*> (ptr.get_ptr()));
+        }
+
+        [[nodiscard]] std::string_view tag() const
+        {
+            return *(reinterpret_cast<const std::string_view*> (ptr.get_ptr()));
+        }
+
+        void destroy()
+        {
+            if (has_value())
+                leaf().~ElementType();
+            ptr.set (nullptr, Empty);
+        }
+
+        [[nodiscard]] bool has_value() const noexcept
+        {
+            return ptr.get_flags() == Leaf;
+        }
+
+        [[nodiscard]] bool is_tag() const noexcept
+        {
+            return ptr.get_flags() == Tag;
+        }
+    };
+
     struct Node
     {
-        std::optional<ElementType> leaf { std::nullopt };
-        std::string_view tag {};
+        ValuePtr value {};
 
         Node* parent {}; // slot for parent in hierarchy
         Node* first_child {}; // slot for first child in hierarchy
@@ -20,7 +80,6 @@ public:
         Node* next_sibling {}; // slot for next sibling in hierarchy
         Node* prev_sibling {}; // slot for previous sibling in hierarchy
         Node* next_linear {}; // slot for linked list through all nodes
-        Node* prev_linear {}; // slot for linked list through all nodes
     };
 
     AbstractTree();
@@ -80,11 +139,29 @@ public:
     /** Creates a new empty node in the tree's memory arena. */
     Node* createEmptyNode();
 
-    /** Allocates a new tag in the tree's memory arena. */
-    std::string_view allocateTag (std::string_view str);
+    Node* createTagNode (std::string_view str);
+
+    Node* createTagNode (std::string_view* str);
+
+    template <typename C = ElementType, typename... Args>
+    Node* createLeafNode (Args&&... args)
+    {
+        auto* bytes = (std::byte*) allocator.allocate_bytes (sizeof(Node) + sizeof(C) + alignof (C), alignof (Node));
+
+        auto* new_node = new (bytes) Node {};
+        last_node->next_linear = new_node;
+        last_node = new_node;
+
+        auto* new_obj = new (juce::snapPointerToAlignment (bytes + sizeof (Node), alignof (C))) C (std::forward<Args> (args)...);
+        new_node->value.set (new_obj);
+        return new_node;
+    }
 
     [[nodiscard]] Node& getRootNode() noexcept { return root_node; }
     [[nodiscard]] const Node& getRootNode() const noexcept { return root_node; }
+
+    void reserve (size_t num_nodes);
+    void freeArena();
 
 protected:
     virtual void onDelete (const Node& /*nodeBeingDeleted*/) {}
