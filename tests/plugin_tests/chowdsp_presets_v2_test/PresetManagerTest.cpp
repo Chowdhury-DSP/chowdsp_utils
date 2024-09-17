@@ -92,7 +92,7 @@ TEST_CASE ("Preset Manager Test", "[plugin][presets][state]")
         presetMgr.setFloatParam (dummyValue);
         REQUIRE_MESSAGE (juce::approximatelyEqual (presetMgr.getFloatParam(), dummyValue), "Changed value is incorrect!");
 
-        presetMgr->loadPreset (*presetMgr->getPresetTree().getRootNode().first_child->leaf);
+        presetMgr->loadPreset (presetMgr->getPresetTree().getRootNode().first_child->value.leaf());
         REQUIRE_MESSAGE (juce::approximatelyEqual (presetMgr.getFloatParam(), testValue), "Preset value is incorrect!");
     }
 
@@ -103,7 +103,7 @@ TEST_CASE ("Preset Manager Test", "[plugin][presets][state]")
 
         ScopedPresetManager presetMgr {};
         presetMgr->addPresets ({ preset });
-        presetMgr->loadPreset (*presetMgr->getPresetTree().getRootNode().first_child->leaf);
+        presetMgr->loadPreset (presetMgr->getPresetTree().getRootNode().first_child->value.leaf());
         REQUIRE_MESSAGE (juce::approximatelyEqual (presetMgr.getFloatParam(), testValue), "Preset value is incorrect!");
     }
 
@@ -119,7 +119,7 @@ TEST_CASE ("Preset Manager Test", "[plugin][presets][state]")
         presetMgr.toggleBoolParam();
         REQUIRE_MESSAGE (! presetMgr.state.params.boolParam->get(), "Value after toggle incorrect!");
 
-        presetMgr->loadPreset (*presetMgr->getPresetTree().getRootNode().first_child->leaf);
+        presetMgr->loadPreset (presetMgr->getPresetTree().getRootNode().first_child->value.leaf());
         REQUIRE_MESSAGE (! presetMgr.state.params.boolParam->get(), "Value after preset load incorrect!");
     }
 
@@ -140,7 +140,7 @@ TEST_CASE ("Preset Manager Test", "[plugin][presets][state]")
         REQUIRE_MESSAGE (presetMgr->getIsPresetDirty(), "Preset dirty after set value is incorrect!");
 
         presetMgr->addPresets ({ preset });
-        presetMgr->loadPreset (*presetMgr->getPresetTree().getRootNode().first_child->leaf);
+        presetMgr->loadPreset (presetMgr->getPresetTree().getRootNode().first_child->value.leaf());
         REQUIRE_MESSAGE (juce::approximatelyEqual (presetMgr.state.params.extraParam->get(), defaultValue), "Reset value is incorrect!");
     }
 
@@ -251,7 +251,7 @@ TEST_CASE ("Preset Manager Test", "[plugin][presets][state]")
         {
             ScopedPresetManager presetMgr {};
             presetMgr->addPresets ({ chowdsp::presets::Preset { preset } });
-            presetMgr->loadPreset (*presetMgr->getPresetTree().getRootNode().first_child->leaf);
+            presetMgr->loadPreset (presetMgr->getPresetTree().getRootNode().first_child->value.leaf());
             REQUIRE (juce::approximatelyEqual (presetMgr.getFloatParam(), testValue));
 
             presetMgr.setFloatParam (otherValue);
@@ -280,14 +280,14 @@ TEST_CASE ("Preset Manager Test", "[plugin][presets][state]")
         presetMgr.state.undoManager = &um;
 
         presetMgr->addPresets ({ chowdsp::presets::Preset { preset }, chowdsp::presets::Preset { preset2 } });
-        presetMgr->loadPreset (*presetMgr->getPresetTree().getRootNode().first_child->leaf);
+        presetMgr->loadPreset (presetMgr->getPresetTree().getRootNode().first_child->value.leaf());
         REQUIRE (juce::approximatelyEqual (presetMgr.getFloatParam(), testValue));
 
         presetMgr.setFloatParam (dirtyVal);
         REQUIRE (juce::approximatelyEqual (presetMgr.getFloatParam(), dirtyVal));
         REQUIRE (presetMgr->getIsPresetDirty());
 
-        presetMgr->loadPreset (*presetMgr->getPresetTree().getRootNode().first_child->next_sibling->leaf);
+        presetMgr->loadPreset (presetMgr->getPresetTree().getRootNode().first_child->next_sibling->value.leaf());
         REQUIRE (juce::approximatelyEqual (presetMgr.getFloatParam(), testValue2));
         REQUIRE (! presetMgr->getIsPresetDirty());
 

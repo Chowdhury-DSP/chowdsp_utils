@@ -107,12 +107,12 @@ static void loadPresetsIntoMenu (juce::PopupMenu& menu, const PresetTree::Node& 
 {
     for (auto* node = root.first_child; node != nullptr; node = node->next_sibling)
     {
-        if (node->leaf.has_value())
+        if (node->value.has_value())
         {
             juce::PopupMenu::Item menuItem;
             menuItem.itemID = -1;
-            menuItem.text = node->leaf->getName();
-            menuItem.action = [&presetMgr, &preset = std::as_const (*node->leaf)]
+            menuItem.text = node->value.leaf().getName();
+            menuItem.action = [&presetMgr, &preset = std::as_const (node->value.leaf())]
             {
                 presetMgr.loadPreset (preset);
             };
@@ -123,7 +123,7 @@ static void loadPresetsIntoMenu (juce::PopupMenu& menu, const PresetTree::Node& 
             juce::PopupMenu subMenu {};
             loadPresetsIntoMenu (subMenu, *node, presetMgr);
             if (subMenu.containsAnyActiveItems())
-                menu.addSubMenu (toString (node->tag), subMenu);
+                menu.addSubMenu (toString (node->value.tag()), subMenu);
         }
     }
 }
