@@ -25,14 +25,14 @@ struct PackedPointer
         actual_ptr = ptr;
 #endif
         ptr_with_flags = reinterpret_cast<T*> ((reinterpret_cast<uintptr_t> (ptr) & address_mask)
-                                        | (static_cast<uintptr_t> (flags) & flags_mask));
+                                               | (static_cast<uintptr_t> (flags) & flags_mask));
     }
 
     void set_flags (uint8_t flags)
     {
         jassert (flags <= max_flag_value);
         ptr_with_flags = reinterpret_cast<T*> ((reinterpret_cast<uintptr_t> (ptr_with_flags) & address_mask)
-                                        | (static_cast<uintptr_t> (flags) & flags_mask));
+                                               | (static_cast<uintptr_t> (flags) & flags_mask));
     }
 
     [[nodiscard]] T* get_ptr()

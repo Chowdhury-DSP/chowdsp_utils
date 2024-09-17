@@ -5,7 +5,7 @@ struct StringTree : chowdsp::AbstractTree<std::string, StringTree>
 {
     static Node& insert_string (std::string&& element, Node& parent_node, AbstractTree& tree)
     {
-        auto* new_node = tree.createLeafNode (std::move(element));
+        auto* new_node = tree.createLeafNode (std::move (element));
 
         insertNodeSorted (parent_node, new_node, [] (const Node& el1, const Node& el2)
                           { return el1.value.leaf() < el2.value.leaf(); });
@@ -40,12 +40,12 @@ TEST_CASE ("Abstract Tree Test", "[common][data-structures]")
         tree.clear();
         REQUIRE (tree.size() == 0);
     }
-    
+
     SECTION ("Insertion")
     {
         tree.insertElement ("almonds");
         REQUIRE (tree.size() == 5);
-    
+
         {
             const auto* a_node = tree.getRootNode().first_child;
             REQUIRE (a_node->value.tag() == "a");
@@ -53,10 +53,10 @@ TEST_CASE ("Abstract Tree Test", "[common][data-structures]")
             REQUIRE (a_node->first_child->next_sibling->value.leaf() == "almonds");
             REQUIRE (a_node->first_child->next_sibling->next_sibling->value.leaf() == "apples");
         }
-    
+
         tree.insertElement ("acai");
         REQUIRE (tree.size() == 6);
-    
+
         {
             const auto* a_node = tree.getRootNode().first_child;
             REQUIRE (a_node->value.tag() == "a");
@@ -66,7 +66,7 @@ TEST_CASE ("Abstract Tree Test", "[common][data-structures]")
             REQUIRE (a_node->first_child->next_sibling->next_sibling->next_sibling->value.leaf() == "apples");
         }
     }
-    
+
     SECTION ("Remove One")
     {
         tree.removeElement ("beets");

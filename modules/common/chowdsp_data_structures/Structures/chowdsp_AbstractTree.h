@@ -146,7 +146,7 @@ public:
     template <typename C = ElementType, typename... Args>
     Node* createLeafNode (Args&&... args)
     {
-        auto* bytes = (std::byte*) allocator.allocate_bytes (sizeof(Node) + sizeof(C) + alignof (C), alignof (Node));
+        auto* bytes = (std::byte*) allocator.allocate_bytes (sizeof (Node) + sizeof (C) + alignof (C), alignof (Node));
 
         auto* new_node = new (bytes) Node {};
         last_node->next_linear = new_node;

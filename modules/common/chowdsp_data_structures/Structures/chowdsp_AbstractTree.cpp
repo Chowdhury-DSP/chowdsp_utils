@@ -240,7 +240,7 @@ typename AbstractTree<ElementType, DerivedType>::Node* AbstractTree<ElementType,
 template <typename ElementType, typename DerivedType>
 typename AbstractTree<ElementType, DerivedType>::Node* AbstractTree<ElementType, DerivedType>::createTagNode (std::string_view* str)
 {
-    auto* bytes = (std::byte*) allocator.allocate_bytes (sizeof(Node), alignof (Node));
+    auto* bytes = (std::byte*) allocator.allocate_bytes (sizeof (Node), alignof (Node));
 
     auto* new_node = new (bytes) Node {};
     last_node->next_linear = new_node;
@@ -254,7 +254,7 @@ typename AbstractTree<ElementType, DerivedType>::Node* AbstractTree<ElementType,
 template <typename ElementType, typename DerivedType>
 typename AbstractTree<ElementType, DerivedType>::Node* AbstractTree<ElementType, DerivedType>::createTagNode (std::string_view str)
 {
-    auto* bytes = (std::byte*) allocator.allocate_bytes (sizeof(Node) + sizeof (std::string_view) + alignof (std::string_view) + str.size(), alignof (Node));
+    auto* bytes = (std::byte*) allocator.allocate_bytes (sizeof (Node) + sizeof (std::string_view) + alignof (std::string_view) + str.size(), alignof (Node));
 
     auto* new_node = new (bytes) Node {};
     last_node->next_linear = new_node;
