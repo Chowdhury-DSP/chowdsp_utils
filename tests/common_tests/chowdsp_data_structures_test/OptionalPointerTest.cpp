@@ -3,7 +3,7 @@
 
 TEST_CASE ("Optional Pointer Test", "[common][data-structures]")
 {
-    struct TestType
+    struct alignas (8) TestType
     {
         TestType (int _x, int _y) : x (_x), y (_y) {}
         int x;
