@@ -19,11 +19,9 @@ namespace PresetTreeInserters
                           PresetTree::Node& root,
                           const PresetTree::InsertionHelper& insertionHelper)
     {
-        auto* item = tree.createEmptyNode();
-        item->leaf = std::move (preset);
-
+        auto* item = tree.createLeafNode (std::move (preset));
         insertionHelper.insertNodeIntoTree (root, item);
-        return *item->leaf;
+        return item->value.leaf();
     }
 
     template <typename TagGetter, typename FallbackInserter = decltype (&flatInserter)>
@@ -44,13 +42,12 @@ namespace PresetTreeInserters
 
         for (auto* iter = root.first_child; iter != nullptr; iter = iter->next_sibling)
         {
-            if (iter->tag == tag)
+            if (iter->value.tag() == tag)
                 return fallbackInserter (std::move (preset), tree, *iter, insertionHelper);
         }
 
         // preset vendor is not currently in the tree, so let's add a new sub-tree
-        auto* subTree = tree.createEmptyNode();
-        subTree->tag = tree.allocateTag (tag);
+        auto* subTree = tree.createTagNode (tag);
         insertionHelper.insertNodeIntoTree (root, subTree);
         return fallbackInserter (std::move (preset), tree, *subTree, insertionHelper);
     }
@@ -115,16 +112,16 @@ PresetTree::PresetTree (PresetState* currentPresetState, InsertionHelper&& inser
             const auto comparator = [&tagComp = std::as_const (insertHelper.tagSortMethod),
                                      &presetComp = std::as_const (insertHelper.presetSortMethod)] (const Node& item1, const Node& item2)
             {
-                if (item1.leaf.has_value() && ! item2.leaf.has_value())
+                if (item1.value.has_value() && ! item2.value.has_value())
                     return false;
 
-                if (! item1.leaf.has_value() && item2.leaf.has_value())
+                if (! item1.value.has_value() && item2.value.has_value())
                     return true;
 
-                if (item1.leaf.has_value())
-                    return presetComp (*item1.leaf, *item2.leaf);
+                if (item1.value.has_value())
+                    return presetComp (item1.value.leaf(), item2.value.leaf());
 
-                return tagComp (item1.tag, item2.tag);
+                return tagComp (item1.value.tag(), item2.value.tag());
             };
             insertNodeSorted (parent, newNode, comparator);
         };
@@ -140,8 +137,8 @@ void PresetTree::onDelete (const Node& nodeBeingDeleted)
 {
     if (presetState != nullptr
         && presetState->get() != nullptr
-        && nodeBeingDeleted.leaf.has_value()
-        && *presetState->get() == *nodeBeingDeleted.leaf)
+        && nodeBeingDeleted.value.has_value()
+        && *presetState->get() == nodeBeingDeleted.value.leaf())
         presetState->assumeOwnership();
 }
 } // namespace chowdsp::presets

@@ -22,6 +22,7 @@ target_sources(chowdsp_data_structures_test
         OptionalRefTest.cpp
         OptionalArrayTest.cpp
         PoolAllocatorTest.cpp
+        PackedPointerTest.cpp
 )
 
 target_compile_features(chowdsp_data_structures_test PRIVATE cxx_std_20)

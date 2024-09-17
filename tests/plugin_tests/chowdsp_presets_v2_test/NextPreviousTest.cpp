@@ -59,7 +59,7 @@ TEST_CASE ("Next/Previous Test", "[plugin][presets]")
         nextPrev.setShouldWrapAtEndOfList (false);
         REQUIRE (nextPrev.willWrapAtEndOFList() == false);
 
-        presetMgr.loadPreset (*presetMgr.getPresetTree().getRootNode().first_child->leaf);
+        presetMgr.loadPreset (presetMgr.getPresetTree().getRootNode().first_child->value.leaf());
         checkPresetIndex (presetMgr, 0);
 
         REQUIRE (nextPrev.goToPreviousPreset() == false);
@@ -100,7 +100,7 @@ TEST_CASE ("Next/Previous Test", "[plugin][presets]")
         nextPrev.setShouldWrapAtEndOfList (true);
         REQUIRE (nextPrev.willWrapAtEndOFList() == true);
 
-        presetMgr.loadPreset (*presetMgr.getPresetTree().getRootNode().first_child->first_child->leaf);
+        presetMgr.loadPreset (presetMgr.getPresetTree().getRootNode().first_child->first_child->value.leaf());
         checkPresetIndex (presetMgr, 0);
 
         REQUIRE (nextPrev.goToNextPreset() == true);

@@ -28,7 +28,7 @@ TEST_CASE ("Preset Tree Test", "[plugin][presets]")
         const auto* iter = root.first_child;
         for (const auto& name : preset_names_sorted)
         {
-            REQUIRE (iter->leaf->getName() == name);
+            REQUIRE (iter->value.leaf().getName() == name);
             iter = iter->next_sibling;
         }
         REQUIRE (iter == nullptr);
@@ -48,19 +48,19 @@ TEST_CASE ("Preset Tree Test", "[plugin][presets]")
         const auto& root = preset_tree.getRootNode();
 
         const auto* bob_node = root.first_child;
-        REQUIRE (bob_node->tag == "Bob");
-        REQUIRE (bob_node->first_child->leaf->getName() == "Preset2");
+        REQUIRE (bob_node->value.tag() == "Bob");
+        REQUIRE (bob_node->first_child->value.leaf().getName() == "Preset2");
         REQUIRE (bob_node->first_child->next_sibling == nullptr);
 
         const auto* jatin_node = bob_node->next_sibling;
-        REQUIRE (jatin_node->tag == "Jatin");
-        REQUIRE (jatin_node->first_child->leaf->getName() == "Preset1");
-        REQUIRE (jatin_node->first_child->next_sibling->leaf->getName() == "ZZZZ");
+        REQUIRE (jatin_node->value.tag() == "Jatin");
+        REQUIRE (jatin_node->first_child->value.leaf().getName() == "Preset1");
+        REQUIRE (jatin_node->first_child->next_sibling->value.leaf().getName() == "ZZZZ");
         REQUIRE (jatin_node->first_child->next_sibling->next_sibling == nullptr);
 
         const auto* livey_node = jatin_node->next_sibling;
-        REQUIRE (livey_node->tag == "Livey");
-        REQUIRE (livey_node->first_child->leaf->getName() == "ABCD");
+        REQUIRE (livey_node->value.tag() == "Livey");
+        REQUIRE (livey_node->first_child->value.leaf().getName() == "ABCD");
         REQUIRE (livey_node->first_child->next_sibling == nullptr);
     }
 
@@ -78,19 +78,19 @@ TEST_CASE ("Preset Tree Test", "[plugin][presets]")
         const auto& root = preset_tree.getRootNode();
 
         const auto* bass_node = root.first_child;
-        REQUIRE (bass_node->tag == "Bass");
-        REQUIRE (bass_node->first_child->leaf->getName() == "ZZZZ");
+        REQUIRE (bass_node->value.tag() == "Bass");
+        REQUIRE (bass_node->first_child->value.leaf().getName() == "ZZZZ");
         REQUIRE (bass_node->first_child->next_sibling == nullptr);
 
         const auto* drums_node = bass_node->next_sibling;
-        REQUIRE (drums_node->tag == "Drums");
-        REQUIRE (drums_node->first_child->leaf->getName() == "ABCD");
-        REQUIRE (drums_node->first_child->next_sibling->leaf->getName() == "Preset2");
+        REQUIRE (drums_node->value.tag() == "Drums");
+        REQUIRE (drums_node->first_child->value.leaf().getName() == "ABCD");
+        REQUIRE (drums_node->first_child->next_sibling->value.leaf().getName() == "Preset2");
         REQUIRE (drums_node->first_child->next_sibling->next_sibling == nullptr);
 
         const auto* loose_preset = drums_node->next_sibling;
         REQUIRE (loose_preset == root.last_child);
-        REQUIRE (loose_preset->leaf->getName() == "Preset1");
+        REQUIRE (loose_preset->value.leaf().getName() == "Preset1");
     }
 
     SECTION ("Vendor/Category Insertion Test")
@@ -112,30 +112,30 @@ TEST_CASE ("Preset Tree Test", "[plugin][presets]")
         const auto& root = preset_tree.getRootNode();
 
         const auto* jatin_node = root.first_child;
-        REQUIRE (jatin_node->tag == "Jatin");
+        REQUIRE (jatin_node->value.tag() == "Jatin");
 
         const auto* jatin_bass_node = jatin_node->first_child;
-        REQUIRE (jatin_bass_node->tag == "Bass");
-        REQUIRE (jatin_bass_node->first_child->leaf->getName() == "Bass1");
-        REQUIRE (jatin_bass_node->first_child->next_sibling->leaf->getName() == "Bass2");
+        REQUIRE (jatin_bass_node->value.tag() == "Bass");
+        REQUIRE (jatin_bass_node->first_child->value.leaf().getName() == "Bass1");
+        REQUIRE (jatin_bass_node->first_child->next_sibling->value.leaf().getName() == "Bass2");
         REQUIRE (jatin_bass_node->first_child->next_sibling->next_sibling == nullptr);
 
         const auto* jatin_drums_node = jatin_bass_node->next_sibling;
-        REQUIRE (jatin_drums_node->tag == "Drums");
-        REQUIRE (jatin_drums_node->first_child->leaf->getName() == "Drums1");
+        REQUIRE (jatin_drums_node->value.tag() == "Drums");
+        REQUIRE (jatin_drums_node->first_child->value.leaf().getName() == "Drums1");
         REQUIRE (jatin_drums_node->first_child->next_sibling == nullptr);
 
         const auto* jatin_loose_preset = jatin_drums_node->next_sibling;
         REQUIRE (jatin_loose_preset == jatin_node->last_child);
-        REQUIRE (jatin_loose_preset->leaf->getName() == "Blah");
+        REQUIRE (jatin_loose_preset->value.leaf().getName() == "Blah");
 
         const auto* steve_node = jatin_node->next_sibling;
-        REQUIRE (steve_node->tag == "Steve");
+        REQUIRE (steve_node->value.tag() == "Steve");
 
         const auto* steve_gtr_node = steve_node->first_child;
-        REQUIRE (steve_gtr_node->tag == "Gtr");
-        REQUIRE (steve_gtr_node->first_child->leaf->getName() == "Gtr1");
-        REQUIRE (steve_gtr_node->first_child->next_sibling->leaf->getName() == "Gtr2");
+        REQUIRE (steve_gtr_node->value.tag() == "Gtr");
+        REQUIRE (steve_gtr_node->first_child->value.leaf().getName() == "Gtr1");
+        REQUIRE (steve_gtr_node->first_child->next_sibling->value.leaf().getName() == "Gtr2");
         REQUIRE (steve_gtr_node->first_child->next_sibling->next_sibling == nullptr);
     }
 
@@ -187,14 +187,14 @@ TEST_CASE ("Preset Tree Test", "[plugin][presets]")
 
         REQUIRE (preset_tree.size() == 2);
         const auto* bass_node = preset_tree.getRootNode().first_child->first_child;
-        REQUIRE (bass_node->tag == "Bass");
+        REQUIRE (bass_node->value.tag() == "Bass");
 
-        REQUIRE (bass_node->first_child->leaf->getName() == "Bass1");
-        REQUIRE (bass_node->first_child->next_sibling->leaf->getName() == "Bass2");
+        REQUIRE (bass_node->first_child->value.leaf().getName() == "Bass1");
+        REQUIRE (bass_node->first_child->next_sibling->value.leaf().getName() == "Bass2");
 
         preset_tree.removeElement (preset2);
         REQUIRE (preset_tree.size() == 1);
-        REQUIRE (bass_node->first_child->leaf->getName() == "Bass1");
+        REQUIRE (bass_node->first_child->value.leaf().getName() == "Bass1");
         REQUIRE (bass_node->first_child->next_sibling == nullptr);
     }
 
@@ -243,7 +243,7 @@ TEST_CASE ("Preset Tree Test", "[plugin][presets]")
         chowdsp::presets::PresetTree preset_tree { &state };
         preset_tree.insertElement (chowdsp::presets::Preset { preset });
 
-        state = *preset_tree.getRootNode().first_child->leaf;
+        state = preset_tree.getRootNode().first_child->value.leaf();
         REQUIRE (*state.get() == preset);
 
         preset_tree.removeElement (preset);

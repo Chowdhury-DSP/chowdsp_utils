@@ -10,7 +10,7 @@ template <typename ElementType, typename DerivedType>
 AbstractTree<ElementType, DerivedType>::~AbstractTree()
 {
     doForAllNodes ([] (Node& node)
-                   { node.leaf.reset(); });
+                   { node.value.destroy(); });
 }
 
 template <typename ElementType, typename DerivedType>
@@ -79,20 +79,24 @@ void AbstractTree<ElementType, DerivedType>::removeNode (Node& node)
 
     onDelete (node);
 
-    if (node.leaf.has_value())
+    if (node.value.has_value())
         count--;
+
+    for (auto* iter = &root_node; iter != nullptr; iter = iter->next_linear)
+    {
+        if (iter->next_linear == &node)
+        {
+            iter->next_linear = node.next_linear;
+            if (last_node == &node)
+                last_node = iter;
+            break;
+        }
+    }
 
     if (node.prev_sibling != nullptr)
         node.prev_sibling->next_sibling = node.next_sibling;
     if (node.next_sibling != nullptr)
         node.next_sibling->prev_sibling = node.prev_sibling;
-    if (node.next_linear != nullptr)
-        node.next_linear->prev_linear = node.prev_linear;
-    // we don't need to check if node.prev_linear is nullptr, because the root node is never deleted!
-    node.prev_linear->next_linear = node.next_linear;
-
-    if (last_node == &node)
-        last_node = node.prev_linear;
 
     if (node.parent->first_child == node.parent->last_child)
     {
@@ -108,7 +112,7 @@ void AbstractTree<ElementType, DerivedType>::removeNode (Node& node)
             node.parent->last_child = node.prev_sibling;
     }
 
-    node.leaf.reset();
+    node.value.destroy();
 }
 
 template <typename ElementType, typename DerivedType>
@@ -116,7 +120,7 @@ void AbstractTree<ElementType, DerivedType>::removeElement (const ElementType& e
 {
     for (auto* node = &root_node; node != nullptr; node = node->next_linear)
     {
-        if (node->leaf.has_value() && node->leaf == element)
+        if (node->value.has_value() && node->value.leaf() == element)
         {
             removeNode (*node);
             break;
@@ -133,7 +137,7 @@ void AbstractTree<ElementType, DerivedType>::removeElements (const Callable& ele
     // need to change.
     for (auto* node = &root_node; node != nullptr;)
     {
-        if (node->leaf.has_value() && elementsToRemove (*node->leaf))
+        if (node->value.has_value() && elementsToRemove (node->value.leaf()))
         {
             auto* next_node = node->next_linear;
             removeNode (*node);
@@ -150,8 +154,8 @@ template <typename ElementType, typename DerivedType>
 void AbstractTree<ElementType, DerivedType>::clear()
 {
     doForAllNodes ([] (Node& node)
-                   { node.leaf.reset(); });
-    allocator.reset (64 * sizeof (Node));
+                   { node.value.destroy(); });
+    allocator.clear();
     count = 0;
     root_node = {};
 }
@@ -205,8 +209,8 @@ void AbstractTree<ElementType, DerivedType>::doForAllElements (Callable&& callab
     doForAllNodes (
         [c = std::forward<Callable> (callable)] (Node& node)
         {
-            if (node.leaf.has_value())
-                c (*node.leaf);
+            if (node.value.has_value())
+                c (node.value.leaf());
         });
 }
 
@@ -217,8 +221,8 @@ void AbstractTree<ElementType, DerivedType>::doForAllElements (Callable&& callab
     doForAllNodes (
         [c = std::forward<Callable> (callable)] (const Node& node)
         {
-            if (node.leaf.has_value())
-                c (*node.leaf);
+            if (node.value.has_value())
+                c (node.value.leaf());
         });
 }
 
@@ -228,17 +232,64 @@ typename AbstractTree<ElementType, DerivedType>::Node* AbstractTree<ElementType,
     auto* new_node = new (allocator.allocate<Node> (1)) Node {};
 
     last_node->next_linear = new_node;
-    new_node->prev_linear = last_node;
     last_node = new_node;
 
     return new_node;
 }
 
 template <typename ElementType, typename DerivedType>
-std::string_view AbstractTree<ElementType, DerivedType>::allocateTag (std::string_view str)
+typename AbstractTree<ElementType, DerivedType>::Node* AbstractTree<ElementType, DerivedType>::createTagNode (std::string_view* str)
 {
-    auto* str_data = allocator.allocate<char> (str.size());
+    auto* bytes = (std::byte*) allocator.allocate_bytes (sizeof(Node), alignof (Node));
+
+    auto* new_node = new (bytes) Node {};
+    last_node->next_linear = new_node;
+    last_node = new_node;
+
+    new_node->value.set_tag (str);
+
+    return new_node;
+}
+
+template <typename ElementType, typename DerivedType>
+typename AbstractTree<ElementType, DerivedType>::Node* AbstractTree<ElementType, DerivedType>::createTagNode (std::string_view str)
+{
+    auto* bytes = (std::byte*) allocator.allocate_bytes (sizeof(Node) + sizeof (std::string_view) + alignof (std::string_view) + str.size(), alignof (Node));
+
+    auto* new_node = new (bytes) Node {};
+    last_node->next_linear = new_node;
+    last_node = new_node;
+
+    bytes = juce::snapPointerToAlignment (bytes + sizeof (Node), alignof (std::string_view));
+
+    auto* str_data = (char*) (bytes + sizeof (std::string_view));
     std::copy (str.begin(), str.end(), str_data);
-    return { str_data, str.size() }; // NOLINT NOSONAR
+
+    auto tag_str_view = new (bytes) std::string_view { str_data, str.size() };
+    new_node->value.set_tag (tag_str_view);
+
+    return new_node;
+}
+
+template <typename ElementType, typename DerivedType>
+void AbstractTree<ElementType, DerivedType>::reserve (size_t num_nodes)
+{
+    if (count > 0)
+    {
+        jassertfalse;
+        return;
+    }
+    allocator.reset (num_nodes * sizeof (Node));
+}
+
+template <typename ElementType, typename DerivedType>
+void AbstractTree<ElementType, DerivedType>::freeArena()
+{
+    if (count > 0)
+    {
+        jassertfalse;
+        return;
+    }
+    allocator.reset (allocator.get_current_arena().get_total_num_bytes());
 }
 } // namespace chowdsp

@@ -5,11 +5,10 @@ struct StringTree : chowdsp::AbstractTree<std::string, StringTree>
 {
     static Node& insert_string (std::string&& element, Node& parent_node, AbstractTree& tree)
     {
-        auto* new_node = tree.createEmptyNode();
-        new_node->leaf = std::move (element);
+        auto* new_node = tree.createLeafNode (std::move(element));
 
         insertNodeSorted (parent_node, new_node, [] (const Node& el1, const Node& el2)
-                          { return *el1.leaf < *el2.leaf; });
+                          { return el1.value.leaf() < el2.value.leaf(); });
         return *new_node;
     }
 
@@ -17,15 +16,14 @@ struct StringTree : chowdsp::AbstractTree<std::string, StringTree>
     {
         for (auto* iter = root.first_child; iter != nullptr; iter = iter->next_sibling)
         {
-            if (iter->tag == std::string_view { element.data(), 1 })
-                return *insert_string (std::move (element), *iter, self).leaf;
+            if (iter->value.tag() == std::string_view { element.data(), 1 })
+                return insert_string (std::move (element), *iter, self).value.leaf();
         }
 
-        auto* new_sub_tree = self.createEmptyNode();
-        new_sub_tree->tag = self.allocateTag ({ element.data(), 1 });
+        auto* new_sub_tree = self.createTagNode ({ element.data(), 1 });
         insertNodeSorted (root, new_sub_tree, [] (const Node& el1, const Node& el2)
-                          { return el1.tag < el2.tag; });
-        return *insert_string (std::move (element), *new_sub_tree, self).leaf;
+                          { return el1.value.tag() < el2.value.tag(); });
+        return insert_string (std::move (element), *new_sub_tree, self).value.leaf();
     }
 };
 
@@ -42,40 +40,40 @@ TEST_CASE ("Abstract Tree Test", "[common][data-structures]")
         tree.clear();
         REQUIRE (tree.size() == 0);
     }
-
+    
     SECTION ("Insertion")
     {
         tree.insertElement ("almonds");
         REQUIRE (tree.size() == 5);
-
+    
         {
             const auto* a_node = tree.getRootNode().first_child;
-            REQUIRE (a_node->tag == "a");
-            REQUIRE (a_node->first_child->leaf == "alfalfa");
-            REQUIRE (a_node->first_child->next_sibling->leaf == "almonds");
-            REQUIRE (a_node->first_child->next_sibling->next_sibling->leaf == "apples");
+            REQUIRE (a_node->value.tag() == "a");
+            REQUIRE (a_node->first_child->value.leaf() == "alfalfa");
+            REQUIRE (a_node->first_child->next_sibling->value.leaf() == "almonds");
+            REQUIRE (a_node->first_child->next_sibling->next_sibling->value.leaf() == "apples");
         }
-
+    
         tree.insertElement ("acai");
         REQUIRE (tree.size() == 6);
-
+    
         {
             const auto* a_node = tree.getRootNode().first_child;
-            REQUIRE (a_node->tag == "a");
-            REQUIRE (a_node->first_child->leaf == "acai");
-            REQUIRE (a_node->first_child->next_sibling->leaf == "alfalfa");
-            REQUIRE (a_node->first_child->next_sibling->next_sibling->leaf == "almonds");
-            REQUIRE (a_node->first_child->next_sibling->next_sibling->next_sibling->leaf == "apples");
+            REQUIRE (a_node->value.tag() == "a");
+            REQUIRE (a_node->first_child->value.leaf() == "acai");
+            REQUIRE (a_node->first_child->next_sibling->value.leaf() == "alfalfa");
+            REQUIRE (a_node->first_child->next_sibling->next_sibling->value.leaf() == "almonds");
+            REQUIRE (a_node->first_child->next_sibling->next_sibling->next_sibling->value.leaf() == "apples");
         }
     }
-
+    
     SECTION ("Remove One")
     {
         tree.removeElement ("beets");
         REQUIRE (tree.size() == 3);
 
         const auto* d_node = tree.getRootNode().first_child->next_sibling;
-        REQUIRE (d_node->tag == "d");
+        REQUIRE (d_node->value.tag() == "d");
     }
 
     SECTION ("Remove From Start of Sub-Tree")
@@ -84,7 +82,7 @@ TEST_CASE ("Abstract Tree Test", "[common][data-structures]")
         REQUIRE (tree.size() == 3);
 
         const auto* a_node = tree.getRootNode().first_child;
-        REQUIRE (a_node->first_child->leaf == "apples");
+        REQUIRE (a_node->first_child->value.leaf() == "apples");
     }
 
     SECTION ("Remove From End of Sub-Tree")
@@ -93,7 +91,7 @@ TEST_CASE ("Abstract Tree Test", "[common][data-structures]")
         REQUIRE (tree.size() == 3);
 
         const auto* a_node = tree.getRootNode().first_child;
-        REQUIRE (a_node->last_child->leaf == "alfalfa");
+        REQUIRE (a_node->first_child->value.leaf() == "alfalfa");
     }
 
     SECTION ("Remove Last Node in Sub-Tree")
@@ -102,7 +100,7 @@ TEST_CASE ("Abstract Tree Test", "[common][data-structures]")
         REQUIRE (tree.size() == 3);
 
         const auto* b_node = tree.getRootNode().last_child;
-        REQUIRE (b_node->tag == "b");
+        REQUIRE (b_node->value.tag() == "b");
     }
 
     SECTION ("Remove Multiple")
@@ -112,7 +110,7 @@ TEST_CASE ("Abstract Tree Test", "[common][data-structures]")
         REQUIRE (tree.size() == 2);
 
         REQUIRE (tree.getRootNode().first_child == tree.getRootNode().last_child);
-        REQUIRE (tree.getRootNode().first_child->tag == "a");
+        REQUIRE (tree.getRootNode().first_child->value.tag() == "a");
     }
 
     SECTION ("Remove All")
@@ -123,8 +121,8 @@ TEST_CASE ("Abstract Tree Test", "[common][data-structures]")
 
         tree.insertElement ("mussels");
         REQUIRE (tree.size() == 1);
-        REQUIRE (tree.getRootNode().first_child->tag == "m");
-        REQUIRE (tree.getRootNode().first_child->first_child->leaf == "mussels");
+        REQUIRE (tree.getRootNode().first_child->value.tag() == "m");
+        REQUIRE (tree.getRootNode().first_child->first_child->value.leaf() == "mussels");
 
         auto found = tree.findElement ("mussels");
         REQUIRE (found);
