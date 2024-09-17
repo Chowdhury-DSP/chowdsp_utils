@@ -11,10 +11,12 @@ class AbstractTree
 public:
     struct ValuePtr
     {
+        JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324) // structure was padded due to alignment specifier
         struct alignas (8) Void
         {
         };
         PackedPointer<Void> ptr { nullptr, Empty };
+        JUCE_END_IGNORE_WARNINGS_MSVC
 
         ValuePtr() = default;
 
