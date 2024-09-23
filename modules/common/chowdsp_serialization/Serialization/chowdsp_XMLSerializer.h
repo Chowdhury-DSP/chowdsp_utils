@@ -28,6 +28,8 @@ public:
     static void toMemoryBlock (const SerializedType& serial, juce::MemoryBlock& block) // NOSONAR
     {
         auto&& outStream = juce::MemoryOutputStream (block, false);
+        // magic number to identify memory blocks that we've stored as XML
+        const juce::uint32 magicXmlNumber = 0x21324356;
         serial->writeTo (outStream);
     }
 
