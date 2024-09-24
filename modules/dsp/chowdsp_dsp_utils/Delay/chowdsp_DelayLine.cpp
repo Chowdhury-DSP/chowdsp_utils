@@ -26,14 +26,14 @@
 namespace chowdsp
 {
 //==============================================================================
-template <typename SampleType, typename InterpolationType>
-DelayLine<SampleType, InterpolationType>::DelayLine()
+template <typename SampleType, typename InterpolationType, typename StorageType>
+DelayLine<SampleType, InterpolationType, StorageType>::DelayLine()
     : DelayLine (1 << 18)
 {
 }
 
-template <typename SampleType, typename InterpolationType>
-DelayLine<SampleType, InterpolationType>::DelayLine (int maximumDelayInSamples)
+template <typename SampleType, typename InterpolationType, typename StorageType>
+DelayLine<SampleType, InterpolationType, StorageType>::DelayLine (int maximumDelayInSamples)
 {
     jassert (maximumDelayInSamples >= 0);
 
@@ -41,8 +41,8 @@ DelayLine<SampleType, InterpolationType>::DelayLine (int maximumDelayInSamples)
 }
 
 //==============================================================================
-template <typename SampleType, typename InterpolationType>
-void DelayLine<SampleType, InterpolationType>::setDelay (DelayLine<SampleType, InterpolationType>::NumericType newDelayInSamples)
+template <typename SampleType, typename InterpolationType, typename StorageType>
+void DelayLine<SampleType, InterpolationType, StorageType>::setDelay (DelayLine<SampleType, InterpolationType, StorageType>::NumericType newDelayInSamples)
 {
     auto upperLimit = (NumericType) (totalSize - 1);
     jassert (juce::isPositiveAndNotGreaterThan (newDelayInSamples, upperLimit));
@@ -54,15 +54,16 @@ void DelayLine<SampleType, InterpolationType>::setDelay (DelayLine<SampleType, I
     interpolator.updateInternalVariables (delayInt, delayFrac);
 }
 
-template <typename SampleType, typename InterpolationType>
-SampleTypeHelpers::ProcessorNumericType<DelayLine<SampleType, InterpolationType>> DelayLine<SampleType, InterpolationType>::getDelay() const
+template <typename SampleType, typename InterpolationType, typename StorageType>
+SampleTypeHelpers::ProcessorNumericType<DelayLine<SampleType, InterpolationType, StorageType>>
+    DelayLine<SampleType, InterpolationType, StorageType>::getDelay() const
 {
     return delay;
 }
 
 //==============================================================================
-template <typename SampleType, typename InterpolationType>
-void DelayLine<SampleType, InterpolationType>::prepare (const juce::dsp::ProcessSpec& spec)
+template <typename SampleType, typename InterpolationType, typename StorageType>
+void DelayLine<SampleType, InterpolationType, StorageType>::prepare (const juce::dsp::ProcessSpec& spec)
 {
     jassert (spec.numChannels > 0);
 
@@ -80,8 +81,8 @@ void DelayLine<SampleType, InterpolationType>::prepare (const juce::dsp::Process
         bufferPtrs[(size_t) ch] = this->bufferData.getWritePointer (ch);
 }
 
-template <typename SampleType, typename InterpolationType>
-void DelayLine<SampleType, InterpolationType>::free()
+template <typename SampleType, typename InterpolationType, typename StorageType>
+void DelayLine<SampleType, InterpolationType, StorageType>::free()
 {
     this->bufferData.setMaxSize (0, 0);
 
@@ -91,8 +92,8 @@ void DelayLine<SampleType, InterpolationType>::free()
     bufferPtrs.clear();
 }
 
-template <typename SampleType, typename InterpolationType>
-void DelayLine<SampleType, InterpolationType>::reset()
+template <typename SampleType, typename InterpolationType, typename StorageType>
+void DelayLine<SampleType, InterpolationType, StorageType>::reset()
 {
     for (auto vec : { &this->writePos, &this->readPos })
         std::fill (vec->begin(), vec->end(), 0);

@@ -29,7 +29,7 @@ namespace chowdsp
 {
 #ifndef DOXYGEN
 /** Base class for delay lines with any interpolation type */
-template <typename SampleType>
+template <typename SampleType, typename StorageType = SampleType>
 class DelayLineBase
 {
 public:
@@ -50,7 +50,7 @@ public:
     virtual SampleType popSample (int /* channel */, NumericType /* delayInSamples */, bool /* updateReadPointer */) noexcept = 0;
     virtual void incrementReadPointer (int channel) noexcept = 0;
 
-    void copyState (const DelayLineBase<SampleType>& other)
+    void copyState (const DelayLineBase& other)
     {
         const auto numChannels = other.bufferData.getNumChannels();
         const auto numSamples = other.bufferData.getNumSamples();
@@ -71,7 +71,7 @@ public:
     }
 
 protected:
-    Buffer<SampleType> bufferData;
+    Buffer<StorageType> bufferData;
     std::vector<SampleType> v;
     std::vector<int> writePos, readPos;
 };
@@ -90,8 +90,8 @@ protected:
     Note: If you intend to change the delay in real time, you may want to smooth
     changes to the delay systematically using either a ramp or a low-pass filter.
 */
-template <typename SampleType, typename InterpolationType = DelayLineInterpolationTypes::Linear>
-class DelayLine : public DelayLineBase<SampleType>
+template <typename SampleType, typename InterpolationType = DelayLineInterpolationTypes::Linear, typename StorageType = SampleType>
+class DelayLine : public DelayLineBase<SampleType, StorageType>
 {
     using NumericType = SampleTypeHelpers::ProcessorNumericType<DelayLine>;
 
@@ -132,8 +132,8 @@ public:
     inline void pushSample (int channel, SampleType sample) noexcept final
     {
         const auto writePtr = this->writePos[(size_t) channel];
-        bufferPtrs[(size_t) channel][writePtr] = sample;
-        bufferPtrs[(size_t) channel][writePtr + totalSize] = sample;
+        bufferPtrs[(size_t) channel][writePtr] = static_cast<StorageType> (sample);
+        bufferPtrs[(size_t) channel][writePtr + totalSize] = static_cast<StorageType> (sample);
         incrementWritePointer (channel);
     }
 
@@ -263,7 +263,7 @@ private:
 
     //==============================================================================
     InterpolationType interpolator;
-    std::vector<SampleType*> bufferPtrs;
+    std::vector<StorageType*> bufferPtrs;
     NumericType delay = 0.0, delayFrac = 0.0;
     int delayInt = 0, totalSize = 4;
 

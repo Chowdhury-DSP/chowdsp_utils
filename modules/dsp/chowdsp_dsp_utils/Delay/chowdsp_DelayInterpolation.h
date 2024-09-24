@@ -20,10 +20,10 @@ namespace DelayLineInterpolationTypes
         {
         }
 
-        template <typename SampleType, typename NumericType = SampleTypeHelpers::NumericType<SampleType>>
+        template <typename SampleType, typename NumericType = SampleTypeHelpers::NumericType<SampleType>, typename StorageType = SampleType>
         inline SampleType call (const SampleType* buffer, int delayInt, NumericType /*delayFrac*/ = {}, const SampleType& /*state*/ = {})
         {
-            return buffer[delayInt];
+            return static_cast<SampleType> (buffer[delayInt]);
         }
     };
 
@@ -40,14 +40,14 @@ namespace DelayLineInterpolationTypes
         {
         }
 
-        template <typename SampleType, typename NumericType>
-        inline SampleType call (const SampleType* buffer, int delayInt, NumericType delayFrac, const SampleType& /*state*/ = {})
+        template <typename SampleType, typename NumericType, typename StorageType = SampleType>
+        inline SampleType call (const StorageType* buffer, int delayInt, NumericType delayFrac, const SampleType& /*state*/ = {})
         {
             auto index1 = delayInt;
             auto index2 = index1 + 1;
 
-            auto value1 = buffer[index1];
-            auto value2 = buffer[index2];
+            auto value1 = static_cast<SampleType> (buffer[index1]);
+            auto value2 = static_cast<SampleType> (buffer[index2]);
 
             return value1 + (SampleType) delayFrac * (value2 - value1);
         }
@@ -71,18 +71,18 @@ namespace DelayLineInterpolationTypes
             }
         }
 
-        template <typename SampleType, typename NumericType>
-        inline SampleType call (const SampleType* buffer, int delayInt, NumericType delayFrac, const SampleType& /*state*/ = {})
+        template <typename SampleType, typename NumericType, typename StorageType = SampleType>
+        inline SampleType call (const StorageType* buffer, int delayInt, NumericType delayFrac, const SampleType& /*state*/ = {})
         {
             auto index1 = delayInt;
             auto index2 = index1 + 1;
             auto index3 = index2 + 1;
             auto index4 = index3 + 1;
 
-            auto value1 = buffer[index1];
-            auto value2 = buffer[index2];
-            auto value3 = buffer[index3];
-            auto value4 = buffer[index4];
+            auto value1 = static_cast<SampleType> (buffer[index1]);
+            auto value2 = static_cast<SampleType> (buffer[index2]);
+            auto value3 = static_cast<SampleType> (buffer[index3]);
+            auto value4 = static_cast<SampleType> (buffer[index4]);
 
             auto d1 = delayFrac - (NumericType) 1.0;
             auto d2 = delayFrac - (NumericType) 2.0;
@@ -114,8 +114,8 @@ namespace DelayLineInterpolationTypes
             }
         }
 
-        template <typename SampleType, typename NumericType>
-        inline SampleType call (const SampleType* buffer, int delayInt, NumericType delayFrac, const SampleType& /*state*/ = {})
+        template <typename SampleType, typename NumericType, typename StorageType = SampleType>
+        inline SampleType call (const StorageType* buffer, int delayInt, NumericType delayFrac, const SampleType& /*state*/ = {})
         {
             auto index1 = delayInt;
             auto index2 = index1 + 1;
@@ -124,12 +124,12 @@ namespace DelayLineInterpolationTypes
             auto index5 = index4 + 1;
             auto index6 = index5 + 1;
 
-            auto value1 = buffer[index1];
-            auto value2 = buffer[index2];
-            auto value3 = buffer[index3];
-            auto value4 = buffer[index4];
-            auto value5 = buffer[index5];
-            auto value6 = buffer[index6];
+            auto value1 = static_cast<SampleType> (buffer[index1]);
+            auto value2 = static_cast<SampleType> (buffer[index2]);
+            auto value3 = static_cast<SampleType> (buffer[index3]);
+            auto value4 = static_cast<SampleType> (buffer[index4]);
+            auto value5 = static_cast<SampleType> (buffer[index5]);
+            auto value6 = static_cast<SampleType> (buffer[index6]);
 
             auto d1 = delayFrac - (NumericType) 1.0;
             auto d2 = delayFrac - (NumericType) 2.0;
