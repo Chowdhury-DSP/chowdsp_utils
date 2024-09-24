@@ -12,10 +12,6 @@ namespace juce
 
 namespace chowdsp
 {
-#ifndef DOXYGEN
-class FloatParameter;
-#endif
-
 /**
  * Template class for smoothing a value over a series of buffers.
  * This can be used with raw values or with parameter handles.
@@ -38,6 +34,7 @@ public:
      */
     void setParameterHandle (std::atomic<float>* handle);
 
+#if JUCE_MODULE_AVAILABLE_chowdsp_parameters
     /**
      * Sets a parameter handle for this buffer to use for smoothing.
      * Note that the parameter handle must not be deleted before this object!
@@ -45,6 +42,7 @@ public:
      * @param handle A parameter handle to use for smoothing
      */
     void setParameterHandle (const FloatParameter* handle);
+#endif
 
     /**
      * Prepare the smoother to process samples with a given sample rate
@@ -98,23 +96,34 @@ public:
      * If using a custom mapping function, make sure this is set properly before calling
      * `prepare()` or `reset()`.
      */
-    std::function<FloatType (FloatType)> mappingFunction = [] (auto x)
+#if CHOWDSP_SMOOTHED_BUFFER_SMALL
+    using MappingFunction = juce::dsp::FixedSizeFunction<16, FloatType (FloatType)>;
+#else
+    using MappingFunction = std::function<FloatType (FloatType)>;
+#endif
+    MappingFunction mappingFunction = [] (auto x)
     { return x; };
 
 private:
+#if ! CHOWDSP_SMOOTHED_BUFFER_SMALL
 #if ! CHOWDSP_NO_XSIMD
     std::vector<FloatType, xsimd::default_allocator<FloatType>> buffer;
 #else
     std::vector<FloatType> buffer;
+#endif
 #endif
     FloatType* bufferData = nullptr;
 
     juce::SmoothedValue<FloatType, ValueSmoothingType> smoother;
     bool isCurrentlySmoothing = false;
 
+#if ! CHOWDSP_SMOOTHED_BUFFER_SMALL
     std::atomic<float>* parameterHandle = nullptr;
 
+#if JUCE_MODULE_AVAILABLE_chowdsp_parameters
     const FloatParameter* modulatableParameterHandle = nullptr;
+#endif
+#endif
 
     double sampleRate = 48000.0;
     double rampLengthInSeconds = 0.05;

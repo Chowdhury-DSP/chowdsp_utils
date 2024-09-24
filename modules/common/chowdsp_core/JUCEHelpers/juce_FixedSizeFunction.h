@@ -125,7 +125,7 @@ namespace dsp
         template <typename Callable,
                   typename Fn = Decay<Callable>,
                   IntIfValidConversion<Callable> = 0>
-        FixedSizeFunction (Callable&& callable)
+        FixedSizeFunction (Callable&& callable) // NOLINT
         {
             static_assert (sizeof (Fn) <= len,
                            "The requested function cannot fit in this FixedSizeFunction");
@@ -137,6 +137,7 @@ namespace dsp
 
             auto* ptr = new (&storage) Fn (std::forward<Callable> (callable));
             jassertquiet ((void*) ptr == (void*) &storage);
+            ignoreUnused (ptr);
         }
 
         /** Move constructor. */
@@ -148,7 +149,7 @@ namespace dsp
 
         /** Converting constructor from smaller FixedSizeFunctions. */
         template <size_t otherLen, typename std::enable_if<(otherLen < len), int>::type = 0>
-        FixedSizeFunction (FixedSizeFunction<otherLen, Ret (Args...)>&& other) noexcept
+        FixedSizeFunction (FixedSizeFunction<otherLen, Ret (Args...)>&& other) noexcept // NOLINT
             : vtable (other.vtable)
         {
             move (std::move (other));
