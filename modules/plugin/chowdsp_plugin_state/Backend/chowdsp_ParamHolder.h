@@ -7,7 +7,7 @@ class ParamHolder
 {
 public:
     /** Convenient alias for a Parameter ID */
-    using PID = juce::ParameterID;
+    using PID = ParameterID;
 
     /**
      * Creates a ParamHolder. The user might want to name the ParamHolder,
