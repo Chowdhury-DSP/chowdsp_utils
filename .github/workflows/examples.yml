@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 env:
-  EXAMPLE_TARGETS: "ForwardingTestPlugin_Standalone ModalSpringReverb_Standalone SimpleEQ_Standalone StatefulPlugin_Standalone ExampleCompressor_Standalone"
+  EXAMPLE_TARGETS: "ForwardingTestPlugin_CLAP ModalSpringReverb_CLAP SimpleEQ_CLAP StatefulPlugin_CLAP ExampleCompressor_CLAP"
 
 jobs:
   build_examples:
@@ -48,3 +48,9 @@ jobs:
       - name: "Build Example: ${{ matrix.target }}"
         shell: bash
         run: cmake --build build --parallel 4 --target $EXAMPLE_TARGETS
+
+      - name: run clap-validator
+        uses: jatinchowdhury18/clap-val-action@main
+        with:
+          plugin_path: build/plugin_products/SimpleEQ.clap build/plugin_products/StatefulPlugin.clap build/plugin_products/ExampleCompressor.clap
+          args: --only-failed --hide-output --invert-filter --test-filter "state-*"

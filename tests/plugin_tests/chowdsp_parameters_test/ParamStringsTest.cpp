@@ -39,6 +39,7 @@ TEST_CASE ("Param Strings Test", "[plugin][parameters]")
         REQUIRE_MESSAGE (timeMsValToString (10.0f) == juce::String ("10.00 ms"), "Incorrect milliseconds string!");
         REQUIRE_MESSAGE (timeMsValToString (2000.0f) == juce::String ("2.00 s"), "Incorrect seconds string!");
         REQUIRE_MESSAGE (juce::approximatelyEqual (stringToTimeMsVal ("200 ms"), 200.0f), "Incorrect milliseconds value!");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (stringToTimeMsVal ("2.00 s"), 2'000.0f), "Incorrect seconds value!");
     }
 
     SECTION ("Semitones Param Test")
