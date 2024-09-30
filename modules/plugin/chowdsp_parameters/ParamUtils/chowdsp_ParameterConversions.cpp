@@ -53,7 +53,18 @@ juce::String timeMsValToString (float timeMsVal)
     return timeSecStr + " s";
 }
 
-float stringToTimeMsVal (const juce::String& s) { return s.getFloatValue(); }
+float stringToTimeMsVal (const juce::String& s)
+{
+    auto timeVal = s.getFloatValue();
+
+    if (s.endsWith (" s") || s.endsWith (" S")
+        || s.endsWith (" seconds") || s.endsWith (" Seconds"))
+        timeVal *= 1000.0f;
+
+    return timeVal;
+
+    return s.getFloatValue();
+}
 
 juce::String semitonesValToString (float semitonesVal, bool snapToInt)
 {
