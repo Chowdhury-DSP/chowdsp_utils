@@ -62,8 +62,6 @@ float stringToTimeMsVal (const juce::String& s)
         timeVal *= 1000.0f;
 
     return timeVal;
-
-    return s.getFloatValue();
 }
 
 juce::String semitonesValToString (float semitonesVal, bool snapToInt)
