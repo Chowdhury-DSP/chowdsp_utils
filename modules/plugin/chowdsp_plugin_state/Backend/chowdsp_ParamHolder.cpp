@@ -177,7 +177,7 @@ void ParamHolder::deserialize (typename Serializer::DeserializedType deserial, P
     }
     else
     {
-        jassertfalse; // state loading error
+       // jassertfalse; // state loading error
     }
 
     for(auto id: paramIDsThatHaveBeenDeserialized)
