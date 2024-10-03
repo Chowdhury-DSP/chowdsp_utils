@@ -43,12 +43,12 @@ void AbstractTree<ElementType, DerivedType>::insertNodeSorted (Node& parent, Nod
     if (parent.first_child == nullptr)
     {
         parent.first_child = new_node;
-        parent.last_child = new_node;
         return;
     }
 
     // insert into the parents children, sorted
-    for (auto* iter = parent.first_child; iter != nullptr; iter = iter->next_sibling)
+    Node* prev {};
+    for (Node* iter = parent.first_child; iter != nullptr; iter = iter->next_sibling)
     {
         if (comparator (*new_node, *iter))
         {
@@ -56,20 +56,20 @@ void AbstractTree<ElementType, DerivedType>::insertNodeSorted (Node& parent, Nod
             new_node->prev_sibling = iter->prev_sibling;
             iter->prev_sibling = new_node;
 
-            if (auto* prev_sibling = new_node->prev_sibling; prev_sibling != nullptr)
-                prev_sibling->next_sibling = new_node;
+            if (prev != nullptr)
+                prev->next_sibling = new_node;
 
             if (iter == parent.first_child)
                 parent.first_child = new_node;
 
             return;
         }
+        prev = iter;
     }
 
     // insert at the end of the parents children
-    parent.last_child->next_sibling = new_node;
-    new_node->prev_sibling = parent.last_child;
-    parent.last_child = new_node;
+    prev->next_sibling = new_node;
+    new_node->prev_sibling = prev;
 }
 
 template <typename ElementType, typename DerivedType>
@@ -99,18 +99,15 @@ void AbstractTree<ElementType, DerivedType>::removeNode (Node& node)
     if (node.next_sibling != nullptr)
         node.next_sibling->prev_sibling = node.prev_sibling;
 
-    if (node.parent->first_child == node.parent->last_child)
+    if (node.prev_sibling == nullptr && node.next_sibling == nullptr)
     {
         node.parent->first_child = nullptr;
-        node.parent->last_child = nullptr;
         removeNode (*node.parent);
     }
     else
     {
         if (node.parent->first_child == &node)
             node.parent->first_child = node.next_sibling;
-        if (node.parent->last_child == &node)
-            node.parent->last_child = node.prev_sibling;
     }
 
     node.value.destroy();
@@ -138,16 +135,11 @@ void AbstractTree<ElementType, DerivedType>::removeElements (const Callable& ele
     // need to change.
     for (auto* node = &root_node; node != nullptr;)
     {
+        auto* next_node = node->next_linear;
         if (node->value.has_value() && elementsToRemove (node->value.leaf()))
-        {
-            auto* next_node = node->next_linear;
             removeNode (*node);
-            node = next_node;
-        }
-        else
-        {
-            node = node->next_linear;
-        }
+
+        node = next_node;
     }
 }
 

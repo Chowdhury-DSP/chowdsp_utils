@@ -118,7 +118,7 @@ TEST_CASE ("Abstract Tree Test", "[common][data-structures]")
         tree.removeElement ("donuts");
         REQUIRE (tree.size() == 3);
 
-        const auto* b_node = tree.getRootNode().last_child;
+        const auto* b_node = tree.getRootNode().first_child->next_sibling;
         REQUIRE (b_node->value.tag() == "b");
     }
 
@@ -128,7 +128,8 @@ TEST_CASE ("Abstract Tree Test", "[common][data-structures]")
                              { return el.find ('t') != std::string::npos; });
         REQUIRE (tree.size() == 2);
 
-        REQUIRE (tree.getRootNode().first_child == tree.getRootNode().last_child);
+        REQUIRE (tree.getRootNode().first_child->next_sibling == nullptr);
+        REQUIRE (tree.getRootNode().first_child->prev_sibling == nullptr);
         REQUIRE (tree.getRootNode().first_child->value.tag() == "a");
     }
 
