@@ -14,10 +14,10 @@ struct DataTree : chowdsp::AbstractTree<FakeData, DataTree>
     static Node& insertOneElement (FakeData&& element, Node& parent, AbstractTree& tree)
     {
         auto* new_node = tree.createLeafNode (std::move (element));
-        new_node->prev_sibling = parent.last_child;
-        if (parent.last_child != nullptr)
-            parent.last_child->next_sibling = new_node;
-        parent.last_child = new_node;
+        new_node->next_sibling = parent.first_child;
+        if (parent.first_child != nullptr)
+            parent.first_child->prev_sibling = new_node;
+        parent.first_child = new_node;
         return *new_node;
     }
 
@@ -27,25 +27,24 @@ struct DataTree : chowdsp::AbstractTree<FakeData, DataTree>
                                               std::string_view tag)
     {
         auto* new_sub_tree_node = tree.createTagNode (tag);
-        new_sub_tree_node->prev_sibling = parent.last_child;
-        if (parent.last_child != nullptr)
-            parent.last_child->next_sibling = new_sub_tree_node;
-        parent.last_child = new_sub_tree_node;
+        new_sub_tree_node->next_sibling = parent.first_child;
+        if (parent.first_child != nullptr)
+            parent.first_child->prev_sibling = new_sub_tree_node;
+        parent.first_child = new_sub_tree_node;
         return insertOneElement (std::move (element), *new_sub_tree_node, tree);
     }
 
     static FakeData& insertElementInternal (AbstractTree& self, FakeData&& element, Node& root)
     {
-        // since we know all the tags ahead of time, we only compare the first letter.
         for (auto* iter = root.first_child; iter != nullptr; iter = iter->next_sibling)
         {
-            if (iter->value.tag()[0] == positiveTag[0] && element[0] > 0)
+            if (iter->value.tag() == positiveTag && element[0] > 0)
                 return insertOneElement (std::move (element), *iter, self).value.leaf();
 
-            if (iter->value.tag()[0] == negativeTag[0] && element[0] < 0)
+            if (iter->value.tag() == negativeTag && element[0] < 0)
                 return insertOneElement (std::move (element), *iter, self).value.leaf();
 
-            if (iter->value.tag()[0] == zeroTag[0] && element[0] == 0)
+            if (iter->value.tag() == zeroTag && element[0] == 0)
                 return insertOneElement (std::move (element), *iter, self).value.leaf();
         }
 

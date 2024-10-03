@@ -81,7 +81,6 @@ public:
 
         Node* parent {}; // slot for parent in hierarchy
         Node* first_child {}; // slot for first child in hierarchy
-        Node* last_child {}; // slot for last child in hierarchy
         Node* next_sibling {}; // slot for next sibling in hierarchy
         Node* prev_sibling {}; // slot for previous sibling in hierarchy
         Node* next_linear {}; // slot for linked list through all nodes
@@ -107,7 +106,10 @@ public:
     /** Removes a node. */
     void removeNode (Node& node);
 
-    /** Removes a element by value. */
+    /**
+     * Removes a element by value.
+     * If the tree contains multiple identical elements, only the first will be removed.
+     */
     void removeElement (const ElementType& element);
 
     /**

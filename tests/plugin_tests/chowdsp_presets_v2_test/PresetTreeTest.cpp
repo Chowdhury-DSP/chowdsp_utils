@@ -89,7 +89,7 @@ TEST_CASE ("Preset Tree Test", "[plugin][presets]")
         REQUIRE (drums_node->first_child->next_sibling->next_sibling == nullptr);
 
         const auto* loose_preset = drums_node->next_sibling;
-        REQUIRE (loose_preset == root.last_child);
+        REQUIRE (loose_preset->next_sibling == nullptr);
         REQUIRE (loose_preset->value.leaf().getName() == "Preset1");
     }
 
@@ -126,7 +126,7 @@ TEST_CASE ("Preset Tree Test", "[plugin][presets]")
         REQUIRE (jatin_drums_node->first_child->next_sibling == nullptr);
 
         const auto* jatin_loose_preset = jatin_drums_node->next_sibling;
-        REQUIRE (jatin_loose_preset == jatin_node->last_child);
+        REQUIRE (jatin_loose_preset->next_sibling == nullptr);
         REQUIRE (jatin_loose_preset->value.leaf().getName() == "Blah");
 
         const auto* steve_node = jatin_node->next_sibling;
