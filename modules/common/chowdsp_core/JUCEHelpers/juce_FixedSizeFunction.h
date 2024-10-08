@@ -197,7 +197,12 @@ namespace dsp
             if (vtable != nullptr)
                 return vtable->call (&storage, std::forward<Args> (args)...);
 
+#if __cpp_exceptions
             throw std::bad_function_call();
+#else
+            jassertfalse;
+            return {};
+#endif
         }
 
         /** Returns true if this instance currently holds a callable. */
