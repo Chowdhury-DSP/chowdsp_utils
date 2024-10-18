@@ -716,15 +716,15 @@ int countInfs (const double* src, int numValues) noexcept
 
 void rotate (float* data, int numToRotate, int totalNumValues, float* scratchData) noexcept
 {
-    juce::FloatVectorOperations::copy (scratchData, data, numToRotate);
-    juce::FloatVectorOperations::copy (data, data + numToRotate, totalNumValues - numToRotate);
-    juce::FloatVectorOperations::copy (data + totalNumValues - numToRotate, scratchData, numToRotate);
+    std::copy (data, data + numToRotate, scratchData);
+    std::copy (data + numToRotate, data + totalNumValues, data);
+    std::copy (scratchData, scratchData + numToRotate, data + totalNumValues - numToRotate);
 }
 
 void rotate (double* data, int numToRotate, int totalNumValues, double* scratchData) noexcept
 {
-    juce::FloatVectorOperations::copy (scratchData, data, numToRotate);
-    juce::FloatVectorOperations::copy (data, data + numToRotate, totalNumValues - numToRotate);
-    juce::FloatVectorOperations::copy (data + totalNumValues - numToRotate, scratchData, numToRotate);
+    std::copy (data, data + numToRotate, scratchData);
+    std::copy (data + numToRotate, data + totalNumValues, data);
+    std::copy (scratchData, scratchData + numToRotate, data + totalNumValues - numToRotate);
 }
 } // namespace chowdsp::FloatVectorOperations
