@@ -137,6 +137,7 @@ void Buffer<SampleType, alignment>::clear() noexcept
     hasBeenCleared = true;
 }
 
+#if CHOWDSP_ALLOW_TEMPLATE_INSTANTIATIONS
 template class Buffer<float>;
 template class Buffer<double>;
 #if CHOWDSP_USING_JUCE
@@ -155,5 +156,6 @@ template AudioBlock<const double> Buffer<double>::toAudioBlock<double>() const;
 #if ! CHOWDSP_NO_XSIMD
 template class Buffer<xsimd::batch<float>>;
 template class Buffer<xsimd::batch<double>>;
+#endif
 #endif
 } // namespace chowdsp
