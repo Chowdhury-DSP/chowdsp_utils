@@ -38,13 +38,9 @@ namespace FloatVectorOperations
     template <typename T>
     std::enable_if_t<std::is_floating_point_v<T>, T> computeRMS (const T* src, int numValues) noexcept;
 
-    /** Counts the number of NaN values in the input data */
+    /** Counts the number of Inf and NaN values in the input data */
     template <typename T>
-    std::enable_if_t<std::is_floating_point_v<T>, int> countNaNs (const T* src, int numValues) noexcept;
-
-    /** Counts the number of Inf values in the input data */
-    template <typename T>
-    std::enable_if_t<std::is_floating_point_v<T>, int> countInfs (const T* src, int numValues) noexcept;
+    std::enable_if_t<std::is_floating_point_v<T>, int> countInfsAndNaNs (const T* src, int numValues) noexcept;
 
     /**
      * Equivalent implementation to std::rotate, but without allocating memory.

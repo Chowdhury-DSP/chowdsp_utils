@@ -335,7 +335,7 @@ TEMPLATE_TEST_CASE ("FloatVectorOperations Test", "[dsp][math]", float, double)
                 for (int j = 0; j < numNaNs; ++j)
                     values[valueIndexes[(size_t) j]] = std::numeric_limits<TestType>::quiet_NaN();
 
-                REQUIRE (chowdsp::FloatVectorOperations::countNaNs (values.data(), numValues) == numNaNs);
+                REQUIRE (chowdsp::FloatVectorOperations::countInfsAndNaNs (values.data(), numValues) == numNaNs);
             }
         }
     }
@@ -361,7 +361,7 @@ TEMPLATE_TEST_CASE ("FloatVectorOperations Test", "[dsp][math]", float, double)
                 for (int j = 0; j < numInfs; ++j)
                     values[valueIndexes[(size_t) j]] = std::numeric_limits<TestType>::infinity();
 
-                REQUIRE (chowdsp::FloatVectorOperations::countInfs (values.data(), numValues) == numInfs);
+                REQUIRE (chowdsp::FloatVectorOperations::countInfsAndNaNs (values.data(), numValues) == numInfs);
             }
         }
     }

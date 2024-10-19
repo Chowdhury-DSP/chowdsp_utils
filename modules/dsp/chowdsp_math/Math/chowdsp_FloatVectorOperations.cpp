@@ -602,7 +602,7 @@ std::enable_if_t<std::is_floating_point_v<T>, T> computeRMS (const T* src, int n
 }
 
 template <typename T>
-std::enable_if_t<std::is_floating_point_v<T>, int> countNaNs (const T* src, int numValues) noexcept
+std::enable_if_t<std::is_floating_point_v<T>, int> countInfsAndNaNs (const T* src, int numValues) noexcept
 {
     return [] (const T* data, int numSamples)
     {
@@ -614,41 +614,14 @@ std::enable_if_t<std::is_floating_point_v<T>, int> countNaNs (const T* src, int 
                 const auto& x_int = reinterpret_cast<const uint32_t&> (data[i]);
                 const auto exp = x_int & 0x7F800000;
                 const auto mantissa = x_int & 0x007FFFFF;
-                nanCount += int (exp == 0x7F800000 && mantissa > 0);
+                nanCount += int (exp == 0x7F800000 && mantissa >= static_cast<uint32_t> (0));
             }
             else if constexpr (std::is_same_v<T, double>)
             {
                 const auto& x_int = reinterpret_cast<const uint64_t&> (data[i]);
                 const auto exp = x_int & 0x7FF0000000000000;
                 const auto mantissa = x_int & 0x000FFFFFFFFFFFFF;
-                nanCount += int (exp == 0x7F800000 && mantissa > 0);
-            }
-        }
-        return nanCount;
-    }(src, numValues);
-}
-
-template <typename T>
-std::enable_if_t<std::is_floating_point_v<T>, int> countInfs (const T* src, int numValues) noexcept
-{
-    return [] (const T* data, int numSamples)
-    {
-        int nanCount = 0;
-        for (int i = 0; i < numSamples; ++i)
-        {
-            if constexpr (std::is_same_v<T, float>)
-            {
-                const auto& x_int = reinterpret_cast<const uint32_t&> (data[i]);
-                const auto exp = x_int & 0x7F800000;
-                const auto mantissa = x_int & 0x007FFFFF;
-                nanCount += int (exp == 0x7F800000 && mantissa == 0);
-            }
-            else if constexpr (std::is_same_v<T, double>)
-            {
-                const auto& x_int = reinterpret_cast<const uint64_t&> (data[i]);
-                const auto exp = x_int & 0x7FF0000000000000;
-                const auto mantissa = x_int & 0x000FFFFFFFFFFFFF;
-                nanCount += int (exp == 0x7F800000 && mantissa == 0);
+                nanCount += int (exp == 0x7FF0000000000000 && mantissa >= static_cast<uint64_t> (0));
             }
         }
         return nanCount;
@@ -678,10 +651,8 @@ template void integerPower (float* dest, const float* src, int exponent, int num
 template void integerPower (double* dest, const double* src, int exponent, int numValues) noexcept;
 template float computeRMS (const float* src, int numValues) noexcept;
 template double computeRMS (const double* src, int numValues) noexcept;
-template int countNaNs (const float* src, int numValues) noexcept;
-template int countNaNs (const double* src, int numValues) noexcept;
-template int countInfs (const float* src, int numValues) noexcept;
-template int countInfs (const double* src, int numValues) noexcept;
+template int countInfsAndNaNs (const float* src, int numValues) noexcept;
+template int countInfsAndNaNs (const double* src, int numValues) noexcept;
 template void rotate (float* data, int numToRotate, int totalNumValues, float* scratchData) noexcept;
 template void rotate (double* data, int numToRotate, int totalNumValues, double* scratchData) noexcept;
 #endif
