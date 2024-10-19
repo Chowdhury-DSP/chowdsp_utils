@@ -151,7 +151,8 @@ SampleType Panner<SampleType>::getBoostForRule (Rule rule)
 }
 
 //==============================================================================
+#if CHOWDSP_ALLOW_TEMPLATE_INSTANTIATIONS
 template class Panner<float>;
 template class Panner<double>;
-
+#endif
 } // namespace chowdsp

@@ -1542,10 +1542,12 @@ FloatType JUCE_CALLTYPE detail::FloatVectorOperationsBase<FloatType, CountType>:
     return FloatVectorHelpers::findMaximum (src, numValues);
 }
 
+#if CHOWDSP_ALLOW_TEMPLATE_INSTANTIATIONS
 template struct detail::FloatVectorOperationsBase<float, int>;
 template struct detail::FloatVectorOperationsBase<float, size_t>;
 template struct detail::FloatVectorOperationsBase<double, int>;
 template struct detail::FloatVectorOperationsBase<double, size_t>;
+#endif
 
 void JUCE_CALLTYPE FloatVectorOperations::convertFixedToFloat (float* dest, const int* src, float multiplier, size_t num) noexcept
 {
@@ -1564,11 +1566,11 @@ intptr_t JUCE_CALLTYPE FloatVectorOperations::getFpStatusRegister() noexcept
     fpsr = static_cast<intptr_t> (_mm_getcsr());
 #elif defined(__arm64__) || defined(__aarch64__) || JUCE_USE_ARM_NEON
 #if defined(__arm64__) || defined(__aarch64__)
-    asm volatile("mrs %0, fpcr"
-                 : "=r"(fpsr));
+    asm volatile ("mrs %0, fpcr"
+                  : "=r"(fpsr));
 #elif JUCE_USE_ARM_NEON
-    asm volatile("vmrs %0, fpscr"
-                 : "=r"(fpsr));
+    asm volatile ("vmrs %0, fpscr"
+                  : "=r"(fpsr));
 #endif
 #else
 #if ! (defined(JUCE_INTEL) || defined(JUCE_ARM))
@@ -1588,13 +1590,13 @@ void JUCE_CALLTYPE FloatVectorOperations::setFpStatusRegister (intptr_t fpsr) no
     _mm_setcsr (fpsr_w);
 #elif defined(__arm64__) || defined(__aarch64__) || JUCE_USE_ARM_NEON
 #if defined(__arm64__) || defined(__aarch64__)
-    asm volatile("msr fpcr, %0"
-                 :
-                 : "ri"(fpsr));
+    asm volatile ("msr fpcr, %0"
+                  :
+                  : "ri"(fpsr));
 #elif JUCE_USE_ARM_NEON
-    asm volatile("vmsr fpscr, %0"
-                 :
-                 : "ri"(fpsr));
+    asm volatile ("vmsr fpscr, %0"
+                  :
+                  : "ri"(fpsr));
 #endif
 #else
 #if ! (defined(JUCE_INTEL) || defined(JUCE_ARM))

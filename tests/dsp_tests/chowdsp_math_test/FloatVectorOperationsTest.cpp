@@ -121,10 +121,12 @@ void testBinaryOp (std::vector<T>& in1, std::vector<T>& in2, VectorOp&& vectorOp
 
 TEMPLATE_TEST_CASE ("FloatVectorOperations Test", "[dsp][math]", float, double)
 {
+#if JUCE_MAC
     if (chowdsp::FloatVectorOperations::isUsingVDSP())
         INFO ("chowdsp::FloatVectorOperations: using vDSP");
     else
         INFO ("chowdsp::FloatVectorOperations: not using vDSP");
+#endif
 
     std::mt19937 mt (Catch::Generators::Detail::getSeed());
     std::vector<std::pair<int, int>> testRanges {
@@ -333,7 +335,7 @@ TEMPLATE_TEST_CASE ("FloatVectorOperations Test", "[dsp][math]", float, double)
                 for (int j = 0; j < numNaNs; ++j)
                     values[valueIndexes[(size_t) j]] = std::numeric_limits<TestType>::quiet_NaN();
 
-                REQUIRE (chowdsp::FloatVectorOperations::countNaNs (values.data(), numValues) == numNaNs);
+                REQUIRE (chowdsp::FloatVectorOperations::countInfsAndNaNs (values.data(), numValues) == numNaNs);
             }
         }
     }
@@ -359,12 +361,11 @@ TEMPLATE_TEST_CASE ("FloatVectorOperations Test", "[dsp][math]", float, double)
                 for (int j = 0; j < numInfs; ++j)
                     values[valueIndexes[(size_t) j]] = std::numeric_limits<TestType>::infinity();
 
-                REQUIRE (chowdsp::FloatVectorOperations::countInfs (values.data(), numValues) == numInfs);
+                REQUIRE (chowdsp::FloatVectorOperations::countInfsAndNaNs (values.data(), numValues) == numInfs);
             }
         }
     }
 
-#if JUCE_MAC
     SECTION ("Rotate Test")
     {
         for (auto [numValues, rotate] : chowdsp::zip<std::initializer_list<size_t>, std::initializer_list<int>> ({ 2, 14, 15, 100, 101 }, { 1, 7, 7, 51, 52 }))
@@ -384,5 +385,4 @@ TEMPLATE_TEST_CASE ("FloatVectorOperations Test", "[dsp][math]", float, double)
                 REQUIRE (juce::approximatelyEqual (actual, exp));
         }
     }
-#endif
 }
