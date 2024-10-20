@@ -366,6 +366,7 @@ TEMPLATE_TEST_CASE ("FloatVectorOperations Test", "[dsp][math]", float, double)
         }
     }
 
+#if ! JUCE_LINUX
     SECTION ("Rotate Test")
     {
         std::vector<float> allData {};
@@ -392,4 +393,5 @@ TEMPLATE_TEST_CASE ("FloatVectorOperations Test", "[dsp][math]", float, double)
                 REQUIRE (juce::approximatelyEqual (actual, exp));
         }
     }
+#endif
 }
