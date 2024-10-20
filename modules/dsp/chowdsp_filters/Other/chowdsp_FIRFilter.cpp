@@ -123,8 +123,10 @@ inline void FIRFilter<FloatType>::processSampleInternalBypassed (FloatType x, Fl
     zPtr = (zPtr == 0 ? order - 1 : zPtr - 1); // iterate state pointer in reverse
 }
 
+#if CHOWDSP_ALLOW_TEMPLATE_INSTANTIATIONS
 template class FIRFilter<float>;
 template class FIRFilter<double>;
+#endif
 } // namespace chowdsp
 
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE

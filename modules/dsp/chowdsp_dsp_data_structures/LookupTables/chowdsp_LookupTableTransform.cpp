@@ -34,6 +34,8 @@ bool LookupTableTransform<FloatType>::initialiseIfNotAlreadyInitialised() noexce
 }
 
 //==============================================================================
+#if CHOWDSP_ALLOW_TEMPLATE_INSTANTIATIONS
 template class LookupTableTransform<float>;
 template class LookupTableTransform<double>;
+#endif
 } // namespace chowdsp

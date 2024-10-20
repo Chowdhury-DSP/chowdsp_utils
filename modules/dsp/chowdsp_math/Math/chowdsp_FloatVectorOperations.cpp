@@ -307,6 +307,7 @@ namespace detail
 #endif // DOXYGEN
 #endif // ! CHOWDSP_NO_XSIMD
 
+#if JUCE_MAC
 bool isUsingVDSP()
 {
 #if JUCE_USE_VDSP_FRAMEWORK
@@ -315,12 +316,43 @@ bool isUsingVDSP()
     return false;
 #endif
 }
+#endif
 
-void divide (float* dest, const float* dividend, const float* divisor, int numValues) noexcept
+template <typename T>
+std::enable_if_t<std::is_floating_point_v<T>, void> divide (T* dest, T dividend, const T* divisor, int numValues) noexcept
 {
 #if JUCE_USE_VDSP_FRAMEWORK
-    vDSP_vdiv (divisor, 1, dividend, 1, dest, 1, (vDSP_Length) numValues);
-#elif CHOWDSP_NO_XSIMD
+    if constexpr (std::is_same_v<T, float>)
+        return vDSP_svdiv (&dividend, divisor, 1, dest, 1, (vDSP_Length) numValues);
+    else if constexpr (std::is_same_v<T, double>)
+        return vDSP_svdivD (&dividend, divisor, 1, dest, 1, (vDSP_Length) numValues);
+#endif
+
+#if CHOWDSP_NO_XSIMD
+    std::transform (divisor, divisor + numValues, dest, [dividend] (auto x)
+                    { return dividend / x; });
+#else
+    detail::unaryOp (dest,
+                     divisor,
+                     numValues,
+                     [dividend] (auto x)
+                     {
+                         return dividend / x;
+                     });
+#endif
+}
+
+template <typename T>
+std::enable_if_t<std::is_floating_point_v<T>, void> divide (T* dest, const T* dividend, const T* divisor, int numValues) noexcept
+{
+#if JUCE_USE_VDSP_FRAMEWORK
+    if constexpr (std::is_same_v<T, float>)
+        return vDSP_vdiv (divisor, 1, dividend, 1, dest, 1, (vDSP_Length) numValues);
+    else if constexpr (std::is_same_v<T, double>)
+        return vDSP_vdivD (divisor, 1, dividend, 1, dest, 1, (vDSP_Length) numValues);
+#endif
+
+#if CHOWDSP_NO_XSIMD
     std::transform (dividend, dividend + numValues, divisor, dest, [] (auto a, auto b)
                     { return a / b; });
 #else
@@ -335,142 +367,86 @@ void divide (float* dest, const float* dividend, const float* divisor, int numVa
 #endif
 }
 
-void divide (double* dest, const double* dividend, const double* divisor, int numValues) noexcept
+template <typename T>
+std::enable_if_t<std::is_floating_point_v<T>, T> accumulate (const T* src, int numValues) noexcept
 {
 #if JUCE_USE_VDSP_FRAMEWORK
-    vDSP_vdivD (divisor, 1, dividend, 1, dest, 1, (vDSP_Length) numValues);
-#elif CHOWDSP_NO_XSIMD
-    std::transform (dividend, dividend + numValues, divisor, dest, [] (auto a, auto b)
-                    { return a / b; });
-#else
-    detail::binaryOp (dest,
-                      dividend,
-                      divisor,
-                      numValues,
-                      [] (auto num, auto den)
-                      {
-                          return num / den;
-                      });
+    if constexpr (std::is_same_v<T, float>)
+    {
+        float result = 0.0f;
+        vDSP_sve (src, 1, &result, (vDSP_Length) numValues);
+        return result;
+    }
+    else if constexpr (std::is_same_v<T, double>)
+    {
+        double result = 0.0;
+        vDSP_sveD (src, 1, &result, (vDSP_Length) numValues);
+        return result;
+    }
 #endif
-}
 
-void divide (float* dest, float dividend, const float* divisor, int numValues) noexcept
-{
-#if JUCE_USE_VDSP_FRAMEWORK
-    vDSP_svdiv (&dividend, divisor, 1, dest, 1, (vDSP_Length) numValues);
-#elif CHOWDSP_NO_XSIMD
-    std::transform (divisor, divisor + numValues, dest, [dividend] (auto x)
-                    { return dividend / x; });
-#else
-    detail::unaryOp (dest,
-                     divisor,
-                     numValues,
-                     [dividend] (auto x)
-                     {
-                         return dividend / x;
-                     });
-#endif
-}
-
-void divide (double* dest, double dividend, const double* divisor, int numValues) noexcept
-{
-#if JUCE_USE_VDSP_FRAMEWORK
-    vDSP_svdivD (&dividend, divisor, 1, dest, 1, (vDSP_Length) numValues);
-#elif CHOWDSP_NO_XSIMD
-    std::transform (divisor, divisor + numValues, dest, [dividend] (auto x)
-                    { return dividend / x; });
-#else
-    detail::unaryOp (dest,
-                     divisor,
-                     numValues,
-                     [dividend] (auto x)
-                     {
-                         return dividend / x;
-                     });
-#endif
-}
-
-float accumulate (const float* src, int numValues) noexcept
-{
-#if JUCE_USE_VDSP_FRAMEWORK
-    float result = 0.0f;
-    vDSP_sve (src, 1, &result, (vDSP_Length) numValues);
-    return result;
-#elif CHOWDSP_NO_XSIMD
-    return std::accumulate (src, src + numValues, 0.0f);
+#if CHOWDSP_NO_XSIMD
+    return std::accumulate (src, src + numValues, T {});
 #else
     return detail::reduce (
         src,
         numValues,
-        0.0f,
+        T {},
         [] (auto prev, auto next)
         { return prev + next; });
 #endif
 }
 
-double accumulate (const double* src, int numValues) noexcept
+template <typename T>
+std::enable_if_t<std::is_floating_point_v<T>, T> innerProduct (const T* src1, const T* src2, int numValues) noexcept
 {
 #if JUCE_USE_VDSP_FRAMEWORK
-    double result = 0.0;
-    vDSP_sveD (src, 1, &result, (vDSP_Length) numValues);
-    return result;
-#elif CHOWDSP_NO_XSIMD
-    return std::accumulate (src, src + numValues, 0.0);
-#else
-    return detail::reduce (
-        src,
-        numValues,
-        0.0,
-        [] (auto prev, auto next)
-        { return prev + next; });
+    if constexpr (std::is_same_v<T, float>)
+    {
+        float result = 0.0f;
+        vDSP_dotpr (src1, 1, src2, 1, &result, (vDSP_Length) numValues);
+        return result;
+    }
+    else if constexpr (std::is_same_v<T, double>)
+    {
+        double result = 0.0;
+        vDSP_dotprD (src1, 1, src2, 1, &result, (vDSP_Length) numValues);
+        return result;
+    }
 #endif
-}
 
-float innerProduct (const float* src1, const float* src2, int numValues) noexcept
-{
-#if JUCE_USE_VDSP_FRAMEWORK
-    float result = 0.0f;
-    vDSP_dotpr (src1, 1, src2, 1, &result, (vDSP_Length) numValues);
-    return result;
-#elif CHOWDSP_NO_XSIMD
-    return std::inner_product (src1, src1 + numValues, src2, 0.0f);
+#if CHOWDSP_NO_XSIMD
+    return std::inner_product (src1, src1 + numValues, src2, T {});
 #else
     return detail::reduce (
         src1,
         src2,
         numValues,
-        0.0f,
+        T {},
         [] (auto prev, auto next1, auto next2)
         { return prev + next1 * next2; });
 #endif
 }
 
-double innerProduct (const double* src1, const double* src2, int numValues) noexcept
+template <typename T>
+std::enable_if_t<std::is_floating_point_v<T>, T> findAbsoluteMaximum (const T* src, int numValues) noexcept
 {
 #if JUCE_USE_VDSP_FRAMEWORK
-    double result = 0.0;
-    vDSP_dotprD (src1, 1, src2, 1, &result, (vDSP_Length) numValues);
-    return result;
-#elif CHOWDSP_NO_XSIMD
-    return std::inner_product (src1, src1 + numValues, src2, 0.0);
-#else
-    return detail::reduce (
-        src1,
-        src2,
-        numValues,
-        0.0,
-        [] (auto prev, auto next1, auto next2)
-        { return prev + next1 * next2; });
+    if constexpr (std::is_same_v<T, float>)
+    {
+        float result = 0.0f;
+        vDSP_maxmgv (src, 1, &result, (vDSP_Length) numValues);
+        return result;
+    }
+    else if constexpr (std::is_same_v<T, double>)
+    {
+        double result = 0.0;
+        vDSP_maxmgvD (src, 1, &result, (vDSP_Length) numValues);
+        return result;
+    }
 #endif
-}
 
-float findAbsoluteMaximum (const float* src, int numValues) noexcept
-{
-#if JUCE_USE_VDSP_FRAMEWORK
-    float result = 0.0f;
-    vDSP_maxmgv (src, 1, &result, (vDSP_Length) numValues);
-    return result;
-#elif CHOWDSP_NO_XSIMD
+#if CHOWDSP_NO_XSIMD
     return [] (const auto& begin, const auto end)
     { return std::abs (*std::max_element (begin, end, [] (auto a, auto b)
                                           { return std::abs (a) < std::abs (b); })); }(src, src + numValues);
@@ -478,37 +454,13 @@ float findAbsoluteMaximum (const float* src, int numValues) noexcept
     return detail::reduce (
         src,
         numValues,
-        0.0f,
+        T {},
         [] (auto a, auto b)
         { return juce::jmax (std::abs (a), std::abs (b)); },
         [] (auto a, auto b)
         { return xsimd::max (xsimd::abs (a), xsimd::abs (b)); },
         [] (auto x)
         { return SIMDUtils::hAbsMaxSIMD (x); });
-#endif
-}
-
-double findAbsoluteMaximum (const double* src, int numValues) noexcept
-{
-#if JUCE_USE_VDSP_FRAMEWORK
-    double result = 0.0;
-    vDSP_maxmgvD (src, 1, &result, (vDSP_Length) numValues);
-    return result;
-#elif CHOWDSP_NO_XSIMD
-    return [] (const auto& begin, const auto end)
-    { return std::abs (*std::max_element (begin, end, [] (auto a, auto b)
-                                          { return std::abs (a) < std::abs (b); })); }(src, src + numValues);
-#else
-    return detail::reduce (
-        src,
-        numValues,
-        0.0,
-        [] (auto a, auto b)
-        { return juce::jmax (a, std::abs (b)); },
-        [] (auto a, auto b)
-        { return xsimd::max (a, xsimd::abs (b)); },
-        [] (auto x)
-        { return SIMDUtils::hMaxSIMD (x); });
 #endif
 }
 
@@ -602,129 +554,106 @@ void integerPowerT (T* dest, const T* src, int exponent, int numValues) noexcept
 }
 #endif // ! CHOWDSP_NO_XSIMD
 
-void integerPower (float* dest, const float* src, int exponent, int numValues) noexcept
+template <typename T>
+std::enable_if_t<std::is_floating_point_v<T>, void> integerPower (T* dest, const T* src, int exponent, int numValues) noexcept
 {
 #if CHOWDSP_NO_XSIMD
     for (int i = 0; i < numValues; ++i)
-        dest[i] = std::pow (src[i], (float) exponent);
+        dest[i] = std::pow (src[i], (T) exponent);
 #else
     integerPowerT (dest, src, exponent, numValues);
 #endif
 }
 
-void integerPower (double* dest, const double* src, int exponent, int numValues) noexcept
+template <typename T>
+std::enable_if_t<std::is_floating_point_v<T>, T> computeRMS (const T* src, int numValues) noexcept
 {
+#if JUCE_USE_VDSP_FRAMEWORK
+    if constexpr (std::is_same_v<T, float>)
+    {
+        float result = 0.0f;
+        vDSP_rmsqv (src, 1, &result, (vDSP_Length) numValues);
+        return result;
+    }
+    else if constexpr (std::is_same_v<T, double>)
+    {
+        double result = 0.0;
+        vDSP_rmsqvD (src, 1, &result, (vDSP_Length) numValues);
+        return result;
+    }
+#endif
+
 #if CHOWDSP_NO_XSIMD
-    for (int i = 0; i < numValues; ++i)
-        dest[i] = std::pow (src[i], (double) exponent);
-#else
-    integerPowerT (dest, src, exponent, numValues);
-#endif
-}
-
-float computeRMS (const float* src, int numValues) noexcept
-{
-#if JUCE_USE_VDSP_FRAMEWORK
-    float result = 0.0f;
-    vDSP_rmsqv (src, 1, &result, (vDSP_Length) numValues);
-    return result;
-#elif CHOWDSP_NO_XSIMD
-    return [] (const float* data, int numSamples)
+    return [] (const T* data, int numSamples)
     {
-        auto squareSum = 0.0;
+        auto squareSum = T {};
         for (int i = 0; i < numSamples; ++i)
             squareSum += data[i] * data[i];
-        return std::sqrt (squareSum / (float) numSamples);
+        return std::sqrt (squareSum / (T) numSamples);
     }(src, numValues);
 #else
     const auto squareSum = detail::reduce (src,
                                            numValues,
-                                           0.0f,
+                                           T {},
                                            [] (auto prev, auto next)
                                            { return prev + next * next; });
-    return std::sqrt (squareSum / (float) numValues);
+    return std::sqrt (squareSum / (T) numValues);
 #endif
 }
 
-double computeRMS (const double* src, int numValues) noexcept
+template <typename T>
+std::enable_if_t<std::is_floating_point_v<T>, int> countInfsAndNaNs (const T* src, int numValues) noexcept
 {
-#if JUCE_USE_VDSP_FRAMEWORK
-    double result = 0.0;
-    vDSP_rmsqvD (src, 1, &result, (vDSP_Length) numValues);
-    return result;
-#elif CHOWDSP_NO_XSIMD
-    return [] (const double* data, int numSamples)
+    return [] (const T* data, int numSamples)
     {
-        auto squareSum = 0.0;
+        int nanCount = 0;
         for (int i = 0; i < numSamples; ++i)
-            squareSum += data[i] * data[i];
-        return std::sqrt (squareSum / (double) numSamples);
+        {
+            if constexpr (std::is_same_v<T, float>)
+            {
+                const auto& x_int = reinterpret_cast<const uint32_t&> (data[i]);
+                const auto exp = x_int & 0x7F800000;
+                const auto mantissa = x_int & 0x007FFFFF;
+                nanCount += int (exp == 0x7F800000 && mantissa >= static_cast<uint32_t> (0));
+            }
+            else if constexpr (std::is_same_v<T, double>)
+            {
+                const auto& x_int = reinterpret_cast<const uint64_t&> (data[i]);
+                const auto exp = x_int & 0x7FF0000000000000;
+                const auto mantissa = x_int & 0x000FFFFFFFFFFFFF;
+                nanCount += int (exp == 0x7FF0000000000000 && mantissa >= static_cast<uint64_t> (0));
+            }
+        }
+        return nanCount;
     }(src, numValues);
-#else
-    const auto squareSum = detail::reduce (src,
-                                           numValues,
-                                           0.0,
-                                           [] (auto prev, auto next)
-                                           { return prev + next * next; });
-    return std::sqrt (squareSum / (double) numValues);
+}
+
+template <typename T>
+std::enable_if_t<std::is_floating_point_v<T>, void> rotate (T* data, int numToRotate, int totalNumValues, T* scratchData) noexcept
+{
+    std::copy (data, data + numToRotate, scratchData);
+    std::copy (data + numToRotate, data + totalNumValues, data);
+    std::copy (scratchData, scratchData + numToRotate, data + totalNumValues - numToRotate);
+}
+
+#if CHOWDSP_ALLOW_TEMPLATE_INSTANTIATIONS
+template void divide (float* dest, const float* dividend, const float* divisor, int numValues) noexcept;
+template void divide (double* dest, const double* dividend, const double* divisor, int numValues) noexcept;
+template void divide (float* dest, float dividend, const float* divisor, int numValues) noexcept;
+template void divide (double* dest, double dividend, const double* divisor, int numValues) noexcept;
+template float accumulate (const float* src, int numValues) noexcept;
+template double accumulate (const double* src, int numValues) noexcept;
+template float innerProduct (const float* src1, const float* src2, int numValues) noexcept;
+template double innerProduct (const double* src1, const double* src2, int numValues) noexcept;
+template float findAbsoluteMaximum (const float* src, int numValues) noexcept;
+template double findAbsoluteMaximum (const double* src, int numValues) noexcept;
+template void integerPower (float* dest, const float* src, int exponent, int numValues) noexcept;
+template void integerPower (double* dest, const double* src, int exponent, int numValues) noexcept;
+template float computeRMS (const float* src, int numValues) noexcept;
+template double computeRMS (const double* src, int numValues) noexcept;
+template int countInfsAndNaNs (const float* src, int numValues) noexcept;
+template int countInfsAndNaNs (const double* src, int numValues) noexcept;
+template void rotate (float* data, int numToRotate, int totalNumValues, float* scratchData) noexcept;
+template void rotate (double* data, int numToRotate, int totalNumValues, double* scratchData) noexcept;
 #endif
-}
-
-int countNaNs (const float* src, int numValues) noexcept
-{
-    return [] (const float* data, int numSamples)
-    {
-        int nanCount = 0;
-        for (int i = 0; i < numSamples; ++i)
-            nanCount += (int) std::isnan (data[i]);
-        return nanCount;
-    }(src, numValues);
-}
-
-int countNaNs (const double* src, int numValues) noexcept
-{
-    return [] (const double* data, int numSamples)
-    {
-        int nanCount = 0;
-        for (int i = 0; i < numSamples; ++i)
-            nanCount += (int) std::isnan (data[i]);
-        return nanCount;
-    }(src, numValues);
-}
-
-int countInfs (const float* src, int numValues) noexcept
-{
-    return [] (const float* data, int numSamples)
-    {
-        int nanCount = 0;
-        for (int i = 0; i < numSamples; ++i)
-            nanCount += (int) std::isinf (data[i]);
-        return nanCount;
-    }(src, numValues);
-}
-
-int countInfs (const double* src, int numValues) noexcept
-{
-    return [] (const double* data, int numSamples)
-    {
-        int nanCount = 0;
-        for (int i = 0; i < numSamples; ++i)
-            nanCount += (int) std::isinf (data[i]);
-        return nanCount;
-    }(src, numValues);
-}
-
-void rotate (float* data, int numToRotate, int totalNumValues, float* scratchData) noexcept
-{
-    juce::FloatVectorOperations::copy (scratchData, data, numToRotate);
-    juce::FloatVectorOperations::copy (data, data + numToRotate, totalNumValues - numToRotate);
-    juce::FloatVectorOperations::copy (data + totalNumValues - numToRotate, scratchData, numToRotate);
-}
-
-void rotate (double* data, int numToRotate, int totalNumValues, double* scratchData) noexcept
-{
-    juce::FloatVectorOperations::copy (scratchData, data, numToRotate);
-    juce::FloatVectorOperations::copy (data, data + numToRotate, totalNumValues - numToRotate);
-    juce::FloatVectorOperations::copy (data + totalNumValues - numToRotate, scratchData, numToRotate);
-}
 } // namespace chowdsp::FloatVectorOperations

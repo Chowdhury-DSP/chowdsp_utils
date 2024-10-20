@@ -409,10 +409,9 @@ bool sanitizeBuffer (BufferType& buffer, FloatType ceiling) noexcept
     {
         const auto* channelData = buffer.getReadPointer (ch);
         const auto channelMax = FloatVectorOperations::findAbsoluteMaximum (channelData, numSamples);
-        const auto channelNaNs = FloatVectorOperations::countNaNs (channelData, numSamples);
-        const auto channelInfs = FloatVectorOperations::countInfs (channelData, numSamples);
+        const auto channelInfsAndNaNs = FloatVectorOperations::countInfsAndNaNs (channelData, numSamples);
 
-        if (channelMax >= ceiling || channelNaNs > 0 || channelInfs > 0)
+        if (channelMax >= ceiling || channelInfsAndNaNs > 0)
         {
             // This buffer contains invalid values! Clearing...
             jassertfalse;

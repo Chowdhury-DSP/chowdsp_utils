@@ -97,7 +97,8 @@ void RebufferedProcessor<FloatType>::pushInputSignal (const BufferView<const Flo
 }
 
 //==============================================================================
+#if CHOWDSP_ALLOW_TEMPLATE_INSTANTIATIONS
 template class RebufferedProcessor<float>;
 template class RebufferedProcessor<double>;
-
+#endif
 } // namespace chowdsp

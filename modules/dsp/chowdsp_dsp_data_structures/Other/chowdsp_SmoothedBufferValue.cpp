@@ -147,8 +147,10 @@ void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::process (FloatType val
     process (value, numSamples);
 }
 
+#if CHOWDSP_ALLOW_TEMPLATE_INSTANTIATIONS
 template class SmoothedBufferValue<float, juce::ValueSmoothingTypes::Linear>;
 template class SmoothedBufferValue<double, juce::ValueSmoothingTypes::Linear>;
 template class SmoothedBufferValue<float, juce::ValueSmoothingTypes::Multiplicative>;
 template class SmoothedBufferValue<double, juce::ValueSmoothingTypes::Multiplicative>;
+#endif
 } // namespace chowdsp

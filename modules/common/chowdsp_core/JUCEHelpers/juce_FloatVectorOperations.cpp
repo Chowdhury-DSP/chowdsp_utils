@@ -1542,10 +1542,12 @@ FloatType JUCE_CALLTYPE detail::FloatVectorOperationsBase<FloatType, CountType>:
     return FloatVectorHelpers::findMaximum (src, numValues);
 }
 
+#if CHOWDSP_ALLOW_TEMPLATE_INSTANTIATIONS
 template struct detail::FloatVectorOperationsBase<float, int>;
 template struct detail::FloatVectorOperationsBase<float, size_t>;
 template struct detail::FloatVectorOperationsBase<double, int>;
 template struct detail::FloatVectorOperationsBase<double, size_t>;
+#endif
 
 void JUCE_CALLTYPE FloatVectorOperations::convertFixedToFloat (float* dest, const int* src, float multiplier, size_t num) noexcept
 {
