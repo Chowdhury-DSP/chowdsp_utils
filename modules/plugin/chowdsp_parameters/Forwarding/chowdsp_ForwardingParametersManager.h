@@ -25,19 +25,19 @@ public:
     explicit ForwardingParametersManager (juce::AudioProcessor& audioProcessor, PluginState& pluginState)
         : ForwardingParametersManager { audioProcessor }
     {
-        for (int i = 0; i < totalNumForwardingParameters; ++i)
+        for (size_t i = 0; i < forwardedParams.size(); ++i)
         {
             auto id = Provider::getForwardingParameterID (i);
-            auto forwardedParam = std::make_unique<ForwardingParameter> (id, pluginState, "Blank");
+            forwardedParams[i] = OptionalPointer<ForwardingParameter> (id, pluginState, "Blank");
+            forwardedParams[i]->setProcessor (processor);
 
-            forwardedParam->setProcessor (&processor);
-            forwardedParams[(size_t) i] = forwardedParam.get();
-            processor.addParameter (forwardedParam.release());
+            if (processor != nullptr)
+                processor->addParameter (forwardedParams[i].release());
         }
     }
 
     /** Initializes the manager without initializing the parameters */
-    explicit ForwardingParametersManager (juce::AudioProcessor& audioProcessor) : processor (audioProcessor)
+    explicit ForwardingParametersManager (juce::AudioProcessor* audioProcessor) : processor (audioProcessor)
     {
     }
 #else
@@ -90,8 +90,8 @@ public:
         ~ScopedForceDeferHostNotifications()
         {
             mgr.forceDeferHostNotifications = previousForceValue;
-            if (! mgr.forceDeferHostNotifications)
-                ForwardingParameter::reportParameterInfoChange (&mgr.processor);
+            if (! mgr.forceDeferHostNotifications && mgr.processor != nullptr)
+                ForwardingParameter::reportParameterInfoChange (mgr.processor);
         }
 
     private:
@@ -121,8 +121,8 @@ public:
             forwardedParams[(size_t) i]->setParam (param, paramName, deferHostNotification || forceDeferHostNotifications);
         }
 
-        if (deferHostNotification && ! forceDeferHostNotifications)
-            ForwardingParameter::reportParameterInfoChange (&processor);
+        if (deferHostNotification && ! forceDeferHostNotifications && processor != nullptr)
+            ForwardingParameter::reportParameterInfoChange (processor);
     }
 
     /**
@@ -143,9 +143,9 @@ public:
     }
 
 protected:
-    std::array<ForwardingParameter*, (size_t) totalNumForwardingParameters> forwardedParams;
+    std::array<OptionalPointer<ForwardingParameter>, (size_t) totalNumForwardingParameters> forwardedParams;
 
-    juce::AudioProcessor& processor;
+    juce::AudioProcessor* processor = nullptr;
 
 private:
     bool forceDeferHostNotifications = false;
