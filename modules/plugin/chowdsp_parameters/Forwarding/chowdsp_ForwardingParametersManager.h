@@ -22,7 +22,8 @@ class ForwardingParametersManager
 public:
 #if JUCE_MODULE_AVAILABLE_chowdsp_plugin_state
     /** Initializes handles to the forwarding parameters, and connects them to the given processor */
-    explicit ForwardingParametersManager (juce::AudioProcessor& audioProcessor, PluginState& pluginState) : processor (audioProcessor)
+    explicit ForwardingParametersManager (juce::AudioProcessor& audioProcessor, PluginState& pluginState)
+        : ForwardingParametersManager { audioProcessor }
     {
         for (int i = 0; i < totalNumForwardingParameters; ++i)
         {
@@ -33,6 +34,11 @@ public:
             forwardedParams[(size_t) i] = forwardedParam.get();
             processor.addParameter (forwardedParam.release());
         }
+    }
+
+    /** Initializes the manager without initializing the parameters */
+    explicit ForwardingParametersManager (juce::AudioProcessor& audioProcessor) : processor (audioProcessor)
+    {
     }
 #else
     /** Initializes handles to the forwarding parameters, and connects them to the given processor */
@@ -139,9 +145,9 @@ public:
 protected:
     std::array<ForwardingParameter*, (size_t) totalNumForwardingParameters> forwardedParams;
 
-private:
     juce::AudioProcessor& processor;
 
+private:
     bool forceDeferHostNotifications = false;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ForwardingParametersManager)
