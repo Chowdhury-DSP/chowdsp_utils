@@ -64,13 +64,27 @@ struct OptionalPointer
     }
 
     /** Move constructor */
-    OptionalPointer (OptionalPointer&&) noexcept = default;
+    OptionalPointer (OptionalPointer&& other) noexcept
+    {
+        invalidate();
+        pointer.swap (other.pointer);
+    }
 
     /** Move assignment */
-    OptionalPointer& operator= (OptionalPointer&&) noexcept = default;
+    OptionalPointer& operator= (OptionalPointer&& other) noexcept
+    {
+        invalidate();
+        pointer.swap (other.pointer);
+        return *this;
+    }
 
     OptionalPointer (const OptionalPointer&) = delete;
     OptionalPointer& operator= (const OptionalPointer&) = delete;
+
+    ~OptionalPointer()
+    {
+        invalidate();
+    }
 
     /** Returns true if this pointer owns the data it's pointing to */
     [[nodiscard]] bool isOwner() const noexcept { return pointer.get_flags() == Owning; }
@@ -89,7 +103,7 @@ struct OptionalPointer
     }
 
     /**
-     * Resets this object ot nullptr. If this object currently
+     * Resets this object to nullptr. If this object currently
      * owns the underlying data, it will free the underlying data.
      */
     void invalidate()

@@ -46,8 +46,17 @@ TEST_CASE ("Packed Pointer Test", "[common][data-structures]")
 
     SECTION ("Modify")
     {
-        chowdsp::PackedPointer<TestType> ptr { &t1, 5 };
+        chowdsp::PackedPointer ptr { &t1, 5 };
         ptr->x = 100;
         REQUIRE (std::as_const (ptr)->x == t1.x);
+    }
+
+    SECTION ("Swap")
+    {
+        chowdsp::PackedPointer ptr { &t1, 5 };
+        chowdsp::PackedPointer<TestType> ptr2 {};
+        ptr.swap (ptr2);
+        REQUIRE (ptr == nullptr);
+        REQUIRE (std::as_const (ptr2)->x == t1.x);
     }
 }
