@@ -23,11 +23,11 @@ public:
 #if JUCE_MODULE_AVAILABLE_chowdsp_plugin_state
     /** Initializes handles to the forwarding parameters, and connects them to the given processor */
     explicit ForwardingParametersManager (juce::AudioProcessor& audioProcessor, PluginState& pluginState)
-        : ForwardingParametersManager { audioProcessor }
+        : ForwardingParametersManager { &audioProcessor }
     {
         for (size_t i = 0; i < forwardedParams.size(); ++i)
         {
-            auto id = Provider::getForwardingParameterID (i);
+            auto id = Provider::getForwardingParameterID (static_cast<int> (i));
             forwardedParams[i] = OptionalPointer<ForwardingParameter> (id, pluginState, "Blank");
             forwardedParams[i]->setProcessor (processor);
 
@@ -47,16 +47,16 @@ public:
     }
 
     /** Initializes handles to the forwarding parameters, and connects them to the given processor */
-    explicit ForwardingParametersManager (juce::AudioProcessor& audioProcessor) : processor (audioProcessor)
+    explicit ForwardingParametersManager (juce::AudioProcessor& audioProcessor) : processor (&audioProcessor)
     {
         for (int i = 0; i < totalNumForwardingParameters; ++i)
         {
             auto id = Provider::getForwardingParameterID (i);
-            auto forwardedParam = std::make_unique<ForwardingParameter> (id, nullptr, "Blank");
+            forwardedParams[i] = OptionalPointer<ForwardingParameter> (id, nullptr, "Blank");
+            forwardedParams[i]->setProcessor (processor);
 
-            forwardedParam->setProcessor (&processor);
-            forwardedParams[(size_t) i] = forwardedParam.get();
-            processor.addParameter (forwardedParam.release());
+            if (processor != nullptr)
+                processor->addParameter (forwardedParams[i].release());
         }
     }
 #endif
