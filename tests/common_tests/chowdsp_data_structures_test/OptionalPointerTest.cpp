@@ -130,4 +130,21 @@ TEST_CASE ("Optional Pointer Test", "[common][data-structures]")
         REQUIRE (x == y);
         REQUIRE_FALSE (x != y);
     }
+
+    SECTION ("Move Constructor")
+    {
+        chowdsp::OptionalPointer<TestType> x { 4, 5 };
+        chowdsp::OptionalPointer<TestType> y { std::move (x) };
+        REQUIRE (x == nullptr); // NOLINT
+        REQUIRE (y->x == 4);
+        REQUIRE (y->y == 5);
+    }
+
+    SECTION ("Move Assignment")
+    {
+        chowdsp::OptionalPointer<TestType> y {};
+        y = chowdsp::OptionalPointer<TestType> { 4, 5 };
+        REQUIRE (y->x == 4);
+        REQUIRE (y->y == 5);
+    }
 }

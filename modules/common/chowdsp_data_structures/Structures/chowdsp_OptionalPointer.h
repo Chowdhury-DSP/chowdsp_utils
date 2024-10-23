@@ -67,16 +67,14 @@ struct OptionalPointer
     OptionalPointer (OptionalPointer&& other) noexcept
     {
         invalidate();
-        pointer = other.pointer;
-        other.pointer.set (nullptr);
+        pointer.swap (other.pointer);
     }
 
     /** Move assignment */
     OptionalPointer& operator= (OptionalPointer&& other) noexcept
     {
         invalidate();
-        pointer = other.pointer;
-        other.pointer.set (nullptr);
+        pointer.swap (other.pointer);
         return *this;
     }
 

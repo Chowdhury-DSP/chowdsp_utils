@@ -62,6 +62,14 @@ struct PackedPointer
     [[nodiscard]] T& operator*() { return *get_ptr(); }
     [[nodiscard]] const T& operator*() const { return *get_ptr(); }
 
+    void swap (PackedPointer& other) noexcept
+    {
+        std::swap (other.ptr_with_flags, ptr_with_flags);
+#if JUCE_DEBUG
+        std::swap (other.actual_ptr, actual_ptr);
+#endif
+    }
+
 private:
     T* ptr_with_flags = nullptr;
 #if JUCE_DEBUG
