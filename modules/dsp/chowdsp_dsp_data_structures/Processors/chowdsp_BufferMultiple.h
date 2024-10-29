@@ -2,12 +2,45 @@
 
 namespace chowdsp
 {
+/**
+ * BufferMultiple can be used to process buffers that need to be a multiple of some
+ * number of samples.
+ *
+ * BufferMultiple requires less latency than RebufferedProcessor, but RebufferedProcessor
+ * should still be preferred when an exact buffer length is required.
+ *
+ * Here's an example where we need to process buffers that are a multiple of 3 samples,
+ * for example if we wanted to down-sample by 3x:
+ * @code
+ * // prepare
+ * BufferMultiple<float> bufferMultiple {};
+ * const auto m3BufferSize = bufferMultiple.prepare (spec, 3);
+ * arenaBytesNeeded += m3BufferSize * numChannels * sizeof (float);
+ * nextProcessor.prepare ({ sampleRate, m3BufferSize, numChannels });
+ * ...
+ * arena.reset (arenaBytesNeeded);
+ *
+ * // use
+ * auto m3Buffer = bufferMultiple.processBufferIn (arena, buffer);
+ * nextProcessor.process (m3Buffer);
+ * bufferMultiple.processBufferOut (m3Buffer, buffer);
+ * @endcode
+ */
 template <typename T>
 class BufferMultiple
 {
 public:
     BufferMultiple() = default;
 
+    /**
+     * Prepares the processor for a given multiple.
+     *
+     * This method returns the maximum number of samples
+     * that may be allocated by the arena allocator used
+     * by processBufferIn(). Note that this number may not
+     * be a multiple of the requested multiple do to buffer
+     * padding restrictions.
+     */
     int prepare (const juce::dsp::ProcessSpec& spec, int multiple)
     {
         jassert (multiple > 1 && multiple <= static_cast<int> (maxMultiple));
@@ -20,6 +53,7 @@ public:
                                              static_cast<int> (SIMDUtils::defaultSIMDAlignment / sizeof (T)));
     }
 
+    /** Resets the processor state. */
     void reset() noexcept
     {
         leftoverDataIn.fill (T {});
@@ -28,16 +62,19 @@ public:
         numSamplesLeftoverOut = 1;
     }
 
-    [[nodiscard]] int getMultipliedBufferLatency() const noexcept
+    /** Returns the latency of the "multiple" buffer. */
+    [[nodiscard]] int getMultipleBufferLatency() const noexcept
     {
         return M - 1;
     }
 
+    /** Returns the "round trip" latency for this processor. */
     [[nodiscard]] int getRoundTripLatency() const noexcept
     {
         return M;
     }
 
+    /** Returns a buffer that is the requested multiple number of samples. */
     BufferView<T> processBufferIn (ArenaAllocatorView arena, const BufferView<const T>& input) noexcept
     {
         const auto numSamplesIn = input.getNumSamples();
@@ -72,6 +109,12 @@ public:
         return bufferOut;
     }
 
+    /**
+     * Copies the multiple buffer into some output buffer.
+     *
+     * The output buffer is expected to be the same size as the
+     * most recent buffer provided to processBufferIn.
+     */
     void processBufferOut (const BufferView<const T>& input, const BufferView<T>& output) noexcept
     {
         const auto numSamplesIn = input.getNumSamples();

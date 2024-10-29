@@ -18,7 +18,7 @@ TEST_CASE ("Buffer Multiple Test", "[dsp][data-structures]")
 
         chowdsp::BufferMultiple<float> multipleProcessor {};
         int maxMultipleBufferSize = multipleProcessor.prepare ({ 0.0, (uint32_t) bufferSize, (uint32_t) numChannels }, multiple);
-        const auto mLatencySamples = multipleProcessor.getMultipliedBufferLatency();
+        const auto mLatencySamples = multipleProcessor.getMultipleBufferLatency();
         const auto roundTripLatencySamples = multipleProcessor.getRoundTripLatency();
 
         chowdsp::ArenaAllocator<> arena { numChannels * maxMultipleBufferSize * sizeof (float) };
