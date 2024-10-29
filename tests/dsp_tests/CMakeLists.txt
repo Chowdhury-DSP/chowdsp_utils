@@ -9,6 +9,7 @@ setup_chowdsp_lib(dsp_tests_lib
         chowdsp_simd
         chowdsp_waveshapers
 )
+target_compile_definitions(dsp_tests_lib PUBLIC CHOWDSP_JASSERT_IS_CASSERT=1)
 
 setup_juce_lib(dsp_juce_tests_lib
     juce::juce_dsp
