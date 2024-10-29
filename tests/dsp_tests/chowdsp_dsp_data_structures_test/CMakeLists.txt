@@ -6,4 +6,5 @@ target_sources(chowdsp_dsp_data_structures_test
         RebufferProcessorTest.cpp
         SmoothedBufferValueTest.cpp
         UIToAudioPipelineTest.cpp
+        BufferMultipleTest.cpp
 )
