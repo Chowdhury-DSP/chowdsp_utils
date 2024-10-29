@@ -8,7 +8,7 @@
 
 // @TODO: figure out a way to re-implement jassert...
 #if CHOWDSP_JASSERT_IS_CASSERT
-#define jassert(expression) assert(expression)
+#define jassert(expression) assert (expression)
 #else
 #define jassert(expression)
 #endif
