@@ -1,11 +1,17 @@
 #pragma once
 
+#include <cassert>
+
 /**
  * This file contains custom overrides of some JUCE macros.
  */
 
 // @TODO: figure out a way to re-implement jassert...
+#if CHOWDSP_JASSERT_IS_CASSERT
+#define jassert(expression) assert (expression)
+#else
 #define jassert(expression)
+#endif
 #define jassertfalse
 #define jassertquiet(expression)
 
