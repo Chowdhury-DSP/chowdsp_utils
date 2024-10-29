@@ -56,6 +56,12 @@ public:
 
     using Ptr = OptionalPointer<FloatParameter>;
 
+    FloatParameter& operator= (float newValue)
+    {
+        AudioParameterFloat::operator= (newValue);
+        return *this;
+    }
+
     /** Returns the default value for the parameter. */
     float getDefaultValue() const override { return unsnappedDefault; }
 
@@ -151,6 +157,12 @@ public:
     }
 
     using Ptr = OptionalPointer<BoolParameter>;
+
+    BoolParameter& operator= (bool newValue)
+    {
+        AudioParameterBool::operator= (newValue);
+        return *this;
+    }
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BoolParameter)
