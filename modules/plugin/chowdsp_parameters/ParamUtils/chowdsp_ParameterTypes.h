@@ -56,11 +56,12 @@ public:
 
     using Ptr = OptionalPointer<FloatParameter>;
 
-    FloatParameter& operator= (float newValue)
-    {
-        AudioParameterFloat::operator= (newValue);
-        return *this;
-    }
+    /**
+     * Sets the parameter value.
+     * This will result in a call @c setValueNotifyingHost, so make sure that's what you want.
+     * Especially if calling this from the audio thread!
+     */
+    void setParameterValue (float newValue) { AudioParameterFloat::operator= (newValue); }
 
     /** Returns the default value for the parameter. */
     float getDefaultValue() const override { return unsnappedDefault; }
@@ -158,11 +159,12 @@ public:
 
     using Ptr = OptionalPointer<BoolParameter>;
 
-    BoolParameter& operator= (bool newValue)
-    {
-        AudioParameterBool::operator= (newValue);
-        return *this;
-    }
+    /**
+     * Sets the parameter value.
+     * This will result in a call @c setValueNotifyingHost, so make sure that's what you want.
+     * Especially if calling this from the audio thread!
+     */
+    void setParameterValue (bool newValue) { AudioParameterBool::operator= (newValue); }
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BoolParameter)
