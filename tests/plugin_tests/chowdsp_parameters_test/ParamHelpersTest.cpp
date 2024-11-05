@@ -103,6 +103,8 @@ TEST_CASE ("Param Helpers Test", "[plugin][parameters]")
         REQUIRE_MESSAGE (modeParam.get() == Mode_1, "Default value is incorrect!");
         modeParam.setValueNotifyingHost (1.0f);
         REQUIRE_MESSAGE (modeParam.get() == Mode_3, "Set value is incorrect!");
+        modeParam.setParameterValue (Mode_2);
+        REQUIRE_MESSAGE (modeParam.get() == Mode_2, "Set value is incorrect!");
     }
 
     SECTION ("Create Semitones Param Test")

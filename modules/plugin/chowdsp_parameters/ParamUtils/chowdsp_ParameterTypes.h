@@ -148,6 +148,13 @@ public:
         return magic_enum::enum_value<EnumType> ((size_t) getIndex());
     }
 
+    /**
+     * Sets the parameter value.
+     * This will result in a call @c setValueNotifyingHost, so make sure that's what you want.
+     * Especially if calling this from the audio thread!
+     */
+    void setParameterValue (EnumType newValue) { AudioParameterChoice::operator= (static_cast<int> (*magic_enum::enum_index (newValue))); }
+
     using Ptr = OptionalPointer<EnumChoiceParameter>;
 
 private:
