@@ -103,6 +103,13 @@ public:
     /** Returns the default value for the parameter. */
     int getDefaultIndex() const noexcept { return defaultChoiceIndex; }
 
+    /**
+     * Sets the parameter value.
+     * This will result in a call @c setValueNotifyingHost, so make sure that's what you want.
+     * Especially if calling this from the audio thread!
+     */
+    void setParameterValue (int newValue) { AudioParameterChoice::operator= (newValue); }
+
 private:
     const int defaultChoiceIndex = 0;
 
