@@ -15,7 +15,7 @@ public:
 
     ParamHolder (ParamHolder&&) noexcept = default;
     ParamHolder& operator= (ParamHolder&&) noexcept = default;
-
+    virtual ~ParamHolder() = default;
     /** Adds parameters to the ParamHolder. */
     template <typename ParamType, typename... OtherParams>
     std::enable_if_t<std::is_base_of_v<FloatParameter, ParamType>, void>
