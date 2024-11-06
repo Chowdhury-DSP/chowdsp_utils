@@ -33,7 +33,11 @@ struct DefaultFDNConfig
     static const FloatType* doFeedbackProcess (DefaultFDNConfig& fdnConfig, const FloatType* data);
 
 protected:
+#if CHOWDSP_REVERB_ALIGN_IO
     alignas (SIMDUtils::defaultSIMDAlignment) std::array<FloatType, (size_t) nChannels> fbData;
+#else
+    std::array<FloatType, (size_t) nChannels> fbData;
+#endif
 
 private:
     std::array<ShelfFilter<FloatType>, (size_t) nChannels> shelfs;
@@ -113,7 +117,11 @@ private:
 
     FDNConfig fdnConfig;
 
+#if CHOWDSP_REVERB_ALIGN_IO
     alignas (SIMDUtils::defaultSIMDAlignment) std::array<FloatType, (size_t) nChannels> outData;
+#else
+    std::array<FloatType, (size_t) nChannels> outData;
+#endif
 
     FloatType fsOver1000 = FloatType (48000 / 1000);
 

@@ -22,6 +22,10 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 #include <chowdsp_dsp_utils/chowdsp_dsp_utils.h>
 
+#ifndef CHOWDSP_REVERB_ALIGN_IO
+#define CHOWDSP_REVERB_ALIGN_IO 1
+#endif
+
 namespace chowdsp
 {
 /** ChowDSP classes for creating reverb effects */

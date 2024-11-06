@@ -83,7 +83,11 @@ private:
     int delayWritePointer = 0;
     std::array<FloatType, (size_t) nChannels> delayReadPointers;
 
+#if CHOWDSP_REVERB_ALIGN_IO
     alignas (SIMDUtils::defaultSIMDAlignment) std::array<FloatType, (size_t) nChannels> outData;
+#else
+    std::array<FloatType, (size_t) nChannels> outData;
+#endif
 
     FloatType fsOver1000 = FloatType (48000 / 1000);
 
