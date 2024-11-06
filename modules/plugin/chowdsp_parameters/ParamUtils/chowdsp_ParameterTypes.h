@@ -56,6 +56,13 @@ public:
 
     using Ptr = OptionalPointer<FloatParameter>;
 
+    /**
+     * Sets the parameter value.
+     * This will result in a call @c setValueNotifyingHost, so make sure that's what you want.
+     * Especially if calling this from the audio thread!
+     */
+    void setParameterValue (float newValue) { AudioParameterFloat::operator= (newValue); }
+
     /** Returns the default value for the parameter. */
     float getDefaultValue() const override { return unsnappedDefault; }
 
@@ -96,6 +103,13 @@ public:
     /** Returns the default value for the parameter. */
     int getDefaultIndex() const noexcept { return defaultChoiceIndex; }
 
+    /**
+     * Sets the parameter value.
+     * This will result in a call @c setValueNotifyingHost, so make sure that's what you want.
+     * Especially if calling this from the audio thread!
+     */
+    void setParameterValue (int newValue) { AudioParameterChoice::operator= (newValue); }
+
 private:
     const int defaultChoiceIndex = 0;
 
@@ -134,6 +148,13 @@ public:
         return magic_enum::enum_value<EnumType> ((size_t) getIndex());
     }
 
+    /**
+     * Sets the parameter value.
+     * This will result in a call @c setValueNotifyingHost, so make sure that's what you want.
+     * Especially if calling this from the audio thread!
+     */
+    void setParameterValue (EnumType newValue) { AudioParameterChoice::operator= (static_cast<int> (*magic_enum::enum_index (newValue))); }
+
     using Ptr = OptionalPointer<EnumChoiceParameter>;
 
 private:
@@ -151,6 +172,13 @@ public:
     }
 
     using Ptr = OptionalPointer<BoolParameter>;
+
+    /**
+     * Sets the parameter value.
+     * This will result in a call @c setValueNotifyingHost, so make sure that's what you want.
+     * Especially if calling this from the audio thread!
+     */
+    void setParameterValue (bool newValue) { AudioParameterBool::operator= (newValue); }
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BoolParameter)
