@@ -133,4 +133,18 @@ public:
         free_chunk (ptr);
     }
 };
+
+/** A pool allocator that is specialized for a single object type. */
+template <typename T>
+struct ObjectPool : PoolAllocator<sizeof (T), alignof (T)>
+{
+    using PoolAllocator<sizeof (T), alignof (T)>::PoolAllocator;
+
+    /** Allocates and constructs an object in place. */
+    template <typename... Args>
+    T* allocate (Args&&... args)
+    {
+        return PoolAllocator<sizeof (T), alignof (T)>::template allocate<T> (std::forward<Args> (args)...);
+    }
+};
 } // namespace chowdsp
