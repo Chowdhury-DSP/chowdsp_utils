@@ -54,4 +54,26 @@ TEST_CASE ("Pool Allocator Test", "[common][data-structures]")
         Thing xx {};
         allocator.free<Thing> (&xx);
     }
+
+    SECTION ("Object Pool Test")
+    {
+        struct Thing
+        {
+            int64_t x {};
+            int64_t y {};
+            int64_t z {};
+        };
+
+        chowdsp::ObjectPool<Thing> allocator { 4 };
+
+        auto* thing = allocator.allocate (0, 1, 2);
+        REQUIRE (thing != nullptr);
+        REQUIRE (thing->x == 0);
+        REQUIRE (thing->y == 1);
+        REQUIRE (thing->z == 2);
+        allocator.free (thing);
+
+        Thing xx {};
+        allocator.free (&xx);
+    }
 }
