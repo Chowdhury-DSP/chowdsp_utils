@@ -5,7 +5,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_logging
    vendor:        Chowdhury DSP
-   version:       2.2.0
+   version:       2.3.0
    name:          ChowDSP Logging
    description:   ChowDSP Logging module
    dependencies:  chowdsp_core, chowdsp_data_structures, chowdsp_listeners

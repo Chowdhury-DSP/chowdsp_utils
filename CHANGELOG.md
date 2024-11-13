@@ -2,8 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
-## [UNRELEASED]
+## [2.3.0] 2024-11-13
 - Added `chowdsp_fuzzy_search` module.
+- Added data structures: `chowdsp::ComponentArena`, `chowdsp::EnumMap`, `chowdsp::OptionalRef` and `chowdsp::OptionalArray`.
+- Added data structures: `chowdsp::PoolAllocator` and `chowdsp::ObjectPool`.
+- Added `chowdsp::SemitonesParameter`.
+- Added `chowdsp::BufferMultiple`.
+- Added parameters assignment methods.
+- Improved backend for `chowdsp_plugin_state`.
+- Improved `chowdsp::ArenaAllocator` and `chowdsp::ChainedArenaAllocator`.
+- Improved `chowdsp::AbstractTree`.
+- Improved `chowdsp::ParametersView`.
+- Improved `chowdsp::logging`.
+- Various memory-related improvements.
+- Updated PFR internal dependency.
+- Updated usage of `juce::Font` for compatibility with JUCE 8.
+- `chowdsp_compressor`: Allow level detector out-of-place processing.
+- `chowdsp::RebufferedProcessor` now supports work splitting.
+- Fixed moodycamel header clashes.
 
 ## [2.2.0] 2024-02-19
 - Refactored `chowdsp_buffers` module out of `chowdsp_dsp_data_structures`.

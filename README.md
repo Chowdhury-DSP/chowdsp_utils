@@ -91,6 +91,9 @@ sure to abide by the license of each module, as well as whichever libraries are 
 - `OptionalPointer`: A pointer which may or may not own the data it points to.
 - `LocalPointer`: An owning pointer which constructs the object it points to using its own local memory.
 - `SmallVector`: A mostly STL-compatible vector implementation, with a small-string-style optimization.
+- `ArenaAllocator`: A simple arena allocator.
+- `ChainedArenaAllocator`: A "growable" arena allocator.
+- `PoolAllocator`: A simple pool allocator.
 - Includes the following internal dependencies:
   - [`short_alloc`](https://howardhinnant.github.io/stack_alloc.html) (MIT license).
 
