@@ -11,7 +11,7 @@ include(AddJUCEModules)
 
 # OSX deployment target must be defined at a project level
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "Minimum OS X deployment target" FORCE)
-project(chowdsp_utils_examples VERSION 2.2.0)
+project(chowdsp_utils_examples VERSION 2.3.0)
 
 # download CLAP extensions
 CPMAddPackage(

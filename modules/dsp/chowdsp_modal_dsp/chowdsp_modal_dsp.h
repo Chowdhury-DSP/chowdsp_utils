@@ -5,7 +5,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_modal_dsp
    vendor:        Chowdhury DSP
-   version:       2.2.0
+   version:       2.3.0
    name:          ChowDSP Modal Signal Processin Utilities
    description:   Modal signal processing tools for ChowDSP plugins
    dependencies:  chowdsp_dsp_data_structures

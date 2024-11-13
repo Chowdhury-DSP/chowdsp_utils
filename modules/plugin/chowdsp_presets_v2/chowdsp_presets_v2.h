@@ -5,7 +5,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_presets_v2
    vendor:        Chowdhury DSP
-   version:       2.2.0
+   version:       2.3.0
    name:          ChowDSP Presets Utilities Version 2
    description:   Presets management system for ChowDSP plugins with chowdsp::PluginState
    dependencies:  chowdsp_core, chowdsp_json, chowdsp_version, chowdsp_plugin_state

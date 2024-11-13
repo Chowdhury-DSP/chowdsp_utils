@@ -5,7 +5,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_plugin_state
    vendor:        Chowdhury DSP
-   version:       2.2.0
+   version:       2.3.0
    name:          ChowDSP Plugin State
    description:   Utilities for managing state in a ChowDSP plugin
    dependencies:  chowdsp_core, chowdsp_serialization, chowdsp_listeners, chowdsp_version, chowdsp_parameters

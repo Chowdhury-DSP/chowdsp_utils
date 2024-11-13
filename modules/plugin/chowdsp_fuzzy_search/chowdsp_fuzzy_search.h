@@ -5,7 +5,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_fuzzy_search
    vendor:        Chowdhury DSP
-   version:       2.2.0
+   version:       2.3.0
    name:          ChowDSP Fuzzy Search
    description:   ChowDSP module useful for doing fuzzy searches on databases of tagged presets or similar
    dependencies:  chowdsp_core, chowdsp_data_structures

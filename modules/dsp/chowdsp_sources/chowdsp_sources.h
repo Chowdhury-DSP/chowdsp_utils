@@ -5,7 +5,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_sources
    vendor:        Chowdhury DSP
-   version:       2.2.0
+   version:       2.3.0
    name:          ChowDSP Sound Sources
    description:   Sound sources (oscillators, signal generators) for ChowDSP plugins
    dependencies:  chowdsp_dsp_data_structures

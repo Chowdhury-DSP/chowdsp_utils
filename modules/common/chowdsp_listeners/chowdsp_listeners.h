@@ -5,7 +5,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_listeners
    vendor:        Chowdhury DSP
-   version:       2.2.0
+   version:       2.3.0
    name:          ChowDSP Listener/Broadcaster Utilities
    description:   Wrapper on the single-header rocket library
    dependencies:  chowdsp_core
