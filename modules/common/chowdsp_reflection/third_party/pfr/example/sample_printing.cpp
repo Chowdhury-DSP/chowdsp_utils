@@ -1,4 +1,4 @@
-// Copyright 2016-2022 Antony Polukhin
+// Copyright 2016-2023 Antony Polukhin
 
 // Distributed under the Boost Software License, Version 1.0.
 // (See the accompanying file LICENSE_1_0.txt
@@ -13,6 +13,7 @@
 
 namespace my_ns
 {
+
 /// Usage:
 ///     struct foo {std::uint8_t a, b;};
 ///     ...
@@ -48,8 +49,8 @@ namespace detail
 
         pfr::for_each_field (x.value, [&] (const auto& v)
                              {
-            out << std::exchange (sep, ", ");
-            detail::print_each (out, v); });
+            out << std::exchange(sep, ", ");
+            detail::print_each(out, v); });
         return out;
     }
 } // namespace detail

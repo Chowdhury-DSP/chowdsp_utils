@@ -1,5 +1,7 @@
 #pragma once
 
+#if ! CHOWDSP_NO_XSIMD
+
 namespace chowdsp
 {
 /** Sine approximation type to use for the AdditiveOscillator */
@@ -127,3 +129,5 @@ private:
 } // namespace chowdsp
 
 #include "chowdsp_AdditiveOscillator.cpp"
+
+#endif // ! CHOWDSP_NO_XSIMD

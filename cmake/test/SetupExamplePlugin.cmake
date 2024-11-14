@@ -40,4 +40,17 @@ function(setup_example_plugin target code)
         CLAP_PROCESS_EVENTS_RESOLUTION_SAMPLES 64
         CLAP_USE_JUCE_PARAMETER_RANGES DISCRETE
     )
+
+    get_target_property(output_dir ${target} RUNTIME_OUTPUT_DIRECTORY)
+    foreach(format AU Standalone VST3 CLAP)
+        if(TARGET ${target}_${format})
+            add_custom_command(
+                TARGET ${target}_${format}
+                POST_BUILD
+                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                COMMAND echo "${target}: Relocating ${format} component"
+                COMMAND ${CMAKE_COMMAND} -E copy_directory ${output_dir}/${format} ${CMAKE_BINARY_DIR}/plugin_products/
+            )
+        endif()
+    endforeach()
 endfunction(setup_example_plugin)

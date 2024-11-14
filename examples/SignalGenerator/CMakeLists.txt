@@ -7,9 +7,13 @@ target_link_libraries(SignalGenerator
         chowdsp::chowdsp_sources
         chowdsp::chowdsp_waveshapers
         chowdsp::chowdsp_plugin_state
+        chowdsp::chowdsp_gui
 )
 
 target_sources(SignalGenerator
     PRIVATE
         SignalGeneratorPlugin.cpp
 )
+
+include(AddDiagnosticInfo)
+add_diagnostic_info(SignalGenerator)

@@ -31,6 +31,24 @@ TEST_CASE ("Sine Test", "[dsp][sources]")
         }
     }
 
+    SECTION ("Single-Sample Quadrature Processing Test")
+    {
+        chowdsp::SineWave<double> chowSine;
+        juce::dsp::ProcessSpec spec { fs, 512, 1 };
+        chowSine.prepare (spec);
+        chowSine.setFrequency (freq1);
+
+        // process samples one at a time, and compare to std::sin and std::cos
+        for (int i = 0; i < 2000; i++)
+        {
+            auto [actual_sin, actual_cos] = chowSine.processSampleQuadrature();
+            auto expected_sin = std::sin (juce::MathConstants<double>::twoPi * freq1 * i / fs);
+            auto expected_cos = std::cos (juce::MathConstants<double>::twoPi * freq1 * i / fs);
+            REQUIRE_MESSAGE (actual_sin == Catch::Approx (expected_sin).margin (err), "Sine Wave is inaccurate");
+            REQUIRE_MESSAGE (actual_cos == Catch::Approx (expected_cos).margin (10.0 * err), "Cosine Wave is inaccurate");
+        }
+    }
+
     SECTION ("Buffer Processing Test")
     {
         chowdsp::SineWave<double> chowSine;

@@ -5,7 +5,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_plugin_state
    vendor:        Chowdhury DSP
-   version:       2.1.0
+   version:       2.3.0
    name:          ChowDSP Plugin State
    description:   Utilities for managing state in a ChowDSP plugin
    dependencies:  chowdsp_core, chowdsp_serialization, chowdsp_listeners, chowdsp_version, chowdsp_parameters
@@ -25,6 +25,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include <chowdsp_listeners/chowdsp_listeners.h>
 #include <chowdsp_version/chowdsp_version.h>
 #include <chowdsp_parameters/chowdsp_parameters.h>
+#include <variant>
 
 JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324) // struct was padded warning
 
@@ -39,6 +40,7 @@ JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324) // struct was padded warning
 
 #include "Frontend/chowdsp_ParameterAttachment.h"
 #include "Frontend/chowdsp_SliderAttachment.h"
+#include "Frontend/chowdsp_SliderChoiceAttachment.h"
 #include "Frontend/chowdsp_ComboBoxAttachment.h"
 #include "Frontend/chowdsp_ButtonAttachment.h"
 

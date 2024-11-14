@@ -7,9 +7,10 @@ namespace parameters_view_detail
     class BooleanParameterComponent : public juce::Component
     {
     public:
-        BooleanParameterComponent (BoolParameter& param, PluginState& pluginState)
-            : attachment (param, pluginState, button)
+        BooleanParameterComponent (BoolParameter& param, ParameterListeners& listeners)
+            : attachment (param, listeners, button, nullptr)
         {
+            setComponentID (param.paramID);
             addAndMakeVisible (button);
         }
 
@@ -30,9 +31,10 @@ namespace parameters_view_detail
     class ChoiceParameterComponent : public juce::Component
     {
     public:
-        ChoiceParameterComponent (ChoiceParameter& param, PluginState& pluginState)
-            : attachment (param, pluginState, box)
+        ChoiceParameterComponent (ChoiceParameter& param, ParameterListeners& listeners)
+            : attachment (param, listeners, box, nullptr)
         {
+            setComponentID (param.paramID);
             addAndMakeVisible (box);
         }
 
@@ -53,9 +55,10 @@ namespace parameters_view_detail
     class SliderParameterComponent : public juce::Component
     {
     public:
-        SliderParameterComponent (FloatParameter& param, PluginState& pluginState)
-            : attachment (param, pluginState, slider)
+        SliderParameterComponent (FloatParameter& param, ParameterListeners& listeners)
+            : attachment (param, listeners, slider, nullptr)
         {
+            setComponentID (param.paramID);
             slider.setScrollWheelEnabled (false);
             addAndMakeVisible (slider);
         }
@@ -77,7 +80,7 @@ namespace parameters_view_detail
     class ParameterDisplayComponent : public juce::Component
     {
     public:
-        ParameterDisplayComponent (juce::RangedAudioParameter& param, PluginState& pluginState)
+        ParameterDisplayComponent (juce::RangedAudioParameter& param, ParameterListeners& listeners)
             : parameter (param)
         {
             parameterName.setText (parameter.getName (128), juce::dontSendNotification);
@@ -85,11 +88,8 @@ namespace parameters_view_detail
             parameterName.setInterceptsMouseClicks (false, false);
             addAndMakeVisible (parameterName);
 
-            parameterLabel.setText (parameter.getLabel(), juce::dontSendNotification);
-            parameterLabel.setInterceptsMouseClicks (false, false);
-            addAndMakeVisible (parameterLabel);
-
-            addAndMakeVisible (*(parameterComp = createParameterComp (pluginState)));
+            addAndMakeVisible (*(parameterComp = createParameterComp (listeners)));
+            setComponentID (parameterComp->getComponentID());
 
             setSize (400, 40);
         }
@@ -98,26 +98,28 @@ namespace parameters_view_detail
         {
             auto area = getLocalBounds();
 
-            parameterName.setBounds (area.removeFromLeft (100));
-            parameterLabel.setBounds (area.removeFromRight (50));
+            parameterName.setBounds (area.removeFromLeft (parameterName
+                                                              .getFont()
+                                                              .getStringWidth (parameterName.getText())
+                                                          * 11 / 10));
             parameterComp->setBounds (area);
         }
 
     private:
         juce::RangedAudioParameter& parameter;
-        juce::Label parameterName, parameterLabel;
+        juce::Label parameterName;
         std::unique_ptr<juce::Component> parameterComp;
 
-        std::unique_ptr<juce::Component> createParameterComp (PluginState& pluginState) const
+        std::unique_ptr<juce::Component> createParameterComp (ParameterListeners& listeners) const
         {
             if (auto* boolParam = dynamic_cast<BoolParameter*> (&parameter))
-                return std::make_unique<BooleanParameterComponent> (*boolParam, pluginState);
+                return std::make_unique<BooleanParameterComponent> (*boolParam, listeners);
 
             if (auto* choiceParam = dynamic_cast<ChoiceParameter*> (&parameter))
-                return std::make_unique<ChoiceParameterComponent> (*choiceParam, pluginState);
+                return std::make_unique<ChoiceParameterComponent> (*choiceParam, listeners);
 
             if (auto* sliderParam = dynamic_cast<FloatParameter*> (&parameter))
-                return std::make_unique<SliderParameterComponent> (*sliderParam, pluginState);
+                return std::make_unique<SliderParameterComponent> (*sliderParam, listeners);
 
             return {};
         }
@@ -128,36 +130,36 @@ namespace parameters_view_detail
     //==============================================================================
     struct ParamControlItem : public juce::TreeViewItem
     {
-        ParamControlItem (juce::RangedAudioParameter& paramIn, PluginState& pluginState)
-            : param (paramIn), state (pluginState) {}
+        ParamControlItem (juce::RangedAudioParameter& paramIn, ParameterListeners& paramListeners)
+            : param (paramIn), listeners (paramListeners) {}
 
         bool mightContainSubItems() override { return false; }
 
         std::unique_ptr<juce::Component> createItemComponent() override
         {
-            return std::make_unique<ParameterDisplayComponent> (param, state);
+            return std::make_unique<ParameterDisplayComponent> (param, listeners);
         }
 
         [[nodiscard]] int getItemHeight() const override { return 40; }
 
         juce::RangedAudioParameter& param;
-        PluginState& state;
+        ParameterListeners& listeners;
     };
 
     struct ParameterGroupItem : public juce::TreeViewItem
     {
-        ParameterGroupItem (ParamHolder& params, PluginState& pluginState)
+        ParameterGroupItem (ParamHolder& params, ParameterListeners& listeners)
             : name (params.getName())
         {
             params.doForAllParameterContainers (
-                [this, &pluginState] (auto& paramVec)
+                [this, &listeners] (auto& paramVec)
                 {
                     for (auto& param : paramVec)
-                        addSubItem (std::make_unique<ParamControlItem> (param, pluginState).release());
+                        addSubItem (std::make_unique<ParamControlItem> (param, listeners).release());
                 },
-                [this, &pluginState] (auto& paramHolder)
+                [this, &listeners] (auto& paramHolder)
                 {
-                    addSubItem (std::make_unique<ParameterGroupItem> (paramHolder, pluginState).release());
+                    addSubItem (std::make_unique<ParameterGroupItem> (paramHolder, listeners).release());
                 });
         }
 
@@ -176,9 +178,10 @@ namespace parameters_view_detail
 //==============================================================================
 struct ParametersView::Pimpl
 {
-    Pimpl (ParamHolder& params, PluginState& pluginState)
-        : groupItem (params, pluginState)
+    Pimpl (ParamHolder& params, ParameterListeners& listeners)
+        : groupItem (params, listeners)
     {
+        view.setIndentSize (5);
         const auto numIndents = getNumIndents (groupItem);
         const auto width = 400 + view.getIndentSize() * numIndents;
 
@@ -198,19 +201,63 @@ struct ParametersView::Pimpl
         return maxInner;
     }
 
+    [[nodiscard]] juce::Component* getComponentForParameter (const juce::RangedAudioParameter& param) const
+    {
+        return getComponentForParameter (param, *view.getRootItem(), view);
+    }
+
+    static juce::Component* getComponentForParameter (const juce::RangedAudioParameter& param,
+                                                      const juce::TreeViewItem& item,
+                                                      const juce::TreeView& tree)
+    {
+        for (int i = 0; i < item.getNumSubItems(); ++i)
+        {
+            if (const auto* subItem = item.getSubItem (i))
+            {
+                if (auto* paramControlItem = dynamic_cast<const parameters_view_detail::ParamControlItem*> (subItem))
+                {
+                    if (&paramControlItem->param == &param)
+                        return tree.getItemComponent (subItem);
+                }
+
+                if (auto* comp = getComponentForParameter (param, *subItem, tree))
+                    return comp;
+            }
+        }
+        return nullptr;
+    }
+
     parameters_view_detail::ParameterGroupItem groupItem;
     juce::TreeView view;
 };
 
 //==============================================================================
 ParametersView::ParametersView (PluginState& pluginState, ParamHolder& params)
-    : pimpl (std::make_unique<Pimpl> (params, pluginState))
+    : ParametersView (pluginState.getParameterListeners(), params)
+{
+    if (pluginState.processor != nullptr)
+    {
+        versionInfoText = pluginState.processor->getName();
+#if defined JucePlugin_VersionString
+        versionInfoText += " " + currentPluginVersion.getVersionString();
+#if defined CHOWDSP_PLUGIN_GIT_COMMIT_HASH
+        versionInfoText += "-" + juce::String { CHOWDSP_PLUGIN_GIT_COMMIT_HASH };
+#endif
+#endif
+    }
+
+    ParametersView::resized();
+}
+
+ParametersView::ParametersView (ParameterListeners& listeners, ParamHolder& params)
+    : pimpl (std::make_unique<Pimpl> (params, listeners))
 {
     auto* viewport = pimpl->view.getViewport();
 
     setOpaque (true);
     addAndMakeVisible (pimpl->view);
 
+    viewport->setScrollBarsShown (true, false);
     setSize (viewport->getViewedComponent()->getWidth() + viewport->getVerticalScrollBar().getWidth(),
              juce::jlimit (125, 400, viewport->getViewedComponent()->getHeight()));
 }
@@ -219,11 +266,35 @@ ParametersView::~ParametersView() = default;
 
 void ParametersView::paint (juce::Graphics& g)
 {
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
+    auto backgroundColour = getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId);
+    g.fillAll (backgroundColour);
+
+    if (versionInfoText.isNotEmpty())
+    {
+        const auto textHeight = juce::jmin (proportionOfHeight (0.05f), 20);
+        auto textArea = getLocalBounds().removeFromBottom (textHeight);
+        g.setColour (backgroundColour.darker (0.8f));
+        g.fillRect (textArea);
+
+        g.setColour (juce::Colours::white);
+        g.setFont (0.8f * static_cast<float> (textHeight));
+        g.drawFittedText (versionInfoText, textArea, juce::Justification::left, 1);
+    }
 }
 
 void ParametersView::resized()
 {
-    pimpl->view.setBounds (getLocalBounds());
+    auto b = getLocalBounds();
+    if (versionInfoText.isNotEmpty())
+    {
+        const auto textHeight = juce::jmin (proportionOfHeight (0.05f), 20);
+        b.removeFromBottom (textHeight);
+    }
+    pimpl->view.setBounds (b);
+}
+
+juce::Component* ParametersView::getComponentForParameter (const juce::RangedAudioParameter& param)
+{
+    return pimpl->getComponentForParameter (param);
 }
 } // namespace chowdsp

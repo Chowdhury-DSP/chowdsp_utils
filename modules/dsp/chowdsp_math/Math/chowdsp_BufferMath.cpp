@@ -409,10 +409,9 @@ bool sanitizeBuffer (BufferType& buffer, FloatType ceiling) noexcept
     {
         const auto* channelData = buffer.getReadPointer (ch);
         const auto channelMax = FloatVectorOperations::findAbsoluteMaximum (channelData, numSamples);
-        const auto channelNaNs = FloatVectorOperations::countNaNs (channelData, numSamples);
-        const auto channelInfs = FloatVectorOperations::countInfs (channelData, numSamples);
+        const auto channelInfsAndNaNs = FloatVectorOperations::countInfsAndNaNs (channelData, numSamples);
 
-        if (channelMax >= ceiling || channelNaNs > 0 || channelInfs > 0)
+        if (channelMax >= ceiling || channelInfsAndNaNs > 0)
         {
             // This buffer contains invalid values! Clearing...
             jassertfalse;
@@ -507,7 +506,7 @@ std::enable_if_t<std::is_floating_point_v<FloatType>, void>
 #endif
 
     static constexpr auto vecSize = (int) xsimd::batch<FloatType>::size;
-    auto numVecOps = numSamples / vecSize;
+    const auto numVecOps = numSamples / vecSize;
     const auto leftoverValues = numSamples % vecSize;
 
     for (int ch = 0; ch < numChannels; ++ch)
@@ -515,7 +514,8 @@ std::enable_if_t<std::is_floating_point_v<FloatType>, void>
         const auto* dataIn = bufferSrc.getReadPointer (ch);
         auto* dataOut = bufferDest.getWritePointer (ch);
 
-        while (--numVecOps >= 0)
+        auto channelVecOps = numVecOps;
+        while (--channelVecOps >= 0)
         {
             xsimd::store_aligned (dataOut, simdFunction (xsimd::load_aligned (dataIn)));
             dataIn += vecSize;

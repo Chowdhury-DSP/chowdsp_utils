@@ -5,7 +5,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_reflection
    vendor:        Chowdhury DSP
-   version:       2.1.0
+   version:       2.3.0
    name:          ChowDSP Reflection Utilities
    description:   JUCE interface for boost::pfr
    dependencies:  chowdsp_core
@@ -24,7 +24,10 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include <chowdsp_core/chowdsp_core.h>
 
 // third party includes
-JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wzero-as-null-pointer-constant", "-Wfloat-equal")
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wzero-as-null-pointer-constant",
+                                     "-Wshadow-field-in-constructor",
+                                     "-Wfloat-equal",
+                                     "-Wc++20-compat")
 #include "third_party/pfr/include/pfr.hpp"
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 

@@ -1,220 +1,263 @@
 namespace chowdsp
 {
-#ifndef DOXYGEN
-namespace abstract_tree_detail
+template <typename ElementType, typename DerivedType>
+AbstractTree<ElementType, DerivedType>::AbstractTree (size_t num_nodes_reserved)
 {
-    template <typename Callable, typename Node, typename Alloc>
-    void doForAllNodes (Callable&& callable, std::vector<Node, Alloc>& nodes)
-    {
-        for (auto& node : nodes)
-        {
-            if (node.leaf.has_value())
-                callable (node);
-            else
-                doForAllNodes (std::forward<Callable> (callable), node.subtree);
-        }
-    }
-
-    template <typename Callable, typename Node, typename Alloc>
-    void doForAllNodes (Callable&& callable, const std::vector<Node, Alloc>& nodes)
-    {
-        for (auto& node : nodes)
-        {
-            if (node.leaf.has_value())
-                callable (node);
-            else
-                doForAllNodes (std::forward<Callable> (callable), node.subtree);
-        }
-    }
-
-    template <typename DeleteChecker, typename OnDeleteAction, typename Node, typename Alloc>
-    static void removeElementsGeneric (DeleteChecker&& shouldDeleteElement, OnDeleteAction&& onDeleteAction, std::vector<Node, Alloc>& nodes)
-    {
-        VectorHelpers::erase_if (
-            nodes,
-            [shouldDelete = std::forward<DeleteChecker> (shouldDeleteElement),
-             onDelete = std::forward<OnDeleteAction> (onDeleteAction)] (const Node& node)
-            {
-                if (shouldDelete (node))
-                {
-                    onDelete (node);
-                    return true;
-                }
-
-                return false;
-            });
-
-        for (auto& node : nodes)
-        {
-            if (! node.leaf.has_value())
-                removeElementsGeneric (std::forward<DeleteChecker> (shouldDeleteElement),
-                                       std::forward<OnDeleteAction> (onDeleteAction),
-                                       node.subtree);
-        }
-
-        // Remove empty sub-trees
-        VectorHelpers::erase_if (nodes, [] (const Node& node)
-                                 { return ! node.leaf.has_value() && node.subtree.empty(); });
-    }
-} // namespace abstract_tree_detail
-#endif // DOXYGEN
-
-template <typename ElementType>
-ElementType& AbstractTree<ElementType>::insertElement (ElementType&& elementToInsert)
-{
-    auto& insertedElement = insertElementInternal (std::move (elementToInsert), nodes);
-    refreshElementIndexes();
-    return insertedElement;
+    reserve (num_nodes_reserved);
+    clear();
 }
 
-template <typename ElementType>
-void AbstractTree<ElementType>::insertElements (std::vector<ElementType>&& elements)
+template <typename ElementType, typename DerivedType>
+AbstractTree<ElementType, DerivedType>::~AbstractTree()
 {
+    doForAllNodes ([] (Node& node)
+                   { node.value.destroy(); });
+}
+
+template <typename ElementType, typename DerivedType>
+ElementType& AbstractTree<ElementType, DerivedType>::insertElement (ElementType&& elementToInsert)
+{
+    count++;
+    return DerivedType::insertElementInternal (static_cast<DerivedType&> (*this),
+                                               std::move (elementToInsert),
+                                               root_node);
+}
+
+template <typename ElementType, typename DerivedType>
+void AbstractTree<ElementType, DerivedType>::insertElements (std::vector<ElementType>&& elements)
+{
+    count += static_cast<int> (elements.size());
     for (auto& element : std::move (elements))
-        insertElementInternal (std::move (element), nodes);
-    refreshElementIndexes();
+        DerivedType::insertElementInternal (static_cast<DerivedType&> (*this),
+                                            std::move (element),
+                                            root_node);
 }
 
-template <typename ElementType>
-void AbstractTree<ElementType>::removeElement (int index)
+template <typename ElementType, typename DerivedType>
+template <typename Comparator>
+void AbstractTree<ElementType, DerivedType>::insertNodeSorted (Node& parent, Node* new_node, Comparator&& comparator)
 {
-    abstract_tree_detail::removeElementsGeneric ([index] (const Node& node)
-                                                 { return node.leaf.has_value() && node.leafIndex == index; },
-                                                 [this] (const Node& node)
-                                                 { onDelete (node); },
-                                                 nodes);
-    refreshElementIndexes();
-}
+    new_node->parent = &parent;
 
-template <typename ElementType>
-void AbstractTree<ElementType>::removeElement (const ElementType& element)
-{
-    abstract_tree_detail::removeElementsGeneric ([&element] (const Node& node)
-                                                 { return node.leaf.has_value() && node.leaf == element; },
-                                                 [this] (const Node& node)
-                                                 { onDelete (node); },
-                                                 nodes);
-    refreshElementIndexes();
-}
+    // parent node has no children, so add the first one here...
+    if (parent.first_child == nullptr)
+    {
+        parent.first_child = new_node;
+        return;
+    }
 
-template <typename ElementType>
-void AbstractTree<ElementType>::removeElements (const std::function<bool (const ElementType&)>& elementsToRemove)
-{
-    abstract_tree_detail::removeElementsGeneric ([&elementsToRemove] (const Node& node)
-                                                 { return node.leaf.has_value() && elementsToRemove (*node.leaf); },
-                                                 [this] (const Node& node)
-                                                 { onDelete (node); },
-                                                 nodes);
-    refreshElementIndexes();
-}
-
-template <typename ElementType>
-void AbstractTree<ElementType>::clear()
-{
-    abstract_tree_detail::removeElementsGeneric ([] (const Node&)
-                                                 { return true; },
-                                                 [this] (const Node& node)
-                                                 { onDelete (node); },
-                                                 nodes);
-    refreshElementIndexes();
-}
-
-template <typename ElementType>
-ElementType* AbstractTree<ElementType>::getElementByIndex (int index)
-{
-    ElementType* result = nullptr;
-    if (! juce::isPositiveAndBelow (index, totalNumElements))
-        return result;
-
-    abstract_tree_detail::doForAllNodes (
-        [&result, index] (Node& node)
+    // insert into the parents children, sorted
+    Node* prev {};
+    for (Node* iter = parent.first_child; iter != nullptr; iter = iter->next_sibling)
+    {
+        if (comparator (*new_node, *iter))
         {
-            if (node.leafIndex == index)
-                result = &(*node.leaf);
-        },
-        nodes);
+            new_node->next_sibling = iter;
+            new_node->prev_sibling = iter->prev_sibling;
+            iter->prev_sibling = new_node;
+
+            if (prev != nullptr)
+                prev->next_sibling = new_node;
+
+            if (iter == parent.first_child)
+                parent.first_child = new_node;
+
+            return;
+        }
+        prev = iter;
+    }
+
+    // insert at the end of the parents children
+    prev->next_sibling = new_node;
+    new_node->prev_sibling = prev;
+}
+
+template <typename ElementType, typename DerivedType>
+void AbstractTree<ElementType, DerivedType>::removeNode (Node& node)
+{
+    if (node.parent == nullptr)
+        return; // this is the root node! please don't delete me :(
+
+    onDelete (node);
+
+    if (node.value.has_value())
+        count--;
+
+    for (auto* iter = &root_node; iter != nullptr; iter = iter->next_linear)
+    {
+        if (iter->next_linear == &node)
+        {
+            iter->next_linear = node.next_linear;
+            if (last_node == &node)
+                last_node = iter;
+            break;
+        }
+    }
+
+    if (node.prev_sibling != nullptr)
+        node.prev_sibling->next_sibling = node.next_sibling;
+    if (node.next_sibling != nullptr)
+        node.next_sibling->prev_sibling = node.prev_sibling;
+
+    if (node.prev_sibling == nullptr && node.next_sibling == nullptr)
+    {
+        node.parent->first_child = nullptr;
+        removeNode (*node.parent);
+    }
+    else
+    {
+        if (node.parent->first_child == &node)
+            node.parent->first_child = node.next_sibling;
+    }
+
+    node.value.destroy();
+}
+
+template <typename ElementType, typename DerivedType>
+void AbstractTree<ElementType, DerivedType>::removeElement (const ElementType& element)
+{
+    for (auto* node = &root_node; node != nullptr; node = node->next_linear)
+    {
+        if (node->value.has_value() && node->value.leaf() == element)
+        {
+            removeNode (*node);
+            break;
+        }
+    }
+}
+
+template <typename ElementType, typename DerivedType>
+template <typename Callable>
+void AbstractTree<ElementType, DerivedType>::removeElements (const Callable& elementsToRemove)
+{
+    // This algorithm assumes that a child node has always been allocated _after_
+    // its parent. If later on we make it possible to "move" nodes, then this may
+    // need to change.
+    for (auto* node = &root_node; node != nullptr;)
+    {
+        auto* next_node = node->next_linear;
+        if (node->value.has_value() && elementsToRemove (node->value.leaf()))
+            removeNode (*node);
+
+        node = next_node;
+    }
+}
+
+template <typename ElementType, typename DerivedType>
+void AbstractTree<ElementType, DerivedType>::clear()
+{
+    doForAllNodes ([] (Node& node)
+                   { node.value.destroy(); });
+    allocator.clear();
+    count = 0;
+    root_node = {};
+}
+
+template <typename ElementType, typename DerivedType>
+OptionalRef<ElementType> AbstractTree<ElementType, DerivedType>::findElement (const ElementType& element)
+{
+    OptionalRef<ElementType> result {};
+    doForAllElements (
+        [&result, element] (ElementType& candidate)
+        {
+            if (element == candidate)
+                result = candidate;
+        });
     return result;
 }
 
-template <typename ElementType>
-const ElementType* AbstractTree<ElementType>::getElementByIndex (int index) const
+template <typename ElementType, typename DerivedType>
+OptionalRef<const ElementType> AbstractTree<ElementType, DerivedType>::findElement (const ElementType& element) const
 {
-    return const_cast<AbstractTree&> (*this).getElementByIndex (index); // NOSONAR
-}
-
-template <typename ElementType>
-int AbstractTree<ElementType>::getIndexForElement (const ElementType& element) const
-{
-    int result = -1;
-    abstract_tree_detail::doForAllNodes (
-        [&result, &element] (const Node& node)
+    OptionalRef<const ElementType> result {};
+    doForAllElements (
+        [&result, element] (const ElementType& candidate)
         {
-            if (node.leaf.has_value() && element == node.leaf)
-                result = node.leafIndex;
-        },
-        nodes);
+            if (element == candidate)
+                result = candidate;
+        });
     return result;
 }
 
-template <typename ElementType>
-ElementType* AbstractTree<ElementType>::findElement (const ElementType& element)
+template <typename ElementType, typename DerivedType>
+template <typename Callable>
+void AbstractTree<ElementType, DerivedType>::doForAllNodes (Callable&& callable)
 {
-    ElementType* result = nullptr;
-    abstract_tree_detail::doForAllNodes (
-        [&result, &element] (Node& node)
+    for (auto* iter = &root_node; iter != nullptr; iter = iter->next_linear)
+        callable (*iter);
+}
+
+template <typename ElementType, typename DerivedType>
+template <typename Callable>
+void AbstractTree<ElementType, DerivedType>::doForAllNodes (Callable&& callable) const
+{
+    for (auto* iter = &root_node; iter != nullptr; iter = iter->next_linear)
+        callable (*iter);
+}
+
+template <typename ElementType, typename DerivedType>
+template <typename Callable>
+void AbstractTree<ElementType, DerivedType>::doForAllElements (Callable&& callable)
+{
+    doForAllNodes (
+        [c = std::forward<Callable> (callable)] (Node& node)
         {
-            if (node.leaf.has_value() && element == node.leaf)
-                result = &(*node.leaf);
-        },
-        nodes);
-    return result;
+            if (node.value.has_value())
+                c (node.value.leaf());
+        });
 }
 
-template <typename ElementType>
-const ElementType* AbstractTree<ElementType>::findElement (const ElementType& element) const
-{
-    return const_cast<AbstractTree&> (*this).findElement (element); // NOSONAR
-}
-
-template <typename ElementType>
+template <typename ElementType, typename DerivedType>
 template <typename Callable>
-void AbstractTree<ElementType>::doForAllNodes (Callable&& callable)
+void AbstractTree<ElementType, DerivedType>::doForAllElements (Callable&& callable) const
 {
-    abstract_tree_detail::doForAllNodes (std::forward<Callable> (callable), nodes);
+    doForAllNodes (
+        [c = std::forward<Callable> (callable)] (const Node& node)
+        {
+            if (node.value.has_value())
+                c (node.value.leaf());
+        });
 }
 
-template <typename ElementType>
-template <typename Callable>
-void AbstractTree<ElementType>::doForAllNodes (Callable&& callable) const
+template <typename ElementType, typename DerivedType>
+typename AbstractTree<ElementType, DerivedType>::Node* AbstractTree<ElementType, DerivedType>::createTagNode (std::string_view str)
 {
-    abstract_tree_detail::doForAllNodes (std::forward<Callable> (callable), nodes);
+    auto* bytes = (std::byte*) allocator.allocate_bytes (sizeof (Node) + sizeof (std::string_view) + alignof (std::string_view) + str.size(), alignof (Node));
+
+    auto* new_node = new (bytes) Node {};
+    last_node->next_linear = new_node;
+    last_node = new_node;
+
+    bytes = juce::snapPointerToAlignment (bytes + sizeof (Node), alignof (std::string_view));
+
+    auto* str_data = (char*) (bytes + sizeof (std::string_view));
+    std::copy (str.begin(), str.end(), str_data);
+
+    auto tag_str_view = new (bytes) std::string_view { str_data, str.size() };
+    new_node->value.set_tag (tag_str_view);
+
+    return new_node;
 }
 
-template <typename ElementType>
-template <typename Callable>
-void AbstractTree<ElementType>::doForAllElements (Callable&& callable)
+template <typename ElementType, typename DerivedType>
+void AbstractTree<ElementType, DerivedType>::reserve (size_t num_nodes)
 {
-    abstract_tree_detail::doForAllNodes ([c = std::forward<Callable> (callable)] (auto& node)
-                                         { c (*node.leaf); },
-                                         nodes);
+    if (count > 0)
+    {
+        jassertfalse;
+        return;
+    }
+    allocator.reset (num_nodes * (sizeof (Node) + sizeof (ElementType) + alignof (ElementType)));
 }
 
-template <typename ElementType>
-template <typename Callable>
-void AbstractTree<ElementType>::doForAllElements (Callable&& callable) const
+template <typename ElementType, typename DerivedType>
+void AbstractTree<ElementType, DerivedType>::shrinkArena()
 {
-    abstract_tree_detail::doForAllNodes ([c = std::forward<Callable> (callable)] (const auto& node)
-                                         { c (*node.leaf); },
-                                         nodes);
-}
-
-template <typename ElementType>
-void AbstractTree<ElementType>::refreshElementIndexes()
-{
-    int counter = 0;
-    abstract_tree_detail::doForAllNodes ([&counter] (Node& node) mutable
-                                         { node.leafIndex = counter++; },
-                                         nodes);
-    totalNumElements = counter;
+    if (count > 0)
+    {
+        jassertfalse;
+        return;
+    }
+    allocator.reset (allocator.get_current_arena().get_total_num_bytes());
 }
 } // namespace chowdsp

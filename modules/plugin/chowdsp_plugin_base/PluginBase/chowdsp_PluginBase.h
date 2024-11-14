@@ -117,6 +117,14 @@ public:
     virtual juce::String getWrapperTypeString() const;
     bool supportsParameterModulation() const;
 
+#if HAS_CLAP_JUCE_EXTENSIONS && JUCE_MODULE_AVAILABLE_chowdsp_presets_v2
+    bool supportsPresetLoad() const noexcept override
+    {
+        return presetManager != nullptr;
+    }
+    bool presetLoadFromLocation (uint32_t location_kind, const char* location, const char* load_key) noexcept override;
+#endif
+
 protected:
 #if JUCE_MODULE_AVAILABLE_chowdsp_plugin_state
     PluginStateType state;
@@ -319,4 +327,14 @@ bool PluginBase<P>::supportsParameterModulation() const
     return false;
 #endif
 }
+
+#if HAS_CLAP_JUCE_EXTENSIONS && JUCE_MODULE_AVAILABLE_chowdsp_presets_v2
+template <class P>
+bool PluginBase<P>::presetLoadFromLocation (uint32_t location_kind, const char* location, const char* load_key) noexcept
+{
+    if (presetManager == nullptr)
+        return false;
+    return presetManager->loadCLAPPreset (location_kind, location, load_key);
+}
+#endif
 } // namespace chowdsp

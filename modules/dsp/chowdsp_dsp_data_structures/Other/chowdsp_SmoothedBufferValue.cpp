@@ -5,30 +5,43 @@ namespace chowdsp
 template <typename FloatType, typename ValueSmoothingTypes>
 void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::setParameterHandle (std::atomic<float>* handle)
 {
+#if ! CHOWDSP_SMOOTHED_BUFFER_SMALL
+#if JUCE_MODULE_AVAILABLE_chowdsp_parameters
     modulatableParameterHandle = nullptr;
+#endif
 
     parameterHandle = handle;
     reset (parameterHandle->load());
-}
-
-template <typename FloatType, typename ValueSmoothingTypes>
-void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::setParameterHandle ([[maybe_unused]] FloatParameter* handle)
-{
-    parameterHandle = nullptr;
-
-#if JUCE_MODULE_AVAILABLE_chowdsp_parameters
-    modulatableParameterHandle = handle;
-    reset (modulatableParameterHandle->getCurrentValue());
 #endif
 }
 
+#if JUCE_MODULE_AVAILABLE_chowdsp_parameters
 template <typename FloatType, typename ValueSmoothingTypes>
-void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::prepare (double fs, int samplesPerBlock)
+void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::setParameterHandle ([[maybe_unused]] const FloatParameter* handle)
+{
+    parameterHandle = nullptr;
+
+    modulatableParameterHandle = handle;
+    reset (modulatableParameterHandle->getCurrentValue());
+}
+#endif
+
+template <typename FloatType, typename ValueSmoothingTypes>
+void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::prepare (double fs, int samplesPerBlock, bool useInternalVector)
 {
     sampleRate = fs;
-    buffer.resize ((size_t) samplesPerBlock, {});
+    if (useInternalVector)
+    {
+#if ! CHOWDSP_SMOOTHED_BUFFER_SMALL
+        buffer.resize ((size_t) samplesPerBlock, {});
+        bufferData = buffer.data();
+#else
+        jassertfalse;
+#endif
+    }
     smoother.reset (sampleRate, rampLengthInSeconds);
 
+#if ! CHOWDSP_SMOOTHED_BUFFER_SMALL
     if (parameterHandle != nullptr)
         reset (parameterHandle->load());
 #if JUCE_MODULE_AVAILABLE_chowdsp_parameters
@@ -36,6 +49,7 @@ void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::prepare (double fs, in
         reset (modulatableParameterHandle->getCurrentValue());
 #endif
     else
+#endif
         reset();
 }
 
@@ -49,6 +63,7 @@ void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::reset (FloatType reset
 template <typename FloatType, typename ValueSmoothingTypes>
 void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::reset()
 {
+#if ! CHOWDSP_SMOOTHED_BUFFER_SMALL
     if (parameterHandle != nullptr)
     {
         reset ((FloatType) parameterHandle->load());
@@ -60,6 +75,7 @@ void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::reset()
     }
 #endif
     else
+#endif
     {
         reset (getCurrentValue());
     }
@@ -77,6 +93,7 @@ void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::setRampLength (double 
 template <typename FloatType, typename ValueSmoothingTypes>
 void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::process (int numSamples)
 {
+#if ! CHOWDSP_SMOOTHED_BUFFER_SMALL
     if (parameterHandle != nullptr)
     {
         process ((FloatType) parameterHandle->load(), numSamples);
@@ -88,6 +105,7 @@ void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::process (int numSample
     }
 #endif
     else
+#endif
     {
         // you must set a parameter handle that is not nullptr using setParameterHandle
         // before calling the method!
@@ -96,12 +114,19 @@ void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::process (int numSample
 }
 
 template <typename FloatType, typename ValueSmoothingTypes>
+void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::process (int numSamples, ArenaAllocatorView alloc)
+{
+    bufferData = alloc.allocate<FloatType> (numSamples, bufferAlignment);
+    jassert (bufferData != nullptr); // arena allocator is out of memory!
+    process (numSamples);
+}
+
+template <typename FloatType, typename ValueSmoothingTypes>
 void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::process (FloatType value, int numSamples)
 {
     const auto mappedValue = mappingFunction (value);
     smoother.setTargetValue (mappedValue);
 
-    auto* bufferData = buffer.data();
     if (! smoother.isSmoothing())
     {
         isCurrentlySmoothing = false;
@@ -114,8 +139,18 @@ void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::process (FloatType val
         bufferData[n] = smoother.getNextValue();
 }
 
+template <typename FloatType, typename ValueSmoothingTypes>
+void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::process (FloatType value, int numSamples, ArenaAllocatorView alloc)
+{
+    bufferData = alloc.allocate<FloatType> (numSamples, bufferAlignment);
+    jassert (bufferData != nullptr); // arena allocator is out of memory!
+    process (value, numSamples);
+}
+
+#if CHOWDSP_ALLOW_TEMPLATE_INSTANTIATIONS
 template class SmoothedBufferValue<float, juce::ValueSmoothingTypes::Linear>;
 template class SmoothedBufferValue<double, juce::ValueSmoothingTypes::Linear>;
 template class SmoothedBufferValue<float, juce::ValueSmoothingTypes::Multiplicative>;
 template class SmoothedBufferValue<double, juce::ValueSmoothingTypes::Multiplicative>;
+#endif
 } // namespace chowdsp

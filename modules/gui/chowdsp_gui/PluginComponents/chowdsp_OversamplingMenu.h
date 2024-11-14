@@ -2,6 +2,8 @@
 
 #include <chowdsp_listeners/chowdsp_listeners.h>
 
+// LCOV_EXCL_START
+
 namespace chowdsp
 {
 /** Menu that can be used as an interface for chowdsp::VariableOversampling */
@@ -57,3 +59,5 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OversamplingMenu)
 };
 } // namespace chowdsp
+
+// LCOV_EXCL_END

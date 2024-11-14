@@ -18,4 +18,7 @@ target_sources(chowdsp_filters_test
         WernerFilterTest.cpp
         ButterQsTest.cpp
         LinearTransformsTest.cpp
+        CrossoverFilterTest.cpp
+        FIRPolyphaseDecimatorTest.cpp
+        FIRPolyphaseInterpolatorTest.cpp
 )

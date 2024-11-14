@@ -17,24 +17,19 @@ TEST_CASE ("Text Interface Test", "[plugin][presets]")
     presetMgr.addPresets ({ chowdsp::presets::Preset { "Preset0", "Vendor", { { "float", 0.1f } } },
                             chowdsp::presets::Preset { "Preset1", "Vendor", { { "float", 0.99f } } } });
 
-    const auto loadPreset = [&presetMgr] (int index)
-    {
-        presetMgr.loadPreset (*presetMgr.getPresetTree().getElementByIndex (index));
-    };
-
     SECTION ("Preset Change")
     {
-        loadPreset (0);
+        presetMgr.loadPreset (presetMgr.getPresetTree().getRootNode().first_child->value.leaf());
         chowdsp::presets::frontend::TextInterface textInterface { presetMgr };
         REQUIRE (textInterface.getPresetText() == "Preset0");
 
-        loadPreset (1);
+        presetMgr.loadPreset (presetMgr.getPresetTree().getRootNode().first_child->next_sibling->value.leaf());
         REQUIRE (textInterface.getPresetText() == "Preset1");
     }
 
     SECTION ("Preset Dirty Change")
     {
-        loadPreset (0);
+        presetMgr.loadPreset (presetMgr.getPresetTree().getRootNode().first_child->value.leaf());
         chowdsp::presets::frontend::TextInterface textInterface { presetMgr };
         REQUIRE (textInterface.getPresetText() == "Preset0");
 
@@ -42,7 +37,7 @@ TEST_CASE ("Text Interface Test", "[plugin][presets]")
         state.getParameterListeners().updateBroadcastersFromMessageThread();
         REQUIRE (textInterface.getPresetText() == "Preset0*");
 
-        loadPreset (1);
+        presetMgr.loadPreset (presetMgr.getPresetTree().getRootNode().first_child->next_sibling->value.leaf());
         REQUIRE (textInterface.getPresetText() == "Preset1");
     }
 }

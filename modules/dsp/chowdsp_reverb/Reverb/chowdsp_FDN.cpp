@@ -2,43 +2,43 @@
 
 namespace chowdsp::Reverb
 {
-template <typename FloatType, int nChannels>
-void DefaultFDNConfig<FloatType, nChannels>::prepare (double sampleRate)
+template <typename FloatType, int nChannels, typename StorageType>
+void DefaultFDNConfig<FloatType, nChannels, StorageType>::prepare (double sampleRate)
 {
     fs = (FloatType) sampleRate;
 }
 
-template <typename FloatType, int nChannels>
-void DefaultFDNConfig<FloatType, nChannels>::reset()
+template <typename FloatType, int nChannels, typename StorageType>
+void DefaultFDNConfig<FloatType, nChannels, StorageType>::reset()
 {
     for (auto& filt : shelfs)
         filt.reset();
 }
 
-template <typename FloatType, int nChannels>
-double DefaultFDNConfig<FloatType, nChannels>::getDelayMult (int channelIndex)
+template <typename FloatType, int nChannels, typename StorageType>
+double DefaultFDNConfig<FloatType, nChannels, StorageType>::getDelayMult (int channelIndex)
 {
     std::random_device rd;
     std::mt19937 randGenerator (rd());
     return DefaultDiffuserConfig::getDelayMult (channelIndex, nChannels, randGenerator);
 }
 
-template <typename FloatType, int nChannels>
-void DefaultFDNConfig<FloatType, nChannels>::applyMixingMatrix (FloatType* data)
+template <typename FloatType, int nChannels, typename StorageType>
+void DefaultFDNConfig<FloatType, nChannels, StorageType>::applyMixingMatrix (FloatType* data)
 {
     MatrixOps::HouseHolder<FloatType, nChannels>::inPlace (data);
 }
 
-template <typename FloatType, int nChannels>
-FloatType DefaultFDNConfig<FloatType, nChannels>::calcGainForT60 (FloatType decayTimeMs, FloatType delayTimeMs)
+template <typename FloatType, int nChannels, typename StorageType>
+FloatType DefaultFDNConfig<FloatType, nChannels, StorageType>::calcGainForT60 (FloatType decayTimeMs, FloatType delayTimeMs)
 {
     const auto nTimes = decayTimeMs / delayTimeMs;
     return std::pow ((FloatType) 0.001, (FloatType) 1 / nTimes);
 }
 
-template <typename FloatType, int nChannels>
+template <typename FloatType, int nChannels, typename StorageType>
 template <typename FDNType>
-void DefaultFDNConfig<FloatType, nChannels>::setDecayTimeMs (const FDNType& fdn, FloatType decayTimeLowMs, FloatType decayTimeHighMs, FloatType crossoverFreqHz)
+void DefaultFDNConfig<FloatType, nChannels, StorageType>::setDecayTimeMs (const FDNType& fdn, FloatType decayTimeLowMs, FloatType decayTimeHighMs, FloatType crossoverFreqHz)
 {
     for (size_t i = 0; i < (size_t) nChannels; ++i)
     {
@@ -49,8 +49,8 @@ void DefaultFDNConfig<FloatType, nChannels>::setDecayTimeMs (const FDNType& fdn,
     }
 }
 
-template <typename FloatType, int nChannels>
-const FloatType* DefaultFDNConfig<FloatType, nChannels>::doFeedbackProcess (DefaultFDNConfig& fdnConfig, const FloatType* data)
+template <typename FloatType, int nChannels, typename StorageType>
+const FloatType* DefaultFDNConfig<FloatType, nChannels, StorageType>::doFeedbackProcess (DefaultFDNConfig& fdnConfig, const FloatType* data)
 {
     for (size_t i = 0; i < (size_t) nChannels; ++i)
         fdnConfig.fbData[i] = fdnConfig.shelfs[i].processSample (data[i]);

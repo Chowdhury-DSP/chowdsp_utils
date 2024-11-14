@@ -1,5 +1,5 @@
 // Copyright (c) 2018 Adam Butcher, Antony Polukhin
-// Copyright (c) 2019-2022 Antony Polukhin
+// Copyright (c) 2019-2023 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -18,17 +18,14 @@
 
 #include <tuple>
 
-namespace pfr
-{
-namespace detail
-{
+namespace pfr { namespace detail {
 
-    /// \brief A `std::tuple` capable of de-structuring assignment used to support
-    /// a tie of multiple lvalue references to fields of an aggregate T.
-    ///
-    /// \sa pfr::tie_from_structure
-    template <typename... Elements>
-    struct tie_from_structure_tuple : std::tuple<Elements&...> {
+/// \brief A `std::tuple` capable of de-structuring assignment used to support
+/// a tie of multiple lvalue references to fields of an aggregate T.
+///
+/// \sa pfr::tie_from_structure
+template <typename... Elements>
+struct tie_from_structure_tuple : std::tuple<Elements&...> {
     using base = std::tuple<Elements&...>;
     using base::base;
 

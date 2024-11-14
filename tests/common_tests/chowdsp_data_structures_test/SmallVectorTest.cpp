@@ -3,6 +3,8 @@
 
 TEST_CASE ("Small Vector Test", "[common][data-structures]")
 {
+    STATIC_REQUIRE (sizeof (chowdsp::SmallVector<int, 8>) < 2 * sizeof (std::array<int, 8>));
+
     SECTION ("Push/Pop Test")
     {
         chowdsp::SmallVector<int, 2> vec;
@@ -276,6 +278,30 @@ TEST_CASE ("Small Vector Test", "[common][data-structures]")
         REQUIRE (vec.empty());
     }
 
+    SECTION ("Clear w/ Destruction Test")
+    {
+        chowdsp::SmallVector<std::shared_ptr<int>, 4> vec {
+            std::make_shared<int> (1),
+            std::make_shared<int> (2),
+            std::make_shared<int> (3),
+        };
+        vec.resize (3);
+        REQUIRE (*vec[2] == 3);
+
+        vec.clear();
+        REQUIRE (vec.empty());
+
+        vec.emplace_back (std::make_shared<int> (0));
+        vec.emplace_back (std::make_shared<int> (1));
+        vec.emplace_back (std::make_shared<int> (2));
+        vec.emplace_back (std::make_shared<int> (3));
+        vec.emplace_back (std::make_shared<int> (4));
+        REQUIRE (vec.size() == 5);
+
+        vec.clear();
+        REQUIRE (vec.empty());
+    }
+
     SECTION ("Insert/Emplace Single Value Test")
     {
         chowdsp::SmallVector<double, 4> vec { 1.0, 2.0 };
@@ -409,7 +435,6 @@ TEST_CASE ("Small Vector Test", "[common][data-structures]")
             vec.erase (vec.begin() + 1, vec.begin() + 3);
             REQUIRE (vec.size() == 3);
             REQUIRE (vec[0] == 1);
-            ;
             REQUIRE (vec[1] == 4);
             REQUIRE (vec[2] == 5);
 

@@ -11,7 +11,11 @@ JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 #if JUCE_MODULE_AVAILABLE_chowdsp_dsp_data_structures
 #include <chowdsp_dsp_data_structures/chowdsp_dsp_data_structures.h>
 #else
+#if __has_include(<concurrentqueue.h>)
+#include <concurrentqueue.h>
+#else
 #include "../../../dsp/chowdsp_dsp_data_structures/third_party/moodycamel/concurrentqueue.h"
+#endif
 #endif
 
 namespace chowdsp
@@ -43,22 +47,22 @@ public:
      * thread, make sure to set `couldBeAudioThread = true`.
      */
     template <typename Callable>
-    void call (Callable&& operationToDefer, bool couldBeAudioThread = false)
+    bool call (Callable&& operationToDefer, bool couldBeAudioThread = false)
     {
         if (juce::MessageManager::existsAndIsCurrentThread())
         {
             operationToDefer();
-            return;
+            return true;
         }
 
+        auto success = true;
         if (couldBeAudioThread)
         {
-            const auto success = queue.try_enqueue (std::forward<Callable> (operationToDefer));
+            success = queue.try_enqueue (std::forward<Callable> (operationToDefer));
 
             // The queue doesn't have enough space for all these messages!
             // Consider changing the default size of the queue.
             jassert (success);
-            juce::ignoreUnused (success);
         }
         else
         {
@@ -68,6 +72,7 @@ public:
         }
 
         callbacksReady.store (true);
+        return success;
     }
 
 private:

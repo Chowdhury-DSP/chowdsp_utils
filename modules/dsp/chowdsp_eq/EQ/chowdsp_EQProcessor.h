@@ -51,18 +51,32 @@ public:
     void setBandOnOff (int band, bool shouldBeOn);
 
     /** Prepares the EQ to process a new stream of audio */
-    void prepare (const juce::dsp::ProcessSpec& spec);
+    void prepare (const juce::dsp::ProcessSpec& spec, bool useInternalArena = true);
 
     /** Resets the EQ state */
     void reset();
 
+    /**
+     * Returns the maximum amount of memory needed by the EQ processor in bytes
+     * If using the EQ with it's internal arena, then this memory will already be
+     * allocated, otherwise it is the user's responsibility to allocate this amount
+     * of memory ahead of time.
+     */
+    [[nodiscard]] size_t getRequiredMemoryBytes() const noexcept { return requiredMemoryBytes; }
+
     /** Processes an audio block */
     void processBlock (const BufferView<FloatType>& block) noexcept;
+
+    /** Processes an audio block */
+    void processBlock (const BufferView<FloatType>& block, ArenaAllocatorView arena) noexcept;
 
 private:
     std::array<EQBandType, numBands> bands;
     std::array<BypassProcessor<FloatType>, numBands> bypasses;
     std::array<bool, numBands> onOffs = { false };
+
+    size_t requiredMemoryBytes = 0;
+    ArenaAllocator<> internalArena;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EQProcessor)
 };

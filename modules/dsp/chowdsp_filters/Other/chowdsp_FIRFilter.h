@@ -1,5 +1,3 @@
-#if ! CHOWDSP_NO_XSIMD
-
 #pragma once
 
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wsign-conversion")
@@ -59,20 +57,37 @@ public:
     /** Process block of samples */
     void processBlock (FloatType* block, const int numSamples, const int channel = 0) noexcept
     {
+        processBlock (block, block, numSamples, channel);
+    }
+
+    /** Process block of samples out-of-place */
+    void processBlock (const FloatType* blockIn, FloatType* blockOut, const int numSamples, const int channel = 0) noexcept
+    {
         auto* z = state[channel].data();
         const auto* h = coefficients.data();
         ScopedValue zPtrLocal { zPtr[channel] };
 
         for (int n = 0; n < numSamples; ++n)
-            block[n] = processSampleInternal (block[n], z, h, zPtrLocal.get(), order, paddedOrder);
+            blockOut[n] = processSampleInternal (blockIn[n], z, h, zPtrLocal.get(), order, paddedOrder);
     }
 
     /** Process block of samples */
     void processBlock (const BufferView<FloatType>& block) noexcept
     {
-        const auto numSamples = block.getNumSamples();
-        for (const auto [channel, data] : buffer_iters::channels (block))
-            processBlock (data.data(), numSamples, channel);
+        processBlock (block, block);
+    }
+
+    /** Process block of samples out-of-place */
+    void processBlock (const BufferView<const FloatType>& blockIn, const BufferView<FloatType>& blockOut) noexcept
+    {
+        jassert (blockIn.getNumChannels() == blockOut.getNumChannels());
+        jassert (blockIn.getNumSamples() == blockOut.getNumSamples());
+
+        const auto numChannels = blockIn.getNumChannels();
+        const auto numSamples = blockIn.getNumSamples();
+
+        for (int ch = 0; ch < numChannels; ++ch)
+            processBlock (blockIn.getReadPointer (ch), blockOut.getWritePointer (ch), numSamples, ch);
     }
 
     /**
@@ -108,7 +123,11 @@ private:
     int paddedOrder = 0;
     std::vector<int> zPtr;
 
+#if CHOWDSP_NO_XSIMD
+    std::vector<FloatType> coefficients;
+#else
     std::vector<FloatType, xsimd::default_allocator<FloatType>> coefficients;
+#endif
     std::vector<std::vector<FloatType>> state;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FIRFilter)
@@ -116,5 +135,3 @@ private:
 } // namespace chowdsp
 
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
-
-#endif // ! CHOWDSP_NO_XSIMD

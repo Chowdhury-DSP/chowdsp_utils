@@ -1,5 +1,7 @@
 #pragma once
 
+// LCOV_EXCL_START
+
 namespace chowdsp::CLAPExtensions
 {
 /** Interface for clap_juce_extensions::clap_properties */
@@ -18,3 +20,5 @@ struct CLAPInfoExtensions : public clap_juce_extensions::clap_properties
     }
 };
 } // namespace chowdsp::CLAPExtensions
+
+// LCOV_EXCL_END

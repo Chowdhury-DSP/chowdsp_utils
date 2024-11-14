@@ -56,6 +56,13 @@ public:
 
     using Ptr = OptionalPointer<FloatParameter>;
 
+    /**
+     * Sets the parameter value.
+     * This will result in a call @c setValueNotifyingHost, so make sure that's what you want.
+     * Especially if calling this from the audio thread!
+     */
+    void setParameterValue (float newValue) { AudioParameterFloat::operator= (newValue); }
+
     /** Returns the default value for the parameter. */
     float getDefaultValue() const override { return unsnappedDefault; }
 
@@ -91,7 +98,8 @@ class ChoiceParameter : public juce::AudioParameterChoice,
 {
 public:
     ChoiceParameter (const ParameterID& parameterID, const juce::String& parameterName, const juce::StringArray& parameterChoices, int defaultItemIndex)
-        : juce::AudioParameterChoice (parameterID, parameterName, parameterChoices, defaultItemIndex)
+        : juce::AudioParameterChoice (parameterID, parameterName, parameterChoices, defaultItemIndex),
+          defaultChoiceIndex (defaultItemIndex)
     {
     }
     void printDebug() const
@@ -101,7 +109,19 @@ public:
 
     using Ptr = OptionalPointer<ChoiceParameter>;
 
+    /** Returns the default value for the parameter. */
+    int getDefaultIndex() const noexcept { return defaultChoiceIndex; }
+
+    /**
+     * Sets the parameter value.
+     * This will result in a call @c setValueNotifyingHost, so make sure that's what you want.
+     * Especially if calling this from the audio thread!
+     */
+    void setParameterValue (int newValue) { AudioParameterChoice::operator= (newValue); }
+
 private:
+    const int defaultChoiceIndex = 0;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ChoiceParameter)
 };
 
@@ -141,6 +161,13 @@ public:
         DBG(paramID + " : " + juce::String(static_cast<int>(get())));
     }
 
+    /**
+     * Sets the parameter value.
+     * This will result in a call @c setValueNotifyingHost, so make sure that's what you want.
+     * Especially if calling this from the audio thread!
+     */
+    void setParameterValue (EnumType newValue) { AudioParameterChoice::operator= (static_cast<int> (*magic_enum::enum_index (newValue))); }
+
     using Ptr = OptionalPointer<EnumChoiceParameter>;
 
 private:
@@ -161,6 +188,13 @@ public:
         DBG(paramID + " : " + juce::String(static_cast<int>(get())));
     }
     using Ptr = OptionalPointer<BoolParameter>;
+
+    /**
+     * Sets the parameter value.
+     * This will result in a call @c setValueNotifyingHost, so make sure that's what you want.
+     * Especially if calling this from the audio thread!
+     */
+    void setParameterValue (bool newValue) { AudioParameterBool::operator= (newValue); }
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BoolParameter)
@@ -282,28 +316,32 @@ private:
 };
 
 /** A float parameter which specifically stores a semitones value. */
-    class SemitonesParameter : public FloatParameter
+
+class SemitonesParameter : public FloatParameter
+{
+public:
+    JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wcomma")
+    SemitonesParameter (const ParameterID& parameterID,
+                        const juce::String& paramName,
+                        juce::NormalisableRange<float> paramRange,
+                        float defaultValue,
+                        bool snapToInt = false)
+        : FloatParameter (
+            parameterID,
+            paramName,
+            (paramRange.interval = snapToInt ? 1.0f : paramRange.interval, paramRange),
+            defaultValue,
+            [snapToInt] (float val)
+            { return ParamUtils::semitonesValToString (val, snapToInt); },
+            &ParamUtils::stringToSemitonesVal)
     {
-    public:
-        SemitonesParameter (const ParameterID& parameterID,
-                            const juce::String& paramName,
-                            juce::NormalisableRange<float> paramRange,
-                            float defaultValue,
-                            bool snapToInt = false)
-                : FloatParameter (
-                parameterID,
-                paramName,
-                (paramRange.interval = snapToInt ? 1.0f : paramRange.interval, paramRange),
-                defaultValue,
-                [snapToInt] (float val)
-                { return ParamUtils::semitonesValToString (val, snapToInt); },
-                &ParamUtils::stringToSemitonesVal)
-        {
-        }
+    }
+    JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
-        using Ptr = OptionalPointer<SemitonesParameter>;
+    using Ptr = OptionalPointer<SemitonesParameter>;
 
-    private:
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SemitonesParameter)
-    };
+private:
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SemitonesParameter)
+};
+
 } // namespace chowdsp

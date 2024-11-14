@@ -6,11 +6,11 @@ namespace chowdsp::compressor
 template <typename T>
 struct GainComputerParams
 {
-    const SmoothedBufferValue<T, juce::ValueSmoothingTypes::Multiplicative>& threshSmooth;
+    const SmoothedBufferValue<T, juce::ValueSmoothingTypes::Multiplicative>& threshSmooth; // linear gain
     const SmoothedBufferValue<T, juce::ValueSmoothingTypes::Multiplicative>& ratioSmooth;
     T kneeDB;
-    T kneeLower;
-    T kneeUpper;
+    T kneeLower; // linear gain
+    T kneeUpper; // linear gain
     T makeupGainTarget = (T) 1; // linear gain
 };
 

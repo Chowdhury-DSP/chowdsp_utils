@@ -6,6 +6,9 @@ namespace chowdsp
 class ParamHolder
 {
 public:
+    /** Convenient alias for a Parameter ID */
+    using PID = ParameterID;
+
     /**
      * Creates a ParamHolder. The user might want to name the ParamHolder,
      * or make it "non-owning" so it doesn't take ownership of the parameter
@@ -33,8 +36,22 @@ public:
 
     /** Adds parameters to the ParamHolder. */
     template <typename ParamType, typename... OtherParams>
-    std::enable_if_t<std::is_base_of_v<ParamHolder, ParamType>, void>
-        add (ParamType& paramHolder, OtherParams&... others);
+    std::enable_if_t<std::is_base_of_v<FloatParameter, ParamType>, void>
+        add (const OptionalPointer<ParamType>& floatParam, OtherParams&... others);
+
+    /** Adds parameters to the ParamHolder. */
+    template <typename ParamType, typename... OtherParams>
+    std::enable_if_t<std::is_base_of_v<ChoiceParameter, ParamType>, void>
+        add (const OptionalPointer<ParamType>& choiceParam, OtherParams&... others);
+
+    /** Adds parameters to the ParamHolder. */
+    template <typename ParamType, typename... OtherParams>
+    std::enable_if_t<std::is_base_of_v<BoolParameter, ParamType>, void>
+        add (const OptionalPointer<ParamType>& boolParam, OtherParams&... others);
+
+    /** Adds parameters to the ParamHolder. */
+    template <typename... OtherParams>
+    void add (ParamHolder& paramHolder, OtherParams&... others);
 
     /** Adds parameters to the ParamHolder. */
     template <typename ParamContainerType, typename... OtherParams>
@@ -43,6 +60,9 @@ public:
 
     /** Counts all the parameters held internally. */
     [[nodiscard]] int count() const noexcept;
+
+    /** Clears any parameters currently in the ParamHolder. */
+    void clear();
 
     /** Connects all the parameters to an AudioProcessor */
     void connectParametersToProcessor (juce::AudioProcessor& processor);
@@ -99,6 +119,9 @@ private:
     std::vector<OptionalPointer<ChoiceParameter>> choiceParams;
     std::vector<OptionalPointer<BoolParameter>> boolParams;
     std::vector<ParamHolder*> otherParams;
+
+    using ParamPtrVariant = std::variant<FloatParameter*, ChoiceParameter*, BoolParameter*>;
+    std::unordered_map<std::string, ParamPtrVariant> allParamsMap {};
 
     juce::String name;
     bool isOwning;

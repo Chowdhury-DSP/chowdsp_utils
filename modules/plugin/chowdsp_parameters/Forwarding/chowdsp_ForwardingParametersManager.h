@@ -22,17 +22,23 @@ class ForwardingParametersManager
 public:
 #if JUCE_MODULE_AVAILABLE_chowdsp_plugin_state
     /** Initializes handles to the forwarding parameters, and connects them to the given processor */
-    explicit ForwardingParametersManager (juce::AudioProcessor& audioProcessor, PluginState& pluginState) : processor (audioProcessor)
+    explicit ForwardingParametersManager (juce::AudioProcessor& audioProcessor, PluginState& pluginState)
+        : ForwardingParametersManager { &audioProcessor }
     {
-        for (int i = 0; i < totalNumForwardingParameters; ++i)
+        for (size_t i = 0; i < forwardedParams.size(); ++i)
         {
-            auto id = Provider::getForwardingParameterID (i);
-            auto forwardedParam = std::make_unique<ForwardingParameter> (id, pluginState, "Blank");
+            auto id = Provider::getForwardingParameterID (static_cast<int> (i));
+            forwardedParams[i] = OptionalPointer<ForwardingParameter> (id, pluginState, "Blank");
+            forwardedParams[i]->setProcessor (processor);
 
-            forwardedParam->setProcessor (&processor);
-            forwardedParams[(size_t) i] = forwardedParam.get();
-            processor.addParameter (forwardedParam.release());
+            if (processor != nullptr)
+                processor->addParameter (forwardedParams[i].release());
         }
+    }
+
+    /** Initializes the manager without initializing the parameters */
+    explicit ForwardingParametersManager (juce::AudioProcessor* audioProcessor) : processor (audioProcessor)
+    {
     }
 #else
     /** Initializes handles to the forwarding parameters, and connects them to the given processor */
@@ -41,16 +47,16 @@ public:
     }
 
     /** Initializes handles to the forwarding parameters, and connects them to the given processor */
-    explicit ForwardingParametersManager (juce::AudioProcessor& audioProcessor) : processor (audioProcessor)
+    explicit ForwardingParametersManager (juce::AudioProcessor& audioProcessor) : processor (&audioProcessor)
     {
         for (int i = 0; i < totalNumForwardingParameters; ++i)
         {
             auto id = Provider::getForwardingParameterID (i);
-            auto forwardedParam = std::make_unique<ForwardingParameter> (id, nullptr, "Blank");
+            forwardedParams[i] = OptionalPointer<ForwardingParameter> (id, nullptr, "Blank");
+            forwardedParams[i]->setProcessor (processor);
 
-            forwardedParam->setProcessor (&processor);
-            forwardedParams[(size_t) i] = forwardedParam.get();
-            processor.addParameter (forwardedParam.release());
+            if (processor != nullptr)
+                processor->addParameter (forwardedParams[i].release());
         }
     }
 #endif
@@ -84,8 +90,8 @@ public:
         ~ScopedForceDeferHostNotifications()
         {
             mgr.forceDeferHostNotifications = previousForceValue;
-            if (! mgr.forceDeferHostNotifications)
-                ForwardingParameter::reportParameterInfoChange (&mgr.processor);
+            if (! mgr.forceDeferHostNotifications && mgr.processor != nullptr)
+                ForwardingParameter::reportParameterInfoChange (mgr.processor);
         }
 
     private:
@@ -115,8 +121,8 @@ public:
             forwardedParams[(size_t) i]->setParam (param, paramName, deferHostNotification || forceDeferHostNotifications);
         }
 
-        if (deferHostNotification && ! forceDeferHostNotifications)
-            ForwardingParameter::reportParameterInfoChange (&processor);
+        if (deferHostNotification && ! forceDeferHostNotifications && processor != nullptr)
+            ForwardingParameter::reportParameterInfoChange (processor);
     }
 
     /**
@@ -137,11 +143,11 @@ public:
     }
 
 protected:
-    std::array<ForwardingParameter*, (size_t) totalNumForwardingParameters> forwardedParams;
+    std::array<OptionalPointer<ForwardingParameter>, (size_t) totalNumForwardingParameters> forwardedParams;
+
+    juce::AudioProcessor* processor = nullptr;
 
 private:
-    juce::AudioProcessor& processor;
-
     bool forceDeferHostNotifications = false;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ForwardingParametersManager)

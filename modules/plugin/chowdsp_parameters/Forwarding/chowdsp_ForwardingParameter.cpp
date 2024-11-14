@@ -75,6 +75,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ForwardingAttachment)
 };
 #else
+// LCOV_EXCL_START
 ForwardingParameter::ForwardingAttachment::ForwardingAttachment (juce::RangedAudioParameter& internal, juce::RangedAudioParameter& forwarding, juce::UndoManager* um)
     : internalParam (internal), forwardingParam (forwarding), undoManager (um)
 {
@@ -135,6 +136,7 @@ void ForwardingParameter::ForwardingAttachment::parameterGestureChanged (int, bo
     else
         endGesture();
 }
+// LCOV_EXCL_END
 #endif
 
 //=================================================================================
@@ -144,10 +146,12 @@ ForwardingParameter::ForwardingParameter (const ParameterID& id, PluginState& st
 {
 }
 #else
+// LCOV_EXCL_START
 ForwardingParameter::ForwardingParameter (const ParameterID& id, juce::UndoManager* um, const juce::String& thisDefaultName)
     : juce::RangedAudioParameter (id, thisDefaultName), undoManager (um), defaultName (thisDefaultName)
 {
 }
+// LCOV_EXCL_END
 #endif
 
 ForwardingParameter::~ForwardingParameter()
@@ -170,7 +174,7 @@ void ForwardingParameter::reportParameterInfoChange (juce::AudioProcessor* proce
 void ForwardingParameter::setParam (juce::RangedAudioParameter* paramToUse, const juce::String& newName, bool deferHostNotification)
 {
 #if ! JUCE_MODULE_AVAILABLE_chowdsp_plugin_state
-    juce::SpinLock::ScopedLockType sl (paramLock);
+    juce::SpinLock::ScopedLockType sl (paramLock); // LCOV_EXCL_LINE
 #endif
 
     if (internalParam != nullptr)
@@ -191,7 +195,7 @@ void ForwardingParameter::setParam (juce::RangedAudioParameter* paramToUse, cons
 #if JUCE_MODULE_AVAILABLE_chowdsp_plugin_state
         attachment = std::make_unique<ForwardingAttachment> (*internalParam, *this, pluginState);
 #else
-        attachment = std::make_unique<ForwardingAttachment> (*internalParam, *this, undoManager);
+        attachment = std::make_unique<ForwardingAttachment> (*internalParam, *this, undoManager); // LCOV_EXCL_LINE
 #endif
     }
 }
@@ -207,9 +211,11 @@ float ForwardingParameter::getValue() const
 void ForwardingParameter::setValue (float newValue)
 {
 #if ! JUCE_MODULE_AVAILABLE_chowdsp_plugin_state
+    // LCOV_EXCL_START
     juce::SpinLock::ScopedTryLockType stl (paramLock);
     if (! stl.isLocked())
         return;
+        // LCOV_EXCL_END
 #endif
 
     if (internalParam != nullptr && ! juce::approximatelyEqual (internalParam->getValue(), newValue))

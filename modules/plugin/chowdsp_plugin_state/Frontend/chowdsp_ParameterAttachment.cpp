@@ -4,38 +4,40 @@ namespace chowdsp
 {
 template <typename Param, typename Callback>
 ParameterAttachment<Param, Callback>::ParameterAttachment (Param& parameter,
-                                                           PluginState& pluginState,
+                                                           PluginState& plugState,
                                                            Callback&& callback)
-    : ParameterAttachment (parameter, pluginState.getParameterListeners(), std::forward<Callback> (callback))
+    : ParameterAttachment (parameter, plugState.getParameterListeners(), std::forward<Callback> (callback))
 {
+    pluginState = &plugState;
 }
 
 template <typename Param, typename Callback>
 ParameterAttachment<Param, Callback>::ParameterAttachment (Param& parameter,
                                                            ParameterListeners& listeners,
                                                            Callback&& callback)
-    : param (&parameter)
+    : param (&parameter),
+      updateCallback (std::move (callback))
 {
     valueChangedCallback = listeners.addParameterListener (*param,
                                                            ParameterListenerThread::MessageThread,
-                                                           [this, c = std::move (callback)]() mutable
+                                                           [this]() mutable
                                                            {
                                                                if (param != nullptr)
-                                                                   c (ParameterTypeHelpers::getValue (*param));
+                                                                   updateCallback (ParameterTypeHelpers::getValue (*param));
                                                            });
 }
 
 template <typename Param, typename Callback>
 void ParameterAttachment<Param, Callback>::beginGesture()
 {
-    if (param != nullptr)
+    if (param != nullptr && pluginState != nullptr && pluginState->processor != nullptr)
         param->beginChangeGesture();
 }
 
 template <typename Param, typename Callback>
 void ParameterAttachment<Param, Callback>::endGesture()
 {
-    if (param != nullptr)
+    if (param != nullptr && pluginState != nullptr && pluginState->processor != nullptr)
         param->endChangeGesture();
 }
 
@@ -52,7 +54,8 @@ void ParameterAttachment<Param, Callback>::setValueAsCompleteGesture (ParamEleme
                                              new ParameterAttachmentHelpers::ParameterChangeAction<Param> (
                                                  *param,
                                                  ParameterTypeHelpers::getValue (*param),
-                                                 val));
+                                                 val,
+                                                 pluginState == nullptr ? nullptr : pluginState->processor));
                                      }
 
                                      beginGesture();
@@ -69,6 +72,13 @@ void ParameterAttachment<Param, Callback>::setValueAsPartOfGesture (ParamElement
                                  {
                                      ParameterTypeHelpers::setValue (val, *param);
                                  });
+}
+
+template <typename Param, typename Callback>
+void ParameterAttachment<Param, Callback>::manuallyTriggerUpdate() const
+{
+    if (param != nullptr)
+        updateCallback (ParameterTypeHelpers::getValue (*param));
 }
 
 template <typename Param, typename Callback>

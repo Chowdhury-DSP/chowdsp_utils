@@ -22,20 +22,49 @@ namespace sl_detail
         return d_first;
     }
 #endif
+
+    /** Counts the string length needed to contain a number. */
+    template <typename Int>
+    constexpr size_t num_str_len (Int number)
+    {
+        size_t digits = (number > 0) ? 0 : 1;
+        while (number)
+        {
+            number /= 10;
+            digits++;
+        }
+        return digits;
+    }
+
+    constexpr void uint_to_str (char* str, size_t size, uint64_t value)
+    {
+        size_t i = size;
+        while (i > 0)
+        {
+            str[i - 1] = static_cast<char> ('0' + (value % 10));
+            value /= 10;
+            i--;
+        }
+    }
+
+    constexpr void sint_to_str (char* str, size_t size, int64_t value)
+    {
+        if (value >= 0)
+            return uint_to_str (str, size, static_cast<uint64_t> (value));
+
+        str[0] = '-';
+        uint_to_str (str + 1, size - 1, static_cast<uint64_t> (-value));
+    }
 } // namespace sl_detail
 #endif
 
 /** A string-literal wrapper type. */
 template <size_t N>
-class StringLiteral
+struct StringLiteral
 {
     std::array<char, N> chars {};
     size_t actual_size = 0;
 
-    template <size_t NN, size_t MM>
-    friend constexpr StringLiteral<NN + MM> operator+ (const StringLiteral<NN>&, const StringLiteral<MM>&);
-
-public:
     constexpr StringLiteral() = default;
     constexpr StringLiteral (const StringLiteral&) = default;
     constexpr StringLiteral& operator= (const StringLiteral&) = default;
@@ -61,6 +90,21 @@ public:
     }
 
     [[nodiscard]] constexpr std::string_view toStringView() const { return { data(), size() }; }
+
+    template <typename IntType, typename = typename std::enable_if_t<std::is_integral_v<IntType>>>
+    constexpr explicit StringLiteral (IntType int_value)
+        : actual_size (sl_detail::num_str_len (int_value))
+    {
+        // N is not large enough to hold this number!
+#if __cplusplus >= 202002L || _MSVC_LANG >= 202002L
+        jassert (N >= actual_size);
+#endif
+
+        if constexpr (std::is_signed_v<IntType>)
+            sl_detail::sint_to_str (chars.data(), actual_size, static_cast<int64_t> (int_value));
+        else
+            sl_detail::uint_to_str (chars.data(), actual_size, static_cast<uint64_t> (int_value));
+    }
     constexpr operator std::string_view() const { return toStringView(); } // NOSONAR NOLINT(google-explicit-constructor)
     [[nodiscard]] std::string toString() const { return { data(), size() }; }
     operator std::string() const { return toString(); } // NOSONAR NOLINT(google-explicit-constructor)
@@ -151,6 +195,24 @@ constexpr bool operator!= (const std::string_view& lhs, const StringLiteral<N>& 
 {
     return ! (lhs == rhs);
 }
+
+#if (defined(__cplusplus) && __cplusplus >= 202002L) || (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L)
+namespace string_literals
+{
+    template <StringLiteral sl>
+    constexpr auto operator"" _sl()
+    {
+        return sl;
+    }
+
+    template <char... str>
+    constexpr auto operator"" _sl_n()
+    {
+        constexpr char str_array[] { str..., '\0' };
+        return StringLiteral { str_array };
+    }
+} // namespace string_literals
+#endif
 } // namespace chowdsp
 
 JUCE_END_IGNORE_WARNINGS_MSVC

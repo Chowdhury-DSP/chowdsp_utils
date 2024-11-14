@@ -5,7 +5,7 @@ TEST_CASE ("Diffuser Test", "[dsp][reverb]")
 {
     static constexpr int nChannels = 4;
     static constexpr int nStages = 4;
-    using TestDiffuser = chowdsp::Reverb::Diffuser<float, nChannels, chowdsp::DelayLineInterpolationTypes::None, 1 << 13>;
+    using TestDiffuser = chowdsp::Reverb::Diffuser<float, nChannels, chowdsp::DelayLineInterpolationTypes::None, 1 << 10>;
 
     SECTION ("Energy Preserving Test")
     {

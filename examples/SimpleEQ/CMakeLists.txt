@@ -15,3 +15,7 @@ target_sources(SimpleEQ
         PluginEditor.cpp
         FilterPlots.cpp
 )
+target_compile_definitions(SimpleEQ
+    PRIVATE
+        CHOWDSP_BUFFER_MAX_NUM_CHANNELS=2
+)

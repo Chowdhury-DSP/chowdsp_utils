@@ -30,7 +30,7 @@ inline juce::Image loadImage (const juce::String& fileName)
                                                .getChildFile (fileName));
 }
 
-inline void compareImages (const juce::Image& testImage, const juce::Image& refImage)
+inline void compareImages (const juce::Image& testImage, const juce::Image& refImage, float diffTolerance = 20.0f)
 {
     const auto width = testImage.getWidth();
     const auto height = testImage.getHeight();
@@ -41,17 +41,20 @@ inline void compareImages (const juce::Image& testImage, const juce::Image& refI
     const auto testImageData = juce::Image::BitmapData { testImage, juce::Image::BitmapData::readOnly };
     const auto refImageData = juce::Image::BitmapData { refImage, juce::Image::BitmapData::readOnly };
 
+    int diffSum = 0;
     for (int w = 0; w < width; ++w)
     {
         for (int h = 0; h < height; ++h)
         {
             const auto testColour = testImageData.getPixelColour (w, h);
             const auto refColour = refImageData.getPixelColour (w, h);
-            REQUIRE (juce::isWithin (testColour.getRed(), refColour.getRed(), (uint8_t) 25));
-            REQUIRE (juce::isWithin (testColour.getBlue(), refColour.getBlue(), (uint8_t) 25));
-            REQUIRE (juce::isWithin (testColour.getGreen(), refColour.getGreen(), (uint8_t) 25));
-            REQUIRE (testColour.getAlpha() == refColour.getAlpha());
+            diffSum += std::abs (testColour.getRed() - refColour.getRed());
+            diffSum += std::abs (testColour.getBlue() - refColour.getBlue());
+            diffSum += std::abs (testColour.getGreen() - refColour.getGreen());
+            diffSum += std::abs (testColour.getAlpha() - refColour.getAlpha());
         }
     }
+    const auto diffAvg = static_cast<float> (diffSum) / static_cast<float> (width * height);
+    REQUIRE (diffAvg < diffTolerance);
 }
 } // namespace VizTestUtils

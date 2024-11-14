@@ -17,6 +17,8 @@ target_link_libraries(static_test_dummy_executable PRIVATE
     chowdsp_listeners
     chowdsp_reflection
     chowdsp_serialization
+    chowdsp_logging
+    chowdsp_fuzzy_search
     chowdsp_units
     chowdsp_buffers
     chowdsp_compressor

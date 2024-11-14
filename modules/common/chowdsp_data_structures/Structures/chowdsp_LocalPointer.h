@@ -15,7 +15,7 @@ JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324) // structure was padded due to alignment 
  * Make sure that no other type (e.g. std::unique_ptr) tries to take ownership
  * of the pointer being stored here, since that will result in a double-delete.
  */
-template <typename T, size_t MaxSize, size_t Alignment = 0>
+template <typename T, size_t MaxSize, size_t Alignment = raw_object_detail::get_alignment<T>()>
 class LocalPointer
 {
 public:
@@ -40,6 +40,7 @@ public:
         jassert (pointer == nullptr);
         jassert (other.pointer == nullptr);
         juce::ignoreUnused (other);
+        return *this;
     }
 
     /**
@@ -52,9 +53,11 @@ public:
     C* emplace (Args&&... args)
     {
         static_assert (MaxSize >= sizeof (C), "Type is too large to fit into MaxSize bytes!");
+        static_assert (Alignment % alignof (C) == 0, "Type alignments are incompatible!");
+
         reset();
         pointer = new (data.data()) C (std::forward<Args> (args)...);
-        return reinterpret_cast<C*> (pointer);
+        return reinterpret_cast<C*> (pointer.get());
     }
 
     /**
@@ -65,21 +68,13 @@ public:
     {
         if (pointer != nullptr)
         {
-            // Why are we calling the destructor explicitly here?
-            // For some types it won't matter since we're zero-ing
-            // the local storage anyway, but if the type has something
-            // like a std::vector or std::unique_ptr inside it, or has
-            // some custom logic in its destructor, then we need to make
-            // sure that stuff gets taken care of before destroying the object.
-            pointer->~T();
-
-            pointer = nullptr;
+            pointer.destroy();
             std::fill (std::begin (data), std::end (data), std::byte {});
         }
     }
 
-    [[nodiscard]] T* get() { return pointer; }
-    [[nodiscard]] const T* get() const { return pointer; }
+    [[nodiscard]] T* get() { return pointer.get(); }
+    [[nodiscard]] const T* get() const { return pointer.get(); }
 
     [[nodiscard]] T* operator->() { return get(); }
     [[nodiscard]] const T* operator->() const { return get(); }
@@ -88,7 +83,7 @@ public:
 
 private:
     alignas (Alignment) std::array<std::byte, MaxSize> data {};
-    T* pointer = nullptr;
+    DestructiblePointer<T> pointer = nullptr;
 };
 
 template <typename T, size_t N, size_t A>

@@ -22,20 +22,15 @@ TEST_CASE ("Clipboard Interface Test", "[plugin][presets]")
     presetMgr.addPresets ({ chowdsp::presets::Preset { "Preset0", "Vendor", { { "float", val1 } } },
                             chowdsp::presets::Preset { "Preset1", "Vendor", { { "float", val2 } } } });
 
-    const auto loadPreset = [&presetMgr] (int index)
-    {
-        presetMgr.loadPreset (*presetMgr.getPresetTree().getElementByIndex (index));
-    };
-
     SECTION ("Copy/Paste")
     {
-        loadPreset (0);
+        presetMgr.loadPreset (presetMgr.getPresetTree().getRootNode().first_child->value.leaf());
         REQUIRE (juce::approximatelyEqual (state.params.floatParam->get(), val1));
 
         chowdsp::presets::frontend::ClipboardInterface clipInterface { presetMgr };
         clipInterface.copyCurrentPreset();
 
-        loadPreset (1);
+        presetMgr.loadPreset (presetMgr.getPresetTree().getRootNode().first_child->next_sibling->value.leaf());
         REQUIRE (juce::approximatelyEqual (state.params.floatParam->get(), val2));
 
         REQUIRE (clipInterface.tryToPastePreset());
@@ -45,7 +40,7 @@ TEST_CASE ("Clipboard Interface Test", "[plugin][presets]")
     SECTION ("Empty Paste")
     {
         chowdsp::presets::frontend::ClipboardInterface clipInterface { presetMgr };
-        loadPreset (0);
+        presetMgr.loadPreset (presetMgr.getPresetTree().getRootNode().first_child->value.leaf());
 
         juce::SystemClipboard::copyTextToClipboard ({});
 
@@ -57,7 +52,7 @@ TEST_CASE ("Clipboard Interface Test", "[plugin][presets]")
     SECTION ("Invalid Preset Paste")
     {
         chowdsp::presets::frontend::ClipboardInterface clipInterface { presetMgr };
-        loadPreset (0);
+        presetMgr.loadPreset (presetMgr.getPresetTree().getRootNode().first_child->value.leaf());
 
         chowdsp::presets::Preset invalid { "Preset1", "", { { "float", val2 } } };
         juce::SystemClipboard::copyTextToClipboard (invalid.toJson().dump());

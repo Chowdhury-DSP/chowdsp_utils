@@ -5,6 +5,7 @@ SliderAttachment::SliderAttachment (FloatParameter& param,
                                     juce::Slider& paramSlider)
     : SliderAttachment (param, pluginState.getParameterListeners(), paramSlider, pluginState.undoManager)
 {
+    attachment.pluginState = &pluginState;
 }
 
 SliderAttachment::SliderAttachment (FloatParameter& param,
@@ -103,14 +104,16 @@ void SliderAttachment::sliderDragStarted (juce::Slider*)
 
 void SliderAttachment::sliderDragEnded (juce::Slider*)
 {
-    if (um != nullptr)
+    const auto valueAtEndOfGesture = attachment.param->get();
+    if (um != nullptr && ! juce::approximatelyEqual (valueAtStartOfGesture, valueAtEndOfGesture))
     {
         um->beginNewTransaction();
         um->perform (
             new ParameterAttachmentHelpers::ParameterChangeAction<FloatParameter> (
                 *attachment.param,
                 valueAtStartOfGesture,
-                attachment.param->get()));
+                valueAtEndOfGesture,
+                attachment.pluginState == nullptr ? nullptr : attachment.pluginState->processor));
     }
 
     attachment.endGesture();

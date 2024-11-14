@@ -143,11 +143,13 @@ namespace dsp
     }
 
     //==============================================================================
+#if CHOWDSP_ALLOW_TEMPLATE_INSTANTIATIONS
     template class LookupTable<float>;
     template class LookupTable<double>;
 
     template class LookupTableTransform<float>;
     template class LookupTableTransform<double>;
+#endif
 
 } // namespace dsp
 } // namespace chowdsp_juce

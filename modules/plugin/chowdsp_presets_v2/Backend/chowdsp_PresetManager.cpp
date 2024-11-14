@@ -1,5 +1,13 @@
 #include "chowdsp_PresetManager.h"
 
+#if HAS_CLAP_JUCE_EXTENSIONS
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wunused-parameter")
+JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4100)
+#include <clap/helpers/preset-discovery-provider.hh>
+JUCE_END_IGNORE_WARNINGS_MSVC
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+#endif
+
 namespace chowdsp::presets
 {
 PresetManager::PresetManager (PluginState& state,
@@ -57,7 +65,7 @@ void PresetManager::saveUserPreset (const juce::File& file, Preset&& preset) // 
     preset.toFile (file);
     loadUserPresetsFromFolder (getUserPresetPath());
 
-    if (const auto* justSavedPreset = presetTree.findElement (preset))
+    if (const auto justSavedPreset = presetTree.findElement (preset))
         loadPreset (*justSavedPreset);
     else
         jassertfalse; // preset was not saved correctly!
@@ -68,9 +76,9 @@ void PresetManager::setDefaultPreset (Preset&& newDefaultPreset)
     // default preset must be a valid preset!
     jassert (newDefaultPreset.isValid());
 
-    if (const auto* foundDefaultPreset = presetTree.findElement (newDefaultPreset))
+    if (const auto foundDefaultPreset = presetTree.findElement (newDefaultPreset))
     {
-        defaultPreset = foundDefaultPreset;
+        defaultPreset = &foundDefaultPreset.value();
         return;
     }
 
@@ -124,4 +132,62 @@ void PresetManager::loadUserPresetsFromFolder (const juce::File& file)
 
     addPresets (std::move (presets), false);
 }
+
+void PresetManager::loadPreset (const Preset& preset)
+{
+#if HAS_CLAP_JUCE_EXTENSIONS
+    const auto presetFile = preset.getPresetFile();
+    const auto presetName = preset.getName();
+#endif
+
+    saverLoader.loadPreset (preset);
+
+#if HAS_CLAP_JUCE_EXTENSIONS
+    if (presetFile == juce::File {})
+    {
+        clapPresetLoadedBroadcaster (CLAP_PRESET_DISCOVERY_LOCATION_PLUGIN,
+                                     nullptr,
+                                     presetName.toRawUTF8());
+    }
+    else
+    {
+        clapPresetLoadedBroadcaster (CLAP_PRESET_DISCOVERY_LOCATION_FILE,
+                                     presetFile.getFullPathName().toRawUTF8(),
+                                     nullptr);
+    }
+#endif
+}
+
+#if HAS_CLAP_JUCE_EXTENSIONS
+bool PresetManager::loadCLAPPreset (uint32_t location_kind, const char* location, const char* load_key) noexcept
+{
+    if (location_kind == CLAP_PRESET_DISCOVERY_LOCATION_FILE)
+    {
+        const auto presetFile = juce::File { location };
+        if (! presetFile.existsAsFile())
+            return false;
+
+        const auto preset = Preset { presetFile };
+        if (! preset.isValid())
+            return false;
+
+        loadPreset (preset);
+        return true;
+    }
+
+    if (location_kind == CLAP_PRESET_DISCOVERY_LOCATION_PLUGIN)
+    {
+        for (const auto& preset : getFactoryPresets())
+        {
+            if (preset.getName() == load_key)
+            {
+                loadPreset (preset);
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+#endif
 } // namespace chowdsp::presets

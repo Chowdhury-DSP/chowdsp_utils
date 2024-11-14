@@ -3,15 +3,15 @@
 namespace chowdsp::presets
 {
 /** A tree-like data structure for storing presets. */
-class PresetTree : public AbstractTree<Preset>
+class PresetTree : public AbstractTree<Preset, PresetTree>
 {
 public:
     /** Methods for sorting and inserting presets into the tree. */
     struct InsertionHelper
     {
-        std::function<bool (const juce::String&, const juce::String&)> tagSortMethod = nullptr;
+        std::function<bool (std::string_view, std::string_view)> tagSortMethod = nullptr;
         std::function<bool (const Preset&, const Preset&)> presetSortMethod = nullptr;
-        std::function<Node&(NodeVector&, Node&&)> insertNodeIntoTree = nullptr;
+        std::function<void (Node& parent, Node* newNode)> insertNodeIntoTree = nullptr;
     };
 
     explicit PresetTree (PresetState* presetState = nullptr, InsertionHelper&& insertionHelper = { nullptr, nullptr, nullptr });
@@ -22,10 +22,12 @@ public:
      *
      * Uses PresetTreeInserters::flatInserter by default.
      */
-    std::function<Preset&(Preset&&, NodeVector&, Node::NodeArena&, const InsertionHelper&)> treeInserter;
+    std::function<Preset&(Preset&&, PresetTree&, Node& root, const InsertionHelper&)> treeInserter {};
+
+    /** For internal use only! */
+    static Preset& insertElementInternal (PresetTree& self, Preset&& element, Node& root);
 
 protected:
-    Preset& insertElementInternal (Preset&& element, NodeVector& topLevelNodes) override;
     void onDelete (const Node& nodeBeingDeleted) override;
 
 private:
@@ -39,21 +41,21 @@ private:
 namespace PresetTreeInserters
 {
     /** Default comparator for sorting tags. */
-    bool defaultTagComparator (const juce::String&, const juce::String&);
+    bool defaultTagComparator (std::string_view, std::string_view);
 
     /** Default comparator for sorting presets. */
     bool defaultPresetComparator (const Preset&, const Preset&);
 
     /** Inserts all presets into the tree as a flat list. */
-    Preset& flatInserter (Preset&&, PresetTree::NodeVector&, PresetTree::Node::NodeArena&, const PresetTree::InsertionHelper&);
+    Preset& flatInserter (Preset&&, PresetTree&, PresetTree::Node&, const PresetTree::InsertionHelper&);
 
     /** Inserts presets into the tree with sub-trees for each vendor. */
-    Preset& vendorInserter (Preset&&, PresetTree::NodeVector&, PresetTree::Node::NodeArena&, const PresetTree::InsertionHelper&);
+    Preset& vendorInserter (Preset&&, PresetTree&, PresetTree::Node&, const PresetTree::InsertionHelper&);
 
     /** Inserts presets into the tree with sub-trees for each category. */
-    Preset& categoryInserter (Preset&&, PresetTree::NodeVector&, PresetTree::Node::NodeArena&, const PresetTree::InsertionHelper&);
+    Preset& categoryInserter (Preset&&, PresetTree&, PresetTree::Node&, const PresetTree::InsertionHelper&);
 
     /** Inserts presets into the tree with sub-trees for each vendor, and sub-sub-trees for each category. */
-    Preset& vendorCategoryInserter (Preset&&, PresetTree::NodeVector&, PresetTree::Node::NodeArena&, const PresetTree::InsertionHelper&);
+    Preset& vendorCategoryInserter (Preset&&, PresetTree&, PresetTree::Node&, const PresetTree::InsertionHelper&);
 } // namespace PresetTreeInserters
 } // namespace chowdsp::presets

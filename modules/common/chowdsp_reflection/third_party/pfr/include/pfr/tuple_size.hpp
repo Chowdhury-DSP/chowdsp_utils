@@ -1,7 +1,8 @@
-// Copyright (c) 2016-2022 Antony Polukhin
+// Copyright (c) 2016-2023 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
 
 #ifndef PFR_TUPLE_SIZE_HPP
 #define PFR_TUPLE_SIZE_HPP
@@ -10,7 +11,7 @@
 #include "detail/config.hpp"
 
 #include <type_traits>
-#include <utility> // metaprogramming stuff
+#include <utility>      // metaprogramming stuff
 
 #include "detail/sequence_tuple.hpp"
 #include "detail/fields_count.hpp"
@@ -19,11 +20,10 @@
 /// Contains tuple-like interfaces to get fields count \forcedlink{tuple_size}, \forcedlink{tuple_size_v}.
 ///
 /// \b Synopsis:
-namespace pfr
-{
+namespace pfr {
 
 /// Has a static const member variable `value` that contains fields count in a T.
-/// Works for any T that supports aggregate initialization.
+/// Works for any T that satisfies \aggregate.
 ///
 /// \b Example:
 /// \code
@@ -34,7 +34,7 @@ using tuple_size = detail::size_t_< pfr::detail::fields_count<T>() >;
 
 
 /// `tuple_size_v` is a template variable that contains fields count in a T and
-/// works for any T that supports aggregate initialization.
+/// works for any T that satisfies \aggregate.
 ///
 /// \b Example:
 /// \code

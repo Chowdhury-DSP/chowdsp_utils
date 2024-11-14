@@ -91,6 +91,9 @@ sure to abide by the license of each module, as well as whichever libraries are 
 - `OptionalPointer`: A pointer which may or may not own the data it points to.
 - `LocalPointer`: An owning pointer which constructs the object it points to using its own local memory.
 - `SmallVector`: A mostly STL-compatible vector implementation, with a small-string-style optimization.
+- `ArenaAllocator`: A simple arena allocator.
+- `ChainedArenaAllocator`: A "growable" arena allocator.
+- `PoolAllocator`: A simple pool allocator.
 - Includes the following internal dependencies:
   - [`short_alloc`](https://howardhinnant.github.io/stack_alloc.html) (MIT license).
 
@@ -99,6 +102,9 @@ sure to abide by the license of each module, as well as whichever libraries are 
 
 `chowdsp_listeners` (BSD)
 - A thin wrapper around [`rocket`](https://github.com/tripleslash/rocket) (Public Domain, included internally).
+
+`chowdsp_logging` (BSD)
+- A thin wrapper around [`spdlog`](https://github.com/gabime/spdlog) (MIT License, included internally).
 
 `chowdsp_reflection` (BSD)
 - Includes the following internal dependencies:
@@ -234,7 +240,6 @@ sure to abide by the license of each module, as well as whichever libraries are 
 
 `chowdsp_plugin_utils` (GPLv3)
 - `FileListener`: A listener which triggers a callback whenever a file is changed.
-- `PluginLogger`: A logging system which can be used within a plugin.
 - `SharedPluginSettings`: A shared object for managing settings which apply to all instances of a plugin.
 - `SharedLNFAllocator`: A shared object for managing `juce::LookAndFeel` classes.
 - `AudioUIBackgroundThread`: A thread class which accepts data from the audio thread, and performs a background task (often useful for creating meters).
@@ -248,6 +253,9 @@ sure to abide by the license of each module, as well as whichever libraries are 
 
 `chowdsp_version` (BSD)
 - Utilities for managing the version of an app or plugin.
+
+`chowdsp_fuzzy_search` (BSD)
+- A tag-based fuzzy searching system, based on [fuzzysearchdatabase](https://bitbucket.org/j_norberg/fuzzysearchdatabase).
 
 ## Development
 

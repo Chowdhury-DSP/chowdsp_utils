@@ -11,7 +11,8 @@ template <typename ParamType, typename... OtherParams>
 std::enable_if_t<std::is_base_of_v<FloatParameter, ParamType>, void>
     ParamHolder::add (OptionalPointer<ParamType>& floatParam, OtherParams&... others)
 {
-    floatParams.emplace_back (isOwning ? floatParam.release() : floatParam.get(), isOwning);
+    auto& param = floatParams.emplace_back (isOwning ? floatParam.release() : floatParam.get(), isOwning);
+    allParamsMap.insert ({ param->paramID.toStdString(), param.get() });
     add (others...);
 }
 
@@ -19,7 +20,8 @@ template <typename ParamType, typename... OtherParams>
 std::enable_if_t<std::is_base_of_v<ChoiceParameter, ParamType>, void>
     ParamHolder::add (OptionalPointer<ParamType>& choiceParam, OtherParams&... others)
 {
-    choiceParams.emplace_back (isOwning ? choiceParam.release() : choiceParam.get(), isOwning);
+    auto& param = choiceParams.emplace_back (isOwning ? choiceParam.release() : choiceParam.get(), isOwning);
+    allParamsMap.insert ({ param->paramID.toStdString(), param.get() });
     add (others...);
 }
 
@@ -27,15 +29,41 @@ template <typename ParamType, typename... OtherParams>
 std::enable_if_t<std::is_base_of_v<BoolParameter, ParamType>, void>
     ParamHolder::add (OptionalPointer<ParamType>& boolParam, OtherParams&... others)
 {
-    boolParams.emplace_back (isOwning ? boolParam.release() : boolParam.get(), isOwning);
+    auto& param = boolParams.emplace_back (isOwning ? boolParam.release() : boolParam.get(), isOwning);
+    allParamsMap.insert ({ param->paramID.toStdString(), param.get() });
     add (others...);
 }
 
 template <typename ParamType, typename... OtherParams>
-std::enable_if_t<std::is_base_of_v<ParamHolder, ParamType>, void>
-    ParamHolder::add (ParamType& paramHolder, OtherParams&... others)
+std::enable_if_t<std::is_base_of_v<FloatParameter, ParamType>, void>
+    ParamHolder::add (const OptionalPointer<ParamType>& floatParam, OtherParams&... others)
+{
+    jassert (! isOwning);
+    add (const_cast<OptionalPointer<ParamType>&> (floatParam), others...);
+}
+
+template <typename ParamType, typename... OtherParams>
+std::enable_if_t<std::is_base_of_v<ChoiceParameter, ParamType>, void>
+    ParamHolder::add (const OptionalPointer<ParamType>& choiceParam, OtherParams&... others)
+{
+    jassert (! isOwning);
+    add (const_cast<OptionalPointer<ParamType>&> (choiceParam), others...);
+}
+
+template <typename ParamType, typename... OtherParams>
+std::enable_if_t<std::is_base_of_v<BoolParameter, ParamType>, void>
+    ParamHolder::add (const OptionalPointer<ParamType>& boolParam, OtherParams&... others)
+{
+    jassert (! isOwning);
+    add (const_cast<OptionalPointer<ParamType>&> (boolParam), others...);
+}
+
+template <typename... OtherParams>
+void ParamHolder::add (ParamHolder& paramHolder, OtherParams&... others)
 {
     otherParams.push_back (&paramHolder);
+    allParamsMap.merge (paramHolder.allParamsMap);
+    jassert (paramHolder.allParamsMap.empty()); // assuming no duplicate parameter IDs, all the parameters should be moved in the merge!
     add (others...);
 }
 
@@ -54,6 +82,19 @@ std::enable_if_t<TypeTraits::IsIterable<ParamContainerType>, void>
     for (const auto& holder : otherParams)
         numParams += holder->count();
     return numParams;
+}
+
+inline void ParamHolder::clear()
+{
+    // It's generally not safe to clear the parameters if this is an owning ParamHolder
+    // since we're almost certainly leaving some dangling references lying around!
+    jassert (! isOwning);
+
+    allParamsMap.clear();
+    floatParams.clear();
+    choiceParams.clear();
+    boolParams.clear();
+    otherParams.clear();
 }
 
 template <typename ParamContainersCallable, typename ParamHolderCallable>
@@ -173,6 +214,7 @@ void ParamHolder::deserialize (typename Serializer::DeserializedType deserial, P
                         paramIDsThatHaveBeenDeserialized.add (paramID);
                     }
                 });
+
         }
     }
     else
@@ -185,12 +227,18 @@ void ParamHolder::deserialize (typename Serializer::DeserializedType deserial, P
         DBG("deserialzied " + id);
     }
     // set all un-matched objects to their default values
-    paramHolder.doForAllParameters (
-        [&paramIDsThatHaveBeenDeserialized] (auto& param, size_t)
-        {
-            if (! paramIDsThatHaveBeenDeserialized.contains (param.paramID))
-                ParameterTypeHelpers::resetParameter (param);
-        });
+    if (! paramIDsThatHaveBeenDeserialized.empty())
+    {
+        paramHolder.doForAllParameters (
+            [&paramIDsThatHaveBeenDeserialized] (auto& param, size_t)
+            {
+                if (std::find (paramIDsThatHaveBeenDeserialized.begin(),
+                               paramIDsThatHaveBeenDeserialized.end(),
+                               std::string_view { param.paramID.toRawUTF8(), param.paramID.getNumBytesAsUTF8() })
+                    == paramIDsThatHaveBeenDeserialized.end())
+                    ParameterTypeHelpers::resetParameter (param);
+            });
+    }
 }
 
 inline void ParamHolder::applyVersionStreaming (const Version& version)

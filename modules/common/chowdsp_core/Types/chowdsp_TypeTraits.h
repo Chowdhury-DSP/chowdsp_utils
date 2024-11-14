@@ -88,6 +88,36 @@ namespace TypeTraits
 
 } // namespace TypeTraits
 
+/** Return true if the complete type is a specialization of the outer type */
+template <typename CompleteType, template <typename...> class OuterType>
+struct is_specialization_of;
+
+template <typename CompleteType, template <typename...> class OuterType>
+struct is_specialization_of final : std::false_type
+{
+};
+
+template <template <typename...> class OuterType, typename... TypeArgs>
+struct is_specialization_of<OuterType<TypeArgs...>, OuterType> final : std::true_type
+{
+};
+
+/** Return true if the complete type is a specialization of the outer type */
+template <typename CompleteType, template <typename...> class OuterType>
+static constexpr bool is_specialization_of_v = is_specialization_of<CompleteType, OuterType>::value;
+
+template <typename T>
+struct is_complete_type
+{
+    template <typename U>
+    static auto test (U*) -> std::integral_constant<bool, sizeof (U) == sizeof (U)>;
+    static auto test (...) -> std::false_type;
+    static constexpr auto value = ! std::is_same_v<decltype (test (static_cast<T*> (nullptr))), std::false_type>;
+};
+
+template <typename T>
+static constexpr auto is_complete_type_v = is_complete_type<T>::value;
+
 /**
  * An empty struct intended to be used with std::conditional_t
  * to effectively "disable" some member of a struct/class.

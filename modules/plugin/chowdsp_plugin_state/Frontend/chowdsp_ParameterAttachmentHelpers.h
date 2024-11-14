@@ -9,15 +9,20 @@ namespace ParameterAttachmentHelpers
     template <typename Attachment>
     struct SetValueCallback
     {
-        explicit SetValueCallback (Attachment& a) : attach (a) {}
+        SetValueCallback() = default;
+        explicit SetValueCallback (Attachment& a) : attach (&a) {}
+        SetValueCallback (const SetValueCallback&) = default;
+        SetValueCallback& operator= (const SetValueCallback&) = default;
+        SetValueCallback (SetValueCallback&&) noexcept = default;
+        SetValueCallback& operator= (SetValueCallback&&) noexcept = default;
 
         template <typename T>
         void operator() (T val)
         {
-            attach.setValue (val);
+            attach->setValue (val);
         }
 
-        Attachment& attach;
+        Attachment* attach = nullptr;
     };
 
     template <typename ParamType>
@@ -28,10 +33,12 @@ namespace ParameterAttachmentHelpers
         explicit ParameterChangeAction (ParamType& parameter,
                                         ValueType oldVal,
                                         ValueType newVal,
+                                        juce::AudioProcessor* processor = nullptr,
                                         bool skipFirstTime = true)
             : param (parameter),
               oldValue (oldVal),
               newValue (newVal),
+              proc (processor),
               firstTime (skipFirstTime)
         {
         }
@@ -59,14 +66,19 @@ namespace ParameterAttachmentHelpers
     private:
         void setParameterValue (ValueType val)
         {
-            param.beginChangeGesture();
+            if (proc != nullptr)
+                param.beginChangeGesture();
+
             ParameterTypeHelpers::setValue (val, param);
-            param.endChangeGesture();
+
+            if (proc != nullptr)
+                param.endChangeGesture();
         }
 
         ParamType& param;
         const ValueType oldValue;
         const ValueType newValue;
+        juce::AudioProcessor* proc = nullptr;
         bool firstTime = true;
     };
 } // namespace ParameterAttachmentHelpers

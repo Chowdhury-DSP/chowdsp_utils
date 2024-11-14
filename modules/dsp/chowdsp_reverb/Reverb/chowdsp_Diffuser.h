@@ -26,10 +26,14 @@ JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324) // structure was padded due to alignment 
  *   - Polarity flipping
  *   - Hadamard mixing
  */
-template <typename FloatType, int nChannels, typename DelayInterpType = DelayLineInterpolationTypes::None, int delayBufferSize = 1 << 18>
+template <typename FloatType,
+          int nChannels,
+          typename DelayInterpType = DelayLineInterpolationTypes::None,
+          int delayBufferSize = 1 << 18,
+          typename StorageType = FloatType>
 class Diffuser
 {
-    using DelayType = StaticDelayBuffer<FloatType, DelayInterpType, delayBufferSize>;
+    using DelayType = StaticDelayBuffer<FloatType, DelayInterpType, delayBufferSize, StorageType>;
 
 public:
     using Float = FloatType;
@@ -79,7 +83,11 @@ private:
     int delayWritePointer = 0;
     std::array<FloatType, (size_t) nChannels> delayReadPointers;
 
-    alignas (xsimd::default_arch::alignment()) std::array<FloatType, (size_t) nChannels> outData;
+#if CHOWDSP_REVERB_ALIGN_IO
+    alignas (SIMDUtils::defaultSIMDAlignment) std::array<FloatType, (size_t) nChannels> outData;
+#else
+    std::array<FloatType, (size_t) nChannels> outData;
+#endif
 
     FloatType fsOver1000 = FloatType (48000 / 1000);
 

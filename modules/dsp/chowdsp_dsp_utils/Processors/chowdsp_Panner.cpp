@@ -75,7 +75,7 @@ void Panner<SampleType>::reset()
 template <typename SampleType>
 void Panner<SampleType>::update()
 {
-    SampleType leftValue, rightValue, boostValue;
+    SampleType leftValue, rightValue;
 
     auto normalisedPan = static_cast<SampleType> (0.5) * (pan + static_cast<SampleType> (1.0));
 
@@ -84,58 +84,75 @@ void Panner<SampleType>::update()
         case Rule::balanced:
             leftValue = juce::jmin (static_cast<SampleType> (0.5), static_cast<SampleType> (1.0) - normalisedPan);
             rightValue = juce::jmin (static_cast<SampleType> (0.5), normalisedPan);
-            boostValue = static_cast<SampleType> (2.0);
             break;
 
         case Rule::linear:
             leftValue = static_cast<SampleType> (1.0) - normalisedPan;
             rightValue = normalisedPan;
-            boostValue = static_cast<SampleType> (2.0);
             break;
 
         case Rule::sin3dB:
             leftValue = static_cast<SampleType> (std::sin (0.5 * juce::MathConstants<double>::pi * (1.0 - normalisedPan)));
             rightValue = static_cast<SampleType> (std::sin (0.5 * juce::MathConstants<double>::pi * normalisedPan));
-            boostValue = std::sqrt (static_cast<SampleType> (2.0));
             break;
 
         case Rule::sin4p5dB:
             leftValue = static_cast<SampleType> (std::pow (std::sin (0.5 * juce::MathConstants<double>::pi * (1.0 - normalisedPan)), 1.5));
             rightValue = static_cast<SampleType> (std::pow (std::sin (0.5 * juce::MathConstants<double>::pi * normalisedPan), 1.5));
-            boostValue = static_cast<SampleType> (std::pow (2.0, 3.0 / 4.0));
             break;
 
         case Rule::sin6dB:
             leftValue = static_cast<SampleType> (std::pow (std::sin (0.5 * juce::MathConstants<double>::pi * (1.0 - normalisedPan)), 2.0));
             rightValue = static_cast<SampleType> (std::pow (std::sin (0.5 * juce::MathConstants<double>::pi * normalisedPan), 2.0));
-            boostValue = static_cast<SampleType> (2.0);
             break;
 
         case Rule::squareRoot3dB:
             leftValue = std::sqrt (static_cast<SampleType> (1.0) - normalisedPan);
             rightValue = std::sqrt (normalisedPan);
-            boostValue = std::sqrt (static_cast<SampleType> (2.0));
             break;
 
         case Rule::squareRoot4p5dB:
             leftValue = static_cast<SampleType> (std::pow (std::sqrt (1.0 - normalisedPan), 1.5));
             rightValue = static_cast<SampleType> (std::pow (std::sqrt (normalisedPan), 1.5));
-            boostValue = static_cast<SampleType> (std::pow (2.0, 3.0 / 4.0));
             break;
 
         default:
             leftValue = juce::jmin (static_cast<SampleType> (0.5), static_cast<SampleType> (1.0) - normalisedPan);
             rightValue = juce::jmin (static_cast<SampleType> (0.5), normalisedPan);
-            boostValue = static_cast<SampleType> (2.0);
             break;
     }
 
+    const auto boostValue = getBoostForRule (currentRule);
     leftVolume.setTargetValue (leftValue * boostValue);
     rightVolume.setTargetValue (rightValue * boostValue);
 }
 
+template <typename SampleType>
+SampleType Panner<SampleType>::getBoostForRule (Rule rule)
+{
+    switch (rule)
+    {
+        case Rule::balanced:
+        case Rule::linear:
+        case Rule::sin6dB:
+            return static_cast<SampleType> (2.0);
+
+        case Rule::sin3dB:
+        case Rule::squareRoot3dB:
+            return std::sqrt (static_cast<SampleType> (2.0));
+
+        case Rule::sin4p5dB:
+        case Rule::squareRoot4p5dB:
+            return static_cast<SampleType> (std::pow (2.0, 3.0 / 4.0));
+
+        default:
+            return static_cast<SampleType> (2.0);
+    }
+}
+
 //==============================================================================
+#if CHOWDSP_ALLOW_TEMPLATE_INSTANTIATIONS
 template class Panner<float>;
 template class Panner<double>;
-
+#endif
 } // namespace chowdsp

@@ -37,9 +37,9 @@ public:
     /** Creates an audio format writer for the given file */
     std::unique_ptr<juce::AudioFormatWriter> createWriterFor (const juce::File& file, const AudioFileWriterParams& params);
 
-private:
     juce::AudioFormatManager formatManager;
 
+private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioFileSaveLoadHelper)
 };
 

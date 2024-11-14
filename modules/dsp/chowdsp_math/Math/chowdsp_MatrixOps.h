@@ -1,5 +1,3 @@
-#if ! CHOWDSP_NO_XSIMD
-
 #pragma once
 
 #include <type_traits>
@@ -21,6 +19,7 @@ namespace MatrixOps
         static constexpr NumericType multiplier = (NumericType) -2 / (NumericType) (size * SampleTypeHelpers::TypeTraits<FloatType>::Size);
 
     public:
+#if ! CHOWDSP_NO_XSIMD
         /** Perform out-of-place Householder transform (scalar types) */
         template <typename T = FloatType>
         static inline std::enable_if_t<std::is_floating_point_v<T>, void>
@@ -46,8 +45,7 @@ namespace MatrixOps
                     scalarAccumulator += in[i];
             }
 
-            static constexpr auto normMultiplier = (T) -2 / (T) size;
-            scalarAccumulator *= normMultiplier;
+            scalarAccumulator *= multiplier;
 
             int j = 0;
             for (; j < vec_loop_size; j += vec_size)
@@ -75,8 +73,28 @@ namespace MatrixOps
             const auto sum = multiplier * xsimd::reduce_add (vecSum);
 
             for (int i = 0; i < size; ++i)
-                out[i] += sum;
+                out[i] = in[i] + sum;
         }
+#else
+        /** Perform out-of-place Householder transform (scalar types) */
+        template <typename T = FloatType>
+        static inline std::enable_if_t<std::is_floating_point_v<T>, void>
+            outOfPlace (FloatType* out, const FloatType* in)
+        {
+            FloatType sum {};
+            for (int i = 0; i < size; ++i)
+            {
+                sum += in[i];
+            }
+
+            sum *= multiplier;
+
+            for (int i = 0; i < size; ++i)
+            {
+                out[i] = in[i] + sum;
+            }
+        }
+#endif
 
         /** Perform in-place Householder transform */
         static inline void inPlace (FloatType* arr)
@@ -135,6 +153,7 @@ namespace MatrixOps
             }
         }
 
+#if ! CHOWDSP_NO_XSIMD
         /** Perform unscaled Hadamard transformation (SIMD fallback) */
         template <typename T = FloatType>
         static inline std::enable_if_t<SampleTypeHelpers::IsSIMDRegister<T> && size == 1, void>
@@ -190,9 +209,17 @@ namespace MatrixOps
             for (int i = 0; i < size; ++i)
                 arr[i] *= scalingFactor;
         }
+#else
+        template <typename T = FloatType>
+        static inline std::enable_if_t<std::is_floating_point_v<T>, void>
+            inPlace (FloatType* arr)
+        {
+            recursiveUnscaled (arr, arr);
+
+            for (int i = 0; i < size; ++i)
+                arr[i] *= scalingFactor;
+        }
+#endif
     };
 } // namespace MatrixOps
-
 } // namespace chowdsp
-
-#endif // ! CHOWDSP_NO_XSIMD

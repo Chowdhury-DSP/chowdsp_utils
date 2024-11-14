@@ -30,9 +30,10 @@ std::pair<const std::vector<float>&, const std::vector<float>&> GenericFilterPlo
 
 void GenericFilterPlotter::updateFilterPlot()
 {
-    plotPath.clear();
     const auto [_, magResponseDBSmoothed] = plotFilterMagnitudeResponse();
 
+    const juce::ScopedLock pathLock { pathMutex };
+    plotPath.clear();
     bool started = false;
     for (size_t i = 0; i < freqAxis.size(); ++i)
     {

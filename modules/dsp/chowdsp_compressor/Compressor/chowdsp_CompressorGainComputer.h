@@ -14,13 +14,13 @@ public:
     GainComputer() = default;
 
     /** Prepares the gain computer to process and audio stream. */
-    void prepare (double sampleRate, int samplesPerBlock)
+    void prepare (double sampleRate, int samplesPerBlock, bool useArenaAllocator = false)
     {
         threshSmooth.setRampLength (0.05);
-        threshSmooth.prepare (sampleRate, samplesPerBlock);
+        threshSmooth.prepare (sampleRate, samplesPerBlock, ! useArenaAllocator);
 
         ratioSmooth.setRampLength (0.05);
-        ratioSmooth.prepare (sampleRate, samplesPerBlock);
+        ratioSmooth.prepare (sampleRate, samplesPerBlock, ! useArenaAllocator);
     }
 
     /** Reset's the processor state. */
@@ -82,13 +82,23 @@ public:
      * Calling this method will fill the gainBuffer with a set of "gain" values,
      * which can be multiplied by the audio signal to apply compression.
      */
-    void processBlock (const BufferView<const SampleType>& levelBuffer, const BufferView<SampleType>& gainBuffer) noexcept
+    void processBlock (const BufferView<const SampleType>& levelBuffer,
+                       const BufferView<SampleType>& gainBuffer,
+                       ArenaAllocator<>* arena = nullptr) noexcept
     {
         jassert (levelBuffer.getNumSamples() == gainBuffer.getNumSamples());
 
         const auto numSamples = gainBuffer.getNumSamples();
-        threshSmooth.process (juce::Decibels::decibelsToGain (threshDB), numSamples);
-        ratioSmooth.process (ratio, numSamples);
+        if (arena == nullptr)
+        {
+            threshSmooth.process (juce::Decibels::decibelsToGain (threshDB), numSamples);
+            ratioSmooth.process (ratio, numSamples);
+        }
+        else
+        {
+            threshSmooth.process (juce::Decibels::decibelsToGain (threshDB), numSamples, *arena);
+            ratioSmooth.process (ratio, numSamples, *arena);
+        }
 
         if constexpr (isMultiModal)
         {

@@ -1,6 +1,9 @@
 ignore:
+  - "modules/common/chowdsp_core/JUCEHelpers/**"
   - "modules/plugin/chowdsp_presets/**/*.h"
   - "modules/plugin/chowdsp_presets/**/*.cpp"
   - "modules/gui/chowdsp_foleys"
   - "modules/gui/chowdsp_gui/Presets"
   - "**/third_party/**"
+  - "build/**"
+  - "tests/**"

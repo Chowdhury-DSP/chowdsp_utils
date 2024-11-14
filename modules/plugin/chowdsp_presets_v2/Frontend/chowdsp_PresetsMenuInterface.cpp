@@ -103,16 +103,16 @@ void MenuInterface::addExtraMenuItems (juce::PopupMenu& menu, std::initializer_l
     }
 }
 
-static void loadPresetsIntoMenu (juce::PopupMenu& menu, const PresetTree::NodeVector& presetTree, PresetManager& presetMgr)
+static void loadPresetsIntoMenu (juce::PopupMenu& menu, const PresetTree::Node& root, PresetManager& presetMgr)
 {
-    for (const auto& item : presetTree)
+    for (auto* node = root.first_child; node != nullptr; node = node->next_sibling)
     {
-        if (item.leaf.has_value())
+        if (node->value.has_value())
         {
             juce::PopupMenu::Item menuItem;
             menuItem.itemID = -1;
-            menuItem.text = item.leaf->getName();
-            menuItem.action = [&presetMgr, &preset = std::as_const (*item.leaf)]
+            menuItem.text = node->value.leaf().getName();
+            menuItem.action = [&presetMgr, &preset = std::as_const (node->value.leaf())]
             {
                 presetMgr.loadPreset (preset);
             };
@@ -121,10 +121,9 @@ static void loadPresetsIntoMenu (juce::PopupMenu& menu, const PresetTree::NodeVe
         else
         {
             juce::PopupMenu subMenu {};
-            loadPresetsIntoMenu (subMenu, item.subtree, presetMgr);
-
+            loadPresetsIntoMenu (subMenu, *node, presetMgr);
             if (subMenu.containsAnyActiveItems())
-                menu.addSubMenu (item.tag, subMenu);
+                menu.addSubMenu (toString (node->value.tag()), subMenu);
         }
     }
 }
@@ -132,6 +131,6 @@ static void loadPresetsIntoMenu (juce::PopupMenu& menu, const PresetTree::NodeVe
 void MenuInterface::refreshPresetsMenu()
 {
     presetsMenu.clear();
-    loadPresetsIntoMenu (presetsMenu, presetManager.getPresetTree().getNodes(), presetManager);
+    loadPresetsIntoMenu (presetsMenu, presetManager.getPresetTree().getRootNode(), presetManager);
 }
 } // namespace chowdsp::presets::frontend

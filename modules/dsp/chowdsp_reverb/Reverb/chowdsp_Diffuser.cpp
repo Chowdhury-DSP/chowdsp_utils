@@ -24,9 +24,9 @@ inline void DefaultDiffuserConfig::fillChannelSwapIndexes (size_t* indexes, int 
 }
 
 //======================================================================
-template <typename FloatType, int nChannels, typename DelayInterpType, int delayBufferSize>
+template <typename FloatType, int nChannels, typename DelayInterpType, int delayBufferSize, typename StorageType>
 template <typename DiffuserConfig>
-void Diffuser<FloatType, nChannels, DelayInterpType, delayBufferSize>::prepare (double sampleRate)
+void Diffuser<FloatType, nChannels, DelayInterpType, delayBufferSize, StorageType>::prepare (double sampleRate)
 {
     fsOver1000 = (FloatType) sampleRate / (FloatType) 1000;
 
@@ -45,15 +45,15 @@ void Diffuser<FloatType, nChannels, DelayInterpType, delayBufferSize>::prepare (
     }
 }
 
-template <typename FloatType, int nChannels, typename DelayInterpType, int delayBufferSize>
-void Diffuser<FloatType, nChannels, DelayInterpType, delayBufferSize>::reset()
+template <typename FloatType, int nChannels, typename DelayInterpType, int delayBufferSize, typename StorageType>
+void Diffuser<FloatType, nChannels, DelayInterpType, delayBufferSize, StorageType>::reset()
 {
     for (auto& delay : delays)
         delay.reset();
 }
 
-template <typename FloatType, int nChannels, typename DelayInterpType, int delayBufferSize>
-void Diffuser<FloatType, nChannels, DelayInterpType, delayBufferSize>::setDiffusionTimeMs (FloatType diffusionTimeMs)
+template <typename FloatType, int nChannels, typename DelayInterpType, int delayBufferSize, typename StorageType>
+void Diffuser<FloatType, nChannels, DelayInterpType, delayBufferSize, StorageType>::setDiffusionTimeMs (FloatType diffusionTimeMs)
 {
     for (size_t i = 0; i < (size_t) nChannels; ++i)
     {

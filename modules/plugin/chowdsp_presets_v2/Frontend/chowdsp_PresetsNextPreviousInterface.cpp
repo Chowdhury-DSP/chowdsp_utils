@@ -4,40 +4,72 @@ namespace chowdsp::presets::frontend
 {
 NextPrevious::NextPrevious (PresetManager& manager) : presetManager (manager)
 {
-    presetChangedCallback = presetManager.getSaveLoadHelper().presetChangedBroadcaster.connect ([this]
-                                                                                                { updateCurrentPresetIndex(); });
-    updateCurrentPresetIndex();
 }
 
-void NextPrevious::updateCurrentPresetIndex()
+static const PresetTree::Node* findNodeForPreset (const PresetTree::Node& root, const Preset& current)
 {
-    if (presetManager.getCurrentPreset() == nullptr)
+    for (auto* node = &root; node != nullptr; node = node->next_linear)
     {
-        currentPresetIndex = -1;
-        return;
+        if (node->value.has_value() && node->value.leaf() == current)
+            return node;
     }
+    return nullptr;
+}
 
-    currentPresetIndex = presetManager.getPresetTree().getIndexForElement (*presetManager.getCurrentPreset());
+static const PresetTree::Node* getNextOrPreviousChildPresetNode (const PresetTree::Node* node, bool forward)
+{
+    if (forward)
+        return node->first_child;
+
+    node = node->first_child;
+    while (node->next_sibling != nullptr)
+        node = node->next_sibling;
+    return node;
+}
+
+static const PresetTree::Node* getNextOrPreviousPresetNode (const PresetTree::Node* node, bool forward)
+{
+    if (node == nullptr)
+        return nullptr;
+
+    const auto* next = forward ? node->next_sibling : node->prev_sibling;
+    if (next != nullptr)
+        return next;
+
+    auto* nextParent = getNextOrPreviousPresetNode (node->parent, forward);
+    if (nextParent == nullptr)
+        return nullptr;
+    if (nextParent->value.has_value())
+        return nextParent;
+
+    return getNextOrPreviousChildPresetNode (nextParent, forward);
 }
 
 bool NextPrevious::navigateThroughPresets (bool forward)
 {
     const auto& presetTree = presetManager.getPresetTree();
-    const auto numAvailablePresets = presetTree.size();
-    if (currentPresetIndex < 0 || numAvailablePresets <= currentPresetIndex)
+    const auto* currentPreset = presetManager.getCurrentPreset();
+    if (currentPreset == nullptr)
         return false;
 
-    auto nextPresetIndex = currentPresetIndex + (forward ? 1 : -1);
-    if (wrapAtEndOfTree)
-        nextPresetIndex = juce::negativeAwareModulo (nextPresetIndex, numAvailablePresets);
+    auto* currentPresetNode = findNodeForPreset (presetTree.getRootNode(), *currentPreset);
+    if (currentPresetNode == nullptr)
+        return false;
 
-    if (auto* nextPreset = presetTree.getElementByIndex (nextPresetIndex))
+    const auto* nextPresetNode = getNextOrPreviousPresetNode (currentPresetNode, forward);
+    if (nextPresetNode == nullptr)
     {
-        presetManager.loadPreset (*nextPreset);
-        return true;
+        if (! wrapAtEndOfTree || presetTree.size() == 0)
+            return false;
+
+        nextPresetNode = &presetTree.getRootNode();
     }
 
-    return false;
+    while (! nextPresetNode->value.has_value())
+        nextPresetNode = getNextOrPreviousChildPresetNode (nextPresetNode, forward);
+
+    presetManager.loadPreset (nextPresetNode->value.leaf());
+    return true;
 }
 
 bool NextPrevious::goToNextPreset()

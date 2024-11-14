@@ -5,51 +5,56 @@
 
 using FakeData = std::array<int32_t, 10>;
 
-struct DataTree : chowdsp::AbstractTree<FakeData>
+struct DataTree : chowdsp::AbstractTree<FakeData, DataTree>
 {
     static constexpr std::string_view positiveTag = "positive";
     static constexpr std::string_view negativeTag = "negative";
     static constexpr std::string_view zeroTag = "zero";
 
-    static Node& insertOneElement (FakeData&& element, NodeVector& nodes, chowdsp::AbstractTree<FakeData>& tree)
+    static Node& insertOneElement (FakeData&& element, Node& parent, AbstractTree& tree)
     {
-        auto newNode = tree.createEmptyNode();
-        newNode.leaf = std::move (element);
-        return *nodes.insert (nodes.end(), std::move (newNode));
+        auto* new_node = tree.createLeafNode (std::move (element));
+        new_node->next_sibling = parent.first_child;
+        if (parent.first_child != nullptr)
+            parent.first_child->prev_sibling = new_node;
+        parent.first_child = new_node;
+        return *new_node;
     }
 
     static Node& insertElementIntoNewSubtree (FakeData&& element,
-                                              NodeVector& topLevelNodes,
-                                              chowdsp::AbstractTree<FakeData>& tree,
+                                              Node& parent,
+                                              AbstractTree& tree,
                                               std::string_view tag)
     {
-        auto newSubTreeNode = tree.createEmptyNode();
-        newSubTreeNode.tag = std::string { tag };
-        auto& insertedSubTreeNode = *topLevelNodes.insert (topLevelNodes.end(), std::move (newSubTreeNode));
-        return insertOneElement (std::move (element), insertedSubTreeNode.subtree, tree);
+        auto* new_sub_tree_node = tree.createTagNode (tag);
+        new_sub_tree_node->next_sibling = parent.first_child;
+        if (parent.first_child != nullptr)
+            parent.first_child->prev_sibling = new_sub_tree_node;
+        parent.first_child = new_sub_tree_node;
+        return insertOneElement (std::move (element), *new_sub_tree_node, tree);
     }
 
-    FakeData& insertElementInternal (FakeData&& element, NodeVector& topLevelNodes) override
+    static FakeData& insertElementInternal (AbstractTree& self, FakeData&& element, Node& root)
     {
-        for (auto& node : topLevelNodes)
+        for (auto* iter = root.first_child; iter != nullptr; iter = iter->next_sibling)
         {
-            if (node.tag == positiveTag && element[0] > 0)
-                return *insertOneElement (std::move (element), node.subtree, *this).leaf;
+            if (iter->value.tag() == positiveTag && element[0] > 0)
+                return insertOneElement (std::move (element), *iter, self).value.leaf();
 
-            if (node.tag == negativeTag && element[0] < 0)
-                return *insertOneElement (std::move (element), node.subtree, *this).leaf;
+            if (iter->value.tag() == negativeTag && element[0] < 0)
+                return insertOneElement (std::move (element), *iter, self).value.leaf();
 
-            if (node.tag == zeroTag && element[0] == 0)
-                return *insertOneElement (std::move (element), node.subtree, *this).leaf;
+            if (iter->value.tag() == zeroTag && element[0] == 0)
+                return insertOneElement (std::move (element), *iter, self).value.leaf();
         }
 
         if (element[0] > 0)
-            return *insertElementIntoNewSubtree (std::move (element), topLevelNodes, *this, positiveTag).leaf;
+            return insertElementIntoNewSubtree (std::move (element), root, self, positiveTag).value.leaf();
 
         if (element[0] < 0)
-            return *insertElementIntoNewSubtree (std::move (element), topLevelNodes, *this, negativeTag).leaf;
+            return insertElementIntoNewSubtree (std::move (element), root, self, negativeTag).value.leaf();
 
-        return *insertElementIntoNewSubtree (std::move (element), topLevelNodes, *this, zeroTag).leaf;
+        return insertElementIntoNewSubtree (std::move (element), root, self, zeroTag).value.leaf();
     }
 };
 
@@ -100,25 +105,6 @@ static void insertTree (benchmark::State& state)
     }
 }
 BENCHMARK (insertTree)->MinTime (0.5);
-
-static void insertTreeMany (benchmark::State& state)
-{
-    DataTree tree {};
-    for (auto _ : state)
-    {
-        std::vector<FakeData> vec;
-        vec.reserve (21);
-        for (int32_t i = -10; i <= 10; ++i)
-        {
-            FakeData data {};
-            std::fill (std::begin (data), std::end (data), i);
-            vec.emplace_back (std::move (data));
-        }
-        tree.insertElements (std::move (vec));
-        tree.clear();
-    }
-}
-BENCHMARK (insertTreeMany)->MinTime (0.5);
 
 static void iterateVector (benchmark::State& state)
 {
@@ -230,7 +216,17 @@ static void accessTree (benchmark::State& state)
 
     for (auto _ : state)
     {
-        (*tree.getElementByIndex (25))[0]++;
+        int iter_count = 0;
+        for (auto* iter = &tree.getRootNode(); iter != nullptr; iter = iter->next_sibling)
+        {
+            if (iter_count == 25)
+            {
+                iter->value.leaf()[0]++;
+                benchmark::DoNotOptimize (iter->value.leaf()[0]);
+                break;
+            }
+            iter_count++;
+        }
     }
 }
 BENCHMARK (accessTree)->MinTime (0.5);

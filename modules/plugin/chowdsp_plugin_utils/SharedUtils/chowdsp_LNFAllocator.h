@@ -25,21 +25,21 @@ public:
      * it will be created and added to the allocator.
      */
     template <typename LookAndFeelSubclass>
-    juce::LookAndFeel* getLookAndFeel()
+    LookAndFeelSubclass* getLookAndFeel()
     {
         return addLookAndFeel<LookAndFeelSubclass>();
     }
 
     /** Adds a new look and feel to the allocator */
     template <typename LookAndFeelSubclass>
-    juce::LookAndFeel* addLookAndFeel()
+    LookAndFeelSubclass* addLookAndFeel()
     {
         auto& lnfCacheEntry = lnfs[getLNFType<LookAndFeelSubclass>()];
         if (lnfCacheEntry != nullptr)
-            return lnfCacheEntry.get();
+            return reinterpret_cast<LookAndFeelSubclass*> (lnfCacheEntry.get()); // NOSONAR
 
         lnfCacheEntry = std::make_unique<LookAndFeelSubclass>();
-        return lnfCacheEntry.get();
+        return dynamic_cast<LookAndFeelSubclass*> (lnfCacheEntry.get());
     }
 
     /** Checks if the allocator already contains this look and feel */

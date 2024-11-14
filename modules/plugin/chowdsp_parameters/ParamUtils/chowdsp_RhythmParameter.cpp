@@ -5,18 +5,23 @@ namespace chowdsp
 RhythmParameter::RhythmParameter (const ParameterID& parameterID,
                                   const juce::String& paramName,
                                   const std::vector<RhythmUtils::Rhythm>& rhythms,
-                                  const RhythmUtils::Rhythm& defaultRhythm) : juce::AudioParameterChoice (parameterID,
-                                                                                                          paramName,
-                                                                                                          makeParameterChoiceList (rhythms),
-                                                                                                          getDefaultParameterChoice (rhythms, defaultRhythm)),
+                                  const RhythmUtils::Rhythm& defaultRhythm) : chowdsp::ChoiceParameter (parameterID,
+                                                                                                        paramName,
+                                                                                                        makeParameterChoiceList (rhythms),
+                                                                                                        getDefaultParameterChoice (rhythms, defaultRhythm)),
                                                                               rhythmChoices (rhythms)
 {
 }
 
-double RhythmParameter::getRhythmTimeSeconds (double tempoBPM) const
+RhythmUtils::Rhythm RhythmParameter::getRhythm() const
 {
     const auto currentRhythmIndex = getIndex();
-    return rhythmChoices[(size_t) currentRhythmIndex].getTimeSeconds (tempoBPM);
+    return rhythmChoices[(size_t) currentRhythmIndex];
+}
+
+double RhythmParameter::getRhythmTimeSeconds (double tempoBPM) const
+{
+    return getRhythm().getTimeSeconds (tempoBPM);
 }
 
 juce::StringArray RhythmParameter::makeParameterChoiceList (const std::vector<RhythmUtils::Rhythm>& rhythms)

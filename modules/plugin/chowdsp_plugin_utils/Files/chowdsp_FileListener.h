@@ -3,10 +3,15 @@
 namespace chowdsp
 {
 /** Abstract class to allow the derived class to listen for changes to a file. */
-class FileListener : private juce::Timer
+class FileListener : public juce::Timer
 {
 public:
-    /** Initialize this FileListener for a given file and update time. */
+    /**
+     * Initialize this FileListener for a given file and update time.
+     *
+     * If the given update time is less than or equal to zero, then
+     * the timer will not be started.
+     */
     FileListener (const juce::File& file, int timerSeconds);
 
     ~FileListener() override;

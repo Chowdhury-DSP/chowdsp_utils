@@ -4,26 +4,23 @@ namespace chowdsp
 {
 #if ! CHOWDSP_NO_XSIMD
 /**
- * Copies data from a chowdsp::Buffer of some scalar type,
- * to a chowdsp::Buffer of the corresponding SIMD type.
+ * Copies data from a chowdsp::BufferView of some scalar type,
+ * to a chowdsp::BufferView of the corresponding SIMD type.
  *
- * The SIMD buffer must have at least enough memory allocated
- * to store all of the data in the scalar buffer. The SIMD buffer
- * will be resized (without allocating) to match the size of
- * the scalar buffer. If the number of channels in the scalar
+ * The SIMD BufferView is expected to be the correct size to
+ * hold the SIMD data. If the number of channels in the scalar
  * buffer does not divide evenly into the SIMD register size,
  * the SIMD buffer will be padded with some extra channels,
  * containing zeros.
  */
-template <typename T1, typename T2>
-[[maybe_unused]] static void copyToSIMDBuffer (const BufferView<const T1>& scalarBuffer, Buffer<xsimd::batch<T2>>& simdBuffer) noexcept
+template <typename T1, typename T2 = T1>
+[[maybe_unused]] static void copyToSIMDBuffer (const BufferView<const T1>& scalarBuffer, const BufferView<xsimd::batch<T2>>& simdBuffer) noexcept
 {
     using Vec = xsimd::batch<T2>;
     static constexpr auto vecSize = (int) Vec::size;
 
     const auto numSamples = scalarBuffer.getNumSamples();
     const auto numScalarChannels = scalarBuffer.getNumChannels();
-    const auto numSIMDChannels = buffers_detail::ceiling_divide (numScalarChannels, vecSize);
 
     const auto interleaveSamples = [numSamples] (const T1** source, T2* dest, int numChannels)
     {
@@ -42,8 +39,6 @@ template <typename T1, typename T2>
         }
     };
 
-    simdBuffer.setCurrentSize (numSIMDChannels, numSamples);
-
     for (int ch = 0; ch < numScalarChannels; ch += vecSize)
     {
         const auto channelsToInterleave = juce::jmin (vecSize, numScalarChannels - ch);
@@ -61,24 +56,48 @@ template <typename T1, typename T2>
 }
 
 /**
+ * Copies data from a chowdsp::BufferView of some scalar type,
+ * to a chowdsp::Buffer of the corresponding SIMD type.
+ *
+ * The SIMD buffer must have at least enough memory allocated
+ * to store all of the data in the scalar buffer. The SIMD buffer
+ * will be resized (without allocating) to match the size of
+ * the scalar buffer. If the number of channels in the scalar
+ * buffer does not divide evenly into the SIMD register size,
+ * the SIMD buffer will be padded with some extra channels,
+ * containing zeros.
+ */
+template <typename T1, typename T2 = T1>
+[[maybe_unused]] static void copyToSIMDBuffer (const BufferView<const T1>& scalarBuffer, Buffer<xsimd::batch<T2>>& simdBuffer) noexcept
+{
+    using Vec = xsimd::batch<T2>;
+    static constexpr auto vecSize = (int) Vec::size;
+
+    const auto numSamples = scalarBuffer.getNumSamples();
+    const auto numScalarChannels = scalarBuffer.getNumChannels();
+    const auto numSIMDChannels = buffers_detail::ceiling_divide (numScalarChannels, vecSize);
+
+    simdBuffer.setCurrentSize (numSIMDChannels, numSamples);
+
+    copyToSIMDBuffer (scalarBuffer, BufferView { simdBuffer });
+}
+
+/**
  * Copies data from a chowdsp::Buffer of some scalar type,
  * to a chowdsp::Buffer of the corresponding SIMD type.
  */
-template <typename T1, typename T2>
+template <typename T1, typename T2 = T1>
 [[maybe_unused]] static void copyToSIMDBuffer (const Buffer<T1>& scalarBuffer, Buffer<xsimd::batch<T2>>& simdBuffer) noexcept
 {
     copyToSIMDBuffer (static_cast<const BufferView<const T1>&> (scalarBuffer), simdBuffer);
 }
 
 /**
- * Copies data from a chowdsp::Buffer of some SIMD type,
- * to a chowdsp::Buffer of the corresponding scalar type.
- *
- * The scalar buffer will NOT be resized to match the size
- * of the SIMD buffer.
+ * Copies data from a chowdsp::BufferView of some SIMD type,
+ * to a chowdsp::BufferView of the corresponding scalar type.
  */
-template <typename T1, typename T2>
-[[maybe_unused]] static void copyFromSIMDBuffer (const Buffer<xsimd::batch<T2>>& simdBuffer, const BufferView<T1>& scalarBuffer) noexcept
+template <typename T1, typename T2 = T1>
+[[maybe_unused]] static void copyFromSIMDBuffer (const BufferView<const xsimd::batch<T2>>& simdBuffer, const BufferView<T1>& scalarBuffer) noexcept
 {
     using Vec = xsimd::batch<T2>;
     static constexpr auto vecSize = (int) Vec::size;
@@ -106,7 +125,7 @@ template <typename T1, typename T2>
 
     for (int ch = 0; ch < numSIMDChannels; ++ch)
     {
-        const auto channelsToDeinterleave = juce::jmin (vecSize, scalarBuffer.getNumChannels() - ch * vecSize);
+        const auto channelsToDeinterleave = std::min (vecSize, scalarBuffer.getNumChannels() - ch * vecSize);
 
         T1* scalarChannelPointers[(size_t) vecSize] {};
         for (int i = 0; i < channelsToDeinterleave; ++i)
@@ -124,10 +143,10 @@ template <typename T1, typename T2>
  * Copies data from a chowdsp::Buffer of some SIMD type,
  * to a chowdsp::Buffer of the corresponding scalar type.
  */
-template <typename T1, typename T2>
+template <typename T1, typename T2 = T1>
 [[maybe_unused]] static void copyFromSIMDBuffer (const Buffer<xsimd::batch<T2>>& simdBuffer, Buffer<T1>& scalarBuffer) noexcept
 {
-    copyFromSIMDBuffer (simdBuffer, static_cast<const BufferView<T1>&> (scalarBuffer));
+    copyFromSIMDBuffer<T1, T2> (simdBuffer, static_cast<const BufferView<T1>&> (scalarBuffer));
 }
 #endif // ! CHOWDSP_NO_XSIMD
 } // namespace chowdsp

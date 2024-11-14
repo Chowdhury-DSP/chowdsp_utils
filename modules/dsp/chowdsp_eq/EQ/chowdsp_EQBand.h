@@ -11,14 +11,14 @@ namespace chowdsp::EQ
  * template parameter. Currently only the filter types derived from
  * chowdsp::IIRFilter<> are supported.
  */
-template <typename FloatType, typename... FilterChoices>
-class EQBand
+template <typename FloatType, typename FilterChoicesTuple>
+class EQBandBase
 {
 public:
     using NumericType = SampleTypeHelpers::NumericType<FloatType>;
 
     /** Default constructor */
-    EQBand();
+    EQBandBase();
 
     /** Sets the cutoff frequency of the EQ band in Hz */
     void setCutoffFrequency (NumericType newCutoffHz);
@@ -58,11 +58,7 @@ public:
     void reset();
 
     /** Processes an buffer of samples. */
-    void processBlock (const BufferView<FloatType>& buffer) noexcept;
-
-    /** Processes an audio context */
-    template <typename ProcessContext>
-    void process (const ProcessContext& context) noexcept;
+    void processBlock (const BufferView<FloatType>& buffer, ArenaAllocatorView arena) noexcept;
 
 private:
     template <typename FilterType, typename T = FloatType, size_t N = FilterType::Order>
@@ -79,9 +75,8 @@ private:
 
     void fadeBuffers (const FloatType* fadeInBuffer, const FloatType* fadeOutBuffer, FloatType* targetBuffer, int numSamples) const;
 
-    static constexpr auto numFilterChoices = sizeof...(FilterChoices);
-    using Filters = std::tuple<FilterChoices...>;
-    Filters filters;
+    static constexpr auto numFilterChoices = std::tuple_size<FilterChoicesTuple>();
+    FilterChoicesTuple filters;
 
     NumericType freqHzHandle = 1000.0f;
     NumericType qHandle = 0.7071f;
@@ -94,9 +89,13 @@ private:
 
     NumericType fs = NumericType (44100.0);
 
-    Buffer<FloatType> fadeBuffer;
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EQBandBase)
+};
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EQBand)
+template <typename FloatType, typename... FilterChoices>
+struct EQBand : EQBandBase<FloatType, std::tuple<FilterChoices...>>
+{
+    using FilterChoicesTuple = std::tuple<FilterChoices...>;
 };
 
 template <typename FloatType = float>

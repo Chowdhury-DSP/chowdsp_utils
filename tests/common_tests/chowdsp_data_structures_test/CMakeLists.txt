@@ -11,9 +11,18 @@ target_sources(chowdsp_data_structures_test
         OptionalPointerTest.cpp
         SmallVectorTest.cpp
         ArenaAllocatorTest.cpp
+        ChainedArenaAllocatorTest.cpp
         StringLiteralTest.cpp
         TupleHelpersTest.cpp
         VectorHelpersTest.cpp
+        SmallMapTest.cpp
+        STLArenaAllocatorTest.cpp
+        RawObjectTest.cpp
+        EnumMapTest.cpp
+        OptionalRefTest.cpp
+        OptionalArrayTest.cpp
+        PoolAllocatorTest.cpp
+        PackedPointerTest.cpp
 )
 
 target_compile_features(chowdsp_data_structures_test PRIVATE cxx_std_20)

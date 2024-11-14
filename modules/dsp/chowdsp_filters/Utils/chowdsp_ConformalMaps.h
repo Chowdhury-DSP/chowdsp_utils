@@ -132,14 +132,20 @@ namespace ConformalMaps
         {
             // the mobius transform adds a little computational overhead, so here's the optimized bilinear transform.
             const auto KSq = K * K;
-            const auto a0_inv = (T) 1 / (as[0] * KSq + as[1] * K + as[2]);
+
+            const auto as0_KSq = as[0] * KSq;
+            const auto as1_K = as[1] * K;
+            const auto bs0_KSq = bs[0] * KSq;
+            const auto bs1_K = bs[1] * K;
+
+            const auto a0_inv = (T) 1 / (as0_KSq + as1_K + as[2]);
 
             a[0] = (T) 1;
-            a[1] = (T) 2 * (as[2] - as[0] * KSq) * a0_inv;
-            a[2] = (as[0] * KSq - as[1] * K + as[2]) * a0_inv;
-            b[0] = (bs[0] * KSq + bs[1] * K + bs[2]) * a0_inv;
-            b[1] = (T) 2 * (bs[2] - bs[0] * KSq) * a0_inv;
-            b[2] = (bs[0] * KSq - bs[1] * K + bs[2]) * a0_inv;
+            a[1] = (T) 2 * (as[2] - as0_KSq) * a0_inv;
+            a[2] = (as0_KSq - as1_K + as[2]) * a0_inv;
+            b[0] = (bs0_KSq + bs1_K + bs[2]) * a0_inv;
+            b[1] = (T) 2 * (bs[2] - bs0_KSq) * a0_inv;
+            b[2] = (bs0_KSq - bs1_K + bs[2]) * a0_inv;
         }
 
         /** Second-order alpha transform */
@@ -148,6 +154,37 @@ namespace ConformalMaps
             const auto Kprime = K / ((T) 2 * fs);
             const auto alphaA = Kprime * ((T) 1 + alpha) * fs;
             mobius (b, a, bs, as, { alphaA, -alphaA, (T) 1, alpha });
+        }
+    };
+
+    /** Transforms for a third-order filter */
+    template <typename T>
+    struct Transform<T, 3>
+    {
+        /** Third-order bilinear transform */
+        static inline void bilinear (T (&b)[4], T (&a)[4], const T (&bs)[4], const T (&as)[4], T K)
+        {
+            // the mobius transform adds a little computational overhead, so here's the optimized bilinear transform.
+            const auto KSq = K * K;
+            const auto KCb = K * KSq;
+
+            const auto as0_KCb = as[0] * KCb;
+            const auto as1_KSq = as[1] * KSq;
+            const auto as2_K = as[2] * K;
+            const auto bs0_KCb = bs[0] * KCb;
+            const auto bs1_KSq = bs[1] * KSq;
+            const auto bs2_K = bs[2] * K;
+
+            const auto a0_inv = (T) 1 / (as0_KCb + as1_KSq + as2_K + as[3]);
+
+            a[0] = (T) 1;
+            a[1] = ((T) -3 * as0_KCb - as1_KSq + as2_K + (T) 3 * as[3]) * a0_inv;
+            a[2] = ((T) 3 * as0_KCb - as1_KSq - as2_K + (T) 3 * as[3]) * a0_inv;
+            a[3] = (-as0_KCb + as1_KSq - as2_K + as[3]) * a0_inv;
+            b[0] = (bs0_KCb + bs1_KSq + bs[2] * K + bs[3]) * a0_inv;
+            b[1] = ((T) -3 * bs0_KCb - bs1_KSq + bs2_K + (T) 3 * bs[3]) * a0_inv;
+            b[2] = ((T) 3 * bs0_KCb - bs1_KSq - bs2_K + (T) 3 * bs[3]) * a0_inv;
+            b[3] = (-bs0_KCb + bs1_KSq - bs2_K + bs[3]) * a0_inv;
         }
     };
 

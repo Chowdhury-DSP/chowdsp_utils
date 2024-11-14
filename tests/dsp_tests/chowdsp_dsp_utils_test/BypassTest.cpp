@@ -10,10 +10,20 @@ constexpr float delaySamp = 5.0f;
 } // namespace
 
 template <typename BypassType, typename FuncType>
-void processFunc (const chowdsp::BufferView<float>& buffer, BypassType& bypass, std::atomic<float>* onOffParam, FuncType&& blockFunc)
+void processFunc (const chowdsp::BufferView<float>& buffer,
+                  BypassType& bypass,
+                  std::atomic<float>* onOffParam,
+                  chowdsp::ArenaAllocatorView* arena,
+                  FuncType&& blockFunc)
 {
+    std::optional<chowdsp::ArenaAllocatorView::Frame> arena_frame;
+    if (arena != nullptr)
+        arena_frame.emplace (*arena);
+
     auto onOff = bypass.toBool (onOffParam);
-    if (! bypass.processBlockIn (buffer, onOff))
+    if (! bypass.processBlockIn (buffer,
+                                 onOff,
+                                 arena == nullptr ? std::optional<chowdsp::ArenaAllocatorView> { std::nullopt } : *arena))
         return;
 
     blockFunc (buffer);
@@ -73,59 +83,79 @@ TEST_CASE ("Bypass Test", "[dsp][misc]")
     static constexpr int bufferTestNIters = 5;
     SECTION ("Audio Buffer Test")
     {
-        chowdsp::BypassProcessor<float> bypass;
-        std::atomic<float> onOffParam { 0.0f };
-        bypass.prepare ({ fs, (juce::uint32) nSamples, 1 }, bypass.toBool (&onOffParam));
-
-        chowdsp::Buffer<float> buffer (1, bufferTestNIters * nSamples);
-        buffer.clear();
-        for (int i = 0; i < bufferTestNIters; ++i)
+        auto arena = chowdsp::ArenaAllocator<std::array<std::byte, nSamples * sizeof (float) + 32>> {};
+        auto arenaView = chowdsp::ArenaAllocatorView { arena };
+        for (auto& arenaPtr : std::vector<chowdsp::ArenaAllocatorView*> { nullptr, &arenaView })
         {
-            chowdsp::BufferView<float> subBuffer { buffer, i * nSamples, nSamples };
-            processFunc (subBuffer,
-                         bypass,
-                         &onOffParam,
-                         [] (const chowdsp::BufferView<float>& block)
-                         {
-                             for (auto [ch, data] : chowdsp::buffer_iters::channels (block))
-                                 juce::FloatVectorOperations::add (data.data(), 1.0f, data.size());
-                         });
-            onOffParam.store (1.0f - onOffParam.load());
-        }
+            chowdsp::BypassProcessor<float> bypass {};
+            std::atomic<float> onOffParam { 0.0f };
+            bypass.prepare ({ fs,
+                              (juce::uint32) nSamples,
+                              1 },
+                            bypass.toBool (&onOffParam),
+                            arenaPtr == nullptr);
 
-        checkForClicks (buffer.getReadPointer (0), bufferTestNIters * nSamples, 0.005f, "Audio Buffer has clicks!");
+            chowdsp::Buffer<float> buffer (1, bufferTestNIters * nSamples);
+            buffer.clear();
+            for (int i = 0; i < bufferTestNIters; ++i)
+            {
+                chowdsp::BufferView<float> subBuffer { buffer, i * nSamples, nSamples };
+                processFunc (subBuffer,
+                             bypass,
+                             &onOffParam,
+                             arenaPtr,
+                             [] (const chowdsp::BufferView<float>& block)
+                             {
+                                 for (const auto& [ch, data] : chowdsp::buffer_iters::channels (block))
+                                     juce::FloatVectorOperations::add (data.data(), 1.0f, data.size());
+                             });
+                onOffParam.store (1.0f - onOffParam.load());
+            }
+
+            checkForClicks (buffer.getReadPointer (0), bufferTestNIters * nSamples, 0.005f, "Audio Buffer has clicks!");
+        }
     }
 
     static constexpr int delayTestNIters = 8;
     SECTION ("Audio Buffer Delay Test")
     {
-        chowdsp::BypassProcessor<float, chowdsp::DelayLineInterpolationTypes::Linear> bypass;
-        std::atomic<float> onOffParam { 0.0f };
-        bypass.prepare ({ fs, (juce::uint32) nSamples, 1 }, bypass.toBool (&onOffParam));
-        bypass.setLatencySamples (delaySamp);
-
-        chowdsp::DelayLine<float> delay { 2048 };
-        delay.prepare ({ fs, (juce::uint32) nSamples, 1 });
-        delay.setDelay (delaySamp);
-
-        chowdsp::Buffer<float> buffer (1, delayTestNIters * nSamples);
-        createPulseTrain (buffer.getWritePointer (0), delayTestNIters * nSamples, pulseSpace);
-        for (int i = 0; i < delayTestNIters; ++i)
+        auto arena = chowdsp::ArenaAllocator<std::array<std::byte, nSamples * sizeof (float) + 32>> {};
+        auto arenaView = chowdsp::ArenaAllocatorView { arena };
+        for (auto& arenaPtr : std::vector<chowdsp::ArenaAllocatorView*> { nullptr, &arenaView })
         {
-            chowdsp::BufferView<float> subBuffer { buffer, i * nSamples, nSamples };
-            processFunc (subBuffer,
-                         bypass,
-                         &onOffParam,
-                         [&] (const chowdsp::BufferView<float>& block)
-                         {
-                             delay.processBlock (block);
-                         });
+            chowdsp::BypassProcessor<float, chowdsp::DelayLineInterpolationTypes::Linear> bypass { static_cast<int> (std::ceil (delaySamp)) };
+            std::atomic<float> onOffParam { 0.0f };
+            bypass.prepare ({ fs,
+                              (juce::uint32) nSamples,
+                              1 },
+                            bypass.toBool (&onOffParam),
+                            arenaPtr == nullptr);
+            bypass.setLatencySamples (delaySamp);
 
-            if (i % 2 != 0)
-                onOffParam.store (1.0f - onOffParam.load());
+            chowdsp::DelayLine<float> delay { 2048 };
+            delay.prepare ({ fs, (juce::uint32) nSamples, 1 });
+            delay.setDelay (delaySamp);
+
+            chowdsp::Buffer<float> buffer (1, delayTestNIters * nSamples);
+            createPulseTrain (buffer.getWritePointer (0), delayTestNIters * nSamples, pulseSpace);
+            for (int i = 0; i < delayTestNIters; ++i)
+            {
+                chowdsp::BufferView<float> subBuffer { buffer, i * nSamples, nSamples };
+                processFunc (subBuffer,
+                             bypass,
+                             &onOffParam,
+                             arenaPtr,
+                             [&] (const chowdsp::BufferView<float>& block)
+                             {
+                                 delay.processBlock (block);
+                             });
+
+                if (i % 2 != 0)
+                    onOffParam.store (1.0f - onOffParam.load());
+            }
+            delay.free();
+
+            checkPulseSpacing (buffer.getReadPointer (0), delayTestNIters * nSamples, pulseSpace);
         }
-        delay.free();
-
-        checkPulseSpacing (buffer.getReadPointer (0), delayTestNIters * nSamples, pulseSpace);
     }
 }

@@ -5,7 +5,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_dsp_utils
    vendor:        Chowdhury DSP
-   version:       2.1.0
+   version:       2.3.0
    name:          ChowDSP DSP Utilities
    description:   Commonly used DSP utilities for ChowDSP plugins
    dependencies:  chowdsp_filters
@@ -69,6 +69,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Processors/chowdsp_Gain.h"
 #include "Processors/chowdsp_LevelDetector.h"
 #include "Processors/chowdsp_Panner.h"
+#include "Processors/chowdsp_WidthPanner.h"
 #include "Processors/chowdsp_TunerProcessor.h"
 #include "Processors/chowdsp_OvershootLimiter.h"
 

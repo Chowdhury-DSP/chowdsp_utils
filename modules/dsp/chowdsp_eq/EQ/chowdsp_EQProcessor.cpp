@@ -46,13 +46,20 @@ void EQProcessor<FloatType, numBands, EQBandType>::setBandOnOff (int band, bool 
 }
 
 template <typename FloatType, size_t numBands, typename EQBandType>
-void EQProcessor<FloatType, numBands, EQBandType>::prepare (const juce::dsp::ProcessSpec& spec)
+void EQProcessor<FloatType, numBands, EQBandType>::prepare (const juce::dsp::ProcessSpec& spec, bool useInternalArena)
 {
     for (size_t i = 0; i < numBands; ++i)
     {
         bands[i].prepare (spec);
-        bypasses[i].prepare (spec, onOffs[i]);
+        bypasses[i].prepare (spec, onOffs[i], false);
     }
+
+    const auto paddedChannelSize = Math::round_to_next_multiple (static_cast<size_t> (spec.maximumBlockSize), SIMDUtils::defaultSIMDAlignment);
+    requiredMemoryBytes = paddedChannelSize * sizeof (FloatType) * 3 // per-band smoothed values
+                          + paddedChannelSize * spec.numChannels * sizeof (FloatType) * 2; // per-band fade and bypass buffers
+
+    if (useInternalArena)
+        internalArena.reset (requiredMemoryBytes + 32);
 }
 
 template <typename FloatType, size_t numBands, typename EQBandType>
@@ -60,17 +67,29 @@ void EQProcessor<FloatType, numBands, EQBandType>::reset()
 {
     for (auto& band : bands)
         band.reset();
+    for (auto [bypass, bandOnOff] : zip (bypasses, onOffs))
+        bypass.reset (bandOnOff);
 }
 
 template <typename FloatType, size_t numBands, typename EQBandType>
 void EQProcessor<FloatType, numBands, EQBandType>::processBlock (const BufferView<FloatType>& block) noexcept
 {
+    processBlock (block, internalArena);
+}
+
+template <typename FloatType, size_t numBands, typename EQBandType>
+void EQProcessor<FloatType, numBands, EQBandType>::processBlock (const BufferView<FloatType>& block, ArenaAllocatorView arena) noexcept
+{
     for (size_t i = 0; i < numBands; ++i)
     {
-        if (! bypasses[i].processBlockIn (block, onOffs[i]))
+        const auto frame = arena.create_frame();
+        if (! bypasses[i].processBlockIn (block, onOffs[i], arena))
+        {
+            bands[i].reset();
             continue;
+        }
 
-        bands[i].processBlock (block);
+        bands[i].processBlock (block, arena);
 
         bypasses[i].processBlockOut (block, onOffs[i]);
     }

@@ -23,16 +23,14 @@ struct OptionalPointer
 
     /** Creates an optional pointer from a raw pointer, and optionally taking ownership */
     explicit OptionalPointer (T* ptr, bool shouldOwn = true)
-        : owningPtr (shouldOwn ? ptr : nullptr),
-          nonOwningPtr (shouldOwn ? owningPtr.get() : ptr)
+        : pointer (ptr, shouldOwn ? Owning : NonOwning)
     {
     }
 
     /** Creates an owning optional pointer */
     template <typename Arg1, typename... Args, typename = typename std::enable_if_t<! (std::is_pointer_v<Arg1> && std::is_base_of_v<T, std::remove_pointer_t<Arg1>>)>>
     explicit OptionalPointer (Arg1&& arg1, Args&&... args)
-        : owningPtr (std::make_unique<T> (std::forward<Arg1> (arg1), std::forward<Args> (args)...)),
-          nonOwningPtr (owningPtr.get())
+        : pointer (new T { std::forward<Arg1> (arg1), std::forward<Args> (args)... }, Owning) // NOSONAR
     {
     }
 
@@ -42,18 +40,18 @@ struct OptionalPointer
      */
     void setOwning (T* ptr)
     {
-        owningPtr.reset (ptr);
-        nonOwningPtr = ptr;
+        invalidate();
+        pointer.set (ptr, Owning);
     }
 
     /**
      * Sets OptionalPointer to point to a new pointer, and take ownership of it.
      * If the OptionalPointer previously owned some data, that data will be deleted.
      */
-    void setOwning (std::unique_ptr<T>&& ptr)
+    void setOwning (std::unique_ptr<T>&& ptr) // NOSONAR
     {
-        owningPtr = std::move (ptr);
-        nonOwningPtr = owningPtr.get();
+        invalidate();
+        pointer.set (ptr.release(), Owning);
     }
 
     /**
@@ -62,21 +60,34 @@ struct OptionalPointer
      */
     void setNonOwning (T* ptr)
     {
-        owningPtr.reset();
-        nonOwningPtr = ptr;
+        pointer.set (ptr, NonOwning);
     }
 
     /** Move constructor */
-    OptionalPointer (OptionalPointer&&) noexcept = default;
+    OptionalPointer (OptionalPointer&& other) noexcept
+    {
+        invalidate();
+        pointer.swap (other.pointer);
+    }
 
     /** Move assignment */
-    OptionalPointer& operator= (OptionalPointer&&) noexcept = default;
+    OptionalPointer& operator= (OptionalPointer&& other) noexcept
+    {
+        invalidate();
+        pointer.swap (other.pointer);
+        return *this;
+    }
 
     OptionalPointer (const OptionalPointer&) = delete;
     OptionalPointer& operator= (const OptionalPointer&) = delete;
 
+    ~OptionalPointer()
+    {
+        invalidate();
+    }
+
     /** Returns true if this pointer owns the data it's pointing to */
-    [[nodiscard]] bool isOwner() const noexcept { return owningPtr != nullptr; }
+    [[nodiscard]] bool isOwner() const noexcept { return pointer.get_flags() == Owning; }
 
     /**
      * Releases ownership of the underlying data.
@@ -87,32 +98,38 @@ struct OptionalPointer
     [[nodiscard]] T* release()
     {
         jassert (isOwner()); // Pointer has already been released!
-        return owningPtr.release();
+        pointer.set_flags (NonOwning);
+        return pointer.get_ptr();
     }
 
     /**
-     * Resets this object ot nullptr. If this object currently
+     * Resets this object to nullptr. If this object currently
      * owns the underlying data, it will free the underlying data.
      */
     void invalidate()
     {
         if (isOwner())
-            owningPtr.reset();
-        nonOwningPtr = nullptr;
+            delete pointer.get_ptr(); // NOSONAR
+        pointer.set (nullptr);
     }
 
-    [[nodiscard]] T* get() { return nonOwningPtr; }
-    [[nodiscard]] const T* get() const { return nonOwningPtr; }
+    [[nodiscard]] T* get() { return pointer.get_ptr(); }
+    [[nodiscard]] const T* get() const { return pointer.get_ptr(); }
 
-    [[nodiscard]] operator T&() { return *nonOwningPtr; } // NOSONAR, NOLINT(google-explicit-constructor): we want to be able to do implicit conversion here
-    [[nodiscard]] T* operator->() { return nonOwningPtr; }
-    [[nodiscard]] const T* operator->() const { return nonOwningPtr; }
-    [[nodiscard]] T& operator*() { return *nonOwningPtr; }
-    [[nodiscard]] const T& operator*() const { return *nonOwningPtr; }
+    [[nodiscard]] operator T&() { return *pointer; } // NOSONAR, NOLINT(google-explicit-constructor): we want to be able to do implicit conversion here
+    [[nodiscard]] T* operator->() { return pointer.get_ptr(); }
+    [[nodiscard]] const T* operator->() const { return pointer.get_ptr(); }
+    [[nodiscard]] T& operator*() { return *pointer; }
+    [[nodiscard]] const T& operator*() const { return *pointer; }
 
 private:
-    std::unique_ptr<T> owningPtr {};
-    T* nonOwningPtr = nullptr;
+    enum : uint8_t
+    {
+        NonOwning = 0,
+        Owning = 1,
+    };
+
+    PackedPointer<T> pointer {};
 };
 
 template <typename T>
@@ -189,5 +206,5 @@ struct IsOptionalPointerType<OptionalPointer<T>> : std::true_type
 
 /** True if the type is a chowdsp::OptionalPointer<T> */
 template <typename T>
-static constexpr bool IsOptionalPointer = IsOptionalPointerType<T>::value;
+static constexpr bool IsOptionalPointer = is_specialization_of_v<T, OptionalPointer>;
 } // namespace chowdsp

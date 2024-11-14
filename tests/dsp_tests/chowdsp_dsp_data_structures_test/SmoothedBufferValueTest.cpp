@@ -18,27 +18,34 @@ TEMPLATE_PRODUCT_TEST_CASE ("Smoothed Buffer Value Test", "[dsp][data-structures
 {
     using FloatType = typename TestType::NumericType;
     using SmoothingType = typename TestType::SmoothingType;
+    using OptionalArena = std::optional<std::reference_wrapper<chowdsp::ArenaAllocator<>>>;
+
+    auto testSmooth = [] (auto& ref, auto& comp, FloatType value, int numBlocks, OptionalArena arena = std::nullopt)
+    {
+        ref.setTargetValue (value);
+        for (int i = 0; i < numBlocks; ++i)
+        {
+            if (arena)
+                comp.process (value, maxBlockSize, arena->get());
+            else
+                comp.process (value, maxBlockSize);
+            const auto* smoothData = comp.getSmoothedBuffer();
+
+            for (int n = 0; n < maxBlockSize; ++n)
+                REQUIRE_MESSAGE (juce::approximatelyEqual (smoothData[n], ref.getNextValue()), "SmoothedValue was inaccurate!");
+
+            //compare current values of each smoother (once each block)
+            REQUIRE_MESSAGE (juce::approximatelyEqual (comp.getCurrentValue(), ref.getCurrentValue()), "Current value is inaccurate!");
+
+            const auto isActuallySmoothing = ! juce::approximatelyEqual (smoothData[0], smoothData[maxBlockSize - 1]);
+            REQUIRE_MESSAGE (comp.isSmoothing() == isActuallySmoothing, "SmoothedBufferValue is not smoothing correctly!");
+            if (arena)
+                arena->get().clear();
+        }
+    };
 
     SECTION ("Value Compare Test")
     {
-        auto testSmooth = [] (auto& ref, auto& comp, FloatType value, int numBlocks)
-        {
-            ref.setTargetValue (value);
-            for (int i = 0; i < numBlocks; ++i)
-            {
-                comp.process (value, maxBlockSize);
-                const auto* smoothData = comp.getSmoothedBuffer();
-
-                for (int n = 0; n < maxBlockSize; ++n)
-                    REQUIRE_MESSAGE (juce::approximatelyEqual (smoothData[n], ref.getNextValue()), "SmoothedValue was inaccurate!");
-
-                REQUIRE_MESSAGE (juce::approximatelyEqual (comp.getCurrentValue(), ref.getCurrentValue()), "Current value is innacurate!");
-
-                const auto isActuallySmoothing = ! juce::approximatelyEqual (smoothData[0], smoothData[maxBlockSize - 1]);
-                REQUIRE_MESSAGE (comp.isSmoothing() == isActuallySmoothing, "SmoothedBufferValue is not smoothing correctly!");
-            }
-        };
-
         chowdsp::SmoothedBufferValue<FloatType, SmoothingType> compSmooth;
         juce::SmoothedValue<FloatType, SmoothingType> refSmooth, refSmooth2;
 
@@ -58,5 +65,30 @@ TEMPLATE_PRODUCT_TEST_CASE ("Smoothed Buffer Value Test", "[dsp][data-structures
         refSmooth2.reset (fs, rampLegnth2);
         refSmooth2.setCurrentAndTargetValue ((FloatType) val3);
         testSmooth (refSmooth2, compSmooth, (FloatType) val4, 5);
+    }
+
+    SECTION ("Arena Allocator Interface Test")
+    {
+        chowdsp::ArenaAllocator<> arena { maxBlockSize * sizeof (FloatType) };
+
+        chowdsp::SmoothedBufferValue<FloatType, SmoothingType> arenaSmooth;
+        juce::SmoothedValue<FloatType, SmoothingType> refSmooth, refSmooth2;
+
+        arenaSmooth.prepare (fs, maxBlockSize, false);
+        arenaSmooth.setRampLength (rampLegnth1);
+        refSmooth.reset (fs, rampLegnth1);
+
+        refSmooth.setCurrentAndTargetValue ((FloatType) val1);
+        arenaSmooth.reset ((FloatType) val1);
+        testSmooth (refSmooth, arenaSmooth, (FloatType) val2, 5, arena);
+
+        arenaSmooth.setRampLength (rampLegnth2);
+        refSmooth.reset (fs, rampLegnth2);
+        testSmooth (refSmooth, arenaSmooth, (FloatType) val3, 5, arena);
+
+        arenaSmooth.reset ((FloatType) val3);
+        refSmooth2.reset (fs, rampLegnth2);
+        refSmooth2.setCurrentAndTargetValue ((FloatType) val3);
+        testSmooth (refSmooth2, arenaSmooth, (FloatType) val4, 5, arena);
     }
 }

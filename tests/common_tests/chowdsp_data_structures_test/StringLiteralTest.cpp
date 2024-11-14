@@ -2,6 +2,8 @@
 #include <CatchUtils.h>
 #include <chowdsp_data_structures/chowdsp_data_structures.h>
 
+using namespace chowdsp::string_literals;
+
 TEST_CASE ("String Literal Test", "[common][data-structures]")
 {
     SECTION ("Construction")
@@ -48,7 +50,8 @@ TEST_CASE ("String Literal Test", "[common][data-structures]")
 
     SECTION ("Stream")
     {
-        static constexpr chowdsp::StringLiteral sl { "BLAH" };
+        using namespace chowdsp::string_literals;
+        static constexpr auto sl = "BLAH"_sl;
         std::stringstream ss;
         ss << sl;
         REQUIRE (ss.str() == (std::string) sl);
@@ -75,5 +78,31 @@ TEST_CASE ("String Literal Test", "[common][data-structures]")
         static constexpr chowdsp::StringLiteral sl { "BLAH" };
         const auto sl2 = sl + " BLAH!";
         REQUIRE (sl2 == "BLAH BLAH!");
+    }
+
+    SECTION ("Numbers")
+    {
+        static constexpr auto fifteen = chowdsp::StringLiteral<2> { 10 + 5 };
+        STATIC_REQUIRE (fifteen == chowdsp::StringLiteral { "15" });
+
+        static constexpr auto m_five = chowdsp::StringLiteral<2> { 5 - 10 };
+        STATIC_REQUIRE (m_five == chowdsp::StringLiteral { "-5" });
+
+        static constexpr auto _2048 = chowdsp::StringLiteral<4> { 1 << 11 };
+        STATIC_REQUIRE (_2048 == chowdsp::StringLiteral { "2048" });
+
+        // This does not compile (which is correct)!
+        // static constexpr auto not_enough_room = chowdsp::StringLiteral<4> { 1'000'000 };
+        // REQUIRE (not_enough_room == chowdsp::StringLiteral { "2048" });
+    }
+
+    SECTION ("Numberic Literals")
+    {
+        static constexpr auto fifteen = 15_sl_n;
+        REQUIRE (fifteen == chowdsp::StringLiteral { "15" });
+
+        REQUIRE (chowdsp::StringLiteral<2> { (int) 15 } == chowdsp::StringLiteral { "15" });
+        REQUIRE (chowdsp::StringLiteral<2> { (size_t) 15 } == chowdsp::StringLiteral { "15" });
+        REQUIRE (chowdsp::StringLiteral<3> { (int) -15 } == chowdsp::StringLiteral { "-15" });
     }
 }

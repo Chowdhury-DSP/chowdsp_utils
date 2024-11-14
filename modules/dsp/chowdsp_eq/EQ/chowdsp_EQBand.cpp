@@ -1,46 +1,43 @@
 namespace chowdsp::EQ
 {
-template <typename FloatType, typename... FilterChoices>
-EQBand<FloatType, FilterChoices...>::EQBand() = default;
+template <typename FloatType, typename FilterChoicesTuple>
+EQBandBase<FloatType, FilterChoicesTuple>::EQBandBase() = default;
 
-template <typename FloatType, typename... FilterChoices>
-void EQBand<FloatType, FilterChoices...>::setCutoffFrequency (NumericType newCutoffHz)
+template <typename FloatType, typename FilterChoicesTuple>
+void EQBandBase<FloatType, FilterChoicesTuple>::setCutoffFrequency (NumericType newCutoffHz)
 {
     freqHzHandle = newCutoffHz;
 }
 
-template <typename FloatType, typename... FilterChoices>
-void EQBand<FloatType, FilterChoices...>::setQValue (NumericType newQValue)
+template <typename FloatType, typename FilterChoicesTuple>
+void EQBandBase<FloatType, FilterChoicesTuple>::setQValue (NumericType newQValue)
 {
     qHandle = newQValue;
 }
 
-template <typename FloatType, typename... FilterChoices>
-void EQBand<FloatType, FilterChoices...>::setGain (NumericType newGain)
+template <typename FloatType, typename FilterChoicesTuple>
+void EQBandBase<FloatType, FilterChoicesTuple>::setGain (NumericType newGain)
 {
     gainHandle = newGain;
 }
 
-template <typename FloatType, typename... FilterChoices>
-void EQBand<FloatType, FilterChoices...>::setGainDB (NumericType newGainDB)
+template <typename FloatType, typename FilterChoicesTuple>
+void EQBandBase<FloatType, FilterChoicesTuple>::setGainDB (NumericType newGainDB)
 {
     gainHandle = juce::Decibels::decibelsToGain (newGainDB);
 }
 
-template <typename FloatType, typename... FilterChoices>
-void EQBand<FloatType, FilterChoices...>::setFilterType (int newFilterType)
+template <typename FloatType, typename FilterChoicesTuple>
+void EQBandBase<FloatType, FilterChoicesTuple>::setFilterType (int newFilterType)
 {
     jassert (juce::isPositiveAndBelow (newFilterType, numFilterChoices));
     filterType = newFilterType;
 }
 
-template <typename FloatType, typename... FilterChoices>
-void EQBand<FloatType, FilterChoices...>::prepare (const juce::dsp::ProcessSpec& spec)
+template <typename FloatType, typename FilterChoicesTuple>
+void EQBandBase<FloatType, FilterChoicesTuple>::prepare (const juce::dsp::ProcessSpec& spec)
 {
     fs = (NumericType) spec.sampleRate;
-
-    fadeBuffer.setMaxSize ((int) spec.numChannels, (int) spec.maximumBlockSize);
-    fadeBuffer.clear();
 
     TupleHelpers::forEachInTuple (
         [spec] (auto& filter, size_t)
@@ -58,15 +55,15 @@ void EQBand<FloatType, FilterChoices...>::prepare (const juce::dsp::ProcessSpec&
 
     for (auto* smoother : { &freqSmooth, &qSmooth, &gainSmooth })
     {
-        smoother->prepare (spec.sampleRate, (int) spec.maximumBlockSize);
+        smoother->prepare (spec.sampleRate, (int) spec.maximumBlockSize, false);
         smoother->setRampLength (0.05);
     }
 
     reset();
 }
 
-template <typename FloatType, typename... FilterChoices>
-void EQBand<FloatType, FilterChoices...>::reset()
+template <typename FloatType, typename FilterChoicesTuple>
+void EQBandBase<FloatType, FilterChoicesTuple>::reset()
 {
     TupleHelpers::forEachInTuple ([] (auto& filter, size_t)
                                   { filter.reset(); },
@@ -79,10 +76,10 @@ void EQBand<FloatType, FilterChoices...>::reset()
     prevFilterType = filterType;
 }
 
-template <typename FloatType, typename... FilterChoices>
+template <typename FloatType, typename FilterChoicesTuple>
 template <typename FilterType, typename T, size_t N>
 std::enable_if_t<std::is_base_of_v<IIRFilter<N, T>, FilterType> || std::is_base_of_v<SOSFilter<N, T>, FilterType> || std::is_base_of_v<SOSFilter<N - 1, T>, FilterType>, void>
-    EQBand<FloatType, FilterChoices...>::processFilterChannel (FilterType& filter, const BufferView<FloatType>& block)
+    EQBandBase<FloatType, FilterChoicesTuple>::processFilterChannel (FilterType& filter, const BufferView<FloatType>& block)
 {
     const auto setParams = [&filter, fs = this->fs] (FloatType curFreq, FloatType curQ, FloatType curGain)
     {
@@ -120,10 +117,10 @@ std::enable_if_t<std::is_base_of_v<IIRFilter<N, T>, FilterType> || std::is_base_
     }
 }
 
-template <typename FloatType, typename... FilterChoices>
+template <typename FloatType, typename FilterChoicesTuple>
 template <typename FilterType, typename T, StateVariableFilterType type>
 std::enable_if_t<std::is_same_v<StateVariableFilter<T, type>, FilterType>, void>
-    EQBand<FloatType, FilterChoices...>::processFilterChannel (FilterType& filter, const BufferView<FloatType>& block)
+    EQBandBase<FloatType, FilterChoicesTuple>::processFilterChannel (FilterType& filter, const BufferView<FloatType>& block)
 {
     const auto numChannels = (int) block.getNumChannels();
     const auto numSamples = (int) block.getNumSamples();
@@ -215,10 +212,10 @@ std::enable_if_t<std::is_same_v<StateVariableFilter<T, type>, FilterType>, void>
     }
 }
 
-template <typename FloatType, typename... FilterChoices>
+template <typename FloatType, typename FilterChoicesTuple>
 template <typename FilterType, typename T, size_t N, StateVariableFilterType type>
 std::enable_if_t<std::is_same_v<NthOrderFilter<T, N, type>, FilterType>, void>
-    EQBand<FloatType, FilterChoices...>::processFilterChannel (FilterType& filter, const BufferView<FloatType>& block)
+    EQBandBase<FloatType, FilterChoicesTuple>::processFilterChannel (FilterType& filter, const BufferView<FloatType>& block)
 {
     const auto numChannels = (int) block.getNumChannels();
     const auto numSamples = (int) block.getNumSamples();
@@ -263,8 +260,8 @@ std::enable_if_t<std::is_same_v<NthOrderFilter<T, N, type>, FilterType>, void>
     }
 }
 
-template <typename FloatType, typename... FilterChoices>
-void EQBand<FloatType, FilterChoices...>::fadeBuffers (const FloatType* fadeInBuffer, const FloatType* fadeOutBuffer, FloatType* targetBuffer, int numSamples) const
+template <typename FloatType, typename FilterChoicesTuple>
+void EQBandBase<FloatType, FilterChoicesTuple>::fadeBuffers (const FloatType* fadeInBuffer, const FloatType* fadeOutBuffer, FloatType* targetBuffer, int numSamples) const
 {
     auto fadeInGain = (FloatType) 0;
     auto fadeOutGain = (FloatType) 1;
@@ -277,25 +274,27 @@ void EQBand<FloatType, FilterChoices...>::fadeBuffers (const FloatType* fadeInBu
     }
 }
 
-template <typename FloatType, typename... FilterChoices>
-void EQBand<FloatType, FilterChoices...>::processBlock (const BufferView<FloatType>& buffer) noexcept
+template <typename FloatType, typename FilterChoicesTuple>
+void EQBandBase<FloatType, FilterChoicesTuple>::processBlock (const BufferView<FloatType>& buffer, ArenaAllocatorView arena) noexcept
 {
     const auto numChannels = buffer.getNumChannels();
     const auto numSamples = buffer.getNumSamples();
+    const auto frame = arena.create_frame();
 
-    freqSmooth.process (freqHzHandle, numSamples);
-    qSmooth.process (qHandle, numSamples);
-    gainSmooth.process (gainHandle, numSamples);
+    freqSmooth.process (freqHzHandle, numSamples, arena);
+    qSmooth.process (qHandle, numSamples, arena);
+    gainSmooth.process (gainHandle, numSamples, arena);
 
     const auto needsFade = filterType != prevFilterType;
+    BufferView<FloatType> fadeBuffer {};
     if (needsFade)
     {
-        fadeBuffer.setCurrentSize (numChannels, numSamples);
+        fadeBuffer = make_temp_buffer<FloatType> (arena, numChannels, numSamples);
         BufferMath::copyBufferData (buffer, fadeBuffer);
     }
 
     TupleHelpers::forEachInTuple (
-        [this, &buffer] (auto& filter, size_t filterIndex)
+        [this, &buffer, &fadeBuffer] (auto& filter, size_t filterIndex)
         {
             if ((int) filterIndex == filterType)
             {
@@ -320,62 +319,4 @@ void EQBand<FloatType, FilterChoices...>::processBlock (const BufferView<FloatTy
 
     prevFilterType = filterType;
 }
-
-template <typename FloatType, typename... FilterChoices>
-template <typename ProcessContext>
-void EQBand<FloatType, FilterChoices...>::process (const ProcessContext& context) noexcept
-{
-    const auto& inputBlock = context.getInputBlock();
-    auto& block = context.getOutputBlock();
-    const auto numChannels = block.getNumChannels();
-    const auto numSamples = (int) block.getNumSamples();
-
-    jassert (inputBlock.getNumChannels() == numChannels);
-    jassert (inputBlock.getNumSamples() == (size_t) numSamples);
-
-    freqSmooth.process (freqHzHandle, numSamples);
-    qSmooth.process (qHandle, numSamples);
-    gainSmooth.process (gainHandle, numSamples);
-
-    // the filters will need to do in-place processing anyway, so let's just copy the blocks here
-    if (context.usesSeparateInputAndOutputBlocks())
-        block.copyFrom (inputBlock);
-
-    if (context.isBypassed)
-    {
-        reset();
-        return;
-    }
-
-    const auto needsFade = filterType != prevFilterType;
-    if (needsFade)
-        BufferMath::copyBufferData (block, fadeBuffer, 0, numSamples, 0, numChannels);
-
-    TupleHelpers::forEachInTuple (
-        [this, &block] (auto& filter, size_t filterIndex)
-        {
-            if ((int) filterIndex == filterType)
-            {
-                processFilterChannel (filter, block);
-            }
-            else if ((int) filterIndex == prevFilterType)
-            {
-                processFilterChannel (filter, fadeBuffer);
-                filter.reset();
-            }
-        },
-        filters);
-
-    if (needsFade)
-    {
-        for (size_t channel = 0; channel < numChannels; ++channel)
-        {
-            auto* blockPtr = block.getChannelPointer (channel);
-            fadeBuffers (blockPtr, fadeBuffer.getReadPointer ((int) channel), blockPtr, numSamples);
-        }
-    }
-
-    prevFilterType = filterType;
-}
-
 } // namespace chowdsp::EQ

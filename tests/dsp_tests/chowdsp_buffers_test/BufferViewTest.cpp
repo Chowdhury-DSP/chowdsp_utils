@@ -1,4 +1,5 @@
 #include <chowdsp_buffers/chowdsp_buffers.h>
+#include <chowdsp_data_structures/chowdsp_data_structures.h>
 
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wfloat-equal")
 #include <CatchUtils.h>
@@ -137,6 +138,16 @@ TEMPLATE_TEST_CASE ("Buffer View Test", "[dsp][buffers][simd]", float, double, x
         {
             chowdsp::BufferView<TestType> buffer_view_copy = buffer_view; // NOLINT
             REQUIRE (buffer_view.getReadPointer (0) == buffer_view_copy.getReadPointer (0));
+        }
+    }
+
+    if constexpr (std::is_floating_point_v<TestType>)
+    {
+        SECTION ("make_temp_buffer")
+        {
+            chowdsp::ArenaAllocator<> arena { 1 << 10 };
+            chowdsp::make_temp_buffer<float> (arena, 2, 61);
+            REQUIRE (arena.get_bytes_used() == 64 * 2 * sizeof (float));
         }
     }
 }

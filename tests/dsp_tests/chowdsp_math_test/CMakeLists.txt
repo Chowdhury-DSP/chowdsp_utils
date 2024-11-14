@@ -6,6 +6,7 @@ target_sources(chowdsp_math_test
         FloatVectorOperationsTest.cpp
         MatrixOpsTest.cpp
         PolynomialsTest.cpp
+        ChebyshevPolynomialTest.cpp
         PowerTest.cpp
         OtherMathOpsTest.cpp
         JacobiEllipticTest.cpp
@@ -15,4 +16,5 @@ target_sources(chowdsp_math_test
         PowApproxTest.cpp
         DecibelsApproxTest.cpp
         TrigApproxTest.cpp
+        RandomFloatTest.cpp
 )

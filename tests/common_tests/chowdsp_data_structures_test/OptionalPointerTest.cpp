@@ -3,7 +3,7 @@
 
 TEST_CASE ("Optional Pointer Test", "[common][data-structures]")
 {
-    struct TestType
+    struct alignas (8) TestType
     {
         TestType (int _x, int _y) : x (_x), y (_y) {}
         int x;
@@ -129,5 +129,22 @@ TEST_CASE ("Optional Pointer Test", "[common][data-structures]")
         y.setNonOwning (x.get());
         REQUIRE (x == y);
         REQUIRE_FALSE (x != y);
+    }
+
+    SECTION ("Move Constructor")
+    {
+        chowdsp::OptionalPointer<TestType> x { 4, 5 };
+        chowdsp::OptionalPointer<TestType> y { std::move (x) };
+        REQUIRE (x == nullptr); // NOLINT
+        REQUIRE (y->x == 4);
+        REQUIRE (y->y == 5);
+    }
+
+    SECTION ("Move Assignment")
+    {
+        chowdsp::OptionalPointer<TestType> y {};
+        y = chowdsp::OptionalPointer<TestType> { 4, 5 };
+        REQUIRE (y->x == 4);
+        REQUIRE (y->y == 5);
     }
 }

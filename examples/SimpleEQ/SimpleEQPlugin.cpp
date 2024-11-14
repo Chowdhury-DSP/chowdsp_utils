@@ -4,6 +4,17 @@
 SimpleEQPlugin::SimpleEQPlugin()
     : eqParamsHandles (state.params.eqParams.eqParams)
 {
+    // let's check that we set up our EQ band choices correctly!
+    using EQFilterChoices = types_list::TupleList<EQBand<float>::FilterChoicesTuple>;
+    jassert (EQFilterChoices::count == (size_t) Params::bandTypeChoices.size());
+    types_list::forEach<EQFilterChoices> (
+        [] (auto typeIndex)
+        {
+            using TypeAtIndex = EQFilterChoices::AtIndex<typeIndex>;
+            juce::Logger::writeToLog (chowdsp::toString (NAMEOF_TYPE (TypeAtIndex))
+                                      + ", " + Params::bandTypeChoices[static_cast<int> (typeIndex)]);
+        });
+
     linPhaseEQ.updatePrototypeEQParameters = [] (auto& eq, auto& eqParams)
     { eq.setParameters (eqParams); };
 
@@ -52,7 +63,7 @@ void SimpleEQPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
     // any thread, but we'll do it on the audio thread here.
     setEQParams();
 
-    if (state.params.linPhaseMode.get())
+    if (state.params.linPhaseMode->get())
     {
         // Linear phase mode is on: processing the linear phase EQ here!
         linPhaseEQ.processBlock (buffer);

@@ -79,18 +79,8 @@ class BaseSerializer
     static constexpr auto IsString = std::is_same_v<T, std::string> || std::is_same_v<T, juce::String>;
 
 #if JUCE_MODULE_AVAILABLE_juce_graphics
-    template <class T>
-    struct IsJucePointType : std::false_type
-    {
-    };
-
-    template <class T>
-    struct IsJucePointType<juce::Point<T>> : std::true_type
-    {
-    };
-
     template <typename T>
-    static constexpr auto IsPoint = IsJucePointType<T>::value;
+    static constexpr auto IsPoint = is_specialization_of_v<T, juce::Point>;
 #endif
 
     template <typename T>
@@ -113,6 +103,7 @@ public:
         return serial;
     }
 
+
 //    /** Serializer for arithmetic types */
 //    template <typename Serializer, typename T>
 //    static std::enable_if_t<std::is_arithmetic_v<T>, SerialType<Serializer>>
@@ -129,6 +120,7 @@ public:
 //    }
 
     /** Serializes an arithmetic type. */
+
     template <typename Serializer, typename T>
     static std::enable_if_t<std::is_arithmetic_v<T>, SerialType<Serializer>>
     serialize(SerialType<Serializer>& parent, juce::String id, T x)
@@ -266,7 +258,7 @@ public:
 
     /** Serializer for container types */
     template <typename Serializer, typename T>
-    static std::enable_if_t<IsContainerNotMapOrString<T>, SerialType<Serializer>>
+    static std::enable_if_t<IsContainerNotMapOrString<T> && ! std::is_same_v<T, SerialType<Serializer>>, SerialType<Serializer>>
         serialize (const T& container)
     {
         auto serial = Serializer::createBaseElement();

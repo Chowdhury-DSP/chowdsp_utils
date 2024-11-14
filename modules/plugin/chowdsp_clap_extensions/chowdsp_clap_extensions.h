@@ -5,7 +5,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_clap_extensions
    vendor:        Chowdhury DSP
-   version:       2.1.0
+   version:       2.3.0
    name:          ChowDSP CLAP Extensions
    description:   Extensions for building CLAP plugins
    dependencies:  juce_core, juce_audio_processors
@@ -44,4 +44,8 @@ namespace CLAPExtensions
 // LCOV_EXCL_START
 #include "ParameterExtensions/chowdsp_ModParamMixin.h"
 #include "PluginExtensions/chowdsp_CLAPInfoExtensions.h"
+
+#if JUCE_MODULE_AVAILABLE_chowdsp_presets_v2
+#include "PresetExtensions/chowdsp_CLAPPresetDiscoveryProviders.h"
+#endif
 // LCOV_EXCL_END

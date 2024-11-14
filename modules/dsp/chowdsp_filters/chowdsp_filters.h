@@ -5,7 +5,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_filters
    vendor:        Chowdhury DSP
-   version:       2.1.0
+   version:       2.3.0
    name:          ChowDSP Filters
    description:   Filter classes for ChowDSP plugins
    dependencies:  chowdsp_data_structures, chowdsp_dsp_data_structures, chowdsp_math
@@ -46,7 +46,10 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Other/chowdsp_FractionalOrderFilter.h"
 #include "Other/chowdsp_HilbertFilter.h"
 #include "Other/chowdsp_FIRFilter.h"
+#include "Other/chowdsp_FIRPolyphaseDecimator.h"
+#include "Other/chowdsp_FIRPolyphaseInterpolator.h"
 #include "Other/chowdsp_WernerFilter.h"
 #include "Other/chowdsp_ARPFilter.h"
 #include "Other/chowdsp_LinkwitzRileyFilter.h"
+#include "Other/chowdsp_CrossoverFilter.h"
 #include "Other/chowdsp_ThreeWayCrossoverFilter.h"

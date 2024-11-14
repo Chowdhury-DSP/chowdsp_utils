@@ -5,7 +5,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_core
    vendor:        Chowdhury DSP
-   version:       2.1.0
+   version:       2.3.0
    name:          ChowDSP Core
    description:   Core code for other ChowDSP modules
    dependencies:
@@ -41,6 +41,14 @@ BEGIN_JUCE_MODULE_DECLARATION
 #define CHOWDSP_USING_JUCE 0
 #endif
 
+#ifndef CHOWDSP_ALLOW_TEMPLATE_INSTANTIATIONS
+#define CHOWDSP_ALLOW_TEMPLATE_INSTANTIATIONS 1
+#endif
+
+#ifndef CHOWDSP_JASSERT_IS_CASSERT
+#define CHOWDSP_JASSERT_IS_CASSERT 0
+#endif
+
 #if ! CHOWDSP_USING_JUCE
 #define JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED 0
 #include "JUCEHelpers/juce_TargetPlatform.h"
@@ -55,7 +63,9 @@ BEGIN_JUCE_MODULE_DECLARATION
 #if ! JUCE_MODULE_AVAILABLE_juce_dsp
 #include "JUCEHelpers/dsp/juce_ProcessSpec.h"
 #include "JUCEHelpers/dsp/juce_LookupTable.h"
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wimplicit-const-int-float-conversion")
 #include "JUCEHelpers/dsp/juce_FastMathApproximations.h"
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 #endif
 #elif JUCE_VERSION < 0x070006
 namespace juce
@@ -97,6 +107,7 @@ namespace experimental
 
 #include "Functional/chowdsp_Bindings.h"
 #include "Functional/chowdsp_EndOfScopeAction.h"
+#include "Memory/chowdsp_AlignedAlloc.h"
 #include "Memory/chowdsp_MemoryAliasing.h"
 #include "Types/chowdsp_TypeHasCheckers.h"
 #include "Types/chowdsp_TypeTraits.h"

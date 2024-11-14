@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(chowdsp_utils VERSION 2.1.0)
+project(chowdsp_utils VERSION 2.3.0)
 set(CMAKE_CXX_STANDARD 17)
 include(CTest)
 
@@ -23,6 +23,9 @@ if(NOT (CHOWDSP_ENABLE_TESTING OR CHOWDSP_ENABLE_BENCHMARKS OR CHOWDSP_ENABLE_EX
 else()
     list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
     list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/test)
+
+    # Useful for testing with address sanitizer:
+    # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -g")
 
     if(CHOWDSP_ENABLE_TESTING)
         enable_testing()

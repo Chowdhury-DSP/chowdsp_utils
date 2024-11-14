@@ -56,6 +56,7 @@ class LinearPhaseEQ : private juce::HighResolutionTimer
 public:
     /** Default constructor. */
     LinearPhaseEQ() = default;
+    ~LinearPhaseEQ() override;
 
     /** Implement this function to update the prototype EQ parameters. */
     std::function<void (PrototypeEQ&, const ProtoEQParams&)> updatePrototypeEQParameters = nullptr;
@@ -86,7 +87,7 @@ private:
     void processBlocksInternal (const AudioBlock<const float>& inputBlock, AudioBlock<float>& outputBlock) noexcept;
 
     PrototypeEQ prototypeEQ;
-    EQParams<ProtoEQParams> params;
+    EQParams<ProtoEQParams> params {};
 
     std::vector<std::unique_ptr<ConvolutionEngine<>>> engines;
     std::unique_ptr<IRTransfer> irTransfer;

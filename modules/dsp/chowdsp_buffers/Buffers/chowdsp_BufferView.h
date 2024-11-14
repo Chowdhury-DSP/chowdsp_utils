@@ -1,5 +1,9 @@
 #pragma once
 
+#if JUCE_MODULE_AVAILABLE_chowdsp_data_structures
+#include <chowdsp_data_structures/chowdsp_data_structures.h>
+#endif
+
 namespace chowdsp
 {
 /**
@@ -14,9 +18,11 @@ public:
     /** The sample type used by the buffer */
     using Type = SampleType;
 
-    BufferView& operator= (const BufferView<SampleType>&) = delete;
-    BufferView (BufferView<SampleType>&&) = delete;
-    BufferView& operator= (BufferView<SampleType>&&) = delete;
+    BufferView() = default;
+
+    BufferView& operator= (const BufferView&) = default;
+    BufferView (BufferView&&) noexcept = default;
+    BufferView& operator= (BufferView&&) noexcept = default;
 
     BufferView (SampleType* const* data, int dataNumChannels, int dataNumSamples, int sampleOffset = 0) : numChannels (dataNumChannels),
                                                                                                           numSamples (dataNumSamples)
@@ -155,6 +161,7 @@ public:
     }
 
 #if JUCE_MODULE_AVAILABLE_juce_dsp
+    template <typename T = SampleType, std::enable_if_t<std::is_floating_point_v<T>>* = nullptr>
     BufferView (const AudioBlock<std::remove_const_t<SampleType>>& block, // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
                 int sampleOffset = 0,
                 int bufferNumSamples = -1,
@@ -167,7 +174,7 @@ public:
             channelPointers[ch] = block.getChannelPointer (ch + (size_t) startChannel) + sampleOffset;
     }
 
-    template <typename T = SampleType, std::enable_if_t<std::is_const_v<T>>* = nullptr>
+    template <typename T = SampleType, std::enable_if_t<std::is_const_v<T> && std::is_floating_point_v<T>>* = nullptr>
     BufferView (const AudioBlock<const SampleType>& block, // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
                 int sampleOffset = 0,
                 int bufferNumSamples = -1,
@@ -239,7 +246,7 @@ private:
     std::enable_if_t<! std::is_const_v<T>, void> initialise (SampleType* const* data, int sampleOffset, int startChannel = 0)
     {
         jassert (juce::isPositiveAndNotGreaterThan (numChannels, maxNumChannels));
-        jassert (numSamples > 0);
+        jassert (numSamples >= 0);
         for (size_t ch = 0; ch < (size_t) numChannels; ++ch)
             channelPointers[ch] = data[ch + (size_t) startChannel] + sampleOffset;
     }
@@ -248,13 +255,13 @@ private:
     std::enable_if_t<std::is_const_v<T>, void> initialise (const SampleType* const* data, int sampleOffset, int startChannel = 0)
     {
         jassert (juce::isPositiveAndNotGreaterThan (numChannels, maxNumChannels));
-        jassert (numSamples > 0);
+        jassert (numSamples >= 0);
         for (size_t ch = 0; ch < (size_t) numChannels; ++ch)
             channelPointers[ch] = data[ch + (size_t) startChannel] + sampleOffset;
     }
 
-    const int numChannels = 1;
-    const int numSamples;
+    int numChannels = 1;
+    int numSamples = 0;
 
     // Assuming we will never need an audio buffer with more than 64 channels.
     // Maybe we'll need to increase this is we're doing high-order ambisonics or something?
@@ -370,4 +377,25 @@ template <typename BufferType,
               std::is_same_v<BufferType, const Buffer<xsimd::batch<double>>> || (std::is_const_v<BufferType> && detail::is_static_buffer_v<std::remove_const_t<BufferType>, xsimd::batch<double>>)>>
 BufferView (BufferType&, Ts...) -> BufferView<const xsimd::batch<double>>;
 #endif // ! CHOWDSP_NO_XSIMD
+
+#if JUCE_MODULE_AVAILABLE_chowdsp_data_structures
+template <typename T>
+BufferView<T> make_temp_buffer (ArenaAllocatorView arena, int num_channels, int num_samples)
+{
+    int num_samples_padded = num_samples;
+#if ! CHOWDSP_NO_XSIMD
+    static constexpr auto vec_size = (int) xsimd::batch<T>::size;
+    if constexpr (std::is_floating_point_v<T>)
+        num_samples_padded = buffers_detail::ceiling_divide (num_samples, vec_size) * vec_size;
+#endif
+
+    std::array<T*, CHOWDSP_BUFFER_MAX_NUM_CHANNELS> channel_pointers {};
+    for (size_t ch = 0; ch < static_cast<size_t> (num_channels); ++ch)
+    {
+        channel_pointers[ch] = arena.allocate<T> (num_samples_padded, SIMDUtils::defaultSIMDAlignment);
+        jassert (channel_pointers[ch] != nullptr);
+    }
+    return { channel_pointers.data(), num_channels, num_samples };
+}
+#endif
 } // namespace chowdsp

@@ -16,36 +16,39 @@ target_compile_definitions(chowdsp_utils_codeql PRIVATE
 )
 
 target_link_libraries(chowdsp_utils_codeql PRIVATE
-    chowdsp_core
-    chowdsp_data_structures
-    chowdsp_json
-    chowdsp_listeners
-    chowdsp_reflection
-    chowdsp_serialization
-    chowdsp_units
-    chowdsp_buffers
-    chowdsp_compressor
-    chowdsp_dsp_data_structures
-    chowdsp_dsp_utils
-    chowdsp_eq
-    chowdsp_filters
-    chowdsp_math
-    chowdsp_modal_dsp
-    chowdsp_reverb
-    chowdsp_simd
-    chowdsp_sources
-    chowdsp_waveshapers
-    chowdsp_gui
-    chowdsp_visualizers
-    chowdsp_rhythm
-    chowdsp_parameters
-    chowdsp_plugin_base
-    chowdsp_plugin_state
-    chowdsp_plugin_utils
-    chowdsp_presets_v2
-    chowdsp_version
-    chowdsp_clap_extensions
+    chowdsp::chowdsp_core
+    chowdsp::chowdsp_data_structures
+    chowdsp::chowdsp_json
+    chowdsp::chowdsp_listeners
+    chowdsp::chowdsp_reflection
+    chowdsp::chowdsp_serialization
+    chowdsp::chowdsp_logging
+    chowdsp::chowdsp_fuzzy_search
+    chowdsp::chowdsp_units
+    chowdsp::chowdsp_buffers
+    chowdsp::chowdsp_compressor
+    chowdsp::chowdsp_dsp_data_structures
+    chowdsp::chowdsp_dsp_utils
+    chowdsp::chowdsp_eq
+    chowdsp::chowdsp_filters
+    chowdsp::chowdsp_math
+    chowdsp::chowdsp_modal_dsp
+    chowdsp::chowdsp_reverb
+    chowdsp::chowdsp_simd
+    chowdsp::chowdsp_sources
+    chowdsp::chowdsp_waveshapers
+    chowdsp::chowdsp_gui
+    chowdsp::chowdsp_visualizers
+    chowdsp::chowdsp_rhythm
+    chowdsp::chowdsp_parameters
+    chowdsp::chowdsp_plugin_base
+    chowdsp::chowdsp_plugin_state
+    chowdsp::chowdsp_plugin_utils
+    chowdsp::chowdsp_presets_v2
+    chowdsp::chowdsp_version
+    chowdsp::chowdsp_clap_extensions
     clap_juce_extensions
+    juce::juce_dsp
     juce::juce_recommended_config_flags
     juce::juce_recommended_lto_flags
     juce::juce_recommended_warning_flags

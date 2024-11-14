@@ -5,7 +5,7 @@ namespace chowdsp
 /**
  * Single-channel delay line using statically allocated memory.
  */
-template <typename SampleType, typename InterpolationType = DelayLineInterpolationTypes::None, int maxDelaySamples = 1 << 18>
+template <typename SampleType, typename InterpolationType = DelayLineInterpolationTypes::None, int maxDelaySamples = 1 << 18, typename StorageType = SampleType>
 class StaticDelayBuffer
 {
     using NumericType = SampleTypeHelpers::NumericType<SampleType>;
@@ -15,7 +15,7 @@ public:
 
     void reset()
     {
-        std::fill (std::begin (buffer), std::end (buffer), SampleType {});
+        std::fill (std::begin (buffer), std::end (buffer), StorageType {});
     }
 
     template <typename IT = InterpolationType>
@@ -24,8 +24,8 @@ public:
         pushSample (SampleType x, int wp) noexcept
     {
         jassert (juce::isPositiveAndBelow (wp, maxDelaySamples));
-        buffer[wp] = x;
-        buffer[wp + maxDelaySamples] = x;
+        buffer[wp] = static_cast<StorageType> (x);
+        buffer[wp + maxDelaySamples] = static_cast<StorageType> (x);
     }
 
     template <typename IT = InterpolationType>
@@ -34,7 +34,7 @@ public:
         pushSample (SampleType x, int wp) noexcept
     {
         jassert (juce::isPositiveAndBelow (wp, maxDelaySamples));
-        buffer[wp] = x;
+        buffer[wp] = static_cast<StorageType> (x);
     }
 
     template <typename IT = InterpolationType>
@@ -98,7 +98,7 @@ private:
     InterpolationType interpolator;
 
     static constexpr auto bufferSize = size_t (std::is_same_v<InterpolationType, DelayLineInterpolationTypes::None> ? maxDelaySamples : (2 * maxDelaySamples));
-    SampleType buffer[bufferSize] {};
+    StorageType buffer[bufferSize] {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StaticDelayBuffer)
 };
