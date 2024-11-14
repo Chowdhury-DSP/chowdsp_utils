@@ -24,4 +24,9 @@ juce::String floatValToStringDecimal (float floatVal)
     return { floatVal, NumDecimalPlaces, false };
 }
 float stringToFloatVal (const juce::String& s);
+
+    juce::String semitonesValToString (float semitonesVal, bool snapToInt);
+    float stringToSemitonesVal (const juce::String& s);
+
+
 } // namespace chowdsp::ParamUtils

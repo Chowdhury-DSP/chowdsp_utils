@@ -29,9 +29,9 @@ void ParameterListeners::updateBroadcastersFromMessageThread()
             continue;
 
         paramInfo.value = paramInfo.paramCookie->getValue();
-
-        audioThreadBroadcastQueue.try_enqueue ([this, i = index]
-                                               { callAudioThreadBroadcaster (i); });
+        if( audioThreadBroadcasters.size() > index) {
+            audioThreadBroadcastQueue.try_enqueue([this, i = index] { callAudioThreadBroadcaster(i); });
+        }
         callMessageThreadBroadcaster (index);
     }
 }

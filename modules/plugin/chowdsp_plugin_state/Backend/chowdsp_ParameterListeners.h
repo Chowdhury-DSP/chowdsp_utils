@@ -54,12 +54,19 @@ public:
 
         if (paramInfoIter == paramInfoList.end())
         {
-            jassertfalse; // trying to listen to a parameter that is not part of this state!
-            return {};
+            //jassertfalse; // trying to listen to a parameter that is not part of this state!
+            //return {};
+            paramInfoList.push_back(ParamInfo{&param, param.getValue()});
         }
+         const auto _paramInfoIter = std::find_if (paramInfoList.begin(), paramInfoList.end(), [&param] (const ParamInfo& info)
+        { return info.paramCookie == &param; });
 
-        const auto index = (size_t) std::distance (paramInfoList.begin(), paramInfoIter);
+        const auto index = (size_t) std::distance (paramInfoList.begin(), _paramInfoIter);
         auto& broadcasterList = listenerThread == ParameterListenerThread::MessageThread ? messageThreadBroadcasters : audioThreadBroadcasters;
+        if(broadcasterList.size() <= index)
+        {
+            broadcasterList.push_back(Broadcaster<void()>());
+        }
         return broadcasterList[index].connect (std::forward<ListenerArgs...> (args...));
     }
 

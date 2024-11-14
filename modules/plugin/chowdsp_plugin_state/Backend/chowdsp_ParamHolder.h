@@ -85,17 +85,17 @@ public:
 
     /** Assign this function to apply version streaming to your non-parameter state. */
     std::function<void (const Version&)> versionStreamingCallback = nullptr;
-
+    std::vector<OptionalPointer<FloatParameter>> floatParams;
+    std::vector<OptionalPointer<ChoiceParameter>> choiceParams;
+    std::vector<OptionalPointer<BoolParameter>> boolParams;
+    std::vector<ParamHolder*> otherParams;
 private:
     void add() const
     {
         // base case!
     }
 
-    std::vector<OptionalPointer<FloatParameter>> floatParams;
-    std::vector<OptionalPointer<ChoiceParameter>> choiceParams;
-    std::vector<OptionalPointer<BoolParameter>> boolParams;
-    std::vector<ParamHolder*> otherParams;
+
 
     juce::String name;
     bool isOwning;
