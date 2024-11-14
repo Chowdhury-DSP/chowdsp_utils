@@ -80,19 +80,6 @@ juce::String floatValToString (float floatVal)
 {
     return floatValToStringDecimal<2> (floatVal);
 }
-    juce::String semitonesValToString (float semitonesVal, bool snapToInt)
-    {
-        auto semitonesStr = snapToInt
-                            ? juce::String (static_cast<int> (semitonesVal)) + " st"
-                            : juce::String (semitonesVal, 2, false) + " st";
-        if (semitonesVal > 0.0f)
-            semitonesStr = "+" + semitonesStr;
-        return semitonesStr;
-    }
-
-    float stringToSemitonesVal (const juce::String& s) { return s.getFloatValue(); }
-
-
 
     float stringToFloatVal (const juce::String& s) { return s.getFloatValue(); }
 } // namespace chowdsp::ParamUtils
