@@ -21,8 +21,26 @@ public:
     ChainedArenaAllocator (const ChainedArenaAllocator&) = delete;
     ChainedArenaAllocator& operator= (const ChainedArenaAllocator&) = delete;
 
-    ChainedArenaAllocator (ChainedArenaAllocator&&) noexcept = default;
-    ChainedArenaAllocator& operator= (ChainedArenaAllocator&&) noexcept = default;
+    ChainedArenaAllocator (ChainedArenaAllocator&& other) noexcept
+    {
+        *this = std::move (other);
+    }
+
+    ChainedArenaAllocator& operator= (ChainedArenaAllocator&& other) noexcept
+    {
+        arena_list.head = other.arena_list.head;
+        arena_list.count = other.arena_list.count;
+        current_arena = other.current_arena;
+        arena_size_bytes = other.arena_size_bytes;
+        extra_alloc_list = other.extra_alloc_list;
+
+        other.arena_list = {};
+        other.current_arena = nullptr;
+        other.arena_size_bytes = 0;
+        other.extra_alloc_list = nullptr;
+
+        return *this;
+    }
 
     ~ChainedArenaAllocator()
     {
