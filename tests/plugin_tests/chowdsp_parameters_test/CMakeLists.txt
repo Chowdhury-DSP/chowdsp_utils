@@ -6,4 +6,5 @@ target_sources(chowdsp_parameters_test PRIVATE
     ParamModulationTest.cpp
     ParamStringsTest.cpp
     RhythmParameterTest.cpp
+    MetricParameterTest.cpp
 )
