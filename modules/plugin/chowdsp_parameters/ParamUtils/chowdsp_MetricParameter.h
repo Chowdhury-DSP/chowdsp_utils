@@ -6,6 +6,8 @@ namespace chowdsp
 class MetricParameter : public FloatParameter
 {
 public:
+    using Ptr = OptionalPointer<MetricParameter>;
+
     MetricParameter (const ParameterID& parameterID,
                      const juce::String& paramName,
                      const juce::NormalisableRange<float>& paramRange,
