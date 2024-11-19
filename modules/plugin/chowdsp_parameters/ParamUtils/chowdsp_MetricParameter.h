@@ -13,14 +13,14 @@ public:
                      const juce::String& unitSuffix = {},
                      int numDecimalPlaces = 2)
         : FloatParameter (
-              parameterID,
-              paramName,
-              paramRange,
-              defaultValue,
-              [numDecimalPlaces, unitSuffix] (float v)
-              { return toString (v, numDecimalPlaces) + unitSuffix; },
-              [] (const juce::String& str)
-              { return fromString (str); })
+            parameterID,
+            paramName,
+            paramRange,
+            defaultValue,
+            [numDecimalPlaces, unitSuffix] (float v)
+            { return toString (v, numDecimalPlaces) + unitSuffix; },
+            [] (const juce::String& str)
+            { return fromString (str); })
     {
     }
 
