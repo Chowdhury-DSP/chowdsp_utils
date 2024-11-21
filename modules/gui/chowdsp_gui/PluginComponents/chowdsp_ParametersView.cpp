@@ -151,11 +151,10 @@ namespace parameters_view_detail
         ParameterGroupItem (ParamHolder& params, ParameterListeners& listeners)
             : name (params.getName())
         {
-            params.doForAllParameterContainers (
-                [this, &listeners] (auto& paramVec)
+            params.doForAllParametersOrContainers (
+                [this, &listeners] (auto& param)
                 {
-                    for (auto& param : paramVec)
-                        addSubItem (std::make_unique<ParamControlItem> (param, listeners).release());
+                    addSubItem (std::make_unique<ParamControlItem> (param, listeners).release());
                 },
                 [this, &listeners] (auto& paramHolder)
                 {
