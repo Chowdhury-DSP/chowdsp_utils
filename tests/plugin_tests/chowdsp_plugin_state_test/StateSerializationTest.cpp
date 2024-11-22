@@ -116,7 +116,7 @@ using StateWithTripleOfSameType = chowdsp::PluginStateImpl<PluginParameterStateT
 
 struct NewGroup : chowdsp::ParamHolder
 {
-    explicit NewGroup(ParamHolder* parent)
+    explicit NewGroup (ParamHolder* parent)
         : ParamHolder { parent }
     {
         add (newParam);
