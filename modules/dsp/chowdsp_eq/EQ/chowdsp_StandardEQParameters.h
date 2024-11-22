@@ -94,14 +94,15 @@ public:
         };
 
         /** Internal use only! */
-        chowdsp::ParamHolder paramHolder { bandNamePrefix + juce::String (bandIndex + 1) };
+        ParamHolder* paramHolder {};
     };
 
     /** Set of parameter handles for the entire EQ. */
     using EQParameterHandles = std::array<EQBandParams, NumBands>;
 
     /** Constructor */
-    explicit StandardEQParameters (EQParameterHandles&& paramHandles, const juce::String& name = {});
+    explicit StandardEQParameters (ParamHolder* parent, EQParameterHandles&& paramHandles, std::string_view name = {});
+    ~StandardEQParameters();
 
     /** Parameter handles */
     EQParameterHandles eqParams;

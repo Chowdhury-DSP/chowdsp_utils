@@ -151,11 +151,10 @@ namespace parameters_view_detail
         ParameterGroupItem (ParamHolder& params, ParameterListeners& listeners)
             : name (params.getName())
         {
-            params.doForAllParameterContainers (
-                [this, &listeners] (auto& paramVec)
+            params.doForAllParametersOrContainers (
+                [this, &listeners] (auto& param)
                 {
-                    for (auto& param : paramVec)
-                        addSubItem (std::make_unique<ParamControlItem> (param, listeners).release());
+                    addSubItem (std::make_unique<ParamControlItem> (param, listeners).release());
                 },
                 [this, &listeners] (auto& paramHolder)
                 {
@@ -167,10 +166,10 @@ namespace parameters_view_detail
 
         std::unique_ptr<juce::Component> createItemComponent() override
         {
-            return std::make_unique<juce::Label> (name, name);
+            return std::make_unique<juce::Label> (toString (name), toString (name));
         }
 
-        juce::String name;
+        std::string_view name;
     };
 } // namespace parameters_view_detail
 #endif
@@ -181,7 +180,7 @@ struct ParametersView::Pimpl
     Pimpl (ParamHolder& params, ParameterListeners& listeners)
         : groupItem (params, listeners)
     {
-        view.setIndentSize (5);
+        view.setIndentSize (12);
         const auto numIndents = getNumIndents (groupItem);
         const auto width = 400 + view.getIndentSize() * numIndents;
 

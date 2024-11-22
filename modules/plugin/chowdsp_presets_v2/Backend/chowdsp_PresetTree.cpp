@@ -42,7 +42,7 @@ namespace PresetTreeInserters
 
         for (auto* iter = root.first_child; iter != nullptr; iter = iter->next_sibling)
         {
-            if (iter->value.tag() == tag)
+            if (iter->value.is_tag() && iter->value.tag() == tag)
                 return fallbackInserter (std::move (preset), tree, *iter, insertionHelper);
         }
 

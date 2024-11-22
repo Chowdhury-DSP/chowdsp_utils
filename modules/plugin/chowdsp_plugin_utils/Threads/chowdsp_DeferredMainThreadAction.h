@@ -1,13 +1,5 @@
 #pragma once
 
-#if JUCE_MODULE_AVAILABLE_juce_dsp
-JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wimplicit-const-int-float-conversion")
-#include <juce_dsp/juce_dsp.h>
-JUCE_END_IGNORE_WARNINGS_GCC_LIKE
-#else
-#include "../../../common/chowdsp_core/JUCEHelpers/juce_FixedSizeFunction.h"
-#endif
-
 #if JUCE_MODULE_AVAILABLE_chowdsp_dsp_data_structures
 #include <chowdsp_dsp_data_structures/chowdsp_dsp_data_structures.h>
 #else
@@ -86,7 +78,7 @@ private:
         }
     }
 
-    using Action = juce::dsp::FixedSizeFunction<256, void()>;
+    using Action = FixedSizeFunction<256, void()>;
     moodycamel::ConcurrentQueue<Action> queue;
 
     moodycamel::ConsumerToken mainThreadConsumerToken { queue };
