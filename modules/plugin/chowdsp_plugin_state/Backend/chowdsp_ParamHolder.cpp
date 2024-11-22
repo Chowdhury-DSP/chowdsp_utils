@@ -39,9 +39,11 @@ template <typename ParamType, typename... OtherParams>
 std::enable_if_t<std::is_base_of_v<FloatParameter, ParamType>, void>
     ParamHolder::add (OptionalPointer<ParamType>& floatParam, OtherParams&... others)
 {
-    allParamsMap.insert ({ floatParam->paramID.toStdString(), floatParam.get() });
-    things.insert (ThingPtr { reinterpret_cast<PackedVoid*> (isOwning ? floatParam.release() : floatParam.get()),
-                              getFlags (FloatParam, isOwning) });
+    const auto paramID = toStringView (floatParam->paramID);
+    ThingPtr paramPtr { reinterpret_cast<PackedVoid*> (isOwning ? floatParam.release() : floatParam.get()),
+                        getFlags (FloatParam, isOwning) };
+    allParamsMap.insert ({ paramID, paramPtr });
+    things.insert (std::move (paramPtr));
     add (others...);
 }
 
@@ -49,9 +51,11 @@ template <typename ParamType, typename... OtherParams>
 std::enable_if_t<std::is_base_of_v<ChoiceParameter, ParamType>, void>
     ParamHolder::add (OptionalPointer<ParamType>& choiceParam, OtherParams&... others)
 {
-    allParamsMap.insert ({ choiceParam->paramID.toStdString(), choiceParam.get() });
-    things.insert (ThingPtr { reinterpret_cast<PackedVoid*> (isOwning ? choiceParam.release() : choiceParam.get()),
-                                    getFlags (ChoiceParam, isOwning) });
+    const auto paramID = toStringView (choiceParam->paramID);
+    ThingPtr paramPtr { reinterpret_cast<PackedVoid*> (isOwning ? choiceParam.release() : choiceParam.get()),
+                              getFlags (ChoiceParam, isOwning) };
+    allParamsMap.insert ({ paramID, paramPtr });
+    things.insert (std::move (paramPtr));
     add (others...);
 }
 
@@ -59,9 +63,11 @@ template <typename ParamType, typename... OtherParams>
 std::enable_if_t<std::is_base_of_v<BoolParameter, ParamType>, void>
     ParamHolder::add (OptionalPointer<ParamType>& boolParam, OtherParams&... others)
 {
-    allParamsMap.insert ({ boolParam->paramID.toStdString(), boolParam.get() });
-    things.insert (ThingPtr { reinterpret_cast<PackedVoid*> (isOwning ? boolParam.release() : boolParam.get()),
-                                    getFlags (BoolParam, isOwning) });
+    const auto paramID = toStringView (boolParam->paramID);
+    ThingPtr paramPtr { reinterpret_cast<PackedVoid*> (isOwning ? boolParam.release() : boolParam.get()),
+                              getFlags (BoolParam, isOwning) };
+    allParamsMap.insert ({ paramID, paramPtr });
+    things.insert (std::move (paramPtr));
     add (others...);
 }
 
@@ -277,21 +283,29 @@ void ParamHolder::deserialize (typename Serializer::DeserializedType deserial, P
                 continue;
 
             paramIDsThatHaveBeenDeserialized.push_back (paramID);
-            [&paramDeserial] (const ParamPtrVariant& paramPtr)
+            [&paramDeserial] (ThingPtr& paramPtr)
             {
                 const auto deserializeParam = [] (auto* param, auto& pd)
                 {
                     ParameterTypeHelpers::deserializeParameter<Serializer> (pd, *param);
                 };
 
-                if (auto* floatParamPtr = std::get_if<FloatParameter*> (&paramPtr))
-                    deserializeParam (*floatParamPtr, paramDeserial);
-                else if (auto* choiceParamPtr = std::get_if<ChoiceParameter*> (&paramPtr))
-                    deserializeParam (*choiceParamPtr, paramDeserial);
-                else if (auto* boolParamPtr = std::get_if<BoolParameter*> (&paramPtr))
-                    deserializeParam (*boolParamPtr, paramDeserial);
-                else
-                    jassertfalse; // bad variant access?
+                const auto type = getType (paramPtr);
+                switch (type)
+                {
+                    case FloatParam:
+                        deserializeParam (reinterpret_cast<FloatParameter*> (paramPtr.get_ptr()), paramDeserial);
+                    break;
+                    case ChoiceParam:
+                        deserializeParam (reinterpret_cast<ChoiceParameter*> (paramPtr.get_ptr()), paramDeserial);
+                    break;
+                    case BoolParam:
+                        deserializeParam (reinterpret_cast<BoolParameter*> (paramPtr.get_ptr()), paramDeserial);
+                    break;
+                    default:
+                        jassertfalse;
+                        break;
+                }
             }(paramPtrIter->second);
         }
     }

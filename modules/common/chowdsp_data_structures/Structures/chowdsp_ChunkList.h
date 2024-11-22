@@ -31,14 +31,17 @@ struct ChunkList
 
     // The list internals are exposed here in case you need to do anything fancy.
     // Please don't touch them unless you know what you are doing!
-    ArenaType& arena;
+    ArenaType* arena {};
     Chunk head_chunk {};
     Chunk* tail_chunk = &head_chunk;
 
     /** Constructs a ChunkList with a backing arena. */
-    explicit ChunkList (ArenaType& arena_to_use) : arena { arena_to_use }
+    explicit ChunkList (ArenaType& arena_to_use) : arena { &arena_to_use }
     {
     }
+
+    ChunkList (ChunkList&&) noexcept = default;
+    ChunkList& operator= (ChunkList&&) noexcept = default;
 
     /**
      * This will "reset" the ChunkList. If you actually want to reclaim the memory
@@ -129,7 +132,7 @@ private:
         if (tail_chunk->count == chunk_size)
 #endif
         {
-            auto* next_chunk_data = arena.allocate_bytes (sizeof (Chunk), alignof (Chunk));
+            auto* next_chunk_data = arena->allocate_bytes (sizeof (Chunk), alignof (Chunk));
             jassert (next_chunk_data != nullptr);
             tail_chunk->next = new (next_chunk_data) Chunk {};
             tail_chunk = tail_chunk->next;

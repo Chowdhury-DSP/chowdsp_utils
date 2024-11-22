@@ -141,8 +141,11 @@ private:
         return static_cast<uint8_t> (type | (shouldDelete ? ShouldDelete : 0));
     }
 
-    using ParamPtrVariant = std::variant<FloatParameter*, ChoiceParameter*, BoolParameter*>;
-    std::unordered_map<std::string, ParamPtrVariant> allParamsMap {};
+    using MapKey = std::string_view;
+    using MapValue = ThingPtr;
+    using MapAllocator = STLArenaAllocator<std::pair<const MapKey, MapValue>, ChainedArenaAllocator>;
+    MapAllocator mapAllocator { arena };
+    std::unordered_map<MapKey, MapValue, std::hash<MapKey>, std::equal_to<MapKey>, MapAllocator> allParamsMap { mapAllocator };
 
     juce::String name;
     bool isOwning;
