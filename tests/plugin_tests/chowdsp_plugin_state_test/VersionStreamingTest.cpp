@@ -12,9 +12,10 @@ struct Params : chowdsp::ParamHolder
 
     chowdsp::BoolParameter::Ptr param { "bool", "Bool", false };
 
-    struct InnerParams : chowdsp::ParamHolder
+    struct InnerParams : ParamHolder
     {
-        InnerParams()
+        explicit InnerParams (ParamHolder* parent)
+            : ParamHolder { parent }
         {
             add (param);
             versionStreamingCallback = [this] (const chowdsp::Version& version)
@@ -25,7 +26,7 @@ struct Params : chowdsp::ParamHolder
         }
 
         chowdsp::BoolParameter::Ptr param { "bool2", "Bool", false };
-    } innerParams;
+    } innerParams { this };
 };
 
 struct NonParams : chowdsp::NonParamState

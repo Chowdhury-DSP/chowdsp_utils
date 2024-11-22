@@ -97,7 +97,7 @@ public:
      * `prepare()` or `reset()`.
      */
 #if CHOWDSP_SMOOTHED_BUFFER_SMALL
-    using MappingFunction = juce::dsp::FixedSizeFunction<16, FloatType (FloatType)>;
+    using MappingFunction = FixedSizeFunction<16, FloatType (FloatType)>;
 #else
     using MappingFunction = std::function<FloatType (FloatType)>;
 #endif

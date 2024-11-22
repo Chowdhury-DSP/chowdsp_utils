@@ -56,7 +56,6 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "JUCEHelpers/juce_ExtraDefinitions.h"
 #include "JUCEHelpers/juce_MathsFunctions.h"
 #include "JUCEHelpers/juce_FloatVectorOperations.h"
-#include "JUCEHelpers/juce_FixedSizeFunction.h"
 #include "JUCEHelpers/juce_Decibels.h"
 #include "JUCEHelpers/juce_SmoothedValue.h"
 
@@ -85,6 +84,10 @@ constexpr bool exactlyEqual (Type a, Type b)
 } // namespace juce
 #endif // CHOWDSP_USING_JUCE
 #endif // DOXYGEN
+
+#if (defined(__cplusplus) && __cplusplus >= 202002L) || (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L)
+#define CHOWDSP_HAS_CPP20 1
+#endif
 
 /** Namespace reserved for code written for Chowdhury DSP projects. */
 namespace chowdsp

@@ -18,6 +18,10 @@ public:
     template <typename T>
     void addStateValues (nonstd::span<StateValue<T>> newStateValues);
 
+    /** Adds more state values to this state. */
+    template <typename ContainerType>
+    void addStateValues (ContainerType& container);
+
     /** Custom serializer */
     template <typename Serializer>
     static typename Serializer::SerializedType serialize (const NonParamState& state);

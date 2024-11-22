@@ -1,13 +1,5 @@
 #pragma once
 
-#if JUCE_MODULE_AVAILABLE_juce_dsp
-JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wimplicit-const-int-float-conversion")
-#include <juce_dsp/juce_dsp.h>
-JUCE_END_IGNORE_WARNINGS_GCC_LIKE
-#else
-#include "../../../common/chowdsp_core/JUCEHelpers/juce_FixedSizeFunction.h"
-#endif
-
 #if JUCE_MODULE_AVAILABLE_chowdsp_dsp_data_structures
 #include <chowdsp_dsp_data_structures/chowdsp_dsp_data_structures.h>
 #else
@@ -92,7 +84,7 @@ private:
 
     static constexpr size_t actionSize = 16; // sizeof ([this, i = index] { callMessageThreadBroadcaster (i); })
     std::vector<Broadcaster<void()>> audioThreadBroadcasters { totalNumParams };
-    using AudioThreadAction = juce::dsp::FixedSizeFunction<actionSize, void()>;
+    using AudioThreadAction = FixedSizeFunction<actionSize, void()>;
     moodycamel::ReaderWriterQueue<AudioThreadAction> audioThreadBroadcastQueue { totalNumParams };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParameterListeners)
