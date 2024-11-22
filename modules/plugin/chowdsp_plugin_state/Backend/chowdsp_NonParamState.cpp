@@ -1,4 +1,3 @@
-#include <__filesystem/directory_iterator.h>
 namespace chowdsp
 {
 inline void NonParamState::addStateValues (const std::initializer_list<StateValueBase*>& newStateValues)

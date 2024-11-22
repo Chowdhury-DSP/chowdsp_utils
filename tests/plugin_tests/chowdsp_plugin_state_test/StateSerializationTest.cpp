@@ -45,9 +45,9 @@ struct PluginNonParameterState : chowdsp::NonParamState
         for (size_t i = 0; i < 4; ++i)
         {
             yesNoNames[i] = chowdsp::StringLiteral { "yes_no" } + chowdsp::StringLiteral<1> { i };
-            yesNoVals.emplace_back (yesNoNames[i], YesNo::No);
+            yesNoVals.emplace (i, yesNoNames[i], YesNo::No);
         }
-        addStateValues<YesNo> ({ yesNoVals.begin(), yesNoVals.end() });
+        addStateValues (yesNoVals);
     }
 
     chowdsp::StateValue<int> editorWidth { "editor_width", 300 };
@@ -63,7 +63,7 @@ struct PluginNonParameterState : chowdsp::NonParamState
                                                                      { "object", { { "currency", "USD" }, { "value", 42.99 } } } } };
 
     std::array<chowdsp::StringLiteral<8>, 8> yesNoNames {};
-    chowdsp::SmallVector<chowdsp::StateValue<YesNo>, 8> yesNoVals;
+    chowdsp::OptionalArray<chowdsp::StateValue<YesNo>, 8> yesNoVals;
 };
 
 using State = chowdsp::PluginStateImpl<PluginParameterState, PluginNonParameterState>;
