@@ -30,16 +30,4 @@ TEST_CASE ("ParamHolder Test", "[plugin][state]")
         REQUIRE (allParamIDs.contains (floatParams[0]->paramID));
         REQUIRE (allParamIDs.contains (floatParams[1]->paramID));
     }
-
-    SECTION ("clear()")
-    {
-        chowdsp::ParamHolder params { nullptr, "Params", false };
-        chowdsp::PercentParameter::Ptr pct_param { "percent", "Percent", 0.5f };
-        chowdsp::PercentParameter::Ptr pct_param2 { "percent2", "Percent 2", 0.5f };
-        params.add (pct_param, pct_param2);
-        REQUIRE (params.count() == 2);
-
-        params.clear();
-        REQUIRE (params.count() == 0);
-    }
 }

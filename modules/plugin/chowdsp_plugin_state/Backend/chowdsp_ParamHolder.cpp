@@ -136,19 +136,6 @@ std::enable_if_t<TypeTraits::IsIterable<ParamContainerType>, void>
     return count;
 }
 
-inline void ParamHolder::clear()
-{
-    jassertfalse; // for now!
-
-    // It's generally not safe to clear the parameters if this is an owning ParamHolder
-    // since we're almost certainly leaving some dangling references lying around!
-    jassert (! isOwning);
-
-    allParamsMap.clear();
-    things.clear();
-    arena->clear(); // @TODO: is this actually what we want to do? what if there's the stuff in the arena?
-}
-
 inline void ParamHolder::connectParametersToProcessor (juce::AudioProcessor& processor)
 {
     for (auto& thing : things)
