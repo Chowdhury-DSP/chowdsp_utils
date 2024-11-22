@@ -42,7 +42,7 @@ struct Params : chowdsp::ParamHolder
         add (eqParams, linPhaseMode);
     }
 
-    EQParams eqParams {
+    EQParams eqParams { this,
         {
             BandParams { 0, "eq_band_0", "Band ", 100, bandTypeChoices, 10, 250.0f },
             BandParams { 1, "eq_band_1", "Band ", 100, bandTypeChoices, 10, 1000.0f },

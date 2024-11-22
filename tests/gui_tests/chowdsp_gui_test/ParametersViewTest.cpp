@@ -6,7 +6,7 @@ namespace params_view_test
 {
 struct LevelParams : chowdsp::ParamHolder
 {
-    explicit LevelParams (const juce::String& paramPrefix = "", int version = 100)
+    explicit LevelParams (chowdsp::ChainedArenaAllocator& arena, const juce::String& paramPrefix = "", int version = 100)
         : prefix (paramPrefix),
           versionHint (version)
     {
@@ -27,7 +27,7 @@ struct PluginParameterState : chowdsp::ParamHolder
         add (levelParams, mode, onOff);
     }
 
-    LevelParams levelParams;
+    LevelParams levelParams { *arena };
     chowdsp::ChoiceParameter::Ptr mode { "mode", "Mode", juce::StringArray { "Percent", "Gain", "Percent / Gain", "Gain / Percent" }, 2 };
     chowdsp::BoolParameter::Ptr onOff { "on_off", "On/Off", true };
 };

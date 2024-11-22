@@ -8,15 +8,15 @@ struct STLArenaAllocator
 {
     using value_type = T;
 
-    ArenaType& arena;
+    ArenaType* arena {};
 
-    explicit STLArenaAllocator (ArenaType& a) noexcept : arena (a)
+    explicit STLArenaAllocator (ArenaType& a) noexcept : arena { &a }
     {
     }
 
     template <class U>
     explicit STLArenaAllocator (const STLArenaAllocator<U, ArenaType>& other) noexcept
-        : arena (other.arena)
+        : arena { other.arena }
     {
     }
 
@@ -28,7 +28,7 @@ struct STLArenaAllocator
 
     T* allocate (std::size_t n)
     {
-        return static_cast<T*> (arena.allocate_bytes (n * sizeof (T), alignof (T)));
+        return static_cast<T*> (arena->allocate_bytes (n * sizeof (T), alignof (T)));
     }
 
     void deallocate (T*, std::size_t) const
@@ -41,7 +41,7 @@ struct STLArenaAllocator
 template <class T, class U, typename Arena>
 constexpr bool operator== (const STLArenaAllocator<T, Arena>& x, const STLArenaAllocator<U, Arena>& y) noexcept
 {
-    return &x.arena == &y.arena;
+    return x.arena == y.arena;
 }
 
 template <class T, class U, typename Arena>

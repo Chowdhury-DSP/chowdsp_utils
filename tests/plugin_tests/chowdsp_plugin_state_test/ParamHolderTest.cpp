@@ -33,7 +33,7 @@ TEST_CASE ("ParamHolder Test", "[plugin][state]")
 
     SECTION ("clear()")
     {
-        chowdsp::ParamHolder params { "Params", false };
+        chowdsp::ParamHolder params { nullptr, "Params", false };
         chowdsp::PercentParameter::Ptr pct_param { "percent", "Percent", 0.5f };
         chowdsp::PercentParameter::Ptr pct_param2 { "percent2", "Percent 2", 0.5f };
         params.add (pct_param, pct_param2);

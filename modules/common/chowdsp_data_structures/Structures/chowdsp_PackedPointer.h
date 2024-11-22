@@ -124,4 +124,9 @@ bool operator!= (std::nullptr_t, const PackedPointer<T>& p2)
 {
     return nullptr != p2.get_ptr();
 }
+
+/** A "void" type that may be used with PackedPointer */
+struct alignas (8) PackedVoid
+{
+};
 } // namespace chowdsp
