@@ -6,9 +6,10 @@ namespace params_view_test
 {
 struct LevelParams : chowdsp::ParamHolder
 {
-    explicit LevelParams (chowdsp::ChainedArenaAllocator& arena, const juce::String& paramPrefix = "", int version = 100)
-        : prefix (paramPrefix),
-          versionHint (version)
+    explicit LevelParams (chowdsp::ChainedArenaAllocator& alloc, const juce::String& paramPrefix = "", int version = 100)
+        : ParamHolder { alloc },
+          prefix { paramPrefix },
+          versionHint { version }
     {
         add (percent, gain);
     }

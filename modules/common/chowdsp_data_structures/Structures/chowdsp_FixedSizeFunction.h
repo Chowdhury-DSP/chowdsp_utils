@@ -202,7 +202,7 @@ private:
     const detail::Vtable<Ret, Args...>* vtable = nullptr;
 
     JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324)
-    alignas (std::max_align_t) mutable std::byte storage[len];
+    alignas (std::max_align_t) mutable std::byte storage[len] {};
     JUCE_END_IGNORE_WARNINGS_MSVC
 };
 

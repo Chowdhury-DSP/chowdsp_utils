@@ -54,7 +54,7 @@ TEST_CASE ("Chunk List Test", "[common][data-structures]")
 
     SECTION ("Iterators")
     {
-        for (auto _ : list)
+        for ([[maybe_unused]] auto _ : list)
             REQUIRE (false);
         REQUIRE ((list.begin() != list.end()) == false);
 
