@@ -5,16 +5,17 @@ TEST_CASE ("ParamHolder Test", "[plugin][state]")
 {
     SECTION ("add()")
     {
-        chowdsp::BoolParameter::Ptr boolNested { "param1", "Param", false };
-        chowdsp::ChoiceParameter::Ptr choiceNested { "param2", "Param", juce::StringArray { "One", "Two" }, 0 };
-        chowdsp::ParamHolder nestedParams;
-        nestedParams.add (boolNested, choiceNested);
-
         chowdsp::ParamHolder params;
         std::array<chowdsp::PercentParameter::Ptr, 2> floatParams {
             chowdsp::PercentParameter::Ptr { "param3", "Param", 0.5f },
             chowdsp::PercentParameter::Ptr { "param4", "Param", 0.5f },
         };
+
+        chowdsp::BoolParameter::Ptr boolNested { "param1", "Param", false };
+        chowdsp::ChoiceParameter::Ptr choiceNested { "param2", "Param", juce::StringArray { "One", "Two" }, 0 };
+        chowdsp::ParamHolder nestedParams { &params };
+        nestedParams.add (boolNested, choiceNested);
+
         params.add (nestedParams, floatParams);
 
         auto allParamIDs = [&params]

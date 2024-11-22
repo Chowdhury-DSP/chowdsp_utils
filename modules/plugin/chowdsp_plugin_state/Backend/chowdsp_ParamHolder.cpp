@@ -13,13 +13,17 @@ inline ParamHolder::ParamHolder (ParamHolder* parent, std::string_view phName, b
               return OptionalPointer<ChainedArenaAllocator> { static_cast<size_t> (1024) };
           }(),
       },
+      allParamsMap { MapAllocator { arena } },
       name { arena::alloc_string (*arena, phName) },
       isOwning { phIsOwning }
 {
 }
 
 inline ParamHolder::ParamHolder (ChainedArenaAllocator& alloc, std::string_view phName, bool phIsOwning)
-    : arena { &alloc, false }, name { arena::alloc_string (*arena, phName) }, isOwning { phIsOwning }
+    : arena { &alloc, false },
+      allParamsMap { MapAllocator { arena } },
+      name { arena::alloc_string (*arena, phName) },
+      isOwning { phIsOwning }
 {
 }
 
@@ -110,6 +114,10 @@ std::enable_if_t<std::is_base_of_v<BoolParameter, ParamType>, void>
 template <typename... OtherParams>
 void ParamHolder::add (ParamHolder& paramHolder, OtherParams&... others)
 {
+    // This should be the parent of the holder being added.
+    // Maybe we can relax this restriction if we no longer need the allParamsMap.
+    jassert (arena == paramHolder.arena);
+
     allParamsMap.merge (paramHolder.allParamsMap);
     jassert (paramHolder.allParamsMap.empty()); // assuming no duplicate parameter IDs, all the parameters should be moved in the merge!
     things.insert (ThingPtr { reinterpret_cast<PackedVoid*> (&paramHolder), Holder });

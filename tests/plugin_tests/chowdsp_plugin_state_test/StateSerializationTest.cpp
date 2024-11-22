@@ -116,7 +116,8 @@ using StateWithTripleOfSameType = chowdsp::PluginStateImpl<PluginParameterStateT
 
 struct NewGroup : chowdsp::ParamHolder
 {
-    NewGroup()
+    explicit NewGroup(ParamHolder* parent)
+        : ParamHolder { parent }
     {
         add (newParam);
     }
@@ -135,7 +136,7 @@ struct PluginParameterStateNewGroup : chowdsp::ParamHolder
     LevelParams levelParams { this };
     chowdsp::ChoiceParameter::Ptr mode { "mode", "Mode", juce::StringArray { "Percent", "Gain", "Percent / Gain", "Gain / Percent" }, 2 };
     chowdsp::BoolParameter::Ptr onOff { "on_off", "On/Off", true };
-    NewGroup newGroup;
+    NewGroup newGroup { this };
 };
 
 using StateWithNewGroup = chowdsp::PluginStateImpl<PluginParameterStateNewGroup>;

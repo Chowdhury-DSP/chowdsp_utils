@@ -142,7 +142,8 @@ private:
     using MapKey = std::string_view;
     using MapValue = ThingPtr;
     using MapAllocator = STLArenaAllocator<std::pair<const MapKey, MapValue>, ChainedArenaAllocator>;
-    std::unordered_map<MapKey, MapValue, std::hash<MapKey>, std::equal_to<>, MapAllocator> allParamsMap { MapAllocator { arena } };
+    using AllParamsMap = std::unordered_map<MapKey, MapValue, std::hash<MapKey>, std::equal_to<>, MapAllocator>;
+    AllParamsMap allParamsMap;
 
     std::string_view name;
     bool isOwning;
