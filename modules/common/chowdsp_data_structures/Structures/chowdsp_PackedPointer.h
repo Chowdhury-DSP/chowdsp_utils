@@ -125,8 +125,10 @@ bool operator!= (std::nullptr_t, const PackedPointer<T>& p2)
     return nullptr != p2.get_ptr();
 }
 
+JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324) // structure was padded due to alignment specifier
 /** A "void" type that may be used with PackedPointer */
 struct alignas (8) PackedVoid
 {
 };
+JUCE_END_IGNORE_WARNINGS_MSVC
 } // namespace chowdsp

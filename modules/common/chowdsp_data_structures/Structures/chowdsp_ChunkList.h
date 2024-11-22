@@ -118,10 +118,10 @@ struct ChunkList
         }
         auto& operator*() const { return chunk->chunk[index_in_chunk]; }
     };
-    auto begin() { return iterator<false> { &head_chunk }; }
-    auto end() { return iterator<false> { tail_chunk, tail_chunk->count }; }
-    auto begin() const { return iterator<true> { &head_chunk }; }
-    auto end() const { return iterator<true> { tail_chunk, tail_chunk->count }; }
+    [[nodiscard]] auto begin() { return iterator<false> { &head_chunk }; }
+    [[nodiscard]] auto end() { return iterator<false> { tail_chunk, tail_chunk->count }; }
+    [[nodiscard]] auto begin() const { return iterator<true> { &head_chunk }; }
+    [[nodiscard]] auto end() const { return iterator<true> { tail_chunk, tail_chunk->count }; }
 
 private:
     void grow_if_needed()

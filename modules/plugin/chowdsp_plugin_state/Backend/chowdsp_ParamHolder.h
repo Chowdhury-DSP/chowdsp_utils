@@ -106,7 +106,7 @@ public:
     void applyVersionStreaming (const Version&);
 
     /** Assign this function to apply version streaming to your non-parameter state. */
-    juce::FixedSizeFunction<8, void (const Version&)> versionStreamingCallback {};
+    FixedSizeFunction<8, void (const Version&)> versionStreamingCallback {};
 
 protected:
     OptionalPointer<ChainedArenaAllocator> arena {};
@@ -145,7 +145,7 @@ private:
     using MapKey = std::string_view;
     using MapValue = ThingPtr;
     using MapAllocator = STLArenaAllocator<std::pair<const MapKey, MapValue>, ChainedArenaAllocator>;
-    std::unordered_map<MapKey, MapValue, std::hash<MapKey>, std::equal_to<MapKey>, MapAllocator> allParamsMap { MapAllocator { arena } };
+    std::unordered_map<MapKey, MapValue, std::hash<MapKey>, std::equal_to<>, MapAllocator> allParamsMap { MapAllocator { arena } };
 
     std::string_view name;
     bool isOwning;
