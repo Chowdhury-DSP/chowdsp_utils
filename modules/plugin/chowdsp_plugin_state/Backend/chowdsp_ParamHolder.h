@@ -80,7 +80,6 @@ public:
     template <typename ParamCallable, typename ParamHolderCallable>
     void doForAllParametersOrContainers (ParamCallable&& paramCallable, ParamHolderCallable&& paramHolderCallable) const;
 
-
     /**
      * Do some callable for all the stored parameters.
      * Callable must have the signature void(ParameterType&, size_t).

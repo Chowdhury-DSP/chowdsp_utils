@@ -15,10 +15,10 @@ StandardEQParameters<NumBands>::StandardEQParameters (ParamHolder* parent,
         bandParams.paramHolder.emplace (this,
                                         format (*arena, "{} {}", bandParams.bandNamePrefix, bandParams.bandIndex + 1));
         bandParams.paramHolder->add (bandParams.onOffParam,
-                                    bandParams.typeParam,
-                                    bandParams.freqParam,
-                                    bandParams.qParam,
-                                    bandParams.gainParam);
+                                     bandParams.typeParam,
+                                     bandParams.freqParam,
+                                     bandParams.qParam,
+                                     bandParams.gainParam);
         add (*bandParams.paramHolder);
     }
 }
