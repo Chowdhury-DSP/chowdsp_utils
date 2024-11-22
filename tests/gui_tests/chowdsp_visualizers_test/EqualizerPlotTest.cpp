@@ -34,32 +34,32 @@ struct TestEQComp : chowdsp::EQ::EqualizerPlotWithParameters<4>
 {
     explicit TestEQComp (chowdsp::PluginStateImpl<TestEQParams>& state)
         : chowdsp::EQ::EqualizerPlotWithParameters<4> (
-              state.getParameterListeners(),
-              state.params.testEQParams,
-              [] (int typeIndex) -> chowdsp::EQ::EQPlotFilterType
-              {
-                  using Type = chowdsp::EQ::EQPlotFilterType;
-                  switch (typeIndex)
-                  {
-                      case 0:
-                          return Type::HPF1;
-                      case 1:
-                          return Type::HPF2;
-                      case 2:
-                          return Type::LowShelf;
-                      case 3:
-                          return Type::Bell;
-                      case 4:
-                          return Type::Notch;
-                      case 5:
-                          return Type::HighShelf;
-                      case 6:
-                          return Type::LPF1;
-                      case 7:
-                      default:
-                          return Type::LPF2;
-                  }
-              })
+            state.getParameterListeners(),
+            state.params.testEQParams,
+            [] (int typeIndex) -> chowdsp::EQ::EQPlotFilterType
+            {
+                using Type = chowdsp::EQ::EQPlotFilterType;
+                switch (typeIndex)
+                {
+                    case 0:
+                        return Type::HPF1;
+                    case 1:
+                        return Type::HPF2;
+                    case 2:
+                        return Type::LowShelf;
+                    case 3:
+                        return Type::Bell;
+                    case 4:
+                        return Type::Notch;
+                    case 5:
+                        return Type::HighShelf;
+                    case 6:
+                        return Type::LPF1;
+                    case 7:
+                    default:
+                        return Type::LPF2;
+                }
+            })
     {
         setSize (500, 300);
     }

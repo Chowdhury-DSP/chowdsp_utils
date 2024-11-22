@@ -282,7 +282,7 @@ TEST_CASE ("FixedSizeFunction Test", "[common][data-structures]")
 
         REQUIRE (value == fnA (std::move (ptr)));
 
-        using FnB = chowdsp::FixedSizeFunction<64, void (std::unique_ptr<int>&&)>;
+        using FnB = chowdsp::FixedSizeFunction<64, void (std::unique_ptr<int> &&)>;
 
         FnB fnB = [&value] (std::unique_ptr<int>&& p)
         {
