@@ -13,13 +13,13 @@ inline ParamHolder::ParamHolder (ParamHolder* parent, std::string_view phName, b
               return OptionalPointer<ChainedArenaAllocator> { static_cast<size_t> (1024) };
           }(),
       },
-      name { phName },
+      name { arena::alloc_string (*arena, phName) },
       isOwning { phIsOwning }
 {
 }
 
 inline ParamHolder::ParamHolder (ChainedArenaAllocator& alloc, std::string_view phName, bool phIsOwning)
-    : arena { &alloc, false }, name { phName }, isOwning { phIsOwning }
+    : arena { &alloc, false }, name { arena::alloc_string (*arena, phName) }, isOwning { phIsOwning }
 {
 }
 
