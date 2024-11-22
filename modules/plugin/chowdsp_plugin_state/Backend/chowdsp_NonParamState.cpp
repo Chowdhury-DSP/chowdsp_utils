@@ -1,3 +1,4 @@
+#include <__filesystem/directory_iterator.h>
 namespace chowdsp
 {
 inline void NonParamState::addStateValues (const std::initializer_list<StateValueBase*>& newStateValues)
@@ -14,8 +15,17 @@ inline void NonParamState::addStateValues (nonstd::span<StateValue<T>> newStateV
     validateStateValues();
 }
 
+template <typename ContainerType>
+inline void NonParamState::addStateValues (ContainerType& container)
+{
+    for (auto& val : container)
+        values.push_back (&val);
+    validateStateValues();
+}
+
 inline void NonParamState::validateStateValues() const
 {
+#if JUCE_DEBUG
     std::vector<std::string_view> stateValueNames;
     for (const auto& value : values)
     {
@@ -29,6 +39,7 @@ inline void NonParamState::validateStateValues() const
     }
 
     jassert (stateValueNames.size() == values.size()); // something has gone horrible wrong!
+#endif
 }
 
 template <typename Serializer>

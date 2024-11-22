@@ -138,6 +138,8 @@ std::enable_if_t<TypeTraits::IsIterable<ParamContainerType>, void>
 
 inline void ParamHolder::clear()
 {
+    jassertfalse; // for now!
+
     // It's generally not safe to clear the parameters if this is an owning ParamHolder
     // since we're almost certainly leaving some dangling references lying around!
     jassert (! isOwning);
