@@ -94,7 +94,7 @@ public:
         };
 
         /** Internal use only! */
-        std::optional<ParamHolder> paramHolder { std::nullopt };
+        std::optional<ParamHolder> paramHolder { std::nullopt }; // @TODO: use pointer instead of optional?
     };
 
     /** Set of parameter handles for the entire EQ. */
