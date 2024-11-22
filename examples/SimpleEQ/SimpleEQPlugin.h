@@ -42,13 +42,12 @@ struct Params : chowdsp::ParamHolder
         add (eqParams, linPhaseMode);
     }
 
-    EQParams eqParams {
-        {
-            BandParams { 0, "eq_band_0", "Band ", 100, bandTypeChoices, 10, 250.0f },
-            BandParams { 1, "eq_band_1", "Band ", 100, bandTypeChoices, 10, 1000.0f },
-            BandParams { 2, "eq_band_2", "Band ", 100, bandTypeChoices, 10, 4000.0f },
-        }
-    };
+    EQParams eqParams { this,
+                        {
+                            BandParams { 0, "eq_band_0", "Band ", 100, bandTypeChoices, 10, 250.0f },
+                            BandParams { 1, "eq_band_1", "Band ", 100, bandTypeChoices, 10, 1000.0f },
+                            BandParams { 2, "eq_band_2", "Band ", 100, bandTypeChoices, 10, 4000.0f },
+                        } };
 
     chowdsp::BoolParameter::Ptr linPhaseMode {
         chowdsp::ParameterID { "linear_phase_mode", 100 },

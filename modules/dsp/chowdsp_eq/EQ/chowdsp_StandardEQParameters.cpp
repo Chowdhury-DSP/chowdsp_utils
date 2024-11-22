@@ -1,20 +1,25 @@
 #if JUCE_MODULE_AVAILABLE_chowdsp_plugin_state
+#include <chowdsp_logging/chowdsp_logging.h>
+
 namespace chowdsp::EQ
 {
 template <size_t NumBands>
-StandardEQParameters<NumBands>::StandardEQParameters (EQParameterHandles&& paramHandles,
-                                                      const juce::String& paramHolderName)
-    : ParamHolder (paramHolderName),
-      eqParams (std::move (paramHandles))
+StandardEQParameters<NumBands>::StandardEQParameters (ParamHolder* parent,
+                                                      EQParameterHandles&& paramHandles,
+                                                      std::string_view paramHolderName)
+    : ParamHolder { parent, paramHolderName },
+      eqParams { std::move (paramHandles) }
 {
     for (auto& bandParams : eqParams)
     {
-        bandParams.paramHolder.add (bandParams.onOffParam,
-                                    bandParams.typeParam,
-                                    bandParams.freqParam,
-                                    bandParams.qParam,
-                                    bandParams.gainParam);
-        add (bandParams.paramHolder);
+        bandParams.paramHolder.emplace (this,
+                                        format (*arena, "{} {}", bandParams.bandNamePrefix, bandParams.bandIndex + 1));
+        bandParams.paramHolder->add (bandParams.onOffParam,
+                                     bandParams.typeParam,
+                                     bandParams.freqParam,
+                                     bandParams.qParam,
+                                     bandParams.gainParam);
+        add (*bandParams.paramHolder);
     }
 }
 
