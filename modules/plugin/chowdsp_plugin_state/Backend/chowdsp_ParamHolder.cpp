@@ -40,8 +40,8 @@ std::enable_if_t<std::is_base_of_v<FloatParameter, ParamType>, void>
     ParamHolder::add (OptionalPointer<ParamType>& floatParam, OtherParams&... others)
 {
     allParamsMap.insert ({ floatParam->paramID.toStdString(), floatParam.get() });
-    things.emplace_back (reinterpret_cast<PackedVoid*> (isOwning ? floatParam.release() : floatParam.get()),
-                         getFlags (FloatParam, isOwning));
+    things.insert (ThingPtr { reinterpret_cast<PackedVoid*> (isOwning ? floatParam.release() : floatParam.get()),
+                              getFlags (FloatParam, isOwning) });
     add (others...);
 }
 
@@ -50,8 +50,8 @@ std::enable_if_t<std::is_base_of_v<ChoiceParameter, ParamType>, void>
     ParamHolder::add (OptionalPointer<ParamType>& choiceParam, OtherParams&... others)
 {
     allParamsMap.insert ({ choiceParam->paramID.toStdString(), choiceParam.get() });
-    things.emplace_back (reinterpret_cast<PackedVoid*> (isOwning ? choiceParam.release() : choiceParam.get()),
-                         getFlags (ChoiceParam, isOwning));
+    things.insert (ThingPtr { reinterpret_cast<PackedVoid*> (isOwning ? choiceParam.release() : choiceParam.get()),
+                                    getFlags (ChoiceParam, isOwning) });
     add (others...);
 }
 
@@ -60,8 +60,8 @@ std::enable_if_t<std::is_base_of_v<BoolParameter, ParamType>, void>
     ParamHolder::add (OptionalPointer<ParamType>& boolParam, OtherParams&... others)
 {
     allParamsMap.insert ({ boolParam->paramID.toStdString(), boolParam.get() });
-    things.emplace_back (reinterpret_cast<PackedVoid*> (isOwning ? boolParam.release() : boolParam.get()),
-                         getFlags (BoolParam, isOwning));
+    things.insert (ThingPtr { reinterpret_cast<PackedVoid*> (isOwning ? boolParam.release() : boolParam.get()),
+                                    getFlags (BoolParam, isOwning) });
     add (others...);
 }
 
@@ -94,7 +94,7 @@ void ParamHolder::add (ParamHolder& paramHolder, OtherParams&... others)
 {
     allParamsMap.merge (paramHolder.allParamsMap);
     jassert (paramHolder.allParamsMap.empty()); // assuming no duplicate parameter IDs, all the parameters should be moved in the merge!
-    things.emplace_back (reinterpret_cast<PackedVoid*> (&paramHolder), Holder);
+    things.insert (ThingPtr { reinterpret_cast<PackedVoid*> (&paramHolder), Holder });
     add (others...);
 }
 
@@ -109,7 +109,7 @@ std::enable_if_t<TypeTraits::IsIterable<ParamContainerType>, void>
 
 [[nodiscard]] inline int ParamHolder::count() const noexcept
 {
-    int count = static_cast<int> (things.size());
+    int count = static_cast<int> (things.count());
     for (auto& thing : things)
     {
         if (thing.get_flags() == Holder)
@@ -126,6 +126,7 @@ inline void ParamHolder::clear()
 
     allParamsMap.clear();
     things.clear();
+    arena.clear();
 }
 
 inline void ParamHolder::connectParametersToProcessor (juce::AudioProcessor& processor)

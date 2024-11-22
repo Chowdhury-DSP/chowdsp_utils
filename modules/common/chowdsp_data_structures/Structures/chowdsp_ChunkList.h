@@ -40,6 +40,16 @@ struct ChunkList
     {
     }
 
+    /**
+     * This will "reset" the ChunkList. If you actually want to reclaim the memory
+     * being used by the ChunkList, that should be done at the arena level.
+     */
+    void clear()
+    {
+        head_chunk = {};
+        tail_chunk = &head_chunk;
+    }
+
     /** Inserts an object into the list (by move) */
     void insert (T&& next)
     {
@@ -84,6 +94,31 @@ struct ChunkList
             count_result += chunk->count;
         return count_result;
     }
+
+    template <bool is_const>
+    struct iterator
+    {
+        std::conditional_t<is_const, const Chunk*, Chunk*> chunk {};
+        size_t index_in_chunk {};
+        bool operator!= (const iterator& other) const
+        {
+            return chunk != other.chunk || index_in_chunk != other.index_in_chunk;
+        }
+        void operator++()
+        {
+            ++index_in_chunk;
+            if (index_in_chunk == chunk->count && chunk->next != nullptr)
+            {
+                chunk = chunk->next;
+                index_in_chunk = 0;
+            }
+        }
+        auto& operator*() const { return chunk->chunk[index_in_chunk]; }
+    };
+    auto begin() { return iterator<false> { &head_chunk }; }
+    auto end() { return iterator<false> { tail_chunk, tail_chunk->count }; }
+    auto begin() const { return iterator<true> { &head_chunk }; }
+    auto end() const { return iterator<true> { tail_chunk, tail_chunk->count }; }
 
 private:
     void grow_if_needed()

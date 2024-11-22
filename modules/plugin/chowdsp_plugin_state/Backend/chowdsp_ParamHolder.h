@@ -114,6 +114,8 @@ private:
         // base case!
     }
 
+    ChainedArenaAllocator arena { 1024 };
+
     enum ThingInfo : uint8_t
     {
         FloatParam = 0,
@@ -124,7 +126,7 @@ private:
         ShouldDelete = 4,
     };
     using ThingPtr = PackedPointer<PackedVoid>;
-    std::vector<ThingPtr> things {};
+    ChunkList<ThingPtr, 16> things { arena };
 
     static ThingInfo getType (const ThingPtr& thingPtr)
     {
