@@ -94,7 +94,7 @@ public:
         };
 
         /** Internal use only! */
-        std::optional<ParamHolder> paramHolder { std::nullopt }; // @TODO: use pointer instead of optional?
+        ParamHolder* paramHolder {};
     };
 
     /** Set of parameter handles for the entire EQ. */
@@ -102,6 +102,7 @@ public:
 
     /** Constructor */
     explicit StandardEQParameters (ParamHolder* parent, EQParameterHandles&& paramHandles, std::string_view name = {});
+    ~StandardEQParameters();
 
     /** Parameter handles */
     EQParameterHandles eqParams;

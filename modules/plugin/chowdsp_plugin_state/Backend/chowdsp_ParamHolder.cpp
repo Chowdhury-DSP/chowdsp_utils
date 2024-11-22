@@ -127,7 +127,7 @@ std::enable_if_t<TypeTraits::IsIterable<ParamContainerType>, void>
 
 [[nodiscard]] inline int ParamHolder::count() const noexcept
 {
-    int count = static_cast<int> (things.count());
+    auto count = static_cast<int> (things.count());
     for (auto& thing : things)
     {
         if (thing.get_flags() == Holder)

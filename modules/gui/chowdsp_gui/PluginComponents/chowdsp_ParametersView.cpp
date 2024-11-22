@@ -180,7 +180,7 @@ struct ParametersView::Pimpl
     Pimpl (ParamHolder& params, ParameterListeners& listeners)
         : groupItem (params, listeners)
     {
-        view.setIndentSize (5);
+        view.setIndentSize (12);
         const auto numIndents = getNumIndents (groupItem);
         const auto width = 400 + view.getIndentSize() * numIndents;
 

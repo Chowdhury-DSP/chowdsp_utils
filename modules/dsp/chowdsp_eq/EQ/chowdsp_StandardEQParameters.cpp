@@ -12,8 +12,10 @@ StandardEQParameters<NumBands>::StandardEQParameters (ParamHolder* parent,
 {
     for (auto& bandParams : eqParams)
     {
-        bandParams.paramHolder.emplace (this,
-                                        format (*arena, "{} {}", bandParams.bandNamePrefix, bandParams.bandIndex + 1));
+        bandParams.paramHolder = new (arena->allocate<ParamHolder> (1)) ParamHolder {
+            this,
+            format (*arena, "{} {}", bandParams.bandNamePrefix, bandParams.bandIndex + 1),
+        };
         bandParams.paramHolder->add (bandParams.onOffParam,
                                      bandParams.typeParam,
                                      bandParams.freqParam,
@@ -21,6 +23,13 @@ StandardEQParameters<NumBands>::StandardEQParameters (ParamHolder* parent,
                                      bandParams.gainParam);
         add (*bandParams.paramHolder);
     }
+}
+
+template <size_t NumBands>
+StandardEQParameters<NumBands>::~StandardEQParameters()
+{
+    for (auto& bandParams : eqParams)
+        bandParams.paramHolder->~ParamHolder();
 }
 
 template <size_t NumBands>
