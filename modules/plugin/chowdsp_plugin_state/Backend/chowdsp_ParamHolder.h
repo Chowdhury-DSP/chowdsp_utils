@@ -14,8 +14,9 @@ public:
      * or make it "non-owning" so it doesn't take ownership of the parameter
      * pointers.
      */
-    explicit ParamHolder (const juce::String& name = {}, bool isOwning = true);
-    virtual ~ParamHolder();
+    explicit ParamHolder (ParamHolder* parent = nullptr, std::string_view name = {}, bool isOwning = true);
+    explicit ParamHolder (ChainedArenaAllocator& alloc, std::string_view name = {}, bool isOwning = true);
+    ~ParamHolder();
 
     ParamHolder (ParamHolder&&) noexcept = default;
     ParamHolder& operator= (ParamHolder&&) noexcept = default;
@@ -69,7 +70,7 @@ public:
     void connectParametersToProcessor (juce::AudioProcessor& processor);
 
     /** Returns the paramHolder name */
-    [[nodiscard]] juce::String getName() const noexcept { return name; }
+    [[nodiscard]] std::string_view getName() const noexcept { return name; }
 
     /** Internal use only! */
     template <typename ParamCallable, typename ParamHolderCallable>
@@ -106,15 +107,16 @@ public:
     void applyVersionStreaming (const Version&);
 
     /** Assign this function to apply version streaming to your non-parameter state. */
-    std::function<void (const Version&)> versionStreamingCallback = nullptr;
+    juce::FixedSizeFunction<8, void (const Version&)> versionStreamingCallback {};
+
+protected:
+    OptionalPointer<ChainedArenaAllocator> arena {};
 
 private:
     void add() const
     {
         // base case!
     }
-
-    ChainedArenaAllocator arena { 1024 };
 
     enum ThingInfo : uint8_t
     {
@@ -126,7 +128,7 @@ private:
         ShouldDelete = 4,
     };
     using ThingPtr = PackedPointer<PackedVoid>;
-    ChunkList<ThingPtr, 16> things { arena };
+    ChunkList<ThingPtr, 8> things { arena };
 
     static ThingInfo getType (const ThingPtr& thingPtr)
     {
@@ -144,10 +146,9 @@ private:
     using MapKey = std::string_view;
     using MapValue = ThingPtr;
     using MapAllocator = STLArenaAllocator<std::pair<const MapKey, MapValue>, ChainedArenaAllocator>;
-    MapAllocator mapAllocator { arena };
-    std::unordered_map<MapKey, MapValue, std::hash<MapKey>, std::equal_to<MapKey>, MapAllocator> allParamsMap { mapAllocator };
+    std::unordered_map<MapKey, MapValue, std::hash<MapKey>, std::equal_to<MapKey>, MapAllocator> allParamsMap { MapAllocator { arena } };
 
-    juce::String name;
+    std::string_view name;
     bool isOwning;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParamHolder)

@@ -1,35 +1,47 @@
 namespace chowdsp
 {
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wswitch-enum")
-inline ParamHolder::ParamHolder (const juce::String& phName, bool phIsOwning)
-    : name (phName),
-      isOwning (phIsOwning)
+inline ParamHolder::ParamHolder (ParamHolder* parent, std::string_view phName, bool phIsOwning)
+    : arena {
+          [parent]
+          {
+              if (parent != nullptr)
+              {
+                  jassert (parent->arena != nullptr);
+                  return OptionalPointer<ChainedArenaAllocator> { parent->arena.get(), false };
+              }
+              return OptionalPointer<ChainedArenaAllocator> { static_cast<size_t> (1024) };
+          }(),
+      },
+      name { phName },
+      isOwning { phIsOwning }
 {
-    juce::ignoreUnused (isOwning);
+}
+
+inline ParamHolder::ParamHolder (ChainedArenaAllocator& alloc, std::string_view phName, bool phIsOwning)
+    : arena { &alloc, false }, name { phName }, isOwning { phIsOwning }
+{
 }
 
 inline ParamHolder::~ParamHolder()
 {
-    if (isOwning)
+    for (auto& thing : things)
     {
-        for (auto& thing : things)
+        if (getShouldDelete (thing))
         {
-            if (getShouldDelete (thing))
+            switch (getType (thing))
             {
-                switch (getType (thing))
-                {
-                    case FloatParam:
-                        delete reinterpret_cast<FloatParameter*> (thing.get_ptr());
-                        break;
-                    case ChoiceParam:
-                        delete reinterpret_cast<ChoiceParameter*> (thing.get_ptr());
-                        break;
-                    case BoolParam:
-                        delete reinterpret_cast<BoolParameter*> (thing.get_ptr());
-                        break;
-                    default:
-                        break;
-                }
+                case FloatParam:
+                    delete reinterpret_cast<FloatParameter*> (thing.get_ptr());
+                    break;
+                case ChoiceParam:
+                    delete reinterpret_cast<ChoiceParameter*> (thing.get_ptr());
+                    break;
+                case BoolParam:
+                    delete reinterpret_cast<BoolParameter*> (thing.get_ptr());
+                    break;
+                default:
+                    break;
             }
         }
     }
@@ -53,7 +65,7 @@ std::enable_if_t<std::is_base_of_v<ChoiceParameter, ParamType>, void>
 {
     const auto paramID = toStringView (choiceParam->paramID);
     ThingPtr paramPtr { reinterpret_cast<PackedVoid*> (isOwning ? choiceParam.release() : choiceParam.get()),
-                              getFlags (ChoiceParam, isOwning) };
+                        getFlags (ChoiceParam, isOwning) };
     allParamsMap.insert ({ paramID, paramPtr });
     things.insert (std::move (paramPtr));
     add (others...);
@@ -65,7 +77,7 @@ std::enable_if_t<std::is_base_of_v<BoolParameter, ParamType>, void>
 {
     const auto paramID = toStringView (boolParam->paramID);
     ThingPtr paramPtr { reinterpret_cast<PackedVoid*> (isOwning ? boolParam.release() : boolParam.get()),
-                              getFlags (BoolParam, isOwning) };
+                        getFlags (BoolParam, isOwning) };
     allParamsMap.insert ({ paramID, paramPtr });
     things.insert (std::move (paramPtr));
     add (others...);
@@ -132,7 +144,7 @@ inline void ParamHolder::clear()
 
     allParamsMap.clear();
     things.clear();
-    arena.clear();
+    arena->clear(); // @TODO: is this actually what we want to do? what if there's the stuff in the arena?
 }
 
 inline void ParamHolder::connectParametersToProcessor (juce::AudioProcessor& processor)
@@ -295,13 +307,13 @@ void ParamHolder::deserialize (typename Serializer::DeserializedType deserial, P
                 {
                     case FloatParam:
                         deserializeParam (reinterpret_cast<FloatParameter*> (paramPtr.get_ptr()), paramDeserial);
-                    break;
+                        break;
                     case ChoiceParam:
                         deserializeParam (reinterpret_cast<ChoiceParameter*> (paramPtr.get_ptr()), paramDeserial);
-                    break;
+                        break;
                     case BoolParam:
                         deserializeParam (reinterpret_cast<BoolParameter*> (paramPtr.get_ptr()), paramDeserial);
-                    break;
+                        break;
                     default:
                         jassertfalse;
                         break;

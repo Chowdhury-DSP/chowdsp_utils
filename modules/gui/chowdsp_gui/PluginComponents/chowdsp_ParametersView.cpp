@@ -166,10 +166,10 @@ namespace parameters_view_detail
 
         std::unique_ptr<juce::Component> createItemComponent() override
         {
-            return std::make_unique<juce::Label> (name, name);
+            return std::make_unique<juce::Label> (toString (name), toString (name));
         }
 
-        juce::String name;
+        std::string_view name;
     };
 } // namespace parameters_view_detail
 #endif
