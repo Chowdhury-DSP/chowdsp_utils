@@ -14,7 +14,9 @@ public:
      * or make it "non-owning" so it doesn't take ownership of the parameter
      * pointers.
      */
-    explicit ParamHolder (const juce::String& name = {}, bool isOwning = true);
+    explicit ParamHolder (ParamHolder* parent = nullptr, std::string_view name = {}, bool isOwning = true);
+    explicit ParamHolder (ChainedArenaAllocator& alloc, std::string_view name = {}, bool isOwning = true);
+    ~ParamHolder();
 
     ParamHolder (ParamHolder&&) noexcept = default;
     ParamHolder& operator= (ParamHolder&&) noexcept = default;
@@ -68,15 +70,15 @@ public:
     void connectParametersToProcessor (juce::AudioProcessor& processor);
 
     /** Returns the paramHolder name */
-    [[nodiscard]] juce::String getName() const noexcept { return name; }
+    [[nodiscard]] std::string_view getName() const noexcept { return name; }
 
     /** Internal use only! */
-    template <typename ParamContainersCallable, typename ParamHolderCallable>
-    void doForAllParameterContainers (ParamContainersCallable&& paramContainersCallable, ParamHolderCallable&& paramHolderCallable);
+    template <typename ParamCallable, typename ParamHolderCallable>
+    void doForAllParametersOrContainers (ParamCallable&& paramCallable, ParamHolderCallable&& paramHolderCallable);
 
     /** Internal use only! */
-    template <typename ParamContainersCallable, typename ParamHolderCallable>
-    void doForAllParameterContainers (ParamContainersCallable&& paramContainersCallable, ParamHolderCallable&& paramHolderCallable) const;
+    template <typename ParamCallable, typename ParamHolderCallable>
+    void doForAllParametersOrContainers (ParamCallable&& paramCallable, ParamHolderCallable&& paramHolderCallable) const;
 
     /**
      * Do some callable for all the stored parameters.
@@ -104,7 +106,10 @@ public:
     void applyVersionStreaming (const Version&);
 
     /** Assign this function to apply version streaming to your non-parameter state. */
-    std::function<void (const Version&)> versionStreamingCallback = nullptr;
+    FixedSizeFunction<8, void (const Version&)> versionStreamingCallback {};
+
+protected:
+    OptionalPointer<ChainedArenaAllocator> arena {};
 
 private:
     void add() const
@@ -112,15 +117,37 @@ private:
         // base case!
     }
 
-    std::vector<OptionalPointer<FloatParameter>> floatParams;
-    std::vector<OptionalPointer<ChoiceParameter>> choiceParams;
-    std::vector<OptionalPointer<BoolParameter>> boolParams;
-    std::vector<ParamHolder*> otherParams;
+    enum ThingInfo : uint8_t
+    {
+        FloatParam = 0,
+        ChoiceParam = 1,
+        BoolParam = 2,
+        Holder = 3,
 
-    using ParamPtrVariant = std::variant<FloatParameter*, ChoiceParameter*, BoolParameter*>;
-    std::unordered_map<std::string, ParamPtrVariant> allParamsMap {};
+        ShouldDelete = 4,
+    };
+    using ThingPtr = PackedPointer<PackedVoid>;
+    ChunkList<ThingPtr, 8> things { arena };
 
-    juce::String name;
+    static ThingInfo getType (const ThingPtr& thingPtr)
+    {
+        return static_cast<ThingInfo> (thingPtr.get_flags() & ~ShouldDelete);
+    }
+    static bool getShouldDelete (const ThingPtr& thingPtr)
+    {
+        return thingPtr.get_flags() & ShouldDelete;
+    }
+    static uint8_t getFlags (ThingInfo type, bool shouldDelete)
+    {
+        return static_cast<uint8_t> (type | (shouldDelete ? ShouldDelete : 0));
+    }
+
+    using MapKey = std::string_view;
+    using MapValue = ThingPtr;
+    using MapAllocator = STLArenaAllocator<std::pair<const MapKey, MapValue>, ChainedArenaAllocator>;
+    std::unordered_map<MapKey, MapValue, std::hash<MapKey>, std::equal_to<>, MapAllocator> allParamsMap { MapAllocator { arena } };
+
+    std::string_view name;
     bool isOwning;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParamHolder)

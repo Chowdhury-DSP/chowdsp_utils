@@ -4,7 +4,8 @@
 
 struct LevelParams2 : chowdsp::ParamHolder
 {
-    LevelParams2()
+    explicit LevelParams2 (ParamHolder* parent)
+        : ParamHolder { parent }
     {
         add (percent, gain);
     }
@@ -20,7 +21,7 @@ struct PluginParameterState2 : chowdsp::ParamHolder
         add (levelParams, mode, onOff);
     }
 
-    LevelParams2 levelParams;
+    LevelParams2 levelParams { this };
     chowdsp::ChoiceParameter::Ptr mode { juce::ParameterID { "mode", 100 }, "Mode", juce::StringArray { "Percent", "Gain", "Percent / Gain", "Gain / Percent" }, 2 };
     chowdsp::BoolParameter::Ptr onOff { juce::ParameterID { "on_off", 100 }, "On/Off", true };
 };
