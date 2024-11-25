@@ -34,7 +34,7 @@ inline void NonParamState::validateStateValues() const
 template <typename Serializer>
 typename Serializer::SerializedType NonParamState::serialize (const NonParamState& state)
 {
-    auto serial = Serializer::createBaseElement();
+    auto serial = Serializer::createBaseElement("nonparam");
     for (const auto& value : state.values)
         value->serialize (serial);
     return serial;
@@ -43,20 +43,24 @@ typename Serializer::SerializedType NonParamState::serialize (const NonParamStat
 template <typename Serializer>
 void NonParamState::deserialize (typename Serializer::DeserializedType deserial, const NonParamState& state)
 {
-    std::vector<std::string_view> namesThatHaveBeenDeserialized {};
-    if (const auto numNamesAndVals = Serializer::getNumChildElements (deserial); numNamesAndVals % 2 == 0)
+
+    juce::StringArray namesThatHaveBeenDeserialized {};
+    if (const auto numNamesAndVals = Serializer::getNumAttributes (deserial))
     {
-        namesThatHaveBeenDeserialized.reserve (static_cast<size_t> (numNamesAndVals) / 2);
-        for (int i = 0; i < numNamesAndVals; i += 2)
+        for (int i = 0; i < numNamesAndVals; i++)
         {
-            const auto name = Serializer::getChildElement (deserial, i).template get<std::string_view>();
-            const auto& valueDeserial = Serializer::getChildElement (deserial, i + 1);
+            juce::String name {};
+            name = Serializer::getAttributeName (deserial, i);
+//Serialization::deserialize<Serializer> (Serializer::getChildElement (deserial, i), name);
+
             for (auto& value : state.values)
             {
-                if (name == value->name)
+                if (name == toString(value->name))
                 {
-                    value->deserialize (valueDeserial);
-                    namesThatHaveBeenDeserialized.push_back (name);
+
+                    value->deserialize (deserial);
+                    namesThatHaveBeenDeserialized.add (name);
+
                 }
             }
         }
@@ -65,15 +69,15 @@ void NonParamState::deserialize (typename Serializer::DeserializedType deserial,
     {
         jassertfalse; // state loading error
     }
-
+    for(auto id: namesThatHaveBeenDeserialized) {
+        DBG("nonparam " + id);
+    }
     // set all un-matched objects to their default values
-    if (! namesThatHaveBeenDeserialized.empty())
+    for (auto& value : state.values)
     {
-        for (auto& value : state.values)
-        {
-            if (std::find (namesThatHaveBeenDeserialized.begin(), namesThatHaveBeenDeserialized.end(), value->name) == namesThatHaveBeenDeserialized.end())
-                value->reset();
-        }
+        if (! namesThatHaveBeenDeserialized.contains (toString (value->name)))
+            value->reset();
     }
 }
+
 } // namespace chowdsp

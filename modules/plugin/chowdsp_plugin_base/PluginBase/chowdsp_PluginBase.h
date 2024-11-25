@@ -259,11 +259,19 @@ void PluginBase<P>::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBu
 
     processAudioBlock (buffer);
 }
-
+// magic number to identify memory blocks that we've stored as XML
+    const juce::uint32 magicXmlNumber = 0x21324356;
 #if JUCE_MODULE_AVAILABLE_chowdsp_plugin_state
 template <class State>
 void PluginBase<State>::getStateInformation (juce::MemoryBlock& data)
 {
+//    {
+//        juce::MemoryOutputStream out (data, false);
+//        out.writeInt (magicXmlNumber);
+//        out.writeInt (0);
+//        xml.writeTo (out, XmlElement::TextFormat().singleLine());
+//        out.writeByte (0);
+//    }
     state.serialize (data);
 }
 

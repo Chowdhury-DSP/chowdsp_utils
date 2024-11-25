@@ -59,8 +59,8 @@ namespace ParameterTypeHelpers
     template <typename Serializer, typename ParamType>
     void serializeParameter (typename Serializer::SerializedType& serial, const ParamType& param)
     {
-        Serializer::addChildElement (serial, param.paramID);
-        Serializer::addChildElement (serial, getValue (param));
+
+        Serializer::addChildElement (serial, param.paramID,getValue (param));
     }
 
     template <typename ParamType>
@@ -70,10 +70,35 @@ namespace ParameterTypeHelpers
     }
 
     template <typename Serializer, typename ParamType>
-    void deserializeParameter (const typename Serializer::SerializedType& serial, ParamType& param)
+    std::enable_if_t<std::is_same_v<Serializer, XMLSerializer>, void>
+    deserializeParameter (const typename Serializer::SerializedType& serial, ParamType& param)
     {
         ParameterElementType<ParamType> val;
-        Serialization::deserialize<Serializer> (serial, val);
+        Serialization::deserialize<Serializer> (serial,param.paramID, val);
+        if constexpr (std::is_same_v<ParameterElementType<ParamType>,bool>)
+        {
+            DBG("paramid" + param.paramID + "val " + juce::String(static_cast<int>(val)));
+        } else
+        {
+            DBG("paramid" + param.paramID + "val " + juce::String(val));
+        }
+
+        setValue (val, param);
+    }
+    template <typename Serializer, typename ParamType>
+    std::enable_if_t<std::is_same_v<Serializer, XMLSerializer>, void>
+    deserializeParameter (const typename Serializer::DeserializedType& serial, ParamType& param)
+    {
+        ParameterElementType<ParamType> val;
+        Serialization::deserialize<Serializer> (serial,param.paramID, val);
+//        if constexpr (std::is_same_v<ParameterElementType<ParamType>,bool>)
+//        {
+//            DBG("paramid" + param.paramID + "val " + juce::String(static_cast<int>(val)));
+//        } else
+//        {
+//            DBG("paramid" + param.paramID + "val " + juce::String(val));
+//        }
+
         setValue (val, param);
     }
 } // namespace ParameterTypeHelpers

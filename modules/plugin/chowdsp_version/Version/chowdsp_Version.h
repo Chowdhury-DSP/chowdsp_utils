@@ -54,7 +54,7 @@ public:
     constexpr Version& operator= (Version&&) noexcept = default;
 
     /** Returns the version as a string of the form MAJOR.MINOR.PATCH. */
-    [[nodiscard]] juce::String getVersionString() const;
+    [[nodiscard]] const juce::String getVersionString() const;
 
     /** Returns an integer hint for this version value. */
     [[nodiscard]] constexpr int getVersionHint() const { return major * 10000 + minor * 100 + patch; }
@@ -70,9 +70,9 @@ public:
     template <typename Serializer>
     static void deserialize (typename Serializer::DeserializedType serial, Version& object)
     {
-        juce::String versionString;
-        Serializer::template deserialize<Serializer> (serial, versionString);
-        object = Version { versionString };
+//        juce::String versionString;
+//        Serializer::template deserialize<Serializer> (serial, versionString);
+//        object = Version { versionString };
     }
 
     friend constexpr bool operator== (const Version& v1, const Version& v2) noexcept;

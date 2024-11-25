@@ -24,7 +24,7 @@ Version::Version (const juce::String& versionStr)
     patch = tokens[2].getIntValue();
 }
 
-juce::String Version::getVersionString() const
+const juce::String Version::getVersionString() const
 {
     return juce::String (major) + "." + juce::String (minor) + "." + juce::String (patch);
 }
