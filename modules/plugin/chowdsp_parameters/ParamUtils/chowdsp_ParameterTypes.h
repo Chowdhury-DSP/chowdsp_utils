@@ -64,7 +64,10 @@ public:
     void setParameterValue (float newValue) { AudioParameterFloat::operator= (newValue); }
 
     /** Returns the default value for the parameter. */
-    float getDefaultValue() const override { return unsnappedDefault; }
+    float getDefaultValue() const override { return normalisableRange.convertTo0to1 (defaultValueInRange); }
+
+    /** Returns the default value for the parameter (in range). */
+    float getDefault() const { return defaultValueInRange; }
 
     /** TRUE! */
     bool supportsMonophonicModulation() override { return true; }
@@ -79,7 +82,7 @@ public:
     operator float() const noexcept { return getCurrentValue(); } // NOSONAR, NOLINT(google-explicit-constructor): we want to be able to do implicit conversion here
 
 private:
-    const float unsnappedDefault;
+    const float defaultValueInRange;
     const juce::NormalisableRange<float> normalisableRange;
 
     float modulationAmount = 0.0f;
@@ -179,6 +182,9 @@ public:
      * Especially if calling this from the audio thread!
      */
     void setParameterValue (bool newValue) { AudioParameterBool::operator= (newValue); }
+
+    /** Returns the default value for the parameter (in range). */
+    bool getDefault() const { return static_cast<const juce::AudioProcessorParameter&> (*this).getDefaultValue() > 0.5f; }
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BoolParameter)

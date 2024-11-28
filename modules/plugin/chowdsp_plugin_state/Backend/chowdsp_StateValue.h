@@ -11,8 +11,13 @@ struct StateValueBase
 
     virtual void reset() {}
 
+#if CHOWDSP_USE_LEGACY_STATE_SERIALIZATION
     virtual void serialize (JSONSerializer::SerializedType&) const {}
     virtual void deserialize (JSONSerializer::DeserializedType) {}
+#else
+    [[nodiscard]] virtual nlohmann::json serialize () const { return {}; }
+    virtual void deserialize (const nlohmann::json&) {}
+#endif
 
     const std::string_view name {};
     Broadcaster<void()> changeBroadcaster {};
@@ -69,6 +74,7 @@ struct StateValue : StateValueBase
     /** Resets the value to its default state */
     void reset() override { set (defaultValue); }
 
+#if CHOWDSP_USE_LEGACY_STATE_SERIALIZATION
     /** JSON Serializer */
     void serialize (JSONSerializer::SerializedType& serial) const override
     {
@@ -80,10 +86,24 @@ struct StateValue : StateValueBase
     {
         deserialize<JSONSerializer> (deserial, *this);
     }
+#else
+    /** JSON Serializer */
+    [[nodiscard]] nlohmann::json serialize () const override
+    {
+        return get();
+    }
+
+    /** JSON Deserializer */
+    void deserialize (const nlohmann::json& deserial) override
+    {
+        set (deserial.get<element_type_>());
+    }
+#endif
 
     const element_type defaultValue;
 
 private:
+#if CHOWDSP_USE_LEGACY_STATE_SERIALIZATION
     template <typename Serializer>
     static void serialize (typename Serializer::SerializedType& serial, const StateValue& value)
     {
@@ -98,6 +118,7 @@ private:
         Serialization::deserialize<Serializer> (deserial, val);
         value.set (val);
     }
+#endif
 
     T currentValue;
 

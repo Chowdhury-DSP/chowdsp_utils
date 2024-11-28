@@ -44,15 +44,32 @@ inline void NonParamState::validateStateValues() const
 template <typename Serializer>
 typename Serializer::SerializedType NonParamState::serialize (const NonParamState& state)
 {
+#if ! CHOWDSP_USE_LEGACY_STATE_SERIALIZATION
+    auto serial = nlohmann::json::object();
+    for (const auto& value : state.values)
+        serial[value->name] = value->serialize();
+    return serial;
+#else
     auto serial = Serializer::createBaseElement();
     for (const auto& value : state.values)
         value->serialize (serial);
     return serial;
+#endif
 }
 
 template <typename Serializer>
 void NonParamState::deserialize (typename Serializer::DeserializedType deserial, const NonParamState& state)
 {
+#if ! CHOWDSP_USE_LEGACY_STATE_SERIALIZATION
+    for (auto& value : state.values)
+    {
+        auto iter = deserial.find (value->name);
+        if (iter != deserial.end())
+            value->deserialize (*iter);
+        else
+            value->reset();
+    }
+#else
     std::vector<std::string_view> namesThatHaveBeenDeserialized {};
     if (const auto numNamesAndVals = Serializer::getNumChildElements (deserial); numNamesAndVals % 2 == 0)
     {
@@ -85,5 +102,6 @@ void NonParamState::deserialize (typename Serializer::DeserializedType deserial,
                 value->reset();
         }
     }
+#endif
 }
 } // namespace chowdsp

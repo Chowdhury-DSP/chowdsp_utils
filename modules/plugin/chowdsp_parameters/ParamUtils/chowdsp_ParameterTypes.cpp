@@ -33,7 +33,7 @@ FloatParameter::FloatParameter (const ParameterID& parameterID,
                 { return valueToTextFunction (v); })
             .withValueFromStringFunction (std::move (textToValueFunction))),
 #endif
-      unsnappedDefault (valueRange.convertTo0to1 (defaultFloatValue)),
+      defaultValueInRange (defaultFloatValue),
       normalisableRange (valueRange)
 {
 }

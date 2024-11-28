@@ -42,6 +42,17 @@ template <typename ParameterState, typename NonParameterState, typename Serializ
 template <typename>
 typename Serializer::SerializedType PluginStateImpl<ParameterState, NonParameterState, Serializer>::serialize (const PluginStateImpl& object)
 {
+#if ! CHOWDSP_USE_LEGACY_STATE_SERIALIZATION
+    return {
+#if defined JucePlugin_VersionString
+        { "version", currentPluginVersion },
+#else
+        { "version", chowdsp::Version {} },
+#endif
+        { "params", Serializer::template serialize<Serializer, ParamHolder> (object.params) },
+        { "non-params", Serializer::template serialize<Serializer, NonParamState> (object.nonParams) },
+    };
+#else
     auto serial = Serializer::createBaseElement();
 
 #if defined JucePlugin_VersionString
@@ -51,6 +62,7 @@ typename Serializer::SerializedType PluginStateImpl<ParameterState, NonParameter
     Serializer::addChildElement (serial, Serializer::template serialize<Serializer, NonParamState> (object.nonParams));
     Serializer::addChildElement (serial, Serializer::template serialize<Serializer, ParamHolder> (object.params));
     return serial;
+#endif
 }
 
 /** Deserializer */
@@ -58,6 +70,13 @@ template <typename ParameterState, typename NonParameterState, typename Serializ
 template <typename>
 void PluginStateImpl<ParameterState, NonParameterState, Serializer>::deserialize (typename Serializer::DeserializedType serial, PluginStateImpl& object)
 {
+#if ! CHOWDSP_USE_LEGACY_STATE_SERIALIZATION
+    jassert (serial.find ("version") != serial.end());
+    object.pluginStateVersion = serial.value ("version", Version {});
+
+    Serializer::template deserialize<Serializer, NonParamState> (serial.at ("non-params"), object.nonParams);
+    Serializer::template deserialize<Serializer, ParamHolder> (serial.at ("params"), object.params);
+#else
     enum
     {
 #if defined JucePlugin_VersionString
@@ -83,6 +102,7 @@ void PluginStateImpl<ParameterState, NonParameterState, Serializer>::deserialize
 
     Serializer::template deserialize<Serializer, NonParamState> (Serializer::getChildElement (serial, nonParamStateChildIndex), object.nonParams);
     Serializer::template deserialize<Serializer, ParamHolder> (Serializer::getChildElement (serial, paramStateChildIndex), object.params);
+#endif
 }
 
 template <typename ParameterState, typename NonParameterState, typename Serializer>
