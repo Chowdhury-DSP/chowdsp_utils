@@ -14,6 +14,21 @@ TEST_CASE ("JSON Test", "[common][json]")
         REQUIRE_MESSAGE (returnString == testString, "JSON serialized string is incorrect!");
     }
 
+    SECTION ("Version Serialization Test")
+    {
+        {
+            chowdsp::json parent;
+            chowdsp::Version testVersion { 2, 5, 7 };
+            parent["key"] = testVersion;
+            auto returnVersion = parent["key"].get<chowdsp::Version>();
+            REQUIRE (returnVersion == testVersion);
+        }
+        {
+            const auto badVersion = chowdsp::json::object().get<chowdsp::Version>();
+            REQUIRE (badVersion == chowdsp::Version{});
+        }
+    }
+
     SECTION ("JSON File Test")
     {
         chowdsp::json jTest = {

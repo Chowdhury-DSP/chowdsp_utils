@@ -6,6 +6,7 @@ setup_juce_lib(common_tests_lib
     chowdsp::chowdsp_logging
     chowdsp::chowdsp_json
     chowdsp::chowdsp_units
+    chowdsp::chowdsp_version
 )
 
 add_subdirectory(chowdsp_core_test)

@@ -92,12 +92,13 @@ public:
     size_t doForAllParameters (Callable&& callable, size_t index = 0) const;
 
     /** Custom serializer */
-    template <typename Serializer>
-    static typename Serializer::SerializedType serialize (const ParamHolder& paramHolder);
+    static json serialize (const ParamHolder& paramHolder);
 
     /** Custom deserializer */
-    template <typename Serializer>
-    static void deserialize (typename Serializer::DeserializedType deserial, ParamHolder& paramHolder);
+    static void deserialize (const json& deserial, ParamHolder& paramHolder);
+
+    /** Legacy deserializer */
+    static void legacy_deserialize (const json& deserial, ParamHolder& paramHolder);
 
     /** Recursively applies version streaming to the parameters herein. */
     void applyVersionStreaming (const Version&);
@@ -138,12 +139,6 @@ private:
     {
         return static_cast<uint8_t> (type | (shouldDelete ? ShouldDelete : 0));
     }
-
-    using MapKey = std::string_view;
-    using MapValue = ThingPtr;
-    using MapAllocator = STLArenaAllocator<std::pair<const MapKey, MapValue>, ChainedArenaAllocator>;
-    using AllParamsMap = std::unordered_map<MapKey, MapValue, std::hash<MapKey>, std::equal_to<>, MapAllocator>;
-    AllParamsMap allParamsMap;
 
     std::string_view name;
     bool isOwning;
