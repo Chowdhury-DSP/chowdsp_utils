@@ -13,9 +13,6 @@ inline ParamHolder::ParamHolder (ParamHolder* parent, std::string_view phName, b
               return OptionalPointer<ChainedArenaAllocator> { static_cast<size_t> (1024) };
           }(),
       },
-#if CHOWDSP_USE_LEGACY_STATE_SERIALIZATION
-      allParamsMap { MapAllocator { arena } },
-#endif
       name { arena::alloc_string (*arena, phName) },
       isOwning { phIsOwning }
 {
@@ -23,9 +20,6 @@ inline ParamHolder::ParamHolder (ParamHolder* parent, std::string_view phName, b
 
 inline ParamHolder::ParamHolder (ChainedArenaAllocator& alloc, std::string_view phName, bool phIsOwning)
     : arena { &alloc, false },
-#if CHOWDSP_USE_LEGACY_STATE_SERIALIZATION
-      allParamsMap { MapAllocator { arena } },
-#endif
       name { arena::alloc_string (*arena, phName) },
       isOwning { phIsOwning }
 {
@@ -59,13 +53,8 @@ template <typename ParamType, typename... OtherParams>
 std::enable_if_t<std::is_base_of_v<FloatParameter, ParamType>, void>
     ParamHolder::add (OptionalPointer<ParamType>& floatParam, OtherParams&... others)
 {
-    ThingPtr paramPtr { reinterpret_cast<PackedVoid*> (isOwning ? floatParam.release() : floatParam.get()),
-                        getFlags (FloatParam, isOwning) };
-#if CHOWDSP_USE_LEGACY_STATE_SERIALIZATION
-    const auto paramID = toStringView (floatParam->paramID);
-    allParamsMap.insert ({ paramID, paramPtr });
-#endif
-    things.insert (std::move (paramPtr));
+    things.insert (ThingPtr { reinterpret_cast<PackedVoid*> (isOwning ? floatParam.release() : floatParam.get()),
+                              getFlags (FloatParam, isOwning) });
     add (others...);
 }
 
@@ -73,13 +62,8 @@ template <typename ParamType, typename... OtherParams>
 std::enable_if_t<std::is_base_of_v<ChoiceParameter, ParamType>, void>
     ParamHolder::add (OptionalPointer<ParamType>& choiceParam, OtherParams&... others)
 {
-    ThingPtr paramPtr { reinterpret_cast<PackedVoid*> (isOwning ? choiceParam.release() : choiceParam.get()),
-                        getFlags (ChoiceParam, isOwning) };
-#if CHOWDSP_USE_LEGACY_STATE_SERIALIZATION
-    const auto paramID = toStringView (choiceParam->paramID);
-    allParamsMap.insert ({ paramID, paramPtr });
-#endif
-    things.insert (std::move (paramPtr));
+    things.insert (ThingPtr { reinterpret_cast<PackedVoid*> (isOwning ? choiceParam.release() : choiceParam.get()),
+                              getFlags (ChoiceParam, isOwning) });
     add (others...);
 }
 
@@ -87,13 +71,8 @@ template <typename ParamType, typename... OtherParams>
 std::enable_if_t<std::is_base_of_v<BoolParameter, ParamType>, void>
     ParamHolder::add (OptionalPointer<ParamType>& boolParam, OtherParams&... others)
 {
-    ThingPtr paramPtr { reinterpret_cast<PackedVoid*> (isOwning ? boolParam.release() : boolParam.get()),
-                        getFlags (BoolParam, isOwning) };
-#if CHOWDSP_USE_LEGACY_STATE_SERIALIZATION
-    const auto paramID = toStringView (boolParam->paramID);
-    allParamsMap.insert ({ paramID, paramPtr });
-#endif
-    things.insert (std::move (paramPtr));
+    things.insert (ThingPtr { reinterpret_cast<PackedVoid*> (isOwning ? boolParam.release() : boolParam.get()),
+                              getFlags (BoolParam, isOwning) });
     add (others...);
 }
 
@@ -124,13 +103,6 @@ std::enable_if_t<std::is_base_of_v<BoolParameter, ParamType>, void>
 template <typename... OtherParams>
 void ParamHolder::add (ParamHolder& paramHolder, OtherParams&... others)
 {
-#if CHOWDSP_USE_LEGACY_STATE_SERIALIZATION
-    // This should be the parent of the holder being added.
-    jassert (arena == paramHolder.arena);
-
-    allParamsMap.merge (paramHolder.allParamsMap);
-    jassert (paramHolder.allParamsMap.empty()); // assuming no duplicate parameter IDs, all the parameters should be moved in the merge!
-#endif
     things.insert (ThingPtr { reinterpret_cast<PackedVoid*> (&paramHolder), Holder });
     add (others...);
 }
@@ -143,7 +115,6 @@ std::enable_if_t<TypeTraits::IsIterable<ParamContainerType>, void>
         add (param);
     add (others...);
 }
-
 
 [[nodiscard]] inline int ParamHolder::count() const noexcept
 {
@@ -275,8 +246,7 @@ size_t ParamHolder::doForAllParameters (Callable&& callable, size_t index) const
     return index;
 }
 
-template <typename Serializer>
-typename Serializer::SerializedType ParamHolder::serialize (const ParamHolder& paramHolder)
+inline json ParamHolder::serialize (const ParamHolder& paramHolder)
 {
 #if ! CHOWDSP_USE_LEGACY_STATE_SERIALIZATION
     auto serial = nlohmann::json::object();
@@ -298,55 +268,37 @@ typename Serializer::SerializedType ParamHolder::serialize (const ParamHolder& p
 #endif
 }
 
-template <typename Serializer>
-void ParamHolder::deserialize (typename Serializer::DeserializedType deserial, ParamHolder& paramHolder)
+inline void ParamHolder::deserialize (const json& deserial, ParamHolder& paramHolder)
 {
-#if ! CHOWDSP_USE_LEGACY_STATE_SERIALIZATION
     paramHolder.doForAllParameters (
         [&deserial] (auto& param, size_t)
         {
             const auto paramID = toStringView (param.paramID);
             ParameterTypeHelpers::setValue (deserial.value (paramID, ParameterTypeHelpers::getDefaultValue (param)), param);
         });
-#else
+}
+
+inline void ParamHolder::legacy_deserialize (const json& deserial, ParamHolder& paramHolder)
+{
+    using Serializer = JSONSerializer;
     std::vector<std::string_view> paramIDsThatHaveBeenDeserialized {};
     if (const auto numParamIDsAndVals = Serializer::getNumChildElements (deserial); numParamIDsAndVals % 2 == 0)
     {
         paramIDsThatHaveBeenDeserialized.reserve (static_cast<size_t> (numParamIDsAndVals) / 2);
         for (int i = 0; i < numParamIDsAndVals; i += 2)
         {
-            const auto paramID = Serializer::getChildElement (deserial, i).template get<std::string_view>();
+            const auto paramID = Serializer::getChildElement (deserial, i).get<std::string_view>();
             const auto& paramDeserial = Serializer::getChildElement (deserial, i + 1);
 
-            auto paramPtrIter = paramHolder.allParamsMap.find (std::string { paramID });
-            if (paramPtrIter == paramHolder.allParamsMap.end())
-                continue;
-
-            paramIDsThatHaveBeenDeserialized.push_back (paramID);
-            [&paramDeserial] (ThingPtr& paramPtr)
-            {
-                const auto deserializeParam = [] (auto* param, auto& pd)
+            paramHolder.doForAllParameters (
+                [&] (auto& param, size_t)
                 {
-                    ParameterTypeHelpers::deserializeParameter<Serializer> (pd, *param);
-                };
+                    if (toStringView (param.paramID) != paramID)
+                        return;
 
-                const auto type = getType (paramPtr);
-                switch (type)
-                {
-                    case FloatParam:
-                        deserializeParam (reinterpret_cast<FloatParameter*> (paramPtr.get_ptr()), paramDeserial);
-                        break;
-                    case ChoiceParam:
-                        deserializeParam (reinterpret_cast<ChoiceParameter*> (paramPtr.get_ptr()), paramDeserial);
-                        break;
-                    case BoolParam:
-                        deserializeParam (reinterpret_cast<BoolParameter*> (paramPtr.get_ptr()), paramDeserial);
-                        break;
-                    default:
-                        jassertfalse;
-                        break;
-                }
-            }(paramPtrIter->second);
+                    paramIDsThatHaveBeenDeserialized.push_back (paramID);
+                    ParameterTypeHelpers::deserializeParameter<Serializer> (paramDeserial, param);
+                });
         }
     }
     else
@@ -367,7 +319,6 @@ void ParamHolder::deserialize (typename Serializer::DeserializedType deserial, P
                     ParameterTypeHelpers::resetParameter (param);
             });
     }
-#endif
 }
 
 inline void ParamHolder::applyVersionStreaming (const Version& version)

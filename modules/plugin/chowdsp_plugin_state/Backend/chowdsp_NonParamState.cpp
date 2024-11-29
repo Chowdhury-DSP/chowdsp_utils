@@ -41,42 +41,24 @@ inline void NonParamState::validateStateValues() const
 #endif
 }
 
-template <typename Serializer>
-typename Serializer::SerializedType NonParamState::serialize (const NonParamState& state)
+inline json NonParamState::serialize (const NonParamState& state)
 {
-#if ! CHOWDSP_USE_LEGACY_STATE_SERIALIZATION
     auto serial = nlohmann::json::object();
     for (const auto& value : state.values)
         serial[value->name] = value->serialize();
     return serial;
-#else
-    auto serial = Serializer::createBaseElement();
-    for (const auto& value : state.values)
-        value->serialize (serial);
-    return serial;
-#endif
 }
 
-template <typename Serializer>
-void NonParamState::deserialize (typename Serializer::DeserializedType deserial, const NonParamState& state)
+inline void NonParamState::legacy_deserialize (const json& deserial, const NonParamState& state)
 {
-#if ! CHOWDSP_USE_LEGACY_STATE_SERIALIZATION
-    for (auto& value : state.values)
-    {
-        auto iter = deserial.find (value->name);
-        if (iter != deserial.end())
-            value->deserialize (*iter);
-        else
-            value->reset();
-    }
-#else
+    using Serializer = JSONSerializer;
     std::vector<std::string_view> namesThatHaveBeenDeserialized {};
     if (const auto numNamesAndVals = Serializer::getNumChildElements (deserial); numNamesAndVals % 2 == 0)
     {
         namesThatHaveBeenDeserialized.reserve (static_cast<size_t> (numNamesAndVals) / 2);
         for (int i = 0; i < numNamesAndVals; i += 2)
         {
-            const auto name = Serializer::getChildElement (deserial, i).template get<std::string_view>();
+            const auto name = Serializer::getChildElement (deserial, i).get<std::string_view>();
             const auto& valueDeserial = Serializer::getChildElement (deserial, i + 1);
             for (auto& value : state.values)
             {
@@ -102,6 +84,17 @@ void NonParamState::deserialize (typename Serializer::DeserializedType deserial,
                 value->reset();
         }
     }
-#endif
+}
+
+inline void NonParamState::deserialize (const json& deserial, const NonParamState& state)
+{
+    for (auto& value : state.values)
+    {
+        auto iter = deserial.find (value->name);
+        if (iter != deserial.end())
+            value->deserialize (*iter);
+        else
+            value->reset();
+    }
 }
 } // namespace chowdsp

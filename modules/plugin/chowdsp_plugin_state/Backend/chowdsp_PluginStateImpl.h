@@ -7,9 +7,8 @@ namespace chowdsp
  *
  * @tparam ParameterState       Struct containing all of the plugin's parameters as chowdsp::OptionalPointer's.
  * @tparam NonParameterState    Struct containing all of the plugin's non-parameter state as StateValue objects.
- * @tparam Serializer           A type that implements chowdsp::BaseSerializer (JSONSerializer by default)
  */
-template <typename ParameterState, typename NonParameterState = NonParamState, typename Serializer = JSONSerializer>
+template <typename ParameterState, typename NonParameterState = NonParamState>
 class PluginStateImpl : public PluginState
 {
     static_assert (std::is_base_of_v<ParamHolder, ParameterState>, "ParameterState must be a chowdsp::ParamHolder!");
@@ -26,15 +25,16 @@ public:
     void serialize (juce::MemoryBlock& data) const override;
 
     /** Deserializes the plugin state from the given MemoryBlock */
-    void deserialize (const juce::MemoryBlock& data) override;
+    void deserialize (juce::MemoryBlock&& data) override;
 
     /** Serializer */
-    template <typename>
-    static typename Serializer::SerializedType serialize (const PluginStateImpl& object);
+    static json serialize (const PluginStateImpl& object);
 
     /** Deserializer */
-    template <typename>
-    static void deserialize (typename Serializer::DeserializedType serial, PluginStateImpl& object);
+    static void deserialize (const json&  serial, PluginStateImpl& object);
+
+    /** Legacy Deserializer */
+    static void legacy_deserialize (const json& serial, PluginStateImpl& object);
 
     /** Returns the plugin non-parameter state */
     [[nodiscard]] NonParamState& getNonParameters() override;

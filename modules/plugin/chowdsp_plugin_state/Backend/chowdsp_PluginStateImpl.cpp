@@ -1,30 +1,31 @@
 namespace chowdsp
 {
-template <typename ParameterState, typename NonParameterState, typename Serializer>
-PluginStateImpl<ParameterState, NonParameterState, Serializer>::PluginStateImpl (juce::UndoManager* um)
+template <typename ParameterState, typename NonParameterState>
+PluginStateImpl<ParameterState, NonParameterState>::PluginStateImpl (juce::UndoManager* um)
 {
     initialise (params, nullptr, um);
 }
 
-template <typename ParameterState, typename NonParameterState, typename Serializer>
-PluginStateImpl<ParameterState, NonParameterState, Serializer>::PluginStateImpl (juce::AudioProcessor& proc, juce::UndoManager* um)
+template <typename ParameterState, typename NonParameterState>
+PluginStateImpl<ParameterState, NonParameterState>::PluginStateImpl (juce::AudioProcessor& proc, juce::UndoManager* um)
 {
     initialise (params, &proc, um);
 }
 
-template <typename ParameterState, typename NonParameterState, typename Serializer>
-void PluginStateImpl<ParameterState, NonParameterState, Serializer>::serialize (juce::MemoryBlock& data) const
+template <typename ParameterState, typename NonParameterState>
+void PluginStateImpl<ParameterState, NonParameterState>::serialize (juce::MemoryBlock& data) const
 {
-    Serialization::serialize<Serializer> (*this, data);
+    const auto serial = serialize (*this);
+    JSONUtils::toMemoryBlock (serial, data);
 }
 
-template <typename ParameterState, typename NonParameterState, typename Serializer>
-void PluginStateImpl<ParameterState, NonParameterState, Serializer>::deserialize (const juce::MemoryBlock& data)
+template <typename ParameterState, typename NonParameterState>
+void PluginStateImpl<ParameterState, NonParameterState>::deserialize (juce::MemoryBlock&& dataBlock)
 {
     callOnMainThread (
-        [this, data]
+        [this, data = std::move (dataBlock)]
         {
-            Serialization::deserialize<Serializer> (data, *this);
+            deserialize (JSONUtils::fromMemoryBlock (data), *this);
 
             params.applyVersionStreaming (pluginStateVersion);
             if (nonParams.versionStreamingCallback != nullptr)
@@ -38,45 +39,25 @@ void PluginStateImpl<ParameterState, NonParameterState, Serializer>::deserialize
 }
 
 /** Serializer */
-template <typename ParameterState, typename NonParameterState, typename Serializer>
-template <typename>
-typename Serializer::SerializedType PluginStateImpl<ParameterState, NonParameterState, Serializer>::serialize (const PluginStateImpl& object)
+template <typename ParameterState, typename NonParameterState>
+json PluginStateImpl<ParameterState, NonParameterState>::serialize (const PluginStateImpl& object)
 {
-#if ! CHOWDSP_USE_LEGACY_STATE_SERIALIZATION
     return {
 #if defined JucePlugin_VersionString
         { "version", currentPluginVersion },
 #else
         { "version", chowdsp::Version {} },
 #endif
-        { "params", Serializer::template serialize<Serializer, ParamHolder> (object.params) },
-        { "non-params", Serializer::template serialize<Serializer, NonParamState> (object.nonParams) },
+        { "params", ParamHolder::serialize (object.params) },
+        { "non-params", NonParamState::serialize (object.nonParams) },
     };
-#else
-    auto serial = Serializer::createBaseElement();
-
-#if defined JucePlugin_VersionString
-    Serializer::addChildElement (serial, Serializer::template serialize<Serializer> (currentPluginVersion));
-#endif
-
-    Serializer::addChildElement (serial, Serializer::template serialize<Serializer, NonParamState> (object.nonParams));
-    Serializer::addChildElement (serial, Serializer::template serialize<Serializer, ParamHolder> (object.params));
-    return serial;
-#endif
 }
 
-/** Deserializer */
-template <typename ParameterState, typename NonParameterState, typename Serializer>
-template <typename>
-void PluginStateImpl<ParameterState, NonParameterState, Serializer>::deserialize (typename Serializer::DeserializedType serial, PluginStateImpl& object)
+/** Legacy Deserializer */
+template <typename ParameterState, typename NonParameterState>
+void PluginStateImpl<ParameterState, NonParameterState>::legacy_deserialize (const json& serial, PluginStateImpl& object)
 {
-#if ! CHOWDSP_USE_LEGACY_STATE_SERIALIZATION
-    jassert (serial.find ("version") != serial.end());
-    object.pluginStateVersion = serial.value ("version", Version {});
-
-    Serializer::template deserialize<Serializer, NonParamState> (serial.at ("non-params"), object.nonParams);
-    Serializer::template deserialize<Serializer, ParamHolder> (serial.at ("params"), object.params);
-#else
+    using Serializer = JSONSerializer;
     enum
     {
 #if defined JucePlugin_VersionString
@@ -94,25 +75,41 @@ void PluginStateImpl<ParameterState, NonParameterState, Serializer>::deserialize
     }
 
 #if defined JucePlugin_VersionString
-    Serializer::template deserialize<Serializer> (Serializer::getChildElement (serial, versionChildIndex), object.pluginStateVersion);
+    Serializer::deserialize<Serializer> (Serializer::getChildElement (serial, versionChildIndex), object.pluginStateVersion);
 #else
     using namespace version_literals;
     object.pluginStateVersion = "0.0.0"_v;
 #endif
 
-    Serializer::template deserialize<Serializer, NonParamState> (Serializer::getChildElement (serial, nonParamStateChildIndex), object.nonParams);
-    Serializer::template deserialize<Serializer, ParamHolder> (Serializer::getChildElement (serial, paramStateChildIndex), object.params);
-#endif
+    NonParamState::legacy_deserialize (Serializer::getChildElement (serial, nonParamStateChildIndex), object.nonParams);
+    ParamHolder::legacy_deserialize (Serializer::getChildElement (serial, paramStateChildIndex), object.params);
 }
 
-template <typename ParameterState, typename NonParameterState, typename Serializer>
-NonParamState& PluginStateImpl<ParameterState, NonParameterState, Serializer>::getNonParameters()
+/** Deserializer */
+template <typename ParameterState, typename NonParameterState>
+void PluginStateImpl<ParameterState, NonParameterState>::deserialize (const json&  serial, PluginStateImpl& object)
+{
+    if (serial.is_array())
+    {
+        legacy_deserialize (serial, object);
+        return;
+    }
+
+    jassert (serial.find ("version") != serial.end());
+    object.pluginStateVersion = serial.value ("version", Version {});
+
+    NonParamState::deserialize (serial.at ("non-params"), object.nonParams);
+    ParamHolder::deserialize (serial.at ("params"), object.params);
+}
+
+template <typename ParameterState, typename NonParameterState>
+NonParamState& PluginStateImpl<ParameterState, NonParameterState>::getNonParameters()
 {
     return nonParams;
 }
 
-template <typename ParameterState, typename NonParameterState, typename Serializer>
-const NonParamState& PluginStateImpl<ParameterState, NonParameterState, Serializer>::getNonParameters() const
+template <typename ParameterState, typename NonParameterState>
+const NonParamState& PluginStateImpl<ParameterState, NonParameterState>::getNonParameters() const
 {
     return nonParams;
 }

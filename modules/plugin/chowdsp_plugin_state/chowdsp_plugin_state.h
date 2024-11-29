@@ -20,10 +20,6 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 #pragma once
 
-#ifndef CHOWDSP_USE_LEGACY_STATE_SERIALIZATION
-#define CHOWDSP_USE_LEGACY_STATE_SERIALIZATION 0
-#endif
-
 #include <chowdsp_core/chowdsp_core.h>
 #include <chowdsp_serialization/chowdsp_serialization.h>
 #include <chowdsp_listeners/chowdsp_listeners.h>
