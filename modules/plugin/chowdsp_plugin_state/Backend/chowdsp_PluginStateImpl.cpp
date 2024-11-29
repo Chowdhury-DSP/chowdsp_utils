@@ -42,14 +42,15 @@ void PluginStateImpl<ParameterState, NonParameterState>::deserialize (juce::Memo
 template <typename ParameterState, typename NonParameterState>
 json PluginStateImpl<ParameterState, NonParameterState>::serialize (const PluginStateImpl& object)
 {
-    return {
+    return
+    {
 #if defined JucePlugin_VersionString
         { "version", currentPluginVersion },
 #else
         { "version", chowdsp::Version {} },
 #endif
-        { "params", ParamHolder::serialize (object.params) },
-        { "non-params", NonParamState::serialize (object.nonParams) },
+            { "params", ParamHolder::serialize (object.params) },
+            { "non-params", NonParamState::serialize (object.nonParams) },
     };
 }
 
@@ -87,7 +88,7 @@ void PluginStateImpl<ParameterState, NonParameterState>::legacy_deserialize (con
 
 /** Deserializer */
 template <typename ParameterState, typename NonParameterState>
-void PluginStateImpl<ParameterState, NonParameterState>::deserialize (const json&  serial, PluginStateImpl& object)
+void PluginStateImpl<ParameterState, NonParameterState>::deserialize (const json& serial, PluginStateImpl& object)
 {
     if (serial.is_array())
     {

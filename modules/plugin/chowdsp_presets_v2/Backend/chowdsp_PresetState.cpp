@@ -58,7 +58,7 @@ void PresetState::deserialize (JSONSerializer::DeserializedType deserial)
     set (PresetPtr { deserial });
 }
 #else
-nlohmann::json PresetState::serialize () const
+nlohmann::json PresetState::serialize() const
 {
     if (preset != nullptr)
         return preset->toJson();

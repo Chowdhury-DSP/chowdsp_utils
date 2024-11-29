@@ -49,7 +49,7 @@ public:
     void deserialize (JSONSerializer::DeserializedType deserial) override;
 #else
     /** Internal use only! */
-    [[nodiscard]] nlohmann::json serialize () const override;
+    [[nodiscard]] nlohmann::json serialize() const override;
 
     /** Internal use only! */
     void deserialize (const nlohmann::json& deserial) override;

@@ -11,7 +11,7 @@ struct StateValueBase
 
     virtual void reset() {}
 
-    [[nodiscard]] virtual nlohmann::json serialize () const { return {}; }
+    [[nodiscard]] virtual nlohmann::json serialize() const { return {}; }
     virtual void deserialize (const nlohmann::json&) {}
 
     const std::string_view name {};
@@ -70,7 +70,7 @@ struct StateValue : StateValueBase
     void reset() override { set (defaultValue); }
 
     /** JSON Serializer */
-    [[nodiscard]] nlohmann::json serialize () const override
+    [[nodiscard]] nlohmann::json serialize() const override
     {
         return get();
     }

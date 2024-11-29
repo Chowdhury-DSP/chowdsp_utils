@@ -25,7 +25,7 @@ TEST_CASE ("JSON Test", "[common][json]")
         }
         {
             const auto badVersion = chowdsp::json::object().get<chowdsp::Version>();
-            REQUIRE (badVersion == chowdsp::Version{});
+            REQUIRE (badVersion == chowdsp::Version {});
         }
     }
 

@@ -31,7 +31,7 @@ public:
     static json serialize (const PluginStateImpl& object);
 
     /** Deserializer */
-    static void deserialize (const json&  serial, PluginStateImpl& object);
+    static void deserialize (const json& serial, PluginStateImpl& object);
 
     /** Legacy Deserializer */
     static void legacy_deserialize (const json& serial, PluginStateImpl& object);
