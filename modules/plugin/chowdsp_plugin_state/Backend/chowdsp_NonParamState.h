@@ -16,17 +16,36 @@ public:
 
     /** Adds more state values to this state. */
     template <typename T>
-    void addStateValues (nonstd::span<StateValue<T>> newStateValues);
+    void addStateValues (nonstd::span<StateValue<T>> newStateValues)
+    {
+        for (auto& val : newStateValues)
+            values.push_back (&val);
+        validateStateValues();
+    }
 
     /** Adds more state values to this state. */
     template <typename ContainerType>
-    void addStateValues (ContainerType& container);
+    void addStateValues (ContainerType& container)
+    {
+        for (auto& val : container)
+            values.push_back (&val);
+        validateStateValues();
+    }
+
+    /** Resets all the state values to their defaults */
+    void reset();
 
     /** Custom serializer */
-    static json serialize (const NonParamState& state);
+    static void serialize (ChainedArenaAllocator& arena, const NonParamState& state);
 
     /** Custom deserializer */
-    static void deserialize (const json& deserial, const NonParamState& state);
+    static void deserialize (nonstd::span<const std::byte> serial_data, NonParamState& state);
+
+    /** Custom serializer */
+    static json serialize_json (const NonParamState& state);
+
+    /** Custom deserializer */
+    static void deserialize_json (const json& deserial, const NonParamState& state);
 
     /** Custom deserializer */
     static void legacy_deserialize (const json& deserial, const NonParamState& state);
@@ -37,10 +56,8 @@ public:
 private:
     void validateStateValues() const;
 
-    std::vector<StateValueBase*> values;
+    std::vector<StateValueBase*> values {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NonParamState)
 };
 } // namespace chowdsp
-
-#include "chowdsp_NonParamState.cpp"

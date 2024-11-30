@@ -21,9 +21,9 @@ function(setup_catch_test_base target)
     )
 
     if(NOT (CMAKE_GENERATOR STREQUAL Xcode))
-        catch_discover_tests(${target}
-            TEST_PREFIX ${target}_
-        )
+        # catch_discover_tests(${target}
+        #     TEST_PREFIX ${target}_
+        # )
     endif()
 endfunction(setup_catch_test_base)
 

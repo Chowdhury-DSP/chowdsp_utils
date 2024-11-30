@@ -53,7 +53,7 @@ json PluginStateImpl<ParameterState, NonParameterState>::serialize (const Plugin
         { "version", chowdsp::Version {} },
 #endif
             { "params", ParamHolder::serialize (object.params) },
-            { "non-params", NonParamState::serialize (object.nonParams) },
+            { "non-params", NonParamState::serialize_json (object.nonParams) },
     };
 }
 
@@ -102,7 +102,7 @@ void PluginStateImpl<ParameterState, NonParameterState>::deserialize (const json
     jassert (serial.find ("version") != serial.end());
     object.pluginStateVersion = serial.value ("version", Version {});
 
-    NonParamState::deserialize (serial.at ("non-params"), object.nonParams);
+    NonParamState::deserialize_json (serial.at ("non-params"), object.nonParams);
     ParamHolder::deserialize (serial.at ("params"), object.params);
 }
 

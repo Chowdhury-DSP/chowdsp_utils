@@ -30,27 +30,37 @@ static std::byte* get_bytes_for_serialization (size_t bytes_count, ArenaType& ar
 
 nonstd::span<const std::byte> get_bytes_for_deserialization (nonstd::span<const std::byte>& bytes);
 
-template <typename T, typename ArenaType>
-static void serialize_object (const T& object, ArenaType& arena)
+template <typename TDest, typename TSource>
+void serialize_direct (TDest* ptr, const TSource& source)
 {
-    auto* bytes = get_bytes_for_serialization (sizeof (T), arena);
-    std::memcpy (bytes, &object, sizeof (T)); // NOLINT
+    const auto source_cast = static_cast<TDest> (source);
+    std::memcpy (ptr, &source_cast, sizeof (TDest));
 }
 
 template <typename T, typename ArenaType>
-static void serialize_span (nonstd::span<const T> data, ArenaType& arena)
+[[nodiscard]] static size_t serialize_object (const T& object, ArenaType& arena)
+{
+    auto* bytes = get_bytes_for_serialization (sizeof (T), arena);
+    std::memcpy (bytes, &object, sizeof (T)); // NOLINT
+    return bytes_detail::sizeof_s + sizeof (T);
+}
+
+template <typename T, typename ArenaType>
+[[nodiscard]] static size_t serialize_span (nonstd::span<const T> data, ArenaType& arena)
 {
     const auto num_bytes = sizeof (T) * data.size();
     auto* bytes = get_bytes_for_serialization (num_bytes, arena);
     std::memcpy (bytes, data.data(), num_bytes); // NOLINT
+    return bytes_detail::sizeof_s + num_bytes;
 }
 
 template <typename ArenaType>
-static void serialize_string (std::string_view str, ArenaType& arena)
+[[nodiscard]] static size_t serialize_string (std::string_view str, ArenaType& arena)
 {
     const auto num_bytes = sizeof (char) * str.size();
     auto* bytes = get_bytes_for_serialization (num_bytes, arena);
     std::memcpy (bytes, str.data(), num_bytes); // NOLINT
+    return bytes_detail::sizeof_s + num_bytes;
 }
 
 template <typename MemoryResourceType>
@@ -64,6 +74,15 @@ static nonstd::span<const std::byte> dump_serialized_bytes (const ArenaAllocator
 
 nonstd::span<const std::byte> dump_serialized_bytes (ChainedArenaAllocator& arena,
                                                      const ChainedArenaAllocator::Frame* frame = nullptr);
+
+template <typename T>
+T deserialize_direct (nonstd::span<const std::byte>& bytes)
+{
+    T x;
+    std::memcpy (&x, bytes.data(), sizeof (T));
+    bytes = bytes.subspan (sizeof (T));
+    return x;
+}
 
 template <typename T>
 static T deserialize_object (nonstd::span<const std::byte>& bytes)

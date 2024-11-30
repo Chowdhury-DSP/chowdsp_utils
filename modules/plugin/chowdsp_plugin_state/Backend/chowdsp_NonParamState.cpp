@@ -1,28 +1,12 @@
 namespace chowdsp
 {
-inline void NonParamState::addStateValues (const std::initializer_list<StateValueBase*>& newStateValues)
+void NonParamState::addStateValues (const std::initializer_list<StateValueBase*>& newStateValues)
 {
     values.insert (values.end(), newStateValues.begin(), newStateValues.end());
     validateStateValues();
 }
 
-template <typename T>
-inline void NonParamState::addStateValues (nonstd::span<StateValue<T>> newStateValues)
-{
-    for (auto& val : newStateValues)
-        values.push_back (&val);
-    validateStateValues();
-}
-
-template <typename ContainerType>
-inline void NonParamState::addStateValues (ContainerType& container)
-{
-    for (auto& val : container)
-        values.push_back (&val);
-    validateStateValues();
-}
-
-inline void NonParamState::validateStateValues() const
+void NonParamState::validateStateValues() const
 {
 #if JUCE_DEBUG
     std::vector<std::string_view> stateValueNames;
@@ -41,7 +25,78 @@ inline void NonParamState::validateStateValues() const
 #endif
 }
 
-inline json NonParamState::serialize (const NonParamState& state)
+void NonParamState::reset()
+{
+    for (auto* value : values)
+        value->reset();
+}
+
+void NonParamState::serialize (ChainedArenaAllocator& arena, const NonParamState& state)
+{
+    auto* serialize_num_bytes = arena.allocate<bytes_detail::size_type> (1, 1);
+    size_t num_bytes = 0;
+    for (const auto& value : state.values)
+    {
+        num_bytes += serialize_string (value->name, arena);
+        num_bytes += value->serialize (arena);
+    }
+    serialize_direct (serialize_num_bytes, num_bytes);
+}
+
+void NonParamState::deserialize (nonstd::span<const std::byte> serial_data, NonParamState& state)
+{
+    auto num_bytes = deserialize_direct<bytes_detail::size_type> (serial_data);
+    if (num_bytes == 0 || serial_data.size() < num_bytes)
+    {
+        state.reset();
+        return;
+    }
+
+    auto values_copy = state.values;
+    auto values_iter = values_copy.begin();
+    const auto get_value_ptr = [&] (std::string_view name) -> StateValueBase*
+    {
+        for (auto iter = values_iter; iter != values_copy.end(); ++iter)
+        {
+            if ((*iter)->name == name)
+            {
+                auto* ptr = *iter;
+                values_iter = values_copy.erase (iter);
+                return ptr;
+            }
+        }
+
+        for (auto iter = values_copy.begin(); iter != values_iter; ++iter)
+        {
+            if ((*iter)->name == name)
+            {
+                auto* ptr = *iter;
+                values_iter = values_copy.erase (iter);
+                return ptr;
+            }
+        }
+        return nullptr;
+    };
+
+    while (serial_data.size() > 0)
+    {
+        const auto value_name = deserialize_string (serial_data);
+        auto* value = get_value_ptr (value_name);
+        if (value == nullptr)
+        {
+            const auto value_num_bytes = deserialize_direct<bytes_detail::size_type> (serial_data);
+            serial_data = serial_data.subspan (value_num_bytes);
+            continue;
+        }
+
+        value->deserialize (serial_data);
+    }
+
+    for (auto* value : values_copy)
+        value->reset();
+}
+
+json NonParamState::serialize_json (const NonParamState& state)
 {
     auto serial = nlohmann::json::object();
     for (const auto& value : state.values)
@@ -49,7 +104,7 @@ inline json NonParamState::serialize (const NonParamState& state)
     return serial;
 }
 
-inline void NonParamState::legacy_deserialize (const json& deserial, const NonParamState& state)
+void NonParamState::legacy_deserialize (const json& deserial, const NonParamState& state)
 {
     using Serializer = JSONSerializer;
     std::vector<std::string_view> namesThatHaveBeenDeserialized {};
@@ -86,7 +141,7 @@ inline void NonParamState::legacy_deserialize (const json& deserial, const NonPa
     }
 }
 
-inline void NonParamState::deserialize (const json& deserial, const NonParamState& state)
+void NonParamState::deserialize_json (const json& deserial, const NonParamState& state)
 {
     for (auto& value : state.values)
     {
