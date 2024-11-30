@@ -15,6 +15,11 @@ PluginStateImpl<ParameterState, NonParameterState>::PluginStateImpl (juce::Audio
 template <typename ParameterState, typename NonParameterState>
 void PluginStateImpl<ParameterState, NonParameterState>::serialize (juce::MemoryBlock& data) const
 {
+    auto& arena = const_cast<ChainedArenaAllocator&> (*params.arena);
+    const auto frame = arena.create_frame();
+
+
+
     const auto serial = serialize (*this);
     JSONUtils::toMemoryBlock (serial, data);
 }

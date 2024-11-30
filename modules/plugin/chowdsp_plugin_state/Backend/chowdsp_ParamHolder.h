@@ -106,7 +106,6 @@ public:
     /** Assign this function to apply version streaming to your non-parameter state. */
     FixedSizeFunction<8, void (const Version&)> versionStreamingCallback {};
 
-protected:
     OptionalPointer<ChainedArenaAllocator> arena {};
 
 private:

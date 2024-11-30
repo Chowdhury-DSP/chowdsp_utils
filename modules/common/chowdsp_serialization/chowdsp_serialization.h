@@ -8,7 +8,7 @@ BEGIN_JUCE_MODULE_DECLARATION
    version:       2.3.0
    name:          ChowDSP Serialization Utilities
    description:   Utility methods for serializing data structures into XML, JSON, or some other format
-   dependencies:  juce_core, chowdsp_core, chowdsp_json, chowdsp_reflection
+   dependencies:  juce_core, chowdsp_core, chowdsp_json, chowdsp_reflection, chowdsp_data_structures
 
    website:       https://ccrma.stanford.edu/~jatin/chowdsp
    license:       BSD 3-Clause
@@ -25,8 +25,10 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include <chowdsp_core/chowdsp_core.h>
 #include <chowdsp_json/chowdsp_json.h>
 #include <chowdsp_reflection/chowdsp_reflection.h>
+#include <chowdsp_data_structures/chowdsp_data_structures.h>
 
 #include "Serialization/chowdsp_BaseSerializer.h"
 #include "Serialization/chowdsp_Serialization.h"
 #include "Serialization/chowdsp_JSONSerializer.h"
 #include "Serialization/chowdsp_XMLSerializer.h"
+#include "Serialization/chowdsp_ByteSerializer.h"
