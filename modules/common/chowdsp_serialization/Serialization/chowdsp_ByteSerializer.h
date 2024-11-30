@@ -65,7 +65,7 @@ static size_t serialize_string (std::string_view str, ArenaType& arena)
 
 template <typename MemoryResourceType>
 static nonstd::span<const std::byte> dump_serialized_bytes (const ArenaAllocator<MemoryResourceType>& arena,
-                                                     const typename ArenaAllocator<MemoryResourceType>::Frame* frame = nullptr)
+                                                            const typename ArenaAllocator<MemoryResourceType>::Frame* frame = nullptr)
 {
     const auto bytes_offset = frame == nullptr ? 0 : frame->bytes_used_at_start;
     const auto bytes_count = arena.get_bytes_used() - bytes_offset;
