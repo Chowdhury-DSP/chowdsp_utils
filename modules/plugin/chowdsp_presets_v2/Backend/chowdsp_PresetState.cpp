@@ -37,6 +37,7 @@ void PresetState::reset()
     set ({});
 }
 
+#if CHOWDSP_USE_LEGACY_STATE_SERIALIZATION
 void PresetState::serialize (JSONSerializer::SerializedType& serial) const
 {
     JSONSerializer::addChildElement (serial, name);
@@ -56,6 +57,26 @@ void PresetState::deserialize (JSONSerializer::DeserializedType deserial)
 
     set (PresetPtr { deserial });
 }
+#else
+nlohmann::json PresetState::serialize() const
+{
+    if (preset != nullptr)
+        return preset->toJson();
+
+    return {};
+}
+
+void PresetState::deserialize (const nlohmann::json& deserial)
+{
+    if (deserial.is_null())
+    {
+        reset();
+        return;
+    }
+
+    set (PresetPtr { deserial });
+}
+#endif
 
 bool operator== (const PresetState& presetState, std::nullptr_t)
 {

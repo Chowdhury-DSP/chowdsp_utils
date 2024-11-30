@@ -11,8 +11,8 @@ struct StateValueBase
 
     virtual void reset() {}
 
-    virtual void serialize (JSONSerializer::SerializedType&) const {}
-    virtual void deserialize (JSONSerializer::DeserializedType) {}
+    [[nodiscard]] virtual nlohmann::json serialize() const { return {}; }
+    virtual void deserialize (const nlohmann::json&) {}
 
     const std::string_view name {};
     Broadcaster<void()> changeBroadcaster {};
@@ -70,35 +70,20 @@ struct StateValue : StateValueBase
     void reset() override { set (defaultValue); }
 
     /** JSON Serializer */
-    void serialize (JSONSerializer::SerializedType& serial) const override
+    [[nodiscard]] nlohmann::json serialize() const override
     {
-        serialize<JSONSerializer> (serial, *this);
+        return get();
     }
 
     /** JSON Deserializer */
-    void deserialize (JSONSerializer::DeserializedType deserial) override
+    void deserialize (const nlohmann::json& deserial) override
     {
-        deserialize<JSONSerializer> (deserial, *this);
+        set (deserial.get<element_type_>());
     }
 
     const element_type defaultValue;
 
 private:
-    template <typename Serializer>
-    static void serialize (typename Serializer::SerializedType& serial, const StateValue& value)
-    {
-        Serializer::addChildElement (serial, value.name);
-        Serializer::addChildElement (serial, Serialization::serialize<Serializer> (value.get()));
-    }
-
-    template <typename Serializer>
-    static void deserialize (typename Serializer::DeserializedType deserial, StateValue& value)
-    {
-        element_type val {};
-        Serialization::deserialize<Serializer> (deserial, val);
-        value.set (val);
-    }
-
     T currentValue;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StateValue)

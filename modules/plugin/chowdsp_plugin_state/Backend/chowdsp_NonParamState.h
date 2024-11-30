@@ -23,12 +23,13 @@ public:
     void addStateValues (ContainerType& container);
 
     /** Custom serializer */
-    template <typename Serializer>
-    static typename Serializer::SerializedType serialize (const NonParamState& state);
+    static json serialize (const NonParamState& state);
 
     /** Custom deserializer */
-    template <typename Serializer>
-    static void deserialize (typename Serializer::DeserializedType deserial, const NonParamState& state);
+    static void deserialize (const json& deserial, const NonParamState& state);
+
+    /** Custom deserializer */
+    static void legacy_deserialize (const json& deserial, const NonParamState& state);
 
     /** Assign this function to apply version streaming to your non-parameter state. */
     std::function<void (const Version&)> versionStreamingCallback = nullptr;
