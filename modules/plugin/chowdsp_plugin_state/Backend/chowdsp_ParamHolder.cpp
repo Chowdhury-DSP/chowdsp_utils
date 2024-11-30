@@ -307,6 +307,7 @@ inline void ParamHolder::deserialize (nonstd::span<const std::byte>& serial_data
     auto data = serial_data.subspan (0, num_bytes);
     serial_data = serial_data.subspan (num_bytes);
 
+    const auto _ = paramHolder.arena->create_frame();
     ParamDeserialVec parameters { ParamDeserialAlloc { *paramHolder.arena } };
     parameters.reserve ((size_t) paramHolder.count());
     getParameterPointers (paramHolder, parameters);
