@@ -38,7 +38,7 @@ void serialize_direct (TDest* ptr, const TSource& source)
 }
 
 template <typename T, typename ArenaType>
-[[nodiscard]] static size_t serialize_object (const T& object, ArenaType& arena)
+static size_t serialize_object (const T& object, ArenaType& arena)
 {
     auto* bytes = get_bytes_for_serialization (sizeof (T), arena);
     std::memcpy (bytes, &object, sizeof (T)); // NOLINT
@@ -46,7 +46,7 @@ template <typename T, typename ArenaType>
 }
 
 template <typename T, typename ArenaType>
-[[nodiscard]] static size_t serialize_span (nonstd::span<const T> data, ArenaType& arena)
+static size_t serialize_span (nonstd::span<const T> data, ArenaType& arena)
 {
     const auto num_bytes = sizeof (T) * data.size();
     auto* bytes = get_bytes_for_serialization (num_bytes, arena);
@@ -55,7 +55,7 @@ template <typename T, typename ArenaType>
 }
 
 template <typename ArenaType>
-[[nodiscard]] static size_t serialize_string (std::string_view str, ArenaType& arena)
+static size_t serialize_string (std::string_view str, ArenaType& arena)
 {
     const auto num_bytes = sizeof (char) * str.size();
     auto* bytes = get_bytes_for_serialization (num_bytes, arena);

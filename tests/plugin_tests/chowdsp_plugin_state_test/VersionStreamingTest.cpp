@@ -83,7 +83,6 @@ TEST_CASE ("Version Streaming Test", "[plugin][state][version]")
             // Save initial state
             State state {};
             state.serialize (stateBlock);
-            std::cout << chowdsp::JSONUtils::fromMemoryBlock (stateBlock).dump() << std::endl;
         }
 
         // check new state

@@ -46,11 +46,14 @@ void NonParamState::serialize (ChainedArenaAllocator& arena, const NonParamState
 void NonParamState::deserialize (nonstd::span<const std::byte> serial_data, NonParamState& state)
 {
     auto num_bytes = deserialize_direct<bytes_detail::size_type> (serial_data);
-    if (num_bytes == 0 || serial_data.size() < num_bytes)
+    if (num_bytes == 0)
     {
         state.reset();
         return;
     }
+
+    auto data = serial_data.subspan (0, num_bytes);
+    serial_data = serial_data.subspan (num_bytes);
 
     auto values_copy = state.values;
     auto values_iter = values_copy.begin();
@@ -78,18 +81,18 @@ void NonParamState::deserialize (nonstd::span<const std::byte> serial_data, NonP
         return nullptr;
     };
 
-    while (serial_data.size() > 0)
+    while (data.size() > 0)
     {
-        const auto value_name = deserialize_string (serial_data);
+        const auto value_name = deserialize_string (data);
         auto* value = get_value_ptr (value_name);
         if (value == nullptr)
         {
-            const auto value_num_bytes = deserialize_direct<bytes_detail::size_type> (serial_data);
-            serial_data = serial_data.subspan (value_num_bytes);
+            const auto value_num_bytes = deserialize_direct<bytes_detail::size_type> (data);
+            data = data.subspan (value_num_bytes);
             continue;
         }
 
-        value->deserialize (serial_data);
+        value->deserialize (data);
     }
 
     for (auto* value : values_copy)

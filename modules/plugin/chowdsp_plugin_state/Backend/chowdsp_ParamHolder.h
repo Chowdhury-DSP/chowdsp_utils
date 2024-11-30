@@ -92,10 +92,16 @@ public:
     size_t doForAllParameters (Callable&& callable, size_t index = 0) const;
 
     /** Custom serializer */
-    static json serialize (const ParamHolder& paramHolder);
+    static void serialize (ChainedArenaAllocator& arena, const ParamHolder& paramHolder);
 
     /** Custom deserializer */
-    static void deserialize (const json& deserial, ParamHolder& paramHolder);
+    static void deserialize (nonstd::span<const std::byte>& serial_data, ParamHolder& paramHolder);
+
+    /** Custom serializer */
+    static json serialize_json (const ParamHolder& paramHolder);
+
+    /** Custom deserializer */
+    static void deserialize_json (const json& deserial, ParamHolder& paramHolder);
 
     /** Legacy deserializer */
     static void legacy_deserialize (const json& deserial, ParamHolder& paramHolder);
@@ -138,6 +144,11 @@ private:
     {
         return static_cast<uint8_t> (type | (shouldDelete ? ShouldDelete : 0));
     }
+
+    using ParamDeserial = std::pair<std::string_view, ThingPtr>;
+    using ParamDeserialAlloc = STLArenaAllocator<ParamDeserial, ChainedArenaAllocator>;
+    using ParamDeserialVec = std::vector<ParamDeserial, ParamDeserialAlloc>;
+    static void getParameterPointers (ParamHolder& holder, ParamDeserialVec& parameters);
 
     std::string_view name;
     bool isOwning;

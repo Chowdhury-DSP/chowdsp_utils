@@ -18,8 +18,17 @@ void PluginStateImpl<ParameterState, NonParameterState>::serialize (juce::Memory
     auto& arena = const_cast<ChainedArenaAllocator&> (*params.arena);
     const auto frame = arena.create_frame();
 
-    const auto serial = serialize (*this);
-    JSONUtils::toMemoryBlock (serial, data);
+#if defined JucePlugin_VersionString
+    serialize_object (currentPluginVersion.getVersionHint(), arena);
+#else
+    serialize_object (int {}, arena);
+#endif
+
+    ParamHolder::serialize (arena, params);
+    NonParamState::serialize (arena, nonParams);
+
+    const auto serial = dump_serialized_bytes (arena, &frame);
+    data.append (serial.begin(), serial.size());
 }
 
 template <typename ParameterState, typename NonParameterState>
@@ -28,7 +37,19 @@ void PluginStateImpl<ParameterState, NonParameterState>::deserialize (juce::Memo
     callOnMainThread (
         [this, data = std::move (dataBlock)]
         {
-            deserialize (JSONUtils::fromMemoryBlock (data), *this);
+            nonstd::span serial_data { static_cast<const std::byte*> (data.getData()), data.getSize() };
+            if (serial_data.size() > 8
+                && (static_cast<char> (serial_data[2]) == '['
+                    || static_cast<char> (serial_data[2]) == '{'))
+            {
+                deserialize (JSONUtils::fromMemoryBlock (data), *this);
+            }
+            else
+            {
+                pluginStateVersion = Version::fromVersionHint (deserialize_object<int> (serial_data));
+                ParamHolder::deserialize (serial_data, params);
+                NonParamState::deserialize (serial_data, nonParams);
+            }
 
             params.applyVersionStreaming (pluginStateVersion);
             if (nonParams.versionStreamingCallback != nullptr)
@@ -45,15 +66,14 @@ void PluginStateImpl<ParameterState, NonParameterState>::deserialize (juce::Memo
 template <typename ParameterState, typename NonParameterState>
 json PluginStateImpl<ParameterState, NonParameterState>::serialize (const PluginStateImpl& object)
 {
-    return
-    {
+    return {
 #if defined JucePlugin_VersionString
         { "version", currentPluginVersion },
 #else
         { "version", chowdsp::Version {} },
 #endif
-            { "params", ParamHolder::serialize (object.params) },
-            { "non-params", NonParamState::serialize_json (object.nonParams) },
+        { "params", ParamHolder::serialize_json (object.params) },
+        { "non-params", NonParamState::serialize_json (object.nonParams) },
     };
 }
 
@@ -103,7 +123,7 @@ void PluginStateImpl<ParameterState, NonParameterState>::deserialize (const json
     object.pluginStateVersion = serial.value ("version", Version {});
 
     NonParamState::deserialize_json (serial.at ("non-params"), object.nonParams);
-    ParamHolder::deserialize (serial.at ("params"), object.params);
+    ParamHolder::deserialize_json (serial.at ("params"), object.params);
 }
 
 template <typename ParameterState, typename NonParameterState>

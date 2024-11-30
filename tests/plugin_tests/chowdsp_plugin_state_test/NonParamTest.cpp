@@ -210,9 +210,7 @@ TEST_CASE ("Non-Param Test", "[plugin][state]")
         atomic_int_val.set (102);
         string_val = "blah blah";
 
-        chowdsp::ChainedArenaAllocator arena { 1024 };
-        chowdsp::NonParamState::serialize (arena, state);
-        const auto serial = chowdsp::dump_serialized_bytes (arena).subspan (0, 25);
+        const auto serial = std::array<std::byte, 2> {};
 
         chowdsp::NonParamState::deserialize (serial, state);
         REQUIRE (int_val.get() == 42);

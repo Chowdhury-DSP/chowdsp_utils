@@ -246,9 +246,149 @@ size_t ParamHolder::doForAllParameters (Callable&& callable, size_t index) const
     return index;
 }
 
-inline json ParamHolder::serialize (const ParamHolder& paramHolder)
+inline void ParamHolder::getParameterPointers (ParamHolder& holder, ParamDeserialVec& parameters)
 {
-#if ! CHOWDSP_USE_LEGACY_STATE_SERIALIZATION
+    for (auto& thing : holder.things)
+    {
+        const auto type = getType (thing);
+        if (type == Holder)
+        {
+            getParameterPointers (*reinterpret_cast<ParamHolder*> (thing.get_ptr()), parameters);
+            continue;
+        }
+
+        std::string_view paramID {};
+        switch (type)
+        {
+            case FloatParam:
+                paramID = toStringView (reinterpret_cast<FloatParameter*> (thing.get_ptr())->paramID);
+                break;
+            case ChoiceParam:
+                paramID = toStringView (reinterpret_cast<ChoiceParameter*> (thing.get_ptr())->paramID);
+                break;
+            case BoolParam:
+                paramID = toStringView (reinterpret_cast<BoolParameter*> (thing.get_ptr())->paramID);
+                break;
+            default:
+                break;
+        }
+
+        parameters.emplace_back (paramID, thing);
+    }
+}
+
+inline void ParamHolder::serialize (ChainedArenaAllocator& arena, const ParamHolder& paramHolder)
+{
+    auto* serialize_num_bytes = arena.allocate<bytes_detail::size_type> (1, 1);
+    size_t num_bytes = 0;
+    paramHolder.doForAllParameters (
+        [&] (auto& param, size_t)
+        {
+            num_bytes += serialize_string (toStringView (param.paramID), arena);
+            num_bytes += serialize_object (ParameterTypeHelpers::getValue (param), arena);
+        });
+    serialize_direct (serialize_num_bytes, num_bytes);
+}
+
+inline void ParamHolder::deserialize (nonstd::span<const std::byte>& serial_data, ParamHolder& paramHolder)
+{
+    using namespace ParameterTypeHelpers;
+    auto num_bytes = deserialize_direct<bytes_detail::size_type> (serial_data);
+    if (num_bytes == 0)
+    {
+        paramHolder.doForAllParameters (
+            [&] (auto& param, size_t)
+            {
+                ParameterTypeHelpers::resetParameter (param);
+            });
+        return;
+    }
+
+    auto data = serial_data.subspan (0, num_bytes);
+    serial_data = serial_data.subspan (num_bytes);
+
+    ParamDeserialVec parameters { ParamDeserialAlloc { *paramHolder.arena } };
+    parameters.reserve ((size_t) paramHolder.count());
+    getParameterPointers (paramHolder, parameters);
+
+    auto params_iter = parameters.begin();
+    const auto get_param_ptr = [&] (std::string_view paramID) -> ThingPtr
+    {
+        for (auto iter = params_iter; iter != parameters.end(); ++iter)
+        {
+            if (iter->first == paramID)
+            {
+                auto ptr = iter->second;
+                params_iter = parameters.erase (iter);
+                return ptr;
+            }
+        }
+
+        for (auto iter = parameters.begin(); iter != params_iter; ++iter)
+        {
+            if (iter->first == paramID)
+            {
+                auto ptr = iter->second;
+                params_iter = parameters.erase (iter);
+                return ptr;
+            }
+        }
+        return {};
+    };
+
+    while (data.size() > 0)
+    {
+        const auto param_id = deserialize_string (data);
+        auto param_ptr = get_param_ptr (param_id);
+        if (param_ptr == nullptr)
+        {
+            const auto param_num_bytes = deserialize_direct<bytes_detail::size_type> (data);
+            data = data.subspan (param_num_bytes);
+            continue;
+        }
+
+        const auto type = getType (param_ptr);
+        switch (type)
+        {
+            case FloatParam:
+                setValue (deserialize_object<ParameterElementType<FloatParameter>> (data),
+                          *reinterpret_cast<FloatParameter*> (param_ptr.get_ptr()));
+                break;
+            case ChoiceParam:
+                setValue (deserialize_object<ParameterElementType<ChoiceParameter>> (data),
+                          *reinterpret_cast<ChoiceParameter*> (param_ptr.get_ptr()));
+                break;
+            case BoolParam:
+                setValue (deserialize_object<ParameterElementType<BoolParameter>> (data),
+                          *reinterpret_cast<BoolParameter*> (param_ptr.get_ptr()));
+                break;
+            default:
+                break;
+        }
+    }
+
+    for (auto [_, param_ptr] : parameters)
+    {
+        const auto type = getType (param_ptr);
+        switch (type)
+        {
+            case FloatParam:
+                resetParameter (*reinterpret_cast<FloatParameter*> (param_ptr.get_ptr()));
+                break;
+            case ChoiceParam:
+                resetParameter (*reinterpret_cast<ChoiceParameter*> (param_ptr.get_ptr()));
+                break;
+            case BoolParam:
+                resetParameter (*reinterpret_cast<BoolParameter*> (param_ptr.get_ptr()));
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+inline json ParamHolder::serialize_json (const ParamHolder& paramHolder)
+{
     auto serial = nlohmann::json::object();
     paramHolder.doForAllParameters (
         [&serial] (auto& param, size_t)
@@ -257,18 +397,9 @@ inline json ParamHolder::serialize (const ParamHolder& paramHolder)
             serial[paramID] = ParameterTypeHelpers::getValue (param);
         });
     return serial;
-#else
-    auto serial = Serializer::createBaseElement();
-    paramHolder.doForAllParameters (
-        [&serial] (auto& param, size_t)
-        {
-            ParameterTypeHelpers::serializeParameter<Serializer> (serial, param);
-        });
-    return serial;
-#endif
 }
 
-inline void ParamHolder::deserialize (const json& deserial, ParamHolder& paramHolder)
+inline void ParamHolder::deserialize_json (const json& deserial, ParamHolder& paramHolder)
 {
     paramHolder.doForAllParameters (
         [&deserial] (auto& param, size_t)
