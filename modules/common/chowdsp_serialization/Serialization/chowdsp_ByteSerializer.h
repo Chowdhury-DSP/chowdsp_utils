@@ -54,13 +54,16 @@ static void serialize_string (std::string_view str, ArenaType& arena)
 }
 
 template <typename MemoryResourceType>
-static nonstd::span<const std::byte> dump_serialized_bytes (ArenaAllocator<MemoryResourceType>& arena,
-                                                            const typename ArenaAllocator<MemoryResourceType>::Frame* frame = nullptr)
+static nonstd::span<const std::byte> dump_serialized_bytes (const ArenaAllocator<MemoryResourceType>& arena,
+                                                     const typename ArenaAllocator<MemoryResourceType>::Frame* frame = nullptr)
 {
     const auto bytes_offset = frame == nullptr ? 0 : frame->bytes_used_at_start;
     const auto bytes_count = arena.get_bytes_used() - bytes_offset;
     return { arena.template data<std::byte> (bytes_offset), bytes_count };
 }
+
+nonstd::span<const std::byte> dump_serialized_bytes (ChainedArenaAllocator& arena,
+                                                     const ChainedArenaAllocator::Frame* frame = nullptr);
 
 template <typename T>
 static T deserialize_object (nonstd::span<const std::byte>& bytes)
