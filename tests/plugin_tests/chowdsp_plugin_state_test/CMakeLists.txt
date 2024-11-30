@@ -8,4 +8,5 @@ target_sources(chowdsp_plugin_state_test
         ParamHolderTest.cpp
         StatePluginInterfaceTest.cpp
         VersionStreamingTest.cpp
+        NonParamTest.cpp
 )

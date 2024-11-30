@@ -32,7 +32,7 @@ public:
     virtual void serialize (juce::MemoryBlock& data) const = 0;
 
     /** Deserializes the plugin state from the given MemoryBlock */
-    virtual void deserialize (const juce::MemoryBlock& data) = 0;
+    virtual void deserialize (juce::MemoryBlock&& data) = 0;
 
     /**
      * Adds a parameter listener which will be called on either the message
@@ -96,7 +96,7 @@ private:
 struct DummyPluginState : PluginState
 {
     void serialize (juce::MemoryBlock&) const override {}
-    void deserialize (const juce::MemoryBlock&) override {}
+    void deserialize (juce::MemoryBlock&&) override {}
 
     NonParamState non_params {};
     [[nodiscard]] NonParamState& getNonParameters() override { return non_params; }

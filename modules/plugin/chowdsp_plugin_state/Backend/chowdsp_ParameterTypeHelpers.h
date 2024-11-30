@@ -50,6 +50,15 @@ namespace ParameterTypeHelpers
             return param.getIndex();
     }
 
+    template <typename ParamType>
+    ParameterElementType<ParamType> getDefaultValue (const ParamType& param)
+    {
+        if constexpr (std::is_base_of_v<FloatParameter, ParamType> || std::is_base_of_v<BoolParameter, ParamType>)
+            return param.getDefault();
+        else if constexpr (std::is_base_of_v<ChoiceParameter, ParamType>)
+            return param.getDefaultIndex();
+    }
+
     /** Resets a parameter to it's default value. */
     inline void resetParameter (juce::AudioProcessorParameter& param)
     {
