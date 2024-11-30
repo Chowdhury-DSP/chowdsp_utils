@@ -16,9 +16,7 @@ TEST_CASE ("Byte Serialization Test", "[common][serialization]")
         chowdsp::ArenaAllocator<std::array<std::byte, 1024>> arena {};
 
         const auto arr = chowdsp::make_array_lambda<float, 12> ([] (auto idx)
-        {
-            return static_cast<float> (idx);
-        });
+                                                                { return static_cast<float> (idx); });
         const auto str = std::string { "Hello world" };
 
         chowdsp::serialize_object (int { 42 }, arena);
