@@ -139,6 +139,11 @@ public:
         return arena_list.count;
     }
 
+    [[nodiscard]] auto* get_extra_alloc_list() const noexcept
+    {
+        return extra_alloc_list;
+    }
+
     /**
      * Returns the total number of bytes currently being used
      * by this allocator.

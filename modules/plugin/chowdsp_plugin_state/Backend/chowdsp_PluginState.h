@@ -84,8 +84,10 @@ public:
     juce::AudioProcessor* processor = nullptr;
     juce::UndoManager* undoManager = nullptr;
 
-private:
+protected:
     std::optional<ParameterListeners> listeners;
+
+private:
     ParamHolder* params = nullptr;
     DeferredAction mainThreadAction;
 

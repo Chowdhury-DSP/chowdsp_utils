@@ -10,7 +10,7 @@ inline ParamHolder::ParamHolder (ParamHolder* parent, std::string_view phName, b
                   jassert (parent->arena != nullptr);
                   return OptionalPointer<ChainedArenaAllocator> { parent->arena.get(), false };
               }
-              return OptionalPointer<ChainedArenaAllocator> { static_cast<size_t> (1024) };
+              return OptionalPointer<ChainedArenaAllocator> { static_cast<size_t> (24 * CHOWDSP_PLUGIN_STATE_MAX_PARAM_COUNT) };
           }(),
       },
       name { arena::alloc_string (*arena, phName) },
@@ -46,6 +46,13 @@ inline ParamHolder::~ParamHolder()
                     break;
             }
         }
+    }
+
+    if (arena.isOwner())
+    {
+        // If you're hitting this assertion, you probably want to increase
+        // CHOWDSP_PLUGIN_STATE_MAX_PARAM_COUNT.
+        jassert (arena->get_extra_alloc_list() == nullptr);
     }
 }
 
@@ -368,7 +375,7 @@ inline void ParamHolder::deserialize (nonstd::span<const std::byte>& serial_data
         }
     }
 
-    for (auto [_, param_ptr] : parameters)
+    for (auto [param_id, param_ptr] : parameters)
     {
         const auto type = getType (param_ptr);
         switch (type)

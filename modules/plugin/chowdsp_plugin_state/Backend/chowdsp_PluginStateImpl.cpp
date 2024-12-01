@@ -13,6 +13,13 @@ PluginStateImpl<ParameterState, NonParameterState>::PluginStateImpl (juce::Audio
 }
 
 template <typename ParameterState, typename NonParameterState>
+PluginStateImpl<ParameterState, NonParameterState>::~PluginStateImpl()
+{
+    // Otherwise the listeners won't be deleted until after the parameters themselves.
+    listeners.reset();
+}
+
+template <typename ParameterState, typename NonParameterState>
 void PluginStateImpl<ParameterState, NonParameterState>::serialize (juce::MemoryBlock& data) const
 {
     auto& arena = const_cast<ChainedArenaAllocator&> (*params.arena);
