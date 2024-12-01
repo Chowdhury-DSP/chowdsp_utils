@@ -10,7 +10,7 @@ inline ParamHolder::ParamHolder (ParamHolder* parent, std::string_view phName, b
                   jassert (parent->arena != nullptr);
                   return OptionalPointer<ChainedArenaAllocator> { parent->arena.get(), false };
               }
-              return OptionalPointer<ChainedArenaAllocator> { static_cast<size_t> (24 * CHOWDSP_PLUGIN_STATE_MAX_PARAM_COUNT) };
+              return OptionalPointer<ChainedArenaAllocator> { static_cast<size_t> (32 * CHOWDSP_PLUGIN_STATE_MAX_PARAM_COUNT) };
           }(),
       },
       name { arena::alloc_string (*arena, phName) },
@@ -374,7 +374,7 @@ inline void ParamHolder::deserialize (nonstd::span<const std::byte>& serial_data
                 break;
         }
     }
-
+/*
     for (auto [param_id, param_ptr] : parameters)
     {
         const auto type = getType (param_ptr);
@@ -393,6 +393,7 @@ inline void ParamHolder::deserialize (nonstd::span<const std::byte>& serial_data
                 break;
         }
     }
+    */
 }
 
 inline json ParamHolder::serialize_json (const ParamHolder& paramHolder)
