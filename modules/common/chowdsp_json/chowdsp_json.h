@@ -32,6 +32,5 @@ namespace chowdsp
 using json = nlohmann::json;
 } // namespace chowdsp
 
-#include "JSONUtils/chowdsp_StringAdapter.h"
-
+#include "JSONUtils/chowdsp_JSONAdaptors.h"
 #include "JSONUtils/chowdsp_JSONUtils.h"

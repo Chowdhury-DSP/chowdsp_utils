@@ -1,4 +1,5 @@
 #pragma once
+#include <chowdsp_serialization/Serialization/chowdsp_ByteSerializer.h>
 
 namespace chowdsp
 {
@@ -11,8 +12,11 @@ struct StateValueBase
 
     virtual void reset() {}
 
-    virtual void serialize (JSONSerializer::SerializedType&) const {}
-    virtual void deserialize (JSONSerializer::DeserializedType) {}
+    [[nodiscard]] virtual nlohmann::json serialize() const { return {}; }
+    virtual void deserialize (const nlohmann::json&) {}
+
+    [[nodiscard]] virtual size_t serialize (ChainedArenaAllocator&) const { return 0; }
+    virtual void deserialize (nonstd::span<const std::byte>&) {}
 
     const std::string_view name {};
     Broadcaster<void()> changeBroadcaster {};
@@ -70,35 +74,85 @@ struct StateValue : StateValueBase
     void reset() override { set (defaultValue); }
 
     /** JSON Serializer */
-    void serialize (JSONSerializer::SerializedType& serial) const override
+    [[nodiscard]] nlohmann::json serialize() const override
     {
-        serialize<JSONSerializer> (serial, *this);
+        return get();
     }
 
     /** JSON Deserializer */
-    void deserialize (JSONSerializer::DeserializedType deserial) override
+    void deserialize (const nlohmann::json& deserial) override
     {
-        deserialize<JSONSerializer> (deserial, *this);
+        set (deserial.get<element_type>());
+    }
+
+    /** Binary serializer */
+    [[nodiscard]] size_t serialize (ChainedArenaAllocator& arena) const override
+    {
+        static constexpr auto is_span = TypeTraits::IsIterable<T> && ! TypeTraits::IsMapLike<T>;
+
+        // Values need to track how many bytes they're serializing so the parent can know also.
+        auto* serialize_num_bytes = arena.allocate<bytes_detail::size_type> (1, 1);
+
+        size_t num_bytes = 0;
+        if constexpr (std::is_same_v<T, json>)
+        {
+            num_bytes = serialize_string (get().dump(), arena);
+        }
+        else if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view>)
+        {
+            num_bytes = serialize_string (currentValue, arena);
+        }
+        else if constexpr (std::is_same_v<T, juce::String>)
+        {
+            num_bytes = serialize_string (toStringView (currentValue), arena);
+        }
+        else if constexpr (is_span)
+        {
+            num_bytes = serialize_span<typename T::value_type> (currentValue, arena);
+        }
+        else
+        {
+            num_bytes = serialize_object (get(), arena);
+        }
+
+        serialize_direct (serialize_num_bytes, num_bytes);
+        return bytes_detail::sizeof_s + num_bytes;
+    }
+
+    void deserialize (nonstd::span<const std::byte>& data) override
+    {
+        static constexpr auto is_span = TypeTraits::IsIterable<T> && ! TypeTraits::IsMapLike<T>;
+
+        [[maybe_unused]] const auto num_bytes = deserialize_direct<bytes_detail::size_type> (data);
+        if constexpr (std::is_same_v<T, json>)
+        {
+            set (json::parse (deserialize_string (data)));
+        }
+        else if constexpr (std::is_same_v<T, std::string>)
+        {
+            set (std::string { deserialize_string (data) });
+        }
+        else if constexpr (std::is_same_v<T, std::string_view>)
+        {
+            set (deserialize_string (data));
+        }
+        else if constexpr (std::is_same_v<T, juce::String>)
+        {
+            set (toString (deserialize_string (data)));
+        }
+        else if constexpr (is_span)
+        {
+            deserialize_span<typename T::value_type> (currentValue, data);
+        }
+        else
+        {
+            set (deserialize_object<element_type> (data));
+        }
     }
 
     const element_type defaultValue;
 
 private:
-    template <typename Serializer>
-    static void serialize (typename Serializer::SerializedType& serial, const StateValue& value)
-    {
-        Serializer::addChildElement (serial, value.name);
-        Serializer::addChildElement (serial, Serialization::serialize<Serializer> (value.get()));
-    }
-
-    template <typename Serializer>
-    static void deserialize (typename Serializer::DeserializedType deserial, StateValue& value)
-    {
-        element_type val {};
-        Serialization::deserialize<Serializer> (deserial, val);
-        value.set (val);
-    }
-
     T currentValue;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StateValue)

@@ -41,11 +41,19 @@ public:
     /** Internal use only! */
     void reset() override;
 
+#if CHOWDSP_USE_LEGACY_STATE_SERIALIZATION
     /** Internal use only! */
     void serialize (JSONSerializer::SerializedType& serial) const override;
 
     /** Internal use only! */
     void deserialize (JSONSerializer::DeserializedType deserial) override;
+#else
+    /** Internal use only! */
+    [[nodiscard]] nlohmann::json serialize() const override;
+
+    /** Internal use only! */
+    void deserialize (const nlohmann::json& deserial) override;
+#endif
 
 private:
     PresetPtr preset {};

@@ -59,6 +59,15 @@ public:
     /** Returns an integer hint for this version value. */
     [[nodiscard]] constexpr int getVersionHint() const { return major * 10000 + minor * 100 + patch; }
 
+    /** Returns a version from a version hint */
+    static constexpr Version fromVersionHint (int versionHint)
+    {
+        const auto major = versionHint / 10000;
+        const auto minor = (versionHint / 100) % 100;
+        const auto patch = versionHint % 100;
+        return { major, minor, patch };
+    }
+
     /** Custom serializer */
     template <typename Serializer>
     static typename Serializer::SerializedType serialize (const Version& object)

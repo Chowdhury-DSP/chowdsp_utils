@@ -103,6 +103,13 @@ public:
         return reinterpret_cast<T*> (raw_data.data() + offset_bytes);
     }
 
+    /** Returns a pointer to the internal buffer with a given offset in bytes */
+    template <typename T, typename IntType>
+    const T* data (IntType offset_bytes) const noexcept
+    {
+        return reinterpret_cast<const T*> (raw_data.data() + offset_bytes);
+    }
+
     /**
      * Creates a "frame" for the allocator.
      * Once the frame goes out of scope, the allocator will be reset
