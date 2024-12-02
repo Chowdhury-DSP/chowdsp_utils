@@ -42,10 +42,16 @@ public:
     void reset() override;
 
     /** Internal use only! */
-    void serialize (JSONSerializer::SerializedType& serial) const override;
+    [[nodiscard]] nlohmann::json serialize_json() const override;
 
     /** Internal use only! */
-    void deserialize (JSONSerializer::DeserializedType deserial) override;
+    void deserialize_json (const nlohmann::json& deserial) override;
+
+    /** Internal use only! */
+    [[nodiscard]] size_t serialize (ChainedArenaAllocator&) const override;
+
+    /** Internal use only! */
+    void deserialize (nonstd::span<const std::byte>&) override;
 
 private:
     PresetPtr preset {};

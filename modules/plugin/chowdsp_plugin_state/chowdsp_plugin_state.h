@@ -20,6 +20,10 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 #pragma once
 
+#ifndef CHOWDSP_PLUGIN_STATE_MAX_PARAM_COUNT
+#define CHOWDSP_PLUGIN_STATE_MAX_PARAM_COUNT 128
+#endif
+
 #include <chowdsp_core/chowdsp_core.h>
 #include <chowdsp_serialization/chowdsp_serialization.h>
 #include <chowdsp_listeners/chowdsp_listeners.h>

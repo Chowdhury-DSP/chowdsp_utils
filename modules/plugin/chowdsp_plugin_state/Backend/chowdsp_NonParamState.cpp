@@ -1,28 +1,12 @@
 namespace chowdsp
 {
-inline void NonParamState::addStateValues (const std::initializer_list<StateValueBase*>& newStateValues)
+void NonParamState::addStateValues (const std::initializer_list<StateValueBase*>& newStateValues)
 {
     values.insert (values.end(), newStateValues.begin(), newStateValues.end());
     validateStateValues();
 }
 
-template <typename T>
-inline void NonParamState::addStateValues (nonstd::span<StateValue<T>> newStateValues)
-{
-    for (auto& val : newStateValues)
-        values.push_back (&val);
-    validateStateValues();
-}
-
-template <typename ContainerType>
-inline void NonParamState::addStateValues (ContainerType& container)
-{
-    for (auto& val : container)
-        values.push_back (&val);
-    validateStateValues();
-}
-
-inline void NonParamState::validateStateValues() const
+void NonParamState::validateStateValues() const
 {
 #if JUCE_DEBUG
     std::vector<std::string_view> stateValueNames;
@@ -41,31 +25,112 @@ inline void NonParamState::validateStateValues() const
 #endif
 }
 
-template <typename Serializer>
-typename Serializer::SerializedType NonParamState::serialize (const NonParamState& state)
+void NonParamState::reset()
 {
-    auto serial = Serializer::createBaseElement();
+    for (auto* value : values)
+        value->reset();
+}
+
+void NonParamState::serialize (ChainedArenaAllocator& arena, const NonParamState& state)
+{
+    auto* serialize_num_bytes = arena.allocate<bytes_detail::size_type> (1, 1);
+    size_t num_bytes = 0;
     for (const auto& value : state.values)
-        value->serialize (serial);
+    {
+        num_bytes += serialize_string (value->name, arena);
+        num_bytes += value->serialize (arena);
+    }
+    serialize_direct (serialize_num_bytes, num_bytes);
+}
+
+void NonParamState::deserialize (nonstd::span<const std::byte>& serial_data, NonParamState& state, ChainedArenaAllocator& arena)
+{
+    auto num_bytes = deserialize_direct<bytes_detail::size_type> (serial_data);
+    if (num_bytes == 0)
+    {
+        state.reset();
+        return;
+    }
+
+    auto data = serial_data.subspan (0, num_bytes);
+    serial_data = serial_data.subspan (num_bytes);
+
+    const auto _ = arena.create_frame();
+    auto values_copy = arena::make_span<StateValueBase*> (arena, state.values.size());
+    std::copy (state.values.begin(), state.values.end(), values_copy.begin());
+    auto values_iter = values_copy.begin();
+    size_t counter = 0;
+    const auto get_value_ptr = [&] (std::string_view name) -> StateValueBase*
+    {
+        const auto returner = [&] (auto& iter)
+        {
+            auto* ptr = *iter;
+            *iter = nullptr;
+            ++iter;
+            values_iter = iter;
+            counter++;
+            return ptr;
+        };
+
+        for (auto iter = values_iter; iter != values_copy.end(); ++iter)
+        {
+            if (*iter != nullptr && (*iter)->name == name)
+                return returner (iter);
+        }
+        for (auto iter = values_copy.begin(); iter != values_iter; ++iter)
+        {
+            if (*iter != nullptr && (*iter)->name == name)
+                return returner (iter);
+        }
+        return nullptr;
+    };
+
+    while (! data.empty())
+    {
+        const auto value_name = deserialize_string (data);
+        auto* value = get_value_ptr (value_name);
+        if (value == nullptr)
+        {
+            const auto value_num_bytes = deserialize_direct<bytes_detail::size_type> (data);
+            data = data.subspan (value_num_bytes);
+            continue;
+        }
+
+        value->deserialize (data);
+    }
+
+    if (counter < values_copy.size())
+    {
+        for (auto* value : values_copy)
+            if (value != nullptr)
+                value->reset();
+    }
+}
+
+json NonParamState::serialize_json (const NonParamState& state)
+{
+    auto serial = nlohmann::json::object();
+    for (const auto& value : state.values)
+        serial[value->name] = value->serialize_json();
     return serial;
 }
 
-template <typename Serializer>
-void NonParamState::deserialize (typename Serializer::DeserializedType deserial, const NonParamState& state)
+void NonParamState::legacy_deserialize (const json& deserial, const NonParamState& state)
 {
+    using Serializer = JSONSerializer;
     std::vector<std::string_view> namesThatHaveBeenDeserialized {};
     if (const auto numNamesAndVals = Serializer::getNumChildElements (deserial); numNamesAndVals % 2 == 0)
     {
         namesThatHaveBeenDeserialized.reserve (static_cast<size_t> (numNamesAndVals) / 2);
         for (int i = 0; i < numNamesAndVals; i += 2)
         {
-            const auto name = Serializer::getChildElement (deserial, i).template get<std::string_view>();
+            const auto name = Serializer::getChildElement (deserial, i).get<std::string_view>();
             const auto& valueDeserial = Serializer::getChildElement (deserial, i + 1);
             for (auto& value : state.values)
             {
                 if (name == value->name)
                 {
-                    value->deserialize (valueDeserial);
+                    value->deserialize_json (valueDeserial);
                     namesThatHaveBeenDeserialized.push_back (name);
                 }
             }
@@ -84,6 +149,18 @@ void NonParamState::deserialize (typename Serializer::DeserializedType deserial,
             if (std::find (namesThatHaveBeenDeserialized.begin(), namesThatHaveBeenDeserialized.end(), value->name) == namesThatHaveBeenDeserialized.end())
                 value->reset();
         }
+    }
+}
+
+void NonParamState::deserialize_json (const json& deserial, const NonParamState& state)
+{
+    for (auto& value : state.values)
+    {
+        auto iter = deserial.find (value->name);
+        if (iter != deserial.end())
+            value->deserialize_json (*iter);
+        else
+            value->reset();
     }
 }
 } // namespace chowdsp
