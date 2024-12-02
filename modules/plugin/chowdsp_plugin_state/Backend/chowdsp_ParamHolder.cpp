@@ -337,7 +337,6 @@ inline void ParamHolder::deserialize (nonstd::span<const std::byte>& serial_data
             if ((*iter).id == paramID)
                 return returner (iter);
         }
-
         for (auto iter = parameters.begin(); iter != params_iter; ++iter)
         {
             if ((*iter).id == paramID)

@@ -43,7 +43,7 @@ void NonParamState::serialize (ChainedArenaAllocator& arena, const NonParamState
     serialize_direct (serialize_num_bytes, num_bytes);
 }
 
-void NonParamState::deserialize (nonstd::span<const std::byte> serial_data, NonParamState& state)
+void NonParamState::deserialize (nonstd::span<const std::byte> serial_data, NonParamState& state, ChainedArenaAllocator& arena)
 {
     auto num_bytes = deserialize_direct<bytes_detail::size_type> (serial_data);
     if (num_bytes == 0)
@@ -55,28 +55,32 @@ void NonParamState::deserialize (nonstd::span<const std::byte> serial_data, NonP
     auto data = serial_data.subspan (0, num_bytes);
     serial_data = serial_data.subspan (num_bytes);
 
-    auto values_copy = state.values;
+    const auto _ = arena.create_frame();
+    auto values_copy = arena::make_span<StateValueBase*> (arena, state.values.size());
+    std::copy (state.values.begin(), state.values.end(), values_copy.begin());
     auto values_iter = values_copy.begin();
+    size_t counter = 0;
     const auto get_value_ptr = [&] (std::string_view name) -> StateValueBase*
     {
+        const auto returner = [&] (auto& iter)
+        {
+            auto* ptr = *iter;
+            *iter = nullptr;
+            ++iter;
+            values_iter = iter;
+            counter++;
+            return ptr;
+        };
+
         for (auto iter = values_iter; iter != values_copy.end(); ++iter)
         {
-            if ((*iter)->name == name)
-            {
-                auto* ptr = *iter;
-                values_iter = values_copy.erase (iter);
-                return ptr;
-            }
+            if (*iter != nullptr && (*iter)->name == name)
+                return returner (iter);
         }
-
         for (auto iter = values_copy.begin(); iter != values_iter; ++iter)
         {
-            if ((*iter)->name == name)
-            {
-                auto* ptr = *iter;
-                values_iter = values_copy.erase (iter);
-                return ptr;
-            }
+            if (*iter != nullptr && (*iter)->name == name)
+                return returner (iter);
         }
         return nullptr;
     };
@@ -95,8 +99,12 @@ void NonParamState::deserialize (nonstd::span<const std::byte> serial_data, NonP
         value->deserialize (data);
     }
 
-    for (auto* value : values_copy)
-        value->reset();
+    if (counter < values_copy.size())
+    {
+        for (auto* value : values_copy)
+            if (value != nullptr)
+                value->reset();
+    }
 }
 
 json NonParamState::serialize_json (const NonParamState& state)

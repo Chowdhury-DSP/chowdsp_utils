@@ -54,7 +54,7 @@ void PluginStateImpl<ParameterState, NonParameterState>::deserialize (juce::Memo
             {
                 pluginStateVersion = Version::fromVersionHint (deserialize_object<int> (serial_data));
                 ParamHolder::deserialize (serial_data, params);
-                NonParamState::deserialize (serial_data, nonParams);
+                NonParamState::deserialize (serial_data, nonParams, *params.arena);
             }
 
             params.applyVersionStreaming (pluginStateVersion);

@@ -95,7 +95,7 @@ TEST_CASE ("Non-Param Test", "[plugin][state]")
         REQUIRE (juce_string_val.get() == "juce");
         REQUIRE (json_val.get() == chowdsp::json { { "val1", 100 }, { "val2", "test" } });
 
-        chowdsp::NonParamState::deserialize (serial_bytes, state);
+        chowdsp::NonParamState::deserialize (serial_bytes, state, arena);
         REQUIRE (int_val.get() == 101);
         REQUIRE (atomic_int_val.get() == 102);
         REQUIRE (! bool_vals.get()[0]);
@@ -134,7 +134,7 @@ TEST_CASE ("Non-Param Test", "[plugin][state]")
         REQUIRE (atomic_int_val.get() == 99);
         REQUIRE (string_val.get() == "blah");
 
-        chowdsp::NonParamState::deserialize (serial_bytes, state);
+        chowdsp::NonParamState::deserialize (serial_bytes, state, arena);
         REQUIRE (int_val.get() == 101);
         REQUIRE (atomic_int_val.get() == 102);
         REQUIRE (string_val.get() == "blah blah");
@@ -166,7 +166,7 @@ TEST_CASE ("Non-Param Test", "[plugin][state]")
         REQUIRE (float_val.get() == 100.0f);
         REQUIRE (string_val.get() == "blah");
 
-        chowdsp::NonParamState::deserialize (serial_bytes, state);
+        chowdsp::NonParamState::deserialize (serial_bytes, state, arena);
         REQUIRE (int_val.get() == 101);
         REQUIRE (float_val.get() == 90.0f);
         REQUIRE (string_val.get() == "blah blah");
@@ -197,7 +197,7 @@ TEST_CASE ("Non-Param Test", "[plugin][state]")
         REQUIRE (int_val.get() == 42);
         REQUIRE (string_val.get() == "blah");
 
-        chowdsp::NonParamState::deserialize (serial_bytes, state);
+        chowdsp::NonParamState::deserialize (serial_bytes, state, arena);
         REQUIRE (int_val.get() == 101);
         REQUIRE (string_val.get() == "blah blah");
     }
@@ -216,7 +216,8 @@ TEST_CASE ("Non-Param Test", "[plugin][state]")
 
         const auto serial = std::array<std::byte, 2> {};
 
-        chowdsp::NonParamState::deserialize (serial, state);
+        chowdsp::ChainedArenaAllocator arena { 1024 };
+        chowdsp::NonParamState::deserialize (serial, state, arena);
         REQUIRE (int_val.get() == 42);
         REQUIRE (atomic_int_val.get() == 99);
         REQUIRE (string_val.get() == "blah");
