@@ -37,28 +37,7 @@ void PresetState::reset()
     set ({});
 }
 
-#if CHOWDSP_USE_LEGACY_STATE_SERIALIZATION
-void PresetState::serialize (JSONSerializer::SerializedType& serial) const
-{
-    JSONSerializer::addChildElement (serial, name);
-    if (preset == nullptr)
-        JSONSerializer::addChildElement (serial, {});
-    else
-        JSONSerializer::addChildElement (serial, preset->toJson());
-}
-
-void PresetState::deserialize (JSONSerializer::DeserializedType deserial)
-{
-    if (deserial.is_null())
-    {
-        reset();
-        return;
-    }
-
-    set (PresetPtr { deserial });
-}
-#else
-nlohmann::json PresetState::serialize() const
+nlohmann::json PresetState::serialize_json() const
 {
     if (preset != nullptr)
         return preset->toJson();
@@ -66,7 +45,7 @@ nlohmann::json PresetState::serialize() const
     return {};
 }
 
-void PresetState::deserialize (const nlohmann::json& deserial)
+void PresetState::deserialize_json (const nlohmann::json& deserial)
 {
     if (deserial.is_null())
     {
@@ -76,7 +55,33 @@ void PresetState::deserialize (const nlohmann::json& deserial)
 
     set (PresetPtr { deserial });
 }
-#endif
+
+[[nodiscard]] size_t PresetState::serialize (ChainedArenaAllocator& arena) const
+{
+    size_t num_bytes = 0;
+    if (preset == nullptr)
+    {
+        num_bytes += serialize_string ("", arena);
+        return num_bytes;
+    }
+
+    num_bytes += serialize_string (preset->toJson().dump(), arena);
+    return num_bytes;
+}
+
+void PresetState::deserialize (nonstd::span<const std::byte>& bytes)
+{
+    try
+    {
+        const auto stateJson = json::parse (deserialize_string (bytes));
+        set (PresetPtr { stateJson });
+    }
+    catch (const std::exception& e)
+    {
+        juce::Logger::writeToLog (std::string { "Unable to load preset state: " } + e.what());
+        reset();
+    }
+}
 
 bool operator== (const PresetState& presetState, std::nullptr_t)
 {

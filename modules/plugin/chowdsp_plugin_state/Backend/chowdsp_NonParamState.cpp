@@ -43,7 +43,7 @@ void NonParamState::serialize (ChainedArenaAllocator& arena, const NonParamState
     serialize_direct (serialize_num_bytes, num_bytes);
 }
 
-void NonParamState::deserialize (nonstd::span<const std::byte> serial_data, NonParamState& state, ChainedArenaAllocator& arena)
+void NonParamState::deserialize (nonstd::span<const std::byte>& serial_data, NonParamState& state, ChainedArenaAllocator& arena)
 {
     auto num_bytes = deserialize_direct<bytes_detail::size_type> (serial_data);
     if (num_bytes == 0)
@@ -111,7 +111,7 @@ json NonParamState::serialize_json (const NonParamState& state)
 {
     auto serial = nlohmann::json::object();
     for (const auto& value : state.values)
-        serial[value->name] = value->serialize();
+        serial[value->name] = value->serialize_json();
     return serial;
 }
 
@@ -130,7 +130,7 @@ void NonParamState::legacy_deserialize (const json& deserial, const NonParamStat
             {
                 if (name == value->name)
                 {
-                    value->deserialize (valueDeserial);
+                    value->deserialize_json (valueDeserial);
                     namesThatHaveBeenDeserialized.push_back (name);
                 }
             }
@@ -158,7 +158,7 @@ void NonParamState::deserialize_json (const json& deserial, const NonParamState&
     {
         auto iter = deserial.find (value->name);
         if (iter != deserial.end())
-            value->deserialize (*iter);
+            value->deserialize_json (*iter);
         else
             value->reset();
     }

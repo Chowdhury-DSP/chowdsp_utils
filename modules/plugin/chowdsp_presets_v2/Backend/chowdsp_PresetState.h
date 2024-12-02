@@ -41,19 +41,17 @@ public:
     /** Internal use only! */
     void reset() override;
 
-#if CHOWDSP_USE_LEGACY_STATE_SERIALIZATION
     /** Internal use only! */
-    void serialize (JSONSerializer::SerializedType& serial) const override;
+    [[nodiscard]] nlohmann::json serialize_json() const override;
 
     /** Internal use only! */
-    void deserialize (JSONSerializer::DeserializedType deserial) override;
-#else
-    /** Internal use only! */
-    [[nodiscard]] nlohmann::json serialize() const override;
+    void deserialize_json (const nlohmann::json& deserial) override;
 
     /** Internal use only! */
-    void deserialize (const nlohmann::json& deserial) override;
-#endif
+    [[nodiscard]] size_t serialize (ChainedArenaAllocator&) const override;
+
+    /** Internal use only! */
+    void deserialize (nonstd::span<const std::byte>&) override;
 
 private:
     PresetPtr preset {};

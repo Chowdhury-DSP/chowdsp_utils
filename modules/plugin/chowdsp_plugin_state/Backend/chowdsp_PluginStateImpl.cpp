@@ -31,8 +31,8 @@ void PluginStateImpl<ParameterState, NonParameterState>::serialize (juce::Memory
     serialize_object (int {}, arena);
 #endif
 
-    ParamHolder::serialize (arena, params);
     NonParamState::serialize (arena, nonParams);
+    ParamHolder::serialize (arena, params);
 
     dump_serialized_bytes (data, arena, &frame);
 }
@@ -53,8 +53,8 @@ void PluginStateImpl<ParameterState, NonParameterState>::deserialize (juce::Memo
             else
             {
                 pluginStateVersion = Version::fromVersionHint (deserialize_object<int> (serial_data));
-                ParamHolder::deserialize (serial_data, params);
                 NonParamState::deserialize (serial_data, nonParams, *params.arena);
+                ParamHolder::deserialize (serial_data, params);
             }
 
             params.applyVersionStreaming (pluginStateVersion);

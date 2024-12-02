@@ -98,9 +98,11 @@ static T deserialize_object (nonstd::span<const std::byte>& bytes)
     const auto serial_bytes = get_bytes_for_deserialization (bytes);
     jassert (serial_bytes.size() == sizeof (T));
 
+    JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wclass-memaccess")
     T object;
     std::memcpy (&object, serial_bytes.data(), serial_bytes.size());
     return object;
+    JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 }
 
 template <typename T>

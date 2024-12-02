@@ -12,8 +12,8 @@ struct StateValueBase
 
     virtual void reset() {}
 
-    [[nodiscard]] virtual nlohmann::json serialize() const { return {}; }
-    virtual void deserialize (const nlohmann::json&) {}
+    [[nodiscard]] virtual nlohmann::json serialize_json() const { return {}; }
+    virtual void deserialize_json (const nlohmann::json&) {}
 
     [[nodiscard]] virtual size_t serialize (ChainedArenaAllocator&) const { return 0; }
     virtual void deserialize (nonstd::span<const std::byte>&) {}
@@ -74,13 +74,13 @@ struct StateValue : StateValueBase
     void reset() override { set (defaultValue); }
 
     /** JSON Serializer */
-    [[nodiscard]] nlohmann::json serialize() const override
+    [[nodiscard]] nlohmann::json serialize_json() const override
     {
         return get();
     }
 
     /** JSON Deserializer */
-    void deserialize (const nlohmann::json& deserial) override
+    void deserialize_json (const nlohmann::json& deserial) override
     {
         set (deserial.get<element_type>());
     }
