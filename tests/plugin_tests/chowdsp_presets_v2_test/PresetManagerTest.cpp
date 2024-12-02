@@ -241,6 +241,27 @@ TEST_CASE ("Preset Manager Test", "[plugin][presets][state]")
         REQUIRE (presetMgr->getIsPresetDirty());
     }
 
+    SECTION ("Null State JSON Test")
+    {
+        static constexpr float otherValue = 0.15f;
+
+        chowdsp::json json_state;
+        {
+            ScopedPresetManager presetMgr {};
+
+            presetMgr.setFloatParam (otherValue);
+            REQUIRE (juce::approximatelyEqual (presetMgr.getFloatParam(), otherValue));
+
+            json_state = decltype (presetMgr.state)::serialize (presetMgr.state);
+        }
+
+        ScopedPresetManager presetMgr {};
+        decltype (presetMgr.state)::deserialize (json_state, presetMgr.state);
+        REQUIRE_MESSAGE (juce::approximatelyEqual (presetMgr.getFloatParam(), otherValue), "Preset state is overriding parameter state!");
+        REQUIRE (presetMgr->getCurrentPreset() == nullptr);
+        REQUIRE (presetMgr->getIsPresetDirty());
+    }
+
     SECTION ("Preset State Test")
     {
         static constexpr float testValue = 0.05f;
@@ -262,6 +283,32 @@ TEST_CASE ("Preset Manager Test", "[plugin][presets][state]")
 
         ScopedPresetManager presetMgr {};
         presetMgr.state.deserialize (std::move (state));
+        REQUIRE_MESSAGE (juce::approximatelyEqual (presetMgr.getFloatParam(), otherValue), "Preset state is overriding parameter state!");
+        REQUIRE (*presetMgr->getCurrentPreset() == preset);
+        REQUIRE (presetMgr->getIsPresetDirty());
+    }
+
+    SECTION ("Preset State JSON Test")
+    {
+        static constexpr float testValue = 0.05f;
+        static constexpr float otherValue = 0.15f;
+        auto preset = saveUserPreset ("test.preset", testValue);
+
+        chowdsp::json json_state;
+        {
+            ScopedPresetManager presetMgr {};
+            presetMgr->addPresets ({ chowdsp::presets::Preset { preset } });
+            presetMgr->loadPreset (presetMgr->getPresetTree().getRootNode().first_child->value.leaf());
+            REQUIRE (juce::approximatelyEqual (presetMgr.getFloatParam(), testValue));
+
+            presetMgr.setFloatParam (otherValue);
+            REQUIRE (juce::approximatelyEqual (presetMgr.getFloatParam(), otherValue));
+
+            json_state = decltype (presetMgr.state)::serialize (presetMgr.state);
+        }
+
+        ScopedPresetManager presetMgr {};
+        decltype (presetMgr.state)::deserialize (json_state, presetMgr.state);
         REQUIRE_MESSAGE (juce::approximatelyEqual (presetMgr.getFloatParam(), otherValue), "Preset state is overriding parameter state!");
         REQUIRE (*presetMgr->getCurrentPreset() == preset);
         REQUIRE (presetMgr->getIsPresetDirty());
