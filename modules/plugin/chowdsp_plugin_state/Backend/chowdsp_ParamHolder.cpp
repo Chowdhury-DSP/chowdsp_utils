@@ -280,7 +280,7 @@ inline void ParamHolder::getParameterPointers (ParamHolder& holder, ParamDeseria
                 break;
         }
 
-        parameters.insert (ParamDeserial { .id = paramID, .ptr = thing, .found = false });
+        parameters.insert (ParamDeserial { paramID, thing, false });
     }
 }
 
@@ -345,7 +345,7 @@ inline void ParamHolder::deserialize (nonstd::span<const std::byte>& serial_data
         return {};
     };
 
-    while (data.size() > 0)
+    while (! data.empty())
     {
         const auto param_id = deserialize_string (data);
         auto param_ptr = get_param_ptr (param_id);

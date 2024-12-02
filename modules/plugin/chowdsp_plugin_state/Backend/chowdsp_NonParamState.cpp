@@ -85,7 +85,7 @@ void NonParamState::deserialize (nonstd::span<const std::byte> serial_data, NonP
         return nullptr;
     };
 
-    while (data.size() > 0)
+    while (! data.empty())
     {
         const auto value_name = deserialize_string (data);
         auto* value = get_value_ptr (value_name);

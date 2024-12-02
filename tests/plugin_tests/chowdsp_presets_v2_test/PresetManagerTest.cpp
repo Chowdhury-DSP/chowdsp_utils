@@ -235,7 +235,7 @@ TEST_CASE ("Preset Manager Test", "[plugin][presets][state]")
         }
 
         ScopedPresetManager presetMgr {};
-        presetMgr.state.deserialize (state);
+        presetMgr.state.deserialize (std::move (state));
         REQUIRE_MESSAGE (juce::approximatelyEqual (presetMgr.getFloatParam(), otherValue), "Preset state is overriding parameter state!");
         REQUIRE (presetMgr->getCurrentPreset() == nullptr);
         REQUIRE (presetMgr->getIsPresetDirty());
@@ -261,7 +261,7 @@ TEST_CASE ("Preset Manager Test", "[plugin][presets][state]")
         }
 
         ScopedPresetManager presetMgr {};
-        presetMgr.state.deserialize (state);
+        presetMgr.state.deserialize (std::move (state));
         REQUIRE_MESSAGE (juce::approximatelyEqual (presetMgr.getFloatParam(), otherValue), "Preset state is overriding parameter state!");
         REQUIRE (*presetMgr->getCurrentPreset() == preset);
         REQUIRE (presetMgr->getIsPresetDirty());
