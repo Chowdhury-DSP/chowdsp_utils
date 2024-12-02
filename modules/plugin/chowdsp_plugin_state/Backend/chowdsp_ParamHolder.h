@@ -145,10 +145,14 @@ private:
         return static_cast<uint8_t> (type | (shouldDelete ? ShouldDelete : 0));
     }
 
-    using ParamDeserial = std::pair<std::string_view, ThingPtr>;
-    using ParamDeserialAlloc = STLArenaAllocator<ParamDeserial, ChainedArenaAllocator>;
-    using ParamDeserialVec = std::vector<ParamDeserial, ParamDeserialAlloc>;
-    static void getParameterPointers (ParamHolder& holder, ParamDeserialVec& parameters);
+    struct ParamDeserial
+    {
+        std::string_view id {};
+        ThingPtr ptr {};
+        bool found = false;
+    };
+    using ParamDeserialList = ChunkList<ParamDeserial, 100>;
+    static void getParameterPointers (ParamHolder& holder, ParamDeserialList& parameters);
 
     std::string_view name;
     bool isOwning;

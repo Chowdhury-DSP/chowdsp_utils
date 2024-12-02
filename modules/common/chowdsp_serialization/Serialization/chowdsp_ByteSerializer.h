@@ -72,8 +72,16 @@ static nonstd::span<const std::byte> dump_serialized_bytes (const ArenaAllocator
     return { arena.template data<std::byte> (bytes_offset), bytes_count };
 }
 
-nonstd::span<const std::byte> dump_serialized_bytes (ChainedArenaAllocator& arena,
-                                                     const ChainedArenaAllocator::Frame* frame = nullptr);
+size_t get_serial_num_bytes (ChainedArenaAllocator& arena,
+                             const ChainedArenaAllocator::Frame* frame = nullptr);
+
+void dump_serialized_bytes (nonstd::span<std::byte> serial,
+                            ChainedArenaAllocator& arena,
+                            const ChainedArenaAllocator::Frame* frame = nullptr);
+
+void dump_serialized_bytes (juce::MemoryBlock& data,
+                            ChainedArenaAllocator& arena,
+                            const ChainedArenaAllocator::Frame* frame = nullptr);
 
 template <typename T>
 T deserialize_direct (nonstd::span<const std::byte>& bytes)

@@ -100,7 +100,9 @@ TEST_CASE ("Byte Serialization Test", "[common][serialization]")
         chowdsp::serialize_span<float> (arr, arena);
         chowdsp::serialize_string (str, arena);
 
-        auto bytes = chowdsp::dump_serialized_bytes (arena);
+        std::vector<std::byte> raw_bytes (chowdsp::get_serial_num_bytes (arena));
+        chowdsp::dump_serialized_bytes (raw_bytes, arena);
+        nonstd::span<const std::byte> bytes { raw_bytes };
 
         const auto int_test = chowdsp::deserialize_object<int> (bytes);
         REQUIRE (int_test == 42);
@@ -138,7 +140,9 @@ TEST_CASE ("Byte Serialization Test", "[common][serialization]")
         chowdsp::serialize_span<float> (vec, arena);
         chowdsp::serialize_string (chowdsp::toStringView (str), arena);
 
-        auto bytes = chowdsp::dump_serialized_bytes (arena, &frame);
+        juce::MemoryBlock raw_data {};
+        chowdsp::dump_serialized_bytes (raw_data, arena, &frame);
+        nonstd::span<const std::byte> bytes { static_cast<std::byte*> (raw_data.getData()), raw_data.getSize() };
 
         const auto int_test = chowdsp::deserialize_object<int> (bytes);
         REQUIRE (int_test == 42);

@@ -14,8 +14,8 @@ nonstd::span<const std::byte> get_bytes_for_deserialization (nonstd::span<const 
     return serial_bytes;
 }
 
-nonstd::span<const std::byte> dump_serialized_bytes (ChainedArenaAllocator& arena,
-                                                     const ChainedArenaAllocator::Frame* frame)
+size_t get_serial_num_bytes (ChainedArenaAllocator& arena,
+                             const ChainedArenaAllocator::Frame* frame)
 {
     size_t num_bytes = 0;
     auto* start_arena = frame == nullptr ? arena.get_arenas().head : frame->arena_at_start;
@@ -31,7 +31,17 @@ nonstd::span<const std::byte> dump_serialized_bytes (ChainedArenaAllocator& aren
         add_bytes_count (*arena_node);
     add_bytes_count (arena.get_current_arena());
 
-    auto serial = arena::make_span<std::byte> (arena, num_bytes, 8);
+    return num_bytes;
+}
+
+void dump_serialized_bytes (nonstd::span<std::byte> serial,
+                            ChainedArenaAllocator& arena,
+                            const ChainedArenaAllocator::Frame* frame)
+{
+    const auto num_bytes = serial.size();
+    jassert (num_bytes == get_serial_num_bytes (arena, frame));
+
+    auto* start_arena = frame == nullptr ? arena.get_arenas().head : frame->arena_at_start;
     size_t bytes_counter = 0;
     const auto copy_bytes = [num_bytes, start_arena, frame, &serial, &bytes_counter] (const ArenaAllocatorView& arena_node)
     {
@@ -48,8 +58,16 @@ nonstd::span<const std::byte> dump_serialized_bytes (ChainedArenaAllocator& aren
     for (auto* arena_node = start_arena; arena_node != &arena.get_current_arena(); arena_node = arena_node->next)
         copy_bytes (*arena_node);
     copy_bytes (arena.get_current_arena());
+}
 
-    return serial;
+void dump_serialized_bytes (juce::MemoryBlock& data,
+                            ChainedArenaAllocator& arena,
+                            const ChainedArenaAllocator::Frame* frame)
+{
+    const auto initial_size = data.getSize();
+    const auto num_bytes = get_serial_num_bytes (arena, frame);
+    data.setSize (initial_size + num_bytes);
+    dump_serialized_bytes ({ static_cast<std::byte*> (data.getData()) + initial_size, num_bytes }, arena, frame);
 }
 
 std::string_view deserialize_string (nonstd::span<const std::byte>& bytes)

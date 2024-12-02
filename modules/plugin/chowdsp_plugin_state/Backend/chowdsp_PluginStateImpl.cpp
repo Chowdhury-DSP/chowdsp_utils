@@ -34,8 +34,7 @@ void PluginStateImpl<ParameterState, NonParameterState>::serialize (juce::Memory
     ParamHolder::serialize (arena, params);
     NonParamState::serialize (arena, nonParams);
 
-    const auto serial = dump_serialized_bytes (arena, &frame);
-    data.append (serial.data(), serial.size());
+    dump_serialized_bytes (data, arena, &frame);
 }
 
 template <typename ParameterState, typename NonParameterState>

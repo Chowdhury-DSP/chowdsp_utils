@@ -253,7 +253,7 @@ size_t ParamHolder::doForAllParameters (Callable&& callable, size_t index) const
     return index;
 }
 
-inline void ParamHolder::getParameterPointers (ParamHolder& holder, ParamDeserialVec& parameters)
+inline void ParamHolder::getParameterPointers (ParamHolder& holder, ParamDeserialList& parameters)
 {
     for (auto& thing : holder.things)
     {
@@ -280,7 +280,7 @@ inline void ParamHolder::getParameterPointers (ParamHolder& holder, ParamDeseria
                 break;
         }
 
-        parameters.emplace_back (paramID, thing);
+        parameters.insert (ParamDeserial { .id = paramID, .ptr = thing, .found = false });
     }
 }
 
@@ -315,31 +315,33 @@ inline void ParamHolder::deserialize (nonstd::span<const std::byte>& serial_data
     serial_data = serial_data.subspan (num_bytes);
 
     const auto _ = paramHolder.arena->create_frame();
-    ParamDeserialVec parameters { ParamDeserialAlloc { *paramHolder.arena } };
-    parameters.reserve ((size_t) paramHolder.count());
+    ParamDeserialList parameters { *paramHolder.arena };
     getParameterPointers (paramHolder, parameters);
 
     auto params_iter = parameters.begin();
+    size_t counter = 0;
     const auto get_param_ptr = [&] (std::string_view paramID) -> ThingPtr
     {
+        const auto returner = [&] (auto& iter)
+        {
+            (*iter).found = true;
+            auto ptr = (*iter).ptr;
+            ++iter;
+            params_iter = iter;
+            counter++;
+            return ptr;
+        };
+
         for (auto iter = params_iter; iter != parameters.end(); ++iter)
         {
-            if (iter->first == paramID)
-            {
-                auto ptr = iter->second;
-                params_iter = parameters.erase (iter);
-                return ptr;
-            }
+            if ((*iter).id == paramID)
+                return returner (iter);
         }
 
         for (auto iter = parameters.begin(); iter != params_iter; ++iter)
         {
-            if (iter->first == paramID)
-            {
-                auto ptr = iter->second;
-                params_iter = parameters.erase (iter);
-                return ptr;
-            }
+            if ((*iter).id == paramID)
+                return returner (iter);
         }
         return {};
     };
@@ -374,26 +376,31 @@ inline void ParamHolder::deserialize (nonstd::span<const std::byte>& serial_data
                 break;
         }
     }
-    /*
-    for (auto [param_id, param_ptr] : parameters)
+
+    if (counter < parameters.count())
     {
-        const auto type = getType (param_ptr);
-        switch (type)
+        for (auto [param_id, param_ptr, found] : parameters)
         {
-            case FloatParam:
-                resetParameter (*reinterpret_cast<FloatParameter*> (param_ptr.get_ptr()));
-                break;
-            case ChoiceParam:
-                resetParameter (*reinterpret_cast<ChoiceParameter*> (param_ptr.get_ptr()));
-                break;
-            case BoolParam:
-                resetParameter (*reinterpret_cast<BoolParameter*> (param_ptr.get_ptr()));
-                break;
-            default:
-                break;
+            if (found)
+                continue;
+
+            const auto type = getType (param_ptr);
+            switch (type)
+            {
+                case FloatParam:
+                    resetParameter (*reinterpret_cast<FloatParameter*> (param_ptr.get_ptr()));
+                    break;
+                case ChoiceParam:
+                    resetParameter (*reinterpret_cast<ChoiceParameter*> (param_ptr.get_ptr()));
+                    break;
+                case BoolParam:
+                    resetParameter (*reinterpret_cast<BoolParameter*> (param_ptr.get_ptr()));
+                    break;
+                default:
+                    break;
+            }
         }
     }
-    */
 }
 
 inline json ParamHolder::serialize_json (const ParamHolder& paramHolder)

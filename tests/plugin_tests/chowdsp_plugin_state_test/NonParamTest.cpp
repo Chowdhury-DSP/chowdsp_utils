@@ -78,7 +78,8 @@ TEST_CASE ("Non-Param Test", "[plugin][state]")
             chowdsp::NonParamState::serialize (arena, state);
         }
 
-        const auto serial = chowdsp::dump_serialized_bytes (arena);
+        std::vector<std::byte> serial_bytes (chowdsp::get_serial_num_bytes (arena));
+        chowdsp::dump_serialized_bytes (serial_bytes, arena);
 
         chowdsp::NonParamState state {};
         state.addStateValues ({ &int_val, &atomic_int_val, &bool_vals, &string_val, &string_view_val, &juce_string_val, &json_val });
@@ -94,7 +95,7 @@ TEST_CASE ("Non-Param Test", "[plugin][state]")
         REQUIRE (juce_string_val.get() == "juce");
         REQUIRE (json_val.get() == chowdsp::json { { "val1", 100 }, { "val2", "test" } });
 
-        chowdsp::NonParamState::deserialize (serial, state);
+        chowdsp::NonParamState::deserialize (serial_bytes, state);
         REQUIRE (int_val.get() == 101);
         REQUIRE (atomic_int_val.get() == 102);
         REQUIRE (! bool_vals.get()[0]);
@@ -123,7 +124,8 @@ TEST_CASE ("Non-Param Test", "[plugin][state]")
             chowdsp::NonParamState::serialize (arena, state);
         }
 
-        const auto serial = chowdsp::dump_serialized_bytes (arena);
+        std::vector<std::byte> serial_bytes (chowdsp::get_serial_num_bytes (arena));
+        chowdsp::dump_serialized_bytes (serial_bytes, arena);
 
         chowdsp::NonParamState state {};
         state.addStateValues ({ &string_val, &atomic_int_val, &int_val });
@@ -132,7 +134,7 @@ TEST_CASE ("Non-Param Test", "[plugin][state]")
         REQUIRE (atomic_int_val.get() == 99);
         REQUIRE (string_val.get() == "blah");
 
-        chowdsp::NonParamState::deserialize (serial, state);
+        chowdsp::NonParamState::deserialize (serial_bytes, state);
         REQUIRE (int_val.get() == 101);
         REQUIRE (atomic_int_val.get() == 102);
         REQUIRE (string_val.get() == "blah blah");
@@ -152,7 +154,8 @@ TEST_CASE ("Non-Param Test", "[plugin][state]")
             chowdsp::NonParamState::serialize (arena, state);
         }
 
-        const auto serial = chowdsp::dump_serialized_bytes (arena);
+        std::vector<std::byte> serial_bytes (chowdsp::get_serial_num_bytes (arena));
+        chowdsp::dump_serialized_bytes (serial_bytes, arena);
 
         chowdsp::StateValue<float> float_val { "float", 90.0f };
         chowdsp::NonParamState state {};
@@ -163,7 +166,7 @@ TEST_CASE ("Non-Param Test", "[plugin][state]")
         REQUIRE (float_val.get() == 100.0f);
         REQUIRE (string_val.get() == "blah");
 
-        chowdsp::NonParamState::deserialize (serial, state);
+        chowdsp::NonParamState::deserialize (serial_bytes, state);
         REQUIRE (int_val.get() == 101);
         REQUIRE (float_val.get() == 90.0f);
         REQUIRE (string_val.get() == "blah blah");
@@ -185,7 +188,8 @@ TEST_CASE ("Non-Param Test", "[plugin][state]")
             chowdsp::NonParamState::serialize (arena, state);
         }
 
-        const auto serial = chowdsp::dump_serialized_bytes (arena);
+        std::vector<std::byte> serial_bytes (chowdsp::get_serial_num_bytes (arena));
+        chowdsp::dump_serialized_bytes (serial_bytes, arena);
 
         chowdsp::NonParamState state {};
         state.addStateValues ({ &string_val, &int_val });
@@ -193,7 +197,7 @@ TEST_CASE ("Non-Param Test", "[plugin][state]")
         REQUIRE (int_val.get() == 42);
         REQUIRE (string_val.get() == "blah");
 
-        chowdsp::NonParamState::deserialize (serial, state);
+        chowdsp::NonParamState::deserialize (serial_bytes, state);
         REQUIRE (int_val.get() == 101);
         REQUIRE (string_val.get() == "blah blah");
     }

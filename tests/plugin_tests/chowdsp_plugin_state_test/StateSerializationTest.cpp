@@ -72,16 +72,31 @@ struct PluginParameterStateNewParam : chowdsp::ParamHolder
 {
     PluginParameterStateNewParam()
     {
-        add (levelParams, mode, onOff, newParam);
+        add (newParam2, onOff, mode, newParam3, levelParams, newParam);
     }
 
     LevelParams levelParams { this };
     chowdsp::ChoiceParameter::Ptr mode { "mode", "Mode", juce::StringArray { "Percent", "Gain", "Percent / Gain", "Gain / Percent" }, 2 };
     chowdsp::BoolParameter::Ptr onOff { "on_off", "On/Off", true };
     chowdsp::GainDBParameter::Ptr newParam { "gain_new", "New Gain", juce::NormalisableRange { -45.0f, 12.0f }, 3.3f };
+    chowdsp::ChoiceParameter::Ptr newParam2 { "choice_new", "New Choice", juce::StringArray { "a", "b", "c" }, 2 };
+    chowdsp::BoolParameter::Ptr newParam3 { "bool_new", "New Bool", false };
 };
 
 using StateWithNewParam = chowdsp::PluginStateImpl<PluginParameterStateNewParam>;
+
+struct PluginParameterStateRemovedParam : chowdsp::ParamHolder
+{
+    PluginParameterStateRemovedParam()
+    {
+        add (levelParams, onOff);
+    }
+
+    LevelParams levelParams { this };
+    chowdsp::BoolParameter::Ptr onOff { "on_off", "On/Off", true };
+};
+
+using StateWithRemovedParam = chowdsp::PluginStateImpl<PluginParameterStateRemovedParam>;
 
 struct PluginParameterStateDoubleOfSameType : chowdsp::ParamHolder
 {
@@ -220,6 +235,8 @@ TEST_CASE ("State Serialization Test", "[plugin][state]")
     SECTION ("Added Parameter Test")
     {
         static constexpr float newGainVal = -22.0f;
+        static constexpr int newChoiceVal = 0;
+        static constexpr bool newBoolVal = true;
 
         juce::MemoryBlock block;
         {
@@ -229,8 +246,34 @@ TEST_CASE ("State Serialization Test", "[plugin][state]")
 
         StateWithNewParam state;
         static_cast<juce::AudioParameterFloat&> (state.params.newParam) = newGainVal;
+        static_cast<juce::AudioParameterChoice&> (state.params.newParam2) = newChoiceVal;
+        static_cast<juce::AudioParameterBool&> (state.params.newParam3) = newBoolVal;
         state.deserialize (std::move (block));
         REQUIRE_MESSAGE (state.params.newParam->get() == Catch::Approx (3.3f).margin (1.0e-6f), "Added param value is incorrect");
+        REQUIRE_MESSAGE (state.params.newParam2->getIndex() == 2, "Added param value is incorrect");
+        REQUIRE_MESSAGE (state.params.newParam3->get() == false, "Added param value is incorrect");
+    }
+
+    SECTION ("Removed Parameter Test")
+    {
+        static constexpr float percentVal = 0.25f;
+        static constexpr float gainVal = -22.0f;
+        static constexpr bool boolVal = false;
+
+        juce::MemoryBlock block;
+        {
+            State state;
+            static_cast<juce::AudioParameterFloat&> (state.params.levelParams.percent) = percentVal;
+            static_cast<juce::AudioParameterFloat&> (state.params.levelParams.gain) = gainVal;
+            static_cast<juce::AudioParameterBool&> (state.params.onOff) = boolVal;
+            state.serialize (block);
+        }
+
+        StateWithRemovedParam state {};
+        state.deserialize (std::move (block));
+        REQUIRE_MESSAGE (juce::approximatelyEqual (state.params.levelParams.percent->get(), percentVal), "Percent value is incorrect");
+        REQUIRE_MESSAGE (juce::approximatelyEqual (state.params.levelParams.gain->get(), gainVal), "Gain value is incorrect");
+        REQUIRE_MESSAGE (state.params.onOff->get() == boolVal, "Bool value is incorrect");
     }
 
     SECTION ("Added Parameter Group Test")
