@@ -40,7 +40,8 @@ TEST_CASE ("ParamHolder Test", "[plugin][state]")
         setValue (1, *choiceNested);
 
         const auto json_state = chowdsp::ParamHolder::serialize_json (params);
-        params.doForAllParameters ([] (auto& param, size_t) { setValue (getDefaultValue (param), param); });
+        params.doForAllParameters ([] (auto& param, size_t)
+                                   { setValue (getDefaultValue (param), param); });
 
         REQUIRE (getValue (*floatParams[0]) == 0.5f);
         REQUIRE (getValue (*floatParams[1]) == 0.5f);
@@ -67,7 +68,8 @@ TEST_CASE ("ParamHolder Test", "[plugin][state]")
         juce::MemoryBlock state {};
         chowdsp::dump_serialized_bytes (state, arena);
 
-        params.doForAllParameters ([] (auto& param, size_t) { setValue (getDefaultValue (param), param); });
+        params.doForAllParameters ([] (auto& param, size_t)
+                                   { setValue (getDefaultValue (param), param); });
 
         REQUIRE (getValue (*floatParams[0]) == 0.5f);
         REQUIRE (getValue (*floatParams[1]) == 0.5f);
