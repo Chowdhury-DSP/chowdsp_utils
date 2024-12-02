@@ -10,10 +10,9 @@ inline ParamHolder::ParamHolder (ParamHolder* parent, std::string_view phName, b
                   jassert (parent->arena != nullptr);
                   return OptionalPointer<ChainedArenaAllocator> { parent->arena.get(), false };
               }
-              return OptionalPointer<ChainedArenaAllocator> { static_cast<size_t> (1024) };
+              return OptionalPointer<ChainedArenaAllocator> { static_cast<size_t> (32 * CHOWDSP_PLUGIN_STATE_MAX_PARAM_COUNT) };
           }(),
       },
-      allParamsMap { MapAllocator { arena } },
       name { arena::alloc_string (*arena, phName) },
       isOwning { phIsOwning }
 {
@@ -21,7 +20,6 @@ inline ParamHolder::ParamHolder (ParamHolder* parent, std::string_view phName, b
 
 inline ParamHolder::ParamHolder (ChainedArenaAllocator& alloc, std::string_view phName, bool phIsOwning)
     : arena { &alloc, false },
-      allParamsMap { MapAllocator { arena } },
       name { arena::alloc_string (*arena, phName) },
       isOwning { phIsOwning }
 {
@@ -49,17 +47,21 @@ inline ParamHolder::~ParamHolder()
             }
         }
     }
+
+    if (arena.isOwner())
+    {
+        // If you're hitting this assertion, you probably want to increase
+        // CHOWDSP_PLUGIN_STATE_MAX_PARAM_COUNT.
+        jassert (arena->get_extra_alloc_list() == nullptr);
+    }
 }
 
 template <typename ParamType, typename... OtherParams>
 std::enable_if_t<std::is_base_of_v<FloatParameter, ParamType>, void>
     ParamHolder::add (OptionalPointer<ParamType>& floatParam, OtherParams&... others)
 {
-    const auto paramID = toStringView (floatParam->paramID);
-    ThingPtr paramPtr { reinterpret_cast<PackedVoid*> (isOwning ? floatParam.release() : floatParam.get()),
-                        getFlags (FloatParam, isOwning) };
-    allParamsMap.insert ({ paramID, paramPtr });
-    things.insert (std::move (paramPtr));
+    things.insert (ThingPtr { reinterpret_cast<PackedVoid*> (isOwning ? floatParam.release() : floatParam.get()),
+                              getFlags (FloatParam, isOwning) });
     add (others...);
 }
 
@@ -67,11 +69,8 @@ template <typename ParamType, typename... OtherParams>
 std::enable_if_t<std::is_base_of_v<ChoiceParameter, ParamType>, void>
     ParamHolder::add (OptionalPointer<ParamType>& choiceParam, OtherParams&... others)
 {
-    const auto paramID = toStringView (choiceParam->paramID);
-    ThingPtr paramPtr { reinterpret_cast<PackedVoid*> (isOwning ? choiceParam.release() : choiceParam.get()),
-                        getFlags (ChoiceParam, isOwning) };
-    allParamsMap.insert ({ paramID, paramPtr });
-    things.insert (std::move (paramPtr));
+    things.insert (ThingPtr { reinterpret_cast<PackedVoid*> (isOwning ? choiceParam.release() : choiceParam.get()),
+                              getFlags (ChoiceParam, isOwning) });
     add (others...);
 }
 
@@ -79,11 +78,8 @@ template <typename ParamType, typename... OtherParams>
 std::enable_if_t<std::is_base_of_v<BoolParameter, ParamType>, void>
     ParamHolder::add (OptionalPointer<ParamType>& boolParam, OtherParams&... others)
 {
-    const auto paramID = toStringView (boolParam->paramID);
-    ThingPtr paramPtr { reinterpret_cast<PackedVoid*> (isOwning ? boolParam.release() : boolParam.get()),
-                        getFlags (BoolParam, isOwning) };
-    allParamsMap.insert ({ paramID, paramPtr });
-    things.insert (std::move (paramPtr));
+    things.insert (ThingPtr { reinterpret_cast<PackedVoid*> (isOwning ? boolParam.release() : boolParam.get()),
+                              getFlags (BoolParam, isOwning) });
     add (others...);
 }
 
@@ -114,12 +110,6 @@ std::enable_if_t<std::is_base_of_v<BoolParameter, ParamType>, void>
 template <typename... OtherParams>
 void ParamHolder::add (ParamHolder& paramHolder, OtherParams&... others)
 {
-    // This should be the parent of the holder being added.
-    // Maybe we can relax this restriction if we no longer need the allParamsMap.
-    jassert (arena == paramHolder.arena);
-
-    allParamsMap.merge (paramHolder.allParamsMap);
-    jassert (paramHolder.allParamsMap.empty()); // assuming no duplicate parameter IDs, all the parameters should be moved in the merge!
     things.insert (ThingPtr { reinterpret_cast<PackedVoid*> (&paramHolder), Holder });
     add (others...);
 }
@@ -263,59 +253,198 @@ size_t ParamHolder::doForAllParameters (Callable&& callable, size_t index) const
     return index;
 }
 
-template <typename Serializer>
-typename Serializer::SerializedType ParamHolder::serialize (const ParamHolder& paramHolder)
+inline void ParamHolder::getParameterPointers (ParamHolder& holder, ParamDeserialList& parameters)
 {
-    auto serial = Serializer::createBaseElement();
+    for (auto& thing : holder.things)
+    {
+        const auto type = getType (thing);
+        if (type == Holder)
+        {
+            getParameterPointers (*reinterpret_cast<ParamHolder*> (thing.get_ptr()), parameters);
+            continue;
+        }
+
+        std::string_view paramID {};
+        switch (type)
+        {
+            case FloatParam:
+                paramID = toStringView (reinterpret_cast<FloatParameter*> (thing.get_ptr())->paramID);
+                break;
+            case ChoiceParam:
+                paramID = toStringView (reinterpret_cast<ChoiceParameter*> (thing.get_ptr())->paramID);
+                break;
+            case BoolParam:
+                paramID = toStringView (reinterpret_cast<BoolParameter*> (thing.get_ptr())->paramID);
+                break;
+            default:
+                break;
+        }
+
+        parameters.insert (ParamDeserial { paramID, thing, false });
+    }
+}
+
+inline void ParamHolder::serialize (ChainedArenaAllocator& arena, const ParamHolder& paramHolder)
+{
+    auto* serialize_num_bytes = arena.allocate<bytes_detail::size_type> (1, 1);
+    size_t num_bytes = 0;
+    paramHolder.doForAllParameters (
+        [&] (auto& param, size_t)
+        {
+            num_bytes += serialize_string (toStringView (param.paramID), arena);
+            num_bytes += serialize_object (ParameterTypeHelpers::getValue (param), arena);
+        });
+    serialize_direct (serialize_num_bytes, num_bytes);
+}
+
+inline void ParamHolder::deserialize (nonstd::span<const std::byte>& serial_data, ParamHolder& paramHolder)
+{
+    using namespace ParameterTypeHelpers;
+    auto num_bytes = deserialize_direct<bytes_detail::size_type> (serial_data);
+    if (num_bytes == 0)
+    {
+        paramHolder.doForAllParameters (
+            [&] (auto& param, size_t)
+            {
+                ParameterTypeHelpers::resetParameter (param);
+            });
+        return;
+    }
+
+    auto data = serial_data.subspan (0, num_bytes);
+    serial_data = serial_data.subspan (num_bytes);
+
+    const auto _ = paramHolder.arena->create_frame();
+    ParamDeserialList parameters { *paramHolder.arena };
+    getParameterPointers (paramHolder, parameters);
+
+    auto params_iter = parameters.begin();
+    size_t counter = 0;
+    const auto get_param_ptr = [&] (std::string_view paramID) -> ThingPtr
+    {
+        const auto returner = [&] (auto& iter)
+        {
+            (*iter).found = true;
+            auto ptr = (*iter).ptr;
+            ++iter;
+            params_iter = iter;
+            counter++;
+            return ptr;
+        };
+
+        for (auto iter = params_iter; iter != parameters.end(); ++iter)
+        {
+            if ((*iter).id == paramID)
+                return returner (iter);
+        }
+        for (auto iter = parameters.begin(); iter != params_iter; ++iter)
+        {
+            if ((*iter).id == paramID)
+                return returner (iter);
+        }
+        return {};
+    };
+
+    while (! data.empty())
+    {
+        const auto param_id = deserialize_string (data);
+        auto param_ptr = get_param_ptr (param_id);
+        if (param_ptr == nullptr)
+        {
+            const auto param_num_bytes = deserialize_direct<bytes_detail::size_type> (data);
+            data = data.subspan (param_num_bytes);
+            continue;
+        }
+
+        const auto type = getType (param_ptr);
+        switch (type)
+        {
+            case FloatParam:
+                setValue (deserialize_object<ParameterElementType<FloatParameter>> (data),
+                          *reinterpret_cast<FloatParameter*> (param_ptr.get_ptr()));
+                break;
+            case ChoiceParam:
+                setValue (deserialize_object<ParameterElementType<ChoiceParameter>> (data),
+                          *reinterpret_cast<ChoiceParameter*> (param_ptr.get_ptr()));
+                break;
+            case BoolParam:
+                setValue (deserialize_object<ParameterElementType<BoolParameter>> (data),
+                          *reinterpret_cast<BoolParameter*> (param_ptr.get_ptr()));
+                break;
+            default:
+                break;
+        }
+    }
+
+    if (counter < parameters.count())
+    {
+        for (auto [param_id, param_ptr, found] : parameters)
+        {
+            if (found)
+                continue;
+
+            const auto type = getType (param_ptr);
+            switch (type)
+            {
+                case FloatParam:
+                    resetParameter (*reinterpret_cast<FloatParameter*> (param_ptr.get_ptr()));
+                    break;
+                case ChoiceParam:
+                    resetParameter (*reinterpret_cast<ChoiceParameter*> (param_ptr.get_ptr()));
+                    break;
+                case BoolParam:
+                    resetParameter (*reinterpret_cast<BoolParameter*> (param_ptr.get_ptr()));
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+}
+
+inline json ParamHolder::serialize_json (const ParamHolder& paramHolder)
+{
+    auto serial = nlohmann::json::object();
     paramHolder.doForAllParameters (
         [&serial] (auto& param, size_t)
         {
-            ParameterTypeHelpers::serializeParameter<Serializer> (serial, param);
+            const auto paramID = toStringView (param.paramID);
+            serial[paramID] = ParameterTypeHelpers::getValue (param);
         });
     return serial;
 }
 
-template <typename Serializer>
-void ParamHolder::deserialize (typename Serializer::DeserializedType deserial, ParamHolder& paramHolder)
+inline void ParamHolder::deserialize_json (const json& deserial, ParamHolder& paramHolder)
 {
+    paramHolder.doForAllParameters (
+        [&deserial] (auto& param, size_t)
+        {
+            const auto paramID = toStringView (param.paramID);
+            ParameterTypeHelpers::setValue (deserial.value (paramID, ParameterTypeHelpers::getDefaultValue (param)), param);
+        });
+}
+
+inline void ParamHolder::legacy_deserialize (const json& deserial, ParamHolder& paramHolder)
+{
+    using Serializer = JSONSerializer;
     std::vector<std::string_view> paramIDsThatHaveBeenDeserialized {};
     if (const auto numParamIDsAndVals = Serializer::getNumChildElements (deserial); numParamIDsAndVals % 2 == 0)
     {
         paramIDsThatHaveBeenDeserialized.reserve (static_cast<size_t> (numParamIDsAndVals) / 2);
         for (int i = 0; i < numParamIDsAndVals; i += 2)
         {
-            const auto paramID = Serializer::getChildElement (deserial, i).template get<std::string_view>();
+            const auto paramID = Serializer::getChildElement (deserial, i).get<std::string_view>();
             const auto& paramDeserial = Serializer::getChildElement (deserial, i + 1);
 
-            auto paramPtrIter = paramHolder.allParamsMap.find (std::string { paramID });
-            if (paramPtrIter == paramHolder.allParamsMap.end())
-                continue;
-
-            paramIDsThatHaveBeenDeserialized.push_back (paramID);
-            [&paramDeserial] (ThingPtr& paramPtr)
-            {
-                const auto deserializeParam = [] (auto* param, auto& pd)
+            paramHolder.doForAllParameters (
+                [&] (auto& param, size_t)
                 {
-                    ParameterTypeHelpers::deserializeParameter<Serializer> (pd, *param);
-                };
+                    if (toStringView (param.paramID) != paramID)
+                        return;
 
-                const auto type = getType (paramPtr);
-                switch (type)
-                {
-                    case FloatParam:
-                        deserializeParam (reinterpret_cast<FloatParameter*> (paramPtr.get_ptr()), paramDeserial);
-                        break;
-                    case ChoiceParam:
-                        deserializeParam (reinterpret_cast<ChoiceParameter*> (paramPtr.get_ptr()), paramDeserial);
-                        break;
-                    case BoolParam:
-                        deserializeParam (reinterpret_cast<BoolParameter*> (paramPtr.get_ptr()), paramDeserial);
-                        break;
-                    default:
-                        jassertfalse;
-                        break;
-                }
-            }(paramPtrIter->second);
+                    paramIDsThatHaveBeenDeserialized.push_back (paramID);
+                    ParameterTypeHelpers::deserializeParameter<Serializer> (paramDeserial, param);
+                });
         }
     }
     else

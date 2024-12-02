@@ -114,6 +114,12 @@ public:
         return get_current_arena().template data<T> (offset_bytes);
     }
 
+    /** Returns the default size for an individual arena */
+    [[nodiscard]] size_t get_default_arena_size() const noexcept
+    {
+        return arena_size_bytes;
+    }
+
     /** Returns the arena currently being used */
     ArenaAllocatorView& get_current_arena()
     {
@@ -131,6 +137,11 @@ public:
     [[nodiscard]] size_t get_arena_count() const noexcept
     {
         return arena_list.count;
+    }
+
+    [[nodiscard]] auto* get_extra_alloc_list() const noexcept
+    {
+        return extra_alloc_list;
     }
 
     /**
