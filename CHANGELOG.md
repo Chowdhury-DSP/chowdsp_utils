@@ -3,6 +3,7 @@
 All notable changes to this project will be documented in this file.
 
 ## [UNRELEASED]
+- Improved plugin state serialization.
 - Added `chowdsp::MetricParameter`.
 
 ## [2.3.0] 2024-11-13
