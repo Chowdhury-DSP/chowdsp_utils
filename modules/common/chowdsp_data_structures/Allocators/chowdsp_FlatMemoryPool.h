@@ -22,7 +22,7 @@ struct FlatMemoryPool
     std::byte* memory_base {};
     std::byte* first_uncommitted_page {};
     std::byte* address_limit {};
-    size_t page_size {};
+    const size_t page_size { get_page_size() };
 
     void* allocate_bytes (size_t num_bytes, size_t alignment = 8)
     {
@@ -89,7 +89,6 @@ struct FlatMemoryPool
 
     void init (size_t reserve_bytes = 1 << 28)
     {
-        page_size = static_cast<size_t> (juce::SystemStats::getPageSize());
         const auto reserve_padded = page_size * ((reserve_bytes + page_size - 1) / page_size);
 
 #if JUCE_WINDOWS
@@ -130,6 +129,25 @@ private:
         first_uncommitted_page = juce::snapPointerToAlignment (end, page_size);
 #endif
     }
+
+#if JUCE_WINDOWS
+    static size_t get_page_size()
+    {
+        SYSTEM_INFO systemInfo;
+        GetNativeSystemInfo (&systemInfo);
+        return static_cast<size_t> (systemInfo.dwPageSize);
+    }
+#elif JUCE_MAC
+    static size_t get_page_size()
+    {
+        return static_cast<size_t> (NSPageSize());
+    }
+#elif JUCE_LINUX
+    static size_t get_page_size()
+    {
+        return static_cast<size_t> (sysconf (_SC_PAGESIZE));
+    }
+#endif
 };
 } // namespace chowdsp
 
