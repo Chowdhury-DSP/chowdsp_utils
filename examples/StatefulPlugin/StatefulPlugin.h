@@ -5,7 +5,7 @@
 
 struct LevelParams : chowdsp::ParamHolder
 {
-    LevelParams() : chowdsp::ParamHolder ("Level")
+    explicit LevelParams (ParamHolder* parent) : ParamHolder { parent, "Level" }
     {
         add (percent, gain);
     }
@@ -22,7 +22,7 @@ struct PluginParameterState : chowdsp::ParamHolder
         add (levelParams, mode, onOff);
     }
 
-    LevelParams levelParams;
+    LevelParams levelParams { this };
     chowdsp::ChoiceParameter::Ptr mode { juce::ParameterID { "mode", 100 }, "Mode", juce::StringArray { "Percent", "Gain", "Percent / Gain", "Gain / Percent" }, 2 };
     chowdsp::BoolParameter::Ptr onOff { juce::ParameterID { "on_off", 100 }, "On/Off", true };
 };
@@ -34,7 +34,7 @@ struct PluginNonParameterState : chowdsp::NonParamState
         addStateValues ({ &editorBounds });
     }
 
-    chowdsp::StateValue<juce::Point<int>> editorBounds { "editor_bounds", { 300, 500 } };
+    chowdsp::StateValue<std::pair<int, int>> editorBounds { "editor_bounds", { 300, 500 } };
 };
 
 using State = chowdsp::PluginStateImpl<PluginParameterState, PluginNonParameterState>;

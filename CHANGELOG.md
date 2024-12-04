@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [UNRELEASED]
+- Improved plugin state serialization.
+- Added `chowdsp::MetricParameter`.
+
 ## [2.3.0] 2024-11-13
 - Added `chowdsp_fuzzy_search` module.
 - Added data structures: `chowdsp::ComponentArena`, `chowdsp::EnumMap`, `chowdsp::OptionalRef` and `chowdsp::OptionalArray`.

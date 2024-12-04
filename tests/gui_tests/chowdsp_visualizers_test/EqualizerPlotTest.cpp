@@ -20,6 +20,7 @@ struct TestEQParams : chowdsp::ParamHolder
     }
 
     chowdsp::EQ::StandardEQParameters<4> testEQParams {
+        this,
         {
             chowdsp::EQ::StandardEQParameters<4>::EQBandParams { 0, "eq_band_0", "Band ", 100, bandTypeChoices, 3, 250.0f },
             chowdsp::EQ::StandardEQParameters<4>::EQBandParams { 1, "eq_band_1", "Band ", 100, bandTypeChoices, 3, 1000.0f },

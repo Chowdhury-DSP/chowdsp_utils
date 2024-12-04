@@ -12,9 +12,10 @@ struct Params : chowdsp::ParamHolder
 
     chowdsp::BoolParameter::Ptr param { "bool", "Bool", false };
 
-    struct InnerParams : chowdsp::ParamHolder
+    struct InnerParams : ParamHolder
     {
-        InnerParams()
+        explicit InnerParams (ParamHolder* parent)
+            : ParamHolder { parent }
         {
             add (param);
             versionStreamingCallback = [this] (const chowdsp::Version& version)
@@ -25,7 +26,7 @@ struct Params : chowdsp::ParamHolder
         }
 
         chowdsp::BoolParameter::Ptr param { "bool2", "Bool", false };
-    } innerParams;
+    } innerParams { this };
 };
 
 struct NonParams : chowdsp::NonParamState
@@ -88,7 +89,26 @@ TEST_CASE ("Version Streaming Test", "[plugin][state][version]")
         State state {};
         REQUIRE (state.params.innerParams.param->get() == false);
         REQUIRE (juce::approximatelyEqual (state.nonParams.editorSize.get(), 1.0f));
-        state.deserialize (stateBlock);
+        state.deserialize (std::move (stateBlock));
+        REQUIRE (state.params.innerParams.param->get() == true);
+        REQUIRE (juce::approximatelyEqual (state.nonParams.editorSize.get(), 1.5f));
+    }
+
+    SECTION ("Version Streaming with Legacy State Serialization")
+    {
+        static_assert (chowdsp::currentPluginVersion == "9.9.9"_v, "Tests are tuned for JucePlugin_VersionString = 9.9.9");
+
+        using State = chowdsp::PluginStateImpl<Params, NonParams>;
+
+        const auto jsonState = nlohmann::json::parse (R"(["9.9.9",["editor_size",1.0],["bool",false,"bool2",false]])");
+        juce::MemoryBlock stateBlock;
+        chowdsp::JSONUtils::toMemoryBlock (jsonState, stateBlock);
+
+        // check new state
+        State state {};
+        REQUIRE (state.params.innerParams.param->get() == false);
+        REQUIRE (juce::approximatelyEqual (state.nonParams.editorSize.get(), 1.0f));
+        state.deserialize (std::move (stateBlock));
         REQUIRE (state.params.innerParams.param->get() == true);
         REQUIRE (juce::approximatelyEqual (state.nonParams.editorSize.get(), 1.5f));
     }

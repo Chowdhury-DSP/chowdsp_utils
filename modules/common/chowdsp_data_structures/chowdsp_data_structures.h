@@ -32,6 +32,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Helpers/chowdsp_VectorHelpers.h"
 #include "Helpers/chowdsp_Iterators.h"
 
+#include "Structures/chowdsp_FixedSizeFunction.h"
 #include "Structures/chowdsp_DoubleBuffer.h"
 #include "Structures/chowdsp_PackedPointer.h"
 #include "Structures/chowdsp_DestructiblePointer.h"
@@ -49,8 +50,10 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Allocators/chowdsp_STLArenaAllocator.h"
 #include "Helpers/chowdsp_ArenaHelpers.h"
 
+#include "Allocators/chowdsp_FlatMemoryPool.h"
 #include "Allocators/chowdsp_PoolAllocator.h"
 
 #include "Structures/chowdsp_BucketArray.h"
+#include "Structures/chowdsp_ChunkList.h"
 #include "Structures/chowdsp_AbstractTree.h"
 #include "Structures/chowdsp_SmallMap.h"

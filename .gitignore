@@ -1,5 +1,6 @@
 *build*/
 cmake-build*/
+.raddbg_project
 .vscode/
 docs/
 .idea/

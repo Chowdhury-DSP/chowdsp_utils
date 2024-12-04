@@ -113,15 +113,19 @@ TEST_CASE ("Version Test", "[plugin][version]")
         using namespace chowdsp::version_literals;
         static constexpr auto v1_2_3 = "1.2.3"_v;
         static_assert (v1_2_3.getVersionHint() == 10203);
+        static_assert (chowdsp::Version::fromVersionHint (v1_2_3.getVersionHint()) == v1_2_3);
 
         static constexpr auto v50_49_5 = chowdsp::Version { 50, 49, 5 };
         static_assert (v50_49_5.getVersionHint() == 504905);
+        static_assert (chowdsp::Version::fromVersionHint (v50_49_5.getVersionHint()) == v50_49_5);
 
         const auto v99_99_99 = "99.99.99"_v;
         REQUIRE (v99_99_99.getVersionHint() == 999999);
+        REQUIRE (chowdsp::Version::fromVersionHint (v99_99_99.getVersionHint()) == v99_99_99);
 
         const auto v5_49_15 = chowdsp::Version { 5, 49, 15 };
         REQUIRE (v5_49_15.getVersionHint() == 54915);
+        REQUIRE (chowdsp::Version::fromVersionHint (v5_49_15.getVersionHint()) == v5_49_15);
 
         REQUIRE (chowdsp::Version {}.getVersionHint() == 0);
     }

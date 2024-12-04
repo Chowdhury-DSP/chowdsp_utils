@@ -28,7 +28,7 @@ PluginEditor::PluginEditor (StatefulPlugin& plug) : juce::AudioProcessorEditor (
     const auto setSizeFromState = [this]
     {
         const auto& stateSize = plugin.getState().nonParams.editorBounds.get();
-        setSize (stateSize.x, stateSize.y);
+        setSize (stateSize.first, stateSize.second);
     };
     setSizeFromState();
 
@@ -65,5 +65,5 @@ void PluginEditor::resized()
     undoButton.setBounds (bounds.removeFromLeft (80));
     redoButton.setBounds (bounds.removeFromLeft (80));
 
-    plugin.getState().nonParams.editorBounds = getLocalBounds().getBottomRight();
+    plugin.getState().nonParams.editorBounds = std::make_pair (getLocalBounds().getRight(), getLocalBounds().getBottom());
 }

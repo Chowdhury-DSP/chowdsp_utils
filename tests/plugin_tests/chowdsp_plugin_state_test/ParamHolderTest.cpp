@@ -3,20 +3,20 @@
 
 TEST_CASE ("ParamHolder Test", "[plugin][state]")
 {
+    std::array<chowdsp::PercentParameter::Ptr, 2> floatParams {
+        chowdsp::PercentParameter::Ptr { "param3", "Param", 0.5f },
+        chowdsp::PercentParameter::Ptr { "param4", "Param", 0.5f },
+    };
+    chowdsp::BoolParameter::Ptr boolNested { "param1", "Param", false };
+    chowdsp::ChoiceParameter::Ptr choiceNested { "param2", "Param", juce::StringArray { "One", "Two" }, 0 };
+
+    chowdsp::ParamHolder params;
+    chowdsp::ParamHolder nestedParams { &params };
+    nestedParams.add (boolNested, choiceNested);
+    params.add (nestedParams, floatParams);
+
     SECTION ("add()")
     {
-        chowdsp::BoolParameter::Ptr boolNested { "param1", "Param", false };
-        chowdsp::ChoiceParameter::Ptr choiceNested { "param2", "Param", juce::StringArray { "One", "Two" }, 0 };
-        chowdsp::ParamHolder nestedParams;
-        nestedParams.add (boolNested, choiceNested);
-
-        chowdsp::ParamHolder params;
-        std::array<chowdsp::PercentParameter::Ptr, 2> floatParams {
-            chowdsp::PercentParameter::Ptr { "param3", "Param", 0.5f },
-            chowdsp::PercentParameter::Ptr { "param4", "Param", 0.5f },
-        };
-        params.add (nestedParams, floatParams);
-
         auto allParamIDs = [&params]
         {
             juce::StringArray allIDs;
@@ -31,15 +31,56 @@ TEST_CASE ("ParamHolder Test", "[plugin][state]")
         REQUIRE (allParamIDs.contains (floatParams[1]->paramID));
     }
 
-    SECTION ("clear()")
+    SECTION ("Serialize JSON")
     {
-        chowdsp::ParamHolder params { "Params", false };
-        chowdsp::PercentParameter::Ptr pct_param { "percent", "Percent", 0.5f };
-        chowdsp::PercentParameter::Ptr pct_param2 { "percent2", "Percent 2", 0.5f };
-        params.add (pct_param, pct_param2);
-        REQUIRE (params.count() == 2);
+        using namespace chowdsp::ParameterTypeHelpers;
+        setValue (0.0f, *floatParams[0]);
+        setValue (1.0f, *floatParams[1]);
+        setValue (true, *boolNested);
+        setValue (1, *choiceNested);
 
-        params.clear();
-        REQUIRE (params.count() == 0);
+        const auto json_state = chowdsp::ParamHolder::serialize_json (params);
+        params.doForAllParameters ([] (auto& param, size_t)
+                                   { setValue (getDefaultValue (param), param); });
+
+        REQUIRE (getValue (*floatParams[0]) == 0.5f);
+        REQUIRE (getValue (*floatParams[1]) == 0.5f);
+        REQUIRE (getValue (*boolNested) == false);
+        REQUIRE (getValue (*choiceNested) == 0);
+
+        chowdsp::ParamHolder::deserialize_json (json_state, params);
+        REQUIRE (getValue (*floatParams[0]) == 0.0f);
+        REQUIRE (getValue (*floatParams[1]) == 1.0f);
+        REQUIRE (getValue (*boolNested) == true);
+        REQUIRE (getValue (*choiceNested) == 1);
+    }
+
+    SECTION ("Serialize Bytes")
+    {
+        using namespace chowdsp::ParameterTypeHelpers;
+        setValue (0.0f, *floatParams[0]);
+        setValue (1.0f, *floatParams[1]);
+        setValue (true, *boolNested);
+        setValue (1, *choiceNested);
+
+        chowdsp::ChainedArenaAllocator arena { 128 };
+        chowdsp::ParamHolder::serialize (arena, params);
+        juce::MemoryBlock state {};
+        chowdsp::dump_serialized_bytes (state, arena);
+
+        params.doForAllParameters ([] (auto& param, size_t)
+                                   { setValue (getDefaultValue (param), param); });
+
+        REQUIRE (getValue (*floatParams[0]) == 0.5f);
+        REQUIRE (getValue (*floatParams[1]) == 0.5f);
+        REQUIRE (getValue (*boolNested) == false);
+        REQUIRE (getValue (*choiceNested) == 0);
+
+        nonstd::span state_data = { (const std::byte*) state.getData(), state.getSize() };
+        chowdsp::ParamHolder::deserialize (state_data, params);
+        REQUIRE (getValue (*floatParams[0]) == 0.0f);
+        REQUIRE (getValue (*floatParams[1]) == 1.0f);
+        REQUIRE (getValue (*boolNested) == true);
+        REQUIRE (getValue (*choiceNested) == 1);
     }
 }

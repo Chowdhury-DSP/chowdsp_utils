@@ -67,7 +67,7 @@ namespace Metric
     struct Micro
     {
         static constexpr auto multiplier = 1.0e-6;
-        static constexpr auto prefix = "μ"sv; // @TODO: how can we use 'μ' here instead?
+        static constexpr auto prefix = "μ"sv;
     };
 
     struct Nano
