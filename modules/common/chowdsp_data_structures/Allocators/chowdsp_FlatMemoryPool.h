@@ -124,7 +124,7 @@ private:
         jassert (end - first_uncommitted_page >= 0);
 #if JUCE_WINDOWS
         const auto size = juce::snapPointerToAlignment (end, page_size) - first_uncommitted_page;
-        VirtualAlloc(first_uncommitted_page, static_cast<size_t> (size), MEM_COMMIT, PAGE_READWRITE);
+        VirtualAlloc (first_uncommitted_page, static_cast<size_t> (size), MEM_COMMIT, PAGE_READWRITE);
         first_uncommitted_page += size;
 #else
         first_uncommitted_page = juce::snapPointerToAlignment (end, page_size);
