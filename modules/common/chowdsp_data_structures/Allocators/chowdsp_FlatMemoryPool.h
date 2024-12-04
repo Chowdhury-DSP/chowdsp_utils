@@ -8,6 +8,7 @@
 #include <windows.h>
 #else
 #include <sys/mman.h>
+#include <unistd.h>
 #endif
 
 namespace chowdsp
@@ -137,12 +138,7 @@ private:
         GetNativeSystemInfo (&systemInfo);
         return static_cast<size_t> (systemInfo.dwPageSize);
     }
-#elif JUCE_MAC
-    static size_t get_page_size()
-    {
-        return static_cast<size_t> (NSPageSize());
-    }
-#elif JUCE_LINUX
+#else
     static size_t get_page_size()
     {
         return static_cast<size_t> (sysconf (_SC_PAGESIZE));
