@@ -2,10 +2,20 @@
 
 namespace chowdsp::arena
 {
+/**
+ * Allocates space for some number of objects of type T
+ * The returned memory will be un-initialized, so be sure to clear it manually if needed.
+ */
+template <typename T, typename IntType, typename Arena>
+T* allocate (Arena& arena, IntType num_Ts, size_t alignment = alignof (T)) noexcept
+{
+    return static_cast<T*> (arena.allocate_bytes ((size_t) num_Ts * sizeof (T), alignment));
+}
+
 template <typename T, typename I, typename Arena>
 nonstd::span<T> make_span (Arena& arena, I size, size_t alignment = alignof (T))
 {
-    return { arena.template allocate<T> (size, alignment), static_cast<size_t> (size) };
+    return { allocate<T> (arena, size, alignment), static_cast<size_t> (size) };
 }
 
 template <typename Arena>
