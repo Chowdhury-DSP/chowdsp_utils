@@ -21,7 +21,7 @@ namespace EnumHelpers
         {
             juce::String nameStr { name.data() };
             for (const auto& [charToReplace, charToReplaceWith] : charMap)
-                nameStr = nameStr.replaceCharacter (charToReplace, charToReplaceWith);
+                nameStr = nameStr.replaceCharacter (charToReplace, charToReplaceWith).trim();
 
             names.add (nameStr);
         }
