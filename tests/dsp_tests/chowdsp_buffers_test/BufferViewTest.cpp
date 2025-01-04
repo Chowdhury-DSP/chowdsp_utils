@@ -141,6 +141,22 @@ TEMPLATE_TEST_CASE ("Buffer View Test", "[dsp][buffers][simd]", float, double, x
         }
     }
 
+    SECTION ("Const Data Copy Constructor Test")
+    {
+        chowdsp::Buffer<TestType> buffer { 1, 32 };
+        chowdsp::BufferView<const TestType> buffer_view { buffer };
+
+        {
+            chowdsp::BufferView<const TestType> buffer_view_copy { buffer_view, 0 }; // NOLINT
+            REQUIRE (buffer_view.getReadPointer (0) == buffer_view_copy.getReadPointer (0));
+        }
+
+        {
+            chowdsp::BufferView<const TestType> buffer_view_copy = buffer_view; // NOLINT
+            REQUIRE (buffer_view.getReadPointer (0) == buffer_view_copy.getReadPointer (0));
+        }
+    }
+
     if constexpr (std::is_floating_point_v<TestType>)
     {
         SECTION ("make_temp_buffer")
