@@ -20,6 +20,7 @@ public:
 
     BufferView() = default;
 
+    BufferView (const BufferView&) noexcept = default;
     BufferView& operator= (const BufferView&) = default;
     BufferView (BufferView&&) noexcept = default;
     BufferView& operator= (BufferView&&) noexcept = default;
@@ -104,7 +105,7 @@ public:
     }
 
     BufferView (const BufferView<std::remove_const_t<SampleType>>& buffer, // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
-                int sampleOffset = 0,
+                int sampleOffset,
                 int bufferNumSamples = -1,
                 int startChannel = 0,
                 int bufferNumChannels = -1)
@@ -118,7 +119,7 @@ public:
 
     template <typename T = SampleType, std::enable_if_t<std::is_const_v<T>>* = nullptr>
     BufferView (const BufferView<const SampleType>& buffer, // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
-                int sampleOffset = 0,
+                int sampleOffset,
                 int bufferNumSamples = -1,
                 int startChannel = 0,
                 int bufferNumChannels = -1)
@@ -128,6 +129,14 @@ public:
         jassert (buffer.getNumChannels() >= startChannel + numChannels);
         jassert (buffer.getNumSamples() >= sampleOffset + numSamples);
         initialise (buffer.getArrayOfReadPointers(), sampleOffset, startChannel);
+    }
+
+    template <typename T = SampleType, std::enable_if_t<std::is_const_v<T>>* = nullptr>
+    BufferView (const BufferView<std::remove_const_t<T>>& buffer) noexcept // NOLINT(google-explicit-constructor): we want to be able to do implicit construction
+        : numChannels (buffer.getNumChannels()),
+          numSamples (buffer.getNumSamples())
+    {
+        initialise (buffer.getArrayOfReadPointers(), 0, 0);
     }
 
 #if CHOWDSP_USING_JUCE
