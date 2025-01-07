@@ -388,8 +388,8 @@ BufferView (BufferType&, Ts...) -> BufferView<const xsimd::batch<double>>;
 #endif // ! CHOWDSP_NO_XSIMD
 
 #if JUCE_MODULE_AVAILABLE_chowdsp_data_structures
-template <typename T>
-BufferView<T> make_temp_buffer (ArenaAllocatorView arena, int num_channels, int num_samples)
+template <typename T, typename ArenaType>
+BufferView<T> make_temp_buffer (ArenaType& arena, int num_channels, int num_samples)
 {
     int num_samples_padded = num_samples;
 #if ! CHOWDSP_NO_XSIMD
@@ -401,7 +401,7 @@ BufferView<T> make_temp_buffer (ArenaAllocatorView arena, int num_channels, int 
     std::array<T*, CHOWDSP_BUFFER_MAX_NUM_CHANNELS> channel_pointers {};
     for (size_t ch = 0; ch < static_cast<size_t> (num_channels); ++ch)
     {
-        channel_pointers[ch] = arena.allocate<T> (num_samples_padded, SIMDUtils::defaultSIMDAlignment);
+        channel_pointers[ch] = arena.template allocate<T> (num_samples_padded, SIMDUtils::defaultSIMDAlignment);
         jassert (channel_pointers[ch] != nullptr);
     }
     return { channel_pointers.data(), num_channels, num_samples };
