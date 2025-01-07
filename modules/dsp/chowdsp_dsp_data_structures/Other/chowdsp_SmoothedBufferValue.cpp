@@ -3,7 +3,7 @@
 namespace chowdsp
 {
 template <typename FloatType, typename ValueSmoothingTypes>
-void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::setParameterHandle (std::atomic<float>* handle)
+void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::setParameterHandle ([[maybe_unused]] std::atomic<float>* handle)
 {
 #if ! CHOWDSP_SMOOTHED_BUFFER_SMALL
 #if JUCE_MODULE_AVAILABLE_chowdsp_parameters
@@ -15,7 +15,7 @@ void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::setParameterHandle (st
 #endif
 }
 
-#if JUCE_MODULE_AVAILABLE_chowdsp_parameters
+#if JUCE_MODULE_AVAILABLE_chowdsp_parameters && (! CHOWDSP_SMOOTHED_BUFFER_SMALL)
 template <typename FloatType, typename ValueSmoothingTypes>
 void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::setParameterHandle ([[maybe_unused]] const FloatParameter* handle)
 {
@@ -27,7 +27,7 @@ void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::setParameterHandle ([[
 #endif
 
 template <typename FloatType, typename ValueSmoothingTypes>
-void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::prepare (double fs, int samplesPerBlock, bool useInternalVector)
+void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::prepare (double fs, [[maybe_unused]] int samplesPerBlock, bool useInternalVector)
 {
     sampleRate = fs;
     if (useInternalVector)
@@ -91,7 +91,7 @@ void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::setRampLength (double 
 }
 
 template <typename FloatType, typename ValueSmoothingTypes>
-void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::process (int numSamples)
+void SmoothedBufferValue<FloatType, ValueSmoothingTypes>::process ([[maybe_unused]] int numSamples)
 {
 #if ! CHOWDSP_SMOOTHED_BUFFER_SMALL
     if (parameterHandle != nullptr)
