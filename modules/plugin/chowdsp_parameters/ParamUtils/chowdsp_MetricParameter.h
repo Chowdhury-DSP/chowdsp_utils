@@ -13,38 +13,20 @@ public:
                      const juce::NormalisableRange<float>& paramRange,
                      float defaultValue,
                      const juce::String& unitSuffix = {},
-                     int numDecimalPlaces = 2)
-        : MetricParameter (
-            parameterID,
-            paramName,
-            paramRange,
-            defaultValue,
-            [numDecimalPlaces, unitSuffix] (float v)
-            { return toString (v, numDecimalPlaces) + unitSuffix; })
-    {
-    }
+                     int numDecimalPlaces = 2);
 
-    MetricParameter (const ParameterID& parameterID,
-                     const juce::String& paramName,
-                     const juce::NormalisableRange<float>& paramRange,
-                     float defaultValue,
-                     const std::function<juce::String (float)>& valueToTextFunction,
-                     std::function<float (const juce::String&)>&& textToValueFunction = [] (const juce::String& str) { return fromString (str); })
-        : FloatParameter (
-            parameterID,
-            paramName,
-            paramRange,
-            defaultValue,
-            valueToTextFunction,
-            std::move (textToValueFunction))
-    {
-    }
+    MetricParameter (
+        const ParameterID& parameterID,
+        const juce::String& paramName,
+        const juce::NormalisableRange<float>& paramRange,
+        float defaultValue,
+        const std::function<juce::String (float)>& valueToTextFunction,
+        std::function<float (const juce::String&)>&& textToValueFunction = nullptr);
 
     static juce::String toString (float value, int numDecimalPlaces);
     static float fromString (const juce::String& str);
 
 private:
-
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MetricParameter)
 };
 } // namespace chowdsp

@@ -2,6 +2,42 @@
 
 namespace chowdsp
 {
+MetricParameter::MetricParameter (const ParameterID& parameterID,
+                                  const juce::String& paramName,
+                                  const juce::NormalisableRange<float>& paramRange,
+                                  float defaultValue,
+                                  const juce::String& unitSuffix,
+                                  int numDecimalPlaces)
+    : MetricParameter (
+          parameterID,
+          paramName,
+          paramRange,
+          defaultValue,
+          [numDecimalPlaces, unitSuffix] (float v)
+          { return toString (v, numDecimalPlaces) + unitSuffix; })
+{
+}
+
+MetricParameter::MetricParameter (
+    const ParameterID& parameterID,
+    const juce::String& paramName,
+    const juce::NormalisableRange<float>& paramRange,
+    float defaultValue,
+    const std::function<juce::String (float)>& valueToTextFunction,
+    std::function<float (const juce::String&)>&& textToValueFunction)
+    : FloatParameter (
+          parameterID,
+          paramName,
+          paramRange,
+          defaultValue,
+          valueToTextFunction,
+          textToValueFunction != nullptr
+              ? std::move (textToValueFunction)
+              : [] (const juce::String& str)
+              { return fromString (str); })
+{
+}
+
 juce::String MetricParameter::toString (float value, int numDecimalPlaces)
 {
     if (value < 1.0e-9f) // pico
