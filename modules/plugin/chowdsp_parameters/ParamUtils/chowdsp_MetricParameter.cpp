@@ -9,12 +9,12 @@ MetricParameter::MetricParameter (const ParameterID& parameterID,
                                   const juce::String& unitSuffix,
                                   int numDecimalPlaces)
     : MetricParameter (
-          parameterID,
-          paramName,
-          paramRange,
-          defaultValue,
-          [numDecimalPlaces, unitSuffix] (float v)
-          { return toString (v, numDecimalPlaces) + unitSuffix; })
+        parameterID,
+        paramName,
+        paramRange,
+        defaultValue,
+        [numDecimalPlaces, unitSuffix] (float v)
+        { return toString (v, numDecimalPlaces) + unitSuffix; })
 {
 }
 
@@ -26,15 +26,15 @@ MetricParameter::MetricParameter (
     const std::function<juce::String (float)>& valueToTextFunction,
     std::function<float (const juce::String&)>&& textToValueFunction)
     : FloatParameter (
-          parameterID,
-          paramName,
-          paramRange,
-          defaultValue,
-          valueToTextFunction,
-          textToValueFunction != nullptr
-              ? std::move (textToValueFunction)
-              : [] (const juce::String& str)
-              { return fromString (str); })
+        parameterID,
+        paramName,
+        paramRange,
+        defaultValue,
+        valueToTextFunction,
+        textToValueFunction != nullptr
+            ? std::move (textToValueFunction)
+            : [] (const juce::String& str)
+            { return fromString (str); })
 {
 }
 
