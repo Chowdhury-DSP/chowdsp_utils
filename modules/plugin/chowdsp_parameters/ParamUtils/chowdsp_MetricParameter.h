@@ -24,12 +24,14 @@ public:
     {
     }
 
-    MetricParameter (const ParameterID& parameterID,
-                     const juce::String& paramName,
-                     const juce::NormalisableRange<float>& paramRange,
-                     float defaultValue,
-                     const std::function<juce::String (float)>& valueToTextFunction,
-                     std::function<float (const juce::String&)>&& textToValueFunction = [] (const juce::String& str) { return fromString (str); })
+    MetricParameter (
+        const ParameterID& parameterID,
+        const juce::String& paramName,
+        const juce::NormalisableRange<float>& paramRange,
+        float defaultValue,
+        const std::function<juce::String (float)>& valueToTextFunction,
+        std::function<float (const juce::String&)>&& textToValueFunction = [] (const juce::String& str)
+        { return fromString (str); })
         : FloatParameter (
             parameterID,
             paramName,
@@ -44,7 +46,6 @@ public:
     static float fromString (const juce::String& str);
 
 private:
-
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MetricParameter)
 };
 } // namespace chowdsp
