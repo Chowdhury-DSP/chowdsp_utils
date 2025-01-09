@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
 
 env:
-  EXAMPLE_TARGETS: "ForwardingTestPlugin_CLAP SimpleEQ_CLAP StatefulPlugin_CLAP ExampleCompressor_CLAP"
+  EXAMPLE_TARGETS: "ForwardingTestPlugin_CLAP ModalSpringReverb_CLAP SimpleEQ_CLAP StatefulPlugin_CLAP ExampleCompressor_CLAP"
 
 jobs:
   build_examples:
