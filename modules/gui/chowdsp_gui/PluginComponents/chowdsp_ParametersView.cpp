@@ -98,12 +98,12 @@ namespace parameters_view_detail
         {
             auto area = getLocalBounds();
 
+            JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wdeprecated-declarations")
             parameterName.setBounds (area.removeFromLeft (parameterName
                                                               .getFont()
-                                                                  JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wdeprecated-declarations")
                                                               .getStringWidth (parameterName.getText())
-                                                                  JUCE_END_IGNORE_WARNINGS_GCC_LIKE
                                                           * 11 / 10));
+            JUCE_END_IGNORE_WARNINGS_GCC_LIKE
             parameterComp->setBounds (area);
         }
 
