@@ -32,8 +32,10 @@ void TooltipComponent::paint (juce::Graphics& g)
 
         auto whitespace = juce::String();
         auto font = g.getCurrentFont();
+        JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wdeprecated-declarations")
         while (font.getStringWidth (whitespace) < font.getStringWidth (name + ": "))
             whitespace += " ";
+        JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
         g.setColour (findColour (textColourID));
         g.drawMultiLineText (whitespace + tip, b.getX(), b.getY() + (int) font.getHeight() - 3, b.getWidth(), juce::Justification::topLeft);

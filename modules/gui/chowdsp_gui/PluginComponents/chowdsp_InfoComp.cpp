@@ -23,7 +23,9 @@ void InfoComp<ProcType, InfoProvider>::paint (juce::Graphics& g)
 
     const auto defaultFont = juce::jmin (20.0f, (float) getHeight());
     g.setFont (defaultFont);
+    JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wdeprecated-declarations")
     auto fw = g.getCurrentFont().getStringWidthFloat (totalStr);
+    JUCE_END_IGNORE_WARNINGS_GCC_LIKE
     if (fw > width)
     {
         float s = width / fw;
@@ -35,7 +37,9 @@ void InfoComp<ProcType, InfoProvider>::paint (juce::Graphics& g)
 
     auto drawText = [&font, &g, &b] (const juce::String& text)
     {
+        JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wdeprecated-declarations")
         auto w = font.getStringWidth (text);
+        JUCE_END_IGNORE_WARNINGS_GCC_LIKE
         g.drawFittedText (text, b.removeFromLeft (w), juce::Justification::left, 1);
     };
 
