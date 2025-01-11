@@ -20,7 +20,9 @@ void TitleComp::paint (juce::Graphics& g)
 
     auto drawText = [&curFont, &g, &b] (const juce::String& text)
     {
+        JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wdeprecated-declarations")
         auto width = curFont.getStringWidth (text);
+        JUCE_END_IGNORE_WARNINGS_GCC_LIKE
         g.drawFittedText (text, b.removeFromLeft (width), juce::Justification::left, 1);
     };
 
