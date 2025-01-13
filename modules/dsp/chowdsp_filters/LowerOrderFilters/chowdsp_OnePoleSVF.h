@@ -101,4 +101,4 @@ struct OnePoleSVF
 
     NumericType T {};
 };
-}
+} // namespace chowdsp

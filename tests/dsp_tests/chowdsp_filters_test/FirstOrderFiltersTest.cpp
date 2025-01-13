@@ -63,7 +63,6 @@ TEMPLATE_TEST_CASE ("First Order Filters Test", "[dsp][filters][simd]", float, d
 
     SECTION ("First Order HPF SVF Test")
     {
-
         chowdsp::OnePoleSVF<T, chowdsp::OnePoleSVFType::Highpass> hpFilter;
         hpFilter.prepare ({ Constants::fs, 128, 1 });
         hpFilter.setCutoffFrequency ((T) Constants::fc);
