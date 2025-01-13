@@ -13,6 +13,7 @@ enum class OnePoleSVFType
     Highpass,
 };
 
+/** A simple 1-pole State Variable Filter */
 template <typename SampleType, OnePoleSVFType type, size_t maxChannelCount = defaultChannelCount>
 struct OnePoleSVF
 {
@@ -22,6 +23,7 @@ struct OnePoleSVF
     using FilterType = StateVariableFilterType;
     using NumericType = SampleTypeHelpers::NumericType<SampleType>;
 
+    /** Prepares the processor to process an audio stream */
     void prepare (const juce::dsp::ProcessSpec& spec)
     {
         T = static_cast<NumericType> (1.0 / spec.sampleRate);
@@ -36,11 +38,13 @@ struct OnePoleSVF
         }
     }
 
+    /** Resets the filter state */
     void reset() noexcept
     {
         std::fill (ic1eq.begin(), ic1eq.end(), SampleType {});
     }
 
+    /** Sets the filter cutoff frequency */
     void setCutoffFrequency (SampleType cutoffHz)
     {
         CHOWDSP_USING_XSIMD_STD (tan);
@@ -49,6 +53,28 @@ struct OnePoleSVF
         g1_r = NumericType (1) / (NumericType (1) + g);
     }
 
+    /** Processes a block of audio */
+    void processBlock (const BufferView<SampleType>& block) noexcept
+    {
+        for (auto [channel, sampleData] : buffer_iters::channels (block))
+        {
+            ScopedValue s1 { ic1eq[(size_t) channel] };
+            for (auto& sample : sampleData)
+                sample = processSampleInternal (sample, s1.get());
+        }
+
+#if JUCE_SNAP_TO_ZERO
+        snapToZero();
+#endif
+    }
+
+    /** Process a single sample */
+    inline SampleType processSample (int channel, SampleType x) noexcept
+    {
+        return processSampleInternal (x, ic1eq[(size_t) channel]);
+    }
+
+    /** Internal use only! */
     inline SampleType processSampleInternal (SampleType x, SampleType& z) const noexcept
     {
         SampleType y;
@@ -66,25 +92,7 @@ struct OnePoleSVF
         return y;
     }
 
-    void processBlock (const BufferView<SampleType>& block) noexcept
-    {
-        for (auto [channel, sampleData] : buffer_iters::channels (block))
-        {
-            ScopedValue s1 { ic1eq[(size_t) channel] };
-            for (auto& sample : sampleData)
-                sample = processSampleInternal (sample, s1.get());
-        }
-
-#if JUCE_SNAP_TO_ZERO
-        snapToZero();
-#endif
-    }
-
-    inline SampleType processSample (int channel, SampleType x) noexcept
-    {
-        return processSampleInternal (x, ic1eq[(size_t) channel]);
-    }
-
+    /** Snaps the internal state variables to zero if needed */
     void snapToZero() noexcept
     {
 #if JUCE_SNAP_TO_ZERO
