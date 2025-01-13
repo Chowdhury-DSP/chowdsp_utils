@@ -49,4 +49,26 @@ TEMPLATE_TEST_CASE ("First Order Filters Test", "[dsp][filters][simd]", float, d
         testFrequency<T> (hpFilter, (NumericType) Constants::fc, (NumericType) -3.01, maxError, "Incorrect gain at cutoff frequency.");
         testFrequency<T> (hpFilter, (NumericType) Constants::fs * (NumericType) 0.498, (NumericType) 0, maxError, "Incorrect gain at high frequencies.");
     }
+
+    SECTION ("First Order LPF SVF Test")
+    {
+        chowdsp::OnePoleSVF<T, chowdsp::OnePoleSVFType::Lowpass> lpFilter;
+        lpFilter.prepare ({ Constants::fs, 128, 1 });
+        lpFilter.setCutoffFrequency ((T) Constants::fc);
+
+        testFrequency<T> (lpFilter, (NumericType) 1, (NumericType) 0, maxError, "Incorrect gain at low frequencies.");
+        testFrequency<T> (lpFilter, (NumericType) Constants::fc, (NumericType) -3.01, maxError, "Incorrect gain at cutoff frequency.");
+        testFrequency<T> (lpFilter, Constants::fc * (NumericType) 4, (NumericType) -12.3, (NumericType) 0.1, "Incorrect gain at high frequencies.");
+    }
+
+    SECTION ("First Order HPF SVF Test")
+    {
+        chowdsp::OnePoleSVF<T, chowdsp::OnePoleSVFType::Highpass> hpFilter;
+        hpFilter.prepare ({ Constants::fs, 128, 1 });
+        hpFilter.setCutoffFrequency ((T) Constants::fc);
+
+        testFrequency<T> (hpFilter, (NumericType) Constants::fc / 4, (NumericType) -12.3, (NumericType) 0.1, "Incorrect gain at low frequencies.");
+        testFrequency<T> (hpFilter, (NumericType) Constants::fc, (NumericType) -3.01, maxError, "Incorrect gain at cutoff frequency.");
+        testFrequency<T> (hpFilter, (NumericType) Constants::fs * (NumericType) 0.498, (NumericType) 0, maxError, "Incorrect gain at high frequencies.");
+    }
 }
