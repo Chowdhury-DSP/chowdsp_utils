@@ -88,6 +88,8 @@ public:
 
     static constexpr SettingID settingsTag = "plugin_settings";
 
+    Broadcaster<void (SettingID)> globalSettingChangedBroadcaster;
+
 private:
     bool loadSettingsFromFile();
     void writeSettingsToFile() const;
@@ -103,7 +105,6 @@ private:
     std::unique_ptr<SettingsFileListener> fileListener;
     json globalProperties;
 
-    Broadcaster<void (SettingID)> globalSettingChangedBroadcaster;
     std::unordered_map<SettingID, std::forward_list<std::pair<void*, ScopedCallback>>> callbacks;
 
     juce::CriticalSection lock;
