@@ -25,10 +25,22 @@ void PresetSaverLoader::initializeListeners (ParamHolder& params, ParameterListe
                 paramListeners.addParameterListener (
                     param,
                     ParameterListenerThread::MessageThread,
-                    [this]
+                    [this, &param]
                     {
-                        if (! areWeInTheMidstOfAPresetChange)
-                            isPresetDirty.set (true);
+                        juce::ignoreUnused (param);
+                        if (areWeInTheMidstOfAPresetChange)
+                            return;
+
+                        using ParamElementType = ParameterTypeHelpers::ParameterElementType<std::remove_reference_t<decltype (param)>>;
+                        if constexpr (std::is_same_v<ParamElementType, float>)
+                        {
+                            const auto presetParamValue01 = param.convertTo0to1 (currentPreset->getState().value (param.paramID, param.getDefault()));
+                            const auto actualParamValue01 = param.convertTo0to1 (param.get());
+                            if (juce::approximatelyEqual (presetParamValue01, actualParamValue01))
+                                return;
+                        }
+
+                        isPresetDirty.set (true);
                     })
             };
         });
