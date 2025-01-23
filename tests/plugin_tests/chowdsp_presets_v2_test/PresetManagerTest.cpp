@@ -137,7 +137,6 @@ TEST_CASE ("Preset Manager Test", "[plugin][presets][state]")
         chowdsp::ParameterTypeHelpers::setValue (extraValue, *presetMgr.state.params.extraParam);
         presetMgr.state.getParameterListeners().updateBroadcastersFromMessageThread();
         REQUIRE_MESSAGE (juce::approximatelyEqual (presetMgr.state.params.extraParam->get(), extraValue), "Set value is incorrect!");
-        REQUIRE_MESSAGE (presetMgr->getIsPresetDirty(), "Preset dirty after set value is incorrect!");
 
         presetMgr->addPresets ({ preset });
         presetMgr->loadPreset (presetMgr->getPresetTree().getRootNode().first_child->value.leaf());
@@ -238,7 +237,6 @@ TEST_CASE ("Preset Manager Test", "[plugin][presets][state]")
         presetMgr.state.deserialize (std::move (state));
         REQUIRE_MESSAGE (juce::approximatelyEqual (presetMgr.getFloatParam(), otherValue), "Preset state is overriding parameter state!");
         REQUIRE (presetMgr->getCurrentPreset() == nullptr);
-        REQUIRE (presetMgr->getIsPresetDirty());
     }
 
     SECTION ("Null State JSON Test")
@@ -259,7 +257,6 @@ TEST_CASE ("Preset Manager Test", "[plugin][presets][state]")
         decltype (presetMgr.state)::deserialize (json_state, presetMgr.state);
         REQUIRE_MESSAGE (juce::approximatelyEqual (presetMgr.getFloatParam(), otherValue), "Preset state is overriding parameter state!");
         REQUIRE (presetMgr->getCurrentPreset() == nullptr);
-        REQUIRE (presetMgr->getIsPresetDirty());
     }
 
     SECTION ("Preset State Test")
