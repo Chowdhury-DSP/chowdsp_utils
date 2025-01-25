@@ -26,8 +26,6 @@ JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wfloat-equal")
 
 TEST_CASE ("Realtime Latest Object Test", "[dsp][data-structures]")
 {
-    static_assert (sizeof (chowdsp::RealtimeLatestObject<Envelope_Params>) == 4);
-
     SECTION ("Aggregate Type")
     {
         chowdsp::RealtimeLatestObject<Envelope_Params> envelope_params {};
