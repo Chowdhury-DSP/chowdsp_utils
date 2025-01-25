@@ -22,7 +22,6 @@ struct Filter_Params
 };
 static_assert (! std::atomic<Filter_Params>::is_always_lock_free, "We can' use std::atomic for this, since it may lock!");
 
-
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wfloat-equal")
 
 TEST_CASE ("Realtime Latest Object Test", "[dsp][data-structures]")
