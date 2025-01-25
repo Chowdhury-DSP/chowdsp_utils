@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 - Added `chowdsp::FlatMemoryPool`.
 - Added `chowdsp::OnePoleSVF`.
 - Added `chowdsp::MetricParameter`.
+- Added `chowdsp::RealtimeLatestObject`.
 
 ## [2.3.0] 2024-11-13
 - Added `chowdsp_fuzzy_search` module.

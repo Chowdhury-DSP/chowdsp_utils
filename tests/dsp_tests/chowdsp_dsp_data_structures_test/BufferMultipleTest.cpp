@@ -3,6 +3,8 @@
 
 #include <iostream>
 
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wfloat-equal")
+
 TEST_CASE ("Buffer Multiple Test", "[dsp][data-structures]")
 {
     static constexpr int numChannels = 2;
@@ -21,7 +23,7 @@ TEST_CASE ("Buffer Multiple Test", "[dsp][data-structures]")
         const auto mLatencySamples = multipleProcessor.getMultipleBufferLatency();
         const auto roundTripLatencySamples = multipleProcessor.getRoundTripLatency();
 
-        chowdsp::ArenaAllocator<> arena { numChannels * maxMultipleBufferSize * sizeof (float) };
+        chowdsp::ArenaAllocator<> arena { static_cast<size_t> (numChannels * maxMultipleBufferSize) * sizeof (float) };
 
         int inOutCount = 0;
         int mCount = 0;
@@ -56,3 +58,5 @@ TEST_CASE ("Buffer Multiple Test", "[dsp][data-structures]")
         }
     }
 }
+
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE
