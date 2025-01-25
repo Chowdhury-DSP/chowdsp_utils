@@ -44,6 +44,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #endif
 
 #include "Other/chowdsp_SmoothedBufferValue.h"
+#include "Other/chowdsp_RealtimeLatestObject.h"
 
 #include "Processors/chowdsp_RebufferedProcessor.h"
 #include "Processors/chowdsp_BufferMultiple.h"
