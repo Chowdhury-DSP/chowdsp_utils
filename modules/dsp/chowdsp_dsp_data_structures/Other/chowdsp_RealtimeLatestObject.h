@@ -27,10 +27,7 @@ struct RealtimeLatestObject
 
     RealtimeLatestObject()
     {
-        allocator.backing_buffer = {
-            reinterpret_cast<std::byte*> (allocator_backing_buffer.data()),
-            allocator_backing_buffer.size() * sizeof (Node),
-        };
+        allocator.backing_buffer = allocator_backing_buffer;
         allocator.free_all();
     }
 
@@ -152,7 +149,6 @@ private:
         if (node == nullptr)
             return;
 
-        node->obj.~T();
         allocator.free (node);
     }
 
@@ -161,8 +157,8 @@ private:
     Node* zombie_list_head {}; // written/read on main thread
     std::atomic<Node*> zombie_list_tail {}; // written on audio thread / read on main thread
 
-    ObjectPool<Node> allocator {};
-    std::array<Node, 4> allocator_backing_buffer {};
+    ObjectPool<Node> allocator { 4 };
+    alignas (alignof (Node)) std::array<std::byte, sizeof (Node) * 4> allocator_backing_buffer {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (RealtimeLatestObject)
 };
