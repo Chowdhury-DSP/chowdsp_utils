@@ -98,16 +98,12 @@ struct RealtimeLatestObject
      */
     const T& read()
     {
-        Node* obj_to_free = nullptr;
         if (main_thread_object.load (std::memory_order_acquire) != nullptr)
         {
-            obj_to_free = audio_thread_object;
+            auto* obj_to_free = audio_thread_object;
             audio_thread_object = main_thread_object.exchange (nullptr, std::memory_order_release);
-        }
 
-        // push obj_to_free onto the free list
-        if (obj_to_free != nullptr)
-        {
+            // push obj_to_free onto the free list
             zombie_list_tail.load (std::memory_order_acquire)->next = obj_to_free;
             zombie_list_tail.store (obj_to_free, std::memory_order_release);
         }
