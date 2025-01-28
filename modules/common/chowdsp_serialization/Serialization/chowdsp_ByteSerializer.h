@@ -5,7 +5,7 @@ namespace chowdsp
 #ifndef DOXYGEN
 namespace bytes_detail
 {
-    using size_type = uint16_t;
+    using size_type = uint64_t;
     static constexpr auto sizeof_s = sizeof (size_type);
 } // namespace bytes_detail
 #endif
