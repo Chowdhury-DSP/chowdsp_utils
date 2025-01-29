@@ -16,6 +16,7 @@ inline ParamHolder::ParamHolder (ParamHolder* parent, std::string_view phName, b
       name { arena::alloc_string (*arena, phName) },
       isOwning { phIsOwning }
 {
+    juce::ignoreUnused (isOwning);
 }
 
 inline ParamHolder::ParamHolder (ChainedArenaAllocator& alloc, std::string_view phName, bool phIsOwning)
@@ -23,6 +24,7 @@ inline ParamHolder::ParamHolder (ChainedArenaAllocator& alloc, std::string_view 
       name { arena::alloc_string (*arena, phName) },
       isOwning { phIsOwning }
 {
+    juce::ignoreUnused (isOwning);
 }
 
 inline ParamHolder::~ParamHolder()
