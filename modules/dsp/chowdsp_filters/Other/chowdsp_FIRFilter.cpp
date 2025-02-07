@@ -11,58 +11,60 @@ JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wsign-conversion")
 
 namespace chowdsp
 {
-template <typename FloatType>
-FIRFilter<FloatType>::FIRFilter()
+template <typename FloatType, int fixedOrder, size_t maxChannelCount>
+FIRFilter<FloatType, fixedOrder, maxChannelCount>::FIRFilter()
 {
     prepare (1);
 }
 
-template <typename FloatType>
-FIRFilter<FloatType>::FIRFilter (int filterOrder) : order (filterOrder)
+template <typename FloatType, int fixedOrder, size_t maxChannelCount>
+template <int, typename>
+FIRFilter<FloatType, fixedOrder, maxChannelCount>::FIRFilter (int filterOrder) : order (filterOrder)
 {
     prepare (1);
     setOrder (filterOrder);
 }
 
-template <typename FloatType>
-void FIRFilter<FloatType>::setOrder (int newOrder)
+template <typename FloatType, int fixedOrder, size_t maxChannelCount>
+template <int N>
+std::enable_if_t<(N < 0), void> FIRFilter<FloatType, fixedOrder, maxChannelCount>::setOrder (int newOrder)
 {
     order = newOrder;
+    paddedOrder = getPaddedOrder (order);
 
-#if ! CHOWDSP_NO_XSIMD
-    static constexpr int batchSize = xsimd::batch<FloatType>::size;
-    paddedOrder = batchSize * Math::ceiling_divide (order, batchSize);
-#else
-    paddedOrder = order;
-#endif
     coefficients.resize (paddedOrder, {});
     prepare (numChannels);
 }
 
-template <typename FloatType>
-void FIRFilter<FloatType>::prepare (int newNumChannels)
+template <typename FloatType, int fixedOrder, size_t maxChannelCount>
+void FIRFilter<FloatType, fixedOrder, maxChannelCount>::prepare (int newNumChannels)
 {
     numChannels = newNumChannels;
 
-    state.resize (numChannels * (2 * order));
-    zPtr.resize (numChannels, 0);
+    if constexpr (heapState)
+        state.resize (numChannels * (2 * order));
+
+    if constexpr (maxChannelCount == dynamicChannelCount)
+        zPtr.resize (numChannels, 0);
+
+    reset();
 }
 
-template <typename FloatType>
-void FIRFilter<FloatType>::reset() noexcept
+template <typename FloatType, int fixedOrder, size_t maxChannelCount>
+void FIRFilter<FloatType, fixedOrder, maxChannelCount>::reset() noexcept
 {
     std::fill (state.begin(), state.end(), 0.0f);
     std::fill (zPtr.begin(), zPtr.end(), 0);
 }
 
-template <typename FloatType>
-void FIRFilter<FloatType>::setCoefficients (const FloatType* coeffsData)
+template <typename FloatType, int fixedOrder, size_t maxChannelCount>
+void FIRFilter<FloatType, fixedOrder, maxChannelCount>::setCoefficients (const FloatType* coeffsData)
 {
     std::copy (coeffsData, coeffsData + order, coefficients.begin());
 }
 
-template <typename FloatType>
-inline FloatType FIRFilter<FloatType>::processSampleInternal (FloatType x, FloatType* z, const FloatType* h, int& zPtr, int order, int paddedOrder) noexcept
+template <typename FloatType, int fixedOrder, size_t maxChannelCount>
+inline FloatType FIRFilter<FloatType, fixedOrder, maxChannelCount>::processSampleInternal (FloatType x, FloatType* z, const FloatType* h, int& zPtr, int order, int paddedOrder) noexcept
 {
     // insert input into double-buffered state
     z[zPtr] = x;
@@ -85,8 +87,8 @@ inline FloatType FIRFilter<FloatType>::processSampleInternal (FloatType x, Float
 }
 
 #if ! CHOWDSP_NO_XSIMD
-template <typename FloatType>
-inline FloatType FIRFilter<FloatType>::simdInnerProduct (const FloatType* z, const FloatType* h, int N)
+template <typename FloatType, int fixedOrder, size_t maxChannelCount>
+inline FloatType FIRFilter<FloatType, fixedOrder, maxChannelCount>::simdInnerProduct (const FloatType* z, const FloatType* h, int N)
 {
     using b_type = xsimd::batch<FloatType>;
     static constexpr int inc = b_type::size;
@@ -107,15 +109,15 @@ inline FloatType FIRFilter<FloatType>::simdInnerProduct (const FloatType* z, con
     return xsimd::reduce_add (batch_y);
 }
 #else
-template <typename FloatType>
-inline FloatType FIRFilter<FloatType>::simdInnerProduct (const FloatType* z, const FloatType* h, int N)
+template <typename FloatType, int fixedOrder, size_t maxChannelCount>
+inline FloatType FIRFilter<FloatType, fixedOrder, maxChannelCount>::simdInnerProduct (const FloatType* z, const FloatType* h, int N)
 {
     return std::inner_product (z, z + N, h, FloatType {});
 }
 #endif
 
-template <typename FloatType>
-inline void FIRFilter<FloatType>::processSampleInternalBypassed (FloatType x, FloatType* z, int& zPtr, int order) noexcept
+template <typename FloatType, int fixedOrder, size_t maxChannelCount>
+inline void FIRFilter<FloatType, fixedOrder, maxChannelCount>::processSampleInternalBypassed (FloatType x, FloatType* z, int& zPtr, int order) noexcept
 {
     // insert input into double-buffered state
     z[zPtr] = x;

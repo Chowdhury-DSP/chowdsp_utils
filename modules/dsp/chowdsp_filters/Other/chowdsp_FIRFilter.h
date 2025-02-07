@@ -11,7 +11,7 @@ namespace chowdsp
  * Still, for filters with an order 512 and higher,
  * juce::dsp::Convolution is probably going to be faster.
  */
-template <typename FloatType>
+template <typename FloatType, int fixedOrder = -1, size_t maxChannelCount = defaultChannelCount>
 class FIRFilter
 {
 public:
@@ -19,6 +19,7 @@ public:
     FIRFilter();
 
     /** Constructs a filter with a given order */
+    template <int N = fixedOrder, typename = typename std::enable_if_t<N < 0>>
     explicit FIRFilter (int filterOrder);
 
     FIRFilter (FIRFilter&&) noexcept = default;
@@ -30,7 +31,9 @@ public:
      * Note that this will clear any coefficients which
      * had previously been loaded.
      */
-    void setOrder (int newOrder);
+    template <int N = fixedOrder>
+    std::enable_if_t<(N < 0), void>
+    setOrder (int newOrder);
 
     /** Returns the current filter order */
     [[nodiscard]] int getOrder() const noexcept { return order; }
@@ -120,16 +123,38 @@ private:
     static FloatType simdInnerProduct (const FloatType* z, const FloatType* h, int N);
     static void processSampleInternalBypassed (FloatType x, FloatType* z, int& zPtr, int order) noexcept;
 
-    int order = 0;
-    int paddedOrder = 0;
-    std::vector<int> zPtr;
+    static constexpr int getPaddedOrder (int order)
+    {
+    #if ! CHOWDSP_NO_XSIMD
+        constexpr int batchSize = xsimd::batch<FloatType>::size;
+        return batchSize * Math::ceiling_divide (order, batchSize);
+    #else
+        return order;
+    #endif
+    }
+
+    int order = std::max (0, fixedOrder);
+    int paddedOrder = getPaddedOrder (order);
+    std::conditional_t<maxChannelCount == dynamicChannelCount,
+                       std::vector<int>,
+                       std::array<int, maxChannelCount>> zPtr;
 
 #if CHOWDSP_NO_XSIMD
-    std::vector<FloatType> coefficients;
+    using Coeffs = std::conditional_t<fixedOrder < 0,
+                                      std::vector<FloatType>,
+                                      std::array<FloatType, getPaddedOrder (fixedOrder)>>;
+    Coeffs coefficients;
 #else
-    std::vector<FloatType, xsimd::default_allocator<FloatType>> coefficients;
+    using Coeffs = std::conditional_t<fixedOrder < 0,
+                                      std::vector<FloatType, xsimd::default_allocator<FloatType>>,
+                                      std::array<FloatType, getPaddedOrder (fixedOrder)>>;
+    alignas (SIMDUtils::defaultSIMDAlignment) Coeffs coefficients;
 #endif
-    std::vector<FloatType> state;
+
+    static constexpr auto heapState = maxChannelCount == dynamicChannelCount || fixedOrder < 0;
+    std::conditional_t<heapState,
+                       std::vector<FloatType>,
+                       std::array<FloatType, maxChannelCount * 2 * fixedOrder>> state;
 
     int numChannels = 0;
 
