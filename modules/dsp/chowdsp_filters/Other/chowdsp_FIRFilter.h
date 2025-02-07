@@ -51,7 +51,8 @@ public:
     /** Process a single sample */
     inline FloatType processSample (FloatType x, int channel = 0) noexcept
     {
-        return processSampleInternal (x, state[channel].data(), coefficients.data(), zPtr[channel], order, paddedOrder);
+        auto* z = state.data() + channel * 2 * order;
+        return processSampleInternal (x, z, coefficients.data(), zPtr[channel], order, paddedOrder);
     }
 
     /** Process block of samples */
@@ -63,7 +64,7 @@ public:
     /** Process block of samples out-of-place */
     void processBlock (const FloatType* blockIn, FloatType* blockOut, const int numSamples, const int channel = 0) noexcept
     {
-        auto* z = state[channel].data();
+        auto* z = state.data() + channel * 2 * order;
         const auto* h = coefficients.data();
         ScopedValue zPtrLocal { zPtr[channel] };
 
@@ -83,10 +84,10 @@ public:
         jassert (blockIn.getNumChannels() == blockOut.getNumChannels());
         jassert (blockIn.getNumSamples() == blockOut.getNumSamples());
 
-        const auto numChannels = blockIn.getNumChannels();
+        const auto inNumChannels = blockIn.getNumChannels();
         const auto numSamples = blockIn.getNumSamples();
 
-        for (int ch = 0; ch < numChannels; ++ch)
+        for (int ch = 0; ch < inNumChannels; ++ch)
             processBlock (blockIn.getReadPointer (ch), blockOut.getWritePointer (ch), numSamples, ch);
     }
 
@@ -96,7 +97,7 @@ public:
      */
     void processBlockBypassed (const FloatType* block, const int numSamples, const int channel = 0) noexcept
     {
-        auto* z = state[channel].data();
+        auto* z = state.data() + channel * 2 * order;
         ScopedValue zPtrLocal { zPtr[channel] };
 
         for (int n = 0; n < numSamples; ++n)
@@ -128,10 +129,14 @@ private:
 #else
     std::vector<FloatType, xsimd::default_allocator<FloatType>> coefficients;
 #endif
-    std::vector<std::vector<FloatType>> state;
+    std::vector<FloatType> state;
+
+    int numChannels = 0;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FIRFilter)
 };
 } // namespace chowdsp
 
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+
+#include "chowdsp_FIRFilter.cpp"

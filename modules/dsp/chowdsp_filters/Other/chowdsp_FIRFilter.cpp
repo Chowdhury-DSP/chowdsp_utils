@@ -1,6 +1,8 @@
 #include "chowdsp_FIRFilter.h"
 
-#if defined(__APPLE_CPP__) || defined(__APPLE_CC__)
+#define CHOWDSP_FIR_USE_ACCELERATE 0
+
+#if CHOWDSP_FIR_USE_ACCELERATE && (defined(__APPLE_CPP__) || defined(__APPLE_CC__))
 // include <Accelerate> on Apple devices so we can use vDSP_dotpr
 #include <Accelerate/Accelerate.h>
 #endif
@@ -34,24 +36,22 @@ void FIRFilter<FloatType>::setOrder (int newOrder)
     paddedOrder = order;
 #endif
     coefficients.resize (paddedOrder, {});
-    prepare ((int) state.size());
+    prepare (numChannels);
 }
 
 template <typename FloatType>
-void FIRFilter<FloatType>::prepare (int numChannels)
+void FIRFilter<FloatType>::prepare (int newNumChannels)
 {
-    state.resize (numChannels);
-    for (auto& z : state)
-        z.resize (2 * order, FloatType {});
+    numChannels = newNumChannels;
 
+    state.resize (numChannels * (2 * order));
     zPtr.resize (numChannels, 0);
 }
 
 template <typename FloatType>
 void FIRFilter<FloatType>::reset() noexcept
 {
-    for (auto& channelState : state)
-        std::fill (channelState.begin(), channelState.end(), 0.0f);
+    std::fill (state.begin(), state.end(), 0.0f);
     std::fill (zPtr.begin(), zPtr.end(), 0);
 }
 
@@ -68,7 +68,7 @@ inline FloatType FIRFilter<FloatType>::processSampleInternal (FloatType x, Float
     z[zPtr] = x;
     z[zPtr + order] = x;
 
-#if JUCE_MAC || JUCE_IOS
+#if CHOWDSP_FIR_USE_ACCELERATE && (JUCE_MAC || JUCE_IOS)
     auto y = (FloatType) 0;
 
     // use Acclerate inner product (if available)
@@ -122,11 +122,6 @@ inline void FIRFilter<FloatType>::processSampleInternalBypassed (FloatType x, Fl
     z[zPtr + order] = x;
     zPtr = (zPtr == 0 ? order - 1 : zPtr - 1); // iterate state pointer in reverse
 }
-
-#if CHOWDSP_ALLOW_TEMPLATE_INSTANTIATIONS
-template class FIRFilter<float>;
-template class FIRFilter<double>;
-#endif
 } // namespace chowdsp
 
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
