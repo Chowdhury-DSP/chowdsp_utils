@@ -163,6 +163,48 @@ static void ChowFIR (benchmark::State& state)
 }
 BENCHMARK (ChowFIR)->MinTime (1)->RangeMultiplier (orderMult)->Range (startOrder, endOrder);
 
+const auto randCoefs = bench_utils::makeRandomVector<float> (endOrder);
+static void ChowTempl16FIR (benchmark::State& state)
+{
+    chowdsp::FIRFilter<float, 16, 1> fir {};
+    fir.setCoefficients (randCoefs.data());
+    for (auto _ : state)
+    {
+        fir.processBlock (audioBuffer);
+    }
+}
+static void ChowTempl64FIR (benchmark::State& state)
+{
+    chowdsp::FIRFilter<float, 64, 1> fir {};
+    fir.setCoefficients (randCoefs.data());
+    for (auto _ : state)
+    {
+        fir.processBlock (audioBuffer);
+    }
+}
+static void ChowTempl256FIR (benchmark::State& state)
+{
+    chowdsp::FIRFilter<float, 256, 1> fir {};
+    fir.setCoefficients (randCoefs.data());
+    for (auto _ : state)
+    {
+        fir.processBlock (audioBuffer);
+    }
+}
+static void ChowTempl1024FIR (benchmark::State& state)
+{
+    chowdsp::FIRFilter<float, 1024, 1> fir {};
+    fir.setCoefficients (randCoefs.data());
+    for (auto _ : state)
+    {
+        fir.processBlock (audioBuffer);
+    }
+}
+BENCHMARK (ChowTempl16FIR)->MinTime (1);
+BENCHMARK (ChowTempl64FIR)->MinTime (1);
+BENCHMARK (ChowTempl256FIR)->MinTime (1);
+BENCHMARK (ChowTempl1024FIR)->MinTime (1);
+
 static void ChowPolyphaseDecimFIR (benchmark::State& state)
 {
     auto& fir = chowPolyphaseDecimFIRChoices[(int) state.range (0)];
