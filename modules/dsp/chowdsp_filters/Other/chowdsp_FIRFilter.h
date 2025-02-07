@@ -137,24 +137,24 @@ private:
     int paddedOrder = getPaddedOrder (order);
     std::conditional_t<maxChannelCount == dynamicChannelCount,
                        std::vector<int>,
-                       std::array<int, maxChannelCount>> zPtr;
+                       std::array<int, maxChannelCount>> zPtr {};
 
 #if CHOWDSP_NO_XSIMD
     using Coeffs = std::conditional_t<fixedOrder < 0,
                                       std::vector<FloatType>,
                                       std::array<FloatType, getPaddedOrder (fixedOrder)>>;
-    Coeffs coefficients;
+    Coeffs coefficients {};
 #else
     using Coeffs = std::conditional_t<fixedOrder < 0,
                                       std::vector<FloatType, xsimd::default_allocator<FloatType>>,
                                       std::array<FloatType, getPaddedOrder (fixedOrder)>>;
-    alignas (SIMDUtils::defaultSIMDAlignment) Coeffs coefficients;
+    alignas (SIMDUtils::defaultSIMDAlignment) Coeffs coefficients {};
 #endif
 
     static constexpr auto heapState = maxChannelCount == dynamicChannelCount || fixedOrder < 0;
     std::conditional_t<heapState,
                        std::vector<FloatType>,
-                       std::array<FloatType, maxChannelCount * 2 * fixedOrder>> state;
+                       std::array<FloatType, maxChannelCount * 2 * fixedOrder>> state {};
 
     int numChannels = 0;
 
