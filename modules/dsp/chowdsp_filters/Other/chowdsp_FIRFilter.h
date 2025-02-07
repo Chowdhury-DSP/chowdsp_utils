@@ -1,6 +1,7 @@
 #pragma once
 
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wsign-conversion")
+JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324) // structure was padded due to alignment specifier
 
 namespace chowdsp
 {
@@ -166,5 +167,6 @@ private:
 } // namespace chowdsp
 
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+JUCE_END_IGNORE_WARNINGS_MSVC
 
 #include "chowdsp_FIRFilter.cpp"
