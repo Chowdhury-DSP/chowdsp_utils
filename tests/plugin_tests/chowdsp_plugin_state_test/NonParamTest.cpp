@@ -214,17 +214,35 @@ TEST_CASE ("Non-Param Test", "[plugin][state]")
 
         chowdsp::NonParamState state {};
         state.addStateValues ({ &int_val, &atomic_int_val, &string_val });
-        int_val = 101;
-        atomic_int_val.set (102);
-        string_val = "blah blah";
 
-        const auto serial = std::array<std::byte, 2> {};
-        nonstd::span<const std::byte> bytes { serial };
+        {
+            int_val = 101;
+            atomic_int_val.set (102);
+            string_val = "blah blah";
 
-        chowdsp::ChainedArenaAllocator arena { 1024 };
-        chowdsp::NonParamState::deserialize (bytes, state, arena);
-        REQUIRE (int_val.get() == 42);
-        REQUIRE (atomic_int_val.get() == 99);
-        REQUIRE (string_val.get() == "blah");
+            const auto serial = std::array<std::byte, 2> {};
+            nonstd::span<const std::byte> bytes { serial };
+
+            chowdsp::ChainedArenaAllocator arena { 1024 };
+            chowdsp::NonParamState::deserialize (bytes, state, arena);
+            REQUIRE (int_val.get() == 42);
+            REQUIRE (atomic_int_val.get() == 99);
+            REQUIRE (string_val.get() == "blah");
+        }
+
+        {
+            int_val = 101;
+            atomic_int_val.set (102);
+            string_val = "blah blah";
+
+            const auto serial = std::array<std::byte, 8> {};
+            nonstd::span<const std::byte> bytes { serial };
+
+            chowdsp::ChainedArenaAllocator arena { 1024 };
+            chowdsp::NonParamState::deserialize (bytes, state, arena);
+            REQUIRE (int_val.get() == 42);
+            REQUIRE (atomic_int_val.get() == 99);
+            REQUIRE (string_val.get() == "blah");
+        }
     }
 }
