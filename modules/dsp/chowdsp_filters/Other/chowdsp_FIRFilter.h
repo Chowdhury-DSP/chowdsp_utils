@@ -10,6 +10,8 @@ namespace chowdsp
  *
  * Still, for filters with an order 512 and higher,
  * juce::dsp::Convolution is probably going to be faster.
+ *
+ * If fixedOrder is negative, then the order must be set at run-time.
  */
 template <typename FloatType, int fixedOrder = -1, size_t maxChannelCount = defaultChannelCount>
 class FIRFilter
