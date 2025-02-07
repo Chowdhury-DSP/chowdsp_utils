@@ -21,8 +21,7 @@ public:
     FIRFilter();
 
     /** Constructs a filter with a given order */
-    template <int N = fixedOrder, typename = typename std::enable_if_t<N < 0>>
-    explicit FIRFilter (int filterOrder);
+    template <int N = fixedOrder, typename = typename std::enable_if_t<N<0>> explicit FIRFilter (int filterOrder);
 
     FIRFilter (FIRFilter&&) noexcept = default;
     FIRFilter& operator= (FIRFilter&&) noexcept = default;
@@ -35,7 +34,7 @@ public:
      */
     template <int N = fixedOrder>
     std::enable_if_t<(N < 0), void>
-    setOrder (int newOrder);
+        setOrder (int newOrder);
 
     /** Returns the current filter order */
     [[nodiscard]] int getOrder() const noexcept { return order; }
@@ -127,36 +126,38 @@ private:
 
     static constexpr int getPaddedOrder (int order)
     {
-    #if ! CHOWDSP_NO_XSIMD
+#if ! CHOWDSP_NO_XSIMD
         constexpr int batchSize = xsimd::batch<FloatType>::size;
         return batchSize * Math::ceiling_divide (order, batchSize);
-    #else
+#else
         return order;
-    #endif
+#endif
     }
 
     int order = std::max (0, fixedOrder);
     int paddedOrder = getPaddedOrder (order);
     std::conditional_t<maxChannelCount == dynamicChannelCount,
                        std::vector<int>,
-                       std::array<int, maxChannelCount>> zPtr {};
+                       std::array<int, maxChannelCount>>
+        zPtr {};
 
 #if CHOWDSP_NO_XSIMD
-    using Coeffs = std::conditional_t<fixedOrder < 0,
-                                      std::vector<FloatType>,
-                                      std::array<FloatType, getPaddedOrder (fixedOrder)>>;
+    using Coeffs = std::conditional_t < fixedOrder<0,
+                                                   std::vector<FloatType>,
+                                                   std::array<FloatType, getPaddedOrder (fixedOrder)>>;
     Coeffs coefficients {};
 #else
-    using Coeffs = std::conditional_t<fixedOrder < 0,
-                                      std::vector<FloatType, xsimd::default_allocator<FloatType>>,
-                                      std::array<FloatType, getPaddedOrder (fixedOrder)>>;
+    using Coeffs = std::conditional_t < fixedOrder<0,
+                                                   std::vector<FloatType, xsimd::default_allocator<FloatType>>,
+                                                   std::array<FloatType, getPaddedOrder (fixedOrder)>>;
     alignas (SIMDUtils::defaultSIMDAlignment) Coeffs coefficients {};
 #endif
 
     static constexpr auto heapState = maxChannelCount == dynamicChannelCount || fixedOrder < 0;
     std::conditional_t<heapState,
                        std::vector<FloatType>,
-                       std::array<FloatType, maxChannelCount * 2 * fixedOrder>> state {};
+                       std::array<FloatType, maxChannelCount * 2 * fixedOrder>>
+        state {};
 
     int numChannels = 0;
 
