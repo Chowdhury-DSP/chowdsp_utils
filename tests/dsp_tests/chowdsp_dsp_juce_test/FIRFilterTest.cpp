@@ -9,11 +9,13 @@ TEST_CASE ("FIR Filter Test", "[dsp][filters][fir]")
     {
         static constexpr double fs = 48000.0;
         static constexpr int blockSize = 512;
+        static constexpr int numChannels = 2;
         static constexpr int firOrder = 63;
 
         auto&& coeffsBuffer = test_utils::makeNoise (firOrder);
-        auto&& refBuffer = test_utils::juce_utils::makeSineWave (100.0f, (float) fs, blockSize);
-        auto&& actualBuffer = juce::AudioBuffer { refBuffer };
+        auto&& refBuffer = test_utils::makeSineWave (100.0f, (float) fs, blockSize, numChannels);
+        chowdsp::Buffer<float> actualBuffer { numChannels, blockSize };
+        chowdsp::BufferMath::copyBufferData (refBuffer, actualBuffer);
 
         {
             juce::dsp::FIR::Filter<float> refFilter;
@@ -22,26 +24,131 @@ TEST_CASE ("FIR Filter Test", "[dsp][filters][fir]")
             auto* coeffsBufferData = coeffsBuffer.getReadPointer (0);
             std::copy (coeffsBufferData, coeffsBufferData + firOrder, coefs.begin());
 
-            refFilter.prepare ({ fs, (juce::uint32) blockSize, 1 });
+            refFilter.prepare ({ fs, (uint32_t) blockSize, 1 });
 
-            auto&& refBlock = juce::dsp::AudioBlock<float> { refBuffer };
-            refFilter.process (juce::dsp::ProcessContextReplacing<float> { refBlock });
+            for (int ch = 0; ch < numChannels; ++ch)
+            {
+                auto&& refBlock = refBuffer.toAudioBlock().getSingleChannelBlock ((size_t) ch);
+                refFilter.process (juce::dsp::ProcessContextReplacing<float> { refBlock });
+                refFilter.reset();
+            }
         }
 
         {
             chowdsp::FIRFilter<float> filter { firOrder };
             filter.setCoefficients (coeffsBuffer.getReadPointer (0));
+            filter.prepare (numChannels);
             REQUIRE_MESSAGE (filter.getOrder() == firOrder, "Filter order is incorrect!");
 
-            auto&& block = juce::dsp::AudioBlock<float> { actualBuffer };
-            filter.processBlock (block);
+            filter.processBlock (actualBuffer);
         }
 
-        for (int i = 0; i < blockSize; ++i)
+        for (int ch = 0; ch < numChannels; ++ch)
         {
-            const auto ref = refBuffer.getSample (0, i);
-            const auto actual = actualBuffer.getSample (0, i);
-            REQUIRE_MESSAGE (actual == Catch::Approx { ref }.margin (1.0e-3f), "Sample at index: " + juce::String (i) + " is incorrect!");
+            for (int i = 0; i < blockSize; ++i)
+            {
+                const auto ref = refBuffer.getReadPointer (ch)[i];
+                const auto actual = actualBuffer.getReadPointer (ch)[i];
+                REQUIRE_MESSAGE (actual == Catch::Approx { ref }.margin (1.0e-3f), "Sample at index: " + juce::String (i) + " is incorrect!");
+            }
+        }
+    }
+
+    SECTION ("FIR Filter Fixed Channel Count Test")
+    {
+        static constexpr double fs = 48000.0;
+        static constexpr int blockSize = 512;
+        static constexpr int numChannels = 2;
+        static constexpr int firOrder = 63;
+
+        auto&& coeffsBuffer = test_utils::makeNoise (firOrder);
+        auto&& refBuffer = test_utils::makeSineWave (100.0f, (float) fs, blockSize, numChannels);
+        chowdsp::Buffer<float> actualBuffer { numChannels, blockSize };
+        chowdsp::BufferMath::copyBufferData (refBuffer, actualBuffer);
+
+        {
+            juce::dsp::FIR::Filter<float> refFilter;
+            auto& coefs = refFilter.coefficients->coefficients;
+            coefs.resize (firOrder);
+            auto* coeffsBufferData = coeffsBuffer.getReadPointer (0);
+            std::copy (coeffsBufferData, coeffsBufferData + firOrder, coefs.begin());
+
+            refFilter.prepare ({ fs, (uint32_t) blockSize, 1 });
+
+            for (int ch = 0; ch < numChannels; ++ch)
+            {
+                auto&& refBlock = refBuffer.toAudioBlock().getSingleChannelBlock ((size_t) ch);
+                refFilter.process (juce::dsp::ProcessContextReplacing<float> { refBlock });
+                refFilter.reset();
+            }
+        }
+
+        {
+            chowdsp::FIRFilter<float, -1, numChannels> filter { firOrder };
+            filter.setCoefficients (coeffsBuffer.getReadPointer (0));
+            filter.prepare (numChannels);
+            REQUIRE_MESSAGE (filter.getOrder() == firOrder, "Filter order is incorrect!");
+
+            filter.processBlock (actualBuffer);
+        }
+
+        for (int ch = 0; ch < numChannels; ++ch)
+        {
+            for (int i = 0; i < blockSize; ++i)
+            {
+                const auto ref = refBuffer.getReadPointer (ch)[i];
+                const auto actual = actualBuffer.getReadPointer (ch)[i];
+                REQUIRE_MESSAGE (actual == Catch::Approx { ref }.margin (1.0e-3f), "Sample at index: " + juce::String (i) + " is incorrect!");
+            }
+        }
+    }
+
+    SECTION ("FIR Filter Fixed Filter Order Test")
+    {
+        static constexpr double fs = 48000.0;
+        static constexpr int blockSize = 512;
+        static constexpr int numChannels = 2;
+        static constexpr int firOrder = 63;
+
+        auto&& coeffsBuffer = test_utils::makeNoise (firOrder);
+        auto&& refBuffer = test_utils::makeSineWave (100.0f, (float) fs, blockSize, numChannels);
+        chowdsp::Buffer<float> actualBuffer { numChannels, blockSize };
+        chowdsp::BufferMath::copyBufferData (refBuffer, actualBuffer);
+
+        {
+            juce::dsp::FIR::Filter<float> refFilter;
+            auto& coefs = refFilter.coefficients->coefficients;
+            coefs.resize (firOrder);
+            auto* coeffsBufferData = coeffsBuffer.getReadPointer (0);
+            std::copy (coeffsBufferData, coeffsBufferData + firOrder, coefs.begin());
+
+            refFilter.prepare ({ fs, (uint32_t) blockSize, 1 });
+
+            for (int ch = 0; ch < numChannels; ++ch)
+            {
+                auto&& refBlock = refBuffer.toAudioBlock().getSingleChannelBlock ((size_t) ch);
+                refFilter.process (juce::dsp::ProcessContextReplacing<float> { refBlock });
+                refFilter.reset();
+            }
+        }
+
+        {
+            chowdsp::FIRFilter<float, firOrder, numChannels> filter {};
+            filter.setCoefficients (coeffsBuffer.getReadPointer (0));
+            filter.prepare (numChannels);
+            REQUIRE_MESSAGE (filter.getOrder() == firOrder, "Filter order is incorrect!");
+
+            filter.processBlock (actualBuffer);
+        }
+
+        for (int ch = 0; ch < numChannels; ++ch)
+        {
+            for (int i = 0; i < blockSize; ++i)
+            {
+                const auto ref = refBuffer.getReadPointer (ch)[i];
+                const auto actual = actualBuffer.getReadPointer (ch)[i];
+                REQUIRE_MESSAGE (actual == Catch::Approx { ref }.margin (1.0e-3f), "Sample at index: " + juce::String (i) + " is incorrect!");
+            }
         }
     }
 

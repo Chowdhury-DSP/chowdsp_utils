@@ -45,6 +45,12 @@ void NonParamState::serialize (ChainedArenaAllocator& arena, const NonParamState
 
 void NonParamState::deserialize (nonstd::span<const std::byte>& serial_data, NonParamState& state, ChainedArenaAllocator& arena)
 {
+    if (serial_data.size() < bytes_detail::sizeof_s)
+    {
+        state.reset();
+        return;
+    }
+
     auto num_bytes = deserialize_direct<bytes_detail::size_type> (serial_data);
     if (num_bytes == 0)
     {

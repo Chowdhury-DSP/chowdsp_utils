@@ -19,6 +19,7 @@ CPMAddPackage(
   VERSION 1.5.2
   OPTIONS "BENCHMARK_ENABLE_TESTING Off"
 )
+target_compile_options(benchmark PUBLIC "-Wno-invalid-offsetof")
 
 setup_benchmark(FloatVectorOperationsBench FloatVectorOperationsBench.cpp chowdsp_math juce_dsp)
 setup_benchmark(LookupTableBench LookupTableBench.cpp chowdsp_dsp_data_structures juce_dsp)
