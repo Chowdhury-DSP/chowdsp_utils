@@ -4,7 +4,7 @@ namespace chowdsp
 {
 /**
  * Base class for synth plugin processors.
- * 
+ *
  * Derived classes must override `prepareToPlay` and `releaseResources`
  * (from `juce::AudioProcessor`), as well as `processSynth`, and
  * `addParameters`.
@@ -38,7 +38,7 @@ public:
         processSynth (buffer, midi);
     }
 
-#if JUCE_MODULE_AVAILABLE_chowdsp_clap_extensions
+#if JUCE_MODULE_AVAILABLE_chowdsp_clap_extensions && JUCE_VERSION < 0x080005
     [[nodiscard]] bool supportsNoteName() const noexcept override
     {
         return true;
