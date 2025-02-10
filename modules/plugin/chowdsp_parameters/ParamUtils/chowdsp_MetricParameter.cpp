@@ -40,31 +40,36 @@ MetricParameter::MetricParameter (
 
 juce::String MetricParameter::toString (float value, int numDecimalPlaces)
 {
-    if (value < 1.0e-9f) // pico
+    const auto absValue = std::abs (value);
+    if (absValue < 1.0e-12f) // femto
+    {
+        return juce::String { value * 1.0e15f, numDecimalPlaces } + " f";
+    }
+    if (absValue < 1.0e-9f) // pico
     {
         return juce::String { value * 1.0e12f, numDecimalPlaces } + " p";
     }
-    if (value < 1.0e-6f) // nano
+    if (absValue < 1.0e-6f) // nano
     {
         return juce::String { value * 1.0e9f, numDecimalPlaces } + " n";
     }
-    if (value < 1.0e-3f) // micro
+    if (absValue < 1.0e-3f) // micro
     {
         return juce::String { value * 1.0e6f, numDecimalPlaces } + " μ";
     }
-    if (value < 1.0f) // milli
+    if (absValue < 1.0f) // milli
     {
         return juce::String { value * 1.0e3f, numDecimalPlaces } + " m";
     }
-    if (value < 1.0e3f) // units
+    if (absValue < 1.0e3f) // units
     {
         return juce::String { value, numDecimalPlaces } + " ";
     }
-    if (value < 1.0e6f) // kilo
+    if (absValue < 1.0e6f) // kilo
     {
         return juce::String { value * 1.0e-3f, numDecimalPlaces } + " k";
     }
-    if (value < 1.0e9f) // mega
+    if (absValue < 1.0e9f) // mega
     {
         return juce::String { value * 1.0e-6f, numDecimalPlaces } + " M";
     }
@@ -106,6 +111,8 @@ float MetricParameter::fromString (const juce::String& str)
             return 1.0e-9f;
         if (sfx.containsAnyOf ("p"))
             return 1.0e-12f;
+        if (sfx.containsAnyOf ("f"))
+            return 1.0e-15f;
         return 1.0f;
     }(suffix);
 
