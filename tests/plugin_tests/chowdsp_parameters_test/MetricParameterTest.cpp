@@ -77,5 +77,40 @@ TEST_CASE ("Metric Parameter Test", "[plugin][parameters]")
         param.setParameterValue (7.7e-12f);
         REQUIRE (param.getCurrentValueAsText() == juce::String::fromUTF8 ("7.70 pF"));
         REQUIRE (getValueForText() == Catch::Approx { param.get() }.margin (1.0e-27));
+
+        param.setParameterValue (7.7e-15f);
+        REQUIRE (param.getCurrentValueAsText() == juce::String::fromUTF8 ("7.70 fF"));
+        REQUIRE (getValueForText() == Catch::Approx { param.get() }.margin (1.0e-30));
+    }
+
+    SECTION ("Voltage Parameter")
+    {
+        chowdsp::MetricParameter param {
+            "param",
+            "Param",
+            juce::NormalisableRange { -2.0f, 2.0f },
+            0.0f,
+            juce::String::fromUTF8 ("V"),
+            2
+        };
+
+        const auto getValueForText = [&param]
+        {
+            const auto text = param.getCurrentValueAsText();
+            const auto normValue = static_cast<juce::AudioProcessorParameter&> (param).getValueForText (text);
+            return param.convertFrom0to1 (normValue);
+        };
+
+        param.setParameterValue (1.0f);
+        REQUIRE (param.getCurrentValueAsText() == juce::String::fromUTF8 ("1.00 V"));
+        REQUIRE (getValueForText() == Catch::Approx { param.get() }.margin (1.0e-6));
+
+        param.setParameterValue (-1.0f);
+        REQUIRE (param.getCurrentValueAsText() == juce::String::fromUTF8 ("-1.00 V"));
+        REQUIRE (getValueForText() == Catch::Approx { param.get() }.margin (1.0e-6));
+
+        param.setParameterValue (-0.001f);
+        REQUIRE (param.getCurrentValueAsText() == juce::String::fromUTF8 ("-1.00 mV"));
+        REQUIRE (getValueForText() == Catch::Approx { param.get() }.margin (1.0e-6));
     }
 }
