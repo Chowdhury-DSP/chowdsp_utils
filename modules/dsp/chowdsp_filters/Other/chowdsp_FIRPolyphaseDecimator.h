@@ -26,7 +26,7 @@ public:
 
         if constexpr (maxChannelCount == dynamicChannelCount)
             overlapState = arena::make_span<T> (arena, (size_t) numChannels * decimationFactor);
-        std::fill (overlapState.begin(), overlapState.end(), T{});
+        std::fill (overlapState.begin(), overlapState.end(), T {});
 
         for (size_t i = 0; i < decimationFactor; ++i)
         {
