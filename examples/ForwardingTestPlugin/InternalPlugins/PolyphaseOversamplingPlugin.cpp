@@ -2,13 +2,11 @@
 
 namespace
 {
-constexpr int os_ratio = 4;
-
 // Coefficients generated from: https://fiiir.com/
 // Cutoff frequency: 0.13
 // Transition bandwidth: 0.08
 // Blackman window
-constexpr std::array<float, 59> aa_coeffs {
+constexpr std::array<float, PolyphaseOversamplingPlugin::num_coeffs> aa_coeffs {
     0.000000000000000000f,
     -0.000009290744190889f,
     -0.000003179945796776f,
@@ -75,10 +73,10 @@ void PolyphaseOversamplingPlugin::prepareToPlay (double sample_rate, int samples
 {
     const auto num_channels = getMainBusNumInputChannels();
 
-    os_buffer.setMaxSize (num_channels, samples_per_block * os_ratio);
+    os_buffer.setMaxSize (num_channels, samples_per_block * (int) os_ratio);
     gain.prepare ({
         sample_rate * static_cast<double> (os_ratio),
-        static_cast<uint32_t> (samples_per_block * os_ratio),
+        static_cast<uint32_t> (samples_per_block * (int) os_ratio),
         static_cast<uint32_t> (num_channels),
     });
 
@@ -87,15 +85,15 @@ void PolyphaseOversamplingPlugin::prepareToPlay (double sample_rate, int samples
     for (auto& coeff : upsample_coeffs)
         coeff *= (float) os_ratio;
 
-    upsampler.prepare (os_ratio, num_channels, samples_per_block, upsample_coeffs);
-    downsampler.prepare (os_ratio, num_channels, samples_per_block * os_ratio, aa_coeffs);
+    upsampler.prepare (num_channels, samples_per_block, upsample_coeffs, arena);
+    downsampler.prepare (num_channels, samples_per_block * (int) os_ratio, aa_coeffs, arena);
 }
 
 void PolyphaseOversamplingPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
 {
     const auto num_channels = buffer.getNumChannels();
     const auto num_samples = buffer.getNumSamples();
-    os_buffer.setCurrentSize (num_channels, num_samples * os_ratio);
+    os_buffer.setCurrentSize (num_channels, num_samples * (int) os_ratio);
 
     upsampler.processBlock (buffer, os_buffer);
 

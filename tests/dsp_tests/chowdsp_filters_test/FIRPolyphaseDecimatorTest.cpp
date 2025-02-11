@@ -1,7 +1,8 @@
 #include <CatchUtils.h>
 #include <chowdsp_filters/chowdsp_filters.h>
 
-static void decimationFilterCompare (int filterOrder, int decimationFactor, int numChannels)
+template <size_t filterOrder, size_t decimationFactor, size_t maxNumChannels = chowdsp::dynamicChannelCount>
+static void decimationFilterCompare (int numChannels)
 {
     const auto numSamples = decimationFactor * 12;
     const auto halfSamples = numSamples / 2;
@@ -25,8 +26,9 @@ static void decimationFilterCompare (int filterOrder, int decimationFactor, int 
     referenceFilter.processBlock (chowdsp::BufferView { bufferIn, halfSamples, halfSamples },
                                   chowdsp::BufferView { referenceBufferOut, halfSamples, halfSamples });
 
-    chowdsp::FIRPolyphaseDecimator<float> decimatorFilter;
-    decimatorFilter.prepare (decimationFactor, numChannels, numSamples, coeffs);
+    chowdsp::ArenaAllocator<> arena { 8192 };
+    chowdsp::FIRPolyphaseDecimator<float, decimationFactor, filterOrder, maxNumChannels> decimatorFilter;
+    decimatorFilter.prepare (numChannels, numSamples, coeffs, arena);
     chowdsp::Buffer<float> testBufferOut { numChannels, numSamples / decimationFactor };
     decimatorFilter.processBlock (chowdsp::BufferView { bufferIn, 0, halfSamples },
                                   chowdsp::BufferView { testBufferOut, 0, halfSamples / decimationFactor });
@@ -46,12 +48,12 @@ static void decimationFilterCompare (int filterOrder, int decimationFactor, int 
 
 TEST_CASE ("FIR Polyphase Decimator Test", "[dsp][filters][fir][anti-aliasing]")
 {
-    decimationFilterCompare (10, 2, 1);
-    decimationFilterCompare (9, 2, 1);
+    decimationFilterCompare<10, 2> (1);
+    decimationFilterCompare<9, 2> (1);
 
-    decimationFilterCompare (16, 3, 4);
-    decimationFilterCompare (19, 3, 4);
+    decimationFilterCompare<16, 3, 8> (4);
+    decimationFilterCompare<19, 3, 8> (4);
 
-    decimationFilterCompare (32, 4, 2);
-    decimationFilterCompare (33, 4, 2);
+    decimationFilterCompare<32, 4, 2> (2);
+    decimationFilterCompare<33, 4, 2> (2);
 }

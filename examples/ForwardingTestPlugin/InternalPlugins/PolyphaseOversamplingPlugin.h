@@ -31,9 +31,13 @@ public:
     bool hasEditor() const override { return false; }
     juce::AudioProcessorEditor* createEditor() override { return nullptr; }
 
+    static constexpr size_t os_ratio = 4;
+    static constexpr size_t num_coeffs = 59;
+
 private:
-    chowdsp::FIRPolyphaseInterpolator<float> upsampler;
-    chowdsp::FIRPolyphaseDecimator<float> downsampler;
+    chowdsp::ChainedArenaAllocator arena { 16384 };
+    chowdsp::FIRPolyphaseInterpolator<float, os_ratio, num_coeffs> upsampler;
+    chowdsp::FIRPolyphaseDecimator<float, os_ratio, num_coeffs> downsampler;
 
     chowdsp::Buffer<float> os_buffer {};
     chowdsp::Gain<float> gain {};
