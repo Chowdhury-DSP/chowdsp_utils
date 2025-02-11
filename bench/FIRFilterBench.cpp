@@ -75,50 +75,6 @@ static auto makeChowFIRChoices()
 
 auto chowFIRChoices = makeChowFIRChoices();
 
-static auto makeChowPolyphaseDecimFIR (int order)
-{
-    const auto coefsData = bench_utils::makeRandomVector<float> (order);
-
-    chowdsp::FIRPolyphaseDecimator<float> filter {};
-    filter.prepare (2, 1, blockSize, coefsData);
-
-    return filter;
-}
-
-static auto makeChowPolyphaseDecimFIRChoices()
-{
-    std::unordered_map<int, chowdsp::FIRPolyphaseDecimator<float>> choices;
-
-    for (int order = startOrder; order <= endOrder; order *= orderMult)
-        choices.emplace (std::make_pair (order, makeChowPolyphaseDecimFIR (order)));
-
-    return choices;
-}
-
-auto chowPolyphaseDecimFIRChoices = makeChowPolyphaseDecimFIRChoices();
-
-static auto makeChowPolyphaseInterpFIR (int order)
-{
-    const auto coefsData = bench_utils::makeRandomVector<float> (order);
-
-    chowdsp::FIRPolyphaseInterpolator<float> filter {};
-    filter.prepare (2, 1, blockSize / 2, coefsData);
-
-    return filter;
-}
-
-static auto makeChowPolyphaseInterpFIRChoices()
-{
-    std::unordered_map<int, chowdsp::FIRPolyphaseInterpolator<float>> choices;
-
-    for (int order = startOrder; order <= endOrder; order *= orderMult)
-        choices.emplace (std::make_pair (order, makeChowPolyphaseInterpFIR (order)));
-
-    return choices;
-}
-
-auto chowPolyphaseInterpFIRChoices = makeChowPolyphaseInterpFIRChoices();
-
 static auto makeAudioBuffer()
 {
     auto bufferData = bench_utils::makeRandomVector<float> (blockSize);
@@ -204,25 +160,5 @@ BENCHMARK (ChowTempl16FIR)->MinTime (1);
 BENCHMARK (ChowTempl64FIR)->MinTime (1);
 BENCHMARK (ChowTempl256FIR)->MinTime (1);
 BENCHMARK (ChowTempl1024FIR)->MinTime (1);
-
-static void ChowPolyphaseDecimFIR (benchmark::State& state)
-{
-    auto& fir = chowPolyphaseDecimFIRChoices[(int) state.range (0)];
-    for (auto _ : state)
-    {
-        fir.processBlock (audioBuffer, audioBuffer);
-    }
-}
-BENCHMARK (ChowPolyphaseDecimFIR)->MinTime (1)->RangeMultiplier (orderMult)->Range (startOrder, endOrder);
-
-static void ChowPolyphaseInterpFIR (benchmark::State& state)
-{
-    auto& fir = chowPolyphaseInterpFIRChoices[(int) state.range (0)];
-    for (auto _ : state)
-    {
-        fir.processBlock (chowdsp::BufferView { audioBuffer, 0, blockSize / 2 }, audioBuffer);
-    }
-}
-BENCHMARK (ChowPolyphaseInterpFIR)->MinTime (1)->RangeMultiplier (orderMult)->Range (startOrder, endOrder);
 
 BENCHMARK_MAIN();
