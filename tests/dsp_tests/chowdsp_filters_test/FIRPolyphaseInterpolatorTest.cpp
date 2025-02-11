@@ -1,7 +1,8 @@
 #include <CatchUtils.h>
 #include <chowdsp_filters/chowdsp_filters.h>
 
-static void interpolationFilterCompare (int filterOrder, int interpolationFactor, int numChannels)
+template <size_t filterOrder, size_t interpolationFactor, size_t maxNumChannels = chowdsp::dynamicChannelCount>
+static void interpolationFilterCompare (int numChannels)
 {
     const auto numSamples = 12;
     const auto halfSamples = numSamples / 2;
@@ -24,14 +25,15 @@ static void interpolationFilterCompare (int filterOrder, int interpolationFactor
     referenceBufferIn.clear();
     for (auto [ch, data] : chowdsp::buffer_iters::channels (std::as_const (bufferIn)))
         for (auto [n, x] : chowdsp::enumerate (data))
-            referenceBufferIn.getWritePointer (ch)[(int) n * interpolationFactor] = x;
+            referenceBufferIn.getWritePointer (ch)[n * interpolationFactor] = x;
     referenceFilter.processBlock (chowdsp::BufferView { referenceBufferIn, 0, halfSamples * interpolationFactor },
                                   chowdsp::BufferView { referenceBufferOut, 0, halfSamples * interpolationFactor });
     referenceFilter.processBlock (chowdsp::BufferView { referenceBufferIn, halfSamples * interpolationFactor, halfSamples * interpolationFactor },
                                   chowdsp::BufferView { referenceBufferOut, halfSamples * interpolationFactor, halfSamples * interpolationFactor });
 
-    chowdsp::FIRPolyphaseInterpolator<float> interpolatorFilter;
-    interpolatorFilter.prepare (interpolationFactor, numChannels, numSamples, coeffs);
+    chowdsp::ArenaAllocator<> arena { 8192 };
+    chowdsp::FIRPolyphaseInterpolator<float, interpolationFactor, filterOrder, maxNumChannels> interpolatorFilter;
+    interpolatorFilter.prepare (numChannels, numSamples, coeffs, arena);
     chowdsp::Buffer<float> testBufferOut { numChannels, numSamples * interpolationFactor };
     interpolatorFilter.processBlock (chowdsp::BufferView { bufferIn, 0, halfSamples },
                                      chowdsp::BufferView { testBufferOut, 0, halfSamples * interpolationFactor });
@@ -48,12 +50,12 @@ static void interpolationFilterCompare (int filterOrder, int interpolationFactor
 
 TEST_CASE ("FIR Polyphase Interpolator Test", "[dsp][filters][fir][anti-aliasing]")
 {
-    interpolationFilterCompare (10, 2, 1);
-    interpolationFilterCompare (9, 2, 1);
+    interpolationFilterCompare<10, 2> (1);
+    interpolationFilterCompare<9, 2> (1);
 
-    interpolationFilterCompare (16, 3, 4);
-    interpolationFilterCompare (19, 3, 4);
+    interpolationFilterCompare<16, 3, 8> (4);
+    interpolationFilterCompare<19, 3, 8> (4);
 
-    interpolationFilterCompare (32, 4, 2);
-    interpolationFilterCompare (33, 4, 2);
+    interpolationFilterCompare<32, 4, 2> (2);
+    interpolationFilterCompare<33, 4, 2> (2);
 }
