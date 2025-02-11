@@ -31,6 +31,7 @@ public:
         for (size_t i = 0; i < decimationFactor; ++i)
         {
             buffers[i] = make_temp_buffer<T> (arena, numChannels, maxBlockSizeIn / (int) decimationFactor);
+            buffers[i].clear();
             filters[i].prepare (numChannels);
 
             std::fill (oneFilterCoeffs.begin(), oneFilterCoeffs.end(), T {});
