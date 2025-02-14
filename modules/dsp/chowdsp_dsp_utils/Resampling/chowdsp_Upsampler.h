@@ -103,16 +103,22 @@ private:
 /**
  * Utility class for upsampling a signal by an integer ratio,
  * using SIMD-accelerated anti-imaging filters.
- * Note that this requires more latency than the non-SIMD
- * version of this code, especially for higher-order filters.
+ * Note that this implementation adds num_filters * (v_size - 1)
+ * samples of latency on top of the non-SIMD
+ * implementation's latency (at the higher sample rate).
  *
  * @tparam T                        Data type to process
  * @tparam AntiImagingFilterType    Filter type to use for an anti-imaging filter, for example chowdsp::ButterworthFilter<8>
  */
-template <typename T, typename AntiImagingFilterType, int maxNumChannels = defaultChannelCount>
+template <typename T, typename AntiImagingFilterType, size_t maxNumChannels = defaultChannelCount>
 class SIMDUpsampler
 {
 public:
+    static constexpr auto filter_order = AntiImagingFilterType::Order;
+    static constexpr auto v_size = xsimd::batch<T>::size;
+    static_assert (filter_order % v_size == 0, "Filter order must be a multiple of the SIMD width on this platform!");
+    static constexpr auto num_filters = filter_order / (2 * v_size);
+
     SIMDUpsampler() = default;
 
     /** Prepares the upsampler to process signal at a given upsampling ratio */
@@ -132,7 +138,7 @@ public:
         alignas (SIMDUtils::defaultSIMDAlignment) std::array<T, v_size> b2 {};
         for (size_t i = 0; i < num_filters; ++i)
         {
-            for (int j = 0; j < v_size; ++j)
+            for (size_t j = 0; j < v_size; ++j)
             {
                 a1[j] = aiFilter.secondOrderSections[i * v_size + j].a[1];
                 a2[j] = aiFilter.secondOrderSections[i * v_size + j].a[2];
@@ -205,11 +211,11 @@ public:
 private:
     void processFilter (T* data, const int channel, const int numSamples) noexcept
     {
-        for (int i = 0; i < num_filters; ++i)
+        for (size_t i = 0; i < num_filters; ++i)
         {
             auto& sos = filter.secondOrderSections[i];
-            auto z1 = sos.z[channel][1];
-            auto z2 = sos.z[channel][2];
+            auto z1 = sos.z[(size_t) channel][1];
+            auto z2 = sos.z[(size_t) channel][2];
             auto x_simd_ = x_simd[(size_t) channel][i];
 
             for (int n = 0; n < numSamples; ++n)
@@ -225,18 +231,14 @@ private:
                     x_simd_[j] = x_simd_[j - 1];
             }
 
-            sos.z[channel][1] = z1;
-            sos.z[channel][2] = z2;
+            sos.z[(size_t) channel][1] = z1;
+            sos.z[(size_t) channel][2] = z2;
             x_simd[(size_t) channel][i] = x_simd_;
         }
     }
 
     int ratio = 1;
 
-    static constexpr auto filter_order = AntiImagingFilterType::Order;
-    static constexpr auto v_size = xsimd::batch<T>::size;
-    static_assert (filter_order % v_size == 0, "Filter order must be a multiple of the SIMD width on this platform!");
-    static constexpr auto num_filters = filter_order / (2 * v_size);
     SOSFilter<filter_order / v_size, xsimd::batch<T>> filter;
 
     static_assert (maxNumChannels != dynamicChannelCount, "SIMD Upsampler cannot be used with a dynamic channel count!");
