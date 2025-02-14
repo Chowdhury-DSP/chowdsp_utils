@@ -286,7 +286,6 @@ private:
     static_assert (maxNumChannels != dynamicChannelCount, "SIMD Upsampler cannot be used with a dynamic channel count!");
     alignas (16) std::array<std::array<std::array<T, v_size>, num_filters>, maxNumChannels> x_simd {};
 
-
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SIMDDownsampler)
 };
 #endif
