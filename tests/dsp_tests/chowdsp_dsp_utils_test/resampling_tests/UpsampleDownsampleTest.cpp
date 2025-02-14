@@ -170,14 +170,14 @@ static float calcSNR (const chowdsp::BufferView<float>& buffer, float freqExpect
 }
 
 template <typename ProcType>
-static auto processInSubBlocks (ProcType& proc, chowdsp::Buffer<float>& inBuffer, int subBlockSize = blockSize / 8)
+static auto processInSubBlocksInPlace (ProcType& proc, chowdsp::Buffer<float>& inBuffer, int subBlockSize = blockSize / 8)
 {
     chowdsp::Buffer<float> outBuffer { inBuffer.getNumChannels(), inBuffer.getNumSamples() * 10 };
     int outBufferPtr = 0;
 
     for (int i = 0; i < inBuffer.getNumSamples(); i += subBlockSize)
     {
-        auto outBlock = proc.process (chowdsp::BufferView<float> { inBuffer, i, subBlockSize });
+        auto outBlock = proc.process (chowdsp::BufferView { inBuffer, i, subBlockSize });
 
         auto numOutSamples = (int) outBlock.getNumSamples();
         juce::FloatVectorOperations::copy (outBuffer.getWritePointer (0) + outBufferPtr, outBlock.getReadPointer (0), numOutSamples);
@@ -196,11 +196,53 @@ void upsampleQualityTest (int upsampleRatio)
 
     constexpr float testFreq = 10000.0f;
     auto sineBuffer = test_utils::makeSineWave (testFreq, (float) _sampleRate, (int) blockSize);
-    auto upsampledBuffer = processInSubBlocks (upsampler, sineBuffer);
+    auto upsampledBuffer = processInSubBlocksInPlace (upsampler, sineBuffer);
     auto snr = calcSNR (upsampledBuffer, testFreq, (float) _sampleRate * (float) upsampler.getUpsamplingRatio());
 
     REQUIRE_MESSAGE (upsampledBuffer.getNumSamples() == (int) blockSize * upsampler.getUpsamplingRatio(), "Upsampled block size is incorrect!");
     REQUIRE_MESSAGE (snr > 60.0f, "Signal to noise ratio is too low!");
+}
+
+template <typename FilterType>
+void upsampleSIMDQualityTest (int upsampleRatio)
+{
+    chowdsp::SIMDUpsampler<float, FilterType, 2> upsampler;
+    upsampler.prepare ({ _sampleRate, (juce::uint32) blockSize, 1 }, upsampleRatio);
+
+    constexpr float testFreq = 10000.0f;
+    auto sineBuffer = test_utils::makeSineWave (testFreq, (float) _sampleRate, (int) blockSize);
+
+    chowdsp::Buffer<float> upsampledBuffer { sineBuffer.getNumChannels(), sineBuffer.getNumSamples() * 10 };
+    int outBufferPtr = 0;
+    const auto subBlockSize = sineBuffer.getNumSamples() / 8;
+
+    for (int i = 0; i < sineBuffer.getNumSamples(); i += subBlockSize)
+    {
+        auto inBlock = chowdsp::BufferView<const float> { sineBuffer, i, subBlockSize };
+        auto outBlock = chowdsp::BufferView { upsampledBuffer, outBufferPtr, subBlockSize * upsampleRatio };
+
+        upsampler.process (inBlock, outBlock);
+
+        outBufferPtr += outBlock.getNumSamples();
+    }
+
+    upsampledBuffer.setCurrentSize (1, outBufferPtr);
+
+    auto snr = calcSNR (upsampledBuffer, testFreq, (float) _sampleRate * (float) upsampler.getUpsamplingRatio());
+
+    REQUIRE_MESSAGE (upsampledBuffer.getNumSamples() == (int) blockSize * upsampler.getUpsamplingRatio(), "Upsampled block size is incorrect!");
+    REQUIRE_MESSAGE (snr > 60.0f, "Signal to noise ratio is too low!");
+
+    {
+        chowdsp::Upsampler<float, FilterType> upsamplerNoSIMD;
+        upsamplerNoSIMD.prepare ({ _sampleRate, (juce::uint32) blockSize, 1 }, upsampleRatio);
+        auto upsampledBufferNoSIMD = processInSubBlocksInPlace (upsamplerNoSIMD, sineBuffer);
+        const auto latencyNoSIMD = upsampleRatio - 1;
+        const auto latencyWithSIMD = latencyNoSIMD + upsampler.num_filters * (upsampler.v_size - 1);
+        const auto expected = upsampledBufferNoSIMD.getReadPointer (0)[latencyNoSIMD + 1];
+        const auto test = upsampledBuffer.getReadPointer (0)[latencyWithSIMD + 1];
+        REQUIRE (test == Catch::Approx (expected).margin (1.0e-6));
+    }
 }
 
 template <typename FilterType>
@@ -209,10 +251,58 @@ void downsampleQualityTest (int downsampleRatio)
     chowdsp::Downsampler<float, FilterType> downsampler;
     downsampler.prepare ({ (double) downsampleRatio * _sampleRate, (juce::uint32) downsampleRatio * (juce::uint32) blockSize, 1 }, downsampleRatio);
 
-    static constexpr float testFreq = 42000.0f;
+    static constexpr float testFreq = 42'000.0f;
     auto thisBlockSize = downsampleRatio * (int) blockSize;
     auto sineBuffer = test_utils::makeSineWave (testFreq, (float) downsampleRatio * (float) _sampleRate, thisBlockSize);
-    auto downsampledBuffer = processInSubBlocks (downsampler, sineBuffer, downsampleRatio * 2048);
+    auto downsampledBuffer = processInSubBlocksInPlace (downsampler, sineBuffer, downsampleRatio * 2048);
+
+    REQUIRE_MESSAGE (downsampledBuffer.getNumSamples() == thisBlockSize / downsampler.getDownsamplingRatio(), "Downsampled block size is incorrect!");
+    if (downsampleRatio > 1)
+    {
+        float squaredSum = 0.0f;
+        for (int n = 0; n < (int) blockSize / downsampleRatio; ++n)
+            squaredSum += std::pow (downsampledBuffer.getReadPointer (0)[n], 2.0f);
+
+        auto rms = juce::Decibels::gainToDecibels (std::sqrt (squaredSum / ((float) blockSize / 2.0f)));
+
+        REQUIRE_MESSAGE (rms < -42.0f, "RMS level is too high!");
+    }
+    else
+    {
+        for (auto [ch, dsData] : chowdsp::buffer_iters::channels (std::as_const (downsampledBuffer)))
+        {
+            auto sineData = sineBuffer.getReadSpan (ch);
+            for (auto [dsSample, sineSample] : chowdsp::zip (dsData, sineData))
+                REQUIRE (std::abs (sineSample - dsSample) < 1.0e-6f);
+        }
+    }
+}
+
+template <typename FilterType>
+void downsampleSIMDQualityTest (int downsampleRatio)
+{
+    chowdsp::SIMDDownsampler<float, FilterType, 2> downsampler;
+    downsampler.prepare ({ (double) downsampleRatio * _sampleRate, (juce::uint32) downsampleRatio * (juce::uint32) blockSize, 1 }, downsampleRatio);
+
+    static constexpr float testFreq = 42'000.0f;
+    auto thisBlockSize = downsampleRatio * (int) blockSize;
+    auto sineBuffer = test_utils::makeSineWave (testFreq, (float) downsampleRatio * (float) _sampleRate, thisBlockSize);
+
+    chowdsp::Buffer<float> downsampledBuffer { sineBuffer.getNumChannels(), sineBuffer.getNumSamples() * 10 };
+    int outBufferPtr = 0;
+    const auto subBlockSize = sineBuffer.getNumSamples() / 8;
+
+    for (int i = 0; i < sineBuffer.getNumSamples(); i += subBlockSize)
+    {
+        auto inBlock = chowdsp::BufferView<const float> { sineBuffer, i, subBlockSize };
+        auto outBlock = chowdsp::BufferView { downsampledBuffer, outBufferPtr, subBlockSize / downsampleRatio };
+
+        downsampler.process (inBlock, outBlock);
+
+        outBufferPtr += outBlock.getNumSamples();
+    }
+
+    downsampledBuffer.setCurrentSize (1, outBufferPtr);
 
     REQUIRE_MESSAGE (downsampledBuffer.getNumSamples() == thisBlockSize / downsampler.getDownsamplingRatio(), "Downsampled block size is incorrect!");
     if (downsampleRatio > 1)
@@ -251,6 +341,7 @@ TEST_CASE ("Upsample/Downsample Test", "[dsp][resampling]")
     SECTION ("Upsample 3x Quality Test")
     {
         upsampleQualityTest<chowdsp::ButterworthFilter<8>> (3);
+        upsampleSIMDQualityTest<chowdsp::ButterworthFilter<8>> (3);
     }
 
     SECTION ("Upsample 3x Chebyshev Quality Test")
@@ -276,6 +367,7 @@ TEST_CASE ("Upsample/Downsample Test", "[dsp][resampling]")
     SECTION ("Downsample 3x Quality Test")
     {
         downsampleQualityTest<chowdsp::ButterworthFilter<16>> (3);
+        downsampleSIMDQualityTest<chowdsp::ButterworthFilter<16>> (3);
     }
 
     SECTION ("Downsample 3x Chebyshev Quality Test")
