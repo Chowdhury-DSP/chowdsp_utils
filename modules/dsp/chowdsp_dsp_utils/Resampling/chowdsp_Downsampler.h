@@ -214,6 +214,7 @@ public:
         while (numSamples > 0)
         {
             const auto N = std::min (numSamples, Math::round_to_next_multiple (2048, ratio));
+            jassert (N % ratio == 0);
 
             JUCE_BEGIN_IGNORE_WARNINGS_MSVC (6255 6386)
             auto filteredData = (T*) alloca ((size_t) N * sizeof (T));
@@ -249,6 +250,7 @@ private:
     {
         for (size_t i = 0; i < num_filters; ++i)
         {
+            auto* cur_data_in = i == 0 ? data_in : data_out;
             auto& sos = filter.secondOrderSections[i];
             auto z1 = sos.z[(size_t) channel][1];
             auto z2 = sos.z[(size_t) channel][2];
@@ -256,7 +258,7 @@ private:
 
             for (int n = 0; n < numSamples; ++n)
             {
-                x_simd_[0] = data_in[n];
+                x_simd_[0] = cur_data_in[n];
                 auto x = xsimd::load_aligned (x_simd_.data());
 
                 x = sos.processSample2ndOrder (x, z1, z2);
