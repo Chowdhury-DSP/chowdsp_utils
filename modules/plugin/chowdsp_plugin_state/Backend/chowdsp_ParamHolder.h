@@ -109,6 +109,14 @@ public:
     {
         return &floatParams;
     }
+    std::vector<OptionalPointer<BoolParameter>>* getBoolParams()
+    {
+        return &boolParams;
+    }
+    std::vector<ParamHolder*>* getParamHolders()
+    {
+        return &otherParams;
+    }
 private:
     void add() const
     {

@@ -52,7 +52,7 @@ public:
                     const juce::NormalisableRange<float>& valueRange,
                     float defaultValue,
                     const std::function<juce::String (float)>& valueToTextFunction,
-                    std::function<float (const juce::String&)>&& textToValueFunction);
+                    std::function<float (const juce::String&)>&& textToValueFunction,bool supportsModulation=false);
 
     using Ptr = OptionalPointer<FloatParameter>;
 
@@ -67,7 +67,7 @@ public:
     float getDefaultValue() const override { return unsnappedDefault; }
 
     /** TRUE! */
-    bool supportsMonophonicModulation() override { return true; }
+    bool supportsMonophonicModulation() override { return supportsModulation; }
 
     /** Applies monphonic modulation to this parameter. */
     void applyMonophonicModulation (double value) override;
@@ -87,6 +87,7 @@ private:
     const float unsnappedDefault;
     const juce::NormalisableRange<float> normalisableRange;
 
+    const bool supportsModulation;
     float modulationAmount = 0.0f;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FloatParameter)
@@ -230,13 +231,13 @@ public:
     GainDBParameter (const ParameterID& parameterID,
                      const juce::String& paramName,
                      const juce::NormalisableRange<float>& paramRange,
-                     float defaultValue)
+                     float defaultValue, bool mod=false)
         : FloatParameter (parameterID,
                           paramName,
                           paramRange,
                           defaultValue,
                           &ParamUtils::gainValToString,
-                          &ParamUtils::stringToGainVal)
+                          &ParamUtils::stringToGainVal, true)
     {
     }
 
@@ -276,13 +277,13 @@ public:
     TimeMsParameter (const ParameterID& parameterID,
                      const juce::String& paramName,
                      const juce::NormalisableRange<float>& paramRange,
-                     float defaultValue)
+                     float defaultValue,bool mod =false)
         : FloatParameter (parameterID,
                           paramName,
                           paramRange,
                           defaultValue,
                           &ParamUtils::timeMsValToString,
-                          &ParamUtils::stringToTimeMsVal)
+                          &ParamUtils::stringToTimeMsVal,mod)
     {
     }
 
