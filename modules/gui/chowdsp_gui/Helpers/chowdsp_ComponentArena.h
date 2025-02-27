@@ -59,6 +59,12 @@ public:
         allocator.clear();
     }
 
+    /** Returns the number of components currently allocated in the arena. */
+    [[nodiscard]] size_t component_count() noexcept
+    {
+        return component_list.size();
+    }
+
     ChainedArenaAllocator allocator { arena_chunk_size_bytes };
 
 private:
