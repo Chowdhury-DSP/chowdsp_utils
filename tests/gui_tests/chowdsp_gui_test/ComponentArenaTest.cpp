@@ -24,6 +24,7 @@ TEST_CASE ("Component Arena Test", "[gui][data-structures]")
     {
         arena.allocate<TestComponent> (destructor_counter);
         arena.allocate_n<TestComponent> (4, destructor_counter);
+        REQUIRE (arena.component_count() == 5);
 
         REQUIRE (destructor_counter == 0);
         arena.clear_all();
@@ -36,6 +37,7 @@ TEST_CASE ("Component Arena Test", "[gui][data-structures]")
         arena.allocate<NotAComponent> (destructor_counter);
         arena.allocate_n<TestComponent> (4, destructor_counter);
         arena.allocate_n<NotAComponent> (3, destructor_counter);
+        REQUIRE (arena.component_count() == 5);
 
         REQUIRE (destructor_counter == 0);
         arena.clear_all();
