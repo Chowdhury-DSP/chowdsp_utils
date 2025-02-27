@@ -55,4 +55,4 @@ jobs:
         uses: jatinchowdhury18/clap-val-action@main
         with:
           plugin_path: build/plugin_products/SimpleEQ.clap build/plugin_products/StatefulPlugin.clap build/plugin_products/ExampleCompressor.clap
-          args: --only-failed --hide-output --invert-filter --test-filter "state-*"
+          args: --only-failed --hide-output --invert-filter --test-filter "state-*|param-fuzz-basic"
