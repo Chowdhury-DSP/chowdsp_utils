@@ -57,6 +57,8 @@ void PresetManager::saveUserPreset (const juce::File& file)
 
 void PresetManager::saveUserPreset (const juce::File& file, Preset&& preset) // NOSONAR
 {
+    juce::Logger::writeToLog ("Saving preset: " + preset.getName() + "; to file: " + file.getFullPathName());
+
     jassert (preset.isValid()); // trying to save an invalid preset??
 
     if (file.existsAsFile())
