@@ -220,7 +220,11 @@ void PresetsComponent::confirmAndDeletePreset (const Preset& presetToDelete, std
                                                  [&presetToDelete, deleter = std::move (presetDeleter)] (int result)
                                                  {
                                                      if (result == 1)
+                                                     {
+                                                         juce::Logger::writeToLog ("Deleting preset: " + presetToDelete.getName()
+                                                                                   + " (" + presetToDelete.getPresetFile().getFullPathName() + ")");
                                                          deleter (presetToDelete);
+                                                     }
                                                  }));
 }
 
@@ -236,7 +240,11 @@ void PresetsComponent::confirmAndOverwritePresetFile (const juce::File& presetFi
                                                  [presetFile, preset = std::move (preset), saver = std::move (presetSaver)] (int result) mutable
                                                  {
                                                      if (result == 1)
+                                                     {
+                                                         juce::Logger::writeToLog ("Over-writing preset: " + preset.getName()
+                                                                                   + " (" + presetFile.getFullPathName() + ")");
                                                          saver (presetFile, std::move (preset));
+                                                     }
                                                  }));
 }
 

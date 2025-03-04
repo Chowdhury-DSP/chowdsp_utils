@@ -21,6 +21,9 @@ void MenuInterface::addExtraMenuItems (juce::PopupMenu& menu, std::initializer_l
     const auto* currentPreset = presetManager.getCurrentPreset();
     const auto currentPresetExists = currentPreset != nullptr && currentPreset->isValid();
     const auto currentPresetFileExists = currentPresetExists && currentPreset->getPresetFile().existsAsFile();
+    const auto currentPresetIsDefault = currentPresetExists
+                                        && presetManager.getDefaultPreset() != nullptr
+                                        && *currentPreset == *presetManager.getDefaultPreset();
     const auto userPresetDirExists = presetManager.getUserPresetPath().isDirectory();
     const auto hasFileInterface = fileInterface != nullptr;
 
@@ -69,7 +72,10 @@ void MenuInterface::addExtraMenuItems (juce::PopupMenu& menu, std::initializer_l
         {
             addPresetMenuItem ([this]
                                { fileInterface->deleteCurrentPreset(); },
-                               currentPresetFileExists && ! (currentPreset->isFactoryPreset) && hasFileInterface);
+                               currentPresetFileExists
+                                   && ! (currentPreset->isFactoryPreset)
+                                   && ! currentPresetIsDefault
+                                   && hasFileInterface);
         }
         else if (itemID == Copy_Current_Preset)
         {

@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Cache pip
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -33,7 +33,7 @@ jobs:
             ${{ runner.os }}-teensy-pip-
 
       - name: Cache PlatformIO
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ~/.platformio
           key: ${{ runner.os }}-teensy-${{ hashFiles('**/lockfiles') }}
