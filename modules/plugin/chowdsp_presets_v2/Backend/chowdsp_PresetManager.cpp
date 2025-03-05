@@ -131,7 +131,7 @@ void PresetManager::loadUserPresetsFromFolder (const juce::File& file)
     // delete old user presets
     juce::File defaultPresetFileToReplace {};
     presetTree.removeElements ([this, &defaultPresetFileToReplace] (const Preset& preset)
-    {
+                               {
         if (preset.isFactoryPreset)
             return false;
 
@@ -139,8 +139,7 @@ void PresetManager::loadUserPresetsFromFolder (const juce::File& file)
         if (&preset == defaultPreset)
             defaultPresetFileToReplace = preset.getPresetFile();
 
-        return true;
-    });
+        return true; });
 
     addPresets (std::move (presets), false);
 
@@ -149,14 +148,13 @@ void PresetManager::loadUserPresetsFromFolder (const juce::File& file)
         // we need to re-discover the default preset from here...
         defaultPreset = nullptr;
         presetTree.doForAllElements ([this, &defaultPresetFileToReplace] (const Preset& preset)
-        {
+                                     {
             // find the preset with the same file as the old default preset, and make that the default preset
             if (defaultPresetFileToReplace.existsAsFile() && preset.getPresetFile() == defaultPresetFileToReplace)
             {
                 defaultPreset = &preset;
                 defaultPresetFileToReplace = juce::File {};
-            }
-        });
+            } });
     }
 }
 
