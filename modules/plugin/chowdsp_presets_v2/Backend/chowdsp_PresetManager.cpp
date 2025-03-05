@@ -146,6 +146,7 @@ void PresetManager::loadUserPresetsFromFolder (const juce::File& file)
 
     if (defaultPresetFileToReplace != juce::File {})
     {
+        // we need to re-discover the default preset from here...
         defaultPreset = nullptr;
         presetTree.doForAllElements ([this, &defaultPresetFileToReplace] (const Preset& preset)
         {
