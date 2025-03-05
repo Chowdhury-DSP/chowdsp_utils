@@ -207,16 +207,49 @@ TEST_CASE ("Preset Manager Test", "[plugin][presets][state]")
         dummyFile.create();
 
         ScopedPresetManager presetMgr { userPresetsDir1 };
-        // REQUIRE_MESSAGE (*presetMgr->getPresetTree().getElementByIndex (0) == preset1, "User preset loaded from folder is incorrect!");
+        REQUIRE (presetMgr->getPresetTree().size() == 1);
+        REQUIRE (presetMgr->getPresetTree().findElement (preset1).has_value());
 
         presetMgr->setUserPresetPath ({});
-        // REQUIRE_MESSAGE (*presetMgr->getPresetTree().getElementByIndex (0) == preset1, "User presets should not change when loading null file as preset path!");
+        REQUIRE (presetMgr->getPresetTree().size() == 1);
+        REQUIRE (presetMgr->getPresetTree().findElement (preset1).has_value());
 
         test_utils::ScopedFile userPresetsDir2 { "user_presets2" };
         userPresetsDir2.file.createDirectory();
         preset2.toFile (userPresetsDir2.file.getChildFile (preset2.getPresetFile().getFileName()));
         presetMgr->setUserPresetPath (userPresetsDir2);
-        // REQUIRE_MESSAGE (*presetMgr->getPresetTree().getElementByIndex (0) == preset2, "User presets not loaded correctly after changing user preset path!");
+        REQUIRE (presetMgr->getPresetTree().size() == 1);
+        REQUIRE (presetMgr->getPresetTree().findElement (preset2).has_value());
+    }
+
+    SECTION ("Default User Preset")
+    {
+        static constexpr float testValue1 = 0.05f;
+        static constexpr float testValue2 = 0.55f;
+
+        auto preset1 = saveUserPreset ("test1.preset", testValue1);
+        auto preset2 = saveUserPreset ("test2.preset", testValue2);
+
+        test_utils::ScopedFile userPresetsDir { "user_presets" };
+        userPresetsDir.file.createDirectory();
+        preset1.toFile (userPresetsDir.file.getChildFile (preset1.getPresetFile().getFileName()));
+        preset2.toFile (userPresetsDir.file.getChildFile (preset2.getPresetFile().getFileName()));
+
+        ScopedPresetManager presetMgr { userPresetsDir };
+        REQUIRE (presetMgr->getPresetTree().size() == 2);
+
+        presetMgr->setDefaultPreset (chowdsp::presets::Preset { preset1 });
+        presetMgr->loadDefaultPreset();
+        REQUIRE (*presetMgr->getCurrentPreset() == preset1);
+
+        presetMgr->loadPreset (preset2);
+        REQUIRE (*presetMgr->getCurrentPreset() == preset2);
+        preset2.getPresetFile().deleteFile();
+        REQUIRE (*presetMgr->getCurrentPreset() == preset2);
+
+        presetMgr->loadUserPresetsFromFolder (presetMgr->getUserPresetPath());
+        presetMgr->loadDefaultPreset();
+        REQUIRE (*presetMgr->getCurrentPreset() == preset1);
     }
 
     SECTION ("Null State Test")
