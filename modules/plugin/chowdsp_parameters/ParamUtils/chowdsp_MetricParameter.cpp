@@ -41,41 +41,62 @@ MetricParameter::MetricParameter (
 juce::String MetricParameter::toString (float value, int numDecimalPlaces)
 {
     const auto absValue = std::abs (value);
+    float valueInRange { value };
+    juce::String suffix {};
+
     if (absValue < 1.0e-12f) // femto
     {
-        return juce::String { value * 1.0e15f, numDecimalPlaces } + " f";
+        valueInRange = value * 1.0e15f;
+        suffix = " f";
     }
-    if (absValue < 1.0e-9f) // pico
+    else if (absValue < 1.0e-9f) // pico
     {
-        return juce::String { value * 1.0e12f, numDecimalPlaces } + " p";
+        valueInRange = value * 1.0e12f;
+        suffix = " p";
     }
-    if (absValue < 1.0e-6f) // nano
+    else if (absValue < 1.0e-6f) // nano
     {
-        return juce::String { value * 1.0e9f, numDecimalPlaces } + " n";
+        valueInRange = value * 1.0e9f;
+        suffix = " n";
     }
-    if (absValue < 1.0e-3f) // micro
+    else if (absValue < 1.0e-3f) // micro
     {
-        return juce::String { value * 1.0e6f, numDecimalPlaces } + " μ";
+        valueInRange = value * 1.0e6f;
+        suffix = juce::String::fromUTF8 (" μ");
     }
-    if (absValue < 1.0f) // milli
+    else if (absValue < 1.0f) // milli
     {
-        return juce::String { value * 1.0e3f, numDecimalPlaces } + " m";
+        valueInRange = value * 1.0e3f;
+        suffix = " m";
     }
-    if (absValue < 1.0e3f) // units
+    else if (absValue < 1.0e3f) // units
     {
-        return juce::String { value, numDecimalPlaces } + " ";
+        suffix = " ";
     }
-    if (absValue < 1.0e6f) // kilo
+    else if (absValue < 1.0e6f) // kilo
     {
-        return juce::String { value * 1.0e-3f, numDecimalPlaces } + " k";
+        valueInRange = value * 1.0e-3f;
+        suffix = " k";
     }
-    if (absValue < 1.0e9f) // mega
+    else if (absValue < 1.0e9f) // mega
     {
-        return juce::String { value * 1.0e-6f, numDecimalPlaces } + " M";
+        valueInRange = value * 1.0e-6f;
+        suffix = " M";
+    }
+    else // Giga
+    {
+        valueInRange = value * 1.0e-9f;
+        suffix = " G";
     }
 
-    // Giga
-    return juce::String { value * 1.0e-9f, numDecimalPlaces } + " G";
+    juce::String res;
+    if (numDecimalPlaces == 0)
+        res = juce::String { static_cast<int> (valueInRange) };
+    else
+        res = juce::String { valueInRange, numDecimalPlaces };
+    res += suffix;
+
+    return res;
 }
 
 float MetricParameter::fromString (const juce::String& str)
