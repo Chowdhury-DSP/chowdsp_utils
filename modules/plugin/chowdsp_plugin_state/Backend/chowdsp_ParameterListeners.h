@@ -90,6 +90,7 @@ private:
 
     std::vector<Broadcaster<void()>> messageThreadBroadcasters { totalNumParams };
 
+
     static constexpr size_t actionSize = 16; // sizeof ([this, i = index] { callMessageThreadBroadcaster (i); })
     std::vector<Broadcaster<void()>> audioThreadBroadcasters { totalNumParams };
     using AudioThreadAction = juce::dsp::FixedSizeFunction<actionSize, void()>;

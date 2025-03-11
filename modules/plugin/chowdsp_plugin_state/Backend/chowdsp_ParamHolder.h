@@ -117,6 +117,13 @@ public:
     {
         return &otherParams;
     }
+
+    virtual void processStateChanges(){}
+    bitklavier::ParameterChangeBuffer stateChanges;
+    void push_change(std::pair<int,juce::ValueTree> && x)
+    {
+        stateChanges.changeState.push_back(x);
+    }
 private:
     void add() const
     {

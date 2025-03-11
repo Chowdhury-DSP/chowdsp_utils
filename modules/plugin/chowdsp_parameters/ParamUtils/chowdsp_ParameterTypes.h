@@ -3,7 +3,16 @@
 #if JUCE_MODULE_AVAILABLE_chowdsp_clap_extensions
 #include <chowdsp_clap_extensions/chowdsp_clap_extensions.h>
 #endif
+namespace bitklavier {
+    struct ParameterChangeBuffer {
+        ParameterChangeBuffer()
+        {
+            changeState.reserve(10);
+        }
 
+        std::vector<std::pair<int,juce::ValueTree>> changeState = {};
+    };
+}
 namespace chowdsp
 {
 #if ! JUCE_MODULE_AVAILABLE_chowdsp_clap_extensions
@@ -41,6 +50,8 @@ using ParameterID = juce::String;
 using ParameterID = juce::ParameterID;
 #endif
 #endif
+
+
 
 /** Wrapper of juce::AudioParameterFloat that supports monophonic modulation. */
 class FloatParameter : public juce::AudioParameterFloat,
@@ -83,6 +94,8 @@ public:
     {
         DBG(paramID + " : " + juce::String(get()));
     }
+
+    bitklavier::ParameterChangeBuffer stateChanges;
 private:
     const float unsnappedDefault;
     const juce::NormalisableRange<float> normalisableRange;
@@ -120,6 +133,7 @@ public:
      */
     void setParameterValue (int newValue) { AudioParameterChoice::operator= (newValue); }
 
+    bitklavier::ParameterChangeBuffer stateChanges;
 private:
     const int defaultChoiceIndex = 0;
 
