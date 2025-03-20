@@ -80,12 +80,7 @@ void PolyphaseOversamplingPlugin::prepareToPlay (double sample_rate, int samples
         static_cast<uint32_t> (num_channels),
     });
 
-    std::array<float, aa_coeffs.size()> upsample_coeffs {};
-    std::copy (aa_coeffs.begin(), aa_coeffs.end(), upsample_coeffs.begin());
-    for (auto& coeff : upsample_coeffs)
-        coeff *= (float) os_ratio;
-
-    upsampler.prepare (num_channels, samples_per_block, upsample_coeffs, arena);
+    upsampler.prepare (num_channels, samples_per_block, aa_coeffs, arena, (float) os_ratio);
     downsampler.prepare (num_channels, samples_per_block * (int) os_ratio, aa_coeffs, arena);
 }
 
