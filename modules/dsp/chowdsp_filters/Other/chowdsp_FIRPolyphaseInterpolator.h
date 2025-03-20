@@ -18,7 +18,8 @@ public:
     void prepare (int numChannels,
                   int maxBlockSizeIn,
                   const nonstd::span<const T, numCoeffs> coeffs,
-                  ArenaType& arena)
+                  ArenaType& arena,
+                  float extraGain = 1.0f)
     {
         std::array<T, coeffsPerFilter> oneFilterCoeffs {};
 
@@ -34,6 +35,7 @@ public:
                 const auto index = (size_t) i + j * (size_t) interpolationFactor;
                 oneFilterCoeffs[j] = index >= coeffs.size() ? T {} : coeffs[index];
             }
+            juce::FloatVectorOperations::multiply (oneFilterCoeffs.data(), extraGain, oneFilterCoeffs.size());
             filters[i].setCoefficients (oneFilterCoeffs.data());
         }
     }
