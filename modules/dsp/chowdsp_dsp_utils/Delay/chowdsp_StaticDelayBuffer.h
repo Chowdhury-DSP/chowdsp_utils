@@ -43,9 +43,9 @@ public:
         popSample (NumericType rp) noexcept
     {
         jassert (juce::isPositiveAndBelow (rp, maxDelaySamples));
-        return interpolator.call (buffer,
-                                  (int) rp,
-                                  rp - (NumericType) (int) rp);
+        return interpolator.template call<SampleType> (buffer,
+                                                       (int) rp,
+                                                       rp - (NumericType) (int) rp);
     }
 
     template <typename IT = InterpolationType>
