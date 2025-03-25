@@ -25,7 +25,7 @@ public:
 
     ~OptionalArray()
     {
-        for (auto [idx, object] : enumerate (objects))
+        for (auto [idx, object] : chowdsp::enumerate (objects))
         {
             if (optional_flags[idx])
                 object.destruct();
