@@ -96,7 +96,7 @@ struct RealtimeLatestObject
      * Read's the latest value from the object.
      * [audio thread]
      */
-    const T& read()
+    T& read()
     {
         if (main_thread_object.load (std::memory_order_acquire) != nullptr)
         {
