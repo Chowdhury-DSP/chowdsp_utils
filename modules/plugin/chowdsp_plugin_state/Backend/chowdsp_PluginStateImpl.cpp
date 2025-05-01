@@ -31,14 +31,23 @@ void PluginStateImpl<ParameterState, NonParameterState>::deserialize (juce::Memo
     callOnMainThread (
         [this, data = std::move (dataBlock)]
         {
-            deserialize (JSONUtils::fromMemoryBlock (data), *this);
+            try
+            {
+                deserialize (JSONUtils::fromMemoryBlock (data), *this);
 
-            params.applyVersionStreaming (pluginStateVersion);
-            if (nonParams.versionStreamingCallback != nullptr)
-                nonParams.versionStreamingCallback (pluginStateVersion);
+                params.applyVersionStreaming (pluginStateVersion);
+                if (nonParams.versionStreamingCallback != nullptr)
+                    nonParams.versionStreamingCallback (pluginStateVersion);
+            }
+            catch (const std::exception& e)
+            {
+                juce::Logger::writeToLog (juce::String { "Encountered exception while deserializing plugin state: " } + e.what());
+                juce::Logger::writeToLog ("Resetting plugin state...");
+                params.reset();
+                nonParams.reset();
+            }
 
             getParameterListeners().updateBroadcastersFromMessageThread();
-
             if (undoManager != nullptr)
                 undoManager->clearUndoHistory();
         });

@@ -54,4 +54,19 @@ TEST_CASE ("ParamHolder Test", "[plugin][state][serial]")
         REQUIRE (getValue (*boolNested) == true);
         REQUIRE (getValue (*choiceNested) == 1);
     }
+
+    SECTION ("reset()")
+    {
+        using namespace chowdsp::ParameterTypeHelpers;
+        setValue (0.0f, *floatParams[0]);
+        setValue (1.0f, *floatParams[1]);
+        setValue (true, *boolNested);
+        setValue (1, *choiceNested);
+
+        params.reset();
+        REQUIRE (getValue (*floatParams[0]) == 0.5f);
+        REQUIRE (getValue (*floatParams[1]) == 0.5f);
+        REQUIRE (getValue (*boolNested) == false);
+        REQUIRE (getValue (*choiceNested) == 0);
+    }
 }

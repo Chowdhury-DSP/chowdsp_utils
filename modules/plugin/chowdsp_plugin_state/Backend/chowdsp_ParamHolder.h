@@ -91,6 +91,9 @@ public:
     template <typename Callable>
     size_t doForAllParameters (Callable&& callable, size_t index = 0) const;
 
+    /** Resets all parameters to their default values */
+    void reset();
+
     /** Custom serializer */
     static json serialize_json (const ParamHolder& paramHolder);
 

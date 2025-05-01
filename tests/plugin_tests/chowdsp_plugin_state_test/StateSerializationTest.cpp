@@ -232,6 +232,21 @@ TEST_CASE ("State Serialization Test", "[plugin][state][serial]")
         REQUIRE_MESSAGE (state.nonParams.jsonThing.get() == testJSON, "JSON thing is incorrect");
     }
 
+    SECTION ("Load invalid state")
+    {
+        static constexpr float percentVal = 0.25f;
+        static constexpr int width = 200;
+
+        State state {};
+        static_cast<juce::AudioParameterFloat&> (state.params.levelParams.percent) = percentVal;
+        state.nonParams.editorWidth = width;
+
+        juce::MemoryBlock block {};
+        state.deserialize (std::move (block));
+        REQUIRE_MESSAGE (juce::approximatelyEqual (state.params.levelParams.percent->get(), 0.5f), "Percent value is incorrect");
+        REQUIRE_MESSAGE (state.nonParams.editorWidth.get() == 300, "Editor width is incorrect");
+    }
+
     SECTION ("Added Parameter Test")
     {
         static constexpr float newGainVal = -22.0f;
