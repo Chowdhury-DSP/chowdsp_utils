@@ -22,19 +22,7 @@ PluginStateImpl<ParameterState, NonParameterState>::~PluginStateImpl()
 template <typename ParameterState, typename NonParameterState>
 void PluginStateImpl<ParameterState, NonParameterState>::serialize (juce::MemoryBlock& data) const
 {
-    auto& arena = const_cast<ChainedArenaAllocator&> (*params.arena);
-    const auto frame = arena.create_frame();
-
-#if defined JucePlugin_VersionString
-    serialize_object (currentPluginVersion.getVersionHint(), arena);
-#else
-    serialize_object (int {}, arena);
-#endif
-
-    NonParamState::serialize (arena, nonParams);
-    ParamHolder::serialize (arena, params);
-
-    dump_serialized_bytes (data, arena, &frame);
+    JSONUtils::toMemoryBlock (serialize (*this), data);
 }
 
 template <typename ParameterState, typename NonParameterState>
@@ -43,19 +31,7 @@ void PluginStateImpl<ParameterState, NonParameterState>::deserialize (juce::Memo
     callOnMainThread (
         [this, data = std::move (dataBlock)]
         {
-            nonstd::span serial_data { static_cast<const std::byte*> (data.getData()), data.getSize() };
-            if (serial_data.size() > 8
-                && (static_cast<char> (serial_data[2]) == '['
-                    || static_cast<char> (serial_data[2]) == '{'))
-            {
-                deserialize (JSONUtils::fromMemoryBlock (data), *this);
-            }
-            else
-            {
-                pluginStateVersion = Version::fromVersionHint (deserialize_object<int> (serial_data));
-                NonParamState::deserialize (serial_data, nonParams, *params.arena);
-                ParamHolder::deserialize (serial_data, params);
-            }
+            deserialize (JSONUtils::fromMemoryBlock (data), *this);
 
             params.applyVersionStreaming (pluginStateVersion);
             if (nonParams.versionStreamingCallback != nullptr)

@@ -36,12 +36,6 @@ public:
     void reset();
 
     /** Custom serializer */
-    static void serialize (ChainedArenaAllocator& arena, const NonParamState& state);
-
-    /** Custom deserializer */
-    static void deserialize (nonstd::span<const std::byte>& serial_data, NonParamState& state, ChainedArenaAllocator& arena);
-
-    /** Custom serializer */
     static json serialize_json (const NonParamState& state);
 
     /** Custom deserializer */

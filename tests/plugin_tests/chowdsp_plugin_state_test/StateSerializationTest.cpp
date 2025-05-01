@@ -170,7 +170,7 @@ struct PluginNonParameterStateNewField : chowdsp::NonParamState
 
 using StateWithNewNonParameterField = chowdsp::PluginStateImpl<PluginParameterState, PluginNonParameterStateNewField>;
 
-TEST_CASE ("State Serialization Test", "[plugin][state]")
+TEST_CASE ("State Serialization Test", "[plugin][state][serial]")
 {
     SECTION ("Save/Load Parameters Test")
     {
