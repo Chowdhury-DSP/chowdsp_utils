@@ -258,9 +258,7 @@ size_t ParamHolder::doForAllParameters (Callable&& callable, size_t index) const
 inline void ParamHolder::reset()
 {
     doForAllParameters ([] (auto& param, size_t)
-    {
-        ParameterTypeHelpers::resetParameter (param);
-    });
+                        { ParameterTypeHelpers::resetParameter (param); });
 }
 
 inline void ParamHolder::getParameterPointers (ParamHolder& holder, ParamDeserialList& parameters)
