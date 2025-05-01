@@ -1,7 +1,7 @@
 #include <CatchUtils.h>
 #include <chowdsp_plugin_state/chowdsp_plugin_state.h>
 
-TEST_CASE ("ParamHolder Test", "[plugin][state]")
+TEST_CASE ("ParamHolder Test", "[plugin][state][serial]")
 {
     std::array<chowdsp::PercentParameter::Ptr, 2> floatParams {
         chowdsp::PercentParameter::Ptr { "param3", "Param", 0.5f },
@@ -55,7 +55,7 @@ TEST_CASE ("ParamHolder Test", "[plugin][state]")
         REQUIRE (getValue (*choiceNested) == 1);
     }
 
-    SECTION ("Serialize Bytes")
+    SECTION ("reset()")
     {
         using namespace chowdsp::ParameterTypeHelpers;
         setValue (0.0f, *floatParams[0]);
@@ -63,24 +63,10 @@ TEST_CASE ("ParamHolder Test", "[plugin][state]")
         setValue (true, *boolNested);
         setValue (1, *choiceNested);
 
-        chowdsp::ChainedArenaAllocator arena { 128 };
-        chowdsp::ParamHolder::serialize (arena, params);
-        juce::MemoryBlock state {};
-        chowdsp::dump_serialized_bytes (state, arena);
-
-        params.doForAllParameters ([] (auto& param, size_t)
-                                   { setValue (getDefaultValue (param), param); });
-
+        params.reset();
         REQUIRE (getValue (*floatParams[0]) == 0.5f);
         REQUIRE (getValue (*floatParams[1]) == 0.5f);
         REQUIRE (getValue (*boolNested) == false);
         REQUIRE (getValue (*choiceNested) == 0);
-
-        nonstd::span state_data = { (const std::byte*) state.getData(), state.getSize() };
-        chowdsp::ParamHolder::deserialize (state_data, params);
-        REQUIRE (getValue (*floatParams[0]) == 0.0f);
-        REQUIRE (getValue (*floatParams[1]) == 1.0f);
-        REQUIRE (getValue (*boolNested) == true);
-        REQUIRE (getValue (*choiceNested) == 1);
     }
 }

@@ -44,7 +44,7 @@ struct NonParams : chowdsp::NonParamState
     chowdsp::StateValue<float> editorSize { "editor_size", 1.0f };
 };
 
-TEST_CASE ("Version Streaming Test", "[plugin][state][version]")
+TEST_CASE ("Version Streaming Test", "[plugin][state][version][serial]")
 {
     SECTION ("Apply Version Streaming to Parameters")
     {
