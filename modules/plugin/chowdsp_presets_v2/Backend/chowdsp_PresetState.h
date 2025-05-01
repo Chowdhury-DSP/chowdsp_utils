@@ -47,12 +47,6 @@ public:
     /** Internal use only! */
     void deserialize_json (const nlohmann::json& deserial) override;
 
-    /** Internal use only! */
-    [[nodiscard]] size_t serialize (ChainedArenaAllocator&) const override;
-
-    /** Internal use only! */
-    void deserialize (nonstd::span<const std::byte>&) override;
-
 private:
     PresetPtr preset {};
 
