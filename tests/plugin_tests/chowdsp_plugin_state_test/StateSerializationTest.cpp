@@ -170,7 +170,7 @@ struct PluginNonParameterStateNewField : chowdsp::NonParamState
 
 using StateWithNewNonParameterField = chowdsp::PluginStateImpl<PluginParameterState, PluginNonParameterStateNewField>;
 
-TEST_CASE ("State Serialization Test", "[plugin][state]")
+TEST_CASE ("State Serialization Test", "[plugin][state][serial]")
 {
     SECTION ("Save/Load Parameters Test")
     {
@@ -230,6 +230,21 @@ TEST_CASE ("State Serialization Test", "[plugin][state]")
         REQUIRE_MESSAGE (state.nonParams.editorHeight.get() == height, "Editor height is incorrect");
         REQUIRE_MESSAGE (state.nonParams.atomicThing.get() == atomic, "Atomic thing is incorrect");
         REQUIRE_MESSAGE (state.nonParams.jsonThing.get() == testJSON, "JSON thing is incorrect");
+    }
+
+    SECTION ("Load invalid state")
+    {
+        static constexpr float percentVal = 0.25f;
+        static constexpr int width = 200;
+
+        State state {};
+        static_cast<juce::AudioParameterFloat&> (state.params.levelParams.percent) = percentVal;
+        state.nonParams.editorWidth = width;
+
+        juce::MemoryBlock block {};
+        state.deserialize (std::move (block));
+        REQUIRE_MESSAGE (juce::approximatelyEqual (state.params.levelParams.percent->get(), 0.5f), "Percent value is incorrect");
+        REQUIRE_MESSAGE (state.nonParams.editorWidth.get() == 300, "Editor width is incorrect");
     }
 
     SECTION ("Added Parameter Test")

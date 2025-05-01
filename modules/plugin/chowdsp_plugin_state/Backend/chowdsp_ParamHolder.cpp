@@ -255,6 +255,14 @@ size_t ParamHolder::doForAllParameters (Callable&& callable, size_t index) const
     return index;
 }
 
+inline void ParamHolder::reset()
+{
+    doForAllParameters ([] (auto& param, size_t)
+    {
+        ParameterTypeHelpers::resetParameter (param);
+    });
+}
+
 inline void ParamHolder::getParameterPointers (ParamHolder& holder, ParamDeserialList& parameters)
 {
     for (auto& thing : holder.things)
@@ -283,124 +291,6 @@ inline void ParamHolder::getParameterPointers (ParamHolder& holder, ParamDeseria
         }
 
         parameters.insert (ParamDeserial { paramID, thing, false });
-    }
-}
-
-inline void ParamHolder::serialize (ChainedArenaAllocator& arena, const ParamHolder& paramHolder)
-{
-    auto* serialize_num_bytes = arena.allocate<bytes_detail::size_type> (1, 1);
-    size_t num_bytes = 0;
-    paramHolder.doForAllParameters (
-        [&] (auto& param, size_t)
-        {
-            num_bytes += serialize_string (toStringView (param.paramID), arena);
-            num_bytes += serialize_object (ParameterTypeHelpers::getValue (param), arena);
-        });
-    serialize_direct (serialize_num_bytes, num_bytes);
-}
-
-inline void ParamHolder::deserialize (nonstd::span<const std::byte>& serial_data, ParamHolder& paramHolder)
-{
-    using namespace ParameterTypeHelpers;
-    auto num_bytes = deserialize_direct<bytes_detail::size_type> (serial_data);
-    if (num_bytes == 0)
-    {
-        paramHolder.doForAllParameters (
-            [&] (auto& param, size_t)
-            {
-                ParameterTypeHelpers::resetParameter (param);
-            });
-        return;
-    }
-
-    auto data = serial_data.subspan (0, num_bytes);
-    serial_data = serial_data.subspan (num_bytes);
-
-    const auto _ = paramHolder.arena->create_frame();
-    ParamDeserialList parameters { *paramHolder.arena };
-    getParameterPointers (paramHolder, parameters);
-
-    auto params_iter = parameters.begin();
-    size_t counter = 0;
-    const auto get_param_ptr = [&] (std::string_view paramID) -> ThingPtr
-    {
-        const auto returner = [&] (auto& iter)
-        {
-            (*iter).found = true;
-            auto ptr = (*iter).ptr;
-            ++iter;
-            params_iter = iter;
-            counter++;
-            return ptr;
-        };
-
-        for (auto iter = params_iter; iter != parameters.end(); ++iter)
-        {
-            if ((*iter).id == paramID)
-                return returner (iter);
-        }
-        for (auto iter = parameters.begin(); iter != params_iter; ++iter)
-        {
-            if ((*iter).id == paramID)
-                return returner (iter);
-        }
-        return {};
-    };
-
-    while (! data.empty())
-    {
-        const auto param_id = deserialize_string (data);
-        auto param_ptr = get_param_ptr (param_id);
-        if (param_ptr == nullptr)
-        {
-            const auto param_num_bytes = deserialize_direct<bytes_detail::size_type> (data);
-            data = data.subspan (param_num_bytes);
-            continue;
-        }
-
-        const auto type = getType (param_ptr);
-        switch (type)
-        {
-            case FloatParam:
-                setValue (deserialize_object<ParameterElementType<FloatParameter>> (data),
-                          *reinterpret_cast<FloatParameter*> (param_ptr.get_ptr()));
-                break;
-            case ChoiceParam:
-                setValue (deserialize_object<ParameterElementType<ChoiceParameter>> (data),
-                          *reinterpret_cast<ChoiceParameter*> (param_ptr.get_ptr()));
-                break;
-            case BoolParam:
-                setValue (deserialize_object<ParameterElementType<BoolParameter>> (data),
-                          *reinterpret_cast<BoolParameter*> (param_ptr.get_ptr()));
-                break;
-            default:
-                break;
-        }
-    }
-
-    if (counter < parameters.count())
-    {
-        for (auto [param_id, param_ptr, found] : parameters)
-        {
-            if (found)
-                continue;
-
-            const auto type = getType (param_ptr);
-            switch (type)
-            {
-                case FloatParam:
-                    resetParameter (*reinterpret_cast<FloatParameter*> (param_ptr.get_ptr()));
-                    break;
-                case ChoiceParam:
-                    resetParameter (*reinterpret_cast<ChoiceParameter*> (param_ptr.get_ptr()));
-                    break;
-                case BoolParam:
-                    resetParameter (*reinterpret_cast<BoolParameter*> (param_ptr.get_ptr()));
-                    break;
-                default:
-                    break;
-            }
-        }
     }
 }
 

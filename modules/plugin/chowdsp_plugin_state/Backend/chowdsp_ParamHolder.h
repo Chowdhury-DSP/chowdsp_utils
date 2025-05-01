@@ -91,11 +91,8 @@ public:
     template <typename Callable>
     size_t doForAllParameters (Callable&& callable, size_t index = 0) const;
 
-    /** Custom serializer */
-    static void serialize (ChainedArenaAllocator& arena, const ParamHolder& paramHolder);
-
-    /** Custom deserializer */
-    static void deserialize (nonstd::span<const std::byte>& serial_data, ParamHolder& paramHolder);
+    /** Resets all parameters to their default values */
+    void reset();
 
     /** Custom serializer */
     static json serialize_json (const ParamHolder& paramHolder);
