@@ -11,6 +11,11 @@ public:
 
     LinearPhase3WayCrossover() = default;
 
+    ~LinearPhase3WayCrossover() override
+    {
+        stopTimer();
+    }
+
     /** Prepares the crossover filter with an IR length and initial crossover frequencies */
     void prepare (const juce::dsp::ProcessSpec& spec, int irLength, float lowBandCrossoverHz, float highBandCrossoverHz)
     {
