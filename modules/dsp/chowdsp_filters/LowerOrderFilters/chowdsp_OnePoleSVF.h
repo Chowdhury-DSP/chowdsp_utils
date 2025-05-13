@@ -39,9 +39,9 @@ struct OnePoleSVF
     }
 
     /** Resets the filter state */
-    void reset() noexcept
+    void reset (SampleType resetValue = {}) noexcept
     {
-        std::fill (ic1eq.begin(), ic1eq.end(), SampleType {});
+        std::fill (ic1eq.begin(), ic1eq.end(), resetValue);
     }
 
     /** Sets the filter cutoff frequency */
