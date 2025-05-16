@@ -7,7 +7,7 @@ FloatParameter::FloatParameter (const ParameterID& parameterID,
                                 const juce::NormalisableRange<float>& valueRange,
                                 float defaultFloatValue,
                                 const std::function<juce::String (float)>& valueToTextFunction,
-                                std::function<float (const juce::String&)>&& textToValueFunction)
+                                std::function<float (const juce::String&)>&& textToValueFunction, bool supportsModulation)
 #if JUCE_VERSION < 0x070000
     : juce::AudioParameterFloat (
         parameterID,
@@ -34,7 +34,8 @@ FloatParameter::FloatParameter (const ParameterID& parameterID,
             .withValueFromStringFunction (std::move (textToValueFunction))),
 #endif
       unsnappedDefault (valueRange.convertTo0to1 (defaultFloatValue)),
-      normalisableRange (valueRange)
+      normalisableRange (valueRange),
+      supportsModulation(supportsModulation)
 {
 }
 

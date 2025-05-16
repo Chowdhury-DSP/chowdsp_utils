@@ -9,7 +9,7 @@ namespace chowdsp
  * @tparam NonParameterState    Struct containing all of the plugin's non-parameter state as StateValue objects.
  * @tparam Serializer           A type that implements chowdsp::BaseSerializer (JSONSerializer by default)
  */
-template <typename ParameterState, typename NonParameterState = NonParamState, typename Serializer = JSONSerializer>
+template <typename ParameterState, typename NonParameterState = NonParamState, typename Serializer = XMLSerializer>
 class PluginStateImpl : public PluginState
 {
     static_assert (std::is_base_of_v<ParamHolder, ParameterState>, "ParameterState must be a chowdsp::ParamHolder!");

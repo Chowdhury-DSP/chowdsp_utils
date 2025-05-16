@@ -27,4 +27,5 @@ juce::String floatValToStringDecimal (float floatVal)
     return { floatVal, NumDecimalPlaces, false };
 }
 float stringToFloatVal (const juce::String& s);
+
 } // namespace chowdsp::ParamUtils

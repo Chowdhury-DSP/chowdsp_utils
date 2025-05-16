@@ -81,5 +81,5 @@ juce::String floatValToString (float floatVal)
     return floatValToStringDecimal<2> (floatVal);
 }
 
-float stringToFloatVal (const juce::String& s) { return s.getFloatValue(); }
+    float stringToFloatVal (const juce::String& s) { return s.getFloatValue(); }
 } // namespace chowdsp::ParamUtils

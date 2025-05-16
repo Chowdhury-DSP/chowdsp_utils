@@ -18,7 +18,7 @@ public:
 
     ParamHolder (ParamHolder&&) noexcept = default;
     ParamHolder& operator= (ParamHolder&&) noexcept = default;
-
+    virtual ~ParamHolder() = default;
     /** Adds parameters to the ParamHolder. */
     template <typename ParamType, typename... OtherParams>
     std::enable_if_t<std::is_base_of_v<FloatParameter, ParamType>, void>
@@ -105,7 +105,25 @@ public:
 
     /** Assign this function to apply version streaming to your non-parameter state. */
     std::function<void (const Version&)> versionStreamingCallback = nullptr;
+    std::vector<OptionalPointer<FloatParameter>>* getFloatParams()
+    {
+        return &floatParams;
+    }
+    std::vector<OptionalPointer<BoolParameter>>* getBoolParams()
+    {
+        return &boolParams;
+    }
+    std::vector<ParamHolder*>* getParamHolders()
+    {
+        return &otherParams;
+    }
 
+    virtual void processStateChanges(){}
+    bitklavier::ParameterChangeBuffer stateChanges;
+    void push_change(std::pair<int,juce::ValueTree> && x)
+    {
+        stateChanges.changeState.push_back(x);
+    }
 private:
     void add() const
     {

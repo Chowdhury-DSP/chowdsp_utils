@@ -42,14 +42,14 @@ template <typename ParameterState, typename NonParameterState, typename Serializ
 template <typename>
 typename Serializer::SerializedType PluginStateImpl<ParameterState, NonParameterState, Serializer>::serialize (const PluginStateImpl& object)
 {
-    auto serial = Serializer::createBaseElement();
+    auto serial = Serializer::createBaseElement("testing");
 
 #if defined JucePlugin_VersionString
-    Serializer::addChildElement (serial, Serializer::template serialize<Serializer> (currentPluginVersion));
+//    Serializer::template serialize<Serializer> (currentPluginVersion, serial);
 #endif
 
     Serializer::addChildElement (serial, Serializer::template serialize<Serializer, NonParamState> (object.nonParams));
-    Serializer::addChildElement (serial, Serializer::template serialize<Serializer, ParamHolder> (object.params));
+     Serializer::addChildElement(serial, Serializer::template serialize<Serializer, ParamHolder> (object.params));
     return serial;
 }
 
@@ -60,9 +60,9 @@ void PluginStateImpl<ParameterState, NonParameterState, Serializer>::deserialize
 {
     enum
     {
-#if defined JucePlugin_VersionString
-        versionChildIndex,
-#endif
+//#if defined JucePlugin_VersionString
+//        versionChildIndex,
+//#endif
         nonParamStateChildIndex,
         paramStateChildIndex,
         expectedNumChildElements,
@@ -74,15 +74,15 @@ void PluginStateImpl<ParameterState, NonParameterState, Serializer>::deserialize
         return;
     }
 
-#if defined JucePlugin_VersionString
-    Serializer::template deserialize<Serializer> (Serializer::getChildElement (serial, versionChildIndex), object.pluginStateVersion);
-#else
-    using namespace version_literals;
-    object.pluginStateVersion = "0.0.0"_v;
-#endif
-
-    Serializer::template deserialize<Serializer, NonParamState> (Serializer::getChildElement (serial, nonParamStateChildIndex), object.nonParams);
-    Serializer::template deserialize<Serializer, ParamHolder> (Serializer::getChildElement (serial, paramStateChildIndex), object.params);
+//#if defined JucePlugin_VersionString
+//    Serializer::template deserialize<Serializer> (Serializer::getChildElement (serial, versionChildIndex), object.pluginStateVersion);
+//#else
+//    using namespace version_literals;
+//    object.pluginStateVersion = "0.0.0"_v;
+//#endif
+//
+    Serializer::template deserialize<Serializer, NonParamState> (Serializer::getChildElement (serial, "nonparam"), object.nonParams);
+    Serializer::template deserialize<Serializer, ParamHolder> (Serializer::getChildElement (serial, object.params.getName()), object.params);
 }
 
 template <typename ParameterState, typename NonParameterState, typename Serializer>

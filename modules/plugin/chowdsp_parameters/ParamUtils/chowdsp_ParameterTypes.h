@@ -3,7 +3,16 @@
 #if JUCE_MODULE_AVAILABLE_chowdsp_clap_extensions
 #include <chowdsp_clap_extensions/chowdsp_clap_extensions.h>
 #endif
+namespace bitklavier {
+    struct ParameterChangeBuffer {
+        ParameterChangeBuffer()
+        {
+            changeState.reserve(10);
+        }
 
+        std::vector<std::pair<int,juce::ValueTree>> changeState = {};
+    };
+}
 namespace chowdsp
 {
 #if ! JUCE_MODULE_AVAILABLE_chowdsp_clap_extensions
@@ -42,6 +51,8 @@ using ParameterID = juce::ParameterID;
 #endif
 #endif
 
+
+
 /** Wrapper of juce::AudioParameterFloat that supports monophonic modulation. */
 class FloatParameter : public juce::AudioParameterFloat,
                        public ParamUtils::ModParameterMixin
@@ -52,7 +63,7 @@ public:
                     const juce::NormalisableRange<float>& valueRange,
                     float defaultValue,
                     const std::function<juce::String (float)>& valueToTextFunction,
-                    std::function<float (const juce::String&)>&& textToValueFunction);
+                    std::function<float (const juce::String&)>&& textToValueFunction,bool supportsModulation=false);
 
     using Ptr = OptionalPointer<FloatParameter>;
 
@@ -67,7 +78,7 @@ public:
     float getDefaultValue() const override { return unsnappedDefault; }
 
     /** TRUE! */
-    bool supportsMonophonicModulation() override { return true; }
+    bool supportsMonophonicModulation() override { return supportsModulation; }
 
     /** Applies monphonic modulation to this parameter. */
     void applyMonophonicModulation (double value) override;
@@ -78,10 +89,18 @@ public:
     /** Returns the current parameter value accounting for any modulation that is currently applied. */
     operator float() const noexcept { return getCurrentValue(); } // NOSONAR, NOLINT(google-explicit-constructor): we want to be able to do implicit conversion here
 
+    /** Print debug info. */
+    void printDebug() const
+    {
+        DBG(paramID + " : " + juce::String(get()));
+    }
+
+    bitklavier::ParameterChangeBuffer stateChanges;
 private:
     const float unsnappedDefault;
     const juce::NormalisableRange<float> normalisableRange;
 
+    const bool supportsModulation;
     float modulationAmount = 0.0f;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FloatParameter)
@@ -97,6 +116,10 @@ public:
           defaultChoiceIndex (defaultItemIndex)
     {
     }
+    void printDebug() const
+    {
+        DBG(paramID + " : " + juce::String(getIndex())); // Using getIndex() for ChoiceParameter
+    }
 
     using Ptr = OptionalPointer<ChoiceParameter>;
 
@@ -110,6 +133,7 @@ public:
      */
     void setParameterValue (int newValue) { AudioParameterChoice::operator= (newValue); }
 
+    bitklavier::ParameterChangeBuffer stateChanges;
 private:
     const int defaultChoiceIndex = 0;
 
@@ -147,6 +171,10 @@ public:
     {
         return magic_enum::enum_value<EnumType> ((size_t) getIndex());
     }
+    void printDebug() const
+    {
+        DBG(paramID + " : " + juce::String(static_cast<int>(get())));
+    }
 
     /**
      * Sets the parameter value.
@@ -170,7 +198,10 @@ public:
         : juce::AudioParameterBool (parameterID, parameterName, defaultBoolValue)
     {
     }
-
+    void printDebug() const
+    {
+        DBG(paramID + " : " + juce::String(static_cast<int>(get())));
+    }
     using Ptr = OptionalPointer<BoolParameter>;
 
     /**
@@ -214,13 +245,13 @@ public:
     GainDBParameter (const ParameterID& parameterID,
                      const juce::String& paramName,
                      const juce::NormalisableRange<float>& paramRange,
-                     float defaultValue)
+                     float defaultValue, bool mod=false)
         : FloatParameter (parameterID,
                           paramName,
                           paramRange,
                           defaultValue,
                           &ParamUtils::gainValToString,
-                          &ParamUtils::stringToGainVal)
+                          &ParamUtils::stringToGainVal, true)
     {
     }
 
@@ -260,13 +291,13 @@ public:
     TimeMsParameter (const ParameterID& parameterID,
                      const juce::String& paramName,
                      const juce::NormalisableRange<float>& paramRange,
-                     float defaultValue)
+                     float defaultValue,bool mod =false)
         : FloatParameter (parameterID,
                           paramName,
                           paramRange,
                           defaultValue,
                           &ParamUtils::timeMsValToString,
-                          &ParamUtils::stringToTimeMsVal)
+                          &ParamUtils::stringToTimeMsVal,mod)
     {
     }
 
@@ -300,6 +331,7 @@ private:
 };
 
 /** A float parameter which specifically stores a semitones value. */
+
 class SemitonesParameter : public FloatParameter
 {
 public:
@@ -326,4 +358,5 @@ public:
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SemitonesParameter)
 };
+
 } // namespace chowdsp
