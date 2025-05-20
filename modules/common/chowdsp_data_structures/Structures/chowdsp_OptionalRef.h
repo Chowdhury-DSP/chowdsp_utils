@@ -54,14 +54,14 @@ public:
     T& value()
     {
         if (! has_value())
-            throw std::bad_optional_access();
+            throw std::runtime_error { "bad_optional_access" }; // we can't actually use std::bad_optional_access here for MacOS compatibility!
         return *ptr;
     }
 
     const T& value() const
     {
         if (! has_value())
-            throw std::bad_optional_access();
+            throw std::runtime_error { "bad_optional_access" };
         return *ptr;
     }
 

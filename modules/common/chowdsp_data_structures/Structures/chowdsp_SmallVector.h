@@ -536,22 +536,22 @@ private:
 
     auto& internal_array()
     {
-        return std::get<0> (internal_data);
+        return *std::get_if<0> (&internal_data);
     }
 
     const auto& internal_array() const
     {
-        return std::get<0> (internal_data);
+        return *std::get_if<0> (&internal_data);
     }
 
     auto& internal_vector()
     {
-        return std::get<1> (internal_data);
+        return *std::get_if<1> (&internal_data);
     }
 
     const auto& internal_vector() const
     {
-        return std::get<1> (internal_data);
+        return *std::get_if<1> (&internal_data);
     }
 
     struct ArrayStuff
