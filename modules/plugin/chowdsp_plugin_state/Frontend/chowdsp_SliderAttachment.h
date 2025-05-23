@@ -34,6 +34,7 @@ public:
 
     /** Returns the attached parameter */
     [[nodiscard]] const FloatParameter* getParameter() const { return attachment.param; }
+    [[nodiscard]] auto& getAttachment() { return attachment; }
 
 private:
     void sliderValueChanged (juce::Slider*) override;

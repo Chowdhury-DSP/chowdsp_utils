@@ -27,6 +27,7 @@ public:
 
     /** Returns the attached parameter */
     [[nodiscard]] const ChoiceParameter* getParameter() const { return attachment.param; }
+    [[nodiscard]] auto& getAttachment() { return attachment; }
 
 private:
     void sliderValueChanged (juce::Slider*) override;
