@@ -34,6 +34,7 @@ public:
 
     /** Returns the attached parameter */
     [[nodiscard]] const ChoiceParameter* getParameter() const { return attachment.param; }
+    [[nodiscard]] auto& getAttachment() { return attachment; }
 
 private:
     void comboBoxChanged (juce::ComboBox*) override;
