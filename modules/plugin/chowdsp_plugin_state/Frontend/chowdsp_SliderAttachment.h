@@ -33,6 +33,7 @@ public:
     void setValue (float newValue);
 
     /** Returns the attached parameter */
+    [[nodiscard]] FloatParameter* getParameter() { return attachment.param; }
     [[nodiscard]] const FloatParameter* getParameter() const { return attachment.param; }
     [[nodiscard]] auto& getAttachment() { return attachment; }
 
