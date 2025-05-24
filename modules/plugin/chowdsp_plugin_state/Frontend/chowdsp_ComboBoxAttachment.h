@@ -33,6 +33,7 @@ public:
     void setValue (int newValue);
 
     /** Returns the attached parameter */
+    [[nodiscard]] ChoiceParameter* getParameter() { return attachment.param; }
     [[nodiscard]] const ChoiceParameter* getParameter() const { return attachment.param; }
     [[nodiscard]] auto& getAttachment() { return attachment; }
 

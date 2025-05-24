@@ -33,6 +33,7 @@ public:
     void setValue (bool newValue);
 
     /** Returns the attached parameter */
+    [[nodiscard]] BoolParameter* getParameter() { return attachment.param; }
     [[nodiscard]] const BoolParameter* getParameter() const { return attachment.param; }
     [[nodiscard]] auto& getAttachment() { return attachment; }
 
