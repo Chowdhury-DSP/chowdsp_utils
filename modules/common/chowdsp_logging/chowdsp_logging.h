@@ -24,8 +24,13 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include <chowdsp_data_structures/chowdsp_data_structures.h>
 #include <chowdsp_listeners/chowdsp_listeners.h>
 
+#if JUCE_WINDOWS
+   #define FMT_UNICODE 0
+#endif
+
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wswitch-enum",
                                      "-Wfloat-equal",
+                                     "-Wsign-conversion",
                                      "-Wextra-semi",
                                      "-Wdeprecated-declarations",
                                      "-Wc++20-compat",
