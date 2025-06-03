@@ -7,6 +7,8 @@
 #include <cassert>
 #include <vector>
 
+#include "../common.h"
+
 namespace spdlog {
 namespace details {
 template <typename T>

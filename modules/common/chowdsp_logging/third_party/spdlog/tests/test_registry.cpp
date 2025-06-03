@@ -25,6 +25,19 @@ TEST_CASE("explicit register", "[registry]") {
 }
 #endif
 
+TEST_CASE("register_or_replace", "[registry]") {
+    spdlog::drop_all();
+    auto logger1 = std::make_shared<spdlog::logger>(
+        tested_logger_name, std::make_shared<spdlog::sinks::null_sink_st>());
+    spdlog::register_logger(logger1);
+    REQUIRE(spdlog::get(tested_logger_name) == logger1);
+
+    auto logger2 = std::make_shared<spdlog::logger>(
+        tested_logger_name, std::make_shared<spdlog::sinks::null_sink_st>());
+    spdlog::register_or_replace(logger2);
+    REQUIRE(spdlog::get(tested_logger_name) == logger2);
+}
+
 TEST_CASE("apply_all", "[registry]") {
     spdlog::drop_all();
     auto logger = std::make_shared<spdlog::logger>(tested_logger_name,

@@ -36,6 +36,7 @@ JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4996)
 #include "third_party/spdlog/include/spdlog/sinks/stdout_color_sinks.h"
 #include "third_party/spdlog/include/spdlog/sinks/basic_file_sink.h"
 #include "third_party/spdlog/include/spdlog/sinks/msvc_sink.h"
+#include "third_party/spdlog/include/spdlog/fmt/bundled/ranges.h"
 
 JUCE_END_IGNORE_WARNINGS_MSVC
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE

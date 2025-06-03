@@ -4,7 +4,7 @@
 #pragma once
 
 #ifndef SPDLOG_HEADER_ONLY
-    #include <spdlog/details/os.h>
+    #include "../details/os.h"
 #endif
 
 #include "../common.h"
@@ -265,9 +265,10 @@ SPDLOG_INLINE int utc_minutes_offset(const std::tm &tm) {
     return offset;
 #else
 
-    #if defined(sun) || defined(__sun) || defined(_AIX) || \
-        (defined(__NEWLIB__) && !defined(__TM_GMTOFF)) ||  \
-        (!defined(_BSD_SOURCE) && !defined(_GNU_SOURCE))
+    #if defined(sun) || defined(__sun) || defined(_AIX) ||                        \
+        (defined(__NEWLIB__) && !defined(__TM_GMTOFF)) ||                         \
+        (!defined(__APPLE__) && !defined(_BSD_SOURCE) && !defined(_GNU_SOURCE) && \
+         (!defined(_POSIX_VERSION) || (_POSIX_VERSION < 202405L)))
     // 'tm_gmtoff' field is BSD extension and it's missing on SunOS/Solaris
     struct helper {
         static long int calculate_gmt_offset(const std::tm &localtm = details::os::localtime(),
@@ -439,7 +440,7 @@ SPDLOG_INLINE bool in_terminal(FILE *file) SPDLOG_NOEXCEPT {
 
 #if (defined(SPDLOG_WCHAR_TO_UTF8_SUPPORT) || defined(SPDLOG_WCHAR_FILENAMES)) && defined(_WIN32)
 SPDLOG_INLINE void wstr_to_utf8buf(wstring_view_t wstr, memory_buf_t &target) {
-    if (wstr.size() > static_cast<size_t>((std::numeric_limits<int>::max)()) / 2 - 1) {
+    if (wstr.size() > static_cast<size_t>((std::numeric_limits<int>::max)()) / 4 - 1) {
         throw_spdlog_ex("UTF-16 string is too big to be converted to UTF-8");
     }
 
@@ -450,7 +451,7 @@ SPDLOG_INLINE void wstr_to_utf8buf(wstring_view_t wstr, memory_buf_t &target) {
     }
 
     int result_size = static_cast<int>(target.capacity());
-    if ((wstr_size + 1) * 2 > result_size) {
+    if ((wstr_size + 1) * 4 > result_size) {
         result_size =
             ::WideCharToMultiByte(CP_UTF8, 0, wstr.data(), wstr_size, NULL, 0, NULL, NULL);
     }
@@ -482,13 +483,12 @@ SPDLOG_INLINE void utf8_to_wstrbuf(string_view_t str, wmemory_buf_t &target) {
     }
 
     // find the size to allocate for the result buffer
-    int result_size =
-        ::MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, str.data(), str_size, NULL, 0);
+    int result_size = ::MultiByteToWideChar(CP_UTF8, 0, str.data(), str_size, NULL, 0);
 
     if (result_size > 0) {
         target.resize(result_size);
-        result_size = ::MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, str.data(), str_size,
-                                            target.data(), result_size);
+        result_size =
+            ::MultiByteToWideChar(CP_UTF8, 0, str.data(), str_size, target.data(), result_size);
         if (result_size > 0) {
             assert(result_size == target.size());
             return;
@@ -534,6 +534,15 @@ SPDLOG_INLINE bool create_dir(const filename_t &path) {
         }
 
         auto subdir = path.substr(0, token_pos);
+#ifdef _WIN32
+        // if subdir is just a drive letter, add a slash e.g. "c:"=>"c:\",
+        // otherwise path_exists(subdir) returns false (issue #3079)
+        const bool is_drive = subdir.length() == 2 && subdir[1] == ':';
+        if (is_drive) {
+            subdir += '\\';
+            token_pos++;
+        }
+#endif
 
         if (!subdir.empty() && !path_exists(subdir) && !mkdir_(subdir)) {
             return false;  // return error if failed creating dir
@@ -577,6 +586,18 @@ SPDLOG_INLINE bool fsync(FILE *fp) {
     return FlushFileBuffers(reinterpret_cast<HANDLE>(_get_osfhandle(_fileno(fp)))) != 0;
 #else
     return ::fsync(fileno(fp)) == 0;
+#endif
+}
+
+// Do non-locking fwrite if possible by the os or use the regular locking fwrite
+// Return true on success.
+SPDLOG_INLINE bool fwrite_bytes(const void *ptr, const size_t n_bytes, FILE *fp) {
+#if defined(_WIN32) && defined(SPDLOG_FWRITE_UNLOCKED)
+    return _fwrite_nolock(ptr, 1, n_bytes, fp) == n_bytes;
+#elif defined(SPDLOG_FWRITE_UNLOCKED)
+    return ::fwrite_unlocked(ptr, 1, n_bytes, fp) == n_bytes;
+#else
+    return std::fwrite(ptr, 1, n_bytes, fp) == n_bytes;
 #endif
 }
 

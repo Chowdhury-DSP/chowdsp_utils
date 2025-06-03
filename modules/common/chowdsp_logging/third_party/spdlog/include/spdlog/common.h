@@ -54,7 +54,7 @@
     #define SPDLOG_FMT_RUNTIME(format_string) fmt::runtime(format_string)
     #define SPDLOG_FMT_STRING(format_string) FMT_STRING(format_string)
     #if defined(SPDLOG_WCHAR_FILENAMES) || defined(SPDLOG_WCHAR_TO_UTF8_SUPPORT)
-        #include <spdlog/fmt/xchar.h>
+        #include "fmt/xchar.h"
     #endif
 #else
     #define SPDLOG_FMT_RUNTIME(format_string) format_string
@@ -319,7 +319,7 @@ struct source_loc {
           line{line_in},
           funcname{funcname_in} {}
 
-    SPDLOG_CONSTEXPR bool empty() const SPDLOG_NOEXCEPT { return line == 0; }
+    SPDLOG_CONSTEXPR bool empty() const SPDLOG_NOEXCEPT { return line <= 0; }
     const char *filename{nullptr};
     int line{0};
     const char *funcname{nullptr};
@@ -364,12 +364,7 @@ SPDLOG_CONSTEXPR_FUNC spdlog::wstring_view_t to_string_view(spdlog::wstring_view
 }
 #endif
 
-#ifndef SPDLOG_USE_STD_FORMAT
-template <typename T, typename... Args>
-inline fmt::basic_string_view<T> to_string_view(fmt::basic_format_string<T, Args...> fmt) {
-    return fmt;
-}
-#elif __cpp_lib_format >= 202207L
+#if defined(SPDLOG_USE_STD_FORMAT) && __cpp_lib_format >= 202207L
 template <typename T, typename... Args>
 SPDLOG_CONSTEXPR_FUNC std::basic_string_view<T> to_string_view(
     std::basic_format_string<T, Args...> fmt) SPDLOG_NOEXCEPT {
