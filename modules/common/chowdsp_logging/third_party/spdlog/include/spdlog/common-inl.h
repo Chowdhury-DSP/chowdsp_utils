@@ -4,7 +4,7 @@
 #pragma once
 
 #ifndef SPDLOG_HEADER_ONLY
-    #include <spdlog/common.h>
+    #include "../common.h"
 #endif
 
 #include <algorithm>

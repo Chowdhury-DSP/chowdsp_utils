@@ -50,9 +50,8 @@ void require_message_count(const std::string &filename, const std::size_t messag
 std::size_t get_filesize(const std::string &filename) {
     std::ifstream ifs(filename, std::ifstream::ate | std::ifstream::binary);
     if (!ifs) {
-        throw std::runtime_error("Failed open file ");
+        throw std::runtime_error("Failed open file " + filename);
     }
-
     return static_cast<std::size_t>(ifs.tellg());
 }
 

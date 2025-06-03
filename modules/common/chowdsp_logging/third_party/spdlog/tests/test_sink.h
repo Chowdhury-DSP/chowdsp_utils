@@ -47,8 +47,9 @@ protected:
         base_sink<Mutex>::formatter_->format(msg, formatted);
         // save the line without the eol
         auto eol_len = strlen(details::os::default_eol);
+        using diff_t = typename std::iterator_traits<decltype(formatted.end())>::difference_type;
         if (lines_.size() < lines_to_save) {
-            lines_.emplace_back(formatted.begin(), formatted.end() - eol_len);
+            lines_.emplace_back(formatted.begin(), formatted.end() - static_cast<diff_t>(eol_len));
         }
         msg_counter_++;
         std::this_thread::sleep_for(delay_);
