@@ -16,7 +16,9 @@ TEST_CASE("custom_callback_logger", "[custom_callback_logger]") {
             spdlog::memory_buf_t formatted;
             formatter.format(msg, formatted);
             auto eol_len = strlen(spdlog::details::os::default_eol);
-            lines.emplace_back(formatted.begin(), formatted.end() - eol_len);
+            using diff_t =
+                typename std::iterator_traits<decltype(formatted.end())>::difference_type;
+            lines.emplace_back(formatted.begin(), formatted.end() - static_cast<diff_t>(eol_len));
         });
     std::shared_ptr<spdlog::sinks::test_sink_st> test_sink(new spdlog::sinks::test_sink_st);
 

@@ -7,7 +7,7 @@
 //
 // include bundled or external copy of fmtlib's ranges support
 //
-#include <spdlog/tweakme.h>
+#include "../tweakme.h"
 
 #if !defined(SPDLOG_USE_STD_FORMAT)
     #if !defined(SPDLOG_FMT_EXTERNAL)
@@ -16,7 +16,7 @@
                 #define FMT_HEADER_ONLY
             #endif
         #endif
-        #include <spdlog/fmt/bundled/ranges.h>
+        #include "bundled/ranges.h"
     #else
         #include <fmt/ranges.h>
     #endif

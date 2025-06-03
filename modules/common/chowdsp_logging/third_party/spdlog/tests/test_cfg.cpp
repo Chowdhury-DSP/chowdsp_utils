@@ -19,6 +19,15 @@ TEST_CASE("env", "[cfg]") {
 #endif
     load_env_levels();
     REQUIRE(l1->level() == spdlog::level::warn);
+
+#ifdef CATCH_PLATFORM_WINDOWS
+    _putenv_s("MYAPP_LEVEL", "l1=trace");
+#else
+    setenv("MYAPP_LEVEL", "l1=trace", 1);
+#endif
+    load_env_levels("MYAPP_LEVEL");
+    REQUIRE(l1->level() == spdlog::level::trace);
+
     spdlog::set_default_logger(spdlog::create<test_sink_st>("cfg-default"));
     REQUIRE(spdlog::default_logger()->level() == spdlog::level::info);
 }
