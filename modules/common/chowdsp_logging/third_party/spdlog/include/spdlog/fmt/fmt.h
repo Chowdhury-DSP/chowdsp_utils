@@ -20,15 +20,11 @@
     #ifndef FMT_USE_WINDOWS_H
         #define FMT_USE_WINDOWS_H 0
     #endif
-    // enable the 'n' flag in for backward compatibility with fmt 6.x
-    #define FMT_DEPRECATED_N_SPECIFIER
-    // enable ostream formatting for backward compatibility with fmt 8.x
-    #define FMT_DEPRECATED_OSTREAM
 
-    #include "../fmt/bundled/core.h"
-    #include "../fmt/bundled/format.h"
+    #include "bundled/base.h"
+    #include "bundled/format.h"
 
 #else  // SPDLOG_FMT_EXTERNAL is defined - use external fmtlib
-    #include <fmt/core.h>
-    #include <fmt/format.h>
+    #include "fmt/base.h"
+    #include "fmt/format.h"
 #endif

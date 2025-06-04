@@ -22,7 +22,7 @@
     #ifndef _WIN32
         #error SPDLOG_WCHAR_TO_UTF8_SUPPORT only supported on windows
     #endif
-    #include <spdlog/details/os.h>
+    #include "details/os.h"
 #endif
 
 #include <vector>

@@ -4,7 +4,7 @@
 #pragma once
 
 #ifndef SPDLOG_HEADER_ONLY
-    #include <spdlog/logger.h>
+    #include "logger.h"
 #endif
 
 #include "details/backtracer.h"

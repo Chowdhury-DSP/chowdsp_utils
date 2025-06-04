@@ -10,16 +10,6 @@ struct fmt::formatter<juce::String> : formatter<std::string>
     }
 };
 
-/** Custom formatter for std::span */
-template <typename T>
-struct fmt::formatter<nonstd::span<T>> : formatter<std::string>
-{
-    static auto format (nonstd::span<const T> span, format_context& ctx) -> decltype (ctx.out())
-    {
-        return fmt::format_to (ctx.out(), "{{{}}}", fmt::join (span, ","));
-    }
-};
-
 namespace chowdsp
 {
 /** Implementation of fmt::vformat using a memory arena. */
