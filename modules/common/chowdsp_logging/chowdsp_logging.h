@@ -24,8 +24,13 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include <chowdsp_data_structures/chowdsp_data_structures.h>
 #include <chowdsp_listeners/chowdsp_listeners.h>
 
+#if JUCE_WINDOWS
+#define FMT_UNICODE 0
+#endif
+
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wswitch-enum",
                                      "-Wfloat-equal",
+                                     "-Wsign-conversion",
                                      "-Wextra-semi",
                                      "-Wdeprecated-declarations",
                                      "-Wc++20-compat",
@@ -36,6 +41,7 @@ JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4996)
 #include "third_party/spdlog/include/spdlog/sinks/stdout_color_sinks.h"
 #include "third_party/spdlog/include/spdlog/sinks/basic_file_sink.h"
 #include "third_party/spdlog/include/spdlog/sinks/msvc_sink.h"
+#include "third_party/spdlog/include/spdlog/fmt/ranges.h"
 
 JUCE_END_IGNORE_WARNINGS_MSVC
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE

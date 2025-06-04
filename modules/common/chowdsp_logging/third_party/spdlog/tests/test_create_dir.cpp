@@ -81,3 +81,64 @@ TEST_CASE("dir_name", "[create_dir]") {
     REQUIRE(dir_name(SPDLOG_FILENAME_T("../file.txt")) == SPDLOG_FILENAME_T(".."));
     REQUIRE(dir_name(SPDLOG_FILENAME_T("./file.txt")) == SPDLOG_FILENAME_T("."));
 }
+
+#ifdef _WIN32
+
+    //
+    // test windows cases when drive letter is given e.g. C:\\some-folder
+    //
+    #include <windows.h>
+    #include <fileapi.h>
+
+std::string get_full_path(const std::string &relative_folder_path) {
+    char full_path[MAX_PATH];
+
+    DWORD result = ::GetFullPathNameA(relative_folder_path.c_str(), MAX_PATH, full_path, nullptr);
+    // Return an empty string if failed to get full path
+    return result > 0 && result < MAX_PATH ? std::string(full_path) : std::string();
+}
+
+std::wstring get_full_path(const std::wstring &relative_folder_path) {
+    wchar_t full_path[MAX_PATH];
+    DWORD result = ::GetFullPathNameW(relative_folder_path.c_str(), MAX_PATH, full_path, nullptr);
+    return result > 0 && result < MAX_PATH ? std::wstring(full_path) : std::wstring();
+}
+
+spdlog::filename_t::value_type find_non_existing_drive() {
+    for (char drive = 'A'; drive <= 'Z'; ++drive) {
+        std::string root_path = std::string(1, drive) + ":\\";
+        UINT drive_type = GetDriveTypeA(root_path.c_str());
+        if (drive_type == DRIVE_NO_ROOT_DIR) {
+            return static_cast<spdlog::filename_t::value_type>(drive);
+        }
+    }
+    return '\0';  // No available drive found
+}
+
+TEST_CASE("create_abs_path1", "[create_dir]") {
+    prepare_logdir();
+    auto abs_path = get_full_path(SPDLOG_FILENAME_T("test_logs\\logdir1"));
+    REQUIRE(!abs_path.empty());
+    REQUIRE(create_dir(abs_path) == true);
+}
+
+TEST_CASE("create_abs_path2", "[create_dir]") {
+    prepare_logdir();
+    auto abs_path = get_full_path(SPDLOG_FILENAME_T("test_logs/logdir2"));
+    REQUIRE(!abs_path.empty());
+    REQUIRE(create_dir(abs_path) == true);
+}
+
+TEST_CASE("non_existing_drive", "[create_dir]") {
+    prepare_logdir();
+    spdlog::filename_t path;
+
+    auto non_existing_drive = find_non_existing_drive();
+    path += non_existing_drive;
+    path += SPDLOG_FILENAME_T(":\\");
+    REQUIRE(create_dir(path) == false);
+    path += SPDLOG_FILENAME_T("subdir");
+    REQUIRE(create_dir(path) == false);
+}
+// #endif  // SPDLOG_WCHAR_FILENAMES
+#endif  // _WIN32

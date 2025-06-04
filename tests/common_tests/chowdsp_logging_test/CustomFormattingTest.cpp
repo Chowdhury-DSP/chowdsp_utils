@@ -16,7 +16,7 @@ TEST_CASE ("Custom Formatting Test", "[common][logs]")
     {
         std::vector vec { 0.0f, 1.0f, 2.0f, 3.0f, 4.0f };
         const auto format_result = chowdsp::format (arena, "{}", nonstd::span { vec });
-        REQUIRE (format_result == "{0,1,2,3,4}");
+        REQUIRE (format_result == "[0, 1, 2, 3, 4]");
     }
 
     SECTION ("Large String")

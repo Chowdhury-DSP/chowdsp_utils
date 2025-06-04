@@ -1,8 +1,12 @@
+#ifdef _WIN32  // to prevent fopen warning on windows
+    #define _CRT_SECURE_NO_WARNINGS
+#endif
+
 #include "includes.h"
 #include "test_sink.h"
 
 template <class T>
-std::string log_info(const T &what, spdlog::level::level_enum logger_level = spdlog::level::info) {
+std::string log_info(const T& what, spdlog::level::level_enum logger_level = spdlog::level::info) {
     std::ostringstream oss;
     auto oss_sink = std::make_shared<spdlog::sinks::ostream_sink_mt>(oss);
 
@@ -105,9 +109,9 @@ TEST_CASE("clone-logger", "[clone]") {
 }
 
 TEST_CASE("clone async", "[clone]") {
-    using spdlog::sinks::test_sink_st;
+    using spdlog::sinks::test_sink_mt;
     spdlog::init_thread_pool(4, 1);
-    auto test_sink = std::make_shared<test_sink_st>();
+    auto test_sink = std::make_shared<test_sink_mt>();
     auto logger = std::make_shared<spdlog::async_logger>("orig", test_sink, spdlog::thread_pool());
     logger->set_pattern("%v");
     auto cloned = logger->clone("clone");
@@ -166,4 +170,55 @@ TEST_CASE("default logger API", "[default logger]") {
     REQUIRE(oss.str().empty());
     spdlog::drop_all();
     spdlog::set_pattern("%v");
+}
+
+#if (defined(SPDLOG_WCHAR_TO_UTF8_SUPPORT) || defined(SPDLOG_WCHAR_FILENAMES)) && defined(_WIN32)
+TEST_CASE("utf8 to utf16 conversion using windows api", "[windows utf]") {
+    spdlog::wmemory_buf_t buffer;
+
+    spdlog::details::os::utf8_to_wstrbuf("", buffer);
+    REQUIRE(std::wstring(buffer.data(), buffer.size()) == std::wstring(L""));
+
+    spdlog::details::os::utf8_to_wstrbuf("abc", buffer);
+    REQUIRE(std::wstring(buffer.data(), buffer.size()) == std::wstring(L"abc"));
+
+    spdlog::details::os::utf8_to_wstrbuf("\xc3\x28", buffer);  // Invalid UTF-8 sequence.
+    REQUIRE(std::wstring(buffer.data(), buffer.size()) == std::wstring(L"\xfffd("));
+
+    spdlog::details::os::utf8_to_wstrbuf("\xe3\x81\xad\xe3\x81\x93",
+                                         buffer);  // "Neko" in hiragana.
+    REQUIRE(std::wstring(buffer.data(), buffer.size()) == std::wstring(L"\x306d\x3053"));
+}
+#endif
+
+struct auto_closer {
+    FILE* fp = nullptr;
+    explicit auto_closer(FILE* f)
+        : fp(f) {}
+    auto_closer(const auto_closer&) = delete;
+    auto_closer& operator=(const auto_closer&) = delete;
+    ~auto_closer() {
+        if (fp != nullptr) (void)std::fclose(fp);
+    }
+};
+
+TEST_CASE("os::fwrite_bytes", "[os]") {
+    using spdlog::details::os::create_dir;
+    using spdlog::details::os::fwrite_bytes;
+    const char* filename = "log_tests/test_fwrite_bytes.txt";
+    const char* msg = "hello";
+    prepare_logdir();
+    REQUIRE(create_dir(SPDLOG_FILENAME_T("log_tests")) == true);
+    {
+        auto_closer closer(std::fopen(filename, "wb"));
+        REQUIRE(closer.fp != nullptr);
+        REQUIRE(fwrite_bytes(msg, std::strlen(msg), closer.fp) == true);
+        REQUIRE(fwrite_bytes(msg, 0, closer.fp) == true);
+        std::fflush(closer.fp);
+        REQUIRE(spdlog::details::os::filesize(closer.fp) == 5);
+    }
+    // fwrite_bytes should return false on write failure
+    auto_closer closer(std::fopen(filename, "r"));
+    REQUIRE(closer.fp != nullptr);
+    REQUIRE_FALSE(fwrite_bytes("Hello", 5, closer.fp));
 }
