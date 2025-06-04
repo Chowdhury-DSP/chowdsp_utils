@@ -84,6 +84,9 @@ public:
     /** Allocated required memory, and resets the property */
     void prepare (const juce::dsp::ProcessSpec& spec, bool onOffParam, bool useInternalBuffer = true);
 
+    /** Resets the processor state */
+    void reset (bool onOffParam);
+
     /**
      * If the non-bypassed processing has some associated
      * latency, it is recommended to report the latency

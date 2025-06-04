@@ -117,6 +117,15 @@ void BypassProcessor<SampleType,
 template <typename SampleType, typename DelayInterpType>
 void BypassProcessor<SampleType,
                      DelayInterpType,
+                     std::enable_if_t<! std::is_same_v<DelayInterpType, NullType>>>::reset (bool onOffParam)
+{
+    prevOnOffParam = onOffParam;
+    compDelay->reset();
+}
+
+template <typename SampleType, typename DelayInterpType>
+void BypassProcessor<SampleType,
+                     DelayInterpType,
                      std::enable_if_t<! std::is_same_v<DelayInterpType, NullType>>>::setLatencySamples (int delaySamples)
 {
     setLatencySamplesInternal ((NumericType) delaySamples);
