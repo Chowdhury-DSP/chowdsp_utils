@@ -32,6 +32,7 @@ JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wswitch-enum",
                                      "-Wfloat-equal",
                                      "-Wsign-conversion",
                                      "-Wextra-semi",
+                                     "-Wduplicate-enum",
                                      "-Wdeprecated-declarations",
                                      "-Wc++20-compat",
                                      "-Wlanguage-extension-token")
