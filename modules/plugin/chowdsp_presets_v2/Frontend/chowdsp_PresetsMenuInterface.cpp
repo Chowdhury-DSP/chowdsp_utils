@@ -5,8 +5,8 @@ namespace chowdsp::presets::frontend
 MenuInterface::MenuInterface (PresetManager& manager, FileInterface* fileFace)
     : presetManager (manager), fileInterface (fileFace), clipboardInterface (manager)
 {
-    presetManager.presetListUpdatedBroadcaster.connect ([this]
-                                                        { refreshPresetsMenu(); });
+    callback = presetManager.presetListUpdatedBroadcaster.connect ([this]
+                                                                   { refreshPresetsMenu(); });
     refreshPresetsMenu();
 }
 
