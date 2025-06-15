@@ -44,6 +44,7 @@ private:
     juce::PopupMenu presetsMenu {};
 
     std::shared_ptr<juce::FileChooser> fileChooser;
+    ScopedCallback callback {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MenuInterface)
 };
