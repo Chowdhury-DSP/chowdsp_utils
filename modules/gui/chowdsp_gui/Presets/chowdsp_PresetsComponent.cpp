@@ -258,7 +258,7 @@ void PresetsComponent::showFailedToLoadPresetMessage (const Preset& preset)
         return "Failed to load preset: " + preset.getName();
     }();
 
-    juce::NativeMessageBox::showOkCancelBox (juce::AlertWindow::InfoIcon,
+    juce::NativeMessageBox::showOkCancelBox (juce::AlertWindow::WarningIcon,
                                              "Failed To Load Preset!",
                                              alertMessage,
                                              this,

@@ -107,6 +107,9 @@ void FileInterface::chooseUserPresetsFolder()
 juce::File FileInterface::getFileForPreset (const Preset& preset) const
 {
     jassert (presetManager.getUserPresetPath().isDirectory());
-    return presetManager.getUserPresetPath().getChildFile (preset.getName() + presetManager.getPresetFileExtension());
+    return presetManager
+        .getUserPresetPath()
+        .getChildFile (juce::File::createLegalFileName (preset.getName()))
+        .withFileExtension (presetManager.getPresetFileExtension());
 }
 } // namespace chowdsp::presets::frontend
