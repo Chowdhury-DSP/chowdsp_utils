@@ -342,7 +342,7 @@ void applyGainSmoothedBuffer (const BufferType1& bufferSrc, BufferType2& bufferD
     jassert (bufferDest.getNumChannels() == numChannels);
     jassert (bufferDest.getNumSamples() == numSamples);
 
-    const auto audioDataIn = bufferDest.getArrayOfReadPointers();
+    const auto audioDataIn = bufferSrc.getArrayOfReadPointers();
     auto audioDataOut = bufferDest.getArrayOfWritePointers();
     const auto gainData = gain.getSmoothedBuffer();
 
