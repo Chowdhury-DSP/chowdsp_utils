@@ -81,12 +81,13 @@ public:
     /** Returns the current parameter value accounting for any modulation that is currently applied. */
     operator float() const noexcept { return getCurrentValue(); } // NOSONAR, NOLINT(google-explicit-constructor): we want to be able to do implicit conversion here
 
-private:
+protected:
     const float defaultValueInRange;
     const juce::NormalisableRange<float> normalisableRange;
 
     float modulationAmount = 0.0f;
 
+private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FloatParameter)
 };
 
