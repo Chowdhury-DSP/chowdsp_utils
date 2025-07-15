@@ -161,9 +161,14 @@ TEMPLATE_TEST_CASE ("Buffer View Test", "[dsp][buffers][simd]", float, double, x
     {
         SECTION ("make_temp_buffer")
         {
-            chowdsp::ArenaAllocator<> arena { 1 << 10 };
+            chowdsp::ArenaAllocator<nonstd::span<std::byte>> arena {};
+            arena.get_memory_resource() = {
+                (std::byte*) chowdsp::aligned_alloc (16, 1 << 10),
+                1 << 10,
+            };
             chowdsp::make_temp_buffer<float> (arena, 2, 61);
             REQUIRE (arena.get_bytes_used() == 64 * 2 * sizeof (float));
+            chowdsp::aligned_free (arena.get_memory_resource().data());
         }
     }
 }
