@@ -68,6 +68,10 @@ jobs:
             os: macos-14
           - name: "Coverage"
             os: windows-2022
+          - name: "Test 32-bit"
+            os: macos-14
+          - name: "Test 32-bit"
+            os: ubuntu-22.04
 
     steps:
       - name: Install Linux Deps
@@ -106,7 +110,7 @@ jobs:
         env:
           CMAKE_ARGS: ${{ matrix.cmake_args }}
         shell: bash
-        run: cmake -Bbuild -DCHOWDSP_ENABLE_TESTING=ON "${CMAKE_ARGS}"
+        run: cmake -Bbuild -DCHOWDSP_ENABLE_TESTING=ON ${CMAKE_ARGS}
 
       - name: Build
         working-directory: ${{env.WORK_DIR}}/build
