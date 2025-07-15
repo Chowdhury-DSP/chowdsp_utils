@@ -2,6 +2,8 @@
 
 namespace chowdsp
 {
+JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324) // structure was padded due to alignment specifier
+
 /** Iterators for iterating over buffers */
 namespace buffer_iters
 {
@@ -286,4 +288,5 @@ namespace buffer_iters
         return iterable_wrapper { buffer1, buffer2 };
     }
 } // namespace buffer_iters
+JUCE_END_IGNORE_WARNINGS_MSVC
 } // namespace chowdsp

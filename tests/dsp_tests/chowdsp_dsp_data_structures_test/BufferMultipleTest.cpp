@@ -3,6 +3,7 @@
 
 #include <iostream>
 
+#if JUCE_64BIT
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wfloat-equal")
 
 TEST_CASE ("Buffer Multiple Test", "[dsp][data-structures]")
@@ -60,3 +61,4 @@ TEST_CASE ("Buffer Multiple Test", "[dsp][data-structures]")
 }
 
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+#endif // JUCE_64BIT
