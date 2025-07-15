@@ -30,6 +30,7 @@ jobs:
               ]
         name: [
                 "Test",
+                "Test 32-bit",
                 "Coverage",
               ]
         os: [ubuntu-22.04, windows-2022, macos-14]
@@ -105,7 +106,7 @@ jobs:
         env:
           CMAKE_ARGS: ${{ matrix.cmake_args }}
         shell: bash
-        run: cmake -Bbuild -DCHOWDSP_ENABLE_TESTING=ON $CMAKE_ARGS
+        run: cmake -Bbuild -DCHOWDSP_ENABLE_TESTING=ON "${CMAKE_ARGS}"
 
       - name: Build
         working-directory: ${{env.WORK_DIR}}/build
