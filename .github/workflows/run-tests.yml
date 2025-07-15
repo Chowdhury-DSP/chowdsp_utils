@@ -44,7 +44,7 @@ jobs:
             build_type: "Debug"
           - name: "Test 32-bit"
             os: windows-2022
-            cmake_args: "-A Win32 -G\"Visual Studio 17 2022\""
+            cmake_args: "-A Win32"
             build_type: "Debug"
           - name: "Coverage"
             os: ubuntu-22.04
