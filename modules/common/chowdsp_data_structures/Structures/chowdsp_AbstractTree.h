@@ -12,7 +12,13 @@ public:
     struct ValuePtr
     {
         JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324) // structure was padded due to alignment specifier
-        struct alignas (8) Void
+        struct
+#if JUCE_64BIT
+            alignas (8)
+#elif JUCE_32BIT
+            alignas (4)
+#endif
+                Void
         {
         };
         PackedPointer<Void> ptr { nullptr, Empty };

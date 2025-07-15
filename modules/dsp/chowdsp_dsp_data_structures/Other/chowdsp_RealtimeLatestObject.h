@@ -2,6 +2,8 @@
 
 namespace chowdsp
 {
+JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4324) // structure was padded due to alignment specifier
+
 /**
  * An object that can be written to from the UI thread and read from
  * the audio thread, and is wait-free on both threads. Here's how it works:
@@ -158,4 +160,5 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (RealtimeLatestObject)
 };
+JUCE_END_IGNORE_WARNINGS_MSVC
 } // namespace chowdsp

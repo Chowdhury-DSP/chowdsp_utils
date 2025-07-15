@@ -48,8 +48,12 @@ TEST_CASE ("Chained Arena Allocator Test", "[common][data-structures]")
     {
         REQUIRE (allocator.template allocate<double> (200) != nullptr);
         REQUIRE (allocator.template allocate<double> (200) != nullptr);
-        REQUIRE (allocator.get_total_bytes_used() == 3200 + 2 * 24);
+        REQUIRE (allocator.get_total_bytes_used() == 3200 + 2 * 3 * sizeof (void*));
+#if JUCE_64BIT
         REQUIRE (allocator.get_total_bytes() == 3200 + 144);
+#elif JUCE_32BIT
+        REQUIRE (allocator.get_total_bytes() == 3200 + 104);
+#endif
         allocator.clear();
     }
 

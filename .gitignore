@@ -1,7 +1,7 @@
 *build*/
 cmake-build*/
 
-.raddbg_project
+*.raddbg_project
 .focus-config
 .vscode/
 docs/

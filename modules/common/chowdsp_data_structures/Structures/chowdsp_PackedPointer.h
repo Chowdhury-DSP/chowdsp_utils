@@ -6,7 +6,11 @@ namespace chowdsp
 template <typename T>
 struct PackedPointer
 {
+#if JUCE_64BIT
     static_assert (alignof (T) >= 8, "PackedPointer implementation requires pointers that are aligned to 8 bytes or greater!");
+#elif JUCE_32BIT
+    static_assert (alignof (T) >= 4, "PackedPointer implementation requires pointers that are aligned to 4 bytes or greater!");
+#endif
 
     static constexpr auto max_flag_value = alignof (T) - 1;
     static constexpr auto address_mask = ~static_cast<uintptr_t> (max_flag_value);
