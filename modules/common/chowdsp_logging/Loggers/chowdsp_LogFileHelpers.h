@@ -12,6 +12,7 @@ struct LogFileParams
     juce::String logFileExtension = ".log";
     size_t maxNumLogFiles = 50;
     int flushPeriodMilliseconds = 2000;
+    bool cleanupOnBackgroundThread = false;
 
     static juce::File getLogFile (const LogFileParams&);
 };

@@ -10,6 +10,27 @@ Logger::Logger (const juce::String& logFileSubDir,
 {
 }
 
+static void handleOldLogFiles (LogFileParams params,
+                               CrashLogHelpers::CrashLogAnalysisCallback callback)
+{
+    using namespace LogFileHelpers;
+    using namespace CrashLogHelpers;
+    if (! params.cleanupOnBackgroundThread)
+    {
+        auto&& pastLogFiles = getLogFilesSorted (params);
+        pruneOldLogFiles (pastLogFiles, params);
+        checkLogFilesForCrashes (pastLogFiles, callback);
+        return;
+    }
+
+    params.cleanupOnBackgroundThread = false;
+    juce::Thread::launch (
+        [params, callback]
+        {
+            handleOldLogFiles (params, callback);
+        });
+}
+
 Logger::Logger (const LogFileParams& loggerParams,
                 CrashLogHelpers::CrashLogAnalysisCallback&& callback)
     : params (loggerParams),
@@ -18,9 +39,7 @@ Logger::Logger (const LogFileParams& loggerParams,
     using namespace LogFileHelpers;
     using namespace CrashLogHelpers;
 
-    auto&& pastLogFiles = getLogFilesSorted (params);
-    pruneOldLogFiles (pastLogFiles, params);
-    checkLogFilesForCrashes (pastLogFiles, crashLogAnalysisCallback);
+    handleOldLogFiles (params, crashLogAnalysisCallback);
 
     log_file = LogFileParams::getLogFile (params);
     log_file.create();
