@@ -4,6 +4,7 @@ cmake-build*/
 *.raddbg_project
 .focus-config
 .vscode/
+.zed/
 docs/
 .idea/
 Testing/
