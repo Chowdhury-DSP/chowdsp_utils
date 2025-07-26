@@ -16,7 +16,7 @@ struct EnumMapComplete
 
     constexpr EnumMapComplete() = default;
 
-    constexpr EnumMapComplete (T default_value)
+    constexpr explicit EnumMapComplete (T default_value)
     {
         std::fill (storage.begin(), storage.end(), default_value);
     }
