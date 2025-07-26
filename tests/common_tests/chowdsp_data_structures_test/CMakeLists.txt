@@ -19,6 +19,7 @@ target_sources(chowdsp_data_structures_test
         STLArenaAllocatorTest.cpp
         RawObjectTest.cpp
         EnumMapTest.cpp
+        EnumMapCompleteTest.cpp
         OptionalRefTest.cpp
         OptionalArrayTest.cpp
         PoolAllocatorTest.cpp

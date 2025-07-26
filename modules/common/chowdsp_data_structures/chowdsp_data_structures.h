@@ -43,6 +43,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include "Structures/chowdsp_StringLiteral.h"
 #include "Structures/chowdsp_OptionalRef.h"
 #include "Structures/chowdsp_EnumMap.h"
+#include "Structures/chowdsp_EnumMapComplete.h"
 #include "Structures/chowdsp_OptionalArray.h"
 
 #include "Allocators/chowdsp_ArenaAllocator.h"
