@@ -45,6 +45,9 @@ public:
     /** Called whenever the current preset's "dirty" status has changed. */
     Broadcaster<void()> presetDirtyStatusBroadcaster {};
 
+    /** Parameters that will be ignored when loading a preset. */
+    std::vector<juce::RangedAudioParameter*> presetAgnosticParameters {};
+
 private:
     void initializeListeners (ParamHolder& params, ParameterListeners& listeners);
 
@@ -54,7 +57,6 @@ private:
     juce::AudioProcessor* processor = nullptr;
     chowdsp::PluginState& pluginState;
 
-    const std::vector<juce::RangedAudioParameter*> presetAgnosticParameters {};
     chowdsp::ScopedCallbackList listeners;
 
     bool areWeInTheMidstOfAPresetChange = false;
