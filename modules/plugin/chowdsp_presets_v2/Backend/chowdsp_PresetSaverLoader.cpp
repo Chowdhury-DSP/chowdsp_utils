@@ -5,9 +5,10 @@ namespace chowdsp::presets
 PresetSaverLoader::PresetSaverLoader (PluginState& state,
                                       juce::AudioProcessor* plugin,
                                       std::vector<juce::RangedAudioParameter*>&& presetAgnosticParams)
-    : processor (plugin),
-      pluginState (state),
-      presetAgnosticParameters (std::move (presetAgnosticParams))
+    :
+      presetAgnosticParameters (std::move (presetAgnosticParams)),
+      processor (plugin),
+      pluginState (state)
 {
     state.getNonParameters().addStateValues ({ &currentPreset, &isPresetDirty });
     initializeListeners (state.getParameters(), state.getParameterListeners());
