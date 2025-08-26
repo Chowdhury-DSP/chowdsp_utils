@@ -4,24 +4,23 @@ namespace chowdsp
 {
 Version::Version (const juce::String& versionStr)
 {
-    int numDots = 0;
+    [[maybe_unused]] int numDots = 0;
     for (auto ch : versionStr)
         if (ch == '.')
             numDots++;
 
-    // Valid version strings must have two dots!
-    jassert (numDots == 2);
+    // Valid version strings must have one or two dots!
+    jassert (numDots == 1 || numDots == 2);
 
     auto trimmedStr = versionStr.retainCharacters ("1234567890.");
 
     juce::StringArray tokens;
-    int numTokens = tokens.addTokens (trimmedStr, ".", "");
-    jassert (numTokens == 3);
-    juce::ignoreUnused (numTokens, numDots);
+    [[maybe_unused]] int numTokens = tokens.addTokens (trimmedStr, ".", "");
+    jassert (numTokens == 2 || numTokens == 3);
 
     major = tokens[0].getIntValue();
     minor = tokens[1].getIntValue();
-    patch = tokens[2].getIntValue();
+    patch = numTokens == 3 ? tokens[2].getIntValue() : 0;
 }
 
 juce::String Version::getVersionString() const

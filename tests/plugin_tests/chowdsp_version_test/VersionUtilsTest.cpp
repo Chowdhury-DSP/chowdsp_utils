@@ -57,6 +57,9 @@ TEST_CASE ("Version Test", "[plugin][version]")
 
         static constexpr std::array<bool, 6> exp8 { false, true, false, true, false, true };
         CHECK_VERSIONS_CONSTEXPR ("1.9.1"sv, "1.11.1"sv, exp8);
+
+        CHECK_VERSIONS_CONSTEXPR ("1.0"sv, "1.0.0"sv, exp0);
+        CHECK_VERSIONS_CONSTEXPR ("1.2"sv, "1.2.0"sv, exp0);
     }
 
     SECTION ("Version Compare Test")
@@ -97,6 +100,8 @@ TEST_CASE ("Version Test", "[plugin][version]")
         checkVersions ("0.1.1", "1.1.1", { false, true, false, true, false, true });
         checkVersions ("1.1.11", "1.1.9", { false, true, true, false, true, false });
         checkVersions ("1.9.1", "1.11.1", { false, true, false, true, false, true });
+        checkVersions ("1.0", "1.0.0", { true, false, false, false, true, true });
+        checkVersions ("1.2", "1.2.0", { true, false, false, false, true, true });
     }
 
     SECTION ("Version String Test")
