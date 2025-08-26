@@ -17,8 +17,8 @@ public:
             if (ch == '.')
                 numDots++;
 
-        // Valid version strings must have two dots!
-        if (numDots != 2)
+        // Valid version strings must have one or two dots!
+        if (numDots != 1 && numDots != 2)
         {
             major = 0;
             minor = 0;
@@ -35,8 +35,15 @@ public:
         const auto minorVersionStr = remainder.substr (0, secondDot);
         minor = version_detail::stoi (minorVersionStr);
 
-        const auto patchVersionStr = remainder.substr (secondDot + 1);
-        patch = version_detail::stoi (patchVersionStr);
+        if (numDots == 2)
+        {
+            const auto patchVersionStr = remainder.substr (secondDot + 1);
+            patch = version_detail::stoi (patchVersionStr);
+        }
+        else
+        {
+            patch = 0;
+        }
     }
 
     /** Construct a version object directly. */
