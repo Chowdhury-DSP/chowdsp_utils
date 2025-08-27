@@ -33,6 +33,34 @@ inline void aligned_free (void* data)
     _aligned_free (data);
 }
 
+#elif defined(__APPLE__) && JUCE_INTEL
+
+// std::aligned_alloc is only available on MacOS 10.13 and later.
+
+/** macOS-safe implementation (uses posix_memalign) */
+[[nodiscard]] inline void* aligned_alloc (size_t alignment, size_t size)
+{
+    // posix_memalign does not require size to be a multiple of alignment, but
+    // we keep the padding as before for consistency.
+    const auto size_padded = ((size + alignment - 1) / alignment) * alignment;
+
+    // At least make sure the alignment is >= sizeof(void*)
+    if (alignment < sizeof (void*))
+        alignment = sizeof (void*);
+
+    void* p = nullptr;
+    if (posix_memalign (&p, alignment, size_padded) != 0)
+        return nullptr;
+
+    return p;
+}
+
+/** Free function for the posix_memalign case */
+inline void aligned_free (void* data)
+{
+    std::free (data);
+}
+
 #else
 
 /** MSVC-compatible implementation of aligned_alloc */
