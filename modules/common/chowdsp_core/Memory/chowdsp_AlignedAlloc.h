@@ -33,8 +33,7 @@ inline void aligned_free (void* data)
     _aligned_free (data);
 }
 
-// @TODO: don't merge until we figure out which defines we actually need to check here!
-#elif defined(__APPLE__) && JUCE_INTEL // && MAC_OS_X_VERSION_MIN_REQUIRED < 101300
+#elif defined(__APPLE__) && JUCE_INTEL
 
 // std::aligned_alloc is only available on MacOS 10.13 and later.
 
