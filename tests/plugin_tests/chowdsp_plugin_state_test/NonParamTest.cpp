@@ -12,50 +12,18 @@ struct AggregateType
 };
 
 template <>
-struct chowdsp::StateValue<AggregateType> : StateValueBase
+struct nlohmann::adl_serializer<AggregateType>
 {
-    StateValue (std::string_view valueName, const AggregateType& default_value)
-        : StateValueBase { valueName },
-          default_val { default_value },
-          val { default_value }
+    static void to_json (json& j, const AggregateType& a)
     {
+        j = { { "a_value", a.a }, { "b_value", a.b } };
     }
 
-    auto get() const noexcept
+    static void from_json (const json& j, AggregateType& a)
     {
-        return val;
+        a.a = j.value ("a_value", juce::String ("default string"));
+        a.b = j.value ("b_value", juce::String ("default string"));
     }
-
-    void set (const AggregateType& v)
-    {
-        if (v == val)
-            return;
-
-        val = v;
-        changeBroadcaster();
-    }
-
-    void reset() override { set (default_val); }
-
-    [[nodiscard]] nlohmann::json serialize_json() const override
-    {
-        const auto current_value = get();
-        return {
-            { "a_value", current_value.a },
-            { "b_value", current_value.b },
-        };
-    }
-
-    void deserialize_json (const nlohmann::json& deserial) override
-    {
-        set (AggregateType {
-            .a = deserial.value ("a_value", juce::String { "default string" }),
-            .b = deserial.value ("b_value", juce::String { "default string" }),
-        });
-    }
-
-    AggregateType default_val {};
-    AggregateType val {};
 };
 
 TEST_CASE ("Non-Param Test", "[plugin][state][serial]")
