@@ -4,10 +4,17 @@ All notable changes to this project will be documented in this file.
 
 ## [UNRELEASED]
 - Improved plugin state serialization.
+  - BREAKING CHANGE: using `chowdsp::StateValue` with an aggregate type now reqires an explicit definition for how the type will be serialized/deserialized. For more information, see [#594](https://github.com/Chowdhury-DSP/chowdsp_utils/issues/594).
 - Added `chowdsp::FlatMemoryPool`.
 - Added `chowdsp::OnePoleSVF`.
 - Added `chowdsp::MetricParameter`.
 - Added `chowdsp::RealtimeLatestObject`.
+- Added `chowdsp::EnumMapComplete`.
+- Added `chowdsp::SIMDUpsampler` and `chowdsp::SIMDDownsampler`.
+- Modified `chowdsp::Version` to support versions with no "patch" number.
+- Modified `chowdsp::FIRFilter` to support fixed filter order and channel count.
+- Fixed `chowdsp::BufferView` copy constructors.
+- Fixed dangling callback in `chowdsp::presets::MenuInterface`.
 
 ## [2.3.0] 2024-11-13
 - Added `chowdsp_fuzzy_search` module.
