@@ -49,6 +49,21 @@ public:
         return span;
     }
 
+    /** Allocates multiple objects into the arena, constructed from a lambda. */
+    template <typename T, typename Lambda>
+    nonstd::span<T> allocate_n_lambda (size_t n, Lambda&& lambda)
+    {
+        auto* bytes = allocator.allocate_bytes (sizeof (T) * n, alignof (T));
+        auto span = nonstd::span<T> { reinterpret_cast<T*> (bytes), n };
+        for (auto [idx, ptr] : chowdsp::enumerate (span))
+        {
+            auto* new_component = new (&ptr) T { lambda (idx) };
+            if constexpr (std::is_base_of_v<juce::Component, T>)
+                component_list.emplace_back (new_component);
+        }
+        return span;
+    }
+
     /**
      * Reclaims the arena memory, and destroys any components
      * that have been allocated into the arena.
