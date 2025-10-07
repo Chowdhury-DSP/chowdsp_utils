@@ -200,13 +200,13 @@ constexpr bool operator!= (const std::string_view& lhs, const StringLiteral<N>& 
 namespace string_literals
 {
     template <StringLiteral sl>
-    constexpr auto operator"" _sl()
+    constexpr auto operator""_sl()
     {
         return sl;
     }
 
     template <char... str>
-    constexpr auto operator"" _sl_n()
+    constexpr auto operator""_sl_n()
     {
         constexpr char str_array[] { str..., '\0' };
         return StringLiteral { str_array };
