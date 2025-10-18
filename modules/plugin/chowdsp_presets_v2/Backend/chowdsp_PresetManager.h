@@ -91,6 +91,8 @@ protected:
     /** Override this to support backwards compatibility for user presets */
     [[nodiscard]] virtual Preset loadUserPresetFromFile (const juce::File& file);
 
+    virtual void savePresetFile (const juce::File& file, Preset& preset) const;
+
     juce::String userPresetsVendor { "User" };
 
     PresetSaverLoader saverLoader;

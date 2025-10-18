@@ -61,16 +61,21 @@ void PresetManager::saveUserPreset (const juce::File& file, Preset&& preset) // 
 
     jassert (preset.isValid()); // trying to save an invalid preset??
 
-    if (file.existsAsFile())
-        file.deleteFile();
-    file.create();
-    preset.toFile (file);
+    savePresetFile (file, preset);
     loadUserPresetsFromFolder (getUserPresetPath());
 
     if (const auto justSavedPreset = presetTree.findElement (preset))
         loadPreset (*justSavedPreset);
     else
         jassertfalse; // preset was not saved correctly!
+}
+
+void PresetManager::savePresetFile (const juce::File& file, Preset& preset) const
+{
+    if (file.existsAsFile())
+        file.deleteFile();
+    file.create();
+    preset.toFile (file);
 }
 
 void PresetManager::setDefaultPreset (Preset&& newDefaultPreset)
