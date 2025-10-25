@@ -184,9 +184,9 @@ void PresetsComponent::saveUserPreset (nlohmann::json&& presetState)
     presetNameEditor.setHighlightedRegion ({ 0, 100 });
     presetNameEditor.grabKeyboardFocus();
 
-    presetNameEditor.onReturnKey = [this, presetState = std::move (presetState)]() mutable
+    presetNameEditor.onReturnKey = [this, state = std::move (presetState)]() mutable
     {
-        auto preset = presetManager.getUserPresetForState (presetNameEditor.getText(), std::move (presetState));
+        auto preset = presetManager.getUserPresetForState (presetNameEditor.getText(), std::move (state));
         const auto file = fileInterface->getFileForPreset (preset);
         hidePresetNameEditor();
 
@@ -237,13 +237,13 @@ void PresetsComponent::confirmAndOverwritePresetFile (const juce::File& presetFi
                                              "Saving this preset will overwrite an existing file. Are you sure you want to continue?",
                                              this,
                                              juce::ModalCallbackFunction::create (
-                                                 [presetFile, preset = std::move (preset), saver = std::move (presetSaver)] (int result) mutable
+                                                 [presetFile, p = std::move (preset), saver = std::move (presetSaver)] (int result) mutable
                                                  {
                                                      if (result == 1)
                                                      {
-                                                         juce::Logger::writeToLog ("Over-writing preset: " + preset.getName()
+                                                         juce::Logger::writeToLog ("Over-writing preset: " + p.getName()
                                                                                    + " (" + presetFile.getFullPathName() + ")");
-                                                         saver (presetFile, std::move (preset));
+                                                         saver (presetFile, std::move (p));
                                                      }
                                                  }));
 }
