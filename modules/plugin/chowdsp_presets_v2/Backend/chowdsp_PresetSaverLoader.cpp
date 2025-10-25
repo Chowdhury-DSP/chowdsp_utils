@@ -116,16 +116,16 @@ void PresetSaverLoader::loadPreset (const Preset& preset)
     };
 
     pluginState.callOnMainThread (
-        [this, preset = preset]() mutable
+        [this, p = std::move (preset)]() mutable
         {
             if (currentPreset == nullptr || pluginState.undoManager == nullptr)
             {
-                currentPreset = OptionalPointer<const Preset> { std::move (preset) };
+                currentPreset = OptionalPointer<const Preset> { std::move (p) };
                 return;
             }
 
-            pluginState.undoManager->beginNewTransaction ("Loading preset: " + preset.getName());
-            pluginState.undoManager->perform (std::make_unique<ChangePresetAction> (*this, std::move (preset)).release());
+            pluginState.undoManager->beginNewTransaction ("Loading preset: " + p.getName());
+            pluginState.undoManager->perform (std::make_unique<ChangePresetAction> (*this, std::move (p)).release());
         });
 }
 
