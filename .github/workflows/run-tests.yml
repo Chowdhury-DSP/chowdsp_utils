@@ -149,7 +149,7 @@ jobs:
         shell: bash
         run: |
           llvm-cov-20 --help
-          lcov --directory . --capture --output-file coverage.info --gcov-tool llvm-cov --gcov-tool gcov
+          lcov --directory . --capture --output-file coverage.info --gcov-tool llvm-cov-20 --gcov-tool gcov
           lcov --remove coverage.info '/usr/*' "${HOME}"'/.cache/*' '/Applications/Xcode*' '*chowdsp_utils/build/*' '*JUCE/modules*' '*foleys_*' '*chowdsp_utils/tests*' '*third_party*' '*chowdsp_foleys*' '*chowdsp_core/JUCEHelpers*' --output-file coverage.info
 
       - name: Report Coverage Data
