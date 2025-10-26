@@ -18,21 +18,18 @@ env:
 jobs:
   clang_tidy:
     name: "Run Code Quality Check: clang-tidy"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
-      - name: Install Linux Deps
-        run: |
-          sudo apt-get update
-          sudo apt install libasound2-dev libcurl4-openssl-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev libsamplerate-dev
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        name: Install Linux Deps
+        if: runner.os == 'Linux'
+        with:
+          packages: clang-20 clang-tidy-20 libasound2-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libglu1-mesa-dev libsamplerate-dev
+          version: 1.0
 
-      - name: Install clang-tidy
-        run: |
-          wget https://apt.llvm.org/llvm.sh
-          chmod +x llvm.sh
-          sudo ./llvm.sh 14
-          sudo apt-get install clang-tidy-14
-          clang-tidy-14 --version
+      - name: Install Ninja
+        uses: seanmiddleditch/gha-setup-ninja@master
 
       - name: Get latest CMake
         uses: lukka/get-cmake@latest
@@ -45,17 +42,16 @@ jobs:
       - name: Set up environment
         working-directory: ${{github.workspace}}
         run: |
-          git clone --depth 1 --branch 7.0.6 https://github.com/juce-framework/JUCE.git
+          git clone --depth 1 --branch 8.0.10 https://github.com/juce-framework/JUCE.git
           cd JUCE_modules
-          git clone --single-branch --branch chowdsp https://github.com/Chowdhury-DSP/foleys_gui_magic.git
           git clone --single-branch --branch main --recursive https://github.com/free-audio/clap-juce-extensions.git
 
       - name: Configure
         working-directory: ${{env.WORK_DIR}}
         shell: bash
-        run: cmake -Bbuild -DCHOWDSP_ENABLE_TESTING=ON -DCHOWDSP_CODE_QUALITY_CHECKS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug
+        run: cmake -Bbuild -G"Ninja Multi-Config" -DCHOWDSP_ENABLE_TESTING=ON -DCHOWDSP_CODE_QUALITY_CHECKS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
       - name: Run clang-tidy
         working-directory: ${{env.WORK_DIR}}
         shell: bash
-        run: cmake --build build --parallel 4 --target chowdsp_utils_clang_tidy
+        run: cmake --build build --config Debug --parallel 4 --target chowdsp_utils_clang_tidy

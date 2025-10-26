@@ -37,7 +37,7 @@ jobs:
         include:
           - name: "Test"
             os: ubuntu-22.04
-            cmake_args: "-DCMAKE_BUILD_TYPE=Release"
+            cmake_args: "-G\"Ninja Multi-Config\" -DCMAKE_LINKER_TYPE=MOLD -DCMAKE_C_COMPILER=clang-15 -DCMAKE_CXX_COMPILER=clang++-15"
             build_type: "Release"
           - name: "Test"
             os: windows-2022
@@ -48,17 +48,17 @@ jobs:
             build_type: "Debug"
           - name: "Coverage"
             os: ubuntu-22.04
-            cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
+            cmake_args: "-G\"Ninja Multi-Config\" -DCODE_COVERAGE=ON"
             run_coverage: true
             build_type: "Debug"
           - name: "Test"
             os: macos-14
-            cmake_args: "-DCMAKE_BUILD_TYPE=Debug"
+            cmake_args: "-G\"Ninja Multi-Config\""
             build_type: "Debug"
           - name: "Live GUI Test"
             os: ubuntu-22.04
             tests: "live_gui_test"
-            cmake_args: "-DCODE_COVERAGE=ON -DCHOWDSP_BUILD_LIVE_GUI_TEST=ON -DCMAKE_BUILD_TYPE=Debug"
+            cmake_args: "-G\"Ninja Multi-Config\" -DCODE_COVERAGE=ON -DCHOWDSP_BUILD_LIVE_GUI_TEST=ON"
             live_gui: true
             run_coverage: true
             build_type: "Debug"
@@ -74,11 +74,12 @@ jobs:
             os: ubuntu-22.04
 
     steps:
-      - name: Install Linux Deps
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        name: Install Linux Deps
         if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt install libasound2-dev libcurl4-openssl-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev libsamplerate-dev
+        with:
+          packages: clang-15 libasound2-dev libx11-dev libxcomposite-dev libxcursor-dev libxext-dev libxinerama-dev libxrandr-dev libxrender-dev libfontconfig1-dev libfreetype6-dev libglu1-mesa-dev libsamplerate-dev
+          version: 1.0
 
       - name: Install lcov (Linux)
         if: matrix.run_coverage && runner.os == 'Linux'
@@ -89,6 +90,12 @@ jobs:
         run: |
           export HOMEBREW_NO_AUTO_UPDATE=1
           brew install lcov
+
+      - uses: rui314/setup-mold@v1
+        if: runner.os == 'Linux'
+
+      - name: Install Ninja
+        uses: seanmiddleditch/gha-setup-ninja@master
 
       - name: Get latest CMake
         uses: lukka/get-cmake@latest
@@ -101,16 +108,14 @@ jobs:
       - name: Set up environment
         working-directory: ${{github.workspace}}
         run: |
-          git clone --depth 1 --branch 7.0.6 https://github.com/juce-framework/JUCE.git
+          git clone --depth 1 --branch 8.0.10 https://github.com/juce-framework/JUCE.git
           cd JUCE_modules
           git clone --single-branch --branch main --recursive https://github.com/free-audio/clap-juce-extensions.git
 
       - name: Configure
         working-directory: ${{env.WORK_DIR}}
-        env:
-          CMAKE_ARGS: ${{ matrix.cmake_args }}
         shell: bash
-        run: cmake -Bbuild -DCHOWDSP_ENABLE_TESTING=ON ${CMAKE_ARGS}
+        run: cmake -Bbuild -DCHOWDSP_ENABLE_TESTING=ON ${{ matrix.cmake_args }}
 
       - name: Build
         working-directory: ${{env.WORK_DIR}}/build

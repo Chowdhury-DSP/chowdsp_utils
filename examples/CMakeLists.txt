@@ -4,7 +4,7 @@ include(CPM)
 CPMAddPackage(
   NAME juce
   GITHUB_REPOSITORY juce-framework/juce
-  GIT_TAG 7.0.12
+  GIT_TAG 8.0.10
 )
 
 include(AddJUCEModules)
@@ -17,7 +17,7 @@ project(chowdsp_utils_examples VERSION 2.3.0)
 CPMAddPackage(
     NAME clap-juce-extensions
     GITHUB_REPOSITORY free-audio/clap-juce-extensions
-    GIT_TAG e72d59a870ab6dea156d4912cbd004b715fca5f7
+    GIT_TAG 4d454e5125da75a0e75d95615cbec26d2a09e2bf
 )
 
 include(SetupExamplePlugin)

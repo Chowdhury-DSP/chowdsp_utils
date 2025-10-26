@@ -364,6 +364,8 @@ namespace CoefficientCalculators
 
             CHOWDSP_USING_XSIMD_STD (sqrt);
             CHOWDSP_USING_XSIMD_STD (exp);
+            CHOWDSP_USING_XSIMD_STD (cos);
+            CHOWDSP_USING_XSIMD_STD (cosh);
             using Power::ipow;
             using SIMDUtils::select;
 
@@ -461,6 +463,8 @@ namespace CoefficientCalculators
 
             CHOWDSP_USING_XSIMD_STD (sqrt);
             CHOWDSP_USING_XSIMD_STD (exp);
+            CHOWDSP_USING_XSIMD_STD (cos);
+            CHOWDSP_USING_XSIMD_STD (cosh);
             using Power::ipow;
             using SIMDUtils::select;
 

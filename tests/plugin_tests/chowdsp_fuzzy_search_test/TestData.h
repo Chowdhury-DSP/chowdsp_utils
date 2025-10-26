@@ -17,7 +17,7 @@ struct Entry
     std::string_view tags;
 };
 
-static constexpr Entry entries[] = {
+static inline const Entry entries[] = {
     { "21kHz", "21kHz", "21kHz", "21kHz, Netboy3", "kHzPalmLoop", "PalmLoop", "CPU friendly voltage controlled oscillator with polyBLEP/BLAMP anti-aliasing", "Oscillator" },
     { "21kHz", "21kHz", "21kHz", "21kHz, Netboy3", "kHzTachyonEntangler", "TachyonEntangler", "Anti-aliased chaotic sync voltage controlled oscillator", "Oscillator" },
     { "21kHz", "21kHz", "21kHz", "21kHz, Netboy3", "kHzD_Inf", u8"D\u221e", "Polyphonic module for modifying V/OCT signals by transposition and inversion", "Tuner Utility Polyphonic" },
