@@ -31,14 +31,16 @@ std::unique_ptr<juce::AudioFormatWriter> AudioFileSaveLoadHelper::createWriterFo
     auto bitDepth = params.bitsPerSample > 0 ? params.bitsPerSample : format->getPossibleBitDepths().getLast();
 
 #if JUCE_VERSION >= 0x080009
-    if (auto writer = std::unique_ptr<juce::AudioFormatWriter> (format->createWriterFor (audioFileStream.get(),
-                                                                                         juce::AudioFormatWriterOptions {}
-                                                                                             .withSampleRate (params.sampleRateToUse)
-                                                                                             .withNumChannels (params.numberOfChannels)
-                                                                                             .withBitsPerSample (bitDepth)
-                                                                                             .withMetadata (params.metadataValues)
-                                                                                             .
-                                                                                             .withQualityOptionIndex (params.qualityOptionIndex))))
+    auto opts = juce::AudioFormatWriterOptions {}
+                    .withSampleRate (params.sampleRateToUse)
+                    .withNumChannels (params.numberOfChannels)
+                    .withBitsPerSample (bitDepth)
+                    // .withMetadata (params.metadataValues)
+                    .withQualityOptionIndex (params.qualityOptionIndex);
+    for (auto [key, value] : chowdsp::zip (params.metadataValues.getAllkeys(), params.metadataValues.getAllValues()))
+        opts = opts.withMetadata (key, value);
+
+    if (auto writer = std::unique_ptr<juce::AudioFormatWriter> (format->createWriterFor (audioFileStream.get(), opts)))
 #else
     if (auto writer = std::unique_ptr<juce::AudioFormatWriter> (format->createWriterFor (audioFileStream.get(), params.sampleRateToUse, params.numberOfChannels, bitDepth, params.metadataValues, params.qualityOptionIndex)))
 #endif

@@ -24,7 +24,7 @@ jobs:
       matrix:
         include:
           - os: ubuntu-24.04
-            cmake_args: "-DCMAKE_LINKER_TYPE=MOLD"
+            cmake_args: "-DCMAKE_LINKER_TYPE=MOLD -DCMAKE_C_COMPILER=clang-20 -DCMAKE_CXX_COMPILER=clang++-20"
           - os: windows-2022
             cmake_args: "-DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl"
           - os: macos-14
@@ -35,7 +35,7 @@ jobs:
         name: Install Linux Deps
         if: runner.os == 'Linux'
         with:
-          packages: libasound2-dev libx11-dev libxcomposite-dev libxcursor-dev libxext-dev libxinerama-dev libxrandr-dev libxrender-dev libfontconfig1-dev libfreetype6-dev libglu1-mesa-dev libsamplerate-dev
+          packages: clang-20 libasound2-dev libx11-dev libxcomposite-dev libxcursor-dev libxext-dev libxinerama-dev libxrandr-dev libxrender-dev libfontconfig1-dev libfreetype6-dev libglu1-mesa-dev libsamplerate-dev
           version: 1.0
 
       - uses: rui314/setup-mold@v1
