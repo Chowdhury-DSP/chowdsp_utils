@@ -48,7 +48,7 @@ jobs:
             build_type: "Debug"
           - name: "Coverage"
             os: ubuntu-24.04
-            cmake_args: "-G\"Ninja Multi-Config\" -DCMAKE_LINKER_TYPE=MOLD -DCODE_COVERAGE=ON"
+            cmake_args: "-G\"Ninja Multi-Config\" -DCODE_COVERAGE=ON"
             run_coverage: true
             build_type: "Debug"
           - name: "Test"
@@ -58,7 +58,7 @@ jobs:
           - name: "Live GUI Test"
             os: ubuntu-24.04
             tests: "live_gui_test"
-            cmake_args: "-G\"Ninja Multi-Config\" -DCMAKE_LINKER_TYPE=MOLD -DCODE_COVERAGE=ON -DCHOWDSP_BUILD_LIVE_GUI_TEST=ON"
+            cmake_args: "-G\"Ninja Multi-Config\" -DCODE_COVERAGE=ON -DCHOWDSP_BUILD_LIVE_GUI_TEST=ON"
             live_gui: true
             run_coverage: true
             build_type: "Debug"
