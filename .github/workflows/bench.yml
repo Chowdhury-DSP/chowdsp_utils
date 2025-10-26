@@ -31,13 +31,16 @@ jobs:
 #            cmake_args: "-DCMAKE_BUILD_TYPE=Release"
 
     steps:
-      - name: Install Linux Deps
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        name: Install Linux Deps
         if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt install libasound2-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libglu1-mesa-dev libsamplerate-dev
-          sudo apt-add-repository "deb http://apt.llvm.org/bullseye/ llvm-toolchain-bullseye-20 main"
-          sudo apt install clang-20 -y
+        with:
+          packages: clang-20 libasound2-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libglu1-mesa-dev libsamplerate-dev
+          add-repository: "deb http://apt.llvm.org/bullseye/ llvm-toolchain-bullseye-20 main"
+          version: 1.0
+
+      - uses: rui314/setup-mold@v1
+        if: runner.os == 'Linux'
 
       - name: Install Ninja
         uses: seanmiddleditch/gha-setup-ninja@master

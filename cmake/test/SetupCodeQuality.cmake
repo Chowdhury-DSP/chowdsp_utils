@@ -1,7 +1,7 @@
 message(STATUS "Configuring clang-tidy target...")
 add_custom_target(chowdsp_utils_clang_tidy
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-    COMMAND clang-tidy-14 -p build "tests/test_utils/CodeQuality.cpp"
+    COMMAND clang-tidy-20 -p build "tests/test_utils/CodeQuality.cpp"
 )
 
 message(STATUS "Configuring CodeQL target...")
