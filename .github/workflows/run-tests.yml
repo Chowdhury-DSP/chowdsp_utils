@@ -33,10 +33,10 @@ jobs:
                 "Test 32-bit",
                 "Coverage",
               ]
-        os: [ubuntu-22.04, windows-2022, macos-14]
+        os: [ubuntu-24.04, windows-2022, macos-14]
         include:
           - name: "Test"
-            os: ubuntu-22.04
+            os: ubuntu-24.04
             cmake_args: "-G\"Ninja Multi-Config\" -DCMAKE_LINKER_TYPE=MOLD -DCMAKE_C_COMPILER=clang-20 -DCMAKE_CXX_COMPILER=clang++-20"
             build_type: "Release"
           - name: "Test"
@@ -47,7 +47,7 @@ jobs:
             cmake_args: "-A Win32"
             build_type: "Debug"
           - name: "Coverage"
-            os: ubuntu-22.04
+            os: ubuntu-24.04
             cmake_args: "-G\"Ninja Multi-Config\" -DCMAKE_LINKER_TYPE=MOLD -DCMAKE_C_COMPILER=clang-20 -DCMAKE_CXX_COMPILER=clang++-20 -DCODE_COVERAGE=ON"
             run_coverage: true
             build_type: "Debug"
@@ -56,7 +56,7 @@ jobs:
             cmake_args: "-G\"Ninja Multi-Config\""
             build_type: "Debug"
           - name: "Live GUI Test"
-            os: ubuntu-22.04
+            os: ubuntu-24.04
             tests: "live_gui_test"
             cmake_args: "-G\"Ninja Multi-Config\" -DCMAKE_LINKER_TYPE=MOLD -DCMAKE_C_COMPILER=clang-20 -DCMAKE_CXX_COMPILER=clang++-20 -DCODE_COVERAGE=ON -DCHOWDSP_BUILD_LIVE_GUI_TEST=ON"
             live_gui: true
@@ -71,19 +71,15 @@ jobs:
           - name: "Test 32-bit"
             os: macos-14
           - name: "Test 32-bit"
-            os: ubuntu-22.04
+            os: ubuntu-24.04
 
     steps:
       - uses: awalsh128/cache-apt-pkgs-action@latest
         name: Install Linux Deps
         if: runner.os == 'Linux'
         with:
-          packages: libasound2-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libglu1-mesa-dev libsamplerate-dev
+          packages: clang-20 libasound2-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libglu1-mesa-dev libsamplerate-dev
           version: 2.0
-
-      - name: Install Linux Deps
-        if: runner.os == 'Linux'
-        run: sudo apt install clang-20 -y
 
       - name: Install lcov (Linux)
         if: matrix.run_coverage && runner.os == 'Linux'
