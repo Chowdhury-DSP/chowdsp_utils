@@ -23,8 +23,8 @@ jobs:
       fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
       matrix:
         include:
-          - os: ubuntu-22.04
-            cmake_args: "-DCMAKE_BUILD_TYPE=Release"
+          - os: ubuntu-24.04
+            cmake_args: "-DCMAKE_LINKER_TYPE=MOLD -DCMAKE_C_COMPILER=clang-20 -DCMAKE_CXX_COMPILER=clang++-20"
 #          - os: windows-2019
 #            cmake_args: ""
 #          - os: macos-latest
@@ -36,6 +36,11 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt install libasound2-dev libcurl4-openssl-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev libsamplerate-dev
+          sudo apt-add-repository "deb http://apt.llvm.org/bullseye/ llvm-toolchain-bullseye-20 main"
+          sudo apt install clang-20 -y
+
+      - name: Install Ninja
+        uses: seanmiddleditch/gha-setup-ninja@master
 
       - name: Get latest CMake
         uses: lukka/get-cmake@latest
@@ -47,14 +52,14 @@ jobs:
 
       - name: Set up environment
         working-directory: ${{github.workspace}}
-        run: git clone --depth 1 --branch 7.0.6 https://github.com/juce-framework/JUCE.git
+        run: git clone --depth 1 --branch 8.0.10 https://github.com/juce-framework/JUCE.git
 
       - name: Configure
         working-directory: ${{env.WORK_DIR}}
         env:
           CMAKE_ARGS: ${{ matrix.cmake_args }}
         shell: bash
-        run: cmake -Bbuild -DCHOWDSP_ENABLE_BENCHMARKS=ON $CMAKE_ARGS
+        run: cmake -Bbuild -G"Ninja Multi-Config" -DCHOWDSP_ENABLE_BENCHMARKS=ON $CMAKE_ARGS
 
       - name: Build
         working-directory: ${{env.WORK_DIR}}/build

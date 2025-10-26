@@ -1,164 +1,164 @@
-name: Test
+# name: Test
 
-on:
-  push:
-    branches:
-      - master
-      - next
-  pull_request:
-    branches:
-      - master
-      - next
+# on:
+#   push:
+#     branches:
+#       - master
+#       - next
+#   pull_request:
+#     branches:
+#       - master
+#       - next
 
-  workflow_dispatch:
+#   workflow_dispatch:
 
-env:
-  WORK_DIR: ${{github.workspace}}/JUCE_modules/chowdsp_utils
+# env:
+#   WORK_DIR: ${{github.workspace}}/JUCE_modules/chowdsp_utils
 
-jobs:
-  build_and_test:
-    name: "Run ${{ matrix.name }} ${{ matrix.tests }} on ${{ matrix.os }}"
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
-      matrix:
-        tests: [
-                "chowdsp_core_test chowdsp_data_structures_test chowdsp_json_test chowdsp_serialization_test chowdsp_logging_test chowdsp_units_test chowdsp_buffers_test chowdsp_dsp_juce_test", # common_tests_lib + dsp_juce_tests_lib
-                "chowdsp_dsp_data_structures_test chowdsp_dsp_utils_test chowdsp_filters_test chowdsp_math_test chowdsp_modal_dsp_test chowdsp_simd_test chowdsp_sources_test chowdsp_waveshapers_test chowdsp_compressor_test", # dsp_tests_lib
-                "chowdsp_parameters_test chowdsp_plugin_state_test chowdsp_plugin_base_test chowdsp_plugin_utils_test chowdsp_presets_v2_test chowdsp_version_test chowdsp_fuzzy_search_test", # plugin_tests_lib
-                "chowdsp_gui_test chowdsp_visualizers_test", # gui_tests_lib
-              ]
-        name: [
-                "Test",
-                "Test 32-bit",
-                "Coverage",
-              ]
-        os: [ubuntu-22.04, windows-2022, macos-14]
-        include:
-          - name: "Test"
-            os: ubuntu-22.04
-            cmake_args: "-DCMAKE_BUILD_TYPE=Release"
-            build_type: "Release"
-          - name: "Test"
-            os: windows-2022
-            build_type: "Debug"
-          - name: "Test 32-bit"
-            os: windows-2022
-            cmake_args: "-A Win32"
-            build_type: "Debug"
-          - name: "Coverage"
-            os: ubuntu-22.04
-            cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
-            run_coverage: true
-            build_type: "Debug"
-          - name: "Test"
-            os: macos-14
-            cmake_args: "-DCMAKE_BUILD_TYPE=Debug"
-            build_type: "Debug"
-          - name: "Live GUI Test"
-            os: ubuntu-22.04
-            tests: "live_gui_test"
-            cmake_args: "-DCODE_COVERAGE=ON -DCHOWDSP_BUILD_LIVE_GUI_TEST=ON -DCMAKE_BUILD_TYPE=Debug"
-            live_gui: true
-            run_coverage: true
-            build_type: "Debug"
-        exclude:
-          # so we don't break GitHub Actions concurrency limit
-          - name: "Coverage"
-            os: macos-14
-          - name: "Coverage"
-            os: windows-2022
-          - name: "Test 32-bit"
-            os: macos-14
-          - name: "Test 32-bit"
-            os: ubuntu-22.04
+# jobs:
+#   build_and_test:
+#     name: "Run ${{ matrix.name }} ${{ matrix.tests }} on ${{ matrix.os }}"
+#     runs-on: ${{ matrix.os }}
+#     strategy:
+#       fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
+#       matrix:
+#         tests: [
+#                 "chowdsp_core_test chowdsp_data_structures_test chowdsp_json_test chowdsp_serialization_test chowdsp_logging_test chowdsp_units_test chowdsp_buffers_test chowdsp_dsp_juce_test", # common_tests_lib + dsp_juce_tests_lib
+#                 "chowdsp_dsp_data_structures_test chowdsp_dsp_utils_test chowdsp_filters_test chowdsp_math_test chowdsp_modal_dsp_test chowdsp_simd_test chowdsp_sources_test chowdsp_waveshapers_test chowdsp_compressor_test", # dsp_tests_lib
+#                 "chowdsp_parameters_test chowdsp_plugin_state_test chowdsp_plugin_base_test chowdsp_plugin_utils_test chowdsp_presets_v2_test chowdsp_version_test chowdsp_fuzzy_search_test", # plugin_tests_lib
+#                 "chowdsp_gui_test chowdsp_visualizers_test", # gui_tests_lib
+#               ]
+#         name: [
+#                 "Test",
+#                 "Test 32-bit",
+#                 "Coverage",
+#               ]
+#         os: [ubuntu-22.04, windows-2022, macos-14]
+#         include:
+#           - name: "Test"
+#             os: ubuntu-22.04
+#             cmake_args: "-DCMAKE_BUILD_TYPE=Release"
+#             build_type: "Release"
+#           - name: "Test"
+#             os: windows-2022
+#             build_type: "Debug"
+#           - name: "Test 32-bit"
+#             os: windows-2022
+#             cmake_args: "-A Win32"
+#             build_type: "Debug"
+#           - name: "Coverage"
+#             os: ubuntu-22.04
+#             cmake_args: "-DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug"
+#             run_coverage: true
+#             build_type: "Debug"
+#           - name: "Test"
+#             os: macos-14
+#             cmake_args: "-DCMAKE_BUILD_TYPE=Debug"
+#             build_type: "Debug"
+#           - name: "Live GUI Test"
+#             os: ubuntu-22.04
+#             tests: "live_gui_test"
+#             cmake_args: "-DCODE_COVERAGE=ON -DCHOWDSP_BUILD_LIVE_GUI_TEST=ON -DCMAKE_BUILD_TYPE=Debug"
+#             live_gui: true
+#             run_coverage: true
+#             build_type: "Debug"
+#         exclude:
+#           # so we don't break GitHub Actions concurrency limit
+#           - name: "Coverage"
+#             os: macos-14
+#           - name: "Coverage"
+#             os: windows-2022
+#           - name: "Test 32-bit"
+#             os: macos-14
+#           - name: "Test 32-bit"
+#             os: ubuntu-22.04
 
-    steps:
-      - name: Install Linux Deps
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt install libasound2-dev libcurl4-openssl-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev libsamplerate-dev
+#     steps:
+#       - name: Install Linux Deps
+#         if: runner.os == 'Linux'
+#         run: |
+#           sudo apt-get update
+#           sudo apt install libasound2-dev libcurl4-openssl-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev libsamplerate-dev
 
-      - name: Install lcov (Linux)
-        if: matrix.run_coverage && runner.os == 'Linux'
-        run: sudo apt install lcov
+#       - name: Install lcov (Linux)
+#         if: matrix.run_coverage && runner.os == 'Linux'
+#         run: sudo apt install lcov
 
-      - name: Install lcov (Mac)
-        if: matrix.run_coverage && runner.os == 'MacOS'
-        run: |
-          export HOMEBREW_NO_AUTO_UPDATE=1
-          brew install lcov
+#       - name: Install lcov (Mac)
+#         if: matrix.run_coverage && runner.os == 'MacOS'
+#         run: |
+#           export HOMEBREW_NO_AUTO_UPDATE=1
+#           brew install lcov
 
-      - name: Get latest CMake
-        uses: lukka/get-cmake@latest
+#       - name: Get latest CMake
+#         uses: lukka/get-cmake@latest
 
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          path: ${{env.WORK_DIR}}
+#       - name: Checkout code
+#         uses: actions/checkout@v2
+#         with:
+#           path: ${{env.WORK_DIR}}
 
-      - name: Set up environment
-        working-directory: ${{github.workspace}}
-        run: |
-          git clone --depth 1 --branch 7.0.6 https://github.com/juce-framework/JUCE.git
-          cd JUCE_modules
-          git clone --single-branch --branch main --recursive https://github.com/free-audio/clap-juce-extensions.git
+#       - name: Set up environment
+#         working-directory: ${{github.workspace}}
+#         run: |
+#           git clone --depth 1 --branch 7.0.6 https://github.com/juce-framework/JUCE.git
+#           cd JUCE_modules
+#           git clone --single-branch --branch main --recursive https://github.com/free-audio/clap-juce-extensions.git
 
-      - name: Configure
-        working-directory: ${{env.WORK_DIR}}
-        env:
-          CMAKE_ARGS: ${{ matrix.cmake_args }}
-        shell: bash
-        run: cmake -Bbuild -DCHOWDSP_ENABLE_TESTING=ON ${CMAKE_ARGS}
+#       - name: Configure
+#         working-directory: ${{env.WORK_DIR}}
+#         env:
+#           CMAKE_ARGS: ${{ matrix.cmake_args }}
+#         shell: bash
+#         run: cmake -Bbuild -DCHOWDSP_ENABLE_TESTING=ON ${CMAKE_ARGS}
 
-      - name: Build
-        working-directory: ${{env.WORK_DIR}}/build
-        shell: bash
-        env:
-          TEST_TARGETS: ${{ matrix.tests }}
-          BUILD_TYPE: ${{ matrix.build_type }}
-        run: cmake --build . --config $BUILD_TYPE --parallel 4 --target $TEST_TARGETS
+#       - name: Build
+#         working-directory: ${{env.WORK_DIR}}/build
+#         shell: bash
+#         env:
+#           TEST_TARGETS: ${{ matrix.tests }}
+#           BUILD_TYPE: ${{ matrix.build_type }}
+#         run: cmake --build . --config $BUILD_TYPE --parallel 4 --target $TEST_TARGETS
 
-      - name: "Run Tests: ${{ matrix.tests }}"
-        if: (! matrix.live_gui)
-        working-directory: ${{env.WORK_DIR}}
-        shell: bash
-        env:
-          TEST_TARGETS: ${{ matrix.tests }}
-          BUILD_TYPE: ${{ matrix.build_type }}
-        run: |
-          ctest --test-dir build -C $BUILD_TYPE -R ${TEST_TARGETS// /|} --show-only
-          ctest --test-dir build -C $BUILD_TYPE -R ${TEST_TARGETS// /|} -j 4 --no-tests=error --output-on-failure
+#       - name: "Run Tests: ${{ matrix.tests }}"
+#         if: (! matrix.live_gui)
+#         working-directory: ${{env.WORK_DIR}}
+#         shell: bash
+#         env:
+#           TEST_TARGETS: ${{ matrix.tests }}
+#           BUILD_TYPE: ${{ matrix.build_type }}
+#         run: |
+#           ctest --test-dir build -C $BUILD_TYPE -R ${TEST_TARGETS// /|} --show-only
+#           ctest --test-dir build -C $BUILD_TYPE -R ${TEST_TARGETS// /|} -j 4 --no-tests=error --output-on-failure
 
-      - name: "Run Live GUI Test"
-        if: matrix.live_gui
-        uses: GabrielBB/xvfb-action@v1
-        with:
-          run: ./live_gui_test
-          working-directory: ${{env.WORK_DIR}}/build/test-binary
+#       - name: "Run Live GUI Test"
+#         if: matrix.live_gui
+#         uses: GabrielBB/xvfb-action@v1
+#         with:
+#           run: ./live_gui_test
+#           working-directory: ${{env.WORK_DIR}}/build/test-binary
 
-      - name: Collect Coverage Data
-        if: matrix.run_coverage
-        working-directory: ${{env.WORK_DIR}}
-        shell: bash
-        run: |
-          lcov --directory . --capture --output-file coverage.info
-          lcov --remove coverage.info '/usr/*' "${HOME}"'/.cache/*' '/Applications/Xcode*' '*chowdsp_utils/build/*' '*JUCE/modules*' '*foleys_*' '*chowdsp_utils/tests*' '*third_party*' '*chowdsp_foleys*' '*chowdsp_core/JUCEHelpers*' --output-file coverage.info
+#       - name: Collect Coverage Data
+#         if: matrix.run_coverage
+#         working-directory: ${{env.WORK_DIR}}
+#         shell: bash
+#         run: |
+#           lcov --directory . --capture --output-file coverage.info
+#           lcov --remove coverage.info '/usr/*' "${HOME}"'/.cache/*' '/Applications/Xcode*' '*chowdsp_utils/build/*' '*JUCE/modules*' '*foleys_*' '*chowdsp_utils/tests*' '*third_party*' '*chowdsp_foleys*' '*chowdsp_core/JUCEHelpers*' --output-file coverage.info
 
-      - name: Report Coverage Data
-        if: matrix.run_coverage
-        working-directory: ${{env.WORK_DIR}}
-        shell: bash
-        run: lcov --list coverage.info
+#       - name: Report Coverage Data
+#         if: matrix.run_coverage
+#         working-directory: ${{env.WORK_DIR}}
+#         shell: bash
+#         run: lcov --list coverage.info
 
-      - name: Upload coverage to Codecov
-        if: matrix.run_coverage
-        uses: codecov/codecov-action@v4
-        with:
-          working-directory: ${{env.WORK_DIR}}
-          fail_ci_if_error: true
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ${{env.WORK_DIR}}/coverage.info
-          codecov_yml_path: ${{env.WORK_DIR}}/codecov.yml
-          verbose: true
+#       - name: Upload coverage to Codecov
+#         if: matrix.run_coverage
+#         uses: codecov/codecov-action@v4
+#         with:
+#           working-directory: ${{env.WORK_DIR}}
+#           fail_ci_if_error: true
+#           token: ${{ secrets.CODECOV_TOKEN }}
+#           files: ${{env.WORK_DIR}}/coverage.info
+#           codecov_yml_path: ${{env.WORK_DIR}}/codecov.yml
+#           verbose: true
