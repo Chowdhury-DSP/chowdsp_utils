@@ -71,7 +71,7 @@ jobs:
           - name: "Test 32-bit"
             os: macos-14
           - name: "Test 32-bit"
-            os: ubuntu-24.04
+            os: ubuntu-22.04
 
     steps:
       - uses: awalsh128/cache-apt-pkgs-action@latest
