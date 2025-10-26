@@ -27,7 +27,7 @@ std::unique_ptr<juce::AudioFormatWriter> AudioFileSaveLoadHelper::createWriterFo
         return nullptr;
     }
 
-    auto audioFileStream = std::make_unique<juce::FileOutputStream> (file);
+    std::unique_ptr<juce::OutputStream> audioFileStream = std::make_unique<juce::FileOutputStream> (file);
     auto bitDepth = params.bitsPerSample > 0 ? params.bitsPerSample : format->getPossibleBitDepths().getLast();
 
 #if JUCE_VERSION >= 0x080009

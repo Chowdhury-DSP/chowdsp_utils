@@ -78,8 +78,12 @@ jobs:
         name: Install Linux Deps
         if: runner.os == 'Linux'
         with:
-          packages: clang-20 libasound2-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libglu1-mesa-dev libsamplerate-dev
+          packages: libasound2-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libglu1-mesa-dev libsamplerate-dev
           version: 2.0
+
+      - name: Install Linux Deps
+        if: runner.os == 'Linux'
+        run: sudo apt install clang-20 -y
 
       - name: Install lcov (Linux)
         if: matrix.run_coverage && runner.os == 'Linux'
