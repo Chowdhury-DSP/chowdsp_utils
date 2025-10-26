@@ -35,7 +35,7 @@ jobs:
         name: Install Linux Deps
         if: runner.os == 'Linux'
         with:
-          packages: libasound2-dev libx11-dev libxinerama-dev libxext-dev libfontconfig1-dev libfreetype6-dev libglu1-mesa-dev libsamplerate-dev
+          packages: libasound2-dev libx11-dev libxcomposite-dev libxcursor-dev libxext-dev libxinerama-dev libxrandr-dev libxrender-dev libfontconfig1-dev libfreetype6-dev libglu1-mesa-dev libsamplerate-dev
           version: 1.0
 
       - uses: rui314/setup-mold@v1
