@@ -33,21 +33,21 @@ std::unique_ptr<juce::AudioFormatWriter> AudioFileSaveLoadHelper::createWriterFo
 #if JUCE_VERSION >= 0x080009
     auto opts = juce::AudioFormatWriterOptions {}
                     .withSampleRate (params.sampleRateToUse)
-                    .withNumChannels (params.numberOfChannels)
+                    .withNumChannels ((int) params.numberOfChannels)
                     .withBitsPerSample (bitDepth)
-                    // .withMetadata (params.metadataValues)
                     .withQualityOptionIndex (params.qualityOptionIndex);
-    for (auto [key, value] : chowdsp::zip (params.metadataValues.getAllkeys(), params.metadataValues.getAllValues()))
+    for (auto [key, value] : chowdsp::zip (params.metadataValues.getAllKeys(), params.metadataValues.getAllValues()))
         opts = opts.withMetadata (key, value);
 
-    if (auto writer = std::unique_ptr<juce::AudioFormatWriter> (format->createWriterFor (audioFileStream.get(), opts)))
+    if (auto writer = std::unique_ptr<juce::AudioFormatWriter> (format->createWriterFor (audioFileStream, opts)))
+    {
 #else
     if (auto writer = std::unique_ptr<juce::AudioFormatWriter> (format->createWriterFor (audioFileStream.get(), params.sampleRateToUse, params.numberOfChannels, bitDepth, params.metadataValues, params.qualityOptionIndex)))
-#endif
     {
         // the audio format writer now owns the file stream pointer, so let's release it here to avoid a double-delete
         auto* releasedFileStream = audioFileStream.release();
         juce::ignoreUnused (releasedFileStream);
+#endif
         return writer;
     }
 

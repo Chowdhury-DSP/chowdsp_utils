@@ -81,21 +81,21 @@ template <typename FilterType, typename T, size_t N>
 std::enable_if_t<std::is_base_of_v<IIRFilter<N, T>, FilterType> || std::is_base_of_v<SOSFilter<N, T>, FilterType> || std::is_base_of_v<SOSFilter<N - 1, T>, FilterType>, void>
     EQBandBase<FloatType, FilterChoicesTuple>::processFilterChannel (FilterType& filter, const BufferView<FloatType>& block)
 {
-    const auto setParams = [&filter, fs = this->fs] (FloatType curFreq, FloatType curQ, FloatType curGain)
+    const auto setParams = [&filter, sampleRate = this->fs] (FloatType curFreq, FloatType curQ, FloatType curGain)
     {
         if constexpr (! FilterType::HasQParameter)
         {
             juce::ignoreUnused (curQ, curGain);
-            filter.calcCoefs (curFreq, fs);
+            filter.calcCoefs (curFreq, sampleRate);
         }
         else if constexpr (! FilterType::HasGainParameter)
         {
             juce::ignoreUnused (curGain);
-            filter.calcCoefs (curFreq, curQ, fs);
+            filter.calcCoefs (curFreq, curQ, sampleRate);
         }
         else
         {
-            filter.calcCoefs (curFreq, curQ, curGain, fs);
+            filter.calcCoefs (curFreq, curQ, curGain, sampleRate);
         }
     };
 

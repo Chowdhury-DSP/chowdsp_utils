@@ -37,7 +37,7 @@ jobs:
         include:
           - name: "Test"
             os: ubuntu-22.04
-            cmake_args: "-DCMAKE_LINKER_TYPE=MOLD -DCMAKE_C_COMPILER=clang-20 -DCMAKE_CXX_COMPILER=clang++-20"
+            cmake_args: "-G\"Ninja Multi-Config\" -DCMAKE_LINKER_TYPE=MOLD -DCMAKE_C_COMPILER=clang-20 -DCMAKE_CXX_COMPILER=clang++-20"
             build_type: "Release"
           - name: "Test"
             os: windows-2022
@@ -48,16 +48,17 @@ jobs:
             build_type: "Debug"
           - name: "Coverage"
             os: ubuntu-22.04
-            cmake_args: "-DCMAKE_LINKER_TYPE=MOLD -DCMAKE_C_COMPILER=clang-20 -DCMAKE_CXX_COMPILER=clang++-20 -DCODE_COVERAGE=ON"
+            cmake_args: "-G\"Ninja Multi-Config\" -DCMAKE_LINKER_TYPE=MOLD -DCMAKE_C_COMPILER=clang-20 -DCMAKE_CXX_COMPILER=clang++-20 -DCODE_COVERAGE=ON"
             run_coverage: true
             build_type: "Debug"
           - name: "Test"
             os: macos-14
+            cmake_args: "-G\"Ninja Multi-Config\""
             build_type: "Debug"
           - name: "Live GUI Test"
             os: ubuntu-22.04
             tests: "live_gui_test"
-            cmake_args: "-DCMAKE_LINKER_TYPE=MOLD -DCMAKE_C_COMPILER=clang-20 -DCMAKE_CXX_COMPILER=clang++-20 -DCODE_COVERAGE=ON -DCHOWDSP_BUILD_LIVE_GUI_TEST=ON"
+            cmake_args: "-G\"Ninja Multi-Config\" -DCMAKE_LINKER_TYPE=MOLD -DCMAKE_C_COMPILER=clang-20 -DCMAKE_CXX_COMPILER=clang++-20 -DCODE_COVERAGE=ON -DCHOWDSP_BUILD_LIVE_GUI_TEST=ON"
             live_gui: true
             run_coverage: true
             build_type: "Debug"
@@ -78,7 +79,7 @@ jobs:
         if: runner.os == 'Linux'
         with:
           packages: clang-20 libasound2-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libglu1-mesa-dev libsamplerate-dev
-          version: 1.0
+          version: 2.0
 
       - name: Install lcov (Linux)
         if: matrix.run_coverage && runner.os == 'Linux'
@@ -114,7 +115,7 @@ jobs:
       - name: Configure
         working-directory: ${{env.WORK_DIR}}
         shell: bash
-        run: cmake -Bbuild -G"Ninja Multi-Config" -DCHOWDSP_ENABLE_TESTING=ON ${{ matrix.cmake_args }}
+        run: cmake -Bbuild -DCHOWDSP_ENABLE_TESTING=ON ${{ matrix.cmake_args }}
 
       - name: Build
         working-directory: ${{env.WORK_DIR}}/build
