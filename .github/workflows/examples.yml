@@ -22,14 +22,36 @@ jobs:
     strategy:
       fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
       matrix:
-        os: [ubuntu-24.04, windows-2022, macos-14]
+        include:
+          - os: ubuntu-24.04
+            cmake_args: "-DCMAKE_LINKER_TYPE=MOLD"
+          - os: windows-2022
+            cmake_args: "-DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl"
+          - os: macos-14
+            cmake_args: ""
 
     steps:
-      - name: Install Linux Deps
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        name: Install Linux Deps
         if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt install libasound2-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libglu1-mesa-dev libsamplerate-dev
+        with:
+          packages: libasound2-dev libx11-dev libxinerama-dev libxext-dev libfontconfig1-dev libfreetype6-dev libglu1-mesa-dev libsamplerate-dev
+          version: 1.0
+
+      - uses: rui314/setup-mold@v1
+        if: runner.os == 'Linux'
+
+      - name: Upgrade LLVM
+        if: runner.os == 'Windows'
+        run: choco upgrade llvm --version=20.1.0 --allow-downgrade
+
+      - name: Add msbuild to PATH
+        if: runner.os == 'Windows'
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup MSVC devcmd
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
 
       - name: Install Ninja
         uses: seanmiddleditch/gha-setup-ninja@master
@@ -42,11 +64,11 @@ jobs:
 
       - name: Configure
         shell: bash
-        run: cmake -Bbuild -G"Ninja Multi-Config" -DCHOWDSP_ENABLE_EXAMPLES=ON
+        run: cmake -Bbuild -G"Ninja Multi-Config" -DCHOWDSP_ENABLE_EXAMPLES=ON ${{ matrix.cmake_args }}
 
       - name: "Build Example: ${{ matrix.target }}"
         shell: bash
-        run: cmake --build build --parallel 4 --target $EXAMPLE_TARGETS
+        run: cmake --build build --config Debug --parallel 4 --target $EXAMPLE_TARGETS
 
       - name: run clap-validator
         uses: jatinchowdhury18/clap-val-action@main

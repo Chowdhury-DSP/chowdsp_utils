@@ -36,7 +36,6 @@ jobs:
         if: runner.os == 'Linux'
         with:
           packages: clang-20 libasound2-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libglu1-mesa-dev libsamplerate-dev
-          add-repository: "deb http://apt.llvm.org/bullseye/ llvm-toolchain-bullseye-20 main"
           version: 1.0
 
       - uses: rui314/setup-mold@v1

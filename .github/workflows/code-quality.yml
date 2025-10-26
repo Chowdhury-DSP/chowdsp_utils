@@ -21,17 +21,12 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      - name: Install Linux Deps
-        run: |
-          sudo apt-get update
-          sudo apt install libasound2-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libglu1-mesa-dev libsamplerate-dev
-          sudo apt-add-repository "deb http://apt.llvm.org/bullseye/ llvm-toolchain-bullseye-20 main"
-          sudo apt install clang-20 -y
-
-      - name: Install clang-tidy
-        run: |
-          sudo apt install clang-tidy-20 -y
-          clang-tidy-20 --version
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        name: Install Linux Deps
+        if: runner.os == 'Linux'
+        with:
+          packages: clang-20 clang-tidy-20 libasound2-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libglu1-mesa-dev libsamplerate-dev
+          version: 1.0
 
       - name: Install Ninja
         uses: seanmiddleditch/gha-setup-ninja@master
