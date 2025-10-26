@@ -15,8 +15,6 @@ function(setup_example_plugin target code)
 
     target_compile_definitions(${target}
         PUBLIC
-            JUCE_DISPLAY_SPLASH_SCREEN=0
-            JUCE_REPORT_APP_USAGE=0
             JUCE_WEB_BROWSER=0
             JUCE_USE_CURL=0
             JUCE_VST3_CAN_REPLACE_VST2=0

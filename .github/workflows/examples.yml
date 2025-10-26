@@ -1,58 +1,55 @@
-# name: Examples
+name: Examples
 
-# on:
-#   push:
-#     branches:
-#       - master
-#       - next
-#   pull_request:
-#     branches:
-#       - master
-#       - next
+on:
+  push:
+    branches:
+      - master
+      - next
+  pull_request:
+    branches:
+      - master
+      - next
 
-#   workflow_dispatch:
+  workflow_dispatch:
 
-# env:
-#   EXAMPLE_TARGETS: "ForwardingTestPlugin_CLAP ModalSpringReverb_CLAP SimpleEQ_CLAP StatefulPlugin_CLAP ExampleCompressor_CLAP"
+env:
+  EXAMPLE_TARGETS: "ForwardingTestPlugin_CLAP ModalSpringReverb_CLAP SimpleEQ_CLAP StatefulPlugin_CLAP ExampleCompressor_CLAP"
 
-# jobs:
-#   build_examples:
-#     name: "Build Example ${{ matrix.target }} on ${{ matrix.os }}"
-#     runs-on: ${{ matrix.os }}
-#     strategy:
-#       fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
-#       matrix:
-#         os: [ubuntu-22.04, windows-2022, macos-14]
+jobs:
+  build_examples:
+    name: "Build Example ${{ matrix.target }} on ${{ matrix.os }}"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
+      matrix:
+        os: [ubuntu-24.04, windows-2022, macos-14]
 
-#     steps:
-#       - name: Install Linux Deps
-#         if: runner.os == 'Linux'
-#         run: |
-#           sudo apt-get update
-#           sudo apt install libasound2-dev libcurl4-openssl-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev libsamplerate-dev
+    steps:
+      - name: Install Linux Deps
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt install libasound2-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libglu1-mesa-dev libsamplerate-dev
 
-#       - name: Set Xcode version
-#         if: runner.os == 'MacOS'
-#         uses: maxim-lobanov/setup-xcode@v1
-#         with:
-#           xcode-version: '15.2'
+      - name: Install Ninja
+        uses: seanmiddleditch/gha-setup-ninja@master
 
-#       - name: Get latest CMake
-#         uses: lukka/get-cmake@latest
+      - name: Get latest CMake
+        uses: lukka/get-cmake@latest
 
-#       - name: Checkout code
-#         uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-#       - name: Configure
-#         shell: bash
-#         run: cmake -Bbuild -DCHOWDSP_ENABLE_EXAMPLES=ON
+      - name: Configure
+        shell: bash
+        run: cmake -Bbuild -G"Ninja Multi-Config" -DCHOWDSP_ENABLE_EXAMPLES=ON
 
-#       - name: "Build Example: ${{ matrix.target }}"
-#         shell: bash
-#         run: cmake --build build --parallel 4 --target $EXAMPLE_TARGETS
+      - name: "Build Example: ${{ matrix.target }}"
+        shell: bash
+        run: cmake --build build --parallel 4 --target $EXAMPLE_TARGETS
 
-#       - name: run clap-validator
-#         uses: jatinchowdhury18/clap-val-action@main
-#         with:
-#           plugin_path: build/plugin_products/SimpleEQ.clap build/plugin_products/StatefulPlugin.clap build/plugin_products/ExampleCompressor.clap
-#           args: --only-failed --hide-output --invert-filter --test-filter "state-*|param-fuzz-basic"
+      - name: run clap-validator
+        uses: jatinchowdhury18/clap-val-action@main
+        with:
+          plugin_path: build/plugin_products/SimpleEQ.clap build/plugin_products/StatefulPlugin.clap build/plugin_products/ExampleCompressor.clap
+          args: --only-failed --hide-output --invert-filter --test-filter "state-*|param-fuzz-basic"
