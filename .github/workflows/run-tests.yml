@@ -28,12 +28,16 @@ jobs:
                 "chowdsp_parameters_test chowdsp_plugin_state_test chowdsp_plugin_base_test chowdsp_plugin_utils_test chowdsp_presets_v2_test chowdsp_version_test chowdsp_fuzzy_search_test", # plugin_tests_lib
                 "chowdsp_gui_test chowdsp_visualizers_test", # gui_tests_lib
               ]
-        name: ["Test"]
-        os: [ubuntu-24.04, windows-2022, macos-14]
+        name: [
+                "Test",
+                "Test 32-bit",
+                "Coverage",
+              ]
+        os: [ubuntu-22.04, windows-2022, macos-14]
         include:
           - name: "Test"
-            os: ubuntu-24.04
-            cmake_args: "-G\"Ninja Multi-Config\" -DCMAKE_LINKER_TYPE=MOLD -DCMAKE_C_COMPILER=clang-20 -DCMAKE_CXX_COMPILER=clang++-20"
+            os: ubuntu-22.04
+            cmake_args: "-G\"Ninja Multi-Config\" -DCMAKE_LINKER_TYPE=MOLD -DCMAKE_C_COMPILER=clang-15 -DCMAKE_CXX_COMPILER=clang++-15"
             build_type: "Release"
           - name: "Test"
             os: windows-2022
@@ -58,13 +62,23 @@ jobs:
             live_gui: true
             run_coverage: true
             build_type: "Debug"
+        exclude:
+          # so we don't break GitHub Actions concurrency limit
+          - name: "Coverage"
+            os: macos-14
+          - name: "Coverage"
+            os: windows-2022
+          - name: "Test 32-bit"
+            os: macos-14
+          - name: "Test 32-bit"
+            os: ubuntu-24.04
 
     steps:
       - uses: awalsh128/cache-apt-pkgs-action@latest
         name: Install Linux Deps
         if: runner.os == 'Linux'
         with:
-          packages: clang-20 libasound2-dev libx11-dev libxcomposite-dev libxcursor-dev libxext-dev libxinerama-dev libxrandr-dev libxrender-dev libfontconfig1-dev libfreetype6-dev libglu1-mesa-dev libsamplerate-dev
+          packages: clang-15 libasound2-dev libx11-dev libxcomposite-dev libxcursor-dev libxext-dev libxinerama-dev libxrandr-dev libxrender-dev libfontconfig1-dev libfreetype6-dev libglu1-mesa-dev libsamplerate-dev
           version: 1.0
 
       - name: Install lcov (Linux)
