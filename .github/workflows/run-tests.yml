@@ -78,8 +78,8 @@ jobs:
         name: Install Linux Deps
         if: runner.os == 'Linux'
         with:
-          packages: clang-20 libasound2-dev libx11-dev libxcomposite-dev libxcursor-dev libxext-dev libxinerama-dev libxrandr-dev libxrender-dev libfontconfig1-dev libfreetype6-dev libglu1-mesa-dev libsamplerate-dev
-          version: 2.0
+          packages: llvm-20 libasound2-dev libx11-dev libxcomposite-dev libxcursor-dev libxext-dev libxinerama-dev libxrandr-dev libxrender-dev libfontconfig1-dev libfreetype6-dev libglu1-mesa-dev libsamplerate-dev
+          version: 1.0
 
       - name: Install lcov (Linux)
         if: matrix.run_coverage && runner.os == 'Linux'
@@ -148,7 +148,7 @@ jobs:
         working-directory: ${{env.WORK_DIR}}
         shell: bash
         run: |
-          lcov --directory . --capture --output-file coverage.info
+          lcov --directory . --capture --output-file coverage.info --gcov-tool "llvm-cov gcov"
           lcov --remove coverage.info '/usr/*' "${HOME}"'/.cache/*' '/Applications/Xcode*' '*chowdsp_utils/build/*' '*JUCE/modules*' '*foleys_*' '*chowdsp_utils/tests*' '*third_party*' '*chowdsp_foleys*' '*chowdsp_core/JUCEHelpers*' --output-file coverage.info
 
       - name: Report Coverage Data
