@@ -16,6 +16,9 @@ struct EndOfScopeAction
 
     EndOfScopeAction& operator= (EndOfScopeAction&& other) noexcept
     {
+        if (this == &other)
+            return *this;
+
         if (invoke)
             f();
 
