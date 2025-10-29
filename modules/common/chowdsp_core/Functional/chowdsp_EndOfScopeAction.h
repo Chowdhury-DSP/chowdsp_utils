@@ -4,6 +4,7 @@ namespace chowdsp
 {
 /**
  * A struct that will run some code in it's destructor.
+ * Inspired by: https://www.gingerbill.org/article/2015/08/19/defer-in-cpp/
  * Inspired by: https://dev.to/pauljlucas/finally-4ke2
  */
 template <typename Func>
