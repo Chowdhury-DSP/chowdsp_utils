@@ -32,6 +32,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 #include <string_view>
 #include <tuple>
 #include <vector>
+#include <utility>
 
 #ifndef DOXYGEN
 #if JUCE_MODULE_AVAILABLE_juce_core
