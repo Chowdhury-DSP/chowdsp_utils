@@ -22,6 +22,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 #include <bitset>
 #include <optional>
+#include <stdexcept>
 
 #include <chowdsp_core/chowdsp_core.h>
 
