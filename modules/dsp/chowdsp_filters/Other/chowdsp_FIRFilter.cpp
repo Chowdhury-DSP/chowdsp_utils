@@ -42,7 +42,7 @@ void FIRFilter<FloatType, fixedOrder, maxChannelCount>::prepare (int newNumChann
     numChannels = newNumChannels;
 
     if constexpr (heapState)
-        state.resize (numChannels * (2 * order));
+        state.resize (numChannels * (2 * paddedOrder));
 
     if constexpr (maxChannelCount == dynamicChannelCount)
         zPtr.resize (numChannels, 0);
