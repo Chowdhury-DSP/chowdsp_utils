@@ -357,16 +357,16 @@ struct Rectangle
     [[nodiscard]] constexpr Rectangle removeFromTop (T amountToRemove) noexcept
     {
         const Rectangle r { position.x, position.y, width, juce::jmin (amountToRemove, height) };
-        position.y += r.h;
-        height -= r.h;
+        position.y += r.height;
+        height -= r.height;
         return r;
     }
 
     [[nodiscard]] constexpr Rectangle removeFromLeft (T amountToRemove) noexcept
     {
         const Rectangle r { position.x, position.y, juce::jmin (amountToRemove, width), height };
-        position.x += r.w;
-        width -= r.w;
+        position.x += r.width;
+        width -= r.width;
         return r;
     }
 
