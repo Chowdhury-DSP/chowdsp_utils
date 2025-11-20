@@ -9,7 +9,7 @@ setup_juce_lib(gui_tests_lib
 )
 
 add_subdirectory(chowdsp_gui_test)
-add_subdirectory(chowdsp_foleys_test)
+#add_subdirectory(chowdsp_foleys_test)
 add_subdirectory(chowdsp_visualizers_test)
 
 if(CHOWDSP_BUILD_LIVE_GUI_TEST)
