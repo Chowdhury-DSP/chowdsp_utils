@@ -15,6 +15,8 @@ All notable changes to this project will be documented in this file.
 - Modified `chowdsp::FIRFilter` to support fixed filter order and channel count.
 - Fixed `chowdsp::BufferView` copy constructors.
 - Fixed dangling callback in `chowdsp::presets::MenuInterface`.
+- Improved compatibility with JUCE 8.
+- Improved compatibility with older MacOS versions.
 
 ## [2.3.0] 2024-11-13
 - Added `chowdsp_fuzzy_search` module.
