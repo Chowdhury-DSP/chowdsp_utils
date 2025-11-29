@@ -140,10 +140,10 @@ public:
                          EnumType defaultChoice,
                          const std::initializer_list<std::pair<char, char>>& charMap = { { '_', ' ' } })
         : ChoiceParameter (
-              parameterID,
-              parameterName,
-              EnumHelpers::createStringArray<EnumType> (charMap),
-              static_cast<int> (*magic_enum::enum_index (defaultChoice)))
+            parameterID,
+            parameterName,
+            EnumHelpers::createStringArray<EnumType> (charMap),
+            static_cast<int> (*magic_enum::enum_index (defaultChoice)))
     {
     }
 
@@ -177,14 +177,14 @@ public:
 
     BoolParameter (const ParameterID& parameterID, const juce::String& parameterName, bool defaultBoolValue, const juce::String& offText, const juce::String& onText)
         : AudioParameterBool (
-              parameterID,
-              parameterName,
-              defaultBoolValue,
-              juce::AudioParameterBoolAttributes()
-                  .withStringFromValueFunction ([onText, offText] (const bool v, int)
-                                                { return v ? onText : offText; })
-                  .withValueFromStringFunction ([onText, offText] (const juce::String& str) -> bool
-                                                {
+            parameterID,
+            parameterName,
+            defaultBoolValue,
+            juce::AudioParameterBoolAttributes()
+                .withStringFromValueFunction ([onText, offText] (const bool v, int)
+                                              { return v ? onText : offText; })
+                .withValueFromStringFunction ([onText, offText] (const juce::String& str) -> bool
+                                              {
                       if (str.equalsIgnoreCase (onText))
                           return true;
 
@@ -337,13 +337,13 @@ public:
                         float defaultValue,
                         bool snapToInt = false)
         : FloatParameter (
-              parameterID,
-              paramName,
-              (paramRange.interval = snapToInt ? 1.0f : paramRange.interval, paramRange),
-              defaultValue,
-              [snapToInt] (float val)
-              { return ParamUtils::semitonesValToString (val, snapToInt); },
-              &ParamUtils::stringToSemitonesVal)
+            parameterID,
+            paramName,
+            (paramRange.interval = snapToInt ? 1.0f : paramRange.interval, paramRange),
+            defaultValue,
+            [snapToInt] (float val)
+            { return ParamUtils::semitonesValToString (val, snapToInt); },
+            &ParamUtils::stringToSemitonesVal)
     {
     }
     JUCE_END_IGNORE_WARNINGS_GCC_LIKE

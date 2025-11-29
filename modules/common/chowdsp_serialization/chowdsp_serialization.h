@@ -5,7 +5,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_serialization
    vendor:        Chowdhury DSP
-   version:       2.3.0
+   version:       2.4.0
    name:          ChowDSP Serialization Utilities
    description:   Utility methods for serializing data structures into XML, JSON, or some other format
    dependencies:  juce_core, chowdsp_core, chowdsp_json, chowdsp_reflection, chowdsp_data_structures
