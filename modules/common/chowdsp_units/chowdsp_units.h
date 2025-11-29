@@ -5,7 +5,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
    ID:            chowdsp_units
    vendor:        Chowdhury DSP
-   version:       2.3.0
+   version:       2.1.0
    name:          ChowDSP Units
    description:   Unit types and conversion utilities
    dependencies:

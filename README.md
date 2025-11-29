@@ -132,6 +132,7 @@ sure to abide by the license of each module, as well as whichever libraries are 
 - `SmoothedBufferValue`: A buffered version of `juce::SmoothedValue`.
 - `COLAProcessor`: A base class for doing Constant Overlap-Add processing.
 - `RebufferedProcessor`: A processor which rebuffers the input to have a constant block size.
+- `RealtimeLatestObject`: A wait-free mechanism for sharing data with a real-time thread. Unlike a lock-free queue, the real-time thread will only see the "latest" value, rather than seeing every update.
 - Wrappers around `moodycamel`'s [lock-free queues](https://github.com/cameron314/readerwriterqueue) (modified BSD)
 
 `chowdsp_dsp_utils` (GPLv3)
@@ -151,6 +152,7 @@ sure to abide by the license of each module, as well as whichever libraries are 
 - Basic first and second order filters (HPF/LPF/BPF, shelving filters, peaking filters, notch filters).
 - Higher-order filters (Butterworth, Chebyshev (Type II), Elliptic).
 - `StateVariableFilter`: A modified version of `juce::dsp::StateVariableTPTFilter` with more filter types and better performance.
+- `OnePoleSVF`: A simple first-order state variable filter.
 - `ModFilterWrapper`: Turns any biquad filter into a State Variable Filter.
 - `FIRFilter`: An FIR filter with SIMD optimizations.
 - `WernerFilter`: Emulation of a generalized Octave-CAT-style SVF, as proposed by Kurt Werner.
