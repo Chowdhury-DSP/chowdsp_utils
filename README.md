@@ -248,7 +248,7 @@ sure to abide by the license of each module, as well as whichever libraries are 
 `chowdsp_presets` (BSD)
 - A system for managing plugin presets.
 
-`chowdsp_preset_v2` (BSD)
+`chowdsp_presets_v2` (BSD)
 - An updated preset management system, compatible with `chowdsp_plugin_state`.
 
 `chowdsp_version` (BSD)
