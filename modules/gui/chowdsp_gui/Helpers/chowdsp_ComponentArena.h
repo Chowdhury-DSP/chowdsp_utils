@@ -26,10 +26,10 @@ public:
     T* allocate (Args&&... args)
     {
         auto* bytes = allocator.allocate_bytes (sizeof (T), alignof (T));
-        auto* new_component = new (bytes) T { std::forward<Args> (args)... };
+        auto* new_component = ::new (bytes) T { std::forward<Args> (args)... };
 
-        if constexpr (std::is_base_of_v<juce::Component, T>)
-            component_list.emplace_back (new_component);
+        if constexpr (std::is_convertible_v<T*, juce::Component*>)
+            component_list.emplace_back ((juce::Component*) new_component);
 
         return new_component;
     }
@@ -55,14 +55,19 @@ public:
     {
         auto* bytes = allocator.allocate_bytes (sizeof (T) * n, alignof (T));
         auto span = nonstd::span<T> { reinterpret_cast<T*> (bytes), n };
+
         for (auto [idx, ptr] : chowdsp::enumerate (span))
         {
             auto* new_component = new (&ptr) T { lambda (idx) };
-            if constexpr (std::is_base_of_v<juce::Component, T>)
-                component_list.emplace_back (new_component);
+
+            if constexpr (std::is_convertible_v<T*, juce::Component*>)
+                component_list.emplace_back ((juce::Component*) new_component);
         }
+
         return span;
     }
+
+
 
     /**
      * Reclaims the arena memory, and destroys any components
