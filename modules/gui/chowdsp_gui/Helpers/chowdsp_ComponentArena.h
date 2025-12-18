@@ -67,8 +67,6 @@ public:
         return span;
     }
 
-
-
     /**
      * Reclaims the arena memory, and destroys any components
      * that have been allocated into the arena.
