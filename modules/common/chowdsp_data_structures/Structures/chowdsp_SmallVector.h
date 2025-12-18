@@ -459,7 +459,8 @@ public:
             {
                 if (internal_array().internal_needs_destruction[internal_array().array_size_used])
                     internal_array().array[internal_array().array_size_used].~T();
-                new (&internal_array().array[internal_array().array_size_used]) T (args...);
+
+                new (&internal_array().array[internal_array().array_size_used]) T { std::forward<Args> (args)... };
                 internal_array().array_size_used++;
                 return internal_array().array[internal_array().array_size_used - 1];
             }
