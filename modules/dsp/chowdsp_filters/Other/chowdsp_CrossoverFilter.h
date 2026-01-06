@@ -11,15 +11,20 @@ class CrossoverFilter
 public:
     CrossoverFilter() = default;
 
-    /** Prepares the filter to process a new stram of audio. */
-    void prepare (const juce::dsp::ProcessSpec& spec)
+    /**
+     * Prepares the filter to process a new stram of audio.
+     *
+     * Returns the number of bytes required from the arena allocator
+     * passed to `processBlock()`.
+     */
+    size_t prepare (const juce::dsp::ProcessSpec& spec)
     {
         lowerBandsCrossover.prepare (spec);
         highCutFilter.prepare (spec);
         for (auto& filter : apHighCutFilter)
             filter.prepare (spec);
 
-        tempBuffer.setMaxSize ((int) spec.numChannels, (int) spec.maximumBlockSize);
+        return (size_t) spec.numChannels * Math::round_to_next_multiple ((size_t) spec.maximumBlockSize * sizeof (T), SIMDUtils::defaultSIMDAlignment);
     }
 
     /** Resets the filter state. */
@@ -59,23 +64,27 @@ public:
      * size of the output buffer span must be equal to NumBands.
      */
     [[maybe_unused]] void processBlock (const BufferView<const T>& bufferIn,
-                                        nonstd::span<const BufferView<T>> buffersOut) noexcept
+                                        nonstd::span<const BufferView<T>> buffersOut,
+                                        chowdsp::ArenaAllocatorView arena) noexcept
     {
         jassert ((int) buffersOut.size() == NumBands);
 
-        tempBuffer.setCurrentSize (bufferIn.getNumChannels(), bufferIn.getNumSamples());
+        auto lowerBandBuffers = buffersOut.template first<(size_t) NumBands - 1>();
+        if constexpr (NumBands - 1 == 2)
+            lowerBandsCrossover.processBlock (bufferIn, lowerBandBuffers);
+        else if constexpr (NumBands - 1 > 2)
+            lowerBandsCrossover.processBlock (bufferIn, lowerBandBuffers, arena);
 
+        const auto _ = arena.create_frame();
+        const auto tempBuffer = make_temp_buffer<T> (arena, bufferIn.getNumChannels(), bufferIn.getNumSamples());
+        
         if constexpr (Order == 1)
         {
-            auto lowerBandBuffers = buffersOut.template first<(size_t) NumBands - 1>();
-            lowerBandsCrossover.processBlock (bufferIn, lowerBandBuffers);
             BufferMath::copyBufferData (lowerBandBuffers.back(), tempBuffer); // Order-1 LR filter does not allow pointer aliasing, so we copy to a temp buffer here.
             highCutFilter.processBlock (tempBuffer, lowerBandBuffers.back(), buffersOut.back());
         }
         else
         {
-            auto lowerBandBuffers = buffersOut.template first<(size_t) NumBands - 1>();
-            lowerBandsCrossover.processBlock (bufferIn, lowerBandBuffers);
             highCutFilter.processBlock (lowerBandBuffers.back(), lowerBandBuffers.back(), buffersOut.back());
 
             // an allpass LR-filter with the same crossover as the high-cut frequency
@@ -94,17 +103,16 @@ public:
      * size of the output buffer list must be equal to NumBands.
      */
     [[maybe_unused]] void processBlock (const BufferView<const T>& bufferIn,
-                                        std::initializer_list<BufferView<T>>&& buffersOut) noexcept
+                                        std::initializer_list<BufferView<T>>&& buffersOut,
+                                        chowdsp::ArenaAllocatorView arena) noexcept
     {
-        processBlock (bufferIn, { buffersOut.begin(), buffersOut.end() });
+        processBlock (bufferIn, { buffersOut.begin(), buffersOut.end() }, arena);
     }
 
 private:
     CrossoverFilter<T, Order, NumBands - 1> lowerBandsCrossover {};
     LinkwitzRileyFilter<T, Order> highCutFilter {};
     std::array<LinkwitzRileyFilter<T, Order>, (size_t) NumBands - 2> apHighCutFilter {};
-
-    Buffer<T> tempBuffer {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CrossoverFilter)
 };

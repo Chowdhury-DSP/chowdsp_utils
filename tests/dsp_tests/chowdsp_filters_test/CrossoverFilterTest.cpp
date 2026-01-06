@@ -43,12 +43,15 @@ void testCrossover (float crossFreq0, float crossFreq1, float crossFreq2)
     chowdsp::Buffer<T> low_mid_buffer { 1, (int) N };
     chowdsp::Buffer<T> mid_high_buffer { 1, (int) N };
     chowdsp::Buffer<T> high_buffer { 1, (int) N };
-    crossover.prepare ({ 48000.0, (uint32_t) N, 1 });
+
+    const auto arena_bytes = crossover.prepare ({ 48000.0, (uint32_t) N, 1 });
+    chowdsp::ArenaAllocator<> arena { arena_bytes };
+
     crossover.setCrossoverFrequency (0, (T) crossFreq0);
     crossover.setCrossoverFrequency (1, (T) crossFreq1);
     crossover.setCrossoverFrequency (2, (T) crossFreq2);
 
-    crossover.processBlock (buffer, { low_buffer, low_mid_buffer, mid_high_buffer, high_buffer });
+    crossover.processBlock (buffer, { low_buffer, low_mid_buffer, mid_high_buffer, high_buffer }, arena);
 
     chowdsp::Buffer<T> test_buffer { 1, (int) N };
     test_buffer.clear();
