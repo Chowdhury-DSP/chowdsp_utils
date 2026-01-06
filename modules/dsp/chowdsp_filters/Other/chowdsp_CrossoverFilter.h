@@ -77,7 +77,7 @@ public:
 
         const auto _ = arena.create_frame();
         const auto tempBuffer = make_temp_buffer<T> (arena, bufferIn.getNumChannels(), bufferIn.getNumSamples());
-        
+
         if constexpr (Order == 1)
         {
             BufferMath::copyBufferData (lowerBandBuffers.back(), tempBuffer); // Order-1 LR filter does not allow pointer aliasing, so we copy to a temp buffer here.
