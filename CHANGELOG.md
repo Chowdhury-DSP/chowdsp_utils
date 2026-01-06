@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.5.0] - UNRELEASED
+- Modified `chowdsp::CrossoverFilter` to use an arena instead of an internal bufffer.
+  - BREAKING CHANGE: the API for `chowdsp::CrossoverFilter` and `chowdsp::ThreeWayCrossover` has changed.
+
 ## [2.4.0] 2025-11-29
 - Improved plugin state serialization.
   - BREAKING CHANGE: using `chowdsp::StateValue` with an aggregate type now reqires an explicit definition for how the type will be serialized/deserialized. For more information, see [#594](https://github.com/Chowdhury-DSP/chowdsp_utils/issues/594).
