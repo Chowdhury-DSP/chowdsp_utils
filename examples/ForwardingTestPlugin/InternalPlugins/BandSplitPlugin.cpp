@@ -10,7 +10,9 @@ void BandSplitPlugin::prepareToPlay (double sampleRate, int samplesPerBlock)
     filter2.prepare (spec);
     filter4.prepare (spec);
     filter8.prepare (spec);
-    filter12.prepare (spec);
+    const auto arenaBytes = filter12.prepare (spec);
+
+    arena.reset (arenaBytes);
 
     for (auto& buffer : outBuffers)
         buffer.setMaxSize (numChannels, samplesPerBlock);
@@ -32,7 +34,7 @@ void BandSplitPlugin::processAudioBlock (juce::AudioBuffer<float>& buffer)
         filter.setCrossoverFrequency (1, *state.params.freqMidParam);
         filter.setCrossoverFrequency (2, *state.params.freqHighParam);
 
-        filter.processBlock (bufferView, { outBuffers[0], outBuffers[1], outBuffers[2], outBuffers[3] });
+        filter.processBlock (bufferView, { outBuffers[0], outBuffers[1], outBuffers[2], outBuffers[3] }, arena);
     };
 
     const auto orderIndex = state.params.orderParam->getIndex();
