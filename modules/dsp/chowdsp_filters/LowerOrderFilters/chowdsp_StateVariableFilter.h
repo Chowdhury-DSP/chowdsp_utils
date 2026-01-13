@@ -203,7 +203,7 @@ public:
     }
 
     /** Internal use only! */
-    inline auto processSampleInternal (SampleType x, SampleType& s1, SampleType& s2) noexcept
+    inline auto processSampleInternal (SampleType x, SampleType& s1, SampleType& s2) const noexcept
     {
         const auto [v0, v1, v2] = processCore (x, s1, s2);
 
@@ -238,7 +238,7 @@ public:
     }
 
     /** Internal use only! */
-    inline auto processCore (SampleType x, SampleType& s1, SampleType& s2) noexcept
+    inline auto processCore (SampleType x, SampleType& s1, SampleType& s2) const noexcept
     {
         const auto v3 = x - s2;
         const auto v0 = a1 * v3 - ak * s1;
