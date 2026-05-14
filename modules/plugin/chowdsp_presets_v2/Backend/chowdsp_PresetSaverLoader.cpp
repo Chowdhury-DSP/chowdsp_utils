@@ -28,7 +28,7 @@ void PresetSaverLoader::initializeListeners (ParamHolder& params, ParameterListe
                     [this, &param]
                     {
                         juce::ignoreUnused (param);
-                        if (areWeInTheMidstOfAPresetChange || currentPreset == nullptr)
+                        if (areWeInTheMidstOfAPresetChange || currentPreset == nullptr || ! currentPreset->isValid())
                             return;
 
                         using ParamElementType = ParameterTypeHelpers::ParameterElementType<std::remove_reference_t<decltype (param)>>;
