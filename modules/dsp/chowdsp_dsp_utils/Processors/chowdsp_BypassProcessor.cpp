@@ -112,6 +112,7 @@ void BypassProcessor<SampleType,
 
     compDelay.emplace (maximumLatencySamples + static_cast<int> (spec.maximumBlockSize));
     compDelay->prepare (spec); // sample rate does not matter
+    prevDelay = {};
 }
 
 template <typename SampleType, typename DelayInterpType>
