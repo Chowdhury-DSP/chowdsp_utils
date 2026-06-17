@@ -30,6 +30,9 @@ public:
     /** Returns the y-coordinate for the given magnitude (in Decibels). */
     [[nodiscard]] float getYCoordinateForDecibels (float magDB) const;
 
+    /** Returns a gain (in Decibels) for a fiven y-coordinate. */
+    [[nodiscard]] float getDecibelsForYCoordinate (float yCoord) const;
+
     /** Draws a set of frequency grid lines. */
     template <typename FreqsContainer = std::initializer_list<float>, typename Dashes = std::initializer_list<float>>
     void drawFrequencyLines (const juce::Graphics& g, const FreqsContainer& freqHzList, float lineThickness = 1.0f, const Dashes& dashLengths = {}) const

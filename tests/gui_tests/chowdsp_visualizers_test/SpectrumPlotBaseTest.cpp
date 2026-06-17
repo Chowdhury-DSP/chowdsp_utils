@@ -32,6 +32,10 @@ TEST_CASE ("Spectrum Plot Base Test", "[visualizers]")
             REQUIRE_MESSAGE (component.getFrequencyForXCoordinate (0.0f) == Catch::Approx { xMinFreq }.margin (1.0e-2f), "Min x-coord. frequency is incorrect!");
             REQUIRE_MESSAGE (component.getFrequencyForXCoordinate ((float) width) == Catch::Approx { xMaxFreq }.margin (1.0e-2f), "Max x-coord. frequency is incorrect!");
             REQUIRE_MESSAGE (component.getFrequencyForXCoordinate ((float) width * 0.5f) == Catch::Approx { xCenterFreq }.margin (1.0e-2f), "Center x-coord. frequency is incorrect!");
+
+            REQUIRE_MESSAGE (component.getDecibelsForYCoordinate (0.0f) == Catch::Approx { yMaxMag }.margin (1.0e-2f), "Max y-coord. mag is incorrect!");
+            REQUIRE_MESSAGE (component.getDecibelsForYCoordinate ((float) height) == Catch::Approx { yMinMag }.margin (1.0e-2f), "Min y-coord. mag is incorrect!");
+            REQUIRE_MESSAGE (component.getDecibelsForYCoordinate ((float) height * 0.5f) == Catch::Approx { yCenterMag }.margin (1.0e-2f), "Center y-coord. mag is incorrect!");
         };
 
         checkCoordinates ({ 20.0f, 20000.0f, -10.0f, 10.0f });

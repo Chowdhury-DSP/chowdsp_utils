@@ -22,4 +22,9 @@ float SpectrumPlotBase::getYCoordinateForDecibels (float gainDB) const
 {
     return (float) getHeight() * (params.maxMagnitudeDB - gainDB) / params.rangeDB;
 }
+
+float SpectrumPlotBase::getDecibelsForYCoordinate (float yCoord) const
+{
+    return params.maxMagnitudeDB - params.rangeDB * yCoord / (float) getHeight();
+}
 } // namespace chowdsp
