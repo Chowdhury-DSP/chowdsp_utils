@@ -94,7 +94,7 @@ private:                                         \
 #endif
 
 #ifndef JUCE_USE_VDSP_FRAMEWORK
-#define JUCE_USE_VDSP_FRAMEWORK 1
+#define JUCE_USE_VDSP_FRAMEWORK (JUCE_MAC || JUCE_IOS)
 #endif
 
 #if __ARM_NEON__ && ! (JUCE_USE_VDSP_FRAMEWORK || defined(JUCE_USE_ARM_NEON))

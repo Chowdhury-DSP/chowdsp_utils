@@ -314,13 +314,13 @@ namespace FloatVectorHelpers
         {
             Type v[numParallel];
             storeU (v, a);
-            return jmax (v[0], v[1], v[2], v[3]);
+            return ::juce::jmax (v[0], v[1], v[2], v[3]);
         }
         static forcedinline Type min (ParallelType a) noexcept
         {
             Type v[numParallel];
             storeU (v, a);
-            return jmin (v[0], v[1], v[2], v[3]);
+            return ::juce::jmin (v[0], v[1], v[2], v[3]);
         }
     };
 
@@ -328,7 +328,7 @@ namespace FloatVectorHelpers
     {
         using Type = double;
         using ParallelType = double;
-        using IntegerType = uint64;
+        using IntegerType = uint64_t;
         union signMaskUnion
         {
             ParallelType f;
@@ -361,8 +361,8 @@ namespace FloatVectorHelpers
         static forcedinline ParallelType add (ParallelType a, ParallelType b) noexcept { return a + b; }
         static forcedinline ParallelType sub (ParallelType a, ParallelType b) noexcept { return a - b; }
         static forcedinline ParallelType mul (ParallelType a, ParallelType b) noexcept { return a * b; }
-        static forcedinline ParallelType max (ParallelType a, ParallelType b) noexcept { return jmax (a, b); }
-        static forcedinline ParallelType min (ParallelType a, ParallelType b) noexcept { return jmin (a, b); }
+        static forcedinline ParallelType max (ParallelType a, ParallelType b) noexcept { return ::juce::jmax (a, b); }
+        static forcedinline ParallelType min (ParallelType a, ParallelType b) noexcept { return ::juce::jmin (a, b); }
 
         static forcedinline ParallelType bit_and (ParallelType a, ParallelType b) noexcept { return toflt (toint (a) & toint (b)); }
         static forcedinline ParallelType bit_not (ParallelType a, ParallelType b) noexcept { return toflt ((~toint (a)) & toint (b)); }
