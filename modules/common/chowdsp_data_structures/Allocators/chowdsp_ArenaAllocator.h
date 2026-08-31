@@ -117,19 +117,22 @@ public:
      */
     struct Frame
     {
+        Frame() = default;
         explicit Frame (ArenaAllocator& allocator)
-            : alloc (allocator),
-              bytes_used_at_start (alloc.bytes_used)
+            : alloc (&allocator),
+              bytes_used_at_start (alloc->bytes_used)
         {
         }
 
         ~Frame()
         {
-            alloc.bytes_used = bytes_used_at_start;
+            if (alloc != nullptr)
+                alloc->bytes_used = bytes_used_at_start;
+            alloc = nullptr;
         }
 
-        ArenaAllocator& alloc;
-        const size_t bytes_used_at_start;
+        ArenaAllocator* alloc;
+        size_t bytes_used_at_start {};
     };
 
     /** Creates a frame for this allocator */

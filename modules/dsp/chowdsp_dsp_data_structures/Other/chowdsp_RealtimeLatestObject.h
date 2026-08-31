@@ -155,7 +155,7 @@ private:
     Node* zombie_list_head {}; // written/read on main thread
     std::atomic<Node*> zombie_list_tail {}; // written on audio thread / read on main thread
 
-    ObjectPool<Node> allocator { 4 };
+    ObjectPool<Node> allocator {};
     alignas (alignof (Node)) std::array<std::byte, sizeof (Node) * 4> allocator_backing_buffer {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (RealtimeLatestObject)
