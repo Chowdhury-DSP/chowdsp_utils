@@ -97,12 +97,19 @@ void PresetSaverLoader::loadPreset (const Preset& preset)
         bool perform() override
         {
             saverLoader.currentPreset = performPreset;
+            // The assignment above stores a NON-owning pointer into this action,
+            // but this action is owned by the UndoManager, which deletes actions
+            // whenever the redo branch is discarded or the storage limit evicts
+            // old transactions -- leaving currentPreset dangling. Copy into owned
+            // memory so the current preset outlives this action.
+            saverLoader.currentPreset.assumeOwnership();
             return true;
         }
 
         bool undo() override
         {
             saverLoader.currentPreset = undoPreset;
+            saverLoader.currentPreset.assumeOwnership(); // see perform()
             saverLoader.isPresetDirty.set (previousStateWasDirty);
             return true;
         }
