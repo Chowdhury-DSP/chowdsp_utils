@@ -304,3 +304,46 @@ TEST_CASE ("Resampler Test", "[dsp][resampling]")
     }
 #endif
 }
+
+TEST_CASE ("Lanczos synchronised channels", "[dsp][resampling]")
+{
+    using Resampler = chowdsp::ResamplingTypes::LanczosResampler<2048, 8>;
+    for (size_t numChannels : { 1U, 2U, 5U })
+    {
+        std::array<Resampler, 5> shared, independent;
+        std::array<std::vector<float>, 5> input, actual, expected;
+        std::array<Resampler::Channel, 5> channels;
+        for (size_t c = 0; c < numChannels; ++c)
+        {
+            gen_sine (input[c], 100.0f + 137.0f * (float) c, origSampleRate, 3200);
+            actual[c].resize (3200 * 6 + 8);
+            expected[c].resize (actual[c].size());
+            shared[c].prepare (origSampleRate, 2.0);
+            independent[c].prepare (origSampleRate, 2.0);
+            // Different histories must become aligned after reset.
+            shared[c].process (input[c].data(), actual[c].data(), 17 + c * 13);
+            shared[c].reset();
+            channels[c] = { &shared[c], input[c].data(), actual[c].data() };
+        }
+        for (float ratio : { 0.5f, 0.667f, 1.0f, 1.5f, 2.0f, 6.0f })
+        {
+            for (size_t c = 0; c < numChannels; ++c)
+            {
+                shared[c].setResampleRatio (ratio);
+                independent[c].setResampleRatio (ratio);
+            }
+            for (size_t blockSize : { 0U, 1U, 17U, 800U, 3200U, 17U })
+            {
+                const auto generated = Resampler::processChannels (channels.data(), numChannels, blockSize);
+                for (size_t c = 0; c < numChannels; ++c)
+                {
+                    CAPTURE (numChannels, ratio, blockSize, c);
+                    const auto count = independent[c].process (input[c].data(), expected[c].data(), blockSize);
+                    REQUIRE (generated == count);
+                    REQUIRE (std::equal (actual[c].begin(), actual[c].begin() + (ptrdiff_t) count, expected[c].begin()));
+                }
+            }
+        }
+    }
+    REQUIRE (Resampler::processChannels (nullptr, 0, 100) == 0);
+}

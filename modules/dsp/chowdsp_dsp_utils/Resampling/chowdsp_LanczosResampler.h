@@ -64,6 +64,7 @@ public:
     /** Resets the state of the resampler */
     void reset() override
     {
+        wp = 0;
         snapOutToIn();
         std::fill (state, &state[BUFFER_SIZE * 2], 0.0f);
     }
@@ -84,26 +85,57 @@ public:
          */
     size_t process (const float* input, float* output, size_t numSamples) noexcept override
     {
-        // If the number of input samples is too large, then we need to process in pieces to avoid buffer overrun
-        if (numSamples > BUFFER_SIZE / 2)
+        const Channel channel { this, input, output };
+        return processChannels (&channel, 1, numSamples);
+    }
+
+    /** One channel of a synchronised resampling group. */
+    struct Channel
+    {
+        LanczosResampler* resampler;
+        const float* input;
+        float* output;
+    };
+
+    /** Process channels with matching ratios, phases and write positions, sharing kernel evaluation.
+     *  Prepare, reset, change ratios and process these resamplers together. Each
+     *  channel must refer to a distinct resampler. Each output needs room for
+     *  floor(chunkSize * ratio) + 1 samples per chunk of at most BUFFER_SIZE / 2 inputs.
+     */
+    static size_t processChannels (const Channel* channels, size_t numChannels, size_t numSamples) noexcept
+    {
+        if (numChannels == 0)
         {
-            size_t samplesGenerated = 0;
-            for (size_t samplesProcessed = 0; samplesProcessed < numSamples;)
-            {
-                auto samplesToProcess = juce::jmin (numSamples - samplesProcessed, BUFFER_SIZE / 2);
-                samplesGenerated += process (input + samplesProcessed, output + samplesGenerated, samplesToProcess);
-                samplesProcessed += samplesToProcess;
-            }
-
-            return samplesGenerated;
+            return 0;
         }
-
-        renormalizePhases();
-
-        for (size_t i = 0; i < numSamples; ++i)
-            push (input[i]);
-
-        return populateNext (output, size_t ((double) numSamples * ratio) + 1);
+        jassert (channels != nullptr && channels[0].resampler != nullptr);
+        for (size_t channel = 1; channel < numChannels; ++channel)
+        {
+            jassert (channels[channel].resampler != nullptr);
+            const auto& first = *channels[0].resampler;
+            const auto& other = *channels[channel].resampler;
+            jassert (other.ratio == first.ratio && other.wp == first.wp
+                     && other.phaseI == first.phaseI && other.phaseO == first.phaseO);
+            juce::ignoreUnused (first, other);
+        }
+        size_t samplesGenerated = 0;
+        for (size_t samplesProcessed = 0; samplesProcessed < numSamples;)
+        {
+            const auto count = juce::jmin (numSamples - samplesProcessed, BUFFER_SIZE / 2);
+            for (size_t channel = 0; channel < numChannels; ++channel)
+            {
+                auto& resampler = *channels[channel].resampler;
+                resampler.renormalizePhases();
+                for (size_t i = 0; i < count; ++i)
+                {
+                    resampler.push (channels[channel].input[samplesProcessed + i]);
+                }
+            }
+            samplesGenerated += populateNext (channels, numChannels, samplesGenerated,
+                                             size_t ((double) count * channels[0].resampler->ratio) + 1);
+            samplesProcessed += count;
+        }
+        return samplesGenerated;
     }
 
 private:
@@ -160,9 +192,10 @@ private:
         return (1.0f - frac) * state[idx0] + frac * state[idx0 + 1];
     }
 
-    [[nodiscard]] inline float read (double xBack) const
+    static void read (const Channel* channels, size_t numChannels, size_t outputIndex, double xBack)
     {
-        double p0 = wp - xBack;
+        const auto& first = *channels[0].resampler;
+        double p0 = first.wp - xBack;
         auto idx0 = (int) floor (p0);
         double off0 = 1.0 - (p0 - idx0);
 
@@ -174,29 +207,56 @@ private:
         double fidx = (off0byto - tidx);
 
         using SR = xsimd::batch<float>;
-        auto rv = SR (0.0f);
         const auto fl = SR ((float) fidx);
-        for (size_t i = 0; i < filterWidth; i += SR::size)
+        const auto weightFor = [&](size_t i)
         {
             auto fn = xsimd::load_aligned (&lanczosTable[tidx][i]);
             auto dfn = xsimd::load_aligned (&lanczosTableDX[tidx][i]);
-            fn = fn + (dfn * fl);
-
-            auto dn = xsimd::load_unaligned (&state[idx0 - (int) A + (int) i]);
-            rv += fn * dn;
+            return fn + (dfn * fl);
+        };
+        if (numChannels == 1)
+        {
+            auto rv = SR (0.0f);
+            for (size_t i = 0; i < filterWidth; i += SR::size)
+            {
+                auto dn = xsimd::load_unaligned (&first.state[idx0 - (int) A + (int) i]);
+                rv += weightFor (i) * dn;
+            }
+            channels[0].output[outputIndex] = xsimd::reduce_add (rv);
+            return;
         }
 
-        return xsimd::reduce_add (rv);
+        SR weights[filterWidth / SR::size];
+        for (size_t i = 0; i < filterWidth; i += SR::size)
+        {
+            weights[i / SR::size] = weightFor (i);
+        }
+
+        for (size_t channel = 0; channel < numChannels; ++channel)
+        {
+            auto rv = SR (0.0f);
+            for (size_t i = 0; i < filterWidth; i += SR::size)
+            {
+                auto dn = xsimd::load_unaligned (&channels[channel].resampler->state[idx0 - (int) A + (int) i]);
+                rv += weights[i / SR::size] * dn;
+            }
+            channels[channel].output[outputIndex] = xsimd::reduce_add (rv);
+        }
     }
 
-    size_t populateNext (float* f, size_t max)
+    static size_t populateNext (const Channel* channels, size_t numChannels, size_t outputOffset, size_t max)
     {
+        auto& first = *channels[0].resampler;
         size_t populated = 0;
-        while (populated < max && (phaseI - phaseO) > A + 1)
+        while (populated < max && (first.phaseI - first.phaseO) > A + 1)
         {
-            f[populated] = read (phaseI - phaseO);
-            phaseO += dPhaseO;
+            read (channels, numChannels, outputOffset + populated, first.phaseI - first.phaseO);
+            first.phaseO += first.dPhaseO;
             populated++;
+        }
+        for (size_t channel = 1; channel < numChannels; ++channel)
+        {
+            channels[channel].resampler->phaseO = first.phaseO;
         }
         return populated;
     }

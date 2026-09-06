@@ -33,3 +33,5 @@ setup_benchmark(DecibelsBench DecibelsBench.cpp chowdsp_math juce_audio_basics)
 setup_benchmark(AbstractTreeBench AbstractTreeBench.cpp chowdsp_data_structures)
 setup_benchmark(TrigBench TrigBench.cpp chowdsp_math juce_dsp)
 #setup_benchmark(ConcurrentScanningBench ConcurrentScanningBench.cpp chowdsp_data_structures)
+
+setup_benchmark(LanczosResamplerBench LanczosResamplerBench.cpp chowdsp_dsp_utils juce_dsp juce_audio_processors)
