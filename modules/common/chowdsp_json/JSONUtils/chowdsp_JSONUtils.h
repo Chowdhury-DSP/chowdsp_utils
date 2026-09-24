@@ -33,9 +33,10 @@ namespace JSONUtils
     }
 
     /** Dump a json object to an output stream */
-    inline void toOutputStream (const json& j, juce::OutputStream& stream, bool isStartOfStream = true, const int indent = -1, const char indent_char = ' ')
+    inline void toOutputStream (const json& j, juce::OutputStream& stream, const int indent = -1, const char indent_char = ' ')
     {
-        stream.writeText (j.dump (indent, indent_char), true, isStartOfStream, nullptr);
+        const auto text = j.dump (indent, indent_char);
+        stream.write (text.data(), (size_t) text.size());
     }
 
     /** Dump a json object to a file */
@@ -50,7 +51,7 @@ namespace JSONUtils
 
         if (auto jsonOutputStream = file.createOutputStream())
         {
-            toOutputStream (j, *jsonOutputStream, true, indent, indent_char);
+            toOutputStream (j, *jsonOutputStream, indent, indent_char);
         }
         else
         {
@@ -65,7 +66,7 @@ namespace JSONUtils
     inline void toMemoryBlock (const json& j, juce::MemoryBlock& block)
     {
         juce::MemoryOutputStream jsonOutputStream { block, true };
-        toOutputStream (j, jsonOutputStream, block.getSize() == 0);
+        toOutputStream (j, jsonOutputStream);
     }
 
     /**
