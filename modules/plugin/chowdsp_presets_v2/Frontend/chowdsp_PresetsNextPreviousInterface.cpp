@@ -8,12 +8,28 @@ NextPrevious::NextPrevious (PresetManager& manager) : presetManager (manager)
 
 static const PresetTree::Node* findNodeForPreset (const PresetTree::Node& root, const Preset& current)
 {
+    const PresetTree::Node* identityMatch = nullptr;
     for (auto* node = &root; node != nullptr; node = node->next_linear)
     {
-        if (node->value.has_value() && node->value.leaf() == current)
+        if (! node->value.has_value())
+            continue;
+
+        const auto& preset = node->value.leaf();
+        if (preset == current)
             return node;
+
+        // Fall back to matching by identity: after undoing a preset load, the
+        // current preset is a state snapshot whose parameter json will not
+        // compare equal to any tree preset -- but its identity still tells
+        // navigation where to anchor. Without this, next/previous silently
+        // stop working until a preset is loaded from the menu again.
+        if (identityMatch == nullptr
+            && preset.getName() == current.getName()
+            && preset.getVendor() == current.getVendor()
+            && preset.getCategory() == current.getCategory())
+            identityMatch = node;
     }
-    return nullptr;
+    return identityMatch;
 }
 
 static const PresetTree::Node* getNextOrPreviousChildPresetNode (const PresetTree::Node* node, bool forward)
