@@ -8,8 +8,11 @@ namespace chowdsp
 class ParametersView : public juce::Component
 {
 public:
-    ParametersView (PluginState& pluginState, ParamHolder& params);
-    ParametersView (ParameterListeners& paramListeners, ParamHolder& params);
+    /** Optionally overrides the text used to label each parameter (the default is the parameter's name) */
+    using NameFormatter = std::function<juce::String (const juce::RangedAudioParameter&)>;
+
+    ParametersView (PluginState& pluginState, ParamHolder& params, NameFormatter nameFormatter = {});
+    ParametersView (ParameterListeners& paramListeners, ParamHolder& params, NameFormatter nameFormatter = {});
     ~ParametersView() override;
 
     void paint (juce::Graphics&) override;

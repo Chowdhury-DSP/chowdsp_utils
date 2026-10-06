@@ -80,10 +80,10 @@ namespace parameters_view_detail
     class ParameterDisplayComponent : public juce::Component
     {
     public:
-        ParameterDisplayComponent (juce::RangedAudioParameter& param, ParameterListeners& listeners)
+        ParameterDisplayComponent (juce::RangedAudioParameter& param, ParameterListeners& listeners, const ParametersView::NameFormatter& nameFormatter)
             : parameter (param)
         {
-            parameterName.setText (parameter.getName (128), juce::dontSendNotification);
+            parameterName.setText (nameFormatter ? nameFormatter (parameter) : parameter.getName (128), juce::dontSendNotification);
             parameterName.setJustificationType (juce::Justification::centredRight);
             parameterName.setInterceptsMouseClicks (false, false);
             addAndMakeVisible (parameterName);
@@ -132,35 +132,36 @@ namespace parameters_view_detail
     //==============================================================================
     struct ParamControlItem : public juce::TreeViewItem
     {
-        ParamControlItem (juce::RangedAudioParameter& paramIn, ParameterListeners& paramListeners)
-            : param (paramIn), listeners (paramListeners) {}
+        ParamControlItem (juce::RangedAudioParameter& paramIn, ParameterListeners& paramListeners, const ParametersView::NameFormatter& nameFormatterIn)
+            : param (paramIn), listeners (paramListeners), nameFormatter (nameFormatterIn) {}
 
         bool mightContainSubItems() override { return false; }
 
         std::unique_ptr<juce::Component> createItemComponent() override
         {
-            return std::make_unique<ParameterDisplayComponent> (param, listeners);
+            return std::make_unique<ParameterDisplayComponent> (param, listeners, nameFormatter);
         }
 
         [[nodiscard]] int getItemHeight() const override { return 40; }
 
         juce::RangedAudioParameter& param;
         ParameterListeners& listeners;
+        const ParametersView::NameFormatter& nameFormatter;
     };
 
     struct ParameterGroupItem : public juce::TreeViewItem
     {
-        ParameterGroupItem (ParamHolder& params, ParameterListeners& listeners)
+        ParameterGroupItem (ParamHolder& params, ParameterListeners& listeners, const ParametersView::NameFormatter& nameFormatter)
             : name (params.getName())
         {
             params.doForAllParametersOrContainers (
-                [this, &listeners] (auto& param)
+                [this, &listeners, &nameFormatter] (auto& param)
                 {
-                    addSubItem (std::make_unique<ParamControlItem> (param, listeners).release());
+                    addSubItem (std::make_unique<ParamControlItem> (param, listeners, nameFormatter).release());
                 },
-                [this, &listeners] (auto& paramHolder)
+                [this, &listeners, &nameFormatter] (auto& paramHolder)
                 {
-                    addSubItem (std::make_unique<ParameterGroupItem> (paramHolder, listeners).release());
+                    addSubItem (std::make_unique<ParameterGroupItem> (paramHolder, listeners, nameFormatter).release());
                 });
         }
 
@@ -179,8 +180,9 @@ namespace parameters_view_detail
 //==============================================================================
 struct ParametersView::Pimpl
 {
-    Pimpl (ParamHolder& params, ParameterListeners& listeners)
-        : groupItem (params, listeners)
+    Pimpl (ParamHolder& params, ParameterListeners& listeners, NameFormatter nameFormatterIn)
+        : nameFormatter (std::move (nameFormatterIn)),
+          groupItem (params, listeners, nameFormatter)
     {
         view.setIndentSize (12);
         const auto numIndents = getNumIndents (groupItem);
@@ -228,13 +230,14 @@ struct ParametersView::Pimpl
         return nullptr;
     }
 
+    NameFormatter nameFormatter;
     parameters_view_detail::ParameterGroupItem groupItem;
     juce::TreeView view;
 };
 
 //==============================================================================
-ParametersView::ParametersView (PluginState& pluginState, ParamHolder& params)
-    : ParametersView (pluginState.getParameterListeners(), params)
+ParametersView::ParametersView (PluginState& pluginState, ParamHolder& params, NameFormatter nameFormatter)
+    : ParametersView (pluginState.getParameterListeners(), params, std::move (nameFormatter))
 {
     if (pluginState.processor != nullptr)
     {
@@ -250,8 +253,8 @@ ParametersView::ParametersView (PluginState& pluginState, ParamHolder& params)
     ParametersView::resized();
 }
 
-ParametersView::ParametersView (ParameterListeners& listeners, ParamHolder& params)
-    : pimpl (std::make_unique<Pimpl> (params, listeners))
+ParametersView::ParametersView (ParameterListeners& listeners, ParamHolder& params, NameFormatter nameFormatter)
+    : pimpl (std::make_unique<Pimpl> (params, listeners, std::move (nameFormatter)))
 {
     auto* viewport = pimpl->view.getViewport();
 
