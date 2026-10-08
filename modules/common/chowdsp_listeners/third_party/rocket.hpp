@@ -2270,8 +2270,7 @@ namespace detail
 
     private:
         std::weak_ptr<Instance> weak;
-        R (Class::*method)
-        (Args...);
+        R (Class::*method) (Args...);
     };
 
     template <class Instance, class Class, class R, class... Args>
@@ -2290,8 +2289,7 @@ namespace detail
 
     private:
         std::shared_ptr<Instance> shared;
-        R (Class::*method)
-        (Args...);
+        R (Class::*method) (Args...);
     };
 } // namespace detail
 
@@ -2626,6 +2624,11 @@ struct scoped_connection_container final
         connections.push_front (scoped_connection { conn });
     }
 
+    void append (scoped_connection&& conn)
+    {
+        connections.push_front (std::move (conn));
+    }
+
     void append (std::initializer_list<connection> list)
     {
         for (auto const& connection : list)
@@ -2637,6 +2640,12 @@ struct scoped_connection_container final
     scoped_connection_container& operator+= (connection const& conn)
     {
         append (conn);
+        return *this;
+    }
+
+    scoped_connection_container& operator+= (scoped_connection&& conn)
+    {
+        append (std::move (conn));
         return *this;
     }
 

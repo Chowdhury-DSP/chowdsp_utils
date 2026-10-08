@@ -174,16 +174,36 @@ TEST_CASE ("State Listeners Test", "[plugin][state][listeners]")
         static constexpr int newValue = 1000;
         bool listenerCalled = false;
         chowdsp::PluginStateImpl<Params, NonParams> state {};
-        const auto listener = state.addNonParameterListener (
-            state.nonParams.value,
-            [&state, &listenerCalled]
-            {
-                listenerCalled = true;
-                REQUIRE_MESSAGE ((int) state.nonParams.value == newValue, "Value after listener callback is incorrect!");
-            });
 
-        state.nonParams.value = newValue;
+        SECTION ("ScopedCallback value")
+        {
+            const auto listener = state.addNonParameterListener (
+                state.nonParams.value,
+                [&state, &listenerCalled]
+                {
+                    listenerCalled = true;
+                    REQUIRE_MESSAGE ((int) state.nonParams.value == newValue, "Value after listener callback is incorrect!");
+                });
 
-        REQUIRE_MESSAGE (listenerCalled, "Listener was never called!");
+            state.nonParams.value = newValue;
+
+            REQUIRE_MESSAGE (listenerCalled, "Listener was never called!");
+        }
+
+        SECTION ("ScopedCallbackList")
+        {
+            chowdsp::ScopedCallbackList listeners;
+            listeners += state.addNonParameterListener (
+                state.nonParams.value,
+                [&state, &listenerCalled]
+                {
+                    listenerCalled = true;
+                    REQUIRE_MESSAGE ((int) state.nonParams.value == newValue, "Value after listener callback is incorrect!");
+                });
+
+            state.nonParams.value = newValue;
+
+            REQUIRE_MESSAGE (listenerCalled, "Listener was never called!");
+        }
     }
 }
