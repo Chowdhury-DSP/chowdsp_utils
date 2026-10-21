@@ -18,9 +18,15 @@ const juce::String logFileNameRoot = "chowdsp_utils_crash_test_Log_";
 
 // a function that lives in a system library
 #if JUCE_WINDOWS
-const void* foreignFunction() { return reinterpret_cast<const void*> (&::GetCurrentProcessId); }
+const void* foreignFunction()
+{
+    return reinterpret_cast<const void*> (&::GetCurrentProcessId);
+}
 #else
-const void* foreignFunction() { return reinterpret_cast<const void*> (&::getpid); }
+const void* foreignFunction()
+{
+    return reinterpret_cast<const void*> (&::getpid);
+}
 #endif
 } // namespace
 
@@ -68,7 +74,9 @@ struct SigAbortGuard
 {
     SigAbortGuard()
     {
-        struct sigaction action {};
+        struct sigaction action
+        {
+        };
         action.sa_handler = previousHandler;
         sigemptyset (&action.sa_mask);
         sigaction (SIGABRT, &action, &original);
@@ -76,7 +84,9 @@ struct SigAbortGuard
 
     ~SigAbortGuard() { sigaction (SIGABRT, &original, nullptr); }
 
-    struct sigaction original {};
+    struct sigaction original
+    {
+    };
 };
 
 enum class CrashOrigin
@@ -148,15 +158,21 @@ TEST_CASE ("Crash Handler Chaining Test", "[common][logs]")
     SECTION ("Handlers are restored")
     {
         SigAbortGuard guard;
-        struct sigaction before {};
+        struct sigaction before
+        {
+        };
         sigaction (SIGABRT, nullptr, &before);
         {
             chowdsp::Logger logger { logFileSubDir, logFileNameRoot, [] (const juce::File&) {} };
-            struct sigaction during {};
+            struct sigaction during
+            {
+            };
             sigaction (SIGABRT, nullptr, &during);
             REQUIRE (during.sa_sigaction != before.sa_sigaction);
         }
-        struct sigaction after {};
+        struct sigaction after
+        {
+        };
         sigaction (SIGABRT, nullptr, &after);
         REQUIRE (after.sa_handler == before.sa_handler);
     }

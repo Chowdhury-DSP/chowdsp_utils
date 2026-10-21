@@ -78,67 +78,70 @@ void checkLogFilesForCrashes (const LogFileHelpers::FileArray& logFiles,
 namespace
 {
 #if CHOWDSP_CRASH_POSIX
-const void* getImageBase (const void* address)
-{
-    Dl_info info {};
-    return dladdr (address, &info) != 0 ? info.dli_fbase : nullptr;
-}
+    const void* getImageBase (const void* address)
+    {
+        Dl_info info {};
+        return dladdr (address, &info) != 0 ? info.dli_fbase : nullptr;
+    }
 #elif CHOWDSP_CRASH_WINDOWS
-const void* getImageBase (const void* address)
-{
-    HMODULE module = nullptr;
-    if (GetModuleHandleExA (GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-                            static_cast<LPCSTR> (address),
-                            &module)
-        == 0)
-        return nullptr;
-    return module;
-}
+    const void* getImageBase (const void* address)
+    {
+        HMODULE module = nullptr;
+        if (GetModuleHandleExA (GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                                static_cast<LPCSTR> (address),
+                                &module)
+            == 0)
+            return nullptr;
+        return module;
+    }
 #else
-const void* getImageBase (const void*) { return nullptr; }
+    const void* getImageBase (const void*)
+    {
+        return nullptr;
+    }
 #endif
 
-bool involvesThisBinary (const void* const* frames, int numFrames)
-{
-    const auto* ourBase = getImageBase (reinterpret_cast<const void*> (&signalHandler));
-    if (ourBase == nullptr || numFrames <= 0)
-        return true; // we can't tell, so assume the worst
-
-    // Skip our own handler frames at the top of the stack, and look
-    // for our code anywhere in the frames below that.
-    int i = 0;
-    while (i < numFrames && getImageBase (frames[i]) == ourBase)
-        ++i;
-
-    for (; i < numFrames; ++i)
-        if (getImageBase (frames[i]) == ourBase)
-            return true;
-
-    return false;
-}
-
-void logSignal (bool isOurCrash)
-{
-    const auto stackTrace = juce::SystemStats::getStackBacktrace();
-
-    if (isOurCrash)
+    bool involvesThisBinary (const void* const* frames, int numFrames)
     {
-        juce::Logger::writeToLog ("Interrupt signal received!");
-    }
-    else
-    {
-        // Probably not our fault: keep the trace for reference, but don't
-        // flag this log file as a crash so the user isn't prompted.
-        juce::Logger::writeToLog ("Signal received, but no frames from this plugin were found in the stack trace.");
+        const auto* ourBase = getImageBase (reinterpret_cast<const void*> (&signalHandler));
+        if (ourBase == nullptr || numFrames <= 0)
+            return true; // we can't tell, so assume the worst
+
+        // Skip our own handler frames at the top of the stack, and look
+        // for our code anywhere in the frames below that.
+        int i = 0;
+        while (i < numFrames && getImageBase (frames[i]) == ourBase)
+            ++i;
+
+        for (; i < numFrames; ++i)
+            if (getImageBase (frames[i]) == ourBase)
+                return true;
+
+        return false;
     }
 
-    juce::Logger::writeToLog ("Stack Trace:");
-    juce::Logger::writeToLog (stackTrace);
+    void logSignal (bool isOurCrash)
+    {
+        const auto stackTrace = juce::SystemStats::getStackBacktrace();
 
-    LogFileHelpers::shutdownLogger (isOurCrash ? 1 : 0);
-}
+        if (isOurCrash)
+        {
+            juce::Logger::writeToLog ("Interrupt signal received!");
+        }
+        else
+        {
+            // Probably not our fault: keep the trace for reference, but don't
+            // flag this log file as a crash so the user isn't prompted.
+            juce::Logger::writeToLog ("Signal received, but no frames from this plugin were found in the stack trace.");
+        }
 
-std::atomic<int> handlerCount { 0 };
+        juce::Logger::writeToLog ("Stack Trace:");
+        juce::Logger::writeToLog (stackTrace);
+
+        LogFileHelpers::shutdownLogger (isOurCrash ? 1 : 0);
+    }
+
+    std::atomic<int> handlerCount { 0 };
 } // namespace
 
 bool framesInvolveThisBinary (const void* const* frames, int numFrames)
@@ -153,56 +156,56 @@ void signalHandler (void*) // NOSONAR (void* is needed here)
 
 namespace
 {
-// Only meant to be called from within an actual signal handler,
-// since the stack is expected to look like: handler, trampoline, crash site...
-[[maybe_unused]] void reportSignal()
-{
+    // Only meant to be called from within an actual signal handler,
+    // since the stack is expected to look like: handler, trampoline, crash site...
+    [[maybe_unused]] void reportSignal()
+    {
 #if CHOWDSP_CRASH_POSIX
-    void* stack[128];
-    const auto numFrames = backtrace (stack, 128);
-    logSignal (involvesThisBinary (stack, numFrames));
+        void* stack[128];
+        const auto numFrames = backtrace (stack, 128);
+        logSignal (involvesThisBinary (stack, numFrames));
 #elif CHOWDSP_CRASH_WINDOWS
-    void* stack[62];
-    const auto numFrames = CaptureStackBackTrace (0, 62, stack, nullptr);
-    logSignal (involvesThisBinary (stack, numFrames));
+        void* stack[62];
+        const auto numFrames = CaptureStackBackTrace (0, 62, stack, nullptr);
+        logSignal (involvesThisBinary (stack, numFrames));
 #else
-    logSignal (true);
+        logSignal (true);
 #endif
-}
+    }
 } // namespace
 
 #if CHOWDSP_CRASH_POSIX
 namespace
 {
-constexpr int crashSignals[] = { SIGFPE, SIGILL, SIGSEGV, SIGBUS, SIGABRT, SIGSYS };
-constexpr size_t numCrashSignals = sizeof (crashSignals) / sizeof (crashSignals[0]);
-struct sigaction previousActions[numCrashSignals];
+    constexpr int crashSignals[] = { SIGFPE, SIGILL, SIGSEGV, SIGBUS, SIGABRT, SIGSYS };
+    constexpr size_t numCrashSignals = sizeof (crashSignals) / sizeof (crashSignals[0]);
+    struct sigaction previousActions[numCrashSignals];
 
-void posixCrashHandler (int signum, siginfo_t* info, void* context)
-{
-    size_t index = 0;
-    while (index < numCrashSignals && crashSignals[index] != signum)
-        ++index;
-    if (index == numCrashSignals)
-        return;
+    void posixCrashHandler (int signum, siginfo_t* info, void* context)
+    {
+        size_t index = 0;
+        while (index < numCrashSignals && crashSignals[index] != signum)
+            ++index;
+        if (index == numCrashSignals)
+            return;
 
-    // Put the previous handler back first: if anything below goes wrong,
-    // or if the previous handler just returns, we won't be re-entered.
-    auto previous = previousActions[index];
-    if (previous.sa_handler == SIG_IGN)
-        previous.sa_handler = SIG_DFL;
-    sigaction (signum, &previous, nullptr);
+        // Put the previous handler back first: if anything below goes wrong,
+        // or if the previous handler just returns, we won't be re-entered.
+        auto previous = previousActions[index];
+        if (previous.sa_handler == SIG_IGN)
+            previous.sa_handler = SIG_DFL;
+        sigaction (signum, &previous, nullptr);
 
-    reportSignal();
+        reportSignal();
 
-    if (previous.sa_handler == SIG_DFL)
-        return; // faulting instruction re-executes (or the pending signal is delivered), with the default action
+        if (previous.sa_handler == SIG_DFL)
+            return; // faulting instruction re-executes (or the pending signal is delivered), with the default action
 
-    if ((previous.sa_flags & SA_SIGINFO) != 0)
-        previous.sa_sigaction (signum, info, context);
-    else
-        previous.sa_handler (signum);
-}
+        if ((previous.sa_flags & SA_SIGINFO) != 0)
+            previous.sa_sigaction (signum, info, context);
+        else
+            previous.sa_handler (signum);
+    }
 } // namespace
 
 void installCrashHandler()
@@ -210,7 +213,9 @@ void installCrashHandler()
     if (handlerCount.fetch_add (1) != 0)
         return;
 
-    struct sigaction action {};
+    struct sigaction action
+    {
+    };
     action.sa_sigaction = posixCrashHandler;
     action.sa_flags = SA_SIGINFO;
     sigemptyset (&action.sa_mask);
@@ -227,7 +232,9 @@ void removeCrashHandler()
     for (size_t i = 0; i < numCrashSignals; ++i)
     {
         // If somebody else installed a handler after us, leave it alone.
-        struct sigaction current {};
+        struct sigaction current
+        {
+        };
         if (sigaction (crashSignals[i], nullptr, &current) == 0 && current.sa_sigaction == posixCrashHandler)
             sigaction (crashSignals[i], &previousActions[i], nullptr);
     }
@@ -236,13 +243,13 @@ void removeCrashHandler()
 #elif CHOWDSP_CRASH_WINDOWS
 namespace
 {
-LPTOP_LEVEL_EXCEPTION_FILTER previousFilter = nullptr;
+    LPTOP_LEVEL_EXCEPTION_FILTER previousFilter = nullptr;
 
-LONG WINAPI windowsCrashFilter (LPEXCEPTION_POINTERS ep)
-{
-    reportSignal();
-    return previousFilter != nullptr ? previousFilter (ep) : EXCEPTION_CONTINUE_SEARCH;
-}
+    LONG WINAPI windowsCrashFilter (LPEXCEPTION_POINTERS ep)
+    {
+        reportSignal();
+        return previousFilter != nullptr ? previousFilter (ep) : EXCEPTION_CONTINUE_SEARCH;
+    }
 } // namespace
 
 void installCrashHandler()
