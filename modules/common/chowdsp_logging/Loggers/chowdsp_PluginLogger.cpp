@@ -27,11 +27,12 @@ PluginLogger::PluginLogger (LogFileParams loggerParams, CrashLogHelpers::CrashLo
                                                                  toString (openString)));
     juce::Logger::setCurrentLogger (fileLogger.get());
 
-    juce::SystemStats::setApplicationCrashHandler (signalHandler);
+    installCrashHandler();
 }
 
 PluginLogger::~PluginLogger()
 {
     LogFileHelpers::shutdownLogger();
+    CrashLogHelpers::removeCrashHandler();
 }
 } // namespace chowdsp
