@@ -88,7 +88,9 @@ void returningInfoHandler (int, siginfo_t* info, void*)
 
 void installSigAbortHandler (void (*handler) (int))
 {
-    struct sigaction action {};
+    struct sigaction action
+    {
+    };
     action.sa_handler = handler;
     sigemptyset (&action.sa_mask);
     sigaction (SIGABRT, &action, nullptr);
@@ -223,7 +225,9 @@ TEST_CASE ("Crash Handler Chaining Test", "[common][logs]")
     SECTION ("Chaining in-process: previous handler wants signal info")
     {
         SigAbortGuard guard;
-        struct sigaction action {};
+        struct sigaction action
+        {
+        };
         action.sa_sigaction = returningInfoHandler;
         action.sa_flags = SA_SIGINFO;
         sigemptyset (&action.sa_mask);
@@ -248,7 +252,9 @@ TEST_CASE ("Crash Handler Chaining Test", "[common][logs]")
             installSigAbortHandler (returningHandler);
         }
 
-        struct sigaction after {};
+        struct sigaction after
+        {
+        };
         sigaction (SIGABRT, nullptr, &after);
         REQUIRE (after.sa_handler == returningHandler);
     }
@@ -256,19 +262,25 @@ TEST_CASE ("Crash Handler Chaining Test", "[common][logs]")
     SECTION ("Multiple loggers share one handler")
     {
         SigAbortGuard guard;
-        struct sigaction before {};
+        struct sigaction before
+        {
+        };
         sigaction (SIGABRT, nullptr, &before);
         {
             auto logger1 = std::make_unique<chowdsp::Logger> (logFileSubDir, logFileNameRoot, [] (const juce::File&) {});
             auto logger2 = std::make_unique<chowdsp::Logger> (logFileSubDir, logFileNameRoot, [] (const juce::File&) {});
             logger1.reset();
 
-            struct sigaction during {};
+            struct sigaction during
+            {
+            };
             sigaction (SIGABRT, nullptr, &during);
             REQUIRE (during.sa_sigaction != before.sa_sigaction); // still installed
         }
 
-        struct sigaction after {};
+        struct sigaction after
+        {
+        };
         sigaction (SIGABRT, nullptr, &after);
         REQUIRE (after.sa_handler == before.sa_handler);
     }

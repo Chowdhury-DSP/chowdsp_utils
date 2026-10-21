@@ -181,13 +181,13 @@ namespace
     constexpr size_t numCrashSignals = sizeof (crashSignals) / sizeof (crashSignals[0]);
     struct sigaction previousActions[numCrashSignals];
 
-void posixCrashHandler (int signum, siginfo_t* info, void* context)
-{
-    size_t index = 0;
-    while (index < numCrashSignals && crashSignals[index] != signum)
-        ++index;
-    if (index == numCrashSignals) // LCOV_EXCL_LINE
-        return; // LCOV_EXCL_LINE
+    void posixCrashHandler (int signum, siginfo_t* info, void* context)
+    {
+        size_t index = 0;
+        while (index < numCrashSignals && crashSignals[index] != signum)
+            ++index;
+        if (index == numCrashSignals) // LCOV_EXCL_LINE
+            return; // LCOV_EXCL_LINE
 
         // Put the previous handler back first: if anything below goes wrong,
         // or if the previous handler just returns, we won't be re-entered.
@@ -198,11 +198,11 @@ void posixCrashHandler (int signum, siginfo_t* info, void* context)
 
         reportSignal();
 
-    // LCOV_EXCL_START
-    // The default action kills the process, so this can only be tested in a child process.
-    if (previous.sa_handler == SIG_DFL)
-        return; // faulting instruction re-executes (or the pending signal is delivered), with the default action
-    // LCOV_EXCL_STOP
+        // LCOV_EXCL_START
+        // The default action kills the process, so this can only be tested in a child process.
+        if (previous.sa_handler == SIG_DFL)
+            return; // faulting instruction re-executes (or the pending signal is delivered), with the default action
+        // LCOV_EXCL_STOP
 
         if ((previous.sa_flags & SA_SIGINFO) != 0)
             previous.sa_sigaction (signum, info, context);
