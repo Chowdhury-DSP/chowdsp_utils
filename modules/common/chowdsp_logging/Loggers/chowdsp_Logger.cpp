@@ -51,7 +51,7 @@ Logger::Logger (const LogFileParams& loggerParams,
 
     set_global_logger (&logger);
 
-    juce::SystemStats::setApplicationCrashHandler (signalHandler);
+    installCrashHandler();
 
     if (loggerParams.flushPeriodMilliseconds > 0)
         startTimer (loggerParams.flushPeriodMilliseconds);
@@ -61,6 +61,7 @@ Logger::~Logger()
 {
     stopTimer();
     LogFileHelpers::shutdownLogger();
+    CrashLogHelpers::removeCrashHandler();
 }
 
 void Logger::timerCallback()
