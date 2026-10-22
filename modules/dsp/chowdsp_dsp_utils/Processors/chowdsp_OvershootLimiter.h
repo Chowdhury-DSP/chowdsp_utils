@@ -69,6 +69,7 @@ public:
         makeupGain.setTargetValue (juce::jmin (thisBlockMakeupGain, lastBlockMakeupGain));
         lastBlockMakeupGain = thisBlockMakeupGain;
 
+        makeupDelay.processBlock (buffer);
         BufferMath::applyGainSmoothed (buffer, makeupGain);
     }
 
