@@ -3,7 +3,11 @@
 
 namespace
 {
-void processInBlocks (chowdsp::OvershootLimiter<float>& limiter, chowdsp::BufferView<float> buffer, int blockSize)
+static constexpr double fs = 48000.0;
+static constexpr int N = 4800;
+static constexpr int lookahead = 64;
+
+static void processInBlocks (chowdsp::OvershootLimiter<float>& limiter, chowdsp::BufferView<float> buffer, int blockSize)
 {
     for (int start = 0; start < buffer.getNumSamples(); start += blockSize)
     {
@@ -15,10 +19,6 @@ void processInBlocks (chowdsp::OvershootLimiter<float>& limiter, chowdsp::Buffer
 
 TEST_CASE ("Overshoot Limiter Test", "[dsp][misc]")
 {
-    constexpr double fs = 48000.0;
-    constexpr int N = 4800;
-    constexpr int lookahead = 64;
-
     chowdsp::OvershootLimiter<float> limiter { lookahead };
     limiter.prepare ({ fs, (uint32_t) N, 1 });
     REQUIRE (limiter.getLatencySamples() == lookahead);
