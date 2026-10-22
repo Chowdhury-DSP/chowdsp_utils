@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 ## [2.5.0] - UNRELEASED
 - Modified `chowdsp::CrossoverFilter` to use an arena instead of an internal bufffer.
   - BREAKING CHANGE: the API for `chowdsp::CrossoverFilter` and `chowdsp::ThreeWayCrossover` has changed.
+- Improved logger crash handling.
+- Fixed delay error in `chowdsp::OvershootLimiter`.
+- Added `chowdsp::SpectrumPlotBase::getDecibelsForYCoordinate()`.
+- Added optional parameter name formatting to `chowdsp::ParametersView`.
+- Modified `chowdsp::ArenaAllocator::Frame` to be default-constructible.
+- Fixed JSON output streaming.
+  - BREAKING CHANGE: removed the `isStartOfStream` argument from `chowdsp::JSONUtils::toOutputStream()`.
+- Fixed `chowdsp::ScopedCallback` being disconnected when added to a list.
+- Fixed `chowdsp::BypassProcessor` state not being reset in `prepare()`.
+- Fixed handling of invalid presets in `chowdsp::presets::PresetSaverLoader`.
 
 ## [2.4.0] 2025-11-29
 - Improved plugin state serialization.
