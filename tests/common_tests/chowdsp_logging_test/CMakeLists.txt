@@ -4,4 +4,5 @@ target_sources(chowdsp_logging_test PRIVATE
     PluginLoggerTest.cpp
     CustomFormattingTest.cpp
     CrashHandlerTest.cpp
+    LoggerFilePathTest.cpp
 )

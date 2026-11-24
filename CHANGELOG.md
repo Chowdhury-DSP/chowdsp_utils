@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - Fixed JSON output streaming.
   - BREAKING CHANGE: removed the `isStartOfStream` argument from `chowdsp::JSONUtils::toOutputStream()`.
 - Fixed `chowdsp::ScopedCallback` being disconnected when added to a list.
+- Fixed `chowdsp::Logger` file path handling.
 - Fixed `chowdsp::BypassProcessor` state not being reset in `prepare()`.
 - Fixed handling of invalid presets in `chowdsp::presets::PresetSaverLoader`.
 
