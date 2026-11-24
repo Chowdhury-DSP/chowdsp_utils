@@ -33,7 +33,7 @@ jobs:
                 "Test 32-bit",
                 "Coverage",
               ]
-        os: [ubuntu-22.04, windows-2022, macos-14]
+        os: [ubuntu-22.04, windows-2022, macos-15]
         include:
           - name: "Test"
             os: ubuntu-22.04
@@ -52,7 +52,7 @@ jobs:
             run_coverage: true
             build_type: "Debug"
           - name: "Test"
-            os: macos-14
+            os: macos-15
             cmake_args: "-G\"Ninja Multi-Config\""
             build_type: "Debug"
           - name: "Live GUI Test"
@@ -65,11 +65,11 @@ jobs:
         exclude:
           # so we don't break GitHub Actions concurrency limit
           - name: "Coverage"
-            os: macos-14
+            os: macos-15
           - name: "Coverage"
             os: windows-2022
           - name: "Test 32-bit"
-            os: macos-14
+            os: macos-15
           - name: "Test 32-bit"
             os: ubuntu-22.04
 
