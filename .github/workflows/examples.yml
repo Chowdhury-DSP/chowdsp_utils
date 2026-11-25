@@ -27,7 +27,7 @@ jobs:
             cmake_args: "-DCMAKE_LINKER_TYPE=MOLD -DCMAKE_C_COMPILER=clang-20 -DCMAKE_CXX_COMPILER=clang++-20"
           - os: windows-2022
             cmake_args: "-DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl"
-          - os: macos-14
+          - os: macos-15
             cmake_args: ""
 
     steps:

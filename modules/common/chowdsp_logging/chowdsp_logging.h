@@ -26,6 +26,13 @@ BEGIN_JUCE_MODULE_DECLARATION
 
 #if JUCE_WINDOWS
 #define FMT_UNICODE 0
+
+// Open log files with the wide-character Windows APIs. Otherwise spdlog passes
+// the (UTF-8) path to _fsopen(), which interprets it in the system's ANSI code
+// page, and fails for paths containing non-ASCII characters.
+#ifndef SPDLOG_WCHAR_FILENAMES
+#define SPDLOG_WCHAR_FILENAMES 1
+#endif
 #endif
 
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wswitch-enum",

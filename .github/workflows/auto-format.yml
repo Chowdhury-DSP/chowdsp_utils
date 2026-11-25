@@ -14,8 +14,8 @@ on:
 jobs:
   build_and_test:
     name: Apply clang-format to pull request
-    runs-on: ubuntu-latest
-    
+    runs-on: ubuntu-22.04
+
     steps:
     - name: Install Linux Deps
       run: |
